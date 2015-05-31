@@ -1,0 +1,766 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-12-05 00:30-0500\n"
+"PO-Revision-Date: 2013-12-10 17:42+0200\n"
+"Last-Translator: lite <litekok@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: ini-to-pot script\n"
+
+msgid "clear"
+msgstr "清屏"
+
+msgid "forward"
+msgstr "前进"
+
+msgid "right"
+msgstr "右边"
+
+msgid "back"
+msgstr "后退"
+
+msgid "left"
+msgstr "左边"
+
+msgid "arc"
+msgstr "走弧形"
+
+msgid "angle"
+msgstr "角度"
+
+msgid "radius"
+msgstr "半径"
+
+msgid "set heading"
+msgstr "设置朝向"
+
+msgid "heading"
+msgstr "朝向"
+
+msgid "set xy"
+msgstr "设置 坐标"
+
+msgid "x"
+msgstr "横"
+
+msgid "y"
+msgstr "纵"
+
+msgid "set color"
+msgstr "设置颜色"
+
+msgid "color"
+msgstr "颜色"
+
+msgid "set hue"
+msgstr ""
+
+msgid "set shade"
+msgstr "设置深度"
+
+msgid "shade"
+msgstr "深度"
+
+msgid "set grey"
+msgstr "设置灰度"
+
+msgid "grey"
+msgstr "灰度"
+
+msgid "set pen size"
+msgstr "设置笔的粗细"
+
+msgid "pen size"
+msgstr "笔的粗细"
+
+msgid "pen up"
+msgstr "抬笔"
+
+msgid "pen down"
+msgstr "落笔"
+
+msgid "begin fill"
+msgstr "开始填充"
+
+msgid "end fill"
+msgstr "完成填充"
+
+msgid "background"
+msgstr "涂满全屏"
+
+msgid "random"
+msgstr "随机值"
+
+msgid "min"
+msgstr "最小值"
+
+msgid "max"
+msgstr "最大值"
+
+msgid "sqrt"
+msgstr "平方根"
+
+msgid "mod"
+msgstr "同余"
+
+msgid "and"
+msgstr "与"
+
+msgid "or"
+msgstr "或"
+
+msgid "not"
+msgstr "非"
+
+msgid "store in"
+msgstr "放入"
+
+msgid "name"
+msgstr "名"
+
+msgid "value"
+msgstr "值"
+
+msgid "box"
+msgstr "盒子"
+
+msgid "action"
+msgstr "动作"
+
+msgid "do"
+msgstr "办"
+
+msgid "start"
+msgstr "开始"
+
+msgid "add 1 to"
+msgstr "加1"
+
+msgid "add"
+msgstr "加"
+
+msgid "to"
+msgstr "于"
+
+msgid "speak"
+msgstr "朗读"
+
+msgid "show"
+msgstr "显示"
+
+msgid "size"
+msgstr "尺寸"
+
+msgid "obj"
+msgstr "对象"
+
+msgid "text"
+msgstr "文本"
+
+msgid "shell"
+msgstr "海龟外壳"
+
+msgid "image"
+msgstr "图片"
+
+msgid "stop media"
+msgstr "停止媒体"
+
+msgid "repeat"
+msgstr "重复"
+
+msgid "forever"
+msgstr "永远执行"
+
+msgid "stop"
+msgstr "停止动作"
+
+msgid "if"
+msgstr "如果"
+
+msgid "then"
+msgstr "那么"
+
+msgid "until"
+msgstr "直到"
+
+msgid "wait for"
+msgstr "等待"
+
+msgid "while"
+msgstr "当"
+
+msgid "else"
+msgstr "否则"
+
+msgid "wait"
+msgstr "等待"
+
+msgid "print"
+msgstr "打印"
+
+msgid "time"
+msgstr "时间"
+
+msgid "mouse x"
+msgstr "鼠标X坐标"
+
+msgid "mouse y"
+msgstr "鼠标Y坐标"
+
+msgid "mouse button"
+msgstr "鼠标按下"
+
+msgid "keyboard"
+msgstr  "查询键盘"
+
+msgid "pixel color"
+msgstr "读取像素"
+
+msgid "unknown"
+msgstr "未知"
+
+msgid "Welcome to Turtle Blocks"
+msgstr ""
+
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr ""
+
+msgid "Palette buttons"
+msgstr ""
+
+msgid "This toolbar contains the palette buttons: click to show or hide the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, Sensors, and Extras). Once open, you can drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+msgid "Expand/collapse toolbar"
+msgstr ""
+
+msgid "This button opens and closes the primary toolbar."
+msgstr ""
+
+msgid "Run fast"
+msgstr ""
+
+msgid "Click to run the project in fast mode."
+msgstr ""
+
+msgid "Run slow"
+msgstr ""
+
+msgid "Click to run the project in slow mode."
+msgstr ""
+
+msgid "Run step by step"
+msgstr ""
+
+msgid "Click to run the project step by step."
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+msgid "Stop the current project."
+msgstr ""
+
+msgid "Clean"
+msgstr ""
+
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr ""
+
+msgid "Show/hide palettes"
+msgstr ""
+
+msgid "Hide or show the block palettes."
+msgstr ""
+
+msgid "Show/hide blocks"
+msgstr ""
+
+msgid "Hide or show the blocks and the palettes."
+msgstr ""
+
+msgid "Expand/collapse collapsable blocks"
+msgstr ""
+
+msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgstr ""
+
+msgid "Help"
+msgstr ""
+
+msgid "Show these messages."
+msgstr ""
+
+msgid "Expand/collapse option toolbar"
+msgstr ""
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr ""
+
+msgid "Paste"
+msgstr ""
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "The copy button copies a stack to the clipboard. It appears after a \"long press\" on a stack."
+
+msgid "Save stack"
+msgstr ""
+
+msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+
+msgid "Settings"
+msgstr ""
+
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr ""
+
+msgid "Decrease block size"
+msgstr ""
+
+msgid "Decrease the size of the blocks."
+msgstr ""
+
+msgid "Increase block size"
+msgstr ""
+
+msgid "Increase the size of the blocks."
+msgstr ""
+
+msgid "Display statistics"
+msgstr ""
+
+msgid "Display statistics about your Turtle project."
+msgstr ""
+
+msgid "Cartesian"
+msgstr ""
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr ""
+
+msgid "Polar"
+msgstr ""
+
+msgid "Show or hide a polar-coordinate grid."
+msgstr ""
+
+msgid "Load samples from server"
+msgstr ""
+
+msgid "This button opens a viewer for loading example projects."
+msgstr ""
+
+msgid "Load project from file"
+msgstr ""
+
+msgid "You can also load projects from the file system."
+msgstr ""
+
+msgid "Load plugin from file"
+msgstr ""
+
+msgid "You can load new blocks from the file system."
+msgstr ""
+
+msgid "Delete all"
+msgstr ""
+
+msgid "Remove all content on the canvas, including the blocks."
+msgstr ""
+
+msgid "Undo"
+msgstr ""
+
+msgid "Restore blocks from the trash."
+msgstr ""
+
+msgid "Save project"
+msgstr ""
+
+msgid "Save your project to a server."
+msgstr ""
+
+msgid "Congratulations."
+msgstr ""
+
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr ""
+
+msgid "hide blocks"
+msgstr "隐藏积木块"
+
+msgid "loudness"
+msgstr "音量"
+
+msgid "publish"
+msgstr "发布"
+
+msgid "comment"
+msgstr "注释"
+
+msgid "play back"
+msgstr "发挥媒体"
+
+msgid "save svg"
+msgstr "保存SVG"
+
+msgid "title"
+msgstr "标题"
+
+msgid "eval"
+msgstr ""
+
+msgid "show blocks"
+msgstr "显示积木块"
+
+msgid "stop play"
+msgstr "停止媒体"
+
+msgid "turtle"
+msgstr "海龟"
+
+msgid "pen"
+msgstr "钢笔"
+
+msgid "number"
+msgstr "数字"
+
+msgid "boolean"
+msgstr "布尔"
+
+msgid "flow"
+msgstr "流程"
+
+msgid "blocks"
+msgstr "拼块"
+
+msgid "media"
+msgstr "多媒体"
+
+msgid "sensors"
+msgstr "传感器"
+
+msgid "extras"
+msgstr "额外的"
+
+msgid "open file"
+msgstr ""
+
+msgid "motion z"
+msgstr ""
+
+msgid "motion y"
+msgstr ""
+
+msgid "motion x"
+msgstr ""
+
+msgid "bitcoin"
+msgstr ""
+
+msgid "from"
+msgstr ""
+
+msgid "mashape"
+msgstr ""
+
+msgid "define"
+msgstr ""
+
+msgid "stock price"
+msgstr ""
+
+msgid "currency"
+msgstr ""
+
+msgid "Google map"
+msgstr "Mapa de Google"
+
+msgid "coordinates"
+msgstr ""
+
+msgid "zoom factor"
+msgstr ""
+
+msgid "zoom"
+msgstr ""
+
+msgid "city latitude"
+msgstr ""
+
+msgid "city longitude"
+msgstr ""
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+msgid "latitude"
+msgstr ""
+
+msgid "longitude"
+msgstr ""
+
+msgid "show heap"
+msgstr ""
+
+msgid "pop"
+msgstr ""
+
+msgid "empty heap"
+msgstr ""
+
+msgid "save heap"
+msgstr ""
+
+msgid "load heap"
+msgstr ""
+
+msgid "push"
+msgstr ""
+
+msgid "logic"
+msgstr ""
+
+msgid "power"
+msgstr ""
+
+msgid "base"
+msgstr ""
+
+msgid "exp"
+msgstr ""
+
+msgid "floor"
+msgstr ""
+
+msgid "ceiling"
+msgstr ""
+
+msgid "degrees"
+msgstr ""
+
+msgid "to degrees"
+msgstr ""
+
+msgid "radians"
+msgstr ""
+
+msgid "to radians"
+msgstr ""
+
+msgid "maths"
+msgstr ""
+
+msgid "cheese"
+msgstr ""
+
+msgid "apple"
+msgstr ""
+
+msgid "get fat"
+msgstr ""
+
+msgid "fish"
+msgstr ""
+
+msgid "get calories"
+msgstr ""
+
+msgid "protein"
+msgstr ""
+
+msgid "chicken"
+msgstr ""
+
+msgid "digest meal"
+msgstr ""
+
+msgid "get fiber"
+msgstr ""
+
+msgid "carbs"
+msgstr ""
+
+msgid "eat"
+msgstr ""
+
+msgid "rice and beans"
+msgstr ""
+
+msgid "orange"
+msgstr ""
+
+msgid "banana"
+msgstr ""
+
+msgid "tamale"
+msgstr ""
+
+msgid "fiber"
+msgstr ""
+
+msgid "corn"
+msgstr ""
+
+msgid "fat"
+msgstr ""
+
+msgid "get carbs"
+msgstr ""
+
+msgid "water"
+msgstr ""
+
+msgid "cookie"
+msgstr ""
+
+msgid "sweet potato"
+msgstr ""
+
+msgid "broccoli"
+msgstr ""
+
+msgid "wheat bread"
+msgstr ""
+
+msgid "tomato"
+msgstr ""
+
+msgid "beef"
+msgstr ""
+
+msgid "potato"
+msgstr ""
+
+msgid "calories"
+msgstr ""
+
+msgid "get name"
+msgstr ""
+
+msgid "cake"
+msgstr ""
+
+msgid "get protein"
+msgstr ""
+
+msgid "food"
+msgstr ""
+
+msgid "eatme"
+msgstr ""
+
+msgid "sense left"
+msgstr ""
+
+msgid "see distance"
+msgstr ""
+
+msgid "sense right"
+msgstr ""
+
+msgid "sing"
+msgstr ""
+
+msgid "note"
+msgstr ""
+
+msgid "duration"
+msgstr ""
+
+msgid "move"
+msgstr ""
+
+msgid "blink (ms)"
+msgstr ""
+
+msgid "rodi"
+msgstr ""
+
+msgid "set lang"
+msgstr ""
+
+msgid "source"
+msgstr ""
+
+msgid "target"
+msgstr ""
+
+msgid "translate"
+msgstr ""
+
+msgid "hello"
+msgstr "你好"
+
+msgid "detect lang"
+msgstr ""
+
+msgid "turtle x"
+msgstr ""
+
+msgid "turtle y"
+msgstr ""
+
+msgid "stop turtle"
+msgstr ""
+
+msgid "turtle name"
+msgstr ""
+
+msgid "start turtle"
+msgstr ""
+
+msgid "forecast"
+msgstr ""
+
+msgid "city"
+msgstr ""
+
+msgid "day"
+msgstr ""
+
+msgid "low"
+msgstr ""
+
+msgid "high"
+msgstr ""
+
+msgid "confirm"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Publish"
+msgstr ""
+
+msgid "Planet"
+msgstr ""
+
+msgid "On my device"
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Worldwide"
+msgstr ""
+
+msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgstr ""

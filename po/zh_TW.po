@@ -1,0 +1,766 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-17 00:31-0400\n"
+"PO-Revision-Date: 2012-03-21 19:17+0200\n"
+"Last-Translator: Yuan <yuanchao@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: ini-to-pot script\n"
+
+msgid "Delete all"
+msgstr ""
+
+msgid "show"
+msgstr "顯示"
+
+msgid "text"
+msgstr "文字"
+
+msgid "random"
+msgstr "亂數"
+
+msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgstr ""
+
+msgid "rice and beans"
+msgstr ""
+
+msgid "mashape"
+msgstr ""
+
+msgid "target"
+msgstr ""
+
+msgid "keyboard"
+msgstr "鍵盤"
+
+msgid "You can also load projects from the file system."
+msgstr ""
+
+msgid "chicken"
+msgstr ""
+
+msgid "apple"
+msgstr ""
+
+msgid "title"
+msgstr ""
+
+msgid "radians"
+msgstr ""
+
+msgid "Undo"
+msgstr ""
+
+msgid "to"
+msgstr ""
+
+msgid "add"
+msgstr ""
+
+msgid "set pen size"
+msgstr "設定畫筆大小"
+
+msgid "start turtle"
+msgstr ""
+
+msgid "city latitude"
+msgstr ""
+
+msgid "city longitude"
+msgstr ""
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+msgid "latitude"
+msgstr ""
+
+msgid "mouse x"
+msgstr "滑鼠座標 x"
+
+msgid "mouse y"
+msgstr "滑鼠座標 y"
+
+msgid "Show/hide blocks"
+msgstr "顯示/隱藏區塊"
+
+msgid "then"
+msgstr "則"
+
+msgid "move"
+msgstr ""
+
+msgid "Stop the current project."
+msgstr ""
+
+msgid "stop turtle"
+msgstr ""
+
+msgid "food"
+msgstr ""
+
+msgid "Click to run the project in slow mode."
+msgstr ""
+
+msgid "stop"
+msgstr "停止"
+
+msgid "fat"
+msgstr ""
+
+msgid "background"
+msgstr ""
+
+msgid "not"
+msgstr "否"
+
+msgid "Google map"
+msgstr ""
+
+msgid "day"
+msgstr ""
+
+msgid "mod"
+msgstr "模數"
+
+msgid "Save project"
+msgstr ""
+
+msgid "get fiber"
+msgstr ""
+
+msgid "name"
+msgstr ""
+
+msgid "turtle x"
+msgstr ""
+
+msgid "turtle y"
+msgstr ""
+
+msgid "Expand/collapse toolbar"
+msgstr ""
+
+msgid "zoom"
+msgstr ""
+
+msgid "Hide or show the blocks and the palettes."
+msgstr ""
+
+msgid "to degrees"
+msgstr ""
+
+msgid "Restore blocks from the trash."
+msgstr ""
+
+msgid "get calories"
+msgstr ""
+
+msgid "Load plugin from file"
+msgstr ""
+
+msgid "x"
+msgstr "X座標"
+
+msgid "show blocks"
+msgstr "顯示區塊"
+
+msgid "heading"
+msgstr "方向"
+
+msgid "Help"
+msgstr "幫助"
+
+msgid "turtle"
+msgstr "小烏龜"
+
+msgid "right"
+msgstr "右轉"
+
+msgid "Load samples from server"
+msgstr ""
+
+msgid "hide blocks"
+msgstr "隱藏區塊"
+
+msgid "Hide or show the block palettes."
+msgstr ""
+
+msgid "This button opens a viewer for loading example projects."
+msgstr ""
+
+msgid "back"
+msgstr "後退"
+
+msgid "grey"
+msgstr ""
+
+msgid "arc"
+msgstr "弧度"
+
+msgid "radius"
+msgstr "半徑"
+
+msgid "longitude"
+msgstr ""
+
+msgid "duration"
+msgstr "時間長度"
+
+msgid "set shade"
+msgstr "設定填滿顏色"
+
+msgid "pixel color"
+msgstr ""
+
+msgid "eatme"
+msgstr ""
+
+msgid "This button opens and closes the primary toolbar."
+msgstr ""
+
+msgid "Show these messages."
+msgstr ""
+
+msgid "show heap"
+msgstr "顯示堆疊"
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr ""
+
+msgid "loudness"
+msgstr "音量"
+
+msgid "publish"
+msgstr ""
+
+msgid "forecast"
+msgstr ""
+
+msgid "pen"
+msgstr ""
+
+msgid "fish"
+msgstr ""
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "The copy button copies a stack to the clipboard. It appears after a \"long press\" on a stack."
+
+msgid "Save stack"
+msgstr ""
+
+msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+
+msgid "Settings"
+msgstr ""
+
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr ""
+
+msgid "Decrease block size"
+msgstr ""
+
+msgid "Decrease the size of the blocks."
+msgstr ""
+
+msgid "Increase block size"
+msgstr ""
+
+msgid "Increase the size of the blocks."
+msgstr ""
+
+msgid "Display statistics"
+msgstr ""
+
+msgid "Display statistics about your Turtle project."
+msgstr ""
+
+msgid "print"
+msgstr "顯示"
+
+msgid "size"
+msgstr ""
+
+msgid "Expand/collapse option toolbar"
+msgstr ""
+
+msgid "save heap"
+msgstr ""
+
+msgid "fiber"
+msgstr ""
+
+msgid "You can load new blocks from the file system."
+msgstr ""
+
+msgid "power"
+msgstr ""
+
+msgid "corn"
+msgstr ""
+
+msgid "Remove all content on the canvas, including the blocks."
+msgstr ""
+
+msgid "to radians"
+msgstr ""
+
+msgid "water"
+msgstr ""
+
+msgid "base"
+msgstr ""
+
+msgid "cookie"
+msgstr ""
+
+msgid "Show or hide a polar-coordinate grid."
+msgstr ""
+
+msgid "sweet potato"
+msgstr ""
+
+msgid "maths"
+msgstr ""
+
+msgid "from"
+msgstr ""
+
+msgid "sensors"
+msgstr ""
+
+msgid "pen down"
+msgstr "落筆"
+
+msgid "get name"
+msgstr ""
+
+msgid "wait"
+msgstr "等待"
+
+msgid "box"
+msgstr "方塊"
+
+msgid "obj"
+msgstr ""
+
+msgid "store in"
+msgstr "放入"
+
+msgid "digest meal"
+msgstr ""
+
+msgid "calories"
+msgstr ""
+
+msgid "zoom factor"
+msgstr ""
+
+msgid "action"
+msgstr "動作"
+
+msgid "get protein"
+msgstr ""
+
+msgid "or"
+msgstr "或"
+
+msgid "sense left"
+msgstr ""
+
+msgid "comment"
+msgstr "註記"
+
+msgid "cheese"
+msgstr ""
+
+msgid "Cartesian"
+msgstr "笛卡爾"
+
+msgid "eval"
+msgstr ""
+
+msgid "color"
+msgstr "顏色"
+
+msgid "image"
+msgstr "圖片"
+
+msgid "Welcome to Turtle Blocks"
+msgstr ""
+
+msgid "number"
+msgstr "數字"
+
+msgid "pop"
+msgstr "取出堆疊"
+
+msgid "bitcoin"
+msgstr ""
+
+msgid "pen size"
+msgstr "畫筆大小"
+
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr ""
+
+msgid "boolean"
+msgstr ""
+
+msgid "coordinates"
+msgstr ""
+
+msgid "sing"
+msgstr ""
+
+msgid "Congratulations."
+msgstr ""
+
+msgid "Run slow"
+msgstr ""
+
+msgid "mouse button"
+msgstr ""
+
+msgid "speak"
+msgstr "聽我說"
+
+msgid "city"
+msgstr ""
+
+msgid "get carbs"
+msgstr ""
+
+msgid "Click to run the project in fast mode."
+msgstr ""
+
+msgid "beef"
+msgstr ""
+
+msgid "source"
+msgstr ""
+
+msgid "unknown"
+msgstr ""
+
+msgid "wait for"
+msgstr ""
+
+msgid "pen up"
+msgstr "提筆"
+
+msgid "start"
+msgstr "啟動"
+
+msgid "stock price"
+msgstr ""
+
+msgid "motion z"
+msgstr ""
+
+msgid "low"
+msgstr ""
+
+msgid "motion x"
+msgstr ""
+
+msgid "motion y"
+msgstr ""
+
+msgid "forward"
+msgstr "前進"
+
+msgid "degrees"
+msgstr ""
+
+msgid "translate"
+msgstr ""
+
+msgid "until"
+msgstr "直到"
+
+msgid "define"
+msgstr ""
+
+msgid "ceiling"
+msgstr ""
+
+msgid "shell"
+msgstr ""
+
+msgid "blink (ms)"
+msgstr ""
+
+msgid "set lang"
+msgstr ""
+
+msgid "turtle name"
+msgstr ""
+
+msgid "carbs"
+msgstr ""
+
+msgid "else"
+msgstr "否則"
+
+msgid "orange"
+msgstr "橘色"
+
+msgid "begin fill"
+msgstr ""
+
+msgid "sense right"
+msgstr ""
+
+msgid "eat"
+msgstr ""
+
+msgid "Expand/collapse collapsable blocks"
+msgstr ""
+
+msgid "high"
+msgstr ""
+
+msgid "set hue"
+msgstr ""
+
+msgid "currency"
+msgstr ""
+
+msgid "potato"
+msgstr ""
+
+msgid "Click to run the project step by step."
+msgstr ""
+
+msgid "value"
+msgstr "值"
+
+msgid "banana"
+msgstr ""
+
+msgid "wheat bread"
+msgstr ""
+
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr ""
+
+msgid "while"
+msgstr "同時間"
+
+msgid "open file"
+msgstr ""
+
+msgid "detect lang"
+msgstr ""
+
+msgid "cake"
+msgstr ""
+
+msgid "exp"
+msgstr ""
+
+msgid "load heap"
+msgstr ""
+
+msgid "see distance"
+msgstr ""
+
+msgid "and"
+msgstr "且"
+
+msgid "set grey"
+msgstr ""
+
+msgid "do"
+msgstr ""
+
+msgid "Run step by step"
+msgstr ""
+
+msgid "Show/hide palettes"
+msgstr ""
+
+msgid "set heading"
+msgstr "設定標頭"
+
+msgid "add 1 to"
+msgstr ""
+
+msgid "stop play"
+msgstr ""
+
+msgid "protein"
+msgstr ""
+
+msgid "play back"
+msgstr ""
+
+msgid "if"
+msgstr "若"
+
+msgid "Save your project to a server."
+msgstr ""
+
+msgid "Polar"
+msgstr ""
+
+msgid "angle"
+msgstr "角度"
+
+msgid "get fat"
+msgstr ""
+
+msgid "min"
+msgstr "最小"
+
+msgid "media"
+msgstr ""
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "sqrt"
+msgstr ""
+
+msgid "note"
+msgstr ""
+
+msgid "Palette buttons"
+msgstr ""
+
+msgid "set xy"
+msgstr "指定座標"
+
+msgid "end fill"
+msgstr "停止填滿"
+
+msgid "Paste"
+msgstr "貼上"
+
+msgid "tamale"
+msgstr ""
+
+msgid "repeat"
+msgstr "重複"
+
+msgid "blocks"
+msgstr ""
+
+msgid "This toolbar contains the palette buttons: click to show or hide the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, Sensors, and Extras). Once open, you can drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+msgid "save svg"
+msgstr ""
+
+msgid "max"
+msgstr "最大"
+
+msgid "logic"
+msgstr ""
+
+msgid "empty heap"
+msgstr "清除堆疊"
+
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr ""
+
+msgid "push"
+msgstr "存入堆疊"
+
+msgid "rodi"
+msgstr ""
+
+msgid "Clean"
+msgstr "清除畫面"
+
+msgid "set color"
+msgstr "設定線條顏色"
+
+msgid "Run fast"
+msgstr ""
+
+msgid "broccoli"
+msgstr ""
+
+msgid "stop media"
+msgstr ""
+
+msgid "tomato"
+msgstr ""
+
+msgid "forever"
+msgstr "持續執行"
+
+msgid "Load project from file"
+msgstr ""
+
+msgid "clear"
+msgstr ""
+
+msgid "floor"
+msgstr ""
+
+msgid "flow"
+msgstr ""
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr ""
+
+msgid "extras"
+msgstr ""
+
+msgid "shade"
+msgstr "形狀"
+
+msgid "time"
+msgstr "時間"
+
+msgid "y"
+msgstr "Y座標"
+
+msgid "hello"
+msgstr "您好"
+
+msgid "left"
+msgstr "左轉"
+
+msgid "confirm"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Publish"
+msgstr ""
+
+msgid "Planet"
+msgstr ""
+
+msgid "On my device"
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Worldwide"
+msgstr ""
+
+msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgstr ""

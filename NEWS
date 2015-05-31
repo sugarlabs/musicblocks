@@ -1,0 +1,371 @@
+0.1
+  * New project: a Javascript version of Turtle Blocks
+  * Basic block manipluation
+  * Basic block execution
+  * Expandable blocks working
+  * Cascading of expandable blocks
+  * Added arithmetic functions (arg parsing)
+  * Rotate turtle using easeljs rotation
+  * Implemented actions (stacks)
+  * Implemented boxes
+  * Added booleans
+  * Added slowmo playback
+  * Only one stack
+  * Added protoblocks for new boxes
+  * Added protoblock for new stacks
+  * Added time block
+  * Added mouse x, mouse y blocks
+  * Added controls for rabbit vs turtle
+  * Added controls for show/hide
+  * Added eraser button
+  * Added coordinate grids
+  * Fixed palette updates from block palette
+  * Added penup/down
+  * Added fill
+  * Implemented Load blocks
+  * Added click on block to run
+  * Added arc
+  * Added setxy
+  * Added set heading
+  * Added x, y, heading
+  * Added lots-o-sample projects
+  * Expanding arithmetic blocks
+  * Expanding 2-arg blocks
+  * Implemented color model (Munsell)
+  * Fixed Munsell 2.5 tables
+  * Added set background color
+  * Added trash
+  * Moved labels to container
+  * Set expandable blocks on load
+  * Fixed repeat docking bug
+  * Fixed filler hide bug
+  * Added real block highlighting
+  * Fixed problem with cascading arithmetic operators
+  * Trigger events on containers, not bitmaps
+  * Added multiple turtles (one for each start block)
+  * Added show text
+  * Added show image
+  * Different colors for each turtle
+  * Added turtle shell (aka sprites)
+  * Erase media (remove children)
+  * Reset turtle skin on clear
+  * Added scale text, images, turtle shell
+  * Center images on turtle
+  * Fixed turtle layering bug
+  * Fixed action name bug
+  * Open file from window location
+  * Major refactoring of code
+  * Prevent CR in numeric text area
+  * Added restore from trash
+  * Added wait block
+  * Added save/restore session
+  * Added stop turtle
+  * First pass on a palette strategy
+  * Added save file to turtle.sugarlabs.org (when running from server) w/tch
+  * Added svg output to window
+  * Added menu to trash for restore and clear all
+  * Fixed block/turtle/canvas layering
+  * Fixed mouse down logic
+  * Figured out how to do inline svg with easeljs...
+    beginning to convert to svg factory methods.
+  * Using container caching on blocks
+  * Fixed labels on random block
+  * Fixed label on less block (use &lt;)
+  * Fixed infinite loop problem when searching for expandables
+  * Fixed more issues with caching
+  * Reload media thumbnails on load
+  * Added collapsible stacks
+  * Added copy/paste of stacks
+  * Rename action blocks when loading projects
+  * Added palette entries when encountering new storein blocks
+  * Allow dragging from collapse button
+  * Added forever block
+  * Added 'stop action' (AKA break)
+  * Fixed several format issues with saved SVG
+  * Saving SVG thumbnail to server along with project file
+  * Seeding SVG with bg color on run
+  * Failed experimenting with zoom and scroll settings
+  * Fixed rounding bug in repeat code
+  * Fixed menu tearing issues
+  * Fixed placement of new items in Blocks menu
+  * Improved highlight logic
+  * Fixed labels on collapsed stacks
+  * Better compartmentalization of block code
+   (using a dictionary for the code associated with each "advanced" block)
+  * Fixed scaling issues with SVG output
+  * Implemented selectable menu of samples (for server version)
+  * Check to see if running from a server or a local copy
+  * Implemented selectable menu of samples (for local filesystem version)
+  * Added paging to samples viewer
+  * Fixed crash due to uncaching something that hasn't been cached
+    (2arg adjustable blocks)
+  * Hide stop button when running from server
+
+0.2
+  * Major overhaul of SVG generation: async
+    (Works with Firefox, Safari, Chrome)
+  * Added paging to samples downloads
+  * Added Easeljs caching throughout
+  * Added URL block
+  * Repositioned palettes when toolbar is unavailable so as not to overlap
+    with on-canvas buttons
+  * Using png for thumbnails
+  * Added project name input when not using Sugar toolbars
+  * Added print block
+  * Consolidated various show blocks into one block
+  * Added 'any' docking parameter
+  * Fixed bug with new start block after clear all
+  * Show parameter values on blocks when running in debig mode
+  * Show and hide blocks
+  * Added keyboard short cuts
+  * Added keyboard sensor
+  * Fixed issue with break block scope
+  * Label box values during debug mode
+  * Fixed some race conditions
+  * Fill broken in save to SVG
+  * Fixed race condition in palettes load
+  * Hover to invoke copy stack
+  * While block (GCI - drakosvlad)
+  * Not block (GCI - Daksh Shah)
+  * And block (GCI - Ignacio Rodriguez)
+  * If-then-else block (GCI - Ignacio Rodriguez)
+  * Camera block for Firefox (GCI - Rafael Cordano)
+  * Video block for Firefox (GCI - Rafael Cordano)
+  * Speak block for Firefox (GCI - Rafael Cordano)
+  * Media blocks in Chrome
+  * Implement if-then-else, while, until
+  * Implement and or not
+  * Fixed problem with block resizing
+  * Drag palette items
+  * Query turtle blocks
+  * Confirm on clear
+  * Save dialog
+  * Palettes open by default
+  * Default start block position needs to move
+  * Copy stack copies instances instead of making new blocks?
+  * Enable number names for actions
+  * Enable number names for turtles
+  * Enable docking to any for boxes, equal
+  * Enable number names for boxes
+  * Fixed the problem with prototypes on the blocks palette
+  * Fixed highlighting of boolean blocks
+  * Global collapse stack button
+  * Smoother hand-off between palette and canvas when dragging blocks
+  * Work-around for number/string conversion error
+  * Adjust docks for vspace added outside of stacks
+  * Added mashape palette
+  * Translation blocks (w/Ignacio Rodriguez)
+  * Color forces max chroma; hue just sets hue.
+  * Preserve collapse state between save/load (w/Ignacio Rodriguez)
+  * Swipe to page samples viewer (w/Ignacio Rodriguez)
+  * Internationalization support (w/Ignacio Rodriguez)
+  * Mashape blocks (w/Ignacio Rodriguez and Sam Parkinson)
+  * Save/restore turtle state (w/Ignacio Rodriguez)
+  * Plugin mechanism
+  * Save colors; allow overwriting plugins
+  * Mechansim for removing plugins (w/Sam Parkinson)
+  * Rotate turtles with gesture (w/Sam Parkinson)
+  * Use busy cursor where approporate (w/Ignacio Rodriguez)
+  * Can open same file twice in a row (w/Ignacio Rodriguez)
+  * Fixed palettes on Firefox (w/Ignacio Rodriguez)
+  * Added plugins to parameter update table
+  * Number block values are being set to string (Sam Parkinson)
+  * Fixed problems with layering (Sam Parkinson)
+  * More sensors (accelerometer w/Ignacio Rodriguez)
+  * Read pixels (w/Ignacio Rodriguez)
+  * Find an approach to cameras and microphone that work on Android
+    (w/Sam Parkinson)
+  * Remove unused do blocks (when associated action is removed)
+    (w/Ignacio Rodriguez)
+  * Clean up palette buttons layout after removing a plugin
+    (w/Ignacio Rodriguez)
+  * Use snap to pixels
+  * Added images to blocks (w/Ignacio Rodriguez)
+  * Reorganize palettes and plugins
+  * Fixed positioning problem with palettes due to multiple copies of the
+    protoblocks being added to the protoList
+  * Expand boolean blocks
+  * Save stacks to personal palette
+  * Use nop blocks when encountering unknown blocks during load
+  * Scroll palette buttons with a gesture when there are too many
+    (Sam Parkinson)
+  * Only show save on action blocks
+  * Only show copy/save menu from top block
+  * Plugin for RoDi (w/Martin Abente)
+  * Fixed problem with reloading camera or media block getting double image
+  * Fixed coordinate grids offset due to scaling
+  * Step-by-step playback mode
+  * Sometimes scrolling menus does not work (Sam Parkinson)
+  * Update plugins to new logo "class"
+  * Allow for changes to playback mode while running
+  * Fixed problem with saveName
+  * Fixed multiple problems with collapsed stacks
+  * Change color of stroke when highlighting blocks
+  * Added image, and palette-stroke-highlight args to rtps files.
+  * Combine various run modes (switch between fast, slow, and step on the fly)
+  * Fixed size of palette highlight (Sam Parkinson)
+  * Fixed value box label in DOM (Sam Parkinson)
+  * Factory-branch fixes
+    - proper updating of labels
+    - proper resizing
+    - proper calculation of hit area
+  * Fixed mouse button code & don't move stage when running code (Ignacio)
+  * Don't allow text in number blocks
+  * Expand blocks horizontally (for long labels)
+  * Added value display to math blocks
+  * Added value to boolean blocks
+  * Added default args to math blocks (Ignacio)
+  * Fine tune value display positioning 
+  * Fixed problem with action block collapsed bounds
+
+0.3
+  * Major refactoring of block handling to better compartmentalize the code
+  * Blocks in a stack being dragged should be on top of everything else
+  * Refactoring of input for Android (Sam Parkinson)
+
+0.4
+  * Write SVG generator
+  * Auto-guestimate block width (need to set label name before creating artwork)
+  * Added splash-screen animation (Sam Parkinson)
+  * Fixed collapse bug which manifests itself when loading custom stacks
+  * Use ellipsis on action and do labels (including do blocks in palette)
+  * Fixed layout problem in boxes palette
+  * Fixed regression in loading macros (NaN)
+  * Set proper z-order for palettes, blocks, turtles, and canvas (Sam Parkinson)
+  * Fixed problem with expanding booleans not docking to parents
+  * Fixed race condition with collapsibles
+  * Fixed problem with start block turtle decoration positioning
+  * Removed event handler after load so that when you change the image
+    associted a media block, other media blocks don't also change
+  * Scale imported bitmaps to maximum of 1200x900
+
+0.5
+  * Eliminated joyride since it doesn't work on Android.
+  * Fixed problem with help container scaling.
+  * Added broadcast and on event blocks.
+  * Fixed problem with events not triggering if turtle has stopped.
+  * Added three-arg flow blocks.
+  * Added named boxes.
+  * Fixed problem selecting blocks from the blocks palettes.
+  * Made separate heaps for each turtle.
+  * Reopen palettes after palette updates.
+  * Fixed problem running with no start block.
+  * Fixed some regressions in macro block palette.
+  * Eliminated deprecated code in palettes.
+  * Added buttons to palettes for scrolling.
+  * Turtles dispatch a click event so that they can be used as buttons.
+  * Fixed problem with tour background (on first load and on small displays).
+  * Resize Turtle hit area when updating turtle shell.
+  * Added Music block plugin (Ignacio Rodriguez)
+  * Added text from Show Block to exported SVG (Abhinav Anurag)
+  * Do block is now labeled 'do' on palette
+  * Update label of named boxes when box name changes.
+  * Update label of named boxes on palette when name changes.
+  * Added Named Do Blocks.
+  * Fixed regression in restoring plugins from local storage.
+  * Properly position and scale text exported to SVG.
+  * Restored delete all button to secondary menu (yes, you can do the
+    same thing from the planet, but that is often inconvenient).
+  * Fixed problem with bad URL in planet (Ignacio Rodriguez).
+  * Restored image click in planet.
+  * Fixed alignment problem with Turtle skin hit area.
+
+0.6
+  * i18n for planet (Ignacio)
+  * setfont block (Abhinav Anurag)
+  * Set default font to 'sans-serif' (w/Sam Parkinson).
+  * Move entire drag group when bouncing blocks out of a connection.
+  * Put vspace blocks in trash after removing them.
+  * Expand two-arg blocks on load.
+  * More eye-candy by Sam Parkinson
+  * Bad/missing thumbnails no longer break the Planet (Abhinav Anurag).
+  * Restored booleanOneArg protoblocks.
+  * Now adding store in blocks when needed on loading new projects.
+  * Fixed one more corner case in auto-block expansion when loading new
+    projects.
+  * Split ever expanding boxes palette into boxes and actions palettes.
+  * Added Named do blocks (similar to named boxes).
+  * Allow for clicking on Action Blocks.
+  * Added graphical error messages.
+  * Fixed logic error when searching for turtles to run.
+  * Added Block-size scaling.
+  * Resized font in DOM for number and text blocks when resizing blocks.
+  * Box and action error messages include name.
+  * Collapsable blocks are rendered properly after block resize.
+  * Collapse button now works after block-size is scaled.
+  * Fixed problem with expandable blocks rendered double after resize.
+  * Fillscreen block implemented.
+  * Fixed problem with break block continuing flow after loop.
+  * Properly position text labels on all parameter blocks (after resize).
+  * Use spanner to open preferences panel for adding plugins and setting
+    block size.
+  * Display rubrics.
+  * Added more error message artwork.
+  * Updated help to include spanner, copy, save stack.
+
+0.7
+  * Removed drag to rotate.
+  * Fixed scaling when dragging turtle.
+  * Disable drag while running.
+  * Don't wait for adjustBlocks to position vspace blocks.
+  * Raise stack to top when disconnectiong from parent stack.
+  * Fixed problem with disappearing protoblock.
+  * New documentation folder (w/Amitjha).
+  * Added short press detection for Android text and number blocks.
+  * Improvements? to color model.
+  * Improvements to GMAP plugin.
+  * Added city to long/city to lat block to gmap plugin (Yash).
+  * Added heap empty? block to HEAP plugin.
+
+0.8
+  * Fixed namespace collisions with plugin globals.
+  * No longer overwriting existing plugin globals when adding new ones.
+  * Fixed memory leak in while and until blocks.
+  * Fixed multiple problems with Break (Stop) block.
+
+TODO:
+  * Save errors
+  * Save to javascript
+  * RTL support
+  * Make expand an array, one element for each arg or slot
+  * User-defined block types
+  * Artwork beautification?
+  * Try to detect difference between unknown flow and arg blocks
+  * What palette/block features from the Python version do we need to port?
+  * Do we need to add support for plugins init, quit, etc.?
+  * Better interoperability with Python version
+  * Sugar datastore/toolbar support
+  * Unit tests
+  * Make error messages extendable with plugins.
+
+FEATURE IDEAS:
+  * Local variables? (e.g., boxes only defined inside an action?) Note that
+    we can use turtlename to create instance variables.
+  * Pass argments to actions? (and arg blocks to reference them)?
+  * Arrays
+  * Color mixer that outputs a stack: set hue; set value; set chroma.
+
+ISSUES:
+  * Find a scalable approach to drawing on the canvas
+  * Need to define a break behaviour from with stacks
+
+KNOWN BUGS:
+  * Not all blocks highlight when using step-by-step mode
+  * Sometimes returning to backgrounded project results in empty project
+  * Loading macros there is a funny collapsed state sometimes.
+  * Somehow we end up in a browser resize loop??? (2842 console messages are
+    not shown js/activity.js:770)
+  * Python show block not compatible with JS show block.
+  * Not serious, but there is still a race condition when creating
+    if-then-else blocks (so there is a work-around in place).
+  * Sometimes clamp block highlight scale is too large.
+  * Sometimes docking position is not scaled properly when dragging block
+    after block resize.
+
+ANDROID-SPECIFIC BUGS:
+  * Camera doesn't work on Android
+  * Music block doesn't work on Android
+  * Cannot open plugins loader on Android
+
+SUGAR-SPECIFIC BUGS:
+  * No access to camera or microphone on XO.

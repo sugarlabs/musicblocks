@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   width="55"
+   height="55"
+   id="svg2384">
+  <defs
+     id="defs2386" />
+  <path
+     d="M 50.991903,28.836033 A 22.935223,21.821863 0 1 1 5.1214581,28.836033 A 22.935223,21.821863 0 1 1 50.991903,28.836033 z"
+     transform="matrix(0.9819585,0,0,1.0009824,-5.0496075e-2,-1.3643614)"
+     id="path3157"
+     style="opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:3.53027272;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  <path
+     d="M 27.333333,1 C 28.083333,50.75 27.333333,54 27.333333,54"
+     id="path3168"
+     style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:3.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  <path
+     d="M 54,27.333333 C 4.2499997,28.083333 1,27.333333 1,27.333333"
+     id="path3170"
+     style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:3.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+</svg>

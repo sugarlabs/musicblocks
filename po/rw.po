@@ -1,0 +1,761 @@
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-17 00:31-0400\n"
+"PO-Revision-Date: 2012-04-05 10:18+0200\n"
+"Last-Translator: Chris <cjl@laptop.org>\n"
+"Language-Team: LANGUAGE <walter@sugarlabs.org>\n"
+"Language: rw\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1) ;\n"
+"X-Generator: Pootle 2.0.5\n"
+
+msgid "Delete all"
+msgstr ""
+
+msgid "show"
+msgstr "erekana"
+
+msgid "text"
+msgstr "inyandiko"
+
+msgid "random"
+msgstr "binyuranye"
+
+msgid "confirm"
+msgstr ""
+
+msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgstr ""
+
+msgid "rice and beans"
+msgstr ""
+
+msgid "mashape"
+msgstr ""
+
+msgid "target"
+msgstr ""
+
+msgid "keyboard"
+msgstr "mwandikisho"
+
+msgid "You can also load projects from the file system."
+msgstr ""
+
+msgid "chicken"
+msgstr ""
+
+msgid "set color"
+msgstr "tunganya ibara"
+
+msgid "apple"
+msgstr ""
+
+msgid "title"
+msgstr ""
+
+msgid "radians"
+msgstr ""
+
+msgid "Undo"
+msgstr ""
+
+msgid "to"
+msgstr ""
+
+msgid "add"
+msgstr ""
+
+msgid "set pen size"
+msgstr "tunganya ingano y'ikaramu"
+
+msgid "start turtle"
+msgstr ""
+
+msgid "city latitude"
+msgstr ""
+
+msgid "city longitude"
+msgstr ""
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+msgid "latitude"
+msgstr ""
+
+msgid "mouse x"
+msgstr "akanyerezo x"
+
+msgid "mouse y"
+msgstr "akanyerezo y"
+
+msgid "Show/hide blocks"
+msgstr ""
+
+msgid "then"
+msgstr "hanyuma"
+
+msgid "move"
+msgstr ""
+
+msgid "Stop the current project."
+msgstr ""
+
+msgid "stop turtle"
+msgstr ""
+
+msgid "food"
+msgstr ""
+
+msgid "Click to run the project in slow mode."
+msgstr ""
+
+msgid "stop"
+msgstr "hejuru"
+
+msgid "fat"
+msgstr ""
+
+msgid "number"
+msgstr "umubare"
+
+msgid "background"
+msgstr ""
+
+msgid "not"
+msgstr "si"
+
+msgid "Google map"
+msgstr ""
+
+msgid "day"
+msgstr ""
+
+msgid "mod"
+msgstr ""
+
+msgid "Save project"
+msgstr ""
+
+msgid "get fiber"
+msgstr ""
+
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr ""
+
+msgid "name"
+msgstr ""
+
+msgid "turtle x"
+msgstr ""
+
+msgid "turtle y"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr ""
+
+msgid "Expand/collapse toolbar"
+msgstr ""
+
+msgid "zoom"
+msgstr ""
+
+msgid "Hide or show the blocks and the palettes."
+msgstr ""
+
+msgid "to degrees"
+msgstr ""
+
+msgid "Restore blocks from the trash."
+msgstr ""
+
+msgid "get calories"
+msgstr ""
+
+msgid "Load plugin from file"
+msgstr ""
+
+msgid "x"
+msgstr "x"
+
+msgid "show blocks"
+msgstr "erekana amablock"
+
+msgid "heading"
+msgstr "umutwempangano"
+
+msgid "Help"
+msgstr "Gufasha"
+
+msgid "turtle"
+msgstr "akanyamashyo"
+
+msgid "right"
+msgstr "iburyo"
+
+msgid "Load samples from server"
+msgstr ""
+
+msgid "hide blocks"
+msgstr "Hisha amablock"
+
+msgid "Hide or show the block palettes."
+msgstr ""
+
+msgid "This button opens a viewer for loading example projects."
+msgstr ""
+
+msgid "back"
+msgstr "inyuma"
+
+msgid "Publish"
+msgstr ""
+
+msgid "grey"
+msgstr ""
+
+msgid "arc"
+msgstr "agaheto"
+
+msgid "radius"
+msgstr "akarambararo"
+
+msgid "longitude"
+msgstr ""
+
+msgid "duration"
+msgstr ""
+
+msgid "set shade"
+msgstr "shyiramo igipimo"
+
+msgid "pixel color"
+msgstr ""
+
+msgid "eatme"
+msgstr ""
+
+msgid "This button opens and closes the primary toolbar."
+msgstr ""
+
+msgid "Show these messages."
+msgstr ""
+
+msgid "show heap"
+msgstr ""
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr ""
+
+msgid "publish"
+msgstr ""
+
+msgid "forecast"
+msgstr ""
+
+msgid "pen"
+msgstr ""
+
+msgid "fish"
+msgstr ""
+
+msgid "print"
+msgstr "gucapa"
+
+msgid "size"
+msgstr ""
+
+msgid "Expand/collapse option toolbar"
+msgstr ""
+
+msgid "save heap"
+msgstr ""
+
+msgid "fiber"
+msgstr ""
+
+msgid "You can load new blocks from the file system."
+msgstr ""
+
+msgid "power"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Save stack"
+msgstr ""
+
+msgid "corn"
+msgstr ""
+
+msgid "Display statistics"
+msgstr ""
+
+msgid "Remove all content on the canvas, including the blocks."
+msgstr ""
+
+msgid "to radians"
+msgstr ""
+
+msgid "water"
+msgstr ""
+
+msgid "base"
+msgstr ""
+
+msgid "cookie"
+msgstr ""
+
+msgid "Show or hide a polar-coordinate grid."
+msgstr ""
+
+msgid "sweet potato"
+msgstr ""
+
+msgid "maths"
+msgstr ""
+
+msgid "from"
+msgstr ""
+
+msgid "sensors"
+msgstr ""
+
+msgid "pen down"
+msgstr "ikaramu hasi"
+
+msgid "get name"
+msgstr ""
+
+msgid "wait"
+msgstr "tegereza"
+
+msgid "box"
+msgstr "ikarito"
+
+msgid "obj"
+msgstr ""
+
+msgid "store in"
+msgstr "bika mu"
+
+msgid "digest meal"
+msgstr ""
+
+msgid "calories"
+msgstr ""
+
+msgid "zoom factor"
+msgstr ""
+
+msgid "action"
+msgstr "igikorwa"
+
+msgid "loudness"
+msgstr "imisakurize"
+
+msgid "Increase the size of the blocks."
+msgstr ""
+
+msgid "or"
+msgstr "cyangwa"
+
+msgid "sense left"
+msgstr ""
+
+msgid "comment"
+msgstr "ibivugwaho"
+
+msgid "cheese"
+msgstr ""
+
+msgid "Cartesian"
+msgstr ""
+
+msgid "eval"
+msgstr ""
+
+msgid "color"
+msgstr "ibara"
+
+msgid "image"
+msgstr "ishusho"
+
+msgid "Welcome to Turtle Blocks"
+msgstr ""
+
+msgid "Increase block size"
+msgstr ""
+
+msgid "pop"
+msgstr ""
+
+msgid "bitcoin"
+msgstr ""
+
+msgid "pen size"
+msgstr "ingano y'ikaramu"
+
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr ""
+
+msgid "boolean"
+msgstr ""
+
+msgid "coordinates"
+msgstr ""
+
+msgid "sing"
+msgstr ""
+
+msgid "Congratulations."
+msgstr ""
+
+msgid "Run slow"
+msgstr ""
+
+msgid "mouse button"
+msgstr ""
+
+msgid "speak"
+msgstr "vuga"
+
+msgid "city"
+msgstr ""
+
+msgid "get carbs"
+msgstr ""
+
+msgid "Click to run the project in fast mode."
+msgstr ""
+
+msgid "beef"
+msgstr ""
+
+msgid "source"
+msgstr ""
+
+msgid "unknown"
+msgstr ""
+
+msgid "wait for"
+msgstr ""
+
+msgid "pen up"
+msgstr "ikaramu hejuru"
+
+msgid "Decrease the size of the blocks."
+msgstr ""
+
+msgid "start"
+msgstr "tangira"
+
+msgid "stock price"
+msgstr ""
+
+msgid "motion z"
+msgstr ""
+
+msgid "low"
+msgstr ""
+
+msgid "motion x"
+msgstr ""
+
+msgid "motion y"
+msgstr ""
+
+msgid "forward"
+msgstr "oherereza"
+
+msgid "degrees"
+msgstr ""
+
+msgid "translate"
+msgstr ""
+
+msgid "until"
+msgstr "kugeza"
+
+msgid "define"
+msgstr ""
+
+msgid "On my device"
+msgstr ""
+
+msgid "save svg"
+msgstr ""
+
+msgid "ceiling"
+msgstr ""
+
+msgid "shell"
+msgstr ""
+
+msgid "blink (ms)"
+msgstr ""
+
+msgid "set lang"
+msgstr ""
+
+msgid "turtle name"
+msgstr ""
+
+msgid "carbs"
+msgstr ""
+
+msgid "else"
+msgstr ""
+
+msgid "orange"
+msgstr "oranje"
+
+msgid "begin fill"
+msgstr ""
+
+msgid "sense right"
+msgstr ""
+
+msgid "eat"
+msgstr ""
+
+msgid "Expand/collapse collapsable blocks"
+msgstr ""
+
+msgid "high"
+msgstr ""
+
+msgid "set hue"
+msgstr ""
+
+msgid "currency"
+msgstr ""
+
+msgid "potato"
+msgstr ""
+
+msgid "Click to run the project step by step."
+msgstr ""
+
+msgid "value"
+msgstr "agaciro"
+
+msgid "banana"
+msgstr ""
+
+msgid "wheat bread"
+msgstr ""
+
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr ""
+
+msgid "while"
+msgstr "umweru"
+
+msgid "open file"
+msgstr ""
+
+msgid "detect lang"
+msgstr ""
+
+msgid "cake"
+msgstr ""
+
+msgid "exp"
+msgstr ""
+
+msgid "load heap"
+msgstr ""
+
+msgid "Open"
+msgstr "Fungura"
+
+msgid "see distance"
+msgstr ""
+
+msgid "and"
+msgstr "na"
+
+msgid "set grey"
+msgstr ""
+
+msgid "do"
+msgstr ""
+
+msgid "Run step by step"
+msgstr ""
+
+msgid "Show/hide palettes"
+msgstr ""
+
+msgid "set heading"
+msgstr "shyiraho umtwe"
+
+msgid "add 1 to"
+msgstr ""
+
+msgid "stop play"
+msgstr ""
+
+msgid "protein"
+msgstr ""
+
+msgid "play back"
+msgstr ""
+
+msgid "if"
+msgstr "niba"
+
+msgid "Save your project to a server."
+msgstr ""
+
+msgid "Decrease block size"
+msgstr ""
+
+msgid "angle"
+msgstr "imfuruka"
+
+msgid "get fat"
+msgstr ""
+
+msgid "min"
+msgstr "min"
+
+msgid "media"
+msgstr ""
+
+msgid "Stop"
+msgstr "Hagarika"
+
+msgid "sqrt"
+msgstr ""
+
+msgid "note"
+msgstr ""
+
+msgid "Palette buttons"
+msgstr ""
+
+msgid "set xy"
+msgstr ""
+
+msgid "end fill"
+msgstr "soza kuzuza"
+
+msgid "Copy"
+msgstr "Koporora"
+
+msgid "Paste"
+msgstr "Komeka"
+
+msgid "Delete"
+msgstr ""
+
+msgid "tamale"
+msgstr ""
+
+msgid "Worldwide"
+msgstr ""
+
+msgid "repeat"
+msgstr "subiramo"
+
+msgid "blocks"
+msgstr ""
+
+msgid "Display statistics about your Turtle project."
+msgstr ""
+
+msgid "Polar"
+msgstr ""
+
+msgid "max"
+msgstr "max"
+
+msgid "logic"
+msgstr ""
+
+msgid "empty heap"
+msgstr ""
+
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr ""
+
+msgid "push"
+msgstr "sunika"
+
+msgid "rodi"
+msgstr ""
+
+msgid "Clean"
+msgstr "Sukura"
+
+msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+msgid "Run fast"
+msgstr ""
+
+msgid "broccoli"
+msgstr ""
+
+msgid "stop media"
+msgstr ""
+
+msgid "tomato"
+msgstr ""
+
+msgid "forever"
+msgstr "igihe cyose"
+
+msgid "Load project from file"
+msgstr ""
+
+msgid "get protein"
+msgstr ""
+
+msgid "clear"
+msgstr ""
+
+msgid "floor"
+msgstr ""
+
+msgid "flow"
+msgstr ""
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr ""
+
+msgid "extras"
+msgstr ""
+
+msgid "shade"
+msgstr "ubwijime"
+
+msgid "time"
+msgstr "igihe"
+
+msgid "y"
+msgstr "y"
+
+msgid "hello"
+msgstr "allo"
+
+msgid "left"
+msgstr "ibumoso"
+
+
+msgid ""
+msgstr ""
+
+msgid "Planet"
+msgstr ""

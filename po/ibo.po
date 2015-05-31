@@ -1,0 +1,772 @@
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2015-02-15 18:19+0100\n"
+"Last-Translator: Chukwuebuka Abazie <ebukaabazie@hotmail.com>\n"
+"Language Team: Igbo\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.7.4\n"
+"X-POOTLE-MTIME: 1423841876.000000\n"
+"Language-Team: \n"
+
+msgid "clear"
+msgstr "doro anya"
+
+msgid "forward"
+msgstr "na-atụ"
+
+msgid "right"
+msgstr "nri"
+
+msgid "back"
+msgstr "azụ"
+
+msgid "left"
+msgstr "ekpe"
+
+msgid "arc"
+msgstr "aak"
+
+msgid "angle"
+msgstr "n'akuku"
+
+msgid "radius"
+msgstr "okirikiri"
+
+msgid "set heading"
+msgstr "set isiokwu"
+
+msgid "heading"
+msgstr "isiokwu"
+
+msgid "set xy"
+msgstr "set xy"
+
+msgid "x"
+msgstr "x"
+
+msgid "y"
+msgstr "y"
+
+msgid "set color"
+msgstr "set agba"
+
+msgid "color"
+msgstr "agba"
+
+msgid "set hue"
+msgstr "set agba"
+
+msgid "set shade"
+msgstr "set ndo"
+
+msgid "shade"
+msgstr "ndo"
+
+msgid "set grey"
+msgstr "set isi awọ"
+
+msgid "grey"
+msgstr "isi awọ"
+
+msgid "set pen size"
+msgstr "set pen size"
+
+msgid "pen size"
+msgstr "pen size"
+
+msgid "pen up"
+msgstr "pen elu"
+
+msgid "pen down"
+msgstr "pen ala"
+
+msgid "begin fill"
+msgstr "na-amalite erijueala"
+
+msgid "end fill"
+msgstr "ọgwụgwụ erijueala"
+
+msgid "background"
+msgstr "ndabere"
+
+msgid "random"
+msgstr "random"
+
+msgid "min"
+msgstr "kacha nta"
+
+msgid "max"
+msgstr "kacha"
+
+msgid "sqrt"
+msgstr "sqrt"
+
+msgid "mod"
+msgstr "mod"
+
+msgid "and"
+msgstr "na"
+
+msgid "or"
+msgstr "ma ọ bụ"
+
+msgid "not"
+msgstr "bụghị"
+
+msgid "store in"
+msgstr "echekwa na"
+
+msgid "name"
+msgstr "aha"
+
+msgid "value"
+msgstr "uru"
+
+msgid "box"
+msgstr "igbe"
+
+msgid "action"
+msgstr "edinam"
+
+msgid "do"
+msgstr "eme"
+
+msgid "start"
+msgstr "bido"
+
+msgid "add 1 to"
+msgstr "tinye 1"
+
+msgid "add"
+msgstr "tinye"
+
+msgid "speak"
+msgstr "kwo"
+
+msgid "show"
+msgstr "show"
+
+msgid "size"
+msgstr "size"
+
+msgid "obj"
+msgstr "obj"
+
+msgid "text"
+msgstr "ederede"
+
+msgid "shell"
+msgstr "shei"
+
+msgid "image"
+msgstr "oyiyi"
+
+msgid "stop media"
+msgstr "kwụsị egwu"
+
+msgid "repeat"
+msgstr "imekwa"
+
+msgid "forever"
+msgstr "ruo mgbe ebighị ebi"
+
+msgid "stop"
+msgstr "kwụsị"
+
+msgid "if"
+msgstr "o buru na"
+
+msgid "then"
+msgstr "mgbe ahụ"
+
+msgid "until"
+msgstr "ruo mgbe"
+
+msgid "wait for"
+msgstr "na-eche maka"
+
+msgid "while"
+msgstr "mgbe"
+
+msgid "else"
+msgstr "ọzọ"
+
+msgid "wait"
+msgstr "na-eche"
+
+msgid "print"
+msgstr "ebipụta"
+
+msgid "time"
+msgstr "oge"
+
+msgid "mouse x"
+msgstr "oke x"
+
+msgid "mouse y"
+msgstr "oke y"
+
+msgid "mouse button"
+msgstr "òké bọtịnụ"
+
+msgid "keyboard"
+msgstr "keyboard"
+
+msgid "pixel color"
+msgstr "pixel agba"
+
+msgid "unknown"
+msgstr "amaghị"
+
+msgid "Welcome to Turtle Blocks"
+msgstr "Mmadụ Bịa mbe nkanka"
+
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr "Mbe nkanka bụ a Logo-sitere n'ike mmụọ nsọ mbe na-adọta yi foto na snap-na-visual-Mmemme blocks"
+
+msgid "Palette buttons"
+msgstr "palette buttons"
+
+msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgstr "Nke a toolbar e dere ihe palette buttons: pịa na-egosi ma ọ bụ zoo palettes nke blocks (mbe, Pen, Ọnụ Ọgụgụ, Boolean, Igba, nkanka, Media, sensọ, na Mkponyeaka). Ozugbo oghe, ị nwere ike ịdọrọ blocks si palettes n'elu kwaaji-eji ha."
+
+msgid "Expand/collapse toolbar"
+msgstr "Ịmụbawanye / ida toolbar"
+
+msgid "This button opens and closes the primary toolbar."
+msgstr "Nke a button emepekwa na-emechi isi toolbar."
+
+msgid "Run fast"
+msgstr "Gbaa ngwa ngwa"
+
+msgid "Click to run the project in fast mode."
+msgstr "Pịa-agba ọsọ ahụ oru ngo na ngwa ngwa mode"
+
+msgid "Run slow"
+msgstr "Gbaa Obere Obere"
+
+msgid "Click to run the project in slow mode."
+msgstr "Pịa-agba ọsọ ahụ oru ngo na-adịghị ngwa mode"
+
+msgid "Run step by step"
+msgstr "Gbaa nzọụkwụ site nzọụkwụ"
+
+msgid "Click to run the project step by step."
+msgstr "Pịa na-agba ọsọ ngo nzọụkwụ site nzọụkwụ"
+
+msgid "Stop"
+msgstr "kwụsị"
+
+msgid "Stop the current project."
+msgstr "Kwụsị ugbu a oru ngo"
+
+msgid "Clean"
+msgstr "ọcha"
+
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr "Clear the screen and return the turtles to their initial positions"
+
+msgid "Show/hide palettes"
+msgstr "Gosi / hide palettes"
+
+msgid "Hide or show the block palettes."
+msgstr "Zoo ma ọ bụ na-egosi na ngọngọ palettes"
+
+msgid "Show/hide blocks"
+msgstr "Gosi / hide blocks"
+
+msgid "Hide or show the blocks and the palettes."
+msgstr "Zoo ma ọ bụ na-egosi na blocks na palettes"
+
+msgid "Expand/collapse collapsable blocks"
+msgstr "Ịmụbawanye / daa collapsable blocks"
+
+msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgstr "Ịmụbawanye ma ọ bụ daa stacks nke blocks, dịka, na-amalite na edinam stack"
+
+msgid "Help"
+msgstr "Help"
+
+msgid "Show these messages."
+msgstr "Gosi ndị a ozi"
+
+msgid "Expand/collapse option toolbar"
+msgstr "Ịmụbawanye / daa nhọrọ toolbar"
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr "Pịa a button mụbaa ma ọ bụ daa na auxillary toolbar"
+
+msgid "Paste"
+msgstr "tapawa"
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr "The tapawa button na-nyeere e nwere blocks depụtaghachiri n'elu clipboard"
+
+msgid "Copy"
+msgstr "Detuo"
+
+msgid "The copy button copies a stack to the clipboard. It appears after a \"long press\" on a stack."
+
+msgid "Save stack"
+msgstr "ịzọpụta tojupụtara"
+
+msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+
+msgid "Settings"
+msgstr "Ntọala"
+
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr "Mepee a panel maka configuring mbe nkanka ."
+
+msgid "Decrease block size"
+msgstr "Ibelata ngọngọ size"
+
+msgid "Decrease the size of the blocks."
+msgstr "Ibelata size nke blocks."
+
+msgid "Increase block size"
+msgstr "Mmụba ngọngọ size"
+
+msgid "Increase the size of the blocks."
+msgstr "Dịkwuo size nke blocks."
+
+msgid "Display statistics"
+msgstr "Ngosipụta ọnụ ọgụgụ"
+
+msgid "Display statistics about your Turtle project."
+msgstr "Ngosipụta ọnụ ọgụgụ banyere gị mbe oru ngo."
+
+msgid "Cartesian"
+msgstr "Cartesian"
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr "Egosi ma ọ bụ zoo a Cartesian-ahazi okporo"
+
+msgid "Polar"
+msgstr "pola"
+
+msgid "Show or hide a polar-coordinate grid."
+msgstr "Egosi ma ọ bụ zoo a polar-ahazi okporo"
+
+msgid "Load samples from server"
+msgstr "Ibu Ibu n'omume site na ihe nkesa"
+
+msgid "This button opens a viewer for loading example projects."
+msgstr "Nke a ga-emepe button a na-ekiri maka loading atụ oru ngo"
+
+msgid "Load project from file"
+msgstr "Ibu Ibu oru ngo si faịlụ"
+
+msgid "You can also load projects from the file system."
+msgstr "giwa nwekwara ike mara oru ngo si faịlụ usoro"
+
+msgid "Load plugin from file"
+msgstr "Ibu Ibu plugin si faịlụ"
+
+msgid "You can load new blocks from the file system."
+msgstr "I nwere ike mara ọhụrụ blocks si faịlụ usoro"
+
+msgid "Delete all"
+msgstr "hichapụ niile"
+
+msgid "Remove all content on the canvas, including the blocks."
+msgstr "Wepụ niile ọdịnaya na kwaaji, gụnyere blocks"
+
+msgid "Undo"
+msgstr "Wepu"
+
+msgid "Restore blocks from the trash."
+msgstr "Weghachi blocks si ahịhịa"
+
+msgid "Save project"
+msgstr "Save oru ngo"
+
+msgid "Save your project to a server."
+msgstr "Zọpụta ndị gị oru ngo na-a nkesa"
+
+msgid "Congratulations."
+msgstr "ekele"
+
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr "ị okokụre njegharị. Biko enwe mbe nkanka!"
+
+msgid "hide blocks"
+msgstr "hide blocks"
+
+msgid "publish"
+msgstr "ebipụta"
+
+msgid "comment"
+msgstr "ikwu"
+
+msgid "play back"
+msgstr "egwu azụ"
+
+msgid "save svg"
+msgstr "save svg"
+
+msgid "title"
+msgstr "aha"
+
+msgid "eval"
+msgstr "eval"
+
+msgid "show blocks"
+msgstr "show blocks"
+
+msgid "stop play"
+msgstr "kwụsị play"
+
+msgid "turtle"
+msgstr "mbe"
+
+msgid "pen"
+msgstr "pen"
+
+msgid "number"
+msgstr "nọmba"
+
+msgid "Boolean"
+msgstr "Boolean"
+
+msgid "flow"
+msgstr "igba"
+
+msgid "blocks"
+msgstr "blocks"
+
+msgid "media"
+msgstr "media"
+
+msgid "sensors"
+msgstr "sensọ"
+
+msgid "extras"
+msgstr "yana mgbakwunye"
+
+msgid "open file"
+msgstr "emeghe faịlụ"
+
+msgid "motion z"
+msgstr "ngagharị z"
+
+msgid "motion y"
+msgstr "ngagharị y"
+
+msgid "motion x"
+msgstr "ngagharị x"
+
+msgid "bitcoin"
+msgstr "Bitcoin"
+
+msgid "from"
+msgstr "site"
+
+msgid "mashape"
+msgstr "ọdịdị"
+
+msgid "define"
+msgstr "kọwaa"
+
+msgid "stock price"
+msgstr "ngwaahịa price"
+
+msgid "currency"
+msgstr "ego"
+
+msgid "Google map"
+msgstr "Google map"
+
+msgid "coordinates"
+msgstr "na-achịkọta"
+
+msgid "zoom factor"
+msgstr "mbugharị na-akpata"
+
+msgid "zoom"
+msgstr "mbugharị"
+
+msgid "city latitude"
+msgstr ""
+
+msgid "city longitude"
+msgstr ""
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+msgid "latitude"
+msgstr "ohere"
+
+msgid "longtitude"
+msgstr "lonjituudu"
+
+msgid "show heap"
+msgstr "show kpokọtara"
+
+msgid "pop"
+msgstr "pop"
+
+msgid "empty heap"
+msgstr "efu kpokọtara"
+
+msgid "save heap"
+msgstr "ịzọpụta kpokọtara"
+
+msgid "load heap"
+msgstr "ibu kpokọtara"
+
+msgid "push"
+msgstr "kwaa"
+
+msgid "logic"
+msgstr "mgbagha"
+
+msgid "power"
+msgstr "ike"
+
+msgid "base"
+msgstr "isi"
+
+msgid "exp"
+msgstr "exp"
+
+msgid "floor"
+msgstr "ahla"
+
+msgid "ceiling"
+msgstr "n'uko"
+
+msgid "degrees"
+msgstr "degrees"
+
+msgid "to degrees"
+msgstr " to degrees"
+
+msgid "radians"
+msgstr "radians"
+
+msgid "to radians"
+msgstr "to oradians"
+
+msgid "maths"
+msgstr "maths"
+
+msgid "cheese"
+msgstr "cheese"
+
+msgid "apple"
+msgstr "apụl"
+
+msgid "get fat"
+msgstr "ga-esi abụba"
+
+msgid "fish"
+msgstr "azụ"
+
+msgid "get calories"
+msgstr "ga-esi calories"
+
+msgid "protein"
+msgstr "protein"
+
+msgid "chicken"
+msgstr "okuko"
+
+msgid "digest meal"
+msgstr "iyochapu nri"
+
+msgid "get fiber"
+msgstr "na-eriri"
+
+msgid "carbs"
+msgstr "carbs"
+
+msgid "eat"
+msgstr "eri"
+
+msgid "rice and beans"
+msgstr "osikapa na agwa"
+
+msgid "orange"
+msgstr "oroma"
+
+msgid "banana"
+msgstr "unere"
+
+msgid "tamale"
+msgstr "tamale"
+
+msgid "fiber"
+msgstr "eriri"
+
+msgid "corn"
+msgstr "ọka"
+
+msgid "fat"
+msgstr "ibu"
+
+msgid "get carbs"
+msgstr "wete carbs"
+
+msgid "water"
+msgstr "imiri"
+
+msgid "cookie"
+msgstr "kuki"
+
+msgid "sweet potato"
+msgstr "ụtọ nduku"
+
+msgid "broccoli"
+msgstr "brọkọlị"
+
+msgid "wheat bread"
+msgstr "wheat achịcha"
+
+msgid "tomato"
+msgstr "tomato"
+
+msgid "beef"
+msgstr "beef"
+
+msgid "potato"
+msgstr "potato"
+
+msgid "calories"
+msgstr "calories"
+
+msgid "get name"
+msgstr "na-aha"
+
+msgid "cake"
+msgstr "achicha"
+
+msgid "get protein"
+msgstr "ga-esi protein"
+
+msgid "food"
+msgstr "nri"
+
+msgid "eatme"
+msgstr "rea-mu"
+
+msgid "sense left"
+msgstr "uche hapụrụ"
+
+msgid "see distance"
+msgstr "ịhụ anya"
+
+msgid "sense right"
+msgstr "uche ziri ezi"
+
+msgid "sing"
+msgstr "na-abụ abụ"
+
+msgid "note"
+msgstr "dee"
+
+msgid "duration"
+msgstr "oge"
+
+msgid "move"
+msgstr "ije"
+
+msgid "blink (ms)"
+msgstr "itabi (MS)"
+
+msgid "rodi"
+msgstr "Rhodes"
+
+msgid "set lang"
+msgstr "dị nnọọ ka"
+
+msgid "source"
+msgstr "isi iyi"
+
+msgid "target"
+msgstr "lekwasịrị"
+
+msgid "translate"
+msgstr "ịsụgharị"
+
+msgid "hello"
+msgstr "hallo"
+
+msgid "detect lang"
+msgstr "chọpụta naanị"
+
+msgid "turtle x"
+msgstr "mbe x"
+
+msgid "turtle y"
+msgstr "mbe y"
+
+msgid "stop turtle"
+msgstr "kwusi mbe "
+
+msgid "turtle name"
+msgstr "mbe aha "
+
+msgid "start turtle"
+msgstr "mbe bido"
+
+msgid "forecast"
+msgstr "amụma"
+
+msgid "city"
+msgstr "obodo"
+
+msgid "day"
+msgstr "ụbọchị"
+
+msgid "low"
+msgstr "ala"
+
+msgid "high"
+msgstr "elu"
+
+msgid "confirm"
+msgstr "gosi"
+
+msgid "to"
+msgstr "ka"
+
+msgid "Download"
+msgstr "ala-ibu"
+
+msgid "Publish"
+msgstr "asuanetop"
+
+msgid "longitude"
+msgstr "lonjituudu"
+
+msgid "Planet"
+msgstr "Planet"
+
+msgid "loudness"
+msgstr "keuzu"
+
+msgid "boolean"
+msgstr "boolean"
+
+msgid "On my device"
+msgstr "On m ngwaọrụ"
+
+msgid "Open"
+msgstr "Mekpe"
+
+msgid "Delete"
+msgstr "hichapụ"
+
+msgid "Worldwide"
+msgstr "Uwa-obosara"
+
+msgid ""
+msgstr ""

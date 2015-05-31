@@ -1,0 +1,117 @@
+//* comment *//
+
+Copyright (C) 2015 Sam Parkinson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+//* arg-globals *//
+var block = logo.blocks.blockList[blk];
+var conns = block.connections;
+
+//* block-globals *//
+var simpleOneArgBlock = function (name, label) {
+    if (label === undefined) { var label = name; }
+    var block = new ProtoBlock(name);
+    block.palette = palettes.dict['maths'];
+    blocks.protoBlockDict[name] = block;
+    block.staticLabels.push(label);
+    block.adjustWidthToLabel();
+    block.oneArgMathBlock();
+    block.defaults.push(1);
+};
+
+var staticBlock = function (name, label) {
+    var block = new ProtoBlock(name);
+    block.palette = palettes.dict['maths'];
+    blocks.protoBlockDict[name] = block;
+    block.staticLabels.push(label);
+    block.adjustWidthToLabel();
+    block.parameterBlock();
+};
+
+//* block:power *//
+var block = new ProtoBlock('power');
+block.palette = palettes.dict['maths'];
+blocks.protoBlockDict['power'] = block;
+block.staticLabels.push(_('power'), _('base'), _('exp'));
+block.twoArgMathBlock();
+block.defaults.push(10, 2);
+//* arg:power *//
+var base = logo.parseArg(logo, turtle, conns[1]);
+var exp  = logo.parseArg(logo, turtle, conns[2]);
+block.value = Math.pow(base, exp);
+
+//* block:sin *// simpleOneArgBlock('sin');
+//* arg:sin *// block.value = Math.sin(logo.parseArg(logo, turtle, conns[1]));
+//* block:cos *// simpleOneArgBlock('cos');
+//* arg:cos *// block.value = Math.cos(logo.parseArg(logo, turtle, conns[1]));
+//* block:tan *// simpleOneArgBlock('tan');
+//* arg:sin *// block.value = Math.tan(logo.parseArg(logo, turtle, conns[1]));
+
+//* block:asin *// simpleOneArgBlock('asin');
+//* arg:asin *// block.value = Math.asin(logo.parseArg(logo, turtle, conns[1]));
+//* block:acos *// simpleOneArgBlock('acos');
+//* arg:acos *// block.value = Math.acos(logo.parseArg(logo, turtle, conns[1]));
+//* block:atan *// simpleOneArgBlock('atan');
+//* arg:atan *// block.value = Math.atan(logo.parseArg(logo, turtle, conns[1]));
+
+//* block:floor *// simpleOneArgBlock(_('floor'));
+//* arg:floor *// block.value = Math.floor(logo.parseArg(logo, turtle, conns[1]));
+//* block:ceiling *// simpleOneArgBlock(_('ceiling'));
+//* arg:ceiling *// block.value = Math.ceil(logo.parseArg(logo, turtle, conns[1]));
+
+//* block:degrees *// simpleOneArgBlock(_('degrees'), _('to degrees'));
+//* arg:degrees *// block.value = logo.parseArg(logo, turtle, conns[1]) * (180/Math.PI);
+//* block:radians *// simpleOneArgBlock(_('radians'), _('to radians'));
+//* arg:radians *// block.value = logo.parseArg(logo, turtle, conns[1]) * (Math.PI/180);
+
+//* block:pi *// staticBlock('pi', 'π');
+//* arg:pi *// block.value = Math.PI;
+//* block:e *// staticBlock('e', 'e');
+//* arg:e *// block.value = Math.E;
+
+//* palette-icon:maths *//
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="55"
+   height="55"
+   viewBox="0 0 55 55"
+   id="svg2"
+   xml:space="preserve"><metadata
+     id="metadata13"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs11" /><g
+     id="toolbar-trigonometry"
+     style="fill:#000000;display:block"><path
+       d="m 11.852704,38.123539 31.294591,0 -31.294591,-26.247077 z"
+       id="path5"
+       style="fill:none;stroke:#ffffff;stroke-width:3.53326035" /><path
+       d="m 11.852704,30.047514 8.076024,0 0,8.076025"
+       id="path7"
+       style="fill:none;stroke:#ffffff;stroke-width:1.51425433" /></g></svg>
+
+//* palette-fill:maths *// #ff0066
+//* palette-stroke:maths *// #ef003e
+//* palette-highlight:maths *// #ffb1b3
+//* palette-stroke-highlight:maths *// #000000
+

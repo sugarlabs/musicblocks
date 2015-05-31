@@ -1,0 +1,761 @@
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-26 00:31-0400\n"
+"PO-Revision-Date: 2013-08-07 03:02+0200\n"
+"Last-Translator: Irma  <sankaypillo@gmail.com>\n"
+"Language-Team: Voluntarios Quechua Sugar\n"
+"Language: quz\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
+"X-Generator: Pootle 2.0.5\n"
+
+msgid "Delete all"
+msgstr ""
+
+msgid "show"
+msgstr "rikuchiy"
+
+msgid "text"
+msgstr "qillqa"
+
+msgid "random"
+msgstr "muyumuyuriq"
+
+msgid "confirm"
+msgstr ""
+
+msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgstr ""
+
+msgid "rice and beans"
+msgstr ""
+
+msgid "mashape"
+msgstr ""
+
+msgid "target"
+msgstr ""
+
+msgid "keyboard"
+msgstr "teclado nisqa"
+
+msgid "You can also load projects from the file system."
+msgstr ""
+
+msgid "chicken"
+msgstr ""
+
+msgid "set color"
+msgstr "llimp'ita akllay"
+
+msgid "apple"
+msgstr ""
+
+msgid "title"
+msgstr ""
+
+msgid "radians"
+msgstr ""
+
+msgid "Undo"
+msgstr ""
+
+msgid "to"
+msgstr ""
+
+msgid "add"
+msgstr ""
+
+msgid "set pen size"
+msgstr "sayayninta akllay"
+
+msgid "start turtle"
+msgstr ""
+
+msgid "city latitude"
+msgstr ""
+
+msgid "city longitude"
+msgstr ""
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+msgid "latitude"
+msgstr ""
+
+msgid "mouse x"
+msgstr "puripaq X"
+
+msgid "mouse y"
+msgstr "puripaq Y"
+
+msgid "Show/hide blocks"
+msgstr "Bloques nisqakunata Qhawachiy/Pakay"
+
+msgid "then"
+msgstr "chayna-kaptinqa"
+
+msgid "move"
+msgstr ""
+
+msgid "Stop the current project."
+msgstr ""
+
+msgid "stop turtle"
+msgstr ""
+
+msgid "food"
+msgstr ""
+
+msgid "Click to run the project in slow mode."
+msgstr ""
+
+msgid "stop"
+msgstr "sayachiy"
+
+msgid "fat"
+msgstr ""
+
+msgid "number"
+msgstr "yupana"
+
+msgid "background"
+msgstr ""
+
+msgid "not"
+msgstr "mana"
+
+msgid "Google map"
+msgstr ""
+
+msgid "day"
+msgstr ""
+
+msgid "mod"
+msgstr "kuyuchiy"
+
+msgid "Save project"
+msgstr ""
+
+msgid "get fiber"
+msgstr ""
+
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr ""
+
+msgid "name"
+msgstr ""
+
+msgid "turtle x"
+msgstr ""
+
+msgid "turtle y"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr ""
+
+msgid "Expand/collapse toolbar"
+msgstr ""
+
+msgid "zoom"
+msgstr ""
+
+msgid "Hide or show the blocks and the palettes."
+msgstr ""
+
+msgid "to degrees"
+msgstr ""
+
+msgid "Restore blocks from the trash."
+msgstr ""
+
+msgid "get calories"
+msgstr ""
+
+msgid "Load plugin from file"
+msgstr ""
+
+msgid "x"
+msgstr "x"
+
+msgid "show blocks"
+msgstr "bloques nisqakunata rikuchiy"
+
+msgid "heading"
+msgstr "mayman"
+
+msgid "Help"
+msgstr "Yanapay"
+
+msgid "turtle"
+msgstr "charapa"
+
+msgid "right"
+msgstr "paña"
+
+msgid "Load samples from server"
+msgstr ""
+
+msgid "hide blocks"
+msgstr "bloques nisqakunata pakay"
+
+msgid "Hide or show the block palettes."
+msgstr ""
+
+msgid "This button opens a viewer for loading example projects."
+msgstr ""
+
+msgid "back"
+msgstr "kutichiy"
+
+msgid "Publish"
+msgstr ""
+
+msgid "grey"
+msgstr ""
+
+msgid "arc"
+msgstr "arco nisqa"
+
+msgid "radius"
+msgstr "radio nisqa"
+
+msgid "longitude"
+msgstr ""
+
+msgid "duration"
+msgstr "unayaynin"
+
+msgid "set shade"
+msgstr "llimp'ita churay"
+
+msgid "pixel color"
+msgstr ""
+
+msgid "eatme"
+msgstr ""
+
+msgid "This button opens and closes the primary toolbar."
+msgstr ""
+
+msgid "Show these messages."
+msgstr ""
+
+msgid "show heap"
+msgstr "tawqata rikuchiy"
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr ""
+
+msgid "publish"
+msgstr ""
+
+msgid "forecast"
+msgstr ""
+
+msgid "pen"
+msgstr ""
+
+msgid "fish"
+msgstr ""
+
+msgid "print"
+msgstr "ñit'iy"
+
+msgid "size"
+msgstr ""
+
+msgid "Expand/collapse option toolbar"
+msgstr ""
+
+msgid "save heap"
+msgstr ""
+
+msgid "fiber"
+msgstr ""
+
+msgid "You can load new blocks from the file system."
+msgstr ""
+
+msgid "power"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Save stack"
+msgstr "Pila nisqata waqaychay"
+
+msgid "corn"
+msgstr ""
+
+msgid "Display statistics"
+msgstr ""
+
+msgid "Remove all content on the canvas, including the blocks."
+msgstr ""
+
+msgid "to radians"
+msgstr ""
+
+msgid "water"
+msgstr ""
+
+msgid "base"
+msgstr ""
+
+msgid "cookie"
+msgstr ""
+
+msgid "Show or hide a polar-coordinate grid."
+msgstr ""
+
+msgid "sweet potato"
+msgstr ""
+
+msgid "maths"
+msgstr ""
+
+msgid "from"
+msgstr ""
+
+msgid "sensors"
+msgstr ""
+
+msgid "pen down"
+msgstr "qillqanata urayachiy"
+
+msgid "get name"
+msgstr ""
+
+msgid "wait"
+msgstr "suyay"
+
+msgid "box"
+msgstr "tawak'uchu"
+
+msgid "obj"
+msgstr ""
+
+msgid "store in"
+msgstr "imapi waqaychanki"
+
+msgid "digest meal"
+msgstr ""
+
+msgid "calories"
+msgstr ""
+
+msgid "zoom factor"
+msgstr ""
+
+msgid "action"
+msgstr "ruway"
+
+msgid "loudness"
+msgstr "qhapariynin"
+
+msgid "Increase the size of the blocks."
+msgstr ""
+
+msgid "or"
+msgstr "utaq"
+
+msgid "sense left"
+msgstr ""
+
+msgid "comment"
+msgstr "rimariy"
+
+msgid "cheese"
+msgstr ""
+
+msgid "Cartesian"
+msgstr "Cartesiana"
+
+msgid "eval"
+msgstr ""
+
+msgid "color"
+msgstr "llimp'i"
+
+msgid "image"
+msgstr "wanki"
+
+msgid "Welcome to Turtle Blocks"
+msgstr ""
+
+msgid "Increase block size"
+msgstr ""
+
+msgid "pop"
+msgstr "hurquy"
+
+msgid "bitcoin"
+msgstr ""
+
+msgid "pen size"
+msgstr "sayan"
+
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr ""
+
+msgid "boolean"
+msgstr ""
+
+msgid "coordinates"
+msgstr ""
+
+msgid "sing"
+msgstr ""
+
+msgid "Congratulations."
+msgstr ""
+
+msgid "Run slow"
+msgstr ""
+
+msgid "mouse button"
+msgstr ""
+
+msgid "speak"
+msgstr "rimay"
+
+msgid "city"
+msgstr ""
+
+msgid "get carbs"
+msgstr ""
+
+msgid "Click to run the project in fast mode."
+msgstr ""
+
+msgid "beef"
+msgstr ""
+
+msgid "source"
+msgstr ""
+
+msgid "unknown"
+msgstr ""
+
+msgid "wait for"
+msgstr ""
+
+msgid "pen up"
+msgstr "qillqanata huqariy"
+
+msgid "Decrease the size of the blocks."
+msgstr ""
+
+msgid "start"
+msgstr "qallariy"
+
+msgid "stock price"
+msgstr ""
+
+msgid "motion z"
+msgstr ""
+
+msgid "low"
+msgstr ""
+
+msgid "motion x"
+msgstr ""
+
+msgid "motion y"
+msgstr ""
+
+msgid "forward"
+msgstr "ñawpaqman"
+
+msgid "degrees"
+msgstr ""
+
+msgid "translate"
+msgstr ""
+
+msgid "until"
+msgstr "kaykama"
+
+msgid "define"
+msgstr ""
+
+msgid "On my device"
+msgstr ""
+
+msgid "save svg"
+msgstr ""
+
+msgid "ceiling"
+msgstr ""
+
+msgid "shell"
+msgstr ""
+
+msgid "blink (ms)"
+msgstr ""
+
+msgid "set lang"
+msgstr ""
+
+msgid "turtle name"
+msgstr ""
+
+msgid "carbs"
+msgstr ""
+
+msgid "else"
+msgstr "mana chayqa"
+
+msgid "orange"
+msgstr "q'illmu"
+
+msgid "begin fill"
+msgstr ""
+
+msgid "sense right"
+msgstr ""
+
+msgid "eat"
+msgstr ""
+
+msgid "Expand/collapse collapsable blocks"
+msgstr ""
+
+msgid "high"
+msgstr ""
+
+msgid "set hue"
+msgstr ""
+
+msgid "currency"
+msgstr ""
+
+msgid "potato"
+msgstr ""
+
+msgid "Click to run the project step by step."
+msgstr ""
+
+msgid "value"
+msgstr "chani"
+
+msgid "banana"
+msgstr ""
+
+msgid "wheat bread"
+msgstr ""
+
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr ""
+
+msgid "while"
+msgstr "chaykamaqa"
+
+msgid "open file"
+msgstr ""
+
+msgid "detect lang"
+msgstr ""
+
+msgid "cake"
+msgstr ""
+
+msgid "exp"
+msgstr ""
+
+msgid "load heap"
+msgstr ""
+
+msgid "Open"
+msgstr "Kichay"
+
+msgid "see distance"
+msgstr ""
+
+msgid "and"
+msgstr "hinallataq"
+
+msgid "set grey"
+msgstr ""
+
+msgid "do"
+msgstr ""
+
+msgid "Run step by step"
+msgstr ""
+
+msgid "Show/hide palettes"
+msgstr ""
+
+msgid "set heading"
+msgstr "mayman rinantam churay"
+
+msgid "add 1 to"
+msgstr ""
+
+msgid "stop play"
+msgstr ""
+
+msgid "protein"
+msgstr ""
+
+msgid "play back"
+msgstr ""
+
+msgid "if"
+msgstr "arí"
+
+msgid "Save your project to a server."
+msgstr ""
+
+msgid "Decrease block size"
+msgstr ""
+
+msgid "angle"
+msgstr "k'uchu"
+
+msgid "get fat"
+msgstr ""
+
+msgid "min"
+msgstr "pisi"
+
+msgid "media"
+msgstr ""
+
+msgid "Stop"
+msgstr "Sayachiy"
+
+msgid "sqrt"
+msgstr ""
+
+msgid "note"
+msgstr ""
+
+msgid "Palette buttons"
+msgstr ""
+
+msgid "set xy"
+msgstr "xy nisqata churay"
+
+msgid "end fill"
+msgstr "huntach'iyta tukuy"
+
+msgid "Copy"
+msgstr "Kikinchay"
+
+msgid "Paste"
+msgstr "K'askachiy"
+
+msgid "Delete"
+msgstr ""
+
+msgid "tamale"
+msgstr ""
+
+msgid "Worldwide"
+msgstr ""
+
+msgid "repeat"
+msgstr "huktawan"
+
+msgid "blocks"
+msgstr ""
+
+msgid "Display statistics about your Turtle project."
+msgstr ""
+
+msgid "Polar"
+msgstr ""
+
+msgid "max"
+msgstr "achkha"
+
+msgid "logic"
+msgstr ""
+
+msgid "empty heap"
+msgstr "tawqata qasichiy"
+
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr ""
+
+msgid "push"
+msgstr "tanqay"
+
+msgid "rodi"
+msgstr ""
+
+msgid "Clean"
+msgstr "Pichay"
+
+msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+msgid "Run fast"
+msgstr ""
+
+msgid "broccoli"
+msgstr ""
+
+msgid "stop media"
+msgstr ""
+
+msgid "tomato"
+msgstr ""
+
+msgid "forever"
+msgstr "wiñaypaq"
+
+msgid "Load project from file"
+msgstr ""
+
+msgid "get protein"
+msgstr ""
+
+msgid "clear"
+msgstr ""
+
+msgid "floor"
+msgstr ""
+
+msgid "flow"
+msgstr ""
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr ""
+
+msgid "extras"
+msgstr ""
+
+msgid "shade"
+msgstr "llimp'iynin"
+
+msgid "time"
+msgstr "pacha"
+
+msgid "y"
+msgstr "y"
+
+msgid "hello"
+msgstr "allillanchu"
+
+msgid "left"
+msgstr "lluqi"
+
+
+msgid ""
+msgstr ""
+
+msgid "Planet"
+msgstr ""

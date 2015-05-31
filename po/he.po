@@ -1,0 +1,767 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-17 00:31-0400\n"
+"PO-Revision-Date: 2013-05-13 18:46+0200\n"
+"Last-Translator: Larry <larry@denenberg.com>\n"
+"Language-Team: LANGUAGE <walter@sugarlabs.org>\n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.0.5\n"
+
+msgid "clear"
+msgstr "נקה"
+
+msgid "forward"
+msgstr "קדימה"
+
+msgid "right"
+msgstr "ימינה"
+
+msgid "back"
+msgstr "אחורה"
+
+msgid "left"
+msgstr "שמאלה"
+
+msgid "arc"
+msgstr "קשת"
+
+msgid "angle"
+msgstr "זווית"
+
+msgid "radius"
+msgstr "רדיוס"
+
+msgid "set heading"
+msgstr "קבע אזימוט (כיוון)"
+
+msgid "heading"
+msgstr "כיוון (אזימוט)"
+
+msgid "set xy"
+msgstr "קבע ערך XY"
+
+msgid "x"
+msgstr "x"
+
+msgid "y"
+msgstr "y"
+
+msgid "set color"
+msgstr  "קבע צבע"
+
+msgid "set hue"
+msgstr  "קבע צבע"
+
+msgid "set shade"
+msgstr "קבע גוון"
+
+msgid "set grey"
+msgstr "קבע אפור"
+
+msgid "color"
+msgstr  "צבע"
+
+msgid "shade"
+msgstr "גוון"
+
+msgid "grey"
+msgstr "אפור"
+
+msgid "set pen size"
+msgstr "קבע עובי עט"
+
+msgid "pen size"
+msgstr "עובי עט"
+
+msgid "pen up"
+msgstr "הרם עט"
+
+msgid "pen down"
+msgstr "הורד עט"
+
+msgid "begin fill"
+msgstr "התחל מילוי"
+
+msgid "end fill"
+msgstr "סיים מילוי"
+
+msgid "background"
+msgstr "מלא מסך"
+
+msgid "random"
+msgstr "מספר אקראי"
+
+msgid "min"
+msgstr "מינימום"
+
+msgid "max"
+msgstr "מקסימום"
+
+msgid "sqrt"
+msgstr "שורש ריבועי"
+
+msgid "mod"
+msgstr "mod"
+
+msgid "and"
+msgstr "and"
+
+msgid "or"
+msgstr "or"
+
+msgid "not"
+msgstr "לא"
+
+msgid "store in"
+msgstr "שמור ב"
+
+msgid "name"
+msgstr ""
+
+msgid "value"
+msgstr "ערך"
+
+msgid "box"
+msgstr "תיבה"
+
+msgid "action"
+msgstr "פעולה"
+
+msgid "do"
+msgstr "לבצע"
+
+msgid "start"
+msgstr "התחל"
+
+msgid "add 1 to"
+msgstr "להוסיף 1 ל"
+
+msgid "add"
+msgstr "להוסיף"
+
+msgid "speak"
+msgstr "דבר"
+
+msgid "show"
+msgstr "הצג"
+
+msgid "obj"
+msgstr ""
+
+msgid "text"
+msgstr ""
+
+msgid "shell"
+msgstr "שריון צב"
+
+msgid "image"
+msgstr "תמונה"
+
+msgid "stop media"
+msgstr "הפסק מדיה"
+
+msgid "repeat"
+msgstr "חזור"
+
+msgid "forever"
+msgstr "בלי-סוף"
+
+msgid "stop"
+msgstr "עצור פעולה"
+
+msgid "if"
+msgstr "אם"
+
+msgid "then"
+msgstr "אז"
+
+msgid "until"
+msgstr "עד_ש"
+
+msgid "wait for"
+msgstr "לחכות ל"
+
+msgid "while"
+msgstr "כל-עוד"
+
+msgid "else"
+msgstr "ואם לא"
+
+msgid "wait"
+msgstr "המתן"
+
+msgid "print"
+msgstr "הודעה"
+
+msgid "time"
+msgstr "זמן"
+
+msgid "mouse button"
+msgstr "כפתור לחוץ"
+
+msgid "keyboard"
+msgstr "קלט מקלדת"
+
+msgid "unknown"
+msgstr "לא ידוע"
+
+msgid "Welcome to Turtle Blocks"
+msgstr ""
+
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr ""
+
+msgid "Palette buttons"
+msgstr ""
+
+msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+msgid "Expand/collapse toolbar"
+msgstr ""
+
+msgid "This button opens and closes the primary toolbar."
+msgstr ""
+
+msgid "Run fast"
+msgstr ""
+
+msgid "Click to run the project in fast mode."
+msgstr ""
+
+msgid "Run slow"
+msgstr ""
+
+msgid "Click to run the project in slow mode."
+msgstr ""
+
+msgid "Run step by step"
+msgstr ""
+
+msgid "Click to run the project step by step."
+msgstr ""
+
+msgid "Stop"
+msgstr "עצור"
+
+msgid "Stop the current project."
+msgstr ""
+
+msgid "Clean"
+msgstr "נקה"
+
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr ""
+
+msgid "Show/hide palettes"
+msgstr ""
+
+msgid "Hide or show the block palettes."
+msgstr ""
+
+msgid "Show/hide blocks"
+msgstr ""
+
+msgid "Hide or show the blocks and the palettes."
+msgstr ""
+
+msgid "Expand/collapse collapsable blocks"
+msgstr ""
+
+msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgstr ""
+
+msgid "Help"
+msgstr "עזרה"
+
+msgid "Show these messages."
+msgstr ""
+
+msgid "Expand/collapse option toolbar"
+msgstr ""
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "The copy button copies a stack to the clipboard. It appears after a \"long press\" on a stack."
+
+msgid "Save stack"
+msgstr ""
+
+msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+
+msgid "Settings"
+msgstr ""
+
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr ""
+
+msgid "Decrease block size"
+msgstr ""
+
+msgid "Decrease the size of the blocks."
+msgstr ""
+
+msgid "Increase block size"
+msgstr ""
+
+msgid "Increase the size of the blocks."
+msgstr ""
+
+msgid "Display statistics"
+msgstr ""
+
+msgid "Display statistics about your Turtle project."
+msgstr ""
+
+msgid "Paste"
+msgstr "הדבק"
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr ""
+
+msgid "Cartesian"
+msgstr "קוארדינטות קרטזיות"
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr ""
+
+msgid "Polar"
+msgstr "קוארדינטות פולריות"
+
+msgid "Show or hide a polar-coordinate grid."
+msgstr ""
+
+msgid "Load samples from server"
+msgstr ""
+
+msgid "This button opens a viewer for loading example projects."
+msgstr ""
+
+msgid "Load project from file"
+msgstr ""
+
+msgid "You can also load projects from the file system."
+msgstr ""
+
+msgid "Load plugin from file"
+msgstr ""
+
+msgid "You can load new blocks from the file system."
+msgstr ""
+
+msgid "Delete all"
+msgstr ""
+
+msgid "Remove all content on the canvas, including the blocks."
+msgstr ""
+
+msgid "Undo"
+msgstr "לבטל"
+
+msgid "Restore blocks from the trash."
+msgstr ""
+
+msgid "Save project"
+msgstr ""
+
+msgid "Save your project to a server."
+msgstr ""
+
+msgid "Congratulations."
+msgstr ""
+
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr ""
+
+msgid "hide blocks"
+msgstr "הסתר בלוקים"
+
+msgid "loudness"
+msgstr "עוצמת קול"
+
+msgid "publish"
+msgstr ""
+
+msgid "comment"
+msgstr "הערה"
+
+msgid "play back"
+msgstr "נגן"
+
+msgid "save svg"
+msgstr "שמור SVG"
+
+msgid "title"
+msgstr "כותרת"
+
+msgid "eval"
+msgstr ""
+
+msgid "show blocks"
+msgstr "הראה בלוקים"
+
+msgid "stop play"
+msgstr ""
+
+msgid "turtle"
+msgstr "צב"
+
+msgid "pen"
+msgstr "עט"
+
+msgid "number"
+msgstr "מספר"
+
+msgid "boolean"
+msgstr ""
+
+msgid "flow"
+msgstr ""
+
+msgid "blocks"
+msgstr ""
+
+msgid "media"
+msgstr ""
+
+msgid "sensors"
+msgstr "חיישנים"
+
+msgid "extras"
+msgstr ""
+
+msgid "open file"
+msgstr ""
+
+msgid "motion z"
+msgstr ""
+
+msgid "motion y"
+msgstr ""
+
+msgid "motion x"
+msgstr ""
+
+msgid "bitcoin"
+msgstr ""
+
+msgid "from"
+msgstr "מ"
+
+msgid "mashape"
+msgstr ""
+
+msgid "define"
+msgstr ""
+
+msgid "stock price"
+msgstr ""
+
+msgid "currency"
+msgstr ""
+
+msgid "Google map"
+msgstr ""
+
+msgid "coordinates"
+msgstr "קואורדינטות"
+
+msgid "zoom factor"
+msgstr "גורם זום"
+
+msgid "zoom"
+msgstr "זום"
+
+msgid "city latitude"
+msgstr ""
+
+msgid "city longitude"
+msgstr ""
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+msgid "latitude"
+msgstr "קו רוחב"
+
+msgid "longitude"
+msgstr "קו אורך"
+
+msgid "show heap"
+msgstr "הצג מחסנית FILO"
+
+msgid "pop"
+msgstr "שלוף\\טען ערך"
+
+msgid "empty heap"
+msgstr "רוקן מחסנית FILO"
+
+msgid "save heap"
+msgstr  "שמור FILO"
+
+msgid "load heap"
+msgstr  "פתח FILO"
+
+msgid "push"
+msgstr "דחוף\\שמור ערך"
+
+msgid "logic"
+msgstr ""
+
+msgid "power"
+msgstr ""
+
+msgid "base"
+msgstr ""
+
+msgid "exp"
+msgstr ""
+
+msgid "floor"
+msgstr ""
+
+msgid "ceiling"
+msgstr ""
+
+msgid "degrees"
+msgstr ""
+
+msgid "to degrees"
+msgstr ""
+
+msgid "radians"
+msgstr ""
+
+msgid "to radians"
+msgstr ""
+
+msgid "maths"
+msgstr ""
+
+msgid "cheese"
+msgstr "גבינה"
+
+msgid "apple"
+msgstr "תפוח"
+
+msgid "get fat"
+msgstr ""
+
+msgid "fish"
+msgstr "דג"
+
+msgid "get calories"
+msgstr ""
+
+msgid "protein"
+msgstr ""
+
+msgid "chicken"
+msgstr "עוף"
+
+msgid "digest meal"
+msgstr "לעכל"
+
+msgid "get fiber"
+msgstr ""
+
+msgid "carbs"
+msgstr ""
+
+msgid "eat"
+msgstr "לאכול"
+
+msgid "rice and beans"
+msgstr "אורז ושעועית"
+
+msgid "orange"
+msgstr "תפוז"
+
+msgid "banana"
+msgstr "בננה"
+
+msgid "tamale"
+msgstr ""
+
+msgid "fiber"
+msgstr ""
+
+msgid "corn"
+msgstr "תירס"
+
+msgid "fat"
+msgstr ""
+
+msgid "get carbs"
+msgstr ""
+
+msgid "water"
+msgstr "מים"
+
+msgid "cookie"
+msgstr "עוגייה"
+
+msgid "sweet potato"
+msgstr "בַּטָטָה"
+
+msgid "broccoli"
+msgstr "ברוקולי"
+
+msgid "wheat bread"
+msgstr "לחם"
+
+msgid "tomato"
+msgstr "עגבניות"
+
+msgid "beef"
+msgstr "בשר בקר"
+
+msgid "potato"
+msgstr "תַפּוּד"
+
+msgid "calories"
+msgstr ""
+
+msgid "get name"
+msgstr ""
+
+msgid "cake"
+msgstr "עוגה"
+
+msgid "get protein"
+msgstr ""
+
+msgid "food"
+msgstr "מזון"
+
+msgid "eatme"
+msgstr "לאכול"
+
+msgid "sense left"
+msgstr ""
+
+msgid "see distance"
+msgstr ""
+
+msgid "sense right"
+msgstr ""
+
+msgid "sing"
+msgstr "לשיר"
+
+msgid "note"
+msgstr ""
+
+msgid "duration"
+msgstr "משך זמן"
+
+msgid "move"
+msgstr ""
+
+msgid "blink (ms)"
+msgstr ""
+
+msgid "rodi"
+msgstr "RoDi"
+
+msgid "set lang"
+msgstr ""
+
+msgid "source"
+msgstr ""
+
+msgid "target"
+msgstr ""
+
+msgid "translate"
+msgstr ""
+
+msgid "hello"
+msgstr "שלום"
+
+msgid "detect lang"
+msgstr ""
+
+msgid "turtle x"
+msgstr ""
+
+msgid "turtle y"
+msgstr ""
+
+msgid "stop turtle"
+msgstr ""
+
+msgid "turtle name"
+msgstr ""
+
+msgid "start turtle"
+msgstr ""
+
+msgid "forecast"
+msgstr ""
+
+msgid "city"
+msgstr ""
+
+msgid "day"
+msgstr ""
+
+msgid "low"
+msgstr ""
+
+msgid "high"
+msgstr ""
+
+msgid "confirm"
+msgstr ""
+
+msgid "to"
+msgstr ""
+
+msgid "mouse x"
+msgstr ""
+
+msgid "mouse y"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Publish"
+msgstr ""
+
+msgid "pixel color"
+msgstr ""
+
+msgid "size"
+msgstr ""
+
+msgid "Planet"
+msgstr ""
+
+msgid "On my device"
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Worldwide"
+msgstr ""

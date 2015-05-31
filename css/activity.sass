@@ -1,0 +1,61 @@
+// Copyright (C) 2015 Sam Parkinson
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+@import popdown
+@import planet
+
+#loading-image-container
+    z-index: 99999
+
+body
+    background-color: #99CCFF
+    padding: 0
+    margin: 0
+    font-family: sans-serif
+    overflow: hidden
+
+    &.samples-shown
+        overflow-y: scroll
+        background: white !important
+
+input.text
+    background-color: #987aff
+    text-align: center
+    font-weight: bold !important
+    resize: none !important
+    padding: 0 !important
+    border: 0 !important
+    width: 100px
+
+input.number
+    background-color: #ff00ff !important
+    text-align: center
+    font-weight: bold !important
+    resize: none !important
+    padding: 0 !important
+    border: 0 !important
+    width: 100px
+
+.helpDiv
+    float: right
+    position: absolute
+    margin-top: 57px
+    z-index: -1
+
+#canvas
+    // overwrite the definition in sugar-web/graphics/css/sugar.css
+    // to workaroud a bug affecting webkit on android 4.1/4.2
+    // https://code.google.com/p/android/issues/detail?id=41312
+    overflow-y: visible

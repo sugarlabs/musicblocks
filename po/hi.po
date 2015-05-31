@@ -1,0 +1,772 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-12-05 00:30-0500\n"
+"PO-Revision-Date: 2011-12-04 06:20+0200\n"
+"Last-Translator: satyaakam goswami <satyaakam@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.0.5\n"
+
+msgid "Delete all"
+msgstr "सब मिटाइए"
+
+msgid "show"
+msgstr "दिखाएँ"
+
+msgid "hide"
+msgstr ""
+
+msgid "popout"
+msgstr ""
+
+msgid "text"
+msgstr "पाठ"
+
+msgid "random"
+msgstr "बेतरतीब"
+
+msgid "confirm"
+msgstr "पक्का करीये"
+
+msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgstr "खोलें या बंद करे जैसे के चालु करे या क्रिया का ढेर"
+
+msgid "rice and beans"
+msgstr "चावल और फली"
+
+msgid "mashape"
+msgstr "आकार"
+
+msgid "target"
+msgstr "लक्ष्य"
+
+msgid "keyboard"
+msgstr "कुंजीपट"
+
+msgid "You can also load projects from the file system."
+msgstr "फाइल सिस्टम से भी प्रोजेक्ट ले सकते है"
+
+msgid "chicken"
+msgstr "चूज़ा"
+
+msgid "set color"
+msgstr "रंग सेट करें"
+
+msgid "apple"
+msgstr "सेब"
+
+msgid "title"
+msgstr "शीर्षक"
+
+msgid "radians"
+msgstr "तेज"
+
+msgid "Undo"
+msgstr "पूर्ववत् करें"
+
+msgid "to"
+msgstr "को"
+
+msgid "add"
+msgstr "जोडें"
+
+msgid "set pen size"
+msgstr "पेन आकार सेट करें"
+
+msgid "start turtle"
+msgstr "टरटल चालू करे"
+
+msgid "city latitude"
+msgstr "शहर अक्षांश"
+
+msgid "city longitude"
+msgstr "शहर देशांतर"
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr "डेटा उपलब्ध नहीं है समन्वय"
+
+msgid "latitude"
+msgstr "अक्षांश"
+
+msgid "mouse x"
+msgstr "माउस एक्स"
+
+msgid "mouse y"
+msgstr "माउस y"
+
+msgid "Show/hide blocks"
+msgstr "पिण्ड दिखाएँ/छुपाएँ"
+
+msgid "then"
+msgstr "तब"
+
+msgid "move"
+msgstr "सरकाय"
+
+msgid "Stop the current project."
+msgstr "ये प्रोजेक्ट बंद करे"
+
+msgid "stop turtle"
+msgstr "टर्टल बंद करे"
+
+msgid "food"
+msgstr "खाना"
+
+msgid "Click to run the project in slow mode."
+msgstr "प्रोजेक्ट को धीरे चलाने के लिये यँहा क्लिक करे"
+
+msgid "stop"
+msgstr "रोकें"
+
+msgid "fat"
+msgstr "चर्बी"
+
+msgid "number"
+msgstr "संख्या"
+
+msgid "background"
+msgstr "पृष्ठभूमि"
+
+msgid "not"
+msgstr "नहीं"
+
+msgid "Google map"
+msgstr "गूगल मानचित्र"
+
+msgid "day"
+msgstr "दिन"
+
+msgid "mod"
+msgstr "मॉड"
+
+msgid "Save project"
+msgstr "प्रोजेक्ट को संचय करे"
+
+msgid "get fiber"
+msgstr "रेशा मिलता है"
+
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr "कछुए ब्लाकों विन्यास के लिए एक पैनल खोलें।"
+
+msgid "name"
+msgstr "नाम"
+
+msgid "turtle x"
+msgstr "कछुआ x"
+
+msgid "turtle y"
+msgstr "कछुआ y"
+
+msgid "Download"
+msgstr "डाउनलोड"
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr "जब क्लिपबोर्ड में ब्लॉक्स प्रतिलिपित होते हैं तब \"पेस्ट\" बटन सक्रिय होता है।"
+
+msgid "Expand/collapse toolbar"
+msgstr "उपकरण पट्टी को खोलें या बंद करें"
+
+msgid "zoom"
+msgstr "ज़ूम"
+
+msgid "Hide or show the blocks and the palettes."
+msgstr "ब्लॉक्स एवं पलेटस को छिपाएं अथवा प्रदर्शित करें"
+
+msgid "to degrees"
+msgstr "डिग्री में"
+
+msgid "Restore blocks from the trash."
+msgstr "डिलीट किये गए ब्लॉक्स वापस लाएं"
+
+msgid "get calories"
+msgstr "कैलोरी लें"
+
+msgid "Load plugin from file"
+msgstr "फाइल से प्लगइन लोड करें"
+
+msgid "x"
+msgstr "एक्स"
+
+msgid "show blocks"
+msgstr "पिण्ड दिखाएँ"
+
+msgid "heading"
+msgstr "शीर्षक"
+
+msgid "Help"
+msgstr "मदद"
+
+msgid "turtle"
+msgstr "कछुआ"
+
+msgid "right"
+msgstr "दायाँ"
+
+msgid "Load samples from server"
+msgstr "सर्वर से नमूना लोड करें"
+
+msgid "hide blocks"
+msgstr "खण्ड छुपाएँ"
+
+msgid "Hide or show the block palettes."
+msgstr "ब्लॉक पैलेट दिखाएँ / छिपाएं   "
+
+msgid "This button opens a viewer for loading example projects."
+msgstr "यह बटन नमूने देखने के लिए एक खिड़की खोलता है"
+
+msgid "back"
+msgstr "पीछे"
+
+msgid "Publish"
+msgstr "प्रकाशित करें"
+
+msgid "grey"
+msgstr "ग्रे"
+
+msgid "arc"
+msgstr "चाप"
+
+msgid "radius"
+msgstr "त्रिज्या"
+
+msgid "longitude"
+msgstr "देशान्तर"
+
+msgid "duration"
+msgstr "अवधि"
+
+msgid "set shade"
+msgstr "छाया सेट करें"
+
+msgid "pixel color"
+msgstr "पिक्सेल का रंग"
+
+msgid "eatme"
+msgstr "मुझे खाओ"
+
+msgid "This button opens and closes the primary toolbar."
+msgstr "यह बटन मुख्य उपकरण पट्टी को खोलता एवं  बंद करता है"
+
+msgid "Show these messages."
+msgstr "यह सन्देश दिखाएँ"
+
+msgid "show heap"
+msgstr "ढेर दिखाएँ"
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr "कर्टेसिअन ग्रिड दिखाएँ या छिपाएं"
+
+msgid "publish"
+msgstr "प्रकाशित करें"
+
+msgid "forecast"
+msgstr "पूर्वानुमान"
+
+msgid "pen"
+msgstr "खोलें"
+
+msgid "fish"
+msgstr "मछली"
+
+msgid "print"
+msgstr "छापें"
+
+msgid "size"
+msgstr "आकार"
+
+msgid "Expand/collapse option toolbar"
+msgstr "विकल्प पट्टी को खोलें या बंद करें"
+
+msgid "save heap"
+msgstr "ढेर सेव करें"
+
+msgid "fiber"
+msgstr "रेशा"
+
+msgid "You can load new blocks from the file system."
+msgstr "आप फाइल सिस्टम से नए ब्लॉक्स लोड कर सकते हैं"
+
+msgid "power"
+msgstr "शक्ति"
+
+msgid "Settings"
+msgstr "सेटिंग"
+
+msgid "Save stack"
+msgstr "स्टैक को सेव करें"
+
+msgid "corn"
+msgstr "मकई"
+
+msgid "Display statistics"
+msgstr "आँकड़े प्रदर्शित करें"
+
+msgid "Remove all content on the canvas, including the blocks."
+msgstr "कैनवास के ऊपर से सब साफ़ करें, ब्लॉक्स के साथ"
+
+msgid "to radians"
+msgstr "रेडियंस में"
+
+msgid "water"
+msgstr "जल"
+
+msgid "base"
+msgstr "आधार"
+
+msgid "cookie"
+msgstr "कुकी"
+
+msgid "Show or hide a polar-coordinate grid."
+msgstr "ध्रुवीय समन्वय ग्रिड दिखाएँ या छिपाएं"
+
+msgid "sweet potato"
+msgstr "शकरकन्द"
+
+msgid "maths"
+msgstr "गणित"
+
+msgid "from"
+msgstr "से"
+
+msgid "sensors"
+msgstr "सेंसर"
+
+msgid "pen down"
+msgstr "पेन नीचे"
+
+msgid "get name"
+msgstr "नाम उपलब्ध करें"
+
+msgid "wait"
+msgstr "इंतजार करें"
+
+msgid "box"
+msgstr "बक्सा"
+
+msgid "obj"
+msgstr "वस्तु"
+
+msgid "store in"
+msgstr "में भंडारित करें"
+
+msgid "digest meal"
+msgstr "भोजन हज़म करना"
+
+msgid "calories"
+msgstr "कैलोरी"
+
+msgid "zoom factor"
+msgstr "ज़ूम गुणक"
+
+msgid "action"
+msgstr "क्रिया"
+
+msgid "loudness"
+msgstr "आवाज़ की उंचाई"
+
+msgid "Increase the size of the blocks."
+msgstr "ब्लॉक्स का आकार बढ़ाएं"
+
+msgid "or"
+msgstr "या"
+
+msgid "sense left"
+msgstr "बाईं ओर  भावना करें"
+
+msgid "comment"
+msgstr "टिप्पणी"
+
+msgid "cheese"
+msgstr "चीज़"
+
+msgid "Cartesian"
+msgstr "कार्टेसियन"
+
+msgid "eval"
+msgstr ""
+
+msgid "color"
+msgstr "रंग"
+
+msgid "image"
+msgstr "फोटो"
+
+msgid "Welcome to Turtle Blocks"
+msgstr "टर्टल ब्लॉक्स में आपका स्वागत है"
+
+msgid "Increase block size"
+msgstr "मूल्यांकन करें"
+
+msgid "pop"
+msgstr "पॉप"
+
+msgid "bitcoin"
+msgstr "बिटकॉइन"
+
+msgid "pen size"
+msgstr "पेन आकार"
+
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr "स्क्रीन साफ़ करके टर्टल को प्रारम्भिक स्थान पर लौटाएं"
+
+msgid "boolean"
+msgstr "बूलियन"
+
+msgid "coordinates"
+msgstr "निर्देशांक"
+
+msgid "sing"
+msgstr "गाओ"
+
+msgid "Congratulations."
+msgstr "गाओ"
+
+msgid "Run slow"
+msgstr "धीमे चलाएं"
+
+msgid "mouse button"
+msgstr "माउस का बटन"
+
+msgid "speak"
+msgstr "बोलो"
+
+msgid "city"
+msgstr "शहर"
+
+msgid "get carbs"
+msgstr "कार्बोहायड्रेट लो"
+
+msgid "Click to run the project in fast mode."
+msgstr "प्रोजेक्ट को तेज़ी से चलाने के लिए क्लिक करें"
+
+msgid "beef"
+msgstr "गाय का गोश्त"
+
+msgid "source"
+msgstr "स्रोत"
+
+msgid "unknown"
+msgstr "अंजान"
+
+msgid "wait for"
+msgstr "अज्ञात"
+
+msgid "pen up"
+msgstr "पेन ऊपर"
+
+msgid "Decrease the size of the blocks."
+msgstr "ब्लॉक्स का आकार घटाएं"
+
+msgid "start"
+msgstr "प्रारंभ"
+
+msgid "stock price"
+msgstr "मूलधन कीमत"
+
+msgid "motion z"
+msgstr "'z'दिशा में गतिवान"
+
+msgid "low"
+msgstr "नीचा"
+
+msgid "motion x"
+msgstr "'x'दिशा में गतिवान"
+
+msgid "motion y"
+msgstr "'y'दिशा में गतिवान"
+
+msgid "forward"
+msgstr "आगे"
+
+msgid "degrees"
+msgstr "डिग्री"
+
+msgid "translate"
+msgstr "अनुवाद करें"
+
+msgid "until"
+msgstr "जब तक"
+
+msgid "define"
+msgstr "परिभाषित करें"
+
+msgid "On my device"
+msgstr "मेरे यन्त्र पे"
+
+msgid "save svg"
+msgstr "svg सेव करें"
+
+msgid "ceiling"
+msgstr "उच्चतम सीमा"
+
+msgid "shell"
+msgstr "शैल"
+
+msgid "blink (ms)"
+msgstr "झिलमिलाहट (ms)"
+
+msgid "set lang"
+msgstr "भाषा स्थित करें"
+
+msgid "turtle name"
+msgstr "कछुआ नाम"
+
+msgid "carbs"
+msgstr "कार्बोहायड्रेट"
+
+msgid "else"
+msgstr "अन्यथा"
+
+msgid "orange"
+msgstr "नारंगी"
+
+msgid "begin fill"
+msgstr "भरना शुरू करें"
+
+msgid "sense right"
+msgstr "भावना सही"
+
+msgid "eat"
+msgstr "खाएं"
+
+msgid "Expand/collapse collapsable blocks"
+msgstr "खुलने और बंधने वाले ब्लॉक को खोलें या बंद करें"
+
+msgid "high"
+msgstr "ऊंचा"
+
+msgid "set hue"
+msgstr "रंग सेट करें"
+
+msgid "currency"
+msgstr "मुद्रा"
+
+msgid "potato"
+msgstr "आलू"
+
+msgid "Click to run the project step by step."
+msgstr "प्रोजेक्ट को क्रमशः चलने के लिए क्लिक करें"
+
+msgid "value"
+msgstr "मान"
+
+msgid "banana"
+msgstr "केला"
+
+msgid "wheat bread"
+msgstr "गेहूं की रोटी"
+
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr "टर्टल ब्लॉक्स लोगो से प्रेरित टर्टल है जो दृश्य-प्रोग्रामिंग ब्लॉक्स से रंगीन चित्र बनता है"
+
+msgid "while"
+msgstr "जबकि"
+
+msgid "open file"
+msgstr "फाइल खोलें"
+
+msgid "detect lang"
+msgstr "भाषा पता लगएं"
+
+msgid "cake"
+msgstr "केक"
+
+msgid "exp"
+msgstr "ऍक्स्प"
+
+msgid "load heap"
+msgstr "ढेर को लोड करें"
+
+msgid "Open"
+msgstr "खोलें"
+
+msgid "see distance"
+msgstr "दूरी देखें"
+
+msgid "and"
+msgstr "और"
+
+msgid "set grey"
+msgstr "ग्रे सेट करें"
+
+msgid "do"
+msgstr "करें"
+
+msgid "Run step by step"
+msgstr "क्रमशः चलाएं"
+
+msgid "Show/hide palettes"
+msgstr "पैलेट दिखाएँ /छुपाएं"
+
+msgid "set heading"
+msgstr "शीर्षक सेट करें"
+
+msgid "add 1 to"
+msgstr "में 1 जोड़ें"
+
+msgid "stop play"
+msgstr "रोकिये"
+
+msgid "protein"
+msgstr "प्रोटीन"
+
+msgid "play back"
+msgstr "दोबारा चलाऐं"
+
+msgid "if"
+msgstr "यदि"
+
+msgid "Save your project to a server."
+msgstr "अपने प्रोजॆक्ट को सर्वर पे सेव करें"
+
+msgid "Decrease block size"
+msgstr "ब्लॊक को छोटा करें"
+
+msgid "angle"
+msgstr "कोण"
+
+msgid "get fat"
+msgstr "चर्बी लें"
+
+msgid "min"
+msgstr "न्यून."
+
+msgid "media"
+msgstr "मीडिया"
+
+msgid "Stop"
+msgstr "रूकें"
+
+msgid "sqrt"
+msgstr "वर्गमूल"
+
+msgid "note"
+msgstr "नोट"
+
+msgid "Palette buttons"
+msgstr "पॆलेट बटन"
+
+msgid "set xy"
+msgstr "xy सेट करें"
+
+msgid "end fill"
+msgstr "अंत भरें"
+
+msgid "Copy"
+msgstr "नक़ल"
+
+msgid "Paste"
+msgstr "चिपकाएँ"
+
+msgid "Delete"
+msgstr "हटाएं"
+
+msgid "tamale"
+msgstr "तमालि"
+
+msgid "Worldwide"
+msgstr "दुनिया भर में"
+
+msgid "repeat"
+msgstr "दोहराएँ"
+
+msgid "blocks"
+msgstr "ब्लॊक्स"
+
+msgid "Display statistics about your Turtle project."
+msgstr "अपने टर्टल प्रोजेक्ट के आङ्कडे  देखें"
+
+msgid "Polar"
+msgstr "ध्रुवीय"
+
+msgid "max"
+msgstr "अधि."
+
+msgid "logic"
+msgstr "तर्क"
+
+msgid "empty heap"
+msgstr "रिक्त ढेर"
+
+msgid "heap empty?"
+msgstr "खाली ढेर"
+
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr "आप टूर पूरा कर चुके। टर्टल ब्लॊक्स का आनन्द लें।"
+
+msgid "push"
+msgstr "दबाएँ"
+
+msgid "rodi"
+msgstr "रोडी"
+
+msgid "Clean"
+msgstr "साफ"
+
+msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgstr "इस उपकरण पट्टी में पेलेट बटन हैं: ब्लॊक के पॆलेट देखने के लिए क्लिक करे (टर्टल, कलम, सङ्ख्या, बूलियन, बहाव, ब्लॊक, मीडिया, इत्यादि) आप ब्लॊक्स को पॆलेट से कॆन्वास पे खीञ्च सकते हैं"
+
+msgid "Run fast"
+msgstr "तेज चलिए"
+
+msgid "broccoli"
+msgstr "ब्रोकली"
+
+msgid "stop media"
+msgstr "मीडिया रोक"
+
+msgid "tomato"
+msgstr "टमाटर"
+
+msgid "forever"
+msgstr "हमेशा के लिए"
+
+msgid "Load project from file"
+msgstr "फ़ाइल से प्रोजेक्ट लें"
+
+msgid "get protein"
+msgstr "प्रोटीन मिलता है"
+
+msgid "clear"
+msgstr "साफ़ करें"
+
+msgid "floor"
+msgstr "मंज़िल"
+
+msgid "flow"
+msgstr "बहाव"
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr "सहायक पट्टीको खोलने या बन्द करने के लिए यह बटन दबाएं"
+
+msgid "extras"
+msgstr "अतिरिक्त"
+
+msgid "shade"
+msgstr "छाया"
+
+msgid "time"
+msgstr "समय"
+
+msgid "y"
+msgstr "वाई"
+
+msgid "hello"
+msgstr "नमस्ते"
+
+msgid "left"
+msgstr "बायाँ"
+
+msgid "Planet"
+msgstr "ग्रह"

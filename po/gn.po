@@ -1,0 +1,1014 @@
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-17 00:31-0400\n"
+"PO-Revision-Date: 2011-02-24 04:22+0200\n"
+"Last-Translator: Chris <cjl@laptop.org>\n"
+"Language-Team: LANGUAGE <walter@sugarlabs.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.0.1\n"
+
+#. TRANS: limpiar
+msgid "clear"
+msgstr ""
+
+#. TRANS: adelante
+msgid "forward"
+msgstr ""
+
+#. TRANS: derecha
+msgid "right"
+msgstr ""
+
+#. TRANS: atrás
+msgid "back"
+msgstr ""
+
+#. TRANS: izquierda
+msgid "left"
+msgstr ""
+
+#. TRANS: arco
+msgid "arc"
+msgstr ""
+
+#. TRANS: ángulo
+msgid "angle"
+msgstr ""
+
+#. TRANS: radio
+msgid "radius"
+msgstr ""
+
+#. TRANS: fijar rumbo
+msgid "set heading"
+msgstr ""
+
+#. TRANS: rumbo
+msgid "heading"
+msgstr ""
+
+#. TRANS: fijar xy
+msgid "set xy"
+msgstr ""
+
+msgid "x"
+msgstr ""
+
+msgid "y"
+msgstr ""
+
+#. TRANS: fijar color
+msgid "set color"
+msgstr ""
+
+#. TRANS: color
+msgid "color"
+msgstr ""
+
+#. TRANS: fijar matiz
+msgid "set hue"
+msgstr ""
+
+#. TRANS: fijar sombra
+msgid "set shade"
+msgstr ""
+
+#. TRANS: sombra
+msgid "shade"
+msgstr ""
+
+#. TRANS: fijar gris
+msgid "set grey"
+msgstr ""
+
+#. TRANS: gris
+msgid "grey"
+msgstr ""
+
+#. TRANS: fijar pluma
+msgid "set pen size"
+msgstr ""
+
+#. TRANS: tamaño de la pluma
+msgid "pen size"
+msgstr ""
+
+#. TRANS: subir pluma
+msgid "pen up"
+msgstr ""
+
+#. TRANS: bajar pluma
+msgid "pen down"
+msgstr ""
+
+#. TRANS: iniciar relleno
+msgid "begin fill"
+msgstr ""
+
+#. TRANS: finalizar relleno
+msgid "end fill"
+msgstr ""
+
+#. TRANS: rellenar pantalla
+msgid "background"
+msgstr ""
+
+#. TRANS: aleatorio
+msgid "random"
+msgstr ""
+
+#. TRANS: mínimo
+msgid "min"
+msgstr ""
+
+#. TRANS: maximo
+msgid "max"
+msgstr ""
+
+#. TRANS: raíz
+msgid "sqrt"
+msgstr ""
+
+#. TRANS: módulo
+msgid "mod"
+msgstr ""
+
+#. TRANS: y
+msgid "and"
+msgstr ""
+
+#. TRANS: o
+msgid "or"
+msgstr ""
+
+#. TRANS: no
+msgid "not"
+msgstr ""
+
+#. TRANS: guardar en
+msgid "store in"
+msgstr ""
+
+#. TRANS: nombre
+msgid "name"
+msgstr ""
+
+#. TRANS: valor
+msgid "value"
+msgstr ""
+
+#. TRANS: caja
+msgid "box"
+msgstr ""
+
+#. TRANS: acción
+msgid "action"
+msgstr ""
+
+#. TRANS: hacer
+msgid "do"
+msgstr ""
+
+#. TRANS: iniciar
+msgid "start"
+msgstr ""
+
+#. TRANS: sumar 1 a
+msgid "add 1 to"
+msgstr ""
+
+#. TRANS: sumar
+msgid "add"
+msgstr ""
+
+#. TRANS: a
+msgid "to"
+msgstr ""
+
+#. TRANS: hablar
+msgid "speak"
+msgstr ""
+
+#. TRANS: mostrar
+msgid "show"
+msgstr ""
+
+#. TRANS: ocultar
+msgid "hide"
+msgstr ""
+
+#. TRANS: popout window (ventana emergente)
+msgid "popout"
+msgstr ""
+
+#. TRANS: tamaño
+msgid "size"
+msgstr ""
+
+#. TRANS: objeto
+msgid "obj"
+msgstr ""
+
+#. TRANS: texto
+msgid "text"
+msgstr ""
+
+#. TRANS: caparazón
+msgid "shell"
+msgstr ""
+
+#. TRANS: imagen
+msgid "image"
+msgstr ""
+
+#. TRANS: detener medios
+msgid "stop media"
+msgstr ""
+
+#. TRANS: repetir
+msgid "repeat"
+msgstr ""
+
+#. TRANS: por siempre
+msgid "forever"
+msgstr ""
+
+#. TRANS: detener
+msgid "stop"
+msgstr ""
+
+#. TRANS: si
+msgid "if"
+msgstr ""
+
+#. TRANS: entonces
+msgid "then"
+msgstr ""
+
+#. TRANS: hasta
+msgid "until"
+msgstr ""
+
+#. TRANS: esperar hasta
+msgid "wait for"
+msgstr ""
+
+#. TRANS: mientras
+msgid "while"
+msgstr ""
+
+#. TRANS: sino
+msgid "else"
+msgstr ""
+
+#. TRANS: esperar
+msgid "wait"
+msgstr ""
+
+#. TRANS: imprimir
+msgid "print"
+msgstr ""
+
+#. TRANS: tiempo
+msgid "time"
+msgstr ""
+
+#. TRANS: cursor x
+msgid "mouse x"
+msgstr ""
+
+#. TRANS: cursor y
+msgid "mouse y"
+msgstr ""
+
+#. TRANS: botón del ratón
+msgid "mouse button"
+msgstr ""
+
+#. TRANS: teclado
+msgid "keyboard"
+msgstr ""
+
+#. TRANS: color del pixel
+msgid "pixel color"
+msgstr ""
+
+#. TRANS: desconocido
+msgid "unknown"
+msgstr ""
+
+#. TRANS: Bienvenidos a TortuBloques
+msgid "Welcome to Turtle Blocks"
+msgstr ""
+
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr ""
+
+#. TRANS: Botones de paleta
+msgid "Palette buttons"
+msgstr ""
+
+msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+#. TRANS: Expandir o colapsar barra
+msgid "Expand/collapse toolbar"
+msgstr ""
+
+#. TRANS: Este botón abre y cierra la barra de herramientas principal.
+msgid "This button opens and closes the primary toolbar."
+msgstr ""
+
+#. TRANS: Ejecutar rápidamente
+msgid "Run fast"
+msgstr ""
+
+#. TRANS: Haga clic para ejecutar el proyecto en modo rápido.
+msgid "Click to run the project in fast mode."
+msgstr ""
+
+#. TRANS: Ejecutar lentamente
+msgid "Run slow"
+msgstr ""
+
+#. TRANS: Haz click para ejecutar el proyecto en modo lento.
+msgid "Click to run the project in slow mode."
+msgstr ""
+
+#. TRANS: Ejecutar paso a paso
+msgid "Run step by step"
+msgstr ""
+
+#. TRANS: Haz click para ejecutar el proyecto en modo paso a paso.
+msgid "Click to run the project step by step."
+msgstr ""
+
+#. TRANS: Detener
+msgid "Stop"
+msgstr ""
+
+#. TRANS: Detener el proyecto actual
+msgid "Stop the current project."
+msgstr ""
+
+msgid "Clean"
+msgstr ""
+
+#. TRANS: Borrar la pantalla y volver a las tortugas a sus posiciones iniciales.
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr ""
+
+#. TRANS: Mostrar u ocultar paletas
+msgid "Show/hide palettes"
+msgstr ""
+
+#. TRANS: Ocultar o mostrar las paletas de bloques.
+msgid "Hide or show the block palettes."
+msgstr ""
+
+#. TRANS: Mostrar o ocultar los bloques.
+msgid "Show/hide blocks"
+msgstr ""
+
+#. TRANS: Ocultar o mostrar los bloques y las paletas.
+msgid "Hide or show the blocks and the palettes."
+msgstr ""
+
+#. TRANS: Expandir o colapsar los bloques colapsables
+msgid "Expand/collapse collapsable blocks"
+msgstr ""
+
+#. TRANS: Expandir o colapsar los bloques colapsables, cómo por ejemplo los bloques de empezar y los de acción.
+msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgstr ""
+
+#. TRANS: Ayuda
+msgid "Help"
+msgstr ""
+
+#. TRANS: Mostrar esos mensajes.
+msgid "Show these messages."
+msgstr ""
+
+#. TRANS: Expandir/colapsar la barra de opciones.
+msgid "Expand/collapse option toolbar"
+msgstr ""
+
+#. TRANS: Haz click en este botón para expandir o colapsar la barra de herramientas auxiliar.
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr ""
+
+#. TRANS: Pegar
+msgid "Paste"
+msgstr ""
+
+#. TRANS: "El botón de pegar está activo, por lo tanto hay bloques copiados en el portapapeles."
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr ""
+
+#. TRANS: Copiar
+msgid "Copy"
+msgstr ""
+
+msgid "The copy button copies a stack to the clipboard. It appears after a \"long press\" on a stack."
+
+#. TRANS: Guardar pila
+msgid "Save stack"
+msgstr ""
+
+#. TRANS: El botón guardar pila, guarda la pila en una paleta personalizada. Aparece luego de \"mantener presionada (por unos segundos)\"  una pila.
+msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+
+#. TRANS: Configuración
+msgid "Settings"
+msgstr ""
+
+#. TRANS: Abre el panel para configurar Turtle Blocks.
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr ""
+
+#. TRANS: Disminuir el tamaño de los bloques
+msgid "Decrease block size"
+msgstr ""
+
+#. TRANS: Disminye el tamaño de los bloques
+msgid "Decrease the size of the blocks."
+msgstr ""
+
+#. TRANS: Incrementar el tamaño de los bloques
+msgid "Increase block size"
+msgstr ""
+
+#. TRANS: Incrementa el tamaño de los bloques
+msgid "Increase the size of the blocks."
+msgstr ""
+
+#. TRANS: Analizar
+msgid "Display statistics"
+msgstr ""
+
+#. TRANS: Analizar los tipos de bloques usados
+msgid "Display statistics about your Turtle project."
+msgstr ""
+
+#. TRANS: Cartesiano
+msgid "Cartesian"
+msgstr ""
+
+#. TRANS: Mostrar u ocultar cuadrícula en coordenadas cartesianas.
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr ""
+
+#. TRANS: Polar
+msgid "Polar"
+msgstr ""
+
+#. TRANS: Mostrar o ocultar la rejilla de coordenadas polares.
+msgid "Show or hide a polar-coordinate grid."
+msgstr ""
+
+#. TRANS: Cargar ejemplos desde el servidor
+msgid "Load samples from server"
+msgstr ""
+
+#. TRANS: Este botón abre la pantalla de carga de proyectos de ejemplo.
+msgid "This button opens a viewer for loading example projects."
+msgstr ""
+
+#. TRANS: Cargar proyecto desde archivo
+msgid "Load project from file"
+msgstr ""
+
+#. TRANS: También puede cargar proyectos desde el sistema de archivos.
+msgid "You can also load projects from the file system."
+msgstr ""
+
+#. TRANS: Cargar plugin desde archivo
+msgid "Load plugin from file"
+msgstr ""
+
+#. TRANS: Tu puedes cargar nuevos bloques desde un archivo. 
+msgid "You can load new blocks from the file system."
+msgstr ""
+
+#. TRANS: Borrar todo
+msgid "Delete all"
+msgstr ""
+
+#. TRANS: Eliminar todo el contenido del canvas, incluyendo los bloques.
+msgid "Remove all content on the canvas, including the blocks."
+msgstr ""
+
+#. TRANS: Deshacer
+msgid "Undo"
+msgstr ""
+
+#. TRANS: Restaurar bloques de la papelera
+msgid "Restore blocks from the trash."
+msgstr ""
+
+#. TRANS: Guardar proyecto
+msgid "Save project"
+msgstr ""
+
+msgid "Save your project to a server."
+msgstr ""
+
+#. TRANS: Felicitaciones
+msgid "Congratulations."
+msgstr ""
+
+#. TRANS: Guarde proyecto en el servidor.
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr ""
+
+#. TRANS: ocultar
+msgid "hide blocks"
+msgstr ""
+
+#. TRANS: volumen
+msgid "loudness"
+msgstr ""
+
+#. TRANS: publicar
+msgid "publish"
+msgstr ""
+
+#. TRANS: comentar
+msgid "comment"
+msgstr ""
+
+#. TRANS: reproducir
+msgid "play back"
+msgstr ""
+
+#. TRANS: guardar como SVG
+msgid "save svg"
+msgstr ""
+
+#. TRANS: título
+msgid "title"
+msgstr ""
+
+#. TRANS: evaluar
+msgid "eval"
+msgstr ""
+
+#. TRANS: mostrar bloques
+msgid "show blocks"
+msgstr ""
+
+#. TRANS: detener
+msgid "stop play"
+msgstr ""
+
+#. TRANS: tortuga
+msgid "turtle"
+msgstr ""
+
+#. TRANS: pluma
+msgid "pen"
+msgstr ""
+
+#. TRANS: numero
+msgid "number"
+msgstr ""
+
+#. TRANS: booleano
+msgid "boolean"
+msgstr ""
+
+#. TRANS: flujo
+msgid "flow"
+msgstr ""
+
+#. TRANS: bloques
+msgid "blocks"
+msgstr ""
+
+#. TRANS: media
+msgid "media"
+msgstr ""
+
+#. TRANS: sensores
+msgid "sensors"
+msgstr ""
+
+#. TRANS: extras
+msgid "extras"
+msgstr ""
+
+#. TRANS: abrir archivo
+msgid "open file"
+msgstr ""
+
+#. TRANS: z del acelerómetro
+msgid "motion z"
+msgstr ""
+
+#. TRANS: y del acelerómetro
+msgid "motion y"
+msgstr ""
+
+#. TRANS: x del acelerómetro
+msgid "motion x"
+msgstr ""
+
+#. TRANS: no se traducen bitcoin
+msgid "bitcoin"
+msgstr ""
+
+#. TRANS: desde
+msgid "from"
+msgstr ""
+
+#. TRANS: no se traducen mashape
+msgid "mashape"
+msgstr ""
+
+#. TRANS: definir
+msgid "define"
+msgstr ""
+
+#. TRANS: stock price
+msgid "stock price"
+msgstr ""
+
+#. TRANS: moneda
+msgid "currency"
+msgstr ""
+
+#. TRANS: Mapa de Google
+msgid "Google map"
+msgstr ""
+
+#. TRANS: coordenadas
+msgid "coordinates"
+msgstr ""
+
+#. TRANS: factor de zoom
+msgid "zoom factor"
+msgstr ""
+
+#. TRANS: zoom
+msgid "zoom"
+msgstr ""
+
+#. TRANS: latitud de la cuidad
+msgid "city latitude"
+msgstr ""
+
+#. TRANS: longitud de la cuidad
+msgid "city longitude"
+msgstr ""
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+#. TRANS: latitud
+msgid "latitude"
+msgstr ""
+
+#. TRANS: longitud
+msgid "longitude"
+msgstr ""
+
+#. TRANS: mostrar pila
+msgid "show heap"
+msgstr ""
+
+#. TRANS: sacar
+msgid "pop"
+msgstr ""
+
+#. TRANS: vaciar pila
+msgid "empty heap"
+msgstr ""
+
+#. TRANS: ¿pila vacío?
+msgid "heap empty?"
+msgstr ""
+
+#. TRANS: guardar pila
+msgid "save heap"
+msgstr ""
+
+#. TRANS: cargar pila
+msgid "load heap"
+msgstr ""
+
+#. TRANS: apilar
+msgid "push"
+msgstr ""
+
+#. TRANS: lógica
+msgid "logic"
+msgstr ""
+
+#. TRANS: poder (matemáticas)
+msgid "power"
+msgstr ""
+
+#. TRANS: base (matemáticas)
+msgid "base"
+msgstr ""
+
+#. TRANS: exp (matemáticas)
+msgid "exp"
+msgstr ""
+
+#. TRANS piso (matemáticas)
+msgid "floor"
+msgstr ""
+
+#. TRANS techo (matemáticas)
+msgid "ceiling"
+msgstr ""
+
+#. TRANS: grados (matemáticas)
+msgid "degrees"
+msgstr ""
+
+#. TRANS: a grados (matemáticas)
+msgid "to degrees"
+msgstr ""
+
+#. TRANS: radianes (matemáticas)
+msgid "radians"
+msgstr ""
+
+#. TRANS: a radianes (matemáticas)
+msgid "to radians"
+msgstr ""
+
+#. TRANS: matemáticas
+msgid "maths"
+msgstr ""
+
+#. TRANS: queso
+msgid "cheese"
+msgstr ""
+
+#. TRANS: manzana
+msgid "apple"
+msgstr ""
+
+#. TRANS: obtener grasas
+msgid "get fat"
+msgstr ""
+
+#. TRANS: pescado
+msgid "fish"
+msgstr ""
+
+#. TRANS: obtener calorías
+msgid "get calories"
+msgstr ""
+
+#. TRANS: proteína
+msgid "protein"
+msgstr ""
+
+#. TRANS: pollo
+msgid "chicken"
+msgstr ""
+
+#. TRANS: digerir
+msgid "digest meal"
+msgstr ""
+
+#. TRANS: obtener fibra
+msgid "get fiber"
+msgstr ""
+
+#. TRANS: carbohidratos
+msgid "carbs"
+msgstr ""
+
+#. TRANS: comer
+msgid "eat"
+msgstr ""
+
+#. TRANS: arroz y frijoles
+msgid "rice and beans"
+msgstr ""
+
+#. TRANS: naranja
+msgid "orange"
+msgstr ""
+
+#. TRANS: banana
+msgid "banana"
+msgstr ""
+
+#. TRANS: tamal
+msgid "tamale"
+msgstr ""
+
+#. TRANS: fibra
+msgid "fiber"
+msgstr ""
+
+#. TRANS: maíz
+msgid "corn"
+msgstr ""
+
+#. TRANS: grasa
+msgid "fat"
+msgstr ""
+
+#. TRANS: obtener carbohidratos
+msgid "get carbs"
+msgstr ""
+
+#. TRANS: agua
+msgid "water"
+msgstr ""
+
+#. TRANS: galleta
+msgid "cookie"
+msgstr ""
+
+#. TRANS: boñato
+msgid "sweet potato"
+msgstr ""
+
+#. TRANS: brocoli
+msgid "broccoli"
+msgstr ""
+
+#. TRANS: pan
+msgid "wheat bread"
+msgstr ""
+
+#. TRANS: tomate
+msgid "tomato"
+msgstr ""
+
+#. TRANS: carne de res
+msgid "beef"
+msgstr ""
+
+#. TRANS: papa
+msgid "potato"
+msgstr ""
+
+#. TRANS: calorías
+msgid "calories"
+msgstr ""
+
+#. TRANS: obtener nombre
+msgid "get name"
+msgstr ""
+
+#. TRANS: pastel
+msgid "cake"
+msgstr ""
+
+#. TRANS: obtener proteínas
+msgid "get protein"
+msgstr ""
+
+#. TRANS: alimentos
+msgid "food"
+msgstr ""
+
+#. TRANS: cómeme
+msgid "eatme"
+msgstr ""
+
+#. TRANS: sentido izquierda
+msgid "sense left"
+msgstr ""
+
+#. TRANS: sentido distancia
+msgid "see distance"
+msgstr ""
+
+#. TRANS: sentido derecha
+msgid "sense right"
+msgstr ""
+
+#. TRANS: cantar
+msgid "sing"
+msgstr ""
+
+#. TRANS: nota
+msgid "note"
+msgstr ""
+
+#. TRANS: duración
+msgid "duration"
+msgstr ""
+
+#. TRANS: mover
+msgid "move"
+msgstr ""
+
+msgid "blink (ms)"
+msgstr ""
+
+#. TRANS: no se traducen rodi
+msgid "rodi"
+msgstr ""
+
+#. TRANS: combiar idioma
+msgid "set lang"
+msgstr ""
+
+#. TRANS: origen
+msgid "source"
+msgstr ""
+
+#. TRANS: destino
+msgid "target"
+msgstr ""
+
+#. TRANS: traducir
+msgid "translate"
+msgstr ""
+
+#. TRANS: hola
+msgid "hello"
+msgstr ""
+
+#. TRANS: detecar idioma
+msgid "detect lang"
+msgstr ""
+
+#. TRANS: tortuga x
+msgid "turtle x"
+msgstr ""
+
+#. TRANS: tortuga y
+msgid "turtle y"
+msgstr ""
+
+#. TRANS: detener tortuga
+msgid "stop turtle"
+msgstr ""
+
+#. TRANS: renombrar tortuga
+msgid "turtle name"
+msgstr ""
+
+#. TRANS: iniciar tortuga
+msgid "start turtle"
+msgstr ""
+
+#. TRANS: pronóstico
+msgid "forecast"
+msgstr ""
+
+#. TRANS: ciudad
+msgid "city"
+msgstr ""
+
+#. TRANS: día
+msgid "day"
+msgstr ""
+
+#. TRANS: baja
+msgid "low"
+msgstr ""
+
+#. TRANS: alta
+msgid "high"
+msgstr ""
+
+#. TRANS: confirmar
+msgid "confirm"
+msgstr ""
+
+#. TRANS: Descargar
+msgid "Download"
+msgstr ""
+
+#. TRANS: Publicar
+msgid "Publish"
+msgstr ""
+
+#. TRANS: Planeta
+msgid "Planet"
+msgstr ""
+
+#. TRANS: En mu dispositivo
+msgid "On my device"
+msgstr ""
+
+#. TRANS: Abrir
+msgid "Open"
+msgstr ""
+
+#. TRANS: Borrar
+msgid "Delete"
+msgstr ""
+
+#. TRANS: En todo el mundo
+msgid "Worldwide"
+msgstr ""

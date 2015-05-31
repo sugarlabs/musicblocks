@@ -1,0 +1,13 @@
+{
+    "BLOCKPLUGINS": {
+        "accelerometerz": "var accelerometerZBlk = new ProtoBlock('accelerometerz');accelerometerZBlk.palette = palettes.dict['sensors'];blocks.protoBlockDict['accelerometerz'] = accelerometerZBlk;accelerometerZBlk.staticLabels.push(_('motion z'));accelerometerZBlk.adjustWidthToLabel();accelerometerZBlk.parameterBlock();", 
+        "accelerometery": "var accelerometerYBlk = new ProtoBlock('accelerometery');accelerometerYBlk.palette = palettes.dict['sensors'];blocks.protoBlockDict['accelerometery'] = accelerometerYBlk;accelerometerYBlk.staticLabels.push(_('motion y'));accelerometerYBlk.adjustWidthToLabel();accelerometerYBlk.parameterBlock();", 
+        "accelerometerx": "var accelerometerXBlk = new ProtoBlock('accelerometerx');accelerometerXBlk.palette = palettes.dict['sensors'];blocks.protoBlockDict['accelerometerx'] = accelerometerXBlk;accelerometerXBlk.staticLabels.push(_('motion x'));accelerometerXBlk.adjustWidthToLabel();accelerometerXBlk.parameterBlock();"
+    }, 
+    "GLOBALS": "accelerometer = {'x': null, 'y': null, 'z': null};function saveAccelerometerData(event) {    accelerometer['x'] = event.accelerationIncludingGravity.x;    accelerometer['y'] = event.accelerationIncludingGravity.y;    accelerometer['z'] = event.accelerationIncludingGravity.z;};if (window.DeviceMotionEvent) {    window.addEventListener(\"devicemotion\", saveAccelerometerData, false);}else{    console.log(\"DeviceMotionEvent is not supported (no accelerometer)\");}", 
+    "ARGPLUGINS": {
+        "accelerometerz": "var block = logo.blocks.blockList[blk];block.value = accelerometer['z'];", 
+        "accelerometery": "var block = logo.blocks.blockList[blk];block.value = accelerometer['y'];", 
+        "accelerometerx": "var block = logo.blocks.blockList[blk];block.value = accelerometer['x'];"
+    }
+}

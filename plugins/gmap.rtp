@@ -1,0 +1,202 @@
+//* comment *//
+
+Copyright (C) 2015 Yash Khandelwal
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+NOTE: Default local is downtown Boston.
+
+//* globals *//
+var gmapMashapeKey = 'JidA8phgY8mshJ8MiEUeHTdwFjjtp1wq209jsncYthfRDMQNW6';
+var cityName = '';
+var cityLatitude = 0;
+var cityLongitude = 0;
+
+//* block:cityToLat *//
+var cityToLatBlk = new ProtoBlock('cityToLat');
+cityToLatBlk.palette = palettes.dict['GMAP'];
+blocks.protoBlockDict['cityToLat'] = cityToLatBlk;
+cityToLatBlk.staticLabels.push(_('city latitude'));
+cityToLatBlk.adjustWidthToLabel();
+cityToLatBlk.oneArgMathBlock();
+cityToLatBlk.dockTypes[1] = 'anyin';
+cityToLatBlk.defaults.push("Boston");
+
+//* block:cityToLong *//
+var cityToLongBlk = new ProtoBlock('cityToLong');
+cityToLongBlk.palette = palettes.dict['GMAP'];
+blocks.protoBlockDict['cityToLong'] = cityToLongBlk;
+cityToLongBlk.staticLabels.push(_('city longitude'));
+cityToLongBlk.adjustWidthToLabel();
+cityToLongBlk.oneArgMathBlock();
+cityToLongBlk.dockTypes[1] = 'anyin';
+cityToLongBlk.defaults.push("Boston");
+
+//* arg:cityToLong *//
+var block = logo.blocks.blockList[blk];
+var conns = block.connections;
+var city = logo.parseArg(logo, turtle, conns[1]);
+
+if (city == cityName) {
+    block.value = cityLongitude;
+} else {
+    var apiURL = 'https://devru-latitude-longitude-find-v1.p.mashape.com/latlon.php?location=' + city;
+    var request = new XMLHttpRequest();
+    request.open('GET', apiURL, false);
+    request.setRequestHeader('X-Mashape-Authorization', gmapMashapeKey);
+    request.send(null);
+    var response = request.responseText;
+    var data = JSON.parse(response);
+    var longitude = 0;
+    if (data['Results'].length > 0) {   
+        data = data['Results'][0]['ll'];
+        var parts = data.split(' ');
+        try {
+            cityLatitude = Number(parts[0]);
+            cityLongitude = Number(parts[1]);
+            var longitude = cityLongitude;
+            cityName = city;
+        } catch (e) {
+           logo.errorMsg(_('Coordinate data not available.'), blk);
+        }
+    } else {
+        logo.errorMsg(_('Coordinate data not available.'), blk);
+    }
+    block.value = longitude;
+}
+
+//* arg:cityToLat *//
+var block = logo.blocks.blockList[blk];
+var conns = block.connections;
+var city = logo.parseArg(logo, turtle, conns[1]);
+
+if (city == cityName) {
+    block.value = cityLatitude;
+} else {
+    var apiURL = 'https://devru-latitude-longitude-find-v1.p.mashape.com/latlon.php?location=' + city;
+    var request = new XMLHttpRequest();
+    request.open('GET', apiURL, false);
+    request.setRequestHeader('X-Mashape-Authorization', gmapMashapeKey);
+    request.send(null);
+    var response = request.responseText;
+    var data = JSON.parse(response);
+    var latitude = 0;
+    if(data['Results'].length > 0) {   
+        data = data['Results'][0]['ll'];
+        var parts = data.split(' ');
+        try {
+            cityLatitude = Number(parts[0]);
+            cityLongitude = Number(parts[1]);
+            var latitude = cityLatitude;
+            cityName = city;
+        } catch (e) {
+           logo.errorMsg(_('Coordinate data not available.'), blk);
+        }
+    } else {
+       logo.errorMsg(_('Coordinate data not available.'), blk);
+    }
+    block.value = latitude;
+}
+
+//* block:gmap *//
+var gmapBlk = new ProtoBlock('gmap');
+gmapBlk.palette = palettes.dict['GMAP'];
+blocks.protoBlockDict['gmap'] = gmapBlk;
+gmapBlk.staticLabels.push(_('Google map'),_('coordinates'),_('zoom factor'));
+gmapBlk.adjustWidthToLabel();
+gmapBlk.twoArgMathBlock();
+
+//* arg:gmap *//
+var block = logo.blocks.blockList[blk];
+var conns = block.connections;
+var url    = logo.parseArg(logo, turtle, conns[1]);
+var zoom_factor   = logo.parseArg(logo, turtle, conns[2]);
+if(!url) {
+    url = 'http://maps.googleapis.com/maps/api/staticmap?center=42.357279,-71.065740';
+}
+
+if(!zoom_factor) {
+    zoom_factor = 10;
+}
+
+if(zoom_factor == 0) {
+    zoom_factor = 0;
+}
+
+gmapURL = url + '&size=800x800&zoom=' + zoom_factor +'&sensor=false';
+block.value = gmapURL;
+
+//* block:zoom *//
+var zoomBlk = new ProtoBlock('zoom');
+zoomBlk.palette = palettes.dict['GMAP'];
+blocks.protoBlockDict['zoom'] = zoomBlk;
+zoomBlk.staticLabels.push(_('zoom'));
+zoomBlk.adjustWidthToLabel();
+zoomBlk.oneArgMathBlock();
+zoomBlk.dockTypes[1] = 'anyin';
+zoomBlk.defaults.push(10);
+
+//* arg:zoom *//
+var block = logo.blocks.blockList[blk];
+var conns = block.connections;
+var zoomFactor = logo.parseArg(logo, turtle, conns[1]);
+block.value = zoomFactor;
+
+//* block:coord *//
+var coordBlk = new ProtoBlock('coord');
+coordBlk.palette = palettes.dict['GMAP'];
+blocks.protoBlockDict['coord'] = coordBlk;
+coordBlk.staticLabels.push(_('coordinates'),_('latitude'),_('longitude'));
+coordBlk.adjustWidthToLabel();
+coordBlk.twoArgMathBlock();
+coordBlk.dockTypes[1] = 'anyin';
+coordBlk.dockTypes[2] = 'anyin';
+coordBlk.defaults.push(42.357279,-71.065740);
+
+//* arg:coord *//
+var block = logo.blocks.blockList[blk];
+var conns = block.connections;
+var latitude    = logo.parseArg(logo, turtle, conns[1]);
+var longitude   = logo.parseArg(logo, turtle, conns[2]);
+
+latitude = eval(latitude);
+longitude = eval(longitude);
+
+if(!latitude || !longitude) {
+    latitude = 42.357279;
+    longitude = -71.065740;
+}
+gmapURL = 'http://maps.googleapis.com/maps/api/staticmap?center=' + latitude + ',' + longitude;
+        
+block.value = gmapURL;
+
+//* palette-icon:GMAP *//
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="55"
+   height="55">
+  <g
+     transform="translate(0,-997.36218)">
+    <path
+       d="m 26.666222,1048.911 c -0.09596,-0.1879 -0.280246,-1.1767 -0.409529,-2.1972 -0.565075,-4.4605 -1.668106,-8.4319 -3.417528,-12.3047 -1.042617,-2.3081 -1.991286,-4.0116 -4.785815,-8.5938 -2.157572,-3.5377 -3.416439,-6.1924 -3.906374,-8.2377 -1.94515,-8.1203 3.386556,-15.8819 11.66714,-16.9844 6.55392,-0.87256 12.754344,3.0441 14.884012,9.4018 0.303361,0.9057 0.454986,1.948 0.528971,3.6362 0.12683,2.8942 -0.172817,4.4431 -1.375035,7.1077 -0.81051,1.7964 -1.193239,2.47 -3.882801,6.8343 -4.222383,6.8514 -6.42126,12.8338 -7.162043,19.4855 -0.09889,0.8879 -0.288049,1.7449 -0.420357,1.9043 -0.340934,0.4108 -1.502333,0.3757 -1.720641,-0.052 z m 3.610049,-29.2554 c 2.087523,-1.02 3.263533,-2.9613 3.249324,-5.3637 -0.01655,-2.7984 -1.484926,-4.8055 -4.176295,-5.7086 -1.149887,-0.3858 -3.454027,-0.19 -4.573135,0.3887 -0.987414,0.5106 -2.073445,1.6471 -2.65731,2.7808 -0.65002,1.2622 -0.65002,3.816 0,5.0782 1.595933,3.0989 5.107552,4.3148 8.157416,2.8246 z"
+       style="fill:#ffffff" />
+  </g>
+</svg>
+
+
+//* palette-fill:GMAP *// #00abff
+//* palette-stroke:GMAP *// #005aaa
+//* palette-highlight:GMAP *// #00c5ff
+//* palette-stroke-highlight:GMAP *// #002659
