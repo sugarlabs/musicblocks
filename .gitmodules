@@ -1,0 +1,3 @@
+[submodule "lib/vexflow"]
+	path = lib/vexflow
+	url = https://github.com/khandelwalYash/Music-Blocks.git
