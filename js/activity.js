@@ -198,10 +198,7 @@ define(function(require) {
         pluginsImages = {};
 
         function allClear() {
-            if (chartBitmap != null) {
-                stage.removeChild(chartBitmap);
-                chartBitmap = null;
-            }
+            
             logo.boxes = {};
             logo.time = 0;
             hideMsgs();
@@ -210,6 +207,29 @@ define(function(require) {
                 turtles.turtleList[turtle].doClear();
             }
 
+            Element.prototype.remove = function() {
+            this.parentElement.removeChild(this);
+            }
+            NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+            for(var i = 0, len = this.length; i < len; i++) {
+                if(this[i] && this[i].parentElement) {
+                    this[i].parentElement.removeChild(this[i]);
+                    }
+                }
+            }
+            var table = document.getElementById("myTable");
+            if(table != null)
+            {
+                table.remove();
+            }
+
+            var canvas = document.getElementById("music1");
+            var context = canvas.getContext("2d");
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            matrix.musicContainer.removeAllChildren();
+            var name = stage.getChildByName('notation1');
+            stage.removeChild(name);
             blocksContainer.x = 0;
             blocksContainer.y = 0;
         }
@@ -391,6 +411,7 @@ define(function(require) {
             turtles = new Turtles(canvas, turtleContainer, refreshCanvas);
             blocks = new Blocks(canvas, blocksContainer, refreshCanvas, trashcan, stage.update);
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
+            matrix = new Matrix(canvas, stage, turtles, trashcan);
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
@@ -399,7 +420,7 @@ define(function(require) {
             blocks.makeCopyPasteButtons(makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(canvas, blocks, turtles, turtleContainer,
+            logo = new Logo(matrix, canvas, blocks, turtles, turtleContainer,
                             refreshCanvas,
                             textMsg, errorMsg, hideMsgs, onStopTurtle,
                             onRunTurtle, prepareExport, getStageX, getStageY,

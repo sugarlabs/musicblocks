@@ -1446,7 +1446,9 @@ function loadPaletteMenuHandler(palette) {
         var offset = {
             x: palette.menuContainer.x - Math.round(event.stageX / palette.palettes.scale),
             y: palette.menuContainer.y - Math.round(event.stageY / palette.palettes.scale)
+            
         };
+        console.log('scale '+offset.x + " "+offset.y);
 
         palette.menuContainer.on('pressup', function(event) {
             if (trashcan.overTrashcan(event.stageX / palette.palettes.scale, event.stageY / palette.palettes.scale)) {

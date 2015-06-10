@@ -13,6 +13,7 @@
     <script src="lib/jquery-1.10.1.js"></script>
     <script src="lib/webL10n.js"></script>
     <script src="lib/tone.min.js"></script>
+    <script src="lib/vexflow/releases/vexflow-min.js"></script>
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
     <script data-main="js/loader" src="lib/require.js"> </script>
@@ -87,7 +88,13 @@
     </div>
 
     <div class="canvasHolder">
-        
+          
+    </div>
+  </div>
+    
+  <div class="music" >
+      <canvas hidden id="music1" width=525 height=120></canvas>    
+  </div>
         <!--<table id='myTable' width=600>
            <th width="30">Solfa</th>
            <tr id="row1"><td>Si</td></tr>

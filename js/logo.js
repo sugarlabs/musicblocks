@@ -22,7 +22,7 @@ var NOSQRTERRORMSG = 'Cannot take square root of negative number.';
 var ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 var EMPTYHEAPERRORMSG = 'empty heap.';
 
-function Logo(canvas, blocks, turtles, stage, refreshCanvas, textMsg, errorMsg,
+function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, errorMsg,
               hideMsgs, onStopTurtle, onRunTurtle, prepareExport, getStageX,
               getStageY, getStageMouseDown, getCurrentKeyCode,
               clearCurrentKeyCode, meSpeak, saveLocally) {
@@ -283,7 +283,7 @@ function Logo(canvas, blocks, turtles, stage, refreshCanvas, textMsg, errorMsg,
 
         // Init the graphic state.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-            this.turtles.turtleList[turtle].container.x = this.turtles.turtleX2screenX(this.turtles.turtleList[turtle].x);
+            this.turtles.turtleList[turtle].container.x =200//= this.turtles.turtleX2screenX(this.turtles.turtleList[turtle].x);
             this.turtles.turtleList[turtle].container.y = this.turtles.turtleY2screenY(this.turtles.turtleList[turtle].y);
         }
 
@@ -1059,21 +1059,33 @@ length;
                 console.log('octave '+args[0]);
                 this.octave = args[0];
                 break;
+            
             case 'matrix' :
-                var matrix = new Matrix(args[0],args[1]);
-
-                matrix.initMatrix();
+                matrix.initMatrix(args[0],args[1]);
                 this.matrix = matrix;
                 break;
                 //logo.setTurtleDelay(2500);
                 //matrix.playMatrix(4);
+
             case 'timeSign' :
                 console.log('Time Signatature' + args[0]);
                 break;
         
+            case 'transposition' :
+                console.log('transposition by scaling ' + args[0]);
+                matrix.setTransposition(args[0]);
+            break;
+
             case 'playmatrix' :
-                this.matrix.playMatrix();
+                console.log('Matrix played after '+args[0]);
+                this.matrix.playMatrix(parseInt(args[0]));
                 break;
+
+            case 'notation' :
+                this.matrix.musicNotation();
+                console.log('Generating Music Notation');
+                break;
+
             default:
                 if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
                     eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
@@ -1544,6 +1556,10 @@ length;
                     var c = logo.parseArg(logo, turtle, a, blk);
                     logo.blocks.blockList[blk].value = a;
                     break;
+
+                case 'matrix' :
+
+
                 default:
                     if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
                         eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);

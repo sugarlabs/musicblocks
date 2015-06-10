@@ -213,4 +213,9 @@ input.number {
   top: 200px;
 }
 
+.music {
+  position: absolute;
+  left: 450px;
+  top: 400px; 
+}
 /*# sourceMappingURL=activity.css.map */

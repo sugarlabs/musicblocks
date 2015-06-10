@@ -526,24 +526,34 @@ function Turtles(canvas, stage, refreshCanvas) {
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
 
-    this.add = function(startBlock, infoDict) {
-        // Add a new turtle for each start block
+    this.add = function(startBlock, infoDict, note) {
+        // Add a new turtle for each start block and for each note to be played in the music-matrix
         if (startBlock != null) {
             console.log('adding a new turtle ' + startBlock.name);
-        } else {
-            console.log('adding a new turtle startBlock is null');
+        }
+        else if(note != null)
+        {
+            console.log('adding a new turtle ' + note);   
+        }
+        else {
+            console.log('adding a new turtle startBlock and note is null');
         };
 
         var blkInfoAvailable = false;
 
-        if (typeof(infoDict) == 'object') {
+        if (typeof(infoDict) == 'object' && infoDict != null) {
           if (Object.keys(infoDict).length == 8) {
             blkInfoAvailable = true;
           }
         }
 
         var i = this.turtleList.length;
-        var turtleName = i.toString();
+        if(note != null)
+        {
+            var turtleName =note +'note' + i.toString();
+        }
+        else
+            var turtleName = i.toString();    
         var myTurtle = new Turtle(turtleName, this);
 
         if (blkInfoAvailable) {

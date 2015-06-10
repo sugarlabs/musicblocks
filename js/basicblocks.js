@@ -63,10 +63,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrix.staticLabels.push(_('Matrix'),_('Time Sign.'),_('Octave'));
     matrix.adjustWidthToLabel();
     matrix.defaults.push('3/4');
-    matrix.defaults.push(4);
-    matrix.twoArgMathBlock();
+    matrix.defaults.push('4');
+    matrix.twoArgBlock();
     matrix.dockTypes[1] = 'anyin';
-    matrix.dockTypes[2] = 'number';
+    matrix.dockTypes[2] = 'anyin';
     
     var timeSign = new ProtoBlock('timeSign');
     timeSign.palette = palettes.dict['matrix'];
@@ -94,6 +94,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     playmatrix.defaults.push('1000');
     playmatrix.oneArgMathBlock();
     playmatrix.dockTypes[1] = 'number';
+    
+    var transposition = new ProtoBlock('transposition');
+    transposition.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['transposition'] = transposition;
+    transposition.staticLabels.push(_('transposition'));
+    transposition.adjustWidthToLabel();
+    transposition.defaults.push('+1');
+    transposition.oneArgBlock();
+    transposition.dockTypes[1] = 'anyin';    
+    
+    var notationBlock = new ProtoBlock('notation');
+    notationBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['notation'] = notationBlock;
+    notationBlock.staticLabels.push(_('Music Notation'));
+    notationBlock.adjustWidthToLabel();
+    notationBlock.zeroArgBlock();
     
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');
