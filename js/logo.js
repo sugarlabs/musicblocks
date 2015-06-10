@@ -83,6 +83,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     }
     
     this.turtleOscs = {};
+    this.noteOscs = {};
 
     this.setTurtleDelay = function(turtleDelay) {
         this.turtleDelay = turtleDelay;
@@ -1085,6 +1086,43 @@ length;
                 this.matrix.musicNotation();
                 console.log('Generating Music Notation');
                 break;
+            case 'note':
+                if (typeof(this.noteOscs[turtle]) == "undefined") {
+                    this.noteOscs[turtle] = new Tone.MonoSynth();
+                }
+                synth = this.noteOscs[turtle];
+                synth.toMaster();
+                //Tone.Transport.setInterval(function(time){
+                    console.log(args[0]);
+                    var noteValue = args[1];
+                    noteValue += "n";
+                synth.triggerAttackRelease(args[0], noteValue);
+                //}, "1n");
+                //start the transport
+                Tone.Transport.start();
+                logo.setTurtleDelay(parseFloat(1/args[1])*2000);
+                break;
+            case 'osctime':
+                this.startTime = parseFloat(args[0]);
+                this.stopTime = parseFloat(args[1]);
+                break;
+            case 'sine':
+            case 'square':
+            case 'sawtooth':
+                var oscName = logo.blocks.blockList[blk].name; 
+                console.log(oscName);    
+                var sineOsc=new Tone.Oscillator(args[0], oscName)
+                .toMaster();
+                 //connected to the master output
+                setTimeout(function(osc){
+                    sineOsc.start();
+                },this.startTime);
+                console.log( sineOsc);
+                setTimeout(function(osc){
+                    sineOsc.stop();
+                },this.stopTime);
+                break;
+
 
             default:
                 if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
@@ -1527,6 +1565,15 @@ length;
                     break;
                 case 'loadFile':
                     // No need to do anything here.
+                    break;
+                case 'osctime':
+                    var block = logo.blocks.blockList[blk];
+                    var a = block.connections[1];
+                    var b = block.connections[2];
+                    var c = logo.parseArg(logo, turtle, a, blk);
+                    var d = logo.parseArg(logo, turtle, b, blk);
+                    this.startTime = parseFloat(c);
+                    this.stopTime = parseFloat(d);
                     break;
                 case 'tofrequency':
                     var block = logo.blocks.blockList[blk];
