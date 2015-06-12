@@ -17,8 +17,8 @@ var PALETTELEFTMARGIN = 10;
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-var BUILTINPALETTES = ['matrix', 'music', 'turtle', 'pen', 'number', 'boolean', 'flow', 'blocks',
-    'actions', 'media', 'sensors', 'myblocks',
+var BUILTINPALETTES = ['matrix', 'music', 'turtle', /*'pen',*/ 'number', /*'boolean',*/ 'flow', /*'blocks',*/
+    'actions', 'media', /*'sensors',*/ 'myblocks',
 ];
 
 
@@ -1142,15 +1142,15 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     add('matrix').
     add('music').
     add('turtle').
-    add('pen').
+    //add('pen').
     add('number').
-    add('boolean').
+    //add('boolean').
     add('flow').
-    add('blocks').
+    //add('blocks').
     add('actions').
-    add('media').
-    add('sensors').
-    add('extras');
+    add('media');
+    //add('sensors').
+    //add('extras');
     palettes.makePalettes();
     blocks = b;
 

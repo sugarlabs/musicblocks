@@ -17,8 +17,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 	this.transposition = null;
 
 	this.musicContainer = null;
-
-	this.index = 0;	
+	this.notationIndex = 0;	
 	this.clearTurtles = function()
 	{
 		for(var i = 0; i < turtles.turtleList.length; i++)
@@ -43,8 +42,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 		console.log('time signature '+timeSign +' and octave '+octave);
 
 		this.clearTurtles();
-		this.musicContainer = new createjs.Container();
-
+			
 		this.octave = octave;
 
 		Element.prototype.remove = function() {
@@ -221,7 +219,6 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 				else
 					index += factor % this.notes.length;
 				index = index % this.notes.length;
-				console.log('index '+index);
 				return this.notes[index];
 
 			}
@@ -252,16 +249,20 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 	this.convertCanvasToImage = function(canvas) {
 		var image = new Image();
 		image.src = canvas.toDataURL("image/png");
-		console.log('img '+image);
 		return image;
 	}
 
 	this.musicNotation = function(){
 
+		if (this.musicContainer == null) {
+			this.musicContainer = new createjs.Container();
+			this.musicContainer.name = 'musicNotation';
+		}
+		stage.addChild(this.musicContainer);
+		
 	    var canvas = document.getElementById("music1");
 	    var context = canvas.getContext("2d");
 	    context.clearRect(0, 0, canvas.width, canvas.height);
-	    console.log(canvas);
 	    var renderer = new Vex.Flow.Renderer(canvas,
 	    Vex.Flow.Renderer.Backends.CANVAS);
 	    
@@ -277,7 +278,6 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 		    if(turtles.turtleList[i].name.includes('note'))
 		    {
 				var note = turtles.turtleList[i].name.substring(0, 1);
-				console.log('note '+note);
 				
 		   		notes.push(new Vex.Flow.StaveNote({ keys: [note + '/' + this.octave], duration: "4" }));
 	  		}
@@ -300,20 +300,16 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 
 		var img = this.convertCanvasToImage(canvas);
 		var bitmap = new createjs.Bitmap(img);
-		bitmap.x = 1000;
-		bitmap.y = 70;
+		bitmap.x = 1150;
+		bitmap.y = 70*(1 + this.notationIndex);
 		
-		this.musicContainer.addChildAt(bitmap, this.index);
-		this.index += 1;
+		bitmap.name = 'notation' + this.notationIndex;
+		this.musicContainer.addChild(bitmap);
 
-		//var index = this.musicContainer.getChildIndex(bitmap);
-		bitmap.name = 'notation';
-		console.log('ch '+this.musicContainer.children);
-		stage.addChild(bitmap);
+		this.notationIndex += 1;
 
 		bitmap.on('mousedown', function(event) {
 			trashcan.show();
-			console.log('x '+event.stageX+' y '+event.stageY);
 			var offset = {
 			x: bitmap.x - Math.round(event.stageX ),
 			y: bitmap.y - Math.round(event.stageY )

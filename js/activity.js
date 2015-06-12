@@ -227,9 +227,9 @@ define(function(require) {
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
             
+            //var name = stage.getChildByName('notation1');
             matrix.musicContainer.removeAllChildren();
-            var name = stage.getChildByName('notation1');
-            stage.removeChild(name);
+            matrix.notationIndex = 0;
             blocksContainer.x = 0;
             blocksContainer.y = 0;
         }
