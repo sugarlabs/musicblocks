@@ -117,9 +117,9 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 
 
  		this.chkArray = new Array(this.timeSignDenominator);
- 		for(var i=0; i<=this.timeSignDenominator; i++)
+ 		for(var i=0; i<=this.timeSignNumerator; i++)
  			this.chkArray[i] = 0;
-	    for(var j=0; j<this.timeSignDenominator; j++)
+	    for(var j=0; j<this.timeSignNumerator; j++)
 	    {
 		    for(var i=1; i<9; i++)
 		    {
@@ -302,6 +302,14 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 		var bitmap = new createjs.Bitmap(img);
 		bitmap.x = 1150;
 		bitmap.y = 70*(1 + this.notationIndex);
+		bitmap.visible = false;	
+		var notdiv = document.getElementById('musicNotation');
+		var base64Notation = canvas.toDataURL();
+		console.log(base64Notation);	
+		notdiv.innerHTML += "<br>" + "<img  height=38% src=" + base64Notation + ">";
+		console.log(notdiv.innerHTML);
+
+		document.getElementById('musicNotation').style.display = 'block';
 		
 		bitmap.name = 'notation' + this.notationIndex;
 		this.musicContainer.addChild(bitmap);

@@ -209,13 +209,23 @@ input.number {
 
 #myTable {
   position: absolute;
-  left: 400px;
-  top: 200px;
+  left: 20%;
+  top: 30%;
 }
 
 .music {
   position: absolute;
   left: 450px;
   top: 400px; 
+}
+
+#musicNotation {
+  position: absolute;
+  right : 3%;
+  top : 15%;
+  overflow: scroll;
+  height: 40%;
+  width : 27%;
+
 }
 /*# sourceMappingURL=activity.css.map */

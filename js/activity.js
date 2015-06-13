@@ -413,6 +413,8 @@ define(function(require) {
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
             matrix = new Matrix(canvas, stage, turtles, trashcan);
 
+            document.getElementById('musicNotation').style.display = 'none';
+
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
             blocks.setTurtles(turtles);
