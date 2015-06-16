@@ -48,6 +48,7 @@ define(function(require) {
     require('activity/analytics');
     require('prefixfree.min');
     require('activity/matrix');
+    require('activity/musicnotation');
 
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function(doc) {
@@ -228,10 +229,12 @@ define(function(require) {
             context.clearRect(0, 0, canvas.width, canvas.height);
             
             //var name = stage.getChildByName('notation1');
-            matrix.musicContainer.removeAllChildren();
-            matrix.notationIndex = 0;
+            musicnotation.musicContainer.removeAllChildren();
+            musicnotation.notationIndex = 0;
             blocksContainer.x = 0;
             blocksContainer.y = 0;
+
+            matrix.clearTurtles();
         }
 
         /*function doFastButton() {
@@ -411,9 +414,14 @@ define(function(require) {
             turtles = new Turtles(canvas, turtleContainer, refreshCanvas);
             blocks = new Blocks(canvas, blocksContainer, refreshCanvas, trashcan, stage.update);
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
-            matrix = new Matrix(canvas, stage, turtles, trashcan);
+            musicnotation = new MusicNotation(turtles, stage);
+            matrix = new Matrix(canvas, stage, turtles, trashcan, musicnotation);
 
-            document.getElementById('musicNotation').style.display = 'none';
+            //setting bgcolor of canvas that will be download as image for music notation
+            var can = document.getElementById('canvasToSave');
+            var ctx = can.getContext('2d');
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0,0,525,800);
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
@@ -970,6 +978,18 @@ define(function(require) {
             }
         }
 
+        function saveMusicNotations() {
+
+            var canvas = document.getElementById("canvasToSave");
+            var img    = canvas.toDataURL("image/png");
+            //document.write('<img src="'+img+'"/>');*/
+            var link = document.createElement('a');
+            link.href = img;
+            link.download = 'Download.png';
+            document.body.appendChild(link);
+            link.click();
+        }
+
         function toggleCollapsibleStacks() {
             if (blocks.visible) {
                 console.log('calling toggleCollapsibles');
@@ -1449,6 +1469,7 @@ define(function(require) {
                 ['palette', changePaletteVisibility],
                 ['hide-blocks', changeBlockVisibility],
                 ['collapse-blocks', toggleCollapsibleStacks],
+                ['fast', saveMusicNotations],//'save-notations'
                 ['help', showHelp]
             ];
 

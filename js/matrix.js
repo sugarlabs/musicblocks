@@ -1,5 +1,5 @@
 
-function Matrix(Mcanvas, stage, turtles, trashcan)
+function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 {
 	this.timeSignDenominator = 4;
 	this.timeSignNumerator = 4;
@@ -16,7 +16,6 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 	this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
 	this.transposition = null;
 
-	this.musicContainer = null;
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
 	{
@@ -24,6 +23,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 		{
 			if(turtles.turtleList[i].name.includes('note'))
 			{
+				console.log("clear turtles ");
 				turtles.turtleList[i].trash = true;
                 turtles.turtleList[i].container.visible = false;	
 				turtles.turtleList.splice(i, 1);
@@ -66,8 +66,10 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 
 		var x = document.createElement("TABLE");
 		x.setAttribute("id", "myTable");
+		x.style.textAlign = 'center';
 		//x.setAttribute("border", "1px solid #fff");
-		x.setAttribute("width", "600px");
+		var w = window.innerWidth;
+		x.setAttribute("width", w/2+"px");
 		document.body.appendChild(x);
 		var table = document.getElementById("myTable");
 		var header = table.createTHead();
@@ -75,6 +77,8 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
     	var cell = row.insertCell(-1);
     	cell.innerHTML = '<b>' + 'Solfa' + '</b>';
     	cell.style.backgroundColor = '#9ACD32';
+    	cell.style.width = "30%";
+
     	for(var i=0; i<solfege.length; i++)
     	{
     		var row = header.insertRow(i+1);
@@ -86,9 +90,9 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
     	var row = header.insertRow(8);
     	var cell = row.insertCell(0);
     	cell.innerHTML = '<b>'+'Time'+'</b>';
+    	cell.style.height = "50px";
     	cell.style.backgroundColor = '#9ACD32';
-
-
+    	
 	    var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
 	    for(var i=0; i<timeSign.length; i++)
 	    {
@@ -241,119 +245,16 @@ function Matrix(Mcanvas, stage, turtles, trashcan)
 		    that.i++;                     
 		    if (that.i < that.notesToPlay.length) {            
 		       that.myLoop();              
-		   	}                        
+		   	}       	                 
 		    }, 1000)
 		}
 
 	
-	this.convertCanvasToImage = function(canvas) {
-		var image = new Image();
-		image.src = canvas.toDataURL("image/png");
-		return image;
-	}
-
-	this.musicNotation = function(){
-
-		if (this.musicContainer == null) {
-			this.musicContainer = new createjs.Container();
-			this.musicContainer.name = 'musicNotation';
+		this.musicNotation = function(){
+		
+			musicnotation.doNotation(this.timeSignNumerator, this.timeSignDenominator, this.octave);
 		}
-		stage.addChild(this.musicContainer);
-		
-	    var canvas = document.getElementById("music1");
-	    var context = canvas.getContext("2d");
-	    context.clearRect(0, 0, canvas.width, canvas.height);
-	    var renderer = new Vex.Flow.Renderer(canvas,
-	    Vex.Flow.Renderer.Backends.CANVAS);
-	    
-	    var ctx = renderer.getContext();
-	    var stave = new Vex.Flow.Stave(10, 0, 500);
-	    stave.addClef("treble").setContext(ctx).draw();
 
-	    //Create the notes
-	    var notes = [];
-
-	 	for(var i = 0; i < turtles.turtleList.length; i++)
-		{
-		    if(turtles.turtleList[i].name.includes('note'))
-		    {
-				var note = turtles.turtleList[i].name.substring(0, 1);
-				
-		   		notes.push(new Vex.Flow.StaveNote({ keys: [note + '/' + this.octave], duration: "4" }));
-	  		}
-	    }
-
-	    var voice = new Vex.Flow.Voice({
-	    num_beats: this.timeSignNumerator,
-	    beat_value: this.timeSignDenominator,
-	    resolution: Vex.Flow.RESOLUTION
-	    });
-	    console.log('notes '+notes);
-	    // Add notes to voice
-	    voice.addTickables(notes);
-
-	    // Format and justify the notes to 500 pixels
-	    var formatter = new Vex.Flow.Formatter().
-	    joinVoices([voice]).format([voice], 500);
-	    // Render voice
-		voice.draw(ctx, stave);
-
-		var img = this.convertCanvasToImage(canvas);
-		var bitmap = new createjs.Bitmap(img);
-		bitmap.x = 1150;
-		bitmap.y = 70*(1 + this.notationIndex);
-		bitmap.visible = false;	
-		var notdiv = document.getElementById('musicNotation');
-		var base64Notation = canvas.toDataURL();
-		console.log(base64Notation);	
-		notdiv.innerHTML += "<br>" + "<img  height=38% src=" + base64Notation + ">";
-		console.log(notdiv.innerHTML);
-
-		document.getElementById('musicNotation').style.display = 'block';
-		
-		bitmap.name = 'notation' + this.notationIndex;
-		this.musicContainer.addChild(bitmap);
-
-		this.notationIndex += 1;
-
-		bitmap.on('mousedown', function(event) {
-			trashcan.show();
-			var offset = {
-			x: bitmap.x - Math.round(event.stageX ),
-			y: bitmap.y - Math.round(event.stageY )
-
-			};
-
-			bitmap.on('pressup', function(event) {
-		    if (trashcan.overTrashcan(event.stageX , event.stageY )) {
-		        bitmap.visible = false;
-		    }
-		    trashcan.hide();
-			});
-
-			bitmap.on('mouseout', function(event) {
-			   	if (trashcan.overTrashcan(event.stageX , event.stageY )) {
-			        bitmap.visible = false;
-			    }
-			    trashcan.hide();
-			});
-
-			bitmap.on('pressmove', function(event) {
-			    var oldX = bitmap.x;
-			    var oldY = bitmap.y;
-			    bitmap.x = event.stageX + offset.x;//Math.round(event.stageX / palette.palettes.scale) + offset.x;
-			    bitmap.y = event.stageY + offset.y;//Math.round(event.stageY / palette.palettes.scale) + offset.y;
-			   
-			    // If we are over the trash, warn the user.
-			    if (trashcan.overTrashcan(event.stageX , event.stageY )) {
-			        trashcan.highlight();
-			    } else {
-			        trashcan.unhighlight();
-			    }
-
-			});
-		});
-    }
 
 	this.playMatrix = function(time){
 		var that = this;
