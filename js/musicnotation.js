@@ -13,7 +13,6 @@ function MusicNotation(turtles, stage)
 
 	this.doNotation = function(timeSignNumerator, timeSignDenominator, octave)
 	{
-		console.log("in music not");
 		if (this.musicContainer == null) {
 			this.musicContainer = new createjs.Container();
 			this.musicContainer.name = 'musicNotation';
@@ -75,9 +74,7 @@ function MusicNotation(turtles, stage)
 		bitmap.visible = false;	
 		var notdiv = document.getElementById('musicNotation');
 		var base64Notation = canvas.toDataURL();
-		console.log(base64Notation);	
-		notdiv.innerHTML += "<br>" + "<img  height=38% src=" + base64Notation + ">";
-		console.log(notdiv.innerHTML);
+		notdiv.innerHTML +=  "<img width=100% src=" + base64Notation + ">";
 
 		document.getElementById('musicNotation').style.display = 'block';
 		

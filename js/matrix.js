@@ -15,6 +15,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 	this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
 	this.transposition = null;
+	this.isMatrix = 0;
 
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
@@ -42,7 +43,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		console.log('time signature '+timeSign +' and octave '+octave);
 
 		this.clearTurtles();
-			
+		this.isMatrix = 1;
 		this.octave = octave;
 
 		Element.prototype.remove = function() {
@@ -76,6 +77,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	    var row = header.insertRow(0);
     	var cell = row.insertCell(-1);
     	cell.innerHTML = '<b>' + 'Solfa' + '</b>';
+    	cell.style.height = "40px";
     	cell.style.backgroundColor = '#9ACD32';
     	cell.style.width = "30%";
 
@@ -86,11 +88,12 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     		var cell = row.insertCell(0);
     		cell.style.backgroundColor = '#9ACD32';
     		cell.innerHTML = solfege[solfege.length-1-i];
+    		cell.style.height = "30px";
     	}
     	var row = header.insertRow(8);
     	var cell = row.insertCell(0);
     	cell.innerHTML = '<b>'+'Time'+'</b>';
-    	cell.style.height = "50px";
+    	cell.style.height = "40px";
     	cell.style.backgroundColor = '#9ACD32';
     	
 	    var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
