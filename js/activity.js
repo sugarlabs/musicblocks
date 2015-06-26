@@ -121,6 +121,10 @@ define(function(require) {
             'BLOCKPLUGINS': {}
         };
 
+        //Matrix
+        window.savedMatricesNotes = [];
+        window.savedMatricesCount = 0;        
+
         // Stacks of blocks saved in local storage
         var macroDict = {};
 
@@ -169,7 +173,7 @@ define(function(require) {
 
         var helpContainer = null;
         var helpIdx = 0;
-        var HELPCONTENT = [[_('Welcome to Turtle Blocks'), _('Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.'), 'activity/activity-icon-color.svg'],
+        var HELPCONTENT = [[_('Welcome to Music Blocks'), _('Music Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.'), 'activity/activity-icon-color.svg'],
                            [_('Palette buttons'), _('This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
                            [_('Save Notations'), _('Click to Save the Music Notations'), 'icons/download-button.svg'],
                            [_('Run slow'), _('Click to run the project in slow mode.'), 'icons/slow-button.svg'],
@@ -237,7 +241,18 @@ define(function(require) {
             blocksContainer.y = 0;
 
             matrix.clearTurtles();
-        }
+            var i = 1;
+            while(logo.blocks.protoBlockDict['namedsavematrix' + i])
+                    {
+                        var cont = logo.blocks.blockList[blk].container;
+                    
+                        delete logo.blocks.protoBlockDict['namedsavematrix' + i];
+                        delete ProtoBlock('namedsavematrix' + i);
+                        cont.updateCache();
+                        window.savedMatricesCount -= 1;
+                        i += 1;
+                    }
+            }
 
         /*function doFastButton() {
             logo.setTurtleDelay(0);
@@ -1191,8 +1206,31 @@ define(function(require) {
                         console.log('empty session found: loading start');
                         justLoadStart();
                     } else {
+                        var i = 0;
+                        var data = JSON.parse(sessionData);
+                        while(data[i]){
+                            i+=1;
+                            //if(sessionData[i][1][0] == "namedsavematrix1")
+                                //delete sessionData[i];
+                        }
+                        var k=1;
+                        for(var j=0; j<i; j++)
+                        {
+                            if(data[j])
+                            {
+                                console.log(data[j]);
+                            
+                                if(data[j][1][0] == 'namedsavematrix' + k)
+                                {
+                                    delete data[j];
+                                    k += 1;
+                                }
+                            
+                            }
+                        }
+                        console.log("data "+data);    
                         console.log('restoring session: ' + sessionData);
-                        blocks.loadNewBlocks(JSON.parse(sessionData));
+                       blocks.loadNewBlocks(JSON.parse(sessionData));
                     }
                 } catch (e) {
                     console.log(e);

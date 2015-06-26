@@ -196,6 +196,7 @@ function Block(protoblock, blocks, overrideName) {
                 proto.extraWidth = 10;
                 proto.basicBlockCollapsed();
                 var obj = proto.generator();
+                console.log("aart "+obj);
                 this.collapseArtwork = obj[0];
 
                 var obj = this.protoblock.generator(this.clampCount[0]);
@@ -1024,7 +1025,6 @@ function loadEventHandlers(myBlock) {
 
     myBlock.container.on('mousedown', function(event) {
         hideDOMLabel();
-
         // Track time for detecting long pause...
         // but only for top block in stack
         if (myBlock.connections[0] == null) {
@@ -1336,6 +1336,7 @@ function labelChanged(myBlock) {
                 if (myBlock.value != _('action')) {
                     // myBlock.blocks.newDoBlock(myBlock.value);
                     myBlock.blocks.newNameddoBlock(myBlock.value);
+                    console.log('myBlock.value' + myBlock.value);   
                 }
                 // Rename both do <- name and nameddo blocks.
                 myBlock.blocks.renameDos(oldValue, newValue);

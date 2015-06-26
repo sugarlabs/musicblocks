@@ -67,6 +67,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     // Matrix
     this.matrix = null;
     this.octave = 4;
+    this.showMatrix = false;
 
     // When running in step-by-step mode, the next command to run is
     // queued here.
@@ -248,8 +249,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     this.runLogoCommands = function(startHere) {
         // Save the state before running.
-        this.saveLocally();
-
+        console.log('name  '+this.blocks.blockList[startHere].name );
+        if(this.blocks.blockList[startHere].name.substring(0,15) != 'namedsavematrix' && this.blocks.blockList[startHere].name != 'showMatrix')
+        {
+           this.saveLocally();
+        }
         this.stopTurtle = false;
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under blocks.
@@ -491,6 +495,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     }
 
     this.runFromBlockNow = function(logo, turtle, blk) {
+        var noSession = 0;
         // Run a stack of blocks, beginning with blk.
         // (1) Evaluate any arguments (beginning with connection[1]);
         var args = [];
@@ -595,6 +600,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     childFlow = args[0];
                     childFlowCount = -1;
                 }
+                break;
+            case 'showMatrix':
+                this.showMatrix = true;
+                noSession = 1;
+                logo.runFromBlock(logo, turtle, args[0]);
                 break;
             case 'break':
                 logo.doBreak(turtle);
@@ -1062,12 +1072,46 @@ length;
                 break;
             
             case 'matrix' :
+                if(window.savedMatricesNotes == null)
+                    window.savedMatricesNotes.push(4);
+                var flag = 0 , tsd = 0;
+                for(var i=0; i<args[0].length; i++)
+                {
+                    if(flag)
+                    {   
+                        tsd += parseInt(args[0][i]);
+                        tsd *= 10;
+
+                    }
+                    if(args[0][i] == '/')
+                    {
+                        flag = 1;
+                    }
+                    
+                }
+
+                tsd = tsd/10; 
+                if(window.savedMatricesNotes[0] != tsd)
+                {
+                    var i=1;
+                    while(logo.blocks.protoBlockDict['namedsavematrix' + i])
+                    {
+                        var cont = logo.blocks.blockList[blk].container;
+                    
+                        delete logo.blocks.protoBlockDict['namedsavematrix' + i];
+                        delete ProtoBlock('namedsavematrix' + i);
+                        cont.updateCache();
+                        window.savedMatricesCount -= 1;
+                        i += 1;
+                    }
+                    logo.blocks.palettes.updatePalettes('matrix');
+                      
+                    window.savedMatricesNotes = [tsd];
+                }
                 matrix.initMatrix(args[0],args[1]);
                 this.matrix = matrix;
                 break;
-                //logo.setTurtleDelay(2500);
-                //matrix.playMatrix(4);
-
+                
             case 'timeSign' :
                 console.log('Time Signatature' + args[0]);
                 break;
@@ -1086,7 +1130,30 @@ length;
                 this.matrix.musicNotation();
                 console.log('Generating Music Notation');
                 break;
-            case 'note':
+
+            case 'savematrix' :
+                this.matrix.saveMatrix();
+                var index = window.savedMatricesCount;
+                var myDoBlock = new ProtoBlock('namedsavematrix' + index);
+                logo.blocks.protoBlockDict['namedsavematrix' + index] = myDoBlock;
+                myDoBlock.zeroArgBlock();
+                myDoBlock.palette = logo.blocks.palettes.dict['matrix'];
+                myDoBlock.staticLabels.push('Chunk' + index);
+                myDoBlock.palette.add(myDoBlock);
+                logo.blocks.palettes.updatePalettes('matrix');  
+                break;
+
+      /*      case 'namedsavematrix':
+                console.log("goes here");
+                matrix.notesToPlay = [];
+                var i = 1;
+                while( i<=window.savedMatricesNotes )
+                {
+
+                    matrix.notesToPlay.push()
+                }
+                break;
+        */    case 'note':
                 if (typeof(this.noteOscs[turtle]) == "undefined") {
                     this.noteOscs[turtle] = new Tone.MonoSynth();
                 }
@@ -1113,7 +1180,7 @@ length;
                 console.log(oscName);    
                 var sineOsc=new Tone.Oscillator(args[0], oscName)
                 .toMaster();
-                 //connected to the master output
+                //connected to the master output
                 setTimeout(function(osc){
                     sineOsc.start();
                 },this.startTime);
@@ -1125,7 +1192,95 @@ length;
 
 
             default:
-                if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
+
+                if(logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix')
+                {  
+                    noSession = 1 //nosession changed to 1, because we don't want namedsavematrix 
+                             //block to be saved locally;
+                    var index = logo.blocks.blockList[blk].name[15];
+                    var notes = window.savedMatricesNotes;
+                    this.matrix.notesToPlay = [];
+                    var count = 0,j=1,temp = 0;
+                    for(var i=0; i<notes.length; i++)
+                    {
+                        if(notes[i] == 'end')
+                        {
+                            count += 1;
+                        }
+                    } 
+                    
+                    console.log("namedsavematrix "+notes);
+                    count = 1;
+                    while( count<index )
+                    {   
+                        if( window.savedMatricesNotes[j] == 'end' )
+                            count += 1;
+                        
+                        j += 1;             
+                    }
+                    temp = j;
+                    while(window.savedMatricesNotes[j] != 'end')
+                    {
+                        this.matrix.notesToPlay.push(window.savedMatricesNotes[j]);
+                        j += 1;
+                    }
+                    var notesToPlayCopy = this.matrix.notesToPlay;
+                    console.log("notes saved IDK "+this.matrix.notesToPlay);
+                    if(this.showMatrix)
+                    {
+                        this.matrix.initMatrix('3/4','4');
+                        this.matrix.notesToPlay = notesToPlayCopy;
+                        console.log('noes to show '+this.matrix.notesToPlay);
+                        var table = document.getElementById("myTable");
+                        if (table != null) {
+                                    for(var k=0; k<this.matrix.notesToPlay.length; k++)
+                                    {   
+                                        console.log('inside '+this.matrix.notesToPlay[k][0]);
+                                        var temp = 1;
+                                        switch(this.matrix.notesToPlay[k][0]){
+                                            case 'B':
+                                                temp = 1;
+                                                break;
+                                            case 'A':
+                                                temp = 2;
+                                                break;
+                                            case 'G':
+                                                temp = 3;
+                                                break;
+                                            case 'F':
+                                                temp = 4;
+                                                break;
+                                            case 'E':
+                                                temp = 5;
+                                                break;
+                                            case 'D':
+                                                temp = 6;
+                                                break;
+                                            case 'C':
+                                                temp = 7;
+                                                break;
+                                            default :
+                                                break;
+                                        }
+                                            var cell = table.rows[temp].cells[k+1];
+                                            console.log('cell '+cell);
+                                            cell.style.backgroundColor = 'black';
+                                            this.matrix.chkArray[cell.id] = 1;
+                                    }                                                   
+                        }
+                        this.showMatrix = false;
+
+                    }
+                    else
+                    {
+                        //console.log('play here'+ matrix.notesToPlay);
+                        this.matrix.playMatrix(0,this.matrix.notesToPlay);
+                        logo.setTurtleDelay(4500*parseFloat(1 / window.savedMatricesNotes[0])*(-temp + j));
+                    }                    
+                }
+                else
+                { 
+                    if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
                     eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
                 } else {
                     // Could be an arg block, so we need to print its value.
@@ -1145,6 +1300,7 @@ length;
                     }
                     logo.stopTurtle = true;
                 }
+            }
                 break;
         }
 
@@ -1243,7 +1399,10 @@ length;
         var me = this;
         this.saveTimeout = setTimeout(function () {
             // Save at the end to save an image
+        if(!noSession)
+        {console.log('down down');
             me.saveLocally();
+        }
         }, DEFAULTDELAY * 1.5)
     }
 
@@ -1603,9 +1762,6 @@ length;
                     var c = logo.parseArg(logo, turtle, a, blk);
                     logo.blocks.blockList[blk].value = a;
                     break;
-
-                case 'matrix' :
-
 
                 default:
                     if (logo.blocks.blockList[blk].name in logo.evalArgDict) {

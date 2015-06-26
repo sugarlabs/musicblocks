@@ -1555,7 +1555,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (oldName == newName) {
             return;
         }
-
+                console.log("renamedos here");
         // Update the blocks, do->oldName should be do->newName
         for (var blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name == 'nameddo') {
@@ -1627,6 +1627,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.newNameddoBlock = function(name) {
+        console.log("newnamedo here");
         if ('myDo_' + name in this.protoBlockDict) {
             return;
         }

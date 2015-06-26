@@ -16,6 +16,9 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
 	this.transposition = null;
 	this.isMatrix = 0;
+	this.freetime = 1000;
+	this.oldNotes = [];
+	//this.savedMatricesNotes = windosavedMatricesNotes;
 
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
@@ -24,7 +27,6 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		{
 			if(turtles.turtleList[i].name.includes('note'))
 			{
-				console.log("clear turtles ");
 				turtles.turtleList[i].trash = true;
                 turtles.turtleList[i].container.visible = false;	
 				turtles.turtleList.splice(i, 1);
@@ -122,6 +124,22 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	    this.timeSignDenominator = tsd/10;
 	    this.timeSignNumerator = tsn/10;
 
+	    if(this.timeSignDenominator == 4)
+	    {
+	    	this.freetime = 1000;
+		}
+	    else if(this.timeSignDenominator == 8)
+	    {
+	    	this.freetime = 500;
+		}
+		else if(this.timeSignDenominator == 16)
+		{
+			this.freetime = 250;
+		}
+		else if(this.timeSignDenominator == 32)
+		{
+			this.freetime = 125;
+		}
 
  		this.chkArray = new Array(this.timeSignDenominator);
  		for(var i=0; i<=this.timeSignNumerator; i++)
@@ -249,7 +267,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    if (that.i < that.notesToPlay.length) {            
 		       that.myLoop();              
 		   	}       	                 
-		    }, 1000)
+		    }, this.freetime);
 		}
 
 	
@@ -260,11 +278,22 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 
 	this.playMatrix = function(time){
+		
+		if(arguments[1])
+		{
+			this.oldNotes = arguments[1];
+		}
 		var that = this;
+
 		setTimeout(function() {
-		that.clearTurtles();
 		var table = document.getElementById("myTable");
-		if (table != null) {
+		if(that.oldNotes.length >0 )
+			{
+				that.notesToPlay = that.oldNotes;
+//				console.log('old nottes '+that.oldNotes);
+			}
+		if (table != null && that.notesToPlay.length == 0) {
+			that.clearTurtles();
 		    for (var i = 0; i < table.rows[1].cells.length; i++) {
         		for (var j = 1; j < table.rows.length; j++)
         		{
@@ -301,15 +330,23 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
         					note = 'B' + that.octave;
         				}
         				that.notesToPlay.push(note);
-        				turtles.add(null, null, note);
+        				turtles.add(null, null, note);				
         				//console.log('turtles '+turtles.turtleList[1].name);
 					}
         		}
         	}
         }
-	  
+	 
 	if(that.notesToPlay.length > 0)
 	{
+	//	console.log("old "+that.oldNotes);
+		if(that.oldNotes.length > 0)
+		{
+			that.clearTurtles();
+			for(var i=0; i<that.oldNotes.length; i++)
+				turtles.add(null, null, that.oldNotes[i]);
+			that.notesToPlay = that.oldNotes;
+    	}
     	if( that.transposition != null )
 	    {
 	    	var transposedArray = [];
@@ -329,11 +366,22 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	    that.myLoop();
 	}
-
-
     		},time);
+	that.notesToPlay = [];
 			
     }
+
+    this.saveMatrix = function(){
+    	console.log("timeSignDenominator "+this.timeSignDenominator);
+    	for(var i=0; i<this.notesToPlay.length; i++)
+    	{
+    		window.savedMatricesNotes.push(this.notesToPlay[i]);
+    	}
+    	window.savedMatricesNotes.push('end');
+    	window.savedMatricesCount += 1;
+
+    }
+
     
 		
 }

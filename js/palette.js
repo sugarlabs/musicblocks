@@ -411,7 +411,7 @@ function PaletteModel(palette, palettes, name) {
 
             var protoBlock = paletteBlocks.protoBlockDict[blkname];
             if (protoBlock == null) {
-                console.log('Could not find block ' + b.blkname);
+                //console.log('Could not find block ' + b.blkname);
                 continue;
             }
 

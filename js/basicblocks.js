@@ -111,26 +111,32 @@ function initBasicProtoBlocks(palettes, blocks) {
     notationBlock.adjustWidthToLabel();
     notationBlock.zeroArgBlock();
     
+    var saveMatrix = new ProtoBlock('savematrix');
+    saveMatrix.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['savematrix'] = saveMatrix;
+    saveMatrix.staticLabels.push(_('Save Matrix'));
+    saveMatrix.adjustWidthToLabel();
+    saveMatrix.zeroArgBlock();
+
+
+    var showMatrixBlock = new ProtoBlock('showMatrix');
+    showMatrixBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['showMatrix'] = showMatrixBlock;
+    showMatrixBlock.staticLabels.push(_('Show'));
+    showMatrixBlock.adjustWidthToLabel();
+    showMatrixBlock.flowClampZeroArgBlock();
+
+    //Music Palette
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['music'];
     blocks.protoBlockDict['note'] = noteBlock;
     noteBlock.staticLabels.push(_('NOTE'),  _('note'), _('note value'));
     noteBlock.adjustWidthToLabel();
-    // A4, 200ms.
     noteBlock.defaults.push("C4", 1);
     noteBlock.twoArgBlock();
     noteBlock.dockTypes[1] = 'anyin';
     noteBlock.dockTypes[2] = 'numberin';
     
-    /*var key = new ProtoBlock('key');
-    key.palette = palettes.dict['music'];
-    blocks.protoBlockDict['key'] = key;
-    key.staticLabels.push(_('key'));
-    key.adjustWidthToLabel();
-    key.defaults.push("A4");
-    key.oneArgMathBlock();
-    key.dockTypes[1] = 'anyin';
-*/
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['music'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
@@ -140,8 +146,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     osctimeBlock.defaults.push('1000','5000');
     osctimeBlock.dockTypes[1] = 'anyin';
     osctimeBlock.dockTypes[2] = 'anyin';
-    
-    
+       
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['music'];
     blocks.protoBlockDict['square'] = squareBlock;
