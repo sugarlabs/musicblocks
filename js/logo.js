@@ -249,7 +249,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     this.runLogoCommands = function(startHere) {
         // Save the state before running.
-        console.log('name  '+this.blocks.blockList[startHere].name );
         if(this.blocks.blockList[startHere].name.substring(0,15) != 'namedsavematrix' && this.blocks.blockList[startHere].name != 'showMatrix')
         {
            this.saveLocally();
@@ -1225,7 +1224,6 @@ length;
                         j += 1;
                     }
                     var notesToPlayCopy = this.matrix.notesToPlay;
-                    console.log("notes saved IDK "+this.matrix.notesToPlay);
                     if(this.showMatrix)
                     {
                         this.matrix.initMatrix('3/4','4');
@@ -1400,7 +1398,7 @@ length;
         this.saveTimeout = setTimeout(function () {
             // Save at the end to save an image
         if(!noSession)
-        {console.log('down down');
+        {
             me.saveLocally();
         }
         }, DEFAULTDELAY * 1.5)

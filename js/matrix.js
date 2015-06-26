@@ -368,6 +368,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	}
     		},time);
 	that.notesToPlay = [];
+	that.oldNotes = [];
 			
     }
 
