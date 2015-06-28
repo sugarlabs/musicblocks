@@ -19,7 +19,7 @@ function MusicNotation(turtles, stage)
 		}
 		stage.addChild(this.musicContainer);
 		
-	    var canvas = document.getElementById("music1");
+	    var canvas = document.getElementById("music");
 	    var context = canvas.getContext("2d");
 	    context.clearRect(0, 0, canvas.width, canvas.height);
 	    var renderer = new Vex.Flow.Renderer(canvas,
@@ -47,7 +47,6 @@ function MusicNotation(turtles, stage)
 	    beat_value: timeSignDenominator,
 	    resolution: Vex.Flow.RESOLUTION
 	    });
-	    console.log('notes '+notes);
 	    // Add notes to voice
 	    voice.addTickables(notes);
 
@@ -57,7 +56,7 @@ function MusicNotation(turtles, stage)
 	    // Render voice
 		voice.draw(ctx, stave);
 		
-		var notationCanvas = document.getElementById('music1');
+		var notationCanvas = document.getElementById('music');
 
 		//adding notation canvas canvas together 
 		//so that they can be downloaded by converting canvas to image.

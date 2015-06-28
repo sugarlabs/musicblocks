@@ -11,18 +11,23 @@
     <script src="lib/reqwest.js"></script>
     <script src="lib/p5.min.js"></script>
     <script src="lib/jquery-1.10.1.js"></script>
+    <script src="lib/jquery-ui.js"></script>
     <script src="lib/webL10n.js"></script>
     <script src="lib/tone.min.js"></script>
     <script src="lib/vexflow/releases/vexflow-min.js"></script>
     <script src="lib/vextab/releases/vextab-div.js"></script>
 
-    <link rel="prefetch" type="application/l10n" href="./localization.ini" />
-    <script data-main="js/loader" src="lib/require.js"> </script>
 
-    <link rel="manifest" href="android_chrome_manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="activity/activity-icon-color-4-00.png">
-    <meta id="theme-color" name="theme-color" content="#2196F3">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+  <link rel="prefetch" type="application/l10n" href="./localization.ini" />
+  <script data-main="js/loader" src="lib/require.js"> </script>
+
+  <link rel="manifest" href="android_chrome_manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="192x192" href="activity/activity-icon-color-4-00.png">
+  <meta id="theme-color" name="theme-color" content="#2196F3">
 </head>
 
 <body id="body" style="background: #96D3F3;">
@@ -48,7 +53,10 @@
       }(document, 'script', 'facebook-jssdk'));
       } catch(e) {}
 
-    </script>
+$(function() {
+    $( "#matrix" ).draggable();
+    $( "#musicNotation" ).draggable();
+  });    </script>
 
     <!-- see activity/activity-icon-color-loading.svg for info -->
     <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
@@ -87,18 +95,15 @@
         <ul class="content w"></ul>
       </div>
     </div>
-
-    <div class="canvasHolder">
+   <div class="canvasHolder">
           
     </div>
   </div>
 
   <canvas hidden id="canvasToSave" width="525" height="800" style="border: 1px solid black"></canvas>
 
-  <div class="music" >
-        <canvas hidden id="music1" width="525"></canvas>          
-  </div>
-
+  <div id="matrix"></div>
+  <canvas hidden id="music" width="525"></canvas>          
   <div id = "musicNotation"></div>
         <!--<table id='myTable' width=600>
            <th width="30">Solfa</th>

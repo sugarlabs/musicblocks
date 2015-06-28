@@ -73,7 +73,9 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		//x.setAttribute("border", "1px solid #fff");
 		var w = window.innerWidth;
 		x.setAttribute("width", w/2+"px");
-		document.body.appendChild(x);
+		var matrixDiv = document.getElementById("matrix");
+		matrixDiv.appendChild(x);
+
 		var table = document.getElementById("myTable");
 		var header = table.createTHead();
 	    var row = header.insertRow(0);

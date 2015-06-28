@@ -207,16 +207,11 @@ input.number {
 #canvas {
   overflow-y: visible; }
 
-#myTable {
-  position: fixed;
-  top : 20%;
-  left : 20%;
-}
 
-.music {
+#music {
   position: absolute;
-  left: 450px;
-  top: 400px; 
+  left: 20%;
+  top: 20%; 
 }
 
 #musicNotation {
@@ -224,11 +219,16 @@ input.number {
   right : 3%;
   top : 15%;
   overflow: scroll;
-  height: 40%;
+  height:   40%;
   width : 27%;
   display: none;
 }
 
+#matrix{
+  position: absolute;
+  top: 20%;
+  left: 20%;
+}
 #canvasToSave {
   position: absolute;
   top : 200px;

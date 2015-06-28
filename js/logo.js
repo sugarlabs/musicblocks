@@ -1208,7 +1208,6 @@ length;
                         }
                     } 
                     
-                    console.log("namedsavematrix "+notes);
                     count = 1;
                     while( count<index )
                     {   
