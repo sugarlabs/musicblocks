@@ -324,7 +324,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
                     this.notesToPlay[index - 1] = note;
                     this.clearTurtles();
                     for(var i=0; i<this.notesToPlay.length; i++)
-                    	turtles.add(null, null, note);              
+                    	turtles.add(null, null, this.notesToPlay[i]);              
                 }
     		}    	
         }
