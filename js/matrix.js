@@ -43,7 +43,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		console.log('time signature '+timeSign +' and octave '+octave);
 
 		this.clearTurtles();
-		notesToPlay = [];
+		this.notesToPlay = [];
 		this.isMatrix = 1;
 		this.octave = octave;
 
@@ -57,49 +57,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
         		}
     		}
 		}
-		var table = document.getElementById("myTable");
-
-
-		if(table != null)
-		{
-			table.remove();
-		}
-		var solfege = ['Do','Re','Mi','Fa','Sol','La','Si'];
-
-		var x = document.createElement("TABLE");
-		x.setAttribute("id", "myTable");
-		x.style.textAlign = 'center';
-		//x.setAttribute("border", "1px solid #fff");
-		var w = window.innerWidth;
-		x.setAttribute("width", w/2+"px");
-		var matrixDiv = document.getElementById("matrix");
-		matrixDiv.appendChild(x);
-
-		var table = document.getElementById("myTable");
-		var header = table.createTHead();
-	    var row = header.insertRow(0);
-    	var cell = row.insertCell(-1);
-    	cell.innerHTML = '<b>' + 'Solfa' + '</b>';
-    	cell.style.height = "40px";
-    	cell.style.backgroundColor = '#9ACD32';
-    	cell.style.width = "30%";
-
-    	for(var i=0; i<solfege.length; i++)
-    	{
-    		var row = header.insertRow(i+1);
-    		row.id = 'row' + i+1;
-    		var cell = row.insertCell(0);
-    		cell.style.backgroundColor = '#9ACD32';
-    		cell.innerHTML = solfege[solfege.length-1-i];
-    		cell.style.height = "30px";
-    	}
-    	var row = header.insertRow(8);
-    	var cell = row.insertCell(0);
-    	cell.innerHTML = '<b>'+'Time'+'</b>';
-    	cell.style.height = "40px";
-    	cell.style.backgroundColor = '#9ACD32';
-    	
-	    var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
+		var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
 	    for(var i=0; i<timeSign.length; i++)
 	    {
 	    	if(flag)
@@ -124,6 +82,51 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	    this.timeSignDenominator = tsd/10;
 	    this.timeSignNumerator = tsn/10;
+	    
+		var table = document.getElementById("myTable");
+
+
+		if(table != null)
+		{
+			table.remove();
+		}
+		var solfege = ['Do','Re','Mi','Fa','Sol','La','Si'];
+
+		var x = document.createElement("TABLE");
+		x.setAttribute("id", "myTable");
+		x.style.textAlign = 'center';
+		//x.setAttribute("border", "1px solid #fff");
+		var w = window.innerWidth;
+		w = (2*w)/this.timeSignDenominator;
+		//x.style.WebkitColumnWidth = w/4 + "px";
+		//x.setAttribute("width", w+"px");
+		var matrixDiv = document.getElementById("matrix");
+		matrixDiv.appendChild(x);
+
+		var table = document.getElementById("myTable");
+		var header = table.createTHead();
+	    var row = header.insertRow(0);
+    	var cell = row.insertCell(-1);
+    	cell.innerHTML = '<b>' + 'Solfa' + '</b>';
+    	cell.style.height = "40px";
+    	cell.style.backgroundColor = '#9ACD32';
+    	cell.style.width = w/4 + 'px';
+
+    	for(var i=0; i<solfege.length; i++)
+    	{
+    		var row = header.insertRow(i+1);
+    		row.id = 'row' + i+1;
+    		var cell = row.insertCell(0);
+    		cell.style.backgroundColor = '#9ACD32';
+    		cell.innerHTML = solfege[solfege.length-1-i];
+    		cell.style.height = "30px";
+    	}
+    	var row = header.insertRow(8);
+    	var cell = row.insertCell(0);
+    	cell.innerHTML = '<b>'+'Time'+'</b>';
+    	cell.style.height = "40px";
+    	cell.style.backgroundColor = '#9ACD32';
+    	
 	    for(var i=0; i<this.timeSignNumerator; i++)
 	    {
 	    	this.notesToPlay.push("C4");
@@ -157,7 +160,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    	var row = table.rows[i];
 		    	var cell = row.insertCell(-1);
 		    	cell.style.backgroundColor = '#ADFF2F';
-		    	cell.width = 60;
+		    	cell.width = w/4;
 		    	
 		    	if(i==8)
 		    	{
@@ -327,7 +330,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
         }
     }
 
-    this.playMatrix = function(){
+    this.playMatrix = function(time){
     	if( this.transposition != null )
         {
             var transposedArray = [];
@@ -345,9 +348,11 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
         else
             console.log('notes to be played ' + this.notesToPlay);
 
-     	console.log("in play "+this.notesToPlay);
     	this.i = 0;
-    	this.myLoop();
+    	var that = this;
+    	setTimeout(function(){ console.log('playing after' + time + 'ms');
+
+    		that.myLoop(); },time);
     }
 
     this.saveMatrix = function(){

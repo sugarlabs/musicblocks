@@ -27,7 +27,9 @@ function MusicNotation(turtles, stage)
 	    
 	    var ctx = renderer.getContext();
 	    var stave = new Vex.Flow.Stave(10, 0, 500);
-	    stave.addClef("treble").setContext(ctx).draw();
+	    stave.addClef("treble");
+	    stave.addTimeSignature(timeSignNumerator + "/" + timeSignDenominator);
+	    stave.setContext(ctx).draw();
 
 	    //Create the notes
 	    var notes = [];
