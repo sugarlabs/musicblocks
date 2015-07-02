@@ -33,8 +33,6 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 				i -=1 ;
 			}
 		}
-
-		this.notesToPlay = [];
 		this.i = 0;
 
 
@@ -45,6 +43,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		console.log('time signature '+timeSign +' and octave '+octave);
 
 		this.clearTurtles();
+		notesToPlay = [];
 		this.isMatrix = 1;
 		this.octave = octave;
 
@@ -125,6 +124,10 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	    this.timeSignDenominator = tsd/10;
 	    this.timeSignNumerator = tsn/10;
+	    for(var i=0; i<this.timeSignNumerator; i++)
+	    {
+	    	this.notesToPlay.push("C4");
+	    }
 
 	    if(this.timeSignDenominator == 4)
 	    {
@@ -173,25 +176,22 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 				        {	
 				    		var cell = table.rows[j].cells[i];
 				    		var that = this;
-				        	
-				        /*	cell.onmouseover = function(){
-				        		this.style.backgroundColor = '#9ACD32';
-				        	};
-				        	cell.onmouseout = function(){
-				        		this.style.backgroundColor = '#ADFF2F';
-				        	}*/
+				   
 				        	cell.onclick=function(){
 				        		//this.onmouseout=null;
 				        		if(this.style.backgroundColor == 'black')
 				        		{
 				        			this.style.backgroundColor = '#ADFF2F';
 				        			that.chkArray[this.id] = 0;
+				        			//that.setNotes(this.id);
 				        		}
 				        		else if(that.chkArray[this.id] == 0)
 				        		{
 
 				        			this.style.backgroundColor = 'black';
-									that.chkArray[this.id] = 1;		        			
+									that.chkArray[this.id] = 1;
+									that.setNotes(this.id);
+
 				        		}
 
 				        	};
@@ -262,9 +262,9 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	this.myLoop = function () {       
 		var that = this;
-
-		setTimeout(function () {    
-		    that.playNote(that.notesToPlay[that.i]); 
+		this.play = this.notesToPlay;
+		setTimeout(function () {
+		    that.playNote(that.play[that.i]); 
 		    that.i++;                     
 		    if (that.i < that.notesToPlay.length) {            
 		       that.myLoop();              
@@ -279,103 +279,78 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		}
 
 
-	this.playMatrix = function(time){
+	this.setNotes = function(index){
 		
-		if(arguments[1])
-		{
-			this.oldNotes = arguments[1];
-		}
-		var that = this;
-
-		setTimeout(function() {
 		var table = document.getElementById("myTable");
-		if(that.oldNotes.length >0 )
-			{
-				that.notesToPlay = that.oldNotes;
-//				console.log('old nottes '+that.oldNotes);
-			}
-		if (table != null && that.notesToPlay.length == 0) {
-			that.clearTurtles();
-		    for (var i = 0; i < table.rows[1].cells.length; i++) {
-        		for (var j = 1; j < table.rows.length; j++)
-        		{
-        			cell = table.rows[j].cells[i];
-        			var note;
-        			if(cell.style.backgroundColor == 'black')
-        			{
-        				var solfege = table.rows[j].cells[0].innerHTML;
-        				if(solfege == 'Do')
-        				{
-        					note = 'C' + that.octave;
-        				}
-        				else if(solfege == 'Re')
-        				{
-        					note = 'D' + that.octave;
-        				}
-        				else if(solfege == 'Mi')
-        				{
-        					note = 'E' + that.octave;
-        				}
-        				else if(solfege == 'Fa')
-        				{
-        					note = 'F' + that.octave;
-        				}
-        				else if(solfege == 'Sol')
-        				{
-        					note = 'G' + that.octave;
-        				}
-        				else if(solfege == 'La')
-        				{
-        					note = 'A' + that.octave;        				}
-        				else if(solfege == 'Si')
-        				{
-        					note = 'B' + that.octave;
-        				}
-        				that.notesToPlay.push(note);
-        				turtles.add(null, null, note);				
-        				//console.log('turtles '+turtles.turtleList[1].name);
-					}
-        		}
-        	}
+		
+		if (table != null) {
+			for (var j = 1; j < table.rows.length; j++)
+    		{
+    			cell = table.rows[j].cells[index];
+    			var note;
+    			if(cell.style.backgroundColor == 'black')
+                {
+                    var solfege = table.rows[j].cells[0].innerHTML;
+                    if(solfege == 'Do')
+                    {
+                        note = 'C' + this.octave;
+                    }
+                    else if(solfege == 'Re')
+                    {
+                        note = 'D' + this.octave;
+                    }
+                    else if(solfege == 'Mi')
+                    {
+                        note = 'E' + this.octave;
+                    }
+                    else if(solfege == 'Fa')
+                    {
+                        note = 'F' + this.octave;
+                    }
+                    else if(solfege == 'Sol')
+                    {
+                        note = 'G' + this.octave;
+                    }
+                    else if(solfege == 'La')
+                    {
+                        note = 'A' + this.octave;                       }
+                    else if(solfege == 'Si')
+                    {
+                        note = 'B' + this.octave;
+                    }
+                    this.notesToPlay[index - 1] = note;
+                    this.clearTurtles();
+                    for(var i=0; i<this.notesToPlay.length; i++)
+                    	turtles.add(null, null, note);              
+                }
+    		}    	
         }
-	 
-	if(that.notesToPlay.length > 0)
-	{
-	//	console.log("old "+that.oldNotes);
-		if(that.oldNotes.length > 0)
-		{
-			that.clearTurtles();
-			for(var i=0; i<that.oldNotes.length; i++)
-				turtles.add(null, null, that.oldNotes[i]);
-			that.notesToPlay = that.oldNotes;
-    	}
-    	if( that.transposition != null )
-	    {
-	    	var transposedArray = [];
-	    	for(var i = 0; i < that.notesToPlay.length; i++)
-	    	{
-	    		var transposedNote = that.doTransposition(that.notesToPlay[i][0]);
-	    		transposedNote += that.octave;
-	    		transposedArray.push(transposedNote);
-	    	}
-	    	
-	    	console.log('original notes ' + that.notesToPlay);
-	    	that.notesToPlay = transposedArray;
-	    	console.log('transposed notes to be played ' + that.notesToPlay);
-	    }
-	    else
-	    	console.log('notes to be played ' + that.notesToPlay);
+    }
 
-	    that.myLoop();
-	}
-    		},time);
-	that.notesToPlay = [];
-	that.oldNotes = [];
-			
+    this.playMatrix = function(){
+    	if( this.transposition != null )
+        {
+            var transposedArray = [];
+            for(var i = 0; i < this.notesToPlay.length; i++)
+            {
+                var transposedNote = this.doTransposition(this.notesToPlay[i][0]);
+                transposedNote += this.octave;
+                transposedArray.push(transposedNote);
+            }
+            
+            console.log('original notes ' + this.notesToPlay);
+            this.notesToPlay = transposedArray;
+            console.log('transposed notes to be played ' + this.notesToPlay);
+        }
+        else
+            console.log('notes to be played ' + this.notesToPlay);
+
+     	console.log("in play "+this.notesToPlay);
+    	this.i = 0;
+    	this.myLoop();
     }
 
     this.saveMatrix = function(){
-    	console.log("timeSignDenominator "+this.timeSignDenominator);
     	for(var i=0; i<this.notesToPlay.length; i++)
     	{
     		window.savedMatricesNotes.push(this.notesToPlay[i]);

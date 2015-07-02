@@ -1218,7 +1218,6 @@ define(function(require) {
                         {
                             if(data[j])
                             {
-                                console.log(data[j]);
                             
                                 if(data[j][1][0] == 'namedsavematrix' + k)
                                 {

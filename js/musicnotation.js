@@ -37,8 +37,7 @@ function MusicNotation(turtles, stage)
 		    if(turtles.turtleList[i].name.includes('note'))
 		    {
 				var note = turtles.turtleList[i].name.substring(0, 1);
-				
-		   		notes.push(new Vex.Flow.StaveNote({ keys: [note + '/' + octave], duration: "4" }));
+		   		notes.push(new Vex.Flow.StaveNote({ keys: [note + '/' + octave], duration: timeSignDenominator.toString() }));
 	  		}
 	    }
 
