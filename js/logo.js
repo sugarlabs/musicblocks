@@ -1154,7 +1154,7 @@ length;
                 break;
         */    case 'note':
                 if (typeof(this.noteOscs[turtle]) == "undefined") {
-                    this.noteOscs[turtle] = new Tone.MonoSynth();
+                    this.noteOscs[turtle] = new Tone.AMSynth();
                 }
                 synth = this.noteOscs[turtle];
                 synth.toMaster();

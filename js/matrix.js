@@ -255,9 +255,42 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		}
 	}
 
+	this.playAll = function(){
+	/*	synth = new Tone.AMSynth();
+		synth.toMaster();
+		console.log("play  t "+this.notesToPlay);
+		var position = 0;
+		time = 1;
+		Tone.Transport.setInterval(function(time){
+	    var note = this.notesToPlay[position++];
+	    position = position % this.notesToPlay.length;
+	    synth.triggerAttackRelease(note, 0.25, time);
+		}, 0.5);
+        
+        Tone.Transport.start();
+	*/	
+	var notes = this.notesToPlay;
+	var position = 0;
+
+	var synth = new Tone.AMSynth().toMaster();
+	var that = this;
+	var setI = Tone.Transport.setInterval(function(time){
+	    var note = notes[position++];
+	    //position = position % notes.length;
+	    synth.triggerAttackRelease(note, 1/that.timeSignDenominator, time);
+	    if(position == notes.length )
+	    	{	Tone.Transport.clearInterval(setI);
+	    		Tone.Transport.stop();
+	    	}
+	}, 2/that.timeSignDenominator);
+
+	//the transport won't start firing events until it's started
+	Tone.Transport.start();
+	}
+
 	this.playNote = function(note){
 		var duration = this.timeSignDenominator + "n"
-		synth = new Tone.MonoSynth();
+		synth = new Tone.AMSynth();
 		synth.toMaster();
         synth.triggerAttackRelease(note, duration);
         Tone.Transport.start();
@@ -352,7 +385,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	var that = this;
     	setTimeout(function(){ console.log('playing after' + time + 'ms');
 
-    		that.myLoop(); },time);
+    		that.playAll(); },time);
     }
 
     this.saveMatrix = function(){
