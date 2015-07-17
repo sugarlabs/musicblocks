@@ -18,7 +18,7 @@ var PALETTELEFTMARGIN = 10;
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
 var BUILTINPALETTES = ['matrix', 'music', 'turtle', /*'pen',*/ 'number', /*'boolean',*/ 'flow', /*'blocks',*/
-    'actions', 'media', /*'sensors',*/ 'myblocks',
+    'actions', 'media', /*'sensors',*/ 'myblocks','assemble'
 ];
 
 
@@ -139,8 +139,13 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 this.buttons[name].y = this.y + this.scrollDiff;
                 this.y += this.cellSize;
                 var me = this;
+                
 
                 function processButtonIcon(me, name, bitmap, extras) {
+                    if(name == 'assemble')
+                {
+                    bitmap.visible = false;
+                }
                     me.buttons[name].addChild(bitmap);
                     if (me.cellSize != me.originalSize) {
                         bitmap.scaleX = me.cellSize / me.originalSize;
@@ -678,6 +683,8 @@ function Palette(palettes, name) {
                 function processCloseIcon(palette, name, bitmap, extras) {
                     bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
                     palette.menuContainer.addChild(bitmap);
+                    //if(name == 'assemble')
+                      //  bitmap.visible = false;
                     bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT;
                     bitmap.y = 0;
 
@@ -1148,7 +1155,8 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     add('flow').
     //add('blocks').
     add('actions').
-    add('media');
+    add('media').
+    add('assemble')
     //add('sensors').
     //add('extras');
     palettes.makePalettes();
@@ -1193,6 +1201,7 @@ function setupBackgroundEvents(palette) {
 
 
 function makeBlockFromPalette(blk, blkname, palette, callback) {
+    console.log("makeBlockFromPalette "+palette.protoList[blk].name);
     switch (palette.protoList[blk].name) {
         case 'do':
             blkname = 'do ' + palette.protoList[blk].defaults[0];
@@ -1552,6 +1561,7 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
     }
     img.src = 'data:image/svg+xml;base64,' + window.btoa(
         unescape(encodeURIComponent(data)));
+
 }
 
 

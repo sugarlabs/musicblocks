@@ -17,6 +17,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.transposition = null;
 	this.isMatrix = 0;
 	this.freetime = 1000;
+	this.synth = 0;
 	this.oldNotes = [];
 	//this.savedMatricesNotes = windosavedMatricesNotes;
 
@@ -40,6 +41,8 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	
 	this.initMatrix = function(timeSign, octave)
 	{
+		document.getElementById('matrix').style.display = 'inline';
+		
 		console.log('time signature '+timeSign +' and octave '+octave);
 
 		this.clearTurtles();
@@ -202,6 +205,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 				    	}
 				    }
 				}
+				this.synth = new Tone.AMSynth().toMaster();
 	}
 
 	this.setTempo = function(timeSign){
@@ -256,31 +260,19 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	}
 
 	this.playAll = function(){
-	/*	synth = new Tone.AMSynth();
-		synth.toMaster();
-		console.log("play  t "+this.notesToPlay);
-		var position = 0;
-		time = 1;
-		Tone.Transport.setInterval(function(time){
-	    var note = this.notesToPlay[position++];
-	    position = position % this.notesToPlay.length;
-	    synth.triggerAttackRelease(note, 0.25, time);
-		}, 0.5);
-        
-        Tone.Transport.start();
-	*/	
+	
 	var notes = this.notesToPlay;
 	var position = 0;
 
-	var synth = new Tone.AMSynth().toMaster();
 	var that = this;
 	var setI = Tone.Transport.setInterval(function(time){
 	    var note = notes[position++];
 	    //position = position % notes.length;
-	    synth.triggerAttackRelease(note, 1/that.timeSignDenominator, time);
+	    that.synth.triggerAttackRelease(note, 1/that.timeSignDenominator, time);
 	    if(position == notes.length )
 	    	{	Tone.Transport.clearInterval(setI);
 	    		Tone.Transport.stop();
+	    		//delete synth;
 	    	}
 	}, 2/that.timeSignDenominator);
 
@@ -288,7 +280,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	Tone.Transport.start();
 	}
 
-	this.playNote = function(note){
+	/*this.playNote = function(note){
 		var duration = this.timeSignDenominator + "n"
 		synth = new Tone.AMSynth();
 		synth.toMaster();
@@ -308,12 +300,11 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    }, this.freetime);
 		}
 
-	
+*/	
 		this.musicNotation = function(){
 		
 			musicnotation.doNotation(this.timeSignNumerator, this.timeSignDenominator, this.octave);
 		}
-
 
 	this.setNotes = function(index){
 		

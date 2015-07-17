@@ -107,6 +107,12 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     }
 
+    this.changePosition = function(x,y) {
+        this.x = x;
+        this.y = y;
+
+    }
+
     this.unhighlight = function() {
         if (this.collapsed && ['start', 'action'].indexOf(this.name) != -1) {
             if (this.highlightCollapseBlockBitmap) {

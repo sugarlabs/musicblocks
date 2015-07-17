@@ -48,6 +48,8 @@ define(function(require) {
     require('activity/analytics');
     require('prefixfree.min');
     require('activity/matrix');
+    require('activity/assemble');
+    
     require('activity/musicnotation');
 
     // Manipulate the DOM only when it is ready.
@@ -96,11 +98,13 @@ define(function(require) {
         var toolbarButtonsVisible = true;
         var menuButtonsVisible = false;
         var menuContainer = null;
+        var workspaceContainer = null;
         var currentKey = '';
         var currentKeyCode = 0;
         var lastKeyCode = 0;
         var pasteContainer = null;
         var chartBitmap = null;
+        var workspace = false;
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -201,6 +205,9 @@ define(function(require) {
                            [_('Congratulations.'), _('You have finished the tour. Please enjoy Turtle Blocks!'), 'activity/activity-icon-color.svg']]
 
         pluginsImages = {};
+        //console.log("tit "+$("body").data("title"));
+        //if ($("body").data("title") === "index") {
+        // Place the logic pertaining to the page with title 'my_page_title' here...
 
         function allClear() {
             
@@ -228,10 +235,11 @@ define(function(require) {
                 table.remove();
             }
 
-            var canvas = document.getElementById("music1");
+            var canvas = document.getElementById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
-            
+            document.getElementById('musicNotation').innerHTML = "";
+            document.getElementById('musicNotation').style.display = 'none';
             if(musicnotation != null)
             {
                 musicnotation.musicContainer.removeAllChildren();
@@ -297,7 +305,7 @@ define(function(require) {
             logo.doStopTurtle();
         }
 */
-        var cartesianVisible = false;
+        /*var cartesianVisible = false;
         function doCartesian() {
             if (cartesianVisible) {
                 hideCartesian();
@@ -318,7 +326,7 @@ define(function(require) {
                 polarVisible = true;
             }
         }
-
+*/
         function doAnalytics() {
             document.body.style.cursor = 'wait';
             var myChart = docById('myChart');
@@ -387,6 +395,7 @@ define(function(require) {
         var errorArtwork = {};
         var ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
 
+        var assemble = null;
         // Get things started
         init();
 
@@ -433,6 +442,8 @@ define(function(require) {
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
             musicnotation = new MusicNotation(turtles, stage);
             matrix = new Matrix(canvas, stage, turtles, trashcan, musicnotation);
+
+            //palettes.buttons['assemble'].visible = false;
 
             //setting bgcolor of canvas that will be download as image for music notation
             var can = document.getElementById('canvasToSave');
@@ -905,6 +916,13 @@ define(function(require) {
                 matrixTable.setAttribute("width", w/2 + 'px');
 
             }
+
+            if(workspace)
+                {
+                    console.log("clear clear");
+                    assemble.clearAll();
+                    clearMenus();
+                }
         }
 
         window.onresize = function() {
@@ -1075,7 +1093,10 @@ define(function(require) {
 
             try {
                 var p = localStorage.currentProject;
-                localStorage['SESSION' + p] = prepareExport();
+                var allData = prepareExport();
+                localStorage['SESSION' + p] = allData["data"];
+                localStorage['SESSIONworkspacea'] = allData["workspaceaData"];
+                //console.log("workspaceaData "+ localStorage["SESSIONworkspacea"]);
             } catch (e) { console.log(e); }
 
             if (isSVGEmpty(turtles)) {
@@ -1218,9 +1239,10 @@ define(function(require) {
                         {
                             if(data[j])
                             {
-                            
+                             
                                 if(data[j][1][0] == 'namedsavematrix' + k)
                                 {
+                                    console.log("in delete");
                                     delete data[j];
                                     k += 1;
                                 }
@@ -1229,7 +1251,7 @@ define(function(require) {
                         }
                         console.log("data "+data);    
                         console.log('restoring session: ' + sessionData);
-                       blocks.loadNewBlocks(JSON.parse(sessionData));
+                        blocks.loadNewBlocks(JSON.parse(sessionData));
                     }
                 } catch (e) {
                     console.log(e);
@@ -1391,7 +1413,7 @@ define(function(require) {
             var blockMap = [];
             for (var blk = 0; blk < blocks.blockList.length; blk++) {
                 var myBlock = blocks.blockList[blk];
-                if (myBlock.trash) {
+                if (myBlock.trash || myBlock.name.substring(0,15) == 'namedsavematrix') {
                     // Don't save blocks in the trash.
                     continue;
                 }
@@ -1399,10 +1421,22 @@ define(function(require) {
             }
 
             var data = [];
+            var workspaceaData = [];
             for (var blk = 0; blk < blocks.blockList.length; blk++) {
                 var myBlock = blocks.blockList[blk];
-                if (myBlock.trash) {
+                if (myBlock.trash || myBlock.name.substring(0,15) == 'namedsavematrix') {
                     // Don't save blocks in the trash.
+                    connections = [];
+                    for (var c = 0; c < myBlock.connections.length; c++) {
+                        var mapConnection = blockMap.indexOf(myBlock.connections[c]);
+                        if (myBlock.connections[c] == null || mapConnection == -1) {
+                            connections.push(null);
+                        } else {
+                            connections.push(mapConnection);
+                        }
+                    }
+                    workspaceaData.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
+
                     continue;
                 }
                 if (blocks.blockList[blk].isValueBlock() || blocks.blockList[blk].name == 'loadFile') {
@@ -1440,7 +1474,7 @@ define(function(require) {
                 }
                 data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
             }
-            return JSON.stringify(data);
+            return {"data" : JSON.stringify(data), "workspaceaData" : JSON.stringify(workspaceaData) };
         }
 
         function doOpenPlugin() {
@@ -1469,6 +1503,9 @@ define(function(require) {
             stopTurtleContainer.visible = true;
         }
 
+        function playThings(){
+            matrix.playMatrix();
+        }
         function updatePasteButton() {
             pasteContainer.removeChild(pasteContainer.children[0]);
             var img = new Image();
@@ -1545,7 +1582,18 @@ define(function(require) {
                 y += dy;
             }
 
+            setupPlayButton();
             setupRightMenu(scale);
+        }
+
+        function setupPlayButton(){
+            var x = 1100;
+            var y = Math.floor(cellSize / 2);
+            var container = makeButton('play-button',
+                    x, y, cellSize);
+                loadButtonDragHandler(container, x, y, playThings);
+                onscreenButtons.push(container);
+
         }
 
         function setupRightMenu(scale) {
@@ -1815,5 +1863,80 @@ define(function(require) {
                 });
             });
         }
+
+        function clearMenus(){
+            if (headerContainer !== undefined) {
+                stage.removeChild(headerContainer);
+                for (i in onscreenButtons) {
+                    stage.removeChild(onscreenButtons[i]);
+                }
+            }
+
+            if (menuContainer !== undefined) {
+                stage.removeChild(menuContainer);
+                for (i in onscreenMenu) {
+                    stage.removeChild(onscreenMenu[i]);
+                }
+            }
+
+        }
+        function doOpenWorkspaceb(){
+            //window.location.pathname = "/Music-Blocks/workspacea.html";
+            //var workspacea = null;
+            workspace = true;
+            assemble = new workspacea(palettes, matrix, canvas, blocks, turtles, turtleContainer, prepareExport, saveLocally, menuContainer);
+            //assemble.deleteBlocks();
+            assemble.clearAll();
+            assemble.makeBlocks();
+            clearMenus();
+        }
+
+
+        function doOpenWorkspacea(){
+            restoreHome();
+            palettes.dict['assemble'].hide();
+
+        }
+
+        function restoreHome(){
+
+            setupAndroidToolbar();
+            blocks.show();
+
+
+        }
+        function makeWorkspaces(){
+                if (workspaceContainer !== undefined) {
+                stage.removeChild(workspaceContainer);
+                
+            }
+
+            // Misc. other buttons
+            var workspaceNames = [
+                ['a', doOpenWorkspacea],
+                ['b', doOpenWorkspaceb]  
+            ];
+
+            var btnSize = cellSize;
+            var x = Math.floor(canvas.width / scale) - btnSize / 2 - 100;
+            var y = Math.floor(canvas.height / scale) - btnSize / 2;//Math.floor(btnSize / 2);
+
+            var dx = 50;
+            var dy = 0;
+
+            for (var name in workspaceNames) {
+                x += dx;
+                y += dy;
+                var container = makeButton(workspaceNames[name][0] + '-button',
+                    x, y, btnSize);
+                loadButtonDragHandler(container, x, y, workspaceNames[name][1]);
+                //onscreenMenu.push(container);
+                container.visible = true;
+            }
+
+            
+        }
+        makeWorkspaces();
+        //}
     });
 });

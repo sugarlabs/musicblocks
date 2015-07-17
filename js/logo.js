@@ -249,6 +249,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     this.runLogoCommands = function(startHere) {
         // Save the state before running.
+        //console.log("name name " + this.blocks.blockList[startHere].name);
         if(this.blocks.blockList[startHere].name.substring(0,15) != 'namedsavematrix' && this.blocks.blockList[startHere].name != 'showMatrix')
         {
            this.saveLocally();
@@ -1139,20 +1140,11 @@ length;
                 myDoBlock.palette = logo.blocks.palettes.dict['matrix'];
                 myDoBlock.staticLabels.push('Chunk' + index);
                 myDoBlock.palette.add(myDoBlock);
+                logo.blocks.palettes.dict['assemble'].add(myDoBlock);
                 logo.blocks.palettes.updatePalettes('matrix');  
                 break;
 
-      /*      case 'namedsavematrix':
-                console.log("goes here");
-                matrix.notesToPlay = [];
-                var i = 1;
-                while( i<=window.savedMatricesNotes )
-                {
-
-                    matrix.notesToPlay.push()
-                }
-                break;
-        */    case 'note':
+                case 'note':
                 if (typeof(this.noteOscs[turtle]) == "undefined") {
                     this.noteOscs[turtle] = new Tone.AMSynth();
                 }

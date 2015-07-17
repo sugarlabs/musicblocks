@@ -1595,7 +1595,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
         console.log('new storein block ' + name);
         var myStoreinBlock = new ProtoBlock('storein');
-        this.protoBlockDict['myStorein_' + name] = myStoreinBlock;
+        this.protoBlockDict['myStorein_' + name] = myStoreinBlockprotoBlockDict;
         myStoreinBlock.palette = this.palettes.dict['blocks'];
         myStoreinBlock.defaults.push(name);
         myStoreinBlock.defaults.push(100);
@@ -1794,7 +1794,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
     }
 
-    this.loadNewBlocks = function(blockObjs) {
+    this.loadNewBlocks = function(blockObjs) {  
         // Check for blocks connected to themselves,
         // and for action blocks not connected to text blocks.
         for (var b = 0; b < blockObjs.length; b++) {

@@ -92,7 +92,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     playmatrix.staticLabels.push(_('Play Matrix'));
     playmatrix.adjustWidthToLabel();
     playmatrix.defaults.push('1000');
-    playmatrix.oneArgMathBlock();
+    playmatrix.oneArgBlock();
     playmatrix.dockTypes[1] = 'number';
     
     var transposition = new ProtoBlock('transposition');
@@ -692,6 +692,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     repeatBlock.adjustWidthToLabel();
     repeatBlock.flowClampOneArgBlock();
     repeatBlock.defaults.push(4);
+    palettes.dict['assemble'].add(repeatBlock);
 
     var foreverBlock = new ProtoBlock('forever');
     foreverBlock.palette = palettes.dict['flow'];
@@ -699,6 +700,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     foreverBlock.staticLabels.push(_('forever'));
     foreverBlock.adjustWidthToLabel();
     foreverBlock.flowClampZeroArgBlock();
+    palettes.dict['assemble'].add(foreverBlock);
 
     var breakBlock = new ProtoBlock('break');
     breakBlock.palette = palettes.dict['flow'];
