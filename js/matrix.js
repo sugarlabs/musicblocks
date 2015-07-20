@@ -1,4 +1,8 @@
-
+/*________________________________________
+  |Developed By Yash Khandelwal GSoC'15   |
+  |All about Music Matrix                 |
+  |_______________________________________|
+*/
 function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 {
 	this.timeSignDenominator = 4;
@@ -19,7 +23,6 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.freetime = 1000;
 	this.synth = 0;
 	this.oldNotes = [];
-	//this.savedMatricesNotes = windosavedMatricesNotes;
 
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
@@ -98,11 +101,9 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		var x = document.createElement("TABLE");
 		x.setAttribute("id", "myTable");
 		x.style.textAlign = 'center';
-		//x.setAttribute("border", "1px solid #fff");
 		var w = window.innerWidth;
 		w = (2*w)/this.timeSignDenominator;
-		//x.style.WebkitColumnWidth = w/4 + "px";
-		//x.setAttribute("width", w+"px");
+
 		var matrixDiv = document.getElementById("matrix");
 		matrixDiv.appendChild(x);
 
@@ -280,31 +281,10 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	Tone.Transport.start();
 	}
 
-	/*this.playNote = function(note){
-		var duration = this.timeSignDenominator + "n"
-		synth = new Tone.AMSynth();
-		synth.toMaster();
-        synth.triggerAttackRelease(note, duration);
-        Tone.Transport.start();
-	};
+	this.musicNotation = function(){
 
-	this.myLoop = function () {       
-		var that = this;
-		this.play = this.notesToPlay;
-		setTimeout(function () {
-		    that.playNote(that.play[that.i]); 
-		    that.i++;                     
-		    if (that.i < that.notesToPlay.length) {            
-		       that.myLoop();              
-		   	}       	                 
-		    }, this.freetime);
-		}
-
-*/	
-		this.musicNotation = function(){
-		
-			musicnotation.doNotation(this.timeSignNumerator, this.timeSignDenominator, this.octave);
-		}
+		musicnotation.doNotation(this.timeSignNumerator, this.timeSignDenominator, this.octave);
+	}
 
 	this.setNotes = function(index){
 		
@@ -388,7 +368,5 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	window.savedMatricesCount += 1;
 
     }
-
-    
 		
 }

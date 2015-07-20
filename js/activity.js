@@ -26,8 +26,6 @@ define(function(require) {
     require('tweenjs');
     require('preloadjs');
     require('howler');
-    require('p5.sound');
-    require('p5.dom');
     require('mespeak');
     require('Chart');
     require('activity/utils');
@@ -205,9 +203,6 @@ define(function(require) {
                            [_('Congratulations.'), _('You have finished the tour. Please enjoy Turtle Blocks!'), 'activity/activity-icon-color.svg']]
 
         pluginsImages = {};
-        //console.log("tit "+$("body").data("title"));
-        //if ($("body").data("title") === "index") {
-        // Place the logic pertaining to the page with title 'my_page_title' here...
 
         function allClear() {
             
@@ -262,71 +257,6 @@ define(function(require) {
                     }
             }
 
-        /*function doFastButton() {
-            logo.setTurtleDelay(0);
-            if (!turtles.running()) {
-                logo.runLogoCommands();
-            } else {
-                logo.step();
-            }
-        }
-
-        function doSlowButton() {
-            logo.setTurtleDelay(DEFAULTDELAY);
-            if (!turtles.running()) {
-                logo.runLogoCommands();
-            } else {
-                logo.step();
-            }
-        }
-
-        function doStepButton() {
-            var turtleCount = 0;
-            for (var turtle in logo.stepQueue) {
-                turtleCount += 1;
-            }
-            if (turtleCount == 0 || logo.turtleDelay != TURTLESTEP) {
-                // Either we haven't set up a queue or we are
-                // switching modes.
-                logo.setTurtleDelay(TURTLESTEP);
-                // Queue and take first step.
-                if (!turtles.running()) {
-                    logo.runLogoCommands();
-                }
-                logo.step();
-            } else {
-                logo.setTurtleDelay(TURTLESTEP);
-                logo.step();
-            }
-        }
-
-        var stopTurtle = false;
-        function doStopButton() {
-            logo.doStopTurtle();
-        }
-*/
-        /*var cartesianVisible = false;
-        function doCartesian() {
-            if (cartesianVisible) {
-                hideCartesian();
-                cartesianVisible = false;
-            } else {
-                showCartesian();
-                cartesianVisible = true;
-            }
-        }
-
-        var polarVisible = false;
-        function doPolar() {
-            if (polarVisible) {
-                hidePolar();
-                polarVisible = false;
-            } else {
-                showPolar();
-                polarVisible = true;
-            }
-        }
-*/
         function doAnalytics() {
             document.body.style.cursor = 'wait';
             var myChart = docById('myChart');
@@ -1229,26 +1159,7 @@ define(function(require) {
                     } else {
                         var i = 0;
                         var data = JSON.parse(sessionData);
-                        while(data[i]){
-                            i+=1;
-                            //if(sessionData[i][1][0] == "namedsavematrix1")
-                                //delete sessionData[i];
-                        }
-                        var k=1;
-                        for(var j=0; j<i; j++)
-                        {
-                            if(data[j])
-                            {
-                             
-                                if(data[j][1][0] == 'namedsavematrix' + k)
-                                {
-                                    console.log("in delete");
-                                    delete data[j];
-                                    k += 1;
-                                }
-                            
-                            }
-                        }
+                        
                         console.log("data "+data);    
                         console.log('restoring session: ' + sessionData);
                         blocks.loadNewBlocks(JSON.parse(sessionData));
@@ -1587,7 +1498,7 @@ define(function(require) {
         }
 
         function setupPlayButton(){
-            var x = 1100;
+            var x = Math.floor(canvas.width / scale) - 200;
             var y = Math.floor(cellSize / 2);
             var container = makeButton('play-button',
                     x, y, cellSize);
@@ -1608,11 +1519,6 @@ define(function(require) {
             var menuNames = [
                 ['planet', doOpenSamples],
                 ['paste-disabled', pasteStack],
-                //['Cartesian', doCartesian],
-                //['polar', doPolar],
-                // ['bigger', doBiggerFont],
-                // ['smaller', doSmallerFont],
-                // ['plugin', doOpenPlugin],
                 ['utility', doUtilityBox],
                 ['empty-trash', deleteBlocksBox],
                 ['restore-trash', restoreTrash]
@@ -1887,7 +1793,6 @@ define(function(require) {
             assemble = new workspacea(palettes, matrix, canvas, blocks, turtles, turtleContainer, prepareExport, saveLocally, menuContainer);
             //assemble.deleteBlocks();
             assemble.clearAll();
-            assemble.makeBlocks();
             clearMenus();
         }
 
@@ -1902,6 +1807,15 @@ define(function(require) {
 
             setupAndroidToolbar();
             blocks.show();
+            for (var b = 0; b < blocks.blockList.length; b++) {
+            var blk = blocks.blockList[b];
+            if(blk.name == "forever" || blk.name == 'repeat')
+            {   
+                blocks.blockList[b].trash = true;
+                blocks.blockList[b].hide();
+            }
+            blocks.refreshCanvas();
+    }
 
 
         }

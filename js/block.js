@@ -202,7 +202,6 @@ function Block(protoblock, blocks, overrideName) {
                 proto.extraWidth = 10;
                 proto.basicBlockCollapsed();
                 var obj = proto.generator();
-                console.log("aart "+obj);
                 this.collapseArtwork = obj[0];
 
                 var obj = this.protoblock.generator(this.clampCount[0]);

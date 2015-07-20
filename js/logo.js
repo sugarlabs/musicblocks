@@ -76,13 +76,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     this.svgOutput = '<rect x="0" y="0" height="' + this.canvas.height + '" width="' + this.canvas.width + '" fill="' + body.style.background + '"/>\n';
 
-    try {
-        this.mic = new p5.AudioIn()
-    } catch (e) {
-        console.log(NOMICERRORMSG);
-        this.mic = null;
-    }
-    
     this.turtleOscs = {};
     this.noteOscs = {};
 
@@ -1048,24 +1041,7 @@ length;
                     doSaveSVG(logo, args[0]);
                 }
                 break;
-            case 'tone':
-                if (typeof(this.turtleOscs[turtle]) == "undefined") {
-                    this.turtleOscs[turtle] = new p5.TriOsc();
-                }
-
-                osc = this.turtleOscs[turtle];
-                osc.stop();
-                osc.start();
-                osc.amp(0);
-
-                osc.freq(args[0]);
-                osc.fade(0.5, 0.2);
-
-                setTimeout(function(osc) {
-                    osc.fade(0, 0.2);
-                }, args[1], osc);
-
-                break;
+            
             case 'octave' :
                 console.log('octave '+args[0]);
                 this.octave = args[0];
@@ -1154,7 +1130,7 @@ length;
                     console.log(args[0]);
                     var noteValue = args[1];
                     noteValue += "n";
-                synth.triggerAttackRelease(args[0], noteValue);
+                synth.triggerAttackRelease('C4', noteValue);
                 //}, "1n");
                 //start the transport
                 Tone.Transport.start();
