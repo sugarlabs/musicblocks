@@ -23,6 +23,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.freetime = 1000;
 	this.synth = 0;
 	this.oldNotes = [];
+	this.cellWidth = 0;
 
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
@@ -103,6 +104,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		x.style.textAlign = 'center';
 		var w = window.innerWidth;
 		w = (2*w)/this.timeSignDenominator;
+		this.cellWidth = w/4;
 
 		var matrixDiv = document.getElementById("matrix");
 		matrixDiv.appendChild(x);
@@ -116,15 +118,20 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	cell.style.backgroundColor = '#9ACD32';
     	cell.style.width = w/4 + 'px';
 
+
+
     	for(var i=0; i<solfege.length; i++)
     	{
     		var row = header.insertRow(i+1);
     		row.id = 'row' + i+1;
     		var cell = row.insertCell(0);
+    		//console.log("roww "+row);
+    		//cell.onclick = this.addRowUp;	
     		cell.style.backgroundColor = '#9ACD32';
     		cell.innerHTML = solfege[solfege.length-1-i];
     		cell.style.height = "30px";
     	}
+    	
     	var row = header.insertRow(8);
     	var cell = row.insertCell(0);
     	cell.innerHTML = '<b>'+'Time'+'</b>';
@@ -164,7 +171,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    	var row = table.rows[i];
 		    	var cell = row.insertCell(-1);
 		    	cell.style.backgroundColor = '#ADFF2F';
-		    	cell.width = w/4;
+		    	cell.width = this.cellWidth;
 		    	
 		    	if(i==8)
 		    	{
@@ -208,6 +215,26 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 				}
 				this.synth = new Tone.AMSynth().toMaster();
 	}
+
+	 	this.addRowUp = function(){
+		var table = document.getElementById("myTable");
+		var index = this.parentNode.rowIndex;
+		var row = table.insertRow(index);
+		var cell = row.insertCell(0);
+		cell.innerHTML = "GOD";
+		cell.style.backgroundColor = '#9ACD32';
+		cell.style.height = "30px";
+		console.log("that "+this.timeSignNumerator);
+		for(var j=0; j<this.timeSignNumerator; j++)
+		{
+			console.log("insidae");
+		  	var cell = row.insertCell(j+1);
+	    	cell.style.backgroundColor = '#ADFF2F';
+	    	cell.width = this.cellWidth;
+	    }
+    //console.log("in" + this.cellIndex);
+	}
+
 
 	this.setTempo = function(timeSign){
 		//var this.tempo = 60;

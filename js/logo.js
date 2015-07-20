@@ -488,6 +488,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     }
 
     this.runFromBlockNow = function(logo, turtle, blk) {
+        var num = 3; deno = 4;
         var noSession = 0;
         // Run a stack of blocks, beginning with blk.
         // (1) Evaluate any arguments (beginning with connection[1]);
@@ -1050,7 +1051,8 @@ length;
             case 'matrix' :
                 if(window.savedMatricesNotes == null)
                     window.savedMatricesNotes.push(4);
-                var flag = 0 , tsd = 0;
+               
+                var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
                 for(var i=0; i<args[0].length; i++)
                 {
                     if(flag)
@@ -1059,15 +1061,23 @@ length;
                         tsd *= 10;
 
                     }
+                    if(flag1 && args[0][i] != '/')
+                    {
+                        tsn += parseInt(args[0][i]);
+                        tsn *= 10;
+
+                    }
                     if(args[0][i] == '/')
                     {
                         flag = 1;
+                        flag1 = 0;
                     }
                     
                 }
+                num = tsn/10;
+                deno = tsd/10;
 
-                tsd = tsd/10; 
-                if(window.savedMatricesNotes[0] != tsd)
+                if(window.savedMatricesNotes[0] != deno)
                 {
                     var i=1;
                     while(logo.blocks.protoBlockDict['namedsavematrix' + i])
@@ -1082,7 +1092,7 @@ length;
                     }
                     logo.blocks.palettes.updatePalettes('matrix');
                       
-                    window.savedMatricesNotes = [tsd];
+                    window.savedMatricesNotes = [deno];
                 }
                 matrix.initMatrix(args[0],args[1]);
                 this.matrix = matrix;
@@ -1100,6 +1110,7 @@ length;
             case 'playmatrix' :
                 console.log('Matrix played after '+args[0]);
                 this.matrix.playMatrix(parseInt(args[0]));
+                logo.setTurtleDelay(4500*parseFloat(1 / deno)*(num));
                 break;
 
             case 'notation' :
