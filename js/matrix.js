@@ -1,8 +1,14 @@
-/*________________________________________
-  |Developed By Yash Khandelwal GSoC'15   |
-  |All about Music Matrix                 |
-  |_______________________________________|
-*/
+// Copyright (c) 2015 Yash Khandelwal
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// You should have received a copy of the GNU General Public License
+// along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 {
 	this.timeSignDenominator = 4;
@@ -252,39 +258,63 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	}
 
-	this.doTransposition = function(note){
-		if(this.transposition != null)
+	this.removeTransposition = function(transposition){
+		this.transposition = null;
+
+	}
+
+	this.doTransposition = function(note, octave){
+		if(this.transposition)
 		{
+			var deltaOctave = 0;
 			if(this.transposition[0] == '-')
 			{
 				var factor = this.transposition;
 				factor = factor.slice(0,0) + factor.slice(1,factor.length);
 				factor = parseInt(factor);
-				console.log('factor '+factor);
 				var index = this.notes.indexOf(note);
 				if(index == 0)
+				{
 					index = this.notes.length - factor % this.notes.length;
+					deltaOctave = -1
+				}
 				else
+				{
+					index = index - ( factor % this.notes.length );
+					if(index < 0)
 					{
-						index = index - ( factor % this.notes.length );
-						if(index < 0)
 							index = this.notes.length +	 index;
+							deltaOctave = -1;
 					}
-				return this.notes[index];
+				}
+				return this.notes[index] + (parseInt(octave) + parseInt(deltaOctave));
 			}
 			else if(this.transposition[0] == '+')
 			{
 				var factor = this.transposition;
+				factor = factor.slice(0,0) + factor.slice(1,factor.length);
+				factor = parseInt(factor);
 				var index = this.notes.indexOf(note);
 				if(index == this.notes.length - 1)
-					index = factor % this.notes.length;
+				{
+					index = factor % this.notes.length - 1;
+					deltaOctave = 1;
+				}	
 				else
-					index += factor % this.notes.length;
-				index = index % this.notes.length;
-				return this.notes[index];
+					{
+						index += factor % this.notes.length;
+					}
+				if(index >= this.notes.length)
+				{
+					index = index % this.notes.length;
+					deltaOctave = 1;
+				}
+				var x = this.notes[index] + (parseInt(octave) + parseInt(deltaOctave));
+				return this.notes[index] + (parseInt(octave) + parseInt(deltaOctave));
 
 			}
 		}
+		return note;
 	}
 
 	this.playAll = function(){
@@ -367,8 +397,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
             var transposedArray = [];
             for(var i = 0; i < this.notesToPlay.length; i++)
             {
-                var transposedNote = this.doTransposition(this.notesToPlay[i][0]);
-                transposedNote += this.octave;
+                var transposedNote = this.doTransposition(this.notesToPlay[i][0], this.octave);
                 transposedArray.push(transposedNote);
             }
             

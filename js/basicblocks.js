@@ -56,6 +56,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     
     blocks.palettes = palettes;
 
+    
     //Matrix palette
     var matrix = new ProtoBlock('matrix');
     matrix.palette = palettes.dict['matrix'];
@@ -749,6 +750,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['clamp'] = clampBlock;
     clampBlock.hidden = true;
     clampBlock.flowClampBlock();
+
+    //Assemble palette
+    var chunkTransposeBlock = new ProtoBlock('chunkTranspose');
+    chunkTransposeBlock.palette = palettes.dict['assemble'];
+    blocks.protoBlockDict['chunkTranspose'] = chunkTransposeBlock;
+    chunkTransposeBlock.staticLabels.push(_('Transpose'));
+    chunkTransposeBlock.defaults.push('+1');
+    chunkTransposeBlock.adjustWidthToLabel();
+    chunkTransposeBlock.flowClampOneArgBlock();
+    chunkTransposeBlock.dockTypes[1] = 'anyin';
+
 
     // Extras palette
     var vspaceBlock = new ProtoBlock('vspace');

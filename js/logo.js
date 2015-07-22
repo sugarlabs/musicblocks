@@ -69,6 +69,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.octave = 4;
     this.showMatrix = false;
 
+    //Play with chunks
+    this.chunktranspose = false;
+
     // When running in step-by-step mode, the next command to run is
     // queued here.
     this.stepQueue = {};
@@ -1050,8 +1053,10 @@ length;
             
             case 'matrix' :
                 if(window.savedMatricesNotes == null)
-                    window.savedMatricesNotes.push(4);
-               
+                    {
+                        window.savedMatricesNotes.push(4);
+                        window.savedMatricesNotes.push('end');
+                    }
                 var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
                 for(var i=0; i<args[0].length; i++)
                 {
@@ -1168,6 +1173,11 @@ length;
                 },this.stopTime);
                 break;
 
+            case 'chunkTranspose':
+                this.chunktranspose = true;
+                this.matrix.setTransposition(args[0]);
+                logo.runFromBlock(logo, turtle, args[1]);
+                break;
 
             default:
 
@@ -1179,7 +1189,7 @@ length;
                     var notes = window.savedMatricesNotes;
                     this.matrix.notesToPlay = [];
                     var count = 0,j=1,temp = 0;
-                    for(var i=0; i<notes.length; i++)
+                    for(var i=2; i<notes.length; i++)
                     {
                         if(notes[i] == 'end')
                         {
@@ -1202,7 +1212,31 @@ length;
                         j += 1;
                     }
                     var notesToPlayCopy = this.matrix.notesToPlay;
-                    if(this.showMatrix)
+                    var trNote;
+                    if(this.chunktranspose)
+                    {
+                        var transposedNotes = [];
+                        j -= 1;
+                        var i = notesToPlayCopy.length;
+                        i -= 1;                        
+                        while(window.savedMatricesNotes[j] != 'end' && i>=0)
+                        {
+                            var len = notesToPlayCopy[i].length;
+                            len -= 1;
+                            var note = notesToPlayCopy[i].substring(0, len);
+                            var trNote = matrix.doTransposition(note, notesToPlayCopy[i][len]);
+                            console.log(notesToPlayCopy[i] + " transposed to "+ trNote);
+                            window.savedMatricesNotes[j] = trNote ;
+                            i -= 1;
+                            
+                            j -= 1;
+                            
+                        }
+                        this.chunktranspose = false;
+                        matrix.removeTransposition();
+                        
+                    }
+                    else if(this.showMatrix)
                     {
                         this.matrix.initMatrix('3/4','4');
                         this.matrix.notesToPlay = notesToPlayCopy;

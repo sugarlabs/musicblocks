@@ -849,7 +849,7 @@ define(function(require) {
 
             if(workspace)
                 {
-                    console.log("clear clear");
+                    console.log("clearing canvas");
                     assemble.clearAll();
                     clearMenus();
                 }
@@ -1790,7 +1790,7 @@ define(function(require) {
             //window.location.pathname = "/Music-Blocks/workspacea.html";
             //var workspacea = null;
             workspace = true;
-            assemble = new workspacea(palettes, matrix, canvas, blocks, turtles, turtleContainer, prepareExport, saveLocally, menuContainer);
+            assemble = new Assemble(palettes, matrix, canvas, blocks, turtles, turtleContainer, prepareExport, saveLocally, menuContainer);
             //assemble.deleteBlocks();
             assemble.clearAll();
             clearMenus();
@@ -1809,12 +1809,13 @@ define(function(require) {
             blocks.show();
             for (var b = 0; b < blocks.blockList.length; b++) {
             var blk = blocks.blockList[b];
-            if(blk.name == "forever" || blk.name == 'repeat')
+            if(blk.name == "forever" || blk.name == 'repeat' || blk.name == 'chunkTranspose')
             {   
                 blocks.blockList[b].trash = true;
                 blocks.blockList[b].hide();
             }
             blocks.refreshCanvas();
+            palettes.show();
     }
 
 
