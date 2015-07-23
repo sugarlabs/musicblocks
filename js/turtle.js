@@ -285,7 +285,7 @@ function Turtle (name, turtles) {
     this.doShowImage = function(size, myImage) {
         // Add an image object to the canvas
         // Is there a JS test for a valid image path?
-        if (myImage == null) {
+        if (!myImage) {
             return;
         }
         var image = new Image();
@@ -309,7 +309,7 @@ function Turtle (name, turtles) {
 
     this.doShowURL = function(size, myURL) {
         // Add an image object from a URL to the canvas
-        if (myURL == null) {
+        if (!myURL) {
             return;
         }
         var image = new Image();
@@ -333,7 +333,7 @@ function Turtle (name, turtles) {
 
     this.doTurtleShell = function(size, myImage) {
         // Add image to turtle
-        if (myImage == null) {
+        if (!myImage) {
             return;
         }
         var image = new Image();
@@ -364,7 +364,7 @@ function Turtle (name, turtles) {
             hitArea.y = -bounds.height / 2;
             me.container.hitArea = hitArea;
 
-            if (me.startBlock != null) {
+            if (me.startBlock) {
                 me.startBlock.container.removeChild(me.decorationBitmap);
                 me.decorationBitmap = new createjs.Bitmap(myImage);
                 me.startBlock.container.addChild(me.decorationBitmap);
@@ -528,10 +528,10 @@ function Turtles(canvas, stage, refreshCanvas) {
 
     this.add = function(startBlock, infoDict, note) {
         // Add a new turtle for each start block and for each note to be played in the music-matrix
-        if (startBlock != null) {
+        if (startBlock) {
             console.log('adding a new turtle ' + startBlock.name);
         }
-        else if(note != null)
+        else if (note)
         {
             console.log('adding a new turtle ' + note);   
         }
@@ -541,19 +541,20 @@ function Turtles(canvas, stage, refreshCanvas) {
 
         var blkInfoAvailable = false;
 
-        if (typeof(infoDict) == 'object' && infoDict != null) {
+        if (infoDict && typeof(infoDict) == 'object') {
           if (Object.keys(infoDict).length == 8) {
             blkInfoAvailable = true;
           }
         }
 
         var i = this.turtleList.length;
-        if(note != null)
+        var turtleName = ''
+        if(note)
         {
-            var turtleName =note +'note' + i.toString();
+            turtleName =note +'note' + i.toString();
         }
         else
-            var turtleName = i.toString();    
+        var turtleName = i.toString();    
         var myTurtle = new Turtle(turtleName, this);
 
         if (blkInfoAvailable) {
@@ -594,7 +595,7 @@ function Turtles(canvas, stage, refreshCanvas) {
             myTurtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
             myTurtle.startBlock = startBlock;
-            if (startBlock != null) {
+            if (startBlock) {
                 myTurtle.decorationBitmap = myTurtle.bitmap.clone();
                 startBlock.container.addChild(myTurtle.decorationBitmap);
                 myTurtle.decorationBitmap.name = 'decoration';
