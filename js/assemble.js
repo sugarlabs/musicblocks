@@ -18,9 +18,18 @@ function Assemble(palettes, matrix, canvas, blocks, turtles, turtleContainer, pr
 
 		for(var i = 0; i < turtles.turtleList.length; i++)
 		{
-			    turtles.turtleList[i].container.visible = false;	
+			turtles.turtleList[i].container.visible = false;	
 			
 		}
+		for (var blk in blocks.blockList) {
+            var myBlock = blocks.blockList[blk];
+            //var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
+            if (myBlock.name == 'start')
+            {
+            	myBlock.show();
+            }
+
+        }
 
 		palettes.dict['assemble'].show();
 	}

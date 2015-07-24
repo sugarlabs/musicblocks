@@ -1,6 +1,6 @@
 [Activity]
-name = Turtle Blocks JS
+name = Mouse Music
 activity_version = 1
-bundle_id = org.sugarlabs.TurtleBlocksJS
-exec = sugar-activity-web
+bundle_id = null
+exec = null
 icon = activity-icon

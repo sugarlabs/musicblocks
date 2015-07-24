@@ -1,3 +1,6 @@
 Libraries used:
 tone jS --> Web Audio framework for creating interactive music in the browser
+			https://github.com/Tonejs/Tone.js/blob/master/README.md
+
 vexflow and vextab --> Allows to create standard music notation and guitar tablature
+					   http://www.vexflow.com/

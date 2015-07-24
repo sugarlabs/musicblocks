@@ -185,10 +185,7 @@ define(function(require) {
                            [_('Save Notations'), _('Click to Download the Music Notations in png format'), 'icons/download-button.svg'],
                            [_('Help'), _('Show these messages.'), 'icons/help-button.svg'],
                            [_('Play'), _('Plays the Music which is inside the start block.'), 'icons/play-button.svg'],
-                           [_('Pause'), _('Pause the Music.'), 'icons/stop-turtle-button.svg'],
                            [_('Stop'), _('Stop the Music.'), 'icons/stop-turtle-button.svg'],
-                           
-
                            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'icons/menu-button.svg'],
                            [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'icons/copy-button.svg'],
                            [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'icons/paste-disabled-button.svg'],
@@ -1288,30 +1285,6 @@ define(function(require) {
             update = true;
         }
 
-        /*function hideCartesian() {
-            cartesianBitmap.visible = false;
-            cartesianBitmap.updateCache();
-            update = true;
-        }
-
-        function showCartesian() {
-            cartesianBitmap.visible = true;
-            cartesianBitmap.updateCache();
-            update = true;
-        }
-
-        function hidePolar() {
-            polarBitmap.visible = false;
-            polarBitmap.updateCache();
-            update = true;
-        }
-
-        function showPolar() {
-            polarBitmap.visible = true;
-            polarBitmap.updateCache();
-            update = true;
-        }*/
-
         function pasteStack() {
             blocks.pasteStack();
         }
@@ -1495,7 +1468,7 @@ define(function(require) {
 
             for (var name in buttonNames) {
                 if ( buttonNames[name][0] == 'play')
-                    x += Math.floor(screen.width / scale*0.6) - btnSize / 2;
+                    x += Math.floor(screen.width / scale*0.5) - btnSize / 2;
                 var container = makeButton(buttonNames[name][0] + '-button',
                     x, y, btnSize);
                 loadButtonDragHandler(container, x, y, buttonNames[name][1]);
