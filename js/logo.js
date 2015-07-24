@@ -112,6 +112,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             this.sounds[sound].stop();
         }
         this.sounds = [];
+        
+        Tone.Transport.stop();
 
         if (this.cameraID != null) {
             doStopVideoCam(this.cameraID, this.setCameraID);

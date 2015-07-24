@@ -199,18 +199,34 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 				   
 				        	cell.onclick=function(){
 				        		//this.onmouseout=null;
-				        		if(this.style.backgroundColor == 'black')
+				        		if (this.style.backgroundColor == 'black')
 				        		{
 				        			this.style.backgroundColor = '#ADFF2F';
 				        			that.chkArray[this.id] = 0;
 				        			//that.setNotes(this.id);
 				        		}
-				        		else if(that.chkArray[this.id] == 0)
+				        		else if (that.chkArray[this.id] == 0)
 				        		{
 
 				        			this.style.backgroundColor = 'black';
 									that.chkArray[this.id] = 1;
 									that.setNotes(this.id);
+
+				        		}
+				        		else if (that.chkArray[this.id] == 1)
+				        		{
+				        			for (var k = 1; k < table.rows.length - 1; k++)
+				        			{
+				        				console.log(this.id + "  "+k);
+				        				cell = table.rows[k].cells[this.id];
+				        				if(cell.style.backgroundColor == 'black')
+				        				{
+				        					cell.style.backgroundColor = '#ADFF2F';
+				        					this.style.backgroundColor = 'black';
+											that.setNotes(this.id);
+				        					break;
+				        				}
+				        			}
 
 				        		}
 
@@ -328,10 +344,9 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	    //position = position % notes.length;
 	    that.synth.triggerAttackRelease(note, 1/that.timeSignDenominator, time);
 	    if(position == notes.length )
-	    	{	Tone.Transport.clearInterval(setI);
-	    		Tone.Transport.stop();
-	    		//delete synth;
-	    	}
+    	{	Tone.Transport.clearInterval(setI);
+    		Tone.Transport.stop();
+    	}
 	}, 2/that.timeSignDenominator);
 
 	//the transport won't start firing events until it's started
@@ -377,13 +392,17 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
                     }
                     else if(solfege == 'La')
                     {
-                        note = 'A' + this.octave;                       }
+                        note = 'A' + this.octave;                       
+                    }
                     else if(solfege == 'Si')
                     {
                         note = 'B' + this.octave;
                     }
                     this.notesToPlay[index - 1] = note;
                     this.clearTurtles();
+               	    this.synth.triggerAttackRelease(note, 1/this.timeSignDenominator);
+					Tone.Transport.start();
+
                     for(var i=0; i<this.notesToPlay.length; i++)
                     	turtles.add(null, null, this.notesToPlay[i]);              
                 }

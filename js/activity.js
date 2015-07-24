@@ -176,32 +176,29 @@ define(function(require) {
 
         var helpContainer = null;
         var helpIdx = 0;
-        var HELPCONTENT = [[_('Welcome to Music Blocks'), _('Music Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.'), 'activity/activity-icon-color.svg'],
-                           [_('Palette buttons'), _('This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
-                           [_('Save Notations'), _('Click to Save the Music Notations'), 'icons/download-button.svg'],
-                           [_('Run slow'), _('Click to run the project in slow mode.'), 'icons/slow-button.svg'],
-                           [_('Run step by step'), _('Click to run the project step by step.'), 'icons/step-button.svg'],
-                           [_('Stop'), _('Stop the current project.'), 'icons/stop-turtle-button.svg'],
-                           [_('Clean'), _('Clear the screen and return the turtles to their initial positions.'), 'icons/clear-button.svg'],
+        var HELPCONTENT = [[_('Welcome to Mouse Music'), _('Mouse Music is a Logo-inspired mouse that plays Music'), 'activity/activity-icon-color.svg'],
+                           [_('Palette buttons'), _('This toolbar contains the palette buttons: click to show the palettes of blocks (Matrix, Music, Media, etc.). You can drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+                           [_('Clean'), _('Clears the Matrix and Music-Notations.'), 'icons/clear-button.svg'],
                            [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'icons/palette-button.svg'],
                            [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'icons/hide-blocks-button.svg'],
                            [_('Expand/collapse collapsable blocks'), _('Expand or collapse stacks of blocks, e.g, start and action stacks.'), 'icons/collapse-blocks-button.svg'],
+                           [_('Save Notations'), _('Click to Download the Music Notations in png format'), 'icons/download-button.svg'],
                            [_('Help'), _('Show these messages.'), 'icons/help-button.svg'],
+                           [_('Play'), _('Plays the Music which is inside the start block.'), 'icons/play-button.svg'],
+                           [_('Pause'), _('Pause the Music.'), 'icons/stop-turtle-button.svg'],
+                           [_('Stop'), _('Stop the Music.'), 'icons/stop-turtle-button.svg'],
+                           
+
                            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'icons/menu-button.svg'],
-                           [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'icons/planet-button.svg'],
                            [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'icons/copy-button.svg'],
                            [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'icons/paste-disabled-button.svg'],
                            [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'icons/save-blocks-button.svg'],
-                           [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'icons/Cartesian-button.svg'],
-                           [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'icons/polar-button.svg'],
-                           [_('Settings'), _('Open a panel for configuring Turtle Blocks.'), 'icons/utility-button.svg'],
+                           [_('Settings'), _('Open a panel for configuring Mouse Music.'), 'icons/utility-button.svg'],
                            [_('Decrease block size'), _('Decrease the size of the blocks.'), 'icons/smaller-button.svg'],
                            [_('Increase block size'), _('Increase the size of the blocks.'), 'icons/bigger-button.svg'],
-                           [_('Display statistics'), _('Display statistics about your Turtle project.'), 'icons/chart-button.svg'],
-                           [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'icons/plugin-button.svg'],
                            [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'icons/empty-trash-button.svg'],
                            [_('Undo'), _('Restore blocks from the trash.'), 'icons/restore-trash-button.svg'],
-                           [_('Congratulations.'), _('You have finished the tour. Please enjoy Turtle Blocks!'), 'activity/activity-icon-color.svg']]
+                           [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-color.svg']]
 
         pluginsImages = {};
 
@@ -1415,9 +1412,25 @@ define(function(require) {
             stopTurtleContainer.visible = true;
         }
 
-        function playThings(){
-            matrix.playMatrix();
+        function playMusic(){
+            for (var blk in logo.blocks.blockList) {
+                var myBlock = logo.blocks.blockList[blk];
+                var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
+                if (myBlock.name == 'start')
+                {
+                    var topBlock = logo.blocks.findTopBlock(thisBlock);
+                    console.log('Playing through Play Button');
+                    logo.runLogoCommands(topBlock);
+                } 
+            }
         }
+
+        function stopMusic(){
+            logo.doStopTurtle();
+            Tone.Transport.stop();
+
+        }
+
         function updatePasteButton() {
             pasteContainer.removeChild(pasteContainer.children[0]);
             var img = new Image();
@@ -1465,7 +1478,9 @@ define(function(require) {
                 ['hide-blocks', changeBlockVisibility],
                 ['collapse-blocks', toggleCollapsibleStacks],
                 ['download', saveMusicNotations],//'save-notations'
-                ['help', showHelp]
+                ['help', showHelp],
+                ['play', playMusic],
+                ['stop-turtle', stopMusic]
             ];
 
             if (showPalettesPopover) {
@@ -1479,6 +1494,8 @@ define(function(require) {
             var dy = 0;
 
             for (var name in buttonNames) {
+                if ( buttonNames[name][0] == 'play')
+                    x += Math.floor(screen.width / scale*0.6) - btnSize / 2;
                 var container = makeButton(buttonNames[name][0] + '-button',
                     x, y, btnSize);
                 loadButtonDragHandler(container, x, y, buttonNames[name][1]);
@@ -1494,18 +1511,12 @@ define(function(require) {
                 y += dy;
             }
 
-            setupPlayButton();
+            //setupPlayButton();
             setupRightMenu(scale);
         }
 
         function setupPlayButton(){
-            var x = Math.floor(canvas.width / scale) - 200;
-            var y = Math.floor(cellSize / 2);
-            var container = makeButton('play-button',
-                    x, y, cellSize);
-                loadButtonDragHandler(container, x, y, playThings);
-                onscreenButtons.push(container);
-
+              
         }
 
         function setupRightMenu(scale) {
@@ -1787,7 +1798,7 @@ define(function(require) {
             }
 
         }
-        function doOpenWorkspaceb(){
+        function doOpenWorkspaceAssemble(){
             //window.location.pathname = "/Music-Blocks/workspacea.html";
             //var workspacea = null;
             workspace = true;
@@ -1798,7 +1809,7 @@ define(function(require) {
         }
 
 
-        function doOpenWorkspacea(){
+        function doOpenHome(){
             restoreHome();
             palettes.dict['assemble'].hide();
 
@@ -1829,8 +1840,8 @@ define(function(require) {
 
             // Misc. other buttons
             var workspaceNames = [
-                ['a', doOpenWorkspacea],
-                ['b', doOpenWorkspaceb]  
+                ['a', doOpenHome],
+                ['b', doOpenWorkspaceAssemble]  
             ];
 
             var btnSize = cellSize;
