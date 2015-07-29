@@ -9,7 +9,7 @@
 
     <script src="lib/mespeak.js"></script>
     <script src="lib/reqwest.js"></script>
-    <script src="lib/jquery-1.10.2.js"></script>
+    <script src="lib/jquery-2.1.4.js"></script>
     <script src="lib/jquery-ui.js"></script>
     <script src="lib/webL10n.js"></script>
     <script src="lib/tone.min.js"></script>
@@ -18,7 +18,7 @@
 
 <script type="text/javascript"></script>
 
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/jquery-2.1.4.js"></script>
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
   <link rel="prefetch" type="application/l10n" href="./localization.ini" />
@@ -53,10 +53,55 @@
       }(document, 'script', 'facebook-jssdk'));
       } catch(e) {}
 
-$(function() {
-    $( "#matrix" ).draggable();
-    $( "#musicNotation" ).draggable();
-  });    </script>
+    $(function() {
+          $( "#musicNotation" ).draggable();
+          $( "#matrix" ).draggable();
+          $( "#solfamenu" ).draggable();
+   
+  });    
+    (function($) {
+   $.fn.fixMe = function() {
+      return this.each(function() {
+         var $this = $(this),
+            $t_fixed;
+         function init() {
+            $this.wrap('<div class="container" />');
+            $t_fixed = $this.clone();
+            $t_fixed.find("tbody").remove().end().addClass("fixed").insertBefore($this);
+            resizeFixed();
+         }
+         function resizeFixed() {
+            $t_fixed.find("th").each(function(index) {
+               $(this).css("width",$this.find("th").eq(index).outerWidth()+"px");
+            });
+         }
+         function scrollFixed() {
+            var offset = $(this).scrollTop(),
+            tableOffsetTop = $this.offset().top,
+            tableOffsetBottom = tableOffsetTop + $this.height() - $this.find("thead").height();
+            if(offset < tableOffsetTop || offset > tableOffsetBottom)
+               $t_fixed.hide();
+            else if(offset >= tableOffsetTop && offset <= tableOffsetBottom && $t_fixed.is(":hidden"))
+               $t_fixed.show();
+         }
+         $(window).resize(resizeFixed);
+         $(window).scroll(scrollFixed);
+         init();
+      });
+   };
+})(jQuery);
+
+$(document).ready(function(){
+   $("solfa").fixMe();
+   $(".up").click(function() {
+      $('html, body').animate({
+      scrollTop: 0
+   }, 2000);
+ });
+});
+
+
+</script>
 
     <!-- see activity/activity-icon-color-loading.svg for info -->
     <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
@@ -102,11 +147,29 @@ $(function() {
 
   <canvas hidden id="canvasToSave" width="525" height="800" style="border: 1px solid black"></canvas>
 
-  <div id="matrix"></div>
+  <div id="matrix">
+<div id="solfamenu">
+  
+    <table id='solfa' class="blue">
+  <thead>
+    <tr>
+      <th>Solfa Menu</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Octave 3</td>
+    </tr> 
+  </tbody>
+</table>
+  </div>
+  
+  </div>
+  
   <canvas hidden id="music" width="525"></canvas>          
   <div id = "musicNotation"></div> 
       <canvas id="myCanvas" width="1200" height="900"></canvas>
-	    <canvas id="myChart" width="600" height="600"></canvas>
+      <canvas id="myChart" width="600" height="600"></canvas>
 
         <video id="camVideo" style="visibility:hidden;"></video>
         <canvas id="camCanvas" style="visibility:hidden;"></canvas>

@@ -54,6 +54,7 @@ define(function(require) {
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function(doc) {
         window.scroll(0, 0);
+//document.getElementById("solfamenu").style.visibility = "hidden";
 
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');

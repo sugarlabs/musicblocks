@@ -107,6 +107,10 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 		var x = document.createElement("TABLE");
 		x.setAttribute("id", "myTable");
+			
+
+     
+
 		x.style.textAlign = 'center';
 		var w = window.innerWidth;
 		w = (2*w)/this.timeSignDenominator;
@@ -124,12 +128,22 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	cell.style.backgroundColor = '#9ACD32';
     	cell.style.width = w/4 + 'px';
 
+    	var that = this;
+    	cell.onclick = function(){
+
+    				that.createSolfaMenu();
+    		        var solfa = document.getElementById("solfamenu");
+    		        if(solfa.style.visibility == 'hidden')
+    		        	solfa.style.visibility = 'visible';
+    		        else
+    		        	solfa.style.visibility = 'hidden';
+    	}
+
 
 
     	for(var i=0; i<solfege.length; i++)
     	{
     		var row = header.insertRow(i+1);
-    		row.id = 'row' + i+1;
     		var cell = row.insertCell(0);
     		//console.log("roww "+row);
     		//cell.onclick = this.addRowUp;	
@@ -187,6 +201,14 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    	cell.setAttribute('id', j+1);
 		    }
 		}
+		for(var i=1; i<8; i++)
+		{
+			var row = table.rows[i];
+		    var cell = row.insertCell(-1);
+		    cell.innerHTML = row.cells[0].innerHTML + this.octave;	
+		    cell.style.visibility = 'collapse';
+
+		}
 		var table = document.getElementById("myTable");
 		var that = this;
 				if (table != null) {
@@ -234,28 +256,121 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 				    	}
 				    }
-				}
+		 	 	}
 				this.synth = new Tone.AMSynth().toMaster();
+				
 	}
 
-	 	this.addRowUp = function(){
-		var table = document.getElementById("myTable");
-		var index = this.parentNode.rowIndex;
-		var row = table.insertRow(index);
-		var cell = row.insertCell(0);
-		cell.innerHTML = "GOD";
-		cell.style.backgroundColor = '#9ACD32';
-		cell.style.height = "30px";
-		console.log("that "+this.timeSignNumerator);
-		for(var j=0; j<this.timeSignNumerator; j++)
-		{
-			console.log("insidae");
-		  	var cell = row.insertCell(j+1);
-	    	cell.style.backgroundColor = '#ADFF2F';
-	    	cell.width = this.cellWidth;
-	    }
-    //console.log("in" + this.cellIndex);
-	}
+	 	this.createSolfaMenu = function(){
+			
+			var solfege = ['Do','Re','Mi','Fa','Sol','La','Si'];
+
+			var table = document.getElementById("solfa");
+			
+			if(table.rows.length < 21)
+        	for(var i=0; i<21; i++)
+		    {
+		    	var row = table.insertRow(-1);
+		    	var cell = row.insertCell(-1);
+		    	cell.innerHTML = solfege[i%7];
+		    	
+		    	var octave = parseInt(this.octave) + parseInt(i/7) -1;
+		    	row.setAttribute('id',solfege[i%7] + octave);
+		    	var that = this;
+
+		    	row.onclick = function(){
+		    		
+        			var solfege = ['Do','Re','Mi','Fa','Sol','La','Si'];
+		    		if(this.style.backgroundColor == 'rgb(254, 100, 46)')
+			    		this.style.backgroundColor = '#ECF0F1';
+					else
+						this.style.backgroundColor = '#FE642E';
+		    		var table = document.getElementById("myTable");
+
+		    		if(this.style.backgroundColor == 'rgb(254, 100, 46)')
+		    		{var row = table.insertRow(table.rows.length - 1);
+
+		    		var cell = row.insertCell(0);
+		    		cell.style.backgroundColor = '#9ACD32';
+		    		cell.innerHTML = this.id.substring(0,this.id.length - 1);
+		    		cell.style.height = "30px";
+
+	    		    for(var i=1; i<=that.timeSignNumerator; i++)
+				    {
+				    	var cell = row.insertCell(-1);
+				    	cell.style.backgroundColor = '#ADFF2F';
+				    	cell.width = this.cellWidth;
+    			    	cell.setAttribute('id', i);
+				    	var thatRow=this;
+				    	cell.onclick = function(){
+				        			if (this.style.backgroundColor == 'black')
+					        		{
+					        			this.style.backgroundColor = '#ADFF2F';
+					        			that.chkArray[this.id] = 0;
+					        			//that.setNotes(this.id);
+					        		}
+					        		else if (that.chkArray[this.id] == 0)
+					        		{
+
+					        			this.style.backgroundColor = 'black';
+										that.chkArray[this.id] = 1;
+										that.setNotes(this.id, thatRow.id[thatRow.id.length - 1]);
+
+					        		}
+					        		else if (that.chkArray[this.id] == 1)
+					        		{
+					        			for (var k = 1; k < table.rows.length - 1; k++)
+					        			{
+					        				cell = table.rows[k].cells[this.id];
+					        				if(cell.style.backgroundColor == 'black')
+					        				{
+					        					cell.style.backgroundColor = '#ADFF2F';
+					        					this.style.backgroundColor = 'black';
+												that.setNotes(this.id, thatRow.id[thatRow.id.length - 1]);
+					        					break;
+					        				}
+					        			}					        		
+						        }
+						        
+
+				        	};
+
+					}
+						var cell = row.insertCell(-1);
+						cell.style.visibility = 'collapse';
+						cell.innerHTML = this.id;
+
+				}
+					else{
+
+				        	table = document.getElementById("myTable");
+							
+							for(var k=1; k<table.rows.length; k++)
+							{
+								var colLen = table.rows[k].cells.length;
+								if(table.rows[k].cells[colLen - 1].innerHTML == this.id)
+								{
+									for(var q=0; q<colLen; q++)
+									{
+										if(table.rows[k].cells[q].style.backgroundColor == 'black')
+												that.chkArray[q] = 0;
+									}
+									table.deleteRow(k);
+									break;
+								}
+	
+							}
+				        }
+		    	}
+			}
+
+			for(var j=0; j<7; j++ )
+		    	{
+		    		var y = solfege[j%7] + this.octave;
+		    		var x = document.getElementById(y);
+		    		x.style.backgroundColor = '#FE642E';
+		    	}
+		}
 
 
 	this.setTempo = function(timeSign){
@@ -361,7 +476,11 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.setNotes = function(index){
 		
 		var table = document.getElementById("myTable");
-		
+		var octave = this.octave;
+		if(arguments[1])
+		{
+			octave = arguments[1];
+		}
 		if (table != null) {
 			for (var j = 1; j < table.rows.length; j++)
     		{
@@ -372,31 +491,31 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
                     var solfege = table.rows[j].cells[0].innerHTML;
                     if(solfege == 'Do')
                     {
-                        note = 'C' + this.octave;
+                        note = 'C' + octave;
                     }
                     else if(solfege == 'Re')
                     {
-                        note = 'D' + this.octave;
+                        note = 'D' + octave;
                     }
                     else if(solfege == 'Mi')
                     {
-                        note = 'E' + this.octave;
+                        note = 'E' + octave;
                     }
                     else if(solfege == 'Fa')
                     {
-                        note = 'F' + this.octave;
+                        note = 'F' + octave;
                     }
                     else if(solfege == 'Sol')
                     {
-                        note = 'G' + this.octave;
+                        note = 'G' + octave;
                     }
                     else if(solfege == 'La')
                     {
-                        note = 'A' + this.octave;                       
+                        note = 'A' + octave;                       
                     }
                     else if(solfege == 'Si')
                     {
-                        note = 'B' + this.octave;
+                        note = 'B' + octave;
                     }
                     this.notesToPlay[index - 1] = note;
                     this.clearTurtles();
