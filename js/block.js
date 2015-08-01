@@ -75,7 +75,7 @@ function Block(protoblock, blocks, overrideName) {
     }
 
     this.highlight = function() {
-        if (this.collapsed && ['start', 'action'].indexOf(this.name) != -1) {
+        if (this.collapsed && ['start', 'action', 'matrix'].indexOf(this.name) != -1) {
             // We may have a race condition.
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = true;
@@ -87,7 +87,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = false;
             this.highlightBitmap.visible = true;
-            if (['start', 'action'].indexOf(this.name) != -1) {
+            if (['start', 'action', 'matrix'].indexOf(this.name) != -1) {
                 // There could be a race condition when making a
                 // new action block.
                 if (this.highlightCollapseBlockBitmap) {
@@ -114,7 +114,7 @@ function Block(protoblock, blocks, overrideName) {
     }
 
     this.unhighlight = function() {
-        if (this.collapsed && ['start', 'action'].indexOf(this.name) != -1) {
+        if (this.collapsed && ['start', 'action', 'matrix'].indexOf(this.name) != -1) {
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = false;
                 this.collapseBlockBitmap.visible = true;
@@ -125,7 +125,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = true;
             this.highlightBitmap.visible = false;
-            if (['start', 'action'].indexOf(this.name) != -1) {
+            if (['start', 'action', 'matrix'].indexOf(this.name) != -1) {
                 if (this.highlightCollapseBlockBitmap) {
                     this.highlightCollapseBlockBitmap.visible = false;
                     this.collapseBlockBitmap.visible = false;
@@ -155,7 +155,7 @@ function Block(protoblock, blocks, overrideName) {
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
-            if (myBlock.name == 'start') {
+            if (myBlock.name == 'start' || myBlock.name == 'matrix') {
                 // Rescale the decoration on the start blocks.
                 for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock == myBlock) {
@@ -197,6 +197,7 @@ function Block(protoblock, blocks, overrideName) {
         switch (this.name) {
             case 'start':
             case 'action':
+            case 'matrix':
                 var proto = new ProtoBlock('collapse');
                 proto.scale = this.protoblock.scale;
                 proto.extraWidth = 10;
@@ -359,7 +360,7 @@ function Block(protoblock, blocks, overrideName) {
                         }, 250);
                     }
 
-                    if (['start', 'action'].indexOf(myBlock.name) != -1) {
+                    if (['start', 'action', 'matrix'].indexOf(myBlock.name) != -1) {
                         myBlock.bitmap.visible = !myBlock.collapsed;
                         myBlock.highlightBitmap.visible = false;
                         myBlock.container.updateCache();
@@ -422,7 +423,7 @@ function Block(protoblock, blocks, overrideName) {
             positionText(this, this.protoblock.scale);
         }
 
-        if (['start', 'action'].indexOf(this.name) == -1) {
+        if (['start', 'action', 'matrix'].indexOf(this.name) == -1) {
             this.loadComplete = true;
             if (this.postProcess != null) {
                 this.postProcess(this.postProcessArg);
@@ -540,7 +541,7 @@ function Block(protoblock, blocks, overrideName) {
     this.show = function() {
         if (!this.trash) {
             // If it is an action block or it is not collapsed then show it.
-            if (!(['action', 'start'].indexOf(this.name) == -1 && this.collapsed)) {
+            if (!(['action', 'start', 'matrix'].indexOf(this.name) == -1 && this.collapsed)) {
                 this.container.visible = true;
                 if (this.collapseContainer != null) {
                     this.collapseContainer.visible = true;

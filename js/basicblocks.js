@@ -58,16 +58,38 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     
     //Matrix palette
-    var matrix = new ProtoBlock('matrix');
-    matrix.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['matrix'] = matrix;
-    matrix.staticLabels.push(_('Matrix'),_('Time Sign.'),_('Octave'));
-    matrix.adjustWidthToLabel();
-    matrix.defaults.push('3/4');
-    matrix.defaults.push('4');
-    matrix.twoArgBlock();
-    matrix.dockTypes[1] = 'anyin';
-    matrix.dockTypes[2] = 'anyin';
+
+    var matrixBlock = new ProtoBlock('matrix');
+    matrixBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['matrix'] = matrixBlock;
+    matrixBlock.staticLabels.push(_('Matrix'));
+    matrixBlock.extraWidth = 10;
+    matrixBlock.adjustWidthToLabel();
+    matrixBlock.stackClampZeroArgBlock();
+
+    var pitch = new ProtoBlock('pitch');
+    pitch.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['pitch'] = pitch;
+    pitch.staticLabels.push(_('Pitch'),_('Name'),_('Octave'));
+    pitch.adjustWidthToLabel();
+    pitch.defaults.push('sol');
+    pitch.defaults.push(4);
+    pitch.twoArgBlock();
+    pitch.dockTypes[1] = 'anyin';
+    pitch.dockTypes[2] = 'anyin';
+    
+
+    var meter = new ProtoBlock('meter');
+    meter.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['meter'] = meter;
+    meter.staticLabels.push(_('Meter'),_('# Beats'),_('Beat Value'));
+    meter.adjustWidthToLabel();
+    meter.defaults.push(3);
+    meter.defaults.push(4);
+    meter.twoArgBlock();
+    meter.dockTypes[1] = 'anyin';
+    meter.dockTypes[2] = 'anyin';
+
     
     var timeSign = new ProtoBlock('timeSign');
     timeSign.palette = palettes.dict['matrix'];

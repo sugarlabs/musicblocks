@@ -30,6 +30,8 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.synth = 0;
 	this.oldNotes = [];
 	this.cellWidth = 0;
+	this.solfegeNotes = [];
+	this.solfegeOct = [];
 
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
@@ -53,7 +55,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	{
 		document.getElementById('matrix').style.display = 'inline';
 		
-		console.log('time signature '+timeSign +' and octave '+octave);
+		console.log('Solnotes '+this.solfegeNotes +' and octave '+this.solfegeOct);
 
 		this.clearTurtles();
 		this.notesToPlay = [];
@@ -70,7 +72,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
         		}
     		}
 		}
-		var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
+		/*var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
 	    for(var i=0; i<timeSign.length; i++)
 	    {
 	    	if(flag)
@@ -95,7 +97,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	    this.timeSignDenominator = tsd/10;
 	    this.timeSignNumerator = tsn/10;
-	    
+	    */
 		var table = document.getElementById("myTable");
 
 
@@ -103,7 +105,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		{
 			table.remove();
 		}
-		var solfege = ['Do','Re','Mi','Fa','Sol','La','Si'];
+		//var solfege = this.solfegeNotes;//['Do','Re','Mi','Fa','Sol','La','Si'];
 
 		var x = document.createElement("TABLE");
 		x.setAttribute("id", "myTable");
@@ -129,7 +131,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	cell.style.width = w/4 + 'px';
 
     	var that = this;
-    	cell.onclick = function(){
+    	/*cell.onclick = function(){
 
     				that.createSolfaMenu();
     		        var solfa = document.getElementById("solfamenu");
@@ -137,22 +139,20 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     		        	solfa.style.visibility = 'visible';
     		        else
     		        	solfa.style.visibility = 'hidden';
-    	}
+    	}*/
 
 
 
-    	for(var i=0; i<solfege.length; i++)
+    	for(var i=0; i<this.solfegeNotes.length; i++)
     	{
     		var row = header.insertRow(i+1);
     		var cell = row.insertCell(0);
-    		//console.log("roww "+row);
-    		//cell.onclick = this.addRowUp;	
     		cell.style.backgroundColor = '#9ACD32';
-    		cell.innerHTML = solfege[solfege.length-1-i];
+    		cell.innerHTML = this.solfegeNotes[this.solfegeNotes.length-1-i];
     		cell.style.height = "30px";
     	}
     	
-    	var row = header.insertRow(8);
+    	var row = header.insertRow(this.solfegeNotes.length + 1);
     	var cell = row.insertCell(0);
     	cell.innerHTML = '<b>'+'Time'+'</b>';
     	cell.style.height = "40px";
@@ -162,7 +162,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	    {
 	    	this.notesToPlay.push("C4");
 	    }
-
+/*
 	    if(this.timeSignDenominator == 4)
 	    {
 	    	this.freetime = 1000;
@@ -178,14 +178,14 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		else if(this.timeSignDenominator == 32)
 		{
 			this.freetime = 125;
-		}
+		}*/
 
  		this.chkArray = new Array(this.timeSignDenominator);
  		for(var i=0; i<=this.timeSignNumerator; i++)
  			this.chkArray[i] = 0;
 	    for(var j=0; j<this.timeSignNumerator; j++)
 	    {
-		    for(var i=1; i<9; i++)
+		    for(var i=1; i<=this.solfegeNotes.length + 1; i++)
 		    {
 		    	var table = document.getElementById("myTable");
 		    	var row = table.rows[i];
@@ -193,7 +193,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    	cell.style.backgroundColor = '#ADFF2F';
 		    	cell.width = this.cellWidth;
 		    	
-		    	if(i==8)
+		    	if(i==this.solfegeNotes.length + 1)
 		    	{
 		    		cell.innerHTML = j+1;
 		    		cell.style.backgroundColor = '#AEB404';
@@ -201,7 +201,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    	cell.setAttribute('id', j+1);
 		    }
 		}
-		for(var i=1; i<8; i++)
+		for(var i=1; i<=this.solfegeNotes.length; i++)
 		{
 			var row = table.rows[i];
 		    var cell = row.insertCell(-1);
@@ -232,7 +232,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 				        			this.style.backgroundColor = 'black';
 									that.chkArray[this.id] = 1;
-									that.setNotes(this.id);
+									that.setNotes(this.id, this.parentNode.rowIndex);
 
 				        		}
 				        		else if (that.chkArray[this.id] == 1)
@@ -245,7 +245,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 				        				{
 				        					cell.style.backgroundColor = '#ADFF2F';
 				        					this.style.backgroundColor = 'black';
-											that.setNotes(this.id);
+											that.setNotes(this.id, this.parentNode.rowIndex);
 				        					break;
 				        				}
 				        			}
@@ -261,7 +261,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 				
 	}
 
-	 	this.createSolfaMenu = function(){
+	/* 	this.createSolfaMenu = function(){
 			
 			var solfege = ['Do','Re','Mi','Fa','Sol','La','Si'];
 
@@ -372,7 +372,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    	}
 		}
 
-
+*/
 	this.setTempo = function(timeSign){
 		//var this.tempo = 60;
     	//var secondsPerBeat = 60 / this.tempo;
@@ -473,52 +473,51 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		musicnotation.doNotation(this.timeSignNumerator, this.timeSignDenominator, this.octave);
 	}
 
-	this.setNotes = function(index){
+	this.setNotes = function(colIndex, rowIndex){
 		
 		var table = document.getElementById("myTable");
-		var octave = this.octave;
-		if(arguments[1])
-		{
-			octave = arguments[1];
-		}
+		var octave = this.solfegeOct[rowIndex - 1];
+
 		if (table != null) {
 			for (var j = 1; j < table.rows.length; j++)
     		{
-    			cell = table.rows[j].cells[index];
+    			cell = table.rows[j].cells[colIndex];
     			var note;
     			if(cell.style.backgroundColor == 'black')
                 {
                     var solfege = table.rows[j].cells[0].innerHTML;
-                    if(solfege == 'Do')
+                    if(solfege.toUpperCase() == 'DO')
                     {
                         note = 'C' + octave;
                     }
-                    else if(solfege == 'Re')
+                    else if(solfege.toUpperCase() == 'RE')
                     {
                         note = 'D' + octave;
                     }
-                    else if(solfege == 'Mi')
+                    else if(solfege.toUpperCase() == 'MI')
                     {
                         note = 'E' + octave;
                     }
-                    else if(solfege == 'Fa')
+                    else if(solfege.toUpperCase() == 'FA')
                     {
                         note = 'F' + octave;
                     }
-                    else if(solfege == 'Sol')
+                    else if(solfege.toUpperCase() == 'SOL')
                     {
                         note = 'G' + octave;
                     }
-                    else if(solfege == 'La')
+                    else if(solfege.toUpperCase() == 'LA')
                     {
                         note = 'A' + octave;                       
                     }
-                    else if(solfege == 'Si')
+                    else if(solfege.toUpperCase() == 'SI')
                     {
                         note = 'B' + octave;
                     }
-                    this.notesToPlay[index - 1] = note;
+                    console.log("ci "+colIndex);
+                    this.notesToPlay[parseInt(colIndex) - 1] = note;
                     this.clearTurtles();
+                    console.log("note "+note);
                	    this.synth.triggerAttackRelease(note, 1/this.timeSignDenominator);
 					Tone.Transport.start();
 
@@ -560,7 +559,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	}
     	window.savedMatricesNotes.push('end');
     	window.savedMatricesCount += 1;
-
+    	console.log("saved "+window.savedMatricesNotes);
     }
 		
 }
