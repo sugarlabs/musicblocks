@@ -1148,6 +1148,8 @@ length;
                 console.log('Matrix played after '+args[0]);
                 matrix.playMatrix(parseInt(args[0]));
                 logo.setTurtleDelay(4500*parseFloat(1 / deno)*(num));
+                setTimeout(function(){
+                            logo.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / deno)*(num)));
                 break;
 
             case 'notation' :
@@ -1183,6 +1185,9 @@ length;
                 //start the transport
                 Tone.Transport.start();
                 logo.setTurtleDelay(parseFloat(1/args[1])*2000);
+                setTimeout(function(){
+                            logo.setTurtleDelay(0);
+                        },logo.setTurtleDelay(parseFloat(1/args[1])*2000));
                 break;
             case 'osctime':
                 this.startTime = parseFloat(args[0]);
@@ -1320,6 +1325,9 @@ length;
                         //console.log('play here'+ matrix.notesToPlay);
                         matrix.playMatrix(0,matrix.notesToPlay);
                         logo.setTurtleDelay(4500*parseFloat(1 / matrix.timeSignDenominator)*(-temp + j));
+                        setTimeout(function(){
+                            logo.setTurtleDelay(0);
+                        },4500*parseFloat(1 / matrix.timeSignDenominator)*(-temp + j));
                     }                    
                 }
                 else
