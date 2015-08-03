@@ -586,8 +586,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     //console.log(this.matrix.solfegeOct +" "+this.matrix.solfegeNotes);
                     matrix.initMatrix();
                 },1500);
-              
-                //this.matrix = matrix;
+                
+                setTimeout(function(){
+                    matrix.makeClickable();
+                },2000);
                 break;
 
             case 'pitch':
@@ -595,9 +597,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 matrix.solfegeOct.push(args[1]);
                 break;
 
-            case 'meter':
-                matrix.timeSignDenominator = args[1];
-                matrix.timeSignNumerator = args[0];
+            case 'rhythm':
+                //matrix.timeSignDenominator = args[1];
+                //matrix.timeSignNumerator = args[0];
+                setTimeout(function(){
+                    matrix.makeMatrix(args[0], args[1]);
+                },1500);
                 break;
 
                 //notesList.push(args[0]);

@@ -32,6 +32,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.cellWidth = 0;
 	this.solfegeNotes = [];
 	this.solfegeOct = [];
+	this.beatValue = 4;
 
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
@@ -55,7 +56,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	{
 		document.getElementById('matrix').style.display = 'inline';
 		
-		console.log('Solnotes '+this.solfegeNotes +' and octave '+this.solfegeOct);
+		console.log('notes '+this.solfegeNotes +' and octave '+this.solfegeOct);
 
 		this.clearTurtles();
 		this.notesToPlay = [];
@@ -72,32 +73,6 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
         		}
     		}
 		}
-		/*var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
-	    for(var i=0; i<timeSign.length; i++)
-	    {
-	    	if(flag)
-	    	{	
-	    		tsd += parseInt(timeSign[i]);
-	    		tsd *= 10;
-
-	    	}
-	    	if(flag1 && timeSign[i] != '/')
-	    	{
-	    		tsn += parseInt(timeSign[i]);
-	    		tsn *= 10;
-
-	    	}
-	    	if(timeSign[i] == '/')
-	    	{
-	    		flag = 1;
-	    		flag1 = 0;
-	    	}
-	    	
-	    }
-
-	    this.timeSignDenominator = tsd/10;
-	    this.timeSignNumerator = tsn/10;
-	    */
 		var table = document.getElementById("myTable");
 
 
@@ -109,18 +84,12 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 		var x = document.createElement("TABLE");
 		x.setAttribute("id", "myTable");
-			
-
-     
-
+		
 		x.style.textAlign = 'center';
-		var w = window.innerWidth;
-		w = (2*w)/this.timeSignDenominator;
-		this.cellWidth = w/4;
-
+		
 		var matrixDiv = document.getElementById("matrix");
 		matrixDiv.appendChild(x);
-
+		
 		var table = document.getElementById("myTable");
 		var header = table.createTHead();
 	    var row = header.insertRow(0);
@@ -128,19 +97,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	cell.innerHTML = '<b>' + 'Solfa' + '</b>';
     	cell.style.height = "40px";
     	cell.style.backgroundColor = '#9ACD32';
-    	cell.style.width = w/4 + 'px';
-
-    	var that = this;
-    	/*cell.onclick = function(){
-
-    				that.createSolfaMenu();
-    		        var solfa = document.getElementById("solfamenu");
-    		        if(solfa.style.visibility == 'hidden')
-    		        	solfa.style.visibility = 'visible';
-    		        else
-    		        	solfa.style.visibility = 'hidden';
-    	}*/
-
+    	//cell.style.width = w/4 + 'px';
 
 
     	for(var i=0; i<this.solfegeNotes.length; i++)
@@ -148,7 +105,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     		var row = header.insertRow(i+1);
     		var cell = row.insertCell(0);
     		cell.style.backgroundColor = '#9ACD32';
-    		cell.innerHTML = this.solfegeNotes[this.solfegeNotes.length-1-i];
+    		cell.innerHTML = this.solfegeNotes[i];
     		cell.style.height = "30px";
     	}
     	
@@ -158,221 +115,100 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	cell.style.height = "40px";
     	cell.style.backgroundColor = '#9ACD32';
     	
-	    for(var i=0; i<this.timeSignNumerator; i++)
+ 		this.chkArray = new Array();
+ 		this.chkArray.push(0);
+
+	}
+
+	this.makeMatrix = function(numBeats, beatValue)
+	{
+
+		var table = document.getElementById("myTable");
+		
+		if(this.beatValue > beatValue)
+			this.beatValue = beatValue;
+	    for(var i=0; i<numBeats; i++)
 	    {
 	    	this.notesToPlay.push("C4");
 	    }
-/*
-	    if(this.timeSignDenominator == 4)
-	    {
-	    	this.freetime = 1000;
-		}
-	    else if(this.timeSignDenominator == 8)
-	    {
-	    	this.freetime = 500;
-		}
-		else if(this.timeSignDenominator == 16)
-		{
-			this.freetime = 250;
-		}
-		else if(this.timeSignDenominator == 32)
-		{
-			this.freetime = 125;
-		}*/
+	    console.log("Rhythm #beats->"+numBeats+" beatValue->"+beatValue);
 
- 		this.chkArray = new Array(this.timeSignDenominator);
- 		for(var i=0; i<=this.timeSignNumerator; i++)
- 			this.chkArray[i] = 0;
-	    for(var j=0; j<this.timeSignNumerator; j++)
+ 		for(var i=1; i<=numBeats; i++)
+ 			this.chkArray.push(0);
+	    for(var j=0; j<numBeats; j++)
 	    {
 		    for(var i=1; i<=this.solfegeNotes.length + 1; i++)
-		    {
-		    	var table = document.getElementById("myTable");
+		    {	
 		    	var row = table.rows[i];
 		    	var cell = row.insertCell(-1);
 		    	cell.style.backgroundColor = '#ADFF2F';
-		    	cell.width = this.cellWidth;
+		    	//cell.width = this.cellWidth;
 		    	
 		    	if(i==this.solfegeNotes.length + 1)
 		    	{
-		    		cell.innerHTML = j+1;
+		    		cell.innerHTML = beatValue;
 		    		cell.style.backgroundColor = '#AEB404';
 		    	}
-		    	cell.setAttribute('id', j+1);
+		    	cell.setAttribute('id', table.rows[1].cells.length - 1);
 		    }
 		}
-		for(var i=1; i<=this.solfegeNotes.length; i++)
-		{
-			var row = table.rows[i];
-		    var cell = row.insertCell(-1);
-		    cell.innerHTML = row.cells[0].innerHTML + this.octave;	
-		    cell.style.visibility = 'collapse';
+		var w = window.innerWidth;
+		w = (2*w)/table.rows[1].cells.length;
+		this.cellWidth = w/4;
+		for(var i = 1; i < table.rows[1].cells.length; i++)
+		table.rows[1].cells[i].width = this.cellWidth + 'px';
 
-		}
-		var table = document.getElementById("myTable");
-		var that = this;
-				if (table != null) {
-				    for (var i = 1; i < table.rows[1].cells.length; i++) {
-				    		
-				        for (var j = 1; j < table.rows.length - 1; j++)
-				        {	
-				    		var cell = table.rows[j].cells[i];
-				    		var that = this;
-				   
-				        	cell.onclick=function(){
-				        		//this.onmouseout=null;
-				        		if (this.style.backgroundColor == 'black')
-				        		{
-				        			this.style.backgroundColor = '#ADFF2F';
-				        			that.chkArray[this.id] = 0;
-				        			//that.setNotes(this.id);
-				        		}
-				        		else if (that.chkArray[this.id] == 0)
-				        		{
-
-				        			this.style.backgroundColor = 'black';
-									that.chkArray[this.id] = 1;
-									that.setNotes(this.id, this.parentNode.rowIndex);
-
-				        		}
-				        		else if (that.chkArray[this.id] == 1)
-				        		{
-				        			for (var k = 1; k < table.rows.length - 1; k++)
-				        			{
-				        				console.log(this.id + "  "+k);
-				        				cell = table.rows[k].cells[this.id];
-				        				if(cell.style.backgroundColor == 'black')
-				        				{
-				        					cell.style.backgroundColor = '#ADFF2F';
-				        					this.style.backgroundColor = 'black';
-											that.setNotes(this.id, this.parentNode.rowIndex);
-				        					break;
-				        				}
-				        			}
-
-				        		}
-
-				        	};
-
-				    	}
-				    }
-		 	 	}
-				this.synth = new Tone.AMSynth().toMaster();
 				
 	}
 
-	/* 	this.createSolfaMenu = function(){
-			
-			var solfege = ['Do','Re','Mi','Fa','Sol','La','Si'];
-
-			var table = document.getElementById("solfa");
-			
-			if(table.rows.length < 21)
-        	for(var i=0; i<21; i++)
-		    {
-		    	var row = table.insertRow(-1);
-		    	var cell = row.insertCell(-1);
-		    	cell.innerHTML = solfege[i%7];
-		    	
-		    	var octave = parseInt(this.octave) + parseInt(i/7) -1;
-		    	row.setAttribute('id',solfege[i%7] + octave);
-		    	var that = this;
-
-		    	row.onclick = function(){
+	this.makeClickable = function(){
+		var table = document.getElementById("myTable");
+		var that = this;
+		if (table != null) {
+		    for (var i = 1; i < table.rows[1].cells.length; i++) {
 		    		
-        			var solfege = ['Do','Re','Mi','Fa','Sol','La','Si'];
-		    		if(this.style.backgroundColor == 'rgb(254, 100, 46)')
-			    		this.style.backgroundColor = '#ECF0F1';
-					else
-						this.style.backgroundColor = '#FE642E';
-		    		var table = document.getElementById("myTable");
+		        for (var j = 1; j < table.rows.length - 1; j++)
+		        {	
+		    		var cell = table.rows[j].cells[i];
+		    		var that = this;
+		        	cell.onclick=function(){
+		        		//this.onmouseout=null;
+		        		if (this.style.backgroundColor == 'black')
+		        		{
+		        			this.style.backgroundColor = '#ADFF2F';
+		        			that.chkArray[this.id] = 0;
+		        			//that.setNotes(this.id);
+		        		}
+		        		else if (that.chkArray[this.id] == 0)
+		        		{
 
-		    		if(this.style.backgroundColor == 'rgb(254, 100, 46)')
-		    		{var row = table.insertRow(table.rows.length - 1);
+		        			this.style.backgroundColor = 'black';
+							that.chkArray[this.id] = 1;
+							that.setNotes(this.id, this.parentNode.rowIndex);
 
-		    		var cell = row.insertCell(0);
-		    		cell.style.backgroundColor = '#9ACD32';
-		    		cell.innerHTML = this.id.substring(0,this.id.length - 1);
-		    		cell.style.height = "30px";
-
-	    		    for(var i=1; i<=that.timeSignNumerator; i++)
-				    {
-				    	var cell = row.insertCell(-1);
-				    	cell.style.backgroundColor = '#ADFF2F';
-				    	cell.width = this.cellWidth;
-    			    	cell.setAttribute('id', i);
-				    	var thatRow=this;
-				    	cell.onclick = function(){
-				        			if (this.style.backgroundColor == 'black')
-					        		{
-					        			this.style.backgroundColor = '#ADFF2F';
-					        			that.chkArray[this.id] = 0;
-					        			//that.setNotes(this.id);
-					        		}
-					        		else if (that.chkArray[this.id] == 0)
-					        		{
-
-					        			this.style.backgroundColor = 'black';
-										that.chkArray[this.id] = 1;
-										that.setNotes(this.id, thatRow.id[thatRow.id.length - 1]);
-
-					        		}
-					        		else if (that.chkArray[this.id] == 1)
-					        		{
-					        			for (var k = 1; k < table.rows.length - 1; k++)
-					        			{
-					        				cell = table.rows[k].cells[this.id];
-					        				if(cell.style.backgroundColor == 'black')
-					        				{
-					        					cell.style.backgroundColor = '#ADFF2F';
-					        					this.style.backgroundColor = 'black';
-												that.setNotes(this.id, thatRow.id[thatRow.id.length - 1]);
-					        					break;
-					        				}
-					        			}					        		
-						        }
-						        
-
-				        	};
-
-					}
-						var cell = row.insertCell(-1);
-						cell.style.visibility = 'collapse';
-						cell.innerHTML = this.id;
-
-				}
-					else{
-
-				        	table = document.getElementById("myTable");
-							
-							for(var k=1; k<table.rows.length; k++)
-							{
-								var colLen = table.rows[k].cells.length;
-								if(table.rows[k].cells[colLen - 1].innerHTML == this.id)
-								{
-									for(var q=0; q<colLen; q++)
-									{
-										if(table.rows[k].cells[q].style.backgroundColor == 'black')
-												that.chkArray[q] = 0;
-									}
-									table.deleteRow(k);
-									break;
-								}
-	
-							}
-				        }
+		        		}
+		        		else if (that.chkArray[this.id] == 1)
+		        		{
+		        			for (var k = 1; k < table.rows.length - 1; k++)
+		        			{
+		        				cell = table.rows[k].cells[this.id];
+		        				if(cell.style.backgroundColor == 'black')
+		        				{
+		        					cell.style.backgroundColor = '#ADFF2F';
+		        					this.style.backgroundColor = 'black';
+									that.setNotes(this.id, this.parentNode.rowIndex);
+		        					break;
+		        				}
+		        			}
+		        		}
+		        	};
 		    	}
-			}
+		    }
+ 	 	}
+ 	 
+		this.synth = new Tone.AMSynth().toMaster();
+	}
 
-			for(var j=0; j<7; j++ )
-		    	{
-		    		var y = solfege[j%7] + this.octave;
-		    		var x = document.getElementById(y);
-		    		x.style.backgroundColor = '#FE642E';
-		    	}
-		}
-
-*/
 	this.setTempo = function(timeSign){
 		//var this.tempo = 60;
     	//var secondsPerBeat = 60 / this.tempo;
@@ -456,13 +292,16 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	var that = this;
 	var setI = Tone.Transport.setInterval(function(time){
 	    var note = notes[position++];
-	    //position = position % notes.length;
-	    that.synth.triggerAttackRelease(note, 1/that.timeSignDenominator, time);
+		var table = document.getElementById("myTable");
+		    
+	    var beatValue = table.rows[table.rows.length - 1].cells[position].innerHTML;
+	    
+	    that.synth.triggerAttackRelease(note, 1/beatValue, time);
 	    if(position == notes.length )
     	{	Tone.Transport.clearInterval(setI);
     		Tone.Transport.stop();
     	}
-	}, 2/that.timeSignDenominator);
+	}, 2/this.beatValue);
 
 	//the transport won't start firing events until it's started
 	Tone.Transport.start();
@@ -514,11 +353,10 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
                     {
                         note = 'B' + octave;
                     }
-                    console.log("ci "+colIndex);
                     this.notesToPlay[parseInt(colIndex) - 1] = note;
                     this.clearTurtles();
                     console.log("note "+note);
-               	    this.synth.triggerAttackRelease(note, 1/this.timeSignDenominator);
+               	    this.synth.triggerAttackRelease(note, 1/this.beatValue);
 					Tone.Transport.start();
 
                     for(var i=0; i<this.notesToPlay.length; i++)

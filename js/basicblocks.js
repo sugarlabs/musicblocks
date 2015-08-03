@@ -79,16 +79,25 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitch.dockTypes[2] = 'anyin';
     
 
-    var meter = new ProtoBlock('meter');
-    meter.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['meter'] = meter;
-    meter.staticLabels.push(_('Meter'),_('# Beats'),_('Beat Value'));
-    meter.adjustWidthToLabel();
-    meter.defaults.push(3);
-    meter.defaults.push(4);
-    meter.twoArgBlock();
-    meter.dockTypes[1] = 'anyin';
-    meter.dockTypes[2] = 'anyin';
+    var rhythm = new ProtoBlock('rhythm');
+    rhythm.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['rhythm'] = rhythm;
+    rhythm.staticLabels.push(_('rhythm'),_('# Beats'),_('Beat Value'));
+    rhythm.adjustWidthToLabel();
+    rhythm.defaults.push(3);
+    rhythm.defaults.push(4);
+    rhythm.twoArgBlock();
+    rhythm.dockTypes[1] = 'anyin';
+    rhythm.dockTypes[2] = 'anyin';
+
+    var noteBlock = new ProtoBlock('note');
+    noteBlock.palette = palettes.dict['music'];
+    blocks.protoBlockDict['note'] = noteBlock;
+    noteBlock.staticLabels.push(_('note'));
+    noteBlock.adjustWidthToLabel();
+    noteBlock.flowClampOneArgBlock();
+    noteBlock.defaults.push(4);
+    palettes.dict['assemble'].add(noteBlock);
 
     
     var timeSign = new ProtoBlock('timeSign');
@@ -150,7 +159,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     showMatrixBlock.flowClampZeroArgBlock();
 
     //Music Palette
-    var noteBlock = new ProtoBlock('note');
+    /*var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['music'];
     blocks.protoBlockDict['note'] = noteBlock;
     noteBlock.staticLabels.push(_('NOTE'),  _('note'), _('note value'));
@@ -159,7 +168,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.twoArgBlock();
     noteBlock.dockTypes[1] = 'anyin';
     noteBlock.dockTypes[2] = 'numberin';
-    
+    */
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['music'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
