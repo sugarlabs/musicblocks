@@ -22,7 +22,7 @@ function MusicNotation(turtles, stage)
 	}
 
 
-	this.doNotation = function(timeSignNumerator, timeSignDenominator, octave)
+	this.doNotation = function(notes, beatValue, timeSignNumerator, timeSignDenominator)
 	{
 		if (this.musicContainer == null) {
 			this.musicContainer = new createjs.Container();
@@ -37,37 +37,43 @@ function MusicNotation(turtles, stage)
 	    Vex.Flow.Renderer.Backends.CANVAS);
 	    
 	    var ctx = renderer.getContext();
-	    var stave = new Vex.Flow.Stave(10, 0, 500);
+	    var stave = new Vex.Flow.Stave(10, 0, 1000);
 	    stave.addClef("treble");
 	    stave.addTimeSignature(timeSignNumerator + "/" + timeSignDenominator);
 	    stave.setContext(ctx).draw();
 
 	    //Create the notes
-	    var notes = [];
-
-	 	for(var i = 0; i < turtles.turtleList.length; i++)
+	    var vexNotes = [];
+	 	for(i in notes)
 		{
-		    if(turtles.turtleList[i].name.includes('note'))
-		    {
-				var note = turtles.turtleList[i].name.substring(0, 1);
-		   		notes.push(new Vex.Flow.StaveNote({ keys: [note + '/' + octave], duration: timeSignDenominator.toString() }));
-	  		}
+		    	var note = notes[i].substring(0, 1);
+		    	if(note == 'R')
+		    	{
+		    		vexNotes.push(new Vex.Flow.StaveNote({ keys: ['g/' + octave], duration: beatValue[i].toString()+'r' }));	
+		    	}
+		    	else{
+		    	var octave = notes[i].substring(1, 2);
+		   		vexNotes.push(new Vex.Flow.StaveNote({ keys: [note + '/' + octave], duration: beatValue[i].toString() }));
+	  			}
 	    }
 
 	    var voice = new Vex.Flow.Voice({
-	    num_beats: timeSignNumerator,
-	    beat_value: timeSignDenominator,
+	    num_beats: 4,
+	    beat_value: 4,
 	    resolution: Vex.Flow.RESOLUTION
 	    });
-	    // Add notes to voice
-	    voice.addTickables(notes);
+	    // turn off tick counter
+    voice.setStrict(false)
 
-	    // Format and justify the notes to 500 pixels
-	    var formatter = new Vex.Flow.Formatter().
-	    joinVoices([voice]).format([voice], 500);
-	    // Render voice
-		voice.draw(ctx, stave);
-		
+    // Add notes to voice
+    voice.addTickables(vexNotes);
+
+    // Format and justify the notes to 700 pixels
+    var formatter = new Vex.Flow.Formatter().
+    joinVoices([voice]).format([voice], 700);
+
+    // Render voice
+    voice.draw(ctx, stave);
 		var notationCanvas = document.getElementById('music');
 
 		//adding notation canvas canvas together 

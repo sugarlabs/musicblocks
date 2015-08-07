@@ -99,25 +99,42 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.defaults.push(4);
     palettes.dict['assemble'].add(noteBlock);
 
+
+    var flatBlock = new ProtoBlock('flat');
+    flatBlock.palette = palettes.dict['music'];
+    blocks.protoBlockDict['flat'] = flatBlock;
+    flatBlock.staticLabels.push(_('Flat'));
+    flatBlock.adjustWidthToLabel();
+    flatBlock.flowClampZeroArgBlock();
+
+
+    var sharpBlock = new ProtoBlock('sharp');
+    sharpBlock.palette = palettes.dict['music'];
+    blocks.protoBlockDict['sharp'] = sharpBlock;
+    sharpBlock.staticLabels.push(_('Sharp'));
+    sharpBlock.adjustWidthToLabel();
+    sharpBlock.flowClampZeroArgBlock();
+
     
-    var timeSign = new ProtoBlock('timeSign');
-    timeSign.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['timeSign'] = timeSign;
-    timeSign.staticLabels.push(_('Time Sign.'));
-    timeSign.adjustWidthToLabel();
-    timeSign.defaults.push('3/4');
-    timeSign.oneArgMathBlock();
-    timeSign.dockTypes[1] = 'anyin';
-    
-    var octave = new ProtoBlock('octave');
-    octave.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['octave'] = octave;
-    octave.staticLabels.push(_('Octave'));
-    octave.adjustWidthToLabel();
-    octave.defaults.push('4');
-    octave.oneArgMathBlock();
-    octave.dockTypes[1] = 'number';
-        
+    var meter = new ProtoBlock('meter');
+    meter.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['meter'] = meter;
+    meter.staticLabels.push('Meter', 'numerator', 'denominator');
+    meter.adjustWidthToLabel();
+    meter.defaults.push(3);
+    meter.defaults.push(4);
+    meter.twoArgMathBlock();
+    meter.dockTypes[1] = 'number';
+    meter.dockTypes[2] = 'number';
+
+    var notationBlock = new ProtoBlock('notation');
+    notationBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['notation'] = notationBlock;
+    notationBlock.staticLabels.push(_('Notation'));
+    notationBlock.adjustWidthToLabel();
+    notationBlock.flowClampOneArgBlock();
+//    notationBlock.defaults.push(parameters);
+
     var playmatrix = new ProtoBlock('playmatrix');
     playmatrix.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['playmatrix'] = playmatrix;
@@ -136,13 +153,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     transposition.oneArgBlock();
     transposition.dockTypes[1] = 'anyin';    
     
-    var notationBlock = new ProtoBlock('notation');
+    /*var notationBlock = new ProtoBlock('notation');
     notationBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['notation'] = notationBlock;
     notationBlock.staticLabels.push(_('Music Notation'));
     notationBlock.adjustWidthToLabel();
     notationBlock.zeroArgBlock();
-    
+    */
     var saveMatrix = new ProtoBlock('savematrix');
     saveMatrix.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['savematrix'] = saveMatrix;

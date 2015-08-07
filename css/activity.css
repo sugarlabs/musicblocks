@@ -218,9 +218,9 @@ input.number {
   position: absolute;
   right : 3%;
   top : 15%;
-  overflow: scroll;
+  overflow: auto;
   height:   40%;
-  width : 27%;
+  width : 35%;
   display: none;
 }
 

@@ -375,7 +375,7 @@ define(function(require) {
             var can = document.getElementById('canvasToSave');
             var ctx = can.getContext('2d');
             ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0,0,525,800);
+            ctx.fillRect(0,0,700,800);
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);

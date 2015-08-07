@@ -68,6 +68,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 //    this.matrix = null;
     this.octave = 4;
     this.showMatrix = false;
+    this.notation = false;
+    this.sharp = false;
+    this.flat = false;
     this.notesList = [];
 
     //Play with chunks
@@ -593,6 +596,16 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
 
             case 'pitch':
+                if(this.sharp)
+                {
+                    args[0] += '#';
+                    this.sharp = false;
+                }
+                else if(this.flat)
+                {
+                    args[0] += '♭';
+                    this.flat = false;
+                }
                 matrix.solfegeNotes.push(args[0]);
                 matrix.solfegeOct.push(args[1]);
                 break;
@@ -763,7 +776,7 @@ length;
             case 'while':
                 // While is tricky because we need to recalculate
                 // args[0] each time, so we requeue the While block
-                // itself.
+                // itself. 
                 if (args.length == 2) {
                     if (args[0]) {
                         // We will add the outflow of the while block
@@ -1083,11 +1096,6 @@ length;
                 }
                 break;
             
-            case 'octave' :
-                console.log('octave '+args[0]);
-                this.octave = args[0];
-                break;
-            
             /*case 'matrix' :
                 if(window.savedMatricesNotes == null)
                     {
@@ -1158,11 +1166,41 @@ length;
                 break;
 
             case 'notation' :
-                matrix.musicNotation();
+                var flagN = 0 ,flagD = 1, tsd = 0, tsn = 0;
+                for(var i=0; i<args[0].length; i++)
+                {
+                    if(flagN)
+                    {   
+                        tsd += parseInt(args[0][i]);
+                        tsd *= 10;
+
+                    }
+                    if(flagN && args[0][i] != '/')
+                    {
+                        tsn += parseInt(args[0][i]);
+                        tsn *= 10;
+
+                    }
+                    if(args[0][i] == '/')
+                    {
+                        flagN = 1;
+                        flagD = 0;
+                    }
+                    
+                }
+                var num = tsn/10;
+                var deno = tsd/10;
+                console.log("notatipjn "+num + " "+deno);
+                this.notation = true;
+                logo.runFromBlock(logo, turtle, args[1]);
                 console.log('Generating Music Notation');
                 break;
 
+            case 'meter' :
+                break;
+
             case 'savematrix' :
+
                 matrix.saveMatrix();
                 var index = window.savedMatricesCount;
                 var myDoBlock = new ProtoBlock('namedsavematrix' + index);
@@ -1175,25 +1213,66 @@ length;
                 logo.blocks.palettes.updatePalettes('matrix');  
                 break;
 
-                case 'note':
-                if (typeof(this.noteOscs[turtle]) == "undefined") {
-                    this.noteOscs[turtle] = new Tone.AMSynth();
-                }
-                synth = this.noteOscs[turtle];
+            case 'note':
+                /*logo.blocks.makeNewBlock('note');
+                logo.blocks.blockList[logo.blocks.blockList.length - 1].x =200;
+                logo.blocks.blockList[logo.blocks.blockList.length - 1].y =200;
+                
+                logo.blocks.makeNewBlock('pitch');  
+                logo.blocks.blockList[logo.blocks.blockList.length - 1].x =300;
+                logo.blocks.blockList[logo.blocks.blockList.length - 1].y =300;
+
+                logo.blocks.blockList[logo.blocks.blockList.length - 2].dragGroup.push(logo.blocks.blockList[logo.blocks.blockList.length - 1]);
+                */
+                var synth = new Tone.AMSynth();
                 synth.toMaster();
-                //Tone.Transport.setInterval(function(time){
-                    console.log(args[0]);
-                    var noteValue = args[1];
-                    noteValue += "n";
-                synth.triggerAttackRelease('C4', noteValue);
-                //}, "1n");
-                //start the transport
+                //console.log("note arg "+args[0]+" "+args[1]+" ");
+                var noteblock = logo.blocks.blockList[args[1]];
+                /*console.log("drag earlier "+logo.blocks.dragGroup);
+                logo.blocks.findDragGroup(noteblock);
+                console.log("drag earlier "+logo.blocks.dragGroup);
+                */var xargs = [];
+                for(var k=1; k<args.length; k++)
+                {
+                    if (logo.blocks.blockList[args[k]].protoblock.args > 0) {
+                        for (var i = 1; i < logo.blocks.blockList[args[k]].protoblock.args + 1; i++) {
+                            xargs.push(logo.parseArg(logo, turtle, logo.blocks.blockList[args[k]].connections[i], args[k]));
+                        }
+                    }
+                }
+                //Here this is to be run first...#Bug...note block has to be clicked twice;
+                //logo.runFromBlock(logo, turtle, args[1]);
+                var beatValue = args[0];
+                /*if(this.sharpForNoteBlock)
+                {
+                    xargs[0] += '#';
+                    this.sharpForNoteBlock = false;
+                }
+                else if(this.flatForNoteBlock)
+                {
+                    xargs[0] += '♭';
+                    this.flatForNoteBlock = false;
+                }*/
+                solfege = xargs[0];
+                octave = xargs[1];
+                note = this.getNote(solfege, octave);
+                console.log("note "+note);
+                synth.triggerAttackRelease(note, 1/beatValue);
                 Tone.Transport.start();
-                logo.setTurtleDelay(parseFloat(1/args[1])*2000);
-                setTimeout(function(){
-                            logo.setTurtleDelay(0);
-                        },logo.setTurtleDelay(parseFloat(1/args[1])*2000));
                 break;
+
+            case 'sharp':
+                this.sharp = true;
+                this.sharpForNoteBlock = true;
+                logo.runFromBlock(logo, turtle, args[0]);
+                break;
+            
+            case 'flat':
+                this.flat = true;
+                this.flatForNoteBlock = true;
+                logo.runFromBlock(logo, turtle, args[0]);
+                break;
+
             case 'osctime':
                 this.startTime = parseFloat(args[0]);
                 this.stopTime = parseFloat(args[1]);
@@ -1224,7 +1303,7 @@ length;
             default:
 
                 if(logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix')
-                {  
+                {  console.log("this.notation "+this.notation);
                     noSession = 1 //nosession changed to 1, because we don't want namedsavematrix 
                              //block to be saved locally;
                     var index = logo.blocks.blockList[blk].name[15];
@@ -1279,6 +1358,12 @@ length;
                         this.chunktranspose = false;
                         matrix.removeTransposition();
                         
+                    }
+                    else if(this.notation)
+                    {
+                        matrix.musicNotation(notesToPlayCopy, matrix.notesToPlayBeatValue, num, deno);
+                        console.log("tonotations "+notesToPlayCopy);
+                        this.notation = false;
                     }
                     else if(this.showMatrix)
                     {
@@ -1461,6 +1546,61 @@ length;
             me.saveLocally();
         }
         }, DEFAULTDELAY * 1.5)
+    }
+
+    this.getNote = function(solfege, octave)
+    {
+        var transformed = false;
+        solfege = solfege.toString();   
+        if(solfege.substr(-1) == '#' || '♭')
+            transformed = true;
+        var note = 'C4';
+            if(solfege.toUpperCase().substr(0,2) == 'DO')
+                    {
+                        note = 'C' + octave;
+                    }
+                    else if(solfege.toUpperCase().substr(0,2) == 'RE')
+                    {
+                        note = 'D' + octave;
+                    }
+                    else if(solfege.toUpperCase().substr(0,2) == 'MI')
+                    {
+                        note = 'E' + octave;
+                    }
+                    else if(solfege.toUpperCase().substr(0,2) == 'FA')
+                    {
+                        note = 'F' + octave;
+                    }
+                    else if(solfege.toUpperCase().substr(0,3) == 'SOL')
+                    {
+                        note = 'G' + octave;
+                    }   
+                    else if(solfege.toUpperCase().substr(0,2) == 'LA')
+                    {
+                        note = 'A' + octave;                       
+                    }
+                    else if(solfege.toUpperCase().substr(0,2) == 'SI')
+                    {
+                        note = 'B' + octave;
+                    }
+                    if(transformed)
+                    {
+                        
+                        if(solfege.substr(-1) == '#')
+                        {
+                            matrix.transposition = '+1';
+                            note = matrix.doTransposition(note[0], note[1]);
+                        }
+
+                        else if(solfege.substr(-1) == '♭')
+                        {
+                            matrix.transposition = '-1';
+                            note = matrix.doTransposition(note[0], note[1]);
+                        }
+                        matrix.transposition = null;
+
+                    }
+        return note;
     }
 
     this.getTargetTurtle = function(args) {
@@ -1791,33 +1931,13 @@ length;
                     this.startTime = parseFloat(c);
                     this.stopTime = parseFloat(d);
                     break;
-                case 'tofrequency':
-                    var block = logo.blocks.blockList[blk];
-                    var cblk = block.connections[1];
-                    var v = logo.parseArg(logo, turtle, cblk, blk);
-                    try {
-                        if (typeof(v) == 'string') {
-                            v = v.toUpperCase();
-                            var note = ['A', 'A♯/B♭', 'B', 'C', 'C♯/D♭', 'D', 'D♯/E♭', 'E', 'F', 'F♯/G♭', 'G', 'G♯/A♭'].indexOf(v[0]);
-                            var octave = v[1];
-                            if (note > 2) {
-                                octave -= 1;  // New octave starts on C
-                            }
-                            var i = octave * 12 + note;
-                            block.value = 27.5 * Math.pow(1.05946309435929, i);
-                        } else {
-                            block.value = 440 * Math.pow(2, (v - 69) / 12);
-                        }
-                    } catch (e) {
-                        this.errorMsg(v + ' is not a note.');
-                        block.value = 440;
-                    }
-                    break;
-                case 'timeSign':
+                case 'meter':
                     var block = logo.blocks.blockList[blk];
                     var a = block.connections[1];
+                    var b = block.connections[2];
                     var c = logo.parseArg(logo, turtle, a, blk);
-                    logo.blocks.blockList[blk].value = a;
+                    var d = logo.parseArg(logo, turtle, b, blk);
+                    logo.blocks.blockList[blk].value = c.toString() + '/' + d.toString();
                     break;
 
                 default:

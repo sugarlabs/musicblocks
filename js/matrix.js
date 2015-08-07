@@ -17,6 +17,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.frequency = 500;
 	this.secondsPerBeat = 1;
 	this.notesToPlay = [];
+	this.notesToPlayBeatValue = [];
 	this.numberOfNotesToPlay = 0;
 	this.chkArray = null;
 	this.octave = 0;
@@ -60,6 +61,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 		this.clearTurtles();
 		this.notesToPlay = [];
+		this.notesToPlayBeatValue = [];
 		this.isMatrix = 1;
 		this.octave = octave;
 
@@ -129,7 +131,8 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 			this.beatValue = beatValue;
 	    for(var i=0; i<numBeats; i++)
 	    {
-	    	this.notesToPlay.push("C4");
+	    	this.notesToPlay.push("R");
+	    	this.notesToPlayBeatValue.push(beatValue);
 	    }
 	    console.log("Rhythm #beats->"+numBeats+" beatValue->"+beatValue);
 
@@ -163,6 +166,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	this.makeClickable = function(){
 		var table = document.getElementById("myTable");
+		
 		var that = this;
 		if (table != null) {
 		    for (var i = 1; i < table.rows[1].cells.length; i++) {
@@ -177,7 +181,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		        		{
 		        			this.style.backgroundColor = '#ADFF2F';
 		        			that.chkArray[this.id] = 0;
-		        			//that.setNotes(this.id);
+		        			that.notesToPlay[this.id - 1] = 'R'	;
 		        		}
 		        		else if (that.chkArray[this.id] == 0)
 		        		{
@@ -233,6 +237,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.doTransposition = function(note, octave){
 		if(this.transposition)
 		{
+
 			var deltaOctave = 0;
 			if(this.transposition[0] == '-')
 			{
@@ -287,6 +292,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.playAll = function(){
 	
 	var notes = this.notesToPlay;
+	console.log('notes all '+notes);
 	var position = 0;
 
 	var that = this;
@@ -295,7 +301,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		var table = document.getElementById("myTable");
 		    
 	    var beatValue = table.rows[table.rows.length - 1].cells[position].innerHTML;
-	    
+	    if(note != 'R')
 	    that.synth.triggerAttackRelease(note, 1/beatValue, time);
 	    if(position == notes.length )
     	{	Tone.Transport.clearInterval(setI);
@@ -307,51 +313,71 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	Tone.Transport.start();
 	}
 
-	this.musicNotation = function(){
+	this.musicNotation = function(notes, beatValue, numerator, denominator){
 
-		musicnotation.doNotation(this.timeSignNumerator, this.timeSignDenominator, this.octave);
+		musicnotation.doNotation(notes, beatValue, numerator, denominator);
 	}
 
 	this.setNotes = function(colIndex, rowIndex){
 		
 		var table = document.getElementById("myTable");
 		var octave = this.solfegeOct[rowIndex - 1];
-
+		var transformed = false;
 		if (table != null) {
 			for (var j = 1; j < table.rows.length; j++)
     		{
     			cell = table.rows[j].cells[colIndex];
     			var note;
+
     			if(cell.style.backgroundColor == 'black')
                 {
                     var solfege = table.rows[j].cells[0].innerHTML;
-                    if(solfege.toUpperCase() == 'DO')
+                    if(solfege.substr(-1) == '#' || '♭')
+                    	transformed = true;
+                    if(solfege.toUpperCase().substr(0,2) == 'DO')
                     {
                         note = 'C' + octave;
                     }
-                    else if(solfege.toUpperCase() == 'RE')
+                    else if(solfege.toUpperCase().substr(0,2) == 'RE')
                     {
                         note = 'D' + octave;
                     }
-                    else if(solfege.toUpperCase() == 'MI')
+                    else if(solfege.toUpperCase().substr(0,2) == 'MI')
                     {
                         note = 'E' + octave;
                     }
-                    else if(solfege.toUpperCase() == 'FA')
+                    else if(solfege.toUpperCase().substr(0,2) == 'FA')
                     {
                         note = 'F' + octave;
                     }
-                    else if(solfege.toUpperCase() == 'SOL')
+                    else if(solfege.toUpperCase().substr(0,3) == 'SOL')
                     {
                         note = 'G' + octave;
-                    }
-                    else if(solfege.toUpperCase() == 'LA')
+                    }	
+                    else if(solfege.toUpperCase().substr(0,2) == 'LA')
                     {
                         note = 'A' + octave;                       
                     }
-                    else if(solfege.toUpperCase() == 'SI')
+                    else if(solfege.toUpperCase().substr(0,2) == 'SI')
                     {
                         note = 'B' + octave;
+                    }
+                    if(transformed)
+                    {
+                    	
+                    	if(solfege.substr(-1) == '#')
+                    	{
+                    		this.transposition = '+1';
+                    		note = this.doTransposition(note[0], note[1]);
+                    	}
+
+                    	else if(solfege.substr(-1) == '♭')
+                    	{
+                    		this.transposition = '-1';
+                    		note = this.doTransposition(note[0], note[1]);
+                    	}
+                    	this.transposition = null;
+
                     }
                     this.notesToPlay[parseInt(colIndex) - 1] = note;
                     this.clearTurtles();
