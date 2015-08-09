@@ -72,6 +72,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.sharp = false;
     this.flat = false;
     this.notesList = [];
+    this.inNote = false;
+    this.noteBlockNotes = [];
+    this.noteBlockOct = [];
+
+    this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
+                
+
 
     //Play with chunks
     this.chunktranspose = false;
@@ -606,8 +613,16 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     args[0] += '♭';
                     this.flat = false;
                 }
-                matrix.solfegeNotes.push(args[0]);
-                matrix.solfegeOct.push(args[1]);
+                if(this.inNote)
+                {
+                    this.noteBlockNotes.push(args[0]);
+                    this.noteBlockOct.push(args[1]);
+                }
+                else
+                {
+                    matrix.solfegeNotes.push(args[0]);
+                    matrix.solfegeOct.push(args[1]);
+                }
                 break;
 
             case 'rhythm':
@@ -1214,35 +1229,31 @@ length;
                 break;
 
             case 'note':
-                /*logo.blocks.makeNewBlock('note');
-                logo.blocks.blockList[logo.blocks.blockList.length - 1].x =200;
-                logo.blocks.blockList[logo.blocks.blockList.length - 1].y =200;
+                this.inNote = true;
+                this.noteBlockNotes = [];
+                this.noteBlockOct = [];
                 
-                logo.blocks.makeNewBlock('pitch');  
-                logo.blocks.blockList[logo.blocks.blockList.length - 1].x =300;
-                logo.blocks.blockList[logo.blocks.blockList.length - 1].y =300;
-
-                logo.blocks.blockList[logo.blocks.blockList.length - 2].dragGroup.push(logo.blocks.blockList[logo.blocks.blockList.length - 1]);
-                */
-                var synth = new Tone.AMSynth();
-                synth.toMaster();
-                //console.log("note arg "+args[0]+" "+args[1]+" ");
-                var noteblock = logo.blocks.blockList[args[1]];
-                /*console.log("drag earlier "+logo.blocks.dragGroup);
-                logo.blocks.findDragGroup(noteblock);
-                console.log("drag earlier "+logo.blocks.dragGroup);
-                */var xargs = [];
-                for(var k=1; k<args.length; k++)
-                {
-                    if (logo.blocks.blockList[args[k]].protoblock.args > 0) {
-                        for (var i = 1; i < logo.blocks.blockList[args[k]].protoblock.args + 1; i++) {
-                            xargs.push(logo.parseArg(logo, turtle, logo.blocks.blockList[args[k]].connections[i], args[k]));
-                        }
-                    }
-                }
-                //Here this is to be run first...#Bug...note block has to be clicked twice;
-                //logo.runFromBlock(logo, turtle, args[1]);
+                logo.runFromBlock(logo, turtle, args[1]);
+                var that=this;
+                setTimeout(function(){
+                    console.log("notes "+that.noteBlockNotes+" oct "+that.noteBlockOct);
+                    var notes = [];
+                that.polySynth.toMaster();
                 var beatValue = args[0];
+                for(i in that.noteBlockNotes)
+                {
+                    note = that.getNote(that.noteBlockNotes[i], that.noteBlockOct[i]);
+                    notes.push(note);
+                
+                }
+                console.log("note play"+notes);
+                that.polySynth.triggerAttackRelease(notes, 1/beatValue);
+                Tone.Transport.start();
+                that.inNote = false;
+
+                },1000);
+                
+                
                 /*if(this.sharpForNoteBlock)
                 {
                     xargs[0] += '#';
@@ -1253,12 +1264,6 @@ length;
                     xargs[0] += '♭';
                     this.flatForNoteBlock = false;
                 }*/
-                solfege = xargs[0];
-                octave = xargs[1];
-                note = this.getNote(solfege, octave);
-                console.log("note "+note);
-                synth.triggerAttackRelease(note, 1/beatValue);
-                Tone.Transport.start();
                 break;
 
             case 'sharp':

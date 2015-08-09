@@ -294,13 +294,15 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	var notes = this.notesToPlay;
 	console.log('notes all '+notes);
 	var position = 0;
-
+    var table = document.getElementById("myTable");    
+	
 	var that = this;
 	var setI = Tone.Transport.setInterval(function(time){
 	    var note = notes[position++];
 		var table = document.getElementById("myTable");
 		    
 	    var beatValue = table.rows[table.rows.length - 1].cells[position].innerHTML;
+	    that.beatValue = beatValue;
 	    if(note != 'R')
 	    that.synth.triggerAttackRelease(note, 1/beatValue, time);
 	    if(position == notes.length )
@@ -309,6 +311,19 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	}
 	}, 2/this.beatValue);
 
+
+	/*for(var i=0; i<notes.length; i++)
+	{
+		console.log('heree');
+		var note = notes[i];
+	    var beatValue = table.rows[table.rows.length - 1].cells[i].innerHTML;
+		var that=this;
+		setTimeout(function(){
+			//	if(note != 'R')
+		    that.synth.triggerAttackRelease('C4', 1/16);
+		},2/16);
+		
+	}*/
 	//the transport won't start firing events until it's started
 	Tone.Transport.start();
 	}

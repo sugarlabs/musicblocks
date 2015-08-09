@@ -1732,6 +1732,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             } else {
                 var name = blockObjs[nameBlk][1][1]['value'];
             }
+            console.log('saved '+JSON.stringify(blockObjs));
             localStorage.setItem('macros', prepareMacroExports(name, blockObjs, this.macroDict));
             this.addToMyPalette(name, blockObjs);
             this.palettes.updatePalettes();
@@ -1795,6 +1796,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.loadNewBlocks = function(blockObjs) {  
+        console.log("blkkobj "+JSON.stringify(blockObjs));
         // Check for blocks connected to themselves,
         // and for action blocks not connected to text blocks.
         for (var b = 0; b < blockObjs.length; b++) {
