@@ -1308,14 +1308,13 @@ length;
             default:
 
                 if(logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix')
-                {  console.log("this.notation "+this.notation);
+                {  
                     noSession = 1 //nosession changed to 1, because we don't want namedsavematrix 
                              //block to be saved locally;
                     var index = logo.blocks.blockList[blk].name[15];
                     var notes = window.savedMatricesNotes;
                     matrix.notesToPlay = [];
                     var count = 0,j=0,temp = 0;
-                    console.log("notes "+notes);
                     for(var i=0; i<notes.length; i++)
                     {
                         if(notes[i] == 'end')
@@ -1499,10 +1498,15 @@ length;
                     else
                     {
                         matrix.playMatrix(0,matrix.notesToPlay);
-                        logo.setTurtleDelay(4500*parseFloat(1 / matrix.timeSignDenominator)*(-temp + j));
+                        var delayFactor = 0;
+                        for(i in matrix.rhythm)
+                        {
+                            delayFactor += 1/matrix.notesToPlay[i][1];
+                        }
+                        logo.setTurtleDelay(2000*parseFloat(delayFactor)*(-temp + j));
                         setTimeout(function(){
                             logo.setTurtleDelay(0);
-                        },4500*parseFloat(1 / matrix.timeSignDenominator)*(-temp + j));
+                        },2000*parseFloat(delayFactor)*(-temp + j));
                     }                    
                 }
                 else

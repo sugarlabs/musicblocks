@@ -35,6 +35,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.solfegeOct = [];
 	this.beatValue = 4;
 	this.rhythm = [];
+	this.notesCounter = 0;
 
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
@@ -65,6 +66,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		this.notesToPlayBeatValue = [];
 		this.isMatrix = 1;
 		this.octave = octave;
+		this.rhythm = [];
 
 		Element.prototype.remove = function() {
  	    this.parentElement.removeChild(this);
@@ -102,7 +104,6 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	cell.style.backgroundColor = '#9ACD32';
     	//cell.style.width = w/4 + 'px';
 
-
     	for(var i=0; i<this.solfegeNotes.length; i++)
     	{
     		var row = header.insertRow(i+1);
@@ -133,7 +134,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 			this.beatValue = beatValue;
 	    for(var i=0; i<numBeats; i++)
 	    {
-	    	this.notesToPlay.push("R");
+	    	this.notesToPlay.push(["R",beatValue]);
 	    	this.notesToPlayBeatValue.push(beatValue);
 	    }
 	    console.log("Rhythm #beats->"+numBeats+" beatValue->"+beatValue);
@@ -161,8 +162,9 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		w = (2*w)/table.rows[1].cells.length;
 		this.cellWidth = w/4;
 		for(var i = 1; i < table.rows[1].cells.length; i++)
-		table.rows[1].cells[i].width = this.cellWidth + 'px';
-
+		{
+			table.rows[1].cells[i].width = w/table.rows[table.rows.length - 1].cells[i].innerHTML + 'px';
+		}
 				
 	}
 
@@ -310,45 +312,28 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.playAll = function(){
 	
 	var notes = this.notesToPlay;
-	console.log('notes all '+notes);
-	var position = 0;
-    var table = document.getElementById("myTable");    
-	
+	this.notesCounter = 0;
 	var that = this;
-	var setI = Tone.Transport.setInterval(function(time){
-	    var note = notes[position++];
-		var table = document.getElementById("myTable");
-		var i = 0, numBeats;
-		numBeats = that.rhythm[i][0];
-		while(position > numBeats)
-		{
-			i++;
-			numBeats += that.rhythm[i][0];
-		}
-	    var beatValue = that.rhythm[i][1];
-	    //that.beatValue = beatValue;
-	    if(note != 'R')
-	    that.synth.triggerAttackRelease(note, 1/beatValue, time);
-	    if(position == notes.length )
-    	{	Tone.Transport.clearInterval(setI);
-    		Tone.Transport.stop();
-    	}
-	}, 2/this.beatValue);
-
-
-	/*for(var i=0; i<notes.length; i++)
-	{
-		console.log('heree');
-		var note = notes[i];
-	    var beatValue = table.rows[table.rows.length - 1].cells[i].innerHTML;
-		var that=this;
-		setTimeout(function(){
-			//	if(note != 'R')
-		    that.synth.triggerAttackRelease('C4', 1/16);
-		},2/16);
+	var time = 0;
+	var table = document.getElementById("myTable");
 		
-	}*/
-	//the transport won't start firing events until it's started
+	for(i in this.notesToPlay)
+	{
+	    var beatValue = 4;
+		time += 1/beatValue;
+		var that = this;
+		
+		setTimeout(function(){
+			if(that.notesCounter >= that.notesToPlay.length)
+				that.notesCounter = 0;
+			note  = that.notesToPlay[that.notesCounter][0];
+			beatValue = that.notesToPlay[that.notesCounter][1];
+			that.notesCounter += 1;
+			if(note != 'R')
+		    	that.synth.triggerAttackRelease(note, 1/beatValue);
+		}, 2000*time);
+	}
+//the transport won't start firing events until it's started
 	Tone.Transport.start();
 	}
 
@@ -418,16 +403,17 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
                     	this.transposition = null;
 
                     }
-                    this.notesToPlay[parseInt(colIndex) - 1] = note;
+                    var beatValue = table.rows[table.rows.length-1].cells[cell.cellIndex].innerHTML;
+                    this.notesToPlay[parseInt(colIndex) - 1] = [note, beatValue];
                     this.clearTurtles();
-                    console.log("note "+note);
                     if(playNote)
                	    {
-               	    	this.synth.triggerAttackRelease(note, 1/this.beatValue);
+               	    	this.synth.triggerAttackRelease(note, 1/beatValue);
 						Tone.Transport.start();
 					}
                     for(var i=0; i<this.notesToPlay.length; i++)
-                    	turtles.add(null, null, this.notesToPlay[i]);              
+                    	turtles.add(null, null, this.notesToPlay[i][0]);
+                    	//console.log('turtles '+	turtles.turtleList);              
                 }
     		}    	
         }
@@ -448,7 +434,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
             console.log('transposed notes to be played ' + this.notesToPlay);
         }
         else
-            console.log('notes to be played ' + this.notesToPlay);
+            console.log('notes to be played ' + this.notesToPlay[0]);
 
     	this.i = 0;
     	var that = this;
@@ -464,7 +450,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
     	}
     	window.savedMatricesNotes.push('end');
     	window.savedMatricesCount += 1;
-    	console.log("saved "+window.savedMatricesNotes);
+    	console.log("saved "+JSON.stringify(window.savedMatricesNotes));
     }
 		
 }
