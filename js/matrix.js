@@ -319,7 +319,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		
 	for(i in this.notesToPlay)
 	{
-	    var beatValue = 4;
+	    var beatValue = this.notesToPlay[i][1];
 		time += 1/beatValue;
 		var that = this;
 		
@@ -434,7 +434,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
             console.log('transposed notes to be played ' + this.notesToPlay);
         }
         else
-            console.log('notes to be played ' + this.notesToPlay[0]);
+            console.log('notes to be played ' + this.notesToPlay);
 
     	this.i = 0;
     	var that = this;
