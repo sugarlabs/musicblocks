@@ -231,7 +231,7 @@ define(function(require) {
             context.clearRect(0, 0, canvas.width, canvas.height);
             document.getElementById('musicNotation').innerHTML = "";
             document.getElementById('musicNotation').style.display = 'none';
-            if(musicnotation != null)
+            if(musicnotation != null && musicnotation.musicContainer)
             {
                 musicnotation.musicContainer.removeAllChildren();
                 musicnotation.notationIndex = 0;

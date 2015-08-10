@@ -34,6 +34,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	this.solfegeNotes = [];
 	this.solfegeOct = [];
 	this.beatValue = 4;
+	this.rhythm = [];
 
 	this.notationIndex = 0;	
 	this.clearTurtles = function()
@@ -79,7 +80,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 
 		if(table != null)
-		{
+		{console.log("in remove");
 			table.remove();
 		}
 		//var solfege = this.solfegeNotes;//['Do','Re','Mi','Fa','Sol','La','Si'];
@@ -122,9 +123,10 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	}
 
-	this.makeMatrix = function(numBeats, beatValue)
+	this.makeMatrix = function(numBeats, beatValue, addToRhythm)
 	{
-
+		if(addToRhythm)
+			this.rhythm.push([numBeats, beatValue]);
 		var table = document.getElementById("myTable");
 		
 		if(this.beatValue > beatValue)
@@ -166,8 +168,23 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	this.makeClickable = function(){
 		var table = document.getElementById("myTable");
-		
+		console.log('chk arr '+this.chkArray)
 		var that = this;
+		for (var i = 1; i < table.rows[1].cells.length; i++) 
+		{	
+	        for (var j = 1; j < table.rows.length - 1; j++)
+	        {			    	
+				cell = table.rows[j].cells[i];
+				if(cell.style.backgroundColor == 'black')
+				{
+					cell.style.backgroundColor = '#ADFF2F';
+					cell.style.backgroundColor = 'black';
+					this.setNotes(i, cell.parentNode.rowIndex, false);
+					break;
+				}
+			}
+		}
+
 		if (table != null) {
 		    for (var i = 1; i < table.rows[1].cells.length; i++) {
 		    		
@@ -176,6 +193,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    		var cell = table.rows[j].cells[i];
 		    		var that = this;
 		        	cell.onclick=function(){
+		        			console.log("here here "+ that.chkArray[this.id]  + "   "+that.chkArray );
 		        		//this.onmouseout=null;
 		        		if (this.style.backgroundColor == 'black')
 		        		{
@@ -188,19 +206,19 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 		        			this.style.backgroundColor = 'black';
 							that.chkArray[this.id] = 1;
-							that.setNotes(this.id, this.parentNode.rowIndex);
+							that.setNotes(this.id, this.parentNode.rowIndex, true);
 
 		        		}
 		        		else if (that.chkArray[this.id] == 1)
 		        		{
 		        			for (var k = 1; k < table.rows.length - 1; k++)
-		        			{
+		        			{	
 		        				cell = table.rows[k].cells[this.id];
 		        				if(cell.style.backgroundColor == 'black')
 		        				{
 		        					cell.style.backgroundColor = '#ADFF2F';
 		        					this.style.backgroundColor = 'black';
-									that.setNotes(this.id, this.parentNode.rowIndex);
+									that.setNotes(this.id, this.parentNode.rowIndex, true);
 		        					break;
 		        				}
 		        			}
@@ -300,9 +318,15 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	var setI = Tone.Transport.setInterval(function(time){
 	    var note = notes[position++];
 		var table = document.getElementById("myTable");
-		    
-	    var beatValue = table.rows[table.rows.length - 1].cells[position].innerHTML;
-	    that.beatValue = beatValue;
+		var i = 0, numBeats;
+		numBeats = that.rhythm[i][0];
+		while(position > numBeats)
+		{
+			i++;
+			numBeats += that.rhythm[i][0];
+		}
+	    var beatValue = that.rhythm[i][1];
+	    //that.beatValue = beatValue;
 	    if(note != 'R')
 	    that.synth.triggerAttackRelease(note, 1/beatValue, time);
 	    if(position == notes.length )
@@ -333,7 +357,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		musicnotation.doNotation(notes, beatValue, numerator, denominator);
 	}
 
-	this.setNotes = function(colIndex, rowIndex){
+	this.setNotes = function(colIndex, rowIndex, playNote){
 		
 		var table = document.getElementById("myTable");
 		var octave = this.solfegeOct[rowIndex - 1];
@@ -397,9 +421,11 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
                     this.notesToPlay[parseInt(colIndex) - 1] = note;
                     this.clearTurtles();
                     console.log("note "+note);
-               	    this.synth.triggerAttackRelease(note, 1/this.beatValue);
-					Tone.Transport.start();
-
+                    if(playNote)
+               	    {
+               	    	this.synth.triggerAttackRelease(note, 1/this.beatValue);
+						Tone.Transport.start();
+					}
                     for(var i=0; i<this.notesToPlay.length; i++)
                     	turtles.add(null, null, this.notesToPlay[i]);              
                 }

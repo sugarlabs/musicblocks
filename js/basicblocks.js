@@ -168,9 +168,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     saveMatrix.zeroArgBlock();
 
 
-    var showMatrixBlock = new ProtoBlock('showMatrix');
+    var showMatrixBlock = new ProtoBlock('showmatrix');
     showMatrixBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['showMatrix'] = showMatrixBlock;
+    blocks.protoBlockDict['showmatrix'] = showMatrixBlock;
     showMatrixBlock.staticLabels.push(_('Show'));
     showMatrixBlock.adjustWidthToLabel();
     showMatrixBlock.flowClampZeroArgBlock();
