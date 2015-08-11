@@ -62,7 +62,7 @@ function ProtoBlock(name) {
         var labelLength = this.staticLabels[0].length;
         if ((labelLength - 6) > 0) {
             // TODO: better estimation of label size
-            this.extraWidth += (labelLength - 6) * 4;
+            this.extraWidth += (labelLength - 5.3) * 4;
         }
     }
 

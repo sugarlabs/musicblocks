@@ -91,7 +91,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.dockTypes[2] = 'anyin';
 
     var noteBlock = new ProtoBlock('note');
-    noteBlock.palette = palettes.dict['music'];
+    noteBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['note'] = noteBlock;
     noteBlock.staticLabels.push(_('note'));
     noteBlock.adjustWidthToLabel();
@@ -99,9 +99,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.defaults.push(4);
     palettes.dict['assemble'].add(noteBlock);
 
+    var playfwdBlock = new ProtoBlock('playfwd');
+    playfwdBlock.palette = palettes.dict['play/save'];
+    blocks.protoBlockDict['playfwd'] = playfwdBlock;
+    playfwdBlock.staticLabels.push(_('play forward'));
+    playfwdBlock.adjustWidthToLabel();
+    playfwdBlock.flowClampZeroArgBlock();
+
+    var playbwdBlock = new ProtoBlock('playbwd');
+    playbwdBlock.palette = palettes.dict['play/save'];
+    blocks.protoBlockDict['playbwd'] = playbwdBlock;
+    playbwdBlock.staticLabels.push(_('play backward'));
+    playbwdBlock.adjustWidthToLabel();
+    playbwdBlock.flowClampZeroArgBlock();
 
     var flatBlock = new ProtoBlock('flat');
-    flatBlock.palette = palettes.dict['music'];
+    flatBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['flat'] = flatBlock;
     flatBlock.staticLabels.push(_('Flat'));
     flatBlock.adjustWidthToLabel();
@@ -109,7 +122,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
 
     var sharpBlock = new ProtoBlock('sharp');
-    sharpBlock.palette = palettes.dict['music'];
+    sharpBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['sharp'] = sharpBlock;
     sharpBlock.staticLabels.push(_('Sharp'));
     sharpBlock.adjustWidthToLabel();
@@ -117,7 +130,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     
     var meter = new ProtoBlock('meter');
-    meter.palette = palettes.dict['matrix'];
+    meter.palette = palettes.dict['play/save'];
     blocks.protoBlockDict['meter'] = meter;
     meter.staticLabels.push('Meter', 'numerator', 'denominator');
     meter.adjustWidthToLabel();
@@ -128,7 +141,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.dockTypes[2] = 'number';
 
     var notationBlock = new ProtoBlock('notation');
-    notationBlock.palette = palettes.dict['matrix'];
+    notationBlock.palette = palettes.dict['play/save'];
     blocks.protoBlockDict['notation'] = notationBlock;
     notationBlock.staticLabels.push(_('Notation'));
     notationBlock.adjustWidthToLabel();
@@ -169,7 +182,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
 
     var showMatrixBlock = new ProtoBlock('showmatrix');
-    showMatrixBlock.palette = palettes.dict['matrix'];
+    showMatrixBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['showmatrix'] = showMatrixBlock;
     showMatrixBlock.staticLabels.push(_('Show'));
     showMatrixBlock.adjustWidthToLabel();
@@ -197,7 +210,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     osctimeBlock.dockTypes[2] = 'anyin';
        
     var squareBlock = new ProtoBlock('square');
-    squareBlock.palette = palettes.dict['music'];
+    squareBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['square'] = squareBlock;
     squareBlock.staticLabels.push(_('square'), _('frequency'), _('time'));
     squareBlock.adjustWidthToLabel();
@@ -207,7 +220,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     squareBlock.dockTypes[2] = 'anyin';
     
     var sineBlock = new ProtoBlock('sine');
-    sineBlock.palette = palettes.dict['music'];
+    sineBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['sine'] = sineBlock;
     sineBlock.staticLabels.push(_('sine'), _('frequency'), _('time'));
     sineBlock.adjustWidthToLabel();
@@ -217,7 +230,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sineBlock.dockTypes[2] = 'anyin';
 
     var sawtoothBlock = new ProtoBlock('sawtooth');
-    sawtoothBlock.palette = palettes.dict['music'];
+    sawtoothBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['sawtooth'] = sawtoothBlock;
     sawtoothBlock.staticLabels.push(_('sawtooth'), _('frequency'), _('time'));
     sawtoothBlock.adjustWidthToLabel();

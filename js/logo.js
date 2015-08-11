@@ -1221,7 +1221,7 @@ length;
                 var myDoBlock = new ProtoBlock('namedsavematrix' + index);
                 logo.blocks.protoBlockDict['namedsavematrix' + index] = myDoBlock;
                 myDoBlock.zeroArgBlock();
-                myDoBlock.palette = logo.blocks.palettes.dict['matrix'];
+                myDoBlock.palette = logo.blocks.palettes.dict['chunk'];
                 myDoBlock.staticLabels.push('Chunk' + index);
                 myDoBlock.palette.add(myDoBlock);
                 logo.blocks.palettes.dict['assemble'].add(myDoBlock);
@@ -1303,6 +1303,16 @@ length;
                 this.chunktranspose = true;
                 matrix.setTransposition(args[0]);
                 logo.runFromBlock(logo, turtle, args[1]);
+                break;
+
+            case 'playfwd':
+                matrix.playDirection = 1;
+                logo.runFromBlock(logo, turtle, args[0]);
+                break;
+
+            case 'playbwd':
+                matrix.playDirection = -1;
+                logo.runFromBlock(logo, turtle, args[0]);  
                 break;
 
             default:
