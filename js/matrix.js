@@ -316,15 +316,21 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 	var time = 0;
 	var table = document.getElementById("myTable");
 		
-	for(i in this.notesToPlayDirected)
+	var note  = this.notesToPlayDirected[this.notesCounter][0];
+	var	beatValue = that.notesToPlayDirected[this.notesCounter][1];
+	this.notesCounter += 1;
+	if(note != 'R')
+	    	this.synth.triggerAttackRelease(note, 1/beatValue);
+
+	for(var i = 1; i < this.notesToPlayDirected.length; i++)
 	{
-	    var beatValue = this.notesToPlayDirected[i][1];
+	    beatValue = this.notesToPlayDirected[i - 1][1];
 		time += 1/beatValue;
 		var that = this;
 		
 		setTimeout(function(){
 			if(that.notesCounter >= that.notesToPlayDirected.length)
-				that.notesCounter = 0;
+				that.notesCounter = 1;
 			note  = that.notesToPlayDirected[that.notesCounter][0];
 			beatValue = that.notesToPlayDirected[that.notesCounter][1];
 			that.notesCounter += 1;
