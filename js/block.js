@@ -155,7 +155,7 @@ function Block(protoblock, blocks, overrideName) {
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
-            if (myBlock.name == 'start' || myBlock.name == 'matrix'|| myBlock.name ==  'note' || myBlock.name ==  'flat' ||  myBlock.name ==  'sharp' ) {
+            if (myBlock.name == 'start' || myBlock.name == 'matrix'|| myBlock.name ==  'note' || myBlock.name ==  'flat' ||  myBlock.name ==  'sharp' || myBlock.name == 'multiplybeatvalue'|| myBlock.name == 'dividebeatvalue') {
                 // Rescale the decoration on the start blocks.
                 for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock == myBlock) {
@@ -201,6 +201,8 @@ function Block(protoblock, blocks, overrideName) {
             case 'note':
             case 'flat':
             case 'sharp':
+            case 'multiplybeatvalue':
+            case 'dividebeatvalue':
                 var proto = new ProtoBlock('collapse');
                 proto.scale = this.protoblock.scale;
                 proto.extraWidth = 10;

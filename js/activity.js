@@ -225,7 +225,6 @@ define(function(require) {
             {
                 table.remove();
             }
-
             var canvas = document.getElementById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -367,7 +366,7 @@ define(function(require) {
             blocks = new Blocks(canvas, blocksContainer, refreshCanvas, trashcan, stage.update);
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
             musicnotation = new MusicNotation(turtles, stage);
-            matrix = new Matrix(canvas, stage, turtles, trashcan, musicnotation);
+            matrix = new Matrix(turtles, musicnotation);
 
             //palettes.buttons['assemble'].visible = false;
 

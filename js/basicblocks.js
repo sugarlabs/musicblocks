@@ -90,6 +90,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
 
+   /* var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
+    rhythmicdotBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
+    rhythmicdotBlock.staticLabels.push(_('rhythmic dot'));
+    rhythmicdotBlock.adjustWidthToLabel();
+    rhythmicdotBlock.flowClampZeroArgBlock();
+*/
+    /*var tripletBlock = new ProtoBlock('triplet');
+    tripletBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['triplet'] = tripletBlock;
+    tripletBlock.staticLabels.push(_('triplet'));
+    tripletBlock.adjustWidthToLabel();
+    tripletBlock.flowClampZeroArgBlock();*/
+
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['note'] = noteBlock;
@@ -98,6 +112,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
     palettes.dict['assemble'].add(noteBlock);
+
+    var multiplyBeatValueBlock = new ProtoBlock('multiplybeatvalue');
+    multiplyBeatValueBlock.palette = palettes.dict['chunk'];
+    blocks.protoBlockDict['multiplybeatvalue'] = multiplyBeatValueBlock;
+    multiplyBeatValueBlock.staticLabels.push(_('multiply all beat values'));
+    multiplyBeatValueBlock.adjustWidthToLabel();
+    multiplyBeatValueBlock.flowClampOneArgBlock();
+    multiplyBeatValueBlock.defaults.push(2);
+
+    var divideBeatValueBlock = new ProtoBlock('dividebeatvalue');
+    divideBeatValueBlock.palette = palettes.dict['chunk'];
+    blocks.protoBlockDict['dividebeatvalue'] = divideBeatValueBlock;
+    divideBeatValueBlock.staticLabels.push(_('divide all beat values'));
+    divideBeatValueBlock.adjustWidthToLabel();
+    divideBeatValueBlock.flowClampOneArgBlock();
+    divideBeatValueBlock.defaults.push(2);
 
     var playfwdBlock = new ProtoBlock('playfwd');
     playfwdBlock.palette = palettes.dict['play/save'];
@@ -179,7 +209,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     saveMatrix.staticLabels.push(_('Save Matrix'));
     saveMatrix.adjustWidthToLabel();
     saveMatrix.zeroArgBlock();
-
 
     var showMatrixBlock = new ProtoBlock('showmatrix');
     showMatrixBlock.palette = palettes.dict['chunk'];

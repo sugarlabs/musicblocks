@@ -9,7 +9,7 @@
 // along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
+function Matrix(turtles, musicnotation)
 {
 	this.tempo = 60;
 	this.frequency = 500;
@@ -123,7 +123,16 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 
 	this.makeMatrix = function(numBeats, beatValue, addToRhythm)
 	{
+
 		var table = document.getElementById("myTable");
+		var beatValueToDisplay = beatValue.toString();
+		console.log("parseInt(beatValue) < beatValue "+parseInt(beatValue) + beatValue);
+		if(parseInt(beatValue) < beatValue)
+		{
+			beatValueToDisplay = parseInt((beatValue*1.5))
+			beatValueToDisplay = beatValueToDisplay.toString() + 'dot.';
+			console.log('beatval '+beatValueToDisplay);
+		}	
 		
 		if(this.beatValue > beatValue)
 			this.beatValue = beatValue;
@@ -146,7 +155,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		    	
 		    	if(i==this.solfegeNotes.length + 1)
 		    	{
-		    		cell.innerHTML = beatValue;
+		    		cell.innerHTML = beatValueToDisplay;
 		    		cell.style.backgroundColor = '#AEB404';
 		    	}
 		    	cell.setAttribute('id', table.rows[1].cells.length - 1);
@@ -157,7 +166,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 		this.cellWidth = w/4;
 		for(var i = 1; i < table.rows[1].cells.length; i++)
 		{
-			table.rows[1].cells[i].width = w/table.rows[table.rows.length - 1].cells[i].innerHTML + 'px';
+			table.rows[1].cells[i].width = w/table.rows[table.rows.length - 1].cells[i].innerHTML[0] + 'px';
 		}
 				
 	}
@@ -335,7 +344,7 @@ function Matrix(Mcanvas, stage, turtles, trashcan, musicnotation)
 			beatValue = that.notesToPlayDirected[that.notesCounter][1];
 			that.notesCounter += 1;
 			if(note != 'R')
-		    	that.synth.triggerAttackRelease(note, 1/beatValue);
+		    	that.synth.triggerAttackRelease(note, "4t");
 		}, 2000*time);
 	}
 //the transport won't start firing events until it's started

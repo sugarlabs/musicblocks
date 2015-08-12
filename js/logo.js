@@ -76,6 +76,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.noteBlockNotes = [];
     this.noteBlockOct = [];
 
+    this.multiplyBeatValueBy = 1;
+    this.divideBeatValueBy = 1;
+
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
                 
 
@@ -626,8 +629,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
 
             case 'rhythm':
-                //matrix.timeSignDenominator = args[1];
-                //matrix.timeSignNumerator = args[0];
+                if(this.rhythmicValueParameter == 'rhythmicdot')
+                {
+                    args[1] = (2/3)*args[1];
+                    this.rhythmicValueParameter = null;
+                }
                 setTimeout(function(){
                     matrix.makeMatrix(args[0], args[1], true);
                 },1500);
@@ -663,11 +669,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     childFlowCount = -1;
                 }
                 break;
-            case 'showmatrix':
-                this.showMatrix = true;
-                noSession = 1;
-                logo.runFromBlock(logo, turtle, args[0]);
-                break;
+
             case 'break':
                 logo.doBreak(turtle);
                 // Since we pop the queue, we need to unhighlight our parent.
@@ -1180,6 +1182,11 @@ length;
                             logo.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / deno)*(num)));
                 break;
 
+            case 'rhythmicdot':
+                this.rhythmicValueParameter = 'rhythmicdot';
+                logo.runFromBlock(logo, turtle, args[0]);
+                break;
+
             case 'notation' :
                 var flagN = 0 ,flagD = 1, tsd = 0, tsn = 0;
                 for(var i=0; i<args[0].length; i++)
@@ -1253,7 +1260,22 @@ length;
 
                 },1000);
                 
-                
+
+            case 'showmatrix':
+                this.showMatrix = true;
+                noSession = 1;
+                logo.runFromBlock(logo, turtle, args[0]);
+                break;
+
+            case 'multiplybeatvalue':
+                this.multiplyBeatValueBy *= args[0];
+                logo.runFromBlock(logo, turtle, args[1]);
+                break;
+
+            case 'dividebeatvalue':
+                this.divideBeatValueBy *= args[0];
+                logo.runFromBlock(logo, turtle, args[1]);
+                break;
                 /*if(this.sharpForNoteBlock)
                 {
                     xargs[0] += '#';
@@ -1342,11 +1364,14 @@ length;
                         j += 1;             
                     }
                     temp = j;
+                    var factor = this.multiplyBeatValueBy/this.divideBeatValueBy;
                     while(window.savedMatricesNotes[j] != 'end')
                     {
-                        matrix.notesToPlay.push(window.savedMatricesNotes[j]);
+                        matrix.notesToPlay.push([window.savedMatricesNotes[j][0], (window.savedMatricesNotes[j][1])*factor]);
                         j += 1;
                     }
+                    this.multiplyBeatValueBy = 1;
+                    this.divideBeatValueBy = 1;
                     var notesToPlayCopy = matrix.notesToPlay;
                     var trNote;
                     if(this.chunktranspose)
@@ -1400,16 +1425,14 @@ length;
                         if (table != null) 
                             table.remove();
                         for(var k=0; k<matrix.notesToPlay.length; k++)
-                        {   
-                            var temp = 1;
-                            switch(matrix.notesToPlay[k][0]){
+                        {  
+                            switch(matrix.notesToPlay[k][0][0]){
                                 case 'B':
                                     if(!solfaDisplay[0])
                                     {
                                         matrix.solfegeNotes.push('si');
                                         matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
                                         solfaDisplay[0] = 1;
-                                        temp = 1;
                                     }
                                     notesPosition.push('si');
                                     
@@ -1419,7 +1442,6 @@ length;
                                     {
                                         matrix.solfegeNotes.push('la');
                                         matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
-                                        temp = 2;
                                         solfaDisplay[1] = 1;
                                         notesPosition.push('la');
                                     }
@@ -1429,7 +1451,6 @@ length;
                                     {
                                         matrix.solfegeNotes.push('sol');
                                         matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
-                                        temp = 3;
                                         solfaDisplay[2] = 1;
                                     }
                                     notesPosition.push('sol');
@@ -1440,7 +1461,6 @@ length;
                                     {
                                         matrix.solfegeNotes.push('fa');
                                         matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
-                                        temp = 4;
                                         solfaDisplay[3] = 1;
                                     }
                                         notesPosition.push('fa');
@@ -1451,7 +1471,6 @@ length;
                                     {
                                         matrix.solfegeNotes.push('mi');
                                         matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
-                                        temp = 5;
                                         solfaDisplay[4] = 1;
                                     }
                                         notesPosition.push('mi');
@@ -1462,7 +1481,6 @@ length;
                                     {
                                         matrix.solfegeNotes.push('re');
                                         matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
-                                        temp = 6;
                                         solfaDisplay[5] = 1;
                                     }
                                         notesPosition.push('re');
@@ -1473,7 +1491,6 @@ length;
                                     {
                                         matrix.solfegeNotes.push('do');
                                         matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
-                                        temp = 7;
                                         solfaDisplay[6] = 1;
                                     }
                                         notesPosition.push('do');
@@ -1484,8 +1501,9 @@ length;
                             }
                         } 
                         matrix.initMatrix();
-                        for(i in matrix.rhythm)
-                            matrix.makeMatrix(matrix.rhythm[i][0], matrix.rhythm[i][1], false);
+                        for(i in notesToPlayCopy)
+                            {   matrix.makeMatrix(1, notesToPlayCopy[i][1], false);
+                            }
                         var table = document.getElementById("myTable");
                         for(var k=0; k<matrix.notesToPlay.length; k++)
                         {
