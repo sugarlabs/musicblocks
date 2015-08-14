@@ -129,6 +129,7 @@ function Matrix(turtles, musicnotation)
 		if(parseInt(beatValue) < beatValue)
 		{
 			beatValueToDisplay = parseInt((beatValue*1.5))
+			//beatValue = parseInt((beatValue*1.5));
 			beatValueToDisplay = beatValueToDisplay.toString() + 'dot.';
 		}	
 		
@@ -160,11 +161,11 @@ function Matrix(turtles, musicnotation)
 		    }
 		}
 		var w = window.innerWidth;
-		w = (2*w)/table.rows[1].cells.length;
+		w = (2*w)/5;//table.rows[1].cells.length;
 		this.cellWidth = w/4;
-		for(var i = 1; i < table.rows[1].cells.length; i++)
+		for(var i = table.rows[1].cells.length - numBeats; i < table.rows[1].cells.length; i++)
 		{
-			table.rows[1].cells[i].width = w/parseInt(table.rows[table.rows.length - 1].cells[i].innerHTML) + 'px';
+			table.rows[1].cells[i].width = w/beatValue + 'px';
 		}
 				
 	}

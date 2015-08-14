@@ -90,13 +90,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
 
-   /* var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
+    var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
     rhythmicdotBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
     rhythmicdotBlock.staticLabels.push(_('rhythmic dot'));
     rhythmicdotBlock.adjustWidthToLabel();
     rhythmicdotBlock.flowClampZeroArgBlock();
-*/
+
+    /*var tieBlock = new ProtoBlock('tie');
+    tieBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['tie'] = tieBlock;
+    tieBlock.staticLabels.push(_('Tie'));
+    tieBlock.adjustWidthToLabel();
+    tieBlock.flowClampZeroArgBlock();*/
+
     /*var tripletBlock = new ProtoBlock('triplet');
     tripletBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['triplet'] = tripletBlock;
