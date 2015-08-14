@@ -533,7 +533,7 @@ function Turtles(canvas, stage, refreshCanvas) {
         }
         else if (note)
         {
-            console.log('adding a new turtle ' + note);   
+            //console.log('adding a new turtle ' + note);   
         }
         else {
             console.log('adding a new turtle startBlock and note is null');

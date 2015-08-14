@@ -126,19 +126,17 @@ function Matrix(turtles, musicnotation)
 
 		var table = document.getElementById("myTable");
 		var beatValueToDisplay = beatValue.toString();
-		console.log("parseInt(beatValue) < beatValue "+parseInt(beatValue) + beatValue);
 		if(parseInt(beatValue) < beatValue)
 		{
 			beatValueToDisplay = parseInt((beatValue*1.5))
 			beatValueToDisplay = beatValueToDisplay.toString() + 'dot.';
-			console.log('beatval '+beatValueToDisplay);
 		}	
 		
 		if(this.beatValue > beatValue)
 			this.beatValue = beatValue;
 	    for(var i=0; i<numBeats; i++)
 	    {
-	    	this.notesToPlay.push(["R",beatValue]);
+	    	this.notesToPlay.push([["R"],beatValue]);
 	    }
 	    console.log("Rhythm #beats->"+numBeats+" beatValue->"+beatValue);
 
@@ -166,18 +164,17 @@ function Matrix(turtles, musicnotation)
 		this.cellWidth = w/4;
 		for(var i = 1; i < table.rows[1].cells.length; i++)
 		{
-			table.rows[1].cells[i].width = w/table.rows[table.rows.length - 1].cells[i].innerHTML[0] + 'px';
+			table.rows[1].cells[i].width = w/parseInt(table.rows[table.rows.length - 1].cells[i].innerHTML) + 'px';
 		}
 				
 	}
 
 	this.makeClickable = function(){
 		var table = document.getElementById("myTable");
-		console.log('chk arr '+this.chkArray)
 		var that = this;
 		for (var i = 1; i < table.rows[1].cells.length; i++) 
 		{	
-	        for (var j = 1; j < table.rows.length - 1; j++)
+			for (var j = 1; j < table.rows.length - 1; j++)
 	        {			    	
 				cell = table.rows[j].cells[i];
 				if(cell.style.backgroundColor == 'black')
@@ -185,11 +182,10 @@ function Matrix(turtles, musicnotation)
 					cell.style.backgroundColor = '#ADFF2F';
 					cell.style.backgroundColor = 'black';
 					this.setNotes(i, cell.parentNode.rowIndex, false);
-					break;
+					//break;
 				}
 			}
 		}
-
 		if (table != null) {
 		    for (var i = 1; i < table.rows[1].cells.length; i++) {
 		    		
@@ -199,13 +195,15 @@ function Matrix(turtles, musicnotation)
 		    		var that = this;
 		        	cell.onclick=function(){
 		        		//this.onmouseout=null;
+		        		var oldBeatVal = 4;
 		        		if (this.style.backgroundColor == 'black')
 		        		{
 		        			this.style.backgroundColor = '#ADFF2F';
 		        			that.chkArray[this.id] = 0;
-		        			that.notesToPlay[this.id - 1] = 'R'	;
+		        			that.notesToPlay[this.id - 1][0] = ['R'];
+							that.setNotes(this.id, this.parentNode.rowIndex, false);
 		        		}
-		        		else if (that.chkArray[this.id] == 0)
+		        		else //if (that.chkArray[this.id] == 0)
 		        		{
 
 		        			this.style.backgroundColor = 'black';
@@ -213,7 +211,7 @@ function Matrix(turtles, musicnotation)
 							that.setNotes(this.id, this.parentNode.rowIndex, true);
 
 		        		}
-		        		else if (that.chkArray[this.id] == 1)
+		        		/*else if (that.chkArray[this.id] == 1)
 		        		{
 		        			for (var k = 1; k < table.rows.length - 1; k++)
 		        			{	
@@ -223,16 +221,16 @@ function Matrix(turtles, musicnotation)
 		        					cell.style.backgroundColor = '#ADFF2F';
 		        					this.style.backgroundColor = 'black';
 									that.setNotes(this.id, this.parentNode.rowIndex, true);
-		        					break;
+		        					//break;
 		        				}
 		        			}
-		        		}
+		        		}*/
 		        	};
 		    	}
 		    }
  	 	}
  	 
-		this.synth = new Tone.AMSynth().toMaster();
+		this.synth = new Tone.PolySynth(4, Tone.AMSynth).toMaster();
 	}
 
 	this.setTempo = function(timeSign){
@@ -333,22 +331,27 @@ function Matrix(turtles, musicnotation)
 
 	for(var i = 1; i < this.notesToPlayDirected.length; i++)
 	{
+		//console.log("here note "+JSON.stringify(this.notesToPlay[i]));
 	    beatValue = this.notesToPlayDirected[i - 1][1];
 		time += 1/beatValue;
 		var that = this;
 		
 		setTimeout(function(){
 			if(that.notesCounter >= that.notesToPlayDirected.length)
+			{
 				that.notesCounter = 1;
+				Tone.Transport.stop();
+			}
 			note  = that.notesToPlayDirected[that.notesCounter][0];
 			beatValue = that.notesToPlayDirected[that.notesCounter][1];
 			that.notesCounter += 1;
 			if(note != 'R')
-		    	that.synth.triggerAttackRelease(note, "4t");
+		    	that.synth.triggerAttackRelease(note, 1/beatValue);
 		}, 2000*time);
 	}
 //the transport won't start firing events until it's started
 	Tone.Transport.start();
+	Tone.Transport.stop();
 	}
 
 	this.musicNotation = function(notes, beatValue, numerator, denominator){
@@ -357,10 +360,10 @@ function Matrix(turtles, musicnotation)
 	}
 
 	this.setNotes = function(colIndex, rowIndex, playNote){
-		
 		var table = document.getElementById("myTable");
 		var octave = this.solfegeOct[rowIndex - 1];
 		var transformed = false;
+		this.notesToPlay[colIndex - 1][0] = [];
 		if (table != null) {
 			for (var j = 1; j < table.rows.length; j++)
     		{
@@ -417,13 +420,14 @@ function Matrix(turtles, musicnotation)
                     	this.transposition = null;
 
                     }
-                    var beatValue = table.rows[table.rows.length-1].cells[cell.cellIndex].innerHTML;
-                    this.notesToPlay[parseInt(colIndex) - 1] = [note, beatValue];
+                    var beatValue = parseInt(table.rows[table.rows.length-1].cells[cell.cellIndex].innerHTML);
+                    this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
                     this.clearTurtles();
                     if(playNote)
                	    {
                	    	this.synth.triggerAttackRelease(note, 1/beatValue);
 						Tone.Transport.start();
+						Tone.Transport.stop();
 					}
                     for(var i=0; i<this.notesToPlay.length; i++)
                     	turtles.add(null, null, this.notesToPlay[i][0]);

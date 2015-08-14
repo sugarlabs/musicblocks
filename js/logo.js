@@ -1175,7 +1175,6 @@ length;
             break;
 
             case 'playmatrix' :
-                console.log('Matrix played after '+args[0]);
                 matrix.playMatrix(parseInt(args[0]));
                 logo.setTurtleDelay(4500*parseFloat(1 / deno)*(num));
                 setTimeout(function(){
@@ -1422,100 +1421,131 @@ length;
                                 }
                             }
                         }
+                        var solfegeArr = [];
+                        var arr = [];
+                        for(k in matrix.notesToPlay)
+                            arr.push([]);
                         if (table != null) 
                             table.remove();
                         for(var k=0; k<matrix.notesToPlay.length; k++)
-                        {  
-                            switch(matrix.notesToPlay[k][0][0]){
+                        {   
+                            for(var i in matrix.notesToPlay[k][0])
+                               {switch(matrix.notesToPlay[k][0][i][0]){
                                 case 'B':
+                                    arr[k].push('si');
+                                        
                                     if(!solfaDisplay[0])
                                     {
-                                        matrix.solfegeNotes.push('si');
-                                        matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
+                                        solfegeArr.push(['si',matrix.notesToPlay[k][0][i][1], 7]);
                                         solfaDisplay[0] = 1;
                                     }
                                     notesPosition.push('si');
                                     
                                     break;
                                 case 'A':
+                                arr[k].push('la');
                                     if(!solfaDisplay[1])
                                     {
-                                        matrix.solfegeNotes.push('la');
-                                        matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
+                                        solfegeArr.push(['la',matrix.notesToPlay[k][0][i][1], 6]);
                                         solfaDisplay[1] = 1;
-                                        notesPosition.push('la');
                                     }
+                                    notesPosition.push('la');
+                                    
                                     break;
                                 case 'G':
+                                arr[k].push('sol');
+                                
                                     if(!solfaDisplay[2])
                                     {
-                                        matrix.solfegeNotes.push('sol');
-                                        matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
+                                        solfegeArr.push(['sol',matrix.notesToPlay[k][0][i][1], 5]);
                                         solfaDisplay[2] = 1;
                                     }
                                     notesPosition.push('sol');
                                     
                                     break;
                                 case 'F':
+                                    arr[k].push('fa');
                                     if(!solfaDisplay[3])
                                     {
-                                        matrix.solfegeNotes.push('fa');
-                                        matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
+                                        solfegeArr.push(['fa',matrix.notesToPlay[k][0][i][1], 4]);
                                         solfaDisplay[3] = 1;
                                     }
-                                        notesPosition.push('fa');
+                                    notesPosition.push('fa');
                                     
                                     break;
                                 case 'E':
+                                    arr[k].push('mi');
                                     if(!solfaDisplay[4])
                                     {
-                                        matrix.solfegeNotes.push('mi');
-                                        matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
+                                        solfegeArr.push(['mi',matrix.notesToPlay[k][0][i][1], 3]);
                                         solfaDisplay[4] = 1;
                                     }
-                                        notesPosition.push('mi');
+                                    notesPosition.push('mi');
                                     
                                     break;
                                 case 'D':
+                                    arr[k].push('re');
                                     if(!solfaDisplay[5])
                                     {
-                                        matrix.solfegeNotes.push('re');
-                                        matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
+                                        solfegeArr.push(['re',matrix.notesToPlay[k][0][i][1], 2]);
                                         solfaDisplay[5] = 1;
                                     }
-                                        notesPosition.push('re');
+                                    notesPosition.push('re');
                                     
                                     break;
                                 case 'C':
+                                    arr[k].push('do');
                                     if(!solfaDisplay[6])
                                     {
-                                        matrix.solfegeNotes.push('do');
-                                        matrix.solfegeOct.push(matrix.notesToPlay[k][1]);
+                                        solfegeArr.push(['do', matrix.notesToPlay[k][0][i][1], 1]);
                                         solfaDisplay[6] = 1;
                                     }
-                                        notesPosition.push('do');
+                                    notesPosition.push('do');
                                     
                                     break;
                                 default :
                                     break;
                             }
+                        }   
                         } 
+                        solfegeArr.sort(function(a,b){
+                            return parseFloat(a[2]) - parseFloat(b[2]);
+                        });
+                        console.log('arra '+JSON.stringify(arr));
+                        matrix.solfegeNotes = [];
+                        matrix.solfegeOct = [];
+                        for(i in solfegeArr)
+                        {
+                            matrix.solfegeNotes.push(solfegeArr[i][0]);
+                            matrix.solfegeOct.push(solfegeArr[i][1]);
+                        }
                         matrix.initMatrix();
                         for(i in notesToPlayCopy)
-                            {   matrix.makeMatrix(1, notesToPlayCopy[i][1], false);
-                            }
+                        {
+                           matrix.makeMatrix(1, notesToPlayCopy[i][1], false);
+                        }
                         var table = document.getElementById("myTable");
                         for(var k=0; k<matrix.notesToPlay.length; k++)
                         {
                             for(var i=1; i<table.rows.length-1; i++)
                             {
-                                if(table.rows[i].cells[0].innerHTML == notesPosition[k])
+                                for(j=0; j<arr[k].length; j++)
                                 {
+                                    if(table.rows[i].cells[0].innerHTML == arr[k][j])
+                                    {
+                                        var cell = table.rows[i].cells[k+1];
+                                        cell.style.backgroundColor = 'black';
+                                        matrix.chkArray[cell.id] = 1;
+                                    }                                    
+                                }
+                                /*if(table.rows[i].cells[0].innerHTML == arr[k][i])
+                                {
+                                    console.log("notesPosition "+notesPosition+" matrix.notesToPlay "+matrix.notesToPlay+ "  "+matrix.notesToPlay[k])
 
                                     var cell = table.rows[i].cells[k+1];
                                     cell.style.backgroundColor = 'black';
                                     matrix.chkArray[cell.id] = 1;                          
-                                }
+                                }*/
                             }
                         }
                         matrix.makeClickable();                                                  
