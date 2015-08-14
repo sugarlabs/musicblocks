@@ -71,6 +71,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.notation = false;
     this.sharp = false;
     this.flat = false;
+    this.flatClampCount = 0;
+    this.sharpClampCount = 0;
     this.notesList = [];
     this.inNote = false;
     this.noteBlockNotes = [];
@@ -539,6 +541,23 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             logo.blocks.highlight(blk, false);
         }
 
+        if(logo.blocks.blockList[blk].name == 'pitch')
+        {
+            if(this.flatClampCount == 0)
+            {
+                this.flat = false;
+                this.flatForNoteBlock = false;
+            }
+            else if(this.flatClampCount > 0)
+                this.flatClampCount -= 2;
+            if(this.sharpClampCount == 0)
+            {
+                this.sharp = false;
+                this.sharpForNoteBlock = false;
+            }
+            else if(this.sharpClampCount > 0)
+                this.sharpClampCount -= 2;
+        }
         switch (logo.blocks.blockList[blk].name) {
             case 'dispatch':
                 // Dispatch an event.
@@ -609,12 +628,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 if(this.sharp)
                 {
                     args[0] += '#';
-                    this.sharp = false;
                 }
                 else if(this.flat)
                 {
                     args[0] += '♭';
-                    this.flat = false;
                 }
                 if(this.inNote)
                 {
@@ -1288,12 +1305,14 @@ length;
                 break;
 
             case 'sharp':
+                this.sharpClampCount = logo.blocks.blockList[blk].clampCount[0]; 
                 this.sharp = true;
                 this.sharpForNoteBlock = true;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
             
             case 'flat':
+                this.flatClampCount = logo.blocks.blockList[blk].clampCount[0];
                 this.flat = true;
                 this.flatForNoteBlock = true;
                 logo.runFromBlock(logo, turtle, args[0]);

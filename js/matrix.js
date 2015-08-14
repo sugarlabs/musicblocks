@@ -79,7 +79,7 @@ function Matrix(turtles, musicnotation)
 
 
 		if(table != null)
-		{console.log("in remove");
+		{
 			table.remove();
 		}
 		//var solfege = this.solfegeNotes;//['Do','Re','Mi','Fa','Sol','La','Si'];
