@@ -423,12 +423,12 @@ function Matrix(turtles, musicnotation)
                     var beatValue = parseInt(table.rows[table.rows.length-1].cells[cell.cellIndex].innerHTML);
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
                     this.clearTurtles();
-                    if(playNote)
+                    /*if(playNote)
                	    {
                	    	this.synth.triggerAttackRelease(note, 1/beatValue);
 						Tone.Transport.start();
 						Tone.Transport.stop();
-					}
+					}*/
                     for(var i=0; i<this.notesToPlay.length; i++)
                     	turtles.add(null, null, this.notesToPlay[i][0]);
                     	//console.log('turtles '+	turtles.turtleList);              
@@ -452,7 +452,7 @@ function Matrix(turtles, musicnotation)
             console.log('transposed notes to be played ' + this.notesToPlay);
         }
         else
-            console.log('notes to be played ' + this.notesToPlay);
+            console.log('notes to be played ' + JSON.stringify(this.notesToPlay));
 
     	this.i = 0;
     	var that = this;
