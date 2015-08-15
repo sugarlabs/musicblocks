@@ -26,7 +26,9 @@ function Matrix(turtles, musicnotation)
 	this.transposition = null;
 	this.isMatrix = 0;
 	this.freetime = 1000;
-	this.synth = 0;
+	this.synth = new Tone.PolySynth(4, Tone.AMSynth).toMaster();
+	Tone.Transport.start();
+
 	this.oldNotes = [];
 	this.cellWidth = 0;
 	this.solfegeNotes = [];
@@ -231,7 +233,6 @@ function Matrix(turtles, musicnotation)
 		    }
  	 	}
  	 
-		this.synth = new Tone.PolySynth(4, Tone.AMSynth).toMaster();
 	}
 
 	this.setTempo = function(timeSign){
@@ -351,8 +352,8 @@ function Matrix(turtles, musicnotation)
 		}, 2000*time);
 	}
 //the transport won't start firing events until it's started
-	Tone.Transport.start();
-	Tone.Transport.stop();
+	//Tone.Transport.start();
+	//Tone.Transport.stop();
 	}
 
 	this.musicNotation = function(notes, beatValue, numerator, denominator){
@@ -424,12 +425,12 @@ function Matrix(turtles, musicnotation)
                     var beatValue = parseInt(table.rows[table.rows.length-1].cells[cell.cellIndex].innerHTML);
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
                     this.clearTurtles();
-                    /*if(playNote)
+                    if(playNote)
                	    {
                	    	this.synth.triggerAttackRelease(note, 1/beatValue);
-						Tone.Transport.start();
-						Tone.Transport.stop();
-					}*/
+						
+					//	Tone.Transport.stop();
+					}
                     for(var i=0; i<this.notesToPlay.length; i++)
                     	turtles.add(null, null, this.notesToPlay[i][0]);
                     	//console.log('turtles '+	turtles.turtleList);              

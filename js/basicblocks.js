@@ -236,7 +236,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.dockTypes[2] = 'numberin';
     */
     var osctimeBlock = new ProtoBlock('osctime');
-    osctimeBlock.palette = palettes.dict['music'];
+    osctimeBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
     osctimeBlock.staticLabels.push(_('osctime'), _('start'), _('end'));
     osctimeBlock.adjustWidthToLabel();
