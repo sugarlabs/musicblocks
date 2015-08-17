@@ -217,6 +217,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     saveMatrix.adjustWidthToLabel();
     saveMatrix.zeroArgBlock();
 
+    var tupletBlock = new ProtoBlock('tuplet');
+    tupletBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['tuplet'] = tupletBlock;
+    tupletBlock.staticLabels.push(_('Tuplet'));
+    tupletBlock.adjustWidthToLabel();
+    tupletBlock.flowClampZeroArgBlock();
+    
     var showMatrixBlock = new ProtoBlock('showmatrix');
     showMatrixBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['showmatrix'] = showMatrixBlock;
@@ -224,6 +231,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     showMatrixBlock.adjustWidthToLabel();
     showMatrixBlock.flowClampZeroArgBlock();
 
+
+    var tupletParamBlock = new ProtoBlock('tupletParamBlock');
+    blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
+    tupletParamBlock.palette = palettes.dict['matrix'];
+    tupletParamBlock.staticLabels.push(_('Tuplet Params'),'tuplet value', '# beats', 'beat value');
+    tupletParamBlock.defaults.push(5, 1, 4);
+    tupletParamBlock.adjustWidthToLabel();
+    tupletParamBlock.threeArgBlock();
+    tupletParamBlock.dockTypes[1] = 'numberin';
+    tupletParamBlock.dockTypes[2] = 'numberin';
+    tupletParamBlock.dockTypes[3] = 'numberin';
     //Music Palette
     /*var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['music'];

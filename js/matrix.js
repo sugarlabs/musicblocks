@@ -114,7 +114,7 @@ function Matrix(turtles, musicnotation)
     	
     	var row = header.insertRow(this.solfegeNotes.length + 1);
     	var cell = row.insertCell(0);
-    	cell.innerHTML = '<b>'+'Time'+'</b>';
+    	cell.innerHTML = '<b>'+'#-of-Notes / Note-Value'+'</b>';
     	cell.style.height = "40px";
     	cell.style.backgroundColor = '#9ACD32';
     	
@@ -123,16 +123,99 @@ function Matrix(turtles, musicnotation)
 
 	}
 
-	this.makeMatrix = function(numBeats, beatValue, addToRhythm)
+	this.handleTuplet = function(param)
+	{
+		console.log("parameters "+JSON.stringify(param));
+		
+		//this.makeMatrix(1, param[0][2], param[0][1]);
+		var table = document.getElementById("myTable");
+	    var timeFactor = (param[0][2]/param[1][1])* (param[1][0]/param[0][1]);
+	    for(var i=1; i<table.rows.length-1; i++)
+    	{
+    	//	for(var k=1; k<param.length; k++)
+    		for(var j=0; j<param[1][0]; j++)
+    		{
+    			row = table.rows[i];
+	    		cell = row.insertCell(-1)
+	    		//cell.width = '75px';
+	    		cell.setAttribute('id', table.rows[i].cells.length - 1);
+		    	cell.style.backgroundColor = '#ADFF2F';
+    		}
+    	}
+    		for(var j=0; j<param[1][0]; j++)
+    		{
+    			this.chkArray.push(0);
+				this.notesToPlay.push([["R"],timeFactor*param[1][1]]);
+	    	}
+
+	
+ 		var w = window.innerWidth;
+		w = (2*w)/5;
+
+	    var row = table.insertRow(table.rows.length - 1);
+    	var cell = row.insertCell(-1);
+    	cell.innerHTML = '<b>' + 'Tuplet Value' + '</b>';
+    	cell.style.backgroundColor = '#9ACD32';
+	
+	   	cell =table.rows[table.rows.length - 1].insertCell(-1);
+		cell.style.backgroundColor = '#9ACD32';
+		cell.style.height = "30px";	
+		cell.innerHTML = param[0][1].toString() + "/" +param[0][2].toString() ;
+		cell.width = w*param[0][1]/(param[0][2]) + 'px';
+    			
+		cell.colSpan = param[0][0];		
+		cell.style.backgroundColor = 'rgb(174, 174, 174)';
+ 		
+		for(var i=0; i < table.rows[table.rows.length - 1].cells.length - 1; i++)
+    	{
+    		cell =row.insertCell(i+1);
+    		cell.style.backgroundColor = 'rgb(4, 255, 174)';
+    		cell.style.height = "30px";	
+    		if(i == table.rows[table.rows.length - 1].cells.length - 2)
+			{
+				cell.style.backgroundColor = 'rgb(4, 255, 174)';
+				cell.innerHTML = param[0][0];
+				//cell.width = "200px";
+				cell.colSpan = param[0][0];
+			}
+    	}
+
+    	var row = table.insertRow(table.rows.length - 2);
+    	var cell = row.insertCell(-1);
+    	cell.innerHTML = '<b>' + '# notes/Notes-Value 2' + '</b>';
+    	cell.style.backgroundColor = '#9ACD32';
+    	for(var i=0; i<table.rows[table.rows.length - 4].cells.length - 1; i++)
+    	{	
+    		cell =row.insertCell(-1);
+    		cell.style.backgroundColor = 'rgb(4, 255, 174)';
+    		cell.style.height = "30px";
+    		if(i >= table.rows[table.rows.length - 1].cells.length - 2)
+    		{
+    			cell.innerHTML = "1/" + timeFactor*param[1][1].toString();	
+    		}
+
+    	}	
+    	
+    	//waitTime = 1/param[1][1]      param[0][1]/param[0][1]
+    	//cell.style.width = w/4 + 'px';
+
+    	
+	}
+
+	this.makeMatrix = function(numBeats, beatValue, beatValueNum)
 	{
 
 		var table = document.getElementById("myTable");
-		var beatValueToDisplay = beatValue.toString();
+		var beatValueToDisplay = null;
+		if(beatValueNum)
+			beatValueToDisplay = beatValueNum.toString() + '/' + beatValue.toString();
+		else
+			beatValueToDisplay = "1/" + beatValue.toString();
 		if(parseInt(beatValue) < beatValue)
 		{
 			beatValueToDisplay = parseInt((beatValue*1.5))
 			//beatValue = parseInt((beatValue*1.5));
-			beatValueToDisplay = beatValueToDisplay.toString() + 'dot.';
+			beatValueToDisplay = "1/" + beatValueToDisplay.toString() + 'dot.';
 		}	
 		
 		if(this.beatValue > beatValue)
@@ -157,7 +240,7 @@ function Matrix(turtles, musicnotation)
 		    	if(i==this.solfegeNotes.length + 1)
 		    	{
 		    		cell.innerHTML = beatValueToDisplay;
-		    		cell.style.backgroundColor = '#AEB404';
+		    		cell.style.backgroundColor = 'rgb(174, 174, 174)';
 		    	}
 		    	cell.setAttribute('id', table.rows[1].cells.length - 1);
 		    }
@@ -172,12 +255,16 @@ function Matrix(turtles, musicnotation)
 				
 	}
 
-	this.makeClickable = function(){
+	this.makeClickable = function(tuplet){
 		var table = document.getElementById("myTable");
 		var that = this;
+		var leaveRowsFromBottom = 1;
+		if(tuplet)
+			leaveRowsFromBottom = 3;
+		console.log("isTuplet "+tuplet);
 		for (var i = 1; i < table.rows[1].cells.length; i++) 
 		{	
-			for (var j = 1; j < table.rows.length - 1; j++)
+			for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
 	        {			    	
 				cell = table.rows[j].cells[i];
 				if(cell.style.backgroundColor == 'black')
@@ -192,11 +279,11 @@ function Matrix(turtles, musicnotation)
 		if (table != null) {
 		    for (var i = 1; i < table.rows[1].cells.length; i++) {
 		    		
-		        for (var j = 1; j < table.rows.length - 1; j++)
+		        for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
 		        {	
 		    		var cell = table.rows[j].cells[i];
 		    		var that = this;
-		        	cell.onclick=function(){
+		        	cell.onclick=function(){	
 		        		//this.onmouseout=null;
 		        		var oldBeatVal = 4;
 		        		if (this.style.backgroundColor == 'black')
@@ -204,15 +291,14 @@ function Matrix(turtles, musicnotation)
 		        			this.style.backgroundColor = '#ADFF2F';
 		        			that.chkArray[this.id] = 0;
 		        			that.notesToPlay[this.id - 1][0] = ['R'];
-							that.setNotes(this.id, this.parentNode.rowIndex, false);
+							that.setNotes(this.id, this.parentNode.rowIndex, false, tuplet);
 		        		}
 		        		else //if (that.chkArray[this.id] == 0)
 		        		{
 
 		        			this.style.backgroundColor = 'black';
 							that.chkArray[this.id] = 1;
-							that.setNotes(this.id, this.parentNode.rowIndex, true);
-
+							that.setNotes(this.id, this.parentNode.rowIndex, true, tuplet);
 		        		}
 		        		/*else if (that.chkArray[this.id] == 1)
 		        		{
@@ -333,7 +419,6 @@ function Matrix(turtles, musicnotation)
 
 	for(var i = 1; i < this.notesToPlayDirected.length; i++)
 	{
-		//console.log("here note "+JSON.stringify(this.notesToPlay[i]));
 	    beatValue = this.notesToPlayDirected[i - 1][1];
 		time += 1/beatValue;
 		var that = this;
@@ -351,9 +436,6 @@ function Matrix(turtles, musicnotation)
 		    	that.synth.triggerAttackRelease(note, 1/beatValue);
 		}, 2000*time);
 	}
-//the transport won't start firing events until it's started
-	//Tone.Transport.start();
-	//Tone.Transport.stop();
 	}
 
 	this.musicNotation = function(notes, beatValue, numerator, denominator){
@@ -361,17 +443,19 @@ function Matrix(turtles, musicnotation)
 		musicnotation.doNotation(notes, beatValue, numerator, denominator);
 	}
 
-	this.setNotes = function(colIndex, rowIndex, playNote){
+	this.setNotes = function(colIndex, rowIndex, playNote, tuplet){
+		var leaveRowsFromBottom = 1;
+		if(tuplet)
+			leaveRowsFromBottom = 3;
 		var table = document.getElementById("myTable");
 		var octave = this.solfegeOct[rowIndex - 1];
 		var transformed = false;
 		this.notesToPlay[colIndex - 1][0] = [];
 		if (table != null) {
-			for (var j = 1; j < table.rows.length; j++)
+			for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
     		{
     			cell = table.rows[j].cells[colIndex];
     			var note;
-
     			if(cell.style.backgroundColor == 'black')
                 {
                     var solfege = table.rows[j].cells[0].innerHTML;
@@ -422,18 +506,16 @@ function Matrix(turtles, musicnotation)
                     	this.transposition = null;
 
                     }
-                    var beatValue = parseInt(table.rows[table.rows.length-1].cells[cell.cellIndex].innerHTML);
+                    var beatValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
+                    
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
                     this.clearTurtles();
                     if(playNote)
-               	    {
-               	    	this.synth.triggerAttackRelease(note, 1/beatValue);
-						
-					//	Tone.Transport.stop();
+               	    {	
+               	    	this.synth.triggerAttackRelease(note, beatValue);
 					}
                     for(var i=0; i<this.notesToPlay.length; i++)
                     	turtles.add(null, null, this.notesToPlay[i][0]);
-                    	//console.log('turtles '+	turtles.turtleList);              
                 }
     		}    	
         }

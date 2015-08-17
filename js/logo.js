@@ -81,6 +81,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.multiplyBeatValueBy = 1;
     this.divideBeatValueBy = 1;
 
+    //tuplet
+    this.tuplet = 0;
+    this.tupletParam = [];
+    this.tupletClampCount = 0;
+    this.tupletRhythmCount = 0;
+    this.rhythmInsideTuplet = 0;
+
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
                 
 
@@ -558,6 +565,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             else if(this.sharpClampCount > 0)
                 this.sharpClampCount -= 2;
         }
+
+
         switch (logo.blocks.blockList[blk].name) {
             case 'dispatch':
                 // Dispatch an event.
@@ -618,9 +627,16 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     //console.log(this.matrix.solfegeOct +" "+this.matrix.solfegeNotes);
                     matrix.initMatrix();
                 },1500);
-                
+                var that = this;
                 setTimeout(function(){
-                    matrix.makeClickable();
+                    if(that.tuplet)
+                    {
+                        matrix.makeClickable(true);
+                        that.tuplet = 0;
+                    }
+
+                    else
+                        matrix.makeClickable();
                 },2000);
                 break;
 
@@ -651,9 +667,22 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     args[1] = (2/3)*args[1];
                     this.rhythmicValueParameter = null;
                 }
-                setTimeout(function(){
-                    matrix.makeMatrix(args[0], args[1], true);
-                },1500);
+                if(blk==this.rhythmInsideTuplet)// && */this.tupletRhythmCount > 0)
+                {
+                    this.tupletRhythmCount -= 2;
+                    this.tupletParam.push([args[0], args[1]]);
+                    var that = this;
+                    setTimeout(function(){
+                        matrix.handleTuplet(that.tupletParam);
+                    },1500)
+                    //this.tuplet = 1;
+                    //this.tupletRhythmCount = 0;
+                }
+                else{
+                    setTimeout(function(){
+                        matrix.makeMatrix(args[0], args[1]);
+                    },1500);
+                }
                 break;
 
                 //notesList.push(args[0]);
@@ -1356,6 +1385,23 @@ length;
                 logo.runFromBlock(logo, turtle, args[0]);  
                 break;
 
+            case 'tuplet':
+                logo.runFromBlock(logo, turtle, args[0]);
+                this.tuplet = 2;
+                
+                this.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
+                break;
+
+            case 'tupletParamBlock':
+                this.tupletParam = [];
+                this.tupletParam.push([args[0], args[1], args[2]]);
+                //this.tuplet = 1;
+                //console.log('args[3 '+logo.blocks.blockList[blk].connections);
+                this.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
+                //logo.runFromBlock(logo, turtle, args[3]);
+                //logo.blocks.blockList[args[3]];
+                            
+                break;
             default:
 
                 if(logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix')
@@ -1531,7 +1577,6 @@ length;
                         solfegeArr.sort(function(a,b){
                             return parseFloat(a[2]) - parseFloat(b[2]);
                         });
-                        console.log('arra '+JSON.stringify(arr));
                         matrix.solfegeNotes = [];
                         matrix.solfegeOct = [];
                         for(i in solfegeArr)
@@ -1542,7 +1587,7 @@ length;
                         matrix.initMatrix();
                         for(i in notesToPlayCopy)
                         {
-                           matrix.makeMatrix(1, notesToPlayCopy[i][1], false);
+                           matrix.makeMatrix(1, notesToPlayCopy[i][1]);
                         }
                         var table = document.getElementById("myTable");
                         for(var k=0; k<matrix.notesToPlay.length; k++)
