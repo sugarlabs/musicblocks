@@ -809,6 +809,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     repeatBlock.flowClampOneArgBlock();
     repeatBlock.defaults.push(4);
     palettes.dict['assemble'].add(repeatBlock);
+    palettes.dict['chunk'].add(repeatBlock);
 
     var foreverBlock = new ProtoBlock('forever');
     foreverBlock.palette = palettes.dict['flow'];
@@ -817,6 +818,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     foreverBlock.adjustWidthToLabel();
     foreverBlock.flowClampZeroArgBlock();
     palettes.dict['assemble'].add(foreverBlock);
+    palettes.dict['chunk'].add(foreverBlock);
 
     var breakBlock = new ProtoBlock('break');
     breakBlock.palette = palettes.dict['flow'];
@@ -868,7 +870,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     //Assemble palette
     var chunkTransposeBlock = new ProtoBlock('chunkTranspose');
-    chunkTransposeBlock.palette = palettes.dict['assemble'];
+    chunkTransposeBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['chunkTranspose'] = chunkTransposeBlock;
     chunkTransposeBlock.staticLabels.push(_('Transpose'));
     chunkTransposeBlock.defaults.push('+1');

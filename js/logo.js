@@ -1620,16 +1620,18 @@ length;
                     }
                     else
                     {
-                        matrix.playMatrix(1000);
                         var delayFactor = 0;
-                        for(i in matrix.rhythm)
+                        matrix.playMatrix(0);
+                        for(i in matrix.notesToPlay)
                         {
+
                             delayFactor += 1/matrix.notesToPlay[i][1];
                         }
-                        logo.setTurtleDelay(2000*parseFloat(delayFactor)*(-temp + j));
+                    
+                        logo.setTurtleDelay(2000*delayFactor + 200);
                         setTimeout(function(){
                             logo.setTurtleDelay(0);
-                        },2000*parseFloat(delayFactor)*(-temp + j));
+                        },2000*delayFactor + 200);
                     }                    
                 }
                 else
