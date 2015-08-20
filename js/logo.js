@@ -1158,59 +1158,7 @@ length;
                     doSaveSVG(logo, args[0]);
                 }
                 break;
-            
-            /*case 'matrix' :
-                if(window.savedMatricesNotes == null)
-                    {
-                        window.savedMatricesNotes.push(4);
-                        window.savedMatricesNotes.push('end');
-                    }
-                var flag = 0 ,flag1 = 1, tsd = 0, tsn = 0;
-                for(var i=0; i<args[0].length; i++)
-                {
-                    if(flag)
-                    {   
-                        tsd += parseInt(args[0][i]);
-                        tsd *= 10;
 
-                    }
-                    if(flag1 && args[0][i] != '/')
-                    {
-                        tsn += parseInt(args[0][i]);
-                        tsn *= 10;
-
-                    }
-                    if(args[0][i] == '/')
-                    {
-                        flag = 1;
-                        flag1 = 0;
-                    }
-                    
-                }
-                num = tsn/10;
-                deno = tsd/10;
-
-                if(window.savedMatricesNotes[0] != deno)
-                {
-                    var i=1;
-                    while(logo.blocks.protoBlockDict['namedsavematrix' + i])
-                    {
-                        var cont = logo.blocks.blockList[blk].container;
-                    
-                        delete logo.blocks.protoBlockDict['namedsavematrix' + i];
-                        delete ProtoBlock('namedsavematrix' + i);
-                        cont.updateCache();
-                        window.savedMatricesCount -= 1;
-                        i += 1;
-                    }
-                    logo.blocks.palettes.updatePalettes('matrix');
-                      
-                    window.savedMatricesNotes = [deno];
-                }
-                matrix.initMatrix(args[0],args[1]);
-                this.matrix = matrix;
-                break;*/
-                
             case 'timeSign' :
                 console.log('Time Signatature' + args[0]);
                 break;
@@ -1437,7 +1385,9 @@ length;
                     }
                     this.multiplyBeatValueBy = 1;
                     this.divideBeatValueBy = 1;
-                    var notesToPlayCopy = matrix.notesToPlay;
+                    var notesToPlayCopy = [];
+                    for(k in matrix.notesToPlay)
+                        notesToPlayCopy.push(matrix.notesToPlay[k])
                     var trNote;
                     if(this.chunktranspose)
                     {
@@ -1447,12 +1397,15 @@ length;
                         i -= 1;                        
                         while(window.savedMatricesNotes[j] != 'end' && i>=0)
                         {
-                            var len = notesToPlayCopy[i].length;
-                            len -= 1;
-                            var note = notesToPlayCopy[i].substring(0, len);
-                            var trNote = matrix.doTransposition(note, notesToPlayCopy[i][len]);
-                            console.log(notesToPlayCopy[i] + " transposed to "+ trNote);
-                            window.savedMatricesNotes[j] = trNote ;
+                            for(var k in notesToPlayCopy[i][0])
+                            {
+                                var len = notesToPlayCopy[i][0][k].length;
+                                len -= 1;
+                                var note = notesToPlayCopy[i][0][k].substring(0, len);
+                                var trNote = matrix.doTransposition(note, notesToPlayCopy[i][0][k][len]);
+                                console.log(note + " transposed to " + trNote)
+                                window.savedMatricesNotes[j][0][k] = trNote ;
+                            }
                             i -= 1;
                             
                             j -= 1;

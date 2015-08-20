@@ -11,6 +11,7 @@
 
 function Matrix(turtles, musicnotation)
 {
+	this.arr = []
 	this.tempo = 60;
 	this.frequency = 500;
 	this.secondsPerBeat = 1;
@@ -27,6 +28,7 @@ function Matrix(turtles, musicnotation)
 	this.isMatrix = 0;
 	this.freetime = 1000;
 	this.synth = new Tone.PolySynth(4, Tone.AMSynth).toMaster();
+
 	Tone.Transport.start();
 
 	this.oldNotes = [];
@@ -56,7 +58,7 @@ function Matrix(turtles, musicnotation)
 	}
 	
 	this.initMatrix = function(timeSign, octave)
-	{
+	{//this.synth.triggerAttackRelease("c4", "4n");
 		document.getElementById('matrix').style.display = 'inline';
 		
 		console.log('notes '+this.solfegeNotes +' and octave '+this.solfegeOct);
@@ -546,13 +548,14 @@ function Matrix(turtles, musicnotation)
     }
 
     this.saveMatrix = function(){
+
     	for(var i=0; i<this.notesToPlay.length; i++)
     	{
-    		window.savedMatricesNotes.push(this.notesToPlay[i]);
+    		var note = this.notesToPlay[i].slice(0);
+    		window.savedMatricesNotes.push(note);
     	}
     	window.savedMatricesNotes.push('end');
     	window.savedMatricesCount += 1;
-    	console.log("saved "+JSON.stringify(window.savedMatricesNotes));
     }
 		
 }
