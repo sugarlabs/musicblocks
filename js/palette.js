@@ -18,7 +18,7 @@ var PALETTELEFTMARGIN = 10;
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
 var BUILTINPALETTES = ['matrix', 'chunk', 'play/save', 'tone', 'turtle', /*'pen',*/ 'number', /*'boolean',*/ 'flow', /*'blocks',*/
-    'actions', 'media', /*'sensors',*/ 'myblocks','assemble'
+    'actions', 'media', /*'sensors',*/ 'myblocks','assemble' //<== I think that we want to bring back some of these, like "boolean" -DU
 ];
 
 
