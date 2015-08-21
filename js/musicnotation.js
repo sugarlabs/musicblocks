@@ -22,7 +22,7 @@ function MusicNotation(turtles, stage)
 	}
 
 
-	this.doNotation = function(notes, beatValue, timeSignNumerator, timeSignDenominator)
+	this.doNotation = function(notes, timeSignNumerator, timeSignDenominator)
 	{
 		if (this.musicContainer == null) {
 			this.musicContainer = new createjs.Container();
@@ -44,16 +44,27 @@ function MusicNotation(turtles, stage)
 
 	    //Create the notes
 	    var vexNotes = [];
+	 	var notesToNotation = [];
 	 	for(i in notes)
-		{
-		    	var note = notes[i].substring(0, 1);
+		{	
+				var note = [];
+		    	var octave = notes[i][0][0].substring(1, 2);
+				var noteArr = notes[i][0]//.substring(0, 1);
+		    	//console.log("notes "+notes+" notearr "+JSON.stringify(noteArr))
+		    	for(j in noteArr)
+		    	{	
+		    		var toPush = noteArr[j].substring(0, 1) + '/' + octave;	
+		    		note.push(toPush.toString());
+		    	}
+		    	notesToNotation.push(note)
+		    	console.log("note "+JSON.stringify(notesToNotation) + " note[0] "+note)
 		    	if(note == 'R')
 		    	{
-		    		vexNotes.push(new Vex.Flow.StaveNote({ keys: ['g/' + octave], duration: beatValue[i].toString()+'r' }));	
+		    		vexNotes.push(new Vex.Flow.StaveNote({ keys: ['g/' + octave], duration: notes[i][1].toString()+'r' }));	
 		    	}
 		    	else{
-		    	var octave = notes[i].substring(1, 2);
-		   		vexNotes.push(new Vex.Flow.StaveNote({ keys: [note + '/' + octave], duration: beatValue[i].toString() }));
+		    	//var octave = notes[i][0][0].substring(1, 2);
+		   		vexNotes.push(new Vex.Flow.StaveNote({ keys: [note[0]], duration: notes[i][1].toString() }));
 	  			}
 	    }
 

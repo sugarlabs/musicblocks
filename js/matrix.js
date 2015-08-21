@@ -440,9 +440,9 @@ function Matrix(turtles, musicnotation)
 	}
 	}
 
-	this.musicNotation = function(notes, beatValue, numerator, denominator){
+	this.musicNotation = function(notes, numerator, denominator){
 
-		musicnotation.doNotation(notes, beatValue, numerator, denominator);
+		musicnotation.doNotation(notes, numerator, denominator);
 	}
 
 	this.setNotes = function(colIndex, rowIndex, playNote, tuplet){

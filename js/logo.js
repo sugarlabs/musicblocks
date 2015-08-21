@@ -88,6 +88,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.tupletRhythmCount = 0;
     this.rhythmInsideTuplet = 0;
 
+    //notations
+    this.num = 3;
+    this.deno = 4;
+
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
                 
 
@@ -516,7 +520,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     }
 
     this.runFromBlockNow = function(logo, turtle, blk) {
-        var num = 3; deno = 4;
         var noSession = 0;
         // Run a stack of blocks, beginning with blk.
         // (1) Evaluate any arguments (beginning with connection[1]);
@@ -1185,13 +1188,14 @@ length;
                 var flagN = 0 ,flagD = 1, tsd = 0, tsn = 0;
                 for(var i=0; i<args[0].length; i++)
                 {
+                    console.log(args[0] +"fhf")
                     if(flagN)
                     {   
                         tsd += parseInt(args[0][i]);
                         tsd *= 10;
 
                     }
-                    if(flagN && args[0][i] != '/')
+                    if(flagD && args[0][i] != '/')
                     {
                         tsn += parseInt(args[0][i]);
                         tsn *= 10;
@@ -1204,9 +1208,8 @@ length;
                     }
                     
                 }
-                var num = tsn/10;
-                var deno = tsd/10;
-                console.log("notatipjn "+num + " "+deno);
+                this.num = tsn/10;
+                this.deno = tsd/10;
                 this.notation = true;
                 logo.runFromBlock(logo, turtle, args[1]);
                 console.log('Generating Music Notation');
@@ -1417,7 +1420,7 @@ length;
                     }
                     else if(this.notation)
                     {
-                        matrix.musicNotation(notesToPlayCopy, matrix.notesToPlayBeatValue, num, deno);
+                        matrix.musicNotation(notesToPlayCopy, this.num, this.deno);
                         console.log("to notations "+notesToPlayCopy);
                         this.notation = false;
                     }
