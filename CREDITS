@@ -4,3 +4,13 @@ tone jS --> Web Audio framework for creating interactive music in the browser
 
 vexflow and vextab --> Allows to create standard music notation and guitar tablature
 					   http://www.vexflow.com/
+
+// To be added more to from HERE//
+
+Forked from TurtleArtJS created by Walter Bender (and others--who?), which can be found at ________ 
+
+Design work for concept and UI by Devin Ulibarri, inspired by some ideas (e.g. aspects of matrix) that Dr. Larry Scripp (New England Conservatory and Center for Music and Education) teaches.
+
+Some art ideas contributed from Chie Yasuda (Mouse idea). She also was very patient with Devin as he worked on all of this--thanks Chie!
+
+So much coding done by Yash Khandelwal as part of Google Summer of Code (GSOC) 2015. Great work, Yash!
