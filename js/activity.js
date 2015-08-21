@@ -177,26 +177,30 @@ define(function(require) {
 
         var helpContainer = null;
         var helpIdx = 0;
-        var HELPCONTENT = [[_('Welcome to Mouse Music'), _('Mouse Music is a Logo-inspired mouse that plays Music'), 'activity/activity-icon-color.svg'],
-                           [_('Palette buttons'), _('This toolbar contains the palette buttons: click to show the palettes of blocks (Matrix, Music, Media, etc.). You can drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
-                           [_('Clean'), _('Clears the Matrix and Music-Notations.'), 'icons/clear-button.svg'],
-                           [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'icons/palette-button.svg'],
-                           [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'icons/hide-blocks-button.svg'],
-                           [_('Expand/collapse collapsable blocks'), _('Expand or collapse stacks of blocks, e.g, start and action stacks.'), 'icons/collapse-blocks-button.svg'],
-                           [_('Save Notations'), _('Click to Download the Music Notations in png format'), 'icons/download-button.svg'],
-                           [_('Help'), _('Show these messages.'), 'icons/help-button.svg'],
-                           [_('Play'), _('Plays the Music which is inside the start block.'), 'icons/play-button.svg'],
+        var HELPCONTENT = [[_('Welcome to Music Blocks'), _('Music Blocks a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way'), 'activity/activity-icon-mouse-color.svg'],
+			   [_('Meet our conductor, "Mr. Mouse!"'), _('Mr. Mouse is our Music Blocks conductor and teacher. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. "Let\'s start our tour!" '), 'activity/activity-icon-mouse-color.svg'],
+                           [_('<<< Palette buttons'), _('The toolbar to the left contains the palette buttons: click the button to reveal the respective palettes of blocks (Matrix, Chunk, Perform, Tone, (Turtle), Number, Flow, Actions, Media, (etc.)). Tip:You can drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'], //<==Let's update the image. I could not find your originals.
+                           [_('Clean'), _('Clears the Matrix (to be done--not yet functional) and user generated Music Notations.'), 'icons/clear-button.svg'], //<==change wording once the "clean function has programmed to clear the matrix.
+                           [_('Show/hide palettes'), _('Toggle between Hiding and showing the block palette toolbar (menu to the left).'), 'icons/palette-button.svg'], //<==I have always found this a little confusing. This should be an improvement.
+                           [_('Show/hide blocks'), _('Hide or show the blocks.'), 'icons/hide-blocks-button.svg'], //this does not seem to be hiding the palettes so I changed wording to be consistent.
+                           [_('Expand/collapse collapsable blocks'), _('Expand or collapse stacks of blocks, e.g, start, action, and matrix stacks.'), 'icons/collapse-blocks-button.svg'],
+                           [_('Save Notations'), _('Click to Download the Music Notations in png (image) format'), 'icons/download-button.svg'],
+                           [_('Help'), _('Show these help messages.'), 'icons/help-button.svg'],
+                           [_('Play'), _('FUTURE FEATURE: Plays the Music which is inside the start block.'), 'icons/play-button.svg'], //<==edit this once the feature has been implemented.
                            [_('Stop'), _('Stop the Music.'), 'icons/stop-turtle-button.svg'],
-                           [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'icons/menu-button.svg'],
+			   [_('Matrix'), _('The Matrix, once generated using Pitch and Rhythm blocks becomes a workspace for designing musical patterns, like melodies and chords.'), 'icons/stop-turtle-button.svg'], //<==Let's make an icon for the Matrix and put here.
+                           [_('Chunk'), _('Once you have created a musical pattern that you like using the matrix, you can save the matrix as a chunk, which will appear at the bottom of the "chunk" palette with a numberic label. You can then string chunks together to create more complex musical patterns'), 'icons/stop-turtle-button.svg'], //<==Let's make an icon for the Chunk HERE.
+			   [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar. Here you will find options like copy, paste, stave stack, settings, and global (to connect with others using Music Blocks--FUTURE FEATURE)'), 'icons/menu-button.svg'],
                            [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'icons/copy-button.svg'],
                            [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'icons/paste-disabled-button.svg'],
                            [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'icons/save-blocks-button.svg'],
-                           [_('Settings'), _('Open a panel for configuring Mouse Music.'), 'icons/utility-button.svg'],
-                           [_('Decrease block size'), _('Decrease the size of the blocks.'), 'icons/smaller-button.svg'],
-                           [_('Increase block size'), _('Increase the size of the blocks.'), 'icons/bigger-button.svg'],
-                           [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'icons/empty-trash-button.svg'],
+                           [_('Settings'), _('Open a panel for configuring settings of Music Blocks.'), 'icons/utility-button.svg'],
+                           [_('Decrease block size'), _('Decrease the display size of the blocks.'), 'icons/smaller-button.svg'],
+                           [_('Increase block size'), _('Increase the display size of the blocks.'), 'icons/bigger-button.svg'],
+                           [_('Delete all'), _('Remove all content on the canvas, including all of the blocks and the matrix.'), 'icons/empty-trash-button.svg'],
                            [_('Undo'), _('Restore blocks from the trash.'), 'icons/restore-trash-button.svg'],
-                           [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-color.svg']]
+                           [_('Code!'), _('Take a peak at the Code. Latest development can be found at https://github.com/pikurasa/Music-Blocks/tree/2015-08-21-Merge-HackMouse. Once you download the code, you are free to share it, study it, modify it, and share your modifications. More SugarLabs projects may be found at http://www.sugarlabs.org/'), 'activity/activity-icon-mouse-color.svg'],
+			   [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']]
 
         pluginsImages = {};
 
