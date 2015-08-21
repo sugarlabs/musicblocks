@@ -177,7 +177,7 @@ define(function(require) {
 
         var helpContainer = null;
         var helpIdx = 0;
-        var HELPCONTENT = [[_('Welcome to Mouse Music'), _('Mouse Music is a Logo-inspired mouse that plays Music'), 'activity/activity-icon-color.svg'],
+        var HELPCONTENT = [[_('Welcome to Music Blocks with Mr. Mouse!'), _('Music Blocks a collection of manipulative tools for kids (and adults!) to explore fundamental musical concepts in an integrative and fun way'), 'activity/activity-icon-mouse-color.svg'],
                            [_('Palette buttons'), _('This toolbar contains the palette buttons: click to show the palettes of blocks (Matrix, Music, Media, etc.). You can drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
                            [_('Clean'), _('Clears the Matrix and Music-Notations.'), 'icons/clear-button.svg'],
                            [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'icons/palette-button.svg'],

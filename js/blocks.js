@@ -12,7 +12,7 @@
 
 var blockBlocks = null;
 
-// Minimum distance (squared) between to docks required before
+// Minimum distance (squared) between two docks required before
 // connecting them.
 var MINIMUMDOCKDISTANCE = 400;
 

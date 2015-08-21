@@ -22,9 +22,9 @@ function Matrix(turtles, musicnotation)
 	this.octave = 0;
 	this.i = 0;
 	this.matrixContainer = null;
-	this.notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+	this.notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; // Is there a way to have the input be either sharps or flats? What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E", "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <== Basically some of notes are equivalent C#=Db
 	this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
-	this.transposition = null;
+	this.transposition = null; //<==Can this be used for transposition?
 	this.isMatrix = 0;
 	this.freetime = 1000;
 	this.synth = new Tone.PolySynth(4, Tone.AMSynth).toMaster();
@@ -110,13 +110,13 @@ function Matrix(turtles, musicnotation)
     		var row = header.insertRow(i+1);
     		var cell = row.insertCell(0);
     		cell.style.backgroundColor = '#9ACD32';
-    		cell.innerHTML = this.solfegeNotes[i];
+    		cell.innerHTML = this.solfegeNotes[i]; //<== (I say this down below, but this is probably where it happens... Can you make it say, "display octave argument as well"? I would guess "cell.innerHTML = this.solfegeNotes[i] + this.octave ... or something like that!!
     		cell.style.height = "30px";
     	}
     	
     	var row = header.insertRow(this.solfegeNotes.length + 1);
     	var cell = row.insertCell(0);
-    	cell.innerHTML = '<b>'+'#-of-Notes / Note-Value'+'</b>';
+    	cell.innerHTML = '<b>'+'Rhythmic Note Values:'+'</b>';
     	cell.style.height = "40px";
     	cell.style.backgroundColor = '#9ACD32';
     	
@@ -156,7 +156,7 @@ function Matrix(turtles, musicnotation)
 
 	    var row = table.insertRow(table.rows.length - 1);
     	var cell = row.insertCell(-1);
-    	cell.innerHTML = '<b>' + 'Tuplet Value' + '</b>';
+    	cell.innerHTML = '<b>' + 'Tuplet Value:' + '</b>';
     	cell.style.backgroundColor = '#9ACD32';
 	
 	   	cell =table.rows[table.rows.length - 1].insertCell(-1);
@@ -184,7 +184,7 @@ function Matrix(turtles, musicnotation)
 
     	var row = table.insertRow(table.rows.length - 2);
     	var cell = row.insertCell(-1);
-    	cell.innerHTML = '<b>' + '# notes/Notes-Value 2' + '</b>';
+    	cell.innerHTML = '<b>' + '# Tuplet Notes-Values:' + '</b>';
     	cell.style.backgroundColor = '#9ACD32';
     	for(var i=0; i<table.rows[table.rows.length - 4].cells.length - 1; i++)
     	{	
@@ -217,7 +217,7 @@ function Matrix(turtles, musicnotation)
 		{
 			beatValueToDisplay = parseInt((beatValue*1.5))
 			//beatValue = parseInt((beatValue*1.5));
-			beatValueToDisplay = "1/" + beatValueToDisplay.toString() + 'dot.';
+			beatValueToDisplay = "1.5/" + beatValueToDisplay.toString() + ' (single-dot)';
 		}	
 		
 		if(this.beatValue > beatValue)
@@ -460,7 +460,7 @@ function Matrix(turtles, musicnotation)
     			var note;
     			if(cell.style.backgroundColor == 'black')
                 {
-                    var solfege = table.rows[j].cells[0].innerHTML;
+                    var solfege = table.rows[j].cells[0].innerHTML; //<==Can you get the matrix to display the octave as well under the "solfa"?
                     if(solfege.substr(-1) == '#' || '♭')
                     	transformed = true;
                     if(solfege.toUpperCase().substr(0,2) == 'DO')
@@ -500,7 +500,7 @@ function Matrix(turtles, musicnotation)
                     		note = this.doTransposition(note[0], note[1]);
                     	}
 
-                    	else if(solfege.substr(-1) == '♭')
+                    	else if(solfege.substr(-1) == '♭') //<=does just putting a plain lower-case b work, too? Because that is easier to find on keyboard.
                     	{
                     		this.transposition = '-1';
                     		note = this.doTransposition(note[0], note[1]);
