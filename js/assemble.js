@@ -9,6 +9,10 @@
 // along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+	FuturevFeature -> Assemble workspace is the area where chunks can be assembled
+	The idea is to make chunks from matrix in the home page and assemble them in the dedicated workspace
+*/
 
 function Assemble(palettes, matrix, canvas, blocks, turtles, turtleContainer, prepareExport, saveLocally, menucontainer) {
 	this.clearAll = function(){

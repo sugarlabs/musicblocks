@@ -9,6 +9,8 @@
 // along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+//All about notation generation
+
 function MusicNotation(turtles, stage)
 {
 	this.notationIndex = 0;
@@ -49,8 +51,7 @@ function MusicNotation(turtles, stage)
 		{	
 				var note = [];
 		    	var octave = notes[i][0][0].substring(1, 2);
-				var noteArr = notes[i][0]//.substring(0, 1);
-		    	//console.log("notes "+notes+" notearr "+JSON.stringify(noteArr))
+				var noteArr = notes[i][0]	
 		    	for(j in noteArr)
 		    	{	
 		    		var toPush = noteArr[j].substring(0, 1) + '/' + octave;	
@@ -63,8 +64,7 @@ function MusicNotation(turtles, stage)
 		    		vexNotes.push(new Vex.Flow.StaveNote({ keys: ['g/' + octave], duration: notes[i][1].toString()+'r' }));	
 		    	}
 		    	else{
-		    	//var octave = notes[i][0][0].substring(1, 2);
-		   		vexNotes.push(new Vex.Flow.StaveNote({ keys: [note[0]], duration: notes[i][1].toString() }));
+		   		vexNotes.push(new Vex.Flow.StaveNote({ keys: note, duration: notes[i][1].toString() }));
 	  			}
 	    }
 
@@ -82,6 +82,7 @@ function MusicNotation(turtles, stage)
     // Format and justify the notes to 700 pixels
     var formatter = new Vex.Flow.Formatter().
     joinVoices([voice]).format([voice], 700);
+    //ToDo : Add bar line to the notations
 
     // Render voice
     voice.draw(ctx, stave);
@@ -93,7 +94,7 @@ function MusicNotation(turtles, stage)
 		var ctx = can.getContext('2d');
 		ctx.drawImage(notationCanvas, 0, 100*(this.notationIndex));
 
-		//converting notatoin canvas to image and appending them to div, 
+		//converting notation canvas to image and appending them to div, 
 		//to get scrollable functionality
 		var img = this.convertCanvasToImage(canvas);
 		var bitmap = new createjs.Bitmap(img);

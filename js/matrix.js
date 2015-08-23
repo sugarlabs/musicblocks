@@ -9,11 +9,29 @@
 // along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+//All about Matrix
+/*clearTurtles() : There is a corresponding turtle for each note in matrix. Whenever matrix is initialized,
+					 the turtles are to be cleared first.
+
+initMatrix() : Initializes the matrix. Makes the pitches according to solfegeNotes(Contains what is to be displayed in first row) 
+  					 and solfegeOct(contains Octave for each pitch )
+
+makeMatrix() : Makes the matrix according to each rhythm block.
+
+makeClickable() : makes the matrix clckable
+
+setNotes() : set notes in this.notesToPlay when user clicks onto any clickable cell.
+
+playMatrix() : Plays the matrix as well as chunks by calling playAll();
+
+handleTuplet() : is called when tuplet block is attached to the matrix clamp. Adds the rows and columns required for adding 
+					tuplet functionality to matrix. "Code is little messy"
+
+savematrix() : Saves the Matrix notes in an array. Part of that array (between 2 'end') constitutes notes for any chunk.
+*/
 function Matrix(turtles, musicnotation)
 {
 	this.arr = []
-	this.tempo = 60;
-	this.frequency = 500;
 	this.secondsPerBeat = 1;
 	this.notesToPlay = [];
 	this.notesToPlayDirected = [];
@@ -24,14 +42,13 @@ function Matrix(turtles, musicnotation)
 	this.matrixContainer = null;
 	this.notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; // Is there a way to have the input be either sharps or flats? What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E", "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <== Basically some of notes are equivalent C#=Db
 	this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
-	this.transposition = null; //<==Can this be used for transposition?
+	this.transposition = null;
 	this.isMatrix = 0;
 	this.freetime = 1000;
-	this.synth = new Tone.PolySynth(4, Tone.AMSynth).toMaster();
+	this.synth = null;
 
 	Tone.Transport.start();
 
-	this.oldNotes = [];
 	this.cellWidth = 0;
 	this.solfegeNotes = [];
 	this.solfegeOct = [];
@@ -57,18 +74,20 @@ function Matrix(turtles, musicnotation)
 
 	}
 	
-	this.initMatrix = function(timeSign, octave)
-	{//this.synth.triggerAttackRelease("c4", "4n");
-		document.getElementById('matrix').style.display = 'inline';
+	this.initMatrix = function(PolySynth)
+	{
+		/*Initializes the matrix. First removes the previous matrix and them make another one in DOM*/
 		
+		this.synth = PolySynth;
+		document.getElementById('matrix').style.display = 'inline';
 		console.log('notes '+this.solfegeNotes +' and octave '+this.solfegeOct);
 
 		this.clearTurtles();
 		this.notesToPlay = [];
 		this.notesToPlayDirected = [];
-		this.isMatrix = 1;
-		this.octave = octave;
+		this.isMatrix = 1; //1 if matrix exists
 
+		/*to remove the matrix table*/
 		Element.prototype.remove = function() {
  	    this.parentElement.removeChild(this);
 		}
@@ -86,7 +105,6 @@ function Matrix(turtles, musicnotation)
 		{
 			table.remove();
 		}
-		//var solfege = this.solfegeNotes;//['Do','Re','Mi','Fa','Sol','La','Si'];
 
 		var x = document.createElement("TABLE");
 		x.setAttribute("id", "myTable");
@@ -103,14 +121,13 @@ function Matrix(turtles, musicnotation)
     	cell.innerHTML = '<b>' + 'Solfa' + '</b>';
     	cell.style.height = "40px";
     	cell.style.backgroundColor = '#9ACD32';
-    	//cell.style.width = w/4 + 'px';
 
     	for(var i=0; i<this.solfegeNotes.length; i++)
     	{
     		var row = header.insertRow(i+1);
     		var cell = row.insertCell(0);
     		cell.style.backgroundColor = '#9ACD32';
-    		cell.innerHTML = this.solfegeNotes[i]; //<== (I say this down below, but this is probably where it happens... Can you make it say, "display octave argument as well"? I would guess "cell.innerHTML = this.solfegeNotes[i] + this.octave ... or something like that!!
+    		cell.innerHTML = this.solfegeNotes[i] + this.solfegeOct[i].toString().sub(); //<== (I say this down below, but this is probably where it happens... Can you make it say, "display octave argument as well"? I would guess "cell.innerHTML = this.solfegeNotes[i] + this.octave ... or something like that!!
     		cell.style.height = "30px";
     	}
     	
@@ -129,17 +146,14 @@ function Matrix(turtles, musicnotation)
 	{
 		console.log("parameters "+JSON.stringify(param));
 		
-		//this.makeMatrix(1, param[0][2], param[0][1]);
 		var table = document.getElementById("myTable");
 	    var timeFactor = (param[0][2]/param[1][1])* (param[1][0]/param[0][1]);
 	    for(var i=1; i<table.rows.length-1; i++)
     	{
-    	//	for(var k=1; k<param.length; k++)
     		for(var j=0; j<param[1][0]; j++)
     		{
     			row = table.rows[i];
 	    		cell = row.insertCell(-1)
-	    		//cell.width = '75px';
 	    		cell.setAttribute('id', table.rows[i].cells.length - 1);
 		    	cell.style.backgroundColor = '#ADFF2F';
     		}
@@ -177,7 +191,6 @@ function Matrix(turtles, musicnotation)
 			{
 				cell.style.backgroundColor = 'rgb(4, 255, 174)';
 				cell.innerHTML = param[0][0];
-				//cell.width = "200px";
 				cell.colSpan = param[0][0];
 			}
     	}
@@ -198,10 +211,6 @@ function Matrix(turtles, musicnotation)
 
     	}	
     	
-    	//waitTime = 1/param[1][1]      param[0][1]/param[0][1]
-    	//cell.style.width = w/4 + 'px';
-
-    	
 	}
 
 	this.makeMatrix = function(numBeats, beatValue, beatValueNum)
@@ -216,7 +225,6 @@ function Matrix(turtles, musicnotation)
 		if(parseInt(beatValue) < beatValue)
 		{
 			beatValueToDisplay = parseInt((beatValue*1.5))
-			//beatValue = parseInt((beatValue*1.5));
 			beatValueToDisplay = "1.5/" + beatValueToDisplay.toString() + ' (single-dot)';
 		}	
 		
@@ -237,7 +245,6 @@ function Matrix(turtles, musicnotation)
 		    	var row = table.rows[i];
 		    	var cell = row.insertCell(-1);
 		    	cell.style.backgroundColor = '#ADFF2F';
-		    	//cell.width = this.cellWidth;
 		    	
 		    	if(i==this.solfegeNotes.length + 1)
 		    	{
@@ -248,7 +255,7 @@ function Matrix(turtles, musicnotation)
 		    }
 		}
 		var w = window.innerWidth;
-		w = (2*w)/5;//table.rows[1].cells.length;
+		w = (2*w)/5;
 		this.cellWidth = w/4;
 		for(var i = table.rows[1].cells.length - numBeats; i < table.rows[1].cells.length; i++)
 		{
@@ -257,7 +264,8 @@ function Matrix(turtles, musicnotation)
 				
 	}
 
-	this.makeClickable = function(tuplet){
+	this.makeClickable = function(tuplet, synth){
+		/*Once the whole matrix is generated, this function makes it clickable*/
 		var table = document.getElementById("myTable");
 		var that = this;
 		var leaveRowsFromBottom = 1;
@@ -274,7 +282,6 @@ function Matrix(turtles, musicnotation)
 					cell.style.backgroundColor = '#ADFF2F';
 					cell.style.backgroundColor = 'black';
 					this.setNotes(i, cell.parentNode.rowIndex, false);
-					//break;
 				}
 			}
 		}
@@ -286,52 +293,25 @@ function Matrix(turtles, musicnotation)
 		    		var cell = table.rows[j].cells[i];
 		    		var that = this;
 		        	cell.onclick=function(){	
-		        		//this.onmouseout=null;
-		        		var oldBeatVal = 4;
 		        		if (this.style.backgroundColor == 'black')
 		        		{
 		        			this.style.backgroundColor = '#ADFF2F';
 		        			that.chkArray[this.id] = 0;
 		        			that.notesToPlay[this.id - 1][0] = ['R'];
-							that.setNotes(this.id, this.parentNode.rowIndex, false, tuplet);
+							that.setNotes(this.id, this.parentNode.rowIndex, false, tuplet, synth);
 		        		}
-		        		else //if (that.chkArray[this.id] == 0)
+		        		else
 		        		{
 
 		        			this.style.backgroundColor = 'black';
 							that.chkArray[this.id] = 1;
-							that.setNotes(this.id, this.parentNode.rowIndex, true, tuplet);
+							that.setNotes(this.id, this.parentNode.rowIndex, true, tuplet, synth);
 		        		}
-		        		/*else if (that.chkArray[this.id] == 1)
-		        		{
-		        			for (var k = 1; k < table.rows.length - 1; k++)
-		        			{	
-		        				cell = table.rows[k].cells[this.id];
-		        				if(cell.style.backgroundColor == 'black')
-		        				{
-		        					cell.style.backgroundColor = '#ADFF2F';
-		        					this.style.backgroundColor = 'black';
-									that.setNotes(this.id, this.parentNode.rowIndex, true);
-		        					//break;
-		        				}
-		        			}
-		        		}*/
-		        	};
+		        	}
 		    	}
 		    }
  	 	}
  	 
-	}
-
-	this.setTempo = function(timeSign){
-		//var this.tempo = 60;
-    	//var secondsPerBeat = 60 / this.tempo;
-
-	}
-
-	this.setPitch = function(timeSign){
-		this.frequency = 500;
-
 	}
 
 	this.setTransposition = function(transposition){
@@ -345,6 +325,7 @@ function Matrix(turtles, musicnotation)
 	}
 
 	this.doTransposition = function(note, octave){
+		/*first setTransposition in called in logo.js and this.transposition shows no. of semitones to be shifted up/down*/
 		if(this.transposition)
 		{
 
@@ -399,7 +380,7 @@ function Matrix(turtles, musicnotation)
 		return note;
 	}
 
-	this.playAll = function(){
+	this.playAll = function(synth){
 	var notes = [];
 	for(i in this.notesToPlay)
 		notes.push(this.notesToPlay[i]);
@@ -417,7 +398,7 @@ function Matrix(turtles, musicnotation)
 	var	beatValue = that.notesToPlayDirected[this.notesCounter][1];
 	this.notesCounter += 1;
 	if(note != 'R')
-	    	this.synth.triggerAttackRelease(note, 1/beatValue);
+	    	synth.triggerAttackRelease(note, 1/beatValue);
 
 	for(var i = 1; i < this.notesToPlayDirected.length; i++)
 	{
@@ -435,7 +416,7 @@ function Matrix(turtles, musicnotation)
 			beatValue = that.notesToPlayDirected[that.notesCounter][1];
 			that.notesCounter += 1;
 			if(note != 'R')
-		    	that.synth.triggerAttackRelease(note, 1/beatValue);
+		    	synth.triggerAttackRelease(note, 1/beatValue);
 		}, 2000*time);
 	}
 	}
@@ -445,7 +426,8 @@ function Matrix(turtles, musicnotation)
 		musicnotation.doNotation(notes, numerator, denominator);
 	}
 
-	this.setNotes = function(colIndex, rowIndex, playNote, tuplet){
+	this.setNotes = function(colIndex, rowIndex, playNote, tuplet, synth){
+		/*sets corresponding note when user clicks on any cell and plays that note*/
 		var leaveRowsFromBottom = 1;
 		if(tuplet)
 			leaveRowsFromBottom = 3;
@@ -461,7 +443,7 @@ function Matrix(turtles, musicnotation)
     			if(cell.style.backgroundColor == 'black')
                 {
                     var solfege = table.rows[j].cells[0].innerHTML; //<==Can you get the matrix to display the octave as well under the "solfa"?
-                    if(solfege.substr(-1) == '#' || '♭')
+                    if(solfege.substr(-1) == '#' || 'b')
                     	transformed = true;
                     if(solfege.toUpperCase().substr(0,2) == 'DO')
                     {
@@ -500,7 +482,7 @@ function Matrix(turtles, musicnotation)
                     		note = this.doTransposition(note[0], note[1]);
                     	}
 
-                    	else if(solfege.substr(-1) == '♭') //<=does just putting a plain lower-case b work, too? Because that is easier to find on keyboard.
+                    	else if(solfege.substr(-1) == 'b')
                     	{
                     		this.transposition = '-1';
                     		note = this.doTransposition(note[0], note[1]);
@@ -514,7 +496,7 @@ function Matrix(turtles, musicnotation)
                     this.clearTurtles();
                     if(playNote)
                	    {	
-               	    	this.synth.triggerAttackRelease(note, beatValue);
+               	    	synth.triggerAttackRelease(note, beatValue);
 					}
                     for(var i=0; i<this.notesToPlay.length; i++)
                     	turtles.add(null, null, this.notesToPlay[i][0]);
@@ -523,7 +505,8 @@ function Matrix(turtles, musicnotation)
         }
     }
 
-    this.playMatrix = function(time){
+    this.playMatrix = function(time, synth){
+    	/*plays the matrix and also the chunks*/
     	if( this.transposition != null )
         {
             var transposedArray = [];
@@ -544,11 +527,11 @@ function Matrix(turtles, musicnotation)
     	var that = this;
     	setTimeout(function(){ console.log('playing after ' + time + 'ms');
 
-    		that.playAll(); },time);
+    		that.playAll(synth); },time);
     }
 
     this.saveMatrix = function(){
-
+    	/*saves the current matrix as chunks, saving as a chunk functionality is implemented in logo js*/
     	for(var i=0; i<this.notesToPlay.length; i++)
     	{
     		var note = this.notesToPlay[i].slice(0);

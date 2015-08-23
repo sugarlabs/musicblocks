@@ -97,20 +97,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmicdotBlock.adjustWidthToLabel();
     rhythmicdotBlock.flowClampZeroArgBlock();
 
-    /*var tieBlock = new ProtoBlock('tie');
-    tieBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['tie'] = tieBlock;
-    tieBlock.staticLabels.push(_('Tie'));
-    tieBlock.adjustWidthToLabel();
-    tieBlock.flowClampZeroArgBlock();*/
-
-    /*var tripletBlock = new ProtoBlock('triplet');
-    tripletBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['triplet'] = tripletBlock;
-    tripletBlock.staticLabels.push(_('triplet'));
-    tripletBlock.adjustWidthToLabel();
-    tripletBlock.flowClampZeroArgBlock();*/
-
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['note'] = noteBlock;
@@ -118,7 +104,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
-    palettes.dict['assemble'].add(noteBlock);
+    //palettes.dict['assemble'].add(noteBlock);
 
     var multiplyBeatValueBlock = new ProtoBlock('multiplybeatvalue');
     multiplyBeatValueBlock.palette = palettes.dict['chunk'];
@@ -259,40 +245,35 @@ function initBasicProtoBlocks(palettes, blocks) {
     osctimeBlock.staticLabels.push(_('osctime'), _('start'), _('end'));
     osctimeBlock.adjustWidthToLabel();
     osctimeBlock.twoArgMathBlock();
-    osctimeBlock.defaults.push('1000','5000');
+    osctimeBlock.defaults.push(1000,5000);
     osctimeBlock.dockTypes[1] = 'anyin';
     osctimeBlock.dockTypes[2] = 'anyin';
        
+    
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['square'] = squareBlock;
     squareBlock.staticLabels.push(_('square'), _('frequency'), _('time'));
     squareBlock.adjustWidthToLabel();
-    squareBlock.twoArgBlock();
+    squareBlock.twoArgMathBlock();
     squareBlock.defaults.push(440);
-    squareBlock.dockTypes[1] = 'numberin';
-    squareBlock.dockTypes[2] = 'anyin';
-    
+
     var sineBlock = new ProtoBlock('sine');
     sineBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['sine'] = sineBlock;
     sineBlock.staticLabels.push(_('sine'), _('frequency'), _('time'));
     sineBlock.adjustWidthToLabel();
-    sineBlock.twoArgBlock();
-    sineBlock.defaults.push(440,'a');
-    sineBlock.dockTypes[1] = 'numberin';
-    sineBlock.dockTypes[2] = 'anyin';
+    sineBlock.twoArgMathBlock();
+    sineBlock.defaults.push(440);
 
     var sawtoothBlock = new ProtoBlock('sawtooth');
     sawtoothBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['sawtooth'] = sawtoothBlock;
     sawtoothBlock.staticLabels.push(_('sawtooth'), _('frequency'), _('time'));
     sawtoothBlock.adjustWidthToLabel();
-    sawtoothBlock.twoArgBlock();
+    sawtoothBlock.twoArgMathBlock();
     sawtoothBlock.defaults.push(440);
-    sawtoothBlock.dockTypes[1] = 'numberin';
-    sawtoothBlock.dockTypes[2] = 'anyin';
-    
+
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');
     clearBlock.palette = palettes.dict['turtle'];
@@ -536,6 +517,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     minusBlock.twoArgMathBlock();
     minusBlock.defaults.push(100, 50)
 
+//ToDo : fix -> Both blocks below are clickable outside the palette also
     var multiplyBlock = new ProtoBlock('multiply');
     multiplyBlock.palette = palettes.dict['number'];
     blocks.protoBlockDict['multiply'] = multiplyBlock;
@@ -808,7 +790,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     repeatBlock.adjustWidthToLabel();
     repeatBlock.flowClampOneArgBlock();
     repeatBlock.defaults.push(4);
-    palettes.dict['assemble'].add(repeatBlock);
+    //palettes.dict['assemble'].add(repeatBlock);
     palettes.dict['chunk'].add(repeatBlock);
 
     var foreverBlock = new ProtoBlock('forever');
@@ -817,7 +799,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     foreverBlock.staticLabels.push(_('forever'));
     foreverBlock.adjustWidthToLabel();
     foreverBlock.flowClampZeroArgBlock();
-    palettes.dict['assemble'].add(foreverBlock);
+    //palettes.dict['assemble'].add(foreverBlock);
     palettes.dict['chunk'].add(foreverBlock);
 
     var breakBlock = new ProtoBlock('break');
@@ -868,7 +850,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     clampBlock.hidden = true;
     clampBlock.flowClampBlock();
 
-    //Assemble palette
     var chunkTransposeBlock = new ProtoBlock('chunkTranspose');
     chunkTransposeBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['chunkTranspose'] = chunkTransposeBlock;

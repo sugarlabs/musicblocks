@@ -1840,7 +1840,8 @@ define(function(require) {
 
             
         }
-        makeWorkspaces();
+        // Future Feature -> Making workspaces, Assemble workspace is implemented but its not fully functional. See MakeWorkspaces()
+        //makeWorkspaces();
         //}
     });
 });

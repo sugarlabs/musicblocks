@@ -17,10 +17,15 @@ var PALETTELEFTMARGIN = 10;
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-var BUILTINPALETTES = ['matrix', 'chunk', 'play/save', 'tone', 'turtle', /*'pen',*/ 'number', /*'boolean',*/ 'flow', /*'blocks',*/
-    'actions', 'media', /*'sensors',*/ 'myblocks','assemble' //<== I think that we want to bring back some of these, like "boolean" -DU
+var BUILTINPALETTES = ['matrix', 'chunk', 'play/save', 'tone', 'turtle', /*'pen',*/ 'number', 'boolean', 'flow', /*'blocks',*/
+    'actions', 'media', /*'sensors',*/ 'myblocks',/*'assemble'*/ 
 ];
 
+//Future Idea:
+//Assemble palette will be a hidden palette where blocks related to assembling of chunks will be there.
+//When the user shifts to the assemble workspace, then only Assemble palette will be shown
+
+//If needed pen, sensors and blocks palettes(used in TBjs) can be added by uncommenting them and adding them in initPalettes().
 
 function maxPaletteHeight(menuSize, scale) {
     // Palettes don't start at the top of the screen and the last
@@ -1155,12 +1160,12 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     add('turtle').
     //add('pen').
     add('number').
-    //add('boolean').
+    add('boolean').
     add('flow').
     //add('blocks').
     add('actions').
-    add('media').
-    add('assemble')
+    add('media')
+    //add('assemble')
     //add('sensors').
     //add('extras');
     palettes.makePalettes();

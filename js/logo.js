@@ -65,7 +65,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.saveTimeout = 0;
 
     // Matrix
-//    this.matrix = null;
     this.octave = 4;
     this.showMatrix = false;
     this.notation = false;
@@ -84,7 +83,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     //tuplet
     this.tuplet = 0;
     this.tupletParam = [];
-    this.tupletClampCount = 0;
     this.tupletRhythmCount = 0;
     this.rhythmInsideTuplet = 0;
 
@@ -94,10 +92,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
                 
-
-
     //Play with chunks
     this.chunktranspose = false;
+
+    //tone
+    this.startTime = 0;
+    this.stopTime = 1000;
 
     // When running in step-by-step mode, the next command to run is
     // queued here.
@@ -553,6 +553,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
         if(logo.blocks.blockList[blk].name == 'pitch')
         {
+            //To apply flat/sharp to all the pitches inside clamp
             if(this.flatClampCount == 0)
             {
                 this.flat = false;
@@ -613,7 +614,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             case 'start':
                 if (args.length == 1) {
                     childFlow = args[0];
-                    //console.log("start blk "+args[0]);  
                     childFlowCount = 1; 
                 }
                 break;
@@ -621,25 +621,23 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             case 'matrix':
                 if (args.length == 1) {
                     childFlow = args[0];
-                    //console.log("start blk "+args[0]);  
                     childFlowCount = 1; 
                 }
                 matrix.solfegeNotes = [];
                 matrix.solfegeOct = [];
                 setTimeout(function(){
-                    //console.log(this.matrix.solfegeOct +" "+this.matrix.solfegeNotes);
                     matrix.initMatrix();
                 },1500);
                 var that = this;
                 setTimeout(function(){
                     if(that.tuplet)
                     {
-                        matrix.makeClickable(true);
+                        matrix.makeClickable(true, that.polySynth);
                         that.tuplet = 0;
                     }
 
                     else
-                        matrix.makeClickable();
+                        matrix.makeClickable(false, that.polySynth);
                 },2000);
                 break;
 
@@ -650,7 +648,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
                 else if(this.flat)
                 {
-                    args[0] += '♭';
+                    args[0] += 'b';
                 }
                 if(this.inNote)
                 {
@@ -670,7 +668,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     args[1] = (2/3)*args[1];
                     this.rhythmicValueParameter = null;
                 }
-                if(blk==this.rhythmInsideTuplet)// && */this.tupletRhythmCount > 0)
+                if(blk==this.rhythmInsideTuplet)
                 {
                     this.tupletRhythmCount -= 2;
                     this.tupletParam.push([args[0], args[1]]);
@@ -678,8 +676,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     setTimeout(function(){
                         matrix.handleTuplet(that.tupletParam);
                     },1500)
-                    //this.tuplet = 1;
-                    //this.tupletRhythmCount = 0;
                 }
                 else{
                     setTimeout(function(){
@@ -688,7 +684,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
                 break;
 
-                //notesList.push(args[0]);
             case 'nameddo':
                 var name = logo.blocks.blockList[blk].privateData;
                 if (name in logo.actions) {
@@ -771,8 +766,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         // We will add the outflow of the until block
                         // each time through, so we pop it off so as
                         // to not accumulate multiple copies.
-                        var queueLength = logo.turtles.turtleList[turtle].queue.
-length;
+                        var queueLength = logo.turtles.turtleList[turtle].queue.length;
                         if (queueLength > 0) {
                             if (logo.turtles.turtleList[turtle].queue[queueLength - 1].parentBlk == blk) {
                                 logo.turtles.turtleList[turtle].queue.pop();
@@ -1173,10 +1167,10 @@ length;
 
             case 'playmatrix' :
                 Tone.Transport.stop();
-                matrix.playMatrix(parseInt(args[0]));
-                logo.setTurtleDelay(4500*parseFloat(1 / deno)*(num));
+                matrix.playMatrix(parseInt(args[0]), this.polySynth);
+                logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num));
                 setTimeout(function(){
-                            logo.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / deno)*(num)));
+                            logo.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num)));
                 break;
 
             case 'rhythmicdot':
@@ -1228,7 +1222,7 @@ length;
                 myDoBlock.palette = logo.blocks.palettes.dict['chunk'];
                 myDoBlock.staticLabels.push('Chunk' + index);
                 myDoBlock.palette.add(myDoBlock);
-                logo.blocks.palettes.dict['assemble'].add(myDoBlock);
+                //logo.blocks.palettes.dict['assemble'].add(myDoBlock);
                 logo.blocks.palettes.updatePalettes('matrix');  
                 break;
 
@@ -1273,18 +1267,7 @@ length;
                 this.divideBeatValueBy *= args[0];
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
-                /*if(this.sharpForNoteBlock)
-                {
-                    xargs[0] += '#';
-                    this.sharpForNoteBlock = false;
-                }
-                else if(this.flatForNoteBlock)
-                {
-                    xargs[0] += '♭';
-                    this.flatForNoteBlock = false;
-                }*/
-                break;
-
+        
             case 'sharp':
                 this.sharpClampCount = logo.blocks.blockList[blk].clampCount[0]; 
                 this.sharp = true;
@@ -1300,14 +1283,12 @@ length;
                 break;
 
             case 'osctime':
-                this.startTime = parseFloat(args[0]);
-                this.stopTime = parseFloat(args[1]);
                 break;
             case 'sine':
             case 'square':
             case 'sawtooth':
                 var oscName = logo.blocks.blockList[blk].name; 
-                console.log(oscName);    
+                console.log(oscName + " start time " + this.startTime + " end time " + this.stopTime);    
                 var sineOsc=new Tone.Oscillator(args[0], oscName)
                 .toMaster();
                 //connected to the master output
@@ -1346,13 +1327,9 @@ length;
             case 'tupletParamBlock':
                 this.tupletParam = [];
                 this.tupletParam.push([args[0], args[1], args[2]]);
-                //this.tuplet = 1;
-                //console.log('args[3 '+logo.blocks.blockList[blk].connections);
-                this.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
-                //logo.runFromBlock(logo, turtle, args[3]);
-                //logo.blocks.blockList[args[3]];
-                            
+                this.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];             
                 break;
+            
             default:
 
                 if(logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix')
@@ -1540,7 +1517,7 @@ length;
                             matrix.solfegeNotes.push(solfegeArr[i][0]);
                             matrix.solfegeOct.push(solfegeArr[i][1]);
                         }
-                        matrix.initMatrix();
+                        matrix.initMatrix(this.polySynth);
                         for(i in notesToPlayCopy)
                         {
                            matrix.makeMatrix(1, notesToPlayCopy[i][1]);
@@ -1552,24 +1529,17 @@ length;
                             {
                                 for(j=0; j<arr[k].length; j++)
                                 {
-                                    if(table.rows[i].cells[0].innerHTML == arr[k][j])
+                                    console.log("inner "+table.rows[i].cells[0].innerHTML + " arr[k][j] "+arr[k][j])
+                                    if(table.rows[i].cells[0].innerHTML.substr(0,2) == arr[k][j] || table.rows[i].cells[0].innerHTML.substr(0,3) == arr[k][j])
                                     {
                                         var cell = table.rows[i].cells[k+1];
                                         cell.style.backgroundColor = 'black';
                                         matrix.chkArray[cell.id] = 1;
                                     }                                    
                                 }
-                                /*if(table.rows[i].cells[0].innerHTML == arr[k][i])
-                                {
-                                    console.log("notesPosition "+notesPosition+" matrix.notesToPlay "+matrix.notesToPlay+ "  "+matrix.notesToPlay[k])
-
-                                    var cell = table.rows[i].cells[k+1];
-                                    cell.style.backgroundColor = 'black';
-                                    matrix.chkArray[cell.id] = 1;                          
-                                }*/
                             }
                         }
-                        matrix.makeClickable();                                                  
+                        matrix.makeClickable(false, this.polySynth);                                                  
                         
                         this.showMatrix = false;
 
@@ -1577,7 +1547,7 @@ length;
                     else
                     {
                         var delayFactor = 0;
-                        matrix.playMatrix(0);
+                        matrix.playMatrix(0, this.polySynth);
                         for(i in matrix.notesToPlay)
                         {
 
@@ -1722,7 +1692,7 @@ length;
     {
         var transformed = false;
         solfege = solfege.toString();   
-        if(solfege.substr(-1) == '#' || '♭')
+        if(solfege.substr(-1) == '#' || 'b')
             transformed = true;
         var note = 'C4';
             if(solfege.toUpperCase().substr(0,2) == 'DO')
@@ -1762,7 +1732,7 @@ length;
                             note = matrix.doTransposition(note[0], note[1]);
                         }
 
-                        else if(solfege.substr(-1) == '♭')
+                        else if(solfege.substr(-1) == 'b')
                         {
                             matrix.transposition = '-1';
                             note = matrix.doTransposition(note[0], note[1]);
@@ -2092,15 +2062,6 @@ length;
                 case 'loadFile':
                     // No need to do anything here.
                     break;
-                case 'osctime':
-                    var block = logo.blocks.blockList[blk];
-                    var a = block.connections[1];
-                    var b = block.connections[2];
-                    var c = logo.parseArg(logo, turtle, a, blk);
-                    var d = logo.parseArg(logo, turtle, b, blk);
-                    this.startTime = parseFloat(c);
-                    this.stopTime = parseFloat(d);
-                    break;
                 case 'meter':
                     var block = logo.blocks.blockList[blk];
                     var a = block.connections[1];
@@ -2108,6 +2069,15 @@ length;
                     var c = logo.parseArg(logo, turtle, a, blk);
                     var d = logo.parseArg(logo, turtle, b, blk);
                     logo.blocks.blockList[blk].value = c.toString() + '/' + d.toString();
+                    break;
+                case 'osctime':
+                    var block = logo.blocks.blockList[blk];
+                    var a = block.connections[1];
+                    var b = block.connections[2];
+                    var c = logo.parseArg(logo, turtle, a, blk);
+                    var d = logo.parseArg(logo, turtle, b, blk);
+                    this.startTime = c;
+                    this.stopTime = d;
                     break;
 
                 default:
