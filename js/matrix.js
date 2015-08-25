@@ -10,22 +10,19 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 //All about Matrix
-/*clearTurtles() : There is a corresponding turtle for each note in matrix. Whenever matrix is initialized,
-					 the turtles are to be cleared first.
+/*clearTurtles() : There is a corresponding turtle for each note in matrix. Whenever matrix is initialized, the turtles are to be cleared first. *<==Can someone please explain why this is like this??? Thanks! -DU*
 
-initMatrix() : Initializes the matrix. Makes the pitches according to solfegeNotes(Contains what is to be displayed in first row) 
-  					 and solfegeOct(contains Octave for each pitch )
+initMatrix() : Initializes the matrix. Makes the pitches according to solfegeNotes(Contains what is to be displayed in first row) and solfegeOct(contains Octave for each pitch )
 
 makeMatrix() : Makes the matrix according to each rhythm block.
 
-makeClickable() : makes the matrix clckable
+makeClickable() : Makes the matrix clickable.
 
-setNotes() : set notes in this.notesToPlay when user clicks onto any clickable cell.
+setNotes() : Set notes in this.notesToPlay when user clicks onto any clickable cell.
 
 playMatrix() : Plays the matrix as well as chunks by calling playAll();
 
-handleTuplet() : is called when tuplet block is attached to the matrix clamp. Adds the rows and columns required for adding 
-					tuplet functionality to matrix. "Code is little messy"
+handleTuplet() : is called when tuplet block is attached to the matrix clamp. Adds the rows and columns required for adding tuplet functionality to matrix. "Code is little messy" *<==How so? How should it be improved in the future?*
 
 savematrix() : Saves the Matrix notes in an array. Part of that array (between 2 'end') constitutes notes for any chunk.
 */
@@ -40,7 +37,7 @@ function Matrix(turtles, musicnotation)
 	this.octave = 0;
 	this.i = 0;
 	this.matrixContainer = null;
-	this.notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; // Is there a way to have the input be either sharps or flats? What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E", "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <== Basically some of notes are equivalent C#=Db
+	this.notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; // Is there a way to have the input be either sharps or flats? What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E", "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <== Basically some of notes are equivalent C#=Db <==Any answer to this question? 2015-08-24
 	this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
 	this.transposition = null;
 	this.isMatrix = 0;
@@ -76,7 +73,7 @@ function Matrix(turtles, musicnotation)
 	
 	this.initMatrix = function(PolySynth)
 	{
-		/*Initializes the matrix. First removes the previous matrix and them make another one in DOM*/
+		/*Initializes the matrix. First removes the previous matrix and them make another one in DOM*/ //<==What is DOM? -DU
 		
 		this.synth = PolySynth;
 		document.getElementById('matrix').style.display = 'inline';
@@ -127,7 +124,7 @@ function Matrix(turtles, musicnotation)
     		var row = header.insertRow(i+1);
     		var cell = row.insertCell(0);
     		cell.style.backgroundColor = '#9ACD32';
-    		cell.innerHTML = this.solfegeNotes[i] + this.solfegeOct[i].toString().sub(); //<== (I say this down below, but this is probably where it happens... Can you make it say, "display octave argument as well"? I would guess "cell.innerHTML = this.solfegeNotes[i] + this.octave ... or something like that!!
+    		cell.innerHTML = this.solfegeNotes[i] + this.solfegeOct[i].toString().sub(); //<== (I say this down below, but this is probably where it happens... Can you make it say, "display octave argument as well"? I would guess "cell.innerHTML = this.solfegeNotes[i] + this.octave ... or something like that!! <==NOTE:2015-08-24 Looks like you fixed this! Thanks!
     		cell.style.height = "30px";
     	}
     	
@@ -197,7 +194,7 @@ function Matrix(turtles, musicnotation)
 
     	var row = table.insertRow(table.rows.length - 2);
     	var cell = row.insertCell(-1);
-    	cell.innerHTML = '<b>' + '# Tuplet Notes-Values:' + '</b>';
+    	cell.innerHTML = '<b>' + '# Tuplet Note Values:' + '</b>';
     	cell.style.backgroundColor = '#9ACD32';
     	for(var i=0; i<table.rows[table.rows.length - 4].cells.length - 1; i++)
     	{	
@@ -225,7 +222,7 @@ function Matrix(turtles, musicnotation)
 		if(parseInt(beatValue) < beatValue)
 		{
 			beatValueToDisplay = parseInt((beatValue*1.5))
-			beatValueToDisplay = "1.5/" + beatValueToDisplay.toString() + ' (single-dot)';
+			beatValueToDisplay = "1.5/" + beatValueToDisplay.toString() + ' (single-dot)'; //<==Rhythmic Dot function does not seem to work anymore (see ownCloud). Did I break it HERE? Thanks and sorry if I did...
 		}	
 		
 		if(this.beatValue > beatValue)
@@ -234,7 +231,7 @@ function Matrix(turtles, musicnotation)
 	    {
 	    	this.notesToPlay.push([["R"],beatValue]);
 	    }
-	    console.log("Rhythm #beats->"+numBeats+" beatValue->"+beatValue);
+	    console.log("Rhythm #beats->"+numBeats+" beatValue->"+beatValue); //<==NOTE: I think this should be changed to "note value, right? See rule above!
 
  		for(var i=1; i<=numBeats; i++)
  			this.chkArray.push(0);
@@ -442,7 +439,7 @@ function Matrix(turtles, musicnotation)
     			var note;
     			if(cell.style.backgroundColor == 'black')
                 {
-                    var solfege = table.rows[j].cells[0].innerHTML; //<==Can you get the matrix to display the octave as well under the "solfa"?
+                    var solfege = table.rows[j].cells[0].innerHTML;
                     if(solfege.substr(-1) == '#' || 'b')
                     	transformed = true;
                     if(solfege.toUpperCase().substr(0,2) == 'DO')
@@ -506,7 +503,7 @@ function Matrix(turtles, musicnotation)
     }
 
     this.playMatrix = function(time, synth){
-    	/*plays the matrix and also the chunks*/
+    	/*plays the matrix and also the chunks*/ //<==What do you mean "also the chunks?" Please be more clear. I expect clicking on the chunk to "play the chunk, but nothing here... -DU
     	if( this.transposition != null )
         {
             var transposedArray = [];
