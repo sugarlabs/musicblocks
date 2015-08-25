@@ -49,7 +49,7 @@ function Matrix(turtles, musicnotation)
 	this.cellWidth = 0;
 	this.solfegeNotes = [];
 	this.solfegeOct = [];
-	this.beatValue = 4;
+	this.noteValue = 4;
 	this.notesCounter = 0;
 	this.playDirection = 1;
 
@@ -124,7 +124,7 @@ function Matrix(turtles, musicnotation)
     		var row = header.insertRow(i+1);
     		var cell = row.insertCell(0);
     		cell.style.backgroundColor = '#9ACD32';
-    		cell.innerHTML = this.solfegeNotes[i] + this.solfegeOct[i].toString().sub(); //<== (I say this down below, but this is probably where it happens... Can you make it say, "display octave argument as well"? I would guess "cell.innerHTML = this.solfegeNotes[i] + this.octave ... or something like that!! <==NOTE:2015-08-24 Looks like you fixed this! Thanks!
+    		cell.innerHTML = this.solfegeNotes[i] + this.solfegeOct[i].toString().sub();
     		cell.style.height = "30px";
     	}
     	
@@ -210,28 +210,28 @@ function Matrix(turtles, musicnotation)
     	
 	}
 
-	this.makeMatrix = function(numBeats, beatValue, beatValueNum)
+	this.makeMatrix = function(numBeats, noteValue, noteValueNum)
 	{
 
 		var table = document.getElementById("myTable");
-		var beatValueToDisplay = null;
-		if(beatValueNum)
-			beatValueToDisplay = beatValueNum.toString() + '/' + beatValue.toString();
+		var noteValueToDisplay = null;
+		if(noteValueNum)
+			noteValueToDisplay = noteValueNum.toString() + '/' + noteValue.toString();
 		else
-			beatValueToDisplay = "1/" + beatValue.toString();
-		if(parseInt(beatValue) < beatValue)
+			noteValueToDisplay = "1/" + noteValue.toString();
+		if(parseInt(noteValue) < noteValue)
 		{
-			beatValueToDisplay = parseInt((beatValue*1.5))
-			beatValueToDisplay = "1.5/" + beatValueToDisplay.toString() + ' (single-dot)'; //<==Rhythmic Dot function does not seem to work anymore (see ownCloud). Did I break it HERE? Thanks and sorry if I did...
+			noteValueToDisplay = parseInt((noteValue*1.5))
+			noteValueToDisplay = "1.5/" + noteValueToDisplay.toString() + ' (single-dot)'; //<==Rhythmic Dot function does not seem to work anymore (see ownCloud). Did I break it HERE? Thanks and sorry if I did...
 		}	
 		
-		if(this.beatValue > beatValue)
-			this.beatValue = beatValue;
+		if(this.noteValue > noteValue)
+			this.noteValue = noteValue;
 	    for(var i=0; i<numBeats; i++)
 	    {
-	    	this.notesToPlay.push([["R"],beatValue]);
+	    	this.notesToPlay.push([["R"],noteValue]);
 	    }
-	    console.log("Rhythm #beats->"+numBeats+" beatValue->"+beatValue); //<==NOTE: I think this should be changed to "note value, right? See rule above!
+	    console.log("Rhythm #beats->"+numBeats+" noteValue->"+noteValue);
 
  		for(var i=1; i<=numBeats; i++)
  			this.chkArray.push(0);
@@ -245,7 +245,7 @@ function Matrix(turtles, musicnotation)
 		    	
 		    	if(i==this.solfegeNotes.length + 1)
 		    	{
-		    		cell.innerHTML = beatValueToDisplay;
+		    		cell.innerHTML = noteValueToDisplay;
 		    		cell.style.backgroundColor = 'rgb(174, 174, 174)';
 		    	}
 		    	cell.setAttribute('id', table.rows[1].cells.length - 1);
@@ -256,7 +256,7 @@ function Matrix(turtles, musicnotation)
 		this.cellWidth = w/4;
 		for(var i = table.rows[1].cells.length - numBeats; i < table.rows[1].cells.length; i++)
 		{
-			table.rows[1].cells[i].width = w/beatValue + 'px';
+			table.rows[1].cells[i].width = w/noteValue + 'px';
 		}
 				
 	}
@@ -392,15 +392,15 @@ function Matrix(turtles, musicnotation)
 	var table = document.getElementById("myTable");
 		
 	var note  = this.notesToPlayDirected[this.notesCounter][0];
-	var	beatValue = that.notesToPlayDirected[this.notesCounter][1];
+	var	noteValue = that.notesToPlayDirected[this.notesCounter][1];
 	this.notesCounter += 1;
 	if(note != 'R')
-	    	synth.triggerAttackRelease(note, 1/beatValue);
+	    	synth.triggerAttackRelease(note, 1/noteValue);
 
 	for(var i = 1; i < this.notesToPlayDirected.length; i++)
 	{
-	    beatValue = this.notesToPlayDirected[i - 1][1];
-		time += 1/beatValue;
+	    noteValue = this.notesToPlayDirected[i - 1][1];
+		time += 1/noteValue;
 		var that = this;
 		
 		setTimeout(function(){
@@ -410,10 +410,10 @@ function Matrix(turtles, musicnotation)
 				Tone.Transport.stop();
 			}
 			note  = that.notesToPlayDirected[that.notesCounter][0];
-			beatValue = that.notesToPlayDirected[that.notesCounter][1];
+			noteValue = that.notesToPlayDirected[that.notesCounter][1];
 			that.notesCounter += 1;
 			if(note != 'R')
-		    	synth.triggerAttackRelease(note, 1/beatValue);
+		    	synth.triggerAttackRelease(note, 1/noteValue);
 		}, 2000*time);
 	}
 	}
@@ -487,13 +487,23 @@ function Matrix(turtles, musicnotation)
                     	this.transposition = null;
 
                     }
-                    var beatValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
+                    var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
+                    var i = 0;
+                    if(noteValue.substr(0,3) == '1.5')
+                    {
+                    	while(noteValue[i] != ' ')
+                    		i += 1;
+                    	noteValue = noteValue.substr(4, i-4);
+                    	noteValue = parseInt(noteValue)
+                    	noteValue = 1.5/noteValue;
+                    	noteValue = noteValue.toString()
+                    }
                     
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
                     this.clearTurtles();
                     if(playNote)
                	    {	
-               	    	synth.triggerAttackRelease(note, beatValue);
+               	    	synth.triggerAttackRelease(note, noteValue);
 					}
                     for(var i=0; i<this.notesToPlay.length; i++)
                     	turtles.add(null, null, this.notesToPlay[i][0]);
@@ -502,8 +512,8 @@ function Matrix(turtles, musicnotation)
         }
     }
 
-    this.playMatrix = function(time, synth){
-    	/*plays the matrix and also the chunks*/ //<==What do you mean "also the chunks?" Please be more clear. I expect clicking on the chunk to "play the chunk, but nothing here... -DU
+    this.playNotesString = function(time, synth){
+    	/*plays the matrix and also the chunks*/
     	if( this.transposition != null )
         {
             var transposedArray = [];

@@ -1167,7 +1167,7 @@ length;
 
             case 'playmatrix' :
                 Tone.Transport.stop();
-                matrix.playMatrix(parseInt(args[0]), this.polySynth);
+                matrix.playNotesString(0, this.polySynth);
                 logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num));
                 setTimeout(function(){
                             logo.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num)));
@@ -1547,7 +1547,7 @@ length;
                     else
                     {
                         var delayFactor = 0;
-                        matrix.playMatrix(0, this.polySynth);
+                        matrix.playNotesString(0, this.polySynth);
                         for(i in matrix.notesToPlay)
                         {
 

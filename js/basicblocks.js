@@ -109,7 +109,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var multiplyBeatValueBlock = new ProtoBlock('multiplybeatvalue'); //NOTE: I believe that the separate multiply and divide functions will be replaced by a single "note value augmentation/diminution" (ratio) function that will essentially do both. -DU 
     multiplyBeatValueBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['multiplybeatvalue'] = multiplyBeatValueBlock;
-    multiplyBeatValueBlock.staticLabels.push(_('multiply note values')); //<===Note that I changed the name to reflect the concept. Let's keep "beat" values strictly for meter. -DU
+    multiplyBeatValueBlock.staticLabels.push(_('multiply note values'));
     multiplyBeatValueBlock.adjustWidthToLabel();
     multiplyBeatValueBlock.flowClampOneArgBlock();
     multiplyBeatValueBlock.defaults.push(2);
@@ -117,7 +117,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var divideBeatValueBlock = new ProtoBlock('dividebeatvalue'); //NOTE: I believe that the separate multiply and divide functions will be replaced by a single "note value augmentation/diminution" (ratio) function that will essentially do both. -DU
     divideBeatValueBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['dividebeatvalue'] = divideBeatValueBlock;
-    divideBeatValueBlock.staticLabels.push(_('divide note values')); //<===Note that I changed the name to reflect the concept. Let's keep "beat" values strictly for meter. -DU
+    divideBeatValueBlock.staticLabels.push(_('divide note values'));
     divideBeatValueBlock.adjustWidthToLabel();
     divideBeatValueBlock.flowClampOneArgBlock();
     divideBeatValueBlock.defaults.push(2);
@@ -176,8 +176,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['playmatrix'] = playmatrix;
     playmatrix.staticLabels.push(_('Play Matrix'));
     playmatrix.adjustWidthToLabel();
-    playmatrix.defaults.push('1000'); //<==We need to find a better way to set parameters here. To have the "time in milliseconds before playback" is just not the only interesting possibility. For example, tempo is interesting too. Should we have them as separate blocks to be put in here or as there own arguments?? Let's think about this one! -DU
-    playmatrix.oneArgBlock();
+    //playmatrix.defaults.push('1000'); //<==We need to find a better way to set parameters here. To have the "time in milliseconds before playback" is just not the only interesting possibility. For example, tempo is interesting too. Should we have them as separate blocks to be put in here or as there own arguments?? Let's think about this one! -DU
+    playmatrix.zeroArgBlock();
     playmatrix.dockTypes[1] = 'number';
     
     var transposition = new ProtoBlock('transposition');
