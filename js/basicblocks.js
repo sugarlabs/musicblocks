@@ -106,18 +106,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.defaults.push(4);
     //palettes.dict['assemble'].add(noteBlock);
 
-    var multiplyBeatValueBlock = new ProtoBlock('multiplybeatvalue');
+    var multiplyBeatValueBlock = new ProtoBlock('multiplybeatvalue'); //NOTE: I believe that the separate multiply and divide functions will be replaced by a single "note value augmentation/diminution" (ratio) function that will essentially do both. -DU 
     multiplyBeatValueBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['multiplybeatvalue'] = multiplyBeatValueBlock;
-    multiplyBeatValueBlock.staticLabels.push(_('multiply all beat values'));
+    multiplyBeatValueBlock.staticLabels.push(_('multiply note values')); //<===Note that I changed the name to reflect the concept. Let's keep "beat" values strictly for meter. -DU
     multiplyBeatValueBlock.adjustWidthToLabel();
     multiplyBeatValueBlock.flowClampOneArgBlock();
     multiplyBeatValueBlock.defaults.push(2);
 
-    var divideBeatValueBlock = new ProtoBlock('dividebeatvalue');
+    var divideBeatValueBlock = new ProtoBlock('dividebeatvalue'); //NOTE: I believe that the separate multiply and divide functions will be replaced by a single "note value augmentation/diminution" (ratio) function that will essentially do both. -DU
     divideBeatValueBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['dividebeatvalue'] = divideBeatValueBlock;
-    divideBeatValueBlock.staticLabels.push(_('divide all beat values'));
+    divideBeatValueBlock.staticLabels.push(_('divide note values')); //<===Note that I changed the name to reflect the concept. Let's keep "beat" values strictly for meter. -DU
     divideBeatValueBlock.adjustWidthToLabel();
     divideBeatValueBlock.flowClampOneArgBlock();
     divideBeatValueBlock.defaults.push(2);
@@ -176,7 +176,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['playmatrix'] = playmatrix;
     playmatrix.staticLabels.push(_('Play Matrix'));
     playmatrix.adjustWidthToLabel();
-    playmatrix.defaults.push('1000');
+    playmatrix.defaults.push('1000'); //<==We need to find a better way to set parameters here. To have the "time in milliseconds before playback" is just not the only interesting possibility. For example, tempo is interesting too. Should we have them as separate blocks to be put in here or as there own arguments?? Let's think about this one! -DU
     playmatrix.oneArgBlock();
     playmatrix.dockTypes[1] = 'number';
     
@@ -199,7 +199,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var saveMatrix = new ProtoBlock('savematrix');
     saveMatrix.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['savematrix'] = saveMatrix;
-    saveMatrix.staticLabels.push(_('Save Matrix'));
+    saveMatrix.staticLabels.push(_('Save Matrix as Chunk'));
     saveMatrix.adjustWidthToLabel();
     saveMatrix.zeroArgBlock();
 
@@ -221,7 +221,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tupletParamBlock = new ProtoBlock('tupletParamBlock');
     blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
     tupletParamBlock.palette = palettes.dict['matrix'];
-    tupletParamBlock.staticLabels.push(_('Tuplet Params'),'tuplet value', '# beats', 'beat value');
+    tupletParamBlock.staticLabels.push(_('Tuplet Params'),'tuplet value', '# notes', 'note value');
     tupletParamBlock.defaults.push(5, 1, 4);
     tupletParamBlock.adjustWidthToLabel();
     tupletParamBlock.threeArgBlock();

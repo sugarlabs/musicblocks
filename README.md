@@ -1,9 +1,18 @@
 # MUSIC-BLOCKS
 
- Music Blocks a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.
+Music Blocks a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way. \
+
+## INTENDED WORKFLOW
+
+1) Users design a matrix using the matrix clamp which will become their 2-D workspace for making simple musical patterns (pitch over time). Users can use "play matrix" block to try their matrix before saving it for the next step.
+2) Users then save the working matrix as a "chunk" that they can run operations on (play forwards and backwards, repeat, rhythmic augmentation/diminution (multiply and divide block as of 2015-08-24).
+3) In future versions of this software, users should be able to commit complex strings of chunks and other blocks to musical notation and performance with various parameters. It should also be integratable with other TurtleJS (upstream) functions.
+4) Students have the freedom to, and should be encouraged to, study and modify the source code for an enriching and empowering interdisciplinary experience.
 
 ### USING MUSIC-BLOCKS
 Music Blocks is designed to run in a browser. It is derived from Turtle Blocks JS which can be found [here](https://github.com/walterbender/turtleblocksjs). You can run it directly from index.html, from the [github](rawgit.com/khandelwalYash/Music-Blocks/master/index.html) repo, or by setting up a local server.
+
+[Note that all of these links were originally authored into this README on 2015-08-24.]
 
 Once you've launched it in your browser, start by clicking on (or dragging) blocks from the Matrix palette. Use multiple blocks to create Music.
 
