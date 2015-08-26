@@ -73,7 +73,7 @@ function SVG() {
         this._fill = 'fill_color';
         this._stroke = 'stroke_color';
         this.margins = [0, 0, 0, 0];
-        this._fontSize = 10;
+        this._fontSize = 8;
     }
 
     // Attribute methods

@@ -82,7 +82,7 @@ function MusicNotation(turtles, stage)
     // Format and justify the notes to 700 pixels
     var formatter = new Vex.Flow.Formatter().
     joinVoices([voice]).format([voice], 700);
-    //ToDo : Add bar line to the notations
+    //ToDo : Add bar line to the notations <==How would this be done? Also, how do we get notes to "roll-over" into the next measure?
 
     // Render voice
     voice.draw(ctx, stave);

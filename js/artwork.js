@@ -24,7 +24,7 @@ var COLLAPSEBUTTONYOFF = 9;
 
 // With default scaling, blocks are multiples of a standard height.
 var STANDARDBLOCKHEIGHT = 42;
-var DEFAULTBLOCKSCALE = 2;  // scale used in block factory
+var DEFAULTBLOCKSCALE = 1.5;  // scale used in block factory
 
 // The default turtles are generated from the TURTLESVG template.
 var FILLCOLORS = ['#ed001d', '#a34600', '#fb5f00', '#466e00', '#00843c', '#008283', '#007ac9', '#005dff', '#b500e3', '#ec008a'];
