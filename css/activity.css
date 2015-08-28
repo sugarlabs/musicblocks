@@ -23,10 +23,10 @@
     list-style: none; }
   #popdown-palette h2 {
     border-bottom: 1px solid #444;
-    width: 80%;
+    width: 50%;
     padding: 0 10%; }
     #popdown-palette h2 span {
-      vertical-align: 60%; }
+      vertical-align: 50%; }
     #popdown-palette h2 img {
       display: block;
       float: right; }
@@ -239,6 +239,8 @@ input.number {
   top :100px;
   left: 200px;
 }
+
+/* The below is from an idea of a dropdown menu, whose intended function is currently being done with the "Matrix" Block Clamp and "pitch" and "rhythm" blocks as its arguments. 
 
 /*#solfamenu{
   visibility: hidden;

@@ -37,7 +37,7 @@ function Matrix(turtles, musicnotation)
 	this.octave = 0;
 	this.i = 0;
 	this.matrixContainer = null;
-	this.notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; // Is there a way to have the input be either sharps or flats? What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E", "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <== Basically some of notes are equivalent C#=Db <==Any answer to this question? 2015-08-24
+	this.notes = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"]; // Is there a way to have the input be either sharps or flats? What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E", "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <== Basically some of notes are equivalent C#=Db <==Any answer to this question? 2015-08-24
 	this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
 	this.transposition = null;
 	this.isMatrix = 0;
@@ -444,31 +444,31 @@ function Matrix(turtles, musicnotation)
                     	transformed = true;
                     if(solfege.toUpperCase().substr(0,2) == 'DO')
                     {
-                        note = 'C' + octave;
+                        note = 'c' + octave;
                     }
                     else if(solfege.toUpperCase().substr(0,2) == 'RE')
                     {
-                        note = 'D' + octave;
+                        note = 'd' + octave;
                     }
                     else if(solfege.toUpperCase().substr(0,2) == 'MI')
                     {
-                        note = 'E' + octave;
+                        note = 'e' + octave;
                     }
                     else if(solfege.toUpperCase().substr(0,2) == 'FA')
                     {
-                        note = 'F' + octave;
+                        note = 'f' + octave;
                     }
                     else if(solfege.toUpperCase().substr(0,3) == 'SOL')
                     {
-                        note = 'G' + octave;
+                        note = 'g' + octave;
                     }	
                     else if(solfege.toUpperCase().substr(0,2) == 'LA')
                     {
-                        note = 'A' + octave;                       
+                        note = 'a' + octave;                       
                     }
                     else if(solfege.toUpperCase().substr(0,2) == 'SI')
                     {
-                        note = 'B' + octave;
+                        note = 'b' + octave;
                     }
                     if(transformed)
                     {

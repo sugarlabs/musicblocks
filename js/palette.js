@@ -77,7 +77,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.buttons = {}; // The toolbar button for each palette.
 
     this.visible = true;
-    this.scale = 1.0;
+    this.scale = 0.5;
     this.x = 0;
     this.y = this.cellSize;
 
