@@ -626,7 +626,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 matrix.solfegeNotes = [];
                 matrix.solfegeOct = [];
                 setTimeout(function(){
-                    matrix.initMatrix();
+                    matrix.initMatrix(logo);
                 },1500);
                 var that = this;
                 setTimeout(function(){
@@ -1166,11 +1166,7 @@ length;
             break;
 
             case 'playmatrix' :
-                Tone.Transport.stop();
-                matrix.playNotesString(0, this.polySynth);
-                logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num));
-                setTimeout(function(){
-                            logo.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num)));
+                this.playMatrix();
                 break;
 
             case 'rhythmicdot':
@@ -1517,7 +1513,7 @@ length;
                             matrix.solfegeNotes.push(solfegeArr[i][0]);
                             matrix.solfegeOct.push(solfegeArr[i][1]);
                         }
-                        matrix.initMatrix(this.polySynth);
+                        matrix.initMatrix(this, this.polySynth);
                         for(i in notesToPlayCopy)
                         {
                            matrix.makeMatrix(1, notesToPlayCopy[i][1]);
@@ -2218,4 +2214,12 @@ length;
             // trashcan.show();
             this.refreshCanvas();
         }
+
+    this.playMatrix = function() {
+        Tone.Transport.stop();
+        matrix.playNotesString(0, this.polySynth);
+        logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num));
+        setTimeout(function(){
+            logo.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num)));
+    }
 }

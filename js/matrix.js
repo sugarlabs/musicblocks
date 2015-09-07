@@ -82,11 +82,12 @@ function Matrix(turtles, musicnotation)
         this.i = 0;
     }
     
-    this.initMatrix = function(PolySynth)
+    this.initMatrix = function(logo, PolySynth)
     {
         /*Initializes the matrix. First removes the previous matrix
 	 * and them make another one in DOM*/ //<==What is DOM? -DU
         
+        this.logo = logo;
         this.synth = PolySynth;
         document.getElementById('matrix').style.display = 'inline';
         document.getElementById('matrix').style.visibility = 'visible';
@@ -142,7 +143,7 @@ function Matrix(turtles, musicnotation)
         cell.style.backgroundColor = '#9A32CD';
         cell.onclick=function()
         {
-            this.playAll(this.synth);
+            logo.playMatrix();
         }
 
         var cell = row.insertCell(2);
