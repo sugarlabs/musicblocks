@@ -131,18 +131,25 @@ function Matrix(turtles, musicnotation)
         var header = table.createTHead();
         var row = header.insertRow(0);
         var cell = row.insertCell(-1);
+        console.log('solfa: ' + cell);
         cell.innerHTML = '<b>' + 'Solfa' + '</b>';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
-        var cell = row.insertCell(-1);
+
+        var cell = row.insertCell(1);
+        console.log('play: ' + cell);
         cell.innerHTML = 'play';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
-        var cell = row.insertCell(-1);
+
+        var cell = row.insertCell(2);
+        console.log('save: ' + cell);
         cell.innerHTML = 'save';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
-        var cell = row.insertCell(-1);
+
+        var cell = row.insertCell(3);
+        console.log('close: ' + cell);
         cell.innerHTML = 'close';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
