@@ -89,6 +89,7 @@ function Matrix(turtles, musicnotation)
         
         this.synth = PolySynth;
         document.getElementById('matrix').style.display = 'inline';
+        document.getElementById('matrix').style.visibility = 'visible';
         console.log('notes '+this.solfegeNotes +' and octave '+this.solfegeOct);
 
         this.clearTurtles();
@@ -131,28 +132,37 @@ function Matrix(turtles, musicnotation)
         var header = table.createTHead();
         var row = header.insertRow(0);
         var cell = row.insertCell(-1);
-        console.log('solfa: ' + cell);
-        cell.innerHTML = '<b>' + 'Solfa' + '</b>';
+        cell.innerHTML = '<b>' + _('Solfa') + '</b>';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
 
         var cell = row.insertCell(1);
-        console.log('play: ' + cell);
-        cell.innerHTML = 'play';
+        cell.innerHTML = _('play');
         cell.style.height = '40px';
-        cell.style.backgroundColor = '#9ACD32';
+        cell.style.backgroundColor = '#9A32CD';
+        cell.onclick=function()
+        {
+            this.playAll(this.synth);
+        }
 
         var cell = row.insertCell(2);
-        console.log('save: ' + cell);
-        cell.innerHTML = 'save';
+        cell.innerHTML = _('save');
         cell.style.height = '40px';
-        cell.style.backgroundColor = '#9ACD32';
+        cell.style.backgroundColor = '#9A32CD';
+        cell.onclick=function()
+        {
+            this.saveMatrix();
+            // TODO: SAVE THE CHUNK!!!!
+        }
 
         var cell = row.insertCell(3);
-        console.log('close: ' + cell);
-        cell.innerHTML = 'close';
+        cell.innerHTML = _('close');
         cell.style.height = '40px';
-        cell.style.backgroundColor = '#9ACD32';
+        cell.style.backgroundColor = '#9A32CD';
+        cell.onclick=function()
+        {
+            document.getElementById('matrix').style.visibility = 'hidden';
+        }
 
         for (var i=0; i<this.solfegeNotes.length; i++)
         {
@@ -165,7 +175,7 @@ function Matrix(turtles, musicnotation)
         
         var row = header.insertRow(this.solfegeNotes.length + 1);
         var cell = row.insertCell(0);
-        cell.innerHTML = 'rhythmic note values';
+        cell.innerHTML = _('rhythmic note values');
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
         
@@ -200,7 +210,7 @@ function Matrix(turtles, musicnotation)
 
         var row = table.insertRow(table.rows.length - 1);
         var cell = row.insertCell(-1);
-        cell.innerHTML = '<b>' + 'Tuplet Value:' + '</b>';
+        cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
         cell.style.backgroundColor = '#9ACD32';
     
         cell =table.rows[table.rows.length - 1].insertCell(-1);
@@ -227,7 +237,7 @@ function Matrix(turtles, musicnotation)
 
         var row = table.insertRow(table.rows.length - 2);
         var cell = row.insertCell(-1);
-        cell.innerHTML = '<b>' + '# Tuplet Note Values:' + '</b>';
+        cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
         cell.style.backgroundColor = '#9ACD32';
         for (var i=0; i<table.rows[table.rows.length - 4].cells.length - 1; i++)
         {    
@@ -269,7 +279,7 @@ function Matrix(turtles, musicnotation)
         {
             this.notesToPlay.push([['R'], noteValue]);
         }
-        console.log('Rhythm #beats->'+numBeats+' noteValue->'+noteValue);
+        console.log('Rhythm #beats->' + numBeats + ' noteValue->' + noteValue);
 
         for (var i=1; i<=numBeats; i++)
         {
@@ -302,7 +312,8 @@ function Matrix(turtles, musicnotation)
     }
 
     this.makeClickable = function(tuplet, synth){
-        /*Once the whole matrix is generated, this function makes it clickable*/
+        /* Once the entire matrix is generated, this function makes it
+	 * clickable. */
         var table = document.getElementById('myTable');
         var that = this;
         var leaveRowsFromBottom = 1;
@@ -310,7 +321,7 @@ function Matrix(turtles, musicnotation)
         {
             leaveRowsFromBottom = 3;
         }
-        console.log('isTuplet '+tuplet);
+        console.log('isTuplet ' + tuplet);
         for (var i = 1; i < table.rows[1].cells.length; i++) 
         {    
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
@@ -331,7 +342,7 @@ function Matrix(turtles, musicnotation)
                 {    
                     var cell = table.rows[j].cells[i];
                     var that = this;
-                    cell.onclick=function(){    
+                    cell.onclick=function(){
                         if (this.style.backgroundColor == 'black')
                         {
                             this.style.backgroundColor = '#ADFF2F';
