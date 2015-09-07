@@ -131,19 +131,19 @@ function Matrix(turtles, musicnotation)
         var header = table.createTHead();
         var row = header.insertRow(0);
         var cell = row.insertCell(-1);
-        cell.innerHTML = '<b>' + _('Solfa') + '</b>';
+        cell.innerHTML = '<b>' + 'Solfa' + '</b>';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
         var cell = row.insertCell(-1);
-        cell.innerHTML = _('play');
+        cell.innerHTML = 'play';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
         var cell = row.insertCell(-1);
-        cell.innerHTML = _('save');
+        cell.innerHTML = 'save';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
         var cell = row.insertCell(-1);
-        cell.innerHTML = _('close');
+        cell.innerHTML = 'close';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
 
@@ -158,7 +158,7 @@ function Matrix(turtles, musicnotation)
         
         var row = header.insertRow(this.solfegeNotes.length + 1);
         var cell = row.insertCell(0);
-        cell.innerHTML = _('rhythmic note values:');
+        cell.innerHTML = 'rhythmic note values';
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
         
