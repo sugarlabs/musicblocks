@@ -642,18 +642,18 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
 
             case 'pitch':
-                if(this.sharp)
+                if(logo.sharp)
                 {
                     args[0] += '#';
                 }
-                else if(this.flat)
+                else if(logo.flat)
                 {
                     args[0] += 'b';
                 }
-                if(this.inNote)
+                if(logo.inNote)
                 {
-                    this.noteBlockNotes.push(args[0]);
-                    this.noteBlockOct.push(args[1]);
+                    logo.noteBlockNotes.push(args[0]);
+                    logo.noteBlockOct.push(args[1]);
                 }
                 else
                 {
@@ -663,15 +663,15 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
 
             case 'rhythm':
-                if(this.rhythmicValueParameter == 'rhythmicdot')
+                if(logo.rhythmicValueParameter == 'rhythmicdot')
                 {
                     args[1] = (2/3)*args[1];
-                    this.rhythmicValueParameter = null;
+                    logo.rhythmicValueParameter = null;
                 }
-                if(blk==this.rhythmInsideTuplet)
+                if(blk==logo.rhythmInsideTuplet)
                 {
-                    this.tupletRhythmCount -= 2;
-                    this.tupletParam.push([args[0], args[1]]);
+                    logo.tupletRhythmCount -= 2;
+                    logo.tupletParam.push([args[0], args[1]]);
                     var that = this;
                     setTimeout(function(){
                         matrix.handleTuplet(that.tupletParam);
@@ -1166,11 +1166,11 @@ length;
             break;
 
             case 'playmatrix' :
-                this.playMatrix();
+                logo.playMatrix();
                 break;
 
             case 'rhythmicdot':
-                this.rhythmicValueParameter = 'rhythmicdot';
+                logo.rhythmicValueParameter = 'rhythmicdot';
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
 
@@ -1198,9 +1198,9 @@ length;
                     }
                     
                 }
-                this.num = tsn/10;
-                this.deno = tsd/10;
-                this.notation = true;
+                logo.num = tsn/10;
+                logo.deno = tsd/10;
+                logo.notation = true;
                 logo.runFromBlock(logo, turtle, args[1]);
                 console.log('Generating Music Notation');
                 break;
@@ -1209,23 +1209,13 @@ length;
                 break;
 
             case 'savematrix' :
-
-                matrix.saveMatrix();
-                var index = window.savedMatricesCount;
-                var myDoBlock = new ProtoBlock('namedsavematrix' + index);
-                logo.blocks.protoBlockDict['namedsavematrix' + index] = myDoBlock;
-                myDoBlock.zeroArgBlock();
-                myDoBlock.palette = logo.blocks.palettes.dict['chunk'];
-                myDoBlock.staticLabels.push('Chunk' + index);
-                myDoBlock.palette.add(myDoBlock);
-                //logo.blocks.palettes.dict['assemble'].add(myDoBlock);
-                logo.blocks.palettes.updatePalettes('matrix');  
+                logo.saveMatrix();
                 break;
 
             case 'note':
-                this.inNote = true;
-                this.noteBlockNotes = [];
-                this.noteBlockOct = [];
+                logo.inNote = true;
+                logo.noteBlockNotes = [];
+                logo.noteBlockOct = [];
                 
                 logo.runFromBlock(logo, turtle, args[1]);
                 var that=this;
@@ -1249,32 +1239,32 @@ length;
                 
 
             case 'showmatrix':
-                this.showMatrix = true;
+                logo.showMatrix = true;
                 noSession = 1;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
 
             case 'multiplybeatvalue':
-                this.multiplyBeatValueBy *= args[0];
+                logo.multiplyBeatValueBy *= args[0];
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
 
             case 'dividebeatvalue':
-                this.divideBeatValueBy *= args[0];
+                logo.divideBeatValueBy *= args[0];
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
         
             case 'sharp':
-                this.sharpClampCount = logo.blocks.blockList[blk].clampCount[0]; 
-                this.sharp = true;
-                this.sharpForNoteBlock = true;
+                logo.sharpClampCount = logo.blocks.blockList[blk].clampCount[0]; 
+                logo.sharp = true;
+                logo.sharpForNoteBlock = true;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
             
             case 'flat':
-                this.flatClampCount = logo.blocks.blockList[blk].clampCount[0];
-                this.flat = true;
-                this.flatForNoteBlock = true;
+                logo.flatClampCount = logo.blocks.blockList[blk].clampCount[0];
+                logo.flat = true;
+                logo.flatForNoteBlock = true;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
 
@@ -1284,21 +1274,21 @@ length;
             case 'square':
             case 'sawtooth':
                 var oscName = logo.blocks.blockList[blk].name; 
-                console.log(oscName + " start time " + this.startTime + " end time " + this.stopTime);    
+                console.log(oscName + " start time " + logo.startTime + " end time " + logo.stopTime);    
                 var sineOsc=new Tone.Oscillator(args[0], oscName)
                 .toMaster();
                 //connected to the master output
                 setTimeout(function(osc){
                     sineOsc.start();
-                },this.startTime);
+                },logo.startTime);
                 console.log( sineOsc);
                 setTimeout(function(osc){
                     sineOsc.stop();
-                },this.stopTime);
+                },logo.stopTime);
                 break;
 
             case 'chunkTranspose':
-                this.chunktranspose = true;
+                logo.chunktranspose = true;
                 matrix.setTransposition(args[0]);
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
@@ -1315,15 +1305,15 @@ length;
 
             case 'tuplet':
                 logo.runFromBlock(logo, turtle, args[0]);
-                this.tuplet = 2;
+                logo.tuplet = 2;
                 
-                this.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
+                logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
                 break;
 
             case 'tupletParamBlock':
-                this.tupletParam = [];
-                this.tupletParam.push([args[0], args[1], args[2]]);
-                this.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];             
+                logo.tupletParam = [];
+                logo.tupletParam.push([args[0], args[1], args[2]]);
+                logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];             
                 break;
             
             default:
@@ -1353,19 +1343,19 @@ length;
                         j += 1;             
                     }
                     temp = j;
-                    var factor = this.multiplyBeatValueBy/this.divideBeatValueBy;
+                    var factor = logo.multiplyBeatValueBy/logo.divideBeatValueBy;
                     while(window.savedMatricesNotes[j] != 'end')
                     {
                         matrix.notesToPlay.push([window.savedMatricesNotes[j][0], (window.savedMatricesNotes[j][1])*factor]);
                         j += 1;
                     }
-                    this.multiplyBeatValueBy = 1;
-                    this.divideBeatValueBy = 1;
+                    logo.multiplyBeatValueBy = 1;
+                    logo.divideBeatValueBy = 1;
                     var notesToPlayCopy = [];
                     for(k in matrix.notesToPlay)
                         notesToPlayCopy.push(matrix.notesToPlay[k])
                     var trNote;
-                    if(this.chunktranspose)
+                    if(logo.chunktranspose)
                     {
                         var transposedNotes = [];
                         j -= 1;
@@ -1387,17 +1377,17 @@ length;
                             j -= 1;
                             
                         }
-                        this.chunktranspose = false;
+                        logo.chunktranspose = false;
                         matrix.removeTransposition();
                         
                     }
-                    else if(this.notation)
+                    else if(logo.notation)
                     {
-                        matrix.musicNotation(notesToPlayCopy, this.num, this.deno);
+                        matrix.musicNotation(notesToPlayCopy, logo.num, logo.deno);
                         console.log("to notations "+notesToPlayCopy);
-                        this.notation = false;
+                        logo.notation = false;
                     }
-                    else if(this.showMatrix)
+                    else if(logo.showMatrix)
                     {
                         matrix.solfegeNotes = [];
                         matrix.solfegeOct = [];
@@ -1407,10 +1397,10 @@ length;
                         console.log('notes to show '+matrix.notesToPlay);
                         var table = document.getElementById("myTable");
                             Element.prototype.remove = function() {
-                        this.parentElement.removeChild(this);
+                        logo.parentElement.removeChild(this);
                         }
                         NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-                        for(var i = 0, len = this.length; i < len; i++) {
+                        for(var i = 0, len = logo.length; i < len; i++) {
                             if(this[i] && this[i].parentElement) {
                                 this[i].parentElement.removeChild(this[i]);
                                 }
@@ -1513,7 +1503,7 @@ length;
                             matrix.solfegeNotes.push(solfegeArr[i][0]);
                             matrix.solfegeOct.push(solfegeArr[i][1]);
                         }
-                        matrix.initMatrix(this, this.polySynth);
+                        matrix.initMatrix(this, logo.polySynth);
                         for(i in notesToPlayCopy)
                         {
                            matrix.makeMatrix(1, notesToPlayCopy[i][1]);
@@ -1535,15 +1525,15 @@ length;
                                 }
                             }
                         }
-                        matrix.makeClickable(false, this.polySynth);                                                  
+                        matrix.makeClickable(false, logo.polySynth);                                                  
                         
-                        this.showMatrix = false;
+                        logo.showMatrix = false;
 
                     }
                     else
                     {
                         var delayFactor = 0;
-                        matrix.playNotesString(0, this.polySynth);
+                        matrix.playNotesString(0, logo.polySynth);
                         for(i in matrix.notesToPlay)
                         {
 
@@ -2218,8 +2208,21 @@ length;
     this.playMatrix = function() {
         Tone.Transport.stop();
         matrix.playNotesString(0, this.polySynth);
-        logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num));
+        this.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num));
         setTimeout(function(){
-            logo.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num)));
+            this.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num)));
+    }
+
+    this.saveMatrix = function() {
+        matrix.saveMatrix();
+        var index = window.savedMatricesCount;
+        var myDoBlock = new ProtoBlock('namedsavematrix' + index);
+        this.blocks.protoBlockDict['namedsavematrix' + index] = myDoBlock;
+        myDoBlock.zeroArgBlock();
+        myDoBlock.palette = this.blocks.palettes.dict['chunk'];
+        myDoBlock.staticLabels.push('Chunk' + index);
+        myDoBlock.palette.add(myDoBlock);
+        //this.blocks.palettes.dict['assemble'].add(myDoBlock);
+        this.blocks.palettes.updatePalettes('matrix');  
     }
 }

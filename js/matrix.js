@@ -152,8 +152,7 @@ function Matrix(turtles, musicnotation)
         cell.style.backgroundColor = '#9A32CD';
         cell.onclick=function()
         {
-            this.saveMatrix();
-            // TODO: SAVE THE CHUNK!!!!
+            logo.saveMatrix();
         }
 
         var cell = row.insertCell(3);
