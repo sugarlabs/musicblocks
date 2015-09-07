@@ -135,15 +135,15 @@ function Matrix(turtles, musicnotation)
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
         var cell = row.insertCell(-1);
-        cell.innerHTML = '_('play')';
+        cell.innerHTML = _('play');
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
         var cell = row.insertCell(-1);
-        cell.innerHTML = '_('save')';
+        cell.innerHTML = _('save');
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
         var cell = row.insertCell(-1);
-        cell.innerHTML = '_('close')';
+        cell.innerHTML = _('close');
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
 
