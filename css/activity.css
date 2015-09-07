@@ -230,6 +230,7 @@ input.number {
   left: 30%;
   border-style: solid;
   border: 2 !important;
+  background: rgba(255, 255, 255, 0.85); }
 }
 #canvasToSave {
   position: absolute;
