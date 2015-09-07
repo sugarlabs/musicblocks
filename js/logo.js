@@ -2208,9 +2208,11 @@ length;
     this.playMatrix = function() {
         Tone.Transport.stop();
         matrix.playNotesString(0, this.polySynth);
-        this.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num));
-        setTimeout(function(){
-            this.setTurtleDelay(0);},logo.setTurtleDelay(4500*parseFloat(1 / this.deno)*(this.num)));
+        this.setTurtleDelay(4500 * parseFloat(1 / this.deno) * (this.num));
+        setTimeout(function()
+        {
+            this.setTurtleDelay(0);
+        }, this.setTurtleDelay(4500 * parseFloat(1 / this.deno) * (this.num)));
     }
 
     this.saveMatrix = function() {
