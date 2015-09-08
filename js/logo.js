@@ -1313,7 +1313,7 @@ length;
             case 'tupletParamBlock':
                 logo.tupletParam = [];
                 logo.tupletParam.push([args[0], args[1], args[2]]);
-                console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4];
+                console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
                 logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
                 break;
             
