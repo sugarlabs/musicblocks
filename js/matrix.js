@@ -213,7 +213,7 @@ function Matrix(turtles, musicnotation)
         cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
         cell.style.backgroundColor = '#9ACD32';
     
-        cell =table.rows[table.rows.length - 1].insertCell(-1);
+        cell = table.rows[table.rows.length - 1].insertCell(-1);
         cell.style.backgroundColor = '#9ACD32';
         cell.style.height = '30px';    
         cell.innerHTML = param[0][1].toString() + '/' + param[0][2].toString();
@@ -224,7 +224,7 @@ function Matrix(turtles, musicnotation)
          
         for (var i=0; i < table.rows[table.rows.length - 1].cells.length - 1; i++)
         {
-            cell =row.insertCell(i+1);
+            cell = row.insertCell(i+1);
             cell.style.backgroundColor = 'rgb(4, 255, 174)';
             cell.style.height = '30px';    
             if (i == table.rows[table.rows.length - 1].cells.length - 2)
@@ -241,7 +241,7 @@ function Matrix(turtles, musicnotation)
         cell.style.backgroundColor = '#9ACD32';
         for (var i=0; i<table.rows[table.rows.length - 4].cells.length - 1; i++)
         {    
-            cell =row.insertCell(-1);
+            cell = row.insertCell(-1);
             cell.style.backgroundColor = 'rgb(4, 255, 174)';
             cell.style.height = '30px';
             if(i >= table.rows[table.rows.length - 1].cells.length - 2)
@@ -255,7 +255,9 @@ function Matrix(turtles, musicnotation)
 
     this.makeMatrix = function(numBeats, noteValue, noteValueNum)
     {
+        console.log('makeMatrix ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
         var table = document.getElementById('myTable');
+        console.log(table);
         var noteValueToDisplay = null;
         if (noteValueNum)
         {
@@ -290,6 +292,7 @@ function Matrix(turtles, musicnotation)
             for (var i=1; i<=this.solfegeNotes.length + 1; i++)
             {    
                 var row = table.rows[i];
+		console.log(row);
                 var cell = row.insertCell(-1);
                 cell.style.backgroundColor = '#ADFF2F';
                 

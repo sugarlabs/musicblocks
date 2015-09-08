@@ -668,7 +668,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     args[1] = (2/3)*args[1];
                     logo.rhythmicValueParameter = null;
                 }
-                if(blk==logo.rhythmInsideTuplet)
+                console.log('blk is ' + blk + ' and rhythmInsideTuplet is ' + logo.rhythmInsideTuplet);
+                if(blk == logo.rhythmInsideTuplet)
                 {
                     logo.tupletRhythmCount -= 2;
                     logo.tupletParam.push([args[0], args[1]]);
@@ -676,11 +677,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     setTimeout(function(){
                         matrix.handleTuplet(that.tupletParam);
                     },1500)
-                }
-                else{
+                } else {
                     setTimeout(function(){
                         matrix.makeMatrix(args[0], args[1]);
-                    },1500);
+                    }, 1500);
                 }
                 break;
 
@@ -702,7 +702,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         childFlow = logo.actions[args[0]];
                         childFlowCount = 1;
                     } else {
-                        logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
+                       logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
                         logo.stopTurtle = true;
                     }
                 }
@@ -1313,7 +1313,8 @@ length;
             case 'tupletParamBlock':
                 logo.tupletParam = [];
                 logo.tupletParam.push([args[0], args[1], args[2]]);
-                logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];             
+                console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4];
+                logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
                 break;
             
             default:
@@ -2209,9 +2210,10 @@ length;
         Tone.Transport.stop();
         matrix.playNotesString(0, this.polySynth);
         this.setTurtleDelay(4500 * parseFloat(1 / this.deno) * (this.num));
-        setTimeout(function()
+        var that = this;
+        setTimeout(function(that)
         {
-            this.setTurtleDelay(0);
+            that.setTurtleDelay(0);
         }, this.setTurtleDelay(4500 * parseFloat(1 / this.deno) * (this.num)));
     }
 
