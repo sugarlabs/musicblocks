@@ -2211,8 +2211,9 @@ length;
         matrix.playNotesString(0, this.polySynth);
         this.setTurtleDelay(4500 * parseFloat(1 / this.deno) * (this.num));
         var that = this;
-        setTimeout(function(that)
+        setTimeout(function()
         {
+            console.log(that);
             that.setTurtleDelay(0);
         }, this.setTurtleDelay(4500 * parseFloat(1 / this.deno) * (this.num)));
     }

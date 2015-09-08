@@ -91,6 +91,7 @@ function Matrix(turtles, musicnotation)
         this.synth = PolySynth;
         document.getElementById('matrix').style.display = 'inline';
         document.getElementById('matrix').style.visibility = 'visible';
+        document.getElementById('matrix').style.border = 2;
         console.log('notes '+this.solfegeNotes +' and octave '+this.solfegeOct);
 
         this.clearTurtles();
@@ -143,6 +144,7 @@ function Matrix(turtles, musicnotation)
         cell.style.backgroundColor = '#9A32CD';
         cell.onclick=function()
         {
+            console.log(logo);
             logo.playMatrix();
         }
 
@@ -162,6 +164,7 @@ function Matrix(turtles, musicnotation)
         cell.onclick=function()
         {
             document.getElementById('matrix').style.visibility = 'hidden';
+            document.getElementById('matrix').style.border = 0;
         }
 
         for (var i=0; i<this.solfegeNotes.length; i++)
