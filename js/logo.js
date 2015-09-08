@@ -570,8 +570,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 this.sharpClampCount -= 2;
         }
 
-
-        switch (logo.blocks.blockList[blk].name) {
+        switch (logo.blocks.blockList[blk].name)
+        {
             case 'dispatch':
                 // Dispatch an event.
                 if (args.length == 1) {
@@ -617,7 +617,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     childFlowCount = 1; 
                 }
                 break;
-
             case 'matrix':
                 if (args.length == 1) {
                     childFlow = args[0];
@@ -625,11 +624,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
                 matrix.solfegeNotes = [];
                 matrix.solfegeOct = [];
-                setTimeout(function(){
+                setTimeout(function()
+                {
                     matrix.initMatrix(logo);
-                },1500);
+                }, 1500);
                 var that = this;
-                setTimeout(function(){
+                setTimeout(function()
+                {
                     if(that.tuplet)
                     {
                         matrix.makeClickable(true, that.polySynth);
@@ -638,9 +639,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                     else
                         matrix.makeClickable(false, that.polySynth);
-                },2000);
+                }, 2000);
                 break;
-
             case 'pitch':
                 if(logo.sharp)
                 {
@@ -661,7 +661,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     matrix.solfegeOct.push(args[1]);
                 }
                 break;
-
             case 'rhythm':
                 if(logo.rhythmicValueParameter == 'rhythmicdot')
                 {
@@ -683,7 +682,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     }, 1500);
                 }
                 break;
-
             case 'nameddo':
                 var name = logo.blocks.blockList[blk].privateData;
                 if (name in logo.actions) {
@@ -713,7 +711,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     childFlowCount = -1;
                 }
                 break;
-
             case 'break':
                 logo.doBreak(turtle);
                 // Since we pop the queue, we need to unhighlight our parent.
@@ -1015,7 +1012,7 @@ length;
                 }
                 break;
 
-            case 'setfont' :
+            case 'setfont':
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
                         logo.turtles.turtleList[turtle].doSetFont(args[0]);                        
@@ -1156,47 +1153,43 @@ length;
                 }
                 break;
 
-            case 'timeSign' :
+            // Actions for music-related blocks
+            case 'timeSign':
                 console.log('Time Signatature' + args[0]);
                 break;
-        
-            case 'transposition' :
+            case 'transposition':
                 console.log('transposition by scaling ' + args[0]);
                 matrix.setTransposition(args[0]);
-            break;
-
-            case 'playmatrix' :
+                break;
+            case 'playmatrix':
                 logo.playMatrix();
                 break;
-
             case 'rhythmicdot':
                 logo.rhythmicValueParameter = 'rhythmicdot';
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
-
-            case 'notation' :
-                var flagN = 0 ,flagD = 1, tsd = 0, tsn = 0;
-                for(var i=0; i<args[0].length; i++)
+            case 'notation':
+                var flagN = 0, flagD = 1, tsd = 0, tsn = 0;
+                for (var i=0; i<args[0].length; i++)
                 {
                     console.log(args[0] +"fhf")
-                    if(flagN)
+                    if (flagN)
                     {   
                         tsd += parseInt(args[0][i]);
                         tsd *= 10;
 
                     }
-                    if(flagD && args[0][i] != '/')
+                    if (flagD && args[0][i] != '/')
                     {
                         tsn += parseInt(args[0][i]);
                         tsn *= 10;
 
                     }
-                    if(args[0][i] == '/')
+                    if (args[0][i] == '/')
                     {
                         flagN = 1;
                         flagD = 0;
                     }
-                    
                 }
                 logo.num = tsn/10;
                 logo.deno = tsd/10;
@@ -1204,14 +1197,11 @@ length;
                 logo.runFromBlock(logo, turtle, args[1]);
                 console.log('Generating Music Notation');
                 break;
-
-            case 'meter' :
+            case 'meter':
                 break;
-
-            case 'savematrix' :
+            case 'savematrix':
                 logo.saveMatrix();
                 break;
-
             case 'note':
                 logo.inNote = true;
                 logo.noteBlockNotes = [];
@@ -1219,55 +1209,46 @@ length;
                 
                 logo.runFromBlock(logo, turtle, args[1]);
                 var that=this;
-                setTimeout(function(){
-                    console.log("notes "+that.noteBlockNotes+" oct "+that.noteBlockOct);
+                setTimeout(function() {
+                    console.log("notes " + that.noteBlockNotes + " oct " + that.noteBlockOct);
                     var notes = [];
-                that.polySynth.toMaster();
-                var beatValue = args[0];
-                for(i in that.noteBlockNotes)
-                {
-                    note = that.getNote(that.noteBlockNotes[i], that.noteBlockOct[i]);
-                    notes.push(note);
-                
-                }
-                console.log("note play"+notes);
-                that.polySynth.triggerAttackRelease(notes, 1/beatValue);
-                Tone.Transport.start();
-                that.inNote = false;
-
-                },1000);
-                
-
+                    that.polySynth.toMaster();
+                    var beatValue = args[0];
+                    for (i in that.noteBlockNotes)
+                    {
+                        note = that.getNote(that.noteBlockNotes[i], that.noteBlockOct[i]);
+                        notes.push(note);
+                    }
+                    console.log("note play" + notes);
+                    that.polySynth.triggerAttackRelease(notes, 1/beatValue);
+                    Tone.Transport.start();
+                    that.inNote = false;
+                }, 1000);
             case 'showmatrix':
                 logo.showMatrix = true;
                 noSession = 1;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
-
             case 'multiplybeatvalue':
                 logo.multiplyBeatValueBy *= args[0];
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
-
             case 'dividebeatvalue':
                 logo.divideBeatValueBy *= args[0];
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
-        
             case 'sharp':
                 logo.sharpClampCount = logo.blocks.blockList[blk].clampCount[0]; 
                 logo.sharp = true;
                 logo.sharpForNoteBlock = true;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
-            
             case 'flat':
                 logo.flatClampCount = logo.blocks.blockList[blk].clampCount[0];
                 logo.flat = true;
                 logo.flatForNoteBlock = true;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
-
             case 'osctime':
                 break;
             case 'sine':
@@ -1275,77 +1256,70 @@ length;
             case 'sawtooth':
                 var oscName = logo.blocks.blockList[blk].name; 
                 console.log(oscName + " start time " + logo.startTime + " end time " + logo.stopTime);    
-                var sineOsc=new Tone.Oscillator(args[0], oscName)
-                .toMaster();
+                var sineOsc = new Tone.Oscillator(args[0], oscName).toMaster();
                 //connected to the master output
                 setTimeout(function(osc){
                     sineOsc.start();
-                },logo.startTime);
+                }, logo.startTime);
                 console.log( sineOsc);
                 setTimeout(function(osc){
                     sineOsc.stop();
-                },logo.stopTime);
+                }, logo.stopTime);
                 break;
-
             case 'chunkTranspose':
                 logo.chunktranspose = true;
                 matrix.setTransposition(args[0]);
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
-
             case 'playfwd':
                 matrix.playDirection = 1;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
-
             case 'playbwd':
                 matrix.playDirection = -1;
                 logo.runFromBlock(logo, turtle, args[0]);  
                 break;
-
             case 'tuplet':
                 logo.runFromBlock(logo, turtle, args[0]);
                 logo.tuplet = 2;
-                
                 logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
                 break;
-
             case 'tupletParamBlock':
                 logo.tupletParam = [];
                 logo.tupletParam.push([args[0], args[1], args[2]]);
                 console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
                 logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
                 break;
-            
             default:
-
                 if(logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix')
-                {  
-                    noSession = 1 //nosession changed to 1, because we don't want namedsavematrix 
-                             //block to be saved locally;
+                {
+                    console.log('namedsavematrix');
+                    noSession = 1; //nosession changed to 1, because we don't want namedsavematrix 
+                                   //block to be saved locally;
                     var index = logo.blocks.blockList[blk].name[15];
                     var notes = window.savedMatricesNotes;
                     matrix.notesToPlay = [];
-                    var count = 0,j=0,temp = 0;
-                    for(var i=0; i<notes.length; i++)
+                    var count = 0, j=0, temp = 0;
+                    for (var i=0; i<notes.length; i++)
                     {
-                        if(notes[i] == 'end')
+                        if (notes[i] == 'end')
                         {
                             count += 1;
                         }
                     } 
                     
                     count = 1;
-                    while( count<index )
-                    {   
-                        if( window.savedMatricesNotes[j] == 'end' )
+                    while (count < index)
+                    {
+                        if (window.savedMatricesNotes[j] == 'end')
+                        {
                             count += 1;
-                        
+                        }
                         j += 1;             
                     }
                     temp = j;
                     var factor = logo.multiplyBeatValueBy/logo.divideBeatValueBy;
-                    while(window.savedMatricesNotes[j] != 'end')
+                    while (window.savedMatricesNotes[j] != 'end')
                     {
                         matrix.notesToPlay.push([window.savedMatricesNotes[j][0], (window.savedMatricesNotes[j][1])*factor]);
                         j += 1;
@@ -1353,8 +1327,10 @@ length;
                     logo.multiplyBeatValueBy = 1;
                     logo.divideBeatValueBy = 1;
                     var notesToPlayCopy = [];
-                    for(k in matrix.notesToPlay)
-                        notesToPlayCopy.push(matrix.notesToPlay[k])
+                    for (k in matrix.notesToPlay)
+                        {
+                            notesToPlayCopy.push(matrix.notesToPlay[k])
+                        }
                     var trNote;
                     if(logo.chunktranspose)
                     {
@@ -1362,9 +1338,9 @@ length;
                         j -= 1;
                         var i = notesToPlayCopy.length;
                         i -= 1;                        
-                        while(window.savedMatricesNotes[j] != 'end' && i>=0)
+                        while (window.savedMatricesNotes[j] != 'end' && i>=0)
                         {
-                            for(var k in notesToPlayCopy[i][0])
+                            for (var k in notesToPlayCopy[i][0])
                             {
                                 var len = notesToPlayCopy[i][0][k].length;
                                 len -= 1;
@@ -1374,53 +1350,59 @@ length;
                                 window.savedMatricesNotes[j][0][k] = trNote ;
                             }
                             i -= 1;
-                            
                             j -= 1;
-                            
                         }
                         logo.chunktranspose = false;
                         matrix.removeTransposition();
-                        
-                    }
-                    else if(logo.notation)
+                    } else if (logo.notation)
                     {
+                        console.log('logo.notation');
                         matrix.musicNotation(notesToPlayCopy, logo.num, logo.deno);
-                        console.log("to notations "+notesToPlayCopy);
+                        console.log("to notations " + notesToPlayCopy);
                         logo.notation = false;
-                    }
-                    else if(logo.showMatrix)
+                    } else if (logo.showMatrix)
                     {
+                        console.log('logo.showMatrix');
                         matrix.solfegeNotes = [];
                         matrix.solfegeOct = [];
                         matrix.notesToPlay = notesToPlayCopy;
                         var solfaDisplay = [0,0,0,0,0,0,0];
                         var notesPosition = [];
-                        console.log('notes to show '+matrix.notesToPlay);
+                        console.log('notes to show ' + matrix.notesToPlay);
                         var table = document.getElementById("myTable");
-                            Element.prototype.remove = function() {
-                        logo.parentElement.removeChild(this);
+                        Element.prototype.remove = function()
+                        {
+                            logo.parentElement.removeChild(this);
                         }
-                        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-                        for(var i = 0, len = logo.length; i < len; i++) {
-                            if(this[i] && this[i].parentElement) {
-                                this[i].parentElement.removeChild(this[i]);
+                        NodeList.prototype.remove = HTMLCollection.prototype.remove = function()
+                        {
+                            for (var i = 0, len = logo.length; i < len; i++)
+                            {
+                                if(this[i] && this[i].parentElement)
+                                {
+                                    this[i].parentElement.removeChild(this[i]);
                                 }
                             }
                         }
                         var solfegeArr = [];
                         var arr = [];
-                        for(k in matrix.notesToPlay)
+                        for (k in matrix.notesToPlay)
+                        {
                             arr.push([]);
+                        }
                         if (table != null) 
+                        {
                             table.remove();
-                        for(var k=0; k<matrix.notesToPlay.length; k++)
+                        }
+                        for (var k=0; k<matrix.notesToPlay.length; k++)
                         {   
                             for(var i in matrix.notesToPlay[k][0])
-                               {switch(matrix.notesToPlay[k][0][i][0]){
+                            {
+                                switch(matrix.notesToPlay[k][0][i][0])
+                                {
                                 case 'B':
                                     arr[k].push('si');
-                                        
-                                    if(!solfaDisplay[0])
+                                    if (!solfaDisplay[0])
                                     {
                                         solfegeArr.push(['si',matrix.notesToPlay[k][0][i][1], 7]);
                                         solfaDisplay[0] = 1;
@@ -1429,8 +1411,8 @@ length;
                                     
                                     break;
                                 case 'A':
-                                arr[k].push('la');
-                                    if(!solfaDisplay[1])
+                                    arr[k].push('la');
+                                    if (!solfaDisplay[1])
                                     {
                                         solfegeArr.push(['la',matrix.notesToPlay[k][0][i][1], 6]);
                                         solfaDisplay[1] = 1;
@@ -1439,39 +1421,35 @@ length;
                                     
                                     break;
                                 case 'G':
-                                arr[k].push('sol');
-                                
-                                    if(!solfaDisplay[2])
+                                    arr[k].push('sol');
+                                    if (!solfaDisplay[2])
                                     {
                                         solfegeArr.push(['sol',matrix.notesToPlay[k][0][i][1], 5]);
                                         solfaDisplay[2] = 1;
                                     }
                                     notesPosition.push('sol');
-                                    
                                     break;
                                 case 'F':
                                     arr[k].push('fa');
-                                    if(!solfaDisplay[3])
+                                    if (!solfaDisplay[3])
                                     {
                                         solfegeArr.push(['fa',matrix.notesToPlay[k][0][i][1], 4]);
                                         solfaDisplay[3] = 1;
                                     }
                                     notesPosition.push('fa');
-                                    
                                     break;
                                 case 'E':
                                     arr[k].push('mi');
-                                    if(!solfaDisplay[4])
+                                    if (!solfaDisplay[4])
                                     {
                                         solfegeArr.push(['mi',matrix.notesToPlay[k][0][i][1], 3]);
                                         solfaDisplay[4] = 1;
                                     }
                                     notesPosition.push('mi');
-                                    
                                     break;
                                 case 'D':
                                     arr[k].push('re');
-                                    if(!solfaDisplay[5])
+                                    if (!solfaDisplay[5])
                                     {
                                         solfegeArr.push(['re',matrix.notesToPlay[k][0][i][1], 2]);
                                         solfaDisplay[5] = 1;
@@ -1481,43 +1459,43 @@ length;
                                     break;
                                 case 'C':
                                     arr[k].push('do');
-                                    if(!solfaDisplay[6])
+                                    if (!solfaDisplay[6])
                                     {
                                         solfegeArr.push(['do', matrix.notesToPlay[k][0][i][1], 1]);
                                         solfaDisplay[6] = 1;
                                     }
                                     notesPosition.push('do');
-                                    
                                     break;
-                                default :
+                                default:
                                     break;
-                            }
-                        }   
+                                }
+                            }   
                         } 
-                        solfegeArr.sort(function(a,b){
+                        solfegeArr.sort(function(a, b)
+                        {
                             return parseFloat(a[2]) - parseFloat(b[2]);
                         });
                         matrix.solfegeNotes = [];
                         matrix.solfegeOct = [];
-                        for(i in solfegeArr)
+                        for (i in solfegeArr)
                         {
                             matrix.solfegeNotes.push(solfegeArr[i][0]);
                             matrix.solfegeOct.push(solfegeArr[i][1]);
                         }
                         matrix.initMatrix(this, logo.polySynth);
-                        for(i in notesToPlayCopy)
+                        for (i in notesToPlayCopy)
                         {
                            matrix.makeMatrix(1, notesToPlayCopy[i][1]);
                         }
                         var table = document.getElementById("myTable");
-                        for(var k=0; k<matrix.notesToPlay.length; k++)
+                        for (var k=0; k<matrix.notesToPlay.length; k++)
                         {
-                            for(var i=1; i<table.rows.length-1; i++)
+                            for (var i=1; i<table.rows.length-1; i++)
                             {
-                                for(j=0; j<arr[k].length; j++)
+                                for (j=0; j<arr[k].length; j++)
                                 {
                                     console.log("inner "+table.rows[i].cells[0].innerHTML + " arr[k][j] "+arr[k][j])
-                                    if(table.rows[i].cells[0].innerHTML.substr(0,2) == arr[k][j] || table.rows[i].cells[0].innerHTML.substr(0,3) == arr[k][j])
+                                    if (table.rows[i].cells[0].innerHTML.substr(0,2) == arr[k][j] || table.rows[i].cells[0].innerHTML.substr(0,3) == arr[k][j])
                                     {
                                         var cell = table.rows[i].cells[k+1];
                                         cell.style.backgroundColor = 'black';
@@ -1526,50 +1504,45 @@ length;
                                 }
                             }
                         }
-                        matrix.makeClickable(false, logo.polySynth);                                                  
-                        
+                        matrix.makeClickable(false, logo.polySynth);
                         logo.showMatrix = false;
-
-                    }
-                    else
-                    {
-                        var delayFactor = 0;
-                        matrix.playNotesString(0, logo.polySynth);
-                        for(i in matrix.notesToPlay)
-                        {
-
-                            delayFactor += 1/matrix.notesToPlay[i][1];
-                        }
-                    
-                        logo.setTurtleDelay(2000*delayFactor + 200);
-                        setTimeout(function(){
-                            logo.setTurtleDelay(0);
-                        },2000*delayFactor + 200);
-                    }                    
-                }
-                else
-                { 
-                    if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
-                    eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
-                } else {
-                    // Could be an arg block, so we need to print its value.
-                    console.log('running an arg block?');
-                    if (logo.blocks.blockList[blk].isArgBlock()) {
-                        args.push(logo.parseArg(logo, turtle, blk));
-                        console.log('block: ' + blk + ' turtle: ' + turtle);
-                        console.log('block name: ' + logo.blocks.blockList[blk].name);
-                        console.log('block value: ' + logo.blocks.blockList[blk].value);
-                        if (logo.blocks.blockList[blk].value == null) {
-                            logo.textMsg('null block value');
                         } else {
-                            logo.textMsg(logo.blocks.blockList[blk].value.toString());
+                            var delayFactor = 0;
+                            matrix.playNotesString(0, logo.polySynth);
+                            for (i in matrix.notesToPlay)
+                            {
+                                delayFactor += 1/matrix.notesToPlay[i][1];
+                            }
+                            logo.setTurtleDelay(2000*delayFactor + 200);
+                            setTimeout(function()
+                            {
+                                logo.setTurtleDelay(0);
+                            }, 2000*delayFactor + 200);
                         }
-                    } else {
-                        logo.errorMsg('I do not know how to ' + logo.blocks.blockList[blk].name + '.', blk);
+                    } else { 
+                        if (logo.blocks.blockList[blk].name in logo.evalFlowDict)
+                        {
+                            eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
+                        } else {
+                            // Could be an arg block, so we need to print its value.
+                            console.log('running an arg block?');
+                            if (logo.blocks.blockList[blk].isArgBlock())
+                            {
+                                args.push(logo.parseArg(logo, turtle, blk));
+                                console.log('block: ' + blk + ' turtle: ' + turtle);
+                                console.log('block name: ' + logo.blocks.blockList[blk].name);
+                                console.log('block value: ' + logo.blocks.blockList[blk].value);
+                                if (logo.blocks.blockList[blk].value == null) {
+                                logo.textMsg('null block value');
+                            } else {
+                                logo.textMsg(logo.blocks.blockList[blk].value.toString());
+                            }
+                        } else {
+                            logo.errorMsg('I do not know how to ' + logo.blocks.blockList[blk].name + '.', blk);
+                        }
+                        logo.stopTurtle = true;
                     }
-                    logo.stopTurtle = true;
                 }
-            }
                 break;
         }
 
@@ -1668,10 +1641,10 @@ length;
         var me = this;
         this.saveTimeout = setTimeout(function () {
             // Save at the end to save an image
-        if(!noSession)
-        {
-            me.saveLocally();
-        }
+            if(!noSession)
+            {
+                me.saveLocally();
+            }
         }, DEFAULTDELAY * 1.5)
     }
 
@@ -1680,53 +1653,46 @@ length;
         var transformed = false;
         solfege = solfege.toString();   
         if(solfege.substr(-1) == '#' || 'b')
+        {
             transformed = true;
+        }
         var note = 'C4';
-            if(solfege.toUpperCase().substr(0,2) == 'DO')
-                    {
-                        note = 'C' + octave;
-                    }
-                    else if(solfege.toUpperCase().substr(0,2) == 'RE')
-                    {
-                        note = 'D' + octave;
-                    }
-                    else if(solfege.toUpperCase().substr(0,2) == 'MI')
-                    {
-                        note = 'E' + octave;
-                    }
-                    else if(solfege.toUpperCase().substr(0,2) == 'FA')
-                    {
-                        note = 'F' + octave;
-                    }
-                    else if(solfege.toUpperCase().substr(0,3) == 'SOL')
-                    {
-                        note = 'G' + octave;
-                    }   
-                    else if(solfege.toUpperCase().substr(0,2) == 'LA')
-                    {
-                        note = 'A' + octave;                       
-                    }
-                    else if(solfege.toUpperCase().substr(0,2) == 'SI')
-                    {
-                        note = 'B' + octave;
-                    }
-                    if(transformed)
-                    {
-                        
-                        if(solfege.substr(-1) == '#')
-                        {
-                            matrix.transposition = '+1';
-                            note = matrix.doTransposition(note[0], note[1]);
-                        }
+        if(solfege.toUpperCase().substr(0,2) == 'DO')
+        {
+            note = 'C' + octave;
+        } else if(solfege.toUpperCase().substr(0,2) == 'RE')
+        {
+            note = 'D' + octave;
+        } else if(solfege.toUpperCase().substr(0,2) == 'MI')
+        {
+            note = 'E' + octave;
+        } else if(solfege.toUpperCase().substr(0,2) == 'FA')
+        {
+            note = 'F' + octave;
+        } else if(solfege.toUpperCase().substr(0,3) == 'SOL')
+        {
+            note = 'G' + octave;
+        } else if(solfege.toUpperCase().substr(0,2) == 'LA')
+        {
+            note = 'A' + octave;                       
+        } else if(solfege.toUpperCase().substr(0,2) == 'SI')
+        {
+            note = 'B' + octave;
+        }
+        if (transformed)
+        {
+            if (solfege.substr(-1) == '#')
+            {
+                matrix.transposition = '+1';
+                note = matrix.doTransposition(note[0], note[1]);
+            } else if(solfege.substr(-1) == 'b')
+            {
+                matrix.transposition = '-1';
+                note = matrix.doTransposition(note[0], note[1]);
+            }
+            matrix.transposition = null;
 
-                        else if(solfege.substr(-1) == 'b')
-                        {
-                            matrix.transposition = '-1';
-                            note = matrix.doTransposition(note[0], note[1]);
-                        }
-                        matrix.transposition = null;
-
-                    }
+        }
         return note;
     }
 
@@ -2228,6 +2194,7 @@ length;
         myDoBlock.staticLabels.push('Chunk' + index);
         myDoBlock.palette.add(myDoBlock);
         //this.blocks.palettes.dict['assemble'].add(myDoBlock);
-        this.blocks.palettes.updatePalettes('matrix');  
+        // this.blocks.palettes.updatePalettes('matrix');  
+        this.blocks.palettes.updatePalettes('chunk');
     }
 }
