@@ -632,7 +632,7 @@ function Matrix(turtles, musicnotation)
         var noteConversion = {'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var stackIdx = 0;
-        console.log('SAVE MATRIX');
+        console.log('Save Matrix!!!');
 
         for (var i=0; i<this.notesToPlay.length; i++)
         {
