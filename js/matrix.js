@@ -642,9 +642,9 @@ function Matrix(turtles, musicnotation)
             window.savedMatricesNotes.push(note);
 
             // Add the Note block and its value
-            var idx = newStack.length();
+            var idx = newStack.length;
             newStack.push([idx, 'note', 0, 0, [stackIdx, idx + 1, null]]);
-            var n = newStack[idx][4].length();
+            var n = newStack[idx][4].length;
             newStack[stackIdx][4][n - 1] = idx;
             var stackIdx = idx;
             newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
