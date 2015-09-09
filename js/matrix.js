@@ -632,22 +632,16 @@ function Matrix(turtles, musicnotation)
         var noteConversion = {'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var stackIdx = 0;
-        console.log('Save Matrix!!!');
+        console.log('SAVE MATRIX!!!');
 
         for (var i=0; i<this.notesToPlay.length; i++)
         {
             var note = this.notesToPlay[i].slice(0);
-            // console.log(note[0][0] + ' ' + note[1]);
-            // if (note[0][0][0] == 'R') {
-            //     console.log(noteConversion[note[0][0][0]]);
-            // } else {
-            //     console.log(noteConversion[note[0][0][0]] + ' ' + note[0][0][1]);
-            // }
             window.savedMatricesNotes.push(note);
 
             // Add the Note block and its value
             var idx = newStack.length;
-            newStack.push([idx, 'note', 0, 0, [stackIdx, idx + 1, null]]);
+            newStack.push([idx, 'note', 0, 0, [stackIdx, idx + 1, idx + 2, null]]);
             var n = newStack[idx][4].length;
             newStack[stackIdx][4][n - 1] = idx;
             var stackIdx = idx;
