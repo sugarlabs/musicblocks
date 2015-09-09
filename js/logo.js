@@ -275,8 +275,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.runLogoCommands = function(startHere) {
         // Save the state before running.
         //console.log("name name " + this.blocks.blockList[startHere].name);
-        if(this.blocks.blockList[startHere].name.substring(0,15) != 'namedsavematrix' && this.blocks.blockList[startHere].name != 'showmatrix')
-        {
+        if startHere && this.blocks.blockList[startHere].name.substring(0,15) != 'namedsavematrix' && this.blocks.blockList[startHere].name != 'showmatrix') {
            this.saveLocally();
         }
         this.stopTurtle = false;
