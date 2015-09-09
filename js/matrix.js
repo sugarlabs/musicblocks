@@ -643,7 +643,11 @@ function Matrix(turtles, musicnotation)
             var idx = newStack.length;
             newStack.push([idx, 'note', 0, 0, [stackIdx, idx + 1, idx + 2, null]]);
             var n = newStack[idx][4].length;
-            newStack[stackIdx][4][n - 1] = idx;
+            if (i == 0) {  // the action block
+                newStack[stackIdx][4][n - 2] = idx;
+            } else { // the previous note block
+                newStack[stackIdx][4][n - 1] = idx;
+            }
             var stackIdx = idx;
             newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
             // Add the pitch block to the Note block
