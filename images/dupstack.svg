@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   width="767"
+   height="38"
+   id="svg2467">
+  <metadata
+     id="metadata20">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs2493" />
+  <path
+     d="M 15,37.5 C 11.5,37.5 8,35 5.5,32.5 3,30 0.5,26.5 0.5,23 l 0,-8 c 0,-3.25 2.5,-8.5 5,-10.5 2.5,-2 6,-4 9.5,-4 l 736.5,0 c 2.5,0 7,1 10.5,4 3.5,2.75 4.5,7.5 4.5,10.5 l 0,8 c 0,3.5 -2,7 -4.5,9.5 -2.5,2.5 -6.5,5 -10.5,5 L 15,37.5 z"
+     id="path4"
+     style="fill:#ffd000;fill-opacity:1;fill-rule:evenodd;stroke:#e0a000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  <g
+     transform="translate(656,65.625)"
+     id="g6">
+    <path
+       d="m 79.5,438.5 c 0,4.5 -3.75,8 -8.5,8 -4.5,0 -8.25,-3.5 -8.25,-8 0,-4.5 3.75,-8.25 8.25,-8.25 4.75,0 8.5,3.75 8.5,8.25 l 0,0 z"
+       transform="translate(24,-485)"
+       id="path8"
+       style="fill:#ff4040;fill-opacity:1;fill-rule:nonzero;stroke:#ff4040;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <text
+       id="text10"
+       style="font-size:12px;font-weight:bold;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans">
+      <tspan
+         x="91"
+         y="-42"
+         id="tspan12"
+         style="font-size:12px">X</tspan>
+    </text>
+  </g>
+  <g
+     transform="translate(6,0)"
+     id="g2478">
+    <path
+       d="M 44,15 10.5,15 27.5,-14 44,15 z"
+       transform="translate(-4,20)"
+       id="path2480"
+       style="fill:#404040;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <path
+       d="M 44,15 10.5,15 27.5,-14 44,15 z"
+       transform="translate(1,17)"
+       id="path2482"
+       style="fill:#e0e0e0;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <path
+       d="M 44,15 10.5,15 27.5,-14 44,15 z"
+       transform="translate(-1,18)"
+       id="path2484"
+       style="fill:#ffe000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+  </g>
+  <text
+     x="6"
+     id="text2486"
+     style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans">
+    <tspan
+       x="27"
+       y="29"
+       id="tspan2488"
+       style="font-size:24px">!</tspan>
+  </text>
+  <g
+     transform="matrix(1.44,0,0,1.44,70,1)"
+     id="g3061"
+     style="fill:#ffe000;fill-opacity:1;stroke:#c0a000;stroke-opacity:1">
+    <path
+       d="m 0.5,14.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 5,-6 5,6 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 z"
+       id="path3063"
+       style="fill:#ffe000;fill-opacity:1;stroke:#c0a000;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+  </g>
+  <g
+     transform="matrix(1.44,0,0,1.44,160,1)"
+     id="g3061-8"
+     style="fill:#ffe000;fill-opacity:1;stroke:#c0a000;stroke-opacity:1">
+    <path
+       d="m 0.5,14.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 5,-6 5,6 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 z"
+       id="path3063-7"
+       style="fill:#ffe000;fill-opacity:1;stroke:#c0a000;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+  </g>
+  <text
+     x="-15.714066"
+     y="-38.59026"
+     transform="scale(1.0155331,-0.98470448)"
+     id="text2474"
+     style="font-size:13.9273119px;font-style:normal;font-weight:normal;line-height:125%;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans">
+    <tspan
+       x="181.58951"
+       y="-6.0931983"
+       id="tspan2476"
+       style="font-size:55.70924759px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans">x</tspan>
+  </text>
+  <text
+     x="103.1943"
+     y="29.748047"
+     id="text2999"
+     xml:space="preserve"
+     style="font-size:288px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><tspan
+       x="103.1943"
+       y="29.748047"
+       id="tspan3001"
+       style="font-size:24px">1</tspan></text>
+  <text
+     x="193.72749"
+     y="29.90625"
+     id="text2999-5"
+     xml:space="preserve"
+     style="font-size:288px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><tspan
+       x="193.72749"
+       y="29.90625"
+       id="tspan3001-1"
+       style="font-size:24px">2</tspan></text>
+</svg>

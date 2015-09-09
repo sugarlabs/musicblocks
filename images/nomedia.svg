@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.0"
+   width="767"
+   height="38"
+   id="svg2">
+  <defs
+     id="defs41">
+    <linearGradient
+       x1="0.94254935"
+       y1="-31.669659"
+       x2="104.37702"
+       y2="20.434471"
+       id="linearGradient3172"
+       xlink:href="#linearGradient3166"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.7083638,0,0,1.0012565,0.1338084,32.632067)" />
+    <linearGradient
+       id="linearGradient3166">
+      <stop
+         id="stop3168"
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop3170"
+         style="stop-color:#ffff00;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       x1="0.94254935"
+       y1="-31.669659"
+       x2="104.37702"
+       y2="20.434471"
+       id="linearGradient2558"
+       xlink:href="#linearGradient3166"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.7083638,0,0,1.0012565,346.13381,24.632067)" />
+  </defs>
+  <path
+     d="M 15,37.5 C 11.5,37.5 8,35 5.5,32.5 C 3,30 0.5,26.5 0.5,23 L 0.5,15 C 0.5,11.75 3,6.5 5.5,4.5 C 8,2.5 11.5,0.5 15,0.5 L 751.5,0.5 C 754,0.5 758.5,1.5 762,4.5 C 765.5,7.25 766.5,12 766.5,15 L 766.5,23 C 766.5,26.5 764.5,30 762,32.5 C 759.5,35 755.5,37.5 751.5,37.5 L 15,37.5 z"
+     id="path4"
+     style="fill:#ffd000;fill-opacity:1;fill-rule:evenodd;stroke:#e0a000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  <g
+     transform="translate(656,65.625)"
+     id="g6">
+    <path
+       d="M 79.5,438.5 C 79.5,443 75.75,446.5 71,446.5 C 66.5,446.5 62.75,443 62.75,438.5 C 62.75,434 66.5,430.25 71,430.25 C 75.75,430.25 79.5,434 79.5,438.5 L 79.5,438.5 z"
+       transform="translate(24,-485)"
+       id="path8"
+       style="fill:#ff4040;fill-opacity:1;fill-rule:nonzero;stroke:#ff4040;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text10"
+       style="font-size:12px;font-weight:bold;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans">
+      <tspan
+         x="91"
+         y="-42"
+         id="tspan12"
+         style="font-size:12px">X</tspan>
+    </text>
+  </g>
+  <text
+     id="text2445"
+     style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans">
+    <tspan
+       x="128"
+       y="28"
+       id="tspan2447"
+       style="font-size:24px">???</tspan>
+  </text>
+  <g
+     transform="translate(6,0)"
+     id="g28">
+    <path
+       d="M 44,15 L 10.5,15 L 27.5,-14 L 44,15 z"
+       transform="translate(-4,20)"
+       id="path30"
+       style="opacity:1;fill:#404040;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       d="M 44,15 L 10.5,15 L 27.5,-14 L 44,15 z"
+       transform="translate(1,17)"
+       id="path32"
+       style="opacity:1;fill:#e0e0e0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       d="M 44,15 L 10.5,15 L 27.5,-14 L 44,15 z"
+       transform="translate(-1,18)"
+       id="path34"
+       style="opacity:1;fill:#ffe000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <text
+     x="6"
+     id="text36"
+     style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans">
+    <tspan
+       x="27"
+       y="29"
+       id="tspan38"
+       style="font-size:24px">!</tspan>
+  </text>
+  <g
+     transform="translate(64.520224,-8.9311472)"
+     id="clipping-image"
+     style="display:block">
+    <g
+       id="g2859"
+       style="display:inline">
+      <g
+         id="g2861">
+        <polygon
+           points="48.788,43.944 48.788,23.002 36.849,11.058 5.962,11.058 5.962,43.944 48.788,43.944 "
+           id="polygon2863"
+           style="fill:#ffffff;stroke:#010101;stroke-width:3.5" />
+        <polyline
+           id="polyline2865"
+           points="36.849,11.058 36.849,23.002 48.788,23.002    "
+           style="fill:none;stroke:#010101;stroke-width:3.5" />
+      </g>
+    </g>
+    <path
+       d="M 27.504,23.342 C 21.246,23.342 16.033,29.583 16.033,29.583 C 16.033,29.583 21.246,35.854 27.504,35.85 C 33.763,35.845 38.979,29.576 38.979,29.576 C 38.979,29.576 33.763,23.338 27.504,23.342 z M 27.504,33.984 C 25.081,33.984 23.117,32.018 23.117,29.595 C 23.117,27.176 25.081,25.207 27.504,25.207 C 29.924,25.207 31.89,27.176 31.89,29.595 C 31.89,32.019 29.924,33.984 27.504,33.984 z"
+       id="path2867"
+       style="fill:#010101;display:inline" />
+    <circle
+       cx="27.504"
+       cy="29.597"
+       r="1.9910001"
+       id="circle2869"
+       style="fill:#010101;display:inline" />
+  </g>
+</svg>
