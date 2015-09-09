@@ -197,6 +197,7 @@ function Block(protoblock, blocks, overrideName) {
         switch (this.name) {
             case 'start':
             case 'action':
+            case 'matrix':
                 var proto = new ProtoBlock('collapse');
                 proto.scale = this.protoblock.scale;
                 proto.extraWidth = 10;
@@ -206,6 +207,14 @@ function Block(protoblock, blocks, overrideName) {
 
                 var obj = this.protoblock.generator(this.clampCount[0]);
                 break;
+            case 'note':
+            case 'flat':
+            case 'sharp':
+            case 'multiplybeatvalue':
+            case 'dividebeatvalue':
+            case 'rhythmicdot':
+            case 'tie':
+            case 'tuplet':
             case 'repeat':
             case 'clamp':
             case 'forever':
