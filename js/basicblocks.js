@@ -77,7 +77,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitch.twoArgBlock();
     pitch.dockTypes[1] = 'anyin';
     pitch.dockTypes[2] = 'anyin';
-    
 
     var rhythm = new ProtoBlock('rhythm');
     rhythm.palette = palettes.dict['matrix'];
@@ -143,14 +142,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     flatBlock.adjustWidthToLabel();
     flatBlock.flowClampZeroArgBlock();
 
-
     var sharpBlock = new ProtoBlock('sharp');
     sharpBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['sharp'] = sharpBlock;
     sharpBlock.staticLabels.push(_('Sharp'));
     sharpBlock.adjustWidthToLabel();
     sharpBlock.flowClampZeroArgBlock();
-
     
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['play/save'];
@@ -217,7 +214,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     showMatrixBlock.adjustWidthToLabel();
     showMatrixBlock.flowClampZeroArgBlock();
 
-
     var tupletParamBlock = new ProtoBlock('tupletParamBlock');
     blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
     tupletParamBlock.palette = palettes.dict['matrix'];
@@ -249,7 +245,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     osctimeBlock.dockTypes[1] = 'anyin';
     osctimeBlock.dockTypes[2] = 'anyin';
        
-    
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['square'] = squareBlock;
