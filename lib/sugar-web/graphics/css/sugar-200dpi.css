@@ -1,0 +1,454 @@
+html {
+  height: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+body {
+  position: relative;
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 10pt;
+  background-color: #c0c0c0;
+}
+.unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+.pull-right {
+  float: right;
+}
+a {
+  color: #0076c3;
+  text-decoration: none;
+}
+/* Toolbar */
+.toolbar {
+  height: 75px;
+  padding: 0 77px;
+  color: white;
+  background-color: #282828;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+/* Toolbar separator */
+.toolbar hr {
+  display: inline-block;
+  height: 45px;
+  margin: 4.5px;
+  margin-bottom: -21px;
+  border: 1px solid #808080;
+}
+/* Toolbar toolbutton */
+.toolbar .toolbutton {
+  position: relative;
+  width: 67px;
+  height: 67px;
+  margin: 4px 2px;
+  color: white;
+  color: transparent;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: 0;
+  border-radius: 7.5px;
+}
+.toolbar .toolbutton:hover {
+  background-color: black;
+}
+.toolbar .toolbutton:active,
+.toolbar .toolbutton.active {
+  background-color: #808080;
+}
+.toolbar .toolbutton img {
+  width: 100%;
+  height: 100%;
+}
+.toolbar .toolbutton:before {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: block;
+  width: 75px;
+  height: 15px;
+  background-color: transparent;
+  content: "";
+}
+.toolbar .toolbutton.invoker:before {
+  background-image: url('../icons/emblems/arrow-down.svg');
+}
+.toolbar #stop-button {
+  background-image: url('../icons/actions/activity-stop.svg');
+}
+/* Canvas */
+#canvas {
+  position: absolute;
+  top: 75px;
+  bottom: 0;
+  width: 100%;
+  overflow-y: auto;
+  color: black;
+  background-color: #c0c0c0;
+}
+/* Button */
+button {
+  padding: 2px 4px;
+  line-height: 30px;
+  color: white;
+  background-color: #808080;
+  border: 2px solid transparent;
+  border-radius: 30px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+button:hover {
+  background-color: #a2a2a2;
+  border-color: #a2a2a2;
+}
+button:active {
+  color: black;
+  background-color: white;
+  border-color: #808080;
+}
+button:focus {
+  border-color: white;
+}
+.toolbar button {
+  margin-top: 18.5px;
+}
+/* Button with icon */
+button.icon {
+  position: relative;
+  padding-left: 34px;
+}
+button.icon span.ok {
+  background-image: url(../icons/actions/dialog-ok.svg);
+}
+button.icon:active span.ok {
+  background-image: url(../icons/actions/dialog-ok-active.svg);
+}
+button.icon span.cancel {
+  background-image: url(../icons/actions/dialog-cancel.svg);
+}
+button.icon:active span.cancel {
+  background-image: url(../icons/actions/dialog-cancel-active.svg);
+}
+button.icon span {
+  position: absolute;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+}
+button.icon span {
+  top: 2px;
+  left: 2px;
+}
+/* One line text input */
+input[type='text'] {
+  width: 225px;
+  padding: 4px;
+  line-height: 30px;
+  background-color: #e5e5e5;
+  border: 2px solid #e5e5e5;
+  border-radius: 30px;
+  outline: 0;
+}
+input[type='text']:focus {
+  background-color: white;
+}
+input[type='text']:disabled {
+  background-color: #808080;
+  border-color: #808080;
+}
+.toolbar input[type='text'],
+.palette .row input[type='text'] {
+  margin-top: 16.5px;
+}
+.palette .row input[type='text']:nth-last-child(1) {
+  margin-top: 14.5px;
+}
+input[type='text'].expand {
+  width: calc(100% - 12px);
+}
+/* One line text input with buttons inside */
+.icon-input {
+  position: relative;
+  display: inline-block;
+}
+.icon-input input[type='text'] {
+  width: 187px;
+  padding-right: 42px;
+}
+.icon-input.expand {
+  width: 100%;
+}
+.icon-input.expand input[type='text'] {
+  width: calc(100% - 50px);
+}
+.icon-input button {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  background-size: 30px 30px;
+}
+.icon-input button.right {
+  right: 0;
+  margin: 0 0 0 -42px;
+  border-radius: 0 30px 30px 0;
+}
+.icon-input button {
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 0;
+}
+.icon-input button {
+  top: 2px;
+}
+.toolbar .icon-input button:hover {
+  background-color: transparent;
+}
+.toolbar .icon-input button {
+  top: 16.5px;
+}
+button.cancel {
+  background-image: url(../icons/actions/entry-cancel.svg);
+}
+button.cancel:active {
+  background-image: url(../icons/actions/entry-cancel-active.svg);
+}
+button.cancel:disabled {
+  background-image: url(../icons/actions/entry-cancel-disabled.svg);
+}
+/* Slider */
+/* FIXME this is not fully Sugarized yet */
+input[type='range'] {
+  height: 15px;
+  cursor: pointer;
+  background-color: #808080;
+  border-radius: 30px;
+  -webkit-appearance: none !important;
+}
+input[type='range']::-webkit-slider-thumb {
+  width: 30px;
+  height: 30px;
+  background-color: #c0c0c0;
+  border: 4px solid #808080;
+  border-radius: 15px;
+  -webkit-appearance: none !important;
+}
+input[type='range']::-webkit-slider-thumb:hover {
+  background-color: #e2e2e2;
+  border-color: #a2a2a2;
+}
+.toolbar input[type='range'] {
+  margin-top: 30px;
+}
+/* Label */
+label {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+/* Palette */
+.palette {
+  position: absolute;
+  color: white;
+  pointer-events: none;
+  background-color: transparent;
+}
+.palette-invoker {
+  width: 71px;
+  height: 73px;
+  background-color: black;
+  background-position: 2px 2px;
+  background-repeat: no-repeat;
+  background-size: 67px;
+  border: 2px solid #808080;
+  border-bottom: 0;
+}
+.palette-invoker:after {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  display: block;
+  width: 75px;
+  height: 15px;
+  background-color: transparent;
+  background-image: url('../icons/emblems/arrow-up.svg');
+  content: "";
+}
+.palette-invoker:before {
+  position: absolute;
+  top: 75px;
+  left: 2px;
+  display: block;
+  width: 71px;
+  height: 2px;
+  background-color: black;
+  content: "";
+}
+.palette .wrapper {
+  max-width: 371px;
+  min-width: 221px;
+  min-height: 71px;
+  pointer-events: auto;
+  background-color: black;
+  border: 2px solid #808080;
+}
+.palette .header {
+  height: 71px;
+  margin: 0 7.5px;
+  font-weight: bold;
+  line-height: 71px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+.palette hr {
+  border: 1px solid #808080;
+}
+.palette hr.header-separator {
+  margin-top: 0;
+}
+.palette .row {
+  height: 75px;
+  margin: 0 7.5px;
+}
+.palette .row:nth-last-child(1) {
+  height: 71px;
+}
+.palette .row.small {
+  height: 30px;
+}
+.palette .row.expand {
+  height: auto;
+}
+/* Palette menu */
+.palette .menu {
+  padding: 0;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  list-style-type: none;
+}
+.palette .menu button {
+  width: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 45px;
+  text-align: left;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.palette .menu button:hover {
+  color: white;
+  background-color: #808080;
+}
+.palette .menu button.icon {
+  padding-left: 49px;
+}
+.palette .menu button.icon span {
+  top: 0;
+  left: 0;
+  width: 45px;
+  height: 45px;
+}
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 15px;
+  background-color: #808080;
+}
+::-webkit-scrollbar-thumb {
+  background-color: white;
+  border: 2px solid #dddddd;
+  border-radius: 15px;
+}
+/* Grid for visual debugging and layout */
+.grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+}
+/* Checkbox and radio */
+input[type='checkbox'],
+input[type='radio'] {
+  width: 30px;
+  height: 30px;
+  margin: 2px 2px 4px 2px;
+  vertical-align: middle;
+  background-position: center;
+  background-size: contain;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.toolbar input[type='checkbox'],
+.toolbar input[type='radio'] {
+  margin-top: 20.5px;
+  margin-bottom: 24.5px;
+}
+input[type='checkbox'] {
+  background-image: url(../icons/actions/checkbox-unchecked.svg);
+}
+input[type='checkbox']:active {
+  background-image: url(../icons/actions/checkbox-checked-selected.svg);
+}
+input[type='checkbox']:checked:active {
+  background-image: url(../icons/actions/checkbox-checked-selected.svg);
+}
+input[type='checkbox']:checked {
+  background-image: url(../icons/actions/checkbox-checked.svg);
+}
+input[type='radio'] {
+  background-image: url(../icons/actions/radio.svg);
+}
+input[type='radio']:active {
+  background-image: url(../icons/actions/radio-selected.svg);
+}
+input[type='radio']:checked:active {
+  background-image: url(../icons/actions/radio-active-selected.svg);
+}
+input[type='radio']:checked {
+  background-image: url(../icons/actions/radio-active.svg);
+}
+/* Textarea */
+textarea {
+  margin: 2px;
+  border: 2px solid #808080;
+}
+textarea.expand {
+  width: calc(100% - 12px);
+}
+/* Lists */
+ul.flat-list {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+ul.flat-list li {
+  height: 43px;
+  line-height: 43px;
+  background-color: white;
+  border-bottom: 2px dotted #c0c0c0;
+}
+ul.flat-list li:nth-last-child(1) {
+  border-bottom: none;
+}
+ul.flat-list.big li {
+  height: 58px;
+  line-height: 58px;
+}
+ul.flat-list.striped li:nth-child(odd) {
+  background-color: #e5e5e5;
+}
+/* ActivityPalette */
+#activity-palette .wrapper {
+  width: 371px;
+}
