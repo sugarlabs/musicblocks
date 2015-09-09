@@ -842,8 +842,9 @@ define(function(require) {
             if(matrix.isMatrix == 1)
             {
                 matrixTable = document.getElementById("myTable");
-                matrixTable.setAttribute("width", w/2 + 'px');
-
+                if (matrixTable) {
+                    matrixTable.setAttribute("width", w/2 + 'px');
+                }
             }
 
             if(workspace)
