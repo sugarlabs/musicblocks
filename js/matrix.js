@@ -637,12 +637,12 @@ function Matrix(turtles, musicnotation)
         for (var i=0; i<this.notesToPlay.length; i++)
         {
             var note = this.notesToPlay[i].slice(0);
-            console.log(note[0][0] + ' ' + note[1]);
-            if (note[0][0][0] == 'R') {
-                console.log(noteConversion[note[0][0][0]]);
-            } else {
-                console.log(noteConversion[note[0][0][0]] + ' ' + note[0][0][1]);
-            }
+            // console.log(note[0][0] + ' ' + note[1]);
+            // if (note[0][0][0] == 'R') {
+            //     console.log(noteConversion[note[0][0][0]]);
+            // } else {
+            //     console.log(noteConversion[note[0][0][0]] + ' ' + note[0][0][1]);
+            // }
             window.savedMatricesNotes.push(note);
 
             // Add the Note block and its value
