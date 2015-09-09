@@ -629,7 +629,7 @@ function Matrix(turtles, musicnotation)
         /* Saves the current matrix as chunks, saving as a chunk
 	 * functionality is implemented in logo js*/
 
-        var noteConversion = {'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si'};
+        var noteConversion = {'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var stackIdx = 0;
         console.log('Save Matrix!!!');
@@ -638,7 +638,11 @@ function Matrix(turtles, musicnotation)
         {
             var note = this.notesToPlay[i].slice(0);
             console.log(note[0][0] + ' ' + note[1]);
-            console.log(noteConversion[note[0][0][0]] + ' ' + note[0][0][1]);
+            if (note[0][0][0] == 'R') {
+                console.log(noteConversion[note[0][0][0]]);
+            } else {
+                console.log(noteConversion[note[0][0][0]] + ' ' + note[0][0][1]);
+            }
             window.savedMatricesNotes.push(note);
 
             // Add the Note block and its value
@@ -651,10 +655,16 @@ function Matrix(turtles, musicnotation)
             // Add the pitch block to the Note block
             newStack.push([idx + 2, 'pitch', 0, 0, [idx, idx + 3, idx + 4]]);
             newStack.push([idx + 3, ['text', {'value': noteConversion[note[0][0][0]]}], 0, 0, [idx + 2]]);
-            newStack.push([idx + 4, ['number', {'value': note[0][0][1]}], 0, 0, [idx + 2]]);
+            if (note[0][0][0] == 'R') {
+                newStack.push([idx + 4, ['number', {'value': 0], 0, 0, [idx + 2]]);
+            } else {
+                newStack.push([idx + 4, ['number', {'value': note[0][0][1]}], 0, 0, [idx + 2]]);
+            }
         }
         window.savedMatricesNotes.push('end');
         window.savedMatricesCount += 1;
         console.log(newStack);
+        // Create a new stack for the chunk.
+        this.logo.blocks.loadNewBlocks(newStack);
     }
 }
