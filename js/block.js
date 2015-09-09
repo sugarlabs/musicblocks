@@ -58,9 +58,10 @@ function Block(protoblock, blocks, overrideName) {
 
     this.size = 1; // Proto size is copied here.
     this.docks = []; // Proto dock is copied here.
-    this.connections = []; // Blocks that cannot be run on their own.
+    this.connections = [];
     // Keep track of clamp count for blocks with clamps
     this.clampCount = [1, 1];
+    this.argClampSlots = [1];
 
     // Some blocks have some post process after they are first loaded.
     this.postProcess = null;
@@ -75,7 +76,7 @@ function Block(protoblock, blocks, overrideName) {
     }
 
     this.highlight = function() {
-        if (this.collapsed && ['start', 'action', 'matrix'].indexOf(this.name) != -1) {
+        if (this.collapsed && ['start', 'action'].indexOf(this.name) != -1) {
             // We may have a race condition.
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = true;
@@ -87,7 +88,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = false;
             this.highlightBitmap.visible = true;
-            if (['start', 'action', 'matrix'].indexOf(this.name) != -1) {
+            if (['start', 'action'].indexOf(this.name) != -1) {
                 // There could be a race condition when making a
                 // new action block.
                 if (this.highlightCollapseBlockBitmap) {
@@ -107,14 +108,8 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     }
 
-    this.changePosition = function(x,y) {
-        this.x = x;
-        this.y = y;
-
-    }
-
     this.unhighlight = function() {
-        if (this.collapsed && ['start', 'action', 'matrix'].indexOf(this.name) != -1) {
+        if (this.collapsed && ['start', 'action'].indexOf(this.name) != -1) {
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = false;
                 this.collapseBlockBitmap.visible = true;
@@ -125,7 +120,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = true;
             this.highlightBitmap.visible = false;
-            if (['start', 'action', 'matrix'].indexOf(this.name) != -1) {
+            if (['start', 'action'].indexOf(this.name) != -1) {
                 if (this.highlightCollapseBlockBitmap) {
                     this.highlightCollapseBlockBitmap.visible = false;
                     this.collapseBlockBitmap.visible = false;
@@ -137,10 +132,15 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     }
 
+    this.updateArgSlots = function(slotList) {
+        // Resize and update number of slots in argClamp
+        this.argClampSlots = slotList;
+        this.newArtwork();
+        this.regenerateArtwork(false);
+    }
+
     this.updateSlots = function(clamp, plusMinus) {
         // Resize an expandable block.
-        var thisBlock = this.blocks.blockList.indexOf(this);
-
         this.clampCount[clamp] += plusMinus;
         this.newArtwork(plusMinus);
         this.regenerateArtwork(false);
@@ -155,7 +155,7 @@ function Block(protoblock, blocks, overrideName) {
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
-            if (myBlock.name == 'start' || myBlock.name == 'matrix'|| myBlock.name ==  'note' || myBlock.name ==  'flat' ||  myBlock.name ==  'sharp' || myBlock.name == 'multiplybeatvalue'|| myBlock.name == 'dividebeatvalue'|| myBlock.name == 'rhythmicdot'|| myBlock.name == 'tie'|| myBlock.name == 'tuplet') {
+            if (myBlock.name == 'start') {
                 // Rescale the decoration on the start blocks.
                 for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock == myBlock) {
@@ -197,15 +197,6 @@ function Block(protoblock, blocks, overrideName) {
         switch (this.name) {
             case 'start':
             case 'action':
-            case 'matrix':
-            case 'note':
-            case 'flat':
-            case 'sharp':
-            case 'multiplybeatvalue':
-            case 'dividebeatvalue':
-            case 'rhythmicdot':
-            case 'tie':
-            case 'tuplet':
                 var proto = new ProtoBlock('collapse');
                 proto.scale = this.protoblock.scale;
                 proto.extraWidth = 10;
@@ -231,6 +222,18 @@ function Block(protoblock, blocks, overrideName) {
             case 'ifthenelse':
                 var obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
                 break;
+            case 'nameddoArg':
+            case 'namedcalcArg':
+            case 'doArg':
+            case 'calcArg':
+                var obj = this.protoblock.generator(this.argClampSlots);
+                this.size = 2;
+                for (var i = 0; i < this.argClampSlots.length; i++) {
+                    this.size += this.argClampSlots[i];
+                }
+                this.docks = [];
+                this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
+                break;
             default:
                 if (this.isArgBlock()) {
                     var obj = this.protoblock.generator(this.clampCount[0]);
@@ -240,6 +243,35 @@ function Block(protoblock, blocks, overrideName) {
                     var obj = this.protoblock.generator();
                 }
                 this.size += plusMinus;
+                break;
+        }
+
+        switch (this.name) {
+            case 'nameddoArg':
+                for (var i = 1; i < obj[1].length - 1; i++) {
+                    this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
+                }
+                this.docks.push([obj[1][2][0], obj[1][2][1], 'in']);
+                break;
+            case 'namedcalcArg':
+                for (var i = 1; i < obj[1].length; i++) {
+                    this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
+                }
+                break;
+            case 'doArg':
+                this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+                for (var i = 2; i < obj[1].length - 1; i++) {
+                    this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
+                }
+                this.docks.push([obj[1][3][0], obj[1][3][1], 'in']);
+                break;
+            case 'calcArg':
+                this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+                for (var i = 2; i < obj[1].length; i++) {
+                    this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
+                }
+                break;
+            default:
                 break;
         }
 
@@ -368,7 +400,7 @@ function Block(protoblock, blocks, overrideName) {
                         }, 250);
                     }
 
-                    if (['start', 'action', 'matrix'].indexOf(myBlock.name) != -1) {
+                    if (['start', 'action'].indexOf(myBlock.name) != -1) {
                         myBlock.bitmap.visible = !myBlock.collapsed;
                         myBlock.highlightBitmap.visible = false;
                         myBlock.container.updateCache();
@@ -381,7 +413,11 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            var artwork = myBlock.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', block_label);
+            if (myBlock.protoblock.disabled) {
+                var artwork = myBlock.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', block_label);
+            } else {
+                var artwork = myBlock.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', block_label);
+            }
 
             for (var i = 1; i < myBlock.protoblock.staticLabels.length; i++) {
                 artwork = artwork.replace('arg_label_' + i, myBlock.protoblock.staticLabels[i]);
@@ -398,7 +434,11 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        var artwork = this.artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', block_label);
+        if (this.protoblock.disabled) {
+            var artwork = this.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', block_label);
+        } else {
+            var artwork = this.artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', block_label);
+        }
 
         for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
             artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
@@ -431,7 +471,7 @@ function Block(protoblock, blocks, overrideName) {
             positionText(this, this.protoblock.scale);
         }
 
-        if (['start', 'action', 'matrix'].indexOf(this.name) == -1) {
+        if (['start', 'action'].indexOf(this.name) == -1) {
             this.loadComplete = true;
             if (this.postProcess != null) {
                 this.postProcess(this.postProcessArg);
@@ -451,7 +491,7 @@ function Block(protoblock, blocks, overrideName) {
             var postProcess = function(myBlock) {
                 loadCollapsibleEventHandlers(myBlock);
                 myBlock.loadComplete = true;
-                    
+
                 if (myBlock.postProcess != null) {
                     myBlock.postProcess(myBlock.postProcessArg);
                     myBlock.postProcess = null;
@@ -549,7 +589,7 @@ function Block(protoblock, blocks, overrideName) {
     this.show = function() {
         if (!this.trash) {
             // If it is an action block or it is not collapsed then show it.
-            if (!(['action', 'start', 'matrix'].indexOf(this.name) == -1 && this.collapsed)) {
+            if (!(['action', 'start'].indexOf(this.name) == -1 && this.collapsed)) {
                 this.container.visible = true;
                 if (this.collapseContainer != null) {
                     this.collapseContainer.visible = true;
@@ -586,6 +626,10 @@ function Block(protoblock, blocks, overrideName) {
 
     this.isNoRunBlock = function() {
         return this.name == 'action';
+    }
+
+    this.isArgClamp = function() {
+        return this.protoblock.style == 'argclamp' || this.protoblock.style == 'argclamparg';
     }
 
     this.isExpandableBlock = function() {
@@ -659,9 +703,8 @@ function Block(protoblock, blocks, overrideName) {
         }
     }
 
-    this.doOpenMedia = function (myBlock) {
+    this.doOpenMedia = function (myBlock, thisBlock) {
         var fileChooser = docById('myOpenAll');
-        var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
 
         readerAction = function (event) {
             window.scroll(0, 0)
@@ -855,6 +898,9 @@ function loadCollapsibleEventHandlers(myBlock) {
 
     var moved = false;
     var locked = false;
+    var mousedown = false;
+    var offset = {x:0, y:0};
+
     function handleClick () {
         if (locked) {
             return;
@@ -878,69 +924,92 @@ function loadCollapsibleEventHandlers(myBlock) {
         // Always show the trash when there is a block selected.
         trashcan.show();
         moved = false;
-        var offset = {
+        mousedown = true;
+        var d = new Date();
+        blocks.time = d.getTime();
+        offset = {
             x: myBlock.collapseContainer.x - Math.round(event.stageX / myBlock.blocks.scale),
             y: myBlock.collapseContainer.y - Math.round(event.stageY / myBlock.blocks.scale)
         };
 
-        myBlock.collapseContainer.on('pressup', function(event) {
-            if (moved) {
-                collapseOut(blocks, myBlock, thisBlock, moved, event);
-                moved = false;
-            } else {
-                handleClick();
-            }
-        });
-
-        myBlock.collapseContainer.on('mouseout', function(event) {
-            if (moved) {
-                collapseOut(blocks, myBlock, thisBlock, moved, event);
-                moved = false;
-            }
-        });
-
-        myBlock.collapseContainer.on('pressmove', function(event) {
-            moved = true;
-            var oldX = myBlock.collapseContainer.x;
-            var oldY = myBlock.collapseContainer.y;
-            myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.scale + offset.x);
-            myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.scale + offset.y);
-            var dx = myBlock.collapseContainer.x - oldX;
-            var dy = myBlock.collapseContainer.y - oldY;
-            myBlock.container.x += dx;
-            myBlock.container.y += dy;
-            myBlock.x = myBlock.container.x;
-            myBlock.y = myBlock.container.y;
-
-            // If we are over the trash, warn the user.
-            if (trashcan.overTrashcan(event.stageX / myBlock.blocks.scale, event.stageY / myBlock.blocks.scale)) {
-                trashcan.highlight();
-            } else {
-                trashcan.unhighlight();
-            }
-
-            myBlock.blocks.findDragGroup(thisBlock)
-            if (myBlock.blocks.dragGroup.length > 0) {
-                for (var b = 0; b < myBlock.blocks.dragGroup.length; b++) {
-                    var blk = myBlock.blocks.dragGroup[b];
-                    if (b != 0) {
-                        myBlock.blocks.moveBlockRelative(blk, dx, dy);
-                    }
-                }
-            }
-
-            myBlock.blocks.refreshCanvas();
-        });
     });
 
     myBlock.collapseContainer.on('pressup', function(event) {
-        collapseOut(blocks, myBlock, thisBlock, moved, event);
-        moved = false;
+        if (!mousedown) {
+            // console.log('pressup w/o mouse down?');
+            return;
+        }
+        mousedown = false;
+        if (moved) {
+            collapseOut(blocks, myBlock, thisBlock, moved, event);
+            moved = false;
+        } else {
+            var d = new Date();
+            if ((d.getTime() - blocks.time) > 1000) {
+                var d = new Date();
+                blocks.time = d.getTime();
+                handleClick();
+            }
+        }
     });
 
     myBlock.collapseContainer.on('mouseout', function(event) {
-        collapseOut(blocks, myBlock, thisBlock, moved, event);
-        moved = false;
+        if (!mousedown) {
+            // console.log('mouseout w/o mouse down?');
+            return;
+        }
+        mousedown = false;
+        if (moved) {
+            collapseOut(blocks, myBlock, thisBlock, moved, event);
+            moved = false;
+        } else {
+            // Maybe restrict to Android?
+            var d = new Date();
+            // var diff = (d.getTime() - blocks.time);
+            // console.log(diff);
+            if ((d.getTime() - blocks.time) < 200) {
+                var d = new Date();
+                blocks.time = d.getTime();
+                handleClick();
+            }
+        }
+    });
+
+    myBlock.collapseContainer.on('pressmove', function(event) {
+        if (!mousedown) {
+            // console.log('pressmove w/o mouse down?');
+            return;
+        }
+        moved = true;
+        var oldX = myBlock.collapseContainer.x;
+        var oldY = myBlock.collapseContainer.y;
+        myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.scale + offset.x);
+        myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.scale + offset.y);
+        var dx = myBlock.collapseContainer.x - oldX;
+        var dy = myBlock.collapseContainer.y - oldY;
+        myBlock.container.x += dx;
+        myBlock.container.y += dy;
+        myBlock.x = myBlock.container.x;
+        myBlock.y = myBlock.container.y;
+
+        // If we are over the trash, warn the user.
+        if (trashcan.overTrashcan(event.stageX / myBlock.blocks.scale, event.stageY / myBlock.blocks.scale)) {
+            trashcan.highlight();
+        } else {
+            trashcan.unhighlight();
+        }
+
+        myBlock.blocks.findDragGroup(thisBlock)
+        if (myBlock.blocks.dragGroup.length > 0) {
+            for (var b = 0; b < myBlock.blocks.dragGroup.length; b++) {
+                var blk = myBlock.blocks.dragGroup[b];
+                if (b != 0) {
+                    myBlock.blocks.moveBlockRelative(blk, dx, dy);
+                }
+            }
+        }
+
+        myBlock.blocks.refreshCanvas();
     });
 }
 
@@ -981,7 +1050,7 @@ function calculateBlockHitArea(myBlock) {
     var bounds = myBlock.container.getBounds()
 
     // Only detect hits on top section of block.
-    if (myBlock.isClampBlock()) {
+    if (myBlock.isClampBlock() || myBlock.isArgClamp()) {
         hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT);
     } else {
         hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75); // Shrinking the height makes it easier to grab blocks below in the stack.
@@ -999,14 +1068,18 @@ function loadEventHandlers(myBlock) {
 
     myBlock.container.on('mouseover', function(event) {
         blocks.highlight(thisBlock, true);
-        blocks.activeBlock = thisBlock;
+        // blocks.activeBlock = thisBlock;
         blocks.refreshCanvas();
     });
 
+    var haveClick = false;
     var moved = false;
     var locked = false;
     var getInput = window.hasMouse;
     myBlock.container.on('click', function(event) {
+        // console.log('CLICK');
+	blocks.activeBlock = thisBlock;
+	haveClick = true;
         if (locked) {
             return;
         }
@@ -1021,12 +1094,14 @@ function loadEventHandlers(myBlock) {
                 blocks.selectedStack = topBlock;
                 blocks.selectingStack = false;
             } else if (myBlock.name == 'media') {
-                myBlock.doOpenMedia(myBlock);
+                myBlock.doOpenMedia(myBlock, thisBlock);
             } else if (myBlock.name == 'loadFile') {
-                myBlock.doOpenMedia(myBlock);
+                myBlock.doOpenMedia(myBlock, thisBlock);
             } else if (myBlock.name == 'text' || myBlock.name == 'number') {
                 if(!myBlock.trash)
-		            changeLabel(myBlock);
+                {
+                    changeLabel(myBlock);
+                }
             } else {
                 if (!blocks.inLongPress) {
                     var topBlock = blocks.findTopBlock(thisBlock);
@@ -1038,7 +1113,9 @@ function loadEventHandlers(myBlock) {
     });
 
     myBlock.container.on('mousedown', function(event) {
-        hideDOMLabel();
+        // console.log('MOUSEDOWN');
+        // hideDOMLabel();
+
         // Track time for detecting long pause...
         // but only for top block in stack
         if (myBlock.connections[0] == null) {
@@ -1067,21 +1144,30 @@ function loadEventHandlers(myBlock) {
         };
 
         myBlock.container.on('mouseout', function(event) {
+            if (haveClick) {
+               return;
+            }
+            // console.log('MOUSEOUT');
             if (!blocks.inLongPress) {
-                mouseoutCallback(myBlock, event, moved);
+                mouseoutCallback(myBlock, event, moved, haveClick, true);
             }
             moved = false;
         });
 
         myBlock.container.on('pressup', function(event) {
+            if (haveClick) {
+               return;
+            }
+            // console.log('PRESSUP');
             if (!blocks.inLongPress) {
-                mouseoutCallback(myBlock, event, moved);
+                mouseoutCallback(myBlock, event, moved, haveClick, true);
             }
             moved = false;
         });
 
         var original = {x: event.stageX, y: event.stageY};
         myBlock.container.on('pressmove', function(event) {
+            // console.log('PRESSMOVE');
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
 
@@ -1144,13 +1230,23 @@ function loadEventHandlers(myBlock) {
 
     myBlock.container.on('mouseout', function(event) {
         if (!blocks.inLongPress) {
-            mouseoutCallback(myBlock, event, moved);
+            // console.log('MOUSEOUT (OUT)');
+            mouseoutCallback(myBlock, event, moved, haveClick, true);
         }
+        moved = false;
+    });
+
+    myBlock.container.on('pressup', function(event) {
+        if (!blocks.inLongPress) {
+            // console.log('PRESSUP (OUT)');
+            mouseoutCallback(myBlock, event, moved, haveClick, false);
+        }
+        moved = false;
     });
 }
 
 
-function mouseoutCallback(myBlock, event, moved) {
+function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
     var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
     // Always hide the trash when there is no block selected.
     // FIXME: need to remove timer
@@ -1171,25 +1267,33 @@ function mouseoutCallback(myBlock, event, moved) {
             blocks.time = d.getTime();
             myBlock.blocks.blockMoved(thisBlock);
         }
-    } else if (myBlock.name == 'text' || myBlock.name == 'number') {
-        var d = new Date();
-        if ((d.getTime() - blocks.time) < 500) {
-            // console.log('blocks WERE moving or we are EDITING already');
-        } else {
-            if(!myBlock.trash)
-            {
-                var d = new Date();
-                blocks.time = d.getTime();
-                changeLabel(myBlock);
+    } else if (['text', 'number', 'media', 'loadFile'].indexOf(myBlock.name) != -1) {
+        if (!haveClick) {
+            // Simulate click on Android.
+            var d = new Date();
+            if ((d.getTime() - blocks.time) < 500) {
+                if(!myBlock.trash)
+                {
+                    var d = new Date();
+                    blocks.time = d.getTime();
+                    if (myBlock.name == 'media' || myBlock.name == 'loadFile') {
+                        myBlock.doOpenMedia(myBlock, thisBlock);
+                    } else {
+                        changeLabel(myBlock);
+                    }
+                }
             }
         }
     }
 
-    if (myBlock.blocks.activeBlock != myBlock) {
-    } else {
-        myBlock.blocks.unhighlight(null);
+    if (hideDOM) {
+        if (myBlock.blocks.activeBlock != thisBlock) {
+            hideDOMLabel();
+        } else {
+            myBlock.blocks.unhighlight(null);
+            myBlock.blocks.refreshCanvas();
+        }
         myBlock.blocks.activeBlock = null;
-        myBlock.blocks.refreshCanvas();
     }
 }
 
@@ -1307,6 +1411,11 @@ function labelChanged(myBlock) {
     var oldValue = myBlock.value;
     var newValue = myBlock.label.value;
 
+    if (oldValue == newValue) {
+       // Nothing to do in this case.
+       return;    
+    }
+
     // Update the block value and block text.
     if (myBlock.name == 'number') {
         myBlock.value = Number(newValue);
@@ -1338,23 +1447,24 @@ function labelChanged(myBlock) {
     }
     myBlock.blocks.refreshCanvas();
 
-    // TODO: Don't allow duplicate action names
     var c = myBlock.connections[0];
     if (myBlock.name == 'text' && c != null) {
         var cblock = myBlock.blocks.blockList[c];
-        console.log('Label changed to: ' + myBlock.name);
+        console.log('Label changed to: ' + myBlock.value);
         switch (cblock.name) {
             case 'action':
                 // If the label was the name of an action, update the
                 // associated run myBlock.blocks and the palette buttons
-                if (myBlock.value != _('action')) {
-                    // myBlock.blocks.newDoBlock(myBlock.value);
-                    myBlock.blocks.newNameddoBlock(myBlock.value);
-                    console.log('myBlock.value' + myBlock.value);   
-                }
                 // Rename both do <- name and nameddo blocks.
+                console.log('renameDos and...');
                 myBlock.blocks.renameDos(oldValue, newValue);
-                myBlock.blocks.renameNameddos(oldValue, newValue);
+                if (oldValue == _('action')) {
+                    console.log('newNameddoBlock.');
+                    myBlock.blocks.newNameddoBlock(newValue, myBlock.blocks.actionHasReturn(c), myBlock.blocks.actionHasArgs(c));
+                } else {
+                    console.log('renameNameddos.');
+                    myBlock.blocks.renameNameddos(oldValue, newValue);
+                }
                 myBlock.blocks.palettes.updatePalettes('actions');
                 break;
             case 'storein':
@@ -1362,13 +1472,14 @@ function labelChanged(myBlock) {
                 //associated box myBlock.blocks and the palette buttons
                 if (myBlock.value != 'box') {
                     myBlock.blocks.newStoreinBlock(myBlock.value);
-                    // myBlock.blocks.newBoxBlock(myBlock.value);
                     myBlock.blocks.newNamedboxBlock(myBlock.value);
                 }
                 // Rename both box <- name and namedbox blocks.
                 myBlock.blocks.renameBoxes(oldValue, newValue);
                 myBlock.blocks.renameNamedboxes(oldValue, newValue);
                 myBlock.blocks.palettes.updatePalettes('blocks');
+                break;
+            default:
                 break;
         }
     }
