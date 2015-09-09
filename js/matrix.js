@@ -630,7 +630,7 @@ function Matrix(turtles, musicnotation)
 	 * functionality is implemented in logo js*/
 
         var noteConversion = {'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si'};
-        var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toSting()}], 0, 0, [0]]];
+        var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var stackIdx = 0;
         console.log('SAVE MATRIX');
 
