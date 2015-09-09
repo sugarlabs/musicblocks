@@ -656,7 +656,7 @@ function Matrix(turtles, musicnotation)
             newStack.push([idx + 2, 'pitch', 0, 0, [idx, idx + 3, idx + 4]]);
             newStack.push([idx + 3, ['text', {'value': noteConversion[note[0][0][0]]}], 0, 0, [idx + 2]]);
             if (note[0][0][0] == 'R') {
-                newStack.push([idx + 4, ['number', {'value': 0], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, ['number', {'value': 0}], 0, 0, [idx + 2]]);
             } else {
                 newStack.push([idx + 4, ['number', {'value': note[0][0][1]}], 0, 0, [idx + 2]]);
             }
