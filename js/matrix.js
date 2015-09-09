@@ -628,9 +628,11 @@ function Matrix(turtles, musicnotation)
     {
         /* Saves the current matrix as chunks, saving as a chunk
 	 * functionality is implemented in logo js*/
+        console.log('SAVE MATRIX');
         for (var i=0; i<this.notesToPlay.length; i++)
         {
             var note = this.notesToPlay[i].slice(0);
+            console.log(note);
             window.savedMatricesNotes.push(note);
         }
         window.savedMatricesNotes.push('end');
