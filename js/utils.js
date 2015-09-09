@@ -27,6 +27,7 @@ function format(str, data) {
   });
 }
 
+
 function canvasPixelRatio() {
     var devicePixelRatio = window.devicePixelRatio || 1;
     var context = document.querySelector('#myCanvas').getContext('2d');
@@ -38,6 +39,7 @@ function canvasPixelRatio() {
     return devicePixelRatio / backingStoreRatio;
 }
 
+
 function windowHeight() {
     var onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
@@ -46,6 +48,7 @@ function windowHeight() {
         return window.innerHeight;
     }
 }
+
 
 function httpGet(projectName) {
     var xmlHttp = null;
@@ -120,7 +123,7 @@ function last(myList) {
 
 
 function doSVG(canvas, logo, turtles, width, height, scale) {
-    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '">\n';
+    var svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '">\n';
     svg += '<g transform="scale(' + scale + ',' + scale + ')">\n';
     svg += logo.svgOutput;
     for (var turtle in turtles.turtleList) {
@@ -131,6 +134,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
     svg += '</svg>';
     return svg;
 }
+
 
 function isSVGEmpty(turtles) {
     for (var turtle in turtles.turtleList) {
@@ -192,7 +196,7 @@ function _(text) {
 };
 
 
-function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict) {
+function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
     // console.log(rawData);
     var lineData = rawData.split('\n');
     var cleanData = '';
@@ -211,17 +215,17 @@ function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict,
 
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
-    try {
-        var obj = processPluginData(cleanData.replace(/\n/g,''), palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict);
-    } catch (e) {
-        var obj = null;
-        errorMsg('Error loading plugin: ' + e);
-    }
+    //try {
+        var obj = processPluginData(cleanData.replace(/\n/g,''), palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList);
+    //} catch (e) {
+    //    var obj = null;
+    //    errorMsg('Error loading plugin: ' + e);
+    //}
     return obj;
 }
 
 
-function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict) {
+function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
     // Plugins are JSON-encoded dictionaries.
     // console.log(pluginData);
     var obj = JSON.parse(pluginData);
@@ -339,6 +343,27 @@ function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDi
         }
     }
 
+    // Code to execute when plugin is loaded
+    if ('ONLOAD' in obj) {
+        for (var arg in obj['ONLOAD']) {
+            eval(obj['ONLOAD'][arg]);
+        }
+    }
+
+    // Code to execute when turtle code is started
+    if ('ONSTART' in obj) {
+        for (var arg in obj['ONSTART']) {
+            evalOnStartList[arg] = obj['ONSTART'][arg];
+        }
+    }
+
+    // Code to execute when turtle code is stopped
+    if ('ONSTOP' in obj) {
+        for (var arg in obj['ONSTOP']) {
+            evalOnStopList[arg] = obj['ONSTOP'][arg];
+        }
+    }
+
     // Push the protoblocks onto their palettes.
     for (var protoblock in blocks.protoBlockDict) {
         if (blocks.protoBlockDict[protoblock].palette == undefined) {
@@ -389,6 +414,15 @@ function updatePluginObj(obj) {
     if ('IMAGES' in obj) {
         pluginObjs['IMAGES'] = obj['IMAGES'];
     }
+    for (var name in obj['ONLOAD']) {
+        pluginObjs['ONLOAD'][name] = obj['ONLOAD'][name];
+    }
+    for (var name in obj['ONSTART']) {
+        pluginObjs['ONSTART'][name] = obj['ONSTART'][name];
+    }
+    for (var name in obj['ONSTOP']) {
+        pluginObjs['ONSTOP'][name] = obj['ONSTOP'][name];
+    }
 }
 
 
@@ -428,6 +462,7 @@ function doSaveSVG(logo, desc) {
     var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
     download(desc, 'data:image/svg+xml;utf8,' + svg, desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
 }
+
 
 function download(filename, data) {
     var a = document.createElement('a');
