@@ -281,6 +281,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
            this.saveLocally();
         }
         this.stopTurtle = false;
+        this.inNote = false;  // TODO: one per turtle
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under blocks.
 
@@ -1571,8 +1572,8 @@ length;
             // child flow completes.
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-        } else {
-            // todo: check to see if we are in a note block
+        } else if (logo.inNote) {
+            // TODO: make turtle-specific
             console.log('dispatching _playnote event');
             logo.stage.dispatchEvent('_playnote');
         }
