@@ -468,6 +468,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
                 logo.stepQueue[turtle].push(blk);
             } else {
+                console.log('settime for running from block ' + blk + ' after ' + delay + 'ms';
                 setTimeout(function() {
                     logo.runFromBlockNow(logo, turtle, blk);
                 }, delay);
@@ -522,11 +523,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     eval(this.evalSetterDict[this.blocks.blockList[blk].name]);
                     break;
                 }
-                this.errorMsg('Block does not support incrementing', blk);
+w                this.errorMsg('Block does not support incrementing', blk);
         }
     }
 
     this.runFromBlockNow = function(logo, turtle, blk) {
+        console.log('running ' + logo.blocks.blockList[blk].name);
+
         var noSession = 0;
         // Run a stack of blocks, beginning with blk.
         // (1) Evaluate any arguments (beginning with connection[1]);
