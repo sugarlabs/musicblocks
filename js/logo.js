@@ -460,6 +460,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         var delay = logo.turtleDelay + logo.waitTimes[turtle];
         logo.waitTimes[turtle] = 0;
 
+        console.log('delay is ' + delay);
+        console.log('stopTurtle is ' + logo.stopTurtle);
         if (!logo.stopTurtle) {
             if (logo.turtleDelay == TURTLESTEP) {
                 // Step mode
@@ -467,6 +469,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.stepQueue[turtle] = [];
                 }
                 logo.stepQueue[turtle].push(blk);
+                console.log(logo.stepQueue[turtle]);
             } else {
                 console.log('settime for running from block ' + blk + ' after ' + delay + 'ms');
                 setTimeout(function() {
