@@ -602,6 +602,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 if (args.length == 2) {
                     if (!(args[1] in logo.actions)) {
                         logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                        console.log('setting stopTurtle inside listen');
                         logo.stopTurtle = true;
                     } else {
                         var listener = function (event) {
@@ -639,6 +640,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     childFlowCount = 1;
                 } else {
                     logo.errorMsg(NOACTIONERRORMSG, blk, name);
+                    console.log('setting stopTurtle inside nameddo');
                     logo.stopTurtle = true;
                 }
                 break;
@@ -650,7 +652,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         childFlow = logo.actions[args[0]];
                         childFlowCount = 1;
                     } else {
-                       logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
+                        logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
+                        console.log('setting stopTurtle inside do');
                         logo.stopTurtle = true;
                     }
                 }
@@ -690,6 +693,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 if (args.length == 2) {
                     if (typeof(args[0]) == 'string') {
                         logo.errorMsg(NANERRORMSG, blk);
+                        console.log('setting stopTurtle inside repeat');
                         logo.stopTurtle = true;
                     } else {
                         childFlow = args[1];
@@ -845,6 +849,7 @@ length;
                 if (args.length == 2) {
                     if (typeof(args[0]) == 'string' || typeof(args[1]) == 'sting') {
                         logo.errorMsg(NANERRORMSG, blk);
+                        console.log('setting stopTurtle inside setxy');
                         logo.stopTurtle = true;
                     } else {
                         logo.turtles.turtleList[turtle].doSetXY(args[0], args[1]);
@@ -855,6 +860,7 @@ length;
                 if (args.length == 2) {
                     if (typeof(args[0]) == 'string' || typeof(args[1]) == 'sting') {
                         logo.errorMsg(NANERRORMSG, blk);
+                        console.log('setting stopTurtle inside arc');
                         logo.stopTurtle = true;
                     } else {
                         logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
@@ -865,6 +871,7 @@ length;
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
                         logo.errorMsg(NANERRORMSG, blk);
+                        console.log('setting stopTurtle inside forward');
                         logo.stopTurtle = true;
                     } else {
                         logo.turtles.turtleList[turtle].doForward(args[0]);
@@ -875,6 +882,7 @@ length;
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
                         logo.errorMsg(NANERRORMSG, blk);
+                        console.log('setting stopTurtle inside back');
                         logo.stopTurtle = true;
                     } else {
                         logo.turtles.turtleList[turtle].doForward(-args[0]);
@@ -885,6 +893,7 @@ length;
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
                         logo.errorMsg(NANERRORMSG, blk);
+                        console.log('setting stopTurtle inside right');
                         logo.stopTurtle = true;
                     } else {
                         logo.turtles.turtleList[turtle].doRight(args[0]);
@@ -895,6 +904,7 @@ length;
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
                         logo.errorMsg(NANERRORMSG, blk);
+                        console.log('setting stopTurtle inside left');
                         logo.stopTurtle = true;
                     } else {
                         logo.turtles.turtleList[turtle].doRight(-args[0]);
@@ -905,6 +915,7 @@ length;
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
                         logo.errorMsg(NANERRORMSG, blk);
+                        console.log('setting stopTurtle inside setheading');
                         logo.stopTurtle = true;
                     } else {
                         logo.turtles.turtleList[turtle].doSetHeading(args[0]);
@@ -961,7 +972,6 @@ length;
                     }
                 }
                 break;
-
             case 'setfont':
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
@@ -1588,8 +1598,9 @@ length;
                             }
                         } else {
                             logo.errorMsg('I do not know how to ' + logo.blocks.blockList[blk].name + '.', blk);
+                            console.log('setting stopTurtle in ???');
+                            logo.stopTurtle = true;
                         }
-                        logo.stopTurtle = true;
                     }
                 }
                 break;
