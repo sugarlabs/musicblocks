@@ -578,8 +578,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         }
 
         console.log('running block ' + logo.blocks.blockList[blk].name);
-        switch (logo.blocks.blockList[blk].name)
-        {
+
+        switch (logo.blocks.blockList[blk].name) {
             case 'dispatch':
                 // Dispatch an event.
                 if (args.length == 1) {
