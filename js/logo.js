@@ -281,6 +281,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
            this.saveLocally();
         }
         this.stopTurtle = false;
+
+        console.log('runLogoCommands: setting inNote false');
         this.inNote = false;  // TODO: one per turtle
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under blocks.
@@ -644,22 +646,18 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }, 2000);
                 break;
             case 'pitch':
-                if(logo.sharp)
-                {
+                if (logo.sharp) {
                     args[0] += '#';
                 }
-                else if(logo.flat)
-                {
+                else if (logo.flat) {
                     args[0] += 'b';
                 }
-                if(logo.inNote)
-                {
+                if (logo.inNote) {
                     console.log('pitch: pushing ' + args[0] + ' ' + args[1]);
                     logo.noteBlockNotes.push(args[0]);
                     logo.noteBlockOct.push(args[1]);
                 }
-                else
-                {
+                else {
                     console.log('pitch: pushing to matrix');
                     matrix.solfegeNotes.push(args[0]);
                     matrix.solfegeOct.push(args[1]);
@@ -1208,6 +1206,7 @@ length;
                 break;
             case 'note':
                 if (!logo.inNote) {
+                    console.log('setting inNote true');
                     logo.inNote = true;
                     logo.noteBlockNotes = [];
                     logo.noteBlockOct = [];
@@ -1233,6 +1232,7 @@ length;
                     console.log("note play" + notes);
                     that.polySynth.triggerAttackRelease(notes, 1/beatValue);
                     Tone.Transport.start();
+                    console.log('setting inNote false');
                     that.inNote = false;
                 }//, 1000);
                 // If there is already a listener, remove it
