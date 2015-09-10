@@ -1221,8 +1221,14 @@ length;
                 }
 
                 console.log(args[1]);
-                childFlow = args[1];
-                childFlowCount = 1;
+
+                var queueBlock = new Queue(args[1], 1, blk);
+                logo.parentFlowQueue[turtle].push(blk);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+
+                // childFlow = args[1];
+                // childFlowCount = 1;
+
                 // logo.runFromBlock(logo, turtle, args[1]);
 
                 var that=this;
