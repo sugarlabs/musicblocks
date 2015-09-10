@@ -75,6 +75,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     // TODO: make turtle-specific
     this.notesList = [];
+    this.pushedNote = false;
     this.inNote = false;
     this.noteBlockNotes = [];
     this.noteBlockOct = [];
@@ -284,6 +285,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
         console.log('runLogoCommands: setting inNote false');
         this.inNote = false;  // TODO: one per turtle
+        this.pushedNote = false;  // TODO: one per turtle
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under blocks.
 
@@ -656,6 +658,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     console.log('pitch: pushing ' + args[0] + ' ' + args[1]);
                     logo.noteBlockNotes.push(args[0]);
                     logo.noteBlockOct.push(args[1]);
+                    logo.pushedNote = true;
                 }
                 else {
                     console.log('pitch: pushing to matrix');
@@ -1208,6 +1211,7 @@ length;
                 if (!logo.inNote) {
                     console.log('setting inNote true');
                     logo.inNote = true;
+                    logo.pushedNote = false;
                     logo.noteBlockNotes = [];
                     logo.noteBlockOct = [];
                 }
@@ -1233,7 +1237,8 @@ length;
                     that.polySynth.triggerAttackRelease(notes, 1/beatValue);
                     Tone.Transport.start();
                     console.log('setting inNote false');
-                    that.inNote = false;
+                    logo.inNote = false;
+                    logo.pushedNote = false;
                 }//, 1000);
                 // If there is already a listener, remove it
                 // before adding the new one.
@@ -1576,7 +1581,7 @@ length;
             // child flow completes.
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-        } else if (logo.inNote) {
+        } else if (logo.inNote && logo.pushedNote) {
             // TODO: make turtle-specific
             console.log('dispatching _playnote event');
             logo.stage.dispatchEvent('_playnote');
