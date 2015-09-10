@@ -1593,7 +1593,7 @@ length;
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
         }
 
-        if (logo.inNote && logo.pushedNote) {
+        else if (logo.inNote && logo.pushedNote) {
             // TODO: make turtle-specific
             console.log('dispatching _playnote event');
             logo.stage.dispatchEvent('_playnote');
