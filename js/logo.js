@@ -1585,7 +1585,9 @@ length;
             // child flow completes.
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-        } else if (logo.inNote && logo.pushedNote) {
+        }
+
+        if (logo.inNote && logo.pushedNote) {
             // TODO: make turtle-specific
             console.log('dispatching _playnote event');
             logo.stage.dispatchEvent('_playnote');
