@@ -1224,7 +1224,7 @@ length;
                     that.polySynth.triggerAttackRelease(notes, 1/beatValue);
                     Tone.Transport.start();
                     that.inNote = false;
-                }, 1000);
+                }, 1); // 1000);
             case 'showmatrix':
                 logo.showMatrix = true;
                 noSession = 1;
