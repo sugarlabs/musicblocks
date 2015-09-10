@@ -543,8 +543,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             // All flow blocks have a nextFlow, but it can be null
             // (i.e., end of a flow).
             var nextFlow = last(logo.blocks.blockList[blk].connections);
-            var queueBlock = new Queue(nextFlow, 1, blk);
-            if (nextFlow != null) {  // Not sure why this check is needed.
+            if (nextFlow != null) {
+                var queueBlock = new Queue(nextFlow, 1, blk);
                 logo.turtles.turtleList[turtle].queue.push(queueBlock);
             }
         }
@@ -557,6 +557,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             logo.blocks.highlight(blk, false);
         }
 
+        // TODO: Should be done as a child flow of the clamp blocks.
         if(logo.blocks.blockList[blk].name == 'pitch')
         {
             //To apply flat/sharp to all the pitches inside clamp
@@ -576,8 +577,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 this.sharpClampCount -= 2;
         }
 
-        switch (logo.blocks.blockList[blk].name)
-        {
+        switch (logo.blocks.blockList[blk].name) {
+            console.log('running block ' + logo.blocks.blockList[blk].name);
             case 'dispatch':
                 // Dispatch an event.
                 if (args.length == 1) {
@@ -621,70 +622,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 if (args.length == 1) {
                     childFlow = args[0];
                     childFlowCount = 1; 
-                }
-                break;
-            case 'matrix':
-                if (args.length == 1) {
-                    childFlow = args[0];
-                    childFlowCount = 1; 
-                }
-                matrix.solfegeNotes = [];
-                matrix.solfegeOct = [];
-                setTimeout(function()
-                {
-                    matrix.initMatrix(logo);
-                }, 1500);
-                var that = this;
-                setTimeout(function()
-                {
-                    if(that.tuplet)
-                    {
-                        matrix.makeClickable(true, that.polySynth);
-                        that.tuplet = 0;
-                    }
-
-                    else
-                        matrix.makeClickable(false, that.polySynth);
-                }, 2000);
-                break;
-            case 'pitch':
-                if (logo.sharp) {
-                    args[0] += '#';
-                }
-                else if (logo.flat) {
-                    args[0] += 'b';
-                }
-                if (logo.inNote) {
-                    console.log('pitch: pushing ' + args[0] + ' ' + args[1]);
-                    logo.noteBlockNotes.push(args[0]);
-                    logo.noteBlockOct.push(args[1]);
-                    logo.pushedNote = true;
-                }
-                else {
-                    console.log('pitch: pushing to matrix');
-                    matrix.solfegeNotes.push(args[0]);
-                    matrix.solfegeOct.push(args[1]);
-                }
-                break;
-            case 'rhythm':
-                if(logo.rhythmicValueParameter == 'rhythmicdot')
-                {
-                    args[1] = (2/3)*args[1];
-                    logo.rhythmicValueParameter = null;
-                }
-                console.log('blk is ' + blk + ' and rhythmInsideTuplet is ' + logo.rhythmInsideTuplet);
-                if(blk == logo.rhythmInsideTuplet)
-                {
-                    logo.tupletRhythmCount -= 2;
-                    logo.tupletParam.push([args[0], args[1]]);
-                    var that = this;
-                    setTimeout(function(){
-                        matrix.handleTuplet(that.tupletParam);
-                    },1500)
-                } else {
-                    setTimeout(function(){
-                        matrix.makeMatrix(args[0], args[1]);
-                    }, 1500);
                 }
                 break;
             case 'nameddo':
@@ -1159,6 +1096,71 @@ length;
                 break;
 
             // Actions for music-related blocks
+            case 'matrix':
+                if (args.length == 1) {
+                    childFlow = args[0];
+                    childFlowCount = 1; 
+                }
+                matrix.solfegeNotes = [];
+                matrix.solfegeOct = [];
+                setTimeout(function()
+                {
+                    matrix.initMatrix(logo);
+                }, 1500);
+                var that = this;
+                setTimeout(function()
+                {
+                    if(that.tuplet)
+                    {
+                        matrix.makeClickable(true, that.polySynth);
+                        that.tuplet = 0;
+                    }
+
+                    else
+                        matrix.makeClickable(false, that.polySynth);
+                }, 2000);
+                break;
+            case 'pitch':
+                if (logo.sharp) {
+                    args[0] += '#';
+                }
+                else if (logo.flat) {
+                    args[0] += 'b';
+                }
+                if (logo.inNote) {
+                    console.log('pitch: pushing ' + args[0] + ' ' + args[1]);
+                    logo.noteBlockNotes.push(args[0]);
+                    logo.noteBlockOct.push(args[1]);
+                    logo.pushedNote = true;
+                }
+                else {
+                    console.log('pitch: pushing to matrix');
+                    matrix.solfegeNotes.push(args[0]);
+                    matrix.solfegeOct.push(args[1]);
+                }
+                console.log('outflow ' + args[2]);
+                break;
+            case 'rhythm':
+                if(logo.rhythmicValueParameter == 'rhythmicdot')
+                {
+                    args[1] = (2/3)*args[1];
+                    logo.rhythmicValueParameter = null;
+                }
+                console.log('blk is ' + blk + ' and rhythmInsideTuplet is ' + logo.rhythmInsideTuplet);
+                if(blk == logo.rhythmInsideTuplet)
+                {
+                    logo.tupletRhythmCount -= 2;
+                    logo.tupletParam.push([args[0], args[1]]);
+                    var that = this;
+                    setTimeout(function(){
+                        matrix.handleTuplet(that.tupletParam);
+                    },1500)
+                } else {
+                    setTimeout(function(){
+                        matrix.makeMatrix(args[0], args[1]);
+                    }, 1500);
+                }
+                break;
             case 'timeSign':
                 console.log('Time Signatature' + args[0]);
                 break;
@@ -1208,6 +1210,9 @@ length;
                 logo.saveMatrix();
                 break;
             case 'note':
+                if (logo.inNote) {
+                    console.log('waiting on previous note');
+                }
                 while(logo.inNote) {
                     // wait for previous note to finish
                 }
@@ -1221,30 +1226,31 @@ length;
                 }
 
                 console.log(args[1]);
+                console.log(logo.parentFlowQueue[turtle]);
 
                 var queueBlock = new Queue(args[1], 1, blk);
                 logo.parentFlowQueue[turtle].push(blk);
                 logo.turtles.turtleList[turtle].queue.push(queueBlock);
 
-                // childFlow = args[1];
-                // childFlowCount = 1;
+                childFlow = args[1];
+                childFlowCount = 1;
 
                 // logo.runFromBlock(logo, turtle, args[1]);
 
-                var that=this;
+                // var that=this;
                 // setTimeout(function() {
                 var listener = function (event) {
-                    console.log("notes " + that.noteBlockNotes + " oct " + that.noteBlockOct);
+                    console.log("notes " + logo.noteBlockNotes + " oct " + logo.noteBlockOct);
                     var notes = [];
-                    that.polySynth.toMaster();
+                    logo.polySynth.toMaster();
                     var beatValue = args[0];
-                    for (i in that.noteBlockNotes)
+                    for (i in logo.noteBlockNotes)
                     {
-                        note = that.getNote(that.noteBlockNotes[i], that.noteBlockOct[i]);
+                        note = logo.getNote(logo.noteBlockNotes[i], logo.noteBlockOct[i]);
                         notes.push(note);
                     }
                     console.log("note play" + notes);
-                    that.polySynth.triggerAttackRelease(notes, 1/beatValue);
+                    logo.polySynth.triggerAttackRelease(notes, 1/beatValue);
                     Tone.Transport.start();
                     console.log('setting inNote false');
                     logo.inNote = false;
@@ -1582,6 +1588,8 @@ length;
         }
 
         // (3) Queue block below the current block.
+        console.log('after switch: child flow is ' + childFlow);
+        console.log('after switch: queue length is ' + logo.turtles.turtleList[turtle].queue.length);
 
         // If there is a child flow, queue it.
         if (childFlow != null) {
@@ -1591,9 +1599,7 @@ length;
             // child flow completes.
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-        }
-
-        else if (logo.inNote && logo.pushedNote) {
+        } else if (logo.inNote && logo.pushedNote) {
             // TODO: make turtle-specific
             console.log('dispatching _playnote event');
             logo.stage.dispatchEvent('_playnote');
