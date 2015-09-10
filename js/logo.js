@@ -1212,8 +1212,12 @@ length;
                     logo.noteBlockNotes = [];
                     logo.noteBlockOct = [];
                 }
+
                 console.log(args[1]);
-                logo.runFromBlock(logo, turtle, args[1]);
+                childFlow = args[1];
+                childFlowCount = 1;
+                // logo.runFromBlock(logo, turtle, args[1]);
+
                 var that=this;
                 // setTimeout(function() {
                 var listener = function (event) {
