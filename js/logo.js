@@ -651,11 +651,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
                 if(logo.inNote)
                 {
+                    console.log('pitch: pushing ' + args[0] + ' ' + args[1]);
                     logo.noteBlockNotes.push(args[0]);
                     logo.noteBlockOct.push(args[1]);
                 }
                 else
                 {
+                    console.log('pitch: pushing to matrix');
                     matrix.solfegeNotes.push(args[0]);
                     matrix.solfegeOct.push(args[1]);
                 }
@@ -1205,7 +1207,7 @@ length;
                 logo.inNote = true;
                 logo.noteBlockNotes = [];
                 logo.noteBlockOct = [];
-                
+                console.log(args[1]);
                 logo.runFromBlock(logo, turtle, args[1]);
                 var that=this;
                 setTimeout(function() {
