@@ -72,6 +72,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.flat = false;
     this.flatClampCount = 0;
     this.sharpClampCount = 0;
+
+    // TODO: make turtle-specific
     this.notesList = [];
     this.inNote = false;
     this.noteBlockNotes = [];
@@ -1212,7 +1214,8 @@ length;
                 console.log(args[1]);
                 logo.runFromBlock(logo, turtle, args[1]);
                 var that=this;
-                setTimeout(function() {
+                // setTimeout(function() {
+                var listener = function (event) {
                     console.log("notes " + that.noteBlockNotes + " oct " + that.noteBlockOct);
                     var notes = [];
                     that.polySynth.toMaster();
@@ -1226,7 +1229,16 @@ length;
                     that.polySynth.triggerAttackRelease(notes, 1/beatValue);
                     Tone.Transport.start();
                     that.inNote = false;
-                }, 1000);
+                }//, 1000);
+                // If there is already a listener, remove it
+                // before adding the new one.
+                // TODO: make event name turtle-specific
+                if ('_playnote' in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(args[0], logo.turtles.turtleList[turtle].listeners['_playnote'], false);
+                }
+                logo.turtles.turtleList[turtle].listeners['_playnote'] = listener;
+                logo.stage.addEventListener('_playnote', listener, false);
+
             case 'showmatrix':
                 logo.showMatrix = true;
                 noSession = 1;
@@ -1559,6 +1571,10 @@ length;
             // child flow completes.
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
+        } else {
+            // todo: check to see if we are in a note block
+            console.log('dispatching _playnote event');
+            logo.stage.dispatchEvent('_playnote');
         }
 
         var nextBlock = null;
