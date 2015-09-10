@@ -1204,9 +1204,11 @@ length;
                 logo.saveMatrix();
                 break;
             case 'note':
-                logo.inNote = true;
-                logo.noteBlockNotes = [];
-                logo.noteBlockOct = [];
+                if (!logo.inNote) {
+                    logo.inNote = true;
+                    logo.noteBlockNotes = [];
+                    logo.noteBlockOct = [];
+                }
                 console.log(args[1]);
                 logo.runFromBlock(logo, turtle, args[1]);
                 var that=this;
@@ -1224,7 +1226,7 @@ length;
                     that.polySynth.triggerAttackRelease(notes, 1/beatValue);
                     Tone.Transport.start();
                     that.inNote = false;
-                }, 1); // 1000);
+                }, 1000);
             case 'showmatrix':
                 logo.showMatrix = true;
                 noSession = 1;
