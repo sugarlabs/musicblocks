@@ -1208,6 +1208,10 @@ length;
                 logo.saveMatrix();
                 break;
             case 'note':
+                while(logo.inNote) {
+                    // wait for previous note to finish
+                }
+
                 if (!logo.inNote) {
                     console.log('setting inNote true');
                     logo.inNote = true;
