@@ -452,6 +452,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     }
 
     this.runFromBlock = function(logo, turtle, blk) {
+        console.log('runFromBlock ' + blk);
         if (blk == null) {
             return;
         }
@@ -1229,14 +1230,14 @@ length;
                 console.log(args[1]);
                 console.log(logo.parentFlowQueue[turtle]);
 
-                var queueBlock = new Queue(args[1], 1, blk);
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                // var queueBlock = new Queue(args[1], 1, blk);
+                // logo.parentFlowQueue[turtle].push(blk);
+                // logo.turtles.turtleList[turtle].queue.push(queueBlock);
 
-                childFlow = args[1];
-                childFlowCount = 1;
+                // childFlow = args[1];
+                // childFlowCount = 1;
 
-                // logo.runFromBlock(logo, turtle, args[1]);
+                logo.runFromBlock(logo, turtle, args[1]);
 
                 // var that=this;
                 // setTimeout(function() {
