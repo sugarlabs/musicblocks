@@ -523,7 +523,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     eval(this.evalSetterDict[this.blocks.blockList[blk].name]);
                     break;
                 }
-w                this.errorMsg('Block does not support incrementing', blk);
+                this.errorMsg('Block does not support incrementing', blk);
         }
     }
 
