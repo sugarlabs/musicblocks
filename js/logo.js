@@ -1363,7 +1363,7 @@ length;
                         matrix.musicNotation(notesToPlayCopy, logo.num, logo.deno);
                         console.log("to notations " + notesToPlayCopy);
                         logo.notation = false;
-                    } else if (logo.showMatrix)
+                    } else if (false) //logo.showMatrix)
                     {
                         console.log('logo.showMatrix');
                         matrix.solfegeNotes = [];
