@@ -1139,7 +1139,7 @@ length;
                     matrix.solfegeNotes.push(args[0]);
                     matrix.solfegeOct.push(args[1]);
                 }
-                console.log('outflow ' + args[2]);
+                console.log('outflow ' + nextFlow);
                 break;
             case 'rhythm':
                 if(logo.rhythmicValueParameter == 'rhythmicdot')
@@ -1620,6 +1620,7 @@ length;
             }
         }
 
+        console.log('nextBlock is ' + nextBlock);
         if (nextBlock != null) {
             parentBlk = null;
             if (logo.turtles.turtleList[turtle].queue.length > 0) {
@@ -1657,8 +1658,10 @@ length;
                     logo.updateParameterBlock(logo, turtle, logo.parameterQueue[turtle][pblk]);
                 }
             }
+            console.log('RUNNING FROM ' + nextBlock);
             logo.runFromBlock(logo, turtle, nextBlock);
         } else {
+            console.log('DONE');
             // Make sure SVG path is closed.
             logo.turtles.turtleList[turtle].closeSVG();
             // Mark the turtle as not running.
