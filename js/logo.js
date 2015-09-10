@@ -468,7 +468,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
                 logo.stepQueue[turtle].push(blk);
             } else {
-                console.log('settime for running from block ' + blk + ' after ' + delay + 'ms';
+                console.log('settime for running from block ' + blk + ' after ' + delay + 'ms');
                 setTimeout(function() {
                     logo.runFromBlockNow(logo, turtle, blk);
                 }, delay);
