@@ -1350,8 +1350,7 @@ length;
                 logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
                 break;
             default:
-                if(logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix')
-                {
+                if (logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix') {
                     console.log('namedsavematrix');
                     noSession = 1; //nosession changed to 1, because we don't want namedsavematrix 
                                    //block to be saved locally;
@@ -1359,48 +1358,40 @@ length;
                     var notes = window.savedMatricesNotes;
                     matrix.notesToPlay = [];
                     var count = 0, j=0, temp = 0;
-                    for (var i=0; i<notes.length; i++)
-                    {
-                        if (notes[i] == 'end')
-                        {
+                    for (var i=0; i<notes.length; i++) {
+                        if (notes[i] == 'end') {
                             count += 1;
                         }
                     } 
-                    
+
                     count = 1;
-                    while (count < index)
-                    {
-                        if (window.savedMatricesNotes[j] == 'end')
-                        {
+                    while (count < index) {
+                        if (window.savedMatricesNotes[j] == 'end') {
                             count += 1;
                         }
-                        j += 1;             
+                        j += 1;
                     }
                     temp = j;
                     var factor = logo.multiplyBeatValueBy/logo.divideBeatValueBy;
-                    while (window.savedMatricesNotes[j] != 'end')
-                    {
+                    while (window.savedMatricesNotes[j] != 'end') {
                         matrix.notesToPlay.push([window.savedMatricesNotes[j][0], (window.savedMatricesNotes[j][1])*factor]);
                         j += 1;
                     }
                     logo.multiplyBeatValueBy = 1;
                     logo.divideBeatValueBy = 1;
                     var notesToPlayCopy = [];
-                    for (k in matrix.notesToPlay)
-                        {
-                            notesToPlayCopy.push(matrix.notesToPlay[k])
-                        }
+                    for (k in matrix.notesToPlay) {
+                        notesToPlayCopy.push(matrix.notesToPlay[k])
+                    }
+
                     var trNote;
-                    if(logo.chunktranspose)
-                    {
+                    if (logo.chunktranspose) {
                         var transposedNotes = [];
                         j -= 1;
                         var i = notesToPlayCopy.length;
                         i -= 1;                        
-                        while (window.savedMatricesNotes[j] != 'end' && i>=0)
-                        {
-                            for (var k in notesToPlayCopy[i][0])
-                            {
+                        while (window.savedMatricesNotes[j] != 'end' && i>=0) {
+                            for (var k in notesToPlayCopy[i][0]) {
                                 var len = notesToPlayCopy[i][0][k].length;
                                 len -= 1;
                                 var note = notesToPlayCopy[i][0][k].substring(0, len);
@@ -1413,195 +1404,31 @@ length;
                         }
                         logo.chunktranspose = false;
                         matrix.removeTransposition();
-                    } else if (logo.notation)
-                    {
-                        console.log('logo.notation');
-                        matrix.musicNotation(notesToPlayCopy, logo.num, logo.deno);
-                        console.log("to notations " + notesToPlayCopy);
-                        logo.notation = false;
-                    } else if (false) //logo.showMatrix)
-                    {
-                        console.log('logo.showMatrix');
-                        matrix.solfegeNotes = [];
-                        matrix.solfegeOct = [];
-                        matrix.notesToPlay = notesToPlayCopy;
-                        var solfaDisplay = [0,0,0,0,0,0,0];
-                        var notesPosition = [];
-                        console.log('notes to show ' + matrix.notesToPlay);
-                        var table = document.getElementById("myTable");
-                        Element.prototype.remove = function()
-                        {
-                            logo.parentElement.removeChild(this);
-                        }
-                        NodeList.prototype.remove = HTMLCollection.prototype.remove = function()
-                        {
-                            for (var i = 0, len = logo.length; i < len; i++)
-                            {
-                                if(this[i] && this[i].parentElement)
-                                {
-                                    this[i].parentElement.removeChild(this[i]);
-                                }
-                            }
-                        }
-                        var solfegeArr = [];
-                        var arr = [];
-                        for (k in matrix.notesToPlay)
-                        {
-                            arr.push([]);
-                        }
-                        if (table != null) 
-                        {
-                            table.remove();
-                        }
-                        for (var k=0; k<matrix.notesToPlay.length; k++)
-                        {   
-                            for(var i in matrix.notesToPlay[k][0])
-                            {
-                                switch(matrix.notesToPlay[k][0][i][0])
-                                {
-                                case 'B':
-                                    arr[k].push('si');
-                                    if (!solfaDisplay[0])
-                                    {
-                                        solfegeArr.push(['si',matrix.notesToPlay[k][0][i][1], 7]);
-                                        solfaDisplay[0] = 1;
-                                    }
-                                    notesPosition.push('si');
-                                    
-                                    break;
-                                case 'A':
-                                    arr[k].push('la');
-                                    if (!solfaDisplay[1])
-                                    {
-                                        solfegeArr.push(['la',matrix.notesToPlay[k][0][i][1], 6]);
-                                        solfaDisplay[1] = 1;
-                                    }
-                                    notesPosition.push('la');
-                                    
-                                    break;
-                                case 'G':
-                                    arr[k].push('sol');
-                                    if (!solfaDisplay[2])
-                                    {
-                                        solfegeArr.push(['sol',matrix.notesToPlay[k][0][i][1], 5]);
-                                        solfaDisplay[2] = 1;
-                                    }
-                                    notesPosition.push('sol');
-                                    break;
-                                case 'F':
-                                    arr[k].push('fa');
-                                    if (!solfaDisplay[3])
-                                    {
-                                        solfegeArr.push(['fa',matrix.notesToPlay[k][0][i][1], 4]);
-                                        solfaDisplay[3] = 1;
-                                    }
-                                    notesPosition.push('fa');
-                                    break;
-                                case 'E':
-                                    arr[k].push('mi');
-                                    if (!solfaDisplay[4])
-                                    {
-                                        solfegeArr.push(['mi',matrix.notesToPlay[k][0][i][1], 3]);
-                                        solfaDisplay[4] = 1;
-                                    }
-                                    notesPosition.push('mi');
-                                    break;
-                                case 'D':
-                                    arr[k].push('re');
-                                    if (!solfaDisplay[5])
-                                    {
-                                        solfegeArr.push(['re',matrix.notesToPlay[k][0][i][1], 2]);
-                                        solfaDisplay[5] = 1;
-                                    }
-                                    notesPosition.push('re');
-                                    
-                                    break;
-                                case 'C':
-                                    arr[k].push('do');
-                                    if (!solfaDisplay[6])
-                                    {
-                                        solfegeArr.push(['do', matrix.notesToPlay[k][0][i][1], 1]);
-                                        solfaDisplay[6] = 1;
-                                    }
-                                    notesPosition.push('do');
-                                    break;
-                                default:
-                                    break;
-                                }
-                            }   
-                        } 
-                        solfegeArr.sort(function(a, b)
-                        {
-                            return parseFloat(a[2]) - parseFloat(b[2]);
-                        });
-                        matrix.solfegeNotes = [];
-                        matrix.solfegeOct = [];
-                        for (i in solfegeArr)
-                        {
-                            matrix.solfegeNotes.push(solfegeArr[i][0]);
-                            matrix.solfegeOct.push(solfegeArr[i][1]);
-                        }
-                        matrix.initMatrix(this, logo.polySynth);
-                        for (i in notesToPlayCopy)
-                        {
-                           matrix.makeMatrix(1, notesToPlayCopy[i][1]);
-                        }
-                        var table = document.getElementById("myTable");
-                        for (var k=0; k<matrix.notesToPlay.length; k++)
-                        {
-                            for (var i=1; i<table.rows.length-1; i++)
-                            {
-                                for (j=0; j<arr[k].length; j++)
-                                {
-                                    console.log("inner "+table.rows[i].cells[0].innerHTML + " arr[k][j] "+arr[k][j])
-                                    if (table.rows[i].cells[0].innerHTML.substr(0,2) == arr[k][j] || table.rows[i].cells[0].innerHTML.substr(0,3) == arr[k][j])
-                                    {
-                                        var cell = table.rows[i].cells[k+1];
-                                        cell.style.backgroundColor = 'black';
-                                        matrix.chkArray[cell.id] = 1;
-                                    }                                    
-                                }
-                            }
-                        }
-                        matrix.makeClickable(false, logo.polySynth);
-                        logo.showMatrix = false;
-                        } else {
-                            var delayFactor = 0;
-                            matrix.playNotesString(0, logo.polySynth);
-                            for (i in matrix.notesToPlay)
-                            {
-                                delayFactor += 1/matrix.notesToPlay[i][1];
-                            }
-                            logo.setTurtleDelay(2000*delayFactor + 200);
-                            setTimeout(function()
-                            {
-                                logo.setTurtleDelay(0);
-                            }, 2000*delayFactor + 200);
-                        }
-                    } else { 
-                        if (logo.blocks.blockList[blk].name in logo.evalFlowDict)
-                        {
-                            eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
-                        } else {
-                            // Could be an arg block, so we need to print its value.
-                            console.log('running an arg block?');
-                            if (logo.blocks.blockList[blk].isArgBlock())
-                            {
-                                args.push(logo.parseArg(logo, turtle, blk));
-                                console.log('block: ' + blk + ' turtle: ' + turtle);
-                                console.log('block name: ' + logo.blocks.blockList[blk].name);
-                                console.log('block value: ' + logo.blocks.blockList[blk].value);
-                                if (logo.blocks.blockList[blk].value == null) {
-                                logo.textMsg('null block value');
-                            } else {
-                                logo.textMsg(logo.blocks.blockList[blk].value.toString());
-                            }
-                        } else {
-                            logo.errorMsg('I do not know how to ' + logo.blocks.blockList[blk].name + '.', blk);
-                            console.log('setting stopTurtle in ???');
-                            logo.stopTurtle = true;
-                        }
                     }
+                } else if (logo.notation) {
+                    console.log('logo.notation');
+                    matrix.musicNotation(notesToPlayCopy, logo.num, logo.deno);
+                    console.log("to notations " + notesToPlayCopy);
+                    logo.notation = false;
+                } else if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
+                    eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
+                } else {
+                    // Could be an arg block, so we need to print its value.
+                    console.log('running an arg block?');
+                    if (logo.blocks.blockList[blk].isArgBlock()) {
+                        args.push(logo.parseArg(logo, turtle, blk));
+                        console.log('block: ' + blk + ' turtle: ' + turtle);
+                        console.log('block name: ' + logo.blocks.blockList[blk].name);
+                        console.log('block value: ' + logo.blocks.blockList[blk].value);
+                        if (logo.blocks.blockList[blk].value == null) {
+                            logo.textMsg('null block value');
+                        } else {
+                            logo.textMsg(logo.blocks.blockList[blk].value.toString());
+                        }
+                    } else {
+                        logo.errorMsg('I do not know how to ' + logo.blocks.blockList[blk].name + '.', blk);
+                    }
+                    logo.stopTurtle = true;
                 }
                 break;
         }
@@ -1717,6 +1544,7 @@ length;
         }, DEFAULTDELAY * 1.5)
     }
 
+    // TODO: this is a utility... not a class method
     this.getNote = function(solfege, octave)
     {
         var transformed = false;
@@ -1760,7 +1588,6 @@ length;
                 note = matrix.doTransposition(note[0], note[1]);
             }
             matrix.transposition = null;
-
         }
         return note;
     }
