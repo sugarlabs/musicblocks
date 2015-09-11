@@ -1250,10 +1250,10 @@ length;
                 // logo.parentFlowQueue[turtle].push(blk);
                 // logo.turtles.turtleList[turtle].queue.push(queueBlock);
 
-                // childFlow = args[1];
-                // childFlowCount = 1;
+                childFlow = args[1];
+                childFlowCount = 1;
 
-                logo.runFromBlock(logo, turtle, args[1]);
+                // logo.runFromBlock(logo, turtle, args[1]);
 
                 // var that=this;
                 // setTimeout(function() {
@@ -1429,9 +1429,9 @@ length;
                             }
                         } else {
                             logo.errorMsg('I do not know how to ' + logo.blocks.blockList[blk].name + '.', blk);
+                            console.log('SETTING STOPTURTLE TRUE');
+                            logo.stopTurtle = true;
                         }
-                        console.log('SETTING STOPTURTLE TRUE');
-                        logo.stopTurtle = true;
                    }
                 }
                 break;
