@@ -443,6 +443,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         }
                         // This is a degenerative case.
                         this.turtles.turtleList[0].running = true;
+                        console.log('RUN LOGO COMMANDS FROM ' + this.blocks.blockList[this.blocks.stackList[blk]].name);
                         this.runFromBlock(this, 0, this.blocks.stackList[blk]);
                     }
                 }
