@@ -1410,25 +1410,29 @@ length;
                     matrix.musicNotation(notesToPlayCopy, logo.num, logo.deno);
                     console.log("to notations " + notesToPlayCopy);
                     logo.notation = false;
-                } else if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
-                    eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
                 } else {
-                    // Could be an arg block, so we need to print its value.
-                    console.log('running an arg block?');
-                    if (logo.blocks.blockList[blk].isArgBlock()) {
-                        args.push(logo.parseArg(logo, turtle, blk));
-                        console.log('block: ' + blk + ' turtle: ' + turtle);
-                        console.log('block name: ' + logo.blocks.blockList[blk].name);
-                        console.log('block value: ' + logo.blocks.blockList[blk].value);
-                        if (logo.blocks.blockList[blk].value == null) {
-                            logo.textMsg('null block value');
-                        } else {
-                            logo.textMsg(logo.blocks.blockList[blk].value.toString());
-                        }
+                    console.log(logo.blocks.blockList[blk].name);
+                    if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
+                        eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
                     } else {
-                        logo.errorMsg('I do not know how to ' + logo.blocks.blockList[blk].name + '.', blk);
-                    }
-                    logo.stopTurtle = true;
+                        // Could be an arg block, so we need to print its value.
+                        console.log('running an arg block?');
+                        if (logo.blocks.blockList[blk].isArgBlock()) {
+                            args.push(logo.parseArg(logo, turtle, blk));
+                            console.log('block: ' + blk + ' turtle: ' + turtle);
+                            console.log('block name: ' + logo.blocks.blockList[blk].name);
+                            console.log('block value: ' + logo.blocks.blockList[blk].value);
+                            if (logo.blocks.blockList[blk].value == null) {
+                                logo.textMsg('null block value');
+                            } else {
+                                logo.textMsg(logo.blocks.blockList[blk].value.toString());
+                            }
+                        } else {
+                            logo.errorMsg('I do not know how to ' + logo.blocks.blockList[blk].name + '.', blk);
+                        }
+                        console.log('SETTING STOPTURTLE TRUE');
+                        logo.stopTurtle = true;
+                   }
                 }
                 break;
         }
