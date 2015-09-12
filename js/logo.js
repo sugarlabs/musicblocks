@@ -1355,7 +1355,7 @@ length;
                 noSession = 1; //nosession changed to 1, because we don't want namedsavematrix 
                                //block to be saved locally;
                 var index = logo.blocks.blockList[blk].privateData;
-                console.log('PRIVATE DATE = ' + index;
+                console.log('PRIVATE DATE = ' + index);
                 var notes = window.savedMatricesNotes;
                 matrix.notesToPlay = [];
                 var count = 0, j=0, temp = 0;
