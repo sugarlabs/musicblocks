@@ -448,6 +448,15 @@ function PaletteModel(palette, palettes, name) {
                         var arg = block.defaults[0];
                     }
                     break;
+                case 'namedsavematrix':
+                    if (block.defaults[0] == undefined) {
+                        modname = 'chunk';
+                        var arg = _('0');
+                    } else {
+                        modname = block.defaults[0];
+                        var arg = block.defaults[0];
+                    }
+                    break;
             }
 
             var protoBlock = paletteBlocks.protoBlockDict[blkname];
