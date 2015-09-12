@@ -2359,7 +2359,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     this.makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
                     break;
 
-                // Named boxes and dos need private data.
+                // Chunk (namedsavematrix) boxes need private data.
                 case 'namedsavematrix':
                     postProcess = function (args) {
                         var thisBlock = args[0];
@@ -2369,6 +2369,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     }
                     this.makeNewBlockWithConnections('namedsavematrix', blockOffset, blkData[4], postProcess, [thisBlock, value]);
                     break;
+
+                // Named boxes and dos need private data.
                 case 'namedbox':
                     postProcess = function (args) {
                         var thisBlock = args[0];
