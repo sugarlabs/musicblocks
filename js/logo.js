@@ -1412,23 +1412,26 @@ length;
                     console.log("to notations " + notesToPlayCopy);
                     logo.notation = false;
                 } else if(logo.showMatrix) {
+                        console.log('SHOWMATRIX');
                         matrix.solfegeNotes = [];
                         matrix.solfegeOct = [];
                         matrix.notesToPlay = notesToPlayCopy;
                         var solfaDisplay = [0,0,0,0,0,0,0];
                         var notesPosition = [];
-                        console.log('notes to show '+matrix.notesToPlay);
+                        console.log('notes to show ' + matrix.notesToPlay);
                         var table = document.getElementById("myTable");
                             Element.prototype.remove = function() {
-                        logo.parentElement.removeChild(this);
+                        logo.parentElement.removeChild(logo);
                         }
                         NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+                        /*
                         for(var i = 0, len = logo.length; i < len; i++) {
                             if(this[i] && this[i].parentElement) {
                                 this[i].parentElement.removeChild(this[i]);
                                 }
                             }
                         }
+                        */
                         var solfegeArr = [];
                         var arr = [];
                         for(k in matrix.notesToPlay)
