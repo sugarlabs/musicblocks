@@ -453,7 +453,7 @@ function PaletteModel(palette, palettes, name) {
                         modname = 'chunk';
                         var arg = _('0');
                     } else {
-                        modname = block.defaults[0];
+                        modname = 'chunk' + block.defaults[0];
                         var arg = block.defaults[0];
                     }
                     break;
