@@ -278,7 +278,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.runLogoCommands = function(startHere) {
         // Save the state before running.
         //console.log("name name " + this.blocks.blockList[startHere].name);
-        if (startHere && this.blocks.blockList[startHere].name.substring(0,15) != 'namedsavematrix' && this.blocks.blockList[startHere].name != 'showmatrix') {
+        if (startHere && this.blocks.blockList[startHere].name != 'namedsavematrix' && this.blocks.blockList[startHere].name != 'showmatrix') {
            this.saveLocally();
         }
         this.stopTurtle = false;
@@ -1350,62 +1350,67 @@ length;
                 console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
                 logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
                 break;
-            default:
-                if (logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix') {
-                    console.log('NAMEDSAVEMATRIX');
-                    noSession = 1; //nosession changed to 1, because we don't want namedsavematrix 
-                                   //block to be saved locally;
-                    var index = logo.blocks.blockList[blk].name[15];
-                    var notes = window.savedMatricesNotes;
-                    matrix.notesToPlay = [];
-                    var count = 0, j=0, temp = 0;
-                    for (var i=0; i<notes.length; i++) {
-                        if (notes[i] == 'end') {
-                            count += 1;
-                        }
-                    } 
+            case 'namedsavematrix':
+                console.log('NAMEDSAVEMATRIX');
+                noSession = 1; //nosession changed to 1, because we don't want namedsavematrix 
+                               //block to be saved locally;
+                var index = logo.blocks.blockList[blk].privateData;
+                console.log('PRIVATE DATE = ' + index;
+                var notes = window.savedMatricesNotes;
+                matrix.notesToPlay = [];
+                var count = 0, j=0, temp = 0;
+                for (var i=0; i<notes.length; i++) {
+                    if (notes[i] == 'end') {
+                        count += 1;
+                    }
+                } 
 
-                    count = 1;
-                    while (count < index) {
-                        if (window.savedMatricesNotes[j] == 'end') {
-                            count += 1;
-                        }
-                        j += 1;
+                count = 1;
+                while (count < index) {
+                    if (window.savedMatricesNotes[j] == 'end') {
+                       count += 1;
                     }
-                    temp = j;
-                    var factor = logo.multiplyBeatValueBy/logo.divideBeatValueBy;
-                    while (window.savedMatricesNotes[j] != 'end') {
-                        matrix.notesToPlay.push([window.savedMatricesNotes[j][0], (window.savedMatricesNotes[j][1])*factor]);
-                        j += 1;
-                    }
-                    logo.multiplyBeatValueBy = 1;
-                    logo.divideBeatValueBy = 1;
-                    var notesToPlayCopy = [];
-                    for (k in matrix.notesToPlay) {
-                        notesToPlayCopy.push(matrix.notesToPlay[k])
-                    }
+                    j += 1;
+                }
+                temp = j;
+                var factor = logo.multiplyBeatValueBy/logo.divideBeatValueBy;
+                while (window.savedMatricesNotes[j] != 'end') {
+                    matrix.notesToPlay.push([window.savedMatricesNotes[j][0], (window.savedMatricesNotes[j][1])*factor]);
+                    j += 1;
+                }
+                logo.multiplyBeatValueBy = 1;
+                logo.divideBeatValueBy = 1;
+                var notesToPlayCopy = [];
+                for (k in matrix.notesToPlay) {
+                    notesToPlayCopy.push(matrix.notesToPlay[k])
+                }
 
-                    var trNote;
-                    if (logo.chunktranspose) {
-                        var transposedNotes = [];
+                var trNote;
+                if (logo.chunktranspose) {
+                    var transposedNotes = [];
+                    j -= 1;
+                    var i = notesToPlayCopy.length;
+                    i -= 1;                        
+                    while (window.savedMatricesNotes[j] != 'end' && i>=0) {
+                        for (var k in notesToPlayCopy[i][0]) {
+                            var len = notesToPlayCopy[i][0][k].length;
+                            len -= 1;
+                            var note = notesToPlayCopy[i][0][k].substring(0, len);
+                            var trNote = matrix.doTransposition(note, notesToPlayCopy[i][0][k][len]);
+                            console.log(note + " transposed to " + trNote)
+                            window.savedMatricesNotes[j][0][k] = trNote ;
+                        }
+                        i -= 1;
                         j -= 1;
-                        var i = notesToPlayCopy.length;
-                        i -= 1;                        
-                        while (window.savedMatricesNotes[j] != 'end' && i>=0) {
-                            for (var k in notesToPlayCopy[i][0]) {
-                                var len = notesToPlayCopy[i][0][k].length;
-                                len -= 1;
-                                var note = notesToPlayCopy[i][0][k].substring(0, len);
-                                var trNote = matrix.doTransposition(note, notesToPlayCopy[i][0][k][len]);
-                                console.log(note + " transposed to " + trNote)
-                                window.savedMatricesNotes[j][0][k] = trNote ;
-                            }
-                            i -= 1;
-                            j -= 1;
-                        }
-                        logo.chunktranspose = false;
-                        matrix.removeTransposition();
                     }
+                    matrix.playNotesString(0, logo.polySynth);
+                    logo.chunktranspose = false;
+                    matrix.removeTransposition();
+                }
+                break;
+            default:
+                if (false) {
+                /*
                 } else if (logo.notation) {
                     console.log('logo.notation');
                     matrix.musicNotation(notesToPlayCopy, logo.num, logo.deno);
@@ -1420,20 +1425,18 @@ length;
                     var notesPosition = [];
                     console.log('notes to show ' + matrix.notesToPlay);
                     var table = document.getElementById("myTable");
+                    // THIS CANNOT POSSIBLY BE CORRECT
                     Element.prototype.remove = function() {
-                        logo.parentElement.removeChild(logo);
+                        this.parentElement.removeChild(this);
                     }
                     NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-                        /*
-                        // THIS CANNOT POSSIBLY BE CORRECT
                         for(var i = 0, len = logo.length; i < len; i++) {
                             if(this[i] && this[i].parentElement) {
                                 this[i].parentElement.removeChild(this[i]);
-                                }
                             }
-                        */
-                     }
-                     var solfegeArr = [];
+                        }
+                    }
+                    var solfegeArr = [];
                     var arr = [];
                     for(k in matrix.notesToPlay)
                         arr.push([]);
@@ -1553,6 +1556,7 @@ length;
                     }
                     matrix.makeClickable(false, logo.polySynth);                                                  
                     logo.showMatrix = false;
+                */
                 } else {
                     console.log(logo.blocks.blockList[blk].name);
                     if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
@@ -2230,13 +2234,15 @@ length;
     this.saveMatrix = function() {
         matrix.saveMatrix();
         var index = window.savedMatricesCount;
-        var myDoBlock = new ProtoBlock('namedsavematrix' + index);
+        var myDoBlock = new ProtoBlock('namedsavematrix');
         this.blocks.protoBlockDict['namedsavematrix' + index] = myDoBlock;
-        myDoBlock.zeroArgBlock();
-        myDoBlock.palette = this.blocks.palettes.dict['chunk'];
-        myDoBlock.staticLabels.push('Chunk' + index);
-        myDoBlock.palette.add(myDoBlock);
-        //this.blocks.palettes.dict['assemble'].add(myDoBlock);
+        myChunkBlock.defaults.push(index);
+        myChunkBlock.staticLabels.push(index);
+        myChunkBlock.zeroArgBlock();
+        myChunkBlock.palette = this.blocks.palettes.dict['chunk'];
+        myChunkBlock.staticLabels.push('Chunk' + index);
+        myChunkBlock.palette.add(myChunkBlock);
+        //this.blocks.palettes.dict['assemble'].add(myChunkBlock);
         // this.blocks.palettes.updatePalettes('matrix');  
         this.blocks.palettes.updatePalettes('chunk');
     }

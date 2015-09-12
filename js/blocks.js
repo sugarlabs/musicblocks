@@ -1430,7 +1430,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.updateBlockText(args[0]);
             }
             postProcessArg = [thisBlock, null];
-        } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) != -1) {
+        } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg', 'namedsavematrix'].indexOf(name) != -1) {
             postProcess = function (args) {
                 me.blockList[thisBlock].value = null;
                 me.blockList[thisBlock].privateData = args[1];
@@ -2059,7 +2059,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         blockItem = [b, [myBlock.name, myBlock.value], x, y, []];
                         break;
                 }
-            } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) != -1) {
+            } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg', 'namedsavematrix'].indexOf(myBlock.name) != -1) {
                 blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
             } else {
                 blockItem = [b, myBlock.name, x, y, []];
@@ -2360,6 +2360,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     break;
 
                 // Named boxes and dos need private data.
+                case 'namedsavematrix':
+                    postProcess = function (args) {
+                        var thisBlock = args[0];
+                        var value = args[1];
+                        me.blockList[thisBlock].privateData = value;
+                        me.blockList[thisBlock].value = null;
+                    }
+                    this.makeNewBlockWithConnections('namedsavematrix', blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                    break;
                 case 'namedbox':
                     postProcess = function (args) {
                         var thisBlock = args[0];
