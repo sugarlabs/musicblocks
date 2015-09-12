@@ -1352,7 +1352,7 @@ length;
                 break;
             default:
                 if (logo.blocks.blockList[blk].name.substring(0,15) == 'namedsavematrix') {
-                    console.log('namedsavematrix');
+                    console.log('NAMEDSAVEMATRIX');
                     noSession = 1; //nosession changed to 1, because we don't want namedsavematrix 
                                    //block to be saved locally;
                     var index = logo.blocks.blockList[blk].name[15];
@@ -1412,36 +1412,36 @@ length;
                     console.log("to notations " + notesToPlayCopy);
                     logo.notation = false;
                 } else if(logo.showMatrix) {
-                        console.log('SHOWMATRIX');
-                        matrix.solfegeNotes = [];
-                        matrix.solfegeOct = [];
-                        matrix.notesToPlay = notesToPlayCopy;
-                        var solfaDisplay = [0,0,0,0,0,0,0];
-                        var notesPosition = [];
-                        console.log('notes to show ' + matrix.notesToPlay);
-                        var table = document.getElementById("myTable");
-                            Element.prototype.remove = function() {
+                    console.log('SHOWMATRIX');
+                    matrix.solfegeNotes = [];
+                    matrix.solfegeOct = [];
+                    matrix.notesToPlay = notesToPlayCopy;
+                    var solfaDisplay = [0,0,0,0,0,0,0];
+                    var notesPosition = [];
+                    console.log('notes to show ' + matrix.notesToPlay);
+                    var table = document.getElementById("myTable");
+                    Element.prototype.remove = function() {
                         logo.parentElement.removeChild(logo);
-                        }
-                        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+                    }
+                    NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
                         /*
+                        // THIS CANNOT POSSIBLY BE CORRECT
                         for(var i = 0, len = logo.length; i < len; i++) {
                             if(this[i] && this[i].parentElement) {
                                 this[i].parentElement.removeChild(this[i]);
                                 }
                             }
-                        }
                         */
-                        var solfegeArr = [];
-                        var arr = [];
-                        for(k in matrix.notesToPlay)
-                            arr.push([]);
-                        if (table != null) 
-                            table.remove();
-                        for(var k=0; k<matrix.notesToPlay.length; k++)
-                        {   
-                            for(var i in matrix.notesToPlay[k][0])
-                               {switch(matrix.notesToPlay[k][0][i][0]){
+                     }
+                     var solfegeArr = [];
+                    var arr = [];
+                    for(k in matrix.notesToPlay)
+                        arr.push([]);
+                    if (table != null) 
+                        table.remove();
+                    for(var k=0; k<matrix.notesToPlay.length; k++) {   
+                        for(var i in matrix.notesToPlay[k][0]) {
+                            switch(matrix.notesToPlay[k][0][i][0]) {
                                 case 'B':
                                     arr[k].push('si');
                                         
@@ -1517,43 +1517,42 @@ length;
                                 default :
                                     break;
                             }
-                        }   
-                        } 
-                        solfegeArr.sort(function(a,b){
-                            return parseFloat(a[2]) - parseFloat(b[2]);
-                        });
-                        matrix.solfegeNotes = [];
-                        matrix.solfegeOct = [];
-                        for(i in solfegeArr)
-                        {
-                            matrix.solfegeNotes.push(solfegeArr[i][0]);
-                            matrix.solfegeOct.push(solfegeArr[i][1]);
                         }
-                        matrix.initMatrix(logo.polySynth);
-                        for(i in notesToPlayCopy)
+                    } 
+                    solfegeArr.sort(function(a,b){
+                        return parseFloat(a[2]) - parseFloat(b[2]);
+                    });
+                    matrix.solfegeNotes = [];
+                    matrix.solfegeOct = [];
+                    for(i in solfegeArr)
+                    {
+                        matrix.solfegeNotes.push(solfegeArr[i][0]);
+                        matrix.solfegeOct.push(solfegeArr[i][1]);
+                    }
+                    matrix.initMatrix(logo.polySynth);
+                    for(i in notesToPlayCopy)
+                    {
+                        matrix.makeMatrix(1, notesToPlayCopy[i][1]);
+                    }
+                    var table = document.getElementById("myTable");
+                    for(var k=0; k<matrix.notesToPlay.length; k++)
+                    {
+                        for(var i=1; i<table.rows.length-1; i++)
                         {
-                           matrix.makeMatrix(1, notesToPlayCopy[i][1]);
-                        }
-                        var table = document.getElementById("myTable");
-                        for(var k=0; k<matrix.notesToPlay.length; k++)
-                        {
-                            for(var i=1; i<table.rows.length-1; i++)
+                            for(j=0; j<arr[k].length; j++)
                             {
-                                for(j=0; j<arr[k].length; j++)
+                                console.log("inner "+table.rows[i].cells[0].innerHTML + " arr[k][j] "+arr[k][j])
+                                if(table.rows[i].cells[0].innerHTML.substr(0,2) == arr[k][j] || table.rows[i].cells[0].innerHTML.substr(0,3) == arr[k][j])
                                 {
-                                    console.log("inner "+table.rows[i].cells[0].innerHTML + " arr[k][j] "+arr[k][j])
-                                    if(table.rows[i].cells[0].innerHTML.substr(0,2) == arr[k][j] || table.rows[i].cells[0].innerHTML.substr(0,3) == arr[k][j])
-                                    {
-                                        var cell = table.rows[i].cells[k+1];
-                                        cell.style.backgroundColor = 'black';
-                                        matrix.chkArray[cell.id] = 1;
-                                    }                                    
-                                }
+                                    var cell = table.rows[i].cells[k+1];
+                                    cell.style.backgroundColor = 'black';
+                                    matrix.chkArray[cell.id] = 1;
+                                }                                    
                             }
                         }
-                        matrix.makeClickable(false, logo.polySynth);                                                  
-                        
-                        logo.showMatrix = false;
+                    }
+                    matrix.makeClickable(false, logo.polySynth);                                                  
+                    logo.showMatrix = false;
                 } else {
                     console.log(logo.blocks.blockList[blk].name);
                     if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
