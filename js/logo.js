@@ -2243,8 +2243,6 @@ length;
         myChunkBlock.staticLabels.push(_('chunk') + index);
         myChunkBlock.zeroArgBlock();
         myChunkBlock.palette.add(myChunkBlock);
-        //this.blocks.palettes.dict['assemble'].add(myChunkBlock);
-        // this.blocks.palettes.updatePalettes('matrix');  
-        this.blocks.palettes.updatePalettes('chunk');
+        this.blocks.palettes.updatePalettes();
     }
 }
