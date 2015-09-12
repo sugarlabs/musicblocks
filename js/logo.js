@@ -2235,6 +2235,8 @@ length;
         matrix.saveMatrix();
         var index = window.savedMatricesCount;
         var myChunkBlock = new ProtoBlock('namedsavematrix');
+        console.log(myChunkBlock);
+        console.log(index);
         this.blocks.protoBlockDict['namedsavematrix' + index] = myChunkBlock;
         myChunkBlock.defaults.push(index);
         myChunkBlock.staticLabels.push(index);
