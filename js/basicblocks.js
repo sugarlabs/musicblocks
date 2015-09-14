@@ -267,11 +267,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     sawtoothBlock.twoArgMathBlock();
     sawtoothBlock.defaults.push(440);
 
-    var namedChunkBlock = new ProtoBlock('namedsavematrix');
+    var namedChunkBlock = new ProtoBlock('_chunk');
     namedChunkBlock.palette = palettes.dict['chunk'];
-    namedChunkBlock.hidden = true;
-    blocks.protoBlockDict['namedsavematrix'] = namedChunkBlock;
+    // namedChunkBlock.hidden = true;
+    blocks.protoBlockDict['_chunk'] = namedChunkBlock;
     namedChunkBlock.staticLabels.push(_('chunk'));
+    namedChunkBlock.defaults.push(-1);
     namedChunkBlock.adjustWidthToLabel();
     namedChunkBlock.zeroArgBlock();
 

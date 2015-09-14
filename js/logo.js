@@ -278,7 +278,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.runLogoCommands = function(startHere) {
         // Save the state before running.
         //console.log("name name " + this.blocks.blockList[startHere].name);
-        if (startHere && this.blocks.blockList[startHere].name != 'namedsavematrix' && this.blocks.blockList[startHere].name != 'showmatrix') {
+        if (startHere && this.blocks.blockList[startHere].name != '_chunk' && this.blocks.blockList[startHere].name != 'showmatrix') {
            this.saveLocally();
         }
         this.stopTurtle = false;
@@ -1232,8 +1232,15 @@ length;
                 if (logo.inNote) {
                     console.log('waiting on previous note');
                 }
+
+                // FIXME: This should be done with a timeout.
+                var counter = 0;
                 while(logo.inNote) {
                     // wait for previous note to finish
+                    counter += 1;
+                    if (counter > 1000) {
+                        console.log("couldn't wait");
+                    }
                 }
 
                 if (!logo.inNote) {
@@ -1350,13 +1357,15 @@ length;
                 console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
                 logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
                 break;
-            case 'namedsavematrix':
-                console.log('NAMEDSAVEMATRIX');
-                noSession = 1; //nosession changed to 1, because we don't want namedsavematrix 
+            case '_chunk':
+                console.log('CHUNK ' + blk);
+                // FIXME: we should save both the matrix and the chunks
+                noSession = 1; //nosession changed to 1, because we don't want chunk 
                                //block to be saved locally;
                 var index = logo.blocks.blockList[blk].privateData;
-                console.log('PRIVATE DATE = ' + index);
+                console.log('PRIVATE DATA = ' + index);
                 var notes = window.savedMatricesNotes;
+                console.log(window.savedMatricesNotes);
                 matrix.notesToPlay = [];
                 var count = 0, j=0, temp = 0;
                 for (var i=0; i<notes.length; i++) {
@@ -1365,7 +1374,7 @@ length;
                     }
                 } 
 
-                count = 1;
+                count = 0;
                 while (count < index) {
                     if (window.savedMatricesNotes[j] == 'end') {
                        count += 1;
@@ -1403,10 +1412,11 @@ length;
                         i -= 1;
                         j -= 1;
                     }
-                    matrix.playNotesString(0, logo.polySynth);
                     logo.chunktranspose = false;
                     matrix.removeTransposition();
                 }
+                console.log('playNotes');
+                matrix.playNotesString(0, logo.polySynth);
                 break;
             default:
                 if (false) {
@@ -2233,16 +2243,18 @@ length;
 
     this.saveMatrix = function() {
         matrix.saveMatrix();
-        var index = window.savedMatricesCount;
-        var myChunkBlock = new ProtoBlock('namedsavematrix');
+        var index = window.savedMatricesCount - 1;
+        var myChunkBlock = new ProtoBlock('_chunk');
         console.log(myChunkBlock);
         console.log(index);
-        this.blocks.protoBlockDict['namedsavematrix' + index] = myChunkBlock;
+        this.blocks.protoBlockDict['chunk' + index] = myChunkBlock;
         myChunkBlock.palette = this.blocks.palettes.dict['chunk'];
         myChunkBlock.defaults.push(index);
-        myChunkBlock.staticLabels.push(_('chunk') + index);
+        myChunkBlock.staticLabels.push(_('chunk') + index + ' ♫');
+        myChunkBlock.extraWidth = 20;
         myChunkBlock.zeroArgBlock();
         myChunkBlock.palette.add(myChunkBlock);
+        console.log(this.blocks.protoBlockDict['chunk' + index]);
         this.blocks.palettes.updatePalettes();
     }
 }

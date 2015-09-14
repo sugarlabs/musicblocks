@@ -380,6 +380,11 @@ function PaletteModel(palette, palettes, name) {
                 continue;
             }
 
+            if (block.name.substr(0, 6) == '_chunk') {
+                console.log(blk + ' ' + block.name + ' ' + block.defaults[0]);
+                console.log(block);
+            }
+
             // Create a proto block for each palette entry.
             var blkname = block.name;
             var modname = blkname;
@@ -448,14 +453,15 @@ function PaletteModel(palette, palettes, name) {
                         var arg = block.defaults[0];
                     }
                     break;
-                case 'namedsavematrix':
+                case '_chunk':
                     if (block.defaults[0] == undefined) {
                         modname = 'chunk';
-                        var arg = _('0');
+                        var arg = 0;
                     } else {
                         modname = 'chunk' + block.defaults[0];
                         var arg = block.defaults[0];
                     }
+                    console.log(blkname + ' ' + modname + ' ' + arg);
                     break;
             }
 
@@ -481,6 +487,10 @@ function PaletteModel(palette, palettes, name) {
                     break;
                 case 'namedarg':
                     label = 'arg ' +  arg;
+                    break;
+                case '_chunk':
+                    label = block.staticLabels[0];
+                    console.log(label);
                     break;
                 default:
                     if (blkname != modname) {
@@ -573,6 +583,9 @@ function PaletteModel(palette, palettes, name) {
             }
 
             // TODO: use ES6 format so there is less "X: X"
+            if (block.name.substr(0, 6) == '_chunk') {
+                console.log(blk);
+            }
             this.blocks.push({
                 blk: blk,
                 blkname: blkname,
@@ -664,6 +677,7 @@ function PopdownPalette(palettes) {
                 var palette = me.palettes.dict[e.dataset.palettename];
                 var container = palette.protoContainers[e.dataset.modname];
 
+                console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = makeBlockFromPalette(
                     e.dataset.blk, e.dataset.modname,
                     palette, function (newBlock) {
@@ -1253,7 +1267,14 @@ function setupBackgroundEvents(palette) {
 
 
 function makeBlockFromPalette(blk, blkname, palette, callback) {
+    console.log('MAKEBLOCKFROMPALETTE ' + blk);
+    console.log(palette.protoList[blk]);
     switch (palette.protoList[blk].name) {
+        case '_chunk':
+            blkname = '_chunk';
+            var newBlk = palette.protoList[blk].name;
+            var arg = palette.protoList[blk].defaults[0];
+            break;
         case 'do':
             blkname = 'do ' + palette.protoList[blk].defaults[0];
             var newBlk = palette.protoList[blk].name;
@@ -1424,6 +1445,7 @@ function loadPaletteMenuItemHandler(palette, blk, blkname) {
 
 
 function makeBlockFromProtoblock(palette, blk, moved, blkname, event, saveX, saveY) {
+        console.log('MAKEBLOCKFROMPROTOBLOCK ' + blk + ' ' + blkname);
         if (moved) {
             moved = false;
             palette.draggingProtoBlock = false;
@@ -1491,6 +1513,7 @@ function makeBlockFromProtoblock(palette, blk, moved, blkname, event, saveX, sav
                     restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
                 }
 
+                console.log(blk + ' ' + blkname);
                 var newBlock = makeBlockFromPalette(blk, blkname, palette, myCallback);
             }
 

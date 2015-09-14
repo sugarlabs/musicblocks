@@ -299,11 +299,11 @@ define(function (require) {
             }
 
             matrix.clearTurtles();
-            var i = 1;
-            while(logo.blocks.protoBlockDict['namedsavematrix' + i]) {
+            var i = 0;
+            while(logo.blocks.protoBlockDict['_chunk' + i]) {
                 var cont = logo.blocks.blockList[blk].container;
-                delete logo.blocks.protoBlockDict['namedsavematrix' + i];
-                delete ProtoBlock('namedsavematrix' + i);
+                delete logo.blocks.protoBlockDict['_chunk' + i];
+                delete ProtoBlock('_chunk' + i);
                 cont.updateCache();
                 window.savedMatricesCount -= 1;
                 i += 1;

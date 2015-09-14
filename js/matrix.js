@@ -95,7 +95,9 @@ function Matrix(turtles, musicnotation)
         document.getElementById('matrix').style.border = 2;
         console.log('notes '+this.solfegeNotes +' and octave '+this.solfegeOct);
 
-        this.clearTurtles();
+        // Since we are not using turtles for notes, no need for this.
+        // this.clearTurtles();
+
         this.notesToPlay = [];
         this.notesToPlayDirected = [];
         this.isMatrix = 1; //1 if matrix exists
@@ -145,7 +147,6 @@ function Matrix(turtles, musicnotation)
         cell.style.backgroundColor = '#9A32CD';
         cell.onclick=function()
         {
-            console.log(logo);
             logo.playMatrix();
         }
 
@@ -261,7 +262,7 @@ function Matrix(turtles, musicnotation)
     {
         console.log('makeMatrix ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
         var table = document.getElementById('myTable');
-        console.log(table);
+
         var noteValueToDisplay = null;
         if (noteValueNum)
         {
@@ -296,7 +297,6 @@ function Matrix(turtles, musicnotation)
             for (var i=1; i<=this.solfegeNotes.length + 1; i++)
             {    
                 var row = table.rows[i];
-		console.log(row);
                 var cell = row.insertCell(-1);
                 cell.style.backgroundColor = '#ADFF2F';
                 
@@ -580,14 +580,16 @@ function Matrix(turtles, musicnotation)
                     }
                     
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
-                    this.clearTurtles();
+                    // ditto
+                    // this.clearTurtles();
                     if (playNote)
                        {    
                            synth.triggerAttackRelease(note, noteValue);
                     }
                     for (var i=0; i<this.notesToPlay.length; i++)
                     {
-                        turtles.add(null, null, this.notesToPlay[i][0]);
+                        // WE AREN'T USING THESE TURTLES SO LETS NOT ADD THEM
+                        // turtles.add(null, null, this.notesToPlay[i][0]);
                     }
                 }
             }        
@@ -661,7 +663,6 @@ function Matrix(turtles, musicnotation)
         }
         window.savedMatricesNotes.push('end');
         window.savedMatricesCount += 1;
-        console.log(newStack);
         // Create a new stack for the chunk.
         this.logo.blocks.loadNewBlocks(newStack);
     }

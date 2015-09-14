@@ -1411,6 +1411,7 @@ value="' + labelValue + '" />';
     }, 100);
 }
 
+
 function labelChanged(myBlock) {
     // Update the block values as they change in the DOM label.
     if (myBlock == null) {
