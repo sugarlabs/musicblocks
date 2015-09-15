@@ -41,6 +41,7 @@ savematrix() : Saves the Matrix notes in an array. Part of that array
 
 function Matrix(turtles, musicnotation)
 {
+    console.log('MATRIX');
     this.arr = [];
     this.secondsPerBeat = 1;
     this.notesToPlay = [];
@@ -70,6 +71,7 @@ function Matrix(turtles, musicnotation)
 
     this.clearTurtles = function()
     {
+	console.log('MATRIX:clearTurtles');
         for (var i = 0; i < turtles.turtleList.length; i++)
         {
             if (turtles.turtleList[i].name.includes('note'))
@@ -87,7 +89,7 @@ function Matrix(turtles, musicnotation)
     {
         /*Initializes the matrix. First removes the previous matrix
 	 * and them make another one in DOM*/ //<==What is DOM? -DU
-        
+	console.log('MATRIX:initMatrix');
         this.logo = logo;
         this.synth = PolySynth;
         document.getElementById('matrix').style.display = 'inline';
@@ -190,6 +192,7 @@ function Matrix(turtles, musicnotation)
 
     this.handleTuplet = function(param)
     {
+	console.log('MATRIX:handleTuplet');
         console.log('parameters ' + JSON.stringify(param));
 
         var table = document.getElementById('myTable');
@@ -260,6 +263,7 @@ function Matrix(turtles, musicnotation)
 
     this.makeMatrix = function(numBeats, noteValue, noteValueNum)
     {
+	console.log('MATRIX:makeMatrix');
         console.log('makeMatrix ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
         var table = document.getElementById('myTable');
 
@@ -321,6 +325,7 @@ function Matrix(turtles, musicnotation)
     this.makeClickable = function(tuplet, synth){
         /* Once the entire matrix is generated, this function makes it
 	 * clickable. */
+	console.log('MATRIX:makeClickable');
         var table = document.getElementById('myTable');
         var that = this;
         var leaveRowsFromBottom = 1;
@@ -372,11 +377,13 @@ function Matrix(turtles, musicnotation)
 
     this.setTransposition = function(transposition)
     {
+	console.log('MATRIX:setTransposition');
         this.transposition = transposition;
     }
 
     this.removeTransposition = function(transposition)
     {
+	console.log('MATRIX:removeTransposition');
         this.transposition = null;
     }
 
@@ -385,6 +392,7 @@ function Matrix(turtles, musicnotation)
         /*first setTransposition in called in logo.js and
 	 * this.transposition shows no. of semitones to be shifted
 	 * up/down*/
+	console.log('MATRIX:doTransposition');
         if (this.transposition)
         {
             var deltaOctave = 0;
@@ -439,6 +447,7 @@ function Matrix(turtles, musicnotation)
 
     this.playAll = function(synth)
     {
+	console.log('MATRIX:playAll');
         var notes = [];
         for (i in this.notesToPlay)
         {
@@ -492,6 +501,7 @@ function Matrix(turtles, musicnotation)
 
     this.musicNotation = function(notes, numerator, denominator)
     {
+	console.log('MATRIX:musicNotation');
         musicnotation.doNotation(notes, numerator, denominator);
     }
 
@@ -499,7 +509,7 @@ function Matrix(turtles, musicnotation)
     {
         /* Sets corresponding note when user clicks on any cell and
 	 * plays that note*/
-
+	console.log('MATRIX:setNotes');
         var leaveRowsFromBottom = 1;
         if(tuplet)
         {
@@ -550,7 +560,6 @@ function Matrix(turtles, musicnotation)
                     }
                     if (transformed)
                     {
-                        
                         if (solfege.substr(-1) == '#')
                         {
                             this.transposition = '+1';
@@ -598,6 +607,7 @@ function Matrix(turtles, musicnotation)
 
     this.playNotesString = function(time, synth){
         /*plays the matrix and also the chunks*/
+	console.log('MATRIX:playNotesString');
         if (this.transposition != null )
         {
             var transposedArray = [];
@@ -630,7 +640,7 @@ function Matrix(turtles, musicnotation)
     {
         /* Saves the current matrix as chunks, saving as a chunk
 	 * functionality is implemented in logo js*/
-
+        console.log('MATRIX:saveMatrix');
         var noteConversion = {'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var stackIdx = 0;

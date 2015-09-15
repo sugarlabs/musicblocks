@@ -54,7 +54,6 @@ var NAMEDICT = {
 function initBasicProtoBlocks(palettes, blocks) {
     blocks.palettes = palettes;
 
-    
     //Matrix palette
 
     var matrixBlock = new ProtoBlock('matrix');
@@ -103,7 +102,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.defaults.push(4);
     //palettes.dict['assemble'].add(noteBlock);
 
-    var multiplyBeatValueBlock = new ProtoBlock('multiplybeatvalue'); //NOTE: I believe that the separate multiply and divide functions will be replaced by a single "note value augmentation/diminution" (ratio) function that will essentially do both. -DU 
+    //NOTE: I believe that the separate multiply and divide functions
+    //will be replaced by a single "note value
+    //augmentation/diminution" (ratio) function that will essentially
+    //do both. -DU
+    var multiplyBeatValueBlock = new ProtoBlock('multiplybeatvalue');
     multiplyBeatValueBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['multiplybeatvalue'] = multiplyBeatValueBlock;
     multiplyBeatValueBlock.staticLabels.push(_('multiply note values'));
@@ -111,7 +114,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     multiplyBeatValueBlock.flowClampOneArgBlock();
     multiplyBeatValueBlock.defaults.push(2);
 
-    var divideBeatValueBlock = new ProtoBlock('dividebeatvalue'); //NOTE: I believe that the separate multiply and divide functions will be replaced by a single "note value augmentation/diminution" (ratio) function that will essentially do both. -DU
+    var divideBeatValueBlock = new ProtoBlock('dividebeatvalue');
     divideBeatValueBlock.palette = palettes.dict['chunk'];
     blocks.protoBlockDict['dividebeatvalue'] = divideBeatValueBlock;
     divideBeatValueBlock.staticLabels.push(_('divide note values'));
@@ -164,16 +167,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     notationBlock.staticLabels.push(_('Notation'));
     notationBlock.adjustWidthToLabel();
     notationBlock.flowClampOneArgBlock();
-//    notationBlock.defaults.push(parameters);
+    // notationBlock.defaults.push(parameters);
 
-    var playmatrix = new ProtoBlock('playmatrix');
-    playmatrix.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['playmatrix'] = playmatrix;
-    playmatrix.staticLabels.push(_('Play Matrix'));
-    playmatrix.adjustWidthToLabel();
-    //playmatrix.defaults.push('1000'); //<==We need to find a better way to set parameters here. To have the "time in milliseconds before playback" is just not the only interesting possibility. For example, tempo is interesting too. Should we have them as separate blocks to be put in here or as there own arguments?? Let's think about this one! -DU
-    playmatrix.zeroArgBlock();
-    playmatrix.dockTypes[1] = 'number';
+    // var playmatrix = new ProtoBlock('playmatrix');
+    // playmatrix.palette = palettes.dict['matrix'];
+    // blocks.protoBlockDict['playmatrix'] = playmatrix;
+    // playmatrix.staticLabels.push(_('Play Matrix'));
+    // playmatrix.adjustWidthToLabel();
+    // <==We need to find a better
+    // way to set parameters here. To have the "time in milliseconds
+    // before playback" is just not the only interesting
+    // possibility. For example, tempo is interesting too. Should we
+    // have them as separate blocks to be put in here or as there own
+    // arguments?? Let's think about this one! -DU
+    // playmatrix.defaults.push('1000');
+    // playmatrix.zeroArgBlock();
+    // playmatrix.dockTypes[1] = 'number';
     
     var transposition = new ProtoBlock('transposition');
     transposition.palette = palettes.dict['matrix'];
@@ -191,12 +200,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     notationBlock.adjustWidthToLabel();
     notationBlock.zeroArgBlock();
     */
-    var saveMatrix = new ProtoBlock('savematrix');
-    saveMatrix.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['savematrix'] = saveMatrix;
-    saveMatrix.staticLabels.push(_('Save Matrix as Chunk'));
-    saveMatrix.adjustWidthToLabel();
-    saveMatrix.zeroArgBlock();
+    // var saveMatrix = new ProtoBlock('savematrix');
+    // saveMatrix.palette = palettes.dict['matrix'];
+    // blocks.protoBlockDict['savematrix'] = saveMatrix;
+    // saveMatrix.staticLabels.push(_('Save Matrix as Chunk'));
+    // saveMatrix.adjustWidthToLabel();
+    // saveMatrix.zeroArgBlock();
 
     var tupletBlock = new ProtoBlock('tuplet');
     tupletBlock.palette = palettes.dict['matrix'];
@@ -205,12 +214,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     tupletBlock.adjustWidthToLabel();
     tupletBlock.flowClampZeroArgBlock();
     
-    var showMatrixBlock = new ProtoBlock('showmatrix');
-    showMatrixBlock.palette = palettes.dict['chunk'];
-    blocks.protoBlockDict['showmatrix'] = showMatrixBlock;
-    showMatrixBlock.staticLabels.push(_('Show'));
-    showMatrixBlock.adjustWidthToLabel();
-    showMatrixBlock.flowClampZeroArgBlock();
+    // var showMatrixBlock = new ProtoBlock('showmatrix');
+    // showMatrixBlock.palette = palettes.dict['chunk'];
+    // blocks.protoBlockDict['showmatrix'] = showMatrixBlock;
+    // showMatrixBlock.staticLabels.push(_('Show'));
+    // showMatrixBlock.adjustWidthToLabel();
+    // showMatrixBlock.flowClampZeroArgBlock();
 
     var tupletParamBlock = new ProtoBlock('tupletParamBlock');
     blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;

@@ -71,9 +71,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     // Music-related attributes
 
-    // Matrix
-    this.clickedMatrix = false;
-    this.octave = 4;
+    // matrix
+    // this.octave = 4;
     this.showMatrix = false;
     this.notation = false;
     this.sharp = false;
@@ -81,12 +80,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.flatClampCount = 0;
     this.sharpClampCount = 0;
 
-    // TODO: make turtle-specific
-    this.notesList = [];
-    this.pushedNote = false;
-    this.inNote = false;
-    this.noteBlockNotes = [];
-    this.noteBlockOct = [];
+    // parameters used by the note block
+    this.pushedNote = {};
+    this.inNote = {};
+    this.noteBeatValue = {};
+    // TODO: better names for these lists
+    this.noteNotes = {};
+    this.noteOctaves = {};
 
     this.multiplyBeatValueBy = 1;
     this.divideBeatValueBy = 1;
@@ -98,8 +98,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.rhythmInsideTuplet = 0;
 
     //notations
-    this.num = 3;
-    this.deno = 4;
+    this.numerator = 3;
+    this.denominator = 4;
 
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
                 
@@ -299,11 +299,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         // Save the state before running.
         this.saveLocally();
 
-        this.clickedMatrix = false;
-        if (startHere && this.blocks.blockList[startHere].name == 'matrix') {
-            this.clickedMatrix = true;
-        }
-
         for (var arg in this.evalOnStartList) {
             eval(this.evalOnStartList[arg]);
         }
@@ -314,9 +309,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
         this.hideMsgs();
 
-        this.inNote = false;  // TODO: one per turtle
-        this.pushedNote = false;  // TODO: one per turtle
-
         // We run the Logo commands here.
         var d = new Date();
         this.time = d.getTime();
@@ -326,9 +318,14 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             this.turtles.add(null);
         }
 
-        // Each turtle needs to keep its own wait time.
+        // Each turtle needs to keep its own wait time and music states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             this.waitTimes[turtle] = 0;
+            this.noteNotes[turtle] = [];
+            this.noteOctaves[turtle] = [];
+            this.noteBeatValue[turtle] = 4;
+            this.inNote[turtle] = false;
+            this.pushedNote[turtle] = false;
         }
 
         // Remove any listeners that might be still active
@@ -488,11 +485,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     this.runFromBlock = function(logo, turtle, blk, isflow, receivedArg) {
         if (blk == null) {
-            return;
-        }
-
-        if (logo.blocks.blockList[blk].name == 'matrix' && !logo.clickedMatrix) {
-            console.log('SKIPPING MATRIX STACK');
             return;
         }
 
@@ -1409,11 +1401,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 else if (logo.flat) {
                     args[0] += 'b';
                 }
-                if (logo.inNote) {
+                if (logo.inNote[turtle]) {
                     console.log('pitch (' + blk + '): pushing ' + args[0] + ' ' + args[1]);
-                    logo.noteBlockNotes.push(args[0]);
-                    logo.noteBlockOct.push(args[1]);
-                    logo.pushedNote = true;
+                    logo.noteNotes[turtle].push(args[0]);
+                    logo.noteOctaves[turtle].push(args[1]);
+                    logo.pushedNote[turtle] = true;
                 }
                 else {
                     console.log('pitch: pushing to matrix');
@@ -1481,8 +1473,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         flagD = 0;
                     }
                 }
-                logo.num = tsn/10;
-                logo.deno = tsd/10;
+                logo.numerator = tsn/10;
+                logo.denominator = tsd/10;
                 logo.notation = true;
                 console.log('calling runFromBlockNow with ' + args[1]);
                 logo.runFromBlock(logo, turtle, args[1]);
@@ -1490,21 +1482,25 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
             case 'meter':
                 break;
-            case 'savematrix':
-                logo.saveMatrix();
-                break;
+            // case 'savematrix':
+            //     logo.saveMatrix();
+            //     break;
             case 'note':
+                // We queue up the child flow of the note clamp and
+                // once all of the children are run, we trigger a
+                // _playnote event, then wait for the note to play.
+                // We should use a timer for more accuracy.
                 var d = new Date();
                 var elapsedTime = d.getTime() - logo.time;
                 console.log('entering note: ' + elapsedTime);
 
-                if (logo.inNote) {
+                if (logo.inNote[turtle]) {
                     console.log('waiting on previous note');
                 }
 
                 // FIXME: This should be done with a timeout.
                 var counter = 0;
-                while(logo.inNote) {
+                while(logo.inNote[turtle]) {
                     // wait for previous note to finish
                     counter += 1;
                     if (counter > 1000) {
@@ -1512,16 +1508,16 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     }
                 }
 
-                if (!logo.inNote) {
+                if (!logo.inNote[turtle]) {
                     console.log('setting inNote true');
-                    logo.inNote = true;
-                    logo.pushedNote = false;
-                    logo.noteBlockNotes = [];
-                    logo.noteBlockOct = [];
+                    logo.inNote[turtle] = true;
+                    logo.pushedNote[turtle] = false;
+                    logo.noteNotes[turtle] = [];
+                    logo.noteOctaves[turtle] = [];
                 }
 
-                console.log(args[1]);
-                console.log(logo.parentFlowQueue[turtle]);
+                logo.noteBeatValue[turtle] = args[0];
+                console.log('beat value: ' + args[0] + ', pitch flow: ' + args[1]);
 
                 childFlow = args[1];
                 childFlowCount = 1;
@@ -1530,13 +1526,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     var d = new Date();
                     var elapsedTime = d.getTime() - logo.time;
                     console.log('playing note: ' + elapsedTime);
-                    console.log("notes " + logo.noteBlockNotes + " oct " + logo.noteBlockOct);
+                    console.log("notes " + logo.noteNotes[turtle] + " oct " + logo.noteOctaves[turtle]);
                     var notes = [];
                     logo.polySynth.toMaster();
                     var beatValue = args[0];
-                    for (i in logo.noteBlockNotes)
+                    for (i in logo.noteNotes[turtle])
                     {
-                        note = logo.getNote(logo.noteBlockNotes[i], logo.noteBlockOct[i]);
+                        note = logo.getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i]);
                         if (note != 'R') {
                             notes.push(note);
                         }
@@ -1548,8 +1544,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         Tone.Transport.start();
                     }
                     console.log('setting inNote false');
-                    logo.inNote = false;
-                    logo.pushedNote = false;
+                    logo.inNote[turtle] = false;
+                    logo.pushedNote[turtle] = false;
                 }
 
                 // If there is already a listener, remove it
@@ -1561,12 +1557,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.turtles.turtleList[turtle].listeners['_playnote'] = listener;
                 logo.stage.addEventListener('_playnote', listener, false);
                 break;
-            case 'showmatrix':
-                logo.showMatrix = true;
-                noSession = 1;
-                console.log('calling runFromBlock with ' + args[0]);
-                logo.runFromBlock(logo, turtle, args[0]);
-                break;
+            // case 'showmatrix':
+            //     logo.showMatrix = true;
+            //     noSession = 1;
+            //     console.log('calling runFromBlock with ' + args[0]);
+            //     logo.runFromBlock(logo, turtle, args[0]);
+            //     break;
             case 'multiplybeatvalue':
                 logo.multiplyBeatValueBy *= args[0];
                 console.log('calling runFromBlock with ' + args[1]);
@@ -1736,7 +1732,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             // child flow completes.
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-        } else if (logo.inNote && logo.pushedNote) {
+        } else if (logo.inNote[turtle] && logo.pushedNote[turtle]) {
             // TODO: make turtle-specific
             var d = new Date();
             var elapsedTime = d.getTime() - logo.time;
@@ -1744,7 +1740,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             console.log('dispatching _playnote event');
             logo.stage.dispatchEvent('_playnote');
             // TODO: figure actual wait time
-            logo.doWait(turtle, 0.25);
+            logo.doWait(turtle, 1 / logo.noteBeatValue[turtle]);
+        } else if (logo.notation) {
+            console.log('logo.notation');
+            matrix.musicNotation(notesToPlayCopy, logo.numerator, logo.denominator);
+            console.log("to notations " + notesToPlayCopy);
+            logo.notation = false;
         }
 
         var nextBlock = null;
