@@ -1559,7 +1559,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
             // case 'showmatrix':
             //     logo.showMatrix = true;
-            //     noSession = 1;
             //     console.log('calling runFromBlock with ' + args[0]);
             //     logo.runFromBlock(logo, turtle, args[0]);
             //     break;

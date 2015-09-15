@@ -2173,6 +2173,35 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var name = blkData[1][0];
             }
 
+	    if (name == 'matrixData') {
+                try {
+                    if ('count' in blkData[1][1]) {
+                        window.savedMatricesCount = blkData[1][1]['count'];
+                        window.savedMatricesNotes = blkData[1][1]['notes'];
+                    } else {
+                        window.savedMatricesCount = 0;
+                        window.savedMatricesNoites = [];
+                    }
+                    for (i = 0; i < window.savedMatricesCount; i++) {
+                        var myChunkBlock = new ProtoBlock('_chunk');
+                        console.log(myChunkBlock);
+                        this.protoBlockDict['chunk' + i] = myChunkBlock;
+                        myChunkBlock.palette = this.palettes.dict['chunk'];
+                        myChunkBlock.defaults.push(i);
+                        myChunkBlock.staticLabels.push(_('chunk') + i + ' ♫');
+                        myChunkBlock.extraWidth = 20;
+                        myChunkBlock.zeroArgBlock();
+                        myChunkBlock.palette.add(myChunkBlock);
+                        console.log(this.protoBlockDict['chunk' + i]);
+                        this.palettes.updatePalettes();
+                    }
+                } catch (e) {
+                    console.log(e);
+                    console.log('could not read matrixData: ' + blkData[1]);
+                }
+                continue;
+            }
+
             if (!(name in this.protoBlockDict)) {
                 continue;
             }
@@ -2662,6 +2691,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     }
                     this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                     break;
+                // FIXME: -1 index means don't create the block
                 default:
                     // Check that name is in the proto list
                     if (name.substring(0, 6) == '_chunk') {
@@ -2679,6 +2709,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         n = blkData[4].length;
                         console.log(n + ': substituting nop block for ' + name);
                         switch (n) {
+                            case 0:
                             case 1:
                                 name = 'nopValueBlock';
                                 break;

@@ -1613,6 +1613,9 @@ define(function (require) {
                 }
                 data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
             }
+            if (window.savedMatricesCount > 0) {
+                data.push([-1, ['matrixData', {'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount}], 0, 0, [null, null]]);
+            }
             return JSON.stringify(data);
         }
 
@@ -2039,6 +2042,7 @@ define(function (require) {
             }
         }
 
+        /*
         function doOpenWorkspaceAssemble() {
             //window.location.pathname = "/Music-Blocks/workspacea.html";
             //var workspacea = null;
@@ -2054,6 +2058,7 @@ define(function (require) {
             palettes.dict['assemble'].hide();
 
         }
+        */
 
         function restoreHome() {
             setupAndroidToolbar();
