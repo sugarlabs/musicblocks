@@ -85,10 +85,15 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     // parameters used by the note block
     this.pushedNote = {};
     this.inNote = {};
+    this.noteTransposition = {};
+
     this.noteBeatValue = {};
+
+    // parameters used by the pitch block
     // TODO: better names for these lists
     this.noteNotes = {};
     this.noteOctaves = {};
+    this.noteTranspositions = {};
 
     this.multiplyBeatValueBy = 1;
     this.divideBeatValueBy = 1;
@@ -329,8 +334,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             this.transposition[turtle] = 0;
             this.noteNotes[turtle] = [];
             this.noteOctaves[turtle] = [];
+            this.noteTranspositions[turtle] = [];
             this.noteBeatValue[turtle] = 4;
             this.inNote[turtle] = false;
+            this.noteTransposition[turtle] = 0;
             this.pushedNote[turtle] = false;
         }
 
@@ -1411,9 +1418,15 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     }
                 }
                 if (logo.inNote[turtle]) {
-                    console.log('pitch (' + blk + '): pushing ' + args[0] + ' ' + args[1]);
                     logo.noteNotes[turtle].push(args[0]);
                     logo.noteOctaves[turtle].push(args[1]);
+                    if (turtle in logo.transposition) {
+                        logo.noteTranspositions[turtle].push(logo.transposition[turtle]);
+                        console.log('pitch (' + blk + '): pushing ' + args[0] + ' ' + args[1] + ' ' + logo.transposition[turtle]);
+                    } else {
+                        logo.noteTranspositions[turtle].push(0);
+                        console.log('pitch (' + blk + '): pushing ' + args[0] + ' ' + args[1] + ' ' + 0);
+                    }
                     logo.pushedNote[turtle] = true;
                 }
                 else {
@@ -1509,9 +1522,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                 if (!logo.inNote[turtle]) {
                     logo.inNote[turtle] = true;
-                    logo.pushedNote[turtle] = false;
-                    logo.noteNotes[turtle] = [];
-                    logo.noteOctaves[turtle] = [];
+                    logo.noteTransposition[turtle] = logo.transposition[turtle];
                     // FIXME
                     // logo.flat[turtle] = false;
                     // logo.sharp[turtle] = false;
@@ -1535,7 +1546,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     var beatValue = args[0];
                     for (i in logo.noteNotes[turtle])
                     {
-                        note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.transposition[turtle]);
+                        note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i] + logo.noteTransposition[turtle]);
                         if (note != 'R') {
                             notes.push(note);
                         }
@@ -1547,6 +1558,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     }
                     logo.inNote[turtle] = false;
                     logo.pushedNote[turtle] = false;
+                    logo.noteTransposition[turtle] = 0;
+                    logo.noteNotes[turtle] = [];
+                    logo.noteOctaves[turtle] = [];
+                    logo.noteTranspositions[turtle] = [];
                     // FIX ME
                     // logo.transposition[turtle] = 0;
                     // logo.flat[turtle] = false;
@@ -1576,11 +1591,27 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
             case 'transposition':
-                // FIXME: come up with nesting strategy
                 logo.transposition[turtle] = args[0];
-                // FIXME: should be a clamp
-                // childFlow = args[1];
-                // childFlowCount = 1;
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                console.log('end of transposition child flow is ' + logo.getBlockAtEndOfFlow(childFlow));
+                if (logo.getBlockAtEndOfFlow(childFlow) != null) {
+                    logo.endOfFlowSignals[turtle][logo.getBlockAtEndOfFlow(childFlow)] = '_transposition_' + turtle;
+                }
+
+                var listener = function (event) {
+                    // FIXME: come up with nesting strategy
+                    logo.transposition[turtle] = 0;
+                }
+                // If there is already a listener, remove it
+                // before adding the new one.
+                var listenerName = '_transposition_' + turtle;
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'sharp':
                 logo.sharp[turtle] = true;
