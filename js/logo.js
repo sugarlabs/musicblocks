@@ -60,6 +60,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.returns = [];
     this.turtleHeaps = {};
 
+    this.endOfFlowSignals = {};
+
     this.time = 0;
     this.waitTimes = {};
     this.turtleDelay = 0;
@@ -321,6 +323,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         // Each turtle needs to keep its own wait time and music states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             this.waitTimes[turtle] = 0;
+            this.endOfFlowSignals[turtle] = {};
             this.sharp[turtle] = false;
             this.flat[turtle] = false;
             this.transposition[turtle] = 0;
@@ -1518,8 +1521,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.noteBeatValue[turtle] = args[0];
                 childFlow = args[1];
                 childFlowCount = 1;
+                console.log('end of note child flow is ' + logo.getBlockAtEndOfFlow(childFlow));
+                if (logo.getBlockAtEndOfFlow(childFlow) != null) {
+                    logo.endOfFlowSignals[turtle][logo.getBlockAtEndOfFlow(childFlow)] = '_playnote_' + turtle;
+                }
 
                 var listener = function (event) {
+                    logo.doWait(turtle, 1 / logo.noteBeatValue[turtle]);
                     var d = new Date();
                     var elapsedTime = d.getTime() - logo.time;
                     var notes = [];
@@ -1710,6 +1718,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
         // (3) Queue block below the current block.
 
+        if (blk in logo.endOfFlowSignals[turtle]) {
+            console.log('found child (' + blk + ') in endOfFlowSignals: ' + logo.endOfFlowSignals[turtle][blk]);
+            console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk]);
+            logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk]);
+            delete logo.endOfFlowSignals[turtle][blk];
+        }
+
         // If there is a child flow, queue it.
         if (childFlow) {
             if(logo.blocks.blockList[blk].name=='doArg' || logo.blocks.blockList[blk].name=='nameddoArg') {
@@ -1722,7 +1737,14 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             // child flow completes.
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-        } else if (logo.inNote[turtle] && logo.pushedNote[turtle]) {
+        } else {
+            if (logo.turtles.turtleList[turtle].queue.length > 0) {
+                var foo = last(logo.turtles.turtleList[turtle].queue).blk;
+            } else {
+                var foo = '???';
+            }
+            console.log('childFlow is null. Parent was ' + foo);
+            if (logo.inNote[turtle] && logo.pushedNote[turtle]) {
             // if (logo.flat[turtle]) {
             //     logo.flat[turtle] = false;
             // } else if (logo.sharp[turtle]) {
@@ -1732,9 +1754,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     console.log(last(logo.turtles.turtleList[turtle].queue).blk);
                 }
                 var listenerName = '_playnote_' + turtle;
-                console.log('dispatching ' + listenerName);
-                logo.stage.dispatchEvent(listenerName);
-                logo.doWait(turtle, 1 / logo.noteBeatValue[turtle]);
+                // console.log('dispatching ' + listenerName);
+                // logo.stage.dispatchEvent(listenerName);
+                // logo.doWait(turtle, 1 / logo.noteBeatValue[turtle]);
             // }
         } else if (logo.notation) {
             console.log('NOTATION');
@@ -1752,7 +1774,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             }
             // logo.sharp[turtle] = false;
         }
-
+        }
         var nextBlock = null;
         // Run the last flow in the queue.
         if (logo.turtles.turtleList[turtle].queue.length > 0) {
@@ -1848,6 +1870,17 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             // Save at the end to save an image
             me.saveLocally();
         }, DEFAULTDELAY * 1.5)
+    }
+
+    this.getBlockAtEndOfFlow = function(blk) {
+        // blk is the first block in a child flow.  This function
+        // returns the blk at the end of the child flow.
+        var lastBlk = blk;
+        while (blk != null) {
+            var lastBlk = blk;
+            blk = last(this.blocks.blockList[blk].connections);
+        }
+        return lastBlk;
     }
 
     this.getTargetTurtle = function(args) {
