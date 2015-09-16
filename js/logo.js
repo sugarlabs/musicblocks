@@ -2511,8 +2511,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 note = note + '#';
                 var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1]};
                 if (note in extraTranspositions) {
-                    note = extraTranspositions[note][0];
                     octave += extraTranspositions[note][1];
+                    note = extraTranspositions[note][0];
                 }
             } else if(solfege.substr(-1) == 'b')
             {
@@ -2520,8 +2520,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 note = note + 'b';
                 var extraTranspositions = {'Cb':['B', -1], 'Fb':['E', 0]};
                 if (note in extraTranspositions) {
-                    note = extraTranspositions[note][0];
                     octave += extraTranspositions[note][1];
+                    note = extraTranspositions[note][0];
                 }
             }
         }
