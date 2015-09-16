@@ -75,10 +75,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     // this.octave = 4;
     this.showMatrix = false;
     this.notation = false;
-    this.sharp = false;
-    this.flat = false;
-    this.flatClampCount = 0;
-    this.sharpClampCount = 0;
+
+    // parameters used by pitch
+    this.sharp = {};
+    this.flat = {};
+    // this.flatClampCount = 0;
+    // this.sharpClampCount = 0;
 
     // parameters used by the note block
     this.pushedNote = {};
@@ -321,6 +323,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         // Each turtle needs to keep its own wait time and music states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             this.waitTimes[turtle] = 0;
+            this.sharp[turtle] = false;
+            this.flat[turtle] = false;
             this.noteNotes[turtle] = [];
             this.noteOctaves[turtle] = [];
             this.noteBeatValue[turtle] = 4;
@@ -1395,11 +1399,14 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }, 2000);
                 break;
             case 'pitch':
-                if (logo.sharp) {
-                    args[0] += '#';
-                }
-                else if (logo.flat) {
-                    args[0] += 'b';
+                if (args[0].toUpperCase() != 'REST') {
+                    // TODO: handle nested sharps and flats
+                    if (logo.sharp[turtle]) {
+                        args[0] += '#';
+                    }
+                    else if (logo.flat[turtle]) {
+                        args[0] += 'b';
+                    }
                 }
                 if (logo.inNote[turtle]) {
                     console.log('pitch (' + blk + '): pushing ' + args[0] + ' ' + args[1]);
@@ -1412,7 +1419,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     matrix.solfegeNotes.push(args[0]);
                     matrix.solfegeOct.push(args[1]);
                 }
-                console.log('outflow ' + nextFlow);
                 break;
             case 'rhythm':
                 if(logo.rhythmicValueParameter == 'rhythmicdot')
@@ -1508,6 +1514,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.pushedNote[turtle] = false;
                     logo.noteNotes[turtle] = [];
                     logo.noteOctaves[turtle] = [];
+                    // FIXME
+                    logo.flat[turtle] = false;
+                    logo.sharp[turtle] = false;
                 }
 
                 logo.noteBeatValue[turtle] = args[0];
@@ -1527,13 +1536,16 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                             notes.push(note);
                         }
                     }
-                    console.log("note play " + notes);
+                    console.log("notes to play " + notes);
                     if (notes.length > 0) {
                         logo.polySynth.triggerAttackRelease(notes, 1/beatValue);
                         Tone.Transport.start();
                     }
                     logo.inNote[turtle] = false;
                     logo.pushedNote[turtle] = false;
+                    // FIX ME
+                    logo.flat[turtle] = false;
+                    logo.sharp[turtle] = false;
                 }
 
                 // If there is already a listener, remove it
@@ -1559,16 +1571,20 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.runFromBlock(logo, turtle, args[1]);
                 break;
             case 'sharp':
-                logo.sharpClampCount = logo.blocks.blockList[blk].clampCount[0]; 
-                logo.sharp = true;
-                logo.sharpForNoteBlock = true;
-                logo.runFromBlock(logo, turtle, args[0]);
+                // FIXME: come up with nesting strategy
+                // logo.sharpClampCount = logo.blocks.blockList[blk].clampCount[0]; 
+                logo.sharp[turtle] = true;
+                // logo.sharpForNoteBlock = true;
+                childFlow = args[0];
+                childFlowCount = 1;
                 break;
             case 'flat':
-                logo.flatClampCount = logo.blocks.blockList[blk].clampCount[0];
-                logo.flat = true;
-                logo.flatForNoteBlock = true;
-                logo.runFromBlock(logo, turtle, args[0]);
+                // FIXME: come up with nesting strategy
+                // logo.flatClampCount = logo.blocks.blockList[blk].clampCount[0];
+                logo.flat[turtle] = true;
+                // logo.flatForNoteBlock = true;
+                childFlow = args[0];
+                childFlowCount = 1;
                 break;
             case 'osctime':
                 break;
@@ -2465,51 +2481,51 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     {
         var transformed = false;
         solfege = solfege.toString();   
-        if(solfege.substr(-1) == '#' || 'b')
-        {
+        if(solfege.substr(-1) == '#' || 'b') {
             transformed = true;
         }
         var note = 'C4';
-        if(solfege.toUpperCase().substr(0,4) == 'REST')
-        {
-            note = 'R';
-        } else if(solfege.toUpperCase().substr(0,2) == 'DO')
-        {
-            note = 'C' + octave;
-        } else if(solfege.toUpperCase().substr(0,2) == 'RE')
-        {
-            note = 'D' + octave;
-        } else if(solfege.toUpperCase().substr(0,2) == 'MI')
-        {
-            note = 'E' + octave;
-        } else if(solfege.toUpperCase().substr(0,2) == 'FA')
-        {
-            note = 'F' + octave;
-        } else if(solfege.toUpperCase().substr(0,3) == 'SOL')
-        {
-            note = 'G' + octave;
-        } else if(solfege.toUpperCase().substr(0,2) == 'LA')
-        {
-            note = 'A' + octave;                       
-        } else if(solfege.toUpperCase().substr(0,2) == 'SI')
-        {
-            note = 'B' + octave;
+        if(solfege.toUpperCase().substr(0,4) == 'REST') {
+            return 'R';
+        } else if(solfege.toUpperCase().substr(0,2) == 'DO') {
+            note = 'C';
+        } else if(solfege.toUpperCase().substr(0,2) == 'RE') {
+            note = 'D';
+        } else if(solfege.toUpperCase().substr(0,2) == 'MI') {
+            note = 'E';
+        } else if(solfege.toUpperCase().substr(0,2) == 'FA') {
+            note = 'F';
+        } else if(solfege.toUpperCase().substr(0,3) == 'SOL') {
+            note = 'G';
+        } else if(solfege.toUpperCase().substr(0,2) == 'LA') {
+            note = 'A';                       
+        } else if(solfege.toUpperCase().substr(0,2) == 'SI') {
+            note = 'B';
         }
 
-        if (transformed && note != 'R')
+        if (transformed)
         {
             if (solfege.substr(-1) == '#')
             {
-                matrix.transposition = '+1';
-                note = matrix.doTransposition(note[0], note[1]);
+                // var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                note = note + '#';
+                var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1]};
+                if (note in extraTranspositions) {
+                    note = extraTranspositions[note][0];
+                    octave += extraTranspositions[note][1];
+                }
             } else if(solfege.substr(-1) == 'b')
             {
-                matrix.transposition = '-1';
-                note = matrix.doTransposition(note[0], note[1]);
+                // var notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+                note = note + 'b';
+                var extraTranspositions = {'Cb':['B', -1], 'Fb':['E', 0]};
+                if (note in extraTranspositions) {
+                    note = extraTranspositions[note][0];
+                    octave += extraTranspositions[note][1];
+                }
             }
-            matrix.transposition = null;
         }
-        return note;
+        return note + octave;
     }
 
     this.saveMatrix = function() {
