@@ -51,7 +51,13 @@ function Matrix(turtles, musicnotation)
     this.octave = 0;
     this.i = 0;
     this.matrixContainer = null;
-    this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']; // Is there a way to have the input be either sharps or flats? What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E", "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <== Basically some of notes are equivalent C#=Db <==Any answer to this question? 2015-08-24
+    // Is there a way to have the input be either sharps or flats?
+    // What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E",
+    // "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <==
+    // Basically some of notes are equivalent C#=Db <==Any answer to
+    // this question? 2015-08-24
+
+    this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
     this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
     this.transposition = null;
     this.isMatrix = 0;
@@ -392,7 +398,7 @@ function Matrix(turtles, musicnotation)
         /*first setTransposition in called in logo.js and
 	 * this.transposition shows no. of semitones to be shifted
 	 * up/down*/
-	console.log('MATRIX:doTransposition');
+	console.log('MATRIX:doTransposition: ' + this.transposition);
         if (this.transposition)
         {
             var deltaOctave = 0;
@@ -412,7 +418,7 @@ function Matrix(turtles, musicnotation)
                     index = index - ( factor % this.notes.length );
                     if(index < 0)
                     {
-                            index = this.notes.length +     index;
+                            index = this.notes.length + index;
                             deltaOctave = -1;
                     }
                 }

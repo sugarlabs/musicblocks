@@ -231,6 +231,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     tupletParamBlock.dockTypes[1] = 'numberin';
     tupletParamBlock.dockTypes[2] = 'numberin';
     tupletParamBlock.dockTypes[3] = 'numberin';
+
+    var matrixData = new ProtoBlock('matrixData');
+    matrixData.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['matrixData'] = matrixData;
+    matrixData.staticLabels.push(_('saved matrix notes'));
+    matrixData.adjustWidthToLabel();
+    matrixData.zeroArgBlock();
+
     //Music Palette
     /*var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['music'];

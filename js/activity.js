@@ -1536,6 +1536,7 @@ define(function (require) {
             // We don't save blocks in the trash, so we need to
             // consolidate the block list and remap the connections.
             var blockMap = [];
+            var hasMatrixDataBlock = false;
             for (var blk = 0; blk < blocks.blockList.length; blk++) {
                 var myBlock = blocks.blockList[blk];
                 if (myBlock.trash) {
@@ -1598,8 +1599,13 @@ define(function (require) {
                     var args = {
                         'value': myBlock.privateData
                     }
+                } else if (myBlock.name == 'matrixData') {
+                    var args = {
+                        'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount
+                    }
+                    hasMatrixDataBlock = true;
                 } else {
-                    var args = {};
+                    var args = {}
                 }
 
                 connections = [];
@@ -1613,8 +1619,9 @@ define(function (require) {
                 }
                 data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
             }
-            if (window.savedMatricesCount > 0) {
-                data.push([-1, ['matrixData', {'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount}], 0, 0, [null, null]]);
+
+            if (!hasMatrixDataBlock && window.savedMatricesCount > 0) {
+                data.push([data.length, ['matrixData', {'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount}], 0, 0, [null, null]]);
             }
             return JSON.stringify(data);
         }

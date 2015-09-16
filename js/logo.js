@@ -72,15 +72,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     // Music-related attributes
 
     // matrix
-    // this.octave = 4;
     this.showMatrix = false;
     this.notation = false;
 
     // parameters used by pitch
     this.sharp = {};
     this.flat = {};
-    // this.flatClampCount = 0;
-    // this.sharpClampCount = 0;
 
     // parameters used by the note block
     this.pushedNote = {};
@@ -1681,6 +1678,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
                 matrix.playNotesString(0, logo.polySynth);
                 break;
+            case 'matrixData':
+                // TODO: Have it behave like all of the chunks
+                break;
             default:
                 if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
                     eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
@@ -1720,15 +1720,34 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
         } else if (logo.inNote[turtle] && logo.pushedNote[turtle]) {
-            var listenerName = '_playnote_' + turtle;
-            console.log('dispatching ' + listenerName);
-            logo.stage.dispatchEvent(listenerName);
-            logo.doWait(turtle, 1 / logo.noteBeatValue[turtle]);
+            // if (logo.flat[turtle]) {
+            //     logo.flat[turtle] = false;
+            // } else if (logo.sharp[turtle]) {
+            //     logo.sharp[turtle] = false;
+            // } else {
+                if (logo.turtles.turtleList[turtle].queue.length > 0) {
+                    console.log(last(logo.turtles.turtleList[turtle].queue).blk);
+                }
+                var listenerName = '_playnote_' + turtle;
+                console.log('dispatching ' + listenerName);
+                logo.stage.dispatchEvent(listenerName);
+                logo.doWait(turtle, 1 / logo.noteBeatValue[turtle]);
+            // }
         } else if (logo.notation) {
             console.log('NOTATION');
             matrix.musicNotation(notesToPlayCopy, logo.numerator, logo.denominator);
             console.log("to notations " + notesToPlayCopy);
             logo.notation = false;
+        } else if (logo.flat[turtle]) {
+            if (logo.turtles.turtleList[turtle].queue.length > 0) {
+                console.log(last(logo.turtles.turtleList[turtle].queue).blk);
+            }
+            // logo.flat[turtle] = false;
+        } else if (logo.sharp[turtle]) {
+            if (logo.turtles.turtleList[turtle].queue.length > 0) {
+                console.log(last(logo.turtles.turtleList[turtle].queue).blk);
+            }
+            // logo.sharp[turtle] = false;
         }
 
         var nextBlock = null;

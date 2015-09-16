@@ -2874,6 +2874,12 @@ function sendStackToTrash(blocks, myBlock) {
         myBlock.connections[0] = null;
     }
 
+    if (myBlock.name == 'matrixData') {
+        // Putting the matrixData block in the trash clears it.
+        window.savedMatricesNotes = [];
+        window.savedMatricesCount = 0;
+    }
+
     if (myBlock.name == 'start') {
         turtle = myBlock.value;
         if (turtle != null) {
