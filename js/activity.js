@@ -298,16 +298,18 @@ define(function (require) {
                 musicnotation.notationIndex = 0;
             }
 
-            matrix.clearTurtles();
-            var i = 0;
-            while(logo.blocks.protoBlockDict['_chunk' + i]) {
-                var cont = logo.blocks.blockList[blk].container;
-                delete logo.blocks.protoBlockDict['_chunk' + i];
-                delete ProtoBlock('_chunk' + i);
-                cont.updateCache();
-                window.savedMatricesCount -= 1;
-                i += 1;
-            }
+            // We handle chunks and saved Matrices differently now.
+
+            // matrix.clearTurtles();
+            // var i = 0;
+            // while(logo.blocks.protoBlockDict['_chunk' + i]) {
+            //     var cont = logo.blocks.blockList[blk].container;
+            //     delete logo.blocks.protoBlockDict['_chunk' + i];
+            //     delete ProtoBlock('_chunk' + i);
+            //     cont.updateCache();
+            //     window.savedMatricesCount -= 1;
+            //     i += 1;
+            // }
         }
 
         function doFastButton(env) {
