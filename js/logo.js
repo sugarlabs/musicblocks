@@ -1513,8 +1513,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.noteNotes[turtle] = [];
                     logo.noteOctaves[turtle] = [];
                     // FIXME
-                    logo.flat[turtle] = false;
-                    logo.sharp[turtle] = false;
+                    // logo.flat[turtle] = false;
+                    // logo.sharp[turtle] = false;
                     // logo.transposition[turtle] = 0;
                 }
 
@@ -1549,8 +1549,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.pushedNote[turtle] = false;
                     // FIX ME
                     // logo.transposition[turtle] = 0;
-                    logo.flat[turtle] = false;
-                    logo.sharp[turtle] = false;
+                    // logo.flat[turtle] = false;
+                    // logo.sharp[turtle] = false;
                 }
 
                 // If there is already a listener, remove it
@@ -1583,16 +1583,50 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 // childFlowCount = 1;
                 break;
             case 'sharp':
-                // FIXME: come up with nesting strategy
                 logo.sharp[turtle] = true;
                 childFlow = args[0];
                 childFlowCount = 1;
+
+                console.log('end of sharp child flow is ' + logo.getBlockAtEndOfFlow(childFlow));
+                if (logo.getBlockAtEndOfFlow(childFlow) != null) {
+                    logo.endOfFlowSignals[turtle][logo.getBlockAtEndOfFlow(childFlow)] = '_sharp_' + turtle;
+                }
+
+                var listener = function (event) {
+                    // FIXME: come up with nesting strategy
+                    logo.sharp[turtle] = false;
+                }
+                // If there is already a listener, remove it
+                // before adding the new one.
+                var listenerName = '_sharp_' + turtle;
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'flat':
-                // FIXME: come up with nesting strategy
                 logo.flat[turtle] = true;
                 childFlow = args[0];
                 childFlowCount = 1;
+
+                console.log('end of flat child flow is ' + logo.getBlockAtEndOfFlow(childFlow));
+                if (logo.getBlockAtEndOfFlow(childFlow) != null) {
+                    logo.endOfFlowSignals[turtle][logo.getBlockAtEndOfFlow(childFlow)] = '_flat_' + turtle;
+                }
+
+                var listener = function (event) {
+                    // FIXME: come up with nesting strategy
+                    logo.flat[turtle] = false;
+                }
+                // If there is already a listener, remove it
+                // before adding the new one.
+                var listenerName = '_flat_' + turtle;
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'osctime':
                 break;
@@ -1758,23 +1792,14 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 // logo.stage.dispatchEvent(listenerName);
                 // logo.doWait(turtle, 1 / logo.noteBeatValue[turtle]);
             // }
-        } else if (logo.notation) {
-            console.log('NOTATION');
-            matrix.musicNotation(notesToPlayCopy, logo.numerator, logo.denominator);
-            console.log("to notations " + notesToPlayCopy);
-            logo.notation = false;
-        } else if (logo.flat[turtle]) {
-            if (logo.turtles.turtleList[turtle].queue.length > 0) {
-                console.log(last(logo.turtles.turtleList[turtle].queue).blk);
+            } else if (logo.notation) {
+                console.log('NOTATION');
+                matrix.musicNotation(notesToPlayCopy, logo.numerator, logo.denominator);
+                console.log("to notations " + notesToPlayCopy);
+                logo.notation = false;
             }
-            // logo.flat[turtle] = false;
-        } else if (logo.sharp[turtle]) {
-            if (logo.turtles.turtleList[turtle].queue.length > 0) {
-                console.log(last(logo.turtles.turtleList[turtle].queue).blk);
-            }
-            // logo.sharp[turtle] = false;
         }
-        }
+
         var nextBlock = null;
         // Run the last flow in the queue.
         if (logo.turtles.turtleList[turtle].queue.length > 0) {
