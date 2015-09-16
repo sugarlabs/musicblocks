@@ -189,7 +189,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['transposition'] = transposition;
     transposition.staticLabels.push(_('transposition'));
     transposition.adjustWidthToLabel();
-    transposition.defaults.push('+1');
+    transposition.defaults.push('1');
     transposition.oneArgBlock();
     transposition.dockTypes[1] = 'anyin';    
     
