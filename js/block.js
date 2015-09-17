@@ -213,7 +213,6 @@ function Block(protoblock, blocks, overrideName) {
             case 'setbeatfactor':
             case 'rhythmicdot':
             case 'settransposition':
-            case 'tie':
             case 'tuplet':
             case 'repeat':
             case 'clamp':
