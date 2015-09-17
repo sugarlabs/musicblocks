@@ -1100,6 +1100,7 @@ define(function (require) {
                 }
             }
             if (addStartBlock) {
+                /*
                 function postprocess() {
                     last(blocks.blockList).x = 250;
                     last(blocks.blockList).y = 250;
@@ -1114,6 +1115,22 @@ define(function (require) {
                 }
 
                 blocks.makeNewBlock('start', postprocess);
+                */
+                var dataObjs = [[0, 'start', 250, 250, [null, null, null]],
+                                [1, 'matrix', 450, 250, [null, 2, null]],
+                                [2, 'pitch', 0, 0, [1, 3, 4, 5]],
+                                [3, ['text', {value:'sol'}], 0, 0, [2]],
+                                [4, ['number', {value:'4'}], 0, 0, [2]],
+                                [5, 'pitch', 0, 0, [2, 6, 7, 8]],
+                                [6, ['text', {value:'mi'}], 0, 0, [5]],
+                                [7, ['number', {value:'4'}], 0, 0, [5]],
+                                [8, 'pitch', 0, 0, [5, 9, 10, 11]],
+                                [9, ['text', {value:'re'}], 0, 0, [8]],
+                                [10, ['number', {value:'4'}], 0, 0, [8]],
+                                [11, 'rhythm', 0, 0, [8, 12, 13, null]],
+                                [12, ['number', {value:'3'}], 0, 0, [11]],
+                                [13, ['number', {value:'4'}], 0, 0, [11]]];
+                blocks.loadNewBlocks(dataObjs);
             }
 
             if (!doNotSave) {
@@ -1348,17 +1365,22 @@ define(function (require) {
             // palettes.updatePalettes();
             console.log(" LOAD START")
             justLoadStart = function () {
-                console.log('loading start');
-                postProcess = function (thisBlock) {
-                    blocks.blockList[0].x = 250;
-                    blocks.blockList[0].y = 250;
-                    blocks.blockList[0].connections = [null, null, null];
-                    blocks.blockList[0].value = turtles.turtleList.length;
-                    blocks.blockList[0].collapsed = false;
-                    turtles.add(blocks.blockList[0]);
-                    blocks.updateBlockPositions();
-                }
-                blocks.makeNewBlock('start', postProcess, null);
+                console.log('loading start and a matrix');
+                var dataObjs = [[0, 'start', 250, 250, [null, null, null]],
+                                [1, 'matrix', 450, 250, [null, 2, null]],
+                                [2, 'pitch', 0, 0, [1, 3, 4, 5]],
+                                [3, ['text', {value:'sol'}], 0, 0, [2]],
+                                [4, ['number', {value:'4'}], 0, 0, [2]],
+                                [5, 'pitch', 0, 0, [2, 6, 7, 8]],
+                                [6, ['text', {value:'mi'}], 0, 0, [5]],
+                                [7, ['number', {value:'4'}], 0, 0, [5]],
+                                [8, 'pitch', 0, 0, [5, 9, 10, 11]],
+                                [9, ['text', {value:'re'}], 0, 0, [8]],
+                                [10, ['number', {value:'4'}], 0, 0, [8]],
+                                [11, 'rhythm', 0, 0, [8, 12, 13, null]],
+                                [12, ['number', {value:'3'}], 0, 0, [11]],
+                                [13, ['number', {value:'4'}], 0, 0, [11]]];
+                blocks.loadNewBlocks(dataObjs);
             }
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
