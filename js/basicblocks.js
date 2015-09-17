@@ -184,14 +184,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     // playmatrix.zeroArgBlock();
     // playmatrix.dockTypes[1] = 'number';
     
-    var transpositionBlock = new ProtoBlock('transposition');
+    var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['transposition'] = transpositionBlock;
+    blocks.protoBlockDict['settransposition'] = transpositionBlock;
     transpositionBlock.staticLabels.push(_('transposition'));
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
     
+    var transposition = new ProtoBlock('transposition');
+    transposition.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['transposition'] = transposition;
+    transposition.staticLabels.push(_('transposition'));
+    transposition.adjustWidthToLabel();
+    transposition.parameterBlock();
+
     /*var notationBlock = new ProtoBlock('notation');
     notationBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['notation'] = notationBlock;
