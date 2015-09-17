@@ -2609,42 +2609,61 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
 function getNote (solfege, octave, transposition) {
     var sharpFlat = false;
+
     solfege = solfege.toString();   
-    if(solfege.substr(-1) == '#' || 'b') {
-        sharpFlat = true;
-    }
 
-    var note = 'C';
-    if(solfege.toUpperCase().substr(0,4) == 'REST') {
-        return 'R';
-    } else if(solfege.toUpperCase().substr(0,2) == 'DO') {
-        note = 'C';
-    } else if(solfege.toUpperCase().substr(0,2) == 'RE') {
-        note = 'D';
-    } else if(solfege.toUpperCase().substr(0,2) == 'MI') {
-        note = 'E';
-    } else if(solfege.toUpperCase().substr(0,2) == 'FA') {
-        note = 'F';
-    } else if(solfege.toUpperCase().substr(0,3) == 'SOL') {
-        note = 'G';
-    } else if(solfege.toUpperCase().substr(0,2) == 'LA') {
-        note = 'A';                       
-    } else if(solfege.toUpperCase().substr(0,2) == 'SI') {
-        note = 'B';
-    }
+    // TODO: Add all 12 solfege tones
 
-    if (sharpFlat) {
-        if (solfege.substr(-1) == '#') {
-            note = note + '#';
-            var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1]};
-            if (note in extraTranspositions) {
-                octave += extraTranspositions[note][1];
-                note = extraTranspositions[note][0];
+    var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    var notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    var notesFlat2 = ['c', 'db', 'd', 'eb', 'e', 'f', 'gb', 'g', 'ab', 'a', 'bb', 'b'];
+    var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'Cb':['B', -1], 'Fb':['E', 0],
+                               'e#':['F', 0], 'b#':['C', 1], 'cb':['B', -1], 'fb':['E', 0]};
+
+    // Already a note? No need to convert from solfege.
+    if (solfege in extraTranspositions) {
+        octave += extraTranspositions[solfege][1];
+        note = extraTranspositions[solfege][0];
+        console.log(solfege + ' -> ' + note);
+    } else if (notesSharp.indexOf(solfege.toUpperCase()) != -1) {
+        note = solfege.toUpperCase();
+    } else if (notesFlat.indexOf(solfege) != -1) {
+        note = solfege;
+    } else if (notesFlat2.indexOf(solfege) != -1) {
+        // Convert to uppercase, e.g., db -> Db.
+        note = notesFlat[notesFlat2.indexOf(solfege)];
+    } else {
+        if(solfege.substr(-1) == '#' || 'b') {
+            sharpFlat = true;
+        }
+        // QUESTION: Should we set the key? This seems to be
+        // specific to C Major.
+
+        var note = 'C';
+        if(solfege.toUpperCase().substr(0,4) == 'REST') {
+            return 'R';
+        } else if(solfege.toUpperCase().substr(0,2) == 'DO') {
+            note = 'C';
+        } else if(solfege.toUpperCase().substr(0,2) == 'RE') {
+            note = 'D';
+        } else if(solfege.toUpperCase().substr(0,2) == 'MI') {
+            note = 'E';
+        } else if(solfege.toUpperCase().substr(0,2) == 'FA') {
+            note = 'F';
+        } else if(solfege.toUpperCase().substr(0,3) == 'SOL') {
+            note = 'G';
+        } else if(solfege.toUpperCase().substr(0,2) == 'LA') {
+            note = 'A';                       
+        } else if(solfege.toUpperCase().substr(0,2) == 'SI') {
+            note = 'B';
+        }
+
+        if (sharpFlat) {
+            if (solfege.substr(-1) == '#') {
+                note = note + '#';
+            } else if(solfege.substr(-1) == 'b') {
+                note = note + 'b';
             }
-        } else if(solfege.substr(-1) == 'b')
-        {
-            note = note + 'b';
-            var extraTranspositions = {'Cb':['B', -1], 'Fb':['E', 0]};
             if (note in extraTranspositions) {
                 octave += extraTranspositions[note][1];
                 note = extraTranspositions[note][0];
@@ -2663,8 +2682,6 @@ function getNote (solfege, octave, transposition) {
 
         octave += deltaOctave;
 
-        var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        var notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
         if (notesSharp.indexOf(note) != -1) {
             i = notesSharp.indexOf(note);
             i += deltaNote;
