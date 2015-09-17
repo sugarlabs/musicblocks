@@ -1116,8 +1116,8 @@ define(function (require) {
 
                 blocks.makeNewBlock('start', postprocess);
                 */
-                var dataObjs = [[0, 'start', 250, 250, [null, null, null]],
-                                [1, 'matrix', 450, 250, [null, 2, null]],
+                var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
+                                [1, 'matrix', 450, 150, [null, 2, null]],
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
                                 [3, ['text', {value:'sol'}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
@@ -1366,8 +1366,8 @@ define(function (require) {
             console.log(" LOAD START")
             justLoadStart = function () {
                 console.log('loading start and a matrix');
-                var dataObjs = [[0, 'start', 250, 250, [null, null, null]],
-                                [1, 'matrix', 450, 250, [null, 2, null]],
+                var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
+                                [1, 'matrix', 450, 150, [null, 2, null]],
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
                                 [3, ['text', {value:'sol'}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
