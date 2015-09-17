@@ -102,7 +102,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.denominator = 4;
 
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
-                
+
     //Play with chunks
     this.chunktranspose = false;
 
@@ -1376,7 +1376,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             case 'matrix':
                 if (args.length == 1) {
                     childFlow = args[0];
-                    childFlowCount = 1; 
+                    childFlowCount = 1;
                 }
                 logo.inMatrix[turtle] = true;
                 matrix.solfegeNotes = [];
@@ -1449,18 +1449,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             case 'playmatrix':
                 logo.playMatrix();
                 break;
-            case 'rhythmicdot':
-                logo.rhythmicValueParameter = 'rhythmicdot';
-                 console.log('calling runFromBlock with ' + args[0]);
-                logo.runFromBlock(logo, turtle, args[0]);
-                break;
             case 'notation':
                 var flagN = 0, flagD = 1, tsd = 0, tsn = 0;
                 for (var i=0; i<args[0].length; i++)
                 {
                     console.log(args[0] +"fhf")
                     if (flagN)
-                    {   
+                    {
                         tsd += parseInt(args[0][i]);
                         tsd *= 10;
 
@@ -1507,9 +1502,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-			logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+            logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-			logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+            logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
@@ -1534,8 +1529,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.pushedNote[turtle] = false;
                 }
 
-                // If there is already a listener, remove it
-                // before adding the new one.
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
@@ -1547,6 +1540,34 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             //     console.log('calling runFromBlock with ' + args[0]);
             //     logo.runFromBlock(logo, turtle, args[0]);
             //     break;
+            case 'rhythmicdot':
+                if (logo.inMatrix) {
+                    logo.rhythmicValueParameter = 'rhythmicdot';
+                }
+                logo.beatFactor[turtle] *= 1.5;  // 3/2
+                childFlow = args[0];
+                childFlowCount = 1;
+
+                var listenerName = '_dot_' + turtle;
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
+                if (endBlk != null) {
+                    if (endBlk in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                    } else {
+                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                    }
+                }
+
+                var listener = function (event) {
+                    logo.beatFactor[turtle] /= 1.5;
+                }
+
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
+                break;
             case 'setbeatfactor':
                 var factor = args[0];
                 if (factor == 0) {
@@ -1562,7 +1583,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                     if (endBlk != null) {
                         if (endBlk in logo.endOfFlowSignals[turtle]) {
-			    logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                            logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                         } else {
                             logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                         }
@@ -1573,8 +1594,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         logo.beatFactor[turtle] /= factor;
                     }
 
-                    // If there is already a listener, remove it
-                    // before adding the new one.
                     if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                         logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                     }
@@ -1592,9 +1611,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-			logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-			logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
@@ -1602,8 +1621,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.transposition[turtle] -= transValue;
                 }
 
-                // If there is already a listener, remove it
-                // before adding the new one.
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
@@ -1619,9 +1636,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-			logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-			logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
@@ -1629,8 +1646,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.transposition[turtle] -= 1;
                 }
 
-                // If there is already a listener, remove it
-                // before adding the new one.
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
@@ -1646,9 +1661,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-			logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-			logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
@@ -1656,8 +1671,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.transposition[turtle] += 1;
                 }
 
-                // If there is already a listener, remove it
-                // before adding the new one.
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
@@ -1669,8 +1682,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             case 'sine':
             case 'square':
             case 'sawtooth':
-                var oscName = logo.blocks.blockList[blk].name; 
-                console.log(oscName + " start time " + logo.startTime + " end time " + logo.stopTime);    
+                var oscName = logo.blocks.blockList[blk].name;
+                console.log(oscName + " start time " + logo.startTime + " end time " + logo.stopTime);
                 var sineOsc = new Tone.Oscillator(args[0], oscName).toMaster();
                 //connected to the master output
                 setTimeout(function(osc){
@@ -1692,7 +1705,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
             case 'playbwd':
                 matrix.playDirection = -1;
-                logo.runFromBlock(logo, turtle, args[0]);  
+                logo.runFromBlock(logo, turtle, args[0]);
                 break;
             case 'tuplet':
                 logo.runFromBlock(logo, turtle, args[0]);
@@ -1714,7 +1727,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     if (notes[i] == 'end') {
                         count += 1;
                     }
-                } 
+                }
 
                 count = 0;
                 while (count < index) {
@@ -1739,7 +1752,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     var transposedNotes = [];
                     j -= 1;
                     var i = notesToPlayCopy.length;
-                    i -= 1;                        
+                    i -= 1;
                     while (window.savedMatricesNotes[j] != 'end' && i>=0) {
                         for (var k in notesToPlayCopy[i][0]) {
                             var len = notesToPlayCopy[i][0][k].length;
@@ -2607,12 +2620,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 }
 
 
-function getNote (solfege, octave, transposition) {
+function getNote (solfege, octave, transposition, key) {
     var sharpFlat = false;
 
-    solfege = solfege.toString();   
-
-    // TODO: Add all 12 solfege tones
+    solfege = solfege.toString();
 
     var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     var notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
@@ -2636,52 +2647,39 @@ function getNote (solfege, octave, transposition) {
         if(solfege.substr(-1) == '#' || 'b') {
             sharpFlat = true;
         }
-        // QUESTION: Should we set the key? This seems to be
-        // specific to C Major.
 
-        var note = 'C';
+        if (!key) {
+            key = 'CMAJOR';
+        }
+        if (key.substr(1, 5).toUpperCase() == 'MAJOR') {
+            var offset = notesSharp.indexOf(key.substr(0, 1).toUpperCase());
+            var scale = notesSharp;
+        } else if (key.substr(1, 5).toUpperCase() == 'MINOR') {
+            var offset = notesFlat.indexOf(key.substr(0, 1).toUpperCase());
+            var scale = notesFlat;
+        } else {
+            console.log('WARNING: Key ' + key + ' not found. Using default of CMAJOR');
+            var offset = 0;
+            var scale = notesSharp;
+        }
+
+        var halfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
+
+        var twoCharSolfege = solfege.toUpperCase().substr(0,2);
         if(solfege.toUpperCase().substr(0,4) == 'REST') {
             return 'R';
-        } else if(solfege.toUpperCase().substr(0,2) == 'DO') {
-            note = 'C';
-        } else if(solfege.toUpperCase().substr(0,2) == 'DI') {
-            note = 'C#';
-        } else if(solfege.toUpperCase().substr(0,2) == 'RA') {
-            note = 'Db';
-        } else if(solfege.toUpperCase().substr(0,2) == 'RE') {
-            note = 'D';
-        } else if(solfege.toUpperCase().substr(0,2) == 'RI') {
-            note = 'D#';
-        } else if(solfege.toUpperCase().substr(0,2) == 'MA') {
-            note = 'Eb';
-        } else if(solfege.toUpperCase().substr(0,2) == 'ME') {
-            note = 'Eb';
-        } else if(solfege.toUpperCase().substr(0,2) == 'MI') {
-            note = 'E';
-        } else if(solfege.toUpperCase().substr(0,2) == 'FA') {
-            note = 'F';
-        } else if(solfege.toUpperCase().substr(0,2) == 'FI') {
-            note = 'F#';
-        } else if(solfege.toUpperCase().substr(0,3) == 'SE') {
-            note = 'Gb';
-        } else if(solfege.toUpperCase().substr(0,3) == 'SOL') {
-            note = 'G';
-        } else if(solfege.toUpperCase().substr(0,3) == 'SI') {
-            note = 'G#';
-        } else if(solfege.toUpperCase().substr(0,2) == 'LE') {
-            note = 'Ab';                       
-        } else if(solfege.toUpperCase().substr(0,2) == 'LO') {
-            note = 'Ab';                       
-        } else if(solfege.toUpperCase().substr(0,2) == 'LA') {
-            note = 'A';                       
-        } else if(solfege.toUpperCase().substr(0,2) == 'LI') {
-            note = 'A#';                       
-        } else if(solfege.toUpperCase().substr(0,2) == 'TE') {
-            note = 'Bb';
-        } else if(solfege.toUpperCase().substr(0,2) == 'TA') {
-            note = 'Bb';
-        } else if(solfege.toUpperCase().substr(0,2) == 'TI') {
-            note = 'B';
+        } else if (twoCharSolfege in halfSteps) {
+            // Current code is specific to C Major. We need to add an
+            // offset to account for different keys.
+            var index = halfSteps[twoCharSolfege] + offset;
+            if (index > 11) {
+                index -= 12;
+                octave += 1;
+            }
+            note = scale[index];
+        } else {
+            console.log('WARNING: Note ' + solfege + ' not found. Returning C');
+            return 'C';
         }
 
         if (sharpFlat) {
