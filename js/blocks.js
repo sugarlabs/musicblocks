@@ -2188,7 +2188,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         this.protoBlockDict['chunk' + i] = myChunkBlock;
                         myChunkBlock.palette = this.palettes.dict['notes'];
                         myChunkBlock.defaults.push(i);
-                        myChunkBlock.staticLabels.push(_('chunk of notes') + i + ' ♫');
+                        myChunkBlock.staticLabels.push(_('chunk') + i + ' ♫');
                         myChunkBlock.extraWidth = 20;
                         myChunkBlock.zeroArgBlock();
                         myChunkBlock.palette.add(myChunkBlock);
