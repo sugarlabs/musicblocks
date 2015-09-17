@@ -2605,6 +2605,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     this.saveMatrix = function() {
         matrix.saveMatrix();
+        // NO LONGER USING CHUNKS; JUST USING ACTIONS
+        /*
         var index = window.savedMatricesCount - 1;
         var myChunkBlock = new ProtoBlock('_chunk');
         this.blocks.protoBlockDict['chunk' + index] = myChunkBlock;
@@ -2616,6 +2618,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         myChunkBlock.palette.add(myChunkBlock);
         console.log(this.blocks.protoBlockDict['chunk' + index]);
         this.blocks.palettes.updatePalettes();
+        */
     }
 }
 

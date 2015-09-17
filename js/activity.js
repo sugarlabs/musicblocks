@@ -1644,9 +1644,12 @@ define(function (require) {
                 data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
             }
 
+            // NO LONGER USING CHUNKS; JUST ACTIONS
+            /*
             if (!hasMatrixDataBlock && window.savedMatricesCount > 0) {
                 data.push([data.length, ['matrixData', {'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount}], 0, 0, [null, null]]);
             }
+            */
             return JSON.stringify(data);
         }
 

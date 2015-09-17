@@ -86,13 +86,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
 
-    var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
-    rhythmicdotBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
-    rhythmicdotBlock.staticLabels.push(_('rhythmic dot'));
-    rhythmicdotBlock.adjustWidthToLabel();
-    rhythmicdotBlock.flowClampZeroArgBlock();
-
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['note'] = noteBlock;
@@ -129,6 +122,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     transposition.staticLabels.push(_('transposition'));
     transposition.adjustWidthToLabel();
     transposition.parameterBlock();
+
+    var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
+    rhythmicdotBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
+    rhythmicdotBlock.staticLabels.push(_('dot'));
+    rhythmicdotBlock.adjustWidthToLabel();
+    rhythmicdotBlock.flowClampZeroArgBlock();
 
     var beatFactorBlock = new ProtoBlock('setbeatfactor');
     beatFactorBlock.palette = palettes.dict['notes'];
@@ -286,7 +286,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     var namedChunkBlock = new ProtoBlock('_chunk');
     namedChunkBlock.palette = palettes.dict['notes'];
-    // namedChunkBlock.hidden = true;
+    namedChunkBlock.hidden = true;
     blocks.protoBlockDict['_chunk'] = namedChunkBlock;
     namedChunkBlock.staticLabels.push(_('chunk of notes'));
     namedChunkBlock.defaults.push(-1);

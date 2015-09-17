@@ -2173,6 +2173,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var name = blkData[1][0];
             }
 
+            // NO LONGER USING CHUNKS; JUST ACTIONS
+            /*
 	    if (name == 'matrixData') {
                 try {
                     if ('count' in blkData[1][1]) {
@@ -2201,6 +2203,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
                 continue;
             }
+            */
 
             if (!(name in this.protoBlockDict)) {
                 continue;
