@@ -100,27 +100,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
-    //palettes.dict['assemble'].add(noteBlock);
 
-    //NOTE: I believe that the separate multiply and divide functions
-    //will be replaced by a single "note value
-    //augmentation/diminution" (ratio) function that will essentially
-    //do both. -DU
-    var multiplyBeatValueBlock = new ProtoBlock('multiplybeatvalue');
-    multiplyBeatValueBlock.palette = palettes.dict['chunk'];
-    blocks.protoBlockDict['multiplybeatvalue'] = multiplyBeatValueBlock;
-    multiplyBeatValueBlock.staticLabels.push(_('multiply note values'));
-    multiplyBeatValueBlock.adjustWidthToLabel();
-    multiplyBeatValueBlock.flowClampOneArgBlock();
-    multiplyBeatValueBlock.defaults.push(2);
+    var beatFactorBlock = new ProtoBlock('setbeatfactor');
+    beatFactorBlock.palette = palettes.dict['chunk'];
+    blocks.protoBlockDict['setbeatfactor'] = beatFactorBlock;
+    beatFactorBlock.staticLabels.push(_('adjust beat factor'));
+    beatFactorBlock.adjustWidthToLabel();
+    beatFactorBlock.flowClampOneArgBlock();
+    beatFactorBlock.defaults.push(2);
 
-    var divideBeatValueBlock = new ProtoBlock('dividebeatvalue');
-    divideBeatValueBlock.palette = palettes.dict['chunk'];
-    blocks.protoBlockDict['dividebeatvalue'] = divideBeatValueBlock;
-    divideBeatValueBlock.staticLabels.push(_('divide note values'));
-    divideBeatValueBlock.adjustWidthToLabel();
-    divideBeatValueBlock.flowClampOneArgBlock();
-    divideBeatValueBlock.defaults.push(2);
+    var beatfactor = new ProtoBlock('beatfactor');
+    beatfactor.palette = palettes.dict['chunk'];
+    blocks.protoBlockDict['beatfactor'] = beatfactor;
+    beatfactor.staticLabels.push(_('beat factor'));
+    beatfactor.adjustWidthToLabel();
+    beatfactor.parameterBlock();
 
     var playfwdBlock = new ProtoBlock('playfwd');
     playfwdBlock.palette = palettes.dict['play/save'];
@@ -187,7 +181,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;
-    transpositionBlock.staticLabels.push(_('transposition'));
+    transpositionBlock.staticLabels.push(_('adjust transposition'));
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();

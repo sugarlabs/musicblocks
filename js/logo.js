@@ -81,19 +81,15 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
     // parameters used by pitch
     this.transposition = {};
-
-    // parameters used by the note block
-    this.pushedNote = {};
-    this.noteBeatValue = {};
-
-    // parameters used by the pitch block
+    this.beatFactor = {};
     // TODO: better names for these lists
     this.noteNotes = {};
     this.noteOctaves = {};
     this.noteTranspositions = {};
+    this.noteBeatValues = {};
 
-    this.multiplyBeatValueBy = 1;
-    this.divideBeatValueBy = 1;
+    // parameters used by the note block
+    this.pushedNote = {};
 
     //tuplet
     this.tuplet = 0;
@@ -280,6 +276,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 case 'transposition':
                     value = this.transposition[turtle];
                     break;
+                case 'beatfactor':
+                    value = this.beatFactor[turtle];
+                    break;
                 default:
                     if (name in this.evalParameterDict) {
                         eval(this.evalParameterDict[name]);
@@ -332,7 +331,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             this.noteNotes[turtle] = [];
             this.noteOctaves[turtle] = [];
             this.noteTranspositions[turtle] = [];
-            this.noteBeatValue[turtle] = 4;
+            this.noteBeatValues[turtle] = [];
+            this.beatFactor[turtle] = 1;
             this.inMatrix[turtle] = false;
             this.pushedNote[turtle] = false;
         }
@@ -1406,13 +1406,19 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 } else {
                     logo.noteNotes[turtle].push(args[0]);
                     logo.noteOctaves[turtle].push(args[1]);
+
                     if (turtle in logo.transposition) {
                         logo.noteTranspositions[turtle].push(logo.transposition[turtle]);
-                        console.log('pitch (' + blk + '): pushing ' + args[0] + ' ' + args[1] + ' ' + logo.transposition[turtle]);
                     } else {
                         logo.noteTranspositions[turtle].push(0);
-                        console.log('pitch (' + blk + '): pushing ' + args[0] + ' ' + args[1] + ' ' + 0);
                     }
+
+                    if (turtle in logo.beatFactor) {
+                        logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+                    } else {
+                        logo.noteBeatValues[turtle].push(1);
+                    }
+
                     logo.pushedNote[turtle] = true;
                 }
                 break;
@@ -1491,27 +1497,26 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.noteNotes[turtle] = [];
                 logo.noteOctaves[turtle] = [];
                 logo.noteTranspositions[turtle] = [];
+                logo.noteBeatValues[turtle] = [];
 
-                logo.noteBeatValue[turtle] = args[0];
+                var noteBeatValue = args[0];
                 childFlow = args[1];
                 childFlowCount = 1;
 
+                var listenerName = '_playnote_' + turtle;
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-			logo.endOfFlowSignals[turtle][endBlk].push('_playnote_' + turtle);
+			logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-			logo.endOfFlowSignals[turtle][endBlk] = ['_playnote_' + turtle];
+			logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
                 var listener = function (event) {
-                    logo.doWait(turtle, 1 / logo.noteBeatValue[turtle]);
-                    var d = new Date();
-                    var elapsedTime = d.getTime() - logo.time;
+                    logo.doWait(turtle, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
                     var notes = [];
                     logo.polySynth.toMaster();
-                    var beatValue = args[0];
                     for (i in logo.noteNotes[turtle])
                     {
                         note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i]);
@@ -1521,7 +1526,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     }
                     console.log("notes to play " + notes);
                     if (notes.length > 0) {
-                        logo.polySynth.triggerAttackRelease(notes, 1/beatValue);
+                        // Use the beatValue of the first note in the
+                        // group since there can only be one.
+                        logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
                         Tone.Transport.start();
                     }
                     logo.pushedNote[turtle] = false;
@@ -1529,7 +1536,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                 // If there is already a listener, remove it
                 // before adding the new one.
-                var listenerName = '_playnote_' + turtle;
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
@@ -1541,13 +1547,40 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             //     console.log('calling runFromBlock with ' + args[0]);
             //     logo.runFromBlock(logo, turtle, args[0]);
             //     break;
-            case 'multiplybeatvalue':
-                logo.multiplyBeatValueBy *= args[0];
-                logo.runFromBlock(logo, turtle, args[1]);
-                break;
-            case 'dividebeatvalue':
-                logo.divideBeatValueBy *= args[0];
-                logo.runFromBlock(logo, turtle, args[1]);
+            case 'setbeatfactor':
+                var factor = args[0];
+                if (factor == 0) {
+                    logo.errorMsg(ZERODIVIDEERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    logo.beatFactor[turtle] *= factor;
+                    console.log('setbeatfactor ' + factor);
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_beat_' + turtle;
+                    var endBlk = logo.getBlockAtEndOfFlow(childFlow);
+                    if (endBlk != null) {
+                        if (endBlk in logo.endOfFlowSignals[turtle]) {
+			    logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                        } else {
+                            logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        }
+                    }
+
+                    var listener = function (event) {
+                        console.log('resetbeatfactor ' + factor);
+                        logo.beatFactor[turtle] /= factor;
+                    }
+
+                    // If there is already a listener, remove it
+                    // before adding the new one.
+                    if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                        logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                    }
+                    logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                    logo.stage.addEventListener(listenerName, listener, false);
+                }
                 break;
             case 'settransposition':
                 var transValue = args[0];
@@ -1555,12 +1588,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 childFlow = args[1];
                 childFlowCount = 1;
 
+                var listenerName = '_transposition_' + turtle;
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-			logo.endOfFlowSignals[turtle][endBlk].push('_transposition_' + turtle);
+			logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-			logo.endOfFlowSignals[turtle][endBlk] = ['_transposition_' + turtle];
+			logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
@@ -1570,7 +1604,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                 // If there is already a listener, remove it
                 // before adding the new one.
-                var listenerName = '_transposition_' + turtle;
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
@@ -1582,12 +1615,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 childFlow = args[0];
                 childFlowCount = 1;
 
+                var listenerName = '_sharp_' + turtle;
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-			logo.endOfFlowSignals[turtle][endBlk].push('_sharp_' + turtle);
+			logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-			logo.endOfFlowSignals[turtle][endBlk] = ['_sharp_' + turtle];
+			logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
@@ -1597,7 +1631,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                 // If there is already a listener, remove it
                 // before adding the new one.
-                var listenerName = '_sharp_' + turtle;
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
@@ -1609,12 +1642,13 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 childFlow = args[0];
                 childFlowCount = 1;
 
+                var listenerName = '_flat_' + turtle;
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-			logo.endOfFlowSignals[turtle][endBlk].push('_flat_' + turtle);
+			logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-			logo.endOfFlowSignals[turtle][endBlk] = ['_flat_' + turtle];
+			logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
@@ -1624,7 +1658,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                 // If there is already a listener, remove it
                 // before adding the new one.
-                var listenerName = '_flat_' + turtle;
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
@@ -1691,13 +1724,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     j += 1;
                 }
                 temp = j;
-                var factor = logo.multiplyBeatValueBy/logo.divideBeatValueBy;
+                var factor = logo.beatFactor[turtle];
                 while (window.savedMatricesNotes[j] != 'end') {
                     matrix.notesToPlay.push([window.savedMatricesNotes[j][0], (window.savedMatricesNotes[j][1])*factor]);
                     j += 1;
                 }
-                logo.multiplyBeatValueBy = 1;
-                logo.divideBeatValueBy = 1;
                 var notesToPlayCopy = [];
                 for (k in matrix.notesToPlay) {
                     notesToPlayCopy.push(matrix.notesToPlay[k])
@@ -2215,6 +2246,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 case 'transposition':
                     logo.blocks.blockList[blk].value = logo.transposition[turtle];
                     break;
+                case 'beatfactor':
+                    logo.blocks.blockList[blk].value = logo.beatFactor[turtle];
+                    break;
                 case 'color':
                 case 'hue':
                     logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].color;
@@ -2547,6 +2581,14 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
 
     // Music extensions
+
+    this.playMatrix = function() {
+        Tone.Transport.stop();
+        matrix.playNotesString(0, this.polySynth);
+        this.setTurtleDelay(4500 * parseFloat(1 / this.denominator) * (this.numerator));
+        var logo = this;
+        setTimeout(function() {logo.setTurtleDelay(0);}, logo.setTurtleDelay(4500 * parseFloat(1 / logo.denominator) * (logo.numerator)));
+    }
 
     this.saveMatrix = function() {
         matrix.saveMatrix();

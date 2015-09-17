@@ -210,8 +210,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'note':
             case 'flat':
             case 'sharp':
-            case 'multiplybeatvalue':
-            case 'dividebeatvalue':
+            case 'setbeatfactor':
             case 'rhythmicdot':
             case 'settransposition':
             case 'tie':
