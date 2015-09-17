@@ -91,13 +91,14 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     // parameters used by the note block
     this.pushedNote = {};
 
-    //tuplet
+    // tuplet
     this.tuplet = 0;
     this.tupletParam = [];
     this.tupletRhythmCount = 0;
     this.rhythmInsideTuplet = 0;
 
-    //notations
+    // parameters used by notations
+    this.notesPlayed = {};
     this.numerator = 3;
     this.denominator = 4;
 
@@ -328,6 +329,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             this.waitTimes[turtle] = 0;
             this.endOfFlowSignals[turtle] = {};
             this.transposition[turtle] = 0;
+            this.notesPlayed[turtle] = [];
             this.noteNotes[turtle] = [];
             this.noteOctaves[turtle] = [];
             this.noteTranspositions[turtle] = [];
@@ -1450,6 +1452,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.playMatrix();
                 break;
             case 'notation':
+                /*
                 var flagN = 0, flagD = 1, tsd = 0, tsn = 0;
                 for (var i=0; i<args[0].length; i++)
                 {
@@ -1476,7 +1479,32 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.denominator = tsd/10;
                 logo.notation = true;
                 logo.runFromBlock(logo, turtle, args[1]);
+                */
                 console.log('Generating Music Notation');
+                childFlow = args[0];
+                childFlowCount = 1;
+
+                var listenerName = '_notation_' + turtle;
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
+                if (endBlk != null) {
+                    if (endBlk in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                    } else {
+                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                    }
+                }
+
+                var listener = function (event) {
+                    console.log('NOTATION');
+                    console.log(logo.notesPlayed[turtle]);
+                    matrix.musicNotation(logo.notesPlayed[turtle], logo.numerator, logo.denominator);
+                }
+
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'meter':
                 break;
@@ -1502,9 +1530,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
                 if (endBlk != null) {
                     if (endBlk in logo.endOfFlowSignals[turtle]) {
-            logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
                     } else {
-            logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
                     }
                 }
 
@@ -1520,6 +1548,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         }
                     }
                     console.log("notes to play " + notes);
+                    logo.notesPlayed[turtle].push(notes);
                     if (notes.length > 0) {
                         // Use the beatValue of the first note in the
                         // group since there can only be one.
@@ -1819,13 +1848,6 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             // child flow completes.
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-        } else {
-            if (logo.notation) {
-                console.log('NOTATION');
-                matrix.musicNotation(notesToPlayCopy, logo.numerator, logo.denominator);
-                console.log("to notations " + notesToPlayCopy);
-                logo.notation = false;
-            }
         }
 
         var nextBlock = null;

@@ -54,7 +54,7 @@ var NAMEDICT = {
 function initBasicProtoBlocks(palettes, blocks) {
     blocks.palettes = palettes;
 
-    //Matrix palette
+    // Matrix palette
 
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['matrix'];
@@ -85,6 +85,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.twoArgBlock();
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
+
+    var matrixData = new ProtoBlock('matrixData');
+    matrixData.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['matrixData'] = matrixData;
+    matrixData.hidden = true;
+    matrixData.staticLabels.push(_('saved matrix notes'));
+    matrixData.adjustWidthToLabel();
+    matrixData.zeroArgBlock();
+
+    // Notes palette
 
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['notes'];
@@ -145,6 +155,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatfactor.adjustWidthToLabel();
     beatfactor.parameterBlock();
 
+    // Tone (utility) palette
+
     var playfwdBlock = new ProtoBlock('playfwd');
     playfwdBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['playfwd'] = playfwdBlock;
@@ -175,7 +187,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['notation'] = notationBlock;
     notationBlock.staticLabels.push(_('Notation'));
     notationBlock.adjustWidthToLabel();
-    notationBlock.flowClampOneArgBlock();
+    notationBlock.flowClampZeroArgBlock();
+    // notationBlock.flowClampOneArgBlock();
     // notationBlock.defaults.push(parameters);
 
     // var playmatrix = new ProtoBlock('playmatrix');
@@ -232,14 +245,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     tupletParamBlock.dockTypes[2] = 'numberin';
     tupletParamBlock.dockTypes[3] = 'numberin';
 
-    var matrixData = new ProtoBlock('matrixData');
-    matrixData.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['matrixData'] = matrixData;
-    matrixData.staticLabels.push(_('saved matrix notes'));
-    matrixData.adjustWidthToLabel();
-    matrixData.zeroArgBlock();
-
-    //Music Palette
     /*var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['music'];
     blocks.protoBlockDict['note'] = noteBlock;
