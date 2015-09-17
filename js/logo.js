@@ -2644,17 +2644,43 @@ function getNote (solfege, octave, transposition) {
             return 'R';
         } else if(solfege.toUpperCase().substr(0,2) == 'DO') {
             note = 'C';
+        } else if(solfege.toUpperCase().substr(0,2) == 'DI') {
+            note = 'C#';
+        } else if(solfege.toUpperCase().substr(0,2) == 'RA') {
+            note = 'Db';
         } else if(solfege.toUpperCase().substr(0,2) == 'RE') {
             note = 'D';
+        } else if(solfege.toUpperCase().substr(0,2) == 'RI') {
+            note = 'D#';
+        } else if(solfege.toUpperCase().substr(0,2) == 'MA') {
+            note = 'Eb';
+        } else if(solfege.toUpperCase().substr(0,2) == 'ME') {
+            note = 'Eb';
         } else if(solfege.toUpperCase().substr(0,2) == 'MI') {
             note = 'E';
         } else if(solfege.toUpperCase().substr(0,2) == 'FA') {
             note = 'F';
+        } else if(solfege.toUpperCase().substr(0,2) == 'FI') {
+            note = 'F#';
+        } else if(solfege.toUpperCase().substr(0,3) == 'SE') {
+            note = 'Gb';
         } else if(solfege.toUpperCase().substr(0,3) == 'SOL') {
             note = 'G';
+        } else if(solfege.toUpperCase().substr(0,3) == 'SI') {
+            note = 'G#';
+        } else if(solfege.toUpperCase().substr(0,2) == 'LE') {
+            note = 'Ab';                       
+        } else if(solfege.toUpperCase().substr(0,2) == 'LO') {
+            note = 'Ab';                       
         } else if(solfege.toUpperCase().substr(0,2) == 'LA') {
             note = 'A';                       
-        } else if(solfege.toUpperCase().substr(0,2) == 'SI') {
+        } else if(solfege.toUpperCase().substr(0,2) == 'LI') {
+            note = 'A#';                       
+        } else if(solfege.toUpperCase().substr(0,2) == 'TE') {
+            note = 'Bb';
+        } else if(solfege.toUpperCase().substr(0,2) == 'TA') {
+            note = 'Bb';
+        } else if(solfege.toUpperCase().substr(0,2) == 'TI') {
             note = 'B';
         }
 
