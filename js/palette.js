@@ -17,7 +17,7 @@ var PALETTELEFTMARGIN = 10;
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-var BUILTINPALETTES = ['matrix', 'chunk', 'play/save', 'tone',
+var BUILTINPALETTES = ['matrix', 'notes', 'tone',
     'turtle', 'pen', 'number', 'boolean', 'flow', 'blocks',
     'actions', 'media', 'sensors', 'myblocks', 'heap'
 ];
@@ -348,7 +348,9 @@ function loadPaletteButtonHandler(palettes, name) {
 
 
 var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
-                   'start', 'and', 'or'];
+                   'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
+                   'tuplet', 'rhythmicdot', 'note', 'setbeatfactor',
+                   'notation', 'playfwd', 'playbwd'];
 
 // Kinda a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {
@@ -1211,8 +1213,7 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     // Instantiate the palettes object on first load.
     var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan).
     add('matrix').
-    add('chunk').
-    add('play/save').
+    add('notes').
     add('tone').
     add('turtle').
     add('pen').

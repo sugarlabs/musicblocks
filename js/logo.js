@@ -2595,9 +2595,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         var index = window.savedMatricesCount - 1;
         var myChunkBlock = new ProtoBlock('_chunk');
         this.blocks.protoBlockDict['chunk' + index] = myChunkBlock;
-        myChunkBlock.palette = this.blocks.palettes.dict['chunk'];
+        myChunkBlock.palette = this.blocks.palettes.dict['notes'];
         myChunkBlock.defaults.push(index);
-        myChunkBlock.staticLabels.push(_('chunk') + index + ' ♫');
+        myChunkBlock.staticLabels.push(_('chunk of notes') + index + ' ♫');
         myChunkBlock.extraWidth = 20;
         myChunkBlock.zeroArgBlock();
         myChunkBlock.palette.add(myChunkBlock);
