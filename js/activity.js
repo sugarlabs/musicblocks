@@ -76,8 +76,8 @@ define(function (require) {
     require('activity/analytics');
     require('prefixfree.min');
     require('activity/matrix');
-    require('activity/assemble');  // ARE WE USING THIS??
-    require('activity/musicnotation');  // ARE WE USING THIS??
+    // require('activity/assemble');  // ARE WE USING THIS??
+    require('activity/musicnotation');
 
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {

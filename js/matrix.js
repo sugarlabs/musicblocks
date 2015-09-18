@@ -515,7 +515,6 @@ function Matrix(turtles, musicnotation)
     {
         /* Sets corresponding note when user clicks on any cell and
 	 * plays that note*/
-	console.log('MATRIX:setNotes');
         var leaveRowsFromBottom = 1;
         if(tuplet)
         {
@@ -530,10 +529,11 @@ function Matrix(turtles, musicnotation)
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
             {
                 cell = table.rows[j].cells[colIndex];
-                var note;
+                var note = 'c' + octave;
                 if (cell.style.backgroundColor == 'black')
                 {
                     var solfege = table.rows[j].cells[0].innerHTML;
+                    console.log(solfege);
                     if (solfege.substr(-1) == '#' || 'b')
                         transformed = true;
                     if (solfege.toUpperCase().substr(0,2) == 'DO')
@@ -563,6 +563,10 @@ function Matrix(turtles, musicnotation)
                     else if (solfege.toUpperCase().substr(0,2) == 'SI')
                     {
                         note = 'b' + octave;
+                    } else {
+                        // TODO: Add other solfege notes as per
+                        // getnote in logo.js
+                        console.log('solfege ' + solfege + ' not found!!');
                     }
                     if (transformed)
                     {
@@ -593,7 +597,6 @@ function Matrix(turtles, musicnotation)
                         noteValue = 1.5/noteValue;
                         noteValue = noteValue.toString()
                     }
-                    
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
                     // ditto
                     // this.clearTurtles();

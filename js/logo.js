@@ -1481,6 +1481,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.runFromBlock(logo, turtle, args[1]);
                 */
                 console.log('Generating Music Notation');
+                // Restart accumulating notes now that we are in the clamp.
+                logo.notesPlayed[turtle] = [];
                 childFlow = args[0];
                 childFlowCount = 1;
 
@@ -1537,8 +1539,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
 
                 var listener = function (event) {
-                    logo.doWait(turtle, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                    var duration =  1 / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                    logo.doWait(turtle, duration);
+                    var duration = '2';
+
                     var notes = [];
+                    var notes2 = [];
                     logo.polySynth.toMaster();
                     for (i in logo.noteNotes[turtle])
                     {
@@ -1546,9 +1552,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         if (note != 'R') {
                             notes.push(note);
                         }
+                        notes2.push([note, duration]);
                     }
                     console.log("notes to play " + notes);
-                    logo.notesPlayed[turtle].push(notes);
+                    logo.notesPlayed[turtle].push(notes2);
+                    console.log(logo.notesPlayed);
                     if (notes.length > 0) {
                         // Use the beatValue of the first note in the
                         // group since there can only be one.

@@ -86,6 +86,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
 
+    // Deprecated
     var matrixData = new ProtoBlock('matrixData');
     matrixData.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrixData'] = matrixData;
@@ -157,19 +158,14 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // Tone (utility) palette
 
-    var playfwdBlock = new ProtoBlock('playfwd');
-    playfwdBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['playfwd'] = playfwdBlock;
-    playfwdBlock.staticLabels.push(_('play forward'));
-    playfwdBlock.adjustWidthToLabel();
-    playfwdBlock.flowClampZeroArgBlock();
-
-    var playbwdBlock = new ProtoBlock('playbwd');
-    playbwdBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['playbwd'] = playbwdBlock;
-    playbwdBlock.staticLabels.push(_('play backward'));
-    playbwdBlock.adjustWidthToLabel();
-    playbwdBlock.flowClampZeroArgBlock();
+    var notationBlock = new ProtoBlock('notation');
+    notationBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['notation'] = notationBlock;
+    notationBlock.staticLabels.push(_('Notation'));
+    notationBlock.adjustWidthToLabel();
+    notationBlock.flowClampZeroArgBlock();
+    // notationBlock.flowClampOneArgBlock();
+    // notationBlock.defaults.push(parameters);
 
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['tone'];
@@ -182,14 +178,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
 
-    var notationBlock = new ProtoBlock('notation');
-    notationBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['notation'] = notationBlock;
-    notationBlock.staticLabels.push(_('Notation'));
-    notationBlock.adjustWidthToLabel();
-    notationBlock.flowClampZeroArgBlock();
-    // notationBlock.flowClampOneArgBlock();
-    // notationBlock.defaults.push(parameters);
+    var playfwdBlock = new ProtoBlock('playfwd');
+    playfwdBlock.hidden = true;
+    playfwdBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['playfwd'] = playfwdBlock;
+    playfwdBlock.staticLabels.push(_('play forward'));
+    playfwdBlock.adjustWidthToLabel();
+    playfwdBlock.flowClampZeroArgBlock();
+
+    var playbwdBlock = new ProtoBlock('playbwd');
+    playbwdBlock.hidden = true;
+    playbwdBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['playbwd'] = playbwdBlock;
+    playbwdBlock.staticLabels.push(_('play backward'));
+    playbwdBlock.adjustWidthToLabel();
+    playbwdBlock.flowClampZeroArgBlock();
 
     // var playmatrix = new ProtoBlock('playmatrix');
     // playmatrix.palette = palettes.dict['matrix'];
@@ -206,13 +209,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     // playmatrix.zeroArgBlock();
     // playmatrix.dockTypes[1] = 'number';
     
-    /*var notationBlock = new ProtoBlock('notation');
-    notationBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['notation'] = notationBlock;
-    notationBlock.staticLabels.push(_('Music Notation'));
-    notationBlock.adjustWidthToLabel();
-    notationBlock.zeroArgBlock();
-    */
     // var saveMatrix = new ProtoBlock('savematrix');
     // saveMatrix.palette = palettes.dict['matrix'];
     // blocks.protoBlockDict['savematrix'] = saveMatrix;
@@ -245,16 +241,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     tupletParamBlock.dockTypes[2] = 'numberin';
     tupletParamBlock.dockTypes[3] = 'numberin';
 
-    /*var noteBlock = new ProtoBlock('note');
-    noteBlock.palette = palettes.dict['music'];
-    blocks.protoBlockDict['note'] = noteBlock;
-    noteBlock.staticLabels.push(_('NOTE'),  _('note'), _('note value'));
-    noteBlock.adjustWidthToLabel();
-    noteBlock.defaults.push("C4", 1);
-    noteBlock.twoArgBlock();
-    noteBlock.dockTypes[1] = 'anyin';
-    noteBlock.dockTypes[2] = 'numberin';
-    */
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
@@ -289,6 +275,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sawtoothBlock.twoArgMathBlock();
     sawtoothBlock.defaults.push(440);
 
+    // deprecated
     var namedChunkBlock = new ProtoBlock('_chunk');
     namedChunkBlock.palette = palettes.dict['notes'];
     namedChunkBlock.hidden = true;
