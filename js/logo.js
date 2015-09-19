@@ -78,6 +78,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.showMatrix = false;
     this.notation = false;
     this.inMatrix = {};
+    this.keySignature = {};
 
     // parameters used by pitch
     this.transposition = {};
@@ -335,6 +336,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.beatFactor[turtle] = 1;
+            this.keySignature[turtle] = 'C';
             this.inMatrix[turtle] = false;
             this.pushedNote[turtle] = false;
         }
@@ -1375,6 +1377,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
 
             // Actions for music-related blocks
+            case 'setkey':
+                if (args.length == 1) {
+                    // TODO: test arg type/validity
+                    logo.keySignature[turtle] = args[0];
+                }
+                break;
             case 'matrix':
                 if (args.length == 1) {
                     childFlow = args[0];
@@ -1547,7 +1555,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.polySynth.toMaster();
                     for (i in logo.noteNotes[turtle])
                     {
-                        note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i]);
+                        note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
                         if (note != 'R') {
                             notes.push(note);
                         }
@@ -2286,6 +2294,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         logo.blocks.blockList[blk].value = 0;
                     }
                     break;
+                case 'key':
+                    logo.blocks.blockList[blk].value = logo.keySignature[turtle];                    
                 case 'transposition':
                     logo.blocks.blockList[blk].value = logo.transposition[turtle];
                     break;
@@ -2653,7 +2663,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 }
 
 
-function getNote (solfege, octave, transposition, key) {
+function getNote (solfege, octave, transposition, keySignature) {
     var sharpFlat = false;
 
     solfege = solfege.toString();
@@ -2685,28 +2695,28 @@ function getNote (solfege, octave, transposition, key) {
             sharpFlat = true;
         }
 
-        if (!key) {
-            key = 'C';
+        if (!keySignature) {
+            keySignature = 'C';
         }
-        if (key.substr(-1).toLowerCase() == 'm') {
+        if (keySignature.substr(-1).toLowerCase() == 'm') {
             var scale = notesFlat;
             var halfSteps = minorHalfSteps;  // 0 2 3 5 7 8 10
-            var key = key.substr(0, key.length - 1);
+            var keySignature = keySignature.substr(0, keySignature.length - 1);
             var major = false;
         } else {
             var scale = notesSharp;
             var halfSteps = majorHalfSteps;  // 0 2 4 5 7 9 11
-            var key = key;
+            var keySignature = keySignature;
             var major = true;
         }
 
-        if (key in extraTranspositions) {
-            key = extraTranspositions[key][0];
+        if (keySignature in extraTranspositions) {
+            keySignature = extraTranspositions[keySignature][0];
         }
 
-        offset = scale.indexOf(key);
+        offset = scale.indexOf(keySignature);
         if (offset == -1) {
-            console.log('WARNING: Key ' + key + ' not found in ' + scale + '. Using default of C');
+            console.log('WARNING: Key ' + keySignature + ' not found in ' + scale + '. Using default of C');
             var offset = 0;
             var scale = notesSharp;
         }
