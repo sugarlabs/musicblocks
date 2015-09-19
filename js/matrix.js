@@ -533,8 +533,8 @@ function Matrix(turtles, musicnotation)
                 if (cell.style.backgroundColor == 'black')
                 {
                     var solfege = table.rows[j].cells[0].innerHTML;
-                    console.log(solfege);
-                    note = getNote(solfege, octave);
+                    console.log(solfege + ' in key ' +  this.logo.keySignature[0]);
+                    note = getNote(solfege, octave, 0, this.logo.keySignature[0]);
                     console.log(note);
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
                     var i = 0;
@@ -602,7 +602,7 @@ function Matrix(turtles, musicnotation)
         /* Saves the current matrix as chunks, saving as a chunk
 	 * functionality is implemented in logo js*/
         console.log('MATRIX:saveMatrix');
-        var noteConversion = {'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si', 'R': 'rest'};
+        var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'si', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var stackIdx = 0;
         console.log('SAVE MATRIX!!!');
@@ -625,6 +625,7 @@ function Matrix(turtles, musicnotation)
             newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
             // Add the pitch block to the Note block
             newStack.push([idx + 2, 'pitch', 0, 0, [idx, idx + 3, idx + 4, null]]);
+            // THIS DOESN'T WORK FOR SHARP/FLAT
             newStack.push([idx + 3, ['text', {'value': noteConversion[note[0][0][0]]}], 0, 0, [idx + 2]]);
             if (note[0][0][0] == 'R') {
                 newStack.push([idx + 4, ['number', {'value': 0}], 0, 0, [idx + 2]]);
@@ -635,6 +636,7 @@ function Matrix(turtles, musicnotation)
         window.savedMatricesNotes.push('end');
         window.savedMatricesCount += 1;
         // Create a new stack for the chunk.
+        console.log(newStack);
         this.logo.blocks.loadNewBlocks(newStack);
     }
 }
