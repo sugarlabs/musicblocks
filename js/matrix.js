@@ -529,61 +529,13 @@ function Matrix(turtles, musicnotation)
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
             {
                 cell = table.rows[j].cells[colIndex];
-                var note = 'c' + octave;
+                var note;
                 if (cell.style.backgroundColor == 'black')
                 {
                     var solfege = table.rows[j].cells[0].innerHTML;
                     console.log(solfege);
-                    if (solfege.substr(-1) == '#' || 'b')
-                        transformed = true;
-                    if (solfege.toUpperCase().substr(0,2) == 'DO')
-                    {
-                        note = 'c' + octave;
-                    }
-                    else if (solfege.toUpperCase().substr(0,2) == 'RE')
-                    {
-                        note = 'd' + octave;
-                    }
-                    else if (solfege.toUpperCase().substr(0,2) == 'MI')
-                    {
-                        note = 'e' + octave;
-                    }
-                    else if (solfege.toUpperCase().substr(0,2) == 'FA')
-                    {
-                        note = 'f' + octave;
-                    }
-                    else if (solfege.toUpperCase().substr(0,3) == 'SOL')
-                    {
-                        note = 'g' + octave;
-                    }    
-                    else if (solfege.toUpperCase().substr(0,2) == 'LA')
-                    {
-                        note = 'a' + octave;                       
-                    }
-                    else if (solfege.toUpperCase().substr(0,2) == 'SI')
-                    {
-                        note = 'b' + octave;
-                    } else {
-                        // TODO: Add other solfege notes as per
-                        // getnote in logo.js
-                        console.log('solfege ' + solfege + ' not found!!');
-                    }
-                    if (transformed)
-                    {
-                        if (solfege.substr(-1) == '#')
-                        {
-                            this.transposition = '+1';
-                            note = this.doTransposition(note[0], note[1]);
-                        }
-
-                        else if (solfege.substr(-1) == 'b')
-                        {
-                            this.transposition = '-1';
-                            note = this.doTransposition(note[0], note[1]);
-                        }
-                        this.transposition = null;
-
-                    }
+                    note = getNote(solfege, octave);
+                    console.log(note);
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
                     var i = 0;
                     if (noteValue.substr(0,3) == '1.5')
