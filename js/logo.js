@@ -1539,9 +1539,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
 
                 var listener = function (event) {
-                    var duration =  1 / (noteBeatValue * logo.noteBeatValues[turtle][0]);
-                    logo.doWait(turtle, duration);
-                    var duration = '2';
+                    var duration =  noteBeatValue * logo.noteBeatValues[turtle][0];
+                    logo.doWait(turtle, 1 / duration);
 
                     var notes = [];
                     var notes2 = [];
@@ -1552,11 +1551,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         if (note != 'R') {
                             notes.push(note);
                         }
-                        notes2.push([note, duration]);
+                        // FIXME: this is not quite right.
+                        notes2.push([note]);
+                        notes2.push([duration]);
                     }
                     console.log("notes to play " + notes);
                     logo.notesPlayed[turtle].push(notes2);
-                    console.log(logo.notesPlayed);
                     if (notes.length > 0) {
                         // Use the beatValue of the first note in the
                         // group since there can only be one.
@@ -2663,6 +2663,10 @@ function getNote (solfege, octave, transposition, key) {
     var notesFlat2 = ['c', 'db', 'd', 'eb', 'e', 'f', 'gb', 'g', 'ab', 'a', 'bb', 'b'];
     var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'Cb':['B', -1], 'Fb':['E', 0],
                                'e#':['F', 0], 'b#':['C', 1], 'cb':['B', -1], 'fb':['E', 0]};
+    var majorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
+    // Is this correct, or is minor solfege expressed by using
+    // DO RE MA FA SOL LE TE?
+    var minorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 2, 'ME': 2, 'MI': 3, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 7, 'LO': 7, 'LA': 8, 'LI': 9, 'TE': 9, 'TA': 9,  'TI': 10};
 
     // Already a note? No need to convert from solfege.
     if (solfege in extraTranspositions) {
@@ -2682,28 +2686,35 @@ function getNote (solfege, octave, transposition, key) {
         }
 
         if (!key) {
-            key = 'CMAJOR';
+            key = 'C';
         }
-        if (key.substr(1, 5).toUpperCase() == 'MAJOR') {
-            var offset = notesSharp.indexOf(key.substr(0, 1).toUpperCase());
-            var scale = notesSharp;
-        } else if (key.substr(1, 5).toUpperCase() == 'MINOR') {
-            var offset = notesFlat.indexOf(key.substr(0, 1).toUpperCase());
+        if (key.substr(-1).toLowerCase() == 'm') {
             var scale = notesFlat;
+            var halfSteps = minorHalfSteps;  // 0 2 3 5 7 8 10
+            var key = key.substr(0, key.length - 1);
+            var major = false;
         } else {
-            console.log('WARNING: Key ' + key + ' not found. Using default of CMAJOR');
+            var scale = notesSharp;
+            var halfSteps = majorHalfSteps;  // 0 2 4 5 7 9 11
+            var key = key;
+            var major = true;
+        }
+
+        if (key in extraTranspositions) {
+            key = extraTranspositions[key][0];
+        }
+
+        offset = scale.indexOf(key);
+        if (offset == -1) {
+            console.log('WARNING: Key ' + key + ' not found in ' + scale + '. Using default of C');
             var offset = 0;
             var scale = notesSharp;
         }
-
-        var halfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
 
         var twoCharSolfege = solfege.toUpperCase().substr(0,2);
         if(solfege.toUpperCase().substr(0,4) == 'REST') {
             return 'R';
         } else if (twoCharSolfege in halfSteps) {
-            // Current code is specific to C Major. We need to add an
-            // offset to account for different keys.
             var index = halfSteps[twoCharSolfege] + offset;
             if (index > 11) {
                 index -= 12;
