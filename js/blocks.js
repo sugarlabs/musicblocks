@@ -1073,7 +1073,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
             maxLength = 10;
         } else {
-            if (myBlock.value) {
+            if (myBlock.value != undefined) {
                 var label = myBlock.value.toString();
             } else {
                 console.log('block value UNDEFINED');

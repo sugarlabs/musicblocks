@@ -625,12 +625,17 @@ function Matrix(turtles, musicnotation)
             newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
             // Add the pitch block to the Note block
             newStack.push([idx + 2, 'pitch', 0, 0, [idx, idx + 3, idx + 4, null]]);
-            // THIS DOESN'T WORK FOR SHARP/FLAT
-            newStack.push([idx + 3, ['text', {'value': noteConversion[note[0][0][0]]}], 0, 0, [idx + 2]]);
-            if (note[0][0][0] == 'R') {
-                newStack.push([idx + 4, ['number', {'value': 0}], 0, 0, [idx + 2]]);
+            console.log(note[0][0]);
+            if(['#', 'b'].indexOf(note[0][0][1]) != -1) {
+                newStack.push([idx + 3, ['text', {'value': noteConversion[note[0][0][0]] + note[0][0][1]}], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, ['number', {'value': note[0][0][2]}], 0, 0, [idx + 2]]);
             } else {
-                newStack.push([idx + 4, ['number', {'value': note[0][0][1]}], 0, 0, [idx + 2]]);
+                newStack.push([idx + 3, ['text', {'value': noteConversion[note[0][0][0]]}], 0, 0, [idx + 2]]);
+                if (note[0][0] == 'R') {
+                    newStack.push([idx + 4, ['number', {'value': 4}], 0, 0, [idx + 2]]);
+                } else {
+                    newStack.push([idx + 4, ['number', {'value': note[0][0][1]}], 0, 0, [idx + 2]]);
+                }
             }
         }
         window.savedMatricesNotes.push('end');

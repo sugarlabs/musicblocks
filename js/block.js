@@ -1208,6 +1208,8 @@ function loadEventHandlers(myBlock) {
             var dx = Math.round(myBlock.container.x - oldX);
             var dy = Math.round(myBlock.container.y - oldY);
 
+            console.log(dx + ' ' + dy);
+
             // If we are over the trash, warn the user.
             if (trashcan.overTrashcan(event.stageX / blocks.scale, event.stageY / blocks.scale)) {
                 trashcan.highlight();

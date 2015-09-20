@@ -2704,6 +2704,10 @@ function getNote (solfege, octave, transposition, keySignature) {
         // Convert to uppercase, e.g., db -> Db.
         note = notesFlat[notesFlat2.indexOf(solfege)];
     } else {
+        // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
+        if (solfege.substr(-1) == '>') {
+            solfege = solfege.substr(0, solfege.indexOf('<'));
+        }
         if(solfege.substr(-1) == '#' || 'b') {
             sharpFlat = true;
         }
