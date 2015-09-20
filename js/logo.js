@@ -77,8 +77,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     // matrix
     this.showMatrix = false;
     this.notation = false;
-    this.inMatrix = {};
+    this.inMatrix = false;
     this.keySignature = {};
+    this.inFlatClamp = false;
+    this.inSharpClamp = false;
 
     // parameters used by pitch
     this.transposition = {};
@@ -337,9 +339,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             this.noteBeatValues[turtle] = [];
             this.beatFactor[turtle] = 1;
             this.keySignature[turtle] = 'C';
-            this.inMatrix[turtle] = false;
             this.pushedNote[turtle] = false;
         }
+
+        this.inMatrix = false;
+        this.inFlatClamp = false;
+        this.inSharpClamp = false;
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -1388,7 +1393,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     childFlow = args[0];
                     childFlowCount = 1;
                 }
-                logo.inMatrix[turtle] = true;
+                logo.inMatrix = true;
                 matrix.solfegeNotes = [];
                 matrix.solfegeOct = [];
                 setTimeout(function()
@@ -1409,9 +1414,15 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }, 2000);
                 break;
             case 'pitch':
-                if (logo.inMatrix[turtle]) {
+                if (logo.inMatrix) {
                     console.log('pitch: pushing to matrix');
-                    matrix.solfegeNotes.push(args[0]);
+                    if (logo.inFlatClamp) {
+                        matrix.solfegeNotes.push(args[0] + 'b');
+                    } else if (logo.inSharpClamp) {
+                        matrix.solfegeNotes.push(args[0] + '#');
+                    } else {
+                        matrix.solfegeNotes.push(args[0]);
+                    }
                     matrix.solfegeOct.push(args[1]);
                 } else {
                     logo.noteNotes[turtle].push(args[0]);
@@ -1675,7 +1686,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'sharp':
-                logo.transposition[turtle] += 1;
+                if (logo.inMatrix) {
+                    this.inSharpClamp = true;
+                } else {
+                    logo.transposition[turtle] += 1;
+                }
                 childFlow = args[0];
                 childFlowCount = 1;
 
@@ -1690,7 +1705,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
 
                 var listener = function (event) {
-                    logo.transposition[turtle] -= 1;
+                    if (logo.inMatrix) {
+                        this.inSharpClamp = false;
+                    } else {
+                        logo.transposition[turtle] -= 1;
+                    }
                 }
 
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
@@ -1700,7 +1719,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'flat':
-                logo.transposition[turtle] -= 1;
+                if (logo.inMatrix) {
+                    this.inFlatClamp = true;
+                } else {
+                    logo.transposition[turtle] -= 1;
+                }
                 childFlow = args[0];
                 childFlowCount = 1;
 
@@ -1715,7 +1738,11 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
 
                 var listener = function (event) {
-                    logo.transposition[turtle] += 1;
+                    if (logo.inMatrix) {
+                        this.inFlatClamp = false;
+                    } else {
+                        logo.transposition[turtle] += 1;
+                    }
                 }
 
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
