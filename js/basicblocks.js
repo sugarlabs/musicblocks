@@ -86,6 +86,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
 
+    var setkeyBlock = new ProtoBlock('setkey');
+    setkeyBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['setkey'] = setkeyBlock;
+    setkeyBlock.staticLabels.push(_('set key'));
+    setkeyBlock.adjustWidthToLabel();
+    setkeyBlock.oneArgBlock();
+    setkeyBlock.dockTypes[1] = 'textin';
+    setkeyBlock.defaults.push('C');
+
+    var keyBlock = new ProtoBlock('key');
+    keyBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['key'] = keyBlock;
+    keyBlock.staticLabels.push(_('key'));
+    keyBlock.adjustWidthToLabel();
+    keyBlock.parameterBlock();
+
     // Deprecated
     var matrixData = new ProtoBlock('matrixData');
     matrixData.palette = palettes.dict['matrix'];
