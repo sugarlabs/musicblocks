@@ -12,14 +12,11 @@
 
 //All about Matrix
 
-/*clearTurtles() : There is a corresponding turtle for each note in
- * matrix. Whenever matrix is initialized, the turtles are to be
- * cleared first. *<==Can someone please explain why this is like
- * this??? Thanks! -DU*
-
+/*
 initMatrix() : Initializes the matrix. Makes the pitches according to
-solfegeNotes(Contains what is to be displayed in first row) and
-solfegeOct(contains Octave for each pitch )
+solfegeNotes (contains what is to be displayed in first row),
+solfegeTranspositions (contains a transposition), and
+solfegeOctaves (contains the octave for each pitch )
 
 makeMatrix() : Makes the matrix according to each rhythm block.
 
@@ -39,7 +36,7 @@ savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.
 */
 
-function Matrix(turtles, musicnotation)
+function Matrix(musicnotation)
 {
     console.log('MATRIX');
     this.arr = [];
@@ -51,12 +48,6 @@ function Matrix(turtles, musicnotation)
     this.octave = 0;
     this.i = 0;
     this.matrixContainer = null;
-    // Is there a way to have the input be either sharps or flats?
-    // What about "this.notes = ["C", "C#" "Db" , "D", "D#" "Eb", "E",
-    // "F", "F#" "Gb", "G", "G#" "Ab", "A", "A#" "Bb", "B"];" <==
-    // Basically some of notes are equivalent C#=Db <==Any answer to
-    // this question? 2015-08-24
-
     this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
     this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
     this.transposition = null;
@@ -68,43 +59,25 @@ function Matrix(turtles, musicnotation)
 
     this.cellWidth = 0;
     this.solfegeNotes = [];
-    this.solfegeOct = [];
+    this.solfegeTranspositions = [];
+    this.solfegeOctaves = [];
     this.noteValue = 4;
     this.notesCounter = 0;
     this.playDirection = 1;
 
     this.notationIndex = 0;    
 
-    this.clearTurtles = function()
-    {
-	console.log('MATRIX:clearTurtles');
-        for (var i = 0; i < turtles.turtleList.length; i++)
-        {
-            if (turtles.turtleList[i].name.includes('note'))
-            {
-                turtles.turtleList[i].trash = true;
-                turtles.turtleList[i].container.visible = false;    
-                turtles.turtleList.splice(i, 1);
-                i -=1 ;
-            }
-        }
-        this.i = 0;
-    }
-    
     this.initMatrix = function(logo, PolySynth)
     {
-        /*Initializes the matrix. First removes the previous matrix
-	 * and them make another one in DOM*/ //<==What is DOM? -DU
+        // Initializes the matrix. First removes the previous matrix
+	// and them make another one in DOM (document object model)
 	console.log('MATRIX:initMatrix');
         this.logo = logo;
         this.synth = PolySynth;
         document.getElementById('matrix').style.display = 'inline';
         document.getElementById('matrix').style.visibility = 'visible';
         document.getElementById('matrix').style.border = 2;
-        console.log('notes '+this.solfegeNotes +' and octave '+this.solfegeOct);
-
-        // Since we are not using turtles for notes, no need for this.
-        // this.clearTurtles();
+        console.log('notes ' + this.solfegeNotes + ' octave ' + this.solfegeOctaves + ' transpositions ' + this.solfegeTranspositions);
 
         this.notesToPlay = [];
         this.notesToPlayDirected = [];
@@ -182,7 +155,15 @@ function Matrix(turtles, musicnotation)
             var row = header.insertRow(i+1);
             var cell = row.insertCell(0);
             cell.style.backgroundColor = '#9ACD32';
-            cell.innerHTML = this.solfegeNotes[i] + this.solfegeOct[i].toString().sub();
+
+            // process transpositions
+            if (this.solfegeTranspositions[i] != 0) {
+                var note = getNote(this.solfegeNotes[i], this.solfegeOctaves[i], this.solfegeTranspositions[i], this.logo.keySignature[0]);
+                console.log(note);
+                this.note2Solfege(note, i);
+            }
+
+            cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             cell.style.height = '30px';
         }
         
@@ -194,6 +175,21 @@ function Matrix(turtles, musicnotation)
         
         this.chkArray = new Array();
         this.chkArray.push(0);
+    }
+
+    this.note2Solfege = function(note, index) {
+        var solfegeConversionTable = {'C': 'do', 'C#': 'do#', 'D': 're', 'D#': 're#', 'E': 'mi', 'F': 'fa', 'F#': 'fa#', 'G': 'sol', 'G#': 'sol#', 'A': 'la', 'A#': 'la#', 'B': 'ti', 'Db': 'reb', 'Eb': 'mib', 'Gb': 'solb', 'Ab': 'lab', 'Bb': 'tib'};
+        if (['b', '#'].indexOf(note[1]) == -1) {
+            var octave = note[1];
+            var newNote = solfegeConversionTable[note[0]];
+        } else {
+            var octave = note[2];
+            var newNote = solfegeConversionTable[note.substr(0,2)];
+        }
+        console.log(index + ': ' + newNote + '/' + octave);
+        this.solfegeNotes[index] = newNote;
+        this.solfegeOctaves[index] = octave;
+        this.solfegeTranspositions[index] = 0;
     }
 
     this.handleTuplet = function(param)
@@ -521,7 +517,7 @@ function Matrix(turtles, musicnotation)
             leaveRowsFromBottom = 3;
         }
         var table = document.getElementById('myTable');
-        var octave = this.solfegeOct[rowIndex - 1];
+        var octave = this.solfegeOctaves[rowIndex - 1];
         var transformed = false;
         this.notesToPlay[colIndex - 1][0] = [];
         if (table != null)
@@ -550,16 +546,10 @@ function Matrix(turtles, musicnotation)
                         noteValue = noteValue.toString()
                     }
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
-                    // ditto
-                    // this.clearTurtles();
+
                     if (playNote)
                        {    
                            synth.triggerAttackRelease(note, noteValue);
-                    }
-                    for (var i=0; i<this.notesToPlay.length; i++)
-                    {
-                        // WE AREN'T USING THESE TURTLES SO LETS NOT ADD THEM
-                        // turtles.add(null, null, this.notesToPlay[i][0]);
                     }
                 }
             }        

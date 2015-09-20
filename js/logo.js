@@ -81,6 +81,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
     this.keySignature = {};
     this.inFlatClamp = false;
     this.inSharpClamp = false;
+    this.inTransposeClamp = false;
 
     // parameters used by pitch
     this.transposition = {};
@@ -345,6 +346,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         this.inMatrix = false;
         this.inFlatClamp = false;
         this.inSharpClamp = false;
+        this.inTranspositionClamp = false;
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -1395,7 +1397,8 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 }
                 logo.inMatrix = true;
                 matrix.solfegeNotes = [];
-                matrix.solfegeOct = [];
+                matrix.solfegeTranspositions = [];
+                matrix.solfegeOctaves = [];
                 setTimeout(function()
                 {
                     matrix.initMatrix(logo);
@@ -1423,7 +1426,12 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     } else {
                         matrix.solfegeNotes.push(args[0]);
                     }
-                    matrix.solfegeOct.push(args[1]);
+                    if (logo.inTranspositionClamp) {
+                        matrix.solfegeTranspositions.push(logo.transposition[turtle]);
+                    } else {
+                        matrix.solfegeTranspositions.push(0);
+                    }
+                    matrix.solfegeOctaves.push(args[1]);
                 } else {
                     logo.noteNotes[turtle].push(args[0]);
                     logo.noteOctaves[turtle].push(args[1]);
@@ -1662,6 +1670,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
             case 'settransposition':
                 var transValue = args[0];
                 logo.transposition[turtle] += transValue;
+                if (logo.inMatrix) {
+                    logo.inTranspositionClamp = true;
+                }
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -1677,6 +1688,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                 var listener = function (event) {
                     logo.transposition[turtle] -= transValue;
+                    if (logo.inMatrix) {
+                        logo.inTranspositionClamp = false;
+                    }
                 }
 
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
