@@ -1514,6 +1514,9 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
                 logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                // How to add this to the start of the list rather
+                // than the end of the list???
+                console.log(logo.stage);
                 logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'meter':
@@ -1559,11 +1562,10 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                         if (note != 'R') {
                             notes.push(note);
                         }
-                        // FIXME: this is not quite right.
-                        notes2.push([note]);
-                        notes2.push([duration]);
+                        notes2.push([note, duration]);
                     }
                     console.log("notes to play " + notes);
+                    console.log("notes for notation " + notes2);
                     logo.notesPlayed[turtle].push(notes2);
                     if (notes.length > 0) {
                         // Use the beatValue of the first note in the
@@ -1845,9 +1847,20 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
         // (3) Queue block below the current block.
 
         if (blk in logo.endOfFlowSignals[turtle]) {
+            var notationDispatches = [];
             for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
-                console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
-                logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
+                // Kludge to ensure notation dispatch is done last.
+                if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
+                    console.log('queueing ' + logo.endOfFlowSignals[turtle][blk][i]);
+                    notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
+                } else {
+                    console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                    logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
+                }
+            }
+            for (var i = 0; i < notationDispatches.length; i++) {
+                console.log('dispatching ' + notationDispatches[i]);
+                logo.stage.dispatchEvent(notationDispatches[i]);
             }
             delete logo.endOfFlowSignals[turtle][blk];
         }
