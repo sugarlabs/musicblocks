@@ -1687,7 +1687,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
             case 'sharp':
                 if (logo.inMatrix) {
-                    this.inSharpClamp = true;
+                    logo.inSharpClamp = true;
                 } else {
                     logo.transposition[turtle] += 1;
                 }
@@ -1706,7 +1706,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                 var listener = function (event) {
                     if (logo.inMatrix) {
-                        this.inSharpClamp = false;
+                        logo.inSharpClamp = false;
                     } else {
                         logo.transposition[turtle] -= 1;
                     }
@@ -1720,7 +1720,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 break;
             case 'flat':
                 if (logo.inMatrix) {
-                    this.inFlatClamp = true;
+                    logo.inFlatClamp = true;
                 } else {
                     logo.transposition[turtle] -= 1;
                 }
@@ -1739,7 +1739,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
 
                 var listener = function (event) {
                     if (logo.inMatrix) {
-                        this.inFlatClamp = false;
+                        logo.inFlatClamp = false;
                     } else {
                         logo.transposition[turtle] += 1;
                     }
