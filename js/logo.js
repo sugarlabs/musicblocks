@@ -97,7 +97,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
     this.pushedNote = {};
 
     // tuplet
-    this.tuplet = 0;
+    this.tuplet = false;
     this.tupletParam = [];
     this.tupletRhythmCount = 0;
     this.rhythmInsideTuplet = 0;
@@ -349,6 +349,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
         this.inFlatClamp = false;
         this.inSharpClamp = false;
         this.inTranspositionClamp = false;
+        this.tuplet = false;
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -1430,7 +1431,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
                     if(logo.tuplet) {
                         matrix.makeClickable(true, logo.polySynth);
-                        logo.tuplet = 0;
+                        logo.tuplet = false;
                     } else {
                         matrix.makeClickable(false, logo.polySynth);
                     }
@@ -1478,17 +1479,21 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 }
                 break;
             case 'rhythm':
-                if(logo.rhythmicValueParameter == 'rhythmicdot') {
-                    args[1] = (2 / 3) * args[1];
-                    logo.rhythmicValueParameter = null;
-                }
-                console.log('blk is ' + blk + ' and rhythmInsideTuplet is ' + logo.rhythmInsideTuplet);
+                if (logo.inMatrix) {
+                    if(logo.rhythmicValueParameter == 'rhythmicdot') {
+                        args[1] = (2 / 3) * args[1];
+                        logo.rhythmicValueParameter = null;
+                    }
+                    console.log('blk is ' + blk + ' and rhythmInsideTuplet is ' + logo.rhythmInsideTuplet);
 
-                // Queue the rhythms for processing inside the matrix callback.
-                if(blk == logo.rhythmInsideTuplet) {
-                    logo.rhythms.push([true, args[0], args[1]]);
+                    // Queue the rhythms for processing inside the matrix callback.
+                    if(blk == logo.rhythmInsideTuplet) {
+                        logo.rhythms.push([true, args[0], args[1]]);
+                    } else {
+                        logo.rhythms.push([false, args[0], args[1]]);
+                    }
                 } else {
-                    logo.rhythms.push([false, args[0], args[1]]);
+                    console.log('rhythm block only used inside matrix');
                 }
                 break;
             case 'timeSign':
@@ -1817,23 +1822,26 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
             case 'tuplet':
-                // logo.runFromBlock(logo, turtle, args[0]);
-                console.log('processing tuplet');
-                logo.tuplet = 2;
-                logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
-                console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
-                logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[1];
+                if (logo.inMatrix) {
+                    console.log('processing tuplet');
+                    logo.tuplet = true;
+                    logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
+                    console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
+                    logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[1];
+                } else {
+                    console.log('tuplet only meaningful inside matrix');
+                }
                 childFlow = args[0];
                 childFlowCount = 1;
                 break;
             case 'tupletParamBlock':
-                logo.tupletParam = [];
-                console.log('tuplet params are ' + args[0] + ', ' + args[1] + ', ' + args[2]);
-                logo.tupletParam.push([args[0], args[1], args[2]]);
-                /*
-                console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
-                logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
-                */
+                if (logo.inMatrix) {
+                    logo.tupletParam = [];
+                    console.log('tuplet params are ' + args[0] + ', ' + args[1] + ', ' + args[2]);
+                    logo.tupletParam.push([args[0], args[1], args[2]]);
+                } else {
+                    console.log('tuplet parameters only useful inside matrix');
+                }
                 break;
             case '_chunk':
                 // DEPRECATED
