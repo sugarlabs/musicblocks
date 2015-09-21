@@ -36,8 +36,7 @@ savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.
 */
 
-function Matrix(musicnotation)
-{
+function Matrix(musicnotation) {
     console.log('MATRIX');
     this.arr = [];
     this.secondsPerBeat = 1;
@@ -65,10 +64,9 @@ function Matrix(musicnotation)
     this.notesCounter = 0;
     this.playDirection = 1;
 
-    this.notationIndex = 0;    
+    this.notationIndex = 0;
 
-    this.initMatrix = function(logo, PolySynth)
-    {
+    this.initMatrix = function(logo, PolySynth) {
         // Initializes the matrix. First removes the previous matrix
 	// and them make another one in DOM (document object model)
 	console.log('MATRIX:initMatrix');
@@ -84,36 +82,32 @@ function Matrix(musicnotation)
         this.isMatrix = 1; //1 if matrix exists
 
         /*to remove the matrix table*/
-        Element.prototype.remove = function()
-        {
+        Element.prototype.remove = function() {
             this.parentElement.removeChild(this);
         }
 
-        NodeList.prototype.remove = HTMLCollection.prototype.remove = function()
-        {
+        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
             for (var i = 0, len = this.length; i < len; i++)
             {
-                if(this[i] && this[i].parentElement)
-                {
+                if (this[i] && this[i].parentElement) {
                     this[i].parentElement.removeChild(this[i]);
                 }
             }
         }
         var table = document.getElementById('myTable');
 
-        if (table != null)
-        {
+        if (table != null) {
             table.remove();
         }
 
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'myTable');
-        
+
         x.style.textAlign = 'center';
-        
+
         var matrixDiv = document.getElementById('matrix');
         matrixDiv.appendChild(x);
-        
+
         var table = document.getElementById('myTable');
         var header = table.createTHead();
         var row = header.insertRow(0);
@@ -126,8 +120,7 @@ function Matrix(musicnotation)
         cell.innerHTML = _('play');
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9A32CD';
-        cell.onclick=function()
-        {
+        cell.onclick=function() {
             logo.playMatrix();
         }
 
@@ -135,8 +128,7 @@ function Matrix(musicnotation)
         cell.innerHTML = _('save');
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9A32CD';
-        cell.onclick=function()
-        {
+        cell.onclick=function() {
             logo.saveMatrix();
         }
 
@@ -144,14 +136,12 @@ function Matrix(musicnotation)
         cell.innerHTML = _('close');
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9A32CD';
-        cell.onclick=function()
-        {
+        cell.onclick=function() {
             document.getElementById('matrix').style.visibility = 'hidden';
             document.getElementById('matrix').style.border = 0;
         }
 
-        for (var i=0; i<this.solfegeNotes.length; i++)
-        {
+        for (var i=0; i<this.solfegeNotes.length; i++) {
             var row = header.insertRow(i+1);
             var cell = row.insertCell(0);
             cell.style.backgroundColor = '#9ACD32';
@@ -169,13 +159,13 @@ function Matrix(musicnotation)
             cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             cell.style.height = '30px';
         }
-        
+
         var row = header.insertRow(this.solfegeNotes.length + 1);
         var cell = row.insertCell(0);
         cell.innerHTML = _('rhythmic note values');
         cell.style.height = '40px';
         cell.style.backgroundColor = '#9ACD32';
-        
+
         this.chkArray = new Array();
         this.chkArray.push(0);
     }
@@ -195,29 +185,25 @@ function Matrix(musicnotation)
         this.solfegeTranspositions[index] = 0;
     }
 
-    this.handleTuplet = function(param)
-    {
+    this.handleTuplet = function(param) {
 	console.log('MATRIX:handleTuplet');
         console.log('parameters ' + JSON.stringify(param));
 
         var table = document.getElementById('myTable');
         var timeFactor = (param[0][2] / param[1][1]) * (param[1][0] / param[0][1]);
-        for (var i=1; i<table.rows.length-1; i++)
-        {
-            for (var j=0; j<param[1][0]; j++)
-            {
+        for (var i = 1; i < table.rows.length - 1; i++) {
+            for (var j = 0; j < param[1][0]; j++) {
                 row = table.rows[i];
                 cell = row.insertCell(-1)
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
                 cell.style.backgroundColor = '#ADFF2F';
             }
         }
-        for (var j=0; j<param[1][0]; j++)
-        {
+        for (var j = 0; j < param[1][0]; j++) {
             this.chkArray.push(0);
             this.notesToPlay.push([['R'], timeFactor*param[1][1]]);
         }
-    
+
         var w = window.innerWidth;
         w = (2 * w) / 5;
 
@@ -225,23 +211,20 @@ function Matrix(musicnotation)
         var cell = row.insertCell(-1);
         cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
         cell.style.backgroundColor = '#9ACD32';
-    
+
         cell = table.rows[table.rows.length - 1].insertCell(-1);
         cell.style.backgroundColor = '#9ACD32';
-        cell.style.height = '30px';    
+        cell.style.height = '30px';
         cell.innerHTML = param[0][1].toString() + '/' + param[0][2].toString();
         cell.width = w*param[0][1]/(param[0][2]) + 'px';
-                
-        cell.colSpan = param[0][0];        
+        cell.colSpan = param[0][0];
         cell.style.backgroundColor = 'rgb(174, 174, 174)';
-         
-        for (var i=0; i < table.rows[table.rows.length - 1].cells.length - 1; i++)
-        {
+
+        for (var i = 0; i < table.rows[table.rows.length - 1].cells.length - 1; i++) {
             cell = row.insertCell(i+1);
             cell.style.backgroundColor = 'rgb(4, 255, 174)';
-            cell.style.height = '30px';    
-            if (i == table.rows[table.rows.length - 1].cells.length - 2)
-            {
+            cell.style.height = '30px';
+            if (i == table.rows[table.rows.length - 1].cells.length - 2) {
                 cell.style.backgroundColor = 'rgb(4, 255, 174)';
                 cell.innerHTML = param[0][0];
                 cell.colSpan = param[0][0];
@@ -252,65 +235,52 @@ function Matrix(musicnotation)
         var cell = row.insertCell(-1);
         cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
         cell.style.backgroundColor = '#9ACD32';
-        for (var i=0; i<table.rows[table.rows.length - 4].cells.length - 1; i++)
-        {    
+        for (var i = 0; i < table.rows[table.rows.length - 4].cells.length - 1; i++) {
             cell = row.insertCell(-1);
             cell.style.backgroundColor = 'rgb(4, 255, 174)';
             cell.style.height = '30px';
-            if(i >= table.rows[table.rows.length - 1].cells.length - 2)
-            {
-                cell.innerHTML = '1/' + timeFactor*param[1][1].toString();    
+            if(i >= table.rows[table.rows.length - 1].cells.length - 2) {
+                cell.innerHTML = '1/' + timeFactor*param[1][1].toString();
             }
-
-        }    
-        
+        }
     }
 
-    this.makeMatrix = function(numBeats, noteValue, noteValueNum)
-    {
-	console.log('MATRIX:makeMatrix');
+    this.makeMatrix = function(numBeats, noteValue, noteValueNum) {
         console.log('makeMatrix ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
         var table = document.getElementById('myTable');
 
         var noteValueToDisplay = null;
-        if (noteValueNum)
-        {
+        if (noteValueNum) {
             noteValueToDisplay = noteValueNum.toString() + '/' + noteValue.toString();
-        }
-        else
-        {
+        } else {
             noteValueToDisplay = '1/' + noteValue.toString();
         }
-        if (parseInt(noteValue) < noteValue)
-        {
+
+        //<==Rhythmic Dot function does not seem to work anymore (see
+        //ownCloud). Did I break it HERE? Thanks and sorry if I did...
+        if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
-            noteValueToDisplay = '1.5/' + noteValueToDisplay.toString() + ' (single-dot)'; //<==Rhythmic Dot function does not seem to work anymore (see ownCloud). Did I break it HERE? Thanks and sorry if I did...
+            noteValueToDisplay = '1.5/' + noteValueToDisplay.toString() + ' (single-dot)';
         }
 
-        if (this.noteValue > noteValue)
-        {
+        if (this.noteValue > noteValue) {
             this.noteValue = noteValue;
         }
-        for (var i=0; i<numBeats; i++)
-        {
+        for (var i = 0; i < numBeats; i++) {
             this.notesToPlay.push([['R'], noteValue]);
         }
         console.log('Rhythm #beats->' + numBeats + ' noteValue->' + noteValue);
 
-        for (var i=1; i<=numBeats; i++)
-        {
+        for (var i = 1; i <= numBeats; i++) {
              this.chkArray.push(0);
         }
-        for (var j=0; j<numBeats; j++)
-        {
-            for (var i=1; i<=this.solfegeNotes.length + 1; i++)
-            {    
+        for (var j = 0; j < numBeats; j++) {
+            for (var i = 1; i <= this.solfegeNotes.length + 1; i++) {
                 var row = table.rows[i];
                 var cell = row.insertCell(-1);
                 cell.style.backgroundColor = '#ADFF2F';
-                
-                if (i == this.solfegeNotes.length + 1)
-                {
+
+                if (i == this.solfegeNotes.length + 1) {
                     cell.innerHTML = noteValueToDisplay;
                     cell.style.backgroundColor = 'rgb(174, 174, 174)';
                 }
@@ -320,32 +290,26 @@ function Matrix(musicnotation)
 
         var w = window.innerWidth;
         w = (2 * w) / 5;
-        this.cellWidth = w/4;
-        for (var i = table.rows[1].cells.length - numBeats; i < table.rows[1].cells.length; i++)
-        {
+        this.cellWidth = w / 4;
+        for (var i = table.rows[1].cells.length - numBeats; i < table.rows[1].cells.length; i++) {
             table.rows[1].cells[i].width = w/noteValue + 'px';
-        }    
+        }
     }
 
-    this.makeClickable = function(tuplet, synth){
+    this.makeClickable = function(tuplet, synth) {
         /* Once the entire matrix is generated, this function makes it
 	 * clickable. */
-	console.log('MATRIX:makeClickable');
         var table = document.getElementById('myTable');
         var that = this;
         var leaveRowsFromBottom = 1;
-        if (tuplet)
-        {
+        if (tuplet) {
             leaveRowsFromBottom = 3;
         }
         console.log('isTuplet ' + tuplet);
-        for (var i = 1; i < table.rows[1].cells.length; i++) 
-        {    
-            for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
-            {                    
+        for (var i = 1; i < table.rows[1].cells.length; i++) {
+            for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                 cell = table.rows[j].cells[i];
-                if(cell.style.backgroundColor == 'black')
-                {
+                if (cell.style.backgroundColor == 'black') {
                     cell.style.backgroundColor = '#ADFF2F';
                     cell.style.backgroundColor = 'black';
                     this.setNotes(i, cell.parentNode.rowIndex, false);
@@ -354,22 +318,16 @@ function Matrix(musicnotation)
         }
         if (table != null) {
             for (var i = 1; i < table.rows[1].cells.length; i++) {
-                    
-                for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
-                {    
+                for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                     var cell = table.rows[j].cells[i];
                     var that = this;
-                    cell.onclick=function(){
-                        if (this.style.backgroundColor == 'black')
-                        {
+                    cell.onclick = function() {
+                        if (this.style.backgroundColor == 'black') {
                             this.style.backgroundColor = '#ADFF2F';
                             that.chkArray[this.id] = 0;
                             that.notesToPlay[this.id - 1][0] = ['R'];
                             that.setNotes(this.id, this.parentNode.rowIndex, false, tuplet, synth);
-                        }
-                        else
-                        {
-
+                        } else {
                             this.style.backgroundColor = 'black';
                             that.chkArray[this.id] = 1;
                             that.setNotes(this.id, this.parentNode.rowIndex, true, tuplet, synth);
@@ -380,66 +338,52 @@ function Matrix(musicnotation)
         }
     }
 
-    this.setTransposition = function(transposition)
-    {
+    this.setTransposition = function(transposition) {
 	console.log('MATRIX:setTransposition');
         this.transposition = transposition;
     }
 
-    this.removeTransposition = function(transposition)
-    {
+    this.removeTransposition = function(transposition) {
 	console.log('MATRIX:removeTransposition');
         this.transposition = null;
     }
 
-    this.doTransposition = function(note, octave)
-    {
-        /*first setTransposition in called in logo.js and
+    // DEPRECATED (now handled in getNote)
+    this.doTransposition = function(note, octave) {
+        /* first setTransposition in called in logo.js and
 	 * this.transposition shows no. of semitones to be shifted
-	 * up/down*/
+	 * up/down */
 	console.log('MATRIX:doTransposition: ' + this.transposition);
-        if (this.transposition)
-        {
+        if (this.transposition) {
             var deltaOctave = 0;
-            if (this.transposition[0] == '-')
-            {
+            if (this.transposition[0] == '-') {
                 var factor = this.transposition;
                 factor = factor.slice(0,0) + factor.slice(1,factor.length);
                 factor = parseInt(factor);
                 var index = this.notes.indexOf(note);
-                if (index == 0)
-                {
+                if (index == 0) {
                     index = this.notes.length - factor % this.notes.length;
                     deltaOctave = -1
-                }
-                else
-                {
+                } else {
                     index = index - ( factor % this.notes.length );
-                    if(index < 0)
-                    {
-                            index = this.notes.length + index;
-                            deltaOctave = -1;
+                    if(index < 0) {
+                        index = this.notes.length + index;
+                        deltaOctave = -1;
                     }
                 }
                 return this.notes[index] + (parseInt(octave) + parseInt(deltaOctave));
-            }
-            else if (this.transposition[0] == '+')
-            {
+            } else if (this.transposition[0] == '+') {
                 var factor = this.transposition;
                 factor = factor.slice(0,0) + factor.slice(1,factor.length);
                 factor = parseInt(factor);
                 var index = this.notes.indexOf(note);
-                if (index == this.notes.length - 1)
-                {
+                if (index == this.notes.length - 1) {
                     index = factor % this.notes.length - 1;
                     deltaOctave = 1;
-                }    
-                else
-                    {
-                        index += factor % this.notes.length;
-                    }
-                if (index >= this.notes.length)
-                {
+                } else {
+                    index += factor % this.notes.length;
+                }
+                if (index >= this.notes.length) {
                     index = index % this.notes.length;
                     deltaOctave = 1;
                 }
@@ -450,20 +394,15 @@ function Matrix(musicnotation)
         return note;
     }
 
-    this.playAll = function(synth)
-    {
+    this.playAll = function(synth) {
 	console.log('MATRIX:playAll');
         var notes = [];
-        for (i in this.notesToPlay)
-        {
+        for (i in this.notesToPlay) {
             notes.push(this.notesToPlay[i]);
         }
-        if (this.playDirection > 0)
-        {
+        if (this.playDirection > 0) {
             this.notesToPlayDirected = notes;
-        }
-        else
-        {
+        } else {
             this.notesToPlayDirected = notes.reverse();
         }
         this.playDirection = 1;
@@ -471,129 +410,107 @@ function Matrix(musicnotation)
         var that = this;
         var time = 0;
         var table = document.getElementById('myTable');
-        
         var note  = this.notesToPlayDirected[this.notesCounter][0];
         var noteValue = that.notesToPlayDirected[this.notesCounter][1];
         this.notesCounter += 1;
-        if (note != 'R')
-        {
+        if (note != 'R') {
             synth.triggerAttackRelease(note, 1 / noteValue);
         }
 
-        for (var i = 1; i < this.notesToPlayDirected.length; i++)
-        {
+        for (var i = 1; i < this.notesToPlayDirected.length; i++) {
             noteValue = this.notesToPlayDirected[i - 1][1];
             time += 1/noteValue;
             var that = this;
-        
-            setTimeout(function()
-            {
-                if(that.notesCounter >= that.notesToPlayDirected.length)
-                {
+
+            setTimeout(function() {
+                if(that.notesCounter >= that.notesToPlayDirected.length) {
                     that.notesCounter = 1;
                     Tone.Transport.stop();
                 }
                 note  = that.notesToPlayDirected[that.notesCounter][0];
                 noteValue = that.notesToPlayDirected[that.notesCounter][1];
                 that.notesCounter += 1;
-                if(note != 'R')
-                {
+                if(note != 'R') {
                     synth.triggerAttackRelease(note, 1 / noteValue);
                 }
             }, 2000 * time);
         }
     }
 
-    this.musicNotation = function(notes, numerator, denominator)
-    {
+    this.musicNotation = function(notes, numerator, denominator) {
 	console.log('MATRIX:musicNotation');
         musicnotation.doNotation(notes, numerator, denominator);
     }
 
-    this.setNotes = function(colIndex, rowIndex, playNote, tuplet, synth)
-    {
+    this.setNotes = function(colIndex, rowIndex, playNote, tuplet, synth) {
         /* Sets corresponding note when user clicks on any cell and
 	 * plays that note*/
         var leaveRowsFromBottom = 1;
-        if(tuplet)
-        {
+        if(tuplet) {
             leaveRowsFromBottom = 3;
         }
         var table = document.getElementById('myTable');
         var octave = this.solfegeOctaves[rowIndex - 1];
         var transformed = false;
         this.notesToPlay[colIndex - 1][0] = [];
-        if (table != null)
-        {
-            for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++)
-            {
+        if (table != null) {
+            for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                 cell = table.rows[j].cells[colIndex];
                 var note;
-                if (cell.style.backgroundColor == 'black')
-                {
+                if (cell.style.backgroundColor == 'black') {
                     var solfege = table.rows[j].cells[0].innerHTML;
                     console.log(solfege + ' in key ' +  this.logo.keySignature[0]);
                     note = getNote(solfege, octave, 0, this.logo.keySignature[0]);
                     console.log(note);
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
                     var i = 0;
-                    if (noteValue.substr(0,3) == '1.5')
-                    {
-                        while (noteValue[i] != ' ')
-                        {
+                    if (noteValue.substr(0,3) == '1.5') {
+                        while (noteValue[i] != ' ') {
                             i += 1;
                         }
-                        noteValue = noteValue.substr(4, i-4);
+                        noteValue = noteValue.substr(4, i - 4);
                         noteValue = parseInt(noteValue)
                         noteValue = 1.5/noteValue;
                         noteValue = noteValue.toString()
                     }
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
-                    if (playNote)
-                       {    
-                           synth.triggerAttackRelease(note, noteValue);
+                    if (playNote) {
+                        synth.triggerAttackRelease(note, noteValue);
                     }
                 }
-            }        
+            }
         }
     }
 
-    this.playNotesString = function(time, synth){
+    this.playNotesString = function(time, synth) {
         /*plays the matrix and also the chunks*/
 	console.log('MATRIX:playNotesString');
-        if (this.transposition != null )
-        {
+        if (this.transposition != null ) {
             var transposedArray = [];
-            for (var i = 0; i < this.notesToPlay.length; i++)
-            {
+            for (var i = 0; i < this.notesToPlay.length; i++) {
                 var transposedNote = this.doTransposition(this.notesToPlay[i][0], this.octave);
                 transposedArray.push(transposedNote);
             }
-            
             console.log('original notes ' + this.notesToPlay);
             this.notesToPlay = transposedArray;
             console.log('transposed notes to be played ' + this.notesToPlay);
-        }
-        else
-        {
+        } else {
             console.log('notes to be played ' + JSON.stringify(this.notesToPlay));
         }
 
         this.i = 0;
 
         var that = this;
-        setTimeout(function()
-        {
+        setTimeout(function() {
             console.log('playing after ' + time + 'ms');
             that.playAll(synth);
-        },time);
+        }, time);
     }
 
-    this.saveMatrix = function()
-    {
-        /* Saves the current matrix as chunks, saving as a chunk
-	 * functionality is implemented in logo js */
+    this.saveMatrix = function() {
+        /* Saves the current matrix as an action stack consisting of
+	 * note and pitch blocks (saving as chunks is deprecated). */
         var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'si', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var endOfStackIdx = 0;
