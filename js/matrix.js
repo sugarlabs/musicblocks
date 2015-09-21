@@ -36,7 +36,7 @@ savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.
 */
 
-function Matrix(musicnotation) {
+function Matrix() {
     console.log('MATRIX');
     this.arr = [];
     this.secondsPerBeat = 1;
@@ -63,8 +63,6 @@ function Matrix(musicnotation) {
     this.noteValue = 4;
     this.notesCounter = 0;
     this.playDirection = 1;
-
-    this.notationIndex = 0;
 
     this.initMatrix = function(logo, PolySynth) {
         // Initializes the matrix. First removes the previous matrix
@@ -435,11 +433,6 @@ function Matrix(musicnotation) {
                 }
             }, 2000 * time);
         }
-    }
-
-    this.musicNotation = function(notes, numerator, denominator) {
-	console.log('MATRIX:musicNotation');
-        musicnotation.doNotation(notes, numerator, denominator);
     }
 
     this.setNotes = function(colIndex, rowIndex, playNote, tuplet, synth) {

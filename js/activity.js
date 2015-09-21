@@ -300,7 +300,6 @@ define(function (require) {
 
             // We handle chunks and saved Matrices differently now.
 
-            // matrix.clearTurtles();
             // var i = 0;
             // while(logo.blocks.protoBlockDict['_chunk' + i]) {
             //     var cont = logo.blocks.blockList[blk].container;
@@ -501,7 +500,7 @@ define(function (require) {
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
 
             musicnotation = new MusicNotation(turtles, stage);
-            matrix = new Matrix(turtles, musicnotation);
+            matrix = new Matrix();
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
@@ -510,8 +509,8 @@ define(function (require) {
             blocks.makeCopyPasteButtons(makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(matrix, canvas, blocks, turtles, turtleContainer,
-                refreshCanvas,
+            logo = new Logo(matrix, musicnotation, canvas,
+                blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
                 onRunTurtle, prepareExport, getStageX, getStageY,
                 getStageMouseDown, getCurrentKeyCode,

@@ -23,7 +23,7 @@ var NOSQRTERRORMSG = 'Cannot take square root of negative number.';
 var ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 var EMPTYHEAPERRORMSG = 'empty heap.';
 
-function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, errorMsg,
+function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanvas, textMsg, errorMsg,
               hideMsgs, onStopTurtle, onRunTurtle, prepareExport, getStageX,
               getStageY, getStageMouseDown, getCurrentKeyCode,
               clearCurrentKeyCode, meSpeak, saveLocally) {
@@ -1399,21 +1399,16 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 matrix.solfegeNotes = [];
                 matrix.solfegeTranspositions = [];
                 matrix.solfegeOctaves = [];
-                setTimeout(function()
-                {
+                setTimeout(function() {
                     matrix.initMatrix(logo);
-                }, 1500);
-                var that = this;
-                setTimeout(function()
-                {
-                    if(that.tuplet)
-                    {
-                        matrix.makeClickable(true, that.polySynth);
-                        that.tuplet = 0;
+                }, 500);
+                setTimeout(function() {
+                    if(logo.tuplet) {
+                        matrix.makeClickable(true, logo.polySynth);
+                        logo.tuplet = 0;
+                    } else {
+                        matrix.makeClickable(false, logo.polySynth);
                     }
-
-                    else
-                        matrix.makeClickable(false, that.polySynth);
                 }, 2000);
                 break;
             case 'pitch':
@@ -1526,7 +1521,7 @@ function Logo(matrix, canvas, blocks, turtles, stage, refreshCanvas, textMsg, er
                 var listener = function (event) {
                     console.log('NOTATION');
                     console.log(logo.notesPlayed[turtle]);
-                    matrix.musicNotation(logo.notesPlayed[turtle], logo.numerator, logo.denominator);
+                    musicnotation.doNotation(logo.notesPlayed[turtle], logo.numerator, logo.denominator);
                 }
 
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
