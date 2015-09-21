@@ -82,6 +82,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
     this.inFlatClamp = false;
     this.inSharpClamp = false;
     this.inTransposeClamp = false;
+    this.rhythms = [];
 
     // parameters used by pitch
     this.transposition = {};
@@ -109,6 +110,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
 
     //Play with chunks
+    // DEPRECATED
     this.chunktranspose = false;
 
     //tone
@@ -1399,17 +1401,46 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 matrix.solfegeNotes = [];
                 matrix.solfegeTranspositions = [];
                 matrix.solfegeOctaves = [];
-                setTimeout(function() {
+
+                logo.rhythms = [];
+
+                var listenerName = '_matrix_';
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
+                if (endBlk != null) {
+                    if (endBlk in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                    } else {
+                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                    }
+                }
+
+                var listener = function (event) {
                     matrix.initMatrix(logo);
-                }, 500);
-                setTimeout(function() {
+
+                    // Process queued up rhythms.
+                    for (var i = 0; i < logo.rhythms.length; i++) {
+                        if (logo.rhythms[i][0]) {
+                            logo.tupletRhythmCount -= 2;
+                            logo.tupletParam.push([logo.rhythms[i][1], logo.rhythms[i][2]]);
+                            matrix.handleTuplet(logo.tupletParam);
+                        } else {
+                            matrix.makeMatrix(logo.rhythms[i][1], logo.rhythms[i][2]);
+                        }
+                    }
+
                     if(logo.tuplet) {
                         matrix.makeClickable(true, logo.polySynth);
                         logo.tuplet = 0;
                     } else {
                         matrix.makeClickable(false, logo.polySynth);
                     }
-                }, 2000);
+                }
+
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'pitch':
                 if (logo.inMatrix) {
@@ -1447,24 +1478,17 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 }
                 break;
             case 'rhythm':
-                if(logo.rhythmicValueParameter == 'rhythmicdot')
-                {
-                    args[1] = (2/3)*args[1];
+                if(logo.rhythmicValueParameter == 'rhythmicdot') {
+                    args[1] = (2 / 3) * args[1];
                     logo.rhythmicValueParameter = null;
                 }
                 console.log('blk is ' + blk + ' and rhythmInsideTuplet is ' + logo.rhythmInsideTuplet);
-                if(blk == logo.rhythmInsideTuplet)
-                {
-                    logo.tupletRhythmCount -= 2;
-                    logo.tupletParam.push([args[0], args[1]]);
-                    var that = this;
-                    setTimeout(function(){
-                        matrix.handleTuplet(that.tupletParam);
-                    },1500)
+
+                // Queue the rhythms for processing inside the matrix callback.
+                if(blk == logo.rhythmInsideTuplet) {
+                    logo.rhythms.push([true, args[0], args[1]]);
                 } else {
-                    setTimeout(function(){
-                        matrix.makeMatrix(args[0], args[1]);
-                    }, 1500);
+                    logo.rhythms.push([false, args[0], args[1]]);
                 }
                 break;
             case 'timeSign':
@@ -1474,6 +1498,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.playMatrix();
                 break;
             case 'notation':
+                // FIXME: restore meter block as arg?
                 /*
                 var flagN = 0, flagD = 1, tsd = 0, tsn = 0;
                 for (var i=0; i<args[0].length; i++)
@@ -1778,6 +1803,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 }, logo.stopTime);
                 break;
             case 'chunkTranspose':
+                // DEPRECATED
                 logo.chunktranspose = true;
                 matrix.setTransposition(args[0]);
                 logo.runFromBlock(logo, turtle, args[1]);
@@ -1791,17 +1817,26 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
             case 'tuplet':
-                logo.runFromBlock(logo, turtle, args[0]);
+                // logo.runFromBlock(logo, turtle, args[0]);
+                console.log('processing tuplet');
                 logo.tuplet = 2;
                 logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
+                console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
+                logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[1];
+                childFlow = args[0];
+                childFlowCount = 1;
                 break;
             case 'tupletParamBlock':
                 logo.tupletParam = [];
+                console.log('tuplet params are ' + args[0] + ', ' + args[1] + ', ' + args[2]);
                 logo.tupletParam.push([args[0], args[1], args[2]]);
+                /*
                 console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
                 logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[4];
+                */
                 break;
             case '_chunk':
+                // DEPRECATED
                 var index = logo.blocks.blockList[blk].privateData;
                 var notes = window.savedMatricesNotes;
                 matrix.notesToPlay = [];
@@ -1831,6 +1866,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 }
 
                 var trNote;
+
+                // DEPRECATED
                 if (logo.chunktranspose) {
                     var transposedNotes = [];
                     j -= 1;
@@ -1854,6 +1891,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 matrix.playNotesString(0, logo.polySynth);
                 break;
             case 'matrixData':
+                // DEPRECATED
                 // TODO: Have it behave like all of the chunks
                 break;
             default:
