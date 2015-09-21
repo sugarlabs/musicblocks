@@ -158,6 +158,9 @@ function Matrix(musicnotation)
 
             // process transpositions
             if (this.solfegeTranspositions[i] != 0) {
+                // When we apply a transposition to solfege, convert
+                // to note octave format and then convert back to
+                // solfege.
                 var note = getNote(this.solfegeNotes[i], this.solfegeOctaves[i], this.solfegeTranspositions[i], this.logo.keySignature[0]);
                 console.log(note);
                 this.note2Solfege(note, i);
@@ -212,7 +215,7 @@ function Matrix(musicnotation)
         for (var j=0; j<param[1][0]; j++)
         {
             this.chkArray.push(0);
-            this.notesToPlay.push([['R'],timeFactor*param[1][1]]);
+            this.notesToPlay.push([['R'], timeFactor*param[1][1]]);
         }
     
         var w = window.innerWidth;
@@ -590,46 +593,66 @@ function Matrix(musicnotation)
     this.saveMatrix = function()
     {
         /* Saves the current matrix as chunks, saving as a chunk
-	 * functionality is implemented in logo js*/
-        console.log('MATRIX:saveMatrix');
+	 * functionality is implemented in logo js */
         var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'si', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
-        var stackIdx = 0;
+        var endOfStackIdx = 0;
         console.log('SAVE MATRIX!!!');
 
-        for (var i=0; i<this.notesToPlay.length; i++)
+        for (var i = 0; i < this.notesToPlay.length; i++)
         {
+            // We want all of the notes in a column.
+            console.log(this.notesToPlay[i]);
             var note = this.notesToPlay[i].slice(0);
             window.savedMatricesNotes.push(note);
 
             // Add the Note block and its value
             var idx = newStack.length;
-            newStack.push([idx, 'note', 0, 0, [stackIdx, idx + 1, idx + 2, null]]);
+            newStack.push([idx, 'note', 0, 0, [endOfStackIdx, idx + 1, idx + 2, null]]);
             var n = newStack[idx][4].length;
             if (i == 0) {  // the action block
-                newStack[stackIdx][4][n - 2] = idx;
+                newStack[endOfStackIdx][4][n - 2] = idx;
             } else { // the previous note block
-                newStack[stackIdx][4][n - 1] = idx;
+                newStack[endOfStackIdx][4][n - 1] = idx;
             }
-            var stackIdx = idx;
+            var endOfStackIdx = idx;
             newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
-            // Add the pitch block to the Note block
-            newStack.push([idx + 2, 'pitch', 0, 0, [idx, idx + 3, idx + 4, null]]);
-            console.log(note[0][0]);
-            if(['#', 'b'].indexOf(note[0][0][1]) != -1) {
-                newStack.push([idx + 3, ['text', {'value': noteConversion[note[0][0][0]] + note[0][0][1]}], 0, 0, [idx + 2]]);
-                newStack.push([idx + 4, ['number', {'value': note[0][0][2]}], 0, 0, [idx + 2]]);
-            } else {
-                newStack.push([idx + 3, ['text', {'value': noteConversion[note[0][0][0]]}], 0, 0, [idx + 2]]);
-                if (note[0][0] == 'R') {
-                    newStack.push([idx + 4, ['number', {'value': 4}], 0, 0, [idx + 2]]);
+            // Add the pitch blocks to the Note block
+            for (var j = 0; j < note[0].length; j++) {
+
+                var thisBlock = idx + 2 + (j * 3);
+
+                // We need to point to the previous note or pitch block.
+                if (j == 0) {
+                    var previousBlock = idx;  // Note block
                 } else {
-                    newStack.push([idx + 4, ['number', {'value': note[0][0][1]}], 0, 0, [idx + 2]]);
+                    var previousBlock = thisBlock - 3;  // Pitch block
+                }
+
+                // The last connection in last pitch block is null.
+                if (note[0].length == 1 || j == note[0].length - 1) {
+                    var lastConnection = null;
+                } else {
+                    var lastConnection = thisBlock + 3;
+                }
+
+                newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                if(['#', 'b'].indexOf(note[0][j][1]) != -1) {
+                    newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
+                } else {
+                    newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                    if (note[0][0] == 'R') {
+                        newStack.push([thisBlock + 2, ['number', {'value': 4}], 0, 0, [thisBlock]]);
+                    } else {
+                        newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
+                    }
                 }
             }
         }
         window.savedMatricesNotes.push('end');
         window.savedMatricesCount += 1;
+
         // Create a new stack for the chunk.
         console.log(newStack);
         this.logo.blocks.loadNewBlocks(newStack);
