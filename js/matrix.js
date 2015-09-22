@@ -18,7 +18,12 @@ solfegeNotes (contains what is to be displayed in first row),
 solfegeTranspositions (contains a transposition), and
 solfegeOctaves (contains the octave for each pitch )
 
-makeMatrix() : Makes the matrix according to each rhythm block.
+addRhythm() : Makes the matrix according to each rhythm block.
+
+addTuplet() : Called when tuplet block is attached to the matrix
+clamp. Adds the rows and columns required for adding tuplet
+functionality to matrix. "Code is little messy" *<==How so? How should
+it be improved in the future?*
 
 makeClickable() : Makes the matrix clickable.
 
@@ -26,11 +31,6 @@ setNotes() : Set notes in this.notesToPlay when user clicks onto any
 clickable cell.
 
 playMatrix() : Plays the matrix as well as chunks by calling playAll();
-
-handleTuplet() : is called when tuplet block is attached to the matrix
-clamp. Adds the rows and columns required for adding tuplet
-functionality to matrix. "Code is little messy" *<==How so? How should
-it be improved in the future?*
 
 savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.
@@ -183,8 +183,8 @@ function Matrix() {
         this.solfegeTranspositions[index] = 0;
     }
 
-    this.handleTuplet = function(param) {
-	console.log('MATRIX:handleTuplet');
+    this.addTuplet = function(param) {
+	console.log('MATRIX:addTuplet');
         console.log('parameters ' + JSON.stringify(param));
 
         var table = document.getElementById('myTable');
@@ -243,8 +243,8 @@ function Matrix() {
         }
     }
 
-    this.makeMatrix = function(numBeats, noteValue, noteValueNum) {
-        console.log('makeMatrix ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
+    this.addRhythm = function(numBeats, noteValue, noteValueNum) {
+        console.log('addRhythm ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
         var table = document.getElementById('myTable');
 
         var noteValueToDisplay = null;

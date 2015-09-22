@@ -1423,9 +1423,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                         if (logo.rhythms[i][0]) {
                             logo.tupletRhythmCount -= 2;
                             logo.tupletParam.push([logo.rhythms[i][1], logo.rhythms[i][2]]);
-                            matrix.handleTuplet(logo.tupletParam);
+                            console.log(logo.tupletParam);
+                            matrix.addTuplet(logo.tupletParam);
                         } else {
-                            matrix.makeMatrix(logo.rhythms[i][1], logo.rhythms[i][2]);
+                            matrix.addRhythm(logo.rhythms[i][1], logo.rhythms[i][2]);
                         }
                     }
 
