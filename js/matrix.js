@@ -54,6 +54,8 @@ function Matrix() {
     this.freetime = 1000;
     this.synth = null;
 
+    this.matrixHasTuplets = false;
+
     Tone.Transport.start();
 
     this.cellWidth = 0;
@@ -78,6 +80,7 @@ function Matrix() {
         this.notesToPlay = [];
         this.notesToPlayDirected = [];
         this.isMatrix = 1; //1 if matrix exists
+        this.matrixHasTuplets = false;
 
         /*to remove the matrix table*/
         Element.prototype.remove = function() {
@@ -189,14 +192,23 @@ function Matrix() {
 
         var table = document.getElementById('myTable');
         var timeFactor = (param[0][2] / param[1][1]) * (param[1][0] / param[0][1]);
-        for (var i = 1; i < table.rows.length - 1; i++) {
+
+        // Add the cells for each tuplet note
+        if (this.matrixHasTuplets) {
+            var rowCount = table.rows.length - 3;
+        } else {
+            var rowCount = table.rows.length - 1;
+        }
+        for (var i = 1; i < rowCount; i++) {
             for (var j = 0; j < param[1][0]; j++) {
                 row = table.rows[i];
-                cell = row.insertCell(-1)
+                cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
                 cell.style.backgroundColor = '#ADFF2F';
             }
         }
+
+        // Set the cells to "rest"
         for (var j = 0; j < param[1][0]; j++) {
             this.chkArray.push(0);
             this.notesToPlay.push([['R'], timeFactor*param[1][1]]);
@@ -205,42 +217,63 @@ function Matrix() {
         var w = window.innerWidth;
         w = (2 * w) / 5;
 
-        var row = table.insertRow(table.rows.length - 1);
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
-        cell.style.backgroundColor = '#9ACD32';
+        if (this.matrixHasTuplets) {
+            console.log('matrix already has tuplet');
+        } else {
+            var row = table.insertRow(table.rows.length - 1);
+            var cell = row.insertCell(-1);
+            cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
+            cell.style.backgroundColor = '#9ACD32';
+        }
 
+        // The bottom row contains the rhythm note values
         cell = table.rows[table.rows.length - 1].insertCell(-1);
-        cell.style.backgroundColor = '#9ACD32';
         cell.style.height = '30px';
         cell.innerHTML = param[0][1].toString() + '/' + param[0][2].toString();
         cell.width = w*param[0][1]/(param[0][2]) + 'px';
         cell.colSpan = param[0][0];
         cell.style.backgroundColor = 'rgb(174, 174, 174)';
 
+        var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
         for (var i = 0; i < table.rows[table.rows.length - 1].cells.length - 1; i++) {
-            cell = row.insertCell(i+1);
-            cell.style.backgroundColor = 'rgb(4, 255, 174)';
-            cell.style.height = '30px';
-            if (i == table.rows[table.rows.length - 1].cells.length - 2) {
+            // Add an entry for the tuplet value in any rhythm columns.
+            if (!this.matrixHasTuplets || i == tupletCol) {
+                cell = row.insertCell(i + 1);
                 cell.style.backgroundColor = 'rgb(4, 255, 174)';
-                cell.innerHTML = param[0][0];
-                cell.colSpan = param[0][0];
+                cell.style.height = '30px';
+                if (i == tupletCol) {
+                    cell.style.backgroundColor = 'rgb(4, 255, 174)';
+                    cell.innerHTML = param[0][0];
+                    cell.colSpan = param[0][0];
+                }
             }
         }
 
-        var row = table.insertRow(table.rows.length - 2);
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
-        cell.style.backgroundColor = '#9ACD32';
+        if (this.matrixHasTuplets) {
+            console.log('matrix already has tuplet');
+        } else {
+            // Add row for tuplet note values
+            var row = table.insertRow(table.rows.length - 2);
+            var cell = row.insertCell(-1);
+            cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
+            cell.style.backgroundColor = '#9ACD32';
+        }
+
+        var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
         for (var i = 0; i < table.rows[table.rows.length - 4].cells.length - 1; i++) {
-            cell = row.insertCell(-1);
-            cell.style.backgroundColor = 'rgb(4, 255, 174)';
-            cell.style.height = '30px';
-            if(i >= table.rows[table.rows.length - 1].cells.length - 2) {
-                cell.innerHTML = '1/' + timeFactor*param[1][1].toString();
+            if (!this.matrixHasTuplets || i >= tupletCol) {
+                // Add cell for tuplet note values
+                cell = row.insertCell(-1);
+                cell.style.backgroundColor = 'rgb(4, 255, 174)';
+                cell.style.height = '30px';
+                // Add tuplet note values
+                if(i >= tupletCol) {
+                    cell.innerHTML = '1/' + timeFactor*param[1][1].toString();
+                }
             }
         }
+
+        this.matrixHasTuplets = true;
     }
 
     this.addRhythm = function(numBeats, noteValue, noteValueNum) {
@@ -248,7 +281,7 @@ function Matrix() {
         var table = document.getElementById('myTable');
 
         var noteValueToDisplay = null;
-        if (noteValueNum) {
+        if (noteValueNum) {  // When does this happen?
             noteValueToDisplay = noteValueNum.toString() + '/' + noteValue.toString();
         } else {
             noteValueToDisplay = '1/' + noteValue.toString();
@@ -272,16 +305,29 @@ function Matrix() {
         for (var i = 1; i <= numBeats; i++) {
              this.chkArray.push(0);
         }
+
+        if (this.matrixHasTuplets) {
+            var rowCount = this.solfegeNotes.length + 3;
+        } else {
+            var rowCount = this.solfegeNotes.length + 1
+        }
+
         for (var j = 0; j < numBeats; j++) {
-            for (var i = 1; i <= this.solfegeNotes.length + 1; i++) {
+            for (var i = 1; i <= rowCount; i++) {
                 var row = table.rows[i];
                 var cell = row.insertCell(-1);
-                cell.style.backgroundColor = '#ADFF2F';
 
-                if (i == this.solfegeNotes.length + 1) {
+                if (i == rowCount) {
                     cell.innerHTML = noteValueToDisplay;
                     cell.style.backgroundColor = 'rgb(174, 174, 174)';
+                } else if (this.matrixHasTuplets && i > this.solfegeNotes.length) {
+                    // We may need to insert some blank cells in the extra rows
+                    // added by tuplets.
+                    cell.style.backgroundColor = 'rgb(4, 255, 174)';
+                } else {
+                    cell.style.backgroundColor = '#ADFF2F';
                 }
+
                 cell.setAttribute('id', table.rows[1].cells.length - 1);
             }
         }
