@@ -86,6 +86,48 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
 
+    var wholeNoteBlock = new ProtoBlock('wholeNote');
+    wholeNoteBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['wholeNote'] = wholeNoteBlock;
+    wholeNoteBlock.staticLabels.push(_('whole note 𝅝'));
+    wholeNoteBlock.adjustWidthToLabel();
+    wholeNoteBlock.zeroArgBlock();
+
+    var halfNoteBlock = new ProtoBlock('halfNote');
+    halfNoteBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['halfNote'] = halfNoteBlock;
+    halfNoteBlock.staticLabels.push(_('half note 𝅗𝅥'));
+    halfNoteBlock.adjustWidthToLabel();
+    halfNoteBlock.zeroArgBlock();
+
+    var quarterNoteBlock = new ProtoBlock('quarterNote');
+    quarterNoteBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['quarterNote'] = quarterNoteBlock;
+    quarterNoteBlock.staticLabels.push(_('quarter note ♩'));
+    quarterNoteBlock.adjustWidthToLabel();
+    quarterNoteBlock.zeroArgBlock();
+
+    var eighthNoteBlock = new ProtoBlock('eighthNote');
+    eighthNoteBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['eighthNote'] = eighthNoteBlock;
+    eighthNoteBlock.staticLabels.push(_('eighth note ♪'));
+    eighthNoteBlock.adjustWidthToLabel();
+    eighthNoteBlock.zeroArgBlock();
+
+    var sixteenthNoteBlock = new ProtoBlock('sixteenthNote');
+    sixteenthNoteBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['sixteenthNote'] = sixteenthNoteBlock;
+    sixteenthNoteBlock.staticLabels.push(_('sixteenth note ♬'));
+    sixteenthNoteBlock.adjustWidthToLabel();
+    sixteenthNoteBlock.zeroArgBlock();
+
+    var thirtysecondNoteBlock = new ProtoBlock('thirtysecondNote');
+    thirtysecondNoteBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['thirtysecondNote'] = thirtysecondNoteBlock;
+    thirtysecondNoteBlock.staticLabels.push(_('thirty-second note 𝅘𝅥𝅰'));
+    thirtysecondNoteBlock.adjustWidthToLabel();
+    thirtysecondNoteBlock.zeroArgBlock();
+
     var setkeyBlock = new ProtoBlock('setkey');
     setkeyBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['setkey'] = setkeyBlock;

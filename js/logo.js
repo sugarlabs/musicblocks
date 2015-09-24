@@ -1503,6 +1503,20 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             case 'playmatrix':
                 logo.playMatrix();
                 break;
+                // FIXME: treat like a rhythm block of 1/X when in matrix
+                //        treat like rest when not in matrix
+            case 'wholeNote':
+            case 'halfNote':
+            case 'quarterNote':
+            case 'eighthNote':
+            case 'sixteenthNote':
+            case 'thirtysecondNote':
+                if (logo.inMatrix) {
+                } else {
+                    console.log(logo.blocks.blockList[blk].protoblock); // .staticLabels[0]);
+                    logo.textMsg(logo.blocks.blockList[blk].protoblock.staticLabels[0]);
+                }
+                break;
             case 'notation':
                 // FIXME: restore meter block as arg?
                 /*
