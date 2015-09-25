@@ -293,7 +293,7 @@ function Matrix() {
             if (i >= tupletCol) {
                 var j = i - tupletCol;
                 var numerator = 32 / param[1][j];
-                cell.innerHTML = asFraction(numerator, totalNoteInterval); // numerator.toString() + '/' + totalNoteInterval.toString();
+                cell.innerHTML = reducedFraction(numerator, totalNoteInterval / tupletTimeFactor);
             }
         }
 
@@ -743,7 +743,7 @@ function Matrix() {
     }
 }
 
-function asFraction(a, b) {
+function reducedFraction(a, b) {
     greatestCommonMultiple = function(a, b) {
         return b == 0 ? a : greatestCommonMultiple(b, a % b);
     }
