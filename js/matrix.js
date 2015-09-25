@@ -36,6 +36,12 @@ savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.
 */
 
+var MATRIXBUTTONCOLOR = '#c374e9'; // '#9A32CD';
+var MATRIXLABELCOLOR = '#90c100';  // '#9ACD32';
+var MATRIXNOTECELLCOLOR = '#b1db00';  // '#ADFF2F';
+var MATRIXTUPLETCELLCOLOR = '#57e751';  // 'rgb(4, 255, 174)';
+var MATRIXRHYTHMCELLCOLOR = '#c8c8c8'; // 'rgb(174, 174, 174)';
+
 function Matrix() {
     console.log('MATRIX');
     this.arr = [];
@@ -49,12 +55,6 @@ function Matrix() {
     this.matrixContainer = null;
     this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
     // this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
-
-    this.buttonColor = '#9A32CD';
-    this.backgroundColor = '#9ACD32';
-    this.noteCellColor = '#ADFF2F';
-    this.tupletCellColor = 'rgb(4, 255, 174)';
-    this.rhythmCellColor = 'rgb(174, 174, 174)';
 
     this.transposition = null;
     this.isMatrix = 0;
@@ -122,12 +122,12 @@ function Matrix() {
         var cell = row.insertCell(-1);
         cell.innerHTML = '<b>' + _('Solfa') + '</b>';
         cell.style.height = '40px';
-        cell.style.backgroundColor = this.backgroundColor;
+        cell.style.backgroundColor = MATRIXLABELCOLOR;
 
         var cell = row.insertCell(1);
         cell.innerHTML = _('play');
         cell.style.height = '40px';
-        cell.style.backgroundColor = this.buttonColor;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             logo.playMatrix();
         }
@@ -135,7 +135,7 @@ function Matrix() {
         var cell = row.insertCell(2);
         cell.innerHTML = _('save');
         cell.style.height = '40px';
-        cell.style.backgroundColor = this.buttonColor;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             logo.saveMatrix();
         }
@@ -143,7 +143,7 @@ function Matrix() {
         var cell = row.insertCell(3);
         cell.innerHTML = _('close');
         cell.style.height = '40px';
-        cell.style.backgroundColor = this.buttonColor;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             document.getElementById('matrix').style.visibility = 'hidden';
             document.getElementById('matrix').style.border = 0;
@@ -152,7 +152,7 @@ function Matrix() {
         for (var i=0; i<this.solfegeNotes.length; i++) {
             var row = header.insertRow(i+1);
             var cell = row.insertCell(0);
-            cell.style.backgroundColor = this.backgroundColor;
+            cell.style.backgroundColor = MATRIXLABELCOLOR;
 
             // process transpositions
             if (this.solfegeTranspositions[i] != 0) {
@@ -172,7 +172,7 @@ function Matrix() {
         var cell = row.insertCell(0);
         cell.innerHTML = _('rhythmic note values');
         cell.style.height = '40px';
-        cell.style.backgroundColor = this.backgroundColor;
+        cell.style.backgroundColor = MATRIXLABELCOLOR;
 
         this.chkArray = new Array();
         this.chkArray.push(0);
@@ -221,7 +221,7 @@ function Matrix() {
             for (var j = 0; j < numberOfNotes; j++) {
                 cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
-                cell.style.backgroundColor = this.noteCellColor;
+                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
         }
 
@@ -239,7 +239,7 @@ function Matrix() {
             var row = table.insertRow(table.rows.length - 1);
             var cell = row.insertCell(-1);
             cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
-            cell.style.backgroundColor = this.backgroundColor;
+            cell.style.backgroundColor = MATRIXLABELCOLOR;
         }
 
         var w = window.innerWidth;
@@ -251,7 +251,7 @@ function Matrix() {
         cell.innerHTML = param[0][0].toString() + '/' + param[0][1].toString();
         cell.width = w * param[0][0] / param[0][1] + 'px';
         cell.colSpan = numberOfNotes;
-        cell.style.backgroundColor = this.rhythmCellColor;
+        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
         var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
         for (var i = 0; i < table.rows[table.rows.length - 1].cells.length - 1; i++) {
@@ -260,7 +260,7 @@ function Matrix() {
             // the new tuplet column.
             if (!this.matrixHasTuplets || i == tupletCol) {
                 cell = row.insertCell(i + 1);
-                cell.style.backgroundColor = this.tupletCellColor;
+                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                 cell.style.height = '30px';
                 if (i == tupletCol) {
                     cell.innerHTML = numberOfNotes.toString();
@@ -276,7 +276,7 @@ function Matrix() {
             var row = table.insertRow(table.rows.length - 2);
             var cell = row.insertCell(-1);
             cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
-            cell.style.backgroundColor = this.backgroundColor;
+            cell.style.backgroundColor = MATRIXLABELCOLOR;
         }
 
         if (this.matrixHasTuplets) {
@@ -294,7 +294,7 @@ function Matrix() {
         for (var i = firstCell; i < cellCount; i++) {
             // Add cell for tuplet note values
             cell = row.insertCell(-1);
-            cell.style.backgroundColor = this.tupletCellColor;
+            cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
             cell.style.height = '30px';
             // Add tuplet note values
             if (i >= tupletCol) {
@@ -329,7 +329,7 @@ function Matrix() {
             for (var j = 0; j < numberOfNotes; j++) {
                 cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
-                cell.style.backgroundColor = this.noteCellColor;
+                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
         }
 
@@ -345,7 +345,7 @@ function Matrix() {
             var row = table.insertRow(table.rows.length - 1);
             var cell = row.insertCell(-1);
             cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
-            cell.style.backgroundColor = this.backgroundColor;
+            cell.style.backgroundColor = MATRIXLABELCOLOR;
         }
 
         var w = window.innerWidth;
@@ -357,7 +357,7 @@ function Matrix() {
         cell.innerHTML = param[0][0].toString() + '/' + param[0][1].toString();
         cell.width = w * param[0][0] / param[0][1] + 'px';
         cell.colSpan = numberOfNotes;
-        cell.style.backgroundColor = this.rhythmCellColor;
+        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
         var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
         for (var i = 0; i < table.rows[table.rows.length - 1].cells.length - 1; i++) {
@@ -366,7 +366,7 @@ function Matrix() {
             // the new tuplet column.
             if (!this.matrixHasTuplets || i == tupletCol) {
                 cell = row.insertCell(i + 1);
-                cell.style.backgroundColor = this.tupletCellColor;
+                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                 cell.style.height = '30px';
                 if (i == tupletCol) {
                     cell.innerHTML = numberOfNotes;
@@ -382,7 +382,7 @@ function Matrix() {
             var row = table.insertRow(table.rows.length - 2);
             var cell = row.insertCell(-1);
             cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
-            cell.style.backgroundColor = this.backgroundColor;
+            cell.style.backgroundColor = MATRIXLABELCOLOR;
         }
 
         if (this.matrixHasTuplets) {
@@ -400,7 +400,7 @@ function Matrix() {
         for (var i = firstCell; i < cellCount; i++) {
             // Add cell for tuplet note values
             cell = row.insertCell(-1);
-            cell.style.backgroundColor = this.tupletCellColor;
+            cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
             cell.style.height = '30px';
             // Add tuplet note values
             if (i >= tupletCol) {
@@ -454,13 +454,13 @@ function Matrix() {
 
                 if (i == rowCount) {
                     cell.innerHTML = noteValueToDisplay;
-                    cell.style.backgroundColor = this.rhythmCellColor;
+                    cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                 } else if (this.matrixHasTuplets && i > this.solfegeNotes.length) {
                     // We may need to insert some blank cells in the extra rows
                     // added by tuplets.
-                    cell.style.backgroundColor = this.tupletCellColor;
+                    cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                 } else {
-                    cell.style.backgroundColor = this.noteCellColor;
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 }
 
                 cell.setAttribute('id', table.rows[1].cells.length - 1);
@@ -489,7 +489,7 @@ function Matrix() {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                 cell = table.rows[j].cells[i];
                 if (cell.style.backgroundColor == 'black') {
-                    cell.style.backgroundColor = this.noteCellColor;
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     cell.style.backgroundColor = 'black';
                     this.setNotes(i, cell.parentNode.rowIndex, false);
                 }
@@ -501,12 +501,15 @@ function Matrix() {
                     var cell = table.rows[j].cells[i];
                     var that = this;
                     cell.onclick = function() {
+                        console.log(this.style.backgroundColor);
                         if (this.style.backgroundColor == 'black') {
-                            this.style.backgroundColor = this.noteCellColor;
+                            console.log('unsetting');
+                            this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                             that.chkArray[this.id] = 0;
                             that.notesToPlay[this.id - 1][0] = ['R'];
                             that.setNotes(this.id, this.parentNode.rowIndex, false, tuplet, synth);
                         } else {
+                            console.log('setting');
                             this.style.backgroundColor = 'black';
                             that.chkArray[this.id] = 1;
                             that.setNotes(this.id, this.parentNode.rowIndex, true, tuplet, synth);
