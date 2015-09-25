@@ -1874,8 +1874,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 break;
             case 'tupletParamBlock':
                 if (logo.inMatrix) {
-                    console.log('tuplet params are ' + args[0] + ', ' + args[1] + ', ' + args[2]);
-                    logo.tupletParams.push([args[0], args[1], args[2]]);
+                    console.log('tuplet params are ' + args[0] + ', ' + args[1]);
+                    logo.tupletParams.push([args[0], args[1]]);
                 } else {
                     console.log('tuplet parameters only useful inside matrix');
                 }

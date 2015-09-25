@@ -193,7 +193,7 @@ function Matrix() {
 	console.log('addNotesTuplet ' + JSON.stringify(param));
 
         var table = document.getElementById('myTable');
-        var tupletTimeFactor = param[0][1] / param[0][2];
+        var tupletTimeFactor = param[0][0] / param[0][1];
         var numberOfNotes = param[1].length;
         var totalNoteInterval = 0;
         for (var i = 0; i < numberOfNotes; i++) {
@@ -223,7 +223,7 @@ function Matrix() {
             this.chkArray.push(0);
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
-            this.notesToPlay.push([['R'], (totalNoteInterval * param[0][2]) / (32 / param[1][j])]);
+            this.notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])]);
         }
 
         if (this.matrixHasTuplets) {
@@ -241,8 +241,8 @@ function Matrix() {
         // The bottom row contains the rhythm note values
         cell = table.rows[table.rows.length - 1].insertCell(-1);
         cell.style.height = '30px';
-        cell.innerHTML = param[0][1].toString() + '/' + param[0][2].toString();
-        cell.width = w * param[0][1] / param[0][2] + 'px';
+        cell.innerHTML = param[0][0].toString() + '/' + param[0][1].toString();
+        cell.width = w * param[0][0] / param[0][1] + 'px';
         cell.colSpan = numberOfNotes;
         cell.style.backgroundColor = 'rgb(174, 174, 174)';
 
@@ -306,7 +306,7 @@ function Matrix() {
         var table = document.getElementById('myTable');
         var numberOfNotes = param[1][0];
         var noteValue = param[1][1];
-        var timeFactor = (param[0][2] / noteValue) * (numberOfNotes / param[0][1]);
+        var timeFactor = (param[0][1] / noteValue) * (numberOfNotes / param[0][0]);
 
         // Add the cells for each tuplet note
         if (this.matrixHasTuplets) {
@@ -327,7 +327,7 @@ function Matrix() {
         }
 
         // Set the cells to "rest"
-        for (var j = 0; j < param[1][0]; j++) {
+        for (var j = 0; j < numberOfNotes; j++) {
             this.chkArray.push(0);
             this.notesToPlay.push([['R'], timeFactor * param[1][1]]);
         }
@@ -347,9 +347,9 @@ function Matrix() {
         // The bottom row contains the rhythm note values
         cell = table.rows[table.rows.length - 1].insertCell(-1);
         cell.style.height = '30px';
-        cell.innerHTML = param[0][1].toString() + '/' + param[0][2].toString();
-        cell.width = w * param[0][1] / param[0][2] + 'px';
-        cell.colSpan = param[0][0];
+        cell.innerHTML = param[0][0].toString() + '/' + param[0][1].toString();
+        cell.width = w * param[0][0] / param[0][1] + 'px';
+        cell.colSpan = numberOfNotes;
         cell.style.backgroundColor = 'rgb(174, 174, 174)';
 
         var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
@@ -362,8 +362,8 @@ function Matrix() {
                 cell.style.backgroundColor = 'rgb(4, 255, 174)';
                 cell.style.height = '30px';
                 if (i == tupletCol) {
-                    cell.innerHTML = param[0][0];
-                    cell.colSpan = param[0][0];
+                    cell.innerHTML = numberOfNotes;
+                    cell.colSpan = numberOfNotes;
                 }
             }
         }
@@ -381,7 +381,7 @@ function Matrix() {
         if (this.matrixHasTuplets) {
             // Just add the new tuplet note values
             var tupletCol = 0;
-            var cellCount = param[1][0];
+            var cellCount = numberOfNotes;
             var firstCell = 0;
         } else {
             // Add cells across all of tuplet note values row.

@@ -59,7 +59,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
-    matrixBlock.staticLabels.push(_('Matrix'));
+    matrixBlock.staticLabels.push(_('matrix'));
     matrixBlock.extraWidth = 10;
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
@@ -67,7 +67,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['pitch'] = pitch;
-    pitch.staticLabels.push(_('Pitch'),_('Name'),_('Octave'));
+    pitch.staticLabels.push(_('pitch'),_('name'),_('octave'));
     pitch.adjustWidthToLabel();
     pitch.defaults.push('sol');
     pitch.defaults.push(4);
@@ -78,7 +78,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var rhythm = new ProtoBlock('rhythm');
     rhythm.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythm'] = rhythm;
-    rhythm.staticLabels.push(_('rhythm'),_('# Notes'),_('Note Value'));
+    rhythm.staticLabels.push(_('rhythm'),_('# notes'),_('note value'));
     rhythm.adjustWidthToLabel();
     rhythm.defaults.push(3);
     rhythm.defaults.push(4);
@@ -117,16 +117,33 @@ function initBasicProtoBlocks(palettes, blocks) {
     var sixteenthNoteBlock = new ProtoBlock('sixteenthNote');
     sixteenthNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['sixteenthNote'] = sixteenthNoteBlock;
-    sixteenthNoteBlock.staticLabels.push(_('sixteenth note ♬'));
+    sixteenthNoteBlock.staticLabels.push(_('1/16 note ♬'));
     sixteenthNoteBlock.adjustWidthToLabel();
     sixteenthNoteBlock.zeroArgBlock();
 
     var thirtysecondNoteBlock = new ProtoBlock('thirtysecondNote');
     thirtysecondNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['thirtysecondNote'] = thirtysecondNoteBlock;
-    thirtysecondNoteBlock.staticLabels.push(_('thirty-second note 𝅘𝅥𝅰'));
+    thirtysecondNoteBlock.staticLabels.push(_('1/32 note 𝅘𝅥𝅰'));
     thirtysecondNoteBlock.adjustWidthToLabel();
     thirtysecondNoteBlock.zeroArgBlock();
+
+    var tupletBlock = new ProtoBlock('tuplet');
+    tupletBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['tuplet'] = tupletBlock;
+    tupletBlock.staticLabels.push(_('tuplet'));
+    tupletBlock.adjustWidthToLabel();
+    tupletBlock.flowClampZeroArgBlock();
+    
+    var tupletParamBlock = new ProtoBlock('tupletParamBlock');
+    blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
+    tupletParamBlock.palette = palettes.dict['matrix'];
+    tupletParamBlock.staticLabels.push(_('tuplet params'), _('# notes'), _('note value'));
+    tupletParamBlock.defaults.push(1, 4);
+    tupletParamBlock.adjustWidthToLabel();
+    tupletParamBlock.twoArgBlock();
+    tupletParamBlock.dockTypes[1] = 'numberin';
+    tupletParamBlock.dockTypes[2] = 'numberin';
 
     var setkeyBlock = new ProtoBlock('setkey');
     setkeyBlock.palette = palettes.dict['matrix'];
@@ -219,7 +236,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var notationBlock = new ProtoBlock('notation');
     notationBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['notation'] = notationBlock;
-    notationBlock.staticLabels.push(_('Notation'));
+    notationBlock.staticLabels.push(_('notation'));
     notationBlock.adjustWidthToLabel();
     notationBlock.flowClampZeroArgBlock();
     // notationBlock.flowClampOneArgBlock();
@@ -228,7 +245,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['tone'];
     blocks.protoBlockDict['meter'] = meter;
-    meter.staticLabels.push('Meter', 'numerator', 'denominator');
+    meter.staticLabels.push('meter', 'numerator', 'denominator');
     meter.adjustWidthToLabel();
     meter.defaults.push(3);
     meter.defaults.push(4);
@@ -274,30 +291,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     // saveMatrix.adjustWidthToLabel();
     // saveMatrix.zeroArgBlock();
 
-    var tupletBlock = new ProtoBlock('tuplet');
-    tupletBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['tuplet'] = tupletBlock;
-    tupletBlock.staticLabels.push(_('Tuplet'));
-    tupletBlock.adjustWidthToLabel();
-    tupletBlock.flowClampZeroArgBlock();
-    
     // var showMatrixBlock = new ProtoBlock('showmatrix');
     // showMatrixBlock.palette = palettes.dict['chunk'];
     // blocks.protoBlockDict['showmatrix'] = showMatrixBlock;
     // showMatrixBlock.staticLabels.push(_('Show'));
     // showMatrixBlock.adjustWidthToLabel();
     // showMatrixBlock.flowClampZeroArgBlock();
-
-    var tupletParamBlock = new ProtoBlock('tupletParamBlock');
-    blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
-    tupletParamBlock.palette = palettes.dict['matrix'];
-    tupletParamBlock.staticLabels.push(_('Tuplet Params'),'tuplet value', '# notes', 'note value');
-    tupletParamBlock.defaults.push(5, 1, 4);
-    tupletParamBlock.adjustWidthToLabel();
-    tupletParamBlock.threeArgBlock();
-    tupletParamBlock.dockTypes[1] = 'numberin';
-    tupletParamBlock.dockTypes[2] = 'numberin';
-    tupletParamBlock.dockTypes[3] = 'numberin';
 
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['tone'];
