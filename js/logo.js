@@ -82,7 +82,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
     this.inFlatClamp = false;
     this.inSharpClamp = false;
     this.inTransposeClamp = false;
-    this.rhythms = [];
+    this.tupletRhythms = [];
+    this.addingNotesToTuplet = false;
 
     // parameters used by pitch
     this.transposition = {};
@@ -99,7 +100,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
     // tuplet
     this.tuplet = false;
     this.tupletParams = [];
-    this.rhythmInsideTuplet = 0;
+    this.blockInsideTuplet = 0;
 
     // parameters used by notations
     this.notesPlayed = {};
@@ -1402,8 +1403,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 matrix.solfegeTranspositions = [];
                 matrix.solfegeOctaves = [];
 
-                logo.rhythms = [];
+                logo.tupletRhythms = [];
                 logo.tupletParams = [];
+                logo.addingNotesToTuplet = false;
 
                 var listenerName = '_matrix_';
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow);
@@ -1419,14 +1421,30 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     matrix.initMatrix(logo);
 
                     // Process queued up rhythms.
-                    for (var i = 0; i < logo.rhythms.length; i++) {
-                        if (logo.rhythms[i][0]) {
-                            var tupletParam = [logo.tupletParams[logo.rhythms[i][3]]];
-                            tupletParam.push([logo.rhythms[i][1], logo.rhythms[i][2]]);
-                            console.log(tupletParam);
-                            matrix.addTuplet(tupletParam);
-                        } else {
-                            matrix.addRhythm(logo.rhythms[i][1], logo.rhythms[i][2]);
+                    for (var i = 0; i < logo.tupletRhythms.length; i++) {
+                        // We have three cases:
+                        // (1) notes in a tuplet
+                        // (2) rhythm block in a tuplet
+                        // (3) rhythm block outside of a tuplet
+                        switch (logo.tupletRhythms[i][0]) {
+                            case 'notes':
+                                var tupletParam = [logo.tupletParams[last(logo.tupletRhythms[i])]];
+                                tupletParam.push([]);
+                                for (var j = 1; j < logo.tupletRhythms[i].length - 1; j++) {
+                                    tupletParam[1].push(logo.tupletRhythms[i][j]);
+                                }
+                                console.log(tupletParam);
+                                matrix.addNotesTuplet(tupletParam);
+                                break;
+                            case 'rhythm':
+                                var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][3]]];
+                                tupletParam.push([logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]]);
+                                console.log(tupletParam);
+                                matrix.addTuplet(tupletParam);
+                                break;
+                            default:
+                                matrix.addRhythm(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
+                                break;
                         }
                     }
 
@@ -1485,13 +1503,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                         args[1] = (2 / 3) * args[1];
                         logo.rhythmicValueParameter = null;
                     }
-                    console.log('blk is ' + blk + ' and rhythmInsideTuplet is ' + logo.rhythmInsideTuplet);
+                    console.log('blk is ' + blk + ' and blockInsideTuplet is ' + logo.blockInsideTuplet);
 
                     // Queue the rhythms for processing inside the matrix callback.
-                    if(blk == logo.rhythmInsideTuplet) {
-                        logo.rhythms.push([true, args[0], args[1], logo.tupletParams.length - 1]);
+                    if(blk == logo.blockInsideTuplet) {
+                        logo.tupletRhythms.push(['rhythm', args[0], args[1], logo.tupletParams.length - 1]);
                     } else {
-                        logo.rhythms.push([false, args[0], args[1]]);
+                        logo.tupletRhythms.push(['', args[0], args[1]]);
                     }
                 } else {
                     console.log('rhythm block only used inside matrix');
@@ -1503,19 +1521,23 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             case 'playmatrix':
                 logo.playMatrix();
                 break;
-                // FIXME: treat like a rhythm block of 1/X when in matrix
-                //        treat like rest when not in matrix
             case 'wholeNote':
+                logo.processNote(blk, 1);
+                break;
             case 'halfNote':
+                logo.processNote(blk, 2);
+                break;
             case 'quarterNote':
+                logo.processNote(blk, 4);
+                break;
             case 'eighthNote':
+                logo.processNote(blk, 8);
+                break;
             case 'sixteenthNote':
+                logo.processNote(blk, 16);
+                break;
             case 'thirtysecondNote':
-                if (logo.inMatrix) {
-                } else {
-                    console.log(logo.blocks.blockList[blk].protoblock); // .staticLabels[0]);
-                    logo.textMsg(logo.blocks.blockList[blk].protoblock.staticLabels[0]);
-                }
+                logo.processNote(blk, 32);
                 break;
             case 'notation':
                 // FIXME: restore meter block as arg?
@@ -1841,8 +1863,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     console.log('processing tuplet');
                     logo.tuplet = true;
                     // logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
-                    console.log('assigning rhythmInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
-                    logo.rhythmInsideTuplet = logo.blocks.blockList[blk].connections[1];
+                    logo.addingNotesToTuplet = false;
+                    console.log('assigning blockInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
+                    logo.blockInsideTuplet = logo.blocks.blockList[blk].connections[1];
                 } else {
                     console.log('tuplet only meaningful inside matrix');
                 }
@@ -2070,6 +2093,32 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             // Save at the end to save an image
             me.saveLocally();
         }, DEFAULTDELAY * 1.5)
+    }
+
+    this.processNote = function(blk, noteValue) {
+        if (this.inMatrix) {
+            if(blk == this.blockInsideTuplet) {
+                if(this.addingNotesToTuplet) {
+                    var i = this.tupletRhythms.length - 1;
+                    this.tupletRhythms[i].push(noteValue);
+                } else {
+                    this.tupletRhythms.push(['notes', noteValue]);
+                    this.addingNotesToTuplet = true;
+                }
+                // Find the next block in tuplet child flow.
+                this.blockInsideTuplet = this.blocks.blockList[blk].connections[1];
+                // If we are at the end, add the parameter block idx.
+                if (this.blockInsideTuplet == null) {
+                    var i = this.tupletRhythms.length - 1;
+                    this.tupletRhythms[i].push(this.tupletParams.length - 1);
+                    this.addingNotesToTuplet = false;
+                }
+            } else {
+                this.tupletRhythms.push(['', 1, noteValue]);
+            }
+        } else {
+            this.textMsg(this.blocks.blockList[blk].protoblock.staticLabels[0]);
+        }
     }
 
     this.getBlockAtEndOfFlow = function(blk) {

@@ -186,11 +186,19 @@ function Matrix() {
         this.solfegeTranspositions[index] = 0;
     }
 
-    this.addTuplet = function(param) {
-	console.log('addTuplet ' + JSON.stringify(param));
+    this.addNotesTuplet = function(param) {
+        // The first two parameters are the interval for the tuplet,
+        // e.g., 1/4; the rest of the parameters are the list of notes
+        // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
+	console.log('addNotesTuplet ' + JSON.stringify(param));
 
         var table = document.getElementById('myTable');
-        var timeFactor = (param[0][2] / param[1][1]) * (param[1][0] / param[0][1]);
+        var tupletTimeFactor = param[0][1] / param[0][2];
+        var numberOfNotes = param[1].length;
+        var totalNoteInterval = 0;
+        for (var i = 0; i < numberOfNotes; i++) {
+            totalNoteInterval += 32 / param[1][i];
+        }
 
         // Add the cells for each tuplet note
         if (this.matrixHasTuplets) {
@@ -203,7 +211,115 @@ function Matrix() {
 
         for (var i = 1; i < rowCount; i++) {
             row = table.rows[i];
-            for (var j = 0; j < param[1][0]; j++) {
+            for (var j = 0; j < numberOfNotes; j++) {
+                cell = row.insertCell(-1);
+                cell.setAttribute('id', table.rows[i].cells.length - 1);
+                cell.style.backgroundColor = '#ADFF2F';
+            }
+        }
+
+        // Set the cells to "rest"
+        for (var j = 0; j < numberOfNotes; j++) {
+            this.chkArray.push(0);
+            // The tuplet time factor * percentage of the tuplet that
+            // is dedicated to this note
+            this.notesToPlay.push([['R'], (totalNoteInterval * param[0][2]) / (32 / param[1][j])]);
+        }
+
+        if (this.matrixHasTuplets) {
+            var row = table.rows[table.rows.length - 2];
+        } else {
+            var row = table.insertRow(table.rows.length - 1);
+            var cell = row.insertCell(-1);
+            cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
+            cell.style.backgroundColor = '#9ACD32';
+        }
+
+        var w = window.innerWidth;
+        w = (2 * w) / 5;
+
+        // The bottom row contains the rhythm note values
+        cell = table.rows[table.rows.length - 1].insertCell(-1);
+        cell.style.height = '30px';
+        cell.innerHTML = param[0][1].toString() + '/' + param[0][2].toString();
+        cell.width = w * param[0][1] / param[0][2] + 'px';
+        cell.colSpan = numberOfNotes;
+        cell.style.backgroundColor = 'rgb(174, 174, 174)';
+
+        var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
+        for (var i = 0; i < table.rows[table.rows.length - 1].cells.length - 1; i++) {
+            // Add an entry for the tuplet value in any rhythm
+            // columns. If we already have tuplets, just add a cell to
+            // the new tuplet column.
+            if (!this.matrixHasTuplets || i == tupletCol) {
+                cell = row.insertCell(i + 1);
+                cell.style.backgroundColor = 'rgb(4, 255, 174)';
+                cell.style.height = '30px';
+                if (i == tupletCol) {
+                    cell.innerHTML = numberOfNotes.toString();
+                    cell.colSpan = numberOfNotes;
+                }
+            }
+        }
+
+        if (this.matrixHasTuplets) {
+            var row = table.rows[table.rows.length - 3];
+        } else {
+            // Add row for tuplet note values
+            var row = table.insertRow(table.rows.length - 2);
+            var cell = row.insertCell(-1);
+            cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
+            cell.style.backgroundColor = '#9ACD32';
+        }
+
+        if (this.matrixHasTuplets) {
+            // Just add the new tuplet note values
+            var tupletCol = 0;
+            var cellCount = param[1][0];
+            var firstCell = 0;
+        } else {
+            // Add cells across all of tuplet note values row.
+            var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
+            var cellCount = table.rows[table.rows.length - 4].cells.length - 1;
+            var firstCell = 0;
+        }
+
+        for (var i = firstCell; i < cellCount; i++) {
+            // Add cell for tuplet note values
+            cell = row.insertCell(-1);
+            cell.style.backgroundColor = 'rgb(4, 255, 174)';
+            cell.style.height = '30px';
+            // Add tuplet note values
+            if (i >= tupletCol) {
+                var j = i - tupletCol;
+                var numerator = 32 / param[1][j];
+                cell.innerHTML = asFraction(numerator, totalNoteInterval); // numerator.toString() + '/' + totalNoteInterval.toString();
+            }
+        }
+
+        this.matrixHasTuplets = true;
+    }
+
+    this.addTuplet = function(param) {
+	console.log('addTuplet ' + JSON.stringify(param));
+
+        var table = document.getElementById('myTable');
+        var numberOfNotes = param[1][0];
+        var noteValue = param[1][1];
+        var timeFactor = (param[0][2] / noteValue) * (numberOfNotes / param[0][1]);
+
+        // Add the cells for each tuplet note
+        if (this.matrixHasTuplets) {
+            // Extra rows for tuplets have already been added.
+            console.log('matrix already has ' + table.rows.length + ' rows');
+            var rowCount = table.rows.length - 3;
+        } else {
+            var rowCount = table.rows.length - 1;
+        }
+
+        for (var i = 1; i < rowCount; i++) {
+            row = table.rows[i];
+            for (var j = 0; j < numberOfNotes; j++) {
                 cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
                 cell.style.backgroundColor = '#ADFF2F';
@@ -213,7 +329,7 @@ function Matrix() {
         // Set the cells to "rest"
         for (var j = 0; j < param[1][0]; j++) {
             this.chkArray.push(0);
-            this.notesToPlay.push([['R'], timeFactor*param[1][1]]);
+            this.notesToPlay.push([['R'], timeFactor * param[1][1]]);
         }
 
         if (this.matrixHasTuplets) {
@@ -625,4 +741,13 @@ function Matrix() {
         console.log(newStack);
         this.logo.blocks.loadNewBlocks(newStack);
     }
+}
+
+function asFraction(a, b) {
+    greatestCommonMultiple = function(a, b) {
+        return b == 0 ? a : greatestCommonMultiple(b, a % b);
+    }
+
+    var gcm = greatestCommonMultiple(a, b);
+    return (a / gcm) + '/' + (b / gcm);
 }
