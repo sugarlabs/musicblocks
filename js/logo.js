@@ -1858,13 +1858,31 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 matrix.playDirection = -1;
                 logo.runFromBlock(logo, turtle, args[0]);
                 break;
+            case 'tuplet2':
+                // Replaces tupletParamBlock/tuplet combination
+                if (logo.inMatrix) {
+                    console.log('tuplet params are ' + args[0] + ', ' + args[1]);
+                    logo.tupletParams.push([args[0], args[1]]);
+
+                    console.log('processing tuplet');
+                    logo.tuplet = true;
+                    // logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
+                    logo.addingNotesToTuplet = false;
+                    console.log('assigning blockInsideTuplet to ' +  logo.blocks.blockList[blk].connections[3]);
+                    logo.blockInsideTuplet = logo.blocks.blockList[blk].connections[3];
+                } else {
+                    console.log('tuplet only useful inside matrix');
+                }
+                childFlow = args[2];
+                childFlowCount = 1;
+                break;
             case 'tuplet':
                 if (logo.inMatrix) {
                     console.log('processing tuplet');
                     logo.tuplet = true;
                     // logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
                     logo.addingNotesToTuplet = false;
-                    console.log('assigning blockInsideTuplet to ' +  logo.blocks.blockList[blk].connections[4]);
+                    console.log('assigning blockInsideTuplet to ' +  logo.blocks.blockList[blk].connections[1]);
                     logo.blockInsideTuplet = logo.blocks.blockList[blk].connections[1];
                 } else {
                     console.log('tuplet only meaningful inside matrix');
