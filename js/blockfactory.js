@@ -890,7 +890,22 @@ function SVG() {
         svg += this._rLineTo(this._expandX, 0);
         svg += this._corner(1, 1 , 90, 0, 1, true, true, false);
         if (this._innies[0]) {
-            svg += this._doInnie();
+            // svg += this._doInnie();
+            for (var i = 0; i < this._innies.length; i++) {
+                if (this._innies[i]) {
+                    svg += this._doInnie();
+                }
+                if (i == 0) {
+                    svg += this._rLineTo(0, this._expandY);
+                } else if (i == 1 && this._expandY2 > 0) {
+                    svg += this._rLineTo(0, this._expandY2);
+                }
+                if (i == 0 && this._porch) {
+                    svg += this._doPorch(false);
+                } else if (this._innies.length - 1 > i) {
+                    svg += this._rLineTo(0, 2 * this._innieY2 + this._inniesSpacer);
+                }
+            }
         } else if (this._bool) {
             svg += this._rLineTo(0, 2 * this._padding + this._strokeWidth);
             svg += this._doBoolean();
@@ -950,6 +965,9 @@ function SVG() {
         var tx = 8 * this._strokeWidth;
         if (this._cap) {
             var ty = (this._strokeWidth / 2.0 + this._radius + this._slotY) * this._scale;
+        } else if (this._innies.length > 1) {
+            var ty = (this._strokeWidth / 2.0 + this._radius) * this._scale / 2;
+            ty += this._fontSize;
         } else {
             var ty = (this._strokeWidth / 2.0 + this._radius) * this._scale / 2;
         }
@@ -970,6 +988,24 @@ function SVG() {
                 count += 1;
             }
         }
+
+        // Add a label for each innies
+        if (this._slot || this._outie) {
+            var di = 1;  // Skip the first dock since it is a slot.
+        } else {
+            var di = 0;
+        }
+        var count = 1;
+        var tx = this._width - this._scale * (this._innieX1 + this._innieX2) - 4 * this._strokeWidth;
+        for (var i = 0; i < this._innies.length; i++) {
+            if (this._innies[i]) {
+                ty = this.docks[di][1] - (this._fontSize / (8 / this._scale));
+                svg += this.text(tx / this._scale, ty / this._scale, this._fontSize / 1.5, this._width, 'right', 'arg_label_' + count);
+                count += 1;
+                di += 1;
+            }
+        }
+
 
         svg += this.footer();
         return this.header(false) + svg;

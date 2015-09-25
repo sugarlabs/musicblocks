@@ -128,6 +128,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     thirtysecondNoteBlock.adjustWidthToLabel();
     thirtysecondNoteBlock.zeroArgBlock();
 
+    var tuplet2Block = new ProtoBlock('tuplet2');
+    tuplet2Block.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['tuplet2'] = tuplet2Block;
+    // FIXME: Add extra labels to basicClamp blocks when present.
+    tuplet2Block.staticLabels.push(_('tuplet'), _('# notes'), _('note value'));
+    tuplet2Block.adjustWidthToLabel();
+    tuplet2Block.flowClampTwoArgBlock();
+    tuplet2Block.defaults.push(1);
+    tuplet2Block.defaults.push(4);
+
+    // DEPRECATED
     var tupletBlock = new ProtoBlock('tuplet');
     tupletBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['tuplet'] = tupletBlock;
@@ -135,6 +146,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     tupletBlock.adjustWidthToLabel();
     tupletBlock.flowClampZeroArgBlock();
     
+    // DEPRECATED
     var tupletParamBlock = new ProtoBlock('tupletParamBlock');
     blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
     tupletParamBlock.palette = palettes.dict['matrix'];

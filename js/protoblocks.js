@@ -493,6 +493,40 @@ function ProtoBlock(name) {
 	return [artwork, svg.docks];
     }
 
+    // E.g., tuplet, which takes two args plus an interior flow. There is a flow above and below.
+    this.flowClampTwoArgBlock = function() {
+        this.style = 'clamp';
+        this.expandable = true;
+        this.size = 3;
+        this.args = 3;
+        this.dockTypes.push('out');
+        this.dockTypes.push('numberin');
+        this.dockTypes.push('numberin');
+        this.dockTypes.push('in');
+        this.dockTypes.push('in');
+        this.generator = this.flowClampTwoArgBlockGenerator;
+    }
+
+    this.flowClampTwoArgBlockGenerator = function(slots) {
+        var svg = new SVG();
+        svg.init();
+        svg.setScale(this.scale);
+        svg.setTab(true);
+        svg.setSlot(true);
+        svg.setInnies([true, true]);
+        svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+        if (slots) {
+            svg.setClampSlots(0, slots);
+        } else {
+            svg.setClampSlots(0, 1);
+        }
+        if (this.fontsize) {
+            svg.setFontSize(this.fontsize);
+        }
+        var artwork = svg.basicClamp();
+	return [artwork, svg.docks];
+    }
+
     // E.g., do with args: innies instead of interior slots.
     this.argClampOneArgBlock = function() {
         this.style = 'argclamp';
