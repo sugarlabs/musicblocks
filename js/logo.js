@@ -1877,6 +1877,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
                 break;
             case 'tuplet':
+                // DEPRECATED
                 if (logo.inMatrix) {
                     console.log('processing tuplet');
                     logo.tuplet = true;
@@ -1891,6 +1892,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
                 break;
             case 'tupletParamBlock':
+                // DEPRECATED
                 if (logo.inMatrix) {
                     console.log('tuplet params are ' + args[0] + ', ' + args[1]);
                     logo.tupletParams.push([args[0], args[1]]);

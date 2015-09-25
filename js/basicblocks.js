@@ -142,6 +142,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tupletBlock = new ProtoBlock('tuplet');
     tupletBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['tuplet'] = tupletBlock;
+    tupletBlock.hidden = true;
     tupletBlock.staticLabels.push(_('tuplet'));
     tupletBlock.adjustWidthToLabel();
     tupletBlock.flowClampZeroArgBlock();
@@ -150,6 +151,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tupletParamBlock = new ProtoBlock('tupletParamBlock');
     blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
     tupletParamBlock.palette = palettes.dict['matrix'];
+    tupletParamBlock.hidden = true;
     tupletParamBlock.staticLabels.push(_('tuplet params'), _('# notes'), _('note value'));
     tupletParamBlock.defaults.push(1, 4);
     tupletParamBlock.adjustWidthToLabel();
