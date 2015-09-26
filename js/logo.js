@@ -1428,9 +1428,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                         // (3) rhythm block outside of a tuplet
                         switch (logo.tupletRhythms[i][0]) {
                             case 'notes':
-                                var tupletParam = [logo.tupletParams[last(logo.tupletRhythms[i])]];
+                                // var tupletParam = [logo.tupletParams[last(logo.tupletRhythms[i])]];
+                                var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                                 tupletParam.push([]);
-                                for (var j = 1; j < logo.tupletRhythms[i].length - 1; j++) {
+                                // for (var j = 1; j < logo.tupletRhythms[i].length - 1; j++) {
+                                for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
                                     tupletParam[1].push(logo.tupletRhythms[i][j]);
                                 }
                                 console.log(tupletParam);
@@ -1503,6 +1505,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                         args[1] = (2 / 3) * args[1];
                         logo.rhythmicValueParameter = null;
                     }
+                    for (var i = 0; i < args[0]; i++) {
+                        logo.processNote(blk, args[1]);
+                    }
+
+                    /*
                     console.log('blk is ' + blk + ' and blockInsideTuplet is ' + logo.blockInsideTuplet);
 
                     // Queue the rhythms for processing inside the matrix callback.
@@ -1511,6 +1518,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     } else {
                         logo.tupletRhythms.push(['', args[0], args[1]]);
                     }
+                    */
                 } else {
                     console.log('rhythm block only used inside matrix');
                 }
@@ -1875,6 +1883,31 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 }
                 childFlow = args[2];
                 childFlowCount = 1;
+
+                var listenerName = '_tuplet_';
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
+                if (endBlk != null) {
+                    if (endBlk in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                    } else {
+                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                    }
+                }
+
+                var listener = function (event) {
+                    console.log('tuplet listener');
+                    if (logo.inMatrix) {
+                        logo.tuplet = false;
+                        logo.addingNotesToTuplet = false;
+                    } else {
+                    }
+                }
+
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'tuplet':
                 // DEPRECATED
@@ -2117,14 +2150,16 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
     this.processNote = function(blk, noteValue) {
         if (this.inMatrix) {
-            if(blk == this.blockInsideTuplet) {
+            // if(blk == this.blockInsideTuplet) {
+            if (this.tuplet == true) {
                 if(this.addingNotesToTuplet) {
                     var i = this.tupletRhythms.length - 1;
                     this.tupletRhythms[i].push(noteValue);
                 } else {
-                    this.tupletRhythms.push(['notes', noteValue]);
+                    this.tupletRhythms.push(['notes', this.tupletParams.length - 1, noteValue]);
                     this.addingNotesToTuplet = true;
                 }
+                /*
                 // Find the next block in tuplet child flow.
                 this.blockInsideTuplet = this.blocks.blockList[blk].connections[1];
                 // If we are at the end, add the parameter block idx.
@@ -2133,6 +2168,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     this.tupletRhythms[i].push(this.tupletParams.length - 1);
                     this.addingNotesToTuplet = false;
                 }
+                */
             } else {
                 this.tupletRhythms.push(['', 1, noteValue]);
             }
