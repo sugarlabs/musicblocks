@@ -221,38 +221,38 @@ define(function (require) {
         var helpContainer = null;
         var helpIdx = 0;
         var HELPCONTENT = [
-            [_('Welcome to Music Blocks'), _('Music Blocks a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
+            [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
             [_('Meet "Mr. Mouse!"'), _('Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. "Let\'s start our tour!" '), 'activity/activity-icon-mouse-color.svg'],
             [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more). Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
-            [_('Run fast'), _('Click to run the project in fast mode.'), 'icons/fast-button.svg'],
-            [_('Run slow'), _('Click to run the project in slow mode.'), 'icons/slow-button.svg'],
-            [_('Run step by step'), _('Click to run the project step by step.'), 'icons/step-button.svg'],
-            [_('Stop'), _('Stop the current project.'), 'icons/stop-turtle-button.svg'],
-            [_('Clean'), _('Clear the screen and return the turtles to their initial positions.'), 'icons/clear-button.svg'],
-            [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'icons/palette-button.svg'],
-            [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'icons/hide-blocks-button.svg'],
-            [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'icons/collapse-blocks-button.svg'],
-            [_('Save Notations'), _('Click to Download the Music Notations in png (image) format'), 'icons/download-button.svg'],
-            [_('Help'), _('Show these messages.'), 'icons/help-button.svg'],
-            [_('Play'), _('FUTURE FEATURE: Plays the Music which is inside the start block. ("Runs" the functions strung together in start block.)'), 'icons/play-button.svg'],
-            [_('Stop'), _('Stop the Music.'), 'icons/stop-turtle-button.svg'],
-            [_('Matrix'), _('The Matrix, once generated using Pitch and Rhythm blocks, becomes a workspace for designing musical patterns--like melodies and chords.'), 'icons/stop-turtle-button.svg'],
-            [_('Chunk'), _('Once you have created a musical pattern that you like using the matrix, you can save the matrix as a chunk. Chunks will appear at the bottom of the "chunk" palette with a numberic label. You can then string chunks together to create more complex musical patterns.'), 'icons/stop-turtle-button.svg'],
-            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'icons/menu-button.svg'],
-            [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'icons/planet-button.svg'],
-            [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'icons/copy-button.svg'],
-            [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'icons/paste-disabled-button.svg'],
-            [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'icons/save-blocks-button.svg'],
-            [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'icons/Cartesian-button.svg'],
-            [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'icons/polar-button.svg'],
-            [_('Settings'), _('Open a panel for configuring Turtle Blocks.'), 'icons/utility-button.svg'],
-            [_('Decrease block size'), _('Decrease the size of the blocks.'), 'icons/smaller-button.svg'],
-            [_('Increase block size'), _('Increase the size of the blocks.'), 'icons/bigger-button.svg'],
-            [_('Display statistics'), _('Display statistics about your Turtle project.'), 'icons/chart-button.svg'],
-            [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'icons/plugin-button.svg'],
-            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'icons/scroll-button.svg'],
-            [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'icons/empty-trash-button.svg'],
-            [_('Undo'), _('Restore blocks from the trash.'), 'icons/restore-trash-button.svg'],
+            [_('Run fast'), _('Click to run the project in fast mode.'), 'header-icons/fast-button.svg'],
+            [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
+            [_('Run step by step'), _('Click to run the project step by step.'), 'header-icons/step-button.svg'],
+            [_('Stop'), _('Stop the current project.'), 'header-icons/stop-turtle-button.svg'],
+            [_('Clean'), _('Clear the screen and return the turtles to their initial positions.'), 'header-icons/clear-button.svg'],
+            [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
+            [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'header-icons/hide-blocks-button.svg'],
+            [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
+            [_('Save Notations'), _('Click to Download the Music Notations in png (image) format'), 'header-icons/download-button.svg'],
+            [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
+            [_('Play'), _('FUTURE FEATURE: Plays the Music which is inside the start block. ("Runs" the functions strung together in start block.)'), 'header-icons/play-button.svg'],
+            [_('Stop'), _('Stop the Music.'), 'header-icons/stop-turtle-button.svg'],
+            [_('Matrix'), _('The Matrix, once generated using Pitch and Rhythm blocks, becomes a workspace for designing musical patterns--like melodies and chords.'), 'header-icons/stop-turtle-button.svg'],
+            [_('Chunk'), _('Once you have created a musical pattern that you like using the matrix, you can save the matrix as a chunk. Chunks will appear at the bottom of the "chunk" palette with a numberic label. You can then string chunks together to create more complex musical patterns.'), 'header-icons/stop-turtle-button.svg'],
+            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
+            [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
+            [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'header-icons/copy-button.svg'],
+            [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'header-icons/paste-disabled-button.svg'],
+            [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'header-icons/save-blocks-button.svg'],
+            [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'header-icons/Cartesian-button.svg'],
+            [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
+            [_('Settings'), _('Open a panel for configuring Turtle Blocks.'), 'header-icons/utility-button.svg'],
+            [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
+            [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
+            [_('Display statistics'), _('Display statistics about your Turtle project.'), 'header-icons/chart-button.svg'],
+            [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugin-button.svg'],
+            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-button.svg'],
+            [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
+            [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Turtle Blocks!'), 'activity/activity-icon-color.svg']
         ]
 
@@ -1712,7 +1712,7 @@ define(function (require) {
                 pasteContainer.addChild(bitmap)
                 update = true;
             }
-            img.src = 'icons/paste-button.svg';
+            img.src = 'header-icons/paste-button.svg';
         }
 
         function setupAndroidToolbar(showPalettesPopover) {
@@ -2023,7 +2023,7 @@ define(function (require) {
                 update = true;
             }
 
-            img.src = 'icons/' + name + '.svg';
+            img.src = 'header-icons/' + name + '.svg';
 
             return container;
         }
