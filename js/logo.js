@@ -2019,22 +2019,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
         if (blk in logo.endOfFlowSignals[turtle]) {
             // Is the block in a queued clamp?
-            console.log('just ran a ' + logo.blocks.blockList[blk].name + ' block');
-            console.log(logo.parentFlowQueue[turtle]);
             var parentClamp = logo.endOfFlowClamps[turtle][blk][0];
-            console.log(parentClamp);
-            console.log(logo.parentFlowQueue[turtle]);
-            if (parentClamp != null) {
-                console.log(logo.parentFlowQueue[turtle].indexOf(parentClamp));
-            }
             if (parentClamp != null && logo.parentFlowQueue[turtle].indexOf(parentClamp) != -1 && logo.loopBlock(logo.blocks.blockList[parentClamp].name)) {
-                console.log('parent block is still in queue');
+                console.log('Still in child flow.');
             } else {
-                if (childFlowCount) {
-                    console.log('childFlowCount == ' + childFLowCount);
-                } else {
-                    console.log('no childFlowCount');
-                }
                 var notationDispatches = [];
                 for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
                     // Kludge to ensure notation dispatch is done last.
