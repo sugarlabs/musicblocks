@@ -1885,7 +1885,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 var listenerName = '_tuplet_';
                 var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
                 if (endBlk[0] != null) {
-                    console.log('tuplet: ' + endBlk[0] + ' ' + endBlk[1]);
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
                         logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
@@ -1893,7 +1892,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                         logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
                         logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
-                    console.log(logo.endOfFlowClamps[turtle][endBlk[0]]);
                 }
 
                 var listener = function (event) {
