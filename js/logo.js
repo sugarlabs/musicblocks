@@ -61,6 +61,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
     this.turtleHeaps = {};
 
     this.endOfFlowSignals = {};
+    this.endOfFlowClamps = {};
 
     this.time = 0;
     this.waitTimes = {};
@@ -100,7 +101,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
     // tuplet
     this.tuplet = false;
     this.tupletParams = [];
-    this.blockInsideTuplet = 0;
 
     // parameters used by notations
     this.notesPlayed = {};
@@ -334,6 +334,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             this.waitTimes[turtle] = 0;
             this.endOfFlowSignals[turtle] = {};
+            this.endOfFlowClamps[turtle] = {};
             this.transposition[turtle] = 0;
             this.notesPlayed[turtle] = [];
             this.noteNotes[turtle] = [];
@@ -594,6 +595,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             // All flow blocks have a nextFlow, but it can be null
             // (i.e., end of a flow).
             var nextFlow = last(logo.blocks.blockList[blk].connections);
+            if (nextFlow == -1) {
+                nextFlow = null;
+            }
             var queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
             if (nextFlow != null) {  // Not sure why this check is needed.
                 logo.turtles.turtleList[turtle].queue.push(queueBlock);
@@ -1408,12 +1412,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.addingNotesToTuplet = false;
 
                 var listenerName = '_matrix_';
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                if (endBlk != null) {
-                    if (endBlk in logo.endOfFlowSignals[turtle]) {
-                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                     } else {
-                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
                 }
 
@@ -1435,13 +1441,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                                 for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
                                     tupletParam[1].push(logo.tupletRhythms[i][j]);
                                 }
-                                console.log(tupletParam);
                                 matrix.addNotesTuplet(tupletParam);
                                 break;
                             case 'rhythm':
                                 var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][3]]];
                                 tupletParam.push([logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]]);
-                                console.log(tupletParam);
                                 matrix.addTuplet(tupletParam);
                                 break;
                             default:
@@ -1466,7 +1470,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 break;
             case 'pitch':
                 if (logo.inMatrix) {
-                    console.log('pitch: pushing to matrix');
                     if (logo.inFlatClamp) {
                         matrix.solfegeNotes.push(args[0] + 'b');
                     } else if (logo.inSharpClamp) {
@@ -1508,17 +1511,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     for (var i = 0; i < args[0]; i++) {
                         logo.processNote(blk, args[1]);
                     }
-
-                    /*
-                    console.log('blk is ' + blk + ' and blockInsideTuplet is ' + logo.blockInsideTuplet);
-
-                    // Queue the rhythms for processing inside the matrix callback.
-                    if(blk == logo.blockInsideTuplet) {
-                        logo.tupletRhythms.push(['rhythm', args[0], args[1], logo.tupletParams.length - 1]);
-                    } else {
-                        logo.tupletRhythms.push(['', args[0], args[1]]);
-                    }
-                    */
                 } else {
                     console.log('rhythm block only used inside matrix');
                 }
@@ -1584,12 +1576,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_notation_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                if (endBlk != null) {
-                    if (endBlk in logo.endOfFlowSignals[turtle]) {
-                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                     } else {
-                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
                 }
 
@@ -1629,12 +1623,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_playnote_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                if (endBlk != null) {
-                    if (endBlk in logo.endOfFlowSignals[turtle]) {
-                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                     } else {
-                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
                 }
 
@@ -1685,12 +1681,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_dot_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                if (endBlk != null) {
-                    if (endBlk in logo.endOfFlowSignals[turtle]) {
-                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                     } else {
-                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
                 }
 
@@ -1711,22 +1709,22 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     logo.stopTurtle = true;
                 } else {
                     logo.beatFactor[turtle] *= factor;
-                    console.log('setbeatfactor ' + factor);
                     childFlow = args[1];
                     childFlowCount = 1;
 
                     var listenerName = '_beat_' + turtle;
-                    var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                    if (endBlk != null) {
-                        if (endBlk in logo.endOfFlowSignals[turtle]) {
-                            logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                    var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                    if (endBlk[0] != null) {
+                        if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                            logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                            logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                         } else {
-                            logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                            logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                            logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                         }
                     }
 
                     var listener = function (event) {
-                        console.log('resetbeatfactor ' + factor);
                         logo.beatFactor[turtle] /= factor;
                     }
 
@@ -1747,12 +1745,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_transposition_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                if (endBlk != null) {
-                    if (endBlk in logo.endOfFlowSignals[turtle]) {
-                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                     } else {
-                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
                 }
 
@@ -1779,12 +1779,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_sharp_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                if (endBlk != null) {
-                    if (endBlk in logo.endOfFlowSignals[turtle]) {
-                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                     } else {
-                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
                 }
 
@@ -1812,12 +1814,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_flat_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                if (endBlk != null) {
-                    if (endBlk in logo.endOfFlowSignals[turtle]) {
-                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                     } else {
-                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
                 }
 
@@ -1869,15 +1873,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             case 'tuplet2':
                 // Replaces tupletParamBlock/tuplet combination
                 if (logo.inMatrix) {
-                    console.log('tuplet params are ' + args[0] + ', ' + args[1]);
                     logo.tupletParams.push([args[0], args[1]]);
-
-                    console.log('processing tuplet');
                     logo.tuplet = true;
-                    // logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
                     logo.addingNotesToTuplet = false;
-                    console.log('assigning blockInsideTuplet to ' +  logo.blocks.blockList[blk].connections[3]);
-                    logo.blockInsideTuplet = logo.blocks.blockList[blk].connections[3];
                 } else {
                     console.log('tuplet only useful inside matrix');
                 }
@@ -1885,12 +1883,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_tuplet_';
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow);
-                if (endBlk != null) {
-                    if (endBlk in logo.endOfFlowSignals[turtle]) {
-                        logo.endOfFlowSignals[turtle][endBlk].push(listenerName);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
                     } else {
-                        logo.endOfFlowSignals[turtle][endBlk] = [listenerName];
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
                     }
                 }
 
@@ -1914,10 +1914,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 if (logo.inMatrix) {
                     console.log('processing tuplet');
                     logo.tuplet = true;
-                    // logo.tupletRhythmCount = logo.blocks.blockList[blk].clampCount[0] - 3;
                     logo.addingNotesToTuplet = false;
-                    console.log('assigning blockInsideTuplet to ' +  logo.blocks.blockList[blk].connections[1]);
-                    logo.blockInsideTuplet = logo.blocks.blockList[blk].connections[1];
                 } else {
                     console.log('tuplet only meaningful inside matrix');
                 }
@@ -2019,22 +2016,29 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
         // (3) Queue block below the current block.
 
         if (blk in logo.endOfFlowSignals[turtle]) {
-            var notationDispatches = [];
-            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
-                // Kludge to ensure notation dispatch is done last.
-                if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
-                    console.log('queueing ' + logo.endOfFlowSignals[turtle][blk][i]);
-                    notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
-                } else {
-                    console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
-                    logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
+            // Is the block in a queued clamp?
+            var parentClamp = logo.endOfFlowClamps[turtle][blk][0];
+            if (parentClamp != null && logo.parentFlowQueue[turtle].indexOf(parentClamp) != -1 && logo.loopBlock(logo.blocks.blockList[parentClamp].name)) {
+                console.log('Still in child flow.');
+            } else {
+                var notationDispatches = [];
+                for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
+                    // Kludge to ensure notation dispatch is done last.
+                    if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
+                        console.log('queueing ' + logo.endOfFlowSignals[turtle][blk][i]);
+                        notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
+                    } else {
+                        console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                        logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
+                    }
                 }
+                for (var i = 0; i < notationDispatches.length; i++) {
+                    console.log('dispatching ' + notationDispatches[i]);
+                    logo.stage.dispatchEvent(notationDispatches[i]);
+                }
+                delete logo.endOfFlowSignals[turtle][blk];
+                delete logo.endOfFlowClamps[turtle][blk];
             }
-            for (var i = 0; i < notationDispatches.length; i++) {
-                console.log('dispatching ' + notationDispatches[i]);
-                logo.stage.dispatchEvent(notationDispatches[i]);
-            }
-            delete logo.endOfFlowSignals[turtle][blk];
         }
 
         // If there is a child flow, queue it.
@@ -2150,7 +2154,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
     this.processNote = function(blk, noteValue) {
         if (this.inMatrix) {
-            // if(blk == this.blockInsideTuplet) {
             if (this.tuplet == true) {
                 if(this.addingNotesToTuplet) {
                     var i = this.tupletRhythms.length - 1;
@@ -2159,16 +2162,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     this.tupletRhythms.push(['notes', this.tupletParams.length - 1, noteValue]);
                     this.addingNotesToTuplet = true;
                 }
-                /*
-                // Find the next block in tuplet child flow.
-                this.blockInsideTuplet = this.blocks.blockList[blk].connections[1];
-                // If we are at the end, add the parameter block idx.
-                if (this.blockInsideTuplet == null) {
-                    var i = this.tupletRhythms.length - 1;
-                    this.tupletRhythms[i].push(this.tupletParams.length - 1);
-                    this.addingNotesToTuplet = false;
-                }
-                */
             } else {
                 this.tupletRhythms.push(['', 1, noteValue]);
             }
@@ -2177,19 +2170,35 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
         }
     }
 
-    this.getBlockAtEndOfFlow = function(blk) {
+    this.getBlockAtEndOfFlow = function(blk, parentClamp, recurse) {
         // blk is the first block in a child flow.  This function
         // returns the blk at the end of the child flow.
         var lastBlk = blk;
-        while (blk != null) {
+        while (blk != null && blk != -1) {
             var lastBlk = blk;
             blk = last(this.blocks.blockList[blk].connections);
         }
-        if (this.blocks.blockList[lastBlk].isClampBlock()) {
+        if (recurse && this.blocks.blockList[lastBlk].isClampBlock()) {
             var i = this.blocks.blockList[lastBlk].protoblock.args;
-            return this.getBlockAtEndOfFlow(this.blocks.blockList[lastBlk].connections[i]);
+            return this.getBlockAtEndOfFlow(this.blocks.blockList[lastBlk].connections[i], lastBlk, true);
+        } else if (recurse && ['do', 'doArg'].indexOf(this.blocks.blockList[lastBlk].name) != -1) {
+            var argBlk = this.blocks.blockList[lastBlk].connections[1];
+            if (argBlk != null) {
+                var name = this.blocks.blockList[argBlk].value;
+                if (name in this.actions) {
+                    return this.getBlockAtEndOfFlow(this.actions[name], lastBlk, true);
+                }
+            }
+            return [lastBlk, parentClamp];
+        } else if (recurse && ['nameddo', 'nameddoArg'].indexOf(this.blocks.blockList[lastBlk].name) != -1) {
+            var name = this.blocks.blockList[lastBlk].privateData;
+            if (name in this.actions) {
+                return this.getBlockAtEndOfFlow(this.actions[name], lastBlk, true);
+            } else {
+                return [lastBlk, parentClamp];
+            }
         } else {
-            return lastBlk;
+            return [lastBlk, parentClamp];
         }
     }
 
@@ -2216,7 +2225,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
     }
 
     this.loopBlock = function(name) {
-        return ['forever', 'repeat', 'while', 'until', 'note', 'matrix'].indexOf(name) != -1;
+        return ['forever', 'repeat', 'while', 'until'].indexOf(name) != -1;
     }
 
     this.doBreak = function(turtle) {
