@@ -1073,12 +1073,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
             maxLength = 10;
         } else {
-            if (myBlock.value != undefined) {
-                var label = myBlock.value.toString();
-            } else {
-                console.log('block value UNDEFINED');
-                var label = '';
-            }
+            var label = myBlock.value.toString();
         }
         if (label.length > maxLength) {
             label = label.substr(0, maxLength - 1) + '...';
@@ -1369,7 +1364,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var postProcessArg = null;
         var me = this;
         var thisBlock = this.blockList.length;
-
         if (name == 'start') {
             postProcess = function (thisBlock) {
                 me.blockList[thisBlock].value = me.turtles.turtleList.length;
@@ -1466,7 +1460,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
             }
         }
-
         if (!protoFound) {
             console.log(name + ' not found!!');
         }
@@ -1549,7 +1542,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.updateBlockText(blk);
                 }
                 this.makeNewBlock('loadFile', postProcess, thisBlock);
+            } else {
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.blockList[thisBlock].text.text = value.toString();
+                }
+                this.makeNewBlock('number', postProcess, [thisBlock, value]);
             }
+
+            var myConnectionBlock = this.blockList[cblk + i];
+            myConnectionBlock.connections = [blk];
+            myConnectionBlock.value = value;
+            myBlock.connections[i + 1] = cblk + i;
         }
 
         // Generate and position the block bitmaps and labels
@@ -2632,7 +2638,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         n = blkData[4].length;
                         console.log(n + ': substituting nop block for ' + name);
                         switch (n) {
-                            case 0:
                             case 1:
                                 name = 'nopValueBlock';
                                 break;
@@ -2795,12 +2800,6 @@ function sendStackToTrash(blocks, myBlock) {
             }
         }
         myBlock.connections[0] = null;
-    }
-
-    if (myBlock.name == 'matrixData') {
-        // Putting the matrixData block in the trash clears it.
-        window.savedMatricesNotes = [];
-        window.savedMatricesCount = 0;
     }
 
     if (myBlock.name == 'start') {
