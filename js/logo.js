@@ -1531,6 +1531,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'thirtysecondNote':
                 logo.processNote(blk, 32, turtle);
                 break;
+            case 'sixtyfourthNote':
+                logo.processNote(blk, 64, turtle);
+                break;
             case 'notation':
                 // FIXME: restore meter block as arg?
                 /*

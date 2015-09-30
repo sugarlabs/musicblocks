@@ -76,7 +76,6 @@ function Matrix() {
     this.initMatrix = function(logo, PolySynth) {
         // Initializes the matrix. First removes the previous matrix
 	// and them make another one in DOM (document object model)
-	console.log('MATRIX:initMatrix');
         this.logo = logo;
         this.synth = PolySynth;
         document.getElementById('matrix').style.display = 'inline';
@@ -580,7 +579,6 @@ function Matrix() {
     }
 
     this.playAll = function(synth) {
-	console.log('MATRIX:playAll');
         var notes = [];
         for (i in this.notesToPlay) {
             notes.push(this.notesToPlay[i]);
@@ -602,7 +600,6 @@ function Matrix() {
             synth.triggerAttackRelease(note, 1 / noteValue);
         }
 
-        console.log(time);
         for (var i = 1; i < this.notesToPlayDirected.length; i++) {
             noteValue = this.notesToPlayDirected[i - 1][1];
             time += 1 / noteValue;

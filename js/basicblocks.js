@@ -128,6 +128,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     thirtysecondNoteBlock.adjustWidthToLabel();
     thirtysecondNoteBlock.zeroArgBlock();
 
+    var sixtyfourthNoteBlock = new ProtoBlock('sixtyfourthNote');
+    sixtyfourthNoteBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['sixtyfourthNote'] = sixtyfourthNoteBlock;
+    sixtyfourthNoteBlock.staticLabels.push(_('1/64 note 𝅘𝅥𝅱'));
+    sixtyfourthNoteBlock.adjustWidthToLabel();
+    sixtyfourthNoteBlock.zeroArgBlock();
+
     var tuplet2Block = new ProtoBlock('tuplet2');
     tuplet2Block.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['tuplet2'] = tuplet2Block;

@@ -348,6 +348,7 @@ function loadPaletteButtonHandler(palettes, name) {
 
 
 // FIXME: this should be calculated
+var EXPANDBYTWO = ['tuplet2'];
 var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
                    'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
                    'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
@@ -370,6 +371,9 @@ function PaletteModel(palette, palettes, name) {
         } else if (EXPANDBYONE.indexOf(blkname) != -1
                 || this.palette.protoList[blk].image) {
                     size += 1;
+        } else if (EXPANDBYTWO.indexOf(blkname) != -1
+                || this.palette.protoList[blk].image) {
+                    size += 2;
         }
         return STANDARDBLOCKHEIGHT * size
                * this.palette.protoList[blk].scale / 2.0;
