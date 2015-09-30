@@ -223,7 +223,7 @@ define(function (require) {
         var HELPCONTENT = [
             [_('Welcome to Music Blocks'), _('Music Blocks a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
             [_('Meet "Mr. Mouse!"'), _('Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. "Let\'s start our tour!" '), 'activity/activity-icon-mouse-color.svg'],
-            [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more). Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+            [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Notes, Turtle, and more). Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
             [_('Run fast'), _('Click to run the project in fast mode.'), 'icons/fast-button.svg'],
             [_('Run slow'), _('Click to run the project in slow mode.'), 'icons/slow-button.svg'],
             [_('Run step by step'), _('Click to run the project step by step.'), 'icons/step-button.svg'],
@@ -237,7 +237,6 @@ define(function (require) {
             [_('Play'), _('FUTURE FEATURE: Plays the Music which is inside the start block. ("Runs" the functions strung together in start block.)'), 'icons/play-button.svg'],
             [_('Stop'), _('Stop the Music.'), 'icons/stop-turtle-button.svg'],
             [_('Matrix'), _('The Matrix, once generated using Pitch and Rhythm blocks, becomes a workspace for designing musical patterns--like melodies and chords.'), 'icons/stop-turtle-button.svg'],
-            [_('Chunk'), _('Once you have created a musical pattern that you like using the matrix, you can save the matrix as a chunk. Chunks will appear at the bottom of the "chunk" palette with a numberic label. You can then string chunks together to create more complex musical patterns.'), 'icons/stop-turtle-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'icons/menu-button.svg'],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'icons/planet-button.svg'],
             [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'icons/copy-button.svg'],
@@ -297,18 +296,6 @@ define(function (require) {
                 musicnotation.musicContainer.removeAllChildren();
                 musicnotation.notationIndex = 0;
             }
-
-            // We handle chunks and saved Matrices differently now.
-
-            // var i = 0;
-            // while(logo.blocks.protoBlockDict['_chunk' + i]) {
-            //     var cont = logo.blocks.blockList[blk].container;
-            //     delete logo.blocks.protoBlockDict['_chunk' + i];
-            //     delete ProtoBlock('_chunk' + i);
-            //     cont.updateCache();
-            //     window.savedMatricesCount -= 1;
-            //     i += 1;
-            // }
         }
 
         function doFastButton(env) {
@@ -1643,12 +1630,6 @@ define(function (require) {
                 data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
             }
 
-            // NO LONGER USING CHUNKS; JUST ACTIONS
-            /*
-            if (!hasMatrixDataBlock && window.savedMatricesCount > 0) {
-                data.push([data.length, ['matrixData', {'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount}], 0, 0, [null, null]]);
-            }
-            */
             return JSON.stringify(data);
         }
 

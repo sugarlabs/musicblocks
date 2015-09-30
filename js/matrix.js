@@ -30,7 +30,7 @@ makeClickable() : Makes the matrix clickable.
 setNotes() : Set notes in this.notesToPlay when user clicks onto any
 clickable cell.
 
-playMatrix() : Plays the matrix as well as chunks by calling playAll();
+playMatrix() : Plays the matrix by calling playAll();
 
 savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.

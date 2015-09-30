@@ -110,10 +110,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
 
-    //Play with chunks
-    // DEPRECATED
-    this.chunktranspose = false;
-
     //tone
     this.startTime = 0;
     this.stopTime = 1000;
@@ -1948,12 +1944,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     sineOsc.stop();
                 }, logo.stopTime);
                 break;
-            case 'chunkTranspose':
-                // DEPRECATED
-                logo.chunktranspose = true;
-                matrix.setTransposition(args[0]);
-                logo.runFromBlock(logo, turtle, args[1]);
-                break;
             case 'playfwd':
                 matrix.playDirection = 1;
                 logo.runFromBlock(logo, turtle, args[0]);
@@ -2021,65 +2011,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 } else {
                     console.log('tuplet parameters only useful inside matrix');
                 }
-                break;
-            case '_chunk':
-                // DEPRECATED
-                var index = logo.blocks.blockList[blk].privateData;
-                var notes = window.savedMatricesNotes;
-                matrix.notesToPlay = [];
-                var count = 0, j=0, temp = 0;
-                for (var i=0; i<notes.length; i++) {
-                    if (notes[i] == 'end') {
-                        count += 1;
-                    }
-                }
-
-                count = 0;
-                while (count < index) {
-                    if (window.savedMatricesNotes[j] == 'end') {
-                       count += 1;
-                    }
-                    j += 1;
-                }
-                temp = j;
-                var factor = logo.beatFactor[turtle];
-                while (window.savedMatricesNotes[j] != 'end') {
-                    matrix.notesToPlay.push([window.savedMatricesNotes[j][0], (window.savedMatricesNotes[j][1])*factor]);
-                    j += 1;
-                }
-                var notesToPlayCopy = [];
-                for (k in matrix.notesToPlay) {
-                    notesToPlayCopy.push(matrix.notesToPlay[k])
-                }
-
-                var trNote;
-
-                // DEPRECATED
-                if (logo.chunktranspose) {
-                    var transposedNotes = [];
-                    j -= 1;
-                    var i = notesToPlayCopy.length;
-                    i -= 1;
-                    while (window.savedMatricesNotes[j] != 'end' && i>=0) {
-                        for (var k in notesToPlayCopy[i][0]) {
-                            var len = notesToPlayCopy[i][0][k].length;
-                            len -= 1;
-                            var note = notesToPlayCopy[i][0][k].substring(0, len);
-                            var trNote = matrix.doTransposition(note, notesToPlayCopy[i][0][k][len]);
-                            console.log(note + " transposed to " + trNote)
-                            window.savedMatricesNotes[j][0][k] = trNote ;
-                        }
-                        i -= 1;
-                        j -= 1;
-                    }
-                    logo.chunktranspose = false;
-                    matrix.removeTransposition();
-                }
-                matrix.playNotesString(0, logo.polySynth);
-                break;
-            case 'matrixData':
-                // DEPRECATED
-                // TODO: Have it behave like all of the chunks
                 break;
             default:
                 if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
@@ -2991,20 +2922,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
     this.saveMatrix = function() {
         matrix.saveMatrix();
-        // NO LONGER USING CHUNKS; JUST USING ACTIONS
-        /*
-        var index = window.savedMatricesCount - 1;
-        var myChunkBlock = new ProtoBlock('_chunk');
-        this.blocks.protoBlockDict['chunk' + index] = myChunkBlock;
-        myChunkBlock.palette = this.blocks.palettes.dict['notes'];
-        myChunkBlock.defaults.push(index);
-        myChunkBlock.staticLabels.push(_('chunk') + index + ' ♫');
-        myChunkBlock.extraWidth = 20;
-        myChunkBlock.zeroArgBlock();
-        myChunkBlock.palette.add(myChunkBlock);
-        console.log(this.blocks.protoBlockDict['chunk' + index]);
-        this.blocks.palettes.updatePalettes();
-        */
     }
 }
 

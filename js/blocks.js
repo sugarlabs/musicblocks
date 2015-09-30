@@ -1331,8 +1331,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             this.blockList.push(new Block(this.protoBlockDict[name], this, postProcessArg[1]));
         } else if (name == 'namedarg') {
             this.blockList.push(new Block(this.protoBlockDict[name], this, 'arg ' + postProcessArg[1]));
-        } else if (name.substring(0, 6) == '_chunk') {
-            this.blockList.push(new Block(this.protoBlockDict[name], this, _('chunk') + postProcessArg[1] + ' ♫'));
         } else {
             this.blockList.push(new Block(this.protoBlockDict[name], this));
         }
@@ -1444,13 +1442,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].privateData = args[1];
             }
             postProcessArg = [thisBlock, arg];
-        } else if (name.substring(0, 6) == '_chunk') {
-            postProcess = function (args) {
-                // FIXME: Why is this getting called with the wrong thisBlock?
-                me.blockList[thisBlock - 1].value = null;
-                me.blockList[thisBlock - 1].privateData = args[1];
-            }
-            postProcessArg = [thisBlock, arg];
         }
 
         var protoFound = false;
@@ -1461,11 +1452,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
-		} else if (me.protoBlockDict[proto].name.substring(0, 6) == '_chunk') {
-                    console.log('new chunk block ' + postProcessArg[1]);
-		    me.makeNewBlock(proto, postProcess, postProcessArg);
-		    protoFound = true;
-		    break;
                 } else if (me.protoBlockDict[proto].defaults[0] == arg) {
                     console.log('creating ' + name + ' block with default arg ' + arg);
                     me.makeNewBlock(proto, postProcess, postProcessArg);
@@ -1563,21 +1549,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.updateBlockText(blk);
                 }
                 this.makeNewBlock('loadFile', postProcess, thisBlock);
-            } else if (myBlock.name.substr(0, 6) != '_chunk') {
-                postProcess = function (args) {
-                    var thisBlock = args[0];
-                    var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.blockList[thisBlock].text.text = value.toString();
-                }
-                this.makeNewBlock('number', postProcess, [thisBlock, value]);
-            }
-
-            if (myBlock.name.substr(0, 6) != '_chunk') {
-                var myConnectionBlock = this.blockList[cblk + i];
-                myConnectionBlock.connections = [blk];
-                myConnectionBlock.value = value;
-                myBlock.connections[i + 1] = cblk + i;
             }
         }
 
@@ -2084,8 +2055,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
             } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) != -1) {
                 blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
-            } else if (name.substring(0, 6) == '_chunk') {
-                blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
             } else {
                 blockItem = [b, myBlock.name, x, y, []];
             }
@@ -2177,38 +2146,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             } else {
                 var name = blkData[1][0];
             }
-
-            // NO LONGER USING CHUNKS; JUST ACTIONS
-            /*
-	    if (name == 'matrixData') {
-                try {
-                    if ('count' in blkData[1][1]) {
-                        window.savedMatricesCount = blkData[1][1]['count'];
-                        window.savedMatricesNotes = blkData[1][1]['notes'];
-                    } else {
-                        window.savedMatricesCount = 0;
-                        window.savedMatricesNoites = [];
-                    }
-                    for (i = 0; i < window.savedMatricesCount; i++) {
-                        var myChunkBlock = new ProtoBlock('_chunk');
-                        console.log(myChunkBlock);
-                        this.protoBlockDict['chunk' + i] = myChunkBlock;
-                        myChunkBlock.palette = this.palettes.dict['notes'];
-                        myChunkBlock.defaults.push(i);
-                        myChunkBlock.staticLabels.push(_('chunk') + i + ' ♫');
-                        myChunkBlock.extraWidth = 20;
-                        myChunkBlock.zeroArgBlock();
-                        myChunkBlock.palette.add(myChunkBlock);
-                        console.log(this.protoBlockDict['chunk' + i]);
-                        this.palettes.updatePalettes();
-                    }
-                } catch (e) {
-                    console.log(e);
-                    console.log('could not read matrixData: ' + blkData[1]);
-                }
-                continue;
-            }
-            */
 
             if (!(name in this.protoBlockDict)) {
                 continue;
@@ -2414,19 +2351,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     blkData[4][0] = null;
                     blkData[4][3] = null;
                     this.makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
-                    break;
-
-                // Chunk (of notes) boxes need private data.
-                // FIXME
-                case '_chunk':
-                    console.log('FIXME: we need to make sure matrix values have been restored');
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].privateData = value;
-                        me.blockList[thisBlock].value = null;
-                    }
-                    this.makeNewBlockWithConnections('_chunk', blockOffset, blkData[4], postProcess, [thisBlock, value]);
                     break;
 
                 // Named boxes and dos need private data.
@@ -2699,18 +2623,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     }
                     this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                     break;
-                // FIXME: -1 index means don't create the block
                 default:
                     // Check that name is in the proto list
-                    if (name.substring(0, 6) == '_chunk') {
-                        postProcess = function (args) {
-                            var thisBlock = args[0];
-                            var value = args[1];
-                            me.blockList[thisBlock].privateData = value;
-                            me.blockList[thisBlock].value = null;
-                        }
-                        this.makeNewBlockWithConnections('_chunk', blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    } else if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
+                    if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
                         // Lots of assumptions here.
                         // TODO: figure out if it is a flow or an arg block.
                         // Substitute a NOP block for an unknown block.

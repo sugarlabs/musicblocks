@@ -306,35 +306,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
 
-    // var playmatrix = new ProtoBlock('playmatrix');
-    // playmatrix.palette = palettes.dict['matrix'];
-    // blocks.protoBlockDict['playmatrix'] = playmatrix;
-    // playmatrix.staticLabels.push(_('Play Matrix'));
-    // playmatrix.adjustWidthToLabel();
-    // <==We need to find a better
-    // way to set parameters here. To have the "time in milliseconds
-    // before playback" is just not the only interesting
-    // possibility. For example, tempo is interesting too. Should we
-    // have them as separate blocks to be put in here or as there own
-    // arguments?? Let's think about this one! -DU
-    // playmatrix.defaults.push('1000');
-    // playmatrix.zeroArgBlock();
-    // playmatrix.dockTypes[1] = 'number';
-    
-    // var saveMatrix = new ProtoBlock('savematrix');
-    // saveMatrix.palette = palettes.dict['matrix'];
-    // blocks.protoBlockDict['savematrix'] = saveMatrix;
-    // saveMatrix.staticLabels.push(_('Save Matrix as Chunk'));
-    // saveMatrix.adjustWidthToLabel();
-    // saveMatrix.zeroArgBlock();
-
-    // var showMatrixBlock = new ProtoBlock('showmatrix');
-    // showMatrixBlock.palette = palettes.dict['chunk'];
-    // blocks.protoBlockDict['showmatrix'] = showMatrixBlock;
-    // showMatrixBlock.staticLabels.push(_('Show'));
-    // showMatrixBlock.adjustWidthToLabel();
-    // showMatrixBlock.flowClampZeroArgBlock();
-
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
@@ -368,16 +339,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     sawtoothBlock.adjustWidthToLabel();
     sawtoothBlock.twoArgMathBlock();
     sawtoothBlock.defaults.push(440);
-
-    // deprecated
-    var namedChunkBlock = new ProtoBlock('_chunk');
-    namedChunkBlock.palette = palettes.dict['notes'];
-    namedChunkBlock.hidden = true;
-    blocks.protoBlockDict['_chunk'] = namedChunkBlock;
-    namedChunkBlock.staticLabels.push(_('chunk of notes'));
-    namedChunkBlock.defaults.push(-1);
-    namedChunkBlock.adjustWidthToLabel();
-    namedChunkBlock.zeroArgBlock();
 
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');
