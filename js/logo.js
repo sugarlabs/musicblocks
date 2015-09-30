@@ -1412,7 +1412,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.addingNotesToTuplet = false;
 
                 var listenerName = '_matrix_';
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                 if (endBlk[0] != null) {
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -1576,7 +1576,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_notation_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                 if (endBlk[0] != null) {
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -1599,7 +1599,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
                 // How to add this to the start of the list rather
                 // than the end of the list???
-                console.log(logo.stage);
                 logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'meter':
@@ -1623,7 +1622,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_playnote_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                 if (endBlk[0] != null) {
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -1681,7 +1680,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_dot_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                 if (endBlk[0] != null) {
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -1713,7 +1712,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     childFlowCount = 1;
 
                     var listenerName = '_beat_' + turtle;
-                    var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                    var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                     if (endBlk[0] != null) {
                         if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                             logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -1745,7 +1744,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_transposition_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                 if (endBlk[0] != null) {
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -1779,7 +1778,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_sharp_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                 if (endBlk[0] != null) {
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -1814,7 +1813,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_flat_' + turtle;
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                 if (endBlk[0] != null) {
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -1883,7 +1882,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 childFlowCount = 1;
 
                 var listenerName = '_tuplet_';
-                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null, true);
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                 if (endBlk[0] != null) {
                     if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
                         logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
@@ -2015,29 +2014,32 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
         // (3) Queue block below the current block.
 
+        // Is the block in a queued clamp?
         if (blk in logo.endOfFlowSignals[turtle]) {
-            // Is the block in a queued clamp?
-            var parentClamp = logo.endOfFlowClamps[turtle][blk][0];
-            if (parentClamp != null && logo.parentFlowQueue[turtle].indexOf(parentClamp) != -1 && logo.loopBlock(logo.blocks.blockList[parentClamp].name)) {
-                console.log('Still in child flow.');
-            } else {
-                var notationDispatches = [];
-                for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
-                    // Kludge to ensure notation dispatch is done last.
+            // There is a list of signals and parent clamps. Each
+            // needs to be handled separately.
+            var notationDispatches = [];
+            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
+                var parentClamp = logo.endOfFlowClamps[turtle][blk][i];
+                var signal = logo.endOfFlowSignals[turtle][blk][i];
+                if (parentClamp != null && logo.parentFlowQueue[turtle].indexOf(parentClamp) != -1 && logo.loopBlock(logo.blocks.blockList[parentClamp].name)) {
+                    // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow');
+                } else if (signal != null) {
                     if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
-                        console.log('queueing ' + logo.endOfFlowSignals[turtle][blk][i]);
                         notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
                     } else {
                         console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     }
+                    // TODO: better clean up strategy
+                    // Mark issued signals as null
+                    logo.endOfFlowSignals[turtle][blk][i] = null;
+                    logo.endOfFlowClamps[turtle][blk][i] = null;
                 }
-                for (var i = 0; i < notationDispatches.length; i++) {
-                    console.log('dispatching ' + notationDispatches[i]);
-                    logo.stage.dispatchEvent(notationDispatches[i]);
-                }
-                delete logo.endOfFlowSignals[turtle][blk];
-                delete logo.endOfFlowClamps[turtle][blk];
+            }
+            for (var i = 0; i < notationDispatches.length; i++) {
+                console.log('dispatching ' + notationDispatches[i]);
+                logo.stage.dispatchEvent(notationDispatches[i]);
             }
         }
 
@@ -2114,6 +2116,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
         } else {
+            // Make sure any unissued signals are dispatched.
+            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
+                if (logo.endOfFlowSignals[turtle][blk][i] != null) {
+                    logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
+                }
+            }
             // Make sure SVG path is closed.
             logo.turtles.turtleList[turtle].closeSVG();
             // Mark the turtle as not running.
@@ -2170,36 +2178,48 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
         }
     }
 
-    this.getBlockAtEndOfFlow = function(blk, parentClamp, recurse) {
+    this.getBlockAtEndOfFlow = function(blk, loopClamp) {
+        // This method is used to find the end of a child flow.
         // blk is the first block in a child flow.  This function
-        // returns the blk at the end of the child flow.
+        // returns the blk at the end of the child flow. It follows do
+        // blocks through their actions and it keeps track of queues
+        // created by loops, which must complete in order to mark a
+        // flow as completed.
         var lastBlk = blk;
+        var newLoopClamp = null;
         while (blk != null && blk != -1) {
+            if (blk != null && this.loopBlock(this.blocks.blockList[blk].name)) {
+                newLoopClamp = blk;
+            }
             var lastBlk = blk;
             blk = last(this.blocks.blockList[blk].connections);
         }
-        if (recurse && this.blocks.blockList[lastBlk].isClampBlock()) {
+
+        // We want the parent loop.
+        if (loopClamp == null) {
+            loopClamp = newLoopClamp;
+        }
+
+        // Do we need to recurse?
+        if (this.blocks.blockList[lastBlk].isClampBlock()) {
             var i = this.blocks.blockList[lastBlk].protoblock.args;
-            return this.getBlockAtEndOfFlow(this.blocks.blockList[lastBlk].connections[i], lastBlk, true);
-        } else if (recurse && ['do', 'doArg'].indexOf(this.blocks.blockList[lastBlk].name) != -1) {
+            return this.getBlockAtEndOfFlow(this.blocks.blockList[lastBlk].connections[i], loopClamp);
+        } else if (['do', 'doArg'].indexOf(this.blocks.blockList[lastBlk].name) != -1) {
             var argBlk = this.blocks.blockList[lastBlk].connections[1];
             if (argBlk != null) {
                 var name = this.blocks.blockList[argBlk].value;
                 if (name in this.actions) {
-                    return this.getBlockAtEndOfFlow(this.actions[name], lastBlk, true);
+                    return this.getBlockAtEndOfFlow(this.actions[name], loopClamp);
                 }
             }
-            return [lastBlk, parentClamp];
-        } else if (recurse && ['nameddo', 'nameddoArg'].indexOf(this.blocks.blockList[lastBlk].name) != -1) {
+        } else if (['nameddo', 'nameddoArg'].indexOf(this.blocks.blockList[lastBlk].name) != -1) {
             var name = this.blocks.blockList[lastBlk].privateData;
             if (name in this.actions) {
-                return this.getBlockAtEndOfFlow(this.actions[name], lastBlk, true);
-            } else {
-                return [lastBlk, parentClamp];
+                return this.getBlockAtEndOfFlow(this.actions[name], loopClamp);
             }
-        } else {
-            return [lastBlk, parentClamp];
         }
+
+        return [lastBlk, loopClamp];
     }
 
     this.getTargetTurtle = function(args) {
