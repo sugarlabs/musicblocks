@@ -307,6 +307,7 @@ function Matrix() {
         this.matrixHasTuplets = true;
     }
 
+    // DEPRECATED
     this.addTuplet = function(param) {
 	console.log('addTuplet ' + JSON.stringify(param));
 
@@ -411,6 +412,7 @@ function Matrix() {
         this.matrixHasTuplets = true;
     }
 
+    // Should this be called addNotes?
     this.addRhythm = function(numBeats, noteValue, noteValueNum) {
         console.log('addRhythm ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
         var table = document.getElementById('myTable');
@@ -422,6 +424,7 @@ function Matrix() {
             noteValueToDisplay = '1/' + noteValue.toString();
         }
 
+        // THIS IS AN UGLY KLUDGE -- FIX ME. (AND DOES NOT WORK FOR DOUBLE DOT)
         //<==Rhythmic Dot function does not seem to work anymore (see
         //ownCloud). Did I break it HERE? Thanks and sorry if I did...
         if (parseInt(noteValue) < noteValue) {
@@ -604,7 +607,6 @@ function Matrix() {
             noteValue = this.notesToPlayDirected[i - 1][1];
             time += 1 / noteValue;
             var that = this;
-            console.log(time);
 
             setTimeout(function() {
                 if(that.notesCounter >= that.notesToPlayDirected.length) {

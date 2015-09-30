@@ -23,9 +23,10 @@ var NOSQRTERRORMSG = 'Cannot take square root of negative number.';
 var ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 var EMPTYHEAPERRORMSG = 'empty heap.';
 
-function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanvas, textMsg, errorMsg,
-              hideMsgs, onStopTurtle, onRunTurtle, prepareExport, getStageX,
-              getStageY, getStageMouseDown, getCurrentKeyCode,
+function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
+              refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
+              onRunTurtle, prepareExport, getStageX, getStageY,
+              getStageMouseDown, getCurrentKeyCode,
               clearCurrentKeyCode, meSpeak, saveLocally) {
 
     this.canvas = canvas;
@@ -330,7 +331,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             this.turtles.add(null);
         }
 
-        // Each turtle needs to keep its own wait time and music states.
+        // Each turtle needs to keep its own wait time and music
+        // states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             this.waitTimes[turtle] = 0;
             this.endOfFlowSignals[turtle] = {};
@@ -675,7 +677,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     logo.stopTurtle = true;
                 }
                 break;
-            // if we clicked on an action block, treat it like a do block.
+            // If we clicked on an action block, treat it like a do
+            // block.
             case 'action':
             case 'do':
                 if (args.length == 1) {
@@ -736,7 +739,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 break;
             case 'break':
                 logo.doBreak(turtle);
-                // Since we pop the queue, we need to unhighlight our parent.
+                // Since we pop the queue, we need to unhighlight our
+                // parent.
                 var parentBlk = logo.blocks.blockList[blk].connections[0];
                 if (parentBlk != null) {
                     logo.unhightlightQueue[turtle].push(parentBlk);
@@ -1429,25 +1433,18 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
                     // Process queued up rhythms.
                     for (var i = 0; i < logo.tupletRhythms.length; i++) {
-                        // We have three cases:
-                        // (1) notes in a tuplet
-                        // (2) rhythm block in a tuplet
-                        // (3) rhythm block outside of a tuplet
+                        // We have two cases: (1) notes in a tuplet;
+                        // and (2) rhythm block outside of a
+                        // tuplet. Rhythm blocks in a tuplet are
+                        // converted to notes.
                         switch (logo.tupletRhythms[i][0]) {
                             case 'notes':
-                                // var tupletParam = [logo.tupletParams[last(logo.tupletRhythms[i])]];
                                 var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                                 tupletParam.push([]);
-                                // for (var j = 1; j < logo.tupletRhythms[i].length - 1; j++) {
                                 for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
                                     tupletParam[1].push(logo.tupletRhythms[i][j]);
                                 }
                                 matrix.addNotesTuplet(tupletParam);
-                                break;
-                            case 'rhythm':
-                                var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][3]]];
-                                tupletParam.push([logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]]);
-                                matrix.addTuplet(tupletParam);
                                 break;
                             default:
                                 matrix.addRhythm(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
@@ -1505,40 +1502,34 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 break;
             case 'rhythm':
                 if (logo.inMatrix) {
-                    if(logo.rhythmicValueParameter == 'rhythmicdot') {
-                        args[1] = (2 / 3) * args[1];
-                        logo.rhythmicValueParameter = null;
-                    }
                     for (var i = 0; i < args[0]; i++) {
-                        logo.processNote(blk, args[1]);
+                        logo.processNote(blk, args[1], turtle);
                     }
                 } else {
                     console.log('rhythm block only used inside matrix');
                 }
                 break;
+            // FIXME: What is this supposed to do?
             case 'timeSign':
                 console.log('Time Signatature' + args[0]);
                 break;
-            case 'playmatrix':
-                logo.playMatrix();
-                break;
             case 'wholeNote':
-                logo.processNote(blk, 1);
+                logo.processNote(blk, 1, turtle);
                 break;
             case 'halfNote':
-                logo.processNote(blk, 2);
+                logo.processNote(blk, 2, turtle);
                 break;
             case 'quarterNote':
-                logo.processNote(blk, 4);
+                logo.processNote(blk, 4, turtle);
                 break;
             case 'eighthNote':
-                logo.processNote(blk, 8);
+                logo.processNote(blk, 8, turtle);
                 break;
             case 'sixteenthNote':
-                logo.processNote(blk, 16);
+                logo.processNote(blk, 16, turtle);
                 break;
             case 'thirtysecondNote':
-                logo.processNote(blk, 32);
+                logo.processNote(blk, 32, turtle);
                 break;
             case 'notation':
                 // FIXME: restore meter block as arg?
@@ -1571,7 +1562,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.runFromBlock(logo, turtle, args[1]);
                 */
                 console.log('Generating Music Notation');
-                // Restart accumulating notes now that we are in the clamp.
+                // Restart accumulating notes now that we are in the
+                // clamp.
                 logo.notesPlayed[turtle] = [];
                 childFlow = args[0];
                 childFlowCount = 1;
@@ -1598,19 +1590,15 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
                 }
                 logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
-                // How to add this to the start of the list rather
-                // than the end of the list???
                 logo.stage.addEventListener(listenerName, listener, false);
                 break;
+            // FIXME: What is this supposed to do?
             case 'meter':
                 break;
-            // case 'savematrix':
-            //     logo.saveMatrix();
-            //     break;
             case 'note':
                 // We queue up the child flow of the note clamp and
                 // once all of the children are run, we trigger a
-                // _playnote event, then wait for the note to play.
+                // _playnote_ event, then wait for the note to play.
                 // We should use a timer for more accuracy.
 
                 logo.noteNotes[turtle] = [];
@@ -1689,15 +1677,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
                 logo.stage.addEventListener(listenerName, listener, false);
                 break;
-            // case 'showmatrix':
-            //     logo.showMatrix = true;
-            //     console.log('calling runFromBlock with ' + args[0]);
-            //     logo.runFromBlock(logo, turtle, args[0]);
-            //     break;
             case 'rhythmicdot':
-                if (logo.inMatrix) {
-                    logo.rhythmicValueParameter = 'rhythmicdot';
-                }
                 logo.beatFactor[turtle] *= 1.5;  // 3/2
                 childFlow = args[0];
                 childFlowCount = 1;
@@ -2188,7 +2168,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
         }, DEFAULTDELAY * 1.5)
     }
 
-    this.processNote = function(blk, noteValue) {
+    this.processNote = function(blk, noteValue, turtle) {
+        console.log(this.beatFactor[turtle]);
+        noteValue /= this.beatFactor[turtle];
         if (this.inMatrix) {
             if (this.tuplet == true) {
                 if(this.addingNotesToTuplet) {
@@ -2911,6 +2893,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
 
     // Music extensions
+    // WHY ARE THESE HERE? Why not in matrix.js?
 
     this.playMatrix = function() {
         Tone.Transport.stop();
