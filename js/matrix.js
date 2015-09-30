@@ -599,10 +599,12 @@ function Matrix() {
             synth.triggerAttackRelease(note, 1 / noteValue);
         }
 
+        console.log(time);
         for (var i = 1; i < this.notesToPlayDirected.length; i++) {
             noteValue = this.notesToPlayDirected[i - 1][1];
-            time += 1/noteValue;
+            time += 1 / noteValue;
             var that = this;
+            console.log(time);
 
             setTimeout(function() {
                 if(that.notesCounter >= that.notesToPlayDirected.length) {

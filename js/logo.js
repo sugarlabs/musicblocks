@@ -1635,7 +1635,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
                 var listener = function (event) {
                     var duration =  noteBeatValue * logo.noteBeatValues[turtle][0];
-                    logo.doWait(turtle, 1 / duration);
+                    // Use 2 to match playback speed of matrix
+                    logo.doWait(turtle, 2 / duration);
 
                     var notes = [];
                     var notes2 = [];
@@ -2117,9 +2118,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             }
         } else {
             // Make sure any unissued signals are dispatched.
-            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
-                if (logo.endOfFlowSignals[turtle][blk][i] != null) {
-                    logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
+            for (var b in logo.endOfFlowSignals[turtle]) {
+                for (var i = 0; i < logo.endOfFlowSignals[turtle][b].length; i++) {
+                    if (logo.endOfFlowSignals[turtle][b][i] != null) {
+                        logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][b][i]);
+                    }
                 }
             }
             // Make sure SVG path is closed.
