@@ -1469,7 +1469,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'pitch':
                 if (logo.inMatrix) {
                     if (logo.inFlatClamp) {
-                        matrix.solfegeNotes.push(args[0] + 'b');
+                        matrix.solfegeNotes.push(args[0] + '♭');
                     } else if (logo.inSharpClamp) {
                         matrix.solfegeNotes.push(args[0] + '#');
                     } else {
@@ -1513,6 +1513,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'timeSign':
                 console.log('Time Signatature' + args[0]);
                 break;
+
+            // 𝅝 𝅗𝅥 𝅘𝅥 𝅘𝅥𝅮 𝅘𝅥𝅯 𝅘𝅥𝅰 𝅘𝅥𝅱 𝅘𝅥𝅲
             case 'wholeNote':
                 logo.processNote(blk, 1, turtle);
                 break;
@@ -1658,6 +1660,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             if (notes.length > 0) {
                                 // Use the beatValue of the first note in the
                                 // group since there can only be one.
+                                for (var i = 0; i < notes.length; i++) {
+                                    notes[i] = notes[i].replace(/♭/g, 'b');
+                                }
                                 logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
                                 Tone.Transport.start();
                             }
@@ -2917,17 +2922,21 @@ function getNote (solfege, octave, transposition, keySignature) {
 
     solfege = solfege.toString();
 
+    var bToFlat = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
     var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    var notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-    var notesFlat2 = ['c', 'db', 'd', 'eb', 'e', 'f', 'gb', 'g', 'ab', 'a', 'bb', 'b'];
-    var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'Cb':['B', -1], 'Fb':['E', 0],
-                               'e#':['F', 0], 'b#':['C', 1], 'cb':['B', -1], 'fb':['E', 0]};
+    var notesFlat = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+    var notesFlat2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
+    var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'C♭':['B', -1], 'F♭':['E', 0],
+                               'e#':['F', 0], 'b#':['C', 1], 'c♭':['B', -1], 'f♭':['E', 0]};
     var majorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
     // Is this correct, or is minor solfege expressed by using
     // DO RE MA FA SOL LE TE?
     var minorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 2, 'ME': 2, 'MI': 3, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 7, 'LO': 7, 'LA': 8, 'LI': 9, 'TE': 9, 'TA': 9,  'TI': 10};
 
     // Already a note? No need to convert from solfege.
+    if (solfege in bToFlat) {
+        solfege = bToFlat[solfege];
+    }
     if (solfege in extraTranspositions) {
         octave += extraTranspositions[solfege][1];
         note = extraTranspositions[solfege][0];
@@ -2937,14 +2946,14 @@ function getNote (solfege, octave, transposition, keySignature) {
     } else if (notesFlat.indexOf(solfege) != -1) {
         note = solfege;
     } else if (notesFlat2.indexOf(solfege) != -1) {
-        // Convert to uppercase, e.g., db -> Db.
+        // Convert to uppercase, e.g., d♭ -> D♭.
         note = notesFlat[notesFlat2.indexOf(solfege)];
     } else {
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (solfege.substr(-1) == '>') {
             solfege = solfege.substr(0, solfege.indexOf('<'));
         }
-        if(solfege.substr(-1) == '#' || 'b') {
+        if(solfege.substr(-1) == '#' || '♭') {
             sharpFlat = true;
         }
 
@@ -2992,8 +3001,8 @@ function getNote (solfege, octave, transposition, keySignature) {
         if (sharpFlat) {
             if (solfege.substr(-1) == '#') {
                 note = note + '#';
-            } else if(solfege.substr(-1) == 'b') {
-                note = note + 'b';
+            } else if(solfege.substr(-1) == '♭') {
+                note = note + '♭';
             }
             if (note in extraTranspositions) {
                 octave += extraTranspositions[note][1];

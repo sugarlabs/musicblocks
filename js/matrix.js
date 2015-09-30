@@ -178,8 +178,8 @@ function Matrix() {
     }
 
     this.note2Solfege = function(note, index) {
-        var solfegeConversionTable = {'C': 'do', 'C#': 'do#', 'D': 're', 'D#': 're#', 'E': 'mi', 'F': 'fa', 'F#': 'fa#', 'G': 'sol', 'G#': 'sol#', 'A': 'la', 'A#': 'la#', 'B': 'ti', 'Db': 'reb', 'Eb': 'mib', 'Gb': 'solb', 'Ab': 'lab', 'Bb': 'tib'};
-        if (['b', '#'].indexOf(note[1]) == -1) {
+        var solfegeConversionTable = {'C': 'do', 'C#': 'do#', 'D': 're', 'D#': 're#', 'E': 'mi', 'F': 'fa', 'F#': 'fa#', 'G': 'sol', 'G#': 'sol#', 'A': 'la', 'A#': 'la#', 'B': 'ti', 'D♭': 're♭', 'E♭': 'mi♭', 'G♭': 'sol♭', 'A♭': 'la♭', 'B♭': 'ti♭'};
+        if (['♭', '#'].indexOf(note[1]) == -1) {
             var octave = note[1];
             var newNote = solfegeConversionTable[note[0]];
         } else {
@@ -503,15 +503,12 @@ function Matrix() {
                     var cell = table.rows[j].cells[i];
                     var that = this;
                     cell.onclick = function() {
-                        console.log(this.style.backgroundColor);
                         if (this.style.backgroundColor == 'black') {
-                            console.log('unsetting');
                             this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                             that.chkArray[this.id] = 0;
                             that.notesToPlay[this.id - 1][0] = ['R'];
                             that.setNotes(this.id, this.parentNode.rowIndex, false, tuplet, synth);
                         } else {
-                            console.log('setting');
                             this.style.backgroundColor = 'black';
                             that.chkArray[this.id] = 1;
                             that.setNotes(this.id, this.parentNode.rowIndex, true, tuplet, synth);
@@ -593,10 +590,14 @@ function Matrix() {
         var that = this;
         var time = 0;
         var table = document.getElementById('myTable');
-        var note  = this.notesToPlayDirected[this.notesCounter][0];
+        var note = this.notesToPlayDirected[this.notesCounter][0];
         var noteValue = that.notesToPlayDirected[this.notesCounter][1];
         this.notesCounter += 1;
-        if (note != 'R') {
+        // Note can be a chord, hence it is an array.
+        for (var i = 0; i < note.length; i++) {
+            note[i] = note[i].replace(/♭/g, 'b');
+        }
+        if (note[0] != 'R') {
             synth.triggerAttackRelease(note, 1 / noteValue);
         }
 
@@ -610,9 +611,13 @@ function Matrix() {
                     that.notesCounter = 1;
                     Tone.Transport.stop();
                 }
-                note  = that.notesToPlayDirected[that.notesCounter][0];
+                note = that.notesToPlayDirected[that.notesCounter][0];
                 noteValue = that.notesToPlayDirected[that.notesCounter][1];
                 that.notesCounter += 1;
+                // Note can be a chord, hence it is an array.
+                for (var i = 0; i < note.length; i++) {
+                    note[i] = note[i].replace(/♭/g, 'b');
+                }
                 if(note != 'R') {
                     synth.triggerAttackRelease(note, 1 / noteValue);
                 }
@@ -637,9 +642,9 @@ function Matrix() {
                 var note;
                 if (cell.style.backgroundColor == 'black') {
                     var solfege = table.rows[j].cells[0].innerHTML;
-                    console.log(solfege + ' in key ' +  this.logo.keySignature[0]);
+                    // console.log(solfege + ' in key ' +  this.logo.keySignature[0]);
                     note = getNote(solfege, octave, 0, this.logo.keySignature[0]);
-                    console.log(note);
+                    // console.log(note);
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
                     var i = 0;
                     if (noteValue.substr(0,3) == '1.5') {
@@ -654,7 +659,7 @@ function Matrix() {
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
                     if (playNote) {
-                        synth.triggerAttackRelease(note, noteValue);
+                        synth.triggerAttackRelease(note.replace(/♭/g, 'b'), noteValue);
                     }
                 }
             }
@@ -732,7 +737,7 @@ function Matrix() {
                 }
 
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                if(['#', 'b'].indexOf(note[0][j][1]) != -1) {
+                if(['#', '♭'].indexOf(note[0][j][1]) != -1) {
                     newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                     newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                 } else {
