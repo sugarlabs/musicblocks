@@ -347,10 +347,12 @@ function loadPaletteButtonHandler(palettes, name) {
 }
 
 
+// FIXME: this should be calculated
 var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
                    'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
-                   'tuplet', 'rhythmicdot', 'note', 'setbeatfactor',
-                   'notation', 'playfwd', 'playbwd'];
+                   'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
+                   'dividebeatfactor', 'notation', 'playfwd', 'playbwd',
+                   'duplicatenotes'];
 
 // Kinda a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {

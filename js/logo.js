@@ -97,6 +97,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
     // parameters used by the note block
     this.pushedNote = {};
+    this.duplicateFactor = {};
 
     // tuplet
     this.tuplet = false;
@@ -286,6 +287,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 case 'beatfactor':
                     value = this.beatFactor[turtle];
                     break;
+                case 'duplicatefactor':
+                    value = this.duplicateFactor[turtle];
+                    break;
                 default:
                     if (name in this.evalParameterDict) {
                         eval(this.evalParameterDict[name]);
@@ -342,6 +346,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.beatFactor[turtle] = 1;
+            this.duplicateFactor[turtle] = 1;
             this.keySignature[turtle] = 'C';
             this.pushedNote[turtle] = false;
         }
@@ -1635,28 +1640,49 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
 
                 var listener = function (event) {
                     var duration =  noteBeatValue * logo.noteBeatValues[turtle][0];
-                    // Use 2 to match playback speed of matrix
-                    logo.doWait(turtle, 2 / duration);
 
-                    var notes = [];
-                    var notes2 = [];
-                    logo.polySynth.toMaster();
-                    for (i in logo.noteNotes[turtle])
-                    {
-                        note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
-                        if (note != 'R') {
-                            notes.push(note);
+                    // Use 2 to match playback speed of matrix
+                    logo.doWait(turtle, (2 / duration) * logo.duplicateFactor[turtle]);
+
+                    var waitTime = 0;
+                    for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
+                        if (j > 0) {
+                            waitTime += (2000 / duration);
                         }
-                        notes2.push([note, duration]);
-                    }
-                    console.log("notes to play " + notes);
-                    console.log("notes for notation " + notes2);
-                    logo.notesPlayed[turtle].push(notes2);
-                    if (notes.length > 0) {
-                        // Use the beatValue of the first note in the
-                        // group since there can only be one.
-                        logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
-                        Tone.Transport.start();
+
+                        // FIXME: When duplicating notes inside a
+                        // notation clamp, the playnote is in a race
+                        // condition with the notation rendering.
+
+                        playnote = function() {
+                            var notes = [];
+                            var notationNotes = [];
+                            logo.polySynth.toMaster();
+                            for (i in logo.noteNotes[turtle]) {
+                                note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+                                if (note != 'R') {
+                                    notes.push(note);
+                                }
+                                notationNotes.push([note, duration]);
+                            }
+                            console.log("notes to play " + notes);
+                            logo.notesPlayed[turtle].push(notationNotes);
+
+                            if (notes.length > 0) {
+                                // Use the beatValue of the first note in the
+                                // group since there can only be one.
+                                logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                Tone.Transport.start();
+                            }
+                        }
+
+                        if (waitTime == 0) {
+                            playnote();
+                        } else {
+                            setTimeout(function() {
+                                playnote();
+                            }, waitTime)
+                        }
                     }
                     logo.pushedNote[turtle] = false;
                 }
@@ -1702,7 +1728,40 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
                 logo.stage.addEventListener(listenerName, listener, false);
                 break;
-            case 'setbeatfactor':
+            case 'duplicatenotes':
+                var factor = args[0];
+                if (factor == 0) {
+                    logo.errorMsg(ZERODIVIDEERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    logo.duplicateFactor[turtle] *= factor;
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_duplicate_' + turtle;
+                    var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
+                    if (endBlk[0] != null) {
+                        if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                            logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                            logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
+                        } else {
+                            logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                            logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
+                        }
+                    }
+
+                    var listener = function (event) {
+                        logo.duplicateFactor[turtle] /= factor;
+                    }
+
+                    if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                        logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                    }
+                    logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                    logo.stage.addEventListener(listenerName, listener, false);
+                }
+                break;
+            case 'multiplybeatfactor':
                 var factor = args[0];
                 if (factor == 0) {
                     logo.errorMsg(ZERODIVIDEERRORMSG, blk);
@@ -1712,7 +1771,40 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     childFlow = args[1];
                     childFlowCount = 1;
 
-                    var listenerName = '_beat_' + turtle;
+                    var listenerName = '_multiplybeat_' + turtle;
+                    var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
+                    if (endBlk[0] != null) {
+                        if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                            logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                            logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
+                        } else {
+                            logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                            logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
+                        }
+                    }
+
+                    var listener = function (event) {
+                        logo.beatFactor[turtle] /= factor;
+                    }
+
+                    if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                        logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                    }
+                    logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                    logo.stage.addEventListener(listenerName, listener, false);
+                }
+                break;
+            case 'dividebeatfactor':
+                var factor = args[0];
+                if (factor == 0) {
+                    logo.errorMsg(ZERODIVIDEERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    logo.beatFactor[turtle] /= factor;
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_dividebeat_' + turtle;
                     var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
                     if (endBlk[0] != null) {
                         if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
@@ -2020,7 +2112,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
             // There is a list of signals and parent clamps. Each
             // needs to be handled separately.
             var notationDispatches = [];
-            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
+            // for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
+            for (var i = logo.endOfFlowSignals[turtle][blk].length - 1; i >= 0; i--) {
                 var parentClamp = logo.endOfFlowClamps[turtle][blk][i];
                 var signal = logo.endOfFlowSignals[turtle][blk][i];
                 if (parentClamp != null && logo.parentFlowQueue[turtle].indexOf(parentClamp) != -1 && logo.loopBlock(logo.blocks.blockList[parentClamp].name)) {
@@ -2122,6 +2215,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                 for (var i = 0; i < logo.endOfFlowSignals[turtle][b].length; i++) {
                     if (logo.endOfFlowSignals[turtle][b][i] != null) {
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][b][i]);
+                        console.log('dispatching ' + logo.endOfFlowSignals[turtle][b][i]);
                     }
                 }
             }
@@ -2192,7 +2286,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
         var newLoopClamp = null;
         while (blk != null && blk != -1) {
             if (blk != null && this.loopBlock(this.blocks.blockList[blk].name)) {
-                newLoopClamp = blk;
+                if (last(this.blocks.blockList[blk].connections)) {
+                    console.log(blk + ' ' + this.blocks.blockList[blk].name + ' ' + last(this.blocks.blockList[blk].connections));
+                    newLoopClamp = blk;
+                }
             }
             var lastBlk = blk;
             blk = last(this.blocks.blockList[blk].connections);
@@ -2544,6 +2641,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage, refreshCanv
                     logo.blocks.blockList[blk].value = logo.keySignature[turtle];                    
                 case 'transposition':
                     logo.blocks.blockList[blk].value = logo.transposition[turtle];
+                    break;
+                case 'duplicatefactor':
+                    logo.blocks.blockList[blk].value = logo.duplicateFactor[turtle];
                     break;
                 case 'beatfactor':
                     logo.blocks.blockList[blk].value = logo.beatFactor[turtle];

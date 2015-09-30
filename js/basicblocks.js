@@ -230,10 +230,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmicdotBlock.adjustWidthToLabel();
     rhythmicdotBlock.flowClampZeroArgBlock();
 
-    var beatFactorBlock = new ProtoBlock('setbeatfactor');
+    var beatFactorBlock = new ProtoBlock('multiplybeatfactor');
     beatFactorBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['setbeatfactor'] = beatFactorBlock;
-    beatFactorBlock.staticLabels.push(_('adjust beat factor'));
+    blocks.protoBlockDict['multiplybeatfactor'] = beatFactorBlock;
+    beatFactorBlock.staticLabels.push(_('multiply beat'));
+    beatFactorBlock.adjustWidthToLabel();
+    beatFactorBlock.flowClampOneArgBlock();
+    beatFactorBlock.defaults.push(2);
+
+    var beatFactorBlock = new ProtoBlock('dividebeatfactor');
+    beatFactorBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['dividebeatfactor'] = beatFactorBlock;
+    beatFactorBlock.staticLabels.push(_('divide beat'));
     beatFactorBlock.adjustWidthToLabel();
     beatFactorBlock.flowClampOneArgBlock();
     beatFactorBlock.defaults.push(2);
@@ -244,6 +252,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatfactor.staticLabels.push(_('beat factor'));
     beatfactor.adjustWidthToLabel();
     beatfactor.parameterBlock();
+
+    var duplicateNotesBlock = new ProtoBlock('duplicatenotes');
+    duplicateNotesBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['duplicatenotes'] = duplicateNotesBlock;
+    duplicateNotesBlock.staticLabels.push(_('duplicate notes'));
+    duplicateNotesBlock.adjustWidthToLabel();
+    duplicateNotesBlock.flowClampOneArgBlock();
+    duplicateNotesBlock.defaults.push(2);
+
+    var duplicateFactor = new ProtoBlock('duplicatefactor');
+    duplicateFactor.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;
+    duplicateFactor.staticLabels.push(_('duplicate factor'));
+    duplicateFactor.adjustWidthToLabel();
+    duplicateFactor.parameterBlock();
 
     // Tone (utility) palette
 
