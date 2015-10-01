@@ -144,6 +144,14 @@ function Matrix() {
         }
 
         var cell = row.insertCell(3);
+        cell.innerHTML = '<img src="header-icons/erase-button.svg" alt="' + _('clear') + '" height="24" width="24">';
+        cell.style.height = '40px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.onclick=function() {
+            logo.clearMatrix();
+        }
+
+        var cell = row.insertCell(4);
         cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="24" width="24">';
         cell.style.height = '40px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -406,10 +414,10 @@ function Matrix() {
         /* Once the entire matrix is generated, this function makes it
 	 * clickable. */
         var table = document.getElementById('myTable');
-        var that = this;
-        var leaveRowsFromBottom = 1;
-        if (tuplet) {
-            leaveRowsFromBottom = 3;
+        if (this.matrixHasTuplets) {
+            var leaveRowsFromBottom = 3;
+        } else {
+            var leaveRowsFromBottom = 1;
         }
         for (var i = 1; i < table.rows[1].cells.length; i++) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
@@ -613,6 +621,31 @@ function Matrix() {
             console.log('playing after ' + time + 'ms');
             that.playAll(synth);
         }, time);
+    }
+
+    this.clearMatrix = function(synth) {
+        // "Unclick" every entry in the matrix.
+        var table = document.getElementById('myTable');
+
+        if (this.matrixHasTuplets) {
+            var leaveRowsFromBottom = 3;
+        } else {
+            var leaveRowsFromBottom = 1;
+        }
+
+        if (table != null) {
+            for (var i = 1; i < table.rows[1].cells.length; i++) {
+                for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
+                    var cell = table.rows[j].cells[i];
+                    if (cell.style.backgroundColor == 'black') {
+                        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        this.chkArray[cell.id] = 0;
+                        this.notesToPlay[cell.id - 1][0] = ['R'];
+                        this.setNotes(cell.id, cell.parentNode.rowIndex, false, this.matrixHasTuplets, synth);
+                    }
+                }
+            }
+        }
     }
 
     this.saveMatrix = function() {

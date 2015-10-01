@@ -1648,7 +1648,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                 if (note != 'R') {
                                     notes.push(note);
                                 }
-                                notationNotes.push([note, duration]);
+                                notationNotes.push([note.replace(/♭/g, 'b'), duration]);
                             }
                             console.log("notes to play " + notes);
                             logo.notesPlayed[turtle].push(notationNotes);
@@ -2908,6 +2908,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     this.saveMatrix = function() {
         matrix.saveMatrix();
+    }
+
+    this.clearMatrix = function() {
+        matrix.clearMatrix(this.polySynth);
     }
 }
 
