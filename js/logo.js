@@ -1430,6 +1430,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                 var listener = function (event) {
                     matrix.initMatrix(logo);
+                    var addedTuplet = false;
 
                     // Process queued up rhythms.
                     for (var i = 0; i < logo.tupletRhythms.length; i++) {
@@ -1439,6 +1440,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         // converted to notes.
                         switch (logo.tupletRhythms[i][0]) {
                             case 'notes':
+                                addedTuplet = true;
                                 var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                                 tupletParam.push([]);
                                 for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
@@ -1451,13 +1453,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                 break;
                         }
                     }
-
-                    if(logo.tuplet) {
-                        matrix.makeClickable(true, logo.polySynth);
-                        logo.tuplet = false;
-                    } else {
-                        matrix.makeClickable(false, logo.polySynth);
-                    }
+                    matrix.makeClickable(addedTuplet, logo.polySynth);
                 }
 
                 if (listenerName in logo.turtles.turtleList[turtle].listeners) {
@@ -2177,7 +2173,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     }
 
     this.processNote = function(blk, noteValue, turtle) {
-        console.log(this.beatFactor[turtle]);
         noteValue /= this.beatFactor[turtle];
         if (this.inMatrix) {
             if (this.tuplet == true) {
