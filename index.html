@@ -32,80 +32,75 @@
 <body data-title="index" id="body" style="background: #96D3F3;">
 
     <script>
-      window.fbAsyncInit = function() {
+    window.fbAsyncInit = function() {
         FB.init({
           appId      : '1496189893985945',
           xfbml      : true,
           version    : 'v2.1'
         });
+    };
 
-        // ADD ADDITIONAL FACEBOOK CODE HERE <==Can somebody please tell me why we have facebook code in this software? What is it doing? Thanks! -DU
-      };
+    try {
+          (function(d, s, id){
+             var js, fjs = d.getElementsByTagName(s)[0];
+             if (d.getElementById(id)) {return;}
+             js = d.createElement(s); js.id = id;
+             js.src = "//connect.facebook.net/en_US/sdk.js";
+             fjs.parentNode.insertBefore(js, fjs);
+          }(document, 'script', 'facebook-jssdk'));
+     } catch(e) {}
 
-      try {
-      (function(d, s, id){
-         var js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) {return;}
-         js = d.createElement(s); js.id = id;
-         js.src = "//connect.facebook.net/en_US/sdk.js";
-         fjs.parentNode.insertBefore(js, fjs);
-      }(document, 'script', 'facebook-jssdk'));
-      } catch(e) {}
-
-    $(function() {
+     $(function() {
           $( "#musicNotation" ).draggable();
           $( "#matrix" ).draggable();
           $( "#solfamenu" ).draggable();
    
-  });    
-    (function($) {
-   $.fn.fixMe = function() {
-      return this.each(function() {
-         var $this = $(this),
-            $t_fixed;
-         function init() {
-            $this.wrap('<div class="container" />');
-            $t_fixed = $this.clone();
-            $t_fixed.find("tbody").remove().end().addClass("fixed").insertBefore($this);
-            resizeFixed();
-         }
-         function resizeFixed() {
-            $t_fixed.find("th").each(function(index) {
-               $(this).css("width",$this.find("th").eq(index).outerWidth()+"px");
-            });
-         }
-         function scrollFixed() {
-            var offset = $(this).scrollTop(),
-            tableOffsetTop = $this.offset().top,
-            tableOffsetBottom = tableOffsetTop + $this.height() - $this.find("thead").height();
-            if(offset < tableOffsetTop || offset > tableOffsetBottom)
-               $t_fixed.hide();
-            else if(offset >= tableOffsetTop && offset <= tableOffsetBottom && $t_fixed.is(":hidden"))
-               $t_fixed.show();
-         }
-         $(window).resize(resizeFixed);
-         $(window).scroll(scrollFixed);
-         init();
-      });
-   };
-})(jQuery);
+     });    
 
-$(document).ready(function(){
-   $("solfa").fixMe();
-   $(".up").click(function() {
-      $('html, body').animate({
-      scrollTop: 0
-   }, 2000);
- });
-});
+     (function($) {
+          $.fn.fixMe = function() {
+              return this.each(function() {
+              var $this = $(this), $t_fixed;
+              function init() {
+                  $this.wrap('<div class="container" />');
+                  $t_fixed = $this.clone();
+                  $t_fixed.find("tbody").remove().end().addClass("fixed").insertBefore($this);
+                  resizeFixed();
+              }
+              function resizeFixed() {
+                  $t_fixed.find("th").each(function(index) {
+                      $(this).css("width", $this.find("th").eq(index).outerWidth()+"px");
+                  });
+              }
+              function scrollFixed() {
+                  var offset = $(this).scrollTop(),
+                  tableOffsetTop = $this.offset().top,
+                  tableOffsetBottom = tableOffsetTop + $this.height() - $this.find("thead").height();
+                  if(offset < tableOffsetTop || offset > tableOffsetBottom)
+                      $t_fixed.hide();
+                  else if(offset >= tableOffsetTop && offset <= tableOffsetBottom && $t_fixed.is(":hidden"))
+                      $t_fixed.show();
+              }
+              $(window).resize(resizeFixed);
+              $(window).scroll(scrollFixed);
+              init();
+              });
+         };
+    })(jQuery);
 
-
-</script>
+    $(document).ready(function(){
+        $("solfa").fixMe();
+        $(".up").click(function() {
+            $('html, body').animate({
+                scrollTop: 0
+            }, 2000);
+        });
+    });
+    </script>
 
     <!-- see activity/activity-icon-color-loading.svg for info -->
     <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
-        <img src= "./activity/mouse.svg"
-        style="max-width:50%; width: 512px; margin: auto; display: block;"/>
+        <img src= "./activity/mouse.svg" style="max-width:50%; width: 512px; margin: auto; display: block;"/>
     </div>
 
     <div id="popdown-palette"></div>
@@ -146,7 +141,7 @@ $(document).ready(function(){
 
   <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
 
-  <div id="matrix">  
+  <div id="matrix" overflow-x="auto">  
   </div>
   
   <canvas hidden id="music" width="700"></canvas>          
@@ -163,7 +158,7 @@ $(document).ready(function(){
           <input class="file" type="file" id="myOpenFile" accept=".ta, .tb"/>
           <input class="file" type="file" id="myOpenPlugin" accept=".json"/>
           <input class="file" type="file" id="myOpenAll" />
-  <!-- <input class="file" type="file" id="mySaveFile" accept=".ta, .tb" nwsaveas="turtle-project.tb" /> -->
+     <!-- <input class="file" type="file" id="mySaveFile" accept=".ta, .tb" nwsaveas="turtle-project.tb" /> -->
         </div>
         <div id="audio"></div>
         <div id="tourData"></div>

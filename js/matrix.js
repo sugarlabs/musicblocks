@@ -81,6 +81,10 @@ function Matrix() {
         document.getElementById('matrix').style.display = 'inline';
         document.getElementById('matrix').style.visibility = 'visible';
         document.getElementById('matrix').style.border = 2;
+        // FIXME: make this number based on canvas size.
+        document.getElementById('matrix').style.width = "600px";
+        document.getElementById('matrix').style.overflowX = "auto";
+
         console.log('notes ' + this.solfegeNotes + ' octave ' + this.solfegeOctaves + ' transpositions ' + this.solfegeTranspositions);
 
         this.notesToPlay = [];
