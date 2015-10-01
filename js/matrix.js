@@ -201,7 +201,6 @@ function Matrix() {
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
 	console.log('addTuplet ' + JSON.stringify(param));
-        console.log(param[0][0] + '/' + param[0][1]);
 
         var table = document.getElementById('myTable');
         var tupletTimeFactor = param[0][0] / param[0][1];
@@ -253,25 +252,19 @@ function Matrix() {
         cell = table.rows[table.rows.length - 1].insertCell(-1);
         cell.style.height = '30px';
 
-        // cell.innerHTML = param[0][0].toString() + '/' + param[0][1].toString();
         var noteSymbol = {1: '𝅝', 2: '𝅗𝅥', 4: '𝅘𝅥', 8: '𝅘𝅥𝅮', 16: '𝅘𝅥𝅯', 32: '𝅘𝅥𝅰', '64': '𝅘𝅥𝅱', '128': '𝅘𝅥𝅲'};
         var noteValue = param[0][1] / param[0][0];
-        console.log(noteValue);
         var noteValueToDisplay = null;
         if (noteValue in noteSymbol) {
             noteValueToDisplay = '1/' + noteValue.toString() + ' ' + noteSymbol[noteValue];
         } else {
             noteValueToDisplay = '1/' + noteValue.toString();
         }
-        console.log(noteValueToDisplay);
 
         // FIXME: DOES NOT WORK FOR DOUBLE DOT
          var dottedNoteSymbol = {1: '𝅝.', 2: '𝅗𝅥.', 4: '𝅘𝅥.', 8: '𝅘𝅥𝅮.', 16: '𝅘𝅥𝅯.', 32: '𝅘𝅥𝅰.', '64': '𝅘𝅥𝅱.', '128': '𝅘𝅥𝅲.'};
         if (parseInt(param[0][1]) < param[0][1]) {
-            var foo = parseInt(param[0][1] * 1.5);
-            console.log(foo);
             noteValueToDisplay = noteValue * 1.5;
-            console.log(noteValueToDisplay);
             if (noteValueToDisplay in dottedNoteSymbol) {
                 noteValueToDisplay = '1.5/' + noteValueToDisplay.toString() + ' ' + dottedNoteSymbol[noteValueToDisplay];
             } else {
@@ -280,6 +273,7 @@ function Matrix() {
         }
 
         cell.innerHTML = noteValueToDisplay;
+        // cell.innerHTML = param[0][0].toString() + '/' + param[0][1].toString();
 
         cell.width = w * param[0][0] / param[0][1] + 'px';
         cell.colSpan = numberOfNotes;
