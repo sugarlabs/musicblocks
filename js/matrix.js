@@ -416,19 +416,29 @@ function Matrix() {
         console.log('addRhythm ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
         var table = document.getElementById('myTable');
 
+        var noteSymbol = {1: '𝅝', 2: '𝅗𝅥', 4: '𝅘𝅥', 8: '𝅘𝅥𝅮', 16: '𝅘𝅥𝅯', 32: '𝅘𝅥𝅰', '64': '𝅘𝅥𝅱', '128': '𝅘𝅥𝅲'};
         var noteValueToDisplay = null;
         if (noteValueNum) {  // When does this happen?
             noteValueToDisplay = noteValueNum.toString() + '/' + noteValue.toString();
         } else {
-            noteValueToDisplay = '1/' + noteValue.toString();
+            if (noteValue in noteSymbol) {
+                noteValueToDisplay = '1/' + noteValue.toString() + ' ' + noteSymbol[noteValue];
+            } else {
+                noteValueToDisplay = '1/' + noteValue.toString();
+            }
         }
 
         // THIS IS AN UGLY KLUDGE -- FIX ME. (AND DOES NOT WORK FOR DOUBLE DOT)
         //<==Rhythmic Dot function does not seem to work anymore (see
         //ownCloud). Did I break it HERE? Thanks and sorry if I did...
+        var dottedNoteSymbol = {1: '𝅝.', 2: '𝅗𝅥.', 4: '𝅘𝅥.', 8: '𝅘𝅥𝅮.', 16: '𝅘𝅥𝅯.', 32: '𝅘𝅥𝅰.', '64': '𝅘𝅥𝅱.', '128': '𝅘𝅥𝅲.'};
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
-            noteValueToDisplay = '1.5/' + noteValueToDisplay.toString() + ' (single-dot)';
+            if (noteValueToDisplay in dottedNoteSymbol) {
+                noteValueToDisplay = '1.5/' + noteValueToDisplay.toString() + ' ' + dottedNoteSymbol[noteValueToDisplay];
+            } else {
+                noteValueToDisplay = '1.5/' + noteValueToDisplay.toString() + ' (dot)';
+            }
         }
 
         if (this.noteValue > noteValue) {
