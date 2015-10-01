@@ -128,7 +128,7 @@ function Matrix() {
         cell.style.backgroundColor = MATRIXLABELCOLOR;
 
         var cell = row.insertCell(1);
-        cell.innerHTML = '<img src="header-icons/play-button.svg" alt="' + _('play') + '" height="36" width="36">';
+        cell.innerHTML = '<img src="header-icons/play-button.svg" alt="' + _('play') + '" height="24" width="24">';
         cell.style.height = '40px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
@@ -136,7 +136,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(2);
-        cell.innerHTML = '<img src="header-icons/download.svg" alt="' + _('save') + '" height="36" width="36">';
+        cell.innerHTML = '<img src="header-icons/download.svg" alt="' + _('save') + '" height="24" width="24">';
         cell.style.height = '40px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
@@ -144,7 +144,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(3);
-        cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="36" width="36">';
+        cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="24" width="24">';
         cell.style.height = '40px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
