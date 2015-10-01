@@ -18,7 +18,7 @@ solfegeNotes (contains what is to be displayed in first row),
 solfegeTranspositions (contains a transposition), and
 solfegeOctaves (contains the octave for each pitch )
 
-addRhythm() : Makes the matrix according to each rhythm block.
+addNotes() : Makes the matrix according to each rhythm block.
 
 addTuplet() : Called when tuplet block is attached to the matrix
 clamp. Adds the rows and columns required for adding tuplet
@@ -196,11 +196,11 @@ function Matrix() {
         this.solfegeTranspositions[index] = 0;
     }
 
-    this.addNotesTuplet = function(param) {
+    this.addTuplet = function(param) {
         // The first two parameters are the interval for the tuplet,
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
-	console.log('addNotesTuplet ' + JSON.stringify(param));
+	console.log('addTuplet ' + JSON.stringify(param));
 
         var table = document.getElementById('myTable');
         var tupletTimeFactor = param[0][0] / param[0][1];
@@ -310,132 +310,20 @@ function Matrix() {
         this.matrixHasTuplets = true;
     }
 
-    // DEPRECATED
-    this.addTuplet = function(param) {
-	console.log('addTuplet ' + JSON.stringify(param));
-
-        var table = document.getElementById('myTable');
-        var numberOfNotes = param[1][0];
-        var noteValue = param[1][1];
-        var timeFactor = (param[0][1] / noteValue) * (numberOfNotes / param[0][0]);
-
-        // Add the cells for each tuplet note
-        if (this.matrixHasTuplets) {
-            // Extra rows for tuplets have already been added.
-            console.log('matrix already has ' + table.rows.length + ' rows');
-            var rowCount = table.rows.length - 3;
-        } else {
-            var rowCount = table.rows.length - 1;
-        }
-
-        for (var i = 1; i < rowCount; i++) {
-            row = table.rows[i];
-            for (var j = 0; j < numberOfNotes; j++) {
-                cell = row.insertCell(-1);
-                cell.setAttribute('id', table.rows[i].cells.length - 1);
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            }
-        }
-
-        // Set the cells to "rest"
-        for (var j = 0; j < numberOfNotes; j++) {
-            this.chkArray.push(0);
-            this.notesToPlay.push([['R'], timeFactor * param[1][1]]);
-        }
-
-        if (this.matrixHasTuplets) {
-            var row = table.rows[table.rows.length - 2];
-        } else {
-            var row = table.insertRow(table.rows.length - 1);
-            var cell = row.insertCell(-1);
-            cell.innerHTML = '<b>' + 'tuplet value' + '</b>';
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
-        }
-
-        var w = window.innerWidth;
-        w = (2 * w) / 5;
-
-        // The bottom row contains the rhythm note values
-        cell = table.rows[table.rows.length - 1].insertCell(-1);
-        cell.style.height = '30px';
-        cell.innerHTML = param[0][0].toString() + '/' + param[0][1].toString();
-        cell.width = w * param[0][0] / param[0][1] + 'px';
-        cell.colSpan = numberOfNotes;
-        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-
-        var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
-        for (var i = 0; i < table.rows[table.rows.length - 1].cells.length - 1; i++) {
-            // Add an entry for the tuplet value in any rhythm
-            // columns. If we already have tuplets, just add a cell to
-            // the new tuplet column.
-            if (!this.matrixHasTuplets || i == tupletCol) {
-                cell = row.insertCell(i + 1);
-                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-                cell.style.height = '30px';
-                if (i == tupletCol) {
-                    cell.innerHTML = numberOfNotes;
-                    cell.colSpan = numberOfNotes;
-                }
-            }
-        }
-
-        if (this.matrixHasTuplets) {
-            var row = table.rows[table.rows.length - 3];
-        } else {
-            // Add row for tuplet note values
-            var row = table.insertRow(table.rows.length - 2);
-            var cell = row.insertCell(-1);
-            cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
-        }
-
-        if (this.matrixHasTuplets) {
-            // Just add the new tuplet note values
-            var tupletCol = 0;
-            var cellCount = numberOfNotes;
-            var firstCell = 0;
-        } else {
-            // Add cells across all of tuplet note values row.
-            var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
-            var cellCount = table.rows[table.rows.length - 4].cells.length - 1;
-            var firstCell = 0;
-        }
-
-        for (var i = firstCell; i < cellCount; i++) {
-            // Add cell for tuplet note values
-            cell = row.insertCell(-1);
-            cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-            cell.style.height = '30px';
-            // Add tuplet note values
-            if (i >= tupletCol) {
-                cell.innerHTML = '1/' + timeFactor*param[1][1].toString();
-            }
-        }
-
-        this.matrixHasTuplets = true;
-    }
-
-    // Should this be called addNotes?
-    this.addRhythm = function(numBeats, noteValue, noteValueNum) {
-        console.log('addRhythm ' + numBeats + ' ' + noteValue + ' ' + noteValueNum);
+    this.addNotes = function(numBeats, noteValue) {
+        console.log('addNotes ' + numBeats + ' ' + noteValue);
         var table = document.getElementById('myTable');
 
         var noteSymbol = {1: '𝅝', 2: '𝅗𝅥', 4: '𝅘𝅥', 8: '𝅘𝅥𝅮', 16: '𝅘𝅥𝅯', 32: '𝅘𝅥𝅰', '64': '𝅘𝅥𝅱', '128': '𝅘𝅥𝅲'};
         var noteValueToDisplay = null;
-        if (noteValueNum) {  // When does this happen?
-            noteValueToDisplay = noteValueNum.toString() + '/' + noteValue.toString();
+        if (noteValue in noteSymbol) {
+            noteValueToDisplay = '1/' + noteValue.toString() + ' ' + noteSymbol[noteValue];
         } else {
-            if (noteValue in noteSymbol) {
-                noteValueToDisplay = '1/' + noteValue.toString() + ' ' + noteSymbol[noteValue];
-            } else {
-                noteValueToDisplay = '1/' + noteValue.toString();
-            }
+            noteValueToDisplay = '1/' + noteValue.toString();
         }
 
-        // THIS IS AN UGLY KLUDGE -- FIX ME. (AND DOES NOT WORK FOR DOUBLE DOT)
-        //<==Rhythmic Dot function does not seem to work anymore (see
-        //ownCloud). Did I break it HERE? Thanks and sorry if I did...
-        var dottedNoteSymbol = {1: '𝅝.', 2: '𝅗𝅥.', 4: '𝅘𝅥.', 8: '𝅘𝅥𝅮.', 16: '𝅘𝅥𝅯.', 32: '𝅘𝅥𝅰.', '64': '𝅘𝅥𝅱.', '128': '𝅘𝅥𝅲.'};
+        // FIXME: DOES NOT WORK FOR DOUBLE DOT
+         var dottedNoteSymbol = {1: '𝅝.', 2: '𝅗𝅥.', 4: '𝅘𝅥.', 8: '𝅘𝅥𝅮.', 16: '𝅘𝅥𝅯.', 32: '𝅘𝅥𝅰.', '64': '𝅘𝅥𝅱.', '128': '𝅘𝅥𝅲.'};
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
             if (noteValueToDisplay in dottedNoteSymbol) {
@@ -448,10 +336,10 @@ function Matrix() {
         if (this.noteValue > noteValue) {
             this.noteValue = noteValue;
         }
+
         for (var i = 0; i < numBeats; i++) {
             this.notesToPlay.push([['R'], noteValue]);
         }
-        console.log('Rhythm #beats->' + numBeats + ' noteValue->' + noteValue);
 
         for (var i = 1; i <= numBeats; i++) {
              this.chkArray.push(0);
@@ -500,7 +388,6 @@ function Matrix() {
         if (tuplet) {
             leaveRowsFromBottom = 3;
         }
-        console.log('isTuplet ' + tuplet);
         for (var i = 1; i < table.rows[1].cells.length; i++) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                 cell = table.rows[j].cells[i];

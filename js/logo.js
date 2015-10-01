@@ -1446,10 +1446,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                 for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
                                     tupletParam[1].push(logo.tupletRhythms[i][j]);
                                 }
-                                matrix.addNotesTuplet(tupletParam);
+                                matrix.addTuplet(tupletParam);
                                 break;
                             default:
-                                matrix.addRhythm(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
+                                matrix.addNotes(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
                                 break;
                         }
                     }
