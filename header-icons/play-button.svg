@@ -1,12 +1,34 @@
-<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd' [
-	<!ENTITY stroke_color "#010101">
-	<!ENTITY fill_color "#FFFFFF">
-]><svg enable-background="new 0 0 55 55" height="55px" version="1.1" viewBox="0 0 55 55" width="55px" x="0px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="0px"><g display="block" id="media-playback-start-insensitive">
-	<g display="inline">
-		<g>
-			<path d="M27.497,5.051c12.464,0.02,22.548,10.104,22.568,22.567c-0.02,12.462-10.104,22.546-22.568,22.566     C15.036,50.164,4.952,40.08,4.93,27.618C4.952,15.155,15.036,5.07,27.497,5.051 M27.5,7.301c-0.001,0-0.002,0-0.003,0     s-0.002,0-0.003,0c0,0,0.001,0,0.002,0C16.312,7.32,7.199,16.436,7.18,27.622c0.019,11.179,9.135,20.294,20.32,20.312     c11.18-0.019,20.296-9.134,20.314-20.32C47.797,16.436,38.684,7.32,27.498,7.301C27.499,7.301,27.5,7.301,27.5,7.301L27.5,7.301z     " fill="#808284"/>
-		</g>
-		<polygon fill="#808284" points="39.512,27.822 21.55,37.977 21.55,17.667   "/>
-		<path d="M27.499,0C12.312,0,0,12.313,0,27.5C0,42.688,12.312,55,27.499,55S55,42.688,55,27.5    C55,12.313,42.686,0,27.499,0z M27.497,52.646c-13.826,0-25.033-11.209-25.036-25.033C2.463,13.787,13.67,2.577,27.497,2.574    c13.826,0.003,25.035,11.213,25.039,25.038C52.531,41.437,41.322,52.646,27.497,52.646z" fill="#808284"/>
-	</g>
-</g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="55"
+   height="55"
+   viewBox="0 0 55 55"
+   id="svg2"
+   xml:space="preserve"><metadata
+     id="metadata19"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs17" /><path
+     d="m 55.000002,28.315678 a 20.741526,20.625 0 1 1 -41.483051,0 20.741526,20.625 0 1 1 41.483051,0 z"
+     transform="matrix(1.0124617,0,0,1.0181818,-7.1853951,-1.3305076)"
+     id="path2986"
+     style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" /><g
+     id="g7"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1"><path
+       d="M 27.497,5.051 C 39.961,5.071 50.045,15.155 50.065,27.618 50.045,40.08 39.961,50.164 27.497,50.184 15.036,50.164 4.952,40.08 4.93,27.618 4.952,15.155 15.036,5.07 27.497,5.051 m 0.003,2.25 c -0.001,0 -0.002,0 -0.003,0 -0.001,0 -0.002,0 -0.003,0 0,0 0.001,0 0.002,0 C 16.312,7.32 7.199,16.436 7.18,27.622 7.199,38.801 16.315,47.916 27.5,47.934 38.68,47.915 47.796,38.8 47.814,27.614 47.797,16.436 38.684,7.32 27.498,7.301 c 10e-4,0 0.002,0 0.002,0 l 0,0 z"
+       id="path9"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1" /></g><polygon
+     points="39.512,27.822 21.55,37.977 21.55,17.667 "
+     id="polygon11"
+     style="fill:#000000" /><path
+     d="M 27.499,0 C 12.312,0 0,12.313 0,27.5 0,42.688 12.312,55 27.499,55 42.686,55 55,42.688 55,27.5 55,12.313 42.686,0 27.499,0 z M 27.497,52.646 C 13.671,52.646 2.464,41.437 2.461,27.613 2.463,13.787 13.67,2.577 27.497,2.574 41.323,2.577 52.532,13.787 52.536,27.612 52.531,41.437 41.322,52.646 27.497,52.646 z"
+     id="path13"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1" /></svg>
