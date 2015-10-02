@@ -76,6 +76,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     // Music-related attributes
     // TODO: Move the turtle-specific attributes to the turtle object itself???
 
+    // this.polyVolume = -40;
+
     // matrix
     this.showMatrix = false;
     this.notation = false;
@@ -110,6 +112,35 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.denominator = 4;
 
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
+    // this.polySnare = new Tone.NoiseSynth().toMaster();
+    // this.polySynth = new Tone.SimpleSynth(6, Tone.NoiseSynth).toMaster();
+    this.polyBass = new Tone.MonoSynth({
+			"volume" : -10,
+			"envelope" : {
+				"attack" : 0.1,
+				"decay" : 0.3,
+				"release" : 2,
+			},
+			"filterEnvelope" : {
+				"attack" : 0.01,
+				"decay" : 0.1,
+				"sustain" : 0.5,
+				"min" : 200,
+				"max" : 1200
+			}
+		}).toMaster();
+    /*
+    this.polyKick = new Tone.DrumSynth({
+			"envelope" : {
+				"sustain" : 0,
+				"attack" : 0.02,
+				"decay" : 0.8
+			},
+			"octaves" : 10
+		}).toMaster();
+    */
+    // Tone.Transport.bpm.value = 90;  // Doesn't seem to do anything.
+    // Tone.Transport.volume = -10;  // ditto.
 
     //tone
     this.startTime = 0;
@@ -1703,6 +1734,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             var notes = [];
                             var notationNotes = [];
                             logo.polySynth.toMaster();
+                            // logo.polyBass.toMaster();
+                            // logo.polySnare.toMaster();
                             for (i in logo.noteNotes[turtle]) {
                                 note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
                                 if (note != 'R') {
@@ -1719,7 +1752,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                 for (var i = 0; i < notes.length; i++) {
                                     notes[i] = notes[i].replace(/♭/g, 'b');
                                 }
+
+                                // logo.polySynth.volume = logo.polyVolume;  // -40 to 0
                                 logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                // logo.polyBass.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                // logo.polySnare.triggerAttackRelease("8n", 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
                                 Tone.Transport.start();
                             }
                         }
