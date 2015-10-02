@@ -49,6 +49,7 @@ function Turtle (name, turtles) {
 
     // Things used for what the turtle draws.
     this.drawingCanvas = null;
+    this.imageContainer = null;
     this.svgOutput = '';
     // Are we currently drawing a path?
     this.svgPath = false;
@@ -59,6 +60,7 @@ function Turtle (name, turtles) {
     this.canvasColor = '#ff0031';
     this.orientation = 0;
     this.fillState = false;
+    this.hollowState = false;
     this.penState = true;
     this.font = DEFAULTFONT;
     this.media = [];  // Media (text, images) we need to remove on clear.
@@ -75,7 +77,101 @@ function Turtle (name, turtles) {
         }
 
         // Draw a line if the pen is down.
-        if (this.penState) {
+        if (this.penState && this.hollowState) {
+            // First, we need to close the current SVG path.
+            this.closeSVG();
+            this.svgPath = true;
+            // Save the current stroke width.
+            var savedStroke = this.stroke;
+            this.stroke = 1;
+            this.drawingCanvas.graphics.setStrokeStyle(this.stroke, 'round', 'round');
+            // Draw a hollow line.
+            if (savedStroke < 3) {
+                var step = 0.5;
+            } else {
+                var step = (savedStroke - 2) / 2.;
+            }
+
+            var capAngleRadians = (this.orientation - 90) * Math.PI / 180.0;
+            var dx = step * Math.sin(capAngleRadians);
+            var dy = -step * Math.cos(capAngleRadians);
+
+            this.drawingCanvas.graphics.moveTo(ox + dx, oy + dy);
+            var oxScaled = (ox + dx) * this.turtles.scale;
+            var oyScaled = (oy + dy) * this.turtles.scale;
+            this.svgOutput += '<path d="M ' + oxScaled + ',' + oyScaled + ' ';
+
+            this.drawingCanvas.graphics.lineTo(nx + dx, ny + dy);
+            var nxScaled = (nx + dx) * this.turtles.scale;
+            var nyScaled = (ny + dy) * this.turtles.scale;
+            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+
+            var capAngleRadians = (this.orientation + 90) * Math.PI / 180.0;
+            var dx = step * Math.sin(capAngleRadians);
+            var dy = -step * Math.cos(capAngleRadians);
+
+            var oAngleRadians = (this.orientation / 180) * Math.PI;
+            var cx = nx;
+            var cy = ny;
+            var sa = oAngleRadians - Math.PI;
+            var ea = oAngleRadians;
+            this.drawingCanvas.graphics.arc(cx, cy, step, sa, ea, false);
+
+            var nxScaled = (nx + dx) * this.turtles.scale;
+            var nyScaled = (ny + dy) * this.turtles.scale;
+
+            var radiusScaled = step * this.turtles.scale;
+
+            // Simulate an arc with line segments since Tinkercad
+            // cannot import SVG arcs reliably.
+            // Replaces:
+            // this.svgOutput += 'A ' + radiusScaled + ',' + radiusScaled + ' 0 0 1 ' + nxScaled + ',' + nyScaled + ' ';
+            // this.svgOutput += 'M ' + nxScaled + ',' + nyScaled + ' ';
+            function svgArc(me, nsteps, cx, cy, radius, sa) {
+                var a = sa;
+                var da = Math.PI / nsteps;
+                for (var i = 0; i < nsteps; i++) {
+                    var nx = cx + radius * Math.cos(a);
+                    var ny = cy + radius * Math.sin(a);
+                    me.svgOutput += nx + ',' + ny + ' ';
+                    a += da;
+                }
+            }
+
+            steps = Math.max(Math.floor(savedStroke, 1));
+            svgArc(this, steps, cx * this.turtles.scale, cy * this.turtles.scale, radiusScaled, sa);
+            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+
+            this.drawingCanvas.graphics.lineTo(ox + dx, oy + dy);
+            var nxScaled = (ox + dx) * this.turtles.scale;
+            var nyScaled = (oy + dy) * this.turtles.scale;
+            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+
+            var capAngleRadians = (this.orientation - 90) * Math.PI / 180.0;
+            var dx = step * Math.sin(capAngleRadians);
+            var dy = -step * Math.cos(capAngleRadians);
+
+            var oAngleRadians = ((this.orientation + 180) / 180) * Math.PI;
+            var cx = ox;
+            var cy = oy;
+            var sa = oAngleRadians - Math.PI;
+            var ea = oAngleRadians;
+            this.drawingCanvas.graphics.arc(cx, cy, step, sa, ea, false);
+
+            var nxScaled = (ox + dx) * this.turtles.scale;
+            var nyScaled = (oy + dy) * this.turtles.scale;
+
+            var radiusScaled = step * this.turtles.scale;
+            svgArc(this, steps, cx * this.turtles.scale, cy * this.turtles.scale, radiusScaled, sa);
+            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+
+            this.closeSVG();
+
+            // restore stroke.
+            this.stroke = savedStroke;
+            this.drawingCanvas.graphics.setStrokeStyle(this.stroke, 'round', 'round');
+            this.drawingCanvas.graphics.moveTo(nx, ny);
+        } else if (this.penState) {
             this.drawingCanvas.graphics.lineTo(nx, ny);
             if (!this.svgPath) {
                 this.svgPath = true;
@@ -123,7 +219,80 @@ function Turtle (name, turtles) {
         }
 
         // Draw an arc if the pen is down.
-        if (this.penState) {
+        if (this.penState && this.hollowState) {
+            // First, we need to close the current SVG path.
+            this.closeSVG();
+            this.svgPath = true;
+            // Save the current stroke width.
+            var savedStroke = this.stroke;
+            this.stroke = 1;
+            this.drawingCanvas.graphics.setStrokeStyle(this.stroke, 'round', 'round');
+            // Draw a hollow line.
+            if (savedStroke < 3) {
+                var step = 0.5;
+            } else {
+                var step = (savedStroke - 2) / 2.;
+            }
+
+            // Simulate an arc with line segments since Tinkercad
+            // cannot import SVG arcs reliably.
+            function svgArc(me, nsteps, cx, cy, radius, sa, ea) {
+                var a = sa;
+                var da = (ea - sa) / nsteps;
+                for (var i = 0; i < nsteps; i++) {
+                    var nx = cx + radius * Math.cos(a);
+                    var ny = cy + radius * Math.sin(a);
+                    me.svgOutput += nx + ',' + ny + ' ';
+                    a += da;
+                }
+            }
+
+            var capAngleRadians = (this.orientation + 90) * Math.PI / 180.0;
+            var dx = step * Math.sin(capAngleRadians);
+            var dy = -step * Math.cos(capAngleRadians);
+
+            if (anticlockwise) {
+                this.drawingCanvas.graphics.moveTo(ox + dx, oy + dy);
+                var oxScaled = (ox + dx) * this.turtles.scale;
+                var oyScaled = (oy + dy) * this.turtles.scale;
+            } else {
+                this.drawingCanvas.graphics.moveTo(ox - dx, oy - dy);
+                var oxScaled = (ox - dx) * this.turtles.scale;
+                var oyScaled = (oy - dy) * this.turtles.scale;
+            }
+            this.svgOutput += '<path d="M ' + oxScaled + ',' + oyScaled + ' ';
+
+            this.drawingCanvas.graphics.arc(cx, cy, radius + step, sa, ea, anticlockwise);
+            nsteps = Math.max(Math.floor(radius * Math.abs(sa - ea) / 2), 2);
+            steps = Math.max(Math.floor(savedStroke, 1));
+
+            svgArc(this, nsteps, cx * this.turtles.scale, cy * this.turtles.scale, (radius + step) * this.turtles.scale, sa, ea);
+
+            var capAngleRadians = (this.orientation + 90) * Math.PI / 180.0;
+            var dx = step * Math.sin(capAngleRadians);
+            var dy = -step * Math.cos(capAngleRadians);
+
+            var cx1 = nx;
+            var cy1 = ny;
+            var sa1 = ea;
+            var ea1 = ea + Math.PI;
+            this.drawingCanvas.graphics.arc(cx1, cy1, step, sa1, ea1, anticlockwise);
+            svgArc(this, steps, cx1 * this.turtles.scale, cy1 * this.turtles.scale, step * this.turtles.scale, sa1, ea1);
+            this.drawingCanvas.graphics.arc(cx, cy, radius - step, ea, sa, !anticlockwise);
+            svgArc(this, nsteps, cx * this.turtles.scale, cy * this.turtles.scale, (radius - step) * this.turtles.scale, ea, sa);
+            var cx2 = ox;
+            var cy2 = oy;
+            var sa2 = sa - Math.PI;
+            var ea2 = sa;
+            this.drawingCanvas.graphics.arc(cx2, cy2, step, sa2, ea2, anticlockwise);
+            svgArc(this, steps, cx2 * this.turtles.scale, cy2 * this.turtles.scale, step * this.turtles.scale, sa2, ea2);
+            this.closeSVG();
+
+            // restore stroke.
+            this.stroke = savedStroke;
+            this.drawingCanvas.graphics.setStrokeStyle(this.stroke, 'round', 'round');
+            this.drawingCanvas.graphics.moveTo(nx, ny);
+        } else if (this.penState) {
             this.drawingCanvas.graphics.arc(cx, cy, radius, sa, ea, anticlockwise);
             if (!this.svgPath) {
                 this.svgPath = true;
@@ -180,14 +349,17 @@ function Turtle (name, turtles) {
 
         // Clear all media.
         for (i = 0; i < this.media.length; i++) {
+            // Could be in the image Container or the Stage
+            this.imageContainer.removeChild(this.media[i]);
             this.turtles.stage.removeChild(this.media[i]);
+            delete this.media[i];
         }
-        // FIX ME: potential memory leak
         this.media = [];
 
         // Clear all graphics.
         this.penState = true;
         this.fillState = false;
+        this.hollowState = false;
 
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
         this.drawingCanvas.graphics.clear();
@@ -212,9 +384,9 @@ function Turtle (name, turtles) {
         var oy = this.turtles.screenY2turtleY(this.container.y);
 
         // new turtle point
-        var rad = this.orientation * Math.PI / 180.0;
-        var nx = ox + Number(steps) * Math.sin(rad);
-        var ny = oy + Number(steps) * Math.cos(rad);
+        var angleRadians = this.orientation * Math.PI / 180.0;
+        var nx = ox + Number(steps) * Math.sin(angleRadians);
+        var ny = oy + Number(steps) * Math.cos(angleRadians);
 
         this.move(ox, oy, nx, ny, true);
         this.turtles.refreshCanvas();
@@ -240,14 +412,37 @@ function Turtle (name, turtles) {
     }
 
     this.doArc = function(angle, radius) {
+        // Break up arcs into chucks of 90 degrees or less (in order
+        // to have exported SVG properly rendered).
+        if (radius < 0) {
+            radius = -radius;
+        }
+        var adeg = Number(angle);
+        if (adeg < 0) {
+            var factor = -1;
+            adeg = -adeg;
+        } else {
+            var factor = 1;
+        }
+        var remainder = adeg % 90;
+        var n = Math.floor(adeg / 90);
+        for (var i = 0; i < n; i++) {
+            this.doArcPart(90 * factor, radius);
+        }
+        if (remainder > 0) {
+            this.doArcPart(remainder * factor, radius);
+        }
+    }
+
+    this.doArcPart = function(angle, radius) {
         if (!this.fillState) {
             this.drawingCanvas.graphics.beginStroke(this.canvasColor);
             this.drawingCanvas.graphics.setStrokeStyle(this.stroke, 'round', 'round');
             this.drawingCanvas.graphics.moveTo(this.container.x, this.container.y);
         }
         var adeg = Number(angle);
-        var arad = (adeg / 180) * Math.PI;
-        var orad = (this.orientation / 180) * Math.PI;
+        var angleRadians = (adeg / 180) * Math.PI;
+        var oAngleRadians = (this.orientation / 180) * Math.PI;
         var r = Number(radius);
 
         // old turtle point
@@ -258,21 +453,21 @@ function Turtle (name, turtles) {
             var anticlockwise = true;
             adeg = -adeg;
             // center point for arc
-            var cx = ox - Math.cos(orad) * r;
-            var cy = oy + Math.sin(orad) * r;
+            var cx = ox - Math.cos(oAngleRadians) * r;
+            var cy = oy + Math.sin(oAngleRadians) * r;
             // new position of turtle
-            var nx = cx + Math.cos(orad + arad) * r;
-            var ny = cy - Math.sin(orad + arad) * r;
+            var nx = cx + Math.cos(oAngleRadians + angleRadians) * r;
+            var ny = cy - Math.sin(oAngleRadians + angleRadians) * r;
         } else {
             var anticlockwise = false;
             // center point for arc
-            var cx = ox + Math.cos(orad) * r;
-            var cy = oy - Math.sin(orad) * r;
+            var cx = ox + Math.cos(oAngleRadians) * r;
+            var cy = oy - Math.sin(oAngleRadians) * r;
             // new position of turtle
-            var nx = cx - Math.cos(orad + arad) * r;
-            var ny = cy + Math.sin(orad + arad) * r;
+            var nx = cx - Math.cos(oAngleRadians + angleRadians) * r;
+            var ny = cy + Math.sin(oAngleRadians + angleRadians) * r;
         }
-        this.arc(cx, cy, ox, oy, nx, ny, r, orad, orad + arad, anticlockwise, true);
+        this.arc(cx, cy, ox, oy, nx, ny, r, oAngleRadians, oAngleRadians + angleRadians, anticlockwise, true);
 
         if (anticlockwise) {
             this.doRight(-adeg);
@@ -285,14 +480,14 @@ function Turtle (name, turtles) {
     this.doShowImage = function(size, myImage) {
         // Add an image object to the canvas
         // Is there a JS test for a valid image path?
-        if (!myImage) {
+        if (myImage == null) {
             return;
         }
         var image = new Image();
         var me = this;
         image.onload = function() {
             var bitmap = new createjs.Bitmap(image);
-            me.turtles.stage.addChild(bitmap);
+            me.imageContainer.addChild(bitmap);
             me.media.push(bitmap);
             bitmap.scaleX = Number(size) / image.width;
             bitmap.scaleY = bitmap.scaleX;
@@ -309,7 +504,7 @@ function Turtle (name, turtles) {
 
     this.doShowURL = function(size, myURL) {
         // Add an image object from a URL to the canvas
-        if (!myURL) {
+        if (myURL == null) {
             return;
         }
         var image = new Image();
@@ -317,7 +512,7 @@ function Turtle (name, turtles) {
         var me = this;
         image.onload = function() {
             var bitmap = new createjs.Bitmap(image);
-            me.turtles.stage.addChild(bitmap);
+            me.imageContainer.addChild(bitmap);
             me.media.push(bitmap);
             bitmap.scaleX = Number(size) / image.width;
             bitmap.scaleY = bitmap.scaleX;
@@ -333,7 +528,7 @@ function Turtle (name, turtles) {
 
     this.doTurtleShell = function(size, myImage) {
         // Add image to turtle
-        if (!myImage) {
+        if (myImage == null) {
             return;
         }
         var image = new Image();
@@ -364,7 +559,7 @@ function Turtle (name, turtles) {
             hitArea.y = -bounds.height / 2;
             me.container.hitArea = hitArea;
 
-            if (me.startBlock) {
+            if (me.startBlock != null) {
                 me.startBlock.container.removeChild(me.decorationBitmap);
                 me.decorationBitmap = new createjs.Bitmap(myImage);
                 me.startBlock.container.addChild(me.decorationBitmap);
@@ -491,6 +686,16 @@ function Turtle (name, turtles) {
         this.fillState = false;
     }
 
+    this.doStartHollowLine = function() {
+        /// start tracking points here
+        this.hollowState = true;
+    }
+
+    this.doEndHollowLine = function() {
+        /// redraw the points with fill enabled
+        this.hollowState = false;
+    }
+
     this.closeSVG = function() {
         if (this.svgPath) {
             this.svgOutput += '" style="stroke-linecap:round;fill:';
@@ -526,35 +731,24 @@ function Turtles(canvas, stage, refreshCanvas) {
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
 
-    this.add = function(startBlock, infoDict, note) {
-        // Add a new turtle for each start block and for each note to be played in the music-matrix
-        if (startBlock) {
+    this.add = function(startBlock, infoDict) {
+        // Add a new turtle for each start block
+        if (startBlock != null) {
             console.log('adding a new turtle ' + startBlock.name);
-        }
-        else if (note)
-        {
-            //console.log('adding a new turtle ' + note);   
-        }
-        else {
-            console.log('adding a new turtle startBlock and note is null');
+        } else {
+            console.log('adding a new turtle startBlock is null');
         };
 
         var blkInfoAvailable = false;
 
-        if (infoDict && typeof(infoDict) == 'object') {
+        if (typeof(infoDict) == 'object') {
           if (Object.keys(infoDict).length == 8) {
             blkInfoAvailable = true;
           }
         }
 
         var i = this.turtleList.length;
-        var turtleName = ''
-        if(note)
-        {
-            turtleName =note +'note' + i.toString();
-        }
-        else
-        var turtleName = i.toString();    
+        var turtleName = i.toString();
         var myTurtle = new Turtle(turtleName, this);
 
         if (blkInfoAvailable) {
@@ -565,6 +759,9 @@ function Turtles(canvas, stage, refreshCanvas) {
         this.turtleList.push(myTurtle);
 
         // Each turtle needs its own canvas.
+        myTurtle.imageContainer = new createjs.Container();
+        console.log('creating image container');
+        this.stage.addChild(myTurtle.imageContainer);
         myTurtle.drawingCanvas = new createjs.Shape();
         this.stage.addChild(myTurtle.drawingCanvas);
         // In theory, this prevents some unnecessary refresh of the
@@ -595,7 +792,7 @@ function Turtles(canvas, stage, refreshCanvas) {
             myTurtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
             myTurtle.startBlock = startBlock;
-            if (startBlock) {
+            if (startBlock != null) {
                 myTurtle.decorationBitmap = myTurtle.bitmap.clone();
                 startBlock.container.addChild(myTurtle.decorationBitmap);
                 myTurtle.decorationBitmap.name = 'decoration';
@@ -609,11 +806,14 @@ function Turtles(canvas, stage, refreshCanvas) {
             me.refreshCanvas();
         }
 
-        makeTurtleBitmap(this, TURTLESVG.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', processTurtleBitmap, startBlock);
+        if (sugarizerCompatibility.isInsideSugarizer()) {
+          makeTurtleBitmap(this, TURTLESVG.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke), 'turtle', processTurtleBitmap, startBlock);
+        } else {
+          makeTurtleBitmap(this, TURTLESVG.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', processTurtleBitmap, startBlock);
+        }
 
         myTurtle.color = i * 10;
         myTurtle.canvasColor = getMunsellColor(myTurtle.color, DEFAULTVALUE, DEFAULTCHROMA);
-
         var turtles = this;
 
         myTurtle.container.on('mousedown', function(event) {
@@ -707,10 +907,11 @@ function Turtles(canvas, stage, refreshCanvas) {
 }
 
 // Queue entry for managing running blocks.
-function Queue (blk, count, parentBlk) {
+function Queue (blk, count, parentBlk, args) {
     this.blk = blk;
     this.count = count;
     this.parentBlk = parentBlk;
+    this.args = args
 }
 
 

@@ -219,6 +219,8 @@ function Block(protoblock, blocks, overrideName) {
             case 'tuplet':
             case 'tuplet2':
             case 'repeat':
+            case 'fill':
+            case 'hollowline':
             case 'clamp':
             case 'forever':
             case 'if':
@@ -1210,6 +1212,8 @@ function loadEventHandlers(myBlock) {
             myBlock.y = myBlock.container.y;
             var dx = Math.round(myBlock.container.x - oldX);
             var dy = Math.round(myBlock.container.y - oldY);
+            // console.log('>>>>>>>>>>>');
+            // console.log(myBlock.name + ' ' + 'dx: ' + dx + ' dy: ' + dy);
 
             // If we are over the trash, warn the user.
             if (trashcan.overTrashcan(event.stageX / blocks.scale, event.stageY / blocks.scale)) {
@@ -1233,6 +1237,7 @@ function loadEventHandlers(myBlock) {
                     var blk = blocks.dragGroup[b];
                     if (b != 0) {
                         blocks.moveBlockRelative(blk, dx, dy);
+                        // console.log(blocks.blockList[blk].name + ' ' + 'dx: ' + dx + ' dy: ' + dy);
                     }
                 }
             }

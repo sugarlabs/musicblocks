@@ -1128,15 +1128,75 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     }
                 }
                 break;
+            case 'fill':
+                logo.turtles.turtleList[turtle].doStartFill();
+
+                childFlow = args[0];
+                childFlowCount = 1;
+
+                var listenerName = '_fill_';
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
+                    } else {
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
+                    }
+                }
+
+                var listener = function (event) {
+                    logo.turtles.turtleList[turtle].doEndFill();
+                }
+
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
+                break;
+            // Deprecated
             case 'beginfill':
                 logo.turtles.turtleList[turtle].doStartFill();
                 break;
+            // Deprecated
             case 'endfill':
                 logo.turtles.turtleList[turtle].doEndFill();
                 break;
+            case 'hollowline':
+                logo.turtles.turtleList[turtle].doStartHollowLine();
+
+                childFlow = args[0];
+                childFlowCount = 1;
+
+                var listenerName = '_hollowline_';
+                var endBlk = logo.getBlockAtEndOfFlow(childFlow, null);
+                if (endBlk[0] != null) {
+                    if (endBlk[0] in logo.endOfFlowSignals[turtle]) {
+                        logo.endOfFlowSignals[turtle][endBlk[0]].push(listenerName);
+                        logo.endOfFlowClamps[turtle][endBlk[0]].push(endBlk[1]);
+                    } else {
+                        logo.endOfFlowSignals[turtle][endBlk[0]] = [listenerName];
+                        logo.endOfFlowClamps[turtle][endBlk[0]] = [endBlk[1]];
+                    }
+                }
+
+                var listener = function (event) {
+                    logo.turtles.turtleList[turtle].doEndHollowLine();
+                }
+
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
+                break;
+            // Deprecated
             case 'beginhollowline':
                 logo.turtles.turtleList[turtle].doStartHollowLine();
                 break;
+            // Deprecated
             case 'endhollowline':
                 logo.turtles.turtleList[turtle].doEndHollowLine();
                 break;
@@ -2200,10 +2260,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // flow as completed.
         var lastBlk = blk;
         var newLoopClamp = null;
-        while (blk != null && blk != -1) {
+        // console.log(blk + ': ' + this.blocks.blockList[blk].name);
+        while (blk != null) {
             if (blk != null && this.loopBlock(this.blocks.blockList[blk].name)) {
-                if (last(this.blocks.blockList[blk].connections)) {
-                    console.log(blk + ' ' + this.blocks.blockList[blk].name + ' ' + last(this.blocks.blockList[blk].connections));
+                // console.log(blk + ' is a loopClamp');
+                // console.log(last(this.blocks.blockList[blk].connections));
+                if (last(this.blocks.blockList[blk].connections) == null) {
+                    // console.log(blk + ' ' + this.blocks.blockList[blk].name + ' ' + last(this.blocks.blockList[blk].connections));
                     newLoopClamp = blk;
                 }
             }
@@ -2216,8 +2279,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             loopClamp = newLoopClamp;
         }
 
+        // console.log(loopClamp);
+
         // Do we need to recurse?
         if (this.blocks.blockList[lastBlk].isClampBlock()) {
+            // console.log('recusing... ' + this.blocks.blockList[lastBlk].name);
             var i = this.blocks.blockList[lastBlk].protoblock.args;
             return this.getBlockAtEndOfFlow(this.blocks.blockList[lastBlk].connections[i], loopClamp);
         } else if (['do', 'doArg'].indexOf(this.blocks.blockList[lastBlk].name) != -1) {
@@ -2235,6 +2301,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             }
         }
 
+        // console.log(lastBlk + ' ' + loopClamp);
         return [lastBlk, loopClamp];
     }
 
