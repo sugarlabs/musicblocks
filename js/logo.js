@@ -2086,6 +2086,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         if (blk in logo.endOfFlowSignals[turtle]) {
             // There is a list of signals and parent clamps. Each
             // needs to be handled separately.
+            var garbage = [];
+            // console.log(logo.endOfFlowSignals[turtle][blk]);
             var notationDispatches = [];
             // for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
             for (var i = logo.endOfFlowSignals[turtle][blk].length - 1; i >= 0; i--) {
@@ -2104,11 +2106,19 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     // Mark issued signals as null
                     logo.endOfFlowSignals[turtle][blk][i] = null;
                     logo.endOfFlowClamps[turtle][blk][i] = null;
+                    garbage.push(i);
                 }
             }
             for (var i = 0; i < notationDispatches.length; i++) {
                 console.log('dispatching ' + notationDispatches[i]);
                 logo.stage.dispatchEvent(notationDispatches[i]);
+            }
+            // Garbage collection
+            // console.log(logo.endOfFlowSignals[turtle][blk]);
+            for (var i = 0; i < garbage.length; i++) {
+                // console.log('removing entry ' + garbage[i] + ' from list: ' + logo.endOfFlowSignals[turtle][blk][garbage[i]]);
+                logo.endOfFlowSignals[turtle][blk] = logo.endOfFlowSignals[turtle][blk].splice(garbage[i], 1); 
+                logo.endOfFlowClamps[turtle][blk] = logo.endOfFlowClamps[turtle][blk].splice(garbage[i], 1); 
             }
         }
 
