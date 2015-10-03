@@ -18,21 +18,21 @@ pitches will be associated with each note. (Note that you can play
 chords by selecting multiple pitches within a single column.)
 
 <img
-src='https://rawgithub.com/walterbender/turtleblocksjs/master/header-icons/play-button.svg'
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg'
 height="36"</img> You can playback the notes in the matrix by clicking
 on the Play Button.
 
 <img
-src='https://rawgithub.com/walterbender/turtleblocksjs/master/header-icons/download.svg'
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/download.svg'
 height="36"</img> Use the Save Button to create a stack of blocks that
 will recreate the "chunk of notes" you've created under control of
 your program.
 
 <img
-src='https://rawgithub.com/walterbender/turtleblocksjs/master/header-icons/erase-button.svg' height="36"</img> You can erase the matrix by clicking on the Erase Button.
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg' height="36"</img> You can erase the matrix by clicking on the Erase Button.
 
 <img
-src='https://rawgithub.com/walterbender/turtleblocksjs/master/header-icons/close-button.svg' height="36"</img> Close the matrix by clicking on the Close Button.
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg' height="36"</img> Close the matrix by clicking on the Close Button.
 
 To write programs, click on (or dragging) blocks from the various
 palettes.  Use multiple blocks to create music and drawings; as the
@@ -62,45 +62,45 @@ Main toolbar
 The Main toolbar is used to run programs, erase the screen, and hide
 the palettes and blocks.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/fast-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/fast-button.png'</img>
 
 Run the blocks fast.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/slow-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/slow-button.png'</img>
 
 Run the blocks slowly. When running slowly, the values of parameter
 boxes are shown as an additional debugging aid.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/step-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/step-button.png'</img>
 
 Run the blocks step by step (one block is executed per turtle per click).
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/stop-turtle-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/stop-turtle-button.png'</img>
 
 Stop running the current project.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/clear-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/clear-button.png'</img>
 
 Clear the screen and return the turtles to their initial positions in
 the center of the screen.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/palette-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/palette-button.png'</img>
 
 Hide or show the block palettes.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/hide-blocks-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/hide-blocks-button.png'</img>
 
 Hide or show the blocks and the block palettes.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/collapse-blocks-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/collapse-blocks-button.png'</img>
 
 Expand or collapse stacks of blocks (start and action stacks).
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/help-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/help-button.png'</img>
 
 Show the help messages.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/menu-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/menu-button.png'</img>
 
 Expand or collapse the auxillary toolbar.
 
@@ -113,11 +113,11 @@ programs, overlaying grids, and accessing the utility panel. The
 Auxillary toolbar button on the Main toolbar (top right) is used to
 show/hide the Auxillary toolbar.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/planet-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/planet-button.png'</img>
 
 Open a viewer for loading example projects.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/copy-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/copy-button.png'</img>
 
 Copy blocks onto the clipboard. (This button appears at the top of a
 stack after a "long press".)
@@ -126,16 +126,16 @@ Also shown on after a long press is the Save Action-stack button. This
 will save an action stack on the custom palette for use in other
 projects.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/paste-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/paste-button.png'</img>
 
 Paste blocks from the clipboard. (This button is highlighted only when
 there are blocks available on the clipboard to paste.)
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/Cartesian-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/Cartesian-button.png'</img>
 
 Show or hide a Cartesian-coordinate grid.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/polar-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/polar-button.png'</img>
 
 Show or hide a polar-coordinate grid.
 
@@ -145,11 +145,11 @@ Open utility panel to access controls for changing block size, loading
 plugins, looking at project statistics, and enabling/disabling
 scrolling.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/empty-trash-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/empty-trash-button.png'</img>
 
 Remove all blocks.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/restore-trash-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/restore-trash-button.png'</img>
 
 Restore blocks from the trash.
 
@@ -166,7 +166,7 @@ Decrease the size of the blocks.
 
 Increase the size of the blocks.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/stats-button.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/documentation/stats-button.png'</img>
 
 Show project statistics.
 
@@ -243,7 +243,7 @@ matrix.
 As a convenience, blocks for some individual notes are also
 provided. They also create columns in the matrix.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/tupletnote.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/tuplet.svg'</img>
 
 A tuplet is a collection of notes that are scaled to map into a
 specified duration. For example, you can pack three quarter notes into
