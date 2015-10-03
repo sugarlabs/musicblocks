@@ -275,6 +275,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     duplicateFactor.adjustWidthToLabel();
     duplicateFactor.parameterBlock();
 
+    var noteVolumeBlock = new ProtoBlock('setnotevolume');
+    noteVolumeBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
+    noteVolumeBlock.staticLabels.push(_('set volume'));
+    noteVolumeBlock.adjustWidthToLabel();
+    noteVolumeBlock.oneArgBlock();
+    noteVolumeBlock.defaults.push(50);
+
+    var notevolumeFactor = new ProtoBlock('notevolumefactor');
+    notevolumeFactor.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['notevolumefactor'] = notevolumeFactor;
+    notevolumeFactor.staticLabels.push(_('note volume'));
+    notevolumeFactor.adjustWidthToLabel();
+    notevolumeFactor.parameterBlock();
+
     // Tone (utility) palette
 
     var notationBlock = new ProtoBlock('notation');
@@ -289,6 +304,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['tone'];
     blocks.protoBlockDict['meter'] = meter;
+    meter.hidden = true;
     meter.staticLabels.push('meter', 'numerator', 'denominator');
     meter.adjustWidthToLabel();
     meter.defaults.push(3);
@@ -301,6 +317,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     playfwdBlock.hidden = true;
     playfwdBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['playfwd'] = playfwdBlock;
+    playfwdBlock.hidden = true;
     playfwdBlock.staticLabels.push(_('play forward'));
     playfwdBlock.adjustWidthToLabel();
     playfwdBlock.flowClampZeroArgBlock();
@@ -309,6 +326,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.hidden = true;
     playbwdBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['playbwd'] = playbwdBlock;
+    playbwdBlock.hidden = true;
     playbwdBlock.staticLabels.push(_('play backward'));
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
