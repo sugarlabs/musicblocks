@@ -812,7 +812,7 @@ function Turtles(canvas, stage, refreshCanvas) {
                 startBlock.container.addChild(myTurtle.decorationBitmap);
                 myTurtle.decorationBitmap.name = 'decoration';
                 var bounds = startBlock.container.getBounds();
-                myTurtle.decorationBitmap.x = bounds.width - 30 * startBlock.protoblock.scale / 2;
+                myTurtle.decorationBitmap.x = bounds.width - 40 * startBlock.protoblock.scale / 2;
                 myTurtle.decorationBitmap.y = 35 * startBlock.protoblock.scale / 2;
                 myTurtle.decorationBitmap.scaleX = myTurtle.decorationBitmap.scaleY = myTurtle.decorationBitmap.scale = 0.5 * startBlock.protoblock.scale / 2
                 startBlock.container.updateCache();
