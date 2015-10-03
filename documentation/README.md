@@ -11,7 +11,7 @@ run it directly from index.html, from [GitHub]
 repo](http://rawgit.com/walterbender/musicblocks/master/index.html).
 
 <img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/chords.png'</img>
+src='https://rawgithub.com/walterbender/musicblocks/master/documentation/chords.png'</img>
 
 Once you've launched it in your browser, start by clicking on the
 Matrix Block. A matrix of pitch (vertical) vs time (horizontal) will
