@@ -10,6 +10,9 @@ run it directly from index.html, from [GitHub]
 (http://walterbender.github.io/musicblocks), or from the [github
 repo](http://rawgit.com/walterbender/musicblocks/master/index.html).
 
+<img
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/chords.png'</img>
+
 Once you've launched it in your browser, start by clicking on the
 Matrix Block. A matrix of pitch (vertical) vs time (horizontal) will
 appear. Time is broken into columns, each representing a single note,
@@ -197,3 +200,5 @@ Tone Palette
 Used to generate notation for the notes contained in the clamp. (Note
 that only notes of a value of a power of two will work in the current
 implementation.)
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/putting-it-all-together.png'</img>
