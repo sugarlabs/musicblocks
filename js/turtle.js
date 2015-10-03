@@ -20,10 +20,14 @@ var DEFAULTFONT = 'sans-serif';
 var turtlePath = 'images/turtle.svg';
 var turtleBasePath = 'images/';
 
-function Turtle (name, turtles) {
+function Turtle (name, turtles, drum) {
     this.name = name;
     this.turtles = turtles;
+    this.drum = drum;
 
+    if (drum) {
+        console.log('turtle ' + name + ' is a drum.');
+    }
     // Is the turtle running?
     this.running = false;
 
@@ -719,6 +723,7 @@ function Turtles(canvas, stage, refreshCanvas) {
     this.refreshCanvas = refreshCanvas;
     this.scale = 1.0;
     this.rotating = false;
+    this.drum = false;
 
     this.setScale = function(scale) {
         this.scale = scale;
@@ -730,6 +735,16 @@ function Turtles(canvas, stage, refreshCanvas) {
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
+
+    this.addDrum = function(startBlock, infoDict) {
+        this.drum = true;
+        this.add(startBlock, infoDict);
+    }
+
+    this.addTurtle = function(startBlock, infoDict) {
+        this.drum = false;
+        this.add(startBlock, infoDict);
+    }
 
     this.add = function(startBlock, infoDict) {
         // Add a new turtle for each start block
@@ -749,7 +764,7 @@ function Turtles(canvas, stage, refreshCanvas) {
 
         var i = this.turtleList.length;
         var turtleName = i.toString();
-        var myTurtle = new Turtle(turtleName, this);
+        var myTurtle = new Turtle(turtleName, this, this.drum);
 
         if (blkInfoAvailable) {
             myTurtle.x = infoDict['xcor'];
@@ -806,10 +821,16 @@ function Turtles(canvas, stage, refreshCanvas) {
             me.refreshCanvas();
         }
 
-        if (sugarizerCompatibility.isInsideSugarizer()) {
-          makeTurtleBitmap(this, TURTLESVG.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke), 'turtle', processTurtleBitmap, startBlock);
+        if (this.drum) {
+           var artwork = DRUMSVG;
         } else {
-          makeTurtleBitmap(this, TURTLESVG.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', processTurtleBitmap, startBlock);
+           var artwork = TURTLESVG;
+        }
+
+        if (sugarizerCompatibility.isInsideSugarizer()) {
+          makeTurtleBitmap(this, artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke), 'turtle', processTurtleBitmap, startBlock);
+        } else {
+          makeTurtleBitmap(this, artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', processTurtleBitmap, startBlock);
         }
 
         myTurtle.color = i * 10;

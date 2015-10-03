@@ -169,7 +169,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (['start', 'action'].indexOf(myBlock.name) != -1) {
+            if (['start', 'action', 'drum'].indexOf(myBlock.name) != -1) {
                 myBlock.collapseToggle();
             }
         }
@@ -1367,7 +1367,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (name == 'start') {
             postProcess = function (thisBlock) {
                 me.blockList[thisBlock].value = me.turtles.turtleList.length;
-                me.turtles.add(me.blockList[thisBlock]);
+                me.turtles.addTurtle(me.blockList[thisBlock]);
+            }
+            postProcessArg = thisBlock;
+        } else if (name == 'drum') {
+            postProcess = function (thisBlock) {
+                me.blockList[thisBlock].value = me.turtles.turtleList.length;
+                me.turtles.addDrum(me.blockList[thisBlock]);
             }
             postProcessArg = thisBlock;
         } else if (name == 'text') {
@@ -2199,6 +2205,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
             switch (name) {
                 case 'action':
+                case 'drum':
                 case 'start':
                     if (typeof(blkData[1]) == 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) == 'object' && 'collapsed' in blkData[1][1]) {
                         if (blkData[1][1]['collapsed']) {
@@ -2307,7 +2314,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     blkInfo = [blkData[1][0], {'value': null}];
                 } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) != -1) {
                     blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (['start', 'action', 'hat'].indexOf(blkData[1][0]) != -1) {
+                    if (['start', 'drum', 'action', 'hat'].indexOf(blkData[1][0]) != -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -2315,7 +2322,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
             } else {
                 blkInfo = [blkData[1], {'value': null}];
-                if (['start', 'action', 'hat'].indexOf(blkData[1]) != -1) {
+                if (['start', 'drum', 'action', 'hat'].indexOf(blkData[1]) != -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -2323,7 +2330,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (['start', 'action'].indexOf(name) != -1) {
+            if (['start', 'drum', 'action'].indexOf(name) != -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
@@ -2348,9 +2355,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         var thisBlock = args[0];
                         var blkInfo = args[1];
                         me.blockList[thisBlock].value = me.turtles.turtleList.length;
-                        me.turtles.add(me.blockList[thisBlock], blkInfo);
+                        me.turtles.addTurtle(me.blockList[thisBlock], blkInfo);
                     }
-                    this.makeNewBlockWithConnections('start', blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
+                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
+                    break;
+                case 'drum':
+                    blkData[4][0] = null;
+                    blkData[4][2] = null;
+                    postProcess = function (args) {
+                        var thisBlock = args[0];
+                        var blkInfo = args[1];
+                        me.blockList[thisBlock].value = me.turtles.turtleList.length;
+                        me.turtles.addDrum(me.blockList[thisBlock], blkInfo);
+                    }
+                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
                     break;
                 case 'action':
                 case 'hat':
@@ -2802,7 +2820,7 @@ function sendStackToTrash(blocks, myBlock) {
         myBlock.connections[0] = null;
     }
 
-    if (myBlock.name == 'start') {
+    if (myBlock.name == 'start' || myBlock.name == 'drum') {
         turtle = myBlock.value;
         if (turtle != null) {
             console.log('putting turtle ' + turtle + ' in the trash');

@@ -1049,7 +1049,7 @@ define(function (require) {
                     blocks.blockList[blk].trash = false;
                     blocks.moveBlockRelative(blk, dx, dy);
                     blocks.blockList[blk].show();
-                    if (blocks.blockList[blk].name == 'start') {
+                    if (blocks.blockList[blk].name == 'start' || blocks.blockList[blk].name == 'drum') {
                         turtle = blocks.blockList[blk].value;
                         turtles.turtleList[turtle].trash = false;
                         turtles.turtleList[turtle].container.visible = true;
@@ -1075,7 +1075,7 @@ define(function (require) {
                 blocks.blockList[blk].trash = true;
                 blocks.moveBlockRelative(blk, dx, dy);
                 blocks.blockList[blk].hide();
-                if (blocks.blockList[blk].name == 'start') {
+                if (blocks.blockList[blk].name == 'start' || blocks.blockList[blk].name == 'drum') {
                     console.log('start blk ' + blk + ' value is ' + blocks.blockList[blk].value)
                     turtle = blocks.blockList[blk].value;
                     if (turtle != null) {
@@ -1568,7 +1568,7 @@ define(function (require) {
                     var args = {
                         'value': myBlock.value
                     };
-                } else if (myBlock.name == 'start') {
+                } else if (myBlock.name == 'start' || myBlock.name == 'drum') {
                     // It's a turtle.
                     turtle = turtles.turtleList[myBlock.value];
                     var args = {
@@ -1663,7 +1663,7 @@ define(function (require) {
             for (var blk in logo.blocks.blockList) {
                 var myBlock = logo.blocks.blockList[blk];
                 var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
-                if (myBlock.name == 'start') {
+                if (myBlock.name == 'start' || myBlock.name == 'drum') {
                     var topBlock = logo.blocks.findTopBlock(thisBlock);
                     console.log('Playing through Play Button');
                     logo.runLogoCommands(topBlock);

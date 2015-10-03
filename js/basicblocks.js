@@ -795,6 +795,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     startBlock.adjustWidthToLabel();
     startBlock.stackClampZeroArgBlock();
 
+    var drumBlock = new ProtoBlock('drum');
+    drumBlock.palette = palettes.dict['actions'];
+    blocks.protoBlockDict['drum'] = drumBlock;
+    drumBlock.staticLabels.push(_('start drum'));
+    drumBlock.extraWidth = 10;
+    drumBlock.adjustWidthToLabel();
+    drumBlock.stackClampZeroArgBlock();
+
     var incrementOneBlock = new ProtoBlock('incrementOne');
     incrementOneBlock.palette = palettes.dict['blocks'];
     blocks.protoBlockDict['incrementOne'] = incrementOneBlock;

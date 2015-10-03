@@ -111,12 +111,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.denominator = 4;
 
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
-    // this.drumSynth = new Tone.DrumSynth().toMaster();
+    this.drumSynth = new Tone.DrumSynth().toMaster();
 
     // Tone.Transport.bpm.value = 90;  // Doesn't seem to do anything.
 
     var toneVol = new Tone.Volume(-20);  // DEFAULT VALUE
     this.polySynth.chain(toneVol, Tone.Master);
+    this.drumSynth.chain(toneVol, Tone.Master);
 
     //tone
     this.startTime = 0;
@@ -396,7 +397,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         this.blocks.findStacks();
         this.actions = {};
         for (var blk = 0; blk < this.blocks.stackList.length; blk++) {
-            if (this.blocks.blockList[this.blocks.stackList[blk]].name == 'start') {
+            if (this.blocks.blockList[this.blocks.stackList[blk]].name == 'start' || this.blocks.blockList[this.blocks.stackList[blk]].name == 'drum') {
                 // Don't start on a start block in the trash.
                 if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
                     // Don't start on a start block with no connections.
@@ -443,7 +444,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             // If a block to start from was passed, find its
             // associated turtle, i.e., which turtle should we use?
             var turtle = 0;
-            if (this.blocks.blockList[startHere].name == 'start') {
+            if (this.blocks.blockList[startHere].name == 'start' || this.blocks.blockList[startHere].name == 'drum') {
                 var turtle = this.blocks.blockList[startHere].value;
                 console.log('starting on start with turtle ' + turtle);
             } else {
@@ -504,7 +505,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     continue;
                 } else {
                     if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
-                        if (this.blocks.blockList[this.blocks.stackList[blk]].name == 'start' && this.blocks.blockList[this.blocks.stackList[blk]].connections[1] == null) {
+                        if ((this.blocks.blockList[this.blocks.stackList[blk]].name == 'start' || this.blocks.blockList[this.blocks.stackList[blk]].name == 'drum') && this.blocks.blockList[this.blocks.stackList[blk]].connections[1] == null) {
                             continue;
                         }
                         // This is a degenerative case.
@@ -673,6 +674,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'start':
+            case 'drum':
                 if (args.length == 1) {
                     childFlow = args[0];
                     childFlowCount = 1;
@@ -1714,8 +1716,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             var notes = [];
                             var notationNotes = [];
 
-                            logo.polySynth.toMaster();
-                            // logo.drumSynth.toMaster();
+                            console.log(logo.turtles.turtleList[turtle].drum);
+                            if (logo.turtles.turtleList[turtle].drum) {
+                                logo.drumSynth.toMaster();
+                            } else {
+                                logo.polySynth.toMaster();
+                            }
 
                             for (i in logo.noteNotes[turtle]) {
                                 note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
@@ -1733,8 +1739,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                 for (var i = 0; i < notes.length; i++) {
                                     notes[i] = notes[i].replace(/♭/g, 'b');
                                 }
-                                logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
-                                // logo.drumSynth.triggerAttackRelease("C2", 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                if (logo.turtles.turtleList[turtle].drum) {
+                                    logo.drumSynth.triggerAttackRelease("C2", 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                } else {
+                                    logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                }
                                 Tone.Transport.start();
                             }
                         }
@@ -2005,7 +2014,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         console.log(vol);
                         logo.polyVolume[turtle] = vol;
                         var toneVol = new Tone.Volume(vol);
-                        logo.polySynth.chain(toneVol, Tone.Master);
+                        if (logo.turtles.turtleList[turtle].drum) {
+                            logo.drumSynth.chain(toneVol, Tone.Master);
+                        } else {
+                            logo.polySynth.chain(toneVol, Tone.Master);
+                        }
                     }
                 }
                 break;
@@ -2366,7 +2379,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         for (var blk in this.blocks.blockList) {
             var name = this.blocks.blockList[blk].name;
             var targetTurtle = this.blocks.blockList[blk].value;
-            if (name == 'start' && targetTurtle == targetTurtleName) {
+            if ((name == 'start' || name == 'drum') && targetTurtle == targetTurtleName) {
                 startHere = blk;
                 break;
             }
