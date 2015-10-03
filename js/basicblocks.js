@@ -59,7 +59,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
-    matrixBlock.staticLabels.push(_('matrix'));
+    matrixBlock.staticLabels.push(_('graphical notation matrix'));
     matrixBlock.extraWidth = 10;
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
