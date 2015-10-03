@@ -5,8 +5,10 @@ Music Blocks is a fork of Turtle Blocks. It has extensions for
 exploring music: pitch and rhythm.
 
 Music Blocks is designed to run in a browser. Most of the development
-has been done in Chrome, but it should also work in Firefox. You can
-run it directly from index.html, from [GitHub]
+has been done in Chrome, but it should also work in Safari. It may or
+may not run in Firefox (there seem to be some outstanding issues with
+the tone.js library) and it will not run in IE. You can run it directly
+from index.html, from [GitHub]
 (http://walterbender.github.io/musicblocks), or from the [github
 repo](http://rawgit.com/walterbender/musicblocks/master/index.html).
 
