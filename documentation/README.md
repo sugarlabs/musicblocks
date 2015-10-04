@@ -143,7 +143,10 @@ column in the matrix.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/key.svg'</img>
 
-The Set Key Block is used to set the key for the mapping between the Solfage and notes using a "movable" system (See [Solfage](https://en.wikipedia.org/wiki/Solf%C3%A8ge) for more details).
+The Set Key Block is used to set the key for the mapping between the
+Solfage and notes using a "movable" system (See
+[Solfage](https://en.wikipedia.org/wiki/Solf%C3%A8ge) for more
+details).
 
 The Key Block contains the current Key, by default, C Major.
 
@@ -174,7 +177,9 @@ Used to raise any contained notes by one step in a 12-step scale.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/transposition.svg'</img>
 
-Used to transpose any contained notes by an integral step in a 12-step scale. The Transposition Block contains the current transposition (the default is 0).
+Used to transpose any contained notes by an integral step in a 12-step
+scale. The Transposition Block contains the current transposition (the
+default is 0).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/multiply-beat.svg'</img>
 
@@ -182,17 +187,25 @@ Used to transpose any contained notes by an integral step in a 12-step scale. Th
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/beat-factor.svg'</img>
 
-Used to adjust the beat of any contained notes. Multiplying the beat will speed things up; dividing the beat will slow things down. The Beat-factor Block contains the current beat factor (the default is 1).
+Used to adjust the beat of any contained notes. Multiplying the beat
+will speed things up; dividing the beat will slow things down. The
+Beat-factor Block contains the current beat factor (the default is 1).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/dot.svg'</img>
 
-Used to dot any contained notes. A dotted note plays for 50% longer than the original note, e.g., a dotted quarter note is equivalent to a 3/8 note. Double-dotting is not yet supported. (When used with the Tuplet Block, the duration of the tuplet is extended by 50%.)
+Used to dot any contained notes. A dotted note plays for 50% longer
+than the original note, e.g., a dotted quarter note is equivalent to a
+3/8 note. Double-dotting is not yet supported. (When used with the
+Tuplet Block, the duration of the tuplet is extended by 50%.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/duplicate-notes.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/duplicate-factor.svg'</img>
 
-Used to repeat any contained notes. Similar to using a Repeat block, but rather than repeating a sequence of notes multiple times, each note is repeated in turn, e.g. duplicate x2 of 4 4 8 would result in 4 4 4 4 8 8, where as repeat x2 of 4 4 8 would result in 4 4 8 4 4 8.
+Used to repeat any contained notes. Similar to using a Repeat block,
+but rather than repeating a sequence of notes multiple times, each
+note is repeated in turn, e.g. duplicate x2 of 4 4 8 would result in 4
+4 4 4 8 8, where as repeat x2 of 4 4 8 would result in 4 4 8 4 4 8.
 
 Tone Palette
 ------------
@@ -204,3 +217,18 @@ that only notes of a value of a power of two will work in the current
 implementation.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/putting-it-all-together.png'</img>
+
+Blocks Palette
+--------------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/drum.svg'</img>
+
+Multiple Start blocks can be used for multiple voices. Use the "Rabbit
+button" on the Main toolbar to run all of the Start blocks
+simultaneously. A Drum Block is provided to create drum beats (using a
+separate synthesizer).
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/chunk.svg'</img>
+
+"Chunk" blocks also found on this palette (at the bottom). Use them to
+run the Action stacks created from the Matrix.

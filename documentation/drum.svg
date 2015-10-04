@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg3641"
+   height="151.1241"
+   width="156"
+   version="1.1">
+  <path
+     style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3660"
+     d="m 1,29.56205 0,-8 c 0,-4.418278 3.581722,-8 8,-8 l 8,0 10,-12.0000001 10,12.0000001 18,0 84,0 8,0 c 4.41828,0 8,3.581722 8,8 l 0,8 0,8 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -84,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.522847,0 -10,4.477153 -10,10 l 0,8 0,8 0,8 c 0,5.522847 4.477153,10 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.581722,8 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.418278,0 -8,-3.58172 -8,-8 l 0,-8 z" />
+  <text
+     y="0.56204993"
+     x="1.4003719e-32"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text3662">
+    <tspan
+       id="tspan3664"
+       y="43.56205"
+       x="8">start drum</tspan>
+  </text>
+  <g
+     id="g4253">
+    <path
+       style="display:inline;fill:#ff0000;stroke:#ff0000;stroke-width:1.67980254;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;fill-opacity:1"
+       d="m 127.65587,29.189613 17.05719,0 c 0.37052,0 0.67192,0.301405 0.67192,0.673361 l 0,1.133627 c 0,0.370037 -0.3014,0.672401 -0.67192,0.672401 l -17.05719,0 c -0.37196,0 -0.67337,-0.301405 -0.67337,-0.672401 l 0,-1.133147 c 0,-0.372916 0.30093,-0.673841 0.67337,-0.673841 z"
+       display="inline"
+       id="path8" />
+    <rect
+       style="display:inline;fill:#ffaaaa;stroke:#ff0000;stroke-width:1.67980254;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       display="inline"
+       height="10.620192"
+       id="rect10"
+       width="15.904851"
+       x="128.23132"
+       y="31.669003" />
+    <path
+       style="display:inline;fill:#ff0000;stroke:#ff0000;stroke-width:1.67980254;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;fill-opacity:1"
+       d="m 127.65587,42.289194 17.05719,0 c 0.37052,0 0.67192,0.300924 0.67192,0.672401 l 0,1.133626 c 0,0.371957 -0.3014,0.674321 -0.67192,0.674321 l -17.05719,0 c -0.37196,0 -0.67337,-0.301884 -0.67337,-0.674321 l 0,-1.133626 c 0,-0.369557 0.30093,-0.672401 0.67337,-0.672401 z"
+       display="inline"
+       id="path17" />
+    <path
+       style="display:inline;fill:none;stroke:#ff0000;stroke-width:1.67980254;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       d="m 128.23084,42.288234 4.10064,-10.619232 3.78963,10.618752 3.80403,-10.619232"
+       display="inline"
+       id="path19" />
+    <path
+       style="display:inline;fill:none;stroke:#ff0000;stroke-width:1.67980254;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       d="M 144.13425,42.288234 139.92514,31.669002"
+       display="inline"
+       id="path21" />
+    <line
+       style="display:inline;fill:none;stroke:#ff0000;stroke-width:1.67980254;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       display="inline"
+       id="line27"
+       x1="139.19228"
+       x2="146.22153"
+       y1="26.765898"
+       y2="23.309824" />
+    <line
+       style="display:inline;fill:none;stroke:#ff0000;stroke-width:1.67980254;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       display="inline"
+       id="line29"
+       x1="125.92279"
+       x2="132.93765"
+       y1="21.517235"
+       y2="25.004986" />
+    <path
+       style="display:inline;fill:#ffaaaa;stroke:#ff0000;stroke-width:1.07987309;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       d="m 135.3676,25.159527 c 0.26397,0.696398 -0.0821,1.471507 -0.77175,1.733556 -0.68968,0.26157 -1.46335,-0.09023 -1.72732,-0.786627 -0.26253,-0.695918 0.0835,-1.471987 0.77223,-1.734036 0.69016,-0.26013 1.46335,0.09119 1.72684,0.787107 z"
+       display="inline"
+       id="path23" />
+    <path
+       style="display:inline;fill:#ffaaaa;stroke:#ff0000;stroke-width:1.07987309;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       d="m 139.02333,28.346353 c -0.49914,0.539936 -1.34288,0.570652 -1.88522,0.06911 -0.54138,-0.501061 -0.57449,-1.344322 -0.0744,-1.884738 0.49962,-0.539937 1.34384,-0.571133 1.88426,-0.07007 0.54185,0.501541 0.57593,1.345282 0.0753,1.885699 z"
+       display="inline"
+       id="path25" />
+  </g>
+</svg>
