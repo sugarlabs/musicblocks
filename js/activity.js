@@ -932,6 +932,7 @@ define(function (require) {
             } else {
                 switch (event.keyCode) {
                     case TAB:
+                        break;
                     case ESC:
                         // toggle full screen
                         toggleToolbar();
