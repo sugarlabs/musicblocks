@@ -2308,7 +2308,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 this.tupletRhythms.push(['', 1, noteValue]);
             }
         } else {
-            this.textMsg(this.blocks.blockList[blk].protoblock.staticLabels[0]);
+            this.doWait(turtle, 2 / noteValue);
+            // this.textMsg(this.blocks.blockList[blk].protoblock.staticLabels[0]);
         }
     }
 
