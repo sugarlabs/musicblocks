@@ -1716,7 +1716,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             var notes = [];
                             var notationNotes = [];
 
-                            console.log(logo.turtles.turtleList[turtle].drum);
+                            // console.log(logo.turtles.turtleList[turtle].drum);
                             if (logo.turtles.turtleList[turtle].drum) {
                                 logo.drumSynth.toMaster();
                             } else {
@@ -1734,13 +1734,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             logo.notesPlayed[turtle].push(notationNotes);
 
                             if (notes.length > 0) {
-                                // Use the beatValue of the first note in the
-                                // group since there can only be one.
                                 for (var i = 0; i < notes.length; i++) {
                                     notes[i] = notes[i].replace(/♭/g, 'b');
                                 }
+
+                                // Use the beatValue of the first note in the
+                                // group since there can only be one.
                                 if (logo.turtles.turtleList[turtle].drum) {
-                                    logo.drumSynth.triggerAttackRelease("C2", 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                    logo.drumSynth.triggerAttackRelease(notes[0], 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
                                 } else {
                                     logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
                                 }
