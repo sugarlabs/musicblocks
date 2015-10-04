@@ -232,11 +232,8 @@ define(function (require) {
             [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
             [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'header-icons/hide-blocks-button.svg'],
             [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
-            [_('Save Notations'), _('Click to Download the Music Notations in png (image) format'), 'header-icons/download-button.svg'],
             [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
-            [_('Play'), _('FUTURE FEATURE: Plays the Music which is inside the start block. ("Runs" the functions strung together in start block.)'), 'header-icons/play-button.svg'],
             [_('Stop'), _('Stop the Music.'), 'header-icons/stop-turtle-button.svg'],
-            [_('Matrix'), _('The Matrix, once generated using Pitch and Rhythm blocks, becomes a workspace for designing musical patterns--like melodies and chords.'), 'header-icons/stop-turtle-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
             [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'header-icons/copy-button.svg'],
@@ -252,7 +249,7 @@ define(function (require) {
             [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-button.svg'],
             [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
             [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
-            [_('Congratulations.'), _('You have finished the tour. Please enjoy Turtle Blocks!'), 'activity/activity-icon-color.svg']
+            [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-color.svg']
         ]
 
         pluginsImages = {};
