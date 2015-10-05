@@ -1734,8 +1734,15 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             logo.notesPlayed[turtle].push(notationNotes);
 
                             if (notes.length > 0) {
-                                for (var i = 0; i < notes.length; i++) {
-                                    notes[i] = notes[i].replace(/♭/g, 'b');
+                                if (logo.turtles.turtleList[turtle].drum) {
+                                    for (var i = 0; i < notes.length; i++) {
+                                        // Remove pitch
+                                        notes[i] = 'C2';
+                                    }
+                                } else {
+                                    for (var i = 0; i < notes.length; i++) {
+                                        notes[i] = notes[i].replace(/♭/g, 'b');
+                                    }
                                 }
 
                                 // Use the beatValue of the first note in the
