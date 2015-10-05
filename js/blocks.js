@@ -169,7 +169,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (['start', 'action', 'drum'].indexOf(myBlock.name) != -1) {
+            if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) != -1) {
                 myBlock.collapseToggle();
             }
         }
@@ -2210,6 +2210,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
             switch (name) {
                 case 'action':
+                case 'matrix':
                 case 'drum':
                 case 'start':
                     if (typeof(blkData[1]) == 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) == 'object' && 'collapsed' in blkData[1][1]) {
@@ -2319,7 +2320,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     blkInfo = [blkData[1][0], {'value': null}];
                 } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) != -1) {
                     blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (['start', 'drum', 'action', 'hat'].indexOf(blkData[1][0]) != -1) {
+                    if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1][0]) != -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -2327,7 +2328,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
             } else {
                 blkInfo = [blkData[1], {'value': null}];
-                if (['start', 'drum', 'action', 'hat'].indexOf(blkData[1]) != -1) {
+                if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1]) != -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -2335,7 +2336,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (['start', 'drum', 'action'].indexOf(name) != -1) {
+            if (['start', 'drum', 'matrix', 'action'].indexOf(name) != -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 

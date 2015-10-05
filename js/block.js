@@ -1373,8 +1373,8 @@ function changeLabel(myBlock) {
     var blocks = myBlock.blocks;
     var x = myBlock.container.x;
     var y = myBlock.container.y;
-    var canvasLeft = blocks.canvas.offsetLeft + 28;
-    var canvasTop = blocks.canvas.offsetTop + 6;
+    var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.scale;
+    var canvasTop = blocks.canvas.offsetTop + 6 * blocks.scale;
 
     var movedStage = false;
     if (!window.hasMouse && blocks.stage.y + y > 75) {
@@ -1391,7 +1391,7 @@ function changeLabel(myBlock) {
 
     // A place in the DOM to put modifiable labels (textareas).
     var labelValue = (myBlock.label)?myBlock.label.value:myBlock.value;
-
+    
     var labelElem = docById('labelDiv');
     labelElem.innerHTML = '<input id="' + type + 'Label" \
 style="position: absolute; \
@@ -1404,11 +1404,15 @@ value="' + labelValue + '" />';
 
     var focused = false;
     var blur = function (event) {
+        // Not sure why the change in the input is not available
+        // immediately in FireFox. This is a rude work-around.
+        setTimeout(function() {labelChanged(myBlock)}, 3000);
+
         if (!focused) {
             return;
         }
-
         labelChanged(myBlock);
+
         event.preventDefault();
 
         labelElem.classList.remove('hasKeyboard');
@@ -1452,9 +1456,7 @@ value="' + labelValue + '" />';
 
 function labelChanged(myBlock) {
     // Update the block values as they change in the DOM label.
-    console.log('label changed');
     if (myBlock == null) {
-        console.log('but I do not know for which block');
         return;
     }
 
@@ -1462,8 +1464,8 @@ function labelChanged(myBlock) {
     var newValue = myBlock.label.value;
 
     if (oldValue == newValue) {
-       // Nothing to do in this case.
-       return;    
+        // Nothing to do in this case.
+        return;    
     }
 
     // Update the block value and block text.
@@ -1500,7 +1502,7 @@ function labelChanged(myBlock) {
     var c = myBlock.connections[0];
     if (myBlock.name == 'text' && c != null) {
         var cblock = myBlock.blocks.blockList[c];
-        console.log('Label changed to: ' + myBlock.value);
+        // console.log('Label changed to: ' + myBlock.value);
         switch (cblock.name) {
             case 'action':
                 // If the label was the name of an action, update the
