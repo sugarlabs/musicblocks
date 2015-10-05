@@ -1850,7 +1850,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Depending upon the form of the associated action block, we
         // want to add a named do, a named calc, a named do w/args, or
         // a named calc w/args.
-        console.log('NEW DO: ' + name + ' ' + hasReturn + ' ' + hasArgs);
+        // console.log('NEW DO: ' + name + ' ' + hasReturn + ' ' + hasArgs);
 
         if (name == _('action')) {
             // 'action' already has its associated palette entries.
@@ -1859,10 +1859,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         if (hasReturn && hasArgs) {
             this.newNamedcalcArgBlock(name);
+            return true;
         } else if (!hasReturn && hasArgs) {
             this.newNameddoArgBlock(name);
+            return true;
         } else if (hasReturn && !hasArgs) {
             this.newNamedcalcBlock(name);
+            return true;
         } else if (this.protoBlockDict['myDo_' + name] == undefined) {
             console.log('creating myDo_' + name);
             var myDoBlock = new ProtoBlock('nameddo');
@@ -1872,8 +1875,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
             myDoBlock.palette.add(myDoBlock);
+            return true;
         } else {
-            console.log('myDo_' + name + ' already exists.');
+            // console.log('myDo_' + name + ' already exists.');
+            return false;
         }
     }
 
@@ -2747,9 +2752,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var arg = null;
                 var c = myBlock.connections[1];
                 if (c != null && this.blockList[c].value != _('action')) {
-                    console.log('calling newNameddoBlock with name ' + this.blockList[c].value);
-                    this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk));
-                    updatePalettes = true;
+                    // console.log('calling newNameddoBlock with name ' + this.blockList[c].value);
+                    if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
+                        updatePalettes = true;
+                    }
                 }
             }
         }
