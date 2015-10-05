@@ -11,7 +11,7 @@
 
 // Length of a long touch
 var LONGPRESSTIME = 2000;
-var COLLAPSABLES = ['drum', 'start', 'action'];
+var COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -534,12 +534,19 @@ function Block(protoblock, blocks, overrideName) {
 
                     if (myBlock.collapseText == null) {
                         var fontSize = 10 * myBlock.protoblock.scale;
-                        if (myBlock.name == 'action') {
+                        switch (myBlock.name) {
+                        case 'action':
                             myBlock.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
-                        } else if (myBlock.name == 'start') {
+                            break;
+                        case 'start':
                             myBlock.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
-                        } else {
-                            myBlock.collapseText = new createjs.Text(_('start drum'), fontSize + 'px Sans', '#000000');
+                            break;
+                        case 'matrix':
+                            myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                            break;
+                        case 'drum':
+                            myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                            break;
                         }
                         myBlock.collapseText.textAlign = 'left';
                         myBlock.collapseText.textBaseline = 'alphabetic';
@@ -799,6 +806,10 @@ function Block(protoblock, blocks, overrideName) {
             // Make sure the text is on top.
             var z = myBlock.container.getNumChildren() - 1;
             myBlock.container.setChildIndex(myBlock.collapseText, z);
+
+            if (myBlock.name == 'drum') {
+                ensureDecorationOnTop(myBlock);
+            }
 
             // Set collapsed state of blocks in drag group.
             if (myBlock.blocks.dragGroup.length > 0) {
@@ -1095,8 +1106,8 @@ function loadEventHandlers(myBlock) {
     var getInput = window.hasMouse;
     myBlock.container.on('click', function(event) {
         // console.log('CLICK');
-	blocks.activeBlock = thisBlock;
-	haveClick = true;
+    blocks.activeBlock = thisBlock;
+    haveClick = true;
         if (locked) {
             return;
         }
@@ -1322,6 +1333,22 @@ function ensureDecorationOnTop(myBlock) {
     // Find the turtle decoration and move it to the top.
     for (var child = 0; child < myBlock.container.getNumChildren(); child++) {
         if (myBlock.container.children[child].name == 'decoration') {
+            // Drum block in collapsed state is less wide.
+            if (myBlock.name == 'drum') {
+                var bounds = myBlock.container.getBounds();
+                if (myBlock.collapsed) {
+                    var dx = 25 * myBlock.protoblock.scale / 2;
+                } else {
+                    var dx = 0;
+                }
+                for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
+                    if (myBlock.blocks.turtles.turtleList[turtle].startBlock == myBlock) {
+                        myBlock.blocks.turtles.turtleList[turtle].decorationBitmap.x = bounds.width - dx - 50 * myBlock.protoblock.scale / 2;
+                      break;
+                    }
+                }
+            }
+
             myBlock.container.setChildIndex(myBlock.container.children[child], myBlock.container.getNumChildren() - 1);
             break;
         }
@@ -1425,7 +1452,9 @@ value="' + labelValue + '" />';
 
 function labelChanged(myBlock) {
     // Update the block values as they change in the DOM label.
+    console.log('label changed');
     if (myBlock == null) {
+        console.log('but I do not know for which block');
         return;
     }
 
