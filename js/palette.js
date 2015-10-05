@@ -33,7 +33,7 @@ function maxPaletteHeight(menuSize, scale) {
 
 
 function paletteBlockButtonPush(name, arg) {
-    console.log('paletteBlockButtonPush: ' + name + ' ' + arg);
+    // console.log('paletteBlockButtonPush: ' + name + ' ' + arg);
     blk = paletteBlocks.makeBlock(name, arg);
     return blk;
 }
@@ -1252,8 +1252,6 @@ function setupBackgroundEvents(palette) {
 
 
 function makeBlockFromPalette(blk, blkname, palette, callback) {
-    console.log('MAKEBLOCKFROMPALETTE ' + blk);
-    console.log(palette.protoList[blk]);
     switch (palette.protoList[blk].name) {
         case 'do':
             blkname = 'do ' + palette.protoList[blk].defaults[0];
@@ -1425,7 +1423,6 @@ function loadPaletteMenuItemHandler(palette, blk, blkname) {
 
 
 function makeBlockFromProtoblock(palette, blk, moved, blkname, event, saveX, saveY) {
-        console.log('MAKEBLOCKFROMPROTOBLOCK ' + blk + ' ' + blkname);
         if (moved) {
             moved = false;
             palette.draggingProtoBlock = false;
@@ -1493,7 +1490,7 @@ function makeBlockFromProtoblock(palette, blk, moved, blkname, event, saveX, sav
                     restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
                 }
 
-                console.log(blk + ' ' + blkname);
+                // console.log(blk + ' ' + blkname);
                 var newBlock = makeBlockFromPalette(blk, blkname, palette, myCallback);
             }
 
