@@ -1261,6 +1261,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleNameBlock.parameterBlock();
     turtleNameBlock.dockTypes[0] = 'textout';
 
+    var setTurtleName = new ProtoBlock('setturtlename');
+    setTurtleName.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['setturtlename'] = setTurtleName;
+    setTurtleName.staticLabels.push(_('turtle name'));
+    setTurtleName.staticLabels.push(_('source'));
+    setTurtleName.staticLabels.push(_('target'));
+    setTurtleName.adjustWidthToLabel();
+    setTurtleName.twoArgBlock();
+    setTurtleName.dockTypes[1] = 'anyin';
+    setTurtleName.dockTypes[2] = 'anyin';
+    setTurtleName.defaults.push('0');
+    setTurtleName.defaults.push('Yertle');
+
     // Sensors palette
     var timeBlock = new ProtoBlock('time');
     timeBlock.palette = palettes.dict['sensors'];
@@ -1390,6 +1403,50 @@ function initBasicProtoBlocks(palettes, blocks) {
     svgBlock.oneArgBlock();
     svgBlock.defaults.push(_('title') + '.svg');
     svgBlock.dockTypes[1] = 'textin';
+
+//* block:xturtle *//
+var getxTurtleBlock = new ProtoBlock('xturtle');
+getxTurtleBlock.palette = palettes.dict['extras'];
+blocks.protoBlockDict['xturtle'] = getxTurtleBlock;
+getxTurtleBlock.hidden = true;
+getxTurtleBlock.staticLabels.push(_('turtle x'));
+getxTurtleBlock.adjustWidthToLabel();
+getxTurtleBlock.oneArgBlock();
+getxTurtleBlock.dockTypes[1] = 'anyin';
+getxTurtleBlock.defaults.push('0');
+
+//* block:yturtle *//
+var getyTurtleBlock = new ProtoBlock('yturtle');
+getyTurtleBlock.palette = palettes.dict['extras'];
+blocks.protoBlockDict['yturtle'] = getyTurtleBlock;
+getyTurtleBlock.hidden = true;
+getyTurtleBlock.staticLabels.push(_('turtle y'));
+getyTurtleBlock.adjustWidthToLabel();
+getyTurtleBlock.oneArgBlock();
+getyTurtleBlock.dockTypes[1] = 'anyin';
+getyTurtleBlock.defaults.push('0');
+
+//* block:startTurtle *//
+var startTurtleBlock = new ProtoBlock('startTurtle');
+startTurtleBlock.palette = palettes.dict['extras'];
+blocks.protoBlockDict['startTurtle'] = startTurtleBlock;
+startTurtleBlock.staticLabels.push(_('start turtle'));
+startTurtleBlock.hidden = true;
+startTurtleBlock.adjustWidthToLabel();
+startTurtleBlock.oneArgBlock();
+startTurtleBlock.dockTypes[1] = 'anyin';
+startTurtleBlock.defaults.push('0');
+
+//* block:stopTurtle *//
+var stopTurtleBlock = new ProtoBlock('stopTurtle');
+stopTurtleBlock.palette = palettes.dict['extras'];
+blocks.protoBlockDict['stopTurtle'] = stopTurtleBlock;
+stopTurtleBlock.hidden = true;
+stopTurtleBlock.staticLabels.push(_('stop turtle'));
+stopTurtleBlock.adjustWidthToLabel();
+stopTurtleBlock.oneArgBlock();
+stopTurtleBlock.dockTypes[1] = 'anyin';
+stopTurtleBlock.defaults.push('0');
 
     var noBackgroundBlock = new ProtoBlock('nobackground');
     blocks.protoBlockDict['nobackground'] = noBackgroundBlock;

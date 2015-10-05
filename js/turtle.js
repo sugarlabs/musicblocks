@@ -201,6 +201,21 @@ function Turtle (name, turtles, drum) {
         }
     }
 
+    this.rename = function(name) {
+        this.name = name;
+
+        // Use the name on the label of the start block.
+        if (this.startBlock != null) {
+            this.startBlock.overrideName = this.name;
+            if (this.name == _('start drum')) {
+                this.startBlock.collapseText.text = _('drum');
+            } else {
+                this.startBlock.collapseText.text = this.name;
+            }
+	    this.startBlock.regenerateArtwork(false);
+        }
+    }
+    
     this.arc = function(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
         if (invert) {
             cx = this.turtles.turtleX2screenX(cx);
@@ -342,6 +357,15 @@ function Turtle (name, turtles, drum) {
         this.font = DEFAULTFONT;
         this.container.x = this.turtles.turtleX2screenX(this.x);
         this.container.y = this.turtles.turtleY2screenY(this.y);
+        if (this.drum) {
+            if (this.name != _('start drum')) {
+                this.rename(_('start drum'));
+            }
+        } else {
+            if (this.name != _('start')) {
+                this.rename(_('start'));
+            }
+        }
 
         if (this.skinChanged) {
             this.doTurtleShell(55, turtleBasePath + 'turtle-' + i.toString() + '.svg');
