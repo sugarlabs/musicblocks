@@ -1082,23 +1082,18 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'setturtlename':
-                var foundTurtle = false;
-                var sourceName = '';
+                var foundTargetTurtle = false;
                 if (args.length == 2) {
-                    sourceName = args[0];
-                    var targetName = args[1];
-                    var thisTurtle = null;
-                    for (var i = 0; i < turtles.turtleList.length; i++) {
-                        thisTurtle = turtles.turtleList[i];
-                        if (sourceName == thisTurtle.name) {
-                            thisTurtle.rename(targetName);
-                            foundTurtle = true;
+                    for (var i = 0; i < logo.turtles.turtleList.length; i++) {
+                        if (logo.turtles.turtleList[i].name == args[0]) {
+                            logo.turtles.turtleList[i].rename(args[1]);
+                            foundTargetTurtle = true;
                             break;
                         }
                     }
                 }
-                if (!foundTurtle) {
-                    logo.errorMsg('Could not find turtle ' + sourceName, blk);
+                if (!foundTargetTurtle) {
+                    logo.errorMsg('Could not find turtle ' + args[0], blk);
                 }
                 break;
             case 'setcolor':
