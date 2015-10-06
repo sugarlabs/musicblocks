@@ -70,6 +70,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
 
+    var notenameBlock = new ProtoBlock('notename');
+    notenameBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['notename'] = notenameBlock;
+    notenameBlock.valueBlock();
+    notenameBlock.dockTypes[0] = 'noteout';
+
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['pitch'] = pitch;

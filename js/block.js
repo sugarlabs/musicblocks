@@ -465,12 +465,14 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Value blocks get a modifiable text label
-        if (['text', 'number', 'solfege'].indexOf(this.name) != -1) {
+        if (['text', 'number', 'solfege', 'notename'].indexOf(this.name) != -1) {
             if (this.value == null) {
                 if (this.name == 'text') {
                     this.value = '---';
                 } else if (this.name == 'solfege') {
                     this.value = 'sol';
+                } else if (this.name == 'notename') {
+                    this.value = 'G';
                 } else {
                     this.value = 100;
                 }
@@ -856,7 +858,7 @@ function positionText(myBlock, scale) {
     myBlock.text.y = TEXTY * scale / 2.;
 
     // Some special cases
-    if (['text', 'number', 'solfege'].indexOf(myBlock.name) != -1) {
+    if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) != -1) {
         myBlock.text.textAlign = 'center';
         myBlock.text.x = VALUETEXTX * scale / 2.;
     } else if (myBlock.protoblock.args == 0) {
@@ -1127,7 +1129,7 @@ function loadEventHandlers(myBlock) {
                 myBlock.doOpenMedia(myBlock, thisBlock);
             } else if (myBlock.name == 'loadFile') {
                 myBlock.doOpenMedia(myBlock, thisBlock);
-            } else if (['text', 'number', 'solfege'].indexOf(myBlock.name) != -1) {
+            } else if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) != -1) {
                 if(!myBlock.trash)
                 {
                     changeLabel(myBlock);
@@ -1300,7 +1302,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
             blocks.time = d.getTime();
             myBlock.blocks.blockMoved(thisBlock);
         }
-    } else if (['text', 'solfege', 'number', 'media', 'loadFile'].indexOf(myBlock.name) != -1) {
+    } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(myBlock.name) != -1) {
         if (!haveClick) {
             // Simulate click on Android.
             var d = new Date();
@@ -1396,10 +1398,16 @@ function changeLabel(myBlock) {
         myBlock.label = docById('textLabel');
    } else if (myBlock.name == 'solfege') {
         var type = 'solfege';
-        // TODO: select labelValue by defaultp
+        // TODO: select labelValue by default
         // TODO: figure out why CSS select.solfege is not applied
         labelElem.innerHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a;"><option value="ti">ti</option><option value="la">la</option><option value="sol" selected>sol</option><option value="fa">fa</option><option value="mi">mi</option><option value="re">re</option><option value="do">do</option></select>'
         myBlock.label = docById('solfegeLabel');
+   } else if (myBlock.name == 'notename') {
+        var type = 'notename';
+        // TODO: select labelValue by default
+        // TODO: add second selector for sharps, double sharps, flats, double flats, and naturals.
+        labelElem.innerHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a;"><option value="B">B</option><option value="A">A</option><option value="G" selected>G</option><option value="F">F</option><option value="E">E</option><option value="D">D</option><option value="C">C</option></select>'
+        myBlock.label = docById('notenameLabel');
     } else {
         var type = 'number';
         labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
