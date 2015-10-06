@@ -25,7 +25,7 @@ var EMPTYHEAPERRORMSG = 'empty heap.';
 
 function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
-              onRunTurtle, prepareExport, getStageX, getStageY,
+              onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
               clearCurrentKeyCode, meSpeak, saveLocally) {
 
@@ -39,7 +39,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.hideMsgs = hideMsgs;
     this.onStopTurtle = onStopTurtle;
     this.onRunTurtle = onRunTurtle;
-    this.prepareExport = prepareExport;
     this.getStageX = getStageX;
     this.getStageY = getStageY;
     this.getStageMouseDown = getStageMouseDown;
@@ -95,6 +94,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.noteOctaves = {};
     this.noteTranspositions = {};
     this.noteBeatValues = {};
+    this.currentNotes = {};
+    this.currentOctaves = {};
 
     // parameters used by the note block
     this.pushedNote = {};
@@ -298,6 +299,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 case 'notevolumefactor':
                     value = this.polyVolume[turtle];
                     break;
+                case 'currentnote':
+                    value = this.currentNotes[turtle];
+                    break;
+                case 'currentoctave':
+                    value = this.currentoctave[turtle];
+                    break;
                 default:
                     if (name in this.evalParameterDict) {
                         eval(this.evalParameterDict[name]);
@@ -352,6 +359,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.notesPlayed[turtle] = [];
             this.noteNotes[turtle] = [];
             this.noteOctaves[turtle] = [];
+            this.currentNotes[turtle] = 'G';
+            this.currentOctaves[turtle] = 4;
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.beatFactor[turtle] = 1;
@@ -378,9 +387,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
         // First we need to reconcile the values in all the value
         // blocks with their associated textareas.
+        // FIXME: Do we still need this check???
         for (var blk = 0; blk < this.blocks.blockList.length; blk++) {
             if (this.blocks.blockList[blk].label != null) {
-                this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value;
+                if (this.blocks.blockList[blk].labelattr != null) {
+                    this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value + this.blocks.blockList[blk].labelattr.value;
+                } else {
+                    this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value;
+		}
             }
         }
 
@@ -441,6 +455,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // A bit complicated because we have lots of corner cases:
         if (startHere != null) {
             console.log('startHere is ' + this.blocks.blockList[startHere].name);
+
             // If a block to start from was passed, find its
             // associated turtle, i.e., which turtle should we use?
             var turtle = 0;
@@ -583,6 +598,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 } else {
                     this.errorMsg(NOBOXERRORMSG, blk, name);
                 }
+                break;
+            case 'notevolumefactor':
+                // A bit ugly because the setter call already added in
+                // the scaled polyVolume value.
+	        value -= this.polyVolume[turtleId];
+                var vol = (this.polyVolume[turtleId] / 0.4) + 100;
+                this.setSynthVolume(vol + value, turtleId);
                 break;
             default:
                 if (this.blocks.blockList[blk].name in this.evalSetterDict) {
@@ -1731,6 +1753,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             logo.notesPlayed[turtle].push(notationNotes);
 
                             if (notes.length > 0) {
+                                var len = notes[0].length;
+                                logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
+				logo.currentOctaves[turtle] = notes[0].slice(len - 1, len);
                                 if (logo.turtles.turtleList[turtle].drum) {
                                     for (var i = 0; i < notes.length; i++) {
                                         // Remove pitch
@@ -2006,24 +2031,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         logo.errorMsg(NANERRORMSG, blk);
                         logo.stopTurtle = true;
                     } else {
-                        var vol = args[0];
-                        if (vol > 100) {
-                            vol = 100;
-                        } else if (vol < 0) {
-                            vol = 0;
-                        }
-                        // Scale runs from 0db (max) to -40db (min)
-                        // FIXME: db is logarithmic
-                        vol -= 100;
-                        vol *= 0.4;
-                        console.log(vol);
-                        logo.polyVolume[turtle] = vol;
-                        var toneVol = new Tone.Volume(vol);
-                        if (logo.turtles.turtleList[turtle].drum) {
-                            logo.drumSynth.chain(toneVol, Tone.Master);
-                        } else {
-                            logo.polySynth.chain(toneVol, Tone.Master);
-                        }
+                        logo.setSynthVolume(args[0], turtle);
                     }
                 }
                 break;
@@ -2181,7 +2189,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     }
-                    // TODO: better clean up strategy
                     // Mark issued signals as null
                     logo.endOfFlowSignals[turtle][blk][i] = null;
                     logo.endOfFlowClamps[turtle][blk][i] = null;
@@ -2319,6 +2326,26 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             // Save at the end to save an image
             me.saveLocally();
         }, DEFAULTDELAY * 1.5)
+    }
+
+    this.setSynthVolume = function(vol, turtle) {
+        if (vol > 100) {
+            vol = 100;
+        } else if (vol < 0) {
+            vol = 0;
+        }
+        // Scale runs from 0db (max) to -40db (min)
+        // FIXME: db is logarithmic
+        vol -= 100;
+        vol *= 0.4;
+        console.log(vol);
+        this.polyVolume[turtle] = vol;
+        var toneVol = new Tone.Volume(vol);
+        if (this.turtles.turtleList[turtle].drum) {
+            this.drumSynth.chain(toneVol, Tone.Master);
+        } else {
+            this.polySynth.chain(toneVol, Tone.Master);
+        }
     }
 
     this.processNote = function(blk, noteValue, turtle) {
@@ -2723,6 +2750,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     break;
                 case 'beatfactor':
                     logo.blocks.blockList[blk].value = logo.beatFactor[turtle];
+                    break;
+                case 'currentnote':
+                    logo.blocks.blockList[blk].value = logo.currentNotes[turtle];
+                    break;
+                case 'currentoctave':
+                    logo.blocks.blockList[blk].value = logo.currentOctaves[turtle];
                     break;
                 case 'color':
                 case 'hue':

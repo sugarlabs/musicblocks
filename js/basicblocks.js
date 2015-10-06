@@ -213,6 +213,20 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
 
+    var currentNoteBlock = new ProtoBlock('currentnote');
+    currentNoteBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['currentnote'] = currentNoteBlock;
+    currentNoteBlock.staticLabels.push(_('current note'));
+    currentNoteBlock.adjustWidthToLabel();
+    currentNoteBlock.parameterBlock();
+
+    var currentOctaveBlock = new ProtoBlock('currentoctave');
+    currentOctaveBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['currentoctave'] = currentOctaveBlock;
+    currentOctaveBlock.staticLabels.push(_('current octave'));
+    currentOctaveBlock.adjustWidthToLabel();
+    currentOctaveBlock.parameterBlock();
+
     var flatBlock = new ProtoBlock('flat');
     flatBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['flat'] = flatBlock;

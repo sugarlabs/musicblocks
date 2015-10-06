@@ -495,7 +495,7 @@ define(function (require) {
             logo = new Logo(matrix, musicnotation, canvas,
                 blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
-                onRunTurtle, prepareExport, getStageX, getStageY,
+                onRunTurtle, getStageX, getStageY,
                 getStageMouseDown, getCurrentKeyCode,
                 clearCurrentKeyCode, meSpeak, saveLocally);
             blocks.setLogo(logo);
@@ -1562,7 +1562,7 @@ define(function (require) {
                     // Don't save blocks in the trash.
                     continue;
                 }
-                if (blocks.blockList[blk].isValueBlock() || blocks.blockList[blk].name == 'loadFile') {
+                if (myBlock.isValueBlock() || myBlock.name == 'loadFile') {
                     // FIX ME: scale image if it exceeds a maximum size.
                     var args = {
                         'value': myBlock.value

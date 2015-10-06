@@ -1576,6 +1576,7 @@ function labelChanged(myBlock) {
     } else {
         myBlock.value = newValue;
     }
+
     var label = myBlock.value.toString();
     if (label.length > 8) {
         label = label.substr(0, 7) + '...';
