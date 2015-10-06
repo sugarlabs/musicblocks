@@ -180,6 +180,15 @@ body {
     overflow-y: scroll;
     background: white !important; }
 
+select.solfage {
+  background-color: #88e20a;
+  text-align: center;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100px; }
+
 input.text {
   background-color: #987aff;
   text-align: center;

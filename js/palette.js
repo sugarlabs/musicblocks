@@ -469,6 +469,9 @@ function PaletteModel(palette, palettes, name) {
                 case 'text':
                     label = _('text');
                     break;
+                case 'solfage':
+                    label = _('sol');
+                    break;
                 case 'number':
                     label = '100';
                     break;
