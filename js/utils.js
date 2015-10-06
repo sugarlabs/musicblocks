@@ -584,6 +584,18 @@ function hideDOMLabel() {
     if (numberLabel != null) {
         numberLabel.style.display = 'none';
     }
+    var solfegeLabel = docById('solfegeLabel');
+    if (solfegeLabel != null) {
+        solfegeLabel.style.display = 'none';
+    }
+    var notenameLabel = docById('notenameLabel');
+    if (notenameLabel != null) {
+        notenameLabel.style.display = 'none';
+    }
+    var noteattrLabel = docById('noteattrLabel');
+    if (noteattrLabel != null) {
+        noteattrLabel.style.display = 'none';
+    }
 }
 
 

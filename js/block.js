@@ -29,6 +29,7 @@ function Block(protoblock, blocks, overrideName) {
     this.trash = false; // Is this block in the trash?
     this.loadComplete = false; // Has the block finished loading?
     this.label = null; // Editable textview in DOM.
+    this.labelattr = null;  // Secondary select in DOM.
     this.text = null; // A dynamically generated text label on block itself.
     this.value = null; // Value for number, text, and media blocks.
     this.privateData = null; // A block may have some private data,
@@ -1396,18 +1397,63 @@ function changeLabel(myBlock) {
         labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
         labelElem.classList.add('hasKeyboard');
         myBlock.label = docById('textLabel');
-   } else if (myBlock.name == 'solfege') {
+    } else if (myBlock.name == 'solfege') {
         var type = 'solfege';
-        // TODO: select labelValue by default
-        // TODO: figure out why CSS select.solfege is not applied
-        labelElem.innerHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a;"><option value="ti">ti</option><option value="la">la</option><option value="sol" selected>sol</option><option value="fa">fa</option><option value="mi">mi</option><option value="re">re</option><option value="do">do</option></select>'
+        if (myBlock.value != null) {
+            var selectednote = myBlock.value;
+        } else {
+            var selectednote = 'sol';
+        }
+        var notes = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+        var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
+        for (var i = 0; i < notes.length; i++) {
+            if (selectednote == notes[i]) {
+                labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
+	    } else {
+                labelHTML += '<option value="' + notes[i] + '">' + notes[i] + '</option>';
+            }
+        }
+        labelHTML += '</select>';
+        labelElem.innerHTML = labelHTML;
         myBlock.label = docById('solfegeLabel');
-   } else if (myBlock.name == 'notename') {
+    } else if (myBlock.name == 'notename') {
         var type = 'notename';
-        // TODO: select labelValue by default
-        // TODO: add second selector for sharps, double sharps, flats, double flats, and naturals.
-        labelElem.innerHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a;"><option value="B">B</option><option value="A">A</option><option value="G" selected>G</option><option value="F">F</option><option value="E">E</option><option value="D">D</option><option value="C">C</option></select>'
+        if (myBlock.value != null) {
+            var selectednote = myBlock.value[0];
+            if (myBlock.value.length == 1) {
+                var selectedattr = '♮';
+            } else if (myBlock.value.length == 2) {
+                var selectedattr = myBlock.value[1];
+            } else {
+                var selectedattr = myBlock.value[1] + myBlock.value[1];
+            }
+        } else {
+            var selectednote = 'G';
+            var selectedattr = '♮'
+        }
+        var notes = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
+        var attrs = ['##', '#', '♮', '♭', '♭♭'];
+        var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+        for (var i = 0; i < notes.length; i++) {
+            if (selectednote == notes[i]) {
+                labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
+            } else {
+                labelHTML += '<option value="' + notes[i] + '">' + notes[i] + '</option>';
+            }
+        }
+        labelHTML += '</select>';
+        labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
+        for (var i = 0; i < attrs.length; i++) {
+            if (selectedattr == attrs[i]) {
+                labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
+	    } else {
+                labelHTML += '<option value="' + attrs[i] + '">' + attrs[i] + '</option>';
+            }
+        }
+        labelHTML += '</select>';
+        labelElem.innerHTML = labelHTML;
         myBlock.label = docById('notenameLabel');
+        myBlock.labelattr = docById('noteattrLabel');
     } else {
         var type = 'number';
         labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
@@ -1428,11 +1474,9 @@ function changeLabel(myBlock) {
 
         event.preventDefault();
 
-        if (myBlock.name == 'text' || myBlock.name == 'number') {
-            labelElem.classList.remove('hasKeyboard');
-	}
+        labelElem.classList.remove('hasKeyboard');
+
         window.scroll(0, 0);
-        myBlock.label.style.display = 'none';
         myBlock.label.removeEventListener('keypress', keypress);
 
         if (movedStage) {
@@ -1440,7 +1484,9 @@ function changeLabel(myBlock) {
             blocks.updateStage();
         }
     };
-    myBlock.label.addEventListener('blur', blur);
+    if (myBlock.name == 'text' || myBlock.name == 'number') {
+        myBlock.label.addEventListener('blur', blur);
+    }
 
     var keypress = function (event) {
         if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
@@ -1453,9 +1499,24 @@ function changeLabel(myBlock) {
         labelChanged(myBlock);
     });
 
+    if (myBlock.labelattr != null) {
+        myBlock.labelattr.addEventListener('change', function() {
+            labelChanged(myBlock);
+        });
+    }
+
     myBlock.label.style.left = Math.round((x + blocks.stage.x) * blocks.scale + canvasLeft) + 'px';
     myBlock.label.style.top = Math.round((y + blocks.stage.y) * blocks.scale + canvasTop) + 'px';
-    myBlock.label.style.width = Math.round(100 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
+    if (myBlock.name == 'notename') {
+        myBlock.label.style.width = Math.round(60 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
+        // There is a second select used for # and b
+        myBlock.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * blocks.scale + canvasLeft) + 'px';
+        myBlock.labelattr.style.top = Math.round((y + blocks.stage.y) * blocks.scale + canvasTop) + 'px';
+        myBlock.labelattr.style.width = Math.round(60 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
+        myBlock.labelattr.style.fontSize = Math.round(20 * blocks.scale * myBlock.protoblock.scale / 2) + 'px';
+    } else {
+        myBlock.label.style.width = Math.round(100 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
+    }
     myBlock.label.style.fontSize = Math.round(20 * blocks.scale * myBlock.protoblock.scale / 2) + 'px';
     myBlock.label.style.display = '';
     myBlock.label.focus();
@@ -1475,9 +1536,29 @@ function labelChanged(myBlock) {
         return;
     }
 
+    myBlock.label.style.display = 'none';
+    if (myBlock.labelattr != null) {
+        myBlock.labelattr.style.display = 'none';
+    }
+
     var oldValue = myBlock.value;
     var newValue = myBlock.label.value;
 
+    if (myBlock.labelattr != null) {
+        var attrValue = myBlock.labelattr.value;
+        switch (attrValue) {
+            case '##':  // Ignoring double sharp for now
+            case '#':
+                newValue = newValue + '#';
+                break;
+            case '♭♭':  // Ignoring double flat for now
+            case '♭':
+                newValue = newValue + '♭';
+                break;
+            default:
+                break;
+        }
+    }
     if (oldValue == newValue) {
         // Nothing to do in this case.
         return;    
