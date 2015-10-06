@@ -989,16 +989,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (type1 == 'fileout' && type2 == 'filein') {
             return true;
         }
-        if (type1 == 'solfagein' && ['solfageout', 'textout'].indexOf(type2) != -1) {
+        if (type1 == 'solfegein' && ['solfegeout', 'textout'].indexOf(type2) != -1) {
             return true;
         }
-        if (type2 == 'solfagein' && ['solfageout', 'textout'].indexOf(type1) != -1) {
+        if (type2 == 'solfegein' && ['solfegeout', 'textout'].indexOf(type1) != -1) {
             return true;
         }
-        if (type1 == 'anyin' && ['textout', 'mediaout', 'numberout', 'anyout', 'fileout', 'solfageout'].indexOf(type2) != -1) {
+        if (type1 == 'anyin' && ['textout', 'mediaout', 'numberout', 'anyout', 'fileout', 'solfegeout'].indexOf(type2) != -1) {
             return true;
         }
-        if (type2 == 'anyin' && ['textout', 'mediaout', 'numberout', 'anyout', 'fileout', 'solfageout'].indexOf(type1) != -1) {
+        if (type2 == 'anyin' && ['textout', 'mediaout', 'numberout', 'anyout', 'fileout', 'solfegeout'].indexOf(type1) != -1) {
             return true;
         }
         return false;
@@ -1391,7 +1391,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].container.updateCache();
             }
             postProcessArg = [thisBlock, _('text')];
-        } else if (name == 'solfage') {
+        } else if (name == 'solfege') {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
@@ -1548,7 +1548,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.blockList[thisBlock].text.text = label;
                 }
                 this.makeNewBlock('text', postProcess, [thisBlock, value]);
-            } else if (myBlock.docks[i + 1][2] == 'solfagein') {
+            } else if (myBlock.docks[i + 1][2] == 'solfegein') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
@@ -1556,7 +1556,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var label = value.toString();
                     me.blockList[thisBlock].text.text = label;
                 }
-                this.makeNewBlock('solfage', postProcess, [thisBlock, value]);
+                this.makeNewBlock('solfege', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] == 'mediain') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -2552,7 +2552,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     }
                     this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                     break;
-                case 'solfage':
+                case 'solfege':
                     postProcess = function (args) {
                         var thisBlock = args[0];
                         var value = args[1];
