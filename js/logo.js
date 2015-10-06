@@ -1323,7 +1323,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     logo.unhightlightQueue[targetTurtle] = [];
                     logo.parameterQueue[targetTurtle] = [];
                     console.log('calling runFromBlock with ' + startHere);
-                    runFromBlock(logo, targetTurtle, startHere, isflow, receivedArg);
+                    logo.runFromBlock(logo, targetTurtle, startHere, isflow, receivedArg);
                 }
                 break;
             case 'stopTurtle':
