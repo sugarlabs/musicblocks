@@ -331,40 +331,38 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
 
-    var osctimeBlock = new ProtoBlock('osctime');
-    osctimeBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['osctime'] = osctimeBlock;
-    osctimeBlock.staticLabels.push(_('osctime'), _('start'), _('end'));
-    osctimeBlock.adjustWidthToLabel();
-    osctimeBlock.twoArgMathBlock();
-    osctimeBlock.defaults.push(1000,5000);
-    osctimeBlock.dockTypes[1] = 'anyin';
-    osctimeBlock.dockTypes[2] = 'anyin';
-       
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['square'] = squareBlock;
-    squareBlock.staticLabels.push(_('square'), _('frequency'), _('time'));
+    squareBlock.staticLabels.push(_('square'));
     squareBlock.adjustWidthToLabel();
-    squareBlock.twoArgMathBlock();
+    squareBlock.oneArgBlock();
     squareBlock.defaults.push(440);
 
     var sineBlock = new ProtoBlock('sine');
     sineBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['sine'] = sineBlock;
-    sineBlock.staticLabels.push(_('sine'), _('frequency'), _('time'));
+    sineBlock.staticLabels.push(_('sine'));
     sineBlock.adjustWidthToLabel();
-    sineBlock.twoArgMathBlock();
+    sineBlock.oneArgBlock();
     sineBlock.defaults.push(440);
 
     var sawtoothBlock = new ProtoBlock('sawtooth');
     sawtoothBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['sawtooth'] = sawtoothBlock;
-    sawtoothBlock.staticLabels.push(_('sawtooth'), _('frequency'), _('time'));
+    sawtoothBlock.staticLabels.push(_('sawtooth'));
     sawtoothBlock.adjustWidthToLabel();
-    sawtoothBlock.twoArgMathBlock();
+    sawtoothBlock.oneArgBlock();
     sawtoothBlock.defaults.push(440);
 
+    var osctimeBlock = new ProtoBlock('osctime');
+    osctimeBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['osctime'] = osctimeBlock;
+    osctimeBlock.staticLabels.push(_('osctime'), _('start'), _('end'));
+    osctimeBlock.adjustWidthToLabel();
+    osctimeBlock.twoArgBlock();
+    osctimeBlock.defaults.push(100, 500);
+       
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');
     clearBlock.palette = palettes.dict['turtle'];
@@ -1133,6 +1131,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var toneBlock = new ProtoBlock('tone');
     toneBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['tone'] = toneBlock;
+    toneBlock.hidden = true;
     toneBlock.staticLabels.push(_('tone'),  _('frequency'), _('duration (ms)'));
     toneBlock.adjustWidthToLabel();
     // A4, 200ms.
