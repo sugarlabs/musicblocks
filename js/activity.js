@@ -227,13 +227,12 @@ define(function (require) {
             [_('Run fast'), _('Click to run the project in fast mode.'), 'header-icons/fast-button.svg'],
             [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
             [_('Run step by step'), _('Click to run the project step by step.'), 'header-icons/step-button.svg'],
-            [_('Stop'), _('Stop the current project.'), 'header-icons/stop-turtle-button.svg'],
+            [_('Stop'), _('Stop the music (and the turtles).'), 'header-icons/stop-turtle-button.svg'],
             [_('Clean'), _('Clear the screen and return the turtles to their initial positions.'), 'header-icons/clear-button.svg'],
             [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
             [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'header-icons/hide-blocks-button.svg'],
             [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
             [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
-            [_('Stop'), _('Stop the Music.'), 'header-icons/stop-turtle-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
             [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'header-icons/copy-button.svg'],
@@ -901,6 +900,7 @@ define(function (require) {
                 return;
             }
 
+            var TAB = 9;
             var ESC = 27;
             var ALT = 18;
             var CTRL = 17;
@@ -931,6 +931,8 @@ define(function (require) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
+                    case TAB:
+                        break;
                     case ESC:
                         // toggle full screen
                         toggleToolbar();

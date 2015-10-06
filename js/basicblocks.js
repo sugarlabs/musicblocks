@@ -331,40 +331,38 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
 
-    var osctimeBlock = new ProtoBlock('osctime');
-    osctimeBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['osctime'] = osctimeBlock;
-    osctimeBlock.staticLabels.push(_('osctime'), _('start'), _('end'));
-    osctimeBlock.adjustWidthToLabel();
-    osctimeBlock.twoArgMathBlock();
-    osctimeBlock.defaults.push(1000,5000);
-    osctimeBlock.dockTypes[1] = 'anyin';
-    osctimeBlock.dockTypes[2] = 'anyin';
-       
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['square'] = squareBlock;
-    squareBlock.staticLabels.push(_('square'), _('frequency'), _('time'));
+    squareBlock.staticLabels.push(_('square'));
     squareBlock.adjustWidthToLabel();
-    squareBlock.twoArgMathBlock();
+    squareBlock.oneArgBlock();
     squareBlock.defaults.push(440);
 
     var sineBlock = new ProtoBlock('sine');
     sineBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['sine'] = sineBlock;
-    sineBlock.staticLabels.push(_('sine'), _('frequency'), _('time'));
+    sineBlock.staticLabels.push(_('sine'));
     sineBlock.adjustWidthToLabel();
-    sineBlock.twoArgMathBlock();
+    sineBlock.oneArgBlock();
     sineBlock.defaults.push(440);
 
     var sawtoothBlock = new ProtoBlock('sawtooth');
     sawtoothBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['sawtooth'] = sawtoothBlock;
-    sawtoothBlock.staticLabels.push(_('sawtooth'), _('frequency'), _('time'));
+    sawtoothBlock.staticLabels.push(_('sawtooth'));
     sawtoothBlock.adjustWidthToLabel();
-    sawtoothBlock.twoArgMathBlock();
+    sawtoothBlock.oneArgBlock();
     sawtoothBlock.defaults.push(440);
 
+    var osctimeBlock = new ProtoBlock('osctime');
+    osctimeBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['osctime'] = osctimeBlock;
+    osctimeBlock.staticLabels.push(_('osctime'), _('start'), _('end'));
+    osctimeBlock.adjustWidthToLabel();
+    osctimeBlock.twoArgBlock();
+    osctimeBlock.defaults.push(100, 500);
+       
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');
     clearBlock.palette = palettes.dict['turtle'];
@@ -1133,6 +1131,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var toneBlock = new ProtoBlock('tone');
     toneBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['tone'] = toneBlock;
+    toneBlock.hidden = true;
     toneBlock.staticLabels.push(_('tone'),  _('frequency'), _('duration (ms)'));
     toneBlock.adjustWidthToLabel();
     // A4, 200ms.
@@ -1260,6 +1259,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleNameBlock.adjustWidthToLabel();
     turtleNameBlock.parameterBlock();
     turtleNameBlock.dockTypes[0] = 'textout';
+
+    var setTurtleName = new ProtoBlock('setturtlename');
+    setTurtleName.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['setturtlename'] = setTurtleName;
+    setTurtleName.staticLabels.push(_('turtle name'));
+    setTurtleName.staticLabels.push(_('source'));
+    setTurtleName.staticLabels.push(_('target'));
+    setTurtleName.adjustWidthToLabel();
+    setTurtleName.twoArgBlock();
+    setTurtleName.dockTypes[1] = 'anyin';
+    setTurtleName.dockTypes[2] = 'anyin';
+    setTurtleName.defaults.push('0');
+    setTurtleName.defaults.push('Yertle');
 
     // Sensors palette
     var timeBlock = new ProtoBlock('time');
@@ -1390,6 +1402,42 @@ function initBasicProtoBlocks(palettes, blocks) {
     svgBlock.oneArgBlock();
     svgBlock.defaults.push(_('title') + '.svg');
     svgBlock.dockTypes[1] = 'textin';
+
+    var getxTurtleBlock = new ProtoBlock('xturtle');
+    getxTurtleBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['xturtle'] = getxTurtleBlock;
+    getxTurtleBlock.staticLabels.push(_('turtle x'));
+    getxTurtleBlock.adjustWidthToLabel();
+    getxTurtleBlock.oneArgBlock();
+    getxTurtleBlock.dockTypes[1] = 'anyin';
+    getxTurtleBlock.defaults.push('0');
+
+    var getyTurtleBlock = new ProtoBlock('yturtle');
+    getyTurtleBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['yturtle'] = getyTurtleBlock;
+    getyTurtleBlock.staticLabels.push(_('turtle y'));
+    getyTurtleBlock.adjustWidthToLabel();
+    getyTurtleBlock.oneArgBlock();
+    getyTurtleBlock.dockTypes[1] = 'anyin';
+    getyTurtleBlock.defaults.push('0');
+
+    var startTurtleBlock = new ProtoBlock('startTurtle');
+    startTurtleBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['startTurtle'] = startTurtleBlock;
+    startTurtleBlock.staticLabels.push(_('start turtle'));
+    startTurtleBlock.adjustWidthToLabel();
+    startTurtleBlock.oneArgBlock();
+    startTurtleBlock.dockTypes[1] = 'anyin';
+    startTurtleBlock.defaults.push('0');
+
+    var stopTurtleBlock = new ProtoBlock('stopTurtle');
+    stopTurtleBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['stopTurtle'] = stopTurtleBlock;
+    stopTurtleBlock.staticLabels.push(_('stop turtle'));
+    stopTurtleBlock.adjustWidthToLabel();
+    stopTurtleBlock.oneArgBlock();
+    stopTurtleBlock.dockTypes[1] = 'anyin';
+    stopTurtleBlock.defaults.push('0');
 
     var noBackgroundBlock = new ProtoBlock('nobackground');
     blocks.protoBlockDict['nobackground'] = noBackgroundBlock;

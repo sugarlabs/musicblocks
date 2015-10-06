@@ -119,9 +119,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.polySynth.chain(toneVol, Tone.Master);
     this.drumSynth.chain(toneVol, Tone.Master);
 
-    //tone
-    this.startTime = 0;
-    this.stopTime = 1000;
+    // Osc start/stop times
+    this.oscStartTime = 0;
+    this.oscStopTime = 1000;
 
     // When running in step-by-step mode, the next command to run is
     // queued here.
@@ -1081,6 +1081,21 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     }
                 }
                 break;
+            case 'setturtlename':
+                var foundTargetTurtle = false;
+                if (args.length == 2) {
+                    for (var i = 0; i < logo.turtles.turtleList.length; i++) {
+                        if (logo.turtles.turtleList[i].name == args[0]) {
+                            logo.turtles.turtleList[i].rename(args[1]);
+                            foundTargetTurtle = true;
+                            break;
+                        }
+                    }
+                }
+                if (!foundTargetTurtle) {
+                    logo.errorMsg('Could not find turtle ' + args[0], blk);
+                }
+                break;
             case 'setcolor':
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
@@ -1303,7 +1318,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     logo.unhightlightQueue[targetTurtle] = [];
                     logo.parameterQueue[targetTurtle] = [];
                     console.log('calling runFromBlock with ' + startHere);
-                    runFromBlock(logo, targetTurtle, startHere, isflow, receivedArg);
+                    logo.runFromBlock(logo, targetTurtle, startHere, isflow, receivedArg);
                 }
                 break;
             case 'stopTurtle':
@@ -1330,24 +1345,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     }
                     doSaveSVG(logo, args[0]);
                 }
-                break;
-            case 'tone':
-                if (typeof(logo.turtleOscs[turtle]) == 'undefined') {
-                    logo.turtleOscs[turtle] = new p5.TriOsc();
-                }
-
-                osc = logo.turtleOscs[turtle];
-                osc.stop();
-                osc.start();
-                osc.amp(0);
-
-                osc.freq(args[0]);
-                osc.fade(0.5, 0.2);
-
-                setTimeout(function(osc) {
-                    osc.fade(0, 0.2);
-                }, args[1], osc);
-
                 break;
             case 'showHeap':
                 if (!(turtle in logo.turtleHeaps)) {
@@ -1734,8 +1731,15 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             logo.notesPlayed[turtle].push(notationNotes);
 
                             if (notes.length > 0) {
-                                for (var i = 0; i < notes.length; i++) {
-                                    notes[i] = notes[i].replace(/♭/g, 'b');
+                                if (logo.turtles.turtleList[turtle].drum) {
+                                    for (var i = 0; i < notes.length; i++) {
+                                        // Remove pitch
+                                        notes[i] = 'C2';
+                                    }
+                                } else {
+                                    for (var i = 0; i < notes.length; i++) {
+                                        notes[i] = notes[i].replace(/♭/g, 'b');
+                                    }
                                 }
 
                                 // Use the beatValue of the first note in the
@@ -2023,22 +2027,45 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     }
                 }
                 break;
+            // DEPRECATED P5 TONE GENERATOR
+            case 'tone':
+                if (typeof(logo.turtleOscs[turtle]) == 'undefined') {
+                    logo.turtleOscs[turtle] = new p5.TriOsc();
+                }
+
+                osc = logo.turtleOscs[turtle];
+                osc.stop();
+                osc.start();
+                osc.amp(0);
+
+                osc.freq(args[0]);
+                osc.fade(0.5, 0.2);
+
+                setTimeout(function(osc) {
+                    osc.fade(0, 0.2);
+                }, args[1], osc);
+
+                break;
             case 'osctime':
+                if (args.length == 2) {
+                    logo.oscStartTime = args[0];
+                    logo.oscStopTime = args[1];
+                }
                 break;
             case 'sine':
             case 'square':
             case 'sawtooth':
                 var oscName = logo.blocks.blockList[blk].name;
-                console.log(oscName + " start time " + logo.startTime + " end time " + logo.stopTime);
+                console.log(oscName + " start time " + logo.oscStartTime + " end time " + logo.oscStopTime);
                 var sineOsc = new Tone.Oscillator(args[0], oscName).toMaster();
                 //connected to the master output
                 setTimeout(function(osc){
                     sineOsc.start();
-                }, logo.startTime);
+                }, logo.oscStartTime);
                 console.log(sineOsc);
                 setTimeout(function(osc){
                     sineOsc.stop();
-                }, logo.stopTime);
+                }, logo.oscStopTime);
                 break;
             case 'playfwd':
                 matrix.playDirection = 1;

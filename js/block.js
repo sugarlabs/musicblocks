@@ -11,7 +11,7 @@
 
 // Length of a long touch
 var LONGPRESSTIME = 2000;
-var COLLAPSABLES = ['drum', 'start', 'action'];
+var COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -534,12 +534,19 @@ function Block(protoblock, blocks, overrideName) {
 
                     if (myBlock.collapseText == null) {
                         var fontSize = 10 * myBlock.protoblock.scale;
-                        if (myBlock.name == 'action') {
+                        switch (myBlock.name) {
+                        case 'action':
                             myBlock.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
-                        } else if (myBlock.name == 'start') {
+                            break;
+                        case 'start':
                             myBlock.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
-                        } else {
-                            myBlock.collapseText = new createjs.Text(_('start drum'), fontSize + 'px Sans', '#000000');
+                            break;
+                        case 'matrix':
+                            myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                            break;
+                        case 'drum':
+                            myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                            break;
                         }
                         myBlock.collapseText.textAlign = 'left';
                         myBlock.collapseText.textBaseline = 'alphabetic';
@@ -799,6 +806,10 @@ function Block(protoblock, blocks, overrideName) {
             // Make sure the text is on top.
             var z = myBlock.container.getNumChildren() - 1;
             myBlock.container.setChildIndex(myBlock.collapseText, z);
+
+            if (myBlock.name == 'drum') {
+                ensureDecorationOnTop(myBlock);
+            }
 
             // Set collapsed state of blocks in drag group.
             if (myBlock.blocks.dragGroup.length > 0) {
@@ -1095,8 +1106,8 @@ function loadEventHandlers(myBlock) {
     var getInput = window.hasMouse;
     myBlock.container.on('click', function(event) {
         // console.log('CLICK');
-	blocks.activeBlock = thisBlock;
-	haveClick = true;
+    blocks.activeBlock = thisBlock;
+    haveClick = true;
         if (locked) {
             return;
         }
@@ -1322,6 +1333,22 @@ function ensureDecorationOnTop(myBlock) {
     // Find the turtle decoration and move it to the top.
     for (var child = 0; child < myBlock.container.getNumChildren(); child++) {
         if (myBlock.container.children[child].name == 'decoration') {
+            // Drum block in collapsed state is less wide.
+            if (myBlock.name == 'drum') {
+                var bounds = myBlock.container.getBounds();
+                if (myBlock.collapsed) {
+                    var dx = 25 * myBlock.protoblock.scale / 2;
+                } else {
+                    var dx = 0;
+                }
+                for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
+                    if (myBlock.blocks.turtles.turtleList[turtle].startBlock == myBlock) {
+                        myBlock.blocks.turtles.turtleList[turtle].decorationBitmap.x = bounds.width - dx - 50 * myBlock.protoblock.scale / 2;
+                      break;
+                    }
+                }
+            }
+
             myBlock.container.setChildIndex(myBlock.container.children[child], myBlock.container.getNumChildren() - 1);
             break;
         }
@@ -1346,8 +1373,8 @@ function changeLabel(myBlock) {
     var blocks = myBlock.blocks;
     var x = myBlock.container.x;
     var y = myBlock.container.y;
-    var canvasLeft = blocks.canvas.offsetLeft + 28;
-    var canvasTop = blocks.canvas.offsetTop + 6;
+    var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.scale;
+    var canvasTop = blocks.canvas.offsetTop + 6 * blocks.scale;
 
     var movedStage = false;
     if (!window.hasMouse && blocks.stage.y + y > 75) {
@@ -1364,7 +1391,7 @@ function changeLabel(myBlock) {
 
     // A place in the DOM to put modifiable labels (textareas).
     var labelValue = (myBlock.label)?myBlock.label.value:myBlock.value;
-
+    
     var labelElem = docById('labelDiv');
     labelElem.innerHTML = '<input id="' + type + 'Label" \
 style="position: absolute; \
@@ -1377,11 +1404,15 @@ value="' + labelValue + '" />';
 
     var focused = false;
     var blur = function (event) {
+        // Not sure why the change in the input is not available
+        // immediately in FireFox. This is a rude work-around.
+        setTimeout(function() {labelChanged(myBlock)}, 3000);
+
         if (!focused) {
             return;
         }
-
         labelChanged(myBlock);
+
         event.preventDefault();
 
         labelElem.classList.remove('hasKeyboard');
@@ -1433,8 +1464,8 @@ function labelChanged(myBlock) {
     var newValue = myBlock.label.value;
 
     if (oldValue == newValue) {
-       // Nothing to do in this case.
-       return;    
+        // Nothing to do in this case.
+        return;    
     }
 
     // Update the block value and block text.
@@ -1471,7 +1502,7 @@ function labelChanged(myBlock) {
     var c = myBlock.connections[0];
     if (myBlock.name == 'text' && c != null) {
         var cblock = myBlock.blocks.blockList[c];
-        console.log('Label changed to: ' + myBlock.value);
+        // console.log('Label changed to: ' + myBlock.value);
         switch (cblock.name) {
             case 'action':
                 // If the label was the name of an action, update the

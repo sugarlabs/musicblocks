@@ -169,7 +169,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (['start', 'action', 'drum'].indexOf(myBlock.name) != -1) {
+            if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) != -1) {
                 myBlock.collapseToggle();
             }
         }
@@ -1850,7 +1850,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Depending upon the form of the associated action block, we
         // want to add a named do, a named calc, a named do w/args, or
         // a named calc w/args.
-        console.log('NEW DO: ' + name + ' ' + hasReturn + ' ' + hasArgs);
+        // console.log('NEW DO: ' + name + ' ' + hasReturn + ' ' + hasArgs);
 
         if (name == _('action')) {
             // 'action' already has its associated palette entries.
@@ -1859,10 +1859,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         if (hasReturn && hasArgs) {
             this.newNamedcalcArgBlock(name);
+            return true;
         } else if (!hasReturn && hasArgs) {
             this.newNameddoArgBlock(name);
+            return true;
         } else if (hasReturn && !hasArgs) {
             this.newNamedcalcBlock(name);
+            return true;
         } else if (this.protoBlockDict['myDo_' + name] == undefined) {
             console.log('creating myDo_' + name);
             var myDoBlock = new ProtoBlock('nameddo');
@@ -1872,8 +1875,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
             myDoBlock.palette.add(myDoBlock);
+            return true;
         } else {
-            console.log('myDo_' + name + ' already exists.');
+            // console.log('myDo_' + name + ' already exists.');
+            return false;
         }
     }
 
@@ -2205,6 +2210,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
             switch (name) {
                 case 'action':
+                case 'matrix':
                 case 'drum':
                 case 'start':
                     if (typeof(blkData[1]) == 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) == 'object' && 'collapsed' in blkData[1][1]) {
@@ -2314,7 +2320,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     blkInfo = [blkData[1][0], {'value': null}];
                 } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) != -1) {
                     blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (['start', 'drum', 'action', 'hat'].indexOf(blkData[1][0]) != -1) {
+                    if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1][0]) != -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -2322,7 +2328,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
             } else {
                 blkInfo = [blkData[1], {'value': null}];
-                if (['start', 'drum', 'action', 'hat'].indexOf(blkData[1]) != -1) {
+                if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1]) != -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -2330,7 +2336,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (['start', 'drum', 'action'].indexOf(name) != -1) {
+            if (['start', 'drum', 'matrix', 'action'].indexOf(name) != -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
@@ -2747,9 +2753,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var arg = null;
                 var c = myBlock.connections[1];
                 if (c != null && this.blockList[c].value != _('action')) {
-                    console.log('calling newNameddoBlock with name ' + this.blockList[c].value);
-                    this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk));
-                    updatePalettes = true;
+                    // console.log('calling newNameddoBlock with name ' + this.blockList[c].value);
+                    if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
+                        updatePalettes = true;
+                    }
                 }
             }
         }
