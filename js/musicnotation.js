@@ -70,6 +70,8 @@ function MusicNotation(turtles, stage) {
             }
             console.log(noteArray);
 
+            // TODO: we need to mark tuplets and then use:
+            // vexNotes.push(new Vex.Flow.Tuplet(tupletnotes));
             if(noteArray[0].substr(-1) == 'R')
             {
                 vexNotes.push(new Vex.Flow.StaveNote({ keys: ['g/4'], duration: notes[i][0][1].toString()+'r' }));

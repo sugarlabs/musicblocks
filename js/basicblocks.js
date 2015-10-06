@@ -64,6 +64,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
 
+    var solfageBlock = new ProtoBlock('solfage');
+    solfageBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['solfage'] = solfageBlock;
+    solfageBlock.valueBlock();
+    solfageBlock.dockTypes[0] = 'solfageout';
+
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['pitch'] = pitch;
@@ -72,7 +78,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitch.defaults.push('sol');
     pitch.defaults.push(4);
     pitch.twoArgBlock();
-    pitch.dockTypes[1] = 'anyin';
+    pitch.dockTypes[1] = 'solfagein';
     pitch.dockTypes[2] = 'anyin';
 
     var rhythm = new ProtoBlock('rhythm');
