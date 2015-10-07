@@ -3132,12 +3132,24 @@ function getNote (solfege, octave, transposition, keySignature) {
     transposition = Math.round(transposition);
     solfege = solfege.toString();
 
+    // Check for double flat or double sharp.
+    var len = solfege.length;
+    if (len > 2) {
+        var lastTwo = solfege.slice(len - 2);        
+        if (lastTwo == 'bb' || lastTwo == '♭♭') {
+            solfege = solfege.slice(0, len - 1);
+	    transposition -= 1;
+        } else if (lastTwo == '##') {
+            solfege = solfege.slice(0, len - 1);
+	    transposition += 1;
+	}
+    }
+
     var bToFlat = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
     var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     var notesFlat = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
     var notesFlat2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
-    var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'C♭':['B', -1], 'F♭':['E', 0],
-                               'e#':['F', 0], 'b#':['C', 1], 'c♭':['B', -1], 'f♭':['E', 0]};
+    var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'C♭':['B', -1], 'F♭':['E', 0], 'e#':['F', 0], 'b#':['C', 1], 'c♭':['B', -1], 'f♭':['E', 0]};
     var majorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
     // Is this correct, or is minor solfege expressed by using
     // DO RE MA FA SOL LE TE?
@@ -3150,7 +3162,6 @@ function getNote (solfege, octave, transposition, keySignature) {
     if (solfege in extraTranspositions) {
         octave += extraTranspositions[solfege][1];
         note = extraTranspositions[solfege][0];
-        console.log(solfege + ' -> ' + note);
     } else if (notesSharp.indexOf(solfege.toUpperCase()) != -1) {
         note = solfege.toUpperCase();
     } else if (notesFlat.indexOf(solfege) != -1) {
@@ -3159,11 +3170,12 @@ function getNote (solfege, octave, transposition, keySignature) {
         // Convert to uppercase, e.g., d♭ -> D♭.
         note = notesFlat[notesFlat2.indexOf(solfege)];
     } else {
+        // Not a note, so convert from Solfege.
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (solfege.substr(-1) == '>') {
             solfege = solfege.substr(0, solfege.indexOf('<'));
         }
-        if(solfege.substr(-1) == '#' || '♭') {
+        if(['#', '♭', 'b'].indexOf(solfege.substr(-1)) != -1) {
             sharpFlat = true;
         }
 
@@ -3212,6 +3224,8 @@ function getNote (solfege, octave, transposition, keySignature) {
             if (solfege.substr(-1) == '#') {
                 note = note + '#';
             } else if(solfege.substr(-1) == '♭') {
+                note = note + '♭';
+            } else if(solfege.substr(-1) == 'b') {
                 note = note + '♭';
             }
             if (note in extraTranspositions) {

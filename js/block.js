@@ -1576,11 +1576,15 @@ function labelChanged(myBlock) {
     if (myBlock.labelattr != null) {
         var attrValue = myBlock.labelattr.value;
         switch (attrValue) {
-            case '##':  // Ignoring double sharp for now
+            case '##':
+                newValue = newValue + '##';
+                break;
             case '#':
                 newValue = newValue + '#';
                 break;
-            case '♭♭':  // Ignoring double flat for now
+            case '♭♭':
+                newValue = newValue + '♭♭';
+                break;
             case '♭':
                 newValue = newValue + '♭';
                 break;
