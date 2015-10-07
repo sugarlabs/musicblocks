@@ -3182,7 +3182,7 @@ function getNote (solfege, octave, transposition, keySignature) {
         if (!keySignature) {
             keySignature = 'C';
         }
-        if (keySignature.substr(-1).toLowerCase() == 'm') {
+        if (keySignature.substr(-1) == 'm' || keySignature.slice(1).toLowerCase() == 'minor') {
             var scale = notesFlat;
             var halfSteps = minorHalfSteps;  // 0 2 3 5 7 8 10
             var keySignature = keySignature.substr(0, keySignature.length - 1);
@@ -3210,6 +3210,7 @@ function getNote (solfege, octave, transposition, keySignature) {
             return ['R', ''];
         } else if (twoCharSolfege in halfSteps) {
             var index = halfSteps[twoCharSolfege] + offset;
+            // console.log(solfege + ' ' + twoCharSolfege + ' ' + offset + ' ' + index + ' ' + scale[index]);
             if (index > 11) {
                 index -= 12;
                 octave += 1;

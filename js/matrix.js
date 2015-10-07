@@ -652,7 +652,7 @@ function Matrix() {
     this.saveMatrix = function() {
         /* Saves the current matrix as an action stack consisting of
 	 * note and pitch blocks (saving as chunks is deprecated). */
-        var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'si', 'R': 'rest'};
+        var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         console.log('SAVE MATRIX!!!');
