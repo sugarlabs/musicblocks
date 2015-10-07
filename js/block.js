@@ -1399,12 +1399,31 @@ function changeLabel(myBlock) {
         myBlock.label = docById('textLabel');
     } else if (myBlock.name == 'solfege') {
         var type = 'solfege';
+        var notes = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+        var attrs = ['##', '#', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
-            var selectednote = myBlock.value;
+            if (notes.indexOf(myBlock.value) != -1) {
+                var selectednote = myBlock.value;
+                var selectedattr = '♮';
+            } else if (myBlock.value.slice(0, 3) == 'sol') {
+                var selectednote = 'sol';
+		if (myBlock.value.length == 4) {
+                    var selectedattr = myBlock.value[3];
+                } else {
+                    var selectedattr = myBlock.value[3] + myBlock.value[3];
+                }
+            } else {
+                var selectednote = myBlock.value.slice(0, 2);
+		if (myBlock.value.length == 3) {
+                    var selectedattr = myBlock.value[2];
+                } else {
+                    var selectedattr = myBlock.value[2] + myBlock.value[2];
+                }
+            }
         } else {
             var selectednote = 'sol';
+            var selectedattr = '♮'
         }
-        var notes = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
         var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
         for (var i = 0; i < notes.length; i++) {
             if (selectednote == notes[i]) {
@@ -1414,10 +1433,22 @@ function changeLabel(myBlock) {
             }
         }
         labelHTML += '</select>';
+        labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
+        for (var i = 0; i < attrs.length; i++) {
+            if (selectedattr == attrs[i]) {
+                labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
+	    } else {
+                labelHTML += '<option value="' + attrs[i] + '">' + attrs[i] + '</option>';
+            }
+        }
+        labelHTML += '</select>';
         labelElem.innerHTML = labelHTML;
         myBlock.label = docById('solfegeLabel');
+        myBlock.labelattr = docById('noteattrLabel');
     } else if (myBlock.name == 'notename') {
         var type = 'notename';
+        var notes = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
+        var attrs = ['##', '#', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             var selectednote = myBlock.value[0];
             if (myBlock.value.length == 1) {
@@ -1431,8 +1462,6 @@ function changeLabel(myBlock) {
             var selectednote = 'G';
             var selectedattr = '♮'
         }
-        var notes = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
-        var attrs = ['##', '#', '♮', '♭', '♭♭'];
         var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
         for (var i = 0; i < notes.length; i++) {
             if (selectednote == notes[i]) {
@@ -1507,9 +1536,9 @@ function changeLabel(myBlock) {
 
     myBlock.label.style.left = Math.round((x + blocks.stage.x) * blocks.scale + canvasLeft) + 'px';
     myBlock.label.style.top = Math.round((y + blocks.stage.y) * blocks.scale + canvasTop) + 'px';
-    if (myBlock.name == 'notename') {
+    // There may be a second select used for # and b.
+    if (myBlock.labelattr != null) {
         myBlock.label.style.width = Math.round(60 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
-        // There is a second select used for # and b
         myBlock.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * blocks.scale + canvasLeft) + 'px';
         myBlock.labelattr.style.top = Math.round((y + blocks.stage.y) * blocks.scale + canvasTop) + 'px';
         myBlock.labelattr.style.width = Math.round(60 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
