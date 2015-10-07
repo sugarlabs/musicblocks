@@ -170,7 +170,8 @@ function Matrix() {
                 // When we apply a transposition to solfege, convert
                 // to note octave format and then convert back to
                 // solfege.
-                var note = getNote(this.solfegeNotes[i], this.solfegeOctaves[i], this.solfegeTranspositions[i], this.logo.keySignature[0]);
+                var noteObj = getNote(this.solfegeNotes[i], this.solfegeOctaves[i], this.solfegeTranspositions[i], this.logo.keySignature[0]);
+                var note = noteObj[0] + noteObj[1];
                 console.log(note);
                 this.note2Solfege(note, i);
             }
@@ -571,11 +572,11 @@ function Matrix() {
         if (table != null) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                 cell = table.rows[j].cells[colIndex];
-                var note;
                 if (cell.style.backgroundColor == 'black') {
                     var solfege = table.rows[j].cells[0].innerHTML;
                     // console.log(solfege + ' in key ' +  this.logo.keySignature[0]);
-                    note = getNote(solfege, octave, 0, this.logo.keySignature[0]);
+                    var noteObj = getNote(solfege, octave, 0, this.logo.keySignature[0]);
+                    var note = noteObj[0] + noteObj[1];
                     // console.log(note);
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
                     var i = 0;

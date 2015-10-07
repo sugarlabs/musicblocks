@@ -599,6 +599,21 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     this.errorMsg(NOBOXERRORMSG, blk, name);
                 }
                 break;
+            case 'currentnote':
+                // A bit ugly because the setter call added the value
+                // to the current note.
+                var len = this.currentNotes[turtleId].length;
+                value = parseInt(value.slice(len));
+                var newNoteObj = getNote(this.currentNotes[turtleId], this.currentOctaves[turtleId], value, this.keySignature[turtleId]);
+                this.currentNotes[turtleId] = newNoteObj[0];
+                this.currentOctaves[turtleId] = newNoteObj[1];
+                break;
+            case 'currentoctave':
+                this.currentOctaves[turtleId] = Math.round(value);
+                if (this.currentOctaves[turtleId] < 1) {
+                    this.currentOctaves[turtleId] = 1;
+                }
+                break;
             case 'notevolumefactor':
                 // A bit ugly because the setter call already added in
                 // the scaled polyVolume value.
@@ -1743,7 +1758,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             }
 
                             for (i in logo.noteNotes[turtle]) {
-                                note = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+                                var noteObj = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+                                var note = noteObj[0] + noteObj[1];
                                 if (note != 'R') {
                                     notes.push(note);
                                 }
@@ -1755,7 +1771,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             if (notes.length > 0) {
                                 var len = notes[0].length;
                                 logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
-				logo.currentOctaves[turtle] = notes[0].slice(len - 1, len);
+				logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
                                 if (logo.turtles.turtleList[turtle].drum) {
                                     for (var i = 0; i < notes.length; i++) {
                                         // Remove pitch
@@ -3112,6 +3128,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 function getNote (solfege, octave, transposition, keySignature) {
     var sharpFlat = false;
 
+    octave = Math.round(octave);
+    transposition = Math.round(transposition);
     solfege = solfege.toString();
 
     var bToFlat = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
@@ -3177,7 +3195,7 @@ function getNote (solfege, octave, transposition, keySignature) {
 
         var twoCharSolfege = solfege.toUpperCase().substr(0,2);
         if(solfege.toUpperCase().substr(0,4) == 'REST') {
-            return 'R';
+            return ['R', ''];
         } else if (twoCharSolfege in halfSteps) {
             var index = halfSteps[twoCharSolfege] + offset;
             if (index > 11) {
@@ -3187,7 +3205,7 @@ function getNote (solfege, octave, transposition, keySignature) {
             note = scale[index];
         } else {
             console.log('WARNING: Note ' + solfege + ' not found. Returning C');
-            return 'C';
+            return ['C', octave];
         }
 
         if (sharpFlat) {
@@ -3241,5 +3259,9 @@ function getNote (solfege, octave, transposition, keySignature) {
         }
     }
 
-    return note + octave;
+    if (octave < 1) {
+        return [note, 1];
+    } else {
+        return [note, octave];
+    }
 }
