@@ -76,7 +76,6 @@ define(function (require) {
     require('activity/analytics');
     require('prefixfree.min');
     require('activity/matrix');
-    // require('activity/assemble');  // ARE WE USING THIS??
     require('activity/musicnotation');
 
     // Manipulate the DOM only when it is ready.
@@ -136,14 +135,12 @@ define(function (require) {
         var toolbarButtonsVisible = true;
         var menuButtonsVisible = false;
         var menuContainer = null;
-        var workspaceContainer = null;  // STILL NEEDED?
         var scrollBlockContainer = false;
         var currentKey = '';
         var currentKeyCode = 0;
         var lastKeyCode = 0;
         var pasteContainer = null;
         var chartBitmap = null;
-        var workspace = false;  // STILL NEEDED?
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -433,8 +430,6 @@ define(function (require) {
         var errorMsgArrow = null;
         var errorArtwork = {};
         var ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
-
-        var assemble = null;  // ARE WE USING THIS??
 
         // Get things started
         init();
@@ -1028,11 +1023,6 @@ define(function (require) {
                 if (matrixTable) {
                     matrixTable.setAttribute("width", w/2 + 'px');
                 }
-            }
-            if (workspace) {  // DO WE NEED THIS?
-                console.log("clearing canvas");
-                assemble.clearAll();
-                clearMenus();
             }
         }
 
@@ -2054,24 +2044,6 @@ define(function (require) {
                 }
             }
         }
-
-        /*
-        function doOpenWorkspaceAssemble() {
-            //window.location.pathname = "/Music-Blocks/workspacea.html";
-            //var workspacea = null;
-            workspace = true;
-            assemble = new Assemble(palettes, matrix, canvas, blocks, turtles, turtleContainer, prepareExport, saveLocally, menuContainer);
-            //assemble.deleteBlocks();
-            assemble.clearAll();
-            clearMenus();
-        }
-
-        function doOpenHome() {
-            restoreHome();
-            palettes.dict['assemble'].hide();
-
-        }
-        */
 
         function restoreHome() {
             setupAndroidToolbar();
