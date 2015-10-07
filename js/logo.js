@@ -390,7 +390,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // FIXME: Do we still need this check???
         for (var blk = 0; blk < this.blocks.blockList.length; blk++) {
             if (this.blocks.blockList[blk].label != null) {
-                if (this.blocks.blockList[blk].labelattr != null) {
+                if (this.blocks.blockList[blk].labelattr != null && this.blocks.blockList[blk].labelattr.value != '♮') {
                     this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value + this.blocks.blockList[blk].labelattr.value;
                 } else {
                     this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value;
@@ -3173,6 +3173,8 @@ function getNote (solfege, octave, transposition, keySignature) {
         // Not a note, so convert from Solfege.
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (solfege.substr(-1) == '>') {
+            // Read octave and solfege from HTML
+	    octave = parseInt(solfege.slice(solfege.indexOf('>') + 1, solfege.indexOf('/') - 1));
             solfege = solfege.substr(0, solfege.indexOf('<'));
         }
         if(['#', '♭', 'b'].indexOf(solfege.substr(-1)) != -1) {

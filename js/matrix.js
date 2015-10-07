@@ -43,7 +43,6 @@ var MATRIXTUPLETCELLCOLOR = '#57e751';  // 'rgb(4, 255, 174)';
 var MATRIXRHYTHMCELLCOLOR = '#c8c8c8'; // 'rgb(174, 174, 174)';
 
 function Matrix() {
-    console.log('MATRIX');
     this.arr = [];
     this.secondsPerBeat = 1;
     this.notesToPlay = [];
@@ -160,7 +159,7 @@ function Matrix() {
             document.getElementById('matrix').style.border = 0;
         }
 
-        for (var i=0; i<this.solfegeNotes.length; i++) {
+        for (var i = 0; i < this.solfegeNotes.length; i++) {
             var row = header.insertRow(i+1);
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
@@ -172,7 +171,6 @@ function Matrix() {
                 // solfege.
                 var noteObj = getNote(this.solfegeNotes[i], this.solfegeOctaves[i], this.solfegeTranspositions[i], this.logo.keySignature[0]);
                 var note = noteObj[0] + noteObj[1];
-                console.log(note);
                 this.note2Solfege(note, i);
             }
 
@@ -566,18 +564,16 @@ function Matrix() {
             leaveRowsFromBottom = 3;
         }
         var table = document.getElementById('myTable');
-        var octave = this.solfegeOctaves[rowIndex - 1];
         var transformed = false;
         this.notesToPlay[colIndex - 1][0] = [];
         if (table != null) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                 cell = table.rows[j].cells[colIndex];
                 if (cell.style.backgroundColor == 'black') {
-                    var solfege = table.rows[j].cells[0].innerHTML;
-                    // console.log(solfege + ' in key ' +  this.logo.keySignature[0]);
-                    var noteObj = getNote(solfege, octave, 0, this.logo.keySignature[0]);
+                    var solfegeHTML = table.rows[j].cells[0].innerHTML;
+                    // Both solfege and octave are extracted from HTML by getNote.
+                    var noteObj = getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
                     var note = noteObj[0] + noteObj[1];
-                    // console.log(note);
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
                     var i = 0;
                     if (noteValue.substr(0,3) == '1.5') {
@@ -656,13 +652,16 @@ function Matrix() {
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         console.log('SAVE MATRIX!!!');
-
         for (var i = 0; i < this.notesToPlay.length; i++)
         {
             // We want all of the notes in a column.
-            console.log(this.notesToPlay[i]);
+            // console.log(this.notesToPlay[i]);
             var note = this.notesToPlay[i].slice(0);
-            window.savedMatricesNotes.push(note);
+            if (note[0] == '') {
+                note[0] = 'R';
+	    }
+
+            // window.savedMatricesNotes.push(note);
 
             // Add the Note block and its value
             var idx = newStack.length;
@@ -696,19 +695,20 @@ function Matrix() {
 
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
                 if(['#', '♭'].indexOf(note[0][j][1]) != -1) {
-                    newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                     newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                 } else {
-                    newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
                     if (note[0][0] == 'R') {
+                        newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': 4}], 0, 0, [thisBlock]]);
                     } else {
+                        newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
                     }
                 }
             }
         }
-        window.savedMatricesNotes.push('end');
+        // window.savedMatricesNotes.push('end');
         window.savedMatricesCount += 1;
 
         // Create a new stack for the chunk.
