@@ -1,16 +1,31 @@
-Libraries used:
-tone jS --> Web Audio framework for creating interactive music in the browser
-			https://github.com/Tonejs/Tone.js/blob/master/README.md
+Music Blocks is a fork of TurtleArtJS created by Walter
+Bender. (Turtle Blocks JS has many
+[contributors](https://github.com/walterbender/turtleblocksjs/graphs/contributors).
 
-vexflow and vextab --> Allows to create standard music notation and guitar tablature
-					   http://www.vexflow.com/
+Devin Ulibarri has contributed functional and user-interface
+designs. Many of his contributions were inspired by the music
+education ideas, representations and practices (e.g. aspects of
+matrix, musical cups) developed and published by Dr. Lawrence Scripp
+with whom Devin studied at New England Conservatory and for whom he
+worked at Affron Scripp & Associates, LLC.
 
-// To be added more to from HERE//
+Related Websites
+----------------
+http://www.larryscripp.net/
+http://centerformie.org/
+http://music-in-education.org/
 
-Forked from TurtleArtJS created by Walter Bender (and others--who?), which can be found at ________ 
+Some of the graphics were contributed by Chie Yasuda (the Mouse theme
+originates with her). She also has been very patient with Devin as he
+works on this--thanks Chie!
 
-Design work for concept and UI by Devin Ulibarri, inspired by some ideas (e.g. aspects of matrix) that Dr. Larry Scripp (New England Conservatory and Center for Music and Education) teaches.
+Much of the initial coding was done by Yash Khandelwal as part of
+Google Summer of Code (GSOC) 2015. Great work, Yash!
 
-Some art ideas contributed from Chie Yasuda (Mouse idea). She also was very patient with Devin as he worked on all of this--thanks Chie!
+Libraries specific to Music Blocks
+----------------------------------
 
-So much coding done by Yash Khandelwal as part of Google Summer of Code (GSOC) 2015. Great work, Yash!
+tonejs --> Web audio framework for creating interactive music in the browser [Tone.js](https://github.com/Tonejs/Tone.js/blob/master/README.md)
+
+vexflow --> Allows to create standard music notation and guitar tablature [Vexflow](http://www.vexflow.com/)
+
