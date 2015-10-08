@@ -308,7 +308,7 @@ function Matrix() {
             // Add row for tuplet note values
             var row = table.insertRow(table.rows.length - 2);
             var cell = row.insertCell(-1);
-            cell.innerHTML = '<b>' + '# tuplet note values' + '</b>';
+            cell.innerHTML = '<b>' + _('tuplet note values') + '</b>';
             cell.style.backgroundColor = MATRIXLABELCOLOR;
         }
 
