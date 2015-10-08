@@ -1719,7 +1719,7 @@ define(function (require) {
                 ['slow', doSlowButton],
                 ['step', doStepButton],
                 ['slow-music', doSlowMusicButton],
-                ['step-music', doStepMusicButton],
+                // ['step-music', doStepMusicButton],
                 ['stop-turtle', doStopButton],
                 ['clear', allClear],
                 ['palette', changePaletteVisibility],
