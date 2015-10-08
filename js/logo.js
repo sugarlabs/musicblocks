@@ -99,6 +99,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     // parameters used by the note block
     this.noteDelay = 0;
+    this.playedNote = {};
     this.pushedNote = {};
     this.duplicateFactor = {};
     this.polyVolume = {};
@@ -149,11 +150,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     // Used to pause between each block as the program executes.
     this.setTurtleDelay = function(turtleDelay) {
         this.turtleDelay = turtleDelay;
+        this.noteDelay = 0;
     }
 
     // Used to pause between each note as the program executes.
     this.setNoteDelay = function(noteDelay) {
         this.noteDelay = noteDelay;
+        this.turtleDelay = 0;
     }
 
     this.step = function() {
@@ -170,6 +173,49 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
             }
         }
+    }
+
+    this.stepNote = function() {
+        // Step through one note for each turtle in excuting Logo
+        // commands, but run through other blocks at full speed.
+        for (turtle in this.stepQueue) {
+            // Have we already played a note for this turtle?
+            if (turtle in this.playedNote && this.playedNote[turtle]) {
+		continue;
+	    }
+            if (this.stepQueue[turtle].length > 0) {
+                if (turtle in this.unhighlightStepQueue && this.unhighlightStepQueue[turtle] != null) {
+                    this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
+                    this.unhighlightStepQueue[turtle] = null;
+                }
+                var blk = this.stepQueue[turtle].pop();
+                if (blk != null) {
+                    if (this.blocks.blockList[blk].name == 'note') {
+                        this.playedNote[turtle] = true;
+		    }
+                    this.runFromBlockNow(this, turtle, blk, 0, null);
+                } else {
+		    this.playedNote[turtle] = true;
+		}
+            }
+        }
+        // At this point, some turtles have played notes and others
+        // have not. We need to keep stepping until they all have.
+        var keepGoing = false;
+	for (turtle in this.stepQueue) {
+            if (this.stepQueue[turtle].length > 0 && !this.playedNote[turtle]) {
+		keepGoing = true;
+                break;
+	    }
+	}
+	if (keepGoing) {
+	    // this.stepNote();
+            this.step();
+	} else {
+            for (turtle in this.playedNote) {
+		this.playedNote[turtle] = false;
+	    }
+	}
     }
 
     this.doStopTurtle = function() {
@@ -1754,13 +1800,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     var duration =  noteBeatValue * logo.noteBeatValues[turtle][0];
 
                     // Use 2 to match playback speed of matrix
-                    logo.doWait(turtle, (2 / duration) * logo.duplicateFactor[turtle] + logo.noteDelay);
+                    logo.doWait(turtle, ((2 / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle]);
 
                     var waitTime = 0;
                     for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
                         if (j > 0) {
                             waitTime += (2000 / duration);
-                            waitTime += logo.noteDelay;
                         }
 
                         // FIXME: When duplicating notes inside a
@@ -1820,7 +1865,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         } else {
                             setTimeout(function() {
                                 playnote();
-                            }, waitTime)
+                            }, waitTime + logo.noteDelay);
                         }
                     }
                     logo.pushedNote[turtle] = false;
