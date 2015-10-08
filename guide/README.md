@@ -119,7 +119,7 @@ clicking on the Run button. Also try the Run Slow button (the Turtle).
 About the Pitch Block
 ---------------------
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
 
 As we have seen, Pitch blocks are used inside the Graphical-notation
 Matrix block to indicate pitches you may want to select. They are also
@@ -136,7 +136,7 @@ specified using a number block and is restricted to whole numbers.
 About the Rhythm Block
 ----------------------
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5.svg'</img>
 
 Rhythm blocks are used to generate rhythm patterns in the
 Graphical-notation Matrix. The top argument to the Rhythm block is the
@@ -146,9 +146,9 @@ generated in the grid. In the middle example, one column for an eighth
 note would be generated. In the bottom example, seven columns for 16th
 notes would be generated.
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix5x.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5x.svg'</img>
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix5xx.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5xx.svg'</img>
 
 You can use as many Rhythm blocks as you'd like in side the
 Graphical-notation Matrix block. In the above example, two Rhythm
@@ -158,9 +158,9 @@ notes.
 Creating Tuplets
 ----------------
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix6.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg'</img>
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix6x.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6x.svg'</img>
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
@@ -174,7 +174,7 @@ grid.
 Using individual notes in the matrix
 ------------------------------------
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix7.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix7.svg'</img>
 
 You can also use individual notes when defining the grid.
 
@@ -188,7 +188,7 @@ with chunks you create and/or modify by hand).
 1. A chunck of notes
 --------------------
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg'</img>
 
 There are several ways to play a chunk...
 
