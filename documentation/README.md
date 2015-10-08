@@ -92,21 +92,33 @@ The blocks on this palette are used to create a matrix for generating
 
 Used to define the matrix used to create "chunks" of notes. The matrix
 is organized by pitch and rhythm. A row in the matrix is created for
-each Pitch Block and columns are created for individual notes, which
-are created by using Rhythm Blocks, individual note blocks, or the
-Tuplet Block.
+each Pitch block and columns are created for individual notes, which
+are created by using Rhythm blocks, individual note blocks, or the
+Tuplet block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/pitch.svg'</img>
 
-The Pitch Block is used to specify the pitch of a note. By default, we
+The Pitch block is used to specify the pitch of a note. By default, we
 use Solfage, i.e., do, re, mi, fa, sol, la, ti, where do is mapped to
 C, re is mapped to D, etc. You can also specify pitch by using a note
 name, e.g., F#. An octave specification is also required. When used
-with the Matrix Block, a row is created for each Pitch Block.
+with the Matrix block, a row is created for each Pitch block.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/solfege.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/pitchname.svg'</img>
+
+Two special blocks can be used with a Pitch block to specify the name
+of the pitch: the Solfege block and the Pitch-name block. The Solfege
+block uses selectors to scroll through Do, Re, Mi, Fa, Sol, La, and
+Ti. A second selector is used for sharps and flats: ##, #, ♮, ♭ and
+♭♭. The Pitch-name block is similar in that it lets you scroll through
+C, D, E, F, G, A, B. It also uses a second selector for sharps and
+flats.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/rhythm.svg'</img>
 
-The Rhythm Block is used to specify a series of notes of the same
+The Rhythm block is used to specify a series of notes of the same
 duration, e.g., three quarter notes or seven eighth notes. The number
 of notes is the top argument; the bottom argument is the inverse of
 the note duration, e.g., 1 for a whole note, 2 for a half note, 4 for
@@ -136,26 +148,26 @@ A tuplet is a collection of notes that are scaled to map into a
 specified duration. For example, you can pack three quarter notes into
 the duration of a single quarter note to get three twelfth notes. You
 can mix and match Rhythm and individual note blocks within a Tuplet
-Block to generate complex rhythms. Each note is represented by a
+block to generate complex rhythms. Each note is represented by a
 column in the matrix.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/setkey.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/key.svg'</img>
 
-The Set Key Block is used to set the key for the mapping between the
+The Set Key block is used to set the key for the mapping between the
 Solfage and notes using a "movable" system (See
 [Solfage](https://en.wikipedia.org/wiki/Solf%C3%A8ge) for more
 details).
 
-The Key Block contains the current Key, by default, C Major.
+The Key block contains the current Key, by default, C Major.
 
 Note Palette
 ------------
 
 The Note Palette contains blocks used to play music. Stacks of notes
 can be created from the matrix, by clicking on the Save Button, or by
-direct construction using the Pitch Block and the blocks on this
+direct construction using the Pitch block and the blocks on this
 palette. In addition to creating notes, you can transform the notes
 using blocks such as Sharp and Flat or Transposition.
 
@@ -164,6 +176,14 @@ using blocks such as Sharp and Flat or Transposition.
 Used to define individual notes by specifying a note value, e.g.,
 whole note (1), half note (2), quarter note (4), etc. and a collection
 of pitch blocks to define individual tones or chords.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/currentpitchname.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/currentpitchoctave.svg'</img>
+
+The Current-pitch-name and Current-pitch-octave blocks maintain the
+state of the note currently being played. (When the note is a chord,
+only one of the pitch/octave combinations is available.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/flat.svg'</img>
 
@@ -178,7 +198,7 @@ Used to raise any contained notes by one step in a 12-step scale.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/transposition.svg'</img>
 
 Used to transpose any contained notes by an integral step in a 12-step
-scale. The Transposition Block contains the current transposition (the
+scale. The Transposition block contains the current transposition (the
 default is 0).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/multiply-beat.svg'</img>
@@ -189,14 +209,14 @@ default is 0).
 
 Used to adjust the beat of any contained notes. Multiplying the beat
 will speed things up; dividing the beat will slow things down. The
-Beat-factor Block contains the current beat factor (the default is 1).
+Beat-factor block contains the current beat factor (the default is 1).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/dot.svg'</img>
 
 Used to dot any contained notes. A dotted note plays for 50% longer
 than the original note, e.g., a dotted quarter note is equivalent to a
 3/8 note. Double-dotting is not yet supported. (When used with the
-Tuplet Block, the duration of the tuplet is extended by 50%.)
+Tuplet block, the duration of the tuplet is extended by 50%.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/duplicate-notes.svg'</img>
 
@@ -225,7 +245,7 @@ Blocks Palette
 
 Multiple Start blocks can be used for multiple voices. Use the "Rabbit
 button" on the Main toolbar to run all of the Start blocks
-simultaneously. A Drum Block is provided to create drum beats (using a
+simultaneously. A Drum block is provided to create drum beats (using a
 separate synthesizer).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/chunk.svg'</img>
