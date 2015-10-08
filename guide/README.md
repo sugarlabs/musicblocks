@@ -53,15 +53,19 @@ rhythms associated with each note.)
 Because there is just one Rhythm block, which specifies three quarter
 notes, there are just three columns for selecting notes.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2x.svg'</img>
+
 By clicking on individual cells in the grid, you should hear
 individual notes (or chords if you click on more than one cell in a
-column).
+column). In the figure, three quarter notes are selected (black
+cells). First Re 4 (D4), followed by Mi 4 (E4), followed by Sol 4
+(G4).
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg'
 height="36"</img> If you click on the Play button (found in the top
 row of the grid), you will hear a sequence of notes played (from left
-to right).
+to right): D4 E4 G4.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/download.svg'
