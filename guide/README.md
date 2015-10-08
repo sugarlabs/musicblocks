@@ -160,10 +160,23 @@ Creating Tuplets
 
 <img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix6.svg'</img>
 
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix6x.svg'</img>
+
+Tuplets are a collection of notes that get scaled to a specific
+duration. Using tuplets makes it easy to create groups of notes that
+are not based on a power of 2. In the example above, three quarter
+notes -- defined in the Rhythm block -- are played in the time of a
+single quarter note. The result is three twelfth notes.
+
+You can mix and match Rhythm blocks and Tuplets when defining your
+grid.
+
 Using individual notes in the matrix
 ------------------------------------
 
 <img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix7.svg'</img>
+
+You can also use individual notes when defining the grid.
 
 PROGRAMMING WITH MUSIC
 ----------------------
