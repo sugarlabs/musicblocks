@@ -1559,8 +1559,18 @@ define(function (require) {
                         'value': myBlock.value
                     };
                 } else if (myBlock.name == 'start' || myBlock.name == 'drum') {
-                    // It's a turtle.
-                    turtle = turtles.turtleList[myBlock.value];
+                    // Find the turtle with this name.
+                    if (typeof(myBlock.value) == 'number') {
+                        var targetName = myBlock.value.toString();
+		    } else {
+                        var targetName = myBlock.value;
+		    }
+                    for (var t = 0; t < turtles.turtleList.length; t++) {
+                        if (turtles.turtleList[t].name == targetName) {
+                            var turtle = turtles.turtleList[t];
+                        }
+		    }
+                    // turtle = turtles.turtleList[myBlock.value];
                     var args = {
                         'collapsed': myBlock.collapsed,
                         'xcor': turtle.x,

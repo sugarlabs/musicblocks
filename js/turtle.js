@@ -213,6 +213,7 @@ function Turtle (name, turtles, drum) {
                 this.startBlock.collapseText.text = this.name;
             }
 	    this.startBlock.regenerateArtwork(false);
+            this.startBlock.value = this.name;
         }
     }
     

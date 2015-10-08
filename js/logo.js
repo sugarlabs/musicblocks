@@ -1346,33 +1346,34 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'startTurtle':
-                var startHere = logo.getTargetTurtle(args);
-
-                if (!startHere) {
-                    logo.errorMsg('Cannot find turtle: ' + args[0], blk)
+                var targetTurtle = logo.getTargetTurtle(args);
+                if (targetTurtle[0] == -1) {
+                    logo.errorMsg('Cannot find start block for turtle: ' + args[0], blk)
                 } else {
-                    var targetTurtle = logo.blocks.blockList[startHere].value;
-                    if (logo.turtles.turtleList[targetTurtle].running) {
+                    if (logo.turtles.turtleList[targetTurtle[0]].running) {
                         logo.errorMsg('Turtle is already running.', blk);
                         break;
                     }
-                    logo.turtles.turtleList[targetTurtle].queue = [];
-                    logo.turtles.turtleList[targetTurtle].running = true;
-                    logo.parentFlowQueue[targetTurtle] = [];
-                    logo.unhightlightQueue[targetTurtle] = [];
-                    logo.parameterQueue[targetTurtle] = [];
-                    console.log('calling runFromBlock with ' + startHere);
-                    logo.runFromBlock(logo, targetTurtle, startHere, isflow, receivedArg);
+                    logo.turtles.turtleList[targetTurtle[0]].queue = [];
+                    logo.turtles.turtleList[targetTurtle[0]].running = true;
+                    logo.parentFlowQueue[targetTurtle[0]] = [];
+                    logo.unhightlightQueue[targetTurtle[0]] = [];
+                    logo.parameterQueue[targetTurtle[0]] = [];
+                    console.log('calling runFromBlock with ' + targetTurtle[1]);
+                    logo.runFromBlock(logo, targetTurtle[0], targetTurtle[1], isflow, receivedArg);
                 }
                 break;
             case 'stopTurtle':
-                var startHere = logo.getTargetTurtle(args);
-                var targetTurtle = logo.blocks.blockList[startHere].value;
-                logo.turtles.turtleList[targetTurtle].queue = [];
-                logo.parentFlowQueue[targetTurtle] = [];
-                logo.unhightlightQueue[targetTurtle] = [];
-                logo.parameterQueue[targetTurtle] = [];
-                logo.doBreak(targetTurtle);
+                var targetTurtle = logo.getTargetTurtle(args);
+                if (targetTurtle[0] == -1) {
+                    logo.errorMsg('Cannot find start block for turtle: ' + args[0], blk)
+                } else {
+                    logo.turtles.turtleList[targetTurtle[0]].queue = [];
+                    logo.parentFlowQueue[targetTurtle[0]] = [];
+                    logo.unhightlightQueue[targetTurtle[0]] = [];
+                    logo.parameterQueue[targetTurtle[0]] = [];
+                    logo.doBreak(targetTurtle[0]);
+                }
                 break;
             case 'showblocks':
                 logo.showBlocks();
@@ -2447,25 +2448,45 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     }
 
     this.getTargetTurtle = function(args) {
-        // The target turtle name can be a string or an int.
-        if (typeof(args[0]) == 'string') {
-            var targetTurtleName = parseInt(args[0])
-        } else {
-            var targetTurtleName = args[0];
+        // The target turtle name can be a string or an int. Make
+        // sure there is a turtle by this name and then find the
+        // associated start block.
+        var foundTargetTurtle = -1;
+
+        var targetTurtle = args[0];
+	if (typeof(targetTurtle) == 'number') {
+	    targetTurtle = targetTurtle.toString();
         }
 
-        var startHere = null;
-
-        for (var blk in this.blocks.blockList) {
-            var name = this.blocks.blockList[blk].name;
-            var targetTurtle = this.blocks.blockList[blk].value;
-            if ((name == 'start' || name == 'drum') && targetTurtle == targetTurtleName) {
-                startHere = blk;
+        for (var i = 0; i < this.turtles.turtleList.length; i++) {
+            var turtleName = this.turtles.turtleList[i].name;
+            if (typeof(turtleName) == 'number') {
+		turtleName = turtleName.toString();
+	    }
+            if (turtleName == targetTurtle) {
+                foundTargetTurtle = i;
                 break;
             }
         }
 
-        return startHere;
+        if (foundTargetTurtle == -1) {
+            this.errorMsg('Could not find turtle ' + args[0], blk);
+            return [-1, -1];
+        }
+
+        for (var blk in this.blocks.blockList) {
+            var name = this.blocks.blockList[blk].name;
+            if (name == 'start' || name == 'drum') {
+                var turtleName = this.blocks.blockList[blk].value;
+                if (typeof(turtleName) == 'number') {
+                    turtleName = turtleName.toString();
+                }
+		if (targetTurtle == turtleName) {
+                    return [foundTargetTurtle, blk];
+                }
+            }
+        }
+        return [-1, -1];
     }
 
     this.loopBlock = function(name) {
