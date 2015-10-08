@@ -53,7 +53,7 @@ rhythms associated with each note.)
 Because there is just one Rhythm block, which specifies three quarter
 notes, there are just three columns for selecting notes.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2x.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg'</img>
 
 By clicking on individual cells in the grid, you should hear
 individual notes (or chords if you click on more than one cell in a
@@ -88,7 +88,7 @@ button that will clear the grid.
 Don't worry. You can reopen the grid at anytime and since you can
 define as many chunks as you want, feel free to experiment.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
 
 The chunk created when you click on the matrix is a stack of
 blocks. The blocks are nested: an Action block contains three Note
@@ -106,20 +106,10 @@ names and the pitch octaves.)
 To play the chuck, simply click on the action block (on the word
 action). You should hear the notes play, ordered from top to bottom.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3x.svg'</img>
-
-Every time you create a new stack, Music Blocks creates a new block
-specific to that stack. (The new block is found at the bottom of the
-Block palette, found on the left edge of the screen.) Clicking on this
-block is the same as clicking on your stack. In the example above, the
-chunk0 block is inside of a Start block, which ties it to the Run
-button in the upper-left corner of the screen (the Rabbit button). Try
-clicking on the Run button. Also try the Run Slow button (the Turtle).
-
 About the Pitch Block
 ---------------------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5.svg'</img>
 
 As we have seen, Pitch blocks are used inside the Graphical-notation
 Matrix block to indicate pitches you may want to select. They are also
@@ -136,7 +126,7 @@ specified using a number block and is restricted to whole numbers.
 About the Rhythm Block
 ----------------------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg'</img>
 
 Rhythm blocks are used to generate rhythm patterns in the
 Graphical-notation Matrix. The top argument to the Rhythm block is the
@@ -146,9 +136,9 @@ generated in the grid. In the middle example, one column for an eighth
 note would be generated. In the bottom example, seven columns for 16th
 notes would be generated.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5x.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix7.svg'</img>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5xx.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix8.svg'</img>
 
 You can use as many Rhythm blocks as you'd like in side the
 Graphical-notation Matrix block. In the above example, two Rhythm
@@ -158,9 +148,9 @@ notes.
 Creating Tuplets
 ----------------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'</img>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6x.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix10.svg'</img>
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
@@ -174,7 +164,7 @@ grid.
 Using individual notes in the matrix
 ------------------------------------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix7.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg'</img>
 
 You can also use individual notes when defining the grid.
 
@@ -188,7 +178,17 @@ with chunks you create and/or modify by hand).
 1. A chunck of notes
 --------------------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
 
-There are several ways to play a chunk...
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg'</img>
+
+Every time you create a new stack, Music Blocks creates a new block
+specific to that stack. (The new block is found at the bottom of the
+Block palette, found on the left edge of the screen.) Clicking on this
+block is the same as clicking on your stack. In the example above, the
+chunk0 block is inside of a Start block, which ties it to the Run
+button in the upper-left corner of the screen (the Rabbit button). Try
+clicking on the Run button. Also try the Run Slow button (the Turtle).
+
+
 
