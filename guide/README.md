@@ -190,5 +190,15 @@ chunk0 block is inside of a Start block, which ties it to the Run
 button in the upper-left corner of the screen (the Rabbit button). Try
 clicking on the Run button. Also try the Run Slow button (the Turtle).
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg'</img>
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg'</img>
 
+You can repeat chunks either by using multiple chunk blocks or using a
+Repeat block.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
+
+You can also mix and match chunks. Here we play chunk0, followed by chunk1 twice, and then chunk0 again.
