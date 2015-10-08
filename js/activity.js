@@ -223,7 +223,9 @@ define(function (require) {
             [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more). Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
             [_('Run fast'), _('Click to run the project in fast mode.'), 'header-icons/fast-button.svg'],
             [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
+            [_('Run music slow'), _('Click to run just the music in slow mode.'), 'header-icons/slow-music-button.svg'],
             [_('Run step by step'), _('Click to run the project step by step.'), 'header-icons/step-button.svg'],
+	    [_('Run note by note'), _('Click to run the music note by note.'), 'header-icons/step-music-button.svg'],
             [_('Stop'), _('Stop the music (and the turtles).'), 'header-icons/stop-turtle-button.svg'],
             [_('Clean'), _('Clear the screen and return the turtles to their initial positions.'), 'header-icons/clear-button.svg'],
             [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
@@ -302,7 +304,6 @@ define(function (require) {
 
         function doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
-	    // logo.setNoteDelay(DEFAULTDELAY);
             if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
@@ -327,6 +328,35 @@ define(function (require) {
             } else {
                 logo.setTurtleDelay(TURTLESTEP);
                 logo.step();
+            }
+        }
+
+        function doSlowMusicButton() {
+            logo.setNoteDelay(DEFAULTDELAY);
+            if (!turtles.running()) {
+                logo.runLogoCommands();
+            } else {
+                logo.stepNotes();
+            }
+        }
+
+        function doStepMusicButton() {
+            var turtleCount = 0;
+            for (var turtle in logo.stepQueue) {
+                turtleCount += 1;
+            }
+            if (turtleCount == 0 || logo.TurtleDelay != TURTLESTEP) {
+                // Either we haven't set up a queue or we are
+                // switching modes.
+                logo.setTurtleDelay(TURTLESTEP);
+                // Queue and take first step.
+                if (!turtles.running()) {
+                    logo.runLogoCommands();
+                }
+                logo.stepNote();
+            } else {
+                logo.setTurtleDelay(TURTLESTEP);
+                logo.stepNote();
             }
         }
 
@@ -1688,6 +1718,8 @@ define(function (require) {
                 ['fast', doFastButton],
                 ['slow', doSlowButton],
                 ['step', doStepButton],
+                ['slow-music', doSlowMusicButton],
+                ['step-music', doStepMusicButton],
                 ['stop-turtle', doStopButton],
                 ['clear', allClear],
                 ['palette', changePaletteVisibility],
