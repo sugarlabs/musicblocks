@@ -84,7 +84,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitch.defaults.push('sol');
     pitch.defaults.push(4);
     pitch.twoArgBlock();
-    pitch.dockTypes[1] = 'solfegein';
+    pitch.dockTypes[1] = 'anyin';
     pitch.dockTypes[2] = 'anyin';
 
     var rhythm = new ProtoBlock('rhythm');
@@ -216,14 +216,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     var currentNoteBlock = new ProtoBlock('currentnote');
     currentNoteBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['currentnote'] = currentNoteBlock;
-    currentNoteBlock.staticLabels.push(_('current note'));
+    currentNoteBlock.staticLabels.push(_('current pitch name'));
     currentNoteBlock.adjustWidthToLabel();
     currentNoteBlock.parameterBlock();
 
     var currentOctaveBlock = new ProtoBlock('currentoctave');
     currentOctaveBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['currentoctave'] = currentOctaveBlock;
-    currentOctaveBlock.staticLabels.push(_('current octave'));
+    currentOctaveBlock.staticLabels.push(_('current pitch octave'));
     currentOctaveBlock.adjustWidthToLabel();
     currentOctaveBlock.parameterBlock();
 

@@ -98,6 +98,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.currentOctaves = {};
 
     // parameters used by the note block
+    this.noteDelay = 0;
     this.pushedNote = {};
     this.duplicateFactor = {};
     this.polyVolume = {};
@@ -145,8 +146,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.turtleOscs = {};
     this.notesOscs = {};
 
+    // Used to pause between each block as the program executes.
     this.setTurtleDelay = function(turtleDelay) {
         this.turtleDelay = turtleDelay;
+    }
+
+    // Used to pause between each note as the program executes.
+    this.setNoteDelay = function(noteDelay) {
+        this.noteDelay = noteDelay;
     }
 
     this.step = function() {
@@ -1734,12 +1741,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     var duration =  noteBeatValue * logo.noteBeatValues[turtle][0];
 
                     // Use 2 to match playback speed of matrix
-                    logo.doWait(turtle, (2 / duration) * logo.duplicateFactor[turtle]);
+                    logo.doWait(turtle, (2 / duration) * logo.duplicateFactor[turtle] + logo.noteDelay);
 
                     var waitTime = 0;
                     for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
                         if (j > 0) {
                             waitTime += (2000 / duration);
+                            waitTime += logo.noteDelay;
                         }
 
                         // FIXME: When duplicating notes inside a

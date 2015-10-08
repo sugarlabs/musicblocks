@@ -165,7 +165,7 @@ define(function (require) {
         };
 
         // Music matrix globals
-        window.savedMatricesNotes = [];
+        // window.savedMatricesNotes = [];
         window.savedMatricesCount = 0;
 
         // Stacks of blocks saved in local storage
@@ -302,6 +302,7 @@ define(function (require) {
 
         function doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
+	    // logo.setNoteDelay(DEFAULTDELAY);
             if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
@@ -1094,13 +1095,13 @@ define(function (require) {
                 var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
                                 [1, 'matrix', 450, 150, [null, 2, null]],
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['text', {value:'sol'}], 0, 0, [2]],
+                                [3, ['solfege', {value:'sol'}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
                                 [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['text', {value:'mi'}], 0, 0, [5]],
+                                [6, ['solfege', {value:'mi'}], 0, 0, [5]],
                                 [7, ['number', {value:'4'}], 0, 0, [5]],
                                 [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['text', {value:'re'}], 0, 0, [8]],
+                                [9, ['solfege', {value:'re'}], 0, 0, [8]],
                                 [10, ['number', {value:'4'}], 0, 0, [8]],
                                 [11, 'rhythm', 0, 0, [8, 12, 13, null]],
                                 [12, ['number', {value:'3'}], 0, 0, [11]],
@@ -1344,13 +1345,13 @@ define(function (require) {
                 var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
                                 [1, 'matrix', 450, 150, [null, 2, null]],
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['text', {value:'sol'}], 0, 0, [2]],
+                                [3, ['solfege', {value:'sol'}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
                                 [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['text', {value:'mi'}], 0, 0, [5]],
+                                [6, ['solfege', {value:'mi'}], 0, 0, [5]],
                                 [7, ['number', {value:'4'}], 0, 0, [5]],
                                 [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['text', {value:'re'}], 0, 0, [8]],
+                                [9, ['solfege', {value:'re'}], 0, 0, [8]],
                                 [10, ['number', {value:'4'}], 0, 0, [8]],
                                 [11, 'rhythm', 0, 0, [8, 12, 13, null]],
                                 [12, ['number', {value:'3'}], 0, 0, [11]],

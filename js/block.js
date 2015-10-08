@@ -1493,8 +1493,8 @@ function changeLabel(myBlock) {
     var focused = false;
     var blur = function (event) {
         // Not sure why the change in the input is not available
-        // immediately in FireFox. This is a rude work-around.
-        setTimeout(function() {labelChanged(myBlock)}, 3000);
+        // immediately in FireFox. We need a workaround if hardware
+	// acceleration is enabled.
 
         if (!focused) {
             return;
