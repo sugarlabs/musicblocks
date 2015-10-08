@@ -147,12 +147,12 @@ function Block(protoblock, blocks, overrideName) {
         this.regenerateArtwork(false);
     }
 
-    this.resize = function(scale) {
+    this.resize = function(blockScale) {
         // If the block scale changes, we need to regenerate the
         // artwork and recalculate the hitarea.
         this.postProcess = function(myBlock) {
             if (myBlock.imageBitmap != null) {
-                positionMedia(myBlock.imageBitmap, myBlock, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, scale);
+                positionMedia(myBlock.imageBitmap, myBlock, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, blockScale);
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
@@ -160,7 +160,7 @@ function Block(protoblock, blocks, overrideName) {
                 // Rescale the decoration on the start blocks.
                 for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock == myBlock) {
-                        myBlock.blocks.turtles.turtleList[turtle].resizeDecoration(scale, myBlock.bitmap.image.width);
+                        myBlock.blocks.turtles.turtleList[turtle].resizeDecoration(blockScale, myBlock.bitmap.image.width);
                         ensureDecorationOnTop(myBlock);
                         break;
                     }
@@ -169,18 +169,18 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.container.updateCache();
             calculateBlockHitArea(myBlock);
         }
-        this.protoblock.scale = scale;
+        this.protoblock.scale = blockScale;
         this.newArtwork(0);
         this.regenerateArtwork(true, []);
 
         if (this.text != null) {
-            positionText(this, scale);
+            positionText(this, blockScale);
         }
         if (this.collapseContainer != null) {
             this.collapseContainer.uncache();
             var postProcess = function(myBlock) {
-                myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = scale / 2;
-                myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = scale / 2;
+                myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = blockScale / 2;
+                myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = blockScale / 2;
                 var bounds = myBlock.collapseContainer.getBounds();
                 myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 positionCollapseContainer(myBlock, myBlock.protoblock.scale);
@@ -188,9 +188,9 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             this.generateCollapseArtwork(postProcess);
-            var fontSize = 10 * scale;
+            var fontSize = 10 * blockScale;
             this.collapseText.font = fontSize + 'px Sans';
-            positionCollapseLabel(this, scale);
+            positionCollapseLabel(this, blockScale);
         }
     }
 
@@ -850,18 +850,18 @@ function $() {
 }
 
 
-function positionText(myBlock, scale) {
+function positionText(myBlock, blockScale) {
     myBlock.text.textBaseline = 'alphabetic';
     myBlock.text.textAlign = 'right';
-    var fontSize = 10 * scale;
+    var fontSize = 10 * blockScale;
     myBlock.text.font = fontSize + 'px Sans';
-    myBlock.text.x = TEXTX * scale / 2.;
-    myBlock.text.y = TEXTY * scale / 2.;
+    myBlock.text.x = TEXTX * blockScale / 2.;
+    myBlock.text.y = TEXTY * blockScale / 2.;
 
     // Some special cases
     if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) != -1) {
         myBlock.text.textAlign = 'center';
-        myBlock.text.x = VALUETEXTX * scale / 2.;
+        myBlock.text.x = VALUETEXTX * blockScale / 2.;
     } else if (myBlock.protoblock.args == 0) {
         var bounds = myBlock.container.getBounds();
         myBlock.text.x = bounds.width - 25;
@@ -879,14 +879,14 @@ function positionText(myBlock, scale) {
 }
 
 
-function positionMedia(bitmap, myBlock, width, height, scale) {
+function positionMedia(bitmap, myBlock, width, height, blockScale) {
     if (width > height) {
-        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * scale / 2;
+        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
     } else {
-        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / height * scale / 2;
+        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / height * blockScale / 2;
     }
-    bitmap.x = (MEDIASAFEAREA[0] - 10) * scale / 2;
-    bitmap.y = MEDIASAFEAREA[1] * scale / 2;
+    bitmap.x = (MEDIASAFEAREA[0] - 10) * blockScale / 2;
+    bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
 }
 
 
@@ -902,9 +902,9 @@ function calculateCollapseHitArea(myBlock) {
 }
 
 
-function positionCollapseLabel(myBlock, scale) {
-    myBlock.collapseText.x = COLLAPSETEXTX * scale / 2;
-    myBlock.collapseText.y = COLLAPSETEXTY * scale / 2;
+function positionCollapseLabel(myBlock, blockScale) {
+    myBlock.collapseText.x = COLLAPSETEXTX * blockScale / 2;
+    myBlock.collapseText.y = COLLAPSETEXTY * blockScale / 2;
 
     // Ensure text is on top.
     z = myBlock.container.getNumChildren() - 1;
@@ -912,9 +912,9 @@ function positionCollapseLabel(myBlock, scale) {
 }
 
 
-function positionCollapseContainer(myBlock, scale) {
-    myBlock.collapseContainer.x = myBlock.container.x + COLLAPSEBUTTONXOFF * scale / 2;
-    myBlock.collapseContainer.y = myBlock.container.y + COLLAPSEBUTTONYOFF * scale / 2;
+function positionCollapseContainer(myBlock, blockScale) {
+    myBlock.collapseContainer.x = myBlock.container.x + COLLAPSEBUTTONXOFF * blockScale / 2;
+    myBlock.collapseContainer.y = myBlock.container.y + COLLAPSEBUTTONYOFF * blockScale / 2;
 }
 
 
@@ -1256,7 +1256,6 @@ function loadEventHandlers(myBlock) {
                     var blk = blocks.dragGroup[b];
                     if (b != 0) {
                         blocks.moveBlockRelative(blk, dx, dy);
-                        // console.log(blocks.blockList[blk].name + ' ' + 'dx: ' + dx + ' dy: ' + dy);
                     }
                 }
             }

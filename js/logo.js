@@ -3209,12 +3209,12 @@ function getNote (solfege, octave, transposition, keySignature) {
             keySignature = 'C';
         }
         if (keySignature.substr(-1) == 'm' || keySignature.slice(1).toLowerCase() == 'minor') {
-            var scale = notesFlat;
+            var thisScale = notesFlat;
             var halfSteps = minorHalfSteps;  // 0 2 3 5 7 8 10
             var keySignature = keySignature.substr(0, keySignature.length - 1);
             var major = false;
         } else {
-            var scale = notesSharp;
+            var thisScale = notesSharp;
             var halfSteps = majorHalfSteps;  // 0 2 4 5 7 9 11
             var keySignature = keySignature;
             var major = true;
@@ -3224,11 +3224,11 @@ function getNote (solfege, octave, transposition, keySignature) {
             keySignature = extraTranspositions[keySignature][0];
         }
 
-        offset = scale.indexOf(keySignature);
+        offset = thisScale.indexOf(keySignature);
         if (offset == -1) {
-            console.log('WARNING: Key ' + keySignature + ' not found in ' + scale + '. Using default of C');
+            console.log('WARNING: Key ' + keySignature + ' not found in ' + thisScale + '. Using default of C');
             var offset = 0;
-            var scale = notesSharp;
+            var thisScale = notesSharp;
         }
 
         var twoCharSolfege = solfege.toUpperCase().substr(0,2);
@@ -3236,12 +3236,12 @@ function getNote (solfege, octave, transposition, keySignature) {
             return ['R', ''];
         } else if (twoCharSolfege in halfSteps) {
             var index = halfSteps[twoCharSolfege] + offset;
-            // console.log(solfege + ' ' + twoCharSolfege + ' ' + offset + ' ' + index + ' ' + scale[index]);
+            // console.log(solfege + ' ' + twoCharSolfege + ' ' + offset + ' ' + index + ' ' + thisScale[index]);
             if (index > 11) {
                 index -= 12;
                 octave += 1;
             }
-            note = scale[index];
+            note = thisScale[index];
         } else {
             console.log('WARNING: Note ' + solfege + ' not found. Returning C');
             return ['C', octave];
