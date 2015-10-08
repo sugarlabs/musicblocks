@@ -40,7 +40,7 @@ THE GRAPHICAL NOTATION MATRIX
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg'</img>
 
 Once you've launched Music Blocks in your browser, start by clicking
-on the Graphical Notation Matrix that appears in the middle of the
+on the Graphical-notation Matrix that appears in the middle of the
 screen. (For the moment, ignore the Start block.) You'll see a grid
 organized vertically by pitch and horizontally by rhythm.
 
@@ -182,12 +182,13 @@ PROGRAMMING WITH MUSIC
 ----------------------
 
 The remainder of this guide discusses how to use the chunks created by
-the Graphical-notation matrix when programming (You can also program with chunks you create and/or modify by hand).
+the Graphical-notation Matrix when programming (You can also program
+with chunks you create and/or modify by hand).
 
 1. A chunck of notes
 --------------------
 
-<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix8.svg'</img>
+<img src='https://rawgithub.com/walterbender/turtleblocksjs/master/guide/matrix3.svg'</img>
 
 There are several ways to play a chunk...
 
