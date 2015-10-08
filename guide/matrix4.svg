@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="svg4224"
+   viewBox="0 0 236.00001 297.99999"
+   height="84.102219mm"
+   width="66.604446mm">
+  <defs
+     id="defs4226" />
+  <metadata
+     id="metadata4229">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-64.362205)"
+     id="layer1">
+    <g
+       id="g4-2"
+       transform="matrix(2,0,0,2,98,168.3622)">
+      <filter
+         style="color-interpolation-filters:sRGB"
+         id="dropshadow-6"
+         height="1.3">
+        <feGaussianBlur
+           id="feGaussianBlur7-6"
+           stdDeviation="3"
+           in="SourceAlpha" />
+        <feOffset
+           id="feOffset9-0"
+           result="offsetblur"
+           dy="2"
+           dx="2" />
+        <feComponentTransfer
+           id="feComponentTransfer11-7">
+          <feFuncA
+             id="feFuncA13-7"
+             slope="0.2"
+             type="linear" />
+        </feComponentTransfer>
+        <feMerge
+           id="feMerge15-19">
+          <feMergeNode
+             id="feMergeNode17-1" />
+          <feMergeNode
+             id="feMergeNode19-3"
+             in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <path
+         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path21-3"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         x="25"
+         style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
+         id="text23-6">
+        <tspan
+           id="tspan25-9"
+           y="13"
+           x="35">B♭</tspan>
+      </text>
+    </g>
+    <g
+       transform="translate(-183.83636,371.18644)"
+       id="g3710-3">
+      <path
+         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+         id="path21-6-72"
+         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+      <text
+         id="text23-9-5"
+         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+         x="333.83636"
+         y="-54.824242">
+        <tspan
+           x="353.83636"
+           y="-28.824242"
+           id="tspan25-8-7">5</tspan>
+      </text>
+    </g>
+    <g
+       transform="translate(0,274.3622)"
+       id="g3423-9">
+      <path
+         d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
+         id="path3194-6"
+         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+      <text
+         id="text3196-0"
+         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="49"
+           id="tspan3198-1">pitch</tspan>
+      </text>
+      <text
+         id="text3200-46"
+         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="22.5"
+           id="tspan3202-3">note</tspan>
+      </text>
+      <text
+         id="text3204-4"
+         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="64.5"
+           id="tspan3206-6">octave</tspan>
+      </text>
+    </g>
+    <g
+       transform="translate(-183.83636,265.18644)"
+       id="g3710-3-4">
+      <path
+         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+         id="path21-6-72-7"
+         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+      <text
+         id="text23-9-5-1"
+         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+         x="333.83636"
+         y="-54.824242">
+        <tspan
+           x="353.83636"
+           y="-28.824242"
+           id="tspan25-8-7-6">4</tspan>
+      </text>
+    </g>
+    <g
+       transform="translate(0,168.3622)"
+       id="g3423-9-4">
+      <path
+         d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
+         id="path3194-6-6"
+         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+      <text
+         id="text3196-0-3"
+         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="49"
+           id="tspan3198-1-3">pitch</tspan>
+      </text>
+      <text
+         id="text3200-46-9"
+         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="22.5"
+           id="tspan3202-3-4">note</tspan>
+      </text>
+      <text
+         id="text3204-4-8"
+         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="64.5"
+           id="tspan3206-6-7">octave</tspan>
+      </text>
+    </g>
+    <g
+       id="g4-2-6"
+       transform="matrix(2,0,0,2,98,64.362205)">
+      <filter
+         style="color-interpolation-filters:sRGB"
+         id="dropshadow-6-4"
+         height="1.3">
+        <feGaussianBlur
+           id="feGaussianBlur7-6-0"
+           stdDeviation="3"
+           in="SourceAlpha" />
+        <feOffset
+           id="feOffset9-0-1"
+           result="offsetblur"
+           dy="2"
+           dx="2" />
+        <feComponentTransfer
+           id="feComponentTransfer11-7-7">
+          <feFuncA
+             id="feFuncA13-7-0"
+             slope="0.2"
+             type="linear" />
+        </feComponentTransfer>
+        <feMerge
+           id="feMerge15-19-4">
+          <feMergeNode
+             id="feMergeNode17-1-2" />
+          <feMergeNode
+             id="feMergeNode19-3-96"
+             in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <path
+         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path21-3-4"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         x="25"
+         style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
+         id="text23-6-7">
+        <tspan
+           id="tspan25-9-30"
+           y="13"
+           x="35">sol</tspan>
+      </text>
+    </g>
+    <g
+       transform="translate(-183.83636,161.18645)"
+       id="g3710-3-1">
+      <path
+         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+         id="path21-6-72-4"
+         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+      <text
+         id="text23-9-5-5"
+         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+         x="333.83636"
+         y="-54.824242">
+        <tspan
+           x="353.83636"
+           y="-28.824242"
+           id="tspan25-8-7-7">6</tspan>
+      </text>
+    </g>
+    <g
+       transform="translate(0,64.362205)"
+       id="g3423-9-7">
+      <path
+         d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
+         id="path3194-6-9"
+         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+      <text
+         id="text3196-0-6"
+         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="49"
+           id="tspan3198-1-9">pitch</tspan>
+      </text>
+      <text
+         id="text3200-46-7"
+         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="22.5"
+           id="tspan3202-3-1">note</tspan>
+      </text>
+      <text
+         id="text3204-4-7"
+         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+        <tspan
+           x="94"
+           y="64.5"
+           id="tspan3206-6-0">octave</tspan>
+      </text>
+    </g>
+    <g
+       transform="translate(-9.9999811,95.800127)"
+       id="g4017">
+      <path
+         d="m 125,179.56207 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+         id="path21-2-0"
+         style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+      <text
+         x="153.21786"
+         y="178.01807"
+         id="text23-2"
+         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+        <tspan
+           x="173.21786"
+           y="204.01805"
+           id="tspan25-1">F#</tspan>
+      </text>
+    </g>
+  </g>
+</svg>
