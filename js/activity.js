@@ -1059,8 +1059,8 @@ define(function (require) {
 
         // FIXME: confirm???
         function sendAllToTrash(addStartBlock, doNotSave) {
-            var dx = 2000;
-            var dy = cellSize;
+            var dx = 0;
+            var dy = cellSize * 3;
             for (var blk in blocks.blockList) {
                 blocks.blockList[blk].trash = true;
                 blocks.moveBlockRelative(blk, dx, dy);
@@ -1076,22 +1076,6 @@ define(function (require) {
                 }
             }
             if (addStartBlock) {
-                /*
-                function postprocess() {
-                    last(blocks.blockList).x = 250;
-                    last(blocks.blockList).y = 250;
-                    last(blocks.blockList).connections = [null, null, null];
-                    turtles.add(last(blocks.blockList));
-                    last(blocks.blockList).value = turtles.turtleList.length - 1;
-                    blocks.updateBlockPositions();
-                    if (!doNotSave) {
-                        console.log('save locally');
-                        saveLocally();
-                    }
-                }
-
-                blocks.makeNewBlock('start', postprocess);
-                */
                 var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
                                 [1, 'matrix', 450, 150, [null, 2, null]],
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
@@ -1107,11 +1091,8 @@ define(function (require) {
                                 [12, ['number', {value:'3'}], 0, 0, [11]],
                                 [13, ['number', {value:'4'}], 0, 0, [11]]];
                 blocks.loadNewBlocks(dataObjs);
-            }
-
-            if (!doNotSave) {
+            } else if (!doNotSave) {
                 // Overwrite session data too.
-                console.log('save locally');
                 saveLocally();
             }
 
@@ -1244,7 +1225,7 @@ define(function (require) {
             }
             img.src = 'data:image/svg+xml;base64,' +
             window.btoa(unescape(encodeURIComponent(svgData)));
-            console.log(img.src);
+            // console.log(img.src);
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 sugarizerCompatibility.saveLocally();
             }
@@ -1559,18 +1540,8 @@ define(function (require) {
                         'value': myBlock.value
                     };
                 } else if (myBlock.name == 'start' || myBlock.name == 'drum') {
-                    // Find the turtle with this name.
-                    if (typeof(myBlock.value) == 'number') {
-                        var targetName = myBlock.value.toString();
-		    } else {
-                        var targetName = myBlock.value;
-		    }
-                    for (var t = 0; t < turtles.turtleList.length; t++) {
-                        if (turtles.turtleList[t].name == targetName) {
-                            var turtle = turtles.turtleList[t];
-                        }
-		    }
-                    // turtle = turtles.turtleList[myBlock.value];
+                    // Find the turtle associated with this block.
+                    turtle = turtles.turtleList[myBlock.value];
                     var args = {
                         'collapsed': myBlock.collapsed,
                         'xcor': turtle.x,

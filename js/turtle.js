@@ -213,7 +213,7 @@ function Turtle (name, turtles, drum) {
                 this.startBlock.collapseText.text = this.name;
             }
 	    this.startBlock.regenerateArtwork(false);
-            this.startBlock.value = this.name;
+            this.startBlock.value = this.turtles.turtleList.indexOf(this);
         }
     }
     
@@ -775,6 +775,10 @@ function Turtles(canvas, stage, refreshCanvas) {
         // Add a new turtle for each start block
         if (startBlock != null) {
             console.log('adding a new turtle ' + startBlock.name);
+            if (startBlock.value != this.turtleList.length) {
+                startBlock.value = this.turtleList.length;
+                console.log('turtle #' + startBlock.value);
+            }
         } else {
             console.log('adding a new turtle startBlock is null');
         };

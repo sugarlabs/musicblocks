@@ -401,7 +401,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value + this.blocks.blockList[blk].labelattr.value;
                 } else {
                     this.blocks.blockList[blk].value = this.blocks.blockList[blk].label.value;
-		}
+                }
             }
         }
 
@@ -624,7 +624,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'notevolumefactor':
                 // A bit ugly because the setter call already added in
                 // the scaled polyVolume value.
-	        value -= this.polyVolume[turtleId];
+                value -= this.polyVolume[turtleId];
                 var vol = (this.polyVolume[turtleId] / 0.4) + 100;
                 this.setSynthVolume(vol + value, turtleId);
                 break;
@@ -1140,6 +1140,48 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     logo.errorMsg('Could not find turtle ' + args[0], blk);
                 }
                 break;
+            case 'startTurtle':
+                var targetTurtle = logo.getTargetTurtle(args);
+                if (targetTurtle == null) {
+                    logo.errorMsg('Cannot find turtle: ' + args[0], blk)
+                } else {
+                    if (logo.turtles.turtleList[targetTurtle].running) {
+                        logo.errorMsg('Turtle is already running.', blk);
+                        break;
+                    }
+                    logo.turtles.turtleList[targetTurtle].queue = [];
+                    logo.turtles.turtleList[targetTurtle].running = true;
+                    logo.parentFlowQueue[targetTurtle] = [];
+                    logo.unhightlightQueue[targetTurtle] = [];
+                    logo.parameterQueue[targetTurtle] = [];
+                    // Find the start block associated with this turtle.
+                    var foundStartBlock = false;
+                    for (var i = 0; i < logo.blocks.blockList.length; i++) {
+                        if (logo.blocks.blockList[i] == logo.turtles.turtleList[targetTurtle].startBlock) {
+                            foundStartBlock = true;
+                            break;
+                        }
+                    }
+                    if (foundStartBlock) {
+                        console.log('calling runFromBlock with ' + i);
+                        logo.runFromBlock(logo, targetTurtle, i, isflow, receivedArg);
+                    } else {
+                        logo.errorMsg('Cannot find start block for turtle: ' + args[0], blk)
+                    }
+                }
+                break;
+            case 'stopTurtle':
+                var targetTurtle = logo.getTargetTurtle(args);
+                if (targetTurtle == null) {
+                    logo.errorMsg('Cannot find turtle: ' + args[0], blk)
+                } else {
+                    logo.turtles.turtleList[targetTurtle].queue = [];
+                    logo.parentFlowQueue[targetTurtle] = [];
+                    logo.unhightlightQueue[targetTurtle] = [];
+                    logo.parameterQueue[targetTurtle] = [];
+                    logo.doBreak(targetTurtle);
+                }
+                break;
             case 'setcolor':
                 if (args.length == 1) {
                     if (typeof(args[0]) == 'string') {
@@ -1343,36 +1385,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'stopvideocam':
                 if (cameraID != null) {
                     doStopVideoCam(logo.cameraID, logo.setCameraID);
-                }
-                break;
-            case 'startTurtle':
-                var targetTurtle = logo.getTargetTurtle(args);
-                if (targetTurtle[0] == -1) {
-                    logo.errorMsg('Cannot find start block for turtle: ' + args[0], blk)
-                } else {
-                    if (logo.turtles.turtleList[targetTurtle[0]].running) {
-                        logo.errorMsg('Turtle is already running.', blk);
-                        break;
-                    }
-                    logo.turtles.turtleList[targetTurtle[0]].queue = [];
-                    logo.turtles.turtleList[targetTurtle[0]].running = true;
-                    logo.parentFlowQueue[targetTurtle[0]] = [];
-                    logo.unhightlightQueue[targetTurtle[0]] = [];
-                    logo.parameterQueue[targetTurtle[0]] = [];
-                    console.log('calling runFromBlock with ' + targetTurtle[1]);
-                    logo.runFromBlock(logo, targetTurtle[0], targetTurtle[1], isflow, receivedArg);
-                }
-                break;
-            case 'stopTurtle':
-                var targetTurtle = logo.getTargetTurtle(args);
-                if (targetTurtle[0] == -1) {
-                    logo.errorMsg('Cannot find start block for turtle: ' + args[0], blk)
-                } else {
-                    logo.turtles.turtleList[targetTurtle[0]].queue = [];
-                    logo.parentFlowQueue[targetTurtle[0]] = [];
-                    logo.unhightlightQueue[targetTurtle[0]] = [];
-                    logo.parameterQueue[targetTurtle[0]] = [];
-                    logo.doBreak(targetTurtle[0]);
                 }
                 break;
             case 'showblocks':
@@ -1780,7 +1792,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             if (notes.length > 0) {
                                 var len = notes[0].length;
                                 logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
-				logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
+                                logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
                                 if (logo.turtles.turtleList[turtle].drum) {
                                     for (var i = 0; i < notes.length; i++) {
                                         // Remove pitch
@@ -2451,42 +2463,25 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // The target turtle name can be a string or an int. Make
         // sure there is a turtle by this name and then find the
         // associated start block.
-        var foundTargetTurtle = -1;
 
         var targetTurtle = args[0];
-	if (typeof(targetTurtle) == 'number') {
-	    targetTurtle = targetTurtle.toString();
+
+        // We'll compare the names as strings.
+        if (typeof(targetTurtle) == 'number') {
+            targetTurtle = targetTurtle.toString();
         }
 
         for (var i = 0; i < this.turtles.turtleList.length; i++) {
             var turtleName = this.turtles.turtleList[i].name;
             if (typeof(turtleName) == 'number') {
-		turtleName = turtleName.toString();
-	    }
+                turtleName = turtleName.toString();
+            }
             if (turtleName == targetTurtle) {
-                foundTargetTurtle = i;
-                break;
+                return i;
             }
         }
 
-        if (foundTargetTurtle == -1) {
-            this.errorMsg('Could not find turtle ' + args[0], blk);
-            return [-1, -1];
-        }
-
-        for (var blk in this.blocks.blockList) {
-            var name = this.blocks.blockList[blk].name;
-            if (name == 'start' || name == 'drum') {
-                var turtleName = this.blocks.blockList[blk].value;
-                if (typeof(turtleName) == 'number') {
-                    turtleName = turtleName.toString();
-                }
-		if (targetTurtle == turtleName) {
-                    return [foundTargetTurtle, blk];
-                }
-            }
-        }
-        return [-1, -1];
+        return null;
     }
 
     this.loopBlock = function(name) {
@@ -3167,11 +3162,11 @@ function getNote (solfege, octave, transposition, keySignature) {
         var lastTwo = solfege.slice(len - 2);        
         if (lastTwo == 'bb' || lastTwo == '♭♭') {
             solfege = solfege.slice(0, len - 1);
-	    transposition -= 1;
+            transposition -= 1;
         } else if (lastTwo == '##') {
             solfege = solfege.slice(0, len - 1);
-	    transposition += 1;
-	}
+            transposition += 1;
+        }
     }
 
     var bToFlat = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
@@ -3203,7 +3198,7 @@ function getNote (solfege, octave, transposition, keySignature) {
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (solfege.substr(-1) == '>') {
             // Read octave and solfege from HTML
-	    octave = parseInt(solfege.slice(solfege.indexOf('>') + 1, solfege.indexOf('/') - 1));
+            octave = parseInt(solfege.slice(solfege.indexOf('>') + 1, solfege.indexOf('/') - 1));
             solfege = solfege.substr(0, solfege.indexOf('<'));
         }
         if(['#', '♭', 'b'].indexOf(solfege.substr(-1)) != -1) {
