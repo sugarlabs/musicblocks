@@ -123,6 +123,8 @@ Pitch block is specified using a Pitch-name block; the pitch name in
 the bottom block is specified using a Text block. The octave is always
 specified using a number block and is restricted to whole numbers.
 
+Note that the rest keyword used in a Pitch block will not be voiced.
+ 
 About the Rhythm Block
 ----------------------
 
@@ -272,7 +274,7 @@ It gets more interesting if we shift up and down octaves.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg'</img>
 
-And even more interesting if we bring the various voices offset in time. (Note that the rest keyword used in a Pitch block will not be voiced.)
+And even more interesting if we bring the various voices offset in time.
 
 4. Adding graphics
 ------------------
