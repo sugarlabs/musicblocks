@@ -255,3 +255,24 @@ Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.
 
 3. Voices
 ---------
+
+Each Start block runs as a separate voice in Music blocks. (When you click on the Run button, all of the Start blocks are run concurrently.)
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg'</img>
+
+If we put our song into an action...
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg'</img>
+
+we can run it from multiple Start blocks.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg'</img>
+
+It gets more interesting if we shift up and down octaves.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg'</img>
+
+And even more interesting if we bring the various voices offset in time.
+
+4. Adding graphics
+------------------
