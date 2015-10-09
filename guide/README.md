@@ -264,7 +264,7 @@ If we put our song into an action...
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg'</img>
 
-we can run it from multiple Start blocks.
+...we can run it from multiple Start blocks.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg'</img>
 
@@ -272,7 +272,7 @@ It gets more interesting if we shift up and down octaves.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg'</img>
 
-And even more interesting if we bring the various voices offset in time.
+And even more interesting if we bring the various voices offset in time. (Note that the rest keyword used in a Pitch block will not be voiced.)
 
 4. Adding graphics
 ------------------
