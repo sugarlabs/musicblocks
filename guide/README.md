@@ -278,3 +278,8 @@ And even more interesting if we bring the various voices offset in time.
 
 4. Adding graphics
 ------------------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'</img>
+
+Turtle graphics can be combined with the music blocks. In this example, each time the pitch is raised by one half step, the pen size decreases and the pen color increases.
+
