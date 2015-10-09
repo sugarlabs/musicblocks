@@ -203,9 +203,9 @@ Repeat block.
 
 You can also mix and match chunks. Here we play chunk0, followed by chunk1 twice, and then chunk0 again.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
-
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg'</img>
 
 A few more chunks and we can make a song. (Can you read the block notation in order to guess what song we've programmed?)
 
