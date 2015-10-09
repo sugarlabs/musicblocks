@@ -283,3 +283,6 @@ And even more interesting if we bring the various voices offset in time.
 
 Turtle graphics can be combined with the music blocks. In this example, each time the pitch is raised by one half step, the pen size decreases and the pen color increases.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
+
+The output of the program after running five times.
