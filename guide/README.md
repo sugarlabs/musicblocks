@@ -202,3 +202,56 @@ Repeat block.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
 
 You can also mix and match chunks. Here we play chunk0, followed by chunk1 twice, and then chunk0 again.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'</img>
+
+A few more chunks and we can make a song. (Can you read the block notation in order to guess what song we've programmed?)
+
+2. Transformations
+------------------
+
+There are many ways to transform both pitch and rhythm.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
+
+The Sharp and Flat blocks can be wrapped around Pitch blocks, Note
+blocks, or chunks. A sharp will raise the pitch by one half step. A
+flat will lower by one half step. In the example, on the left, just
+the Pitch block Mi is lowered by one half step; on the right, both
+pitch blocks are raised by one half step.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg'</img>
+
+The Transposition block can be used to make larger shifts in pitch. To
+shift an entire octave, transpose by 12 half-steps up. -12 will shift
+an octave down.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg'</img>
+
+In the example above, we take the song we programmed previously and raise it by one octave.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg'</img>
+
+You can "dot" notes using the Dot block. A dotted note extends by
+50%. E.g., a dotted quarter note will play for 3/8 of a beat. A dotted
+eighth note will play for 3/16 of a beat.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg'</img>
+
+You can also multiply (or divide) the beat factor, which will speed up
+or slowdown the notes.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg'</img>
+
+There are several ways to repeat notes. The Repeat block will play a
+sequence of notes multiple times; the Duplicate block will repeat each
+note in a sequence.
+
+In the example, on the left, the result would be Sol, Re, Sol, Sol,
+Re, Sol, Sol, Re, Sol, Sol, Re, Sol; on the right the result would be
+Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.
+
+3. Voices
+---------
