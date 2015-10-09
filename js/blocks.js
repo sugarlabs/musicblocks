@@ -989,10 +989,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (type1 == 'fileout' && type2 == 'filein') {
             return true;
         }
-        if (type1 == 'solfegein' && ['solfegeout', 'textout', 'noteout'].indexOf(type2) != -1) {
+        if (type1 == 'solfegein' && ['anyout', 'solfegeout', 'textout', 'noteout'].indexOf(type2) != -1) {
             return true;
         }
-        if (type2 == 'solfegein' && ['solfegeout', 'textout', 'noteout'].indexOf(type1) != -1) {
+        if (type2 == 'solfegein' && ['anyout', 'solfegeout', 'textout', 'noteout'].indexOf(type1) != -1) {
             return true;
         }
         if (type1 == 'notein' && ['solfegeout', 'textout', 'noteout'].indexOf(type2) != -1) {

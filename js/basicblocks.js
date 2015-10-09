@@ -84,7 +84,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitch.defaults.push('sol');
     pitch.defaults.push(4);
     pitch.twoArgBlock();
-    pitch.dockTypes[1] = 'anyin';
+    pitch.dockTypes[1] = 'solfegein';
     pitch.dockTypes[2] = 'anyin';
 
     var rhythm = new ProtoBlock('rhythm');
