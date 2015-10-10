@@ -188,7 +188,7 @@ note". This gives the user endless rhythmic possibilities.
 As a convenience, blocks for the most common note values are also
 provided (whole note through 64th note). They also create columns in
 the matrix. If you would like multiple note values in a row, simply
-use the /Repeat/ block clamp or /Duplicate/ block clamp.
+use the *Repeat* block clamp or *Duplicate* block clamp.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/tuplet.svg'</img>
 
@@ -289,11 +289,11 @@ tuplet is extended by 50%.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/duplicate-factor.svg'</img>
 
-*Duplicate Notes* block is used to repeat any contained notes. Similar
-to using a *Repeat* block, but rather than repeating a sequence of
-notes multiple times, each note is repeated in turn, e.g. duplicate x2
-of 4 4 8 would result in 4 4 4 4 8 8, where as repeat x2 of 4 4 8
-would result in 4 4 8 4 4 8.
+The *Duplicate Notes* block is used to repeat any contained
+notes. Similar to using a *Repeat* block, but rather than repeating a
+sequence of notes multiple times, each note is repeated in turn,
+e.g. duplicate x2 of 4 4 8 would result in 4 4 4 4 8 8, where as
+repeat x2 of 4 4 8 would result in 4 4 8 4 4 8.
 
 Tone Palette
 ------------
