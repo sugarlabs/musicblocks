@@ -1,12 +1,12 @@
 // Copyright (c) 2015 Walter Bender
 //
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 3 of the License, or
-// (at your option) any later version.
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
 //
-// You should have received a copy of the GNU General Public License
-// along with this library; if not, write to the Free Software
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 var FONTSMALLERSVG = '<g id="fontsmaller"> <g transform="matrix(-1,0,0,1,60.419,78.41)" id="g29" style="fill:#000000;stroke:#000000;stroke-opacity:1"> <g id="g31" style="fill:#000000;stroke:#000000;stroke-opacity:1"> <path d="m 25.263,12.435 h 24.656 v 3.562 H 39.575 V 41.59 H 35.606 V 15.996 H 25.263 v -3.561 z" id="path33" style="fill:#000000;stroke:#000000;stroke-opacity:1" /> </g> </g> <g transform="matrix(-1,0,0,1,68.4192,78.41)" id="g35" style="fill:#000000;stroke:#000000;stroke-opacity:1"> <g id="g37" style="fill:#000000;stroke:#000000;stroke-opacity:1"> <path d="m 13.953,24.435 h 16.656 v 3.562 H 24.265 V 41.59 H 20.296 V 27.997 h -6.344 v -3.562 z" id="path39" style="fill:#000000;stroke:#000000;stroke-opacity:1" /> </g> </g> <path d="m 28.4062,96.087762 6,5.999998 -4,0" id="path41" style="fill:none;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" /> </g> ';
