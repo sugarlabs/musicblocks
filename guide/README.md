@@ -257,6 +257,7 @@ Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.
 
 3. Voices
 ---------
+
 Each Start block runs as a separate voice in Music blocks. (When you click on the Run button, all of the Start blocks are run concurrently.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg'</img>
@@ -285,5 +286,3 @@ Turtle graphics can be combined with the music blocks. In this example, each tim
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
 
 The output of the program after running five times.
-
-
