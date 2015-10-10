@@ -239,7 +239,7 @@ tones or chords.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/currentpitchoctave.svg'</img>
 
-The *Current-pitch-name* and *Current-pitch-name* blocks maintain the
+The *Current-pitch-name* and *Current-pitch-octave* blocks maintain the
 state of the note currently being played. (When the note is a chord,
 only one of the pitch/octave combinations is available.)
 
