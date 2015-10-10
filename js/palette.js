@@ -885,7 +885,13 @@ function Palette(palettes, name) {
             setupBackgroundEvents(this);
         }
 
-        var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
+	// Since we don't always add items at the end, the dependency
+	// on this.y is unrelable. Easy workaround is just to always
+	// extend the palette to the bottom.
+
+        // var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
+	var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
+
         var shape = new createjs.Shape();
         shape.graphics.f('#b3b3b3').r(0, 0, MENUWIDTH, h).ef();
         shape.width = MENUWIDTH;
@@ -980,6 +986,9 @@ function Palette(palettes, name) {
                                                 b.height.toString()),
                     b.modname, processFiller, [b, blk]);
             } else {
+                this.protoContainers[b.modname].x = this.menuContainer.x;
+                this.protoContainers[b.modname].y = this.menuContainer.y
+                    + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
                 this.y += Math.ceil(b.height * PROTOBLOCKSCALE);
             }
         }
@@ -1187,9 +1196,15 @@ function Palette(palettes, name) {
         return returnString;
     };
 
-    this.add = function(protoblock) {
+    this.add = function(protoblock, top) {
+        // Add a new palette entry to the end of the list (default) or
+        // to the top.
         if (this.protoList.indexOf(protoblock) == -1) {
-            this.protoList.push(protoblock);
+            if (top == undefined) {
+                this.protoList.push(protoblock);
+            } else {
+                this.protoList.splice(0, 0, protoblock);
+            }
         }
         return this;
     }

@@ -1832,7 +1832,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (name == 'box') {
             return;
         }
-        myStoreinBlock.palette.add(myStoreinBlock);
+        // Add the new block to the top of the palette.
+        myStoreinBlock.palette.add(myStoreinBlock, true);
     }
 
     this.newNamedboxBlock = function (name) {
@@ -1848,7 +1849,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (name == 'box') {
             return;
         }
-        myBoxBlock.palette.add(myBoxBlock);
+	// Add the new block to the top of the palette.
+        myBoxBlock.palette.add(myBoxBlock, true);
     }
 
     this.newLocalArgBlock = function (name) {
@@ -1921,7 +1923,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             myDoBlock.defaults.push(name);
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
-            myDoBlock.palette.add(myDoBlock);
+            myDoBlock.palette.add(myDoBlock, true);
             return true;
         } else {
             // console.log('myDo_' + name + ' already exists.');
@@ -1938,7 +1940,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             myCalcBlock.defaults.push(name);
             myCalcBlock.staticLabels.push(name);
             myCalcBlock.zeroArgBlock();
-            myCalcBlock.palette.add(myCalcBlock);
+            // Add the new block to the top of the palette.
+            myCalcBlock.palette.add(myCalcBlock, true);
         } else {
             console.log('myCalc_' + name + ' already exists.');
         }
@@ -1953,7 +1956,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             myDoArgBlock.defaults.push(name);
             myDoArgBlock.staticLabels.push(name);
             myDoArgBlock.zeroArgBlock();
-            myDoArgBlock.palette.add(myDoArgBlock);
+            // Add the new block to the top of the palette.
+            myDoArgBlock.palette.add(myDoArgBlock, true);
         } else {
             console.log('myDoArg_' + name + ' already exists.');
         }
@@ -1968,12 +1972,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             myCalcArgBlock.defaults.push(name);
             myCalcArgBlock.staticLabels.push(name);
             myCalcArgBlock.zeroArgBlock();
-            myCalcArgBlock.palette.add(myCalcArgBlock);
+            // Add the new block to the top of the palette.
+            myCalcArgBlock.palette.add(myCalcArgBlock, true);
         } else {
             console.log('myCalcArg_' + name + ' already exists.');
         }
     }
 
+    /* 
+    // DEPRECATED
     this.newActionBlock = function (name) {
         if ('myAction_' + name in this.protoBlockDict) {
             return;
@@ -1989,9 +1996,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (name == 'action') {
             return;
         }
-        myActionBlock.palette.add(myActionBlock);
+        // Add the new block to the top of the palette.	
+        myActionBlock.palette.add(myActionBlock, true);
     }
-
+    */
+    
     this.insideArgClamp = function (blk) {
         // Returns a containing arg clamp block or null
         if (this.blockList[blk] == null) {
