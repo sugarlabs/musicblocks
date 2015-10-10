@@ -293,5 +293,4 @@ Turtle graphics can be combined with the music blocks. In this example, each tim
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
 
 The output of the program after running five times.
-=======
->>>>>>> 4015c30ec2d941ef917a19866a693cfb91c67d4f
+
