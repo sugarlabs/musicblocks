@@ -4,6 +4,10 @@ MUSIC-BLOCKS
 Music Blocks a collection of manipulative tools for exploring
 fundamental musical concepts in an integrative and fun way.
 
+<img
+src='https://rawgithub.com/walterbender/musicblocks/master/documentation/chords.png'</img>
+
+
 Using Music Blocks
 ------------------
 
@@ -32,15 +36,15 @@ with whom Devin studied at New England Conservatory and for whom he
 worked at Affron Scripp & Associates, LLC.
 
 [Larry Scripp](http://www.larryscripp.net/)
+
 [Center for Music and the Arts in Education (CMAIE)](http://centerformie.org/)
+
 [Music in Education](http://music-in-education.org/)
 
-Some of the graphics were contributed by Chie Yasuda (the Mouse theme
-originates with her). She also has been very patient with Devin as he
-works on this--thanks Chie!
+Some of the graphics were contributed by Chie Yasuda.
 
-Much of the initial coding was done by Yash Khandelwal as part of
-Google Summer of Code (GSOC) 2015. Great work, Yash!
+Much of the initial coding of the fork from Turtle Blocks was done by
+Yash Khandelwal as part of Google Summer of Code (GSOC) 2015.
 
 Reporting Bugs
 --------------
