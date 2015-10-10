@@ -205,9 +205,15 @@ Repeat block.
 
 You can also mix and match chunks. Here we play chunk0, followed by chunk1 twice, and then chunk0 again.
 
+<<<<<<< HEAD
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg'</img>
+=======
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'</img>
+>>>>>>> 4015c30ec2d941ef917a19866a693cfb91c67d4f
 
 A few more chunks and we can make a song. (Can you read the block notation in order to guess what song we've programmed?)
 
@@ -257,6 +263,7 @@ Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.
 
 3. Voices
 ---------
+<<<<<<< HEAD
 
 Each Start block runs as a separate voice in Music blocks. (When you click on the Run button, all of the Start blocks are run concurrently.)
 
@@ -286,3 +293,5 @@ Turtle graphics can be combined with the music blocks. In this example, each tim
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
 
 The output of the program after running five times.
+=======
+>>>>>>> 4015c30ec2d941ef917a19866a693cfb91c67d4f
