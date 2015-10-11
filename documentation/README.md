@@ -208,17 +208,6 @@ block to generate complex rhythms (e.g. two quarter notes plus an
 eighth note is possible within the tuplet). Each note is represented
 by a column in the matrix.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/setkey.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/key.svg'</img>
-
-The *Set Key* block is used to set the key for the mapping between the
-Solfage and notes using a "movable" system (See
-[Solfage](https://en.wikipedia.org/wiki/Solf%C3%A8ge) for more
-details).
-
-The *Set Key* block contains the current Key, by default, C Major.
-
 Note Palette
 ------------
 
@@ -305,6 +294,25 @@ contained in the clamp. (Note that only notes of a value of a power of
 two will work in the current implementation.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/putting-it-all-together.png'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/setbpm.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/bpm.svg'</img>
+
+The *Set Beats per Minute* block is used to set the beats per minute (in our case, the number of quarter notes per minute).
+
+The *Beats per Minute* block contains the current beats per minutes, which is by default, 90.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/setkey.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/key.svg'</img>
+
+The *Set Key* block is used to set the key for the mapping between the
+Solfage and notes using a "movable" system (See
+[Solfage](https://en.wikipedia.org/wiki/Solf%C3%A8ge) for more
+details).
+
+The *Key* block contains the current Key, by default, C Major.
 
 Blocks Palette
 --------------

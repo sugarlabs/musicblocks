@@ -7,7 +7,7 @@
    xmlns="http://www.w3.org/2000/svg"
    id="svg2"
    height="42"
-   width="166"
+   width="198"
    version="1.1">
   <metadata
      id="metadata31">
@@ -24,15 +24,16 @@
   <defs
      id="defs29" />
   <path
-     d="m 17,1 148,0 0,40 -148,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     d="m 17,1 180,0 0,40 -180,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
      id="path21"
-     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" />
+     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   <text
+     x="-2.0274581e-17"
      id="text23"
      style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
     <tspan
        x="20"
        y="26"
-       id="tspan25">key</tspan>
+       id="tspan25">beats per minute</tspan>
   </text>
 </svg>

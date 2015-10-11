@@ -178,22 +178,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     tupletParamBlock.dockTypes[1] = 'numberin';
     tupletParamBlock.dockTypes[2] = 'numberin';
 
-    var setkeyBlock = new ProtoBlock('setkey');
-    setkeyBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['setkey'] = setkeyBlock;
-    setkeyBlock.staticLabels.push(_('set key'));
-    setkeyBlock.adjustWidthToLabel();
-    setkeyBlock.oneArgBlock();
-    setkeyBlock.dockTypes[1] = 'textin';
-    setkeyBlock.defaults.push('C');
-
-    var keyBlock = new ProtoBlock('key');
-    keyBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['key'] = keyBlock;
-    keyBlock.staticLabels.push(_('key'));
-    keyBlock.adjustWidthToLabel();
-    keyBlock.parameterBlock();
-
     // Deprecated
     var matrixData = new ProtoBlock('matrixData');
     matrixData.palette = palettes.dict['matrix'];
@@ -326,6 +310,37 @@ function initBasicProtoBlocks(palettes, blocks) {
     notationBlock.flowClampZeroArgBlock();
     // notationBlock.flowClampOneArgBlock();
     // notationBlock.defaults.push(parameters);
+
+    var setbpmBlock = new ProtoBlock('setbpm');
+    setbpmBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setbpm'] = setbpmBlock;
+    setbpmBlock.staticLabels.push(_('set beats per minute'));
+    setbpmBlock.adjustWidthToLabel();
+    setbpmBlock.oneArgBlock();
+    setbpmBlock.defaults.push(90);
+
+    var bpmBlock = new ProtoBlock('bpm');
+    bpmBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['bpm'] = bpmBlock;
+    bpmBlock.staticLabels.push(_('beats per minute'));
+    bpmBlock.adjustWidthToLabel();
+    bpmBlock.parameterBlock();
+
+    var setkeyBlock = new ProtoBlock('setkey');
+    setkeyBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setkey'] = setkeyBlock;
+    setkeyBlock.staticLabels.push(_('set key'));
+    setkeyBlock.adjustWidthToLabel();
+    setkeyBlock.oneArgBlock();
+    setkeyBlock.dockTypes[1] = 'textin';
+    setkeyBlock.defaults.push('C');
+
+    var keyBlock = new ProtoBlock('key');
+    keyBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['key'] = keyBlock;
+    keyBlock.staticLabels.push(_('key'));
+    keyBlock.adjustWidthToLabel();
+    keyBlock.parameterBlock();
 
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['tone'];
