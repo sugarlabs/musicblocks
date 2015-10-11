@@ -672,7 +672,7 @@ function PopdownPalette(palettes) {
 
                 console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = makeBlockFromPalette(
-                    e.dataset.blk, e.dataset.modname,
+                    palette.protoList[e.dataset.blk], e.dataset.modname,
                     palette, function (newBlock) {
                     // Move the drag group under the cursor.
                     paletteBlocks.findDragGroup(newBlock);
@@ -946,7 +946,7 @@ function Palette(palettes, name) {
                         hitArea.graphics.beginFill('#FFF').drawRect(0, 0, Math.ceil(bounds.width), Math.ceil(bounds.height * 0.75));
                         palette.protoContainers[modname].hitArea = hitArea;
 
-                        loadPaletteMenuItemHandler(palette, blk, modname);
+                        loadPaletteMenuItemHandler(palette, palette.protoList[blk], modname);
                         palette.palettes.refreshCanvas();
                     }
 
@@ -1273,90 +1273,90 @@ function setupBackgroundEvents(palette) {
 }
 
 
-function makeBlockFromPalette(blk, blkname, palette, callback) {
-    switch (palette.protoList[blk].name) {
+function makeBlockFromPalette(protoblk, blkname, palette, callback) {
+    switch (protoblk.name) {
         case 'do':
-            blkname = 'do ' + palette.protoList[blk].defaults[0];
-            var newBlk = palette.protoList[blk].name;
-            var arg = palette.protoList[blk].defaults[0];
+            blkname = 'do ' + protoblk.defaults[0];
+            var newBlk = protoblk.name;
+            var arg = protoblk.defaults[0];
             break;
         case 'storein':
             // Use the name of the box in the label
-            blkname = 'store in ' + palette.protoList[blk].defaults[0];
-            var newBlk = palette.protoList[blk].name;
-            var arg = palette.protoList[blk].defaults[0];
+            blkname = 'store in ' + protoblk.defaults[0];
+            var newBlk = protoblk.name;
+            var arg = protoblk.defaults[0];
             break;
         case 'box':
             // Use the name of the box in the label
-            blkname = palette.protoList[blk].defaults[0];
-            var newBlk = palette.protoList[blk].name;
-            var arg = palette.protoList[blk].defaults[0];
+            blkname = protoblk.defaults[0];
+            var newBlk = protoblk.name;
+            var arg = protoblk.defaults[0];
             break;
         case 'namedbox':
             // Use the name of the box in the label
-            if (palette.protoList[blk].defaults[0] == undefined) {
+            if (protoblk.defaults[0] == undefined) {
                 blkname = 'namedbox';
                 var arg = _('box');
             } else {
-                blkname = palette.protoList[blk].defaults[0];
-                var arg = palette.protoList[blk].defaults[0];
+                blkname = protoblk.defaults[0];
+                var arg = protoblk.defaults[0];
             }
-            var newBlk = palette.protoList[blk].name;
+            var newBlk = protoblk.name;
             break;
         case 'namedarg':
             // Use the name of the arg in the label
-            if (palette.protoList[blk].defaults[0] == undefined) {
+            if (protoblk.defaults[0] == undefined) {
                 blkname = 'namedarg';
                 var arg = '1';
             } else {
-                blkname = palette.protoList[blk].defaults[0];
-                var arg = palette.protoList[blk].defaults[0];
+                blkname = protoblk.defaults[0];
+                var arg = protoblk.defaults[0];
             }
-            var newBlk = palette.protoList[blk].name;
+            var newBlk = protoblk.name;
             break;
         case 'nameddo':
             // Use the name of the action in the label
-            if (palette.protoList[blk].defaults[0] == undefined) {
+            if (protoblk.defaults[0] == undefined) {
                 blkname = 'nameddo';
                 var arg = _('action');
             } else {
-                blkname = palette.protoList[blk].defaults[0];
-                var arg = palette.protoList[blk].defaults[0];
+                blkname = protoblk.defaults[0];
+                var arg = protoblk.defaults[0];
             }
-            var newBlk = palette.protoList[blk].name;
+            var newBlk = protoblk.name;
             break;
         case 'nameddoArg':
             // Use the name of the action in the label
-            if (palette.protoList[blk].defaults[0] == undefined) {
+            if (protoblk.defaults[0] == undefined) {
                 blkname = 'nameddoArg';
                 var arg = _('action');
             } else {
-                blkname = palette.protoList[blk].defaults[0];
-                var arg = palette.protoList[blk].defaults[0];
+                blkname = protoblk.defaults[0];
+                var arg = protoblk.defaults[0];
             }
-            var newBlk = palette.protoList[blk].name;
+            var newBlk = protoblk.name;
             break;
         case 'namedcalc':
             // Use the name of the action in the label
-            if (palette.protoList[blk].defaults[0] == undefined) {
+            if (protoblk.defaults[0] == undefined) {
                 blkname = 'namedcalc';
                 var arg = _('action');
             } else {
-                blkname = palette.protoList[blk].defaults[0];
-                var arg = palette.protoList[blk].defaults[0];
+                blkname = protoblk.defaults[0];
+                var arg = protoblk.defaults[0];
             }
-            var newBlk = palette.protoList[blk].name;
+            var newBlk = protoblk.name;
             break;
         case 'namedcalcArg':
             // Use the name of the action in the label
-            if (palette.protoList[blk].defaults[0] == undefined) {
+            if (protoblk.defaults[0] == undefined) {
                 blkname = 'namedcalcArg';
                 var arg = _('action');
             } else {
-                blkname = palette.protoList[blk].defaults[0];
-                var arg = palette.protoList[blk].defaults[0];
+                blkname = protoblk.defaults[0];
+                var arg = protoblk.defaults[0];
             }
-            var newBlk = palette.protoList[blk].name;
+            var newBlk = protoblk.name;
             break;
         default:
             var newBlk = blkname;
@@ -1369,7 +1369,7 @@ function makeBlockFromPalette(blk, blkname, palette, callback) {
 
 
 // Menu Item event handlers
-function loadPaletteMenuItemHandler(palette, blk, blkname) {
+function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
     // A menu item is a protoblock that is used to create a new block.
     var pressupLock = false;
     var moved = false;
@@ -1439,7 +1439,7 @@ function loadPaletteMenuItemHandler(palette, blk, blkname) {
                 pressupLock = false;
             }, 1000);
         }
-        makeBlockFromProtoblock(palette, blk, moved, blkname, event, saveX, saveY);
+        makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX, saveY);
     });
 }
 
