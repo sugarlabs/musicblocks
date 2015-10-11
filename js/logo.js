@@ -10,6 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+var BPMFACTOR = 2;  // Seems to make everything run at 120 bpm.
 var DEFAULTDELAY = 500; // milleseconds
 var TURTLESTEP = -1;  // Run in step-by-step mode
 
@@ -98,6 +99,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.currentOctaves = {};
 
     // parameters used by the note block
+    this.bpmFactor = BPMFACTOR;
     this.noteDelay = 0;
     this.playedNote = {};
     this.pushedNote = {};
@@ -115,9 +117,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
     this.drumSynth = new Tone.DrumSynth().toMaster();
-
-    // Tone.Transport.bpm.value = 90;  // Doesn't seem to do anything.
-
+    
     var toneVol = new Tone.Volume(-20);  // DEFAULT VALUE
     this.polySynth.chain(toneVol, Tone.Master);
     this.drumSynth.chain(toneVol, Tone.Master);
@@ -428,6 +428,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         this.inSharpClamp = false;
         this.inTranspositionClamp = false;
         this.tuplet = false;
+
+        Tone.Transport.bpm.value = 120;  // Doesn't seem to do anything
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -1800,12 +1802,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     var duration =  noteBeatValue * logo.noteBeatValues[turtle][0];
 
                     // Use 2 to match playback speed of matrix
-                    logo.doWait(turtle, ((2 / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle]);
+                    logo.doWait(turtle, ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle]);
 
                     var waitTime = 0;
                     for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
                         if (j > 0) {
-                            waitTime += (2000 / duration);
+                            waitTime += (logo.bpmFactor * 1000 / duration);
                         }
 
                         // FIXME: When duplicating notes inside a
@@ -1852,9 +1854,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                 // Use the beatValue of the first note in the
                                 // group since there can only be one.
                                 if (logo.turtles.turtleList[turtle].drum) {
-                                    logo.drumSynth.triggerAttackRelease(notes[0], 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                    logo.drumSynth.triggerAttackRelease(notes[0], logo.bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]));
                                 } else {
-                                    logo.polySynth.triggerAttackRelease(notes, 1 / (noteBeatValue * logo.noteBeatValues[turtle][0]));
+                                    logo.polySynth.triggerAttackRelease(notes, logo.bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]));
                                 }
                                 Tone.Transport.start();
                             }

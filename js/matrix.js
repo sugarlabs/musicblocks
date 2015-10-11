@@ -550,9 +550,9 @@ function Matrix() {
                     note[i] = note[i].replace(/♭/g, 'b');
                 }
                 if(note != 'R') {
-                    synth.triggerAttackRelease(note, 1 / noteValue);
+                    synth.triggerAttackRelease(note, that.logo.bpmFactor / noteValue);
                 }
-            }, 2000 * time);
+            }, that.logo.bpmFactor * 1000 * time);
         }
     }
 
