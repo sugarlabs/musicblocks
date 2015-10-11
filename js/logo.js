@@ -10,7 +10,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-var BPMFACTOR = 2;  // Seems to make everything run at 120 bpm.
+var TONEBPM = 240;  // Seems to be the default.
+var TARGETBPM = 90;  // What we'd like to use for beats per minute
 var DEFAULTDELAY = 500; // milleseconds
 var TURTLESTEP = -1;  // Run in step-by-step mode
 
@@ -100,7 +101,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.currentOctaves = {};
 
     // parameters used by the note block
-    this.bpmFactor = BPMFACTOR;
+    this.bpm = TARGETBPM;
+    this.bpmFactor = TONEBPM / TARGETBPM;
     this.noteDelay = 0;
     this.playedNote = {};
     this.pushedNote = {};
@@ -359,6 +361,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     break;
                 case 'currentoctave':
                     value = this.currentoctave[turtle];
+                    break;
+                case 'bpm':
+                    value = logo.bpm;
                     break;
                 default:
                     if (name in this.evalParameterDict) {
@@ -655,6 +660,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 } else {
                     this.errorMsg(NOBOXERRORMSG, blk, name);
                 }
+                break;
+            case 'bpm':
+                this.bpm = value;
+                this.bpmFactor = TONEBPM / this.bpm;
                 break;
             case 'currentnote':
                 // A bit ugly because the setter call added the value
@@ -1573,6 +1582,18 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 break;
 
             // Actions for music-related blocks
+            case 'setbpm':
+                if (args.length == 1 && typeof(args[0] == 'number')) {
+                    if (args[0] < 30) {
+                        args[0] = 30;
+                    } else if (args[0] > 1000) {
+                        console.log('clipping BPM at 1000');
+                        args[0] = 1000;
+                    }
+                    this.bpm = args[0];
+                    this.bpmFactor = TONEBPM / this.bpm;
+                }
+                break;
             case 'setkey':
                 if (args.length == 1) {
                     // TODO: test arg type/validity
@@ -2849,8 +2870,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         logo.blocks.blockList[blk].value = 0;
                     }
                     break;
+                case 'bpm':
+                    logo.blocks.blockList[blk].value = logo.bpm;
+                    break;
                 case 'key':
                     logo.blocks.blockList[blk].value = logo.keySignature[turtle];
+                    break;
                 case 'transposition':
                     logo.blocks.blockList[blk].value = logo.transposition[turtle];
                     break;
