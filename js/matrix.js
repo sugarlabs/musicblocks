@@ -528,8 +528,9 @@ function Matrix() {
         for (var i = 0; i < note.length; i++) {
             note[i] = note[i].replace(/♭/g, 'b');
         }
+
         if (note[0] != 'R') {
-            synth.triggerAttackRelease(note, 1 / noteValue);
+            synth.triggerAttackRelease(note, this.logo.bpmFactor / noteValue);
         }
 
         for (var i = 1; i < this.notesToPlayDirected.length; i++) {
@@ -575,6 +576,9 @@ function Matrix() {
                     var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
                     var note = noteObj[0] + noteObj[1];
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
+                    // Remove ' 𝅘𝅥' at the end of the HTML code for the
+                    // note value.
+                    noteValue = noteValue.slice(0, noteValue.length - 2);
                     var i = 0;
                     if (noteValue.substr(0,3) == '1.5') {
                         while (noteValue[i] != ' ') {
@@ -597,7 +601,6 @@ function Matrix() {
 
     this.playNotesString = function(time, synth) {
         /*plays the matrix and also the chunks*/
-	console.log('MATRIX:playNotesString');
         if (this.transposition != null ) {
             var transposedArray = [];
             for (var i = 0; i < this.notesToPlay.length; i++) {
