@@ -23,6 +23,7 @@ var NOINPUTERRORMSG = 'Missing argument.';
 var NOSQRTERRORMSG = 'Cannot take square root of negative number.';
 var ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 var EMPTYHEAPERRORMSG = 'empty heap.';
+var INVALIDPITCH = 'Not a valid pitch name';
 
 function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
@@ -105,6 +106,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.pushedNote = {};
     this.duplicateFactor = {};
     this.polyVolume = {};
+    this.validNote = true;
 
     // tuplet
     this.tuplet = false;
@@ -117,7 +119,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
     this.drumSynth = new Tone.DrumSynth().toMaster();
-    
+
     var toneVol = new Tone.Volume(-20);  // DEFAULT VALUE
     this.polySynth.chain(toneVol, Tone.Master);
     this.drumSynth.chain(toneVol, Tone.Master);
@@ -181,8 +183,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         for (turtle in this.stepQueue) {
             // Have we already played a note for this turtle?
             if (turtle in this.playedNote && this.playedNote[turtle]) {
-		continue;
-	    }
+                continue;
+            }
             if (this.stepQueue[turtle].length > 0) {
                 if (turtle in this.unhighlightStepQueue && this.unhighlightStepQueue[turtle] != null) {
                     this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
@@ -192,30 +194,30 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 if (blk != null) {
                     if (this.blocks.blockList[blk].name == 'note') {
                         this.playedNote[turtle] = true;
-		    }
+                    }
                     this.runFromBlockNow(this, turtle, blk, 0, null);
                 } else {
-		    this.playedNote[turtle] = true;
-		}
+                    this.playedNote[turtle] = true;
+                }
             }
         }
         // At this point, some turtles have played notes and others
         // have not. We need to keep stepping until they all have.
         var keepGoing = false;
-	for (turtle in this.stepQueue) {
+        for (turtle in this.stepQueue) {
             if (this.stepQueue[turtle].length > 0 && !this.playedNote[turtle]) {
-		keepGoing = true;
+                keepGoing = true;
                 break;
-	    }
-	}
-	if (keepGoing) {
-	    // this.stepNote();
+            }
+        }
+        if (keepGoing) {
+            // this.stepNote();
             this.step();
-	} else {
+        } else {
             for (turtle in this.playedNote) {
-		this.playedNote[turtle] = false;
-	    }
-	}
+                this.playedNote[turtle] = false;
+            }
+        }
     }
 
     this.doStopTurtle = function() {
@@ -659,7 +661,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 // to the current note.
                 var len = this.currentNotes[turtleId].length;
                 value = parseInt(value.slice(len));
-                var newNoteObj = getNote(this.currentNotes[turtleId], this.currentOctaves[turtleId], value, this.keySignature[turtleId]);
+                var newNoteObj = logo.getNote(this.currentNotes[turtleId], this.currentOctaves[turtleId], value, this.keySignature[turtleId]);
                 this.currentNotes[turtleId] = newNoteObj[0];
                 this.currentOctaves[turtleId] = newNoteObj[1];
                 break;
@@ -1638,6 +1640,29 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'pitch':
+                if (args.length != 2) {
+                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    break;
+                }
+
+                // TODO: Allow frequency input
+                if (typeof(args[0]) == 'number') {
+                    logo.errorMsg(INVALIDPITCH, blk);
+                }
+
+                if (args[1] < 1) {
+                    args[1] = 1;
+                } else if (args[1] > 10) {
+                    // Humans can only hear 10 octaves.
+                    console.log('clipping octave at 10');
+                    args[1] = 10;
+                }
+
+                logo.getNote(args[0], args[1], 0, 'C');
+                if (!logo.validNote) {
+                    logo.errorMsg(INVALIDPITCH, blk);
+                }
+
                 if (logo.inMatrix) {
                     if (logo.inFlatClamp) {
                         matrix.solfegeNotes.push(args[0] + '♭');
@@ -1826,7 +1851,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             }
 
                             for (i in logo.noteNotes[turtle]) {
-                                var noteObj = getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+                                var noteObj = logo.getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
                                 var note = noteObj[0] + noteObj[1];
                                 if (note != 'R') {
                                     notes.push(note);
@@ -2287,8 +2312,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             // console.log(logo.endOfFlowSignals[turtle][blk]);
             for (var i = 0; i < garbage.length; i++) {
                 // console.log('removing entry ' + garbage[i] + ' from list: ' + logo.endOfFlowSignals[turtle][blk][garbage[i]]);
-                logo.endOfFlowSignals[turtle][blk] = logo.endOfFlowSignals[turtle][blk].splice(garbage[i], 1); 
-                logo.endOfFlowClamps[turtle][blk] = logo.endOfFlowClamps[turtle][blk].splice(garbage[i], 1); 
+                logo.endOfFlowSignals[turtle][blk] = logo.endOfFlowSignals[turtle][blk].splice(garbage[i], 1);
+                logo.endOfFlowClamps[turtle][blk] = logo.endOfFlowClamps[turtle][blk].splice(garbage[i], 1);
             }
         }
 
@@ -2825,7 +2850,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     }
                     break;
                 case 'key':
-                    logo.blocks.blockList[blk].value = logo.keySignature[turtle];                    
+                    logo.blocks.blockList[blk].value = logo.keySignature[turtle];
                 case 'transposition':
                     logo.blocks.blockList[blk].value = logo.transposition[turtle];
                     break;
@@ -3193,163 +3218,168 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.clearMatrix = function() {
         matrix.clearMatrix(this.polySynth);
     }
+
+    this.getNote = function (solfege, octave, transposition, keySignature) {
+        this.validNote = true;
+        var sharpFlat = false;
+
+        octave = Math.round(octave);
+        transposition = Math.round(transposition);
+        if (typeof(solfege) == 'number') {
+            solfege = solfege.toString();
+        }
+
+        // Check for double flat or double sharp.
+        var len = solfege.length;
+        if (len > 2) {
+            var lastTwo = solfege.slice(len - 2);
+            if (lastTwo == 'bb' || lastTwo == '♭♭') {
+                solfege = solfege.slice(0, len - 1);
+                transposition -= 1;
+            } else if (lastTwo == '##') {
+                solfege = solfege.slice(0, len - 1);
+                transposition += 1;
+            }
+        }
+
+        var bToFlat = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
+        var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        var notesFlat = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+        var notesFlat2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
+        var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'C♭':['B', -1], 'F♭':['E', 0], 'e#':['F', 0], 'b#':['C', 1], 'c♭':['B', -1], 'f♭':['E', 0]};
+        var majorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
+        // Is this correct, or is minor solfege expressed by using
+        // DO RE MA FA SOL LE TE?
+        var minorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 2, 'ME': 2, 'MI': 3, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 7, 'LO': 7, 'LA': 8, 'LI': 9, 'TE': 9, 'TA': 9,  'TI': 10};
+
+        // Already a note? No need to convert from solfege.
+        if (solfege in bToFlat) {
+            solfege = bToFlat[solfege];
+        }
+        if (solfege in extraTranspositions) {
+            octave += extraTranspositions[solfege][1];
+            note = extraTranspositions[solfege][0];
+        } else if (notesSharp.indexOf(solfege.toUpperCase()) != -1) {
+            note = solfege.toUpperCase();
+        } else if (notesFlat.indexOf(solfege) != -1) {
+            note = solfege;
+        } else if (notesFlat2.indexOf(solfege) != -1) {
+            // Convert to uppercase, e.g., d♭ -> D♭.
+            note = notesFlat[notesFlat2.indexOf(solfege)];
+        } else {
+            // Not a note, so convert from Solfege.
+            // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
+            if (solfege.substr(-1) == '>') {
+                // Read octave and solfege from HTML
+                octave = parseInt(solfege.slice(solfege.indexOf('>') + 1, solfege.indexOf('/') - 1));
+                solfege = solfege.substr(0, solfege.indexOf('<'));
+            }
+            if(['#', '♭', 'b'].indexOf(solfege.substr(-1)) != -1) {
+                sharpFlat = true;
+            }
+
+            if (!keySignature) {
+                keySignature = 'C';
+            }
+            if (keySignature.substr(-1) == 'm' || keySignature.slice(1).toLowerCase() == 'minor') {
+                var thisScale = notesFlat;
+                var halfSteps = minorHalfSteps;  // 0 2 3 5 7 8 10
+                var keySignature = keySignature.substr(0, keySignature.length - 1);
+                var major = false;
+            } else {
+                var thisScale = notesSharp;
+                var halfSteps = majorHalfSteps;  // 0 2 4 5 7 9 11
+                var keySignature = keySignature;
+                var major = true;
+            }
+
+            if (keySignature in extraTranspositions) {
+                keySignature = extraTranspositions[keySignature][0];
+            }
+
+            offset = thisScale.indexOf(keySignature);
+            if (offset == -1) {
+                console.log('WARNING: Key ' + keySignature + ' not found in ' + thisScale + '. Using default of C');
+                var offset = 0;
+                var thisScale = notesSharp;
+            }
+
+            var twoCharSolfege = solfege.toUpperCase().substr(0,2);
+            if(solfege.toUpperCase().substr(0,4) == 'REST') {
+                return ['R', ''];
+            } else if (twoCharSolfege in halfSteps) {
+                var index = halfSteps[twoCharSolfege] + offset;
+                // console.log(solfege + ' ' + twoCharSolfege + ' ' + offset + ' ' + index + ' ' + thisScale[index]);
+                if (index > 11) {
+                    index -= 12;
+                    octave += 1;
+                }
+                note = thisScale[index];
+            } else {
+                console.log('WARNING: Note ' + solfege + ' not found. Returning C');
+                this.validNote = false;
+                return ['C', octave];
+            }
+
+            if (sharpFlat) {
+                if (solfege.substr(-1) == '#') {
+                    note = note + '#';
+                } else if(solfege.substr(-1) == '♭') {
+                    note = note + '♭';
+                } else if(solfege.substr(-1) == 'b') {
+                    note = note + '♭';
+                }
+                if (note in extraTranspositions) {
+                    octave += extraTranspositions[note][1];
+                    note = extraTranspositions[note][0];
+                }
+            }
+        }
+
+        if (transposition && transposition != 0) {
+            if (transposition < 0) {
+                deltaOctave = -Math.floor(-transposition / 12);
+                deltaNote = -(-transposition % 12);
+            } else {
+                deltaOctave = Math.floor(transposition / 12);
+                deltaNote = transposition % 12;
+            }
+
+            octave += deltaOctave;
+
+            if (notesSharp.indexOf(note) != -1) {
+                i = notesSharp.indexOf(note);
+                i += deltaNote;
+                if (i < 0) {
+                    i += 12;
+                    octave -= 1;
+                } else if (i > 11) {
+                    i -= 12;
+                    octave += 1;
+                }
+                note = notesSharp[i];
+            } else if (notesFlat.indexOf(note) != -1) {
+                i = notesFlat.indexOf(note);
+                i += deltaNote;
+                if (i < 0) {
+                    i += 12;
+                    octave -= 1;
+                } else if (i > 11) {
+                    i -= 12;
+                    octave += 1;
+                }
+                note = notesFlat[i];
+            } else {
+                console.log('note not found? ' + note);
+            }
+        }
+
+        if (octave < 1) {
+            return [note, 1];
+        } else {
+            return [note, octave];
+        }
+    }
+
 }
 
-
-function getNote (solfege, octave, transposition, keySignature) {
-    var sharpFlat = false;
-
-    octave = Math.round(octave);
-    transposition = Math.round(transposition);
-    solfege = solfege.toString();
-
-    // Check for double flat or double sharp.
-    var len = solfege.length;
-    if (len > 2) {
-        var lastTwo = solfege.slice(len - 2);        
-        if (lastTwo == 'bb' || lastTwo == '♭♭') {
-            solfege = solfege.slice(0, len - 1);
-            transposition -= 1;
-        } else if (lastTwo == '##') {
-            solfege = solfege.slice(0, len - 1);
-            transposition += 1;
-        }
-    }
-
-    var bToFlat = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
-    var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    var notesFlat = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
-    var notesFlat2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
-    var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'C♭':['B', -1], 'F♭':['E', 0], 'e#':['F', 0], 'b#':['C', 1], 'c♭':['B', -1], 'f♭':['E', 0]};
-    var majorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
-    // Is this correct, or is minor solfege expressed by using
-    // DO RE MA FA SOL LE TE?
-    var minorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 2, 'ME': 2, 'MI': 3, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 7, 'LO': 7, 'LA': 8, 'LI': 9, 'TE': 9, 'TA': 9,  'TI': 10};
-
-    // Already a note? No need to convert from solfege.
-    if (solfege in bToFlat) {
-        solfege = bToFlat[solfege];
-    }
-    if (solfege in extraTranspositions) {
-        octave += extraTranspositions[solfege][1];
-        note = extraTranspositions[solfege][0];
-    } else if (notesSharp.indexOf(solfege.toUpperCase()) != -1) {
-        note = solfege.toUpperCase();
-    } else if (notesFlat.indexOf(solfege) != -1) {
-        note = solfege;
-    } else if (notesFlat2.indexOf(solfege) != -1) {
-        // Convert to uppercase, e.g., d♭ -> D♭.
-        note = notesFlat[notesFlat2.indexOf(solfege)];
-    } else {
-        // Not a note, so convert from Solfege.
-        // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
-        if (solfege.substr(-1) == '>') {
-            // Read octave and solfege from HTML
-            octave = parseInt(solfege.slice(solfege.indexOf('>') + 1, solfege.indexOf('/') - 1));
-            solfege = solfege.substr(0, solfege.indexOf('<'));
-        }
-        if(['#', '♭', 'b'].indexOf(solfege.substr(-1)) != -1) {
-            sharpFlat = true;
-        }
-
-        if (!keySignature) {
-            keySignature = 'C';
-        }
-        if (keySignature.substr(-1) == 'm' || keySignature.slice(1).toLowerCase() == 'minor') {
-            var thisScale = notesFlat;
-            var halfSteps = minorHalfSteps;  // 0 2 3 5 7 8 10
-            var keySignature = keySignature.substr(0, keySignature.length - 1);
-            var major = false;
-        } else {
-            var thisScale = notesSharp;
-            var halfSteps = majorHalfSteps;  // 0 2 4 5 7 9 11
-            var keySignature = keySignature;
-            var major = true;
-        }
-
-        if (keySignature in extraTranspositions) {
-            keySignature = extraTranspositions[keySignature][0];
-        }
-
-        offset = thisScale.indexOf(keySignature);
-        if (offset == -1) {
-            console.log('WARNING: Key ' + keySignature + ' not found in ' + thisScale + '. Using default of C');
-            var offset = 0;
-            var thisScale = notesSharp;
-        }
-
-        var twoCharSolfege = solfege.toUpperCase().substr(0,2);
-        if(solfege.toUpperCase().substr(0,4) == 'REST') {
-            return ['R', ''];
-        } else if (twoCharSolfege in halfSteps) {
-            var index = halfSteps[twoCharSolfege] + offset;
-            // console.log(solfege + ' ' + twoCharSolfege + ' ' + offset + ' ' + index + ' ' + thisScale[index]);
-            if (index > 11) {
-                index -= 12;
-                octave += 1;
-            }
-            note = thisScale[index];
-        } else {
-            console.log('WARNING: Note ' + solfege + ' not found. Returning C');
-            return ['C', octave];
-        }
-
-        if (sharpFlat) {
-            if (solfege.substr(-1) == '#') {
-                note = note + '#';
-            } else if(solfege.substr(-1) == '♭') {
-                note = note + '♭';
-            } else if(solfege.substr(-1) == 'b') {
-                note = note + '♭';
-            }
-            if (note in extraTranspositions) {
-                octave += extraTranspositions[note][1];
-                note = extraTranspositions[note][0];
-            }
-        }
-    }
-
-    if (transposition && transposition != 0) {
-        if (transposition < 0) {
-            deltaOctave = -Math.floor(-transposition / 12);
-            deltaNote = -(-transposition % 12);
-        } else {
-            deltaOctave = Math.floor(transposition / 12);
-            deltaNote = transposition % 12;
-        }
-
-        octave += deltaOctave;
-
-        if (notesSharp.indexOf(note) != -1) {
-            i = notesSharp.indexOf(note);
-            i += deltaNote;
-            if (i < 0) {
-                i += 12;
-                octave -= 1;
-            } else if (i > 11) {
-                i -= 12;
-                octave += 1;
-            }
-            note = notesSharp[i];
-        } else if (notesFlat.indexOf(note) != -1) {
-            i = notesFlat.indexOf(note);
-            i += deltaNote;
-            if (i < 0) {
-                i += 12;
-                octave -= 1;
-            } else if (i > 11) {
-                i -= 12;
-                octave += 1;
-            }
-            note = notesFlat[i];
-        } else {
-            console.log('note not found? ' + note);
-        }
-    }
-
-    if (octave < 1) {
-        return [note, 1];
-    } else {
-        return [note, octave];
-    }
-}
