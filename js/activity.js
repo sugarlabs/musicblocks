@@ -164,10 +164,6 @@ define(function (require) {
             'ONSTOP': {}
         };
 
-        // Music matrix globals
-        // window.savedMatricesNotes = [];
-        window.savedMatricesCount = 0;
-
         // Stacks of blocks saved in local storage
         var macroDict = {};
 

@@ -652,7 +652,7 @@ function Matrix() {
         /* Saves the current matrix as an action stack consisting of
 	 * note and pitch blocks (saving as chunks is deprecated). */
         var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
-        var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk" + window.savedMatricesCount.toString()}], 0, 0, [0]]];
+        var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk"}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         console.log('SAVE MATRIX!!!');
         for (var i = 0; i < this.notesToPlay.length; i++)
@@ -663,8 +663,6 @@ function Matrix() {
             if (note[0] == '') {
                 note[0] = 'R';
 	    }
-
-            // window.savedMatricesNotes.push(note);
 
             // Add the Note block and its value
             var idx = newStack.length;
@@ -711,8 +709,6 @@ function Matrix() {
                 }
             }
         }
-        // window.savedMatricesNotes.push('end');
-        window.savedMatricesCount += 1;
 
         // Create a new stack for the chunk.
         console.log(newStack);
