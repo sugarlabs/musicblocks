@@ -846,7 +846,7 @@ function Palette(palettes, name) {
             h = max;
         }
         // return this.menuContainer.y + h - STANDARDBLOCKHEIGHT / 2;
-        return this.menuContainer.y + h - STANDARDBLOCKHEIGHT * 3;
+        return this.menuContainer.y + h; // - STANDARDBLOCKHEIGHT * 3;
     }
 
     this.resizeEvent = function() {
