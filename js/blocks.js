@@ -720,6 +720,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (b == thisBlock) {
                 continue;
             }
+
+	    // Don't connect to a collapsed block.
+            if (this.blockList[b].collapsed) {
+                continue;
+	    }
+
             for (var i = 1; i < this.blockList[b].connections.length; i++) {
                 // When converting from Python projects to JS format,
                 // sometimes extra null connections are added. We need
