@@ -220,6 +220,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'settransposition':
             case 'tuplet':
             case 'tuplet2':
+            case 'osctime':
             case 'repeat':
             case 'fill':
             case 'hollowline':
