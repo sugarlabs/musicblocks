@@ -1978,28 +1978,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             console.log('myCalcArg_' + name + ' already exists.');
         }
     }
-
-    /* 
-    // DEPRECATED
-    this.newActionBlock = function (name) {
-        if ('myAction_' + name in this.protoBlockDict) {
-            return;
-        }
-        var myActionBlock = new ProtoBlock('action');
-        this.protoBlockDict['myAction_' + name] = myActionBlock;
-        myActionBlock.palette = this.palettes.dict['actions'];
-        myActionBlock.defaults.push(name);
-        myActionBlock.staticLabels.push(_('action'));
-        myActionBlock.expandable = true;
-        myActionBlock.style = 'clamp';
-        myActionBlock.stackClampOneArgBlock();
-        if (name == 'action') {
-            return;
-        }
-        // Add the new block to the top of the palette.	
-        myActionBlock.palette.add(myActionBlock, true);
-    }
-    */
     
     this.insideArgClamp = function (blk) {
         // Returns a containing arg clamp block or null

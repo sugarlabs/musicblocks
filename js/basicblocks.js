@@ -789,6 +789,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     notBlock.booleanOneBooleanArgBlock();
 
     // Blocks palette
+    var namedBoxBlock = new ProtoBlock('namedbox');
+    namedBoxBlock.palette = palettes.dict['blocks'];
+    blocks.protoBlockDict['namedbox'] = namedBoxBlock;
+    namedBoxBlock.staticLabels.push(_('box'));
+    namedBoxBlock.extraWidth = 10;
+    namedBoxBlock.adjustWidthToLabel();
+    namedBoxBlock.parameterBlock();
+    namedBoxBlock.dockTypes[0] = 'anyout';
+
     var storeinBlock = new ProtoBlock('storein');
     storeinBlock.palette = palettes.dict['blocks'];
     blocks.protoBlockDict['storein'] = storeinBlock;
@@ -799,48 +808,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     storeinBlock.defaults.push(100);
     storeinBlock.dockTypes[1] = 'anyin';
     storeinBlock.dockTypes[2] = 'anyin';
-
-    var namedBoxBlock = new ProtoBlock('namedbox');
-    namedBoxBlock.palette = palettes.dict['blocks'];
-    blocks.protoBlockDict['namedbox'] = namedBoxBlock;
-    namedBoxBlock.staticLabels.push(_('box'));
-    namedBoxBlock.extraWidth = 10;
-    namedBoxBlock.adjustWidthToLabel();
-    namedBoxBlock.parameterBlock();
-    namedBoxBlock.dockTypes[0] = 'anyout';
-
-    var actionBlock = new ProtoBlock('action');
-    actionBlock.palette = palettes.dict['actions'];
-    blocks.protoBlockDict['action'] = actionBlock;
-    actionBlock.staticLabels.push(_('action'));
-    actionBlock.extraWidth = 25;
-    actionBlock.adjustWidthToLabel();
-    actionBlock.stackClampOneArgBlock();
-    actionBlock.defaults.push(_('action'));
-
-    var namedDoBlock = new ProtoBlock('nameddo');
-    namedDoBlock.palette = palettes.dict['actions'];
-    blocks.protoBlockDict['nameddo'] = namedDoBlock;
-    namedDoBlock.staticLabels.push(_('action'));
-    namedDoBlock.extraWidth = 10;
-    namedDoBlock.adjustWidthToLabel();
-    namedDoBlock.zeroArgBlock();
-
-    var startBlock = new ProtoBlock('start');
-    startBlock.palette = palettes.dict['actions'];
-    blocks.protoBlockDict['start'] = startBlock;
-    startBlock.staticLabels.push(_('start'));
-    startBlock.extraWidth = 10;
-    startBlock.adjustWidthToLabel();
-    startBlock.stackClampZeroArgBlock();
-
-    var drumBlock = new ProtoBlock('drum');
-    drumBlock.palette = palettes.dict['actions'];
-    blocks.protoBlockDict['drum'] = drumBlock;
-    drumBlock.staticLabels.push(_('start drum'));
-    drumBlock.extraWidth = 10;
-    drumBlock.adjustWidthToLabel();
-    drumBlock.stackClampZeroArgBlock();
 
     var incrementOneBlock = new ProtoBlock('incrementOne');
     incrementOneBlock.palette = palettes.dict['blocks'];
@@ -870,6 +837,40 @@ function initBasicProtoBlocks(palettes, blocks) {
     // Show the value in the box as if it were a parameter.
     boxBlock.parameter = true;
     boxBlock.dockTypes[1] = 'anyin';
+
+    // Actions palette
+    var namedDoBlock = new ProtoBlock('nameddo');
+    namedDoBlock.palette = palettes.dict['actions'];
+    blocks.protoBlockDict['nameddo'] = namedDoBlock;
+    namedDoBlock.staticLabels.push(_('action'));
+    namedDoBlock.extraWidth = 10;
+    namedDoBlock.adjustWidthToLabel();
+    namedDoBlock.zeroArgBlock();
+
+    var actionBlock = new ProtoBlock('action');
+    actionBlock.palette = palettes.dict['actions'];
+    blocks.protoBlockDict['action'] = actionBlock;
+    actionBlock.staticLabels.push(_('action'));
+    actionBlock.extraWidth = 25;
+    actionBlock.adjustWidthToLabel();
+    actionBlock.stackClampOneArgBlock();
+    actionBlock.defaults.push(_('action'));
+
+    var startBlock = new ProtoBlock('start');
+    startBlock.palette = palettes.dict['actions'];
+    blocks.protoBlockDict['start'] = startBlock;
+    startBlock.staticLabels.push(_('start'));
+    startBlock.extraWidth = 10;
+    startBlock.adjustWidthToLabel();
+    startBlock.stackClampZeroArgBlock();
+
+    var drumBlock = new ProtoBlock('drum');
+    drumBlock.palette = palettes.dict['actions'];
+    blocks.protoBlockDict['drum'] = drumBlock;
+    drumBlock.staticLabels.push(_('start drum'));
+    drumBlock.extraWidth = 10;
+    drumBlock.adjustWidthToLabel();
+    drumBlock.stackClampZeroArgBlock();
 
     var doBlock = new ProtoBlock('do');
     doBlock.palette = palettes.dict['actions'];

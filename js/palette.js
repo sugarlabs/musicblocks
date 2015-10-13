@@ -885,12 +885,12 @@ function Palette(palettes, name) {
             setupBackgroundEvents(this);
         }
 
-	// Since we don't always add items at the end, the dependency
-	// on this.y is unrelable. Easy workaround is just to always
-	// extend the palette to the bottom.
+        // Since we don't always add items at the end, the dependency
+        // on this.y is unrelable. Easy workaround is just to always
+        // extend the palette to the bottom.
 
         // var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
-	var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
+        var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
 
         var shape = new createjs.Shape();
         shape.graphics.f('#b3b3b3').r(0, 0, MENUWIDTH, h).ef();
@@ -1444,7 +1444,7 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
 }
 
 
-function makeBlockFromProtoblock(palette, blk, moved, blkname, event, saveX, saveY) {
+function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX, saveY) {
         if (moved) {
             moved = false;
             palette.draggingProtoBlock = false;
@@ -1512,8 +1512,8 @@ function makeBlockFromProtoblock(palette, blk, moved, blkname, event, saveX, sav
                     restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
                 }
 
-                // console.log(blk + ' ' + blkname);
-                var newBlock = makeBlockFromPalette(blk, blkname, palette, myCallback);
+                // console.log(protoblk + ' ' + blkname);
+                var newBlock = makeBlockFromPalette(protoblk, blkname, palette, myCallback);
             }
 
             palette.updateBlockMasks();
