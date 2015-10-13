@@ -1586,9 +1586,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'setbpm':
                 if (args.length == 1 && typeof(args[0] == 'number')) {
                     if (args[0] < 30) {
+			logo.errorMsg(_('Beats per minute must be > 30.'))
                         args[0] = 30;
                     } else if (args[0] > 1000) {
-                        console.log('clipping BPM at 1000');
+			logo.errorMsg(_('Maximum beats per minute is 1000.'))
                         args[0] = 1000;
                     }
                     this.bpm = args[0];
