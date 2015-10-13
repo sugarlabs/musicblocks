@@ -399,10 +399,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
-    osctimeBlock.staticLabels.push(_('osctime'), _('start'), _('end'));
+    osctimeBlock.staticLabels.push(_('osctime'));
     osctimeBlock.adjustWidthToLabel();
-    osctimeBlock.twoArgBlock();
-    osctimeBlock.defaults.push(100, 500);
+    osctimeBlock.flowClampOneArgBlock();
+    osctimeBlock.defaults.push(4);
        
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');

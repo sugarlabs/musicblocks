@@ -130,9 +130,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     Tone.Transport.bpm.value = 120;  // Doesn't seem to do anything
 
-    // Osc start/stop times
-    this.oscStartTime = 0;
-    this.oscStopTime = 1000;
+    // Oscillator parameters
+    this.oscDuration = {};
+    this.oscList = {};
 
     // When running in step-by-step mode, the next command to run is
     // queued here.
@@ -434,6 +434,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.keySignature[turtle] = 'C';
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = -20;
+            this.oscDuration[turtle] = 4;
+            this.oscList[turtle] = [];
         }
 
         this.inMatrix = false;
@@ -2094,25 +2096,45 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                 break;
             case 'osctime':
-                if (args.length == 2) {
-                    logo.oscStartTime = args[0];
-                    logo.oscStopTime = args[1];
+            if (args.length == 2) {
+		    logo.oscDuration[turtle] = args[0];
+                    logo.oscList[turtle] = [];
                 }
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                var listenerName = '_osctime_' + turtle;
+                logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                var listener = function (event) {
+                    var oscillators = [];
+                    for (var i = 0; i < logo.oscList[turtle].length; i++) {
+                        oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
+                    }
+
+                    for (var i = 0; i < oscillators.length; i++) {
+                        oscillators[i].start();
+		    }
+
+                    setTimeout(function(osc){
+                        for (var i = 0; i < oscillators.length; i++) {
+                            oscillators[i].stop();
+			}
+                    }, (logo.bpmFactor * 1000 / logo.oscDuration[turtle]));
+                }
+
+                if (listenerName in logo.turtles.turtleList[turtle].listeners) {
+                    logo.stage.removeEventListener(listenerName, logo.turtles.turtleList[turtle].listeners[listenerName], false);
+                }
+                logo.turtles.turtleList[turtle].listeners[listenerName] = listener;
+                logo.stage.addEventListener(listenerName, listener, false);
                 break;
             case 'sine':
             case 'square':
             case 'sawtooth':
-                var oscName = logo.blocks.blockList[blk].name;
-                console.log(oscName + " start time " + logo.oscStartTime + " end time " + logo.oscStopTime);
-                var sineOsc = new Tone.Oscillator(args[0], oscName).toMaster();
-                //connected to the master output
-                setTimeout(function(osc){
-                    sineOsc.start();
-                }, logo.oscStartTime);
-                console.log(sineOsc);
-                setTimeout(function(osc){
-                    sineOsc.stop();
-                }, logo.oscStopTime);
+                if (args.length == 1) {
+                    logo.oscList[turtle].push([logo.blocks.blockList[blk].name, args[0]]);
+                }
                 break;
             case 'playfwd':
                 matrix.playDirection = 1;
