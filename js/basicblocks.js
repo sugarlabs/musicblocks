@@ -402,7 +402,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     osctimeBlock.staticLabels.push(_('osctime'));
     osctimeBlock.adjustWidthToLabel();
     osctimeBlock.flowClampOneArgBlock();
-    osctimeBlock.defaults.push(4);
+    osctimeBlock.defaults.push(200);
        
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');
