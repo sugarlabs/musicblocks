@@ -1230,10 +1230,6 @@ function loadEventHandlers(myBlock) {
             myBlock.container.y = Math.round(event.stageY / blocks.scale) + offset.y;
             myBlock.x = myBlock.container.x;
             myBlock.y = myBlock.container.y;
-            var dx = Math.round(myBlock.container.x - oldX);
-            var dy = Math.round(myBlock.container.y - oldY);
-            // console.log('>>>>>>>>>>>');
-            // console.log(myBlock.name + ' ' + 'dx: ' + dx + ' dy: ' + dy);
 
             // If we are over the trash, warn the user.
             if (trashcan.overTrashcan(event.stageX / blocks.scale, event.stageY / blocks.scale)) {
@@ -1251,6 +1247,9 @@ function loadEventHandlers(myBlock) {
             }
 
             // Move any connected blocks.
+            var dx = Math.round(myBlock.container.x - oldX);
+            var dy = Math.round(myBlock.container.y - oldY);
+
             blocks.findDragGroup(thisBlock)
             if (blocks.dragGroup.length > 0) {
                 for (var b = 0; b < blocks.dragGroup.length; b++) {
@@ -1302,6 +1301,12 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
             var d = new Date();
             blocks.time = d.getTime();
             myBlock.blocks.blockMoved(thisBlock);
+
+            // Just incase the blocks are not properly docked after
+            // the move (workaround for issue #38 -- Blocks fly
+            // apart). Still need to get to the root cause.
+            myBlock.blocks.loopCounter = 0;
+            myBlock.blocks.adjustDocks(myBlock.blocks.blockList.indexOf(myBlock));
         }
     } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(myBlock.name) != -1) {
         if (!haveClick) {
