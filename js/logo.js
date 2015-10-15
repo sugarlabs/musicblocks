@@ -1872,10 +1872,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             playnote = function() {
                                 var notes = [];
                                 var notationNotes = [];
-
                                 if ((logo.noteNotes[turtle].length + logo.oscList[turtle].length) > 1) {
+                                    var insideChord = true;
                                     logo.lilypondNotes[turtle] += '< ';
-                                }
+                                } else {
+                                    var insideChord = false;
+				}
 
                                 var oscillators = [];
                                 if (logo.oscList[turtle].length > 0) {
@@ -1883,9 +1885,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                         oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
                                         console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
                                         if (logo.blocks.blockList[blk].name == 'osctime') {
-                                               logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle);
+                                            logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
                                         } else {
-                                            logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle);
+                                            logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
                                         }
                                     }
 
@@ -1918,9 +1920,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                             notes.push(note);
                                         }
                                         if (logo.blocks.blockList[blk].name == 'osctime') {
-                                            logo.updateNotation(note, 1000 / duration, turtle);
+                                            logo.updateNotation(note, 1000 / duration, turtle, insideChord);
                                         } else {
-                                            logo.updateNotation(note, duration, turtle);
+                                            logo.updateNotation(note, duration, turtle, insideChord);
                                         }
                                     }
 
@@ -1956,8 +1958,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     }
                                 }
 
-                                if ((logo.noteNotes[turtle].length + logo.oscList[turtle].length) > 1) {
+                                if (insideChord) {
                                     logo.lilypondNotes[turtle] += '> ';
+                                    if (logo.blocks.blockList[blk].name == 'osctime') {
+                                        logo.updateNotation('', 1000 / duration, turtle, false);
+                                    } else {
+                                        logo.updateNotation('', duration, turtle, false);
+                                    }
                                 }
 
                             }
@@ -3412,36 +3419,45 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         }
     }
 
-    this.updateNotation = function (note, duration, turtle) {
+    this.updateNotation = function (note, duration, turtle, insideChord) {
         // FIXME: try approximating duration using ties
         var POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
         var dotted = false;
         var doubleDotted = false;
 
-        if (POWER2.indexOf(duration) == -1) {
-            if (POWER2.indexOf(duration * 1.5) == -1) {
-                if (POWER2.indexOf(duration * 1.75) == -1) {
-                    console.log('cannot convert ' + duration + ' to a note');
-                    duration = 8;
+        if (!insideChord) {
+            if (POWER2.indexOf(duration) == -1) {
+                if (POWER2.indexOf(duration * 1.5) == -1) {
+                    if (POWER2.indexOf(duration * 1.75) == -1) {
+                        console.log('cannot convert ' + duration + ' to a note');
+                        duration = 8;
+                    } else {
+                        duration = POWER2[POWER2.indexOf(duration * 1.75)];
+                        doubleDotted = true;
+                    }
                 } else {
-                    duration = POWER2[POWER2.indexOf(duration * 1.75)];
-                    doubleDotted = true;
+                    duration = POWER2[POWER2.indexOf(duration * 1.5)];
+                    dotted = true;
                 }
-            } else {
-                duration = POWER2[POWER2.indexOf(duration * 1.5)];
-                dotted = true;
             }
         }
 
-        // TODO: Add dots in vexflow
-        // console.log(note.replace(/♭/g, 'b') + ' ' + duration);
-        this.notesPlayed[turtle].push([[note.replace(/♭/g, 'b').replace(/♯/g, '#'), duration]]);
+        if (note != '') {
+            // TODO: Add dots in vexflow
+            // console.log(note.replace(/♭/g, 'b') + ' ' + duration);
+            this.notesPlayed[turtle].push([[note.replace(/♭/g, 'b').replace(/♯/g, '#'), duration]]);
 
-        // Replace sharps and flats and octaves for Lilypond
-        var lilynote = note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
-        if (dotted) {
-            // console.log(lilynote + ' ' + duration + '.');
-            this.lilypondNotes[turtle] += (lilynote + duration + '. ');
+            // Replace sharps and flats and octaves for Lilypond
+            var lilynote = note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
+        } else {
+            var lilynote = '';
+        }
+
+        if (insideChord) {
+            this.lilypondNotes[turtle] += (lilynote + ' ');
+        } else if (dotted) {
+           // console.log(lilynote + ' ' + duration + '.');
+           this.lilypondNotes[turtle] += (lilynote + duration + '. ');
         } else if (doubleDotted) {
             // console.log(lilynote + ' ' + duration + '.');
             this.lilypondNotes[turtle] += (lilynote + duration + '.. ');
