@@ -372,6 +372,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
 
+    var osctimeBlock = new ProtoBlock('osctime');
+    osctimeBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['osctime'] = osctimeBlock;
+    osctimeBlock.staticLabels.push(_('osctime'));
+    osctimeBlock.adjustWidthToLabel();
+    osctimeBlock.flowClampOneArgBlock();
+    osctimeBlock.defaults.push(200);
+
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['square'] = squareBlock;
@@ -379,6 +387,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     squareBlock.adjustWidthToLabel();
     squareBlock.oneArgBlock();
     squareBlock.defaults.push(440);
+
+    var triangleBlock = new ProtoBlock('triangle');
+    triangleBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['triangle'] = triangleBlock;
+    triangleBlock.staticLabels.push(_('triangle'));
+    triangleBlock.adjustWidthToLabel();
+    triangleBlock.oneArgBlock();
+    triangleBlock.defaults.push(440);
 
     var sineBlock = new ProtoBlock('sine');
     sineBlock.palette = palettes.dict['tone'];
@@ -395,15 +411,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     sawtoothBlock.adjustWidthToLabel();
     sawtoothBlock.oneArgBlock();
     sawtoothBlock.defaults.push(440);
-
-    var osctimeBlock = new ProtoBlock('osctime');
-    osctimeBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['osctime'] = osctimeBlock;
-    osctimeBlock.staticLabels.push(_('osctime'));
-    osctimeBlock.adjustWidthToLabel();
-    osctimeBlock.flowClampOneArgBlock();
-    osctimeBlock.defaults.push(200);
        
+    var lilypondBlock = new ProtoBlock('savelilypond');
+    lilypondBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['savelilypond'] = lilypondBlock;
+    lilypondBlock.staticLabels.push(_('save as lilypond'));
+    lilypondBlock.adjustWidthToLabel();
+    lilypondBlock.oneArgBlock();
+    lilypondBlock.defaults.push(_('title') + '.ly');
+    lilypondBlock.dockTypes[1] = 'textin';
+
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');
     clearBlock.palette = palettes.dict['turtle'];

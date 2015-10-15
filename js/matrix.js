@@ -36,11 +36,11 @@ savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.
 */
 
-var MATRIXBUTTONCOLOR = '#c374e9'; // '#9A32CD';
-var MATRIXLABELCOLOR = '#90c100';  // '#9ACD32';
-var MATRIXNOTECELLCOLOR = '#b1db00';  // '#ADFF2F';
-var MATRIXTUPLETCELLCOLOR = '#57e751';  // 'rgb(4, 255, 174)';
-var MATRIXRHYTHMCELLCOLOR = '#c8c8c8'; // 'rgb(174, 174, 174)';
+var MATRIXBUTTONCOLOR = '#c374e9';
+var MATRIXLABELCOLOR = '#90c100';
+var MATRIXNOTECELLCOLOR = '#b1db00';
+var MATRIXTUPLETCELLCOLOR = '#57e751';
+var MATRIXRHYTHMCELLCOLOR = '#c8c8c8';
 
 function Matrix() {
     this.arr = [];
@@ -53,11 +53,8 @@ function Matrix() {
     this.i = 0;
     this.matrixContainer = null;
     this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
-    // this.colorCode = ['#F2F5A9' ,'#F3F781', '#F4FA58', '#F7FE2E', '#FFFF00', '#D7DF01', '#AEB404'];
 
     this.transposition = null;
-    this.isMatrix = 0;
-    this.freetime = 1000;
     this.synth = null;
 
     this.matrixHasTuplets = false;
@@ -88,7 +85,6 @@ function Matrix() {
 
         this.notesToPlay = [];
         this.notesToPlayDirected = [];
-        this.isMatrix = 1; //1 if matrix exists
         this.matrixHasTuplets = false;
 
         // Used to remove the matrix table

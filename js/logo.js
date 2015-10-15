@@ -119,6 +119,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.tupletParams = [];
 
     // parameters used by notations
+    this.lilypondNotes = {};
+    this.lilypondOutput = '';
     this.notesPlayed = {};
     this.numerator = 3;
     this.denominator = 4;
@@ -424,6 +426,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.endOfFlowActions[turtle] = {};
             this.doBlocks[turtle] = [];
             this.transposition[turtle] = 0;
+            this.lilypondNotes[turtle] = '';
             this.notesPlayed[turtle] = [];
             this.noteNotes[turtle] = [];
             this.noteOctaves[turtle] = [];
@@ -1445,6 +1448,27 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.hideBlocks();
                 logo.setTurtleDelay(0);
                 break;
+            case 'savelilypond':
+                console.log('save lilypond');
+                console.log(logo.lilypondNotes);
+                if (args.length == 1) {
+                    if (logo.lilypondNotes > 1) {
+                        logo.lilypondOutput = '<<\n';
+                      } else {
+                        logo.lilypondOutput = '';
+                    }
+                    for (var t in logo.lilypondNotes) {
+                        logo.lilypondOutput += '{\n';
+                        logo.lilypondOutput += logo.lilypondNotes[t];
+                        logo.lilypondOutput += '\n }\n';
+                    }
+                    if (logo.lilypondNotes > 1) {
+                        logo.lilypondOutput += '>>\n';
+                    }
+                    console.log(logo.lilypondOutput);
+                    doSaveLilypond(logo, args[0]);
+                }
+                break;
             case 'savesvg':
                 if (args.length == 1) {
                     if (logo.svgBackground) {
@@ -1789,7 +1813,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 // once all of the children are run, we trigger a
                 // _playnote_ event, then wait for the note to play.
                 // The note can be specified by pitch or synth blocks.
-                // We should use a timer for more accuracy.
+                // The osctime block specifies the duration in
+                // milleseconds while the note block specifies
+                // duration as a beat value. Note: we should consider
+                // the use of the global timer in Tone.js for more
+                // accuracy.
 
                 logo.oscList[turtle] = [];
                 logo.noteNotes[turtle] = [];
@@ -1818,11 +1846,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         var waitTime = 0;
                         for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
                             if (j > 0) {
-				if (logo.blocks.blockList[blk].name == 'osctime') {
+                                if (logo.blocks.blockList[blk].name == 'osctime') {
                                     waitTime += duration;
-				} else {
-				    waitTime += (logo.bpmFactor * 1000 / duration);
-				}
+                                } else {
+                                    waitTime += (logo.bpmFactor * 1000 / duration);
+                                }
                             }
 
                             // FIXME: When duplicating notes inside a
@@ -1841,17 +1869,17 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                             var toneVol = new Tone.Volume(logo.polyVolume[turtle]);
                                         }
                                         oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster().chain(toneVol, Tone.Master));
-					console.log("tone to play " + logo.oscList[turtle][i][1]);
+                                        console.log("tone to play " + logo.oscList[turtle][i][1]);
                                     }
                                     for (var i = 0; i < oscillators.length; i++) {
                                         oscillators[i].volume.value = logo.polyVolume[turtle] * OSCVOLUMEADJUSTMENT;
                                         oscillators[i].start();
                                     }
-				    if (logo.blocks.blockList[blk].name == 'osctime') {
+                                    if (logo.blocks.blockList[blk].name == 'osctime') {
                                         var stopTime = duration;
-				    } else {
+                                    } else {
                                         var stopTime = logo.bpmFactor * 1000 / duration;
-				    }
+                                    }
                                     setTimeout(function(){
                                         for (var i = 0; i < oscillators.length; i++) {
                                             oscillators[i].stop();
@@ -1865,19 +1893,35 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                         logo.polySynth.toMaster();
                                     }
 
+                                    if (logo.noteNotes[turtle].length > 1) {
+                                        logo.lilypondNotes[turtle] += '< ';
+                                    }
+
                                     for (i in logo.noteNotes[turtle]) {
                                         var noteObj = logo.getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
                                         var note = noteObj[0] + noteObj[1];
                                         if (note != 'R') {
                                             notes.push(note);
                                         }
-					if (logo.blocks.blockList[blk].name == 'note') {
+                                        if (logo.blocks.blockList[blk].name == 'note') {
+                                            // FIXME: Duration must be
+                                            // power of 2 (or 1.5x or
+                                            // 1.75x a power of 2)
                                             notationNotes.push([note.replace(/♭/g, 'b'), duration]);
-					}
+                                            // Replace sharps and flats for Lilypond
+                                            // Replace octaves for Lilypond
+                                            var lilynote = note.replace(/#/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
+                                            logo.lilypondNotes[turtle] += (lilynote + duration + ' ');
+                                        }
                                     }
+
+                                    if (logo.noteNotes[turtle].length > 1) {
+                                        logo.lilypondNotes[turtle] += ' >';
+                                    }
+
                                     console.log("notes to play " + notes);
-				    if (logo.blocks.blockList[blk].name == 'note') {
-					logo.notesPlayed[turtle].push(notationNotes);
+                                    if (logo.blocks.blockList[blk].name == 'note') {
+                                        logo.notesPlayed[turtle].push(notationNotes);
                                     }
                                     if (notes.length > 0) {
                                         var len = notes[0].length;
@@ -1896,11 +1940,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                                         // Use the beatValue of the first note in the
                                         // group since there can only be one.
-  					if (logo.blocks.blockList[blk].name == 'osctime') {
-					    var beatValue = duration / 1000;
-					} else {
-					    var beatValue = logo.bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
-					}
+                                        if (logo.blocks.blockList[blk].name == 'osctime') {
+                                            var beatValue = duration / 1000;
+                                        } else {
+                                            var beatValue = logo.bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                                        }
                                         if (logo.turtles.turtleList[turtle].drum) {
                                             logo.drumSynth.triggerAttackRelease(notes[0], beatValue);
                                         } else {
@@ -2092,6 +2136,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }, args[1], osc);
 
                 break;
+            case 'triangle':
             case 'sine':
             case 'square':
             case 'sawtooth':

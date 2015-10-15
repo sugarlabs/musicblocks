@@ -464,6 +464,11 @@ function doSaveSVG(logo, desc) {
 }
 
 
+function doSaveLilypond(logo, desc) {
+    download(desc, 'data:text;utf8,' + logo.lilypondOutput, desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
+}
+
+
 function download(filename, data) {
     var a = document.createElement('a');
     a.setAttribute('href', data);
