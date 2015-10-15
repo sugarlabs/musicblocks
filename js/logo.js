@@ -19,7 +19,7 @@ var OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
 
 // This header is prepended to the Lilypond output.
 // Note: We are using URL encoding for \ (%5C) and newline (%0A)
-var LILYPONDHEADER = '%5Cheader { %0Adedication = "Description: http://walterbender.github.io/musicblocks/" %0Atitle = "Title: My Music Blocks Creation" %0Asubtitle = "Subtitle:" %0Ainstrument = "Instrument:" %0Acomposer = "Composer: Mr. Mouse" %0Aarranger = "Arranger:" %0Acopyright = "Copyright: Mr. Mouse (c) 2015 -- CC-SA-BY" %0Atagline = "Made from MB v. 328bc6d" %0A} %0A'
+var LILYPONDHEADER = '%5Cversion "2.18.2"%A0%5Cheader {%0Adedication = "Description: http://walterbender.github.io/musicblocks/"%0Atitle = "Title: My Music Blocks Creation"%0Asubtitle = "Subtitle:"%0Ainstrument = "Instrument:"%0Acomposer = "Composer: Mr. Mouse"%0Aarranger = "Arranger:"%0Acopyright = "Copyright: Mr. Mouse (c) 2015 -- CC-SA-BY"%0Atagline = "Made from MB v. 328bc6d"%0A}%0A'
 
 var NOMICERRORMSG = 'The microphone is not available.';
 var NANERRORMSG = 'Not a number.';
@@ -1454,21 +1454,37 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.setTurtleDelay(0);
                 break;
             case 'savelilypond':
-                console.log('save lilypond');
-                console.log(logo.lilypondNotes);
+                var turtleCount = 0;
+                for (var t in logo.lilypondNotes) {
+                    turtleCount += 1;
+                }
                 if (args.length == 1) {
-                    if (logo.lilypondNotes > 1) {
-                        logo.lilypondOutput += '<< %0A';
+                    console.log('saving as lilypond');
+                    if (turtleCount > 1) {
+                        for (var t in logo.lilypondNotes) {
+                            if (logo.lilypondNotes[t].length > 0) {
+                                logo.lilypondOutput += 'instrument' + t + ' = {%0A';
+                                logo.lilypondOutput += logo.lilypondNotes[t];
+                                logo.lilypondOutput += '%0A}%0A%0A';
+                            }
+                        }
+                        // This doesn't seem to be necessary and it
+                        // generates extra empty staffs.
+                        /*
+                        logo.lilypondOutput += '<<%0A';
+                        for (var t in logo.lilypondNotes) {
+                            if (logo.lilypondNotes[t].length > 0) {
+                                logo.lilypondOutput += '%5Cnew Staff { %5Cinstrument' + t + '}%0A';
+                            }
+                        }
+                        logo.lilypondOutput += '>>%0A';
+                        */
+                    } else {
+                        logo.lilypondOutput += '%0A{%0A';
+                        logo.lilypondOutput += logo.lilypondNotes[turtle];
+                        logo.lilypondOutput += '%0A}%0A';
                     }
-                    for (var t in logo.lilypondNotes) {
-                        logo.lilypondOutput += '%0A{ %0A';
-                        logo.lilypondOutput += logo.lilypondNotes[t];
-                        logo.lilypondOutput += ' %0A}%0A';
-                    }
-                    if (logo.lilypondNotes > 1) {
-                        logo.lilypondOutput += ' >>%0A';
-                    }
-                    console.log(logo.lilypondOutput);
+                    // console.log(logo.lilypondOutput);
                     doSaveLilypond(logo, args[0]);
                 }
                 break;
@@ -1877,7 +1893,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     logo.lilypondNotes[turtle] += '< ';
                                 } else {
                                     var insideChord = false;
-				}
+                                }
 
                                 var oscillators = [];
                                 if (logo.oscList[turtle].length > 0) {
@@ -2252,9 +2268,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var parentAction = logo.endOfFlowActions[turtle][blk][i];
                 var signal = logo.endOfFlowSignals[turtle][blk][i];
                 if (parentLoop != null && logo.parentFlowQueue[turtle].indexOf(parentLoop) != -1 && logo.loopBlock(logo.blocks.blockList[parentLoop].name)) {
-                    console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of loop block');
+                    // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of loop block');
                 } else if (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1) {
-                    console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of action block');
+                    // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of action block');
                 } else if (signal != null) {
                     if (logo.doBlocks[turtle].indexOf(parentAction) != -1) {
                         logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] = -1;
@@ -2262,7 +2278,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
                         notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
                     } else {
-                        console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                        // console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     }
                     // Mark issued signals as null
@@ -2272,7 +2288,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
             }
             for (var i = 0; i < notationDispatches.length; i++) {
-                console.log('dispatching ' + notationDispatches[i]);
+                // console.log('dispatching ' + notationDispatches[i]);
                 logo.stage.dispatchEvent(notationDispatches[i]);
             }
 
@@ -2382,7 +2398,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 for (var i = 0; i < logo.endOfFlowSignals[turtle][b].length; i++) {
                     if (logo.endOfFlowSignals[turtle][b][i] != null) {
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][b][i]);
-                        console.log('dispatching ' + logo.endOfFlowSignals[turtle][b][i]);
+                        // console.log('dispatching ' + logo.endOfFlowSignals[turtle][b][i]);
                     }
                 }
             }
@@ -3421,6 +3437,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     this.updateNotation = function (note, duration, turtle, insideChord) {
         // FIXME: try approximating duration using ties
+
+        // lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
         var POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
         var dotted = false;
         var doubleDotted = false;
