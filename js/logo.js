@@ -1700,7 +1700,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.inFlatClamp) {
                         matrix.solfegeNotes.push(note + '♭');
                     } else if (logo.inSharpClamp) {
-                        matrix.solfegeNotes.push(note + '#');
+                        matrix.solfegeNotes.push(note + '♯');
                     } else {
                         matrix.solfegeNotes.push(note);
                     }
@@ -1933,7 +1933,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                             }
                                         } else {
                                             for (var i = 0; i < notes.length; i++) {
-                                                notes[i] = notes[i].replace(/♭/g, 'b');
+                                                notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
                                             }
                                         }
 
@@ -3262,17 +3262,17 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             if (lastTwo == 'bb' || lastTwo == '♭♭') {
                 solfege = solfege.slice(0, len - 1);
                 transposition -= 1;
-            } else if (lastTwo == '##') {
+            } else if (lastTwo == '##' || lastTwo == '♯♯') {
                 solfege = solfege.slice(0, len - 1);
                 transposition += 1;
             }
         }
 
         var bToFlat = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
-        var notesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        var notesSharp = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
         var notesFlat = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
         var notesFlat2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
-        var extraTranspositions = {'E#':['F', 0], 'B#':['C', 1], 'C♭':['B', -1], 'F♭':['E', 0], 'e#':['F', 0], 'b#':['C', 1], 'c♭':['B', -1], 'f♭':['E', 0]};
+        var extraTranspositions = {'E♯':['F', 0], 'B♯':['C', 1], 'C♭':['B', -1], 'F♭':['E', 0], 'e♯':['F', 0], 'b♯':['C', 1], 'c♭':['B', -1], 'f♭':['E', 0]};
         var majorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
         // Is this correct, or is minor solfege expressed by using
         // DO RE MA FA SOL LE TE?
@@ -3300,7 +3300,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 octave = parseInt(solfege.slice(solfege.indexOf('>') + 1, solfege.indexOf('/') - 1));
                 solfege = solfege.substr(0, solfege.indexOf('<'));
             }
-            if(['#', '♭', 'b'].indexOf(solfege.substr(-1)) != -1) {
+            if(['#', '♯', '♭', 'b'].indexOf(solfege.substr(-1)) != -1) {
                 sharpFlat = true;
             }
 
@@ -3349,8 +3349,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
             if (sharpFlat) {
                 if (solfege.substr(-1) == '#') {
-                    note = note + '#';
-                } else if(solfege.substr(-1) == '♭') {
+                    note = note + '♯';
+                } else if (solfege.substr(-1) == '♯') {
+                    note = note + '♯';
+                } else if (solfege.substr(-1) == '♭') {
                     note = note + '♭';
                 } else if(solfege.substr(-1) == 'b') {
                     note = note + '♭';
@@ -3430,10 +3432,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
         // TODO: Add dots in vexflow
         // console.log(note.replace(/♭/g, 'b') + ' ' + duration);
-        this.notesPlayed[turtle].push([[note.replace(/♭/g, 'b'), duration]]);
+        this.notesPlayed[turtle].push([[note.replace(/♭/g, 'b').replace(/♯/g, '#'), duration]]);
 
         // Replace sharps and flats and octaves for Lilypond
-        var lilynote = note.replace(/#/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
+        var lilynote = note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
         if (dotted) {
             // console.log(lilynote + ' ' + duration + '.');
             this.lilypondNotes[turtle] += (lilynote + duration + '. ');

@@ -1405,7 +1405,7 @@ function changeLabel(myBlock) {
     } else if (myBlock.name == 'solfege') {
         var type = 'solfege';
         var notes = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
-        var attrs = ['##', '#', '♮', '♭', '♭♭'];
+        var attrs = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             if (notes.indexOf(myBlock.value) != -1) {
                 var selectednote = myBlock.value;
@@ -1453,7 +1453,7 @@ function changeLabel(myBlock) {
     } else if (myBlock.name == 'notename') {
         var type = 'notename';
         var notes = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
-        var attrs = ['##', '#', '♮', '♭', '♭♭'];
+        var attrs = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             var selectednote = myBlock.value[0];
             if (myBlock.value.length == 1) {
@@ -1581,17 +1581,11 @@ function labelChanged(myBlock) {
     if (myBlock.labelattr != null) {
         var attrValue = myBlock.labelattr.value;
         switch (attrValue) {
-            case '##':
-                newValue = newValue + '##';
-                break;
-            case '#':
-                newValue = newValue + '#';
-                break;
+            case '♯♯':
+            case '♯':
             case '♭♭':
-                newValue = newValue + '♭♭';
-                break;
             case '♭':
-                newValue = newValue + '♭';
+                newValue = newValue + attrValue;
                 break;
             default:
                 break;

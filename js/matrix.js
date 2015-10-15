@@ -185,8 +185,8 @@ function Matrix() {
     }
 
     this.note2Solfege = function(note, index) {
-        var solfegeConversionTable = {'C': 'do', 'C#': 'do#', 'D': 're', 'D#': 're#', 'E': 'mi', 'F': 'fa', 'F#': 'fa#', 'G': 'sol', 'G#': 'sol#', 'A': 'la', 'A#': 'la#', 'B': 'ti', 'D♭': 're♭', 'E♭': 'mi♭', 'G♭': 'sol♭', 'A♭': 'la♭', 'B♭': 'ti♭'};
-        if (['♭', '#'].indexOf(note[1]) == -1) {
+        var solfegeConversionTable = {'C': 'do', 'C♯': 'do♯', 'D': 're', 'D♯': 're♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa♯', 'G': 'sol', 'G♯': 'sol♯', 'A': 'la', 'A♯': 'la♯', 'B': 'ti', 'D♭': 're♭', 'E♭': 'mi♭', 'G♭': 'sol♭', 'A♭': 'la♭', 'B♭': 'ti♭'};
+        if (['♭', '♯'].indexOf(note[1]) == -1) {
             var octave = note[1];
             var newNote = solfegeConversionTable[note[0]];
         } else {
@@ -522,7 +522,7 @@ function Matrix() {
         this.notesCounter += 1;
         // Note can be a chord, hence it is an array.
         for (var i = 0; i < note.length; i++) {
-            note[i] = note[i].replace(/♭/g, 'b');
+            note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
         }
 
         if (note[0] != 'R') {
@@ -544,7 +544,7 @@ function Matrix() {
                 that.notesCounter += 1;
                 // Note can be a chord, hence it is an array.
                 for (var i = 0; i < note.length; i++) {
-                    note[i] = note[i].replace(/♭/g, 'b');
+                    note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
                 }
                 if(note != 'R') {
                     synth.triggerAttackRelease(note, that.logo.bpmFactor / noteValue);
@@ -588,7 +588,7 @@ function Matrix() {
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
                     if (playNote) {
-                        synth.triggerAttackRelease(note.replace(/♭/g, 'b'), noteValue);
+                        synth.triggerAttackRelease(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue);
                     }
                 }
             }
@@ -691,7 +691,7 @@ function Matrix() {
                 }
 
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                if(['#', '♭'].indexOf(note[0][j][1]) != -1) {
+                if(['♯', '♭'].indexOf(note[0][j][1]) != -1) {
                     newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                     newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                 } else {
