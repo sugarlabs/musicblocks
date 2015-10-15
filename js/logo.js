@@ -1840,7 +1840,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             var duration = noteBeatValue;  // microseconds
                             logo.doWait(turtle, ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle]);
                         } else {
-                            var duration = noteBeatValue * logo.noteBeatValues[turtle][0];
+                            var duration = noteBeatValue * logo.beatFactor[turtle];  // beat value
                             logo.doWait(turtle, ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle]);
                         }
                         var waitTime = 0;
@@ -1877,8 +1877,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     }
                                     if (logo.blocks.blockList[blk].name == 'osctime') {
                                         var stopTime = duration;
+                                        console.log('stopTime: ' + stopTime);
                                     } else {
                                         var stopTime = logo.bpmFactor * 1000 / duration;
+                                        console.log('stopTime: ' + stopTime);
                                     }
                                     setTimeout(function(){
                                         for (var i = 0; i < oscillators.length; i++) {
