@@ -17,6 +17,10 @@ var TURTLESTEP = -1;  // Run in step-by-step mode
 var OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
                                // to scale back its volume.
 
+// This header is prepended to the Lilypond output.
+// Note: We are using URL encoding for \ (%5C) and newline (%0A)
+var LILYPONDHEADER = '%5Cheader { %0Adedication = "Description: http://walterbender.github.io/musicblocks/" %0Atitle = "Title: My Music Blocks Creation" %0Asubtitle = "Subtitle:" %0Ainstrument = "Instrument:" %0Acomposer = "Composer: Mr. Mouse" %0Aarranger = "Arranger:" %0Acopyright = "Copyright: Mr. Mouse (c) 2015 -- CC-SA-BY" %0Atagline = "Made from MB v. 328bc6d" %0A} %0A'
+
 var NOMICERRORMSG = 'The microphone is not available.';
 var NANERRORMSG = 'Not a number.';
 var NOSTRINGERRORMSG = 'Not a string.';
@@ -120,7 +124,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     // parameters used by notations
     this.lilypondNotes = {};
-    this.lilypondOutput = '';
+    this.lilypondOutput = LILYPONDHEADER;
     this.notesPlayed = {};
     this.numerator = 3;
     this.denominator = 4;
@@ -1052,6 +1056,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 break;
             case 'clear':
                 logo.svgBackground = true;
+                logo.lilypondOutput = LILYPONDHEADER;
                 logo.turtles.turtleList[turtle].doClear();
                 break;
             case 'setxy':
@@ -1453,17 +1458,15 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 console.log(logo.lilypondNotes);
                 if (args.length == 1) {
                     if (logo.lilypondNotes > 1) {
-                        logo.lilypondOutput = '<< \n';
-                      } else {
-                        logo.lilypondOutput = '';
+                        logo.lilypondOutput += '<< %0A';
                     }
                     for (var t in logo.lilypondNotes) {
-                        logo.lilypondOutput += '{ \n';
+                        logo.lilypondOutput += '%0A{ %0A';
                         logo.lilypondOutput += logo.lilypondNotes[t];
-                        logo.lilypondOutput += '\n }\n';
+                        logo.lilypondOutput += ' %0A}%0A';
                     }
                     if (logo.lilypondNotes > 1) {
-                        logo.lilypondOutput += ' >>\n';
+                        logo.lilypondOutput += ' >>%0A';
                     }
                     console.log(logo.lilypondOutput);
                     doSaveLilypond(logo, args[0]);
@@ -1472,7 +1475,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'savesvg':
                 if (args.length == 1) {
                     if (logo.svgBackground) {
-                        logo.svgOutput = '<rect x="0" y="0" height="' + this.canvas.height + '" width="' + this.canvas.width + '" fill="' + body.style.background + '"/>\n' + logo.svgOutput;
+                        logo.svgOutput = '<rect x="0" y="0" height="' + this.canvas.height + '" width="' + this.canvas.width + '" fill="' + body.style.background + '"/> ' + logo.svgOutput;
                     }
                     doSaveSVG(logo, args[0]);
                 }
@@ -1674,25 +1677,25 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     var obj = frequencyToNote(args[0]);
                     var note = obj[0];
                     var octave = obj[1];
-		    console.log(note + ' ' + octave);
+                    console.log(note + ' ' + octave);
                     if (note == '?') {
-			logo.errorMsg(INVALIDPITCH, blk);
-		    }
+                        logo.errorMsg(INVALIDPITCH, blk);
+                    }
                 } else {
                     var note = args[0];
                     if (args[1] < 1) {
-			var octave = 1;
+                        var octave = 1;
                     } else if (args[1] > 10) {
-			// Humans can only hear 10 octaves.
-			console.log('clipping octave at 10');
-			var octave = 10;
+                        // Humans can only hear 10 octaves.
+                        console.log('clipping octave at 10');
+                        var octave = 10;
                     } else {
                         var octave = args[1];
-		    }
+                    }
 
                     logo.getNote(args[0], args[1], 0, 'C');
                     if (!logo.validNote) {
-			logo.errorMsg(INVALIDPITCH, blk);
+                        logo.errorMsg(INVALIDPITCH, blk);
                     }
                 }
 
@@ -1880,10 +1883,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                         oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
                                         console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
                                         if (logo.blocks.blockList[blk].name == 'osctime') {
-   					    logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle);
-					} else {
-					    logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle);
-					}
+                                               logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle);
+                                        } else {
+                                            logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle);
+                                        }
                                     }
 
                                     for (var i = 0; i < oscillators.length; i++) {
@@ -1917,8 +1920,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                         if (logo.blocks.blockList[blk].name == 'osctime') {
                                             logo.updateNotation(note, 1000 / duration, turtle);
                                         } else {
-					    logo.updateNotation(note, duration, turtle);
-					}
+                                            logo.updateNotation(note, duration, turtle);
+                                        }
                                     }
 
                                     console.log("notes to play " + notes);
