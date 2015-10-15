@@ -1669,41 +1669,50 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     break;
                 }
 
-                // TODO: Allow frequency input
                 if (typeof(args[0]) == 'number') {
-                    logo.errorMsg(INVALIDPITCH, blk);
-                }
+                    // If frequency is input, ignore octave (args[1]).
+                    var obj = frequencyToNote(args[0]);
+                    var note = obj[0];
+                    var octave = obj[1];
+		    console.log(note + ' ' + octave);
+                    if (note == '?') {
+			logo.errorMsg(INVALIDPITCH, blk);
+		    }
+                } else {
+                    var note = args[0];
+                    if (args[1] < 1) {
+			var octave = 1;
+                    } else if (args[1] > 10) {
+			// Humans can only hear 10 octaves.
+			console.log('clipping octave at 10');
+			var octave = 10;
+                    } else {
+                        var octave = args[1];
+		    }
 
-                if (args[1] < 1) {
-                    args[1] = 1;
-                } else if (args[1] > 10) {
-                    // Humans can only hear 10 octaves.
-                    console.log('clipping octave at 10');
-                    args[1] = 10;
-                }
-
-                logo.getNote(args[0], args[1], 0, 'C');
-                if (!logo.validNote) {
-                    logo.errorMsg(INVALIDPITCH, blk);
+                    logo.getNote(args[0], args[1], 0, 'C');
+                    if (!logo.validNote) {
+			logo.errorMsg(INVALIDPITCH, blk);
+                    }
                 }
 
                 if (logo.inMatrix) {
                     if (logo.inFlatClamp) {
-                        matrix.solfegeNotes.push(args[0] + '♭');
+                        matrix.solfegeNotes.push(note + '♭');
                     } else if (logo.inSharpClamp) {
-                        matrix.solfegeNotes.push(args[0] + '#');
+                        matrix.solfegeNotes.push(note + '#');
                     } else {
-                        matrix.solfegeNotes.push(args[0]);
+                        matrix.solfegeNotes.push(note);
                     }
                     if (logo.inTranspositionClamp) {
                         matrix.solfegeTranspositions.push(logo.transposition[turtle]);
                     } else {
                         matrix.solfegeTranspositions.push(0);
                     }
-                    matrix.solfegeOctaves.push(args[1]);
+                    matrix.solfegeOctaves.push(octave);
                 } else {
-                    logo.noteNotes[turtle].push(args[0]);
-                    logo.noteOctaves[turtle].push(args[1]);
+                    logo.noteNotes[turtle].push(note);
+                    logo.noteOctaves[turtle].push(octave);
 
                     if (turtle in logo.transposition) {
                         logo.noteTranspositions[turtle].push(logo.transposition[turtle]);
@@ -3239,6 +3248,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     }
 
     this.getNote = function (solfege, octave, transposition, keySignature) {
+        SHARP = '♯';
+        FLAT = '♭';
+
         this.validNote = true;
         var sharpFlat = false;
 
@@ -3402,3 +3414,37 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
 }
 
+
+function frequencyToNote(hz) {
+    // Calculate the note and octave based on frequency, rounding to
+    // the nearest note.
+    NOTES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
+    TWELTHROOT2 = 1.05946309435929;
+    A0 = 27.5;
+    C8 = 4186.01;
+
+    if (hz < A0) {
+        return 'A0';
+    } else if (hz > C8) {
+        // FIXME: set upper bound of C10
+        return 'C8';
+    }
+
+    for (var i = 0; i < 88; i++) {
+        var f = A0 * Math.pow(TWELTHROOT2, i);
+        if (hz < f * 1.03 && hz > f * 0.97) {
+            return [NOTES[i % 12], Math.floor(i / 12)];
+        }
+    }
+    console.log('could not find note/octave for ' + hz);
+    return ['?', -1];
+}
+
+
+function noteToFrequency(note, octave) {
+    // Calculate the frequency based on note and octave.
+    NOTES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
+    TWELTHROOT2 = 1.05946309435929;
+    i = octave * 12 + NOTES.index(self._note);
+    return A0 * Math.pow(TWELTHROOT2, i);
+}
