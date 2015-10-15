@@ -44,14 +44,16 @@ function MusicNotation(turtles, stage) {
         //Create the notes
         var vexNotes = [];
 
-        // We treat each call to donotation as a single "measure".
-        console.log(notes);
+        // We treat each call to "donotation" as a single "measure".
+        // console.log(notes);
         for (i = 0; i < notes.length; i++) {
             // Each entry in notes is an array of notes and durations.
             // [[C4, 8], [E4, 8]]...
+            // console.log(notes[i]);
             var noteArray = [];
             var accidentalArray = [];
             for (j = 0; j < notes[i].length; j++) {
+		// console.log(notes[i][j]);
                 var octave = notes[i][j][0].substr(-1);
                 var pitch = notes[i][j][0].substr(0, notes[i][j][0].length - 1);
                 // FIXME: need to account for more complex cases

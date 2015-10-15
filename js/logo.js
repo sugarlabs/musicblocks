@@ -1453,17 +1453,17 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 console.log(logo.lilypondNotes);
                 if (args.length == 1) {
                     if (logo.lilypondNotes > 1) {
-                        logo.lilypondOutput = '<<\n';
+                        logo.lilypondOutput = '<< \n';
                       } else {
                         logo.lilypondOutput = '';
                     }
                     for (var t in logo.lilypondNotes) {
-                        logo.lilypondOutput += '{\n';
+                        logo.lilypondOutput += '{ \n';
                         logo.lilypondOutput += logo.lilypondNotes[t];
                         logo.lilypondOutput += '\n }\n';
                     }
                     if (logo.lilypondNotes > 1) {
-                        logo.lilypondOutput += '>>\n';
+                        logo.lilypondOutput += ' >>\n';
                     }
                     console.log(logo.lilypondOutput);
                     doSaveLilypond(logo, args[0]);
@@ -1870,26 +1870,30 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                 var notes = [];
                                 var notationNotes = [];
 
-                                // console.log(logo.turtles.turtleList[turtle].drum);
+                                if ((logo.noteNotes[turtle].length + logo.oscList[turtle].length) > 1) {
+                                    logo.lilypondNotes[turtle] += '< ';
+                                }
+
                                 var oscillators = [];
                                 if (logo.oscList[turtle].length > 0) {
                                     for (var i = 0; i < logo.oscList[turtle].length; i++) {
-                                        if (i == 0) {
-                                            var toneVol = new Tone.Volume(logo.polyVolume[turtle]);
-                                        }
-                                        oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster().chain(toneVol, Tone.Master));
-                                        console.log("tone to play " + logo.oscList[turtle][i][1]);
+                                        oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
+                                        console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
+                                        if (logo.blocks.blockList[blk].name == 'osctime') {
+   					    logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle);
+					} else {
+					    logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle);
+					}
                                     }
+
                                     for (var i = 0; i < oscillators.length; i++) {
                                         oscillators[i].volume.value = logo.polyVolume[turtle] * OSCVOLUMEADJUSTMENT;
                                         oscillators[i].start();
                                     }
                                     if (logo.blocks.blockList[blk].name == 'osctime') {
                                         var stopTime = duration;
-                                        console.log('stopTime: ' + stopTime);
                                     } else {
                                         var stopTime = logo.bpmFactor * 1000 / duration;
-                                        console.log('stopTime: ' + stopTime);
                                     }
                                     setTimeout(function(){
                                         for (var i = 0; i < oscillators.length; i++) {
@@ -1904,36 +1908,20 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                         logo.polySynth.toMaster();
                                     }
 
-                                    if (logo.noteNotes[turtle].length > 1) {
-                                        logo.lilypondNotes[turtle] += '< ';
-                                    }
-
                                     for (i in logo.noteNotes[turtle]) {
                                         var noteObj = logo.getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
                                         var note = noteObj[0] + noteObj[1];
                                         if (note != 'R') {
                                             notes.push(note);
                                         }
-                                        if (logo.blocks.blockList[blk].name == 'note') {
-                                            // FIXME: Duration must be
-                                            // power of 2 (or 1.5x or
-                                            // 1.75x a power of 2)
-                                            notationNotes.push([note.replace(/♭/g, 'b'), duration]);
-                                            // Replace sharps and flats for Lilypond
-                                            // Replace octaves for Lilypond
-                                            var lilynote = note.replace(/#/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
-                                            logo.lilypondNotes[turtle] += (lilynote + duration + ' ');
-                                        }
-                                    }
-
-                                    if (logo.noteNotes[turtle].length > 1) {
-                                        logo.lilypondNotes[turtle] += ' >';
+                                        if (logo.blocks.blockList[blk].name == 'osctime') {
+                                            logo.updateNotation(note, 1000 / duration, turtle);
+                                        } else {
+					    logo.updateNotation(note, duration, turtle);
+					}
                                     }
 
                                     console.log("notes to play " + notes);
-                                    if (logo.blocks.blockList[blk].name == 'note') {
-                                        logo.notesPlayed[turtle].push(notationNotes);
-                                    }
                                     if (notes.length > 0) {
                                         var len = notes[0].length;
                                         logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
@@ -1964,6 +1952,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                         Tone.Transport.start();
                                     }
                                 }
+
+                                if ((logo.noteNotes[turtle].length + logo.oscList[turtle].length) > 1) {
+                                    logo.lilypondNotes[turtle] += '> ';
+                                }
+
                             }
 
                             if (waitTime == 0) {
@@ -1980,7 +1973,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.setListener(turtle, listenerName, listener);
                 break;
             case 'rhythmicdot':
-                logo.beatFactor[turtle] *= 1.5;  // 3/2
+                // Dotting a note will increase its play time by 50%
+                // so we divide the beat factor by 1.5.
+                logo.beatFactor[turtle] /= 1.5;
                 childFlow = args[0];
                 childFlowCount = 1;
 
@@ -1988,7 +1983,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
                 var listener = function (event) {
-                    logo.beatFactor[turtle] /= 1.5;
+                    logo.beatFactor[turtle] *= 1.5;
                 }
 
                 logo.setListener(turtle, listenerName, listener);
@@ -3412,16 +3407,54 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         }
     }
 
+    this.updateNotation = function (note, duration, turtle) {
+        // FIXME: try approximating duration using ties
+        var POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
+        var dotted = false;
+        var doubleDotted = false;
+
+        if (POWER2.indexOf(duration) == -1) {
+            if (POWER2.indexOf(duration * 1.5) == -1) {
+                if (POWER2.indexOf(duration * 1.75) == -1) {
+                    console.log('cannot convert ' + duration + ' to a note');
+                    duration = 8;
+                } else {
+                    duration = POWER2[POWER2.indexOf(duration * 1.75)];
+                    doubleDotted = true;
+                }
+            } else {
+                duration = POWER2[POWER2.indexOf(duration * 1.5)];
+                dotted = true;
+            }
+        }
+
+        // TODO: Add dots in vexflow
+        // console.log(note.replace(/♭/g, 'b') + ' ' + duration);
+        this.notesPlayed[turtle].push([[note.replace(/♭/g, 'b'), duration]]);
+
+        // Replace sharps and flats and octaves for Lilypond
+        var lilynote = note.replace(/#/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
+        if (dotted) {
+            // console.log(lilynote + ' ' + duration + '.');
+            this.lilypondNotes[turtle] += (lilynote + duration + '. ');
+        } else if (doubleDotted) {
+            // console.log(lilynote + ' ' + duration + '.');
+            this.lilypondNotes[turtle] += (lilynote + duration + '.. ');
+        } else {
+            // console.log(lilynote + ' ' + duration);
+            this.lilypondNotes[turtle] += (lilynote + duration + ' ');
+        }
+    }
 }
 
 
 function frequencyToNote(hz) {
     // Calculate the note and octave based on frequency, rounding to
     // the nearest note.
-    NOTES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
-    TWELTHROOT2 = 1.05946309435929;
-    A0 = 27.5;
-    C8 = 4186.01;
+    var NOTES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
+    var TWELTHROOT2 = 1.05946309435929;
+    var A0 = 27.5;
+    var C8 = 4186.01;
 
     if (hz < A0) {
         return 'A0';
@@ -3443,8 +3476,10 @@ function frequencyToNote(hz) {
 
 function noteToFrequency(note, octave) {
     // Calculate the frequency based on note and octave.
-    NOTES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
-    TWELTHROOT2 = 1.05946309435929;
+    var NOTES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
+    var TWELTHROOT2 = 1.05946309435929;
+    var A0 = 27.5;
+
     i = octave * 12 + NOTES.index(self._note);
     return A0 * Math.pow(TWELTHROOT2, i);
 }
