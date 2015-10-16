@@ -3548,10 +3548,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 if (obj[4] > 0 && !singleton) {
                     // lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
                     this.lilypondNotes[turtle] += '%5Ctuplet ' + obj[4] + '%2F' + obj[1] + ' { ';
-                    var duration = 4 * obj[1];
+                    var duration = 2 * obj[1];
 	    	    this.lilypondNotes[turtle] += obj[0] + duration + ' ';
                     for (var j = 1; j < obj[4]; j++) {
-			var duration = 4 * this.lilypondStaging[turtle][i + j][1];
+			var duration = 2 * this.lilypondStaging[turtle][i + j][1];
 	    		this.lilypondNotes[turtle] += this.lilypondStaging[turtle][i + j][0] + duration + ' ';
 		    }
 		    this.lilypondNotes[turtle] += '} ';
