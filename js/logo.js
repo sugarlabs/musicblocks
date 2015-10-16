@@ -3443,17 +3443,43 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.updateNotation = function (note, duration, turtle, insideChord) {
         // FIXME: try approximating duration using ties
 
-        // lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
         var POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
         var dotted = false;
         var doubleDotted = false;
+        var tupletValue = -1;
 
         if (!insideChord) {
             if (POWER2.indexOf(duration) == -1) {
                 if (POWER2.indexOf(duration * 1.5) == -1) {
                     if (POWER2.indexOf(duration * 1.75) == -1) {
-                        console.log('cannot convert ' + duration + ' to a note');
-                        duration = 8;
+                        // First, see if the note is a tuplet (has a
+                        // factor of 2).
+                        var factorOfTwo = 1;
+                        console.log(duration + ' ' + Math.floor(duration / 2));
+                        while (Math.floor(duration / 2) * 2 == duration) {
+                            factorOfTwo *= 2;
+                            duration /= 2;
+                        }
+                        if (factorOfTwo > 1) {
+                            // We have a tuplet of sorts
+                            console.log('tuplet ' + factorOfTwo + ' ' + duration);
+                            tupletValue = duration;
+                            duration = factorOfTwo;
+                        } else {
+                            // Otherwise, find an approximate solution.
+                            console.log('cannot convert ' + duration + ' to a note');
+                            for (var i = 1; i < POWER2.length; i++) {
+                                // Rounding down
+                                if (duration < POWER2[i]) {
+                                    duration = POWER2[i - 1];
+                                    break;
+                                }
+                            }
+                            if (POWER2.indexOf(duration) == -1) {
+                                duration = 128;
+                            }
+                            console.log('substuting in ' + duration);
+                        }
                     } else {
                         duration = POWER2[POWER2.indexOf(duration * 1.75)];
                         doubleDotted = true;
@@ -3477,17 +3503,24 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         }
 
         if (insideChord) {
-            this.lilypondNotes[turtle] += (lilynote + ' ');
+            this.lilypondNotes[turtle] += (lilynote);
         } else if (dotted) {
            // console.log(lilynote + ' ' + duration + '.');
-           this.lilypondNotes[turtle] += (lilynote + duration + '. ');
+           this.lilypondNotes[turtle] += (lilynote + duration + '.');
         } else if (doubleDotted) {
             // console.log(lilynote + ' ' + duration + '.');
-            this.lilypondNotes[turtle] += (lilynote + duration + '.. ');
+            this.lilypondNotes[turtle] += (lilynote + duration + '..');
         } else {
             // console.log(lilynote + ' ' + duration);
-            this.lilypondNotes[turtle] += (lilynote + duration + ' ');
+            this.lilypondNotes[turtle] += (lilynote + duration);
         }
+        // TODO: process all the notes together rather than one at a
+        // time so that you can generate tuplets.
+        // lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
+        if (tupletValue > 0) {
+            this.lilypondNotes[turtle] += '-' + tupletValue;
+	}
+	this.lilypondNotes[turtle] += ' ';
     }
 }
 
