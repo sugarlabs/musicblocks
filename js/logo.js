@@ -19,7 +19,7 @@ var OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
 
 // This header is prepended to the Lilypond output.
 // Note: We are using URL encoding for \ (%5C) and newline (%0A)
-var LILYPONDHEADER = '%5Cversion "2.18.2"%A0%5Cheader {%0Adedication = "Description: http://walterbender.github.io/musicblocks/"%0Atitle = "Title: My Music Blocks Creation"%0Asubtitle = "Subtitle:"%0Ainstrument = "Instrument:"%0Acomposer = "Composer: Mr. Mouse"%0Aarranger = "Arranger:"%0Acopyright = "Copyright: Mr. Mouse (c) 2015 -- CC-SA-BY"%0Atagline = "Made from MB v. 328bc6d"%0A}%0A'
+var LILYPONDHEADER = '%5Cversion "2.18.2"%0A%5Cheader {%0Adedication = "Description: http://walterbender.github.io/musicblocks/"%0Atitle = "Title: My Music Blocks Creation"%0Asubtitle = "Subtitle:"%0Ainstrument = "Instrument:"%0Acomposer = "Composer: Mr. Mouse"%0Aarranger = "Arranger:"%0Acopyright = "Copyright: Mr. Mouse (c) 2015 -- CC-SA-BY"%0Atagline = "Made from MB v. 328bc6d"%0A}%0A%0A'
 
 var NOMICERRORMSG = 'The microphone is not available.';
 var NANERRORMSG = 'Not a number.';
@@ -1455,6 +1455,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 break;
             case 'savelilypond':
                 var turtleCount = 0;
+                var RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
                 for (var t in logo.lilypondNotes) {
                     turtleCount += 1;
                 }
@@ -1463,22 +1464,26 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (turtleCount > 1) {
                         for (var t in logo.lilypondNotes) {
                             if (logo.lilypondNotes[t].length > 0) {
-                                logo.lilypondOutput += 'instrument' + t + ' = {%0A';
+                                var instrumentName = logo.turtles.turtleList[t].name;
+				if (instrumentName == t.toString()) {
+				    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+				}
+                                logo.lilypondOutput += instrumentName + ' = %5cnew Staff {%0A';
                                 logo.lilypondOutput += logo.lilypondNotes[t];
                                 logo.lilypondOutput += '%0A}%0A%0A';
                             }
                         }
-                        // This doesn't seem to be necessary and it
-                        // generates extra empty staffs.
-                        /*
-                        logo.lilypondOutput += '<<%0A';
+                        logo.lilypondOutput += '{ <<%0A';
                         for (var t in logo.lilypondNotes) {
                             if (logo.lilypondNotes[t].length > 0) {
-                                logo.lilypondOutput += '%5Cnew Staff { %5Cinstrument' + t + '}%0A';
+                                var instrumentName = logo.turtles.turtleList[t].name;
+				if (instrumentName == t.toString()) {
+				    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+				}
+                                logo.lilypondOutput += '%5C' + instrumentName + '%0A';
                             }
                         }
-                        logo.lilypondOutput += '>>%0A';
-                        */
+                        logo.lilypondOutput += '>> }%0A';
                     } else {
                         logo.lilypondOutput += '%0A{%0A';
                         logo.lilypondOutput += logo.lilypondNotes[turtle];
