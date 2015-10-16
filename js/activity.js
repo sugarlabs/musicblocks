@@ -257,7 +257,9 @@ define(function (require) {
             logo.time = 0;
             hideMsgs();
             logo.setBackgroundColor(-1);
+            logo.lilypondOutput = LILYPONDHEADER;
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+	        logo.lilypondStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear();
             }
             blocksContainer.x = 0;
