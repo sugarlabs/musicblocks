@@ -3580,15 +3580,24 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // TODO: process all the notes together rather than one at a
         // time so that you can generate tuplets.
 
+        // obj = [instructions] or
         // obj = [note, duration, dotted, doubleDotted, tupletValue, insideChord]
 
         this.lilypondNotes[turtle] = '';
+
+        function toLilynote (note) {
+            // Lilypond notes use is for sharp, es for flat,
+            // , and ' for shifts in octave.
+            // Also, notes must be lowercase.
+            return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
+        }
+
         for (var i = 0; i < this.lilypondStaging[turtle].length; i++) {
             obj = this.lilypondStaging[turtle][i];
             if (obj.length == 1) {
                 this.lilypondNotes[turtle] += obj[0];
             } else {
-                var note = obj[0].replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
+                var note = toLilynote(obj[0]);
                 var singleton = false;
                 // If it is a tuplet, look ahead to see if it is complete.
                 if (obj[4] > 0) {  // tupletValue
@@ -3613,7 +3622,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         this.lilypondNotes[turtle] += note + duration + ' ';
                     for (var j = 1; j < obj[4]; j++) {
                         var duration = 2 * this.lilypondStaging[turtle][i + j][1];
-                            this.lilypondNotes[turtle] += this.lilypondStaging[turtle][i + j][0].replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase() + duration + ' ';
+                        this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][0]) + duration + ' ';
                     }
                     this.lilypondNotes[turtle] += '} ';
                     i += obj[4] - 1;
