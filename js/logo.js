@@ -3586,7 +3586,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         for (var i = 0; i < this.lilypondStaging[turtle].length; i++) {
             obj = this.lilypondStaging[turtle][i];
             if (obj.length == 1) {
-                this.lilypondNotes += obj[0];
+                this.lilypondNotes[turtle] += obj[0];
             } else {
                 var note = obj[0].replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
                 var singleton = false;
