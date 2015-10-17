@@ -1523,18 +1523,24 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         }
                         logo.lilypondOutput += '%5Cscore {%0A';
                         logo.lilypondOutput += '<<%0A';
-                        var i = 0;
-                        for (var t in logo.lilypondNotes) {
-                            if (logo.lilypondStaging[t].length > 0) {
-                                var instrumentName = logo.turtles.turtleList[t].name;
-                                if (instrumentName == t.toString()) {
-                                    instrumentName = RODENTS[t % 12];
+                        var CLEFS = ['treble', 'bass', 'bass_8'];
+                        // Sort the staffs, treble on top, bass_8 on the bottom.
+                        for (var c = 0; c < CLEFS.length; c++) {
+                            var i = 0;
+                            for (var t in logo.lilypondNotes) {
+                                if (clef[i] == CLEFS[c]) {
+                                    if (logo.lilypondStaging[t].length > 0) {
+                                        var instrumentName = logo.turtles.turtleList[t].name;
+                                        if (instrumentName == t.toString()) {
+                                            instrumentName = RODENTS[t % 12];
+                                        }
+                                        logo.lilypondOutput += '%5Cnew Staff = "' + clef[i] + '" {%0A';
+                                        logo.lilypondOutput += '%5Cclef "' + clef[i] + '"%0A';
+                                        logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A}%0A';
+                                    }
                                 }
-                                logo.lilypondOutput += '%5Cnew Staff = "' + clef[i] + '" {%0A';
-                                logo.lilypondOutput += '%5Cclef "' + clef[i] + '"%0A';
-                                logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A}%0A';
+                                i += 1;
                             }
-                            i += 1;
                         }
                         logo.lilypondOutput += '>>%0A';
                         logo.lilypondOutput += '%5C\layout { }%0A}%0A';
