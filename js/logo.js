@@ -431,7 +431,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.endOfFlowActions[turtle] = {};
             this.doBlocks[turtle] = [];
             this.transposition[turtle] = 0;
-            this.lilypondNotes[turtle] = '';
             this.notesPlayed[turtle] = [];
             this.noteNotes[turtle] = [];
             this.noteOctaves[turtle] = [];
@@ -1454,6 +1453,27 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.setTurtleDelay(0);
                 break;
             case 'savelilypond':
+/*
+mouse = \relative c' {
+  \repeat unfold 4 { c d e f | g f e d | }
+}
+
+brown_rat = \relative c' {
+  \repeat unfold 4 { f c d e | d g f e | }
+}
+
+\score {
+  <<
+    \new Staff = "treble" {
+      \set Staff.instrumentName = #"mouse" \mouse
+    }
+    \new Staff = "treble" {
+      \set Staff.instrumentName = #"brown rat" \brown_rat
+    }
+  >>
+  \layout { }
+}
+*/
                 var turtleCount = 0;
                 var RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
                 for (var t in logo.lilypondStaging) {
@@ -1469,29 +1489,31 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 				if (instrumentName == t.toString()) {
 				    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
 				}
-                                logo.lilypondOutput += instrumentName + ' = %5cnew Staff {%0A';
+                                logo.lilypondOutput += instrumentName + ' = {%0A';
                                 logo.lilypondOutput += logo.lilypondNotes[t];
                                 logo.lilypondOutput += '%0A}%0A%0A';
                             }
                         }
-                        logo.lilypondOutput += '{ <<%0A';
+                        logo.lilypondOutput += '%5Cscore {%0A';
+                        logo.lilypondOutput += '<<%0A';
                         for (var t in logo.lilypondNotes) {
                             if (logo.lilypondStaging[t].length > 0) {
                                 var instrumentName = logo.turtles.turtleList[t].name;
 				if (instrumentName == t.toString()) {
-				    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+				    instrumentName = RODENTS[t % 12];
 				}
-                                logo.lilypondOutput += '%5C' + instrumentName + '%0A';
+                                logo.lilypondOutput += '%5Cnew Staff = "treble" {%0A';
+logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A}%0A';
                             }
                         }
-                        logo.lilypondOutput += '>> }%0A';
+                        logo.lilypondOutput += '>>%0A';
+                        logo.lilypondOutput += '%5C\layout { }%0A}%0A';
                     } else {
                         logo.processLilypondNotes(turtle);
                         logo.lilypondOutput += '%0A{%0A';
                         logo.lilypondOutput += logo.lilypondNotes[turtle];
                         logo.lilypondOutput += '%0A}%0A';
                     }
-                    // console.log(logo.lilypondOutput);
                     doSaveLilypond(logo, args[0]);
                 }
                 break;
