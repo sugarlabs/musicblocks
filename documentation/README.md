@@ -314,6 +314,22 @@ details).
 
 The *Key* block contains the current Key, by default, C Major.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/osctime.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sine.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/square.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/triangle.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sawtooth.svg'</img>
+
+The *OscTime* block lets you specify note duration in milliseconds. It can be used with *Pitch* blocks or one of several built-in synthesizers, e.g., *Sine*, *Square*, *Triangle*, and *Sawtooth* Blocks. These blocks take as their input frequency (in Hertz).
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/lilypad.svg'</img>
+
+The *Save as Lilypond* block saves your composition as a .ly file in your Downloads directory. The .ly file can be used to generate sheet music using [Lilypond](http://www.lilypond.org/).
+
 Blocks Palette
 --------------
 
