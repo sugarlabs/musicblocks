@@ -1453,42 +1453,69 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.setTurtleDelay(0);
                 break;
             case 'savelilypond':
-/*
-mouse = \relative c' {
-  \repeat unfold 4 { c d e f | g f e d | }
-}
+            /*
+              mouse = \relative c' {
+                \repeat unfold 4 { c d e f | g f e d | }
+              }
 
-brown_rat = \relative c' {
-  \repeat unfold 4 { f c d e | d g f e | }
-}
+              brown_rat = \relative c' {
+                \repeat unfold 4 { f c d e | d g f e | }
+              }
 
-\score {
-  <<
-    \new Staff = "treble" {
-      \set Staff.instrumentName = #"mouse" \mouse
-    }
-    \new Staff = "treble" {
-      \set Staff.instrumentName = #"brown rat" \brown_rat
-    }
-  >>
-  \layout { }
-}
-*/
+              \score {
+                <<
+                  \new Staff = "treble" {
+                    \set Staff.instrumentName = #"mouse" \mouse
+                  }
+                  \new Staff = "treble" {
+                    \set Staff.instrumentName = #"brown rat" \brown_rat
+                  }
+                >>
+                \layout { }
+              }
+            */
                 var turtleCount = 0;
+                var clef = [];
                 var RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
                 for (var t in logo.lilypondStaging) {
                     turtleCount += 1;
                 }
                 if (args.length == 1) {
                     console.log('saving as lilypond: ' + turtleCount);
-                    if (turtleCount > 1) {
+                    if (turtleCount > 0) {
                         for (var t in logo.lilypondStaging) {
                             if (logo.lilypondStaging[t].length > 0) {
+                                var octaveTotal = 0;
+                                var noteCount = 0;
+                                for (var i = 0; i < logo.lilypondStaging[t].length; i++) {
+                                    obj = logo.lilypondStaging[t][i];
+                                    if (obj.length > 1) {
+                                        octaveTotal += parseInt(obj[0].substr(obj[0].length - 1));
+                                        noteCount += 1;
+                                    }
+                                }
+                                if (noteCount > 0) {
+                                    switch (Math.floor(octaveTotal / noteCount)) {
+                                        case 0:
+                                        case 1:
+                                        case 2:
+                                            clef.push('bass_8');
+                                            break;
+                                        case 3:
+                                            clef.push('bass');
+                                            break;
+                                        default:
+                                            clef.push('treble');
+                                            break;
+                                    }
+                                } else {
+                                    clef.push('treble');
+                                }
                                 logo.processLilypondNotes(t);
                                 var instrumentName = logo.turtles.turtleList[t].name;
-				if (instrumentName == t.toString()) {
-				    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
-				}
+                                if (instrumentName == t.toString()) {
+                                    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                                }
                                 logo.lilypondOutput += instrumentName + ' = {%0A';
                                 logo.lilypondOutput += logo.lilypondNotes[t];
                                 logo.lilypondOutput += '%0A}%0A%0A';
@@ -1496,15 +1523,18 @@ brown_rat = \relative c' {
                         }
                         logo.lilypondOutput += '%5Cscore {%0A';
                         logo.lilypondOutput += '<<%0A';
+                        var i = 0;
                         for (var t in logo.lilypondNotes) {
                             if (logo.lilypondStaging[t].length > 0) {
                                 var instrumentName = logo.turtles.turtleList[t].name;
-				if (instrumentName == t.toString()) {
-				    instrumentName = RODENTS[t % 12];
-				}
-                                logo.lilypondOutput += '%5Cnew Staff = "treble" {%0A';
-logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A}%0A';
+                                if (instrumentName == t.toString()) {
+                                    instrumentName = RODENTS[t % 12];
+                                }
+                                logo.lilypondOutput += '%5Cnew Staff = "' + clef[i] + '" {%0A';
+                                logo.lilypondOutput += '%5Cclef "' + clef[i] + '"%0A';
+                                logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A}%0A';
                             }
+                            i += 1;
                         }
                         logo.lilypondOutput += '>>%0A';
                         logo.lilypondOutput += '%5C\layout { }%0A}%0A';
@@ -3474,7 +3504,7 @@ logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '
 
     this.stageNotesForLilypond = function (turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord) {
         if (turtle in this.lilypondStaging) {
-            this.lilypondStaging[turtle].push([note, duration, dotted, doubleDotted, tupletValue, insideChord,]);
+            this.lilypondStaging[turtle].push([note, duration, dotted, doubleDotted, tupletValue, insideChord]);
         } else {
             this.lilypondStaging[turtle] = [[note, duration, dotted, doubleDotted, tupletValue, insideChord]];
         }
@@ -3532,7 +3562,7 @@ logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '
         }
 
         // Push notes for lilypond.
-        this.stageNotesForLilypond(turtle, note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase(), duration, dotted, doubleDotted, tupletValue, insideChord);
+        this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord);
 
         if (note != '') {
             // Push notes for vexflow.
@@ -3544,12 +3574,15 @@ logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '
         // TODO: process all the notes together rather than one at a
         // time so that you can generate tuplets.
 
+        // obj = [note, duration, dotted, doubleDotted, tupletValue, insideChord]
+
         this.lilypondNotes[turtle] = '';
         for (var i = 0; i < this.lilypondStaging[turtle].length; i++) {
             obj = this.lilypondStaging[turtle][i];
             if (obj.length == 1) {
                 this.lilypondNotes += obj[0];
             } else {
+                var note = obj[0].replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
                 var singleton = false;
                 // If it is a tuplet, look ahead to see if it is complete.
                 if (obj[4] > 0) {  // tupletValue
@@ -3566,33 +3599,33 @@ logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '
                             }
                         }
                     }
-		}
+                }
                 if (obj[4] > 0 && !singleton) {
                     // lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
                     this.lilypondNotes[turtle] += '%5Ctuplet ' + obj[4] + '%2F' + obj[1] + ' { ';
                     var duration = 2 * obj[1];
-	    	    this.lilypondNotes[turtle] += obj[0] + duration + ' ';
+                        this.lilypondNotes[turtle] += note + duration + ' ';
                     for (var j = 1; j < obj[4]; j++) {
-			var duration = 2 * this.lilypondStaging[turtle][i + j][1];
-	    		this.lilypondNotes[turtle] += this.lilypondStaging[turtle][i + j][0] + duration + ' ';
-		    }
-		    this.lilypondNotes[turtle] += '} ';
-		    i += obj[4] - 1;
-		} else {
+                        var duration = 2 * this.lilypondStaging[turtle][i + j][1];
+                            this.lilypondNotes[turtle] += this.lilypondStaging[turtle][i + j][0].replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase() + duration + ' ';
+                    }
+                    this.lilypondNotes[turtle] += '} ';
+                    i += obj[4] - 1;
+                } else {
                     if (obj[5]) {  // insideChord
-			this.lilypondNotes[turtle] += (obj[0]);
+                        this.lilypondNotes[turtle] += (note);
                     } else if (obj[2]) {  // dotted
-			this.lilypondNotes[turtle] += (obj[0] + obj[1] + '.');
+                        this.lilypondNotes[turtle] += (note + obj[1] + '.');
                     } else if (obj[3]) {  // doubleDotted
-			this.lilypondNotes[turtle] += (obj[0] + obj[1] + '..');
+                        this.lilypondNotes[turtle] += (note + obj[1] + '..');
                     } else {
-			this.lilypondNotes[turtle] += (obj[0] + obj[1]);
+                        this.lilypondNotes[turtle] += (note + obj[1]);
                     }
                     // singleton (incomplete tuplets)
                     if (singleton) {
-			this.lilypondNotes[turtle] += '-' + obj[4];  // tupletValue
+                        this.lilypondNotes[turtle] += '-' + obj[4];  // tupletValue
                     }
-		}
+                }
                 this.lilypondNotes[turtle] += ' ';
             }
         }
