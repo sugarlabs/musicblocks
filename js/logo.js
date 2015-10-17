@@ -1482,74 +1482,71 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 if (args.length == 1) {
                     console.log('saving as lilypond: ' + turtleCount);
-                    if (turtleCount > 0) {
-                        for (var t in logo.lilypondStaging) {
-                            if (logo.lilypondStaging[t].length > 0) {
-                                var octaveTotal = 0;
-                                var noteCount = 0;
-                                for (var i = 0; i < logo.lilypondStaging[t].length; i++) {
-                                    obj = logo.lilypondStaging[t][i];
-                                    if (obj.length > 1) {
-                                        octaveTotal += parseInt(obj[0].substr(obj[0].length - 1));
-                                        noteCount += 1;
-                                    }
+                    for (var t in logo.lilypondStaging) {
+                        if (logo.lilypondStaging[t].length > 0) {
+                            var octaveTotal = 0;
+                            var noteCount = 0;
+                            for (var i = 0; i < logo.lilypondStaging[t].length; i++) {
+                                obj = logo.lilypondStaging[t][i];
+                                if (obj.length > 1) {
+                                    octaveTotal += parseInt(obj[0].substr(obj[0].length - 1));
+                                    noteCount += 1;
                                 }
-                                if (noteCount > 0) {
-                                    switch (Math.floor(octaveTotal / noteCount)) {
-                                        case 0:
-                                        case 1:
-                                        case 2:
-                                            clef.push('bass_8');
-                                            break;
-                                        case 3:
-                                            clef.push('bass');
-                                            break;
-                                        default:
-                                            clef.push('treble');
-                                            break;
-                                    }
-                                } else {
+                            }
+                            if (noteCount > 0) {
+                                switch (Math.floor(octaveTotal / noteCount)) {
+                                case 0:
+                                case 1:
+                                case 2:
+                                    clef.push('bass_8');
+                                    break;
+                                case 3:
+                                    clef.push('bass');
+                                    break;
+                                default:
                                     clef.push('treble');
+                                    break;
                                 }
-                                logo.processLilypondNotes(t);
-                                var instrumentName = logo.turtles.turtleList[t].name;
-                                if (instrumentName == t.toString()) {
-                                    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
-                                }
-                                logo.lilypondOutput += instrumentName + ' = {%0A';
-                                logo.lilypondOutput += logo.lilypondNotes[t];
-                                logo.lilypondOutput += '%0A}%0A%0A';
+                            } else {
+                                clef.push('treble');
                             }
-                        }
-                        logo.lilypondOutput += '%5Cscore {%0A';
-                        logo.lilypondOutput += '<<%0A';
-                        var CLEFS = ['treble', 'bass', 'bass_8'];
-                        // Sort the staffs, treble on top, bass_8 on the bottom.
-                        for (var c = 0; c < CLEFS.length; c++) {
-                            var i = 0;
-                            for (var t in logo.lilypondNotes) {
-                                if (clef[i] == CLEFS[c]) {
-                                    if (logo.lilypondStaging[t].length > 0) {
-                                        var instrumentName = logo.turtles.turtleList[t].name;
-                                        if (instrumentName == t.toString()) {
-                                            instrumentName = RODENTS[t % 12];
-                                        }
-                                        logo.lilypondOutput += '%5Cnew Staff = "' + clef[i] + '" {%0A';
-                                        logo.lilypondOutput += '%5Cclef "' + clef[i] + '"%0A';
-                                        logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A}%0A';
-                                    }
-                                }
-                                i += 1;
+                            logo.processLilypondNotes(t);
+                            var instrumentName = logo.turtles.turtleList[t].name;
+                            if (instrumentName == _('start')) {
+                                instrumentName = RODENTS[0].replace(/ /g, '_');
+                            } else if (instrumentName == t.toString()) {
+                                instrumentName = RODENTS[t % 12].replace(/ /g, '_');
                             }
+                            logo.lilypondOutput += instrumentName + ' = {%0A';
+                            logo.lilypondOutput += logo.lilypondNotes[t];
+                            logo.lilypondOutput += '%0A}%0A%0A';
                         }
-                        logo.lilypondOutput += '>>%0A';
-                        logo.lilypondOutput += '%5C\layout { }%0A}%0A';
-                    } else {
-                        logo.processLilypondNotes(turtle);
-                        logo.lilypondOutput += '%0A{%0A';
-                        logo.lilypondOutput += logo.lilypondNotes[turtle];
-                        logo.lilypondOutput += '%0A}%0A';
                     }
+                    logo.lilypondOutput += '%5Cscore {%0A';
+                    logo.lilypondOutput += '<<%0A';
+                    var CLEFS = ['treble', 'bass', 'bass_8'];
+                    // Sort the staffs, treble on top, bass_8 on the bottom.
+                    for (var c = 0; c < CLEFS.length; c++) {
+                        var i = 0;
+                        for (var t in logo.lilypondNotes) {
+                            if (clef[i] == CLEFS[c]) {
+                                if (logo.lilypondStaging[t].length > 0) {
+                                    var instrumentName = logo.turtles.turtleList[t].name;
+                                    if (instrumentName == _('start')) {
+                                        instrumentName = RODENTS[0].replace(/ /g, '_');
+                                    } else if (instrumentName == t.toString()) {
+                                        instrumentName = RODENTS[t % 12];
+                                    }
+                                    logo.lilypondOutput += '%5Cnew Staff = "' + clef[i] + '" {%0A';
+                                    logo.lilypondOutput += '%5Cclef "' + clef[i] + '"%0A';
+                                    logo.lilypondOutput += '%5Cset Staff.instrumentName = %23"' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A}%0A';
+                                }
+                            }
+                            i += 1;
+                        }
+                    }
+                    logo.lilypondOutput += '>>%0A';
+                    logo.lilypondOutput += '%5C\layout { }%0A}%0A';
                     doSaveLilypond(logo, args[0]);
                 }
                 break;
