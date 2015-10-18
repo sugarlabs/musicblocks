@@ -1513,7 +1513,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             logo.processLilypondNotes(t);
                             var instrumentName = logo.turtles.turtleList[t].name;
                             if (instrumentName == _('start')) {
-                                instrumentName = RODENTS[0].replace(/ /g, '_');
+                                instrumentName = RODENTS[t % 12].replace(/ /g, '_');
                             } else if (instrumentName == t.toString()) {
                                 instrumentName = RODENTS[t % 12].replace(/ /g, '_');
                             }
@@ -1533,7 +1533,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                 if (logo.lilypondStaging[t].length > 0) {
                                     var instrumentName = logo.turtles.turtleList[t].name;
                                     if (instrumentName == _('start')) {
-                                        instrumentName = RODENTS[0].replace(/ /g, '_');
+                                        instrumentName = RODENTS[t % 12].replace(/ /g, '_');
                                     } else if (instrumentName == t.toString()) {
                                         instrumentName = RODENTS[t % 12];
                                     }
