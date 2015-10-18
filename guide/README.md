@@ -117,14 +117,18 @@ used inside of Note blocks to specify the pitch(s) to be played when
 the Note block is run.
 
 You can plug different values into the Pitch block name and octave
-slots. Some examples are shown above. The pitch name in the top Pitch
-block is specified using a Solfege block; the pitch name in the middle
-Pitch block is specified using a Pitch-name block; the pitch name in
-the bottom block is specified using a Text block. The octave is always
-specified using a number block and is restricted to whole numbers.
+slots. Some examples are shown above. Starting from the top, the pitch
+name block is specified using a Solfege block; the pitch name is
+specified using a Pitch-name block; the pitch name is specified using
+a Number block (frequency in Hertz); the pitch name is specified using
+a Text block.
+
+The octave is specified using a number block and is restricted to
+whole numbers. In the case where the pitch name is specified by
+frequency, the octave is ignored.
 
 Note that the rest keyword used in a Pitch block will not be voiced.
- 
+
 About the Rhythm Block
 ----------------------
 
