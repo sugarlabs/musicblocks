@@ -121,7 +121,7 @@ define(function (require) {
 
         // Are we running off of a server?
         var server = true;
-        var scale = 1;
+        var musicBlocksScale = 1;
         var stage;
         var turtles;
         var palettes;
@@ -407,7 +407,7 @@ define(function (require) {
                 img.onload = function () {
                     chartBitmap = new createjs.Bitmap(img);
                     stage.addChild(chartBitmap);
-                    chartBitmap.x = (canvas.width / (2 * scale)) - (300);
+                    chartBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (300);
                     chartBitmap.y = 0;
                     chartBitmap.scaleX = chartBitmap.scaleY = chartBitmap.scale = 600 / chartBitmap.image.width;
                     logo.hideBlocks();
@@ -783,7 +783,7 @@ define(function (require) {
             if (event.clientX < cellSize) {
                 palettes.menuScrollEvent(delta, scrollSpeed);
             } else {
-                palette = palettes.findPalette(event.clientX / scale, event.clientY / scale);
+                palette = palettes.findPalette(event.clientX / musicBlocksScale, event.clientY / musicBlocksScale);
                 if (palette) {
                     palette.scrollEvent(delta, scrollSpeed);
                 }
@@ -999,43 +999,43 @@ define(function (require) {
             if (smallSide < cellSize * 11) {
                 var mobileSize = true;
                 if (w < cellSize * 10) {
-                    scale = smallSide / (cellSize * 11);
+                    musicBlocksScale = smallSide / (cellSize * 11);
                 } else {
-                    scale = Math.max(smallSide / (cellSize * 11), 0.75);
+                    musicBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
                 }
             } else {
                 var mobileSize = false;
                 if (w > h) {
-                    scale = w / 1200;
+                    musicBlocksScale = w / 1200;
                 } else {
-                    scale = w / 900;
+                    musicBlocksScale = w / 900;
                 }
             }
-            stage.scaleX = scale;
-            stage.scaleY = scale;
+            stage.scaleX = musicBlocksScale;
+            stage.scaleY = musicBlocksScale;
 
             stage.canvas.width = w;
             stage.canvas.height = h;
 
-            console.log('Resize: scale ' + scale +
+            console.log('Resize: scale ' + musicBlocksScale +
             ', windowW ' + w + ', windowH ' + h +
             ', canvasW ' + canvas.width + ', canvasH ' + canvas.height +
             ', screenW ' + screen.width + ', screenH ' + screen.height);
 
-            turtles.setScale(scale);
-            blocks.setScale(scale);
-            palettes.setScale(scale);
-            trashcan.resizeEvent(scale);
+            turtles.setScale(musicBlocksScale);
+            blocks.setScale(musicBlocksScale);
+            palettes.setScale(musicBlocksScale);
+            trashcan.resizeEvent(musicBlocksScale);
             setupAndroidToolbar(mobileSize);
 
             // Reposition coordinate grids.
-            cartesianBitmap.x = (canvas.width / (2 * scale)) - (600);
-            cartesianBitmap.y = (canvas.height / (2 * scale)) - (450);
-            polarBitmap.x = (canvas.width / (2 * scale)) - (600);
-            polarBitmap.y = (canvas.height / (2 * scale)) - (450);
+            cartesianBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (600);
+            cartesianBitmap.y = (canvas.height / (2 * musicBlocksScale)) - (450);
+            polarBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (600);
+            polarBitmap.y = (canvas.height / (2 * musicBlocksScale)) - (450);
             update = true;
 
-            // Setup help now that we have calculated scale.
+            // Setup help now that we have calculated musicBlocksScale.
             showHelp(true);
 
             // Hide palette icons on mobile
@@ -1078,11 +1078,11 @@ define(function (require) {
         }
 
         function deleteBlocksBox() {
-            clearBox.show(scale);
+            clearBox.show(musicBlocksScale);
         }
 
         function doUtilityBox() {
-            utilityBox.show(scale);
+            utilityBox.show(musicBlocksScale);
         }
 
         // FIXME: confirm???
@@ -1236,9 +1236,11 @@ define(function (require) {
                 console.log(e);
             }
 
-            if (isSVGEmpty(turtles)) {
-                return;
-            }
+            // if (isSVGEmpty(turtles)) {
+                // We will use the music icon in these cases.
+                // return;
+            // }
+
             var img = new Image();
             var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
             img.onload = function () {
@@ -1705,7 +1707,7 @@ define(function (require) {
 
             headerContainer = new createjs.Shape();
             headerContainer.graphics.f(platformColor.header).r(0, 0,
-                screen.width / scale, cellSize);
+                screen.width / musicBlocksScale, cellSize);
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
             }
@@ -1761,10 +1763,10 @@ define(function (require) {
                 y += dy;
             }
 
-            setupRightMenu(scale);
+            setupRightMenu(musicBlocksScale);
         }
 
-        function setupRightMenu(scale) {
+        function setupRightMenu(musicBlocksScale) {
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
                 for (i in onscreenMenu) {
@@ -1787,7 +1789,7 @@ define(function (require) {
             ];
 
             var btnSize = cellSize;
-            var x = Math.floor(canvas.width / scale) - btnSize / 2;
+            var x = Math.floor(canvas.width / musicBlocksScale) - btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
             var dx = 0;
@@ -1839,7 +1841,7 @@ define(function (require) {
                             if (helpIdx >= HELPCONTENT.length) {
                                 helpIdx = 0;
                             }
-                            var imageScale = 55 * scale;
+                            var imageScale = 55 * musicBlocksScale;
                             helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>'
                         }
                         update = true;
@@ -1847,10 +1849,10 @@ define(function (require) {
 
                     var img = new Image();
                     img.onload = function () {
-                        // console.log(scale);
+                        // console.log(musicBlocksScale);
                         bitmap = new createjs.Bitmap(img);
-                        if (scale > 1) {
-                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = scale;
+                        if (musicBlocksScale > 1) {
+                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
                         } else {
                             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1.125;
                         }
@@ -1876,21 +1878,21 @@ define(function (require) {
                 var helpElem = docById('helpElem');
                 helpElem.style.position = 'absolute';
                 helpElem.style.display = 'block';
-                helpElem.style.paddingLeft = 20 * scale + 'px';
-                helpElem.style.paddingRight = 20 * scale + 'px';
+                helpElem.style.paddingLeft = 20 * musicBlocksScale + 'px';
+                helpElem.style.paddingRight = 20 * musicBlocksScale + 'px';
                 helpElem.style.paddingTop = '0px';
-                helpElem.style.paddingBottom = 20 * scale + 'px';
-                helpElem.style.fontSize = 20 * scale + 'px';
+                helpElem.style.paddingBottom = 20 * musicBlocksScale + 'px';
+                helpElem.style.fontSize = 20 * musicBlocksScale + 'px';
                 helpElem.style.color = '#ffffff';
-                helpElem.style.left = 65 * scale + 'px';
-                helpElem.style.top = 105 * scale + 'px';
-                var w = Math.min(300, 300 * scale);
-                var h = Math.min(300, 300 * scale);
+                helpElem.style.left = 65 * musicBlocksScale + 'px';
+                helpElem.style.top = 105 * musicBlocksScale + 'px';
+                var w = Math.min(300, 300 * musicBlocksScale);
+                var h = Math.min(300, 300 * musicBlocksScale);
                 helpElem.style.width = w + 'px';
                 helpElem.style.height = h + 'px';
 
-                if (scale > 1) {
-                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = scale;
+                if (musicBlocksScale > 1) {
+                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
                 }
             }
 
@@ -2022,7 +2024,7 @@ define(function (require) {
                 };
 
                 var circles = showButtonHighlight(ox, oy, cellSize / 2,
-                    event, scale, stage);
+                    event, musicBlocksScale, stage);
                 container.on('pressup', function (event) {
                     hideButtonHighlight(circles, stage);
 
