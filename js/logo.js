@@ -3614,12 +3614,22 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 if (obj[4] > 0 && !singleton) {
                     // lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
-                    this.lilypondNotes[turtle] += '%5Ctuplet ' + obj[4] + '%2F' + obj[1] + ' { ';
-                    var duration = 2 * obj[1];
-                        this.lilypondNotes[turtle] += note + duration + ' ';
+		    // multiplier = tuplet_duration / target_duration
+		    // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
+		    
+                    var tuplet_count = obj[4];
+                    if ((obj[1] / 2) * 2 == obj[1]) {
+                        var target_duration = obj[1] / 2;
+		    } else {
+                        tuplet_count *= 2;
+                        var target_duration = obj[1];
+		    }
+                    this.lilypondNotes[turtle] += '%5Ctuplet ' + tuplet_count + '%2F' + target_duration + ' { ';
+                    var tuplet_duration = 2 * obj[1];
+                    this.lilypondNotes[turtle] += note + tuplet_duration + ' ';
                     for (var j = 1; j < obj[4]; j++) {
-                        var duration = 2 * this.lilypondStaging[turtle][i + j][1];
-                        this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][0]) + duration + ' ';
+                        var tuplet_duration = 2 * this.lilypondStaging[turtle][i + j][1];
+                        this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][0]) + tuplet_duration + ' ';
                     }
                     this.lilypondNotes[turtle] += '} ';
                     i += obj[4] - 1;
