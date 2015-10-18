@@ -123,14 +123,25 @@ function last(myList) {
 
 
 function doSVG(canvas, logo, turtles, width, height, scale) {
+    // Aggregate SVG output from each turtle. If there is none, use
+    // the MUSICICON.
+    var MUSICICON = '<g transform="matrix(20,0,0,20,-2500,-200)"> <g style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000" transform="translate(0.32906,-0.2)"> <path d="m 138.47094,26.82 q 0,-1.16 1.24,-2.02 0.96,-0.64 1.94,-0.64 0.68,0.02 1.18,0.34 l 0,-11.84 0.44,0 0,12.94 q 0,1.32 -1.34,2.1 -0.86,0.5 -1.8,0.5 -0.98,0 -1.44,-0.7 -0.22,-0.32 -0.22,-0.68 z" /> </g> <g transform="translate(-12.52094,4.8)" style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"> <path d="m 138.47094,26.82 q 0,-1.16 1.24,-2.02 0.96,-0.64 1.94,-0.64 0.68,0.02 1.18,0.34 l 0,-11.84 0.44,0 0,12.94 q 0,1.32 -1.34,2.1 -0.86,0.5 -1.8,0.5 -0.98,0 -1.44,-0.7 -0.22,-0.32 -0.22,-0.68 z" /> </g> <path style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 130.81346,17 12.29007,-5 0,2 -12.29007,5 z" /> </g>';
+
+    var turtleSVG = '';
+    for (var turtle in turtles.turtleList) {
+        turtles.turtleList[turtle].closeSVG();
+        turtleSVG += turtles.turtleList[turtle].svgOutput;
+    }
+
     var svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '">\n';
     svg += '<g transform="scale(' + scale + ',' + scale + ')">\n';
     svg += logo.svgOutput;
-    for (var turtle in turtles.turtleList) {
-        turtles.turtleList[turtle].closeSVG();
-        svg += turtles.turtleList[turtle].svgOutput;
-    }
     svg += '</g>';
+    if (turtleSVG == '') {
+        svg += MUSICICON;
+    } else {
+	svg += turtleSVG;
+    }
     svg += '</svg>';
     return svg;
 }
