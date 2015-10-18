@@ -258,7 +258,9 @@ Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.
 3. Voices
 ---------
 
-Each Start block runs as a separate voice in Music blocks. (When you click on the Run button, all of the Start blocks are run concurrently.)
+Each Start block runs as a separate voice in Music blocks. (When you
+click on the Run button, all of the Start blocks are run
+concurrently.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg'</img>
 
@@ -281,9 +283,40 @@ And even more interesting if we bring the various voices offset in time.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'</img>
 
-Turtle graphics can be combined with the music blocks. In this example, each time the pitch is raised by one half step, the pen size decreases and the pen color increases.
+Turtle graphics can be combined with the music blocks. In this
+example, each time the pitch is raised by one half step, the pen size
+decreases and the pen color increases.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
 
 The output of the program after running five times.
 
+5. Extras
+---------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg'</img>
+
+The *Save as Lilypond* block will transcribe your composition. The
+output of the program above is saved to Downloads/hotdog.ly.
+
+```
+\version "2.18.2"
+
+mouse = {
+c'8 c'8 c'8 c'8 c'4 c'4 g'8 g'8 g'8 g'8 g'4 g'4 a'8 a'8 a'8 a'8 a'4
+a'4 g'8 g'8 g'8 g'8 g'4 g'4 f'8 f'8 f'8 f'8 f'4 f'4 e'8 e'8 e'8 e'8
+e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
+}
+
+\score {
+<<
+\new Staff = "treble" {
+\clef "treble"
+\set Staff.instrumentName = #"mouse" \mouse
+}
+>>
+\layout { }
+}
+```
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/hotdog.png'</img>
