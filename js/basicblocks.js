@@ -905,7 +905,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     returnBlock.extraWidth = 10;
     returnBlock.adjustWidthToLabel();
     returnBlock.oneArgBlock();
-    returnBlock.defaults.push(_('100'));
+    returnBlock.defaults.push(100);
     returnBlock.dockTypes[1] = 'anyin';
 
     var returnToUrlBlock = new ProtoBlock('returnToUrl');

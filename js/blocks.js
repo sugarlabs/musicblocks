@@ -161,7 +161,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     // The scale of the graphics is determined by screen size.
     this.setScale = function (scale) {
-        this.scale = scale;
+        this.blockScale = scale;
     }
 
     // Toggle state of collapsible blocks.
@@ -721,10 +721,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 continue;
             }
 
-	    // Don't connect to a collapsed block.
+            // Don't connect to a collapsed block.
             if (this.blockList[b].collapsed) {
                 continue;
-	    }
+            }
 
             for (var i = 1; i < this.blockList[b].connections.length; i++) {
                 // When converting from Python projects to JS format,
@@ -1627,13 +1627,21 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.findDragGroup = function (blk) {
         // Generate a drag group from blocks connected to blk
+        this.dragLoopCounter = 0;
         this.dragGroup = [];
         this.calculateDragGroup(blk);
     }
 
     this.calculateDragGroup = function (blk) {
         // Give a block, find all the blocks connected to it
+        this.dragLoopCounter += 1;
+        if (this.dragLoopCount > this.blockList.length) {
+            console.log('maximum loop counter exceeded in calculateDragGroup... this is bad. ' + blk);
+            return;
+        }
+
         if (blk == null) {
+            console.log('null block passed to calculateDragGroup');
             return;
         }
 
@@ -1855,7 +1863,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (name == 'box') {
             return;
         }
-	// Add the new block to the top of the palette.
+        // Add the new block to the top of the palette.
         myBoxBlock.palette.add(myBoxBlock, true);
     }
 

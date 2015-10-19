@@ -962,8 +962,8 @@ function loadCollapsibleEventHandlers(myBlock) {
         var d = new Date();
         blocks.time = d.getTime();
         offset = {
-            x: myBlock.collapseContainer.x - Math.round(event.stageX / myBlock.blocks.scale),
-            y: myBlock.collapseContainer.y - Math.round(event.stageY / myBlock.blocks.scale)
+            x: myBlock.collapseContainer.x - Math.round(event.stageX / myBlock.blocks.blockScale),
+            y: myBlock.collapseContainer.y - Math.round(event.stageY / myBlock.blocks.blockScale)
         };
 
     });
@@ -1017,8 +1017,8 @@ function loadCollapsibleEventHandlers(myBlock) {
         moved = true;
         var oldX = myBlock.collapseContainer.x;
         var oldY = myBlock.collapseContainer.y;
-        myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.scale + offset.x);
-        myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.scale + offset.y);
+        myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.blockScale + offset.x);
+        myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.blockScale + offset.y);
         var dx = myBlock.collapseContainer.x - oldX;
         var dy = myBlock.collapseContainer.y - oldY;
         myBlock.container.x += dx;
@@ -1027,7 +1027,7 @@ function loadCollapsibleEventHandlers(myBlock) {
         myBlock.y = myBlock.container.y;
 
         // If we are over the trash, warn the user.
-        if (trashcan.overTrashcan(event.stageX / myBlock.blocks.scale, event.stageY / myBlock.blocks.scale)) {
+        if (trashcan.overTrashcan(event.stageX / myBlock.blocks.blockScale, event.stageY / myBlock.blocks.blockScale)) {
             trashcan.highlight();
         } else {
             trashcan.unhighlight();
@@ -1054,7 +1054,7 @@ function collapseOut(blocks, myBlock, thisBlock, moved, event) {
     blocks.unhighlight(thisBlock);
     if (moved) {
         // Check if block is in the trash.
-        if (trashcan.overTrashcan(event.stageX / blocks.scale, event.stageY / blocks.scale)) {
+        if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
             sendStackToTrash(blocks, myBlock);
         } else {
             // Otherwise, process move.
@@ -1173,8 +1173,8 @@ function loadEventHandlers(myBlock) {
 
         moved = false;
         var offset = {
-            x: myBlock.container.x - Math.round(event.stageX / blocks.scale),
-            y: myBlock.container.y - Math.round(event.stageY / blocks.scale)
+            x: myBlock.container.x - Math.round(event.stageX / blocks.blockScale),
+            y: myBlock.container.y - Math.round(event.stageY / blocks.blockScale)
         };
 
         myBlock.container.on('mouseout', function(event) {
@@ -1226,13 +1226,13 @@ function loadEventHandlers(myBlock) {
 
             var oldX = myBlock.container.x;
             var oldY = myBlock.container.y;
-            myBlock.container.x = Math.round(event.stageX / blocks.scale) + offset.x;
-            myBlock.container.y = Math.round(event.stageY / blocks.scale) + offset.y;
+            myBlock.container.x = Math.round(event.stageX / blocks.blockScale) + offset.x;
+            myBlock.container.y = Math.round(event.stageY / blocks.blockScale) + offset.y;
             myBlock.x = myBlock.container.x;
             myBlock.y = myBlock.container.y;
 
             // If we are over the trash, warn the user.
-            if (trashcan.overTrashcan(event.stageX / blocks.scale, event.stageY / blocks.scale)) {
+            if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
                 trashcan.highlight();
             } else {
                 trashcan.unhighlight();
@@ -1293,7 +1293,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
 
     if (moved) {
         // Check if block is in the trash.
-        if (trashcan.overTrashcan(event.stageX / myBlock.blocks.scale, event.stageY / myBlock.blocks.scale)) {
+        if (trashcan.overTrashcan(event.stageX / myBlock.blocks.blockScale, event.stageY / myBlock.blocks.blockScale)) {
             sendStackToTrash(blocks, myBlock);
         } else {
             // Otherwise, process move.
@@ -1383,8 +1383,8 @@ function changeLabel(myBlock) {
     var blocks = myBlock.blocks;
     var x = myBlock.container.x;
     var y = myBlock.container.y;
-    var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.scale;
-    var canvasTop = blocks.canvas.offsetTop + 6 * blocks.scale;
+    var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.blockScale;
+    var canvasTop = blocks.canvas.offsetTop + 6 * blocks.blockScale;
 
     var movedStage = false;
     if (!window.hasMouse && blocks.stage.y + y > 75) {
@@ -1539,19 +1539,19 @@ function changeLabel(myBlock) {
         });
     }
 
-    myBlock.label.style.left = Math.round((x + blocks.stage.x) * blocks.scale + canvasLeft) + 'px';
-    myBlock.label.style.top = Math.round((y + blocks.stage.y) * blocks.scale + canvasTop) + 'px';
+    myBlock.label.style.left = Math.round((x + blocks.stage.x) * blocks.blockScale + canvasLeft) + 'px';
+    myBlock.label.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
     // There may be a second select used for # and b.
     if (myBlock.labelattr != null) {
-        myBlock.label.style.width = Math.round(60 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
-        myBlock.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * blocks.scale + canvasLeft) + 'px';
-        myBlock.labelattr.style.top = Math.round((y + blocks.stage.y) * blocks.scale + canvasTop) + 'px';
-        myBlock.labelattr.style.width = Math.round(60 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
-        myBlock.labelattr.style.fontSize = Math.round(20 * blocks.scale * myBlock.protoblock.scale / 2) + 'px';
+        myBlock.label.style.width = Math.round(60 * blocks.blockScale) * myBlock.protoblock.scale / 2 + 'px';
+        myBlock.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * blocks.blockScale + canvasLeft) + 'px';
+        myBlock.labelattr.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
+        myBlock.labelattr.style.width = Math.round(60 * blocks.blockScale) * myBlock.protoblock.scale / 2 + 'px';
+        myBlock.labelattr.style.fontSize = Math.round(20 * blocks.blockScale * myBlock.protoblock.scale / 2) + 'px';
     } else {
-        myBlock.label.style.width = Math.round(100 * blocks.scale) * myBlock.protoblock.scale / 2 + 'px';
+        myBlock.label.style.width = Math.round(100 * blocks.blockScale) * myBlock.protoblock.scale / 2 + 'px';
     }
-    myBlock.label.style.fontSize = Math.round(20 * blocks.scale * myBlock.protoblock.scale / 2) + 'px';
+    myBlock.label.style.fontSize = Math.round(20 * blocks.blockScale * myBlock.protoblock.scale / 2) + 'px';
     myBlock.label.style.display = '';
     myBlock.label.focus();
 
