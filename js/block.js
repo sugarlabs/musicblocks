@@ -1226,8 +1226,8 @@ function loadEventHandlers(myBlock) {
 
             var oldX = myBlock.container.x;
             var oldY = myBlock.container.y;
-            myBlock.container.x = Math.round(event.stageX / blocks.blockScale); //  + offset.x;
-            myBlock.container.y = Math.round(event.stageY / blocks.blockScale); //  + offset.y;
+            myBlock.container.x = Math.round(event.stageX / blocks.blockScale) + offset.x;
+            myBlock.container.y = Math.round(event.stageY / blocks.blockScale) + offset.y;
             myBlock.x = myBlock.container.x;
             myBlock.y = myBlock.container.y;
 
