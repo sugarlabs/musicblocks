@@ -399,7 +399,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         }
     }
 
-    this.runLogoCommands = function(startHere , env) {
+    this.runLogoCommands = function(startHere, env) {
         // Save the state before running.
         this.saveLocally();
 
@@ -563,50 +563,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
             }
         } else {
-            // Or run from the top of each stack.
-            // Find a turtle.
-            var turtle = null;
-            for (var t = 0; t < this.turtles.turtleList.length; t++) {
-                if (!this.turtles.turtleList[t].trash) {
-                    console.log('found turtle ' + t);
-                    turtle = t;
-                    break;
-                }
-            }
-
-            if (turtle == null) {
-                console.log('could not find a turtle');
-                turtle = this.turtles.turtleList.length;
-                this.turtles.add(null);
-            }
-
-            // Make sure the turtle we "found" exisits.
-            if(this.turtles.turtleList.length < turtle + 1) {
-                turtle = 0;
-            }
-
-            console.log('running with turtle ' + turtle);
-
-            this.turtles.turtleList[turtle].queue = [];
-            this.parentFlowQueue[turtle] = [];
-            this.unhightlightQueue[turtle] = [];
-            this.parameterQueue[turtle] = [];
-
-            for (var blk = 0; blk < this.blocks.stackList.length; blk++) {
-                if (this.blocks.blockList[blk].isNoRunBlock()) {
-                    continue;
-                } else {
-                    if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
-                        if ((this.blocks.blockList[this.blocks.stackList[blk]].name == 'start' || this.blocks.blockList[this.blocks.stackList[blk]].name == 'drum') && this.blocks.blockList[this.blocks.stackList[blk]].connections[1] == null) {
-                            continue;
-                        }
-                        // This is a degenerative case.
-                        this.turtles.turtleList[0].running = true;
-                        console.log('calling runFromBlockNow with ' + this.blocks.stackList[blk]);
-                        this.runFromBlock(this, 0, this.blocks.stackList[blk], 0, env);
-                    }
-                }
-            }
+            console.log('nothing to run');
         }
         this.refreshCanvas();
     }
