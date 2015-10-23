@@ -1638,15 +1638,27 @@ function promptPaletteDelete(palette) {
     delete pluginObjs['PALETTESTROKECOLORS'][palette.name];
     delete pluginObjs['PALETTEFILLCOLORS'][palette.name];
     delete pluginObjs['PALETTEPLUGINS'][palette.name];
+    if ('GLOBALS' in pluginObjs) {
+        delete pluginObjs['GLOBALS'][palette.name];
+    }
+    if ('IMAGES' in pluginObjs) {
+        delete pluginObjs['IMAGES'][palette.name];
+    }
+    if ('ONLOAD' in pluginObjs) {
+        delete pluginObjs['ONLOAD'][palette.name];
+    }
+    if ('ONSTART' in pluginObjs) {
+        delete pluginObjs['ONSTART'][palette.name];
+    }
+    if ('ONSTOP' in pluginObjs) {
+        delete pluginObjs['ONSTOP'][palette.name];
+    }
 
     for (var i = 0; i < palette.protoList.length; i++) {
         var name = palette.protoList[i].name;
         delete pluginObjs['FLOWPLUGINS'][name];
         delete pluginObjs['ARGPLUGINS'][name];
         delete pluginObjs['BLOCKPLUGINS'][name];
-        delete pluginObjs['ONLOAD'][name];
-        delete pluginObjs['ONSTART'][name];
-        delete pluginObjs['ONSTOP'][name];
     }
 
     storage.plugins = preparePluginExports({});
