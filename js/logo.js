@@ -2330,6 +2330,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var parentLoop = logo.endOfFlowLoops[turtle][blk][i];
                 var parentAction = logo.endOfFlowActions[turtle][blk][i];
                 var signal = logo.endOfFlowSignals[turtle][blk][i];
+                // console.log(parentLoop);
+		// if (parentLoop != null) {
+                //     console.log(logo.parentFlowQueue[turtle].indexOf(parentLoop) + ' ' + logo.loopBlock(logo.blocks.blockList[parentLoop].name));
+		// }
                 if (parentLoop != null && logo.parentFlowQueue[turtle].indexOf(parentLoop) != -1 && logo.loopBlock(logo.blocks.blockList[parentLoop].name)) {
                     // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of loop block');
                 } else if (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1) {
@@ -2341,7 +2345,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
                         notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
                     } else {
-                        // console.log('dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                        // console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     }
                     // Mark issued signals as null
@@ -2434,11 +2438,15 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 // If we are at the end of the child flow, queue the
                 // unhighlighting of the parent block to the flow.
                 if (logo.parentFlowQueue[turtle].length > 0 && logo.turtles.turtleList[turtle].queue.length > 0 && last(logo.turtles.turtleList[turtle].queue).parentBlk != last(logo.parentFlowQueue[turtle])) {
-                    logo.unhightlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
+                    // console.log('popping parent flow queue for ' + logo.blocks.blockList[blk].name);
+                    logo.unhightlightQueue[turtle].push(last(logo.parentFlowQueue[turtle]));
+
+		    // logo.unhightlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
                 } else if (logo.unhightlightQueue[turtle].length > 0) {
                     // The child flow is finally complete, so unhighlight.
                     if (logo.turtleDelay != 0) {
                         setTimeout(function() {
+                            console.log('popping parent flow queue for ' + logo.blocks.blockList[blk].name);
                             logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
                         }, logo.turtleDelay);
                     }
@@ -2553,6 +2561,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     }
 
     this.updateEndBlks = function(childFlow, turtle, listenerName) {
+        var blk = this.blocks.blockList[childFlow].connections[0];
         var endBlk = this.getBlockAtEndOfFlow(childFlow, null, null);
         if (endBlk[0] != null) {
             if (endBlk[0] in this.endOfFlowSignals[turtle]) {
@@ -2564,7 +2573,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 this.endOfFlowLoops[turtle][endBlk[0]] = [endBlk[1]];
                 this.endOfFlowActions[turtle][endBlk[0]] = [endBlk[2]];
             }
-        }
+            // console.log(this.blocks.blockList[blk].name + ' ends with ' + this.blocks.blockList[endBlk[0]].name);
+
+        } // else {
+            // console.log(this.blocks.blockList[blk].name + ' has no end');
+        // }
     }
 
     this.getBlockAtEndOfFlow = function(blk, loopClamp, doClamp) {
