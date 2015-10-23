@@ -311,7 +311,7 @@ function Matrix() {
         if (this.matrixHasTuplets) {
             // Just add the new tuplet note values
             var tupletCol = 0;
-            var cellCount = param[1][0];
+            var cellCount = param[1].length;
             var firstCell = 0;
         } else {
             // Add cells across all of tuplet note values row.
@@ -328,6 +328,7 @@ function Matrix() {
             // Add tuplet note values
             if (i >= tupletCol) {
                 var j = i - tupletCol;
+                console.log(i + ' ' + j + ' ' + param[1][j]);
                 var numerator = 32 / param[1][j];
                 cell.innerHTML = reducedFraction(numerator, totalNoteInterval / tupletTimeFactor);
             }
