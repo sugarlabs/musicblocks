@@ -426,31 +426,41 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 vspaceBlock.hide();
             }
         } else if (secondArgumentSize > vSpaceCount + 1) {
-            // Add a vspace block
+            // Add vspace blocks
             var n = secondArgumentSize - vSpaceCount - 1;
-            for (var nextBlock, newPos, i = 0; i < n; i++) {
-                nextBlock = last(myBlock.connections);
-                newPos = blockBlocks.blockList.length;
+            var nextBlock = last(myBlock.connections);
+            var thisBlock = myBlock;
+            var newPos = blockBlocks.blockList.length;
 
-                blockBlocks.makeNewBlockWithConnections('vspace', newPos, [null, null], function (args) {
-                    var vspace = args[1];
-                    var nextBlock = args[0];
-                    var vspaceBlock = blockBlocks.blockList[vspace];
-                    var lastDock = last(myBlock.docks);
-                    var dx = lastDock[0] - vspaceBlock.docks[0][0];
-                    var dy = lastDock[1] - vspaceBlock.docks[0][1];
-                    vspaceBlock.x = myBlock.container.x + dx;
-                    vspaceBlock.y = myBlock.container.y + dy;
-                    vspaceBlock.container.x = myBlock.container.x + dx;
-                    vspaceBlock.container.y = myBlock.container.y + dy;
-                    vspaceBlock.connections[0] = blk;
-                    vspaceBlock.connections[1] = nextBlock;
-                    myBlock.connections[myBlock.connections.length - 1] = vspace;
-                    if (nextBlock) {
-                        blockBlocks.blockList[nextBlock].connections[0] = vspace;
-                    }
-                }, [nextBlock, newPos]);
-            }
+            function vspaceAdjuster(args) { // nextBlock, vspace, i, n
+                var thisBlock = args[0];
+                var nextBlock = args[1];
+                var vspace = args[2];
+                var i = args[3];
+		var n = args[4];
+                var vspaceBlock = blockBlocks.blockList[vspace];
+                var lastDock = last(thisBlock.docks);
+                var dx = lastDock[0] - vspaceBlock.docks[0][0];
+                var dy = lastDock[1] - vspaceBlock.docks[0][1];
+                vspaceBlock.x = thisBlock.container.x + dx;
+                vspaceBlock.y = thisBlock.container.y + dy;
+                vspaceBlock.container.x = thisBlock.container.x + dx;
+                vspaceBlock.container.y = thisBlock.container.y + dy;
+                vspaceBlock.connections[0] = blockBlocks.blockList.indexOf(thisBlock);
+                vspaceBlock.connections[1] = nextBlock;
+                thisBlock.connections[thisBlock.connections.length - 1] = vspace;
+                if (nextBlock) {
+                    blockBlocks.blockList[nextBlock].connections[0] = vspace;
+                }
+                if (i + 1 < n) {
+		    var newPos = blockBlocks.blockList.length;
+                    thisBlock = last(blockBlocks.blockList);
+		    nextBlock = last(thisBlock.connections);
+                    blockBlocks.makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, i + 1, n]);
+		}
+	    }
+
+            blockBlocks.makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, 0, n]);
         }
 
         function howManyVSpaceBlocksBelow(blk) {
