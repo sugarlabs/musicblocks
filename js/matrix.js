@@ -575,7 +575,10 @@ function Matrix() {
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
                     // Remove ' 𝅘𝅥' at the end of the HTML code for the
                     // note value.
-                    noteValue = noteValue.slice(0, noteValue.length - 2);
+                    var len = noteValue.length;
+		    if (len > 2 && noteValue.charAt(len - 3) == ' ') {
+                        noteValue = noteValue.slice(0, noteValue.length - 2);
+		    }
                     var i = 0;
                     if (noteValue.substr(0,3) == '1.5') {
                         while (noteValue[i] != ' ') {
