@@ -71,7 +71,7 @@ function Matrix() {
 
     this.initMatrix = function(logo, PolySynth) {
         // Initializes the matrix. First removes the previous matrix
-	// and them make another one in DOM (document object model)
+        // and them make another one in DOM (document object model)
         this.logo = logo;
         this.synth = PolySynth;
         document.getElementById('matrix').style.display = 'inline';
@@ -203,7 +203,7 @@ function Matrix() {
         // The first two parameters are the interval for the tuplet,
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
-	console.log('addTuplet ' + JSON.stringify(param));
+        console.log('addTuplet ' + JSON.stringify(param));
 
         var table = document.getElementById('myTable');
         var tupletTimeFactor = param[0][0] / param[0][1];
@@ -408,7 +408,7 @@ function Matrix() {
 
     this.makeClickable = function(tuplet, synth) {
         /* Once the entire matrix is generated, this function makes it
-	 * clickable. */
+         * clickable. */
         var table = document.getElementById('myTable');
         if (this.matrixHasTuplets) {
             var leaveRowsFromBottom = 3;
@@ -448,21 +448,21 @@ function Matrix() {
     }
 
     this.setTransposition = function(transposition) {
-	console.log('MATRIX:setTransposition');
+        console.log('MATRIX:setTransposition');
         this.transposition = transposition;
     }
 
     this.removeTransposition = function(transposition) {
-	console.log('MATRIX:removeTransposition');
+        console.log('MATRIX:removeTransposition');
         this.transposition = null;
     }
 
     // DEPRECATED (now handled in getNote)
     this.doTransposition = function(note, octave) {
         /* first setTransposition in called in logo.js and
-	 * this.transposition shows no. of semitones to be shifted
-	 * up/down */
-	console.log('MATRIX:doTransposition: ' + this.transposition);
+         * this.transposition shows no. of semitones to be shifted
+         * up/down */
+        console.log('MATRIX:doTransposition: ' + this.transposition);
         if (this.transposition) {
             var deltaOctave = 0;
             if (this.transposition[0] == '-') {
@@ -556,7 +556,7 @@ function Matrix() {
 
     this.setNotes = function(colIndex, rowIndex, playNote, tuplet, synth) {
         /* Sets corresponding note when user clicks on any cell and
-	 * plays that note*/
+         * plays that note*/
         var leaveRowsFromBottom = 1;
         if(tuplet) {
             leaveRowsFromBottom = 3;
@@ -576,9 +576,10 @@ function Matrix() {
                     // Remove ' 𝅘𝅥' at the end of the HTML code for the
                     // note value.
                     var len = noteValue.length;
-		    if (len > 2 && noteValue.charAt(len - 3) == ' ') {
+                    // if (len > 2 && noteValue.charAt(len - 3) == ' ') {
+                    if (noteValue.indexOf(' ') != -1) {
                         noteValue = noteValue.slice(0, noteValue.length - 2);
-		    }
+                    }
                     var i = 0;
                     if (noteValue.substr(0,3) == '1.5') {
                         while (noteValue[i] != ' ') {
@@ -650,7 +651,7 @@ function Matrix() {
 
     this.saveMatrix = function() {
         /* Saves the current matrix as an action stack consisting of
-	 * note and pitch blocks (saving as chunks is deprecated). */
+         * note and pitch blocks (saving as chunks is deprecated). */
         var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
         var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk"}], 0, 0, [0]]];
         var endOfStackIdx = 0;
@@ -662,7 +663,7 @@ function Matrix() {
             var note = this.notesToPlay[i].slice(0);
             if (note[0] == '') {
                 note[0] = 'R';
-	    }
+            }
 
             // Add the Note block and its value
             var idx = newStack.length;
