@@ -282,6 +282,10 @@ It gets more interesting if we shift up and down octaves.
 
 And even more interesting if we bring the various voices offset in time.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg'</img>
+
+We can also launch the phrases (chunks) interactively. In this case, when the mouse is in the lower-left quadrant, `chunk0` is played; lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and upper-right quadrant, `chunk3`.
+
 4. Adding graphics
 ------------------
 
