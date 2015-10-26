@@ -791,11 +791,11 @@ define(function (require) {
         }
 
         function getStageX() {
-            return turtles.screenX2turtleX(stageX / blocks.blocksScale);  //music Blocks Scale???
+            return turtles.screenX2turtleX(stageX / musicBlocksScale); // blocks.blocksScale);  //music Blocks Scale???
         }
 
         function getStageY() {
-            return turtles.screenY2turtleY(stageY / blocks.blocksScale);
+            return turtles.screenY2turtleY(stageY / musicBlocksScale); // blocks.blocksScale);
         }
 
         function getStageMouseDown() {
