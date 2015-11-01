@@ -756,6 +756,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var name = logo.blocks.blockList[blk].privateData;
                 if (name in logo.actions) {
                     childFlow = logo.actions[name];
+                    // console.log('child flow is ' + logo.actions[name] + ' ' + logo.blocks.blockList[logo.actions[name]].name);
                     childFlowCount = 1;
                     if (logo.doBlocks[turtle].indexOf(blk) == -1) {
                         logo.doBlocks[turtle].push(blk);
@@ -2326,26 +2327,36 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             // needs to be handled separately.
             // console.log(logo.endOfFlowSignals[turtle][blk]);
             var notationDispatches = [];
+            var parentActions = [];
             for (var i = logo.endOfFlowSignals[turtle][blk].length - 1; i >= 0; i--) {
+                // console.log(i + ': ' + logo.blocks.blockList[blk].name);
                 var parentLoop = logo.endOfFlowLoops[turtle][blk][i];
                 var parentAction = logo.endOfFlowActions[turtle][blk][i];
                 var signal = logo.endOfFlowSignals[turtle][blk][i];
-                // console.log(parentLoop);
-		// if (parentLoop != null) {
-                //     console.log(logo.parentFlowQueue[turtle].indexOf(parentLoop) + ' ' + logo.loopBlock(logo.blocks.blockList[parentLoop].name));
-		// }
+                // console.log('parent loop = ' + parentLoop + ' ' + 'parentAction = ' + parentAction);
+                var test = (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1);
+                if (parentAction != null) {
+		    // console.log(logo.blocks.blockList[parentAction].name + ' ' + logo.namedActionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.actionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.doBlocks[turtle].indexOf(parentAction) + ' ' + test);
+		}
                 if (parentLoop != null && logo.parentFlowQueue[turtle].indexOf(parentLoop) != -1 && logo.loopBlock(logo.blocks.blockList[parentLoop].name)) {
                     // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of loop block');
-                } else if (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1) {
+                } else if (test) { // parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1) {
+                    // console.log(logo.blocks.blockList[parentAction].name + ' ' + logo.namedActionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.actionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.doBlocks[turtle].indexOf(parentAction) + ' ' + test);
                     // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of action block');
                 } else if (signal != null) {
                     if (logo.doBlocks[turtle].indexOf(parentAction) != -1) {
-                        logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] = -1;
+                        // console.log('queuing parent action');
+                        if (parentActions.indexOf(parentAction) == -1) {
+                            parentActions.push(parentAction);
+                        }
                     }
                     if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
                         notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
                     } else {
-                        // console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                        if (parentAction != null) {
+			    // console.log(logo.blocks.blockList[parentAction].name + ' ' + logo.namedActionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.actionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.doBlocks[turtle].indexOf(parentAction) + ' ' + test);
+			}
+                        console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     }
                     // Mark issued signals as null
@@ -2354,6 +2365,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     logo.endOfFlowActions[turtle][blk][i] = null;
                 }
             }
+            for (var i = 0; i < parentActions.length; i++ ) {
+                if (logo.doBlocks[turtle].indexOf(parentAction) != -1) {
+                    // console.log('setting doBlocks[' + logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] + '] to -1');
+                    logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] = -1;
+		}
+	    }
             for (var i = 0; i < notationDispatches.length; i++) {
                 // console.log('dispatching ' + notationDispatches[i]);
                 logo.stage.dispatchEvent(notationDispatches[i]);
@@ -2389,7 +2406,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
         // If there is a child flow, queue it.
         if (childFlow) {
-            if(logo.blocks.blockList[blk].name=='doArg' || logo.blocks.blockList[blk].name=='nameddoArg') {
+            // console.log('child flow is ' + childFlow + ' '  + logo.blocks.blockList[childFlow].name);
+
+            if (logo.blocks.blockList[blk].name=='doArg' || logo.blocks.blockList[blk].name=='nameddoArg') {
                 var queueBlock = new Queue(childFlow, childFlowCount, blk, actionArgs);
             } else {
                 var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
@@ -2402,10 +2421,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         }
 
         var nextBlock = null;
+	// console.log('queue length is ' + logo.turtles.turtleList[turtle].queue.length);
+
         // Run the last flow in the queue.
         if (logo.turtles.turtleList[turtle].queue.length > 0) {
             nextBlock = last(logo.turtles.turtleList[turtle].queue).blk;
             passArg = last(logo.turtles.turtleList[turtle].queue).args;
+            // console.log('nextBlock ' + nextBlock + ' '  + logo.blocks.blockList[nextBlock].name);
             // Since the forever block starts at -1, it will never == 1.
             if (last(logo.turtles.turtleList[turtle].queue).count == 1) {
                 // Finished child so pop it off the queue.
