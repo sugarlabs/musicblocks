@@ -1936,11 +1936,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         if (logo.blocks.blockList[blk].name == 'osctime') {
                             var duration = noteBeatValue;  // microseconds
                             logo.turtleTime[turtle] += ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle];
-                            logo.doWait(turtle, ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle] - turtleLag);
+                            logo.doWait(turtle, Math.max(((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle] - turtleLag, 0));
                         } else {
                             var duration = noteBeatValue * logo.beatFactor[turtle];  // beat value
                             logo.turtleTime[turtle] += ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle];
-                            logo.doWait(turtle, ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag);
+                            logo.doWait(turtle, Math.max(((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag, 0));
                         }
                         var waitTime = 0;
                         for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
