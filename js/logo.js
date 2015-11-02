@@ -2602,6 +2602,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     }
 
     this.updateEndBlks = function(childFlow, turtle, listenerName) {
+        if (childFlow == null) {
+            console.log('null childFlow sent to updateEndBlks');
+            return;
+	}
         var blk = this.blocks.blockList[childFlow].connections[0];
         var endBlk = this.getBlockAtEndOfFlow(childFlow, null, null);
         if (endBlk[0] != null) {

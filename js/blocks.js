@@ -736,6 +736,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 continue;
             }
 
+            // Don't connect to a block in the trash.
+            if (this.blockList[b].trash) {
+                continue;
+            }
+
             for (var i = 1; i < this.blockList[b].connections.length; i++) {
                 // When converting from Python projects to JS format,
                 // sometimes extra null connections are added. We need
