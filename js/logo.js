@@ -111,6 +111,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     // parameters used by the note block
     this.bpm = TARGETBPM;
     this.bpmFactor = TONEBPM / TARGETBPM;
+    this.turtleTime = [];
     this.noteDelay = 0;
     this.playedNote = {};
     this.pushedNote = {};
@@ -425,6 +426,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // Each turtle needs to keep its own wait time and music
         // states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            this.turtleTime[turtle] = 0;
             this.waitTimes[turtle] = 0;
             this.endOfFlowSignals[turtle] = {};
             this.endOfFlowLoops[turtle] = {};
@@ -1925,12 +1927,18 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.inMatrix) {
                         logo.processNote(noteBeatValue, turtle);
                     } else {
+                        var d = new Date();
+			var elapsedTime = (d.getTime() - logo.time) / 1000;
+			var turtleLag = elapsedTime - logo.turtleTime[turtle];
+                        // console.log(turtleLag);
                         if (logo.blocks.blockList[blk].name == 'osctime') {
                             var duration = noteBeatValue;  // microseconds
-                            logo.doWait(turtle, ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle]);
+                            logo.turtleTime[turtle] += ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle];
+                            logo.doWait(turtle, ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle] - turtleLag);
                         } else {
                             var duration = noteBeatValue * logo.beatFactor[turtle];  // beat value
-                            logo.doWait(turtle, ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle]);
+			    logo.turtleTime[turtle] += ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle];
+                            logo.doWait(turtle, ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag);
                         }
                         var waitTime = 0;
                         for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
