@@ -2329,19 +2329,24 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             var notationDispatches = [];
             var parentActions = [];
             for (var i = logo.endOfFlowSignals[turtle][blk].length - 1; i >= 0; i--) {
-                // console.log(i + ': ' + logo.blocks.blockList[blk].name);
                 var parentLoop = logo.endOfFlowLoops[turtle][blk][i];
                 var parentAction = logo.endOfFlowActions[turtle][blk][i];
                 var signal = logo.endOfFlowSignals[turtle][blk][i];
-                // console.log('parent loop = ' + parentLoop + ' ' + 'parentAction = ' + parentAction);
-                var test = (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1);
-                if (parentAction != null) {
-		    // console.log(logo.blocks.blockList[parentAction].name + ' ' + logo.namedActionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.actionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.doBlocks[turtle].indexOf(parentAction) + ' ' + test);
+                var loopTest = parentLoop != null && logo.parentFlowQueue[turtle].indexOf(parentLoop) != -1 && logo.loopBlock(logo.blocks.blockList[parentLoop].name);
+                var actionTest = (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1);
+                if (loopTest) {
+                    var stillInLoop = false;
+                    for (var j = 0; j < logo.turtles.turtleList[turtle].queue.length; j++) {
+                        if (parentLoop == logo.turtles.turtleList[turtle].queue[j].parentBlk) {
+                            stillInLoop = true;
+                            break;
+                        }
+		    }
 		}
-                if (parentLoop != null && logo.parentFlowQueue[turtle].indexOf(parentLoop) != -1 && logo.loopBlock(logo.blocks.blockList[parentLoop].name)) {
+
+                if (loopTest && stillInLoop) {
                     // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of loop block');
-                } else if (test) { // parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1) {
-                    // console.log(logo.blocks.blockList[parentAction].name + ' ' + logo.namedActionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.actionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.doBlocks[turtle].indexOf(parentAction) + ' ' + test);
+                } else if (actionTest) {
                     // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of action block');
                 } else if (signal != null) {
                     if (logo.doBlocks[turtle].indexOf(parentAction) != -1) {
@@ -2353,9 +2358,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
                         notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
                     } else {
-                        if (parentAction != null) {
-			    // console.log(logo.blocks.blockList[parentAction].name + ' ' + logo.namedActionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.actionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.doBlocks[turtle].indexOf(parentAction) + ' ' + test);
-			}
                         console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     }
