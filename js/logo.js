@@ -758,6 +758,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var name = logo.blocks.blockList[blk].privateData;
                 if (name in logo.actions) {
                     childFlow = logo.actions[name];
+                    // console.log('child flow is ' + logo.actions[name] + ' ' + logo.blocks.blockList[logo.actions[name]].name);
                     childFlowCount = 1;
                     if (logo.doBlocks[turtle].indexOf(blk) == -1) {
                         logo.doBlocks[turtle].push(blk);
@@ -1507,7 +1508,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     logo.lilypondOutput += '>>%0A';
 
                     // Add GUITAR TAB in comments.
-		    logo.lilypondOutput += '%25 GUITAR TAB -- Delete the %25{ and }%25 (comment-section indicator) below for guitar tablature output.%0A%25{%0A    %5Cnew TabStaff = "guitar tab" %0A<<%0A      %5Cclef moderntab%0A';
+                    logo.lilypondOutput += '%25 GUITAR TAB -- Delete the %25{ and }%25 (comment-section indicator) below for guitar tablature output.%0A%25{%0A    %5Cnew TabStaff = "guitar tab" %0A<<%0A      %5Cclef moderntab%0A';
                     for (var c = 0; c < CLEFS.length; c++) {
                         var i = 0;
                         for (var t in logo.lilypondNotes) {
@@ -1520,12 +1521,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                         instrumentName = RODENTS[t % 12];
                                     }
                                     logo.lilypondOutput += '      %5Ccontext TabVoice = "'+ instrumentName + '" %5C' + instrumentName + '%0A';
-				}
-			    }
-			}
-		    }
-		    logo.lilypondOutput += '>>%0A%}%0A%25{%0A<<%0A      %5CnumericTimeSignature%0A      %5Cclef "G_8"%0A      %5Cglobal%0A      %5CmergeDifferentlyHeadedOn%0A';
-		    for (var c = 0; c < CLEFS.length; c++) {
+                                }
+                            }
+                        }
+                    }
+                    logo.lilypondOutput += '>>%0A%}%0A%25{%0A<<%0A      %5CnumericTimeSignature%0A      %5Cclef "G_8"%0A      %5Cglobal%0A      %5CmergeDifferentlyHeadedOn%0A';
+                    for (var c = 0; c < CLEFS.length; c++) {
                         var i = 0;
                         for (var t in logo.lilypondNotes) {
                             if (clef[i] == CLEFS[c]) {
@@ -1537,16 +1538,16 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                         instrumentName = RODENTS[t % 12];
                                     }
                                     logo.lilypondOutput += '      %5Ccontext Voice = "'+ instrumentName + '" %5C' + instrumentName + '%0A';
-				}
-			    }
-			}
-		    }
-		    logo.lilypondOutput += '>>%0A%25}%0A';
+                                }
+                            }
+                        }
+                    }
+                    logo.lilypondOutput += '>>%0A%25}%0A';
 
                     logo.lilypondOutput += '%5Clayout { }%0A}%0A';
 
-		    // Add MIDI output commented time.
-		    logo.lilypondOutput += '%25 MIDI -- Delete the two %25{ (comment-section indicator) below for midi as well%0A%25{  %5Cmidi {%0A    %5Ctempo 4=90%0A  }%0A%25}%0A';
+                    // Add MIDI output commented time.
+                    logo.lilypondOutput += '%25 MIDI -- Delete the two %25{ (comment-section indicator) below for midi as well%0A%25{  %5Cmidi {%0A    %5Ctempo 4=90%0A  }%0A%25}%0A';
 
                     doSaveLilypond(logo, args[0]);
                 }
@@ -1928,16 +1929,17 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         logo.processNote(noteBeatValue, turtle);
                     } else {
                         var d = new Date();
-			var elapsedTime = (d.getTime() - logo.time) / 1000;
-			var turtleLag = elapsedTime - logo.turtleTime[turtle];
+                        var elapsedTime = (d.getTime() - logo.time) / 1000;
+                        var turtleLag = elapsedTime - logo.turtleTime[turtle];
                         // console.log(turtleLag);
+
                         if (logo.blocks.blockList[blk].name == 'osctime') {
                             var duration = noteBeatValue;  // microseconds
                             logo.turtleTime[turtle] += ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle];
                             logo.doWait(turtle, ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle] - turtleLag);
                         } else {
                             var duration = noteBeatValue * logo.beatFactor[turtle];  // beat value
-			    logo.turtleTime[turtle] += ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle];
+                            logo.turtleTime[turtle] += ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle];
                             logo.doWait(turtle, ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag);
                         }
                         var waitTime = 0;
@@ -1962,8 +1964,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     if (turtle in logo.lilypondStaging) {
                                         var insideChord = logo.lilypondStaging[turtle].length + 1;
                                     } else {
-					var insideChord = 1;
-				    }
+                                        var insideChord = 1;
+                                    }
                                 }
 
                                 var oscillators = [];
@@ -2330,36 +2332,62 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
         // Is the block in a queued clamp?
         if (blk in logo.endOfFlowSignals[turtle]) {
-            // There is a list of signals and parent clamps. Each
-            // needs to be handled separately.
-            // console.log(logo.endOfFlowSignals[turtle][blk]);
+            // There is a list of signals, loops, and parent
+            // clamps. Each needs to be handled separately.
+            // If we are at the end of a clamp(s), and
+            // if we are at the end of a loop, we need to trigger.
+	    // else if we are returning from an action, we need to trigger.
+            // else trigger.
             var notationDispatches = [];
+            var parentActions = [];
             for (var i = logo.endOfFlowSignals[turtle][blk].length - 1; i >= 0; i--) {
+                // console.log(i + ': ' + logo.blocks.blockList[blk].name);
                 var parentLoop = logo.endOfFlowLoops[turtle][blk][i];
                 var parentAction = logo.endOfFlowActions[turtle][blk][i];
                 var signal = logo.endOfFlowSignals[turtle][blk][i];
-                // console.log(parentLoop);
-		// if (parentLoop != null) {
-                //     console.log(logo.parentFlowQueue[turtle].indexOf(parentLoop) + ' ' + logo.loopBlock(logo.blocks.blockList[parentLoop].name));
-		// }
-                if (parentLoop != null && logo.parentFlowQueue[turtle].indexOf(parentLoop) != -1 && logo.loopBlock(logo.blocks.blockList[parentLoop].name)) {
+                // console.log('parent loop = ' + parentLoop + ' ' + 'parentAction = ' + parentAction);
+                var loopTest = parentLoop != null && logo.parentFlowQueue[turtle].indexOf(parentLoop) != -1 && logo.loopBlock(logo.blocks.blockList[parentLoop].name);
+                var actionTest = (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1);
+                var stillInLoop = false;
+                if (loopTest) {
+                    for (var j = 0; j < logo.turtles.turtleList[turtle].queue.length; j++) {
+                        // console.log(logo.turtles.turtleList[turtle].queue[j].parentBlk);
+                        if (parentLoop == logo.turtles.turtleList[turtle].queue[j].parentBlk) {
+                            stillInLoop = true;
+                            break;
+                        }
+                    }
+                }
+                if (loopTest && stillInLoop) {
                     // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of loop block');
-                } else if (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) == -1) {
+                } else if (actionTest) {
                     // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of action block');
                 } else if (signal != null) {
                     if (logo.doBlocks[turtle].indexOf(parentAction) != -1) {
-                        logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] = -1;
+                        // console.log('queuing parent action');
+                        if (parentActions.indexOf(parentAction) == -1) {
+                            parentActions.push(parentAction);
+                        }
                     }
                     if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
                         notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
                     } else {
-                        // console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                        if (parentAction != null) {
+                            // console.log(logo.blocks.blockList[parentAction].name + ' ' + logo.namedActionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.actionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.doBlocks[turtle].indexOf(parentAction) + ' ' + actionTest);
+                        }
+                        console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                         logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     }
                     // Mark issued signals as null
                     logo.endOfFlowSignals[turtle][blk][i] = null;
                     logo.endOfFlowLoops[turtle][blk][i] = null;
                     logo.endOfFlowActions[turtle][blk][i] = null;
+                }
+            }
+            for (var i = 0; i < parentActions.length; i++ ) {
+                if (logo.doBlocks[turtle].indexOf(parentAction) != -1) {
+                    // console.log('setting doBlocks[' + logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] + '] to -1');
+                    logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] = -1;
                 }
             }
             for (var i = 0; i < notationDispatches.length; i++) {
@@ -2397,7 +2425,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
         // If there is a child flow, queue it.
         if (childFlow) {
-            if(logo.blocks.blockList[blk].name=='doArg' || logo.blocks.blockList[blk].name=='nameddoArg') {
+            // console.log('child flow is ' + childFlow + ' '  + logo.blocks.blockList[childFlow].name);
+
+            if (logo.blocks.blockList[blk].name=='doArg' || logo.blocks.blockList[blk].name=='nameddoArg') {
                 var queueBlock = new Queue(childFlow, childFlowCount, blk, actionArgs);
             } else {
                 var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
@@ -2410,10 +2440,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         }
 
         var nextBlock = null;
+        // console.log('queue length is ' + logo.turtles.turtleList[turtle].queue.length);
+
         // Run the last flow in the queue.
         if (logo.turtles.turtleList[turtle].queue.length > 0) {
             nextBlock = last(logo.turtles.turtleList[turtle].queue).blk;
             passArg = last(logo.turtles.turtleList[turtle].queue).args;
+            // console.log('nextBlock ' + nextBlock + ' '  + logo.blocks.blockList[nextBlock].name);
             // Since the forever block starts at -1, it will never == 1.
             if (last(logo.turtles.turtleList[turtle].queue).count == 1) {
                 // Finished child so pop it off the queue.
@@ -2449,7 +2482,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     // console.log('popping parent flow queue for ' + logo.blocks.blockList[blk].name);
                     logo.unhightlightQueue[turtle].push(last(logo.parentFlowQueue[turtle]));
 
-		    // logo.unhightlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
+                    // logo.unhightlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
                 } else if (logo.unhightlightQueue[turtle].length > 0) {
                     // The child flow is finally complete, so unhighlight.
                     if (logo.turtleDelay != 0) {
@@ -3614,7 +3647,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var j = 1;
                 var k = 1;
                 while (k < obj[4]) {
-		    if (i + j >= this.lilypondStaging[turtle].length) {
+                    if (i + j >= this.lilypondStaging[turtle].length) {
                         singleton = true;
                         break;
                     }
@@ -3624,7 +3657,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     } else if (this.lilypondStaging[turtle][i + j][4] != obj[4]) {
                         singleton = true;
                         break;
-		    } else {
+                    } else {
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
@@ -3633,16 +3666,16 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
             if (obj[4] > 0 && !singleton) {
                 // lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
-		// multiplier = tuplet_duration / target_duration
-		// e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
+                // multiplier = tuplet_duration / target_duration
+                // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
                 // There may be chords embedded.
-		tuplet_count = obj[4];
+                tuplet_count = obj[4];
                 if ((obj[1] / 2) * 2 == obj[1]) {
                     var target_duration = obj[1] / 2;
-		} else {
+                } else {
                     tuplet_count *= 2;
                     var target_duration = obj[1];
-		}
+                }
                 this.lilypondNotes[turtle] += '%5Ctuplet ' + tuplet_count + '%2F' + target_duration + ' { ';
                 var tuplet_duration = 2 * obj[1];
 
@@ -3663,28 +3696,28 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         if (i + j == this.lilypondStaging[turtle].length - 1 || this.lilypondStaging[turtle][i + j + 1][5] != this.lilypondStaging[turtle][i + j][5]) {
                             this.lilypondNotes[turtle] += ' > ' + tuplet_duration + ' ';
                             k++;  // Increment notes in tuplet.
-	                }
+                        }
                         j++;
-		    } else {
+                    } else {
                         this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][0]) + tuplet_duration + ' ';
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
-		}
+                }
 
                 this.lilypondNotes[turtle] += '} ';
-		i += j - 1;
+                i += j - 1;
             } else {
                 if (obj[5] > 0) {  // insideChord
                     // Is this the first note in the chord?
                     if (i == 0 || this.lilypondStaging[turtle][i - 1][5] != obj[5]) {
                         this.lilypondNotes[turtle] += '< ';
-		    }
+                    }
                     this.lilypondNotes[turtle] += (note);
                     // Is this the last note in the chord?
                     if (i == this.lilypondStaging[turtle].length - 1 || this.lilypondStaging[turtle][i + 1][5] != obj[5]) {
                         this.lilypondNotes[turtle] += '> ';
-		    }
+                    }
                 } else if (obj[2]) {  // dotted
                     this.lilypondNotes[turtle] += (note + obj[1] + '.');
                 } else if (obj[3]) {  // doubleDotted
