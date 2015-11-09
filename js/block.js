@@ -467,7 +467,7 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Value blocks get a modifiable text label
-        if (['text', 'number', 'solfege', 'notename'].indexOf(this.name) != -1) {
+        if (['text', 'number', 'solfege', 'notename', 'rest'].indexOf(this.name) != -1) {
             if (this.value == null) {
                 if (this.name == 'text') {
                     this.value = '---';
@@ -475,8 +475,10 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = 'sol';
                 } else if (this.name == 'notename') {
                     this.value = 'G';
+                } else if (this.name == 'rest') {
+                    this.value = 'rest';
                 } else {
-                    this.value = 100;
+                    this.value = 4;
                 }
             }
             var label = this.value.toString();
@@ -1259,6 +1261,9 @@ function loadEventHandlers(myBlock) {
                     }
                 }
             }
+	    // if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
+            //     myBlock.blocks.adjustDocks(thisBlock);
+	    // }
             blocks.refreshCanvas();
         });
     });

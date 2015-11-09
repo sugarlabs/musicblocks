@@ -477,7 +477,7 @@ function PaletteModel(palette, palettes, name) {
                     label = 'G';
                     break;
                 case 'number':
-                    label = '100';
+                    label = '4';
                     break;
                 case 'less':
                 case 'greater':

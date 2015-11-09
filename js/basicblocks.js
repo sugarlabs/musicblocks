@@ -76,6 +76,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     notenameBlock.valueBlock();
     notenameBlock.dockTypes[0] = 'noteout';
 
+    var restBlock = new ProtoBlock('rest');
+    restBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['rest'] = restBlock;
+    restBlock.valueBlock();
+    restBlock.dockTypes[0] = 'textout';
+
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['pitch'] = pitch;

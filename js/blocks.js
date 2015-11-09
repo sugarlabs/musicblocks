@@ -1443,7 +1443,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].text.text = value.toString();
                 me.blockList[thisBlock].container.updateCache();
             }
-            postProcessArg = [thisBlock, 100];
+            postProcessArg = [thisBlock, 4];
         } else if (name == 'media') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1852,7 +1852,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.protoBlockDict['myStorein_' + name] = myStoreinBlock;
         myStoreinBlock.palette = this.palettes.dict['blocks'];
         myStoreinBlock.defaults.push(name);
-        myStoreinBlock.defaults.push(100);
+        myStoreinBlock.defaults.push(4);
         myStoreinBlock.staticLabels.push(_('store in'), _('name'), _('value'));
         myStoreinBlock.adjustWidthToLabel();
         myStoreinBlock.twoArgBlock();
