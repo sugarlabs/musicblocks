@@ -349,7 +349,7 @@ function loadPaletteButtonHandler(palettes, name) {
 
 
 // FIXME: this should be calculated
-var EXPANDBYTWO = ['tuplet2'];
+var EXPANDBYTWO = ['tuplet2', 'namedcalcArg', 'nameddoArg'];
 var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
                    'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
                    'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
@@ -1385,10 +1385,9 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
         var clickY = event.stageY/palette.palettes.scale;
         var paletteEndY = palette.menuContainer.y + h + STANDARDBLOCKHEIGHT;
 
-        if(clickY < paletteEndY)
-        {
-            palette.protoContainers[blkname].mask = null;
-        }
+        // if(clickY < paletteEndY)
+        palette.protoContainers[blkname].mask = null;
+
         moved = false;
         // No need to recalculate saveX (prevents lost palette entry)
         // saveX = palette.protoContainers[blkname].x;
@@ -1403,14 +1402,12 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
 
         palette.protoContainers[blkname].on('pressmove', function(event) {
             if (mode === MODEDRAG) {
-                if(clickY < paletteEndY)
-                {
-                    moved = true;
-                    palette.draggingProtoBlock = true;
-                    palette.protoContainers[blkname].x = Math.round(event.stageX / palette.palettes.scale) - PALETTELEFTMARGIN;
-                    palette.protoContainers[blkname].y = Math.round(event.stageY / palette.palettes.scale);
-                    palette.palettes.refreshCanvas();
-                }
+                // if(clickY < paletteEndY)
+                moved = true;
+                palette.draggingProtoBlock = true;
+                palette.protoContainers[blkname].x = Math.round(event.stageX / palette.palettes.scale) - PALETTELEFTMARGIN;
+                palette.protoContainers[blkname].y = Math.round(event.stageY / palette.palettes.scale);
+                palette.palettes.refreshCanvas();
                 return;
             }
 
