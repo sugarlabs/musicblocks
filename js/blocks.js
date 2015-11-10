@@ -1759,7 +1759,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
 
         // Update the palette
-        var blockPalette = this.palettes.dict['blocks'];
+        var blockPalette = this.palettes.dict['boxes'];
         var nameChanged = false;
         for (var blockId = 0; blockId < blockPalette.protoList.length; blockId++) {
             var block = blockPalette.protoList[blockId];
@@ -1850,7 +1850,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         console.log('new storein block ' + name);
         var myStoreinBlock = new ProtoBlock('storein');
         this.protoBlockDict['myStorein_' + name] = myStoreinBlock;
-        myStoreinBlock.palette = this.palettes.dict['blocks'];
+        myStoreinBlock.palette = this.palettes.dict['boxes'];
         myStoreinBlock.defaults.push(name);
         myStoreinBlock.defaults.push(4);
         myStoreinBlock.staticLabels.push(_('store in'), _('name'), _('value'));
@@ -1871,7 +1871,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
         var myBoxBlock = new ProtoBlock('namedbox');
         this.protoBlockDict['myBox_' + name] = myBoxBlock;
-        myBoxBlock.palette = this.palettes.dict['blocks'];
+        myBoxBlock.palette = this.palettes.dict['boxes'];
         myBoxBlock.defaults.push(name);
         myBoxBlock.staticLabels.push(name);
         myBoxBlock.parameterBlock();

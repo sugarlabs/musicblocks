@@ -1662,7 +1662,7 @@ function labelChanged(myBlock) {
                 // Rename both box <- name and namedbox blocks.
                 myBlock.blocks.renameBoxes(oldValue, newValue);
                 myBlock.blocks.renameNamedboxes(oldValue, newValue);
-                myBlock.blocks.palettes.updatePalettes('blocks');
+                myBlock.blocks.palettes.updatePalettes('boxes');
                 break;
             default:
                 break;

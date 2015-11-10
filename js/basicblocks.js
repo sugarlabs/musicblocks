@@ -813,7 +813,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // Blocks palette
     var namedBoxBlock = new ProtoBlock('namedbox');
-    namedBoxBlock.palette = palettes.dict['blocks'];
+    namedBoxBlock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['namedbox'] = namedBoxBlock;
     namedBoxBlock.staticLabels.push(_('box'));
     namedBoxBlock.extraWidth = 10;
@@ -822,7 +822,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     namedBoxBlock.dockTypes[0] = 'anyout';
 
     var storeinBlock = new ProtoBlock('storein');
-    storeinBlock.palette = palettes.dict['blocks'];
+    storeinBlock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['storein'] = storeinBlock;
     storeinBlock.staticLabels.push(_('store in'), _('name'), _('value'));
     storeinBlock.adjustWidthToLabel();
@@ -833,14 +833,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     storeinBlock.dockTypes[2] = 'anyin';
 
     var incrementOneBlock = new ProtoBlock('incrementOne');
-    incrementOneBlock.palette = palettes.dict['blocks'];
+    incrementOneBlock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['incrementOne'] = incrementOneBlock;
     incrementOneBlock.staticLabels.push(_('add 1 to'));
     incrementOneBlock.adjustWidthToLabel();
     incrementOneBlock.oneArgBlock();
 
     var incrementBlock = new ProtoBlock('increment');
-    incrementBlock.palette = palettes.dict['blocks'];
+    incrementBlock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['increment'] = incrementBlock;
     incrementBlock.staticLabels.push(_('add'), _('to'), _('value'));
     incrementBlock.adjustWidthToLabel();
@@ -849,7 +849,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     incrementBlock.dockTypes[2] = 'anyin';
 
     var boxBlock = new ProtoBlock('box');
-    boxBlock.palette = palettes.dict['blocks'];
+    boxBlock.palette = palettes.dict['boxes'];
     blocks.protoBlockDict['box'] = boxBlock;
     boxBlock.staticLabels.push(_('box'));
     boxBlock.extraWidth = 10;
