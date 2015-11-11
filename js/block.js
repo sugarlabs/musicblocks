@@ -294,10 +294,19 @@ function Block(protoblock, blocks, overrideName) {
 
         // Save new artwork and dock positions.
         this.artwork = obj[0];
-        for (var i = 0; i < this.docks.length; i++) {
-            this.docks[i][0] = obj[1][i][0];
-            this.docks[i][1] = obj[1][i][1];
-        }
+        try {
+            for (var i = 0; i < this.docks.length; i++) {
+                this.docks[i][0] = obj[1][i][0];
+                this.docks[i][1] = obj[1][i][1];
+            }
+	} catch (e) {
+            // FIXME: For some reason, ifthenelse blocks are missing
+            // an arg in the obj dock after a rescale (sometimes).
+            console.log(i + ' ' + e);
+	    console.log(this.name);
+	    console.log(this.docks);
+	    console.log(obj);
+	}
     }
 
     this.imageLoad = function() {
@@ -388,8 +397,14 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.container.uncache();
                 }
 
+                // ???
+                try {
                 myBlock.bounds = myBlock.container.getBounds();
                 myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
+                } catch (e) {
+                    console.log(e + ' ' + myBlock.name);
+		}
+
                 myBlock.blocks.refreshCanvas();
 
                 if (firstTime) {
@@ -404,8 +419,9 @@ function Block(protoblock, blocks, overrideName) {
                     }
 
                     // Adjust the docks.
-                    myBlock.blocks.loopCounter = 0;
-                    myBlock.blocks.adjustDocks(thisBlock);
+                    // myBlock.blocks.loopCounter = 0;
+                    // console.log('adjust Docks');
+                    // myBlock.blocks.adjustDocks(thisBlock);
 
                     // Adjust the text position.
                     positionText(myBlock, myBlock.protoblock.scale);
@@ -1311,6 +1327,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
             // the move (workaround for issue #38 -- Blocks fly
             // apart). Still need to get to the root cause.
             myBlock.blocks.loopCounter = 0;
+        console.log('adjust Docks');
             myBlock.blocks.adjustDocks(myBlock.blocks.blockList.indexOf(myBlock));
         }
     } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(myBlock.name) != -1) {

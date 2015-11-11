@@ -117,12 +117,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (blk = 0; blk < this.blockList.length; blk++) {
             this.blockList[blk].resize(scale);
         }
-        this.findStacks();
+
         for (stack = 0; stack < this.stackList.length; stack++) {
             // Just in case the block list is corrupted, count iterations.
             this.loopCounter = 0;
             this.adjustDocks(this.stackList[stack]);
         }
+
         // We reset the protoblock scale on the palettes, but don't
         // modify the palettes themselves.
         for (palette in this.palettes.dict) {
@@ -570,6 +571,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
 
         this.loopCounter += 1;
+        // FIXME: race condition when rescaling blocks?
         if (this.loopCounter > this.blockList.length * 2) {
             console.log('Infinite loop encountered while adjusting docks: ' + blk + ' ' + this.blockList);
             return;
@@ -937,6 +939,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // First, adjust the docks for any blocks that may have
             // had a vspace added.
             for (var i = 0; i < checkArgBlocks.length; i++) {
+        console.log('adjust Docks');
                 blocks.adjustDocks(checkArgBlocks[i]);
             }
 
@@ -1138,13 +1141,21 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             return blk;
         }
 
+        // Test for corrupted connection scenario
+        // FIXME: How does this happen?
+	// FIXME: Should we try to correct it?
+	if (myBlock.connections.length > 1 && myBlock.connections[0] != null && myBlock.connections[0] == last(myBlock.connections)) {
+            console.log('WARNING: CORRUPTED BLOCK DATA. Block ' + myBlock.name + ' (' + blk + ') is connected to the same block ' + this.blockList[myBlock.connections[0]].name + ' (' + myBlock.connections[0] + ') twice.');
+            return blk;
+	}
+
         var topBlockLoop = 0;
         while (myBlock.connections[0] != null) {
             topBlockLoop += 1;
             if (topBlockLoop > 2 * this.blockList.length) {
                 // Could happen if the block data is malformed.
                 console.log('infinite loop finding topBlock?');
-                console.log(myBlock.name);
+                console.log(this.blockList.indexOf(myBlock) + ' ' + myBlock.name);
                 break;
             }
             blk = myBlock.connections[0];
