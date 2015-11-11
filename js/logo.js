@@ -3212,6 +3212,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         logo.stopTurtle = true;
                     }
                     break;
+                case 'doArg':
+                    return blk;
+                    break;
+                case 'nameddoArg':
+                    return blk;
+                    break;
                 case 'returnValue':
                     if (logo.returns.length > 0) {
                         logo.blocks.blockList[blk].value = logo.returns.pop();
