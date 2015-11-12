@@ -283,7 +283,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Make sure myBlock is a clamp block.
         if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
             return;
-        }
+        } else if (myBlock.isArgClamp()) {
+            // We handle ArgClamp blocks elsewhere.
+            this.adjustArgClampBlock([blk]);
+            return;
+	}
 
         function clampAdjuster(blocks, blk, myBlock, clamp) {
             // First we need to count up the number of (and size of) the
@@ -785,7 +789,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         // Get the size of the block we are inserting
                         // adding.
                         var size = this.getBlockSize(thisBlock);
-
+			console.log('inserting block of size ' + size + ' to arg clamp ' + this.blockList[newBlock].name);
                         // Get the current slot list.
                         var slotList = this.blockList[newBlock].argClampSlots;
 
@@ -1238,7 +1242,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 this.expandablesList.push(blk);
                 var c = this.blockList[blk].connections.length - 2;
                 this.searchForExpandables(this.blockList[blk].connections[c]);
-            }
+            } else if (this.blockList[blk].isArgClamp()) {
+                // FIXME: We need to do something with ArgClampArg blocks too.
+                this.expandablesList.push(blk);
+	    }
             blk = last(this.blockList[blk].connections);
         }
     }
