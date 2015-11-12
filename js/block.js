@@ -421,7 +421,7 @@ function Block(protoblock, blocks, overrideName) {
                     // Adjust the docks.
                     // myBlock.blocks.loopCounter = 0;
                     // console.log('adjust Docks');
-                    // myBlock.blocks.adjustDocks(thisBlock);
+                    myBlock.blocks.adjustDocks(thisBlock);
 
                     // Adjust the text position.
                     positionText(myBlock, myBlock.protoblock.scale);
@@ -1327,7 +1327,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
             // the move (workaround for issue #38 -- Blocks fly
             // apart). Still need to get to the root cause.
             myBlock.blocks.loopCounter = 0;
-        console.log('adjust Docks');
+            // console.log('adjust Docks');
             myBlock.blocks.adjustDocks(myBlock.blocks.blockList.indexOf(myBlock));
         }
     } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(myBlock.name) != -1) {
