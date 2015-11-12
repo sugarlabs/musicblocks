@@ -3559,6 +3559,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
         if (octave < 1) {
             return [note, 1];
+        } else if (octave > 10) {
+            return [note, 10];
         } else {
             return [note, octave];
         }
@@ -3580,49 +3582,46 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         var doubleDotted = false;
         var tupletValue = -1;
 
-        // Huh? Why inside Chord
-        //if (insideChord < 0) {
-            if (POWER2.indexOf(duration) == -1) {
-                if (POWER2.indexOf(duration * 1.5) == -1) {
-                    if (POWER2.indexOf(duration * 1.75) == -1) {
-                        // First, see if the note is a tuplet (has a
-                        // factor of 2).
-                        var factorOfTwo = 1;
-                        console.log(duration + ' ' + Math.floor(duration / 2));
-                        while (Math.floor(duration / 2) * 2 == duration) {
-                            factorOfTwo *= 2;
-                            duration /= 2;
-                        }
-                        if (factorOfTwo > 1) {
-                            // We have a tuplet of sorts
-                            console.log('tuplet ' + factorOfTwo + ' ' + duration);
-                            tupletValue = duration;
-                            duration = factorOfTwo;
-                        } else {
-                            // Otherwise, find an approximate solution.
-                            console.log('cannot convert ' + duration + ' to a note');
-                            for (var i = 1; i < POWER2.length; i++) {
-                                // Rounding down
-                                if (duration < POWER2[i]) {
-                                    duration = POWER2[i - 1];
-                                    break;
-                                }
-                            }
-                            if (POWER2.indexOf(duration) == -1) {
-                                duration = 128;
-                            }
-                            console.log('substuting in ' + duration);
-                        }
+        if (POWER2.indexOf(duration) == -1) {
+            if (POWER2.indexOf(duration * 1.5) == -1) {
+                if (POWER2.indexOf(duration * 1.75) == -1) {
+                    // First, see if the note is a tuplet (has a
+                    // factor of 2).
+                    var factorOfTwo = 1;
+                    console.log(duration + ' ' + Math.floor(duration / 2));
+                    while (Math.floor(duration / 2) * 2 == duration) {
+                        factorOfTwo *= 2;
+                        duration /= 2;
+                    }
+                    if (factorOfTwo > 1) {
+                        // We have a tuplet of sorts
+                        console.log('tuplet ' + factorOfTwo + ' ' + duration);
+                        tupletValue = duration;
+                        duration = factorOfTwo;
                     } else {
-                        duration = POWER2[POWER2.indexOf(duration * 1.75)];
-                        doubleDotted = true;
+                        // Otherwise, find an approximate solution.
+                        console.log('cannot convert ' + duration + ' to a note');
+                        for (var i = 1; i < POWER2.length; i++) {
+                            // Rounding down
+                            if (duration < POWER2[i]) {
+                                duration = POWER2[i - 1];
+                                break;
+                            }
+                        }
+                        if (POWER2.indexOf(duration) == -1) {
+                            duration = 128;
+                        }
+                        console.log('substuting in ' + duration);
                     }
                 } else {
-                    duration = POWER2[POWER2.indexOf(duration * 1.5)];
-                    dotted = true;
+                    duration = POWER2[POWER2.indexOf(duration * 1.75)];
+                    doubleDotted = true;
                 }
+            } else {
+                duration = POWER2[POWER2.indexOf(duration * 1.5)];
+                dotted = true;
             }
-        // }
+        }
 
         // Push notes for lilypond.
         this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord);
@@ -3646,7 +3645,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             // Lilypond notes use is for sharp, es for flat,
             // , and ' for shifts in octave.
             // Also, notes must be lowercase.
-            return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").toLowerCase();
+            return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
         }
 
         for (var i = 0; i < this.lilypondStaging[turtle].length; i++) {
