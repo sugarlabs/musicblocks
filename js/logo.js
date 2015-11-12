@@ -1551,13 +1551,15 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     logo.lilypondOutput += '%0A   >>%0A   %5Clayout {}%0A}%0A%0A';
 
                     // Add MIDI OUTPUT in comments.
-                    logo.lilypondOutput += '%25 MIDI SECTION%0A%25 Delete the %25{ and %25} below to include MIDI output.%0A%25{%0A%5Cmidi {%0A   %5Ctempo 4=90%0A}%0A%25}%0A';
+                    logo.lilypondOutput += '%25 MIDI SECTION%0A%25 Delete the %25{ and %25} below to include MIDI output.%0A%25{%0A%5Cmidi {%0A   %5Ctempo 4=90%0A}%0A%25}%0A%0A';
 
                     // ADD TURTLE BLOCKS CODE HERE
-
-                    // prepareExport() returns json-encoded project
-                    // data.  We need to do some clean up to make it
-                    // safe for inclusion in the export to lilypond.
+                    logo.lilypondOutput += '%25 MUSIC BLOCKS CODE%0A';
+                    logo.lilypondOutput += '%25 Below is the code for the Music Blocks project that generated this Lilypond file.%0A%25{%0A%0A';
+                    // prepareExport() returns json-encoded project data.
+                    var projectData = prepareExport();
+                    logo.lilypondOutput += projectData.replace(/]],/g, ']],%0A');
+                    logo.lilypondOutput += '%0A%25}%0A%0A';
 
                     doSaveLilypond(logo, args[0]);
                 }
