@@ -19,7 +19,7 @@ var OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
 
 // This header is prepended to the Lilypond output.
 // Note: We are using URL encoding, e.g., \ (%5C) and newline (%0A)
-var LILYPONDHEADER = '%5Cversion "2.18.2"%0A%0A%25 ****************************************************************%0A%25 %0A%25 WHAT IS THIS? -- This is a LilyPond file generated from Music%0A%25 Blocks software (Read about it at www.musicblocks.net).%0A%25 %0A%25 DOWNLOAD LILYPOND -- In order to create notation with this file,%0A%25 you will need to download and install LilyPond software onto your%0A%25 computer (http:%2F%2Flilypond.org%2Fdownload.html).  Frescobaldi%0A%25 software is also handy for editing LilyPond files%0A%25 (http:%2F%2Ffrescobaldi.org%2Fdownload)%0A%25 %0A%25 LILYPOND INSTRUCTIONS -- For instructions on how to further%0A%25 manipulate the musical notation using LilyPond software, please%0A%25 read the Introduction (http:%2F%2Flilypond.org%2Ftext-input.html) and%0A%25 the Manual%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2FDocumentation%2Flearning%2Findex.html)%0A%25 %0A%25 GLOSSARY -- A glossary with very helpful examples may be found%0A%25 HERE (http:%2F%2Fwww.lilypond.org%2Fdoc%2Fv2.19%2FDocumentation%2Fmusic-glossary%2F)%0A%25 %0A%25 MUTOPIA -- You may also benefit from studying scores from the%0A%25 Mutopia Project website, which has freely sharable music notation%0A%25 generated with LilyPond (http:%2F%2Fwww.mutopiaproject.org%2F)%0A%25 %0A%25 COMMENTS -- Some of the code below is commented out, but you can%0A%25 initiate it by deleting the that precedes the text or, in the%0A%25 case of a commented section, deleting the %{ and }that surrounds%0A%25 the section.%0A%25 %0A%25 ****************************************************************%0A%0A%5Cheader {%0A%25 Please add your own name, title of your musical creation,%0A%25 and intended copyright below!%0Adedication = "Made with LilyPond and Music Blocks -- http:%2F%2Fwalterbender.github.io%2Fmusicblocks%2F"%0Atitle = "My Music Blocks Creation"%0A%25 subtitle = "Subtitle"%0A%25 instrument = "Instrument"%0Acomposer = "Mr. Mouse"%0A%25 arranger = "Arranger"%0A%25 The copyright below is great for sharing (and re-sharing)!%0A%25 Read about it here (http:%2F%2Fcreativecommons.org%2Flicenses%2Fby-sa%2F4.0%2F).%0A%25 Of course, you can use any copyright you like -- you made it!%0Acopyright = "Mr. Mouse (c) 2015 -- CC-BY-SA"%0Atagline = "Made from Music Blocks v.0.9"%0A}%0A%0A%25 You can change the meter by uncommenting the code below (delete the%0A%25 percent sign) and making adjustments.%0A%0A%25{%0Aglobal = {%0A  %5Ctime 3%2F4%0A  %5Ckey c %5Cminor%0A %5CnumericTimeSignature%0A %5Cpartial 4 %0A %5Ctempo "Andante" 4=90%0A}%0A%25}%0A%0A'
+var LILYPONDHEADER = '%5Cversion "2.18.2"%0A%0A%25 ****************************************************************%0A%25 %0A%25 WHAT IS THIS? -- This is a LilyPond file generated from Music%0A%25 Blocks software (Read about it at www.musicblocks.net).%0A%25 %0A%25 DOWNLOAD LILYPOND -- In order to create notation with this file,%0A%25 you will need to download and install LilyPond software onto your%0A%25 computer (http:%2F%2Flilypond.org%2Fdownload.html). Frescobaldi%0A%25 software is also handy for editing LilyPond files%0A%25 (http:%2F%2Ffrescobaldi.org%2Fdownload).%0A%25 %0A%25 LILYPOND INSTRUCTIONS -- For instructions on how to further%0A%25 manipulate musical notation using LilyPond software, please%0A%25 read the Introduction (http:%2F%2Flilypond.org%2Ftext-input.html) and%0A%25 the Manual%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2FDocumentation%2Flearning%2Findex.html).%0A%25 %0A%25 GLOSSARY -- A glossary with helpful examples may be found here%0A%25 (http:%2F%2Fwww.lilypond.org%2Fdoc%2Fv2.19%2FDocumentation%2Fmusic-glossary%2F).%0A%25 %0A%25 MUTOPIA -- You may also benefit from studying scores from the%0A%25 Mutopia Project website, which has freely sharable music notation%0A%25 generated with LilyPond (http:%2F%2Fwww.mutopiaproject.org%2F).%0A%25 %0A%25 COMMENTS -- Some of the code below is commented out. You can%0A%25 enable it by deleting the %25 that precedes the text or, in the%0A%25 case of a commented section, deleting the %{ and %} that surrounds%0A%25 the section.%0A%25 %0A%25 ****************************************************************%0A%0A%5Cheader {%0A%25 Please add your own name, a title of your musical creation,%0A%25 and an intended copyright below.%0A   dedication = "Made with LilyPond and Music Blocks (http:%2F%2Fwalterbender.github.io%2Fmusicblocks%2F)"%0A   title = "My Music Blocks Creation"%0A%25  subtitle = "Subtitle"%0A%25  instrument = "Instrument"%0A   composer = "Mr. Mouse"%0A%25  arranger = "Arranger"%0A%25 The copyright below is great for sharing (and re-sharing)!%0A%25 Read more about it here (http:%2F%2Fcreativecommons.org%2Flicenses%2Fby-sa%2F4.0%2F).%0A%25 Of course, you can use any copyright you like -- you made it!%0A   copyright = "Mr. Mouse (c) 2015 -- CC-BY-SA"%0A   tagline = "Made from Music Blocks v.0.9"%0A}%0A%0A%25 Delete the %25{ and %25} below to change the meter and making adjustments.%0A%25{%0Aglobal = {%0A   %5Ctime 3%2F4%0A   %5Ckey c %5Cminor%0A   %5CnumericTimeSignature%0A   %5Cpartial 4 %0A   %5Ctempo "Andante" 4=90%0A}%0A%25}%0A%0A'
 
 var NOMICERRORMSG = 'The microphone is not available.';
 var NANERRORMSG = 'Not a number.';
@@ -1475,7 +1475,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         }
                         c += 1;
                     }
-		    logo.lilypondOutput += '%0A%25 You can change the midi instrument below to anything on this list:%0A%25 http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2Fdocumentation%2Fnotation%2Fmidi-instruments%0A';
+		    logo.lilypondOutput += '%0A%25 You can change the midi instrument below to anything on this list:%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2Fdocumentation%2Fnotation%2Fmidi-instruments)%0A';
 
                     var CLEFS = ['treble', 'bass', 'bass_8'];
                     // Sort the staffs, treble on top, bass_8 on the bottom.
@@ -1494,10 +1494,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                                     logo.lilypondOutput += instrumentName + 'Voice = ';
                                     logo.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
-                                    logo.lilypondOutput += '    %5Cclef "' + clef[i] + '"%0A';
-                                    logo.lilypondOutput += '    instrumentName = "' + instrumentName + '"%0A';
-				    logo.lilypondOutput += '    shortInstrumentName = "' + shortInstrumentName + '"%0A';
-    				    logo.lilypondOutput += '    midiInstrument = "acoustic grand"%0A';
+                                    logo.lilypondOutput += '   %5Cclef "' + clef[i] + '"%0A';
+                                    logo.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
+				    logo.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
+    				    logo.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
        				    logo.lilypondOutput += '} { %5Cclef ' + clef[i] + ' %5C' + instrumentName + ' }%0A';
                                 }
                             }
@@ -1505,8 +1505,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         }
                     }
 
-                    logo.lilypondOutput += '%5Cscore {%0A';
-                    logo.lilypondOutput += '<<%0A';
+                    // Begin the SCORE section.
+                    logo.lilypondOutput += '%0A%0A%5Cscore {%0A';
+                    logo.lilypondOutput += '   <<%0A';
 
                     // Sort the staffs, treble on top, bass_8 on the bottom.
                     for (var c = 0; c < CLEFS.length; c++) {
@@ -1520,14 +1521,14 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     } else if (instrumentName == t.toString()) {
                                         instrumentName = RODENTS[t % 12];
                                     }
-                                    logo.lilypondOutput += '%5C' + instrumentName + 'Voice%0A';
+                                    logo.lilypondOutput += '      %5C' + instrumentName + 'Voice%0A';
 				}
 			    }
 			}
 		    }
 
                     // Add GUITAR TAB in comments.
-                    logo.lilypondOutput += '%25 GUITAR TAB -- Delete the %25{ and }%25 (comment-section indicator) below for guitar tablature output.%0A%25{%0A    %5Cnew TabStaff = "guitar tab" %0A<<%0A      %5Cclef moderntab%0A';
+                    logo.lilypondOutput += '%0A%0A%25 GUITAR TAB SECTION%0A%25 Delete the %25{ and %25} below to include guitar tablature output.%0A%25{%0A      %5Cnew TabStaff = "guitar tab" %0A      <<%0A         %5Cclef moderntab%0A';
                     for (var c = 0; c < CLEFS.length; c++) {
                         var i = 0;
                         for (var t in logo.lilypondNotes) {
@@ -1539,17 +1540,18 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     } else if (instrumentName == t.toString()) {
                                         instrumentName = RODENTS[t % 12];
                                     }
-                                    logo.lilypondOutput += '      %5Ccontext TabVoice = "'+ instrumentName + '" %5C' + instrumentName + '%0A';
+                                    logo.lilypondOutput += '         %5Ccontext TabVoice = "'+ instrumentName + '" %5C' + instrumentName + '%0A';
                                 }
                             }
                         }
                     }
 
-                    logo.lilypondOutput += '    >>%0A%25}%0A%0A>>%0A';
-                    logo.lilypondOutput += '%5Clayout {}%0A}%0A%0A';
+                    // Close the SCORE sections.
+                    logo.lilypondOutput += '      >>%0A%25}%0A';
+                    logo.lilypondOutput += '%0A   >>%0A   %5Clayout {}%0A}%0A%0A';
 
-                    // Add MIDI output commented time.
-                    logo.lilypondOutput += '%25 MIDI -- Delete the two %25{ (comment-section indicator) below for midi as well%0A%25{  %5Cmidi {%0A    %5Ctempo 4=90%0A  }%0A%25}%0A';
+                    // Add MIDI OUTPUT in comments.
+                    logo.lilypondOutput += '%25 MIDI SECTION%0A%25 Delete the %25{ and %25} below to include midi output.%0A%25{%0A%5Cmidi {%0A   %5Ctempo 4=90%0A}%0A%25}%0A';
 
                     // ADD TURTLE BLOCKS CODE HERE
 
