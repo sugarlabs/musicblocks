@@ -118,9 +118,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             this.blockList[blk].resize(scale);
         }
 
+	this.findStacks();
         for (stack = 0; stack < this.stackList.length; stack++) {
             // Just in case the block list is corrupted, count iterations.
             this.loopCounter = 0;
+            // console.log('Adjust Docks: ' + this.blockList[this.stackList[stack]].name);
             this.adjustDocks(this.stackList[stack]);
         }
 
@@ -263,6 +265,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Just in case the block list is corrupted, count iterations.
         this.loopCounter = 0;
+        // console.log('Adjust Docks: ' + this.blockList[this.dragGroup[0]].name);
         this.adjustDocks(this.dragGroup[0])
     }
 
@@ -287,7 +290,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // We handle ArgClamp blocks elsewhere.
             this.adjustArgClampBlock([blk]);
             return;
-	}
+        }
 
         function clampAdjuster(blocks, blk, myBlock, clamp) {
             // First we need to count up the number of (and size of) the
@@ -442,7 +445,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var nextBlock = args[1];
                 var vspace = args[2];
                 var i = args[3];
-		var n = args[4];
+                var n = args[4];
                 var vspaceBlock = blockBlocks.blockList[vspace];
                 var lastDock = last(thisBlock.docks);
                 var dx = lastDock[0] - vspaceBlock.docks[0][0];
@@ -458,12 +461,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     blockBlocks.blockList[nextBlock].connections[0] = vspace;
                 }
                 if (i + 1 < n) {
-		    var newPos = blockBlocks.blockList.length;
+                    var newPos = blockBlocks.blockList.length;
                     thisBlock = last(blockBlocks.blockList);
-		    nextBlock = last(thisBlock.connections);
+                    nextBlock = last(thisBlock.connections);
                     blockBlocks.makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, i + 1, n]);
-		}
-	    }
+                }
+            }
 
             blockBlocks.makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, 0, n]);
         }
@@ -789,7 +792,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         // Get the size of the block we are inserting
                         // adding.
                         var size = this.getBlockSize(thisBlock);
-			console.log('inserting block of size ' + size + ' to arg clamp ' + this.blockList[newBlock].name);
+                        console.log('inserting block of size ' + size + ' to arg clamp ' + this.blockList[newBlock].name);
                         // Get the current slot list.
                         var slotList = this.blockList[newBlock].argClampSlots;
 
@@ -889,6 +892,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
             this.blockList[newBlock].connections[newConnection] = thisBlock;
             this.loopCounter = 0;
+            // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock);
             // TODO: some graphical feedback re new connection?
         }
@@ -943,7 +947,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // First, adjust the docks for any blocks that may have
             // had a vspace added.
             for (var i = 0; i < checkArgBlocks.length; i++) {
-        console.log('adjust Docks');
+                // console.log('Adjust Docks: ' + this.blockList[checkArgBlocks[i]].name);
                 blocks.adjustDocks(checkArgBlocks[i]);
             }
 
@@ -1147,11 +1151,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Test for corrupted connection scenario
         // FIXME: How does this happen?
-	// FIXME: Should we try to correct it?
-	if (myBlock.connections.length > 1 && myBlock.connections[0] != null && myBlock.connections[0] == last(myBlock.connections)) {
+        // FIXME: Should we try to correct it?
+        if (myBlock.connections.length > 1 && myBlock.connections[0] != null && myBlock.connections[0] == last(myBlock.connections)) {
             console.log('WARNING: CORRUPTED BLOCK DATA. Block ' + myBlock.name + ' (' + blk + ') is connected to the same block ' + this.blockList[myBlock.connections[0]].name + ' (' + myBlock.connections[0] + ') twice.');
             return blk;
-	}
+        }
 
         var topBlockLoop = 0;
         while (myBlock.connections[0] != null) {
@@ -1245,7 +1249,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             } else if (this.blockList[blk].isArgClamp()) {
                 // FIXME: We need to do something with ArgClampArg blocks too.
                 this.expandablesList.push(blk);
-	    }
+            }
             blk = last(this.blockList[blk].connections);
         }
     }
@@ -1652,6 +1656,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Generate and position the block bitmaps and labels
         this.updateBlockPositions();
+        // console.log('Adjust Docks: ' + this.blockList[blk].name);
         this.adjustDocks(blk, true);
         this.refreshCanvas();
 
@@ -2822,6 +2827,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         for (var blk = 0; blk < this.adjustTheseDocks.length; blk++) {
             this.loopCounter = 0;
+            // console.log('Adjust Docks: ' + this.blockList[this.adjustTheseDocks[blk]].name);
             this.adjustDocks(this.adjustTheseDocks[blk]);
             // blockBlocks.expandTwoArgs();
             blockBlocks.expandClamps();

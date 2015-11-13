@@ -93,6 +93,13 @@ define(function (require) {
         facebookInit();
         window.scroll(0, 0);
 
+var txt = "";
+txt += "innerWidth: " + window.innerWidth + " ";
+txt += "innerHeight: " + window.innerHeight + " ";
+txt += "outerWidth: " + window.outerWidth + " ";
+txt += "outerHeight: " + window.outerHeight + " ";
+console.log(txt);
+
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
             meSpeak.loadVoice('lib/voices/en/en.json');
@@ -988,6 +995,7 @@ define(function (require) {
             }
 
             if (!platform.androidWebkit) {
+
                 var w = window.innerWidth;
                 var h = window.innerHeight;
             } else {
