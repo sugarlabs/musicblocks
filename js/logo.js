@@ -1428,6 +1428,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 if (args.length == 1) {
                     console.log('saving as lilypond: ' + turtleCount);
+
+                    logo.lilypondOutput += '%25 You can change the MIDI instruments below to anything on this list:%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2Fdocumentation%2Fnotation%2Fmidi-instruments)%0A%0A';
+
                     var c = 0;
                     for (var t in logo.lilypondStaging) {
                         if (logo.lilypondStaging[t].length > 0) {
@@ -1467,42 +1470,24 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             logo.lilypondOutput += instrumentName + ' = {%0A';
                             logo.lilypondOutput += '%25 %5Cmeter%0A';
                             logo.lilypondOutput += logo.lilypondNotes[t];
+
                             // Add bar to last turtle's output.
                             if (c == turtleCount - 1) {
                                 logo.lilypondOutput += ' %5Cbar "%7C."'
                             }
                             logo.lilypondOutput += '%0A}%0A%0A';
+
+                            var shortInstrumentName = RODENTSSHORT[t % 12];
+
+                            logo.lilypondOutput += instrumentName + 'Voice = ';
+                            logo.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
+                            logo.lilypondOutput += '   %5Cclef "' + last(clef) + '"%0A';
+                            logo.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
+                            logo.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
+                            logo.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
+                            logo.lilypondOutput += '} { %5Cclef ' + last(clef) + ' %5C' + instrumentName + ' }%0A%0A';
                         }
                         c += 1;
-                    }
-                    logo.lilypondOutput += '%25 You can change the MIDI instruments below to anything on this list:%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2Fdocumentation%2Fnotation%2Fmidi-instruments)%0A';
-
-                    var CLEFS = ['treble', 'bass', 'bass_8'];
-                    // Sort the staffs, treble on top, bass_8 on the bottom.
-                    for (var c = 0; c < CLEFS.length; c++) {
-                        var i = 0;
-                        for (var t in logo.lilypondNotes) {
-                            if (clef[i] == CLEFS[c]) {
-                                if (logo.lilypondStaging[t].length > 0) {
-                                    var instrumentName = logo.turtles.turtleList[t].name;
-                                    if (instrumentName == _('start')) {
-                                        instrumentName = RODENTS[t % 12].replace(/ /g, '_');
-                                    } else if (instrumentName == t.toString()) {
-                                        instrumentName = RODENTS[t % 12];
-                                    }
-                                    var shortInstrumentName = RODENTSSHORT[t % 12];
-
-                                    logo.lilypondOutput += instrumentName + 'Voice = ';
-                                    logo.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
-                                    logo.lilypondOutput += '   %5Cclef "' + clef[i] + '"%0A';
-                                    logo.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
-                                    logo.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
-                                    logo.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
-                                    logo.lilypondOutput += '} { %5Cclef ' + clef[i] + ' %5C' + instrumentName + ' }%0A%0A';
-                                }
-                            }
-                            i += 1;
-                        }
                     }
 
                     // Begin the SCORE section.
@@ -1510,6 +1495,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     logo.lilypondOutput += '   <<%0A';
 
                     // Sort the staffs, treble on top, bass_8 on the bottom.
+                    var CLEFS = ['treble', 'bass', 'bass_8'];
                     for (var c = 0; c < CLEFS.length; c++) {
                         var i = 0;
                         for (var t in logo.lilypondNotes) {
