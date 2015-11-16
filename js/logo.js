@@ -1479,13 +1479,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                             var shortInstrumentName = RODENTSSHORT[t % 12];
 
-                            logo.lilypondOutput += instrumentName + 'Voice = ';
+                            logo.lilypondOutput += instrumentName.replace(/ /g, '_') + 'Voice = ';
                             logo.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
                             logo.lilypondOutput += '   %5Cclef "' + last(clef) + '"%0A';
                             logo.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
                             logo.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
                             logo.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
-                            logo.lilypondOutput += '} { %5Cclef ' + last(clef) + ' %5C' + instrumentName + ' }%0A%0A';
+                            logo.lilypondOutput += '} { %5Cclef ' + last(clef) + ' %5C' + instrumentName.replace(/ /g, '_') + ' }%0A%0A';
                         }
                         c += 1;
                     }
@@ -1507,7 +1507,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     } else if (instrumentName == t.toString()) {
                                         instrumentName = RODENTS[t % 12];
                                     }
-                                    logo.lilypondOutput += '      %5C' + instrumentName + 'Voice%0A';
+                                    logo.lilypondOutput += '      %5C' + instrumentName.replace(/ /g, '_') + 'Voice%0A';
                                 }
                             }
                         }
@@ -1526,7 +1526,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     } else if (instrumentName == t.toString()) {
                                         instrumentName = RODENTS[t % 12];
                                     }
-                                    logo.lilypondOutput += '         %5Ccontext TabVoice = "'+ instrumentName + '" %5C' + instrumentName + '%0A';
+                                    logo.lilypondOutput += '         %5Ccontext TabVoice = "'+ instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A';
                                 }
                             }
                         }
