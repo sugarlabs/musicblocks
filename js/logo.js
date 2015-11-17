@@ -1534,10 +1534,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                     // Close the SCORE sections.
                     logo.lilypondOutput += '      >>%0A%25}%0A';
-                    logo.lilypondOutput += '%0A   >>%0A   %5Clayout {}%0A}%0A%0A';
+                    logo.lilypondOutput += '%0A   >>%0A   %5Clayout {}%0A%0A';
 
                     // Add MIDI OUTPUT in comments.
-                    logo.lilypondOutput += '%25 MIDI SECTION%0A%25 Delete the %25{ and %25} below to include MIDI output.%0A%25{%0A%5Cmidi {%0A   %5Ctempo 4=90%0A}%0A%25}%0A%0A';
+                    logo.lilypondOutput += '%25 MIDI SECTION%0A%25 Delete the %25{ and %25} below to include MIDI output.%0A%25{%0A%5Cmidi {%0A   %5Ctempo 4=90%0A}%0A%25}%0A%0A}%0A%0A';
 
                     // ADD TURTLE BLOCKS CODE HERE
                     logo.lilypondOutput += '%25 MUSIC BLOCKS CODE%0A';
