@@ -391,19 +391,19 @@ function Block(protoblock, blocks, overrideName) {
                 // Hide it to start
                 myBlock.highlightBitmap.visible = false;
 
-                // At me point, it should be safe to calculate the
+                // At this point, it should be safe to calculate the
                 // bounds of the container and cache its contents.
                 if (!firstTime) {
                     myBlock.container.uncache();
                 }
 
-                // ???
-                try {
                 myBlock.bounds = myBlock.container.getBounds();
-                myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
-                } catch (e) {
-                    console.log(e + ' ' + myBlock.name);
-		}
+                if (myBlock.bounds == null) {
+		    // FIXME: Why is this happening sometimes? Race condition?
+		    console.log('block container for ' + + ' not yet ready.' + myBlock.name);
+		} else {
+		    myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
+                }
 
                 myBlock.blocks.refreshCanvas();
 
@@ -419,9 +419,9 @@ function Block(protoblock, blocks, overrideName) {
                     }
 
                     // Adjust the docks.
-                    // myBlock.blocks.loopCounter = 0;
-                    // console.log('adjust Docks');
-                    // myBlock.blocks.adjustDocks(thisBlock);
+                    myBlock.blocks.loopCounter = 0;
+                    // console.log('adjust Docks ' + myBlock.name);
+                    myBlock.blocks.adjustDocks(thisBlock);
 
                     // Adjust the text position.
                     positionText(myBlock, myBlock.protoblock.scale);
@@ -1327,7 +1327,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
             // the move (workaround for issue #38 -- Blocks fly
             // apart). Still need to get to the root cause.
             myBlock.blocks.loopCounter = 0;
-        console.log('adjust Docks');
+            // console.log('adjust Docks ' + myBlock.name);
             myBlock.blocks.adjustDocks(myBlock.blocks.blockList.indexOf(myBlock));
         }
     } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(myBlock.name) != -1) {
