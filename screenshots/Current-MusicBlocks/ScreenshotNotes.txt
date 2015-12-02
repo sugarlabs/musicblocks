@@ -1,3 +1,3 @@
-Screenshot - 08262015 - 03:30:13 PM Notation works--we just do not have bar lines yet
-Screenshot - 08242015 - 09:24:09 PM We now show the octave number in MusicBlocks which is GREAT
-Note that the octave 5 shows beneath the 4 because I told it to...
+Screenshot - 11202015 - 08:11:22 PM Nice Picture of Music Blocks and Frere Jacques.png
+
+This is a screenshot of Frere Jacques for Music Blocks. The file from where this screenshot was generated is in the samples folder.
