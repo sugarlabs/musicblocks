@@ -75,6 +75,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.doBlocks = {};
 
     this.time = 0;
+    this.firstNoteTime = null;
     this.waitTimes = {};
     this.turtleDelay = 0;
     this.sounds = [];
@@ -417,6 +418,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // We run the Logo commands here.
         var d = new Date();
         this.time = d.getTime();
+	this.firstNoteTime = null;
 
         // Ensure we have at least one turtle.
         if (this.turtles.turtleList.length == 0) {
@@ -1859,7 +1861,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         tsd *= 10;
 
                     }
-                    if (flagD && args[0][i] != '/')
+                   if (flagD && args[0][i] != '/')
                     {
                         tsn += parseInt(args[0][i]);
                         tsn *= 10;
@@ -1926,8 +1928,16 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.inMatrix) {
                         logo.processNote(noteBeatValue, turtle);
                     } else {
+                        // We start the music clock as the first note
+                        // is being played.
+                        if (logo.firstNoteTime == null) {
+                            var d = new Date();
+                            logo.firstNoteTime = d.getTime();
+                        }
+                        // Calculate a lag: In case this turtle has
+                        // fallen behind, we need to catch up.
                         var d = new Date();
-                        var elapsedTime = (d.getTime() - logo.time) / 1000;
+                        var elapsedTime = (d.getTime() - logo.firstNoteTime) / 1000; // (d.getTime() - logo.time) / 1000;
                         var turtleLag = elapsedTime - logo.turtleTime[turtle];
                         // console.log(turtleLag);
 
