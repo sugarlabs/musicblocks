@@ -228,8 +228,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             }
         }
         if (keepGoing) {
-            // this.stepNote();
-            this.step();
+            this.stepNote();
+            // this.step();
         } else {
             for (turtle in this.playedNote) {
                 this.playedNote[turtle] = false;
@@ -418,7 +418,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // We run the Logo commands here.
         var d = new Date();
         this.time = d.getTime();
-	this.firstNoteTime = null;
+	      this.firstNoteTime = null;
 
         // Ensure we have at least one turtle.
         if (this.turtles.turtleList.length == 0) {
@@ -2409,7 +2409,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             var cleanSignals = [];
             var cleanLoops = [];
             var cleanActions = [];
-            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) { 
+            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
                 if (logo.endOfFlowSignals[turtle][blk][i] != null) {
                     cleanSignals.push(logo.endOfFlowSignals[turtle][blk][i]);
                     cleanLoops.push(logo.endOfFlowLoops[turtle][blk][i]);
