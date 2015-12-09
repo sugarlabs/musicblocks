@@ -115,6 +115,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.turtleTime = [];
     this.noteDelay = 0;
     this.playedNote = {};
+    this.playedNoteTimes = {};
     this.pushedNote = {};
     this.duplicateFactor = {};
     this.polyVolume = {};
@@ -180,7 +181,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     this.step = function() {
         // Take one step for each turtle in excuting Logo commands.
-        for (turtle in this.stepQueue) {
+        console.log(JSON.stringify(this.stepQueue));
+        for (var turtle in this.stepQueue) {
             if (this.stepQueue[turtle].length > 0) {
                 if (turtle in this.unhighlightStepQueue && this.unhighlightStepQueue[turtle] != null) {
                     this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
@@ -197,44 +199,79 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.stepNote = function() {
         // Step through one note for each turtle in excuting Logo
         // commands, but run through other blocks at full speed.
-        for (turtle in this.stepQueue) {
-            // Have we already played a note for this turtle?
-            if (turtle in this.playedNote && this.playedNote[turtle]) {
-                continue;
-            }
-            if (this.stepQueue[turtle].length > 0) {
-                if (turtle in this.unhighlightStepQueue && this.unhighlightStepQueue[turtle] != null) {
-                    this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
-                    this.unhighlightStepQueue[turtle] = null;
+        console.log(this);
+    //    console.log(JSON.stringify(this.stepQueue));
+        console.log(JSON.stringify(this.playedNote));
+        var tempStepQueue = {};
+        var notesFinish = {};
+        var logo = this;
+        stepNote();
+
+        function stepNote() {
+          console.log(JSON.stringify(logo.stepQueue));
+            for (var turtle in logo.stepQueue) {
+                // Have we already played a note for this turtle?
+                if (turtle in logo.playedNote && logo.playedNote[turtle]) {
+                    continue;
                 }
-                var blk = this.stepQueue[turtle].pop();
-                if (blk != null) {
-                    if (this.blocks.blockList[blk].name == 'note') {
-                        this.playedNote[turtle] = true;
+                if (logo.stepQueue[turtle].length > 0) {
+                    if (turtle in logo.unhighlightStepQueue && logo.unhighlightStepQueue[turtle] != null) {
+                        logo.blocks.unhighlight(logo.unhighlightStepQueue[turtle]);
+                        logo.unhighlightStepQueue[turtle] = null;
                     }
-                    this.runFromBlockNow(this, turtle, blk, 0, null);
-                } else {
-                    this.playedNote[turtle] = true;
+                    var blk = logo.stepQueue[turtle].pop();
+                    console.log(turtle);
+                    console.log(blk);
+                    console.log(notesFinish);
+                    if (blk != null && blk != notesFinish[turtle]) {
+                      var block = logo.blocks.blockList[blk];
+                      console.log(block.name);
+                        if (block.name == 'note') {
+                          tempStepQueue[turtle] = blk;
+                          console.log(block.connections);
+                          notesFinish[turtle] = block.connections[block.connections.length - 1];
+                          console.log(logo.parseArg(logo, turtle, block.connections[1], blk, null));
+                            // logo.playedNote[turtle] = true;
+                            logo.playedNoteTimes[turtle] = logo.playedNoteTimes[turtle] || 0;
+                            logo.playedNoteTimes[turtle] += Math.pow(logo.parseArg(logo, turtle, block.connections[1], blk, null), -1);
+                            // Keep track of how long the note played for, so we can go back and play it again if needed
+                        }
+                        logo.runFromBlockNow(logo, turtle, blk, 0, null);
+                    } else {
+                        logo.playedNote[turtle] = true;
+                    }
                 }
             }
-        }
-        // At this point, some turtles have played notes and others
-        // have not. We need to keep stepping until they all have.
-        var keepGoing = false;
-        for (turtle in this.stepQueue) {
-            if (this.stepQueue[turtle].length > 0 && !this.playedNote[turtle]) {
-                keepGoing = true;
-                break;
+            // At this point, some turtles have played notes and others
+            // have not. We need to keep stepping until they all have.
+            var keepGoing = false;
+            for (turtle in logo.stepQueue) {
+                if (logo.stepQueue[turtle].length > 0 && !logo.playedNote[turtle]) {
+                    keepGoing = true;
+                    break;
+                }
             }
-        }
-        if (keepGoing) {
-            // this.stepNote();
-            this.step();
-        } else {
-            for (turtle in this.playedNote) {
-                this.playedNote[turtle] = false;
+            if (keepGoing) {
+                stepNote();
+                // logo.step();
+            } else {
+                var shortestNote = [];
+                for (turtle in logo.playedNote) {
+                    logo.playedNote[turtle] = false;
+                    shortestNote.push(logo.playedNoteTimes[turtle]);
+                }
+                // If some notes are supposed to play for longer, add them back to the queue
+                shortestNote = Math.min.apply(null, shortestNote);
+                console.log(shortestNote);
+                console.log(logo.playedNoteTimes);
+                console.log(tempStepQueue);
+                for (turtle in logo.playedNoteTimes) {
+                    if (logo.playedNoteTimes[turtle] > shortestNote) {
+                        logo.stepQueue[turtle].push(tempStepQueue[turtle]);
+                    }
+                }
             }
-        }
+          }
     }
 
     this.doStopTurtle = function() {
@@ -418,7 +455,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // We run the Logo commands here.
         var d = new Date();
         this.time = d.getTime();
-	this.firstNoteTime = null;
+	      this.firstNoteTime = null;
 
         // Ensure we have at least one turtle.
         if (this.turtles.turtleList.length == 0) {
@@ -2409,7 +2446,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             var cleanSignals = [];
             var cleanLoops = [];
             var cleanActions = [];
-            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) { 
+            for (var i = 0; i < logo.endOfFlowSignals[turtle][blk].length; i++) {
                 if (logo.endOfFlowSignals[turtle][blk][i] != null) {
                     cleanSignals.push(logo.endOfFlowSignals[turtle][blk][i]);
                     cleanLoops.push(logo.endOfFlowLoops[turtle][blk][i]);

@@ -359,6 +359,8 @@ console.log(txt);
                     logo.runLogoCommands();
                 }
                 logo.stepNote();
+                // It goes up to, but not including, the first note block, so call stepNote() again
+              //  logo.stepNote();
             } else {
                 logo.setTurtleDelay(TURTLESTEP);
                 logo.stepNote();
@@ -1676,7 +1678,7 @@ console.log(txt);
                     var topBlock = logo.blocks.findTopBlock(thisBlock);
                     console.log('Playing through Play Button');
                     logo.runLogoCommands(topBlock);
-                } 
+                }
             }
         }
 
@@ -1727,7 +1729,7 @@ console.log(txt);
                 ['slow', doSlowButton],
                 ['step', doStepButton],
                 ['slow-music', doSlowMusicButton],
-                // ['step-music', doStepMusicButton],
+                ['step-music', doStepMusicButton],
                 ['stop-turtle', doStopButton],
                 ['clear', allClear],
                 ['palette', changePaletteVisibility],
