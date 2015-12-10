@@ -359,8 +359,6 @@ console.log(txt);
                     logo.runLogoCommands();
                 }
                 logo.stepNote();
-                // It goes up to, but not including, the first note block, so call stepNote() again
-              //  logo.stepNote();
             } else {
                 logo.setTurtleDelay(TURTLESTEP);
                 logo.stepNote();

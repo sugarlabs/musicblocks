@@ -199,16 +199,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.stepNote = function() {
         // Step through one note for each turtle in excuting Logo
         // commands, but run through other blocks at full speed.
-        console.log(this);
-    //    console.log(JSON.stringify(this.stepQueue));
-        console.log(JSON.stringify(this.playedNote));
         var tempStepQueue = {};
         var notesFinish = {};
         var logo = this;
         stepNote();
 
         function stepNote() {
-          console.log(JSON.stringify(logo.stepQueue));
             for (var turtle in logo.stepQueue) {
                 // Have we already played a note for this turtle?
                 if (turtle in logo.playedNote && logo.playedNote[turtle]) {
@@ -220,17 +216,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         logo.unhighlightStepQueue[turtle] = null;
                     }
                     var blk = logo.stepQueue[turtle].pop();
-                    console.log(turtle);
-                    console.log(blk);
-                    console.log(notesFinish);
                     if (blk != null && blk != notesFinish[turtle]) {
                       var block = logo.blocks.blockList[blk];
-                      console.log(block.name);
                         if (block.name == 'note') {
                           tempStepQueue[turtle] = blk;
-                          console.log(block.connections);
-                          notesFinish[turtle] = block.connections[block.connections.length - 1];
-                          console.log(logo.parseArg(logo, turtle, block.connections[1], blk, null));
+                          notesFinish[turtle] = last(block.connections);
                             // logo.playedNote[turtle] = true;
                             logo.playedNoteTimes[turtle] = logo.playedNoteTimes[turtle] || 0;
                             logo.playedNoteTimes[turtle] += Math.pow(logo.parseArg(logo, turtle, block.connections[1], blk, null), -1);
@@ -262,13 +252,16 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 // If some notes are supposed to play for longer, add them back to the queue
                 shortestNote = Math.min.apply(null, shortestNote);
-                console.log(shortestNote);
-                console.log(logo.playedNoteTimes);
-                console.log(tempStepQueue);
+                console.log('shortestNote', shortestNote);
+                console.log('playedNoteTimes', logo.playedNoteTimes);
+                var continueFrom;
                 for (turtle in logo.playedNoteTimes) {
                     if (logo.playedNoteTimes[turtle] > shortestNote) {
-                        logo.stepQueue[turtle].push(tempStepQueue[turtle]);
+                        continueFrom = tempStepQueue[turtle];
+                    } else {
+                        continueFrom = notesFinish[turtle];
                     }
+                    logo.runFromBlock(logo, turtle, continueFrom, 0, null);
                 }
             }
           }
