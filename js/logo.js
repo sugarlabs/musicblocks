@@ -201,6 +201,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // commands, but run through other blocks at full speed.
         var tempStepQueue = {};
         var notesFinish = {};
+        var thisNote = {};
         var logo = this;
         stepNote();
 
@@ -221,9 +222,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         if (block.name == 'note') {
                           tempStepQueue[turtle] = blk;
                           notesFinish[turtle] = last(block.connections);
+                          if (notesFinish[turtle] == null) { // end of flow
+                              notesFinish[turtle] = last(logo.turtles.turtleList[turtle].queue).blk;
+                          }
                             // logo.playedNote[turtle] = true;
                             logo.playedNoteTimes[turtle] = logo.playedNoteTimes[turtle] || 0;
-                            logo.playedNoteTimes[turtle] += Math.pow(logo.parseArg(logo, turtle, block.connections[1], blk, null), -1);
+                            thisNote[turtle] = Math.pow(logo.parseArg(logo, turtle, block.connections[1], blk, null), -1);
+                            logo.playedNoteTimes[turtle] += thisNote[turtle];
                             // Keep track of how long the note played for, so we can go back and play it again if needed
                         }
                         logo.runFromBlockNow(logo, turtle, blk, 0, null);
@@ -252,12 +257,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 // If some notes are supposed to play for longer, add them back to the queue
                 shortestNote = Math.min.apply(null, shortestNote);
-                console.log('shortestNote', shortestNote);
-                console.log('playedNoteTimes', logo.playedNoteTimes);
                 var continueFrom;
                 for (turtle in logo.playedNoteTimes) {
                     if (logo.playedNoteTimes[turtle] > shortestNote) {
                         continueFrom = tempStepQueue[turtle];
+                        // Subtract the time, as if we haven't played it yet
+                        logo.playedNoteTimes[turtle] -= thisNote[turtle];
                     } else {
                         continueFrom = notesFinish[turtle];
                     }
