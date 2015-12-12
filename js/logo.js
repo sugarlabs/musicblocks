@@ -223,7 +223,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                           tempStepQueue[turtle] = blk;
                           notesFinish[turtle] = last(block.connections);
                           if (notesFinish[turtle] == null) { // end of flow
-                              notesFinish[turtle] = last(logo.turtles.turtleList[turtle].queue).blk;
+                              notesFinish[turtle] = last(logo.turtles.turtleList[turtle].queue) && last(logo.turtles.turtleList[turtle].queue).blk;
+                              // catch case of null - end of project
                           }
                             // logo.playedNote[turtle] = true;
                             logo.playedNoteTimes[turtle] = logo.playedNoteTimes[turtle] || 0;
@@ -250,13 +251,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 stepNote();
                 // logo.step();
             } else {
-                var shortestNote = [];
+                var notesArray = [];
                 for (turtle in logo.playedNote) {
                     logo.playedNote[turtle] = false;
-                    shortestNote.push(logo.playedNoteTimes[turtle]);
+                    notesArray.push(logo.playedNoteTimes[turtle]);
                 }
                 // If some notes are supposed to play for longer, add them back to the queue
-                shortestNote = Math.min.apply(null, shortestNote);
+                var shortestNote = Math.min.apply(null, notesArray);
                 var continueFrom;
                 for (turtle in logo.playedNoteTimes) {
                     if (logo.playedNoteTimes[turtle] > shortestNote) {
@@ -267,6 +268,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         continueFrom = notesFinish[turtle];
                     }
                     logo.runFromBlock(logo, turtle, continueFrom, 0, null);
+                }
+                if (shortestNote == Math.max.apply(null, notesArray)) {
+                    logo.playedNoteTimes = {};
                 }
             }
           }
