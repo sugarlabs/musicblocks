@@ -115,6 +115,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.turtleTime = [];
     this.noteDelay = 0;
     this.playedNote = {};
+    this.playedNoteTimes = {};
     this.pushedNote = {};
     this.duplicateFactor = {};
     this.polyVolume = {};
@@ -180,7 +181,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     this.step = function() {
         // Take one step for each turtle in excuting Logo commands.
-        for (turtle in this.stepQueue) {
+        for (var turtle in this.stepQueue) {
             if (this.stepQueue[turtle].length > 0) {
                 if (turtle in this.unhighlightStepQueue && this.unhighlightStepQueue[turtle] != null) {
                     this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
@@ -197,44 +198,81 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.stepNote = function() {
         // Step through one note for each turtle in excuting Logo
         // commands, but run through other blocks at full speed.
-        for (turtle in this.stepQueue) {
-            // Have we already played a note for this turtle?
-            if (turtle in this.playedNote && this.playedNote[turtle]) {
-                continue;
-            }
-            if (this.stepQueue[turtle].length > 0) {
-                if (turtle in this.unhighlightStepQueue && this.unhighlightStepQueue[turtle] != null) {
-                    this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
-                    this.unhighlightStepQueue[turtle] = null;
+        var tempStepQueue = {};
+        var notesFinish = {};
+        var thisNote = {};
+        var logo = this;
+        stepNote();
+
+        function stepNote() {
+            for (var turtle in logo.stepQueue) {
+                // Have we already played a note for this turtle?
+                if (turtle in logo.playedNote && logo.playedNote[turtle]) {
+                    continue;
                 }
-                var blk = this.stepQueue[turtle].pop();
-                if (blk != null) {
-                    if (this.blocks.blockList[blk].name == 'note') {
-                        this.playedNote[turtle] = true;
+                if (logo.stepQueue[turtle].length > 0) {
+                    if (turtle in logo.unhighlightStepQueue && logo.unhighlightStepQueue[turtle] != null) {
+                        logo.blocks.unhighlight(logo.unhighlightStepQueue[turtle]);
+                        logo.unhighlightStepQueue[turtle] = null;
                     }
-                    this.runFromBlockNow(this, turtle, blk, 0, null);
-                } else {
-                    this.playedNote[turtle] = true;
+                    var blk = logo.stepQueue[turtle].pop();
+                    if (blk != null && blk != notesFinish[turtle]) {
+                      var block = logo.blocks.blockList[blk];
+                        if (block.name == 'note') {
+                          tempStepQueue[turtle] = blk;
+                          notesFinish[turtle] = last(block.connections);
+                          if (notesFinish[turtle] == null) { // end of flow
+                              notesFinish[turtle] = last(logo.turtles.turtleList[turtle].queue) && last(logo.turtles.turtleList[turtle].queue).blk;
+                              // catch case of null - end of project
+                          }
+                            // logo.playedNote[turtle] = true;
+                            logo.playedNoteTimes[turtle] = logo.playedNoteTimes[turtle] || 0;
+                            thisNote[turtle] = Math.pow(logo.parseArg(logo, turtle, block.connections[1], blk, null), -1);
+                            logo.playedNoteTimes[turtle] += thisNote[turtle];
+                            // Keep track of how long the note played for, so we can go back and play it again if needed
+                        }
+                        logo.runFromBlockNow(logo, turtle, blk, 0, null);
+                    } else {
+                        logo.playedNote[turtle] = true;
+                    }
                 }
             }
-        }
-        // At this point, some turtles have played notes and others
-        // have not. We need to keep stepping until they all have.
-        var keepGoing = false;
-        for (turtle in this.stepQueue) {
-            if (this.stepQueue[turtle].length > 0 && !this.playedNote[turtle]) {
-                keepGoing = true;
-                break;
+            // At this point, some turtles have played notes and others
+            // have not. We need to keep stepping until they all have.
+            var keepGoing = false;
+            for (turtle in logo.stepQueue) {
+                if (logo.stepQueue[turtle].length > 0 && !logo.playedNote[turtle]) {
+                    keepGoing = true;
+                    break;
+                }
             }
-        }
-        if (keepGoing) {
-            this.stepNote();
-            // this.step();
-        } else {
-            for (turtle in this.playedNote) {
-                this.playedNote[turtle] = false;
+            if (keepGoing) {
+                stepNote();
+                // logo.step();
+            } else {
+                var notesArray = [];
+                for (turtle in logo.playedNote) {
+                    logo.playedNote[turtle] = false;
+                    notesArray.push(logo.playedNoteTimes[turtle]);
+                }
+                // If some notes are supposed to play for longer, add them back to the queue
+                var shortestNote = Math.min.apply(null, notesArray);
+                var continueFrom;
+                for (turtle in logo.playedNoteTimes) {
+                    if (logo.playedNoteTimes[turtle] > shortestNote) {
+                        continueFrom = tempStepQueue[turtle];
+                        // Subtract the time, as if we haven't played it yet
+                        logo.playedNoteTimes[turtle] -= thisNote[turtle];
+                    } else {
+                        continueFrom = notesFinish[turtle];
+                    }
+                    logo.runFromBlock(logo, turtle, continueFrom, 0, null);
+                }
+                if (shortestNote == Math.max.apply(null, notesArray)) {
+                    logo.playedNoteTimes = {};
+                }
             }
-        }
+          }
     }
 
     this.doStopTurtle = function() {
