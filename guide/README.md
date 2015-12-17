@@ -299,6 +299,10 @@ decreases and the pen color increases.
 
 The output of the program after running five times.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.png'</img>
+
+In this example, the graphics are synchronized to the music.
+
 5. Extras
 ---------
 
