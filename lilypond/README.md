@@ -35,17 +35,28 @@ sudo ./lilypond-2.16.2-1.linux-64.sh
 Download the `.exe` file and run it to launch the installation process.
 
 ###Installation for Mac OS
-[Read Mac OS Installation on the Lilypond webpage](http://www.lilypond.org/macos-x.html)
-
+1. Open the `.tar.bz2` file once it gets downloaded.
+ <img src="\images\ly_mac_1.png"></img>
+2. Clicking it will, open the `Archive Utility` and extract it's contents.
+ <img src="\images\ly_mac_2.png"></img>
+3. After they have been extracted, you will see a `LilyPond application` file in the directory that pops up.
+4. Drag and drop this file to the `Applications` on the left pane.
+ <img src="\images\ly_mac_3.png"></img>
+5. This will now enable you to see the "LilyPond" in your applications, i.e. It will get installed and you can drag and drop it from there to your dock, in order to have a shortcut for `LilyPond` in the dock.
+6. You can double-click it to run the program.
+ <img src="\images\ly_mac_4.png"></img>
+7. Alternatively, run it from a [terminal](http://guides.macrumors.com/Terminal) with the command `open -a LilyPond`.
+ <img src="\images\ly_mac_5.png"></img>
 
 ##Generating LilyPond files from Music Blocks
-<img src='https://wiki.sugarlabs.org/images/0/0d/Save_as_lilypond.svg'></img>
+<img src='https://rawgit.com/Daksh/guides/master/lywithmb//images/save_as_ly_bt.svg'</img>
+
 *save as lilypond block*
 
 As you play music in Music Blocks, the notes you play are stored in a cache. The `save as lilypond` block is used to transcribe the notes in the cache into a `.ly` file.
 
 **Note**: Use the <img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg' height="36"</img> (Erase button)  to clear the cache before you run your project to ensure you only get the notes from that project.
+src="https://rawgit.com/Daksh/guides/master/lywithmb//images/eraser_bt.svg" height="36"</img> (Erase button)  to clear the cache before you run your project to ensure you only get the notes from that project.
 
 ###Microphone Analogy
 You can imagine this feature as a microphone. It starts recording as soon as you start the activity. So each time that you play a sound, it gets recorded in memory. When you run the `save as lilypond` button, a copy of all what it has recorded up until in the specified file.
@@ -78,7 +89,7 @@ Mi Fa
 ```
 
 **Hint:** Everytime the save button gets pressed, the `.ly` file gets downloaded
-![MusicBlocks](https://wiki.sugarlabs.org/images/f/f0/Save_to_ly_MusicBlocks.png)
+<img src="\images\ly_from_mb_download.png"></img>
 
 
 ##Using LilyPond
@@ -93,9 +104,9 @@ Mi Fa
 ###For Windows
 1. Copy the generated `filename.ly` file to desktop.
 2. Drag and drop this file on the LilyPond shortcut.
-![Drag](https://wiki.sugarlabs.org/images/9/9c/LilyPondWindows3.png)
+<img src="\images\ly_windows_1.png"></img>
 3. The `.pdf` and logs are created and can be found on the desktop.
-![PDF and logs](https://wiki.sugarlabs.org/images/4/49/LilyPondWindows2.png)
+<img src="\images\ly_windows_2.png"></img>
 
 ###For Mac OS X
 #####Compile (with LilyPad)
@@ -104,19 +115,19 @@ Mi Fa
 2. Close the example file which it opens.
 3. Use `File > Open` to open your `.ly` file:
 
-   <img src="https://wiki.sugarlabs.org/images/7/73/Lilypond_mac_8.png"></img>
+   <img src="\images\ly_use_mac_1.png"></img>
 4. From the menu along the top left of your screen, select `Compile > Typeset`
 
-   <img src="https://wiki.sugarlabs.org/images/0/06/Lilypond_mac_4.png"></img>
+   <img src="\images\ly_use_mac_2.png"></img>
 
 5. A new window will open showing a progress log of the compilation of the file you have just saved.
 
-   <img src="https://wiki.sugarlabs.org/images/8/83/Lilypond_mac_5.png"></img>
+   <img src="\images\ly_use_mac_3.png"></img>
 
 #####View output
 Once the compilation has finished, a `.pdf` file will be created with the same name as the original file. This file will be automatically opened in the default PDF viewer and displayed on your screen.
 
-   <img src="https://wiki.sugarlabs.org/images/a/ab/Lilypond_mac_6.png"></img>
+   <img src="\images\ly_use_mac_4.png"></img>
 
 If the `.pdf` file is not displayed check the window with the progress log for any errors.
 
@@ -141,10 +152,34 @@ Optionally, you can install `frescobaldi` a Graphical User Interface [(GUI)](htt
 3. Once you open the newly installed software, you can just drag and drop your `.ly` file onto it, to start editing.
 
 ###For Mac OS X
-1. Download the [DMG disk images](https://github.com/wbsoft/frescobaldi/releases)
-2. These contain an application bundle that you can drag and drop in your Applications folder.
-3. 64 bit and 32 bit versions are provided (the "Frescobaldi-2.x.x-x86_64.dmg" and "Frescobaldi-2.x.x-i386.dmg" files, respectively).
-4. As an alternative you can install via [Homebrew or MacPorts](https://github.com/wbsoft/frescobaldi/wiki/How-to-install-Frescobaldi-on-Mac-OS-X)
+1. Download the [DMG disk images](https://github.com/wbsoft/frescobaldi/releases).
+ (64 bit and 32 bit versions are provided (the "Frescobaldi-2.x.x-x86_64.dmg" and "Frescobaldi-2.x.x-i386.dmg" files, respectively)
+2. Click to open the downloaded `.dmg` file.
+ <img src="\images\frescobaldi_mac_1.png"></img>
+3. This will open up a pop up in which you can see the `Applications` shortcut and the Frescobaldi logo, drag the logo onto the Applications shortcut.
+ <img src="\images\frescobaldi_mac_2.png"></img>
+4. Doing that will take you to the `Applications` folder and you can drop it there.
+ <img src="\images\frescobaldi_mac_3.png"></img>
+
+####Alternative install via Homebrew or MacPorts
+1. If you have not already installed [Homebrew](http://brew.sh/) or [MacPorts](https://www.macports.org/), choose one of them and install.
+2. You should have [LilyPond](#installation-for-mac-os) installed.
+3. To install Frescobaldi, open a [Terminal](http://guides.macrumors.com/Terminal) and enter the command for the package manager you installed:
+    1. Homebrew: `brew install frescobaldi --without-lilypond` (if you omit `--without-lilypond`, Homebrew will install also a copy of LilyPond, but this is not recommended).
+    2. MacPorts: `sudo port install frescobaldi`
+    3. After the installation, Frescobaldi’s launcher script will be in your `$PATH`, so you’ll be able to launch Frescobaldi by entering `frescobaldi` in a Terminal.
+ 
+#####Application bundle
+The installation process generates also the application bundle Frescobaldi.app, that can be used to launch Frescobaldi.
+* Homebrew: you’ll see a couple of commands at the end of the installation process, that you can copy and paste in order to link the application bundle into your `~/Applications` or `/Applications` directory.
+* MacPorts: you can find the application bundle inside the `/Applications/MacPorts` directory.
+
+If you don’t want the application bundle, you should install with the command:
+* Homebrew: `brew install frescobaldi --without-lilypond --without-launcher`
+* MacPorts: `sudo port install frescobaldi -app`
+
+####LilyPond and Frescobaldi
+If you installed LilyPond in the usual location, i.e. you copied the application bundle `LilyPond.app` into the `/Applications` directory, Frescobaldi should automatically recognize it and you should be able to compile your LilyPond source files right away. If for some reasons this doesn’t happen, you need to point Frescobaldi to the correct location: go to “LilyPond Preferences” in Frescobaldi’s preferences, click “Add…” and either click the directory icon and select LilyPond’s application bundle or directly insert its path (the typical value is `/Applications/LilyPond.app`).
 
 ###How Frescobaldi and Lilypond work together
 [Frescobaldi](http://frescobaldi.org/uguide.html) is a lightweight, yet powerful, music and text editor with many features added and enhanced particularly for LilyPond. Major features include point-and-click links between the code and music views, detailed score wizards, built in LilyPond documentation browser, syntax highlighting and automatic completion. Frescobaldi is written in [Python](https://wiki.python.org/moin/), with [PyQt4](https://wiki.python.org/moin/PyQt4) for its user interface. It acts as a front-end for the Lilypond software, as it helps in editing the input file given to be processed and helps to check the output `pdf` simultaneously. The conversion at the back of Frescobaldi, is done with LilyPond itself.
@@ -176,7 +211,7 @@ More customization details are found in the .ly file. Further references include
 * [Lilypond output in a web browser](https://www.tunefl.com/)
 
 ##Example: Making a `.ly` file from Music Blocks and Output
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg'</img>
+<img src='https://rawgit.com/Daksh/guides/master/lywithmb//images/example.svg'</img>
 
 The `save as lilypond` block will transcribe your composition. The
 output of the program above is saved to `~/Downloads/hotdog.ly.`
@@ -201,7 +236,7 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 }
 ```
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/hotdog.png'</img>
+<img src='\images\sheetmusic.png'</img>
 
 ##Example: Blank `.ly` file
 ```
