@@ -42,6 +42,9 @@ var MATRIXNOTECELLCOLOR = '#b1db00';
 var MATRIXTUPLETCELLCOLOR = '#57e751';
 var MATRIXRHYTHMCELLCOLOR = '#c8c8c8';
 
+var MATRIXBUTTONCOLORHOVER = '#c894e0';
+var MATRIXNOTECELLCOLORHOVER = '#c2e820';
+
 function Matrix() {
     this.arr = [];
     this.secondsPerBeat = 1;
@@ -140,6 +143,12 @@ function Matrix() {
         cell.onclick=function() {
             logo.playMatrix();
         }
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
 
         var cell = row.insertCell(2);
         cell.innerHTML = '<img src="header-icons/download.svg" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">';
@@ -147,6 +156,12 @@ function Matrix() {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             logo.saveMatrix();
+        }
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
         var cell = row.insertCell(3);
@@ -156,6 +171,12 @@ function Matrix() {
         cell.onclick=function() {
             logo.clearMatrix();
         }
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
 
         var cell = row.insertCell(4);
         cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">';
@@ -164,6 +185,12 @@ function Matrix() {
         cell.onclick=function() {
             document.getElementById('matrix').style.visibility = 'hidden';
             document.getElementById('matrix').style.border = 0;
+        }
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
         for (var i = 0; i < this.solfegeNotes.length; i++) {
@@ -247,6 +274,16 @@ function Matrix() {
                 cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                cell.onmouseover=function() {
+                    if (this.style.backgroundColor != 'black'){
+                        this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    }
+                }
+                cell.onmouseout=function() {
+                    if (this.style.backgroundColor != 'black'){
+                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    }
+                }
             }
         }
 
@@ -417,6 +454,16 @@ function Matrix() {
                     cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                 } else {
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    cell.onmouseover=function() {
+                        if (this.style.backgroundColor != 'black'){
+                            this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        }
+                    }
+                    cell.onmouseout=function() {
+                        if (this.style.backgroundColor != 'black'){
+                            this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        }
+                    }
                 }
 
                 cell.setAttribute('id', table.rows[1].cells.length - 1);
