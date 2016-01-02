@@ -96,6 +96,22 @@
             }, 2000);
         });
     });
+
+    function moveMatrix(event) {
+        var matrixDiv = document.getElementById('matrix');
+        matrixDivPosition = matrixDiv.getBoundingClientRect();
+
+        var table = document.getElementById('myTable');
+        var row = table.rows.item(0);
+        row.style.left = matrixDivPosition.left + 'px';
+        row.style.top = matrixDivPosition.top + 'px';
+
+        for(i=0, row; row = table.rows[i]; i++) {
+            cell = row.cells[0];
+            cell.style.left = matrixDivPosition.left + 2 + 'px';
+            cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
+        }
+    }
     </script>
 
     <!-- see activity/activity-icon-color-loading.svg for info -->
@@ -141,7 +157,7 @@
 
   <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
 
-  <div id="matrix" overflow-x="auto">  
+  <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)" >
   </div>
   
   <canvas hidden id="music" width="700"></canvas>          

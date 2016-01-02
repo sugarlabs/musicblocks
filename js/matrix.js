@@ -114,11 +114,18 @@ function Matrix() {
         x.style.textAlign = 'center';
 
         var matrixDiv = document.getElementById('matrix');
+        matrixDiv.style.paddingTop = 40 * this.cellScale + 4 + 'px';
+        matrixDiv.style.paddingLeft = 35 * this.cellScale + 4 + 'px';
         matrixDiv.appendChild(x);
+        matrixDivPosition = matrixDiv.getBoundingClientRect();
 
         var table = document.getElementById('myTable');
         var header = table.createTHead();
         var row = header.insertRow(0);
+        row.style.position = "fixed";
+        row.style.left = matrixDivPosition.left+"px";
+        row.style.top = matrixDivPosition.top+"px";
+
         var cell = row.insertCell(-1);
         cell.style.fontSize = this.cellScale * 100 + '%';
         cell.innerHTML = '<b>' + _('Solfa') + '</b>';
@@ -163,7 +170,6 @@ function Matrix() {
             var row = header.insertRow(i+1);
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
-
             // process transpositions
             if (this.solfegeTranspositions[i] != 0) {
                 // When we apply a transposition to solfege, convert
@@ -176,13 +182,21 @@ function Matrix() {
             cell.style.fontSize = this.cellScale * 100 + '%';
             cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             cell.style.height = 30 * this.cellScale + 'px';
+            cell.style.position = "fixed";
+            cell.style.width = 40 + 'px';
+            cell.style.left = matrixDivPosition.left + 2 + 'px';
+            cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
         }
 
         var row = header.insertRow(this.solfegeNotes.length + 1);
         var cell = row.insertCell(0);
-	cell.style.fontSize = this.cellScale * 50 + '%';
+        cell.style.fontSize = this.cellScale * 50 + '%';
         cell.innerHTML = _('rhythmic note values');
+        cell.style.position = "fixed";
         cell.style.height = 40 * this.cellScale + 'px';
+        cell.style.width = 40 + 'px';
+        cell.style.left = matrixDivPosition.left + 2 + 'px';
+        cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
 
         this.chkArray = new Array();
@@ -339,7 +353,7 @@ function Matrix() {
                 var j = i - tupletCol;
                 console.log(i + ' ' + j + ' ' + param[1][j]);
                 var numerator = 32 / param[1][j];
-		cell.style.fontSize = this.cellScale * 100 + '%';
+                cell.style.fontSize = this.cellScale * 100 + '%';
                 cell.innerHTML = reducedFraction(numerator, totalNoteInterval / tupletTimeFactor);
             }
         }
@@ -392,9 +406,9 @@ function Matrix() {
             for (var i = 1; i <= rowCount; i++) {
                 var row = table.rows[i];
                 var cell = row.insertCell(-1);
-
+                cell.style.height = 30 * this.cellScale + 'px';
                 if (i == rowCount) {
-		    cell.style.fontSize = this.cellScale * 100 + '%';
+                    cell.style.fontSize = this.cellScale * 100 + '%';
                     cell.innerHTML = noteValueToDisplay;
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                 } else if (this.matrixHasTuplets && i > this.solfegeNotes.length) {
@@ -736,3 +750,4 @@ function reducedFraction(a, b) {
     var gcm = greatestCommonMultiple(a, b);
     return (a / gcm) + '/' + (b / gcm);
 }
+
