@@ -1381,8 +1381,11 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
 
     palette.protoContainers[blkname].on('mousedown', function(event) {
         var stage = palette.palettes.stage;
-        stage.setChildIndex(palette.protoContainers[blkname], stage.getNumChildren() - 1);
 
+        saveX = palette.protoContainers[blkname].x;
+        saveY = palette.protoContainers[blkname].y;
+
+        stage.setChildIndex(palette.protoContainers[blkname], stage.getNumChildren() - 1);
         var h = Math.min(maxPaletteHeight(palette.palettes.cellSize, palette.palettes.scale), palette.palettes.y);
         var clickY = event.stageY/palette.palettes.scale;
         var paletteEndY = palette.menuContainer.y + h + STANDARDBLOCKHEIGHT;
