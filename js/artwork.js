@@ -24,7 +24,7 @@ var COLLAPSEBUTTONYOFF = 9;
 
 // With default scaling, blocks are multiples of a standard height.
 var STANDARDBLOCKHEIGHT = 42;
-var DEFAULTBLOCKSCALE = 1.5;  // scale used in block factory
+var DEFAULTBLOCKSCALE = 1.5; // scale used in block factory
 
 // The default turtles are generated from the TURTLESVG template.
 var FILLCOLORS = ['#ed001d', '#a34600', '#fb5f00', '#466e00', '#00843c', '#008283', '#007ac9', '#005dff', '#b500e3', '#ec008a'];
@@ -54,7 +54,7 @@ var ACTIVECOLOR = '#212121';
 function showMaterialHighlight(x, y, r, event, scale, stage) {
     var circles = {
         highlight: new createjs.Shape(),
-        active:    new createjs.Shape()
+        active: new createjs.Shape()
     };
 
     circles.highlight.graphics.f(HIGHLIGHTCOLOR).drawCircle(0, 0, r);
@@ -65,15 +65,29 @@ function showMaterialHighlight(x, y, r, event, scale, stage) {
     circles.active.graphics.f(ACTIVECOLOR).drawCircle(0, 0, r);
     circles.active.alpha = 0;
 
-	stage.addChild(circles.highlight, circles.active);
-
-	createjs.Tween.get(circles.active)
-        // Why doesn't stageX/stageY deal with scale?
-		.to({scaleX: 0.3, scaleY: 0.3, x: event.rawX / scale, y: event.rawY / scale})
-		.to({scaleX: 1, scaleY: 1, x: x, y: y}, 650, createjs.Ease.circInOut);
+    stage.addChild(circles.highlight, circles.active);
 
     createjs.Tween.get(circles.active)
-        .to({alpha: 0.05}).to({alpha: 0.3}, 400);
+        // Why doesn't stageX/stageY deal with scale?
+        .to({
+            scaleX: 0.3,
+            scaleY: 0.3,
+            x: event.rawX / scale,
+            y: event.rawY / scale
+        })
+        .to({
+            scaleX: 1,
+            scaleY: 1,
+            x: x,
+            y: y
+        }, 650, createjs.Ease.circInOut);
+
+    createjs.Tween.get(circles.active)
+        .to({
+            alpha: 0.05
+        }).to({
+            alpha: 0.3
+        }, 400);
 
     return circles;
 }
@@ -84,8 +98,12 @@ function hideButtonHighlight(circles, stage) {
         return;
     }
 
-    createjs.Tween.get(circles.active).to({alpha: 0}, 400);
-    createjs.Tween.get(circles.highlight).to({alpha: 0}, 400);
+    createjs.Tween.get(circles.active).to({
+        alpha: 0
+    }, 400);
+    createjs.Tween.get(circles.highlight).to({
+        alpha: 0
+    }, 400);
     setTimeout(function() {
         stage.removeChild(circles.active, circles.highlight);
     }, 650);
@@ -117,8 +135,8 @@ var BORDER = '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120">'
 // hue, value, chroma
 var PALETTECOLORS = {
     'matrix': [37.5, 70, 50],
-    'notes' : [12.5, 60, 80],
-    'tone' : [57.5, 50, 28],
+    'notes': [12.5, 60, 80],
+    'tone': [57.5, 50, 28],
     'turtle': [37.5, 70, 50],
     'pen': [57.5, 50, 28],
     'boxes': [12.5, 60, 80],
@@ -130,21 +148,17 @@ var PALETTECOLORS = {
     'sensors': [7.5, 60, 80],
     'extras': [7.5, 50, 50],
     'myblocks': [57.5, 70, 14],
-    'heap': [17.5, 60, 70],    
+    'heap': [17.5, 60, 70],
 };
 
 // These colors are calculated at load time from the colors defined above.
-var PALETTEFILLCOLORS = {
-};
+var PALETTEFILLCOLORS = {};
 
-var PALETTESTROKECOLORS = {
-};
+var PALETTESTROKECOLORS = {};
 
-var PALETTEHIGHLIGHTCOLORS = {
-};
+var PALETTEHIGHLIGHTCOLORS = {};
 
-var HIGHLIGHTSTROKECOLORS = {
-};
+var HIGHLIGHTSTROKECOLORS = {};
 
 var UPICON = '<svg width="55" height="55" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55 55"><path d="M27.5,5C15.073,5,5,15.073,5,27.5C5,39.928,15.073,50,27.5,50S50,39.928,50,27.5 C50,15.073,39.927,5,27.5,5z M37.906,32.275c-0.626,0.624-1.447,0.939-2.271,0.939c-0.821,0-1.645-0.315-2.271-0.939l-5.84-5.833 l-5.657,5.802c-0.63,0.645-1.464,0.967-2.3,0.967c-0.808,0-1.62-0.305-2.246-0.914c-1.266-1.238-1.295-3.271-0.056-4.546 l7.929-8.126c0.002,0,0.002,0,0.003,0c0.01-0.011,0.015-0.021,0.022-0.028c0.116-0.115,0.245-0.208,0.371-0.302 c0.039-0.028,0.071-0.064,0.111-0.093c0.114-0.075,0.24-0.133,0.36-0.194c0.068-0.035,0.131-0.078,0.2-0.107 c0.1-0.039,0.203-0.064,0.306-0.093c0.099-0.032,0.191-0.068,0.292-0.09c0.083-0.018,0.169-0.018,0.251-0.028 c0.122-0.015,0.244-0.033,0.366-0.036c0.071,0,0.147,0.014,0.219,0.021c0.133,0.007,0.266,0.011,0.395,0.036 c0.075,0.014,0.146,0.043,0.223,0.064c0.123,0.035,0.251,0.061,0.373,0.111c0.082,0.032,0.161,0.082,0.243,0.121 c0.106,0.055,0.216,0.104,0.316,0.165c0.084,0.058,0.159,0.13,0.238,0.194c0.086,0.064,0.176,0.122,0.255,0.201 c0.005,0.003,0.009,0.011,0.013,0.014c0.007,0.004,0.011,0.008,0.014,0.011l8.142,8.13C39.162,28.981,39.166,31.014,37.906,32.275 z" fill="#000000"/></svg>';
 
@@ -187,9 +201,9 @@ var NOTESPALETTEICON = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <
 var TONEPALETTEICON = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1" width="55" height="55" viewBox="0 0 55 55" id="Layer_1" xml:space="preserve"><metadata id="metadata14"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs id="defs12" /><g transform="matrix(0.83337674,0,0,0.83337674,4.4102265,2.7730896)" id="preferences-system" style="fill:#ffffff;fill-opacity:1;display:block"><path d="m 51.103,50.895 c -2.343,2.343 -6.143,2.343 -8.485,0 L 19.813,28.091 c -2.343,-2.343 -2.343,-6.143 0,-8.485 l 0,0 c 2.343,-2.343 6.143,-2.343 8.485,0 L 51.102,42.41 c 2.343,2.342 2.343,6.142 0.001,8.485 l 0,0 z" id="path4" style="fill:#ffffff;fill-opacity:1" /><g id="g6" style="fill:#ffffff;fill-opacity:1"><g id="g8" style="fill:#ffffff;fill-opacity:1"><path d="m 17.813,2.254 c -0.804,0 -1.587,0.081 -2.358,0.2 L 26.012,13.012 13.22,25.804 2.662,15.246 c -0.119,0.771 -0.2,1.555 -0.2,2.36 0,8.479 6.873,15.352 15.351,15.352 8.478,0 15.351,-6.873 15.351,-15.352 0,-8.479 -6.873,-15.352 -15.351,-15.352 z" id="path10" style="fill:#ffffff;fill-opacity:1" /></g></g></g><text x="25.423845" y="55.311741" transform="scale(1.1549947,0.86580484)" id="text2995" xml:space="preserve" style="font-size:13.85287762px;font-style:normal;font-weight:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-opacity:1;font-family:Sans"><tspan x="25.423845" y="55.311741" id="tspan2997" style="font-size:24.24253464px;font-weight:bold;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-opacity:1;-inkscape-font-specification:Sans Bold">♫</tspan></text> </svg>';
 
 var PALETTEICONS = {
-    'matrix' : MATRIXPALETTEICON,
-    'notes' : NOTESPALETTEICON,
-    'tone' : TONEPALETTEICON,
+    'matrix': MATRIXPALETTEICON,
+    'notes': NOTESPALETTEICON,
+    'tone': TONEPALETTEICON,
     'turtle': TURTLEPALETTEICON,
     'pen': PENPALETTEICON,
     'number': NUMBERPALETTEICON,

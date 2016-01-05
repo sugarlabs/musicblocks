@@ -97,15 +97,15 @@ function searchColors(r, g, b) {
     var nearestColor = -1;
     var distance = 10000000;
     for (i = 0; i < 100; i++) {
-	var color = getcolor(i);
+        var color = getcolor(i);
         var r1 = parseInt(color[2].substr(1, 2), 16);
         var g1 = parseInt(color[2].substr(3, 2), 16);
         var b1 = parseInt(color[2].substr(5, 2), 16);
-	var distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
-	if (distSquared < distance) {
-	    distance = distSquared;
-	    nearestColor = i;
-	}
+        var distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
+        if (distSquared < distance) {
+            distance = distSquared;
+            nearestColor = i;
+        }
     }
     return nearestColor;
 }
@@ -639,4 +639,3 @@ MUNSELL = [
     "#e3e3e3", "#f2e2e5", "#ffdbe3", "#ffd4e1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1",
     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"
 ];
-

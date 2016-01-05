@@ -39,8 +39,8 @@ function ClearBox(canvas, stage, refreshCanvas, clear) {
 
             function processBackground(box, name, bitmap, extras) {
                 box.container.addChild(bitmap);
-		loadClearContainerHandler(box);
-		box.completeShow();
+                loadClearContainerHandler(box);
+                box.completeShow();
             }
             makeBoxBitmap(this, CONFIRMBOX.replace(/confirm/g, _('confirm')), 'box', processBackground, null);
         } else {
@@ -49,8 +49,8 @@ function ClearBox(canvas, stage, refreshCanvas, clear) {
     }
 
     this.completeShow = function() {
-	this.container.visible = true;
-	this.refreshCanvas();
+        this.container.visible = true;
+        this.refreshCanvas();
     }
 }
 
@@ -58,7 +58,7 @@ function ClearBox(canvas, stage, refreshCanvas, clear) {
 function loadClearContainerHandler(box) {
     var hitArea = new createjs.Shape();
     this.bounds = box.container.getBounds();
-    hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds. width, bounds.height);
+    hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
     hitArea.x = 0;
     hitArea.y = 0;
     box.container.hitArea = hitArea;
@@ -81,9 +81,9 @@ function loadClearContainerHandler(box) {
             console.log('closing box');
             box.hide();
         } else if (y > 55) {
-	    // Clear
-	    box.doClear(true);
-	    box.hide();
+            // Clear
+            box.doClear(true);
+            box.hide();
         }
     });
 }

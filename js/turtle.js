@@ -20,7 +20,7 @@ var DEFAULTFONT = 'sans-serif';
 var turtlePath = 'images/turtle.svg';
 var turtleBasePath = 'images/';
 
-function Turtle (name, turtles, drum) {
+function Turtle(name, turtles, drum) {
     this.name = name;
     this.turtles = turtles;
     this.drum = drum;
@@ -39,11 +39,11 @@ function Turtle (name, turtles, drum) {
     this.x = 0;
     this.y = 0;
     this.bitmap = null;
-    this.skinChanged = false;  // Should we reskin the turtle on clear?
+    this.skinChanged = false; // Should we reskin the turtle on clear?
 
     // Which start block is assocated with this turtle?
     this.startBlock = null;
-    this.decorationBitmap = null;  // Start block decoration.
+    this.decorationBitmap = null; // Start block decoration.
 
     // Queue of blocks this turtle is executing.
     this.queue = [];
@@ -67,7 +67,7 @@ function Turtle (name, turtles, drum) {
     this.hollowState = false;
     this.penState = true;
     this.font = DEFAULTFONT;
-    this.media = [];  // Media (text, images) we need to remove on clear.
+    this.media = []; // Media (text, images) we need to remove on clear.
 
     this.move = function(ox, oy, x, y, invert) {
         if (invert) {
@@ -212,11 +212,11 @@ function Turtle (name, turtles, drum) {
             } else {
                 this.startBlock.collapseText.text = this.name;
             }
-	    this.startBlock.regenerateArtwork(false);
+            this.startBlock.regenerateArtwork(false);
             this.startBlock.value = this.turtles.turtleList.indexOf(this);
         }
     }
-    
+
     this.arc = function(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
         if (invert) {
             cx = this.turtles.turtleX2screenX(cx);
@@ -478,7 +478,7 @@ function Turtle (name, turtles, drum) {
         ox = this.turtles.screenX2turtleX(this.container.x);
         oy = this.turtles.screenY2turtleY(this.container.y);
 
-        if( adeg < 0 ) {
+        if (adeg < 0) {
             var anticlockwise = true;
             adeg = -adeg;
             // center point for arc
@@ -786,9 +786,9 @@ function Turtles(canvas, stage, refreshCanvas) {
         var blkInfoAvailable = false;
 
         if (typeof(infoDict) == 'object') {
-          if (Object.keys(infoDict).length == 8) {
-            blkInfoAvailable = true;
-          }
+            if (Object.keys(infoDict).length == 8) {
+                blkInfoAvailable = true;
+            }
         }
 
         var i = this.turtleList.length;
@@ -851,15 +851,15 @@ function Turtles(canvas, stage, refreshCanvas) {
         }
 
         if (this.drum) {
-           var artwork = DRUMSVG;
+            var artwork = DRUMSVG;
         } else {
-           var artwork = TURTLESVG;
+            var artwork = TURTLESVG;
         }
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
-          makeTurtleBitmap(this, artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke), 'turtle', processTurtleBitmap, startBlock);
+            makeTurtleBitmap(this, artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke), 'turtle', processTurtleBitmap, startBlock);
         } else {
-          makeTurtleBitmap(this, artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', processTurtleBitmap, startBlock);
+            makeTurtleBitmap(this, artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', processTurtleBitmap, startBlock);
         }
 
         myTurtle.color = i * 10;
@@ -957,7 +957,7 @@ function Turtles(canvas, stage, refreshCanvas) {
 }
 
 // Queue entry for managing running blocks.
-function Queue (blk, count, parentBlk, args) {
+function Queue(blk, count, parentBlk, args) {
     this.blk = blk;
     this.count = count;
     this.parentBlk = parentBlk;
@@ -969,7 +969,7 @@ function makeTurtleBitmap(me, data, name, callback, extras) {
     // Async creation of bitmap from SVG data
     // Works with Chrome, Safari, Firefox (untested on IE)
     var img = new Image();
-    img.onload = function () {
+    img.onload = function() {
         complete = true;
         bitmap = new createjs.Bitmap(img);
         callback(me, name, bitmap, extras);

@@ -56,8 +56,8 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
 
             function processBackground(box, name, bitmap, extras) {
                 box.container.addChild(bitmap);
-		loadUtilityContainerHandler(box);
-		box.completeShow();
+                loadUtilityContainerHandler(box);
+                box.completeShow();
             }
             if (this.scrollStatus) {
                 var UTILITYBOX = UTILITYBOXSVG + FONTSMALLERSVG + FONTBIGGERSVG + STATSSVG + PLUGINSVG + SCROLLLOCKSVG + '</svg>';
@@ -72,8 +72,8 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
     }
 
     this.completeShow = function() {
-	this.container.visible = true;
-	this.refreshCanvas();
+        this.container.visible = true;
+        this.refreshCanvas();
     }
 }
 
@@ -81,7 +81,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
 function loadUtilityContainerHandler(box) {
     var hitArea = new createjs.Shape();
     this.bounds = box.container.getBounds();
-    hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds. width, bounds.height);
+    hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
     hitArea.x = 0;
     hitArea.y = 0;
     box.container.hitArea = hitArea;
@@ -105,17 +105,17 @@ function loadUtilityContainerHandler(box) {
             console.log('closing box');
             box.hide();
         } else if (x < 75) {
-	    box.doSmaller();
+            box.doSmaller();
         } else if (x < 150) {
-	    box.doBigger();
+            box.doBigger();
         } else if (x < 225) {
             box.doStats();
             box.hide();
         } else if (x < 300) {
-	    box.doPlugins();
+            box.doPlugins();
             box.hide();
         } else {
-	    box.doScroller();
+            box.doScroller();
             box.hide();
             // Force regeneration of graphics.
             box.stage.removeChild(box.container);

@@ -98,8 +98,7 @@ function Matrix() {
         }
 
         NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-            for (var i = 0, len = this.length; i < len; i++)
-            {
+            for (var i = 0, len = this.length; i < len; i++) {
                 if (this[i] && this[i].parentElement) {
                     this[i].parentElement.removeChild(this[i]);
                 }
@@ -126,8 +125,8 @@ function Matrix() {
         var header = table.createTHead();
         var row = header.insertRow(0);
         row.style.position = "fixed";
-        row.style.left = matrixDivPosition.left+"px";
-        row.style.top = matrixDivPosition.top+"px";
+        row.style.left = matrixDivPosition.left + "px";
+        row.style.top = matrixDivPosition.top + "px";
 
         var cell = row.insertCell(-1);
         cell.style.fontSize = this.cellScale * 100 + '%';
@@ -140,13 +139,13 @@ function Matrix() {
         cell.innerHTML = '<img src="header-icons/play-button.svg" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = 40 * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        cell.onclick=function() {
+        cell.onclick = function() {
             logo.playMatrix();
         }
-        cell.onmouseover=function() {
+        cell.onmouseover = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
         }
-        cell.onmouseout=function() {
+        cell.onmouseout = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
@@ -154,13 +153,13 @@ function Matrix() {
         cell.innerHTML = '<img src="header-icons/download.svg" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = 40 * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        cell.onclick=function() {
+        cell.onclick = function() {
             logo.saveMatrix();
         }
-        cell.onmouseover=function() {
+        cell.onmouseover = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
         }
-        cell.onmouseout=function() {
+        cell.onmouseout = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
@@ -168,13 +167,13 @@ function Matrix() {
         cell.innerHTML = '<img src="header-icons/erase-button.svg" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = 40 * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        cell.onclick=function() {
+        cell.onclick = function() {
             logo.clearMatrix();
         }
-        cell.onmouseover=function() {
+        cell.onmouseover = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
         }
-        cell.onmouseout=function() {
+        cell.onmouseout = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
@@ -182,19 +181,19 @@ function Matrix() {
         cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = 40 * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        cell.onclick=function() {
+        cell.onclick = function() {
             document.getElementById('matrix').style.visibility = 'hidden';
             document.getElementById('matrix').style.border = 0;
         }
-        cell.onmouseover=function() {
+        cell.onmouseover = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
         }
-        cell.onmouseout=function() {
+        cell.onmouseout = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
         for (var i = 0; i < this.solfegeNotes.length; i++) {
-            var row = header.insertRow(i+1);
+            var row = header.insertRow(i + 1);
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             // process transpositions
@@ -231,13 +230,31 @@ function Matrix() {
     }
 
     this.note2Solfege = function(note, index) {
-        var solfegeConversionTable = {'C': 'do', 'C♯': 'do♯', 'D': 're', 'D♯': 're♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa♯', 'G': 'sol', 'G♯': 'sol♯', 'A': 'la', 'A♯': 'la♯', 'B': 'ti', 'D♭': 're♭', 'E♭': 'mi♭', 'G♭': 'sol♭', 'A♭': 'la♭', 'B♭': 'ti♭'};
+        var solfegeConversionTable = {
+            'C': 'do',
+            'C♯': 'do♯',
+            'D': 're',
+            'D♯': 're♯',
+            'E': 'mi',
+            'F': 'fa',
+            'F♯': 'fa♯',
+            'G': 'sol',
+            'G♯': 'sol♯',
+            'A': 'la',
+            'A♯': 'la♯',
+            'B': 'ti',
+            'D♭': 're♭',
+            'E♭': 'mi♭',
+            'G♭': 'sol♭',
+            'A♭': 'la♭',
+            'B♭': 'ti♭'
+        };
         if (['♭', '♯'].indexOf(note[1]) == -1) {
             var octave = note[1];
             var newNote = solfegeConversionTable[note[0]];
         } else {
             var octave = note[2];
-            var newNote = solfegeConversionTable[note.substr(0,2)];
+            var newNote = solfegeConversionTable[note.substr(0, 2)];
         }
         console.log(index + ': ' + newNote + '/' + octave);
         this.solfegeNotes[index] = newNote;
@@ -274,13 +291,13 @@ function Matrix() {
                 cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                cell.onmouseover=function() {
-                    if (this.style.backgroundColor != 'black'){
+                cell.onmouseover = function() {
+                    if (this.style.backgroundColor != 'black') {
                         this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                     }
                 }
-                cell.onmouseout=function() {
-                    if (this.style.backgroundColor != 'black'){
+                cell.onmouseout = function() {
+                    if (this.style.backgroundColor != 'black') {
                         this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     }
                 }
@@ -292,7 +309,9 @@ function Matrix() {
             this.chkArray.push(0);
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
-            this.notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])]);
+            this.notesToPlay.push([
+                ['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])
+            ]);
         }
 
         if (this.matrixHasTuplets) {
@@ -312,7 +331,16 @@ function Matrix() {
         cell = table.rows[table.rows.length - 1].insertCell(-1);
         cell.style.height = 30 * this.cellScale + 'px';
 
-        var noteSymbol = {1: '𝅝', 2: '𝅗𝅥', 4: '𝅘𝅥', 8: '𝅘𝅥𝅮', 16: '𝅘𝅥𝅯', 32: '𝅘𝅥𝅰', '64': '𝅘𝅥𝅱', '128': '𝅘𝅥𝅲'};
+        var noteSymbol = {
+            1: '𝅝',
+            2: '𝅗𝅥',
+            4: '𝅘𝅥',
+            8: '𝅘𝅥𝅮',
+            16: '𝅘𝅥𝅯',
+            32: '𝅘𝅥𝅰',
+            '64': '𝅘𝅥𝅱',
+            '128': '𝅘𝅥𝅲'
+        };
         var noteValue = param[0][1] / param[0][0];
         var noteValueToDisplay = null;
         if (noteValue in noteSymbol) {
@@ -322,7 +350,16 @@ function Matrix() {
         }
 
         // FIXME: DOES NOT WORK FOR DOUBLE DOT
-         var dottedNoteSymbol = {1: '𝅝.', 2: '𝅗𝅥.', 4: '𝅘𝅥.', 8: '𝅘𝅥𝅮.', 16: '𝅘𝅥𝅯.', 32: '𝅘𝅥𝅰.', '64': '𝅘𝅥𝅱.', '128': '𝅘𝅥𝅲.'};
+        var dottedNoteSymbol = {
+            1: '𝅝.',
+            2: '𝅗𝅥.',
+            4: '𝅘𝅥.',
+            8: '𝅘𝅥𝅮.',
+            16: '𝅘𝅥𝅯.',
+            32: '𝅘𝅥𝅰.',
+            '64': '𝅘𝅥𝅱.',
+            '128': '𝅘𝅥𝅲.'
+        };
         if (parseInt(param[0][1]) < param[0][1]) {
             noteValueToDisplay = noteValue * 1.5;
             if (noteValueToDisplay in dottedNoteSymbol) {
@@ -402,7 +439,16 @@ function Matrix() {
         console.log('addNotes ' + numBeats + ' ' + noteValue);
         var table = document.getElementById('myTable');
 
-        var noteSymbol = {1: '𝅝', 2: '𝅗𝅥', 4: '𝅘𝅥', 8: '𝅘𝅥𝅮', 16: '𝅘𝅥𝅯', 32: '𝅘𝅥𝅰', '64': '𝅘𝅥𝅱', '128': '𝅘𝅥𝅲'};
+        var noteSymbol = {
+            1: '𝅝',
+            2: '𝅗𝅥',
+            4: '𝅘𝅥',
+            8: '𝅘𝅥𝅮',
+            16: '𝅘𝅥𝅯',
+            32: '𝅘𝅥𝅰',
+            '64': '𝅘𝅥𝅱',
+            '128': '𝅘𝅥𝅲'
+        };
         var noteValueToDisplay = null;
         if (noteValue in noteSymbol) {
             noteValueToDisplay = '1/' + noteValue.toString() + ' ' + noteSymbol[noteValue];
@@ -411,7 +457,16 @@ function Matrix() {
         }
 
         // FIXME: DOES NOT WORK FOR DOUBLE DOT
-         var dottedNoteSymbol = {1: '𝅝.', 2: '𝅗𝅥.', 4: '𝅘𝅥.', 8: '𝅘𝅥𝅮.', 16: '𝅘𝅥𝅯.', 32: '𝅘𝅥𝅰.', '64': '𝅘𝅥𝅱.', '128': '𝅘𝅥𝅲.'};
+        var dottedNoteSymbol = {
+            1: '𝅝.',
+            2: '𝅗𝅥.',
+            4: '𝅘𝅥.',
+            8: '𝅘𝅥𝅮.',
+            16: '𝅘𝅥𝅯.',
+            32: '𝅘𝅥𝅰.',
+            '64': '𝅘𝅥𝅱.',
+            '128': '𝅘𝅥𝅲.'
+        };
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
             if (noteValueToDisplay in dottedNoteSymbol) {
@@ -426,11 +481,13 @@ function Matrix() {
         }
 
         for (var i = 0; i < numBeats; i++) {
-            this.notesToPlay.push([['R'], noteValue]);
+            this.notesToPlay.push([
+                ['R'], noteValue
+            ]);
         }
 
         for (var i = 1; i <= numBeats; i++) {
-             this.chkArray.push(0);
+            this.chkArray.push(0);
         }
 
         if (this.matrixHasTuplets) {
@@ -454,13 +511,13 @@ function Matrix() {
                     cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                 } else {
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    cell.onmouseover=function() {
-                        if (this.style.backgroundColor != 'black'){
+                    cell.onmouseover = function() {
+                        if (this.style.backgroundColor != 'black') {
                             this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                         }
                     }
-                    cell.onmouseout=function() {
-                        if (this.style.backgroundColor != 'black'){
+                    cell.onmouseout = function() {
+                        if (this.style.backgroundColor != 'black') {
                             this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                         }
                     }
@@ -539,15 +596,15 @@ function Matrix() {
             var deltaOctave = 0;
             if (this.transposition[0] == '-') {
                 var factor = this.transposition;
-                factor = factor.slice(0,0) + factor.slice(1,factor.length);
+                factor = factor.slice(0, 0) + factor.slice(1, factor.length);
                 factor = parseInt(factor);
                 var index = this.notes.indexOf(note);
                 if (index == 0) {
                     index = this.notes.length - factor % this.notes.length;
                     deltaOctave = -1
                 } else {
-                    index = index - ( factor % this.notes.length );
-                    if(index < 0) {
+                    index = index - (factor % this.notes.length);
+                    if (index < 0) {
                         index = this.notes.length + index;
                         deltaOctave = -1;
                     }
@@ -555,7 +612,7 @@ function Matrix() {
                 return this.notes[index] + (parseInt(octave) + parseInt(deltaOctave));
             } else if (this.transposition[0] == '+') {
                 var factor = this.transposition;
-                factor = factor.slice(0,0) + factor.slice(1,factor.length);
+                factor = factor.slice(0, 0) + factor.slice(1, factor.length);
                 factor = parseInt(factor);
                 var index = this.notes.indexOf(note);
                 if (index == this.notes.length - 1) {
@@ -608,7 +665,7 @@ function Matrix() {
             var that = this;
 
             setTimeout(function() {
-                if(that.notesCounter >= that.notesToPlayDirected.length) {
+                if (that.notesCounter >= that.notesToPlayDirected.length) {
                     that.notesCounter = 1;
                     Tone.Transport.stop();
                 }
@@ -619,7 +676,7 @@ function Matrix() {
                 for (var i = 0; i < note.length; i++) {
                     note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
                 }
-                if(note != 'R') {
+                if (note != 'R') {
                     synth.triggerAttackRelease(note, that.logo.bpmFactor / noteValue);
                 }
             }, that.logo.bpmFactor * 1000 * time);
@@ -630,7 +687,7 @@ function Matrix() {
         /* Sets corresponding note when user clicks on any cell and
          * plays that note*/
         var leaveRowsFromBottom = 1;
-        if(tuplet) {
+        if (tuplet) {
             leaveRowsFromBottom = 3;
         }
         var table = document.getElementById('myTable');
@@ -653,13 +710,13 @@ function Matrix() {
                         noteValue = noteValue.slice(0, noteValue.length - 2);
                     }
                     var i = 0;
-                    if (noteValue.substr(0,3) == '1.5') {
+                    if (noteValue.substr(0, 3) == '1.5') {
                         while (noteValue[i] != ' ') {
                             i += 1;
                         }
                         noteValue = noteValue.substr(4, i - 4);
                         noteValue = parseInt(noteValue)
-                        noteValue = 1.5/noteValue;
+                        noteValue = 1.5 / noteValue;
                         noteValue = noteValue.toString()
                     }
                     this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
@@ -674,7 +731,7 @@ function Matrix() {
 
     this.playNotesString = function(time, synth) {
         /*plays the matrix and also the chunks*/
-        if (this.transposition != null ) {
+        if (this.transposition != null) {
             var transposedArray = [];
             for (var i = 0; i < this.notesToPlay.length; i++) {
                 var transposedNote = this.doTransposition(this.notesToPlay[i][0], this.octave);
@@ -724,12 +781,27 @@ function Matrix() {
     this.saveMatrix = function() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
-        var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
-        var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk"}], 0, 0, [0]]];
+        var noteConversion = {
+            'C': 'do',
+            'D': 're',
+            'E': 'mi',
+            'F': 'fa',
+            'G': 'sol',
+            'A': 'la',
+            'B': 'ti',
+            'R': 'rest'
+        };
+        var newStack = [
+            [0, ["action", {
+                "collapsed": false
+            }], 100, 100, [null, 1, null, null]],
+            [1, ["text", {
+                "value": "chunk"
+            }], 0, 0, [0]]
+        ];
         var endOfStackIdx = 0;
         console.log('SAVE MATRIX!!!');
-        for (var i = 0; i < this.notesToPlay.length; i++)
-        {
+        for (var i = 0; i < this.notesToPlay.length; i++) {
             // We want all of the notes in a column.
             // console.log(this.notesToPlay[i]);
             var note = this.notesToPlay[i].slice(0);
@@ -741,13 +813,15 @@ function Matrix() {
             var idx = newStack.length;
             newStack.push([idx, 'note', 0, 0, [endOfStackIdx, idx + 1, idx + 2, null]]);
             var n = newStack[idx][4].length;
-            if (i == 0) {  // the action block
+            if (i == 0) { // the action block
                 newStack[endOfStackIdx][4][n - 2] = idx;
             } else { // the previous note block
                 newStack[endOfStackIdx][4][n - 1] = idx;
             }
             var endOfStackIdx = idx;
-            newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
+            newStack.push([idx + 1, ['number', {
+                'value': note[1]
+            }], 0, 0, [idx]]);
             // Add the pitch blocks to the Note block
             for (var j = 0; j < note[0].length; j++) {
 
@@ -755,9 +829,9 @@ function Matrix() {
 
                 // We need to point to the previous note or pitch block.
                 if (j == 0) {
-                    var previousBlock = idx;  // Note block
+                    var previousBlock = idx; // Note block
                 } else {
-                    var previousBlock = thisBlock - 3;  // Pitch block
+                    var previousBlock = thisBlock - 3; // Pitch block
                 }
 
                 // The last connection in last pitch block is null.
@@ -768,16 +842,28 @@ function Matrix() {
                 }
 
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                if(['♯', '♭'].indexOf(note[0][j][1]) != -1) {
-                    newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
-                    newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
+                if (['♯', '♭'].indexOf(note[0][j][1]) != -1) {
+                    newStack.push([thisBlock + 1, ['solfege', {
+                        'value': noteConversion[note[0][j][0]] + note[0][j][1]
+                    }], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 2, ['number', {
+                        'value': note[0][j][2]
+                    }], 0, 0, [thisBlock]]);
                 } else {
                     if (note[0][0] == 'R') {
-                        newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
-                        newStack.push([thisBlock + 2, ['number', {'value': 4}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 1, ['text', {
+                            'value': noteConversion[note[0][j][0]]
+                        }], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 2, ['number', {
+                            'value': 4
+                        }], 0, 0, [thisBlock]]);
                     } else {
-                        newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
-                        newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 1, ['solfege', {
+                            'value': noteConversion[note[0][j][0]]
+                        }], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 2, ['number', {
+                            'value': note[0][j][1]
+                        }], 0, 0, [thisBlock]]);
                     }
                 }
             }
@@ -797,4 +883,3 @@ function reducedFraction(a, b) {
     var gcm = greatestCommonMultiple(a, b);
     return (a / gcm) + '/' + (b / gcm);
 }
-

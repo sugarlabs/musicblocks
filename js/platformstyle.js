@@ -17,26 +17,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
-    FF:      /Firefox/i.test(navigator.userAgent),
-    mobile:  /Mobi/i   .test(navigator.userAgent),
-    tablet:  /Tablet/i .test(navigator.userAgent)
+    FF: /Firefox/i.test(navigator.userAgent),
+    mobile: /Mobi/i.test(navigator.userAgent),
+    tablet: /Tablet/i.test(navigator.userAgent)
 }
 
 platform.androidWebkit = platform.android && !platform.FF;
-platform.FFOS = platform.FF
-            && (platform.mobile || platform.tablet)
-            && !platform.android;
+platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
 console.log('On platform: ', platform);
 
 
 window.platformColor = {
-    header: platform.FF? '#00539F' : '#2196F3',
+    header: platform.FF ? '#00539F' : '#2196F3',
     doHeaderShadow: !platform.FF,
-    background: platform.FF? '#00CAF2' : '#96D3F3'
+    background: platform.FF ? '#00CAF2' : '#96D3F3'
 }
 
 document.querySelector('meta[name=theme-color]')
-        .content = platformColor.header;
+    .content = platformColor.header;
 
 
 function showButtonHighlight(x, y, r, event, scale, stage) {

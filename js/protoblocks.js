@@ -90,7 +90,7 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., break
@@ -112,7 +112,7 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., collapsed
@@ -134,7 +134,7 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., forward, right
@@ -158,7 +158,7 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., wait for
@@ -185,7 +185,7 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., setxy. These are expandable.
@@ -217,7 +217,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., ??? These are expandable.
@@ -250,7 +250,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., sqrt, box
@@ -277,7 +277,7 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., plus, minus, multiply, divide. These are also expandable.
@@ -310,7 +310,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     //
@@ -344,7 +344,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicBlock();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., number, string. Value blocks get DOM textareas associated
@@ -368,7 +368,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicBox();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., media. Media blocks invoke a chooser and a thumbnail
@@ -393,7 +393,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicBox();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., start. A "child" flow is docked in an expandable clamp.
@@ -425,7 +425,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., emptyclamp. Unlike start, there is a flow above and below.
@@ -457,7 +457,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., repeat. Unlike action, there is a flow above and below.
@@ -490,7 +490,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., tuplet, which takes two args plus an interior flow. There is a flow above and below.
@@ -524,7 +524,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., do with args: innies instead of interior slots.
@@ -557,7 +557,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.argClamp();
-    return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., calculate with args: innies instead of interior slots.
@@ -590,7 +590,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.argClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., named do with args: innies instead of interior slots.
@@ -621,7 +621,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.argClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., named calculate with args: innies instead of interior slots.
@@ -652,7 +652,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.argClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., if.  A "child" flow is docked in an expandable clamp. The
@@ -686,7 +686,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., if then else.  Two "child" flows are docked in expandable
@@ -702,7 +702,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('in');
         this.dockTypes.push('in');
-	this.generator = this.doubleFlowClampBooleanArgBlockGenerator;
+        this.generator = this.doubleFlowClampBooleanArgBlockGenerator;
     }
 
     this.doubleFlowClampBooleanArgBlockGenerator = function(bottomSlots, topSlots) {
@@ -728,7 +728,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         var artwork = svg.basicClamp();
-	return [artwork, svg.docks];
+        return [artwork, svg.docks];
     }
 
     // E.g., forever. Unlike start, there is flow above and below.
@@ -837,7 +837,7 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         svg.setInnies([true]);
-        var artwork = svg.booleanNot(true);  // OneArg
+        var artwork = svg.booleanNot(true); // OneArg
         return [artwork, svg.docks];
     }
 

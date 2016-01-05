@@ -10,21 +10,21 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 function format(str, data) {
-  str = str.replace(/{([a-zA-Z0-9.]*)}/g,
-                     function (match, name) {
-    x = data;
-    name.split('.').forEach(function (v) {
-      if (x === undefined) {
-        console.log('Undefined value in template string', str, name, x, v);
-      }
-      x = x[v];
-    });
-    return x;
-  });
-  return str.replace(/{_([a-zA-Z0-9]+)}/g,
-                     function (match, item) {
-    return _(item);
-  });
+    str = str.replace(/{([a-zA-Z0-9.]*)}/g,
+        function(match, name) {
+            x = data;
+            name.split('.').forEach(function(v) {
+                if (x === undefined) {
+                    console.log('Undefined value in template string', str, name, x, v);
+                }
+                x = x[v];
+            });
+            return x;
+        });
+    return str.replace(/{_([a-zA-Z0-9]+)}/g,
+        function(match, item) {
+            return _(item);
+        });
 }
 
 
@@ -32,10 +32,10 @@ function canvasPixelRatio() {
     var devicePixelRatio = window.devicePixelRatio || 1;
     var context = document.querySelector('#myCanvas').getContext('2d');
     var backingStoreRatio = context.webkitBackingStorePixelRatio ||
-                            context.mozBackingStorePixelRatio ||
-                            context.msBackingStorePixelRatio ||
-                            context.oBackingStorePixelRatio ||
-                            context.backingStorePixelRatio || 1;
+        context.mozBackingStorePixelRatio ||
+        context.msBackingStorePixelRatio ||
+        context.oBackingStorePixelRatio ||
+        context.backingStorePixelRatio || 1;
     return devicePixelRatio / backingStoreRatio;
 }
 
@@ -91,10 +91,11 @@ function HttpRequest(url, loadCallback, userCallback) {
     var objref = this;
     try {
         req.open('GET', url);
-        req.onreadystatechange = function() { objref.handler(); };
+        req.onreadystatechange = function() {
+            objref.handler();
+        };
         req.send('');
-    }
-    catch(e) {
+    } catch (e) {
         if (self.console) console.log('Failed to load resource from ' + url + ': Network error.');
         if (typeof userCallback == 'function') userCallback(false, 'network error');
         this.request = this.handler = this.userCallback = null;
@@ -140,7 +141,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
     if (turtleSVG == '') {
         svg += MUSICICON;
     } else {
-	svg += turtleSVG;
+        svg += turtleSVG;
     }
     svg += '</svg>';
     return svg;
@@ -227,7 +228,7 @@ function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict,
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
     //try {
-        var obj = processPluginData(cleanData.replace(/\n/g,''), palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList);
+    var obj = processPluginData(cleanData.replace(/\n/g, ''), palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList);
     //} catch (e) {
     //    var obj = null;
     //    errorMsg('Error loading plugin: ' + e);
@@ -301,8 +302,8 @@ function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDi
     }
 
     // Define the image blocks
-    if ('IMAGES' in obj)  {
-        for (var blkName in obj['IMAGES'])  {
+    if ('IMAGES' in obj) {
+        for (var blkName in obj['IMAGES']) {
             pluginsImages[blkName] = obj['IMAGES'][blkName];
         }
     }
@@ -512,6 +513,7 @@ function doPublish(desc) {
 
 // TODO: Move to camera plugin
 var hasSetupCamera = false;
+
 function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) {
     var w = 320;
     var h = 240;
@@ -520,17 +522,19 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
     var video = document.querySelector('#camVideo');
     var canvas = document.querySelector('#camCanvas');
     navigator.getMedia = (navigator.getUserMedia ||
-                          navigator.mozGetUserMedia ||
-                          navigator.webkitGetUserMedia ||
-                          navigator.msGetUserMedia);
+        navigator.mozGetUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.msGetUserMedia);
     if (navigator.getMedia === undefined) {
         errorMsg('Your browser does not support the webcam');
     }
 
     if (!hasSetupCamera) {
-        navigator.getMedia(
-            {video: true, audio: false},
-            function (stream) {
+        navigator.getMedia({
+                video: true,
+                audio: false
+            },
+            function(stream) {
                 if (navigator.mozGetUserMedia) {
                     video.mozSrcObject = stream;
                 } else {
@@ -539,10 +543,11 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
                 }
                 video.play();
                 hasSetupCamera = true;
-            }, function (error) {
+            },
+            function(error) {
                 errorMsg('Could not connect to camera');
                 console.log('Could not connect to camera', error);
-        });
+            });
     } else {
         streaming = true;
         video.play();
@@ -554,7 +559,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
         }
     }
 
-    video.addEventListener('canplay', function (event) {
+    video.addEventListener('canplay', function(event) {
         console.log('canplay', streaming, hasSetupCamera);
         if (!streaming) {
             video.setAttribute('width', w);

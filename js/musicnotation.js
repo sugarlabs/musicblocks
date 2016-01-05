@@ -28,12 +28,12 @@ function MusicNotation(turtles, stage) {
             this.musicContainer.name = 'musicNotation';
         }
         stage.addChild(this.musicContainer);
- 
+
         var canvas = document.getElementById('music');
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
         var renderer = new Vex.Flow.Renderer(canvas,
-        Vex.Flow.Renderer.Backends.CANVAS);
+            Vex.Flow.Renderer.Backends.CANVAS);
 
         var ctx = renderer.getContext();
         var stave = new Vex.Flow.Stave(10, 0, 1000);
@@ -53,7 +53,7 @@ function MusicNotation(turtles, stage) {
             var noteArray = [];
             var accidentalArray = [];
             for (j = 0; j < notes[i].length; j++) {
-		// console.log(notes[i][j]);
+                // console.log(notes[i][j]);
                 var octave = notes[i][j][0].substr(-1);
                 var pitch = notes[i][j][0].substr(0, notes[i][j][0].length - 1);
                 // FIXME: need to account for more complex cases
@@ -74,12 +74,17 @@ function MusicNotation(turtles, stage) {
 
             // TODO: we need to mark tuplets and then use:
             // vexNotes.push(new Vex.Flow.Tuplet(tupletnotes));
-            if(noteArray[0].substr(-1) == 'R')
-            {
-                vexNotes.push(new Vex.Flow.StaveNote({ keys: ['g/4'], duration: notes[i][0][1].toString()+'r' }));
+            if (noteArray[0].substr(-1) == 'R') {
+                vexNotes.push(new Vex.Flow.StaveNote({
+                    keys: ['g/4'],
+                    duration: notes[i][0][1].toString() + 'r'
+                }));
             } else {
                 console.log(notes[i][0][1]);
-                var tmp = new Vex.Flow.StaveNote({ keys: noteArray, duration: notes[i][0][1].toString() });
+                var tmp = new Vex.Flow.StaveNote({
+                    keys: noteArray,
+                    duration: notes[i][0][1].toString()
+                });
                 for (a = 0; a < accidentalArray.length; a++) {
                     // Add sharps and flats here
                     if (accidentalArray[a] != '') {
@@ -90,7 +95,11 @@ function MusicNotation(turtles, stage) {
             }
         }
 
-        var voice = new Vex.Flow.Voice({ num_beats: 4, beat_value: 4, resolution: Vex.Flow.RESOLUTION });
+        var voice = new Vex.Flow.Voice({
+            num_beats: 4,
+            beat_value: 4,
+            resolution: Vex.Flow.RESOLUTION
+        });
         // turn off tick counter
         voice.setStrict(false)
 
@@ -116,15 +125,15 @@ function MusicNotation(turtles, stage) {
         //to get scrollable functionality
         var img = this.convertCanvasToImage(canvas);
         var bitmap = new createjs.Bitmap(img);
-        bitmap.x = 1150;  // Why here?
+        bitmap.x = 1150; // Why here?
         bitmap.y = 70 * (1 + this.notationIndex);
-        bitmap.visible = false;    
+        bitmap.visible = false;
         var notdiv = document.getElementById('musicNotation');
         var base64Notation = canvas.toDataURL();
-        notdiv.innerHTML +=  '<img width=100% src=' + base64Notation + '>';
+        notdiv.innerHTML += '<img width=100% src=' + base64Notation + '>';
 
         document.getElementById('musicNotation').style.display = 'block';
-        
+
         bitmap.name = 'notation' + this.notationIndex;
         this.musicContainer.addChild(bitmap);
 
