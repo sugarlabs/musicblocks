@@ -439,7 +439,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         }
     }
 
-    this.runLogoCommands = function(startHere, env) {
+    this.runLogoCommands = function(startHere, env, runSilently) {
+        //console.log("runSilently is "+runSilently+" in runLogoCommands");
         // Save the state before running.
         this.saveLocally();
 
@@ -507,6 +508,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         // First we need to reconcile the values in all the value
         // blocks with their associated textareas.
         // FIXME: Do we still need this check???
+        console.log("blocklist number: " + this.blocks.blockList.length);
         for (var blk = 0; blk < this.blocks.blockList.length; blk++) {
             if (this.blocks.blockList[blk].label != null) {
                 if (this.blocks.blockList[blk].labelattr != null && this.blocks.blockList[blk].labelattr.value != '♮') {
@@ -590,7 +592,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.unhightlightQueue[turtle] = [];
             this.parameterQueue[turtle] = [];
             this.turtles.turtleList[turtle].running = true;
-            this.runFromBlock(this, turtle, startHere, 0, env);
+            if (runSilently)
+                this.runFromBlock(this, turtle, startHere, 0, env, runSilently);
+            else
+                this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             // If there are start blocks, run them all.
             for (var b = 0; b < startBlocks.length; b++) {
@@ -601,7 +606,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 this.parameterQueue[turtle] = [];
                 if (!this.turtles.turtleList[turtle].trash) {
                     this.turtles.turtleList[turtle].running = true;
-                    this.runFromBlock(this, turtle, startBlocks[b], 0, env);
+                    if (runSilently)
+                        this.runFromBlock(this, turtle, startBlocks[b], 0, env, runSilently);
+                    else
+                        this.runFromBlock(this, turtle, startBlocks[b], 0, env);
                 }
             }
         } else {
@@ -610,7 +618,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         this.refreshCanvas();
     }
 
-    this.runFromBlock = function(logo, turtle, blk, isflow, receivedArg) {
+    this.runFromBlock = function(logo, turtle, blk, isflow, receivedArg, runSilently) {
+        //console.log("runSilently is "+runSilently+" in runFromBlock");
         if (blk == null) {
             return;
         }
@@ -627,7 +636,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.stepQueue[turtle].push(blk);
             } else {
                 setTimeout(function() {
-                    logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+                    if (runSilently)
+                        logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg, undefined, runSilently);
+                    else
+                        logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
                 }, delay);
             }
         }
@@ -711,7 +723,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         }
     }
 
-    this.runFromBlockNow = function(logo, turtle, blk, isflow, receivedArg, queueStart) {
+    this.runFromBlockNow = function(logo, turtle, blk, isflow, receivedArg, queueStart, runSilently) {
+        //console.log("runSilently is "+runSilently+" in runFromBlockNow in the first statement");
         // Run a stack of blocks, beginning with blk.
 
         // Sometimes we don't want to unwind the entire queue.
@@ -1460,136 +1473,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.setTurtleDelay(0);
                 break;
             case 'savelilypond':
-                var turtleCount = 0;
-                var clef = [];
-                var RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
-                var RODENTSSHORT = [_('ra'), _('rb'), _('rc'), _('rd'), _('re'), _('rf'), _('rg'), _('rh'), _('ri'), _('rj'), _('rk'), _('rl')];
-                for (var t in logo.lilypondStaging) {
-                    turtleCount += 1;
-                }
-                if (args.length == 1) {
-                    console.log('saving as lilypond: ' + turtleCount);
-
-                    logo.lilypondOutput += '%25 You can change the MIDI instruments below to anything on this list:%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2Fdocumentation%2Fnotation%2Fmidi-instruments)%0A%0A';
-
-                    var c = 0;
-                    for (var t in logo.lilypondStaging) {
-                        if (logo.lilypondStaging[t].length > 0) {
-                            var octaveTotal = 0;
-                            var noteCount = 0;
-                            for (var i = 0; i < logo.lilypondStaging[t].length; i++) {
-                                obj = logo.lilypondStaging[t][i];
-                                if (obj.length > 1) {
-                                    octaveTotal += parseInt(obj[0].substr(obj[0].length - 1));
-                                    noteCount += 1;
-                                }
-                            }
-                            if (noteCount > 0) {
-                                switch (Math.floor(octaveTotal / noteCount)) {
-                                    case 0:
-                                    case 1:
-                                    case 2:
-                                        clef.push('bass_8');
-                                        break;
-                                    case 3:
-                                        clef.push('bass');
-                                        break;
-                                    default:
-                                        clef.push('treble');
-                                        break;
-                                }
-                            } else {
-                                clef.push('treble');
-                            }
-                            logo.processLilypondNotes(t);
-                            var instrumentName = logo.turtles.turtleList[t].name;
-                            if (instrumentName == _('start')) {
-                                instrumentName = RODENTS[t % 12].replace(/ /g, '_');
-                            } else if (instrumentName == t.toString()) {
-                                instrumentName = RODENTS[t % 12].replace(/ /g, '_');
-                            }
-                            logo.lilypondOutput += instrumentName + ' = {%0A';
-                            logo.lilypondOutput += '%25 %5Cmeter%0A';
-                            logo.lilypondOutput += logo.lilypondNotes[t];
-
-                            // Add bar to last turtle's output.
-                            if (c == turtleCount - 1) {
-                                logo.lilypondOutput += ' %5Cbar "%7C."'
-                            }
-                            logo.lilypondOutput += '%0A}%0A%0A';
-
-                            var shortInstrumentName = RODENTSSHORT[t % 12];
-
-                            logo.lilypondOutput += instrumentName.replace(/ /g, '_') + 'Voice = ';
-                            logo.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
-                            logo.lilypondOutput += '   %5Cclef "' + last(clef) + '"%0A';
-                            logo.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
-                            logo.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
-                            logo.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
-                            logo.lilypondOutput += '} { %5Cclef ' + last(clef) + ' %5C' + instrumentName.replace(/ /g, '_') + ' }%0A%0A';
-                        }
-                        c += 1;
-                    }
-
-                    // Begin the SCORE section.
-                    logo.lilypondOutput += '%0A%5Cscore {%0A';
-                    logo.lilypondOutput += '   <<%0A';
-
-                    // Sort the staffs, treble on top, bass_8 on the bottom.
-                    var CLEFS = ['treble', 'bass', 'bass_8'];
-                    for (var c = 0; c < CLEFS.length; c++) {
-                        var i = 0;
-                        for (var t in logo.lilypondNotes) {
-                            if (clef[i] == CLEFS[c]) {
-                                if (logo.lilypondStaging[t].length > 0) {
-                                    var instrumentName = logo.turtles.turtleList[t].name;
-                                    if (instrumentName == _('start')) {
-                                        instrumentName = RODENTS[t % 12].replace(/ /g, '_');
-                                    } else if (instrumentName == t.toString()) {
-                                        instrumentName = RODENTS[t % 12];
-                                    }
-                                    logo.lilypondOutput += '      %5C' + instrumentName.replace(/ /g, '_') + 'Voice%0A';
-                                }
-                            }
-                        }
-                    }
-
-                    // Add GUITAR TAB in comments.
-                    logo.lilypondOutput += '%0A%0A%25 GUITAR TAB SECTION%0A%25 Delete the %25{ and %25} below to include guitar tablature output.%0A%25{%0A      %5Cnew TabStaff = "guitar tab" %0A      <<%0A         %5Cclef moderntab%0A';
-                    for (var c = 0; c < CLEFS.length; c++) {
-                        var i = 0;
-                        for (var t in logo.lilypondNotes) {
-                            if (clef[i] == CLEFS[c]) {
-                                if (logo.lilypondStaging[t].length > 0) {
-                                    var instrumentName = logo.turtles.turtleList[t].name;
-                                    if (instrumentName == _('start')) {
-                                        instrumentName = RODENTS[t % 12].replace(/ /g, '_');
-                                    } else if (instrumentName == t.toString()) {
-                                        instrumentName = RODENTS[t % 12];
-                                    }
-                                    logo.lilypondOutput += '         %5Ccontext TabVoice = "' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A';
-                                }
-                            }
-                        }
-                    }
-
-                    // Close the SCORE sections.
-                    logo.lilypondOutput += '      >>%0A%25}%0A';
-                    logo.lilypondOutput += '%0A   >>%0A   %5Clayout {}%0A%0A';
-
-                    // Add MIDI OUTPUT in comments.
-                    logo.lilypondOutput += '%25 MIDI SECTION%0A%25 Delete the %25{ and %25} below to include MIDI output.%0A%25{%0A%5Cmidi {%0A   %5Ctempo 4=90%0A}%0A%25}%0A%0A}%0A%0A';
-
-                    // ADD TURTLE BLOCKS CODE HERE
-                    logo.lilypondOutput += '%25 MUSIC BLOCKS CODE%0A';
-                    logo.lilypondOutput += '%25 Below is the code for the Music Blocks project that generated this Lilypond file.%0A%25{%0A%0A';
-                    // prepareExport() returns json-encoded project data.
-                    var projectData = prepareExport();
-                    logo.lilypondOutput += projectData.replace(/]],/g, ']],%0A');
-                    logo.lilypondOutput += '%0A%25}%0A%0A';
-
+                var check = false;
+                if (args.length == 1)
+                    check = true;
+                this.savelyfile(logo, check);
+                if (check)
                     doSaveLilypond(logo, args[0]);
-                }
                 break;
             case 'savesvg':
                 if (args.length == 1) {
@@ -1948,6 +1837,11 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 // the use of the global timer in Tone.js for more
                 // accuracy.
 
+                if (typeof runSilently == 'undefined') //if runSilently is not passed
+                    runSilently = false;
+
+                //console.log("runSilently is "+runSilently+" in runFromBlockNow starting of note");
+
                 logo.oscList[turtle] = [];
                 logo.noteNotes[turtle] = [];
                 logo.noteOctaves[turtle] = [];
@@ -1981,13 +1875,16 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                         if (logo.blocks.blockList[blk].name == 'osctime') {
                             var duration = noteBeatValue; // microseconds
                             logo.turtleTime[turtle] += ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle];
-                            logo.doWait(turtle, Math.max(((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle] - turtleLag, 0));
+                            if (runSilently === false)
+                                logo.doWait(turtle, Math.max(((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle] - turtleLag, 0));
                         } else {
                             var duration = noteBeatValue * logo.beatFactor[turtle]; // beat value
                             logo.turtleTime[turtle] += ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle];
-                            logo.doWait(turtle, Math.max(((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag, 0));
+                            if (runSilently === false)
+                                logo.doWait(turtle, Math.max(((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag, 0));
                         }
                         var waitTime = 0;
+
                         for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
                             if (j > 0) {
                                 if (logo.blocks.blockList[blk].name == 'osctime') {
@@ -2013,94 +1910,130 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     }
                                 }
 
-                                var oscillators = [];
-                                if (logo.oscList[turtle].length > 0) {
-                                    for (var i = 0; i < logo.oscList[turtle].length; i++) {
-                                        oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
-                                        console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
-                                        if (logo.blocks.blockList[blk].name == 'osctime') {
-                                            logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
-                                        } else {
-                                            logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
+
+
+                                if (runSilently) {
+                                    if (logo.oscList[turtle].length > 0) {
+                                        for (var i = 0; i < logo.oscList[turtle].length; i++) {
+                                            console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
+                                            if (logo.blocks.blockList[blk].name == 'osctime') {
+                                                logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
+                                            } else {
+                                                logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
+                                            }
                                         }
                                     }
+                                    if (logo.noteNotes[turtle].length > 0) {
+                                        if (logo.turtles.turtleList[turtle].drum) {
+                                            logo.drumSynth.toMaster();
+                                        } else {
+                                            logo.polySynth.toMaster();
+                                        }
 
-                                    for (var i = 0; i < oscillators.length; i++) {
-                                        oscillators[i].volume.value = logo.polyVolume[turtle] * OSCVOLUMEADJUSTMENT;
-                                        oscillators[i].start();
+                                        for (i in logo.noteNotes[turtle]) {
+                                            var noteObj = logo.getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+                                            var note = noteObj[0] + noteObj[1];
+                                            if (note != 'R') {
+                                                notes.push(note);
+                                            }
+                                            if (logo.blocks.blockList[blk].name == 'osctime') {
+                                                logo.updateNotation(note, 1000 / duration, turtle, insideChord);
+                                            } else {
+                                                logo.updateNotation(note, duration, turtle, insideChord);
+                                            }
+                                        }
                                     }
-                                    if (logo.blocks.blockList[blk].name == 'osctime') {
-                                        var stopTime = duration;
-                                    } else {
-                                        var stopTime = logo.bpmFactor * 1000 / duration;
-                                    }
-                                    setTimeout(function() {
+                                }
+
+                                if (runSilently == false) {
+                                    var oscillators = [];
+                                    if (logo.oscList[turtle].length > 0) {
+                                        for (var i = 0; i < logo.oscList[turtle].length; i++) {
+                                            oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
+                                            console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
+                                            if (logo.blocks.blockList[blk].name == 'osctime') {
+                                                logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
+                                            } else {
+                                                logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
+                                            }
+                                        }
+
                                         for (var i = 0; i < oscillators.length; i++) {
-                                            oscillators[i].stop();
-                                        }
-                                    }, stopTime);
-                                }
-                                if (logo.noteNotes[turtle].length > 0) {
-                                    if (logo.turtles.turtleList[turtle].drum) {
-                                        logo.drumSynth.toMaster();
-                                    } else {
-                                        logo.polySynth.toMaster();
-                                    }
-
-                                    for (i in logo.noteNotes[turtle]) {
-                                        var noteObj = logo.getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
-                                        var note = noteObj[0] + noteObj[1];
-                                        if (note != 'R') {
-                                            notes.push(note);
+                                            oscillators[i].volume.value = logo.polyVolume[turtle] * OSCVOLUMEADJUSTMENT;
+                                            oscillators[i].start();
                                         }
                                         if (logo.blocks.blockList[blk].name == 'osctime') {
-                                            logo.updateNotation(note, 1000 / duration, turtle, insideChord);
+                                            var stopTime = duration;
                                         } else {
-                                            logo.updateNotation(note, duration, turtle, insideChord);
+                                            var stopTime = logo.bpmFactor * 1000 / duration;
                                         }
-                                    }
-
-                                    console.log("notes to play " + notes);
-                                    if (notes.length > 0) {
-                                        var len = notes[0].length;
-                                        logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
-                                        logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
-                                        if (logo.turtles.turtleList[turtle].drum) {
-                                            for (var i = 0; i < notes.length; i++) {
-                                                // Remove pitch
-                                                notes[i] = 'C2';
+                                        setTimeout(function() {
+                                            for (var i = 0; i < oscillators.length; i++) {
+                                                oscillators[i].stop();
                                             }
+                                        }, stopTime);
+                                    }
+                                    if (logo.noteNotes[turtle].length > 0) {
+                                        if (logo.turtles.turtleList[turtle].drum) {
+                                            logo.drumSynth.toMaster();
                                         } else {
-                                            for (var i = 0; i < notes.length; i++) {
-                                                notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
+                                            logo.polySynth.toMaster();
+                                        }
+
+                                        for (i in logo.noteNotes[turtle]) {
+                                            var noteObj = logo.getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+                                            var note = noteObj[0] + noteObj[1];
+                                            if (note != 'R') {
+                                                notes.push(note);
+                                            }
+                                            if (logo.blocks.blockList[blk].name == 'osctime') {
+                                                logo.updateNotation(note, 1000 / duration, turtle, insideChord);
+                                            } else {
+                                                logo.updateNotation(note, duration, turtle, insideChord);
                                             }
                                         }
 
-                                        // Use the beatValue of the first note in the
-                                        // group since there can only be one.
+                                        console.log("notes to play " + notes);
+                                        if (notes.length > 0) {
+                                            var len = notes[0].length;
+                                            logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
+                                            logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
+                                            if (logo.turtles.turtleList[turtle].drum) {
+                                                for (var i = 0; i < notes.length; i++) {
+                                                    // Remove pitch
+                                                    notes[i] = 'C2';
+                                                }
+                                            } else {
+                                                for (var i = 0; i < notes.length; i++) {
+                                                    notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
+                                                }
+                                            }
+
+                                            // Use the beatValue of the first note in the
+                                            // group since there can only be one.
+                                            if (logo.blocks.blockList[blk].name == 'osctime') {
+                                                var beatValue = duration / 1000;
+                                            } else {
+                                                var beatValue = logo.bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                                            }
+                                            if (logo.turtles.turtleList[turtle].drum) {
+                                                logo.drumSynth.triggerAttackRelease(notes[0], beatValue);
+                                            } else {
+                                                logo.polySynth.triggerAttackRelease(notes, beatValue);
+                                            }
+                                            Tone.Transport.start();
+                                        }
+                                    }
+
+                                    if (insideChord > 0) {
+                                        insideChord = -1;
                                         if (logo.blocks.blockList[blk].name == 'osctime') {
-                                            var beatValue = duration / 1000;
+                                            // logo.updateNotation('', 1000 / duration, turtle, false);
                                         } else {
-                                            var beatValue = logo.bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                                            // logo.updateNotation('', duration, turtle, false);
                                         }
-                                        if (logo.turtles.turtleList[turtle].drum) {
-                                            logo.drumSynth.triggerAttackRelease(notes[0], beatValue);
-                                        } else {
-                                            logo.polySynth.triggerAttackRelease(notes, beatValue);
-                                        }
-                                        Tone.Transport.start();
                                     }
                                 }
-
-                                if (insideChord > 0) {
-                                    insideChord = -1;
-                                    if (logo.blocks.blockList[blk].name == 'osctime') {
-                                        // logo.updateNotation('', 1000 / duration, turtle, false);
-                                    } else {
-                                        // logo.updateNotation('', duration, turtle, false);
-                                    }
-                                }
-
                             }
 
                             if (waitTime == 0) {
@@ -2115,6 +2048,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     }
                 }
                 logo.setListener(turtle, listenerName, listener);
+
+                //console.log("runSilently is "+runSilently+" in runFromBlockNow ending of note");
+
                 break;
             case 'rhythmicdot':
                 // Dotting a note will increase its play time by 50%
@@ -2539,7 +2475,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             if (isflow) {
                 logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
             } else {
-                logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
+                if (runSilently)
+                    logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg, runSilently);
+                else
+                    logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
         } else {
             // Make sure any unissued signals are dispatched.
@@ -2586,7 +2525,151 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
         this.saveTimeout = setTimeout(function() {
             // Save at the end to save an image
             me.saveLocally();
+            if (runSilently) {
+                logo.savelyfile(logo, true);
+                var lyfilename = prompt("Please enter the file name", "lilypondexport.ly");
+                if (lyfilename != null) {
+                    if (lyfilename != "")
+                        doSaveLilypond(logo, lyfilename);
+                    else
+                        doSaveLilypond(logo, "lilypondexport.ly");
+                }
+            }
         }, DEFAULTDELAY * 1.5)
+    }
+
+    this.savelyfile = function(logo, check) {
+        console.log("In function savelyfile");
+        console.log(logo);
+
+        var turtleCount = 0;
+        var clef = [];
+        var RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
+        var RODENTSSHORT = [_('ra'), _('rb'), _('rc'), _('rd'), _('re'), _('rf'), _('rg'), _('rh'), _('ri'), _('rj'), _('rk'), _('rl')];
+        for (var t in logo.lilypondStaging) {
+            turtleCount += 1;
+        }
+        if (check) {
+            console.log('saving as lilypond: ' + turtleCount);
+
+            logo.lilypondOutput += '%25 You can change the MIDI instruments below to anything on this list:%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2Fdocumentation%2Fnotation%2Fmidi-instruments)%0A%0A';
+
+            var c = 0;
+            for (var t in logo.lilypondStaging) {
+                if (logo.lilypondStaging[t].length > 0) {
+                    var octaveTotal = 0;
+                    var noteCount = 0;
+                    for (var i = 0; i < logo.lilypondStaging[t].length; i++) {
+                        obj = logo.lilypondStaging[t][i];
+                        if (obj.length > 1) {
+                            octaveTotal += parseInt(obj[0].substr(obj[0].length - 1));
+                            noteCount += 1;
+                        }
+                    }
+                    if (noteCount > 0) {
+                        switch (Math.floor(octaveTotal / noteCount)) {
+                            case 0:
+                            case 1:
+                            case 2:
+                                clef.push('bass_8');
+                                break;
+                            case 3:
+                                clef.push('bass');
+                                break;
+                            default:
+                                clef.push('treble');
+                                break;
+                        }
+                    } else {
+                        clef.push('treble');
+                    }
+                    logo.processLilypondNotes(t);
+                    var instrumentName = logo.turtles.turtleList[t].name;
+                    if (instrumentName == _('start')) {
+                        instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                    } else if (instrumentName == t.toString()) {
+                        instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                    }
+                    logo.lilypondOutput += instrumentName + ' = {%0A';
+                    logo.lilypondOutput += '%25 %5Cmeter%0A';
+                    logo.lilypondOutput += logo.lilypondNotes[t];
+
+                    // Add bar to last turtle's output.
+                    if (c == turtleCount - 1) {
+                        logo.lilypondOutput += ' %5Cbar "%7C."'
+                    }
+                    logo.lilypondOutput += '%0A}%0A%0A';
+
+                    var shortInstrumentName = RODENTSSHORT[t % 12];
+
+                    logo.lilypondOutput += instrumentName.replace(/ /g, '_') + 'Voice = ';
+                    logo.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
+                    logo.lilypondOutput += '   %5Cclef "' + last(clef) + '"%0A';
+                    logo.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
+                    logo.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
+                    logo.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
+                    logo.lilypondOutput += '} { %5Cclef ' + last(clef) + ' %5C' + instrumentName.replace(/ /g, '_') + ' }%0A%0A';
+                }
+                c += 1;
+            }
+
+            // Begin the SCORE section.
+            logo.lilypondOutput += '%0A%5Cscore {%0A';
+            logo.lilypondOutput += '   <<%0A';
+
+            // Sort the staffs, treble on top, bass_8 on the bottom.
+            var CLEFS = ['treble', 'bass', 'bass_8'];
+            for (var c = 0; c < CLEFS.length; c++) {
+                var i = 0;
+                for (var t in logo.lilypondNotes) {
+                    if (clef[i] == CLEFS[c]) {
+                        if (logo.lilypondStaging[t].length > 0) {
+                            var instrumentName = logo.turtles.turtleList[t].name;
+                            if (instrumentName == _('start')) {
+                                instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                            } else if (instrumentName == t.toString()) {
+                                instrumentName = RODENTS[t % 12];
+                            }
+                            logo.lilypondOutput += '      %5C' + instrumentName.replace(/ /g, '_') + 'Voice%0A';
+                        }
+                    }
+                }
+            }
+
+            // Add GUITAR TAB in comments.
+            logo.lilypondOutput += '%0A%0A%25 GUITAR TAB SECTION%0A%25 Delete the %25{ and %25} below to include guitar tablature output.%0A%25{%0A      %5Cnew TabStaff = "guitar tab" %0A      <<%0A         %5Cclef moderntab%0A';
+            for (var c = 0; c < CLEFS.length; c++) {
+                var i = 0;
+                for (var t in logo.lilypondNotes) {
+                    if (clef[i] == CLEFS[c]) {
+                        if (logo.lilypondStaging[t].length > 0) {
+                            var instrumentName = logo.turtles.turtleList[t].name;
+                            if (instrumentName == _('start')) {
+                                instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                            } else if (instrumentName == t.toString()) {
+                                instrumentName = RODENTS[t % 12];
+                            }
+                            logo.lilypondOutput += '         %5Ccontext TabVoice = "' + instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A';
+                        }
+                    }
+                }
+            }
+
+            // Close the SCORE sections.
+            logo.lilypondOutput += '      >>%0A%25}%0A';
+            logo.lilypondOutput += '%0A   >>%0A   %5Clayout {}%0A%0A';
+
+            // Add MIDI OUTPUT in comments.
+            logo.lilypondOutput += '%25 MIDI SECTION%0A%25 Delete the %25{ and %25} below to include MIDI output.%0A%25{%0A%5Cmidi {%0A   %5Ctempo 4=90%0A}%0A%25}%0A%0A}%0A%0A';
+
+            // ADD TURTLE BLOCKS CODE HERE
+            logo.lilypondOutput += '%25 MUSIC BLOCKS CODE%0A';
+            logo.lilypondOutput += '%25 Below is the code for the Music Blocks project that generated this Lilypond file.%0A%25{%0A%0A';
+            // prepareExport() returns json-encoded project data.
+            var projectData = prepareExport();
+            logo.lilypondOutput += projectData.replace(/]],/g, ']],%0A');
+            logo.lilypondOutput += '%0A%25}%0A%0A';
+        }
     }
 
     this.setSynthVolume = function(vol, turtle) {
