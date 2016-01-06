@@ -242,7 +242,9 @@ table {
   left: 30%;
   border-style: solid;
   border: 0 !important;
-  background: rgba(255, 225, 255, 0.85); }
+  background: rgba(255, 225, 255, 0.85);
+  -webkit-user-select: none;
+}
   overflow-x: scroll !important;
 }
 

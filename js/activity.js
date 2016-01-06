@@ -1594,6 +1594,10 @@ console.log(txt);
                     var args = {
                         'collapsed': myBlock.collapsed
                     }
+                } else if(myBlock.name=='matrix') { 
+                    var args = {
+                        'collapsed' : myBlock.collapsed
+                    }
                 } else if (myBlock.name == 'namedbox') {
                     var args = {
                         'value': myBlock.privateData
