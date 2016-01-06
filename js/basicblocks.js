@@ -85,7 +85,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['pitch'] = pitch;
-    pitch.staticLabels.push(_('pitch'),_('name'),_('octave'));
+    pitch.staticLabels.push(_('pitch'), _('name'), _('octave'));
     pitch.adjustWidthToLabel();
     pitch.defaults.push('sol');
     pitch.defaults.push(4);
@@ -96,7 +96,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var rhythm = new ProtoBlock('rhythm');
     rhythm.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythm'] = rhythm;
-    rhythm.staticLabels.push(_('rhythm'),_('# notes'),_('note value'));
+    rhythm.staticLabels.push(_('rhythm'), _('# notes'), _('note value'));
     rhythm.adjustWidthToLabel();
     rhythm.defaults.push(3);
     rhythm.defaults.push(4);
@@ -171,7 +171,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     tupletBlock.staticLabels.push(_('tuplet'));
     tupletBlock.adjustWidthToLabel();
     tupletBlock.flowClampZeroArgBlock();
-    
+
     // DEPRECATED
     var tupletParamBlock = new ProtoBlock('tupletParamBlock');
     blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
@@ -230,7 +230,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sharpBlock.staticLabels.push(_('Sharp'));
     sharpBlock.adjustWidthToLabel();
     sharpBlock.flowClampZeroArgBlock();
-    
+
     var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;
@@ -238,7 +238,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
-    
+
     var transposition = new ProtoBlock('transposition');
     transposition.palette = palettes.dict['notes'];
     blocks.protoBlockDict['transposition'] = transposition;
@@ -417,7 +417,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sawtoothBlock.adjustWidthToLabel();
     sawtoothBlock.oneArgBlock();
     sawtoothBlock.defaults.push(440);
-       
+
     var lilypondBlock = new ProtoBlock('savelilypond');
     lilypondBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['savelilypond'] = lilypondBlock;
@@ -1098,7 +1098,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     loadHeap.adjustWidthToLabel();
     loadHeap.oneArgBlock();
     loadHeap.dockTypes[1] = 'filein';
-    loadHeap.defaults = [[null, null]];
+    loadHeap.defaults = [
+        [null, null]
+    ];
 
     var loadHeapFromApp = new ProtoBlock('loadHeapFromApp');
     loadHeapFromApp.palette = palettes.dict['heap'];
@@ -1197,7 +1199,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     toneBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['tone'] = toneBlock;
     toneBlock.hidden = true;
-    toneBlock.staticLabels.push(_('tone'),  _('frequency'), _('duration (ms)'));
+    toneBlock.staticLabels.push(_('tone'), _('frequency'), _('duration (ms)'));
     toneBlock.adjustWidthToLabel();
     // A4, 200ms.
     toneBlock.defaults.push(440, 200);

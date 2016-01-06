@@ -15,7 +15,7 @@
 // scratch. -- Walter Bender, October 2014.
 
 function facebookInit() {
-    window.fbAsyncInit = function () {
+    window.fbAsyncInit = function() {
         FB.init({
             appId: '1496189893985945',
             xfbml: true,
@@ -27,7 +27,7 @@ function facebookInit() {
 }
 
 try {
-    (function (d, s, id) {
+    (function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) {
             return;
@@ -37,8 +37,7 @@ try {
         js.src = "//connect.facebook.net/en_US/sdk.js";
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
-} catch (e) {
-}
+} catch (e) {}
 
 var lang = document.webL10n.getLanguage();
 if (lang.indexOf("-") != -1) {
@@ -49,7 +48,7 @@ if (lang.indexOf("-") != -1) {
 
 // sugarizerCompatibility.ifInsideSugarizerHideLoading();
 
-define(function (require) {
+define(function(require) {
     require("activity/sugarizer-compatibility");
     require('activity/platformstyle');
     require('easeljs');
@@ -79,9 +78,9 @@ define(function (require) {
     require('activity/musicnotation');
 
     // Manipulate the DOM only when it is ready.
-    require(['domReady!'], function (doc) {
+    require(['domReady!'], function(doc) {
         if (sugarizerCompatibility.isInsideSugarizer()) {
-            sugarizerCompatibility.loadData(function () {
+            sugarizerCompatibility.loadData(function() {
                 domReady(doc);
             });
         } else {
@@ -93,12 +92,12 @@ define(function (require) {
         facebookInit();
         window.scroll(0, 0);
 
-var txt = "";
-txt += "innerWidth: " + window.innerWidth + " ";
-txt += "innerHeight: " + window.innerHeight + " ";
-txt += "outerWidth: " + window.outerWidth + " ";
-txt += "outerHeight: " + window.outerHeight + " ";
-console.log(txt);
+        var txt = "";
+        txt += "innerWidth: " + window.innerWidth + " ";
+        txt += "innerHeight: " + window.innerHeight + " ";
+        txt += "outerWidth: " + window.outerWidth + " ";
+        txt += "outerHeight: " + window.outerHeight + " ";
+        console.log(txt);
 
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
@@ -212,8 +211,7 @@ console.log(txt);
         var cellSize = 55;
         if (onXO) {
             cellSize = 75;
-        }
-        ;
+        };
 
         var onscreenButtons = [];
         var onscreenMenu = [];
@@ -228,12 +226,13 @@ console.log(txt);
             [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
             [_('Run music slow'), _('Click to run just the music in slow mode.'), 'header-icons/slow-music-button.svg'],
             [_('Run step by step'), _('Click to run the project step by step.'), 'header-icons/step-button.svg'],
-	    [_('Run note by note'), _('Click to run the music note by note.'), 'header-icons/step-music-button.svg'],
+            [_('Run note by note'), _('Click to run the music note by note.'), 'header-icons/step-music-button.svg'],
             [_('Stop'), _('Stop the music (and the turtles).'), 'header-icons/stop-turtle-button.svg'],
             [_('Clean'), _('Clear the screen and return the turtles to their initial positions.'), 'header-icons/clear-button.svg'],
             [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
             [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'header-icons/hide-blocks-button.svg'],
             [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
+            [_('Save to Lilypond'), _('Save the music to Lilypond Sheet Music'), 'header-icons/save-to-lilypond-button.svg'],
             [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
@@ -266,7 +265,7 @@ console.log(txt);
             logo.setBackgroundColor(-1);
             logo.lilypondOutput = LILYPONDHEADER;
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-	        logo.lilypondStaging[turtle] = [];
+                logo.lilypondStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear();
             }
             blocksContainer.x = 0;
@@ -277,14 +276,14 @@ console.log(txt);
                 this.parentElement.removeChild(this);
             }
             NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-                for(var i = 0, len = this.length; i < len; i++) {
-                    if(this[i] && this[i].parentElement) {
+                for (var i = 0, len = this.length; i < len; i++) {
+                    if (this[i] && this[i].parentElement) {
                         this[i].parentElement.removeChild(this[i]);
                     }
                 }
             }
             var table = document.getElementById("myTable");
-            if(table != null) {
+            if (table != null) {
                 table.remove();
             }
             var canvas = document.getElementById("music");
@@ -292,7 +291,7 @@ console.log(txt);
             context.clearRect(0, 0, canvas.width, canvas.height);
             document.getElementById('musicNotation').innerHTML = "";
             document.getElementById('musicNotation').style.display = 'none';
-            if(musicnotation != null && musicnotation.musicContainer) {
+            if (musicnotation != null && musicnotation.musicContainer) {
                 musicnotation.musicContainer.removeAllChildren();
                 musicnotation.notationIndex = 0;
             }
@@ -305,6 +304,13 @@ console.log(txt);
             } else {
                 logo.step(null, env);
             }
+        }
+
+        function saveLilyPondButton() {
+            logo.lilypondOutput = '%5Cversion "2.18.2"%0A%0A%25 ****************************************************************%0A%25 %0A%25 WHAT IS THIS? -- This is a LilyPond file generated from Music%0A%25 Blocks software (Read about it at www.musicblocks.net).%0A%25 %0A%25 DOWNLOAD LILYPOND -- In order to create notation with this file,%0A%25 you will need to download and install LilyPond software onto your%0A%25 computer (http:%2F%2Flilypond.org%2Fdownload.html). Frescobaldi%0A%25 software is also handy for editing LilyPond files%0A%25 (http:%2F%2Ffrescobaldi.org%2Fdownload).%0A%25 %0A%25 LILYPOND INSTRUCTIONS -- For instructions on how to further%0A%25 manipulate musical notation using LilyPond software, please%0A%25 read the Introduction (http:%2F%2Flilypond.org%2Ftext-input.html) and%0A%25 the Manual%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2FDocumentation%2Flearning%2Findex.html).%0A%25 %0A%25 GLOSSARY -- A glossary with helpful examples may be found here%0A%25 (http:%2F%2Fwww.lilypond.org%2Fdoc%2Fv2.19%2FDocumentation%2Fmusic-glossary%2F).%0A%25 %0A%25 MUTOPIA -- You may also benefit from studying scores from the%0A%25 Mutopia Project website, which has freely sharable music notation%0A%25 generated with LilyPond (http:%2F%2Fwww.mutopiaproject.org%2F).%0A%25 %0A%25 TUNEFL -- You can explore your Lilypond output in a web browser at%0A%25 (https://www.tunefl.com/).%0A%25 %0A%25 COMMENTS -- Some of the code below is commented out. You can%0A%25 enable it by deleting the %25 that precedes the text or, in the%0A%25 case of a commented section, deleting the %{ and %} that surrounds%0A%25 the section.%0A%25 %0A%25 ****************************************************************%0A%0A%25 Please add your own name, the title of your musical creation,%0A%25 and the intended copyright below.%0A%25 The copyright is great for sharing (and re-sharing)!%0A%25 Read more about it here (http:%2F%2Fcreativecommons.org%2Flicenses%2Fby-sa%2F4.0%2F).%0A%25 Of course, you can use any copyright you like -- you made it!%0A%5Cheader {%0A   dedication = "Made with LilyPond and Music Blocks (http:%2F%2Fwalterbender.github.io%2Fmusicblocks%2F)"%0A   title = "My Music Blocks Creation"%0A%25   subtitle = "Subtitle"%0A%25   instrument = "Instrument"%0A   composer = "Mr. Mouse"%0A%25   arranger = "Arranger"%0A   copyright = "Mr. Mouse (c) 2015 -- CC-BY-SA"%0A   tagline = "Made from Music Blocks v.0.9"%0A}%0A%0A%25 To change the meter make adjustments in the following section.%0A%25 You must also delete the %25 before %5Cmeter everywhere it appears below.%0Ameter = {%0A   %5Ctime 3%2F4%0A   %5Ckey c %5Cminor%0A   %5CnumericTimeSignature%0A   %5Cpartial 4 %0A   %5Ctempo "Andante" 4=90%0A}%0A%0A';
+            logo.lilypondNotes = {};
+            logo.lilypondStaging = {};
+            logo.runLogoCommands(undefined, undefined, true);
         }
 
         function doSlowButton() {
@@ -408,10 +414,10 @@ console.log(txt);
             console.log(scores);
             var data = scoreToChartData(scores);
 
-            var callback = function () {
+            var callback = function() {
                 var imageData = myRadarChart.toBase64Image();
                 var img = new Image();
-                img.onload = function () {
+                img.onload = function() {
                     chartBitmap = new createjs.Bitmap(img);
                     stage.addChild(chartBitmap);
                     chartBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (300);
@@ -481,11 +487,11 @@ console.log(txt);
             createjs.Ticker.addEventListener('tick', stage);
             createjs.Ticker.addEventListener('tick', tick);
 
-            createMsgContainer('#ffffff', '#7a7a7a', function (text) {
+            createMsgContainer('#ffffff', '#7a7a7a', function(text) {
                 msgText = text;
             }, 55);
 
-            createMsgContainer('#ffcbc4', '#ff0031', function (text) {
+            createMsgContainer('#ffcbc4', '#ff0031', function(text) {
                 errorMsgText = text;
             }, 110);
 
@@ -558,18 +564,18 @@ console.log(txt);
                 updatePluginObj(obj);
             }
 
-            fileChooser.addEventListener('click', function (event) {
+            fileChooser.addEventListener('click', function(event) {
                 this.value = null;
             });
-            fileChooser.addEventListener('change', function (event) {
+            fileChooser.addEventListener('change', function(event) {
 
                 // Read file here.
                 var reader = new FileReader();
 
-                reader.onload = (function (theFile) {
+                reader.onload = (function(theFile) {
                     // Show busy cursor.
                     document.body.style.cursor = 'wait';
-                    setTimeout(function () {
+                    setTimeout(function() {
                         var rawData = reader.result;
                         var cleanData = rawData.replace('\n', ' ');
                         console.log(cleanData);
@@ -584,24 +590,24 @@ console.log(txt);
                 reader.readAsText(fileChooser.files[0]);
             }, false);
 
-            allFilesChooser.addEventListener('click', function (event) {
+            allFilesChooser.addEventListener('click', function(event) {
                 this.value = null;
             });
 
-            pluginChooser.addEventListener('click', function (event) {
+            pluginChooser.addEventListener('click', function(event) {
                 window.scroll(0, 0);
                 this.value = null;
             });
-            pluginChooser.addEventListener('change', function (event) {
+            pluginChooser.addEventListener('change', function(event) {
                 window.scroll(0, 0)
 
                 // Read file here.
                 var reader = new FileReader();
 
-                reader.onload = (function (theFile) {
+                reader.onload = (function(theFile) {
                     // Show busy cursor.
                     document.body.style.cursor = 'wait';
-                    setTimeout(function () {
+                    setTimeout(function() {
                         obj = processRawPluginData(reader.result, palettes, blocks, errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList);
                         // Save plugins to local storage.
                         if (obj != null) {
@@ -611,7 +617,7 @@ console.log(txt);
                         }
 
                         // Refresh the palettes.
-                        setTimeout(function () {
+                        setTimeout(function() {
                             if (palettes.visible) {
                                 palettes.hide();
                             }
@@ -679,12 +685,12 @@ console.log(txt);
                                     break;
                                 case 'inurl':
                                     var url = args[1];
-                                    var getJSON = function (url) {
-                                        return new Promise(function (resolve, reject) {
+                                    var getJSON = function(url) {
+                                        return new Promise(function(resolve, reject) {
                                             var xhr = new XMLHttpRequest();
                                             xhr.open('get', url, true);
                                             xhr.responseType = 'json';
-                                            xhr.onload = function () {
+                                            xhr.onload = function() {
                                                 var status = xhr.status;
                                                 if (status == 200) {
                                                     resolve(xhr.response);
@@ -695,11 +701,11 @@ console.log(txt);
                                             xhr.send();
                                         });
                                     };
-                                    getJSON(url).then(function (data) {
+                                    getJSON(url).then(function(data) {
                                         console.log('Your Json result is:  ' + data.arg); //you can comment this, i used it to debug
                                         n = data.arg;
                                         env.push(parseInt(n));
-                                    }, function (status) { //error detection....
+                                    }, function(status) { //error detection....
                                         alert('Something went wrong.');
                                     });
                                     break;
@@ -722,12 +728,12 @@ console.log(txt);
             }
 
             if (projectName != null) {
-                setTimeout(function () {
+                setTimeout(function() {
                     console.log('load ' + projectName);
                     loadProject(projectName, runProjectOnLoad, env);
                 }, 2000);
             } else {
-                setTimeout(function () {
+                setTimeout(function() {
                     loadStart();
                 }, 2000);
             }
@@ -741,15 +747,15 @@ console.log(txt);
         function setupBlocksContainerEvents() {
             var moving = false;
 
-            stage.on('stagemousemove', function (event) {
+            stage.on('stagemousemove', function(event) {
                 stageX = event.stageX;
                 stageY = event.stageY;
             });
 
-            stage.on('stagemousedown', function (event) {
+            stage.on('stagemousedown', function(event) {
                 stageMouseDown = true;
                 if (stage.getObjectUnderPoint() !== null | turtles.running()) {
-                    stage.on('stagemouseup', function (event) {
+                    stage.on('stagemouseup', function(event) {
                         stageMouseDown = false;
                     });
                     return;
@@ -760,7 +766,7 @@ console.log(txt);
                     y: event.stageY
                 };
 
-                stage.on('stagemousemove', function (event) {
+                stage.on('stagemousemove', function(event) {
                     if (!moving) {
                         return;
                     }
@@ -775,7 +781,7 @@ console.log(txt);
                     }
                 });
 
-                stage.on('stagemouseup', function (event) {
+                stage.on('stagemouseup', function(event) {
                     stageMouseDown = false;
                     moving = false;
                 }, null, true); // once = true
@@ -841,7 +847,7 @@ console.log(txt);
             var img = new Image();
             var svgData = MSGBLOCK.replace('fill_color', fillColor).replace(
                 'stroke_color', strokeColor);
-            img.onload = function () {
+            img.onload = function() {
                 var msgBlock = new createjs.Bitmap(img);
                 container.addChild(msgBlock);
                 text = new createjs.Text('your message here',
@@ -861,7 +867,7 @@ console.log(txt);
                 hitArea.y = 0;
                 container.hitArea = hitArea;
 
-                container.on('click', function (event) {
+                container.on('click', function(event) {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -895,7 +901,7 @@ console.log(txt);
             errorArtwork[name].visible = false;
 
             var img = new Image();
-            img.onload = function () {
+            img.onload = function() {
                 console.log('creating error message artwork for ' + img.src);
                 var artwork = new createjs.Bitmap(img);
                 container.addChild(artwork);
@@ -913,7 +919,7 @@ console.log(txt);
                 hitArea.y = 0;
                 container.hitArea = hitArea;
 
-                container.on('click', function (event) {
+                container.on('click', function(event) {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -959,8 +965,7 @@ console.log(txt);
                         logo.doStopTurtle();
                         break;
                 }
-            } else if (event.ctrlKey) {
-            } else {
+            } else if (event.ctrlKey) {} else {
                 switch (event.keyCode) {
                     case TAB:
                         break;
@@ -1026,9 +1031,9 @@ console.log(txt);
             stage.canvas.height = h;
 
             console.log('Resize: scale ' + musicBlocksScale +
-            ', windowW ' + w + ', windowH ' + h +
-            ', canvasW ' + canvas.width + ', canvasH ' + canvas.height +
-            ', screenW ' + screen.width + ', screenH ' + screen.height);
+                ', windowW ' + w + ', windowH ' + h +
+                ', canvasW ' + canvas.width + ', canvasH ' + canvas.height +
+                ', screenW ' + screen.width + ', screenH ' + screen.height);
 
             turtles.setScale(musicBlocksScale);
             blocks.setScale(musicBlocksScale);
@@ -1058,12 +1063,12 @@ console.log(txt);
             if (matrix.isMatrix == 1) {
                 matrixTable = document.getElementById("myTable");
                 if (matrixTable) {
-                    matrixTable.setAttribute("width", w/2 + 'px');
+                    matrixTable.setAttribute("width", w / 2 + 'px');
                 }
             }
         }
 
-        window.onresize = function () {
+        window.onresize = function() {
             onResize();
         }
 
@@ -1112,20 +1117,38 @@ console.log(txt);
                 }
             }
             if (addStartBlock) {
-                var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
-                                [1, 'matrix', 450, 150, [null, 2, null]],
-                                [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['solfege', {value:'sol'}], 0, 0, [2]],
-                                [4, ['number', {value:'4'}], 0, 0, [2]],
-                                [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['solfege', {value:'mi'}], 0, 0, [5]],
-                                [7, ['number', {value:'4'}], 0, 0, [5]],
-                                [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['solfege', {value:'re'}], 0, 0, [8]],
-                                [10, ['number', {value:'4'}], 0, 0, [8]],
-                                [11, 'rhythm', 0, 0, [8, 12, 13, null]],
-                                [12, ['number', {value:'3'}], 0, 0, [11]],
-                                [13, ['number', {value:'4'}], 0, 0, [11]]];
+                var dataObjs = [
+                    [0, 'start', 250, 150, [null, null, null]],
+                    [1, 'matrix', 450, 150, [null, 2, null]],
+                    [2, 'pitch', 0, 0, [1, 3, 4, 5]],
+                    [3, ['solfege', {
+                        value: 'sol'
+                    }], 0, 0, [2]],
+                    [4, ['number', {
+                        value: '4'
+                    }], 0, 0, [2]],
+                    [5, 'pitch', 0, 0, [2, 6, 7, 8]],
+                    [6, ['solfege', {
+                        value: 'mi'
+                    }], 0, 0, [5]],
+                    [7, ['number', {
+                        value: '4'
+                    }], 0, 0, [5]],
+                    [8, 'pitch', 0, 0, [5, 9, 10, 11]],
+                    [9, ['solfege', {
+                        value: 're'
+                    }], 0, 0, [8]],
+                    [10, ['number', {
+                        value: '4'
+                    }], 0, 0, [8]],
+                    [11, 'rhythm', 0, 0, [8, 12, 13, null]],
+                    [12, ['number', {
+                        value: '3'
+                    }], 0, 0, [11]],
+                    [13, ['number', {
+                        value: '4'
+                    }], 0, 0, [11]]
+                ];
                 blocks.loadNewBlocks(dataObjs);
             } else if (!doNotSave) {
                 // Overwrite session data too.
@@ -1245,13 +1268,13 @@ console.log(txt);
             }
 
             // if (isSVGEmpty(turtles)) {
-                // We will use the music icon in these cases.
-                // return;
+            // We will use the music icon in these cases.
+            // return;
             // }
 
             var img = new Image();
             var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-            img.onload = function () {
+            img.onload = function() {
                 var bitmap = new createjs.Bitmap(img);
                 var bounds = bitmap.getBounds();
                 bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -1262,7 +1285,7 @@ console.log(txt);
                 }
             }
             img.src = 'data:image/svg+xml;base64,' +
-            window.btoa(unescape(encodeURIComponent(svgData)));
+                window.btoa(unescape(encodeURIComponent(svgData)));
             // console.log(img.src);
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 sugarizerCompatibility.saveLocally();
@@ -1275,7 +1298,7 @@ console.log(txt);
             // Show busy cursor.
             document.body.style.cursor = 'wait';
             // palettes.updatePalettes();
-            setTimeout(function () {
+            setTimeout(function() {
                 if (fileExt(projectName) != 'tb') {
                     projectName += '.tb';
                 }
@@ -1298,7 +1321,7 @@ console.log(txt);
                 update = true;
             }, 200);
             if (run) {
-                setTimeout(function () {
+                setTimeout(function() {
                     changeBlockVisibility();
                     doFastButton(env);
                 }, 2000);
@@ -1321,7 +1344,7 @@ console.log(txt);
             // palettes.updatePalettes();
             // Show busy cursor.
             document.body.style.cursor = 'wait';
-            setTimeout(function () {
+            setTimeout(function() {
                 var punctuationless = projectName.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^`{|}~']/g, '');
                 projectName = punctuationless.replace(/ /g, '_');
                 if (fileExt(projectName) != 'tb') {
@@ -1334,7 +1357,7 @@ console.log(txt);
 
                     var img = new Image();
                     var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-                    img.onload = function () {
+                    img.onload = function() {
                         var bitmap = new createjs.Bitmap(img);
                         var bounds = bitmap.getBounds();
                         bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -1359,29 +1382,46 @@ console.log(txt);
             // where to put this?
             // palettes.updatePalettes();
             console.log(" LOAD START")
-            justLoadStart = function () {
+            justLoadStart = function() {
                 console.log('loading start and a matrix');
-                var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
-                                [1, 'matrix', 450, 150, [null, 2, null]],
-                                [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['solfege', {value:'sol'}], 0, 0, [2]],
-                                [4, ['number', {value:'4'}], 0, 0, [2]],
-                                [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['solfege', {value:'mi'}], 0, 0, [5]],
-                                [7, ['number', {value:'4'}], 0, 0, [5]],
-                                [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['solfege', {value:'re'}], 0, 0, [8]],
-                                [10, ['number', {value:'4'}], 0, 0, [8]],
-                                [11, 'rhythm', 0, 0, [8, 12, 13, null]],
-                                [12, ['number', {value:'3'}], 0, 0, [11]],
-                                [13, ['number', {value:'4'}], 0, 0, [11]]];
+                var dataObjs = [
+                    [0, 'start', 250, 150, [null, null, null]],
+                    [1, 'matrix', 450, 150, [null, 2, null]],
+                    [2, 'pitch', 0, 0, [1, 3, 4, 5]],
+                    [3, ['solfege', {
+                        value: 'sol'
+                    }], 0, 0, [2]],
+                    [4, ['number', {
+                        value: '4'
+                    }], 0, 0, [2]],
+                    [5, 'pitch', 0, 0, [2, 6, 7, 8]],
+                    [6, ['solfege', {
+                        value: 'mi'
+                    }], 0, 0, [5]],
+                    [7, ['number', {
+                        value: '4'
+                    }], 0, 0, [5]],
+                    [8, 'pitch', 0, 0, [5, 9, 10, 11]],
+                    [9, ['solfege', {
+                        value: 're'
+                    }], 0, 0, [8]],
+                    [10, ['number', {
+                        value: '4'
+                    }], 0, 0, [8]],
+                    [11, 'rhythm', 0, 0, [8, 12, 13, null]],
+                    [12, ['number', {
+                        value: '3'
+                    }], 0, 0, [11]],
+                    [13, ['number', {
+                        value: '4'
+                    }], 0, 0, [11]]
+                ];
                 blocks.loadNewBlocks(dataObjs);
             }
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 storage = sugarizerCompatibility.data;
-            }
-            else {
+            } else {
                 storage = localStorage;
             }
 
@@ -1624,7 +1664,8 @@ console.log(txt);
                     }
                 } else if (myBlock.name == 'matrixData') {
                     var args = {
-                        'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount
+                        'notes': window.savedMatricesNotes,
+                        'count': window.savedMatricesCount
                     }
                     hasMatrixDataBlock = true;
                 } else {
@@ -1672,7 +1713,7 @@ console.log(txt);
             stopTurtleContainer.visible = true;
         }
 
-        function playMusic(){
+        function playMusic() {
             for (var blk in logo.blocks.blockList) {
                 var myBlock = logo.blocks.blockList[blk];
                 var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
@@ -1692,7 +1733,7 @@ console.log(txt);
         function updatePasteButton() {
             pasteContainer.removeChild(pasteContainer.children[0]);
             var img = new Image();
-            img.onload = function () {
+            img.onload = function() {
                 var originalSize = 55; // this is the original svg size
                 var halfSize = Math.floor(cellSize / 2);
 
@@ -1737,13 +1778,14 @@ console.log(txt);
                 ['palette', changePaletteVisibility],
                 ['hide-blocks', changeBlockVisibility],
                 ['collapse-blocks', toggleCollapsibleStacks],
+                ['save-to-lilypond', saveLilyPondButton],
                 ['help', showHelp]
             ];
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
-                buttonNames.push(['sugarizer-stop', function () {
+                buttonNames.push(['sugarizer-stop', function() {
                     sugarizerCompatibility.data.blocks = prepareExport();
-                    sugarizerCompatibility.saveLocally(function () {
+                    sugarizerCompatibility.saveLocally(function() {
                         sugarizerCompatibility.sugarizerStop();
                     });
                 }])
@@ -1843,7 +1885,7 @@ console.log(txt);
                     helpContainer.x = 65;
                     helpContainer.y = 65;
 
-                    helpContainer.on('click', function (event) {
+                    helpContainer.on('click', function(event) {
                         var bounds = helpContainer.getBounds();
                         if (event.stageY < helpContainer.y + bounds.height / 2) {
                             helpContainer.visible = false;
@@ -1860,7 +1902,7 @@ console.log(txt);
                     });
 
                     var img = new Image();
-                    img.onload = function () {
+                    img.onload = function() {
                         // console.log(musicBlocksScale);
                         bitmap = new createjs.Bitmap(img);
                         if (musicBlocksScale > 1) {
@@ -1952,7 +1994,7 @@ console.log(txt);
                 // Race conditions during load
                 setTimeout(doMenuAnimation, 50);
             }
-            setTimeout(function () {
+            setTimeout(function() {
                 if (menuButtonsVisible) {
                     menuButtonsVisible = false;
                     for (button in onscreenMenu) {
@@ -1993,7 +2035,7 @@ console.log(txt);
 
             var img = new Image();
 
-            img.onload = function () {
+            img.onload = function() {
                 var originalSize = 55; // this is the original svg size
                 var halfSize = Math.floor(size / 2);
 
@@ -2028,7 +2070,7 @@ console.log(txt);
             // Prevent multiple button presses (i.e., debounce).
             var locked = false;
 
-            container.on('mousedown', function (event) {
+            container.on('mousedown', function(event) {
                 var moved = true;
                 var offset = {
                     x: container.x - Math.round(event.stageX / blocks.scale),
@@ -2037,14 +2079,14 @@ console.log(txt);
 
                 var circles = showButtonHighlight(ox, oy, cellSize / 2,
                     event, musicBlocksScale, stage);
-                container.on('pressup', function (event) {
+                container.on('pressup', function(event) {
                     hideButtonHighlight(circles, stage);
 
                     container.x = ox;
                     container.y = oy;
                     if (action != null && moved && !locked) {
                         locked = true;
-                        setTimeout(function () {
+                        setTimeout(function() {
                             locked = false;
                         }, 500);
                         action();

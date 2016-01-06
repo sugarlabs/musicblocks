@@ -284,14 +284,12 @@ function loadThumbnailContainerHandler(viewer) {
             if (viewer.next.visible) {
                 showNextPage(viewer);
             }
-        }
-        else if(endY < startY - 30 || endX < startX - 30) {
+        } else if (endY < startY - 30 || endX < startX - 30) {
             // Up or left
             if (viewer.prev.visible) {
                 hideCurrentPage(viewer);
             }
-        }
-        else {
+        } else {
             locked = false;
             viewerClicked(viewer, event)
         }

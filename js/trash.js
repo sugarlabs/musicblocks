@@ -18,18 +18,18 @@ require(['activity/utils']);
 var TRASHWIDTH = 320;
 var TRASHHEIGHT = 120;
 
-function Trashcan (canvas, stage, size, refreshCanvas) {
+function Trashcan(canvas, stage, size, refreshCanvas) {
     this.canvas = canvas;
     this.stage = stage;
     this.refreshCanvas = refreshCanvas;
     this.size = size;
 
-    this.iconsize = 55;  // default value
+    this.iconsize = 55; // default value
     this.container = new createjs.Container();
 
     function makeBorderHighlight(me) {
         var img = new Image();
-        img.onload = function () {
+        img.onload = function() {
             bitmap = new createjs.Bitmap(img);
             bitmap.scaleX = size / me.iconsize;
             bitmap.scaleY = size / me.iconsize;
@@ -46,7 +46,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
 
     function makeBorder(me) {
         var img = new Image();
-        img.onload = function () {
+        img.onload = function() {
             border = new createjs.Bitmap(img);
             bitmap.scaleX = me.size / me.iconsize;
             bitmap.scaleY = me.size / me.iconsize;
@@ -59,7 +59,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
 
     function makeTrash(me) {
         var img = new Image();
-        img.onload = function () {
+        img.onload = function() {
             bitmap = new createjs.Bitmap(img);
             me.container.addChild(bitmap);
             me.iconsize = bitmap.getBounds().width;
@@ -73,8 +73,8 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     }
 
     this.resizeEvent = function(scale) {
-        this.container.x = (this.canvas.width * 1/scale / 2) - ((TRASHWIDTH / 2) * (this.size / this.iconsize));
-        this.container.y = (this.canvas.height * 1/scale) - (TRASHHEIGHT * (this.size / this.iconsize));
+        this.container.x = (this.canvas.width * 1 / scale / 2) - ((TRASHWIDTH / 2) * (this.size / this.iconsize));
+        this.container.y = (this.canvas.height * 1 / scale) - (TRASHHEIGHT * (this.size / this.iconsize));
     }
 
     this.stage.addChild(this.container);
@@ -84,14 +84,23 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
 
     this.hide = function() {
         createjs.Tween.get(this.container)
-            .to({alpha: 0}, 200)
-            .set({visible: false});
+            .to({
+                alpha: 0
+            }, 200)
+            .set({
+                visible: false
+            });
     }
 
     this.show = function() {
         createjs.Tween.get(this.container)
-            .to({alpha: 0.0, visible: true})
-            .to({alpha: 1.0}, 200);
+            .to({
+                alpha: 0.0,
+                visible: true
+            })
+            .to({
+                alpha: 1.0
+            }, 200);
     }
 
     this.highlight = function() {
