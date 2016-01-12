@@ -1790,7 +1790,29 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                 logo.setListener(turtle, listenerName, listener);
                 break;
+            case 'invert':
+                logo.invertList[turtle].push([args[0], args[1]]);
+                if (logo.inMatrix) {
+                    logo.inInvertClamp = true;
+                } else {
+                    logo.inverting = true;
+                }
+                childFlow = args[2];
+                childFlowCount = 1;
 
+                var listenerName = '_invert_' + turtle;
+                logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                var listener = function(event) {
+                    if (logo.inMatrix) {
+                        logo.inInvertClamp = false;
+                    } else {
+                        logo.inverting = !(logo.invertList[turtle].length === 0);
+                    }
+                    logo.invertList[turtle].pop();
+                }
+                logo.setListener(turtle, listenerName, listener);
+                break;
             case 'pitch':
                 if (args.length != 2) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -3482,6 +3504,80 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     this.clearMatrix = function() {
         matrix.clearMatrix(this.polySynth);
+    }
+
+    this.getNumber = function(solfege, octave) {
+         // converts a note to a number
+
+         if (octave < 1) {
+             var num = 0;
+         } else if (octave > 10) {
+             var num = 9 * 12;
+         } else {
+             var num = 12 * (octave - 1);
+         }
+         var notes = {
+             'C': 1,
+             'D': 3,
+             'E': 5,
+             'F': 6,
+             'G': 8,
+             'A': 10,
+             'B': 12
+         };
+         solfege = String(solfege);
+         if (solfege.substring(0, 1) in notes) {
+             num += notes[solfege.substring(0, 1)];
+             if (solfege.length >= 1) {
+                 var delta = solfege.substring(1);
+                 if (delta == 'bb' || delta == '♭♭') {
+                     num -= 2;
+                 } else if (delta == '##' || delta == '♯♯') {
+                     num += 2;
+                 } else if (delta == 'b' || delta == '♭') {
+                     num -= 1;
+                 } else if (delta == '#' || delta == '♯') {
+                     num += 1;
+                 }
+             }
+         }
+         return num;
+    }
+
+    this.getNumNote = function(value, delta) {
+        // Converts from number to note
+        var num = value + delta;
+        if (num < 0) {
+            num = 1;
+            var octave = 1;
+        } else if (num > 10 * 12) {
+            num = 12;
+            var octave = 10;
+        } else {
+            var octave = Math.floor(num / 12);
+            num = num % 12;
+        }
+
+        var notes = {
+            1: "do",
+            2: "do♯",
+            3: "re",
+            4: "re♯",
+            5: "mi",
+            6: "fa",
+            7: "fa♯",
+            8: "sol",
+            9: "sol♯",
+            10: "la",
+            11: "la♯",
+            0: "ti"
+        };
+        var note = notes[num];
+
+        if (notes[num] == "ti") {
+            octave -= 1;
+        }
+        return [note, octave + 1];
     }
 
     this.getNote = function (solfege, octave, transposition, keySignature) {
