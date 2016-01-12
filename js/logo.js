@@ -68,6 +68,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.actions = {};
     this.returns = [];
     this.turtleHeaps = {};
+    this.invertList = {};
+
 
     this.endOfFlowSignals = {};
     this.endOfFlowLoops = {};
@@ -92,6 +94,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.notation = false;
     this.inMatrix = false;
     this.keySignature = {};
+    this.inInvertClamp = false;
+    this.inverting = false;
     this.inFlatClamp = false;
     this.inSharpClamp = false;
     this.inTransposeClamp = false;
@@ -481,6 +485,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.beatFactor[turtle] = 1;
+            this.invertList[turtle] = [];
             this.duplicateFactor[turtle] = 1;
             this.keySignature[turtle] = 'C';
             this.pushedNote[turtle] = false;
@@ -489,6 +494,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.oscList[turtle] = [];
         }
 
+        this.inInvertClamp = false;
         this.inMatrix = false;
         this.inFlatClamp = false;
         this.inSharpClamp = false;
@@ -1784,6 +1790,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                 logo.setListener(turtle, listenerName, listener);
                 break;
+
             case 'pitch':
                 if (args.length != 2) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -1817,28 +1824,51 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     }
                 }
 
+                var delta = 0;
+
                 if (logo.inMatrix) {
-                    if (logo.inFlatClamp) {
-                        matrix.solfegeNotes.push(note + '♭');
-                    } else if (logo.inSharpClamp) {
-                        matrix.solfegeNotes.push(note + '♯');
-                    } else {
-                        matrix.solfegeNotes.push(note);
+                    if (logo.inInvertClamp) {
+                        var len = logo.invertList[turtle].length;
+                        //Gets Anchor Note and it's corresponding number that is used to calculate the difference
+                        var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
+                        var num1 = logo.getNumber(note1[0], note1[1]);
+                        for (var i = len - 1; i > -1; i--) {
+                            console.log(logo.invertList[turtle][0])
+                            //Note to which delta is calculated
+                            var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
+                            var num2 = logo.getNumber(note2[0], note2[1]);
+                            var a = logo.getNumNote(num1, 0);
+                            delta += num2 - num1;
+                            num1 += 2 * delta;
+                        }
                     }
-                    if (logo.inTranspositionClamp) {
-                        matrix.solfegeTranspositions.push(logo.transposition[turtle]);
+                    matrix.solfegeNotes.push(note);
+                    if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
+                        matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
                     } else {
-                        matrix.solfegeTranspositions.push(0);
+                        matrix.solfegeTranspositions.push(2 * delta);
                     }
+
                     matrix.solfegeOctaves.push(octave);
                 } else {
                     logo.noteNotes[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
-
+                    if (logo.inverting) {
+                        var len = logo.invertList[turtle].length;
+                        var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
+                        var num1 = logo.getNumber(note1[0], note1[1]);
+                        for (var i = len - 1; i > -1; i--) {
+                            var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
+                            var num2 = logo.getNumber(note2[0], note2[1]);
+                            var a = logo.getNumNote(num1, 0);
+                            delta += num2 - num1;
+                            num1 += 2 * delta;
+                        }
+                    }
                     if (turtle in logo.transposition) {
-                        logo.noteTranspositions[turtle].push(logo.transposition[turtle]);
+                        logo.noteTranspositions[turtle].push(logo.transposition[turtle] + 2 * delta);
                     } else {
-                        logo.noteTranspositions[turtle].push(0);
+                        logo.noteTranspositions[turtle].push(2 * delta);
                     }
 
                     if (turtle in logo.beatFactor) {
@@ -2195,7 +2225,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 break;
             case 'settransposition':
                 var transValue = args[0];
-                logo.transposition[turtle] += transValue;
+                if (logo.inInvertClamp || logo.inverting) {
+                    logo.transposition[turtle] -= transValue;
+                } else {
+                    logo.transposition[turtle] += transValue;
+                }
+
                 if (logo.inMatrix) {
                     logo.inTranspositionClamp = true;
                 }
@@ -2205,8 +2240,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var listenerName = '_transposition_' + turtle;
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
-                var listener = function (event) {
-                    logo.transposition[turtle] -= transValue;
+                var listener = function(event) {
+                    if (logo.inInvertClamp || logo.inverting) {
+                        logo.transposition[turtle] += transValue;
+                    } else {
+                        logo.transposition[turtle] -= transValue;
+                    }
                     if (logo.inMatrix) {
                         logo.inTranspositionClamp = false;
                     }
@@ -2217,6 +2256,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'sharp':
                 if (logo.inMatrix) {
                     logo.inSharpClamp = true;
+                }
+                if (logo.inInvertClamp || logo.inverting) {
+                    logo.transposition[turtle] -= 1;
                 } else {
                     logo.transposition[turtle] += 1;
                 }
@@ -2226,9 +2268,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var listenerName = '_sharp_' + turtle;
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
-                var listener = function (event) {
+                var listener = function(event) {
                     if (logo.inMatrix) {
                         logo.inSharpClamp = false;
+                    }
+                    if (logo.inInvertClamp || logo.inverting) {
+                        logo.transposition[turtle] += 1;
                     } else {
                         logo.transposition[turtle] -= 1;
                     }
@@ -2239,6 +2284,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'flat':
                 if (logo.inMatrix) {
                     logo.inFlatClamp = true;
+                }
+                if (logo.inInvertClamp || logo.inverting) {
+                    logo.transposition[turtle] += 1;
                 } else {
                     logo.transposition[turtle] -= 1;
                 }
@@ -2248,9 +2296,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var listenerName = '_flat_' + turtle;
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
-                var listener = function (event) {
+                var listener = function(event) {
                     if (logo.inMatrix) {
                         logo.inFlatClamp = false;
+                    }
+                    if (logo.inInvertClamp || logo.inverting) {
+                        logo.transposition[turtle] -= 1;
                     } else {
                         logo.transposition[turtle] += 1;
                     }
