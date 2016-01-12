@@ -95,7 +95,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.inMatrix = false;
     this.keySignature = {};
     this.inInvertClamp = false;
-    this.inverting = false;
     this.inFlatClamp = false;
     this.inSharpClamp = false;
     this.inTransposeClamp = false;
@@ -1794,8 +1793,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.invertList[turtle].push([args[0], args[1]]);
                 if (logo.inMatrix) {
                     logo.inInvertClamp = true;
-                } else {
-                    logo.inverting = true;
                 }
                 childFlow = args[2];
                 childFlowCount = 1;
@@ -1806,8 +1803,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var listener = function(event) {
                     if (logo.inMatrix) {
                         logo.inInvertClamp = false;
-                    } else {
-                        logo.inverting = !(logo.invertList[turtle].length === 0);
                     }
                     logo.invertList[turtle].pop();
                 }
@@ -1875,7 +1870,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 } else {
                     logo.noteNotes[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
-                    if (logo.inverting) {
+                    if (!(logo.invertList[turtle].length === 0)) {
                         var len = logo.invertList[turtle].length;
                         var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
                         var num1 = logo.getNumber(note1[0], note1[1]);
@@ -2247,7 +2242,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 break;
             case 'settransposition':
                 var transValue = args[0];
-                if (logo.inInvertClamp || logo.inverting) {
+                if (logo.inInvertClamp || !(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] -= transValue;
                 } else {
                     logo.transposition[turtle] += transValue;
@@ -2263,7 +2258,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
                 var listener = function(event) {
-                    if (logo.inInvertClamp || logo.inverting) {
+                    if (logo.inInvertClamp || !(logo.invertList[turtle].length === 0)) {
                         logo.transposition[turtle] += transValue;
                     } else {
                         logo.transposition[turtle] -= transValue;
@@ -2279,7 +2274,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 if (logo.inMatrix) {
                     logo.inSharpClamp = true;
                 }
-                if (logo.inInvertClamp || logo.inverting) {
+                if (logo.inInvertClamp || !(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] -= 1;
                 } else {
                     logo.transposition[turtle] += 1;
@@ -2294,7 +2289,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.inMatrix) {
                         logo.inSharpClamp = false;
                     }
-                    if (logo.inInvertClamp || logo.inverting) {
+                    if (logo.inInvertClamp || !(logo.invertList[turtle].length === 0)) {
                         logo.transposition[turtle] += 1;
                     } else {
                         logo.transposition[turtle] -= 1;
@@ -2307,7 +2302,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 if (logo.inMatrix) {
                     logo.inFlatClamp = true;
                 }
-                if (logo.inInvertClamp || logo.inverting) {
+                if (logo.inInvertClamp || !(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] += 1;
                 } else {
                     logo.transposition[turtle] -= 1;
@@ -2322,7 +2317,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.inMatrix) {
                         logo.inFlatClamp = false;
                     }
-                    if (logo.inInvertClamp || logo.inverting) {
+                    if (logo.inInvertClamp || !(logo.invertList[turtle].length === 0)) {
                         logo.transposition[turtle] -= 1;
                     } else {
                         logo.transposition[turtle] += 1;
