@@ -204,7 +204,7 @@ msgstr "प्रकल्प जतन करा"
 msgid "Copy"
 msgstr "कॉपी"
 
-msgid "Open a panel for configuring Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
 msgstr "एक फळी उघडा टर्टल चा संरांचना साठी "
 
 #. TRANS: the name of a variable (stored in a box)
@@ -970,7 +970,7 @@ msgstr "पुन्हा"
 msgid "blocks"
 msgstr "ब्लॉक"
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr "आकडेवारी दाखवणे आपल्या टर्टल प्रकल्पाचे"
 
 msgid "Polar"

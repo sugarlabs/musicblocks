@@ -235,8 +235,8 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
-#. TRANS: Abre el panel para configurar Turtle Blocks.
-msgid "Open a panel for configuring Turtle Blocks."
+#. TRANS: Abre el panel para configurar Music Blocks.
+msgid "Open a panel for configuring Music Blocks."
 msgstr ""
 
 #. TRANS: nombre
@@ -1129,7 +1129,7 @@ msgid "blocks"
 msgstr ""
 
 #. TRANS: Analizar los tipos de bloques usados
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr ""
 
 #. TRANS: Polar

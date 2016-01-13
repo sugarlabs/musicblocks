@@ -204,7 +204,7 @@ msgstr ""
 msgid "Copy"
 msgstr "Kopiér"
 
-msgid "Open a panel for configuring Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
 msgstr ""
 
 #. TRANS: the name of a variable (stored in a box)
@@ -970,7 +970,7 @@ msgstr "gentag"
 msgid "blocks"
 msgstr "blokke"
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr ""
 
 msgid "Polar"

@@ -20,6 +20,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
@@ -37,6 +40,7 @@ msgstr "亂數"
 msgid "confirm"
 msgstr ""
 
+#. TRANS: musical meter
 msgid "meter"
 msgstr ""
 
@@ -49,6 +53,10 @@ msgstr ""
 
 #. TRANS: target language for translation
 msgid "target"
+msgstr ""
+
+#. TRANS: horizontal space
+msgid "hspace"
 msgstr ""
 
 msgid "keyboard"
@@ -107,7 +115,7 @@ msgstr ""
 msgid "set pen size"
 msgstr "設定畫筆大小"
 
-msgid "start turtle"
+msgid "rhythm"
 msgstr ""
 
 msgid "latitude"
@@ -125,8 +133,9 @@ msgstr "滑鼠座標 y"
 msgid "Show/hide blocks"
 msgstr "顯示/隱藏區塊"
 
-msgid "then"
-msgstr "則"
+#. TRANS: do this action
+msgid "do"
+msgstr ""
 
 msgid "move"
 msgstr ""
@@ -196,7 +205,7 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
-msgid "Open a panel for configuring Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
 msgstr ""
 
 #. TRANS: the name of a variable (stored in a box)
@@ -257,6 +266,7 @@ msgstr "幫助"
 msgid "turtle"
 msgstr "小烏龜"
 
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
@@ -642,9 +652,6 @@ msgstr "提筆"
 msgid "Decrease the size of the blocks."
 msgstr ""
 
-msgid "broccoli"
-msgstr ""
-
 msgid "Run note by note"
 msgstr ""
 
@@ -700,6 +707,9 @@ msgstr ""
 
 #. TRANS: a turtle shell
 msgid "shell"
+msgstr ""
+
+msgid "start turtle"
 msgstr ""
 
 msgid "Welcome to Music Blocks"
@@ -770,8 +780,7 @@ msgstr ""
 msgid "this"
 msgstr ""
 
-#. TRANS: horizontal space
-msgid "hspace"
+msgid "Palette buttons"
 msgstr ""
 
 msgid "potato"
@@ -829,9 +838,8 @@ msgstr "且"
 msgid "set grey"
 msgstr ""
 
-#. TRANS: do this action
-msgid "do"
-msgstr ""
+msgid "then"
+msgstr "則"
 
 msgid "calories"
 msgstr ""
@@ -862,10 +870,7 @@ msgstr ""
 msgid "protein"
 msgstr ""
 
-#. TRANS: number of notes
-msgid "# notes"
-msgstr ""
-
+#. TRANS: oscillator time
 msgid "osctime"
 msgstr ""
 
@@ -881,6 +886,10 @@ msgid "Save your project to a server."
 msgstr ""
 
 msgid "Decrease block size"
+msgstr ""
+
+#. TRANS: number of notes
+msgid "number of notes"
 msgstr ""
 
 msgid "angle"
@@ -923,7 +932,7 @@ msgstr ""
 msgid "square"
 msgstr ""
 
-msgid "Palette buttons"
+msgid "Meet Mr. Mouse!"
 msgstr ""
 
 msgid "set xy"
@@ -938,6 +947,7 @@ msgstr "若"
 msgid "Paste"
 msgstr "貼上"
 
+#. TRANS: musical key, e.g., C Major
 msgid "set key"
 msgstr ""
 
@@ -961,7 +971,7 @@ msgstr "重複"
 msgid "blocks"
 msgstr ""
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr ""
 
 msgid "Polar"
@@ -988,6 +998,7 @@ msgstr ""
 msgid "On my device"
 msgstr ""
 
+#. TRANS: musical key, e.g., C Major
 msgid "key"
 msgstr ""
 
@@ -1022,8 +1033,7 @@ msgstr ""
 msgid "Run fast"
 msgstr ""
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
+msgid "broccoli"
 msgstr ""
 
 #. TRANS: stop playing current media file (movie or audio)
@@ -1083,7 +1093,8 @@ msgstr "時間"
 msgid "y"
 msgstr "Y座標"
 
-msgid "Meet Mr. Mouse!"
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
 msgstr ""
 
 msgid "multiply beat"

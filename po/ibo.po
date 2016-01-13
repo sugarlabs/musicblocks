@@ -203,7 +203,7 @@ msgstr "Save oru ngo"
 msgid "Copy"
 msgstr "Detuo"
 
-msgid "Open a panel for configuring Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
 msgstr "Mepee a panel maka configuring mbe nkanka ."
 
 #. TRANS: the name of a variable (stored in a box)
@@ -969,7 +969,7 @@ msgstr "imekwa"
 msgid "blocks"
 msgstr "blocks"
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr "Ngosipụta ọnụ ọgụgụ banyere gị mbe oru ngo."
 
 msgid "Polar"

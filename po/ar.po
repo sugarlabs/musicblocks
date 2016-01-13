@@ -201,7 +201,7 @@ msgstr "حفظ المشروع"
 msgid "Copy"
 msgstr "نسخ"
 
-msgid "Open a panel for configuring Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
 msgstr "افتح لوحة لتكوين لبنات السلحفاة."
 
 #. TRANS: the name of a variable (stored in a box)
@@ -967,7 +967,7 @@ msgstr "كرر"
 msgid "blocks"
 msgstr "لبنات"
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr "اعرض الإحصائيات المتعلقة ببرنامج السلحفاة."
 
 msgid "Polar"

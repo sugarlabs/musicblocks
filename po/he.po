@@ -206,7 +206,7 @@ msgstr "שמור פרויקט"
 msgid "Copy"
 msgstr "העתק"
 
-msgid "Open a panel for configuring Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
 msgstr "פתיחת פאנל להתאמת בלוקים"
 
 #. TRANS: the name of a variable (stored in a box)
@@ -972,7 +972,7 @@ msgstr "חזור"
 msgid "blocks"
 msgstr "בלוקים"
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr "הצג סטטיסטיקות אודות פרויקט הצב שלך"
 
 msgid "Polar"

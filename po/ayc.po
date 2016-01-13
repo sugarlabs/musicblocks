@@ -219,7 +219,7 @@ msgstr "Wakichata imaña"
 msgid "Copy"
 msgstr "Apaqata"
 
-msgid "Open a panel for configuring Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
 msgstr "Tortuga wakichata siqinaka wakichañataki wakisiri wakichaña qhantayma"
 
 #. TRANS: nombre
@@ -1060,7 +1060,7 @@ msgstr "kutxataña"
 msgid "blocks"
 msgstr "t'aqanaka"
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr "Tortuga amtäwi wakichatama jakhuthapinakapa uñachayaña"
 
 msgid "Polar"
