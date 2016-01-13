@@ -13,197 +13,106 @@
 "X-POOTLE-MTIME: 1423841876.000000\n"
 "Language-Team: \n"
 
-msgid "clear"
-msgstr "doro anya"
 
-msgid "forward"
-msgstr "na-atụ"
+msgid ""
 
-msgid "right"
-msgstr "nri"
 
-msgid "back"
-msgstr "azụ"
+msgid ""
+msgstr ""
 
-msgid "left"
-msgstr "ekpe"
-
-msgid "arc"
-msgstr "aak"
-
-msgid "angle"
-msgstr "n'akuku"
-
-msgid "radius"
-msgstr "okirikiri"
-
-msgid "set heading"
-msgstr "set isiokwu"
-
-msgid "heading"
-msgstr "isiokwu"
-
-msgid "set xy"
-msgstr "set xy"
-
-msgid "x"
-msgstr "x"
-
-msgid "y"
-msgstr "y"
-
-msgid "set color"
-msgstr "set agba"
-
-msgid "color"
-msgstr "agba"
-
-msgid "set hue"
-msgstr "set agba"
-
-msgid "set shade"
-msgstr "set ndo"
-
-msgid "shade"
-msgstr "ndo"
-
-msgid "set grey"
-msgstr "set isi awọ"
-
-msgid "grey"
-msgstr "isi awọ"
-
-msgid "set pen size"
-msgstr "set pen size"
-
-msgid "pen size"
-msgstr "pen size"
-
-msgid "pen up"
-msgstr "pen elu"
-
-msgid "pen down"
-msgstr "pen ala"
-
-msgid "begin fill"
-msgstr "na-amalite erijueala"
-
-msgid "end fill"
-msgstr "ọgwụgwụ erijueala"
-
-msgid "background"
-msgstr "ndabere"
-
-msgid "random"
-msgstr "random"
-
-msgid "min"
-msgstr "kacha nta"
-
-msgid "max"
-msgstr "kacha"
-
-msgid "sqrt"
-msgstr "sqrt"
-
-msgid "mod"
-msgstr "mod"
-
-msgid "and"
-msgstr "na"
-
-msgid "or"
-msgstr "ma ọ bụ"
-
-msgid "not"
-msgstr "bụghị"
-
-msgid "store in"
-msgstr "echekwa na"
-
-msgid "name"
-msgstr "aha"
-
-msgid "value"
-msgstr "uru"
-
-msgid "box"
-msgstr "igbe"
-
-msgid "action"
-msgstr "edinam"
-
-msgid "do"
-msgstr "eme"
-
-msgid "start"
-msgstr "bido"
-
-msgid "add 1 to"
-msgstr "tinye 1"
-
-msgid "add"
-msgstr "tinye"
-
-msgid "speak"
-msgstr "kwo"
+msgid "Delete all"
+msgstr "hichapụ niile"
 
 msgid "show"
 msgstr "show"
 
-msgid "size"
-msgstr "size"
-
-msgid "obj"
-msgstr "obj"
-
 msgid "text"
 msgstr "ederede"
 
-msgid "shell"
-msgstr "shei"
+msgid "random"
+msgstr "random"
 
-msgid "image"
-msgstr "oyiyi"
+msgid "confirm"
+msgstr "gosi"
 
-msgid "stop media"
-msgstr "kwụsị egwu"
+msgid "meter"
+msgstr ""
 
-msgid "repeat"
-msgstr "imekwa"
+msgid "rice and beans"
+msgstr "osikapa na agwa"
 
-msgid "forever"
-msgstr "ruo mgbe ebighị ebi"
+#. TRANS: mashape webservices (probably no need to translate)
+msgid "mashape"
+msgstr "ọdịdị"
 
-msgid "stop"
-msgstr "kwụsị"
+#. TRANS: target language for translation
+msgid "target"
+msgstr "lekwasịrị"
 
-msgid "if"
-msgstr "o buru na"
+msgid "keyboard"
+msgstr "keyboard"
 
-msgid "then"
-msgstr "mgbe ahụ"
+msgid "You can also load projects from the file system."
+msgstr "giwa nwekwara ike mara oru ngo si faịlụ usoro"
 
-msgid "until"
-msgstr "ruo mgbe"
+#. TRANS: as in "on event do"
+msgid "on"
+msgstr ""
 
-msgid "wait for"
-msgstr "na-eche maka"
+msgid "chicken"
+msgstr "okuko"
 
-msgid "while"
-msgstr "mgbe"
+msgid "Run music slow"
+msgstr ""
 
-msgid "else"
-msgstr "ọzọ"
+msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
 
-msgid "wait"
-msgstr "na-eche"
+msgid "apple"
+msgstr "apụl"
 
-msgid "print"
-msgstr "ebipụta"
+msgid "graphical notation matrix"
+msgstr ""
 
-msgid "time"
-msgstr "oge"
+msgid "number"
+msgstr "nọmba"
+
+#. TRANS: unique ID
+msgid "UID"
+msgstr ""
+
+#. TRANS: name of project
+msgid "title"
+msgstr "aha"
+
+msgid "radians"
+msgstr "radians"
+
+msgid "Undo"
+msgstr "Wepu"
+
+#. TRANS: ms is micro seconds
+msgid "duration (ms)"
+msgstr ""
+
+#. TRANS: as in "add 1 to"
+msgid "to"
+msgstr "ka"
+
+msgid "add"
+msgstr "tinye"
+
+msgid "set pen size"
+msgstr "set pen size"
+
+msgid "start turtle"
+msgstr "mbe bido"
+
+msgid "latitude"
+msgstr "ohere"
+
+msgid "1/32 note 𝅘𝅥𝅰"
+msgstr ""
 
 msgid "mouse x"
 msgstr "oke x"
@@ -211,496 +120,86 @@ msgstr "oke x"
 msgid "mouse y"
 msgstr "oke y"
 
-msgid "mouse button"
-msgstr "òké bọtịnụ"
-
-msgid "keyboard"
-msgstr "keyboard"
-
-msgid "pixel color"
-msgstr "pixel agba"
-
-msgid "unknown"
-msgstr "amaghị"
-
-msgid "Welcome to Turtle Blocks"
-msgstr "Mmadụ Bịa mbe nkanka"
-
-msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
-msgstr "Mbe nkanka bụ a Logo-sitere n'ike mmụọ nsọ mbe na-adọta yi foto na snap-na-visual-Mmemme blocks"
-
-msgid "Palette buttons"
-msgstr "palette buttons"
-
-msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
-msgstr "Nke a toolbar e dere ihe palette buttons: pịa na-egosi ma ọ bụ zoo palettes nke blocks (mbe, Pen, Ọnụ Ọgụgụ, Boolean, Igba, nkanka, Media, sensọ, na Mkponyeaka). Ozugbo oghe, ị nwere ike ịdọrọ blocks si palettes n'elu kwaaji-eji ha."
-
-msgid "Expand/collapse toolbar"
-msgstr "Ịmụbawanye / ida toolbar"
-
-msgid "This button opens and closes the primary toolbar."
-msgstr "Nke a button emepekwa na-emechi isi toolbar."
-
-msgid "Run fast"
-msgstr "Gbaa ngwa ngwa"
-
-msgid "Click to run the project in fast mode."
-msgstr "Pịa-agba ọsọ ahụ oru ngo na ngwa ngwa mode"
-
-msgid "Run slow"
-msgstr "Gbaa Obere Obere"
-
-msgid "Click to run the project in slow mode."
-msgstr "Pịa-agba ọsọ ahụ oru ngo na-adịghị ngwa mode"
-
-msgid "Run step by step"
-msgstr "Gbaa nzọụkwụ site nzọụkwụ"
-
-msgid "Click to run the project step by step."
-msgstr "Pịa na-agba ọsọ ngo nzọụkwụ site nzọụkwụ"
-
-msgid "Stop"
-msgstr "kwụsị"
-
-msgid "Stop the current project."
-msgstr "Kwụsị ugbu a oru ngo"
-
-msgid "Clean"
-msgstr "ọcha"
-
-msgid "Clear the screen and return the turtles to their initial positions."
-msgstr "Clear the screen and return the turtles to their initial positions"
-
-msgid "Show/hide palettes"
-msgstr "Gosi / hide palettes"
-
-msgid "Hide or show the block palettes."
-msgstr "Zoo ma ọ bụ na-egosi na ngọngọ palettes"
-
 msgid "Show/hide blocks"
 msgstr "Gosi / hide blocks"
 
-msgid "Hide or show the blocks and the palettes."
-msgstr "Zoo ma ọ bụ na-egosi na blocks na palettes"
-
-msgid "Expand/collapse collapsable blocks"
-msgstr "Ịmụbawanye / daa collapsable blocks"
-
-msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
-msgstr "Ịmụbawanye ma ọ bụ daa stacks nke blocks, dịka, na-amalite na edinam stack"
-
-msgid "Help"
-msgstr "Help"
-
-msgid "Show these messages."
-msgstr "Gosi ndị a ozi"
-
-msgid "Expand/collapse option toolbar"
-msgstr "Ịmụbawanye / daa nhọrọ toolbar"
-
-msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "Pịa a button mụbaa ma ọ bụ daa na auxillary toolbar"
-
-msgid "Paste"
-msgstr "tapawa"
-
-msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-msgstr "The tapawa button na-nyeere e nwere blocks depụtaghachiri n'elu clipboard"
-
-msgid "Copy"
-msgstr "Detuo"
-
-msgid "The copy button copies a stack to the clipboard. It appears after a \"long press\" on a stack."
-
-msgid "Save stack"
-msgstr "ịzọpụta tojupụtara"
-
-msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
-
-msgid "Settings"
-msgstr "Ntọala"
-
-msgid "Open a panel for configuring Turtle Blocks."
-msgstr "Mepee a panel maka configuring mbe nkanka ."
-
-msgid "Decrease block size"
-msgstr "Ibelata ngọngọ size"
-
-msgid "Decrease the size of the blocks."
-msgstr "Ibelata size nke blocks."
-
-msgid "Increase block size"
-msgstr "Mmụba ngọngọ size"
-
-msgid "Increase the size of the blocks."
-msgstr "Dịkwuo size nke blocks."
-
-msgid "Display statistics"
-msgstr "Ngosipụta ọnụ ọgụgụ"
-
-msgid "Display statistics about your Turtle project."
-msgstr "Ngosipụta ọnụ ọgụgụ banyere gị mbe oru ngo."
-
-msgid "Cartesian"
-msgstr "Cartesian"
-
-msgid "Show or hide a Cartesian-coordinate grid."
-msgstr "Egosi ma ọ bụ zoo a Cartesian-ahazi okporo"
-
-msgid "Polar"
-msgstr "pola"
-
-msgid "Show or hide a polar-coordinate grid."
-msgstr "Egosi ma ọ bụ zoo a polar-ahazi okporo"
-
-msgid "Load samples from server"
-msgstr "Ibu Ibu n'omume site na ihe nkesa"
-
-msgid "This button opens a viewer for loading example projects."
-msgstr "Nke a ga-emepe button a na-ekiri maka loading atụ oru ngo"
-
-msgid "Load project from file"
-msgstr "Ibu Ibu oru ngo si faịlụ"
-
-msgid "You can also load projects from the file system."
-msgstr "giwa nwekwara ike mara oru ngo si faịlụ usoro"
-
-msgid "Load plugin from file"
-msgstr "Ibu Ibu plugin si faịlụ"
-
-msgid "You can load new blocks from the file system."
-msgstr "I nwere ike mara ọhụrụ blocks si faịlụ usoro"
-
-msgid "Delete all"
-msgstr "hichapụ niile"
-
-msgid "Remove all content on the canvas, including the blocks."
-msgstr "Wepụ niile ọdịnaya na kwaaji, gụnyere blocks"
-
-msgid "Undo"
-msgstr "Wepu"
-
-msgid "Restore blocks from the trash."
-msgstr "Weghachi blocks si ahịhịa"
-
-msgid "Save project"
-msgstr "Save oru ngo"
-
-msgid "Save your project to a server."
-msgstr "Zọpụta ndị gị oru ngo na-a nkesa"
-
-msgid "Congratulations."
-msgstr "ekele"
-
-msgid "You have finished the tour. Please enjoy Turtle Blocks!"
-msgstr "ị okokụre njegharị. Biko enwe mbe nkanka!"
-
-msgid "hide blocks"
-msgstr "hide blocks"
-
-msgid "publish"
-msgstr "ebipụta"
-
-msgid "comment"
-msgstr "ikwu"
-
-msgid "play back"
-msgstr "egwu azụ"
-
-msgid "save svg"
-msgstr "save svg"
-
-msgid "title"
-msgstr "aha"
-
-msgid "eval"
-msgstr "eval"
-
-msgid "show blocks"
-msgstr "show blocks"
-
-msgid "stop play"
-msgstr "kwụsị play"
-
-msgid "turtle"
-msgstr "mbe"
-
-msgid "pen"
-msgstr "pen"
-
-msgid "number"
-msgstr "nọmba"
-
-msgid "Boolean"
-msgstr "Boolean"
-
-msgid "flow"
-msgstr "igba"
-
-msgid "blocks"
-msgstr "blocks"
-
-msgid "media"
-msgstr "media"
-
-msgid "sensors"
-msgstr "sensọ"
-
-msgid "extras"
-msgstr "yana mgbakwunye"
-
-msgid "open file"
-msgstr "emeghe faịlụ"
-
-msgid "motion z"
-msgstr "ngagharị z"
-
-msgid "motion y"
-msgstr "ngagharị y"
-
-msgid "motion x"
-msgstr "ngagharị x"
-
-msgid "bitcoin"
-msgstr "Bitcoin"
-
-msgid "from"
-msgstr "site"
-
-msgid "mashape"
-msgstr "ọdịdị"
-
-msgid "define"
-msgstr "kọwaa"
-
-msgid "stock price"
-msgstr "ngwaahịa price"
-
-msgid "currency"
-msgstr "ego"
-
-msgid "Google map"
-msgstr "Google map"
-
-msgid "coordinates"
-msgstr "na-achịkọta"
-
-msgid "zoom factor"
-msgstr "mbugharị na-akpata"
-
-msgid "zoom"
-msgstr "mbugharị"
-
-msgid "city latitude"
-msgstr ""
-
-msgid "city longitude"
-msgstr ""
-
-#. TRANS: longitude and latitude coordinate data
-msgid "Coordinate data not available."
-msgstr ""
-
-msgid "latitude"
-msgstr "ohere"
-
-msgid "longtitude"
-msgstr "lonjituudu"
-
-msgid "show heap"
-msgstr "show kpokọtara"
-
-msgid "pop"
-msgstr "pop"
-
-msgid "empty heap"
-msgstr "efu kpokọtara"
-
-msgid "save heap"
-msgstr "ịzọpụta kpokọtara"
-
-msgid "load heap"
-msgstr "ibu kpokọtara"
-
-msgid "push"
-msgstr "kwaa"
-
-msgid "logic"
-msgstr "mgbagha"
-
-msgid "power"
-msgstr "ike"
-
-msgid "base"
-msgstr "isi"
-
-msgid "exp"
-msgstr "exp"
-
-msgid "floor"
-msgstr "ahla"
-
-msgid "ceiling"
-msgstr "n'uko"
-
-msgid "degrees"
-msgstr "degrees"
-
-msgid "to degrees"
-msgstr " to degrees"
-
-msgid "radians"
-msgstr "radians"
-
-msgid "to radians"
-msgstr "to oradians"
-
-msgid "maths"
-msgstr "maths"
-
-msgid "cheese"
-msgstr "cheese"
-
-msgid "apple"
-msgstr "apụl"
-
-msgid "get fat"
-msgstr "ga-esi abụba"
-
-msgid "fish"
-msgstr "azụ"
-
-msgid "get calories"
-msgstr "ga-esi calories"
-
-msgid "protein"
-msgstr "protein"
-
-msgid "chicken"
-msgstr "okuko"
-
-msgid "digest meal"
-msgstr "iyochapu nri"
-
-msgid "get fiber"
-msgstr "na-eriri"
-
-msgid "carbs"
-msgstr "carbs"
-
-msgid "eat"
-msgstr "eri"
-
-msgid "rice and beans"
-msgstr "osikapa na agwa"
-
-msgid "orange"
-msgstr "oroma"
-
-msgid "banana"
-msgstr "unere"
-
-msgid "tamale"
-msgstr "tamale"
-
-msgid "fiber"
-msgstr "eriri"
-
-msgid "corn"
-msgstr "ọka"
-
-msgid "fat"
-msgstr "ibu"
-
-msgid "get carbs"
-msgstr "wete carbs"
-
-msgid "water"
-msgstr "imiri"
-
-msgid "cookie"
-msgstr "kuki"
-
-msgid "sweet potato"
-msgstr "ụtọ nduku"
-
-msgid "broccoli"
-msgstr "brọkọlị"
-
-msgid "wheat bread"
-msgstr "wheat achịcha"
-
-msgid "tomato"
-msgstr "tomato"
-
-msgid "beef"
-msgstr "beef"
-
-msgid "potato"
-msgstr "potato"
-
-msgid "calories"
-msgstr "calories"
-
-msgid "get name"
-msgstr "na-aha"
-
-msgid "cake"
-msgstr "achicha"
-
-msgid "get protein"
-msgstr "ga-esi protein"
-
-msgid "food"
-msgstr "nri"
-
-msgid "eatme"
-msgstr "rea-mu"
-
-msgid "sense left"
-msgstr "uche hapụrụ"
-
-msgid "see distance"
-msgstr "ịhụ anya"
-
-msgid "sense right"
-msgstr "uche ziri ezi"
-
-msgid "sing"
-msgstr "na-abụ abụ"
-
-msgid "note"
-msgstr "dee"
-
-msgid "duration"
-msgstr "oge"
+msgid "then"
+msgstr "mgbe ahụ"
 
 msgid "move"
 msgstr "ije"
 
-msgid "blink (ms)"
-msgstr "itabi (MS)"
+msgid "triangle"
+msgstr ""
 
-msgid "rodi"
-msgstr "Rhodes"
+msgid "stop turtle"
+msgstr "kwusi mbe "
 
-msgid "set lang"
-msgstr "dị nnọọ ka"
+msgid "current pitch octave"
+msgstr ""
 
-msgid "source"
-msgstr "isi iyi"
+#. TRANS: robot sensors.
+msgid "distance"
+msgstr ""
 
-msgid "target"
-msgstr "lekwasịrị"
+msgid "food"
+msgstr "nri"
 
-msgid "translate"
-msgstr "ịsụgharị"
+msgid "Click to run the project in slow mode."
+msgstr "Pịa-agba ọsọ ahụ oru ngo na-adịghị ngwa mode"
 
-msgid "hello"
-msgstr "hallo"
+msgid "stop"
+msgstr "kwụsị"
 
-msgid "detect lang"
-msgstr "chọpụta naanị"
+msgid "fat"
+msgstr "ibu"
+
+msgid "Expand or collapse start and action stacks."
+msgstr "Ịmụbawanye ma ọ bụ daa stacks nke blocks, dịka, na-amalite na edinam stack"
+
+#. TRANS: a container for a variable
+msgid "boxes"
+msgstr ""
+
+msgid "get fiber"
+msgstr "na-eriri"
+
+msgid "background"
+msgstr "ndabere"
+
+#. TRANS: logical "not" operator
+msgid "not"
+msgstr "bụghị"
+
+msgid "Google map"
+msgstr "Google map"
+
+#. TRANS: as in blinking an eye.
+msgid "blink"
+msgstr ""
+
+msgid "day"
+msgstr "ụbọchị"
+
+#. TRANS: mathematical modular (remainder) function.
+msgid "mod"
+msgstr "mod"
+
+msgid "beat factor"
+msgstr ""
+
+msgid "Save project"
+msgstr "Save oru ngo"
+
+msgid "Copy"
+msgstr "Detuo"
+
+msgid "Open a panel for configuring Turtle Blocks."
+msgstr "Mepee a panel maka configuring mbe nkanka ."
+
+#. TRANS: the name of a variable (stored in a box)
+msgid "name"
+msgstr "aha"
 
 msgid "turtle x"
 msgstr "mbe x"
@@ -708,65 +207,891 @@ msgstr "mbe x"
 msgid "turtle y"
 msgstr "mbe y"
 
-msgid "stop turtle"
-msgstr "kwusi mbe "
-
-msgid "turtle name"
-msgstr "mbe aha "
-
-msgid "start turtle"
-msgstr "mbe bido"
-
-msgid "forecast"
-msgstr "amụma"
-
-msgid "city"
-msgstr "obodo"
-
-msgid "day"
-msgstr "ụbọchị"
-
-msgid "low"
-msgstr "ala"
-
-msgid "high"
-msgstr "elu"
-
-msgid "confirm"
-msgstr "gosi"
-
-msgid "to"
-msgstr "ka"
-
 msgid "Download"
 msgstr "ala-ibu"
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr "The tapawa button na-nyeere e nwere blocks depụtaghachiri n'elu clipboard"
+
+msgid "transposition"
+msgstr ""
+
+msgid "Expand/collapse toolbar"
+msgstr "Ịmụbawanye / ida toolbar"
+
+msgid "zoom"
+msgstr "mbugharị"
+
+msgid "Hide or show the blocks and the palettes."
+msgstr "Zoo ma ọ bụ na-egosi na blocks na palettes"
+
+msgid "to degrees"
+msgstr " to degrees"
+
+msgid "Restore blocks from the trash."
+msgstr "Weghachi blocks si ahịhịa"
+
+msgid "get calories"
+msgstr "ga-esi calories"
+
+msgid "Load plugin from file"
+msgstr "Ibu Ibu plugin si faịlụ"
+
+msgid "You can scroll the blocks on the canvas."
+msgstr ""
+
+msgid "x"
+msgstr "x"
+
+msgid "show blocks"
+msgstr "show blocks"
+
+msgid "heading"
+msgstr "isiokwu"
+
+msgid "Help"
+msgstr "Help"
+
+msgid "turtle"
+msgstr "mbe"
+
+msgid "sawtooth"
+msgstr ""
+
+msgid "right"
+msgstr "nri"
+
+msgid "Load samples from server"
+msgstr "Ibu Ibu n'omume site na ihe nkesa"
+
+msgid "hide blocks"
+msgstr "hide blocks"
+
+msgid "Hide or show the block palettes."
+msgstr "Zoo ma ọ bụ na-egosi na ngọngọ palettes"
+
+msgid "This button opens a viewer for loading example projects."
+msgstr "Nke a ga-emepe button a na-ekiri maka loading atụ oru ngo"
+
+msgid "Enable scrolling"
+msgstr ""
+
+msgid "back"
+msgstr "azụ"
 
 msgid "Publish"
 msgstr "asuanetop"
 
+msgid "Click to run the project step by step."
+msgstr "Pịa na-agba ọsọ ngo nzọụkwụ site nzọụkwụ"
+
+#. TRANS: hollow line refers to drawing an outline around a line
+msgid "hollow line"
+msgstr ""
+
+msgid "arc"
+msgstr "aak"
+
+msgid "radius"
+msgstr "okirikiri"
+
 msgid "longitude"
 msgstr "lonjituudu"
+
+msgid "duration"
+msgstr "oge"
+
+#. TRANS: shade refers to value (dark to light)
+msgid "set shade"
+msgstr "set ndo"
+
+msgid "duplicate notes"
+msgstr ""
+
+#. TRANS: in mathematical sense (inverse of period)
+msgid "frequency"
+msgstr ""
+
+#. TRANS: as in the event that a signal arrives
+msgid "event"
+msgstr ""
+
+msgid "pixel color"
+msgstr "pixel agba"
+
+msgid "eatme"
+msgstr "rea-mu"
+
+msgid "This button opens and closes the primary toolbar."
+msgstr "Nke a button emepekwa na-emechi isi toolbar."
+
+#. TRANS: index specifies a position into an array (heap)
+msgid "index"
+msgstr ""
+
+msgid "note volume"
+msgstr ""
+
+msgid "hide"
+msgstr ""
+
+#. TRANS: show the contents of the heap.
+msgid "show heap"
+msgstr "show kpokọtara"
+
+msgid "Stop the music (and the turtles)."
+msgstr ""
+
+msgid "You have finished the tour. Please enjoy Music Blocks!"
+msgstr ""
+
+#. TRANS: vertical space
+msgid "vspace"
+msgstr ""
+
+#. TRANS: publish project to Facebook
+msgid "publish"
+msgstr "ebipụta"
+
+#. TRANS: weather forecast
+msgid "forecast"
+msgstr "amụma"
+
+#. TRANS: hours ago that the data was updated.
+msgid "hours ago"
+msgstr ""
+
+msgid "pen"
+msgstr "pen"
+
+msgid "fish"
+msgstr "azụ"
+
+msgid "print"
+msgstr "ebipụta"
+
+#. TRANS: how many entries are in the heap?
+msgid "heap length"
+msgstr ""
+
+msgid "speak"
+msgstr "kwo"
+
+msgid "Expand/collapse option toolbar"
+msgstr "Ịmụbawanye / daa nhọrọ toolbar"
+
+msgid "end hollow line"
+msgstr ""
+
+msgid "city latitude"
+msgstr ""
+
+#. TRANS: dietary fiber
+msgid "fiber"
+msgstr "eriri"
+
+msgid "You can load new blocks from the file system."
+msgstr "I nwere ike mara ọhụrụ blocks si faịlụ usoro"
+
+#. TRANS: mathematical power, e.g., 2^4 == 16
+msgid "power"
+msgstr "ike"
+
+msgid "Settings"
+msgstr "Ntọala"
+
+msgid "one of"
+msgstr ""
+
+msgid "Save stack"
+msgstr "ịzọpụta tojupụtara"
+
+msgid "corn"
+msgstr "ọka"
+
+msgid "Display statistics"
+msgstr "Ngosipụta ọnụ ọgụgụ"
+
+msgid "Remove all content on the canvas, including the blocks."
+msgstr "Wepụ niile ọdịnaya na kwaaji, gụnyere blocks"
+
+msgid "to radians"
+msgstr "to oradians"
+
+msgid "water"
+msgstr "imiri"
+
+#. TRANS: robot sensors.
+msgid "infrared light (left)"
+msgstr ""
+
+#. TRANS: mathematical exponential base
+msgid "base"
+msgstr "isi"
+
+msgid "cookie"
+msgstr "kuki"
+
+msgid "Show or hide a polar-coordinate grid."
+msgstr "Egosi ma ọ bụ zoo a polar-ahazi okporo"
+
+msgid "octave"
+msgstr ""
+
+msgid "sweet potato"
+msgstr "ụtọ nduku"
+
+#. TRANS: save the heap to a file
+msgid "save heap"
+msgstr "ịzọpụta kpokọtara"
+
+msgid "from"
+msgstr "site"
+
+msgid "sensors"
+msgstr "sensọ"
+
+msgid "pen down"
+msgstr "pen ala"
+
+#. TRANS: retrieve the value at a specific entry (index) in the heap
+msgid "index heap"
+msgstr ""
+
+msgid "get name"
+msgstr "na-aha"
+
+msgid "wait"
+msgstr "na-eche"
+
+#. TRANS: a container for a variable
+msgid "box"
+msgstr "igbe"
 
 msgid "Planet"
 msgstr "Planet"
 
+msgid "Show these messages."
+msgstr "Gosi ndị a ozi"
+
+#. TRANS: object
+msgid "obj"
+msgstr "obj"
+
+msgid "numerator"
+msgstr ""
+
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
+msgstr ""
+
+#. TRANS: store a value in a box
+msgid "store in"
+msgstr "echekwa na"
+
+msgid "digest meal"
+msgstr "iyochapu nri"
+
+msgid "maths"
+msgstr "maths"
+
+msgid "denominator"
+msgstr ""
+
+msgid "eighth note ♪"
+msgstr ""
+
+msgid "whole note 𝅝"
+msgstr ""
+
+#. TRANS: popout window
+msgid "popout"
+msgstr ""
+
+msgid "zoom factor"
+msgstr "mbugharị na-akpata"
+
+#. TRANS: the name of a stack of blocks
+msgid "action"
+msgstr "edinam"
+
+#. TRANS: volume of microphone audio
 msgid "loudness"
 msgstr "keuzu"
 
+msgid "Increase the size of the blocks."
+msgstr "Dịkwuo size nke blocks."
+
+msgid "set volume"
+msgstr ""
+
+#. TRANS: logical "or" operator
+msgid "or"
+msgstr "ma ọ bụ"
+
+msgid "note value"
+msgstr ""
+
+msgid "comment"
+msgstr "ikwu"
+
+msgid "cheese"
+msgstr "cheese"
+
+#. TRANS: lilypond is a language used to generate musical scores.
+msgid "save as lilypond"
+msgstr ""
+
+msgid "Cartesian"
+msgstr "Cartesian"
+
+#. TRANS: audio (as in musical note)
+msgid "tone"
+msgstr ""
+
+#. TRANS: evaluate Javascript code
+msgid "eval"
+msgstr "eval"
+
+msgid "color"
+msgstr "agba"
+
+msgid "image"
+msgstr "oyiyi"
+
+msgid "Click to run the music note by note."
+msgstr ""
+
+#. TRANS: pop a value off of the heap.
+msgid "pop"
+msgstr "pop"
+
+#. TRANS: bitcoin currency (probably no need to translate)
+msgid "bitcoin"
+msgstr "Bitcoin"
+
+msgid "pen size"
+msgstr "pen size"
+
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr "Clear the screen and return the turtles to their initial positions"
+
+#. TRANS: Boolean logic
 msgid "boolean"
 msgstr "boolean"
 
-msgid "On my device"
-msgstr "On m ngwaọrụ"
+msgid "coordinates"
+msgstr "na-achịkọta"
+
+msgid "sing"
+msgstr "na-abụ abụ"
+
+msgid "play backward"
+msgstr ""
+
+msgid "Congratulations."
+msgstr "ekele"
+
+msgid "Run slow"
+msgstr "Gbaa Obere Obere"
+
+msgid "mouse button"
+msgstr "òké bọtịnụ"
+
+#. TRANS: music term for dividing the beat into a different number of equal subdivisions
+msgid "tuplet"
+msgstr ""
+
+#. TRANS: cloud as in cloud server
+msgid "cloud"
+msgstr ""
+
+msgid "size"
+msgstr "size"
+
+msgid "city"
+msgstr "obodo"
+
+#. TRANS: carbohydrates
+msgid "get carbs"
+msgstr "wete carbs"
+
+msgid "sine"
+msgstr ""
+
+msgid "Click to run the project in fast mode."
+msgstr "Pịa-agba ọsọ ahụ oru ngo na ngwa ngwa mode"
+
+msgid "beef"
+msgstr "beef"
+
+#. TRANS: source language for translation
+msgid "source"
+msgstr "isi iyi"
+
+msgid "unknown"
+msgstr "amaghị"
+
+msgid "wait for"
+msgstr "na-eche maka"
+
+msgid "pen up"
+msgstr "pen elu"
+
+msgid "Decrease the size of the blocks."
+msgstr "Ibelata size nke blocks."
+
+msgid "broccoli"
+msgstr "brọkọlị"
+
+msgid "Run note by note"
+msgstr ""
+
+msgid "start"
+msgstr "bido"
+
+msgid "stock price"
+msgstr "ngwaahịa price"
+
+#. TRANS: is the heap empty?
+msgid "heap empty?"
+msgstr ""
+
+msgid "motion z"
+msgstr "ngagharị z"
+
+#. TRANS: low temperature
+msgid "low"
+msgstr "ala"
+
+msgid "motion x"
+msgstr "ngagharị x"
+
+msgid "motion y"
+msgstr "ngagharị y"
+
+msgid "forward"
+msgstr "na-atụ"
+
+#. TRANS: 360 degrees in a circle
+msgid "degrees"
+msgstr "degrees"
+
+msgid "translate"
+msgstr "ịsụgharị"
+
+msgid "quarter note ♩"
+msgstr ""
+
+msgid "until"
+msgstr "ruo mgbe"
+
+msgid "define"
+msgstr "kọwaa"
+
+#. TRANS: save project as simple vector graphic (SVG)
+msgid "save svg"
+msgstr "save svg"
+
+#. TRANS: mathematical ceiling function, e.g., ceiling(2.5) == 3
+msgid "ceiling"
+msgstr "n'uko"
+
+#. TRANS: a turtle shell
+msgid "shell"
+msgstr "shei"
+
+msgid "Welcome to Music Blocks"
+msgstr ""
+
+#. TRANS: set language
+msgid "set lang"
+msgstr "dị nnọọ ka"
+
+msgid "turtle name"
+msgstr "mbe aha "
+
+#. TRANS: carbohydrates
+msgid "carbs"
+msgstr "carbs"
+
+msgid "else"
+msgstr "ọzọ"
+
+#. TRANS: as in broadcast a signal
+msgid "broadcast"
+msgstr ""
+
+msgid "orange"
+msgstr "oroma"
+
+msgid "begin hollow line"
+msgstr ""
+
+msgid "flat"
+msgstr ""
+
+#. TRANS: the heap is a first-in-last-out (FILO) stack
+msgid "heap"
+msgstr ""
+
+#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
+msgid "begin fill"
+msgstr "na-amalite erijueala"
+
+msgid "beats per minute"
+msgstr ""
+
+msgid "eat"
+msgstr "eri"
+
+msgid "Expand/collapse collapsable blocks"
+msgstr "Ịmụbawanye / daa collapsable blocks"
+
+#. TRANS: high temperature
+msgid "high"
+msgstr "elu"
+
+msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgstr ""
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+#. TRANS: hue refers to spectral hue (red, yellow, green, blue...)
+msgid "set hue"
+msgstr "set agba"
+
+msgid "currency"
+msgstr "ego"
+
+msgid "this"
+msgstr ""
+
+#. TRANS: horizontal space
+msgid "hspace"
+msgstr ""
+
+msgid "potato"
+msgstr "potato"
+
+msgid "city longitude"
+msgstr ""
+
+msgid "grey"
+msgstr "isi awọ"
+
+#. TRANS: the value of a variable (stored in a box)
+msgid "value"
+msgstr "uru"
+
+msgid "banana"
+msgstr "unere"
+
+msgid "wheat bread"
+msgstr "wheat achịcha"
+
+msgid "while"
+msgstr "mgbe"
+
+msgid "open file"
+msgstr "emeghe faịlụ"
+
+#. TRANS: detect language
+msgid "detect lang"
+msgstr "chọpụta naanị"
+
+msgid "cake"
+msgstr "achicha"
+
+#. TRANS: mathematical exponent
+msgid "exp"
+msgstr "exp"
+
+#. TRANS: load the heap from a file
+msgid "load heap"
+msgstr "ibu kpokọtara"
 
 msgid "Open"
 msgstr "Mekpe"
 
+#. TRANS: database fetch
+msgid "fetch"
+msgstr ""
+
+#. TRANS: logical "and" operator
+msgid "and"
+msgstr "na"
+
+#. TRANS: grey refers to chroma (grey to vivid)
+msgid "set grey"
+msgstr "set isi awọ"
+
+#. TRANS: do this action
+msgid "do"
+msgstr "eme"
+
+msgid "calories"
+msgstr "calories"
+
+msgid "Run step by step"
+msgstr "Gbaa nzọụkwụ site nzọụkwụ"
+
+#. TRANS: musical pitch
+msgid "pitch"
+msgstr ""
+
+msgid "Show/hide palettes"
+msgstr "Gosi / hide palettes"
+
+msgid "set heading"
+msgstr "set isiokwu"
+
+msgid "add 1 to"
+msgstr "tinye 1"
+
+#. TRANS: stop playing current media file (movie or audio)
+msgid "stop play"
+msgstr "kwụsị play"
+
+msgid "sharp"
+msgstr ""
+
+msgid "protein"
+msgstr "protein"
+
+#. TRANS: number of notes
+msgid "# notes"
+msgstr ""
+
+msgid "osctime"
+msgstr ""
+
+#. TRANS: play media (audio or video)
+msgid "play back"
+msgstr "egwu azụ"
+
+#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
+msgid "fill"
+msgstr ""
+
+msgid "Save your project to a server."
+msgstr "Zọpụta ndị gị oru ngo na-a nkesa"
+
+msgid "Decrease block size"
+msgstr "Ibelata ngọngọ size"
+
+msgid "angle"
+msgstr "n'akuku"
+
+msgid "get fat"
+msgstr "ga-esi abụba"
+
+#. TRANS: minimum
+msgid "min"
+msgstr "kacha nta"
+
+msgid "media"
+msgstr "media"
+
+msgid "that"
+msgstr ""
+
+msgid "Stop"
+msgstr "kwụsị"
+
+#. TRANS: square root
+msgid "sqrt"
+msgstr "sqrt"
+
+#. TRANS: as in button click
+msgid "click"
+msgstr ""
+
+msgid "note"
+msgstr "dee"
+
+#. TRANS: field of interest in a database, e.g., temperature in a weather database
+msgid "field"
+msgstr ""
+
+msgid "invert"
+msgstr ""
+
+msgid "square"
+msgstr ""
+
+msgid "Palette buttons"
+msgstr "palette buttons"
+
+msgid "set xy"
+msgstr "set xy"
+
+msgid "end fill"
+msgstr "ọgwụgwụ erijueala"
+
+msgid "if"
+msgstr "o buru na"
+
+msgid "Paste"
+msgstr "tapawa"
+
+msgid "set key"
+msgstr ""
+
 msgid "Delete"
 msgstr "hichapụ"
+
+#. TRANS: Mexican tamale
+msgid "tamale"
+msgstr "tamale"
 
 msgid "Worldwide"
 msgstr "Uwa-obosara"
 
-msgid ""
+#. TRANS: as in play a musical note.
+msgid "play"
 msgstr ""
+
+msgid "repeat"
+msgstr "imekwa"
+
+msgid "blocks"
+msgstr "blocks"
+
+msgid "Display statistics about your Turtle project."
+msgstr "Ngosipụta ọnụ ọgụgụ banyere gị mbe oru ngo."
+
+msgid "Polar"
+msgstr "pola"
+
+#. TRANS: maximum
+msgid "max"
+msgstr "kacha"
+
+msgid "logic"
+msgstr "mgbagha"
+
+msgid "current pitch name"
+msgstr ""
+
+#. TRANS: empty the heap
+msgid "empty heap"
+msgstr "efu kpokọtara"
+
+#. TRANS: robot sensors.
+msgid "infrared light (right)"
+msgstr ""
+
+msgid "On my device"
+msgstr "On m ngwaọrụ"
+
+msgid "key"
+msgstr ""
+
+#. TRANS: push a value on to the heap.
+msgid "push"
+msgstr "kwaa"
+
+#. TRANS: the name of a robot built in Paraguay (probably no need to translate)
+msgid "rodi"
+msgstr "Rhodes"
+
+msgid "Increase block size"
+msgstr "Mmụba ngọngọ size"
+
+#. TRANS: mathematical floor function, e.g., floor(2.5) == 2
+msgid "floor"
+msgstr "ahla"
+
+msgid "Clean"
+msgstr "ọcha"
+
+msgid "1/64 note 𝅘𝅥𝅱"
+msgstr ""
+
+#. TRANS: color refers to a hue, value, chroma triplet
+msgid "set color"
+msgstr "set agba"
+
+msgid "Click to run just the music in slow mode."
+msgstr ""
+
+msgid "Run fast"
+msgstr "Gbaa ngwa ngwa"
+
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
+msgstr ""
+
+#. TRANS: stop playing current media file (movie or audio)
+msgid "stop media"
+msgstr "kwụsị egwu"
+
+msgid "tomato"
+msgstr "tomato"
+
+msgid "forever"
+msgstr "ruo mgbe ebighị ebi"
+
+#. TRANS: musical note to frequency
+msgid "note to frequency"
+msgstr ""
+
+msgid "no background"
+msgstr ""
+
+msgid "Load project from file"
+msgstr "Ibu Ibu oru ngo si faịlụ"
+
+msgid "get protein"
+msgstr "ga-esi protein"
+
+#. TRANS: clear the screen of any graphics drawn by the turtle
+msgid "clear"
+msgstr "doro anya"
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr "Egosi ma ọ bụ zoo a Cartesian-ahazi okporo"
+
+msgid "flow"
+msgstr "igba"
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr "Pịa a button mụbaa ma ọ bụ daa na auxillary toolbar"
+
+msgid "half note 𝅗𝅥"
+msgstr ""
+
+msgid "1/16 note ♬"
+msgstr ""
+
+msgid "extras"
+msgstr "yana mgbakwunye"
+
+msgid "set beats per minute"
+msgstr ""
+
+msgid "shade"
+msgstr "ndo"
+
+msgid "time"
+msgstr "oge"
+
+msgid "y"
+msgstr "y"
+
+msgid "Meet "Mr. Mouse!"
+msgstr ""
+
+msgid "multiply beat"
+msgstr ""
+
+msgid "hello"
+msgstr "hallo"
+
+msgid "dot"
+msgstr ""
+
+msgid "left"
+msgstr "ekpe"
