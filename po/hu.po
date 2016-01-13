@@ -18,6 +18,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
@@ -35,6 +38,7 @@ msgstr ""
 msgid "confirm"
 msgstr ""
 
+#. TRANS: musical meter
 msgid "meter"
 msgstr ""
 
@@ -47,6 +51,10 @@ msgstr ""
 
 #. TRANS: target language for translation
 msgid "target"
+msgstr ""
+
+#. TRANS: horizontal space
+msgid "hspace"
 msgstr ""
 
 msgid "keyboard"
@@ -105,7 +113,7 @@ msgstr ""
 msgid "set pen size"
 msgstr ""
 
-msgid "start turtle"
+msgid "rhythm"
 msgstr ""
 
 msgid "latitude"
@@ -123,7 +131,8 @@ msgstr ""
 msgid "Show/hide blocks"
 msgstr ""
 
-msgid "then"
+#. TRANS: do this action
+msgid "do"
 msgstr ""
 
 msgid "move"
@@ -255,6 +264,7 @@ msgstr ""
 msgid "turtle"
 msgstr ""
 
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
@@ -640,9 +650,6 @@ msgstr ""
 msgid "Decrease the size of the blocks."
 msgstr ""
 
-msgid "broccoli"
-msgstr ""
-
 msgid "Run note by note"
 msgstr ""
 
@@ -698,6 +705,9 @@ msgstr ""
 
 #. TRANS: a turtle shell
 msgid "shell"
+msgstr ""
+
+msgid "start turtle"
 msgstr ""
 
 msgid "Welcome to Music Blocks"
@@ -768,8 +778,7 @@ msgstr ""
 msgid "this"
 msgstr ""
 
-#. TRANS: horizontal space
-msgid "hspace"
+msgid "Palette buttons"
 msgstr ""
 
 msgid "potato"
@@ -827,8 +836,7 @@ msgstr ""
 msgid "set grey"
 msgstr ""
 
-#. TRANS: do this action
-msgid "do"
+msgid "then"
 msgstr ""
 
 msgid "calories"
@@ -860,10 +868,7 @@ msgstr ""
 msgid "protein"
 msgstr ""
 
-#. TRANS: number of notes
-msgid "# notes"
-msgstr ""
-
+#. TRANS: oscillator time
 msgid "osctime"
 msgstr ""
 
@@ -879,6 +884,10 @@ msgid "Save your project to a server."
 msgstr ""
 
 msgid "Decrease block size"
+msgstr ""
+
+#. TRANS: number of notes
+msgid "number of notes"
 msgstr ""
 
 msgid "angle"
@@ -921,7 +930,7 @@ msgstr ""
 msgid "square"
 msgstr ""
 
-msgid "Palette buttons"
+msgid "Meet Mr. Mouse!"
 msgstr ""
 
 msgid "set xy"
@@ -936,6 +945,7 @@ msgstr ""
 msgid "Paste"
 msgstr ""
 
+#. TRANS: musical key, e.g., C Major
 msgid "set key"
 msgstr ""
 
@@ -986,6 +996,7 @@ msgstr ""
 msgid "On my device"
 msgstr ""
 
+#. TRANS: musical key, e.g., C Major
 msgid "key"
 msgstr ""
 
@@ -1020,8 +1031,7 @@ msgstr ""
 msgid "Run fast"
 msgstr ""
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
+msgid "broccoli"
 msgstr ""
 
 #. TRANS: stop playing current media file (movie or audio)
@@ -1081,7 +1091,8 @@ msgstr ""
 msgid "y"
 msgstr ""
 
-msgid "Meet Mr. Mouse!"
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
 msgstr ""
 
 msgid "multiply beat"

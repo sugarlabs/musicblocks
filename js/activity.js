@@ -222,8 +222,8 @@ console.log(txt);
         var helpIdx = 0;
         var HELPCONTENT = [
             [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
-            [_('Meet "Mr. Mouse!"'), _('Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. "Let\'s start our tour!" '), 'activity/activity-icon-mouse-color.svg'],
-            [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+            [_('Meet Mr. Mouse!'), _('Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!'), 'activity/activity-icon-mouse-color.svg'],
+            [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
             [_('Run fast'), _('Click to run the project in fast mode.'), 'header-icons/fast-button.svg'],
             [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
             [_('Run music slow'), _('Click to run just the music in slow mode.'), 'header-icons/slow-music-button.svg'],
@@ -242,10 +242,10 @@ console.log(txt);
             [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'header-icons/save-blocks-button.svg'],
             [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'header-icons/Cartesian-button.svg'],
             [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
-            [_('Settings'), _('Open a panel for configuring Turtle Blocks.'), 'header-icons/utility-button.svg'],
+            [_('Settings'), _('Open a panel for configuring Music Blocks.'), 'header-icons/utility-button.svg'],
             [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
             [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
-            [_('Display statistics'), _('Display statistics about your Turtle project.'), 'header-icons/chart-button.svg'],
+            [_('Display statistics'), _('Display statistics about your Music project.'), 'header-icons/chart-button.svg'],
             [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugin-button.svg'],
             [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-button.svg'],
             [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],

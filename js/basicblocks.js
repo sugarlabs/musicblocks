@@ -60,7 +60,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
     matrixBlock.staticLabels.push(_('graphical notation matrix'));
-    matrixBlock.extraWidth = 10;
+    matrixBlock.extraWidth = 20;
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
 
@@ -96,7 +96,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     var rhythm = new ProtoBlock('rhythm');
     rhythm.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythm'] = rhythm;
-    rhythm.staticLabels.push(_('rhythm'),_('# notes'),_('note value'));
+    rhythm.staticLabels.push(_('rhythm'),_('number of notes'),_('note value'));
+    rhythm.extraWidth = 20;
     rhythm.adjustWidthToLabel();
     rhythm.defaults.push(3);
     rhythm.defaults.push(4);

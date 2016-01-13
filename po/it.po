@@ -28,6 +28,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
@@ -45,6 +48,7 @@ msgstr "casuale"
 msgid "confirm"
 msgstr ""
 
+#. TRANS: musical meter
 msgid "meter"
 msgstr ""
 
@@ -58,6 +62,10 @@ msgstr "mashape"
 #. TRANS: target language for translation
 msgid "target"
 msgstr "obiettivo"
+
+#. TRANS: horizontal space
+msgid "hspace"
+msgstr ""
 
 msgid "keyboard"
 msgstr "tastiera"
@@ -115,8 +123,8 @@ msgstr "aggiungere"
 msgid "set pen size"
 msgstr "selezionare dimensione della penna"
 
-msgid "start turtle"
-msgstr "iniziare tartaruga"
+msgid "rhythm"
+msgstr ""
 
 msgid "latitude"
 msgstr "latitudine"
@@ -133,8 +141,9 @@ msgstr "mouse y"
 msgid "Show/hide blocks"
 msgstr "Mostrare/Nascondire blocchi"
 
-msgid "then"
-msgstr "allora"
+#. TRANS: do this action
+msgid "do"
+msgstr "fare"
 
 msgid "move"
 msgstr "muovere"
@@ -265,6 +274,7 @@ msgstr "Aiuto"
 msgid "turtle"
 msgstr "tartaruga"
 
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
@@ -650,9 +660,6 @@ msgstr "caricare penna"
 msgid "Decrease the size of the blocks."
 msgstr ""
 
-msgid "broccoli"
-msgstr "broccoli"
-
 msgid "Run note by note"
 msgstr ""
 
@@ -709,6 +716,9 @@ msgstr "soffitto"
 #. TRANS: a turtle shell
 msgid "shell"
 msgstr "console"
+
+msgid "start turtle"
+msgstr "iniziare tartaruga"
 
 msgid "Welcome to Music Blocks"
 msgstr ""
@@ -778,9 +788,8 @@ msgstr "moneta"
 msgid "this"
 msgstr ""
 
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr ""
+msgid "Palette buttons"
+msgstr "Pulsanti della tavolozza"
 
 msgid "potato"
 msgstr "patata"
@@ -837,9 +846,8 @@ msgstr "e"
 msgid "set grey"
 msgstr "selezionare grigio"
 
-#. TRANS: do this action
-msgid "do"
-msgstr "fare"
+msgid "then"
+msgstr "allora"
 
 msgid "calories"
 msgstr "calorie"
@@ -870,10 +878,7 @@ msgstr ""
 msgid "protein"
 msgstr "proteine"
 
-#. TRANS: number of notes
-msgid "# notes"
-msgstr ""
-
+#. TRANS: oscillator time
 msgid "osctime"
 msgstr ""
 
@@ -889,6 +894,10 @@ msgid "Save your project to a server."
 msgstr "Salvare tuo progetto nel server."
 
 msgid "Decrease block size"
+msgstr ""
+
+#. TRANS: number of notes
+msgid "number of notes"
 msgstr ""
 
 msgid "angle"
@@ -931,8 +940,8 @@ msgstr ""
 msgid "square"
 msgstr ""
 
-msgid "Palette buttons"
-msgstr "Pulsanti della tavolozza"
+msgid "Meet Mr. Mouse!"
+msgstr ""
 
 msgid "set xy"
 msgstr "selezionare xy"
@@ -946,6 +955,7 @@ msgstr "se"
 msgid "Paste"
 msgstr "Incollare"
 
+#. TRANS: musical key, e.g., C Major
 msgid "set key"
 msgstr ""
 
@@ -996,6 +1006,7 @@ msgstr ""
 msgid "On my device"
 msgstr ""
 
+#. TRANS: musical key, e.g., C Major
 msgid "key"
 msgstr ""
 
@@ -1030,9 +1041,8 @@ msgstr ""
 msgid "Run fast"
 msgstr "Correre veloce"
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
-msgstr ""
+msgid "broccoli"
+msgstr "broccoli"
 
 #. TRANS: stop playing current media file (movie or audio)
 msgid "stop media"
@@ -1091,7 +1101,8 @@ msgstr "tempo"
 msgid "y"
 msgstr "y"
 
-msgid "Meet Mr. Mouse!"
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
 msgstr ""
 
 msgid "multiply beat"

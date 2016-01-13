@@ -11,6 +11,9 @@ msgstr ""
 "Language: en\n"
 "X-Generator: ini-to-pot script\n"
 
+msgid "rhythm"
+msgstr ""
+
 #. TRANS: clear the screen of any graphics drawn by the turtle
 msgid "clear"
 msgstr ""
@@ -270,13 +273,13 @@ msgstr ""
 msgid "Meet Mr. Mouse!"
 msgstr ""
 
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
 msgstr ""
 
 msgid "Palette buttons"
 msgstr ""
 
-msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr ""
 
 msgid "Expand/collapse toolbar"
@@ -376,7 +379,7 @@ msgid "The save-stack button saves a stack onto a custom palette. It appears aft
 msgid "Settings"
 msgstr ""
 
-msgid "Open a panel for configuring Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
 msgstr ""
 
 msgid "Decrease block size"
@@ -394,7 +397,7 @@ msgstr ""
 msgid "Display statistics"
 msgstr ""
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr ""
 
 msgid "Cartesian"
@@ -1004,8 +1007,7 @@ msgstr ""
 msgid "tuplet"
 msgstr ""
 
-#. TRANS: number of notes
-msgid "# notes"
+msgid "number of notes"
 msgstr ""
 
 msgid "note value"
@@ -1053,12 +1055,15 @@ msgstr ""
 msgid "beats per minute"
 msgstr ""
 
+#. TRANS: musical key, e.g., C Major
 msgid "set key"
 msgstr ""
 
+#. TRANS: musical key, e.g., C Major
 msgid "key"
 msgstr ""
 
+#. TRANS: musical meter
 msgid "meter"
 msgstr ""
 
@@ -1071,6 +1076,7 @@ msgstr ""
 msgid "play backward"
 msgstr ""
 
+#. TRANS: oscillator time
 msgid "osctime"
 msgstr ""
 
@@ -1083,6 +1089,7 @@ msgstr ""
 msgid "sine"
 msgstr ""
 
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 

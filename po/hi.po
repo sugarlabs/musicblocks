@@ -21,6 +21,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
@@ -38,6 +41,7 @@ msgstr "बेतरतीब"
 msgid "confirm"
 msgstr "पक्का करीये"
 
+#. TRANS: musical meter
 msgid "meter"
 msgstr ""
 
@@ -51,6 +55,10 @@ msgstr "आकार"
 #. TRANS: target language for translation
 msgid "target"
 msgstr "लक्ष्य"
+
+#. TRANS: horizontal space
+msgid "hspace"
+msgstr ""
 
 msgid "keyboard"
 msgstr "कुंजीपट"
@@ -108,8 +116,8 @@ msgstr "जोडें"
 msgid "set pen size"
 msgstr "पेन आकार सेट करें"
 
-msgid "start turtle"
-msgstr "टरटल चालू करे"
+msgid "rhythm"
+msgstr ""
 
 msgid "latitude"
 msgstr "अक्षांश"
@@ -126,8 +134,9 @@ msgstr "माउस y"
 msgid "Show/hide blocks"
 msgstr "पिण्ड दिखाएँ/छुपाएँ"
 
-msgid "then"
-msgstr "तब"
+#. TRANS: do this action
+msgid "do"
+msgstr "करें"
 
 msgid "move"
 msgstr "सरकाय"
@@ -258,6 +267,7 @@ msgstr "मदद"
 msgid "turtle"
 msgstr "कछुआ"
 
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
@@ -643,9 +653,6 @@ msgstr "पेन ऊपर"
 msgid "Decrease the size of the blocks."
 msgstr "ब्लॉक्स का आकार घटाएं"
 
-msgid "broccoli"
-msgstr "ब्रोकली"
-
 msgid "Run note by note"
 msgstr ""
 
@@ -702,6 +709,9 @@ msgstr "उच्चतम सीमा"
 #. TRANS: a turtle shell
 msgid "shell"
 msgstr "शैल"
+
+msgid "start turtle"
+msgstr "टरटल चालू करे"
 
 msgid "Welcome to Music Blocks"
 msgstr ""
@@ -771,9 +781,8 @@ msgstr "मुद्रा"
 msgid "this"
 msgstr ""
 
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr ""
+msgid "Palette buttons"
+msgstr "पॆलेट बटन"
 
 msgid "potato"
 msgstr "आलू"
@@ -830,9 +839,8 @@ msgstr "और"
 msgid "set grey"
 msgstr "ग्रे सेट करें"
 
-#. TRANS: do this action
-msgid "do"
-msgstr "करें"
+msgid "then"
+msgstr "तब"
 
 msgid "calories"
 msgstr "कैलोरी"
@@ -863,10 +871,7 @@ msgstr ""
 msgid "protein"
 msgstr "प्रोटीन"
 
-#. TRANS: number of notes
-msgid "# notes"
-msgstr ""
-
+#. TRANS: oscillator time
 msgid "osctime"
 msgstr ""
 
@@ -883,6 +888,10 @@ msgstr "अपने प्रोजॆक्ट को सर्वर पे �
 
 msgid "Decrease block size"
 msgstr "ब्लॊक को छोटा करें"
+
+#. TRANS: number of notes
+msgid "number of notes"
+msgstr ""
 
 msgid "angle"
 msgstr "कोण"
@@ -924,8 +933,8 @@ msgstr ""
 msgid "square"
 msgstr ""
 
-msgid "Palette buttons"
-msgstr "पॆलेट बटन"
+msgid "Meet Mr. Mouse!"
+msgstr ""
 
 msgid "set xy"
 msgstr "xy सेट करें"
@@ -939,6 +948,7 @@ msgstr "यदि"
 msgid "Paste"
 msgstr "चिपकाएँ"
 
+#. TRANS: musical key, e.g., C Major
 msgid "set key"
 msgstr ""
 
@@ -989,6 +999,7 @@ msgstr ""
 msgid "On my device"
 msgstr "मेरे यन्त्र पे"
 
+#. TRANS: musical key, e.g., C Major
 msgid "key"
 msgstr ""
 
@@ -1023,9 +1034,8 @@ msgstr ""
 msgid "Run fast"
 msgstr "तेज चलिए"
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
-msgstr ""
+msgid "broccoli"
+msgstr "ब्रोकली"
 
 #. TRANS: stop playing current media file (movie or audio)
 msgid "stop media"
@@ -1084,7 +1094,8 @@ msgstr "समय"
 msgid "y"
 msgstr "वाई"
 
-msgid "Meet Mr. Mouse!"
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
 msgstr ""
 
 msgid "multiply beat"

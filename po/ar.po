@@ -16,6 +16,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
@@ -33,6 +36,7 @@ msgstr "عشوائي"
 msgid "confirm"
 msgstr "تأكيد"
 
+#. TRANS: musical meter
 msgid "meter"
 msgstr ""
 
@@ -46,6 +50,10 @@ msgstr "mashape"
 #. TRANS: target language for translation
 msgid "target"
 msgstr "اللغة الهدف"
+
+#. TRANS: horizontal space
+msgid "hspace"
+msgstr "الفراغ الأفقي"
 
 msgid "keyboard"
 msgstr "لوحة المفاتيح"
@@ -103,8 +111,8 @@ msgstr "أضف"
 msgid "set pen size"
 msgstr "اضبط حجم القلم"
 
-msgid "start turtle"
-msgstr "ابدأ السلحفاة"
+msgid "rhythm"
+msgstr ""
 
 msgid "latitude"
 msgstr "خط العرض"
@@ -121,8 +129,9 @@ msgstr "الفأرة ص"
 msgid "Show/hide blocks"
 msgstr "إظهار/ إخفاء اللبنات"
 
-msgid "then"
-msgstr "ثم"
+#. TRANS: do this action
+msgid "do"
+msgstr "أجرِ"
 
 msgid "move"
 msgstr "حرّك"
@@ -253,6 +262,7 @@ msgstr "المساعدة"
 msgid "turtle"
 msgstr "السلحفاة"
 
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
@@ -638,9 +648,6 @@ msgstr "احتجز"
 msgid "Decrease the size of the blocks."
 msgstr "قم بتقليل حجم اللبنات"
 
-msgid "broccoli"
-msgstr "بروكولي"
-
 msgid "Run note by note"
 msgstr ""
 
@@ -697,6 +704,9 @@ msgstr "السقف"
 #. TRANS: a turtle shell
 msgid "shell"
 msgstr "صدفة السلحفاة"
+
+msgid "start turtle"
+msgstr "ابدأ السلحفاة"
 
 msgid "Welcome to Music Blocks"
 msgstr ""
@@ -766,9 +776,8 @@ msgstr "العملة"
 msgid "this"
 msgstr "هذا"
 
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr "الفراغ الأفقي"
+msgid "Palette buttons"
+msgstr "ازرار اللوحة"
 
 msgid "potato"
 msgstr "البطاطا"
@@ -825,9 +834,8 @@ msgstr "و"
 msgid "set grey"
 msgstr "اختر الرمادي"
 
-#. TRANS: do this action
-msgid "do"
-msgstr "أجرِ"
+msgid "then"
+msgstr "ثم"
 
 msgid "calories"
 msgstr "السعرات الحرارية"
@@ -858,10 +866,7 @@ msgstr ""
 msgid "protein"
 msgstr "بروتينات"
 
-#. TRANS: number of notes
-msgid "# notes"
-msgstr ""
-
+#. TRANS: oscillator time
 msgid "osctime"
 msgstr ""
 
@@ -878,6 +883,10 @@ msgstr "احفظ مشروعك على خادم"
 
 msgid "Decrease block size"
 msgstr "قلل حجم اللبنة"
+
+#. TRANS: number of notes
+msgid "number of notes"
+msgstr ""
 
 msgid "angle"
 msgstr "زاوية"
@@ -919,8 +928,8 @@ msgstr ""
 msgid "square"
 msgstr ""
 
-msgid "Palette buttons"
-msgstr "ازرار اللوحة"
+msgid "Meet Mr. Mouse!"
+msgstr ""
 
 msgid "set xy"
 msgstr "حدد س ص"
@@ -934,6 +943,7 @@ msgstr "إذا"
 msgid "Paste"
 msgstr "لصق"
 
+#. TRANS: musical key, e.g., C Major
 msgid "set key"
 msgstr ""
 
@@ -984,6 +994,7 @@ msgstr ""
 msgid "On my device"
 msgstr "على جهازي"
 
+#. TRANS: musical key, e.g., C Major
 msgid "key"
 msgstr ""
 
@@ -1018,9 +1029,8 @@ msgstr ""
 msgid "Run fast"
 msgstr "شغل بشكل سريع"
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
-msgstr "حدد القيمة المدخلة إلى الكومة"
+msgid "broccoli"
+msgstr "بروكولي"
 
 #. TRANS: stop playing current media file (movie or audio)
 msgid "stop media"
@@ -1079,8 +1089,9 @@ msgstr "الوقت"
 msgid "y"
 msgstr "ص"
 
-msgid "Meet Mr. Mouse!"
-msgstr ""
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
+msgstr "حدد القيمة المدخلة إلى الكومة"
 
 msgid "multiply beat"
 msgstr ""

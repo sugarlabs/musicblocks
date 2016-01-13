@@ -12,6 +12,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
@@ -29,8 +32,9 @@ msgstr "aleatorio"
 msgid "confirm"
 msgstr "confirmar"
 
+#. TRANS: musical meter
 msgid "meter"
-msgstr ""
+msgstr "metro"
 
 msgid "rice and beans"
 msgstr "arroz y frijoles"
@@ -42,6 +46,10 @@ msgstr "mashape"
 #. TRANS: target language for translation
 msgid "target"
 msgstr "destino"
+
+#. TRANS: horizontal space
+msgid "hspace"
+msgstr "espacio horizontal"
 
 msgid "keyboard"
 msgstr "teclado"
@@ -57,16 +65,16 @@ msgid "chicken"
 msgstr "pollo"
 
 msgid "Run music slow"
-msgstr ""
+msgstr "Música ejecute lentamente"
 
-msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
+msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr "Esta barra de herramientas contiene los botones de la paleta de Matrix, Notas, Tono, Tortuga, y más. Haga clic para mostrar las paletas de bloques y bloques de arrastre de las gamas de colores en el lienzo para usarlos."
 
 msgid "apple"
 msgstr "manzana"
 
 msgid "graphical notation matrix"
-msgstr ""
+msgstr "matriz gráfica notación"
 
 msgid "number"
 msgstr "número"
@@ -99,14 +107,14 @@ msgstr "sumar"
 msgid "set pen size"
 msgstr "fijar pluma"
 
-msgid "start turtle"
-msgstr "iniciar tortuga"
+msgid "rhythm"
+msgstr "ritmo"
 
 msgid "latitude"
 msgstr "latitud"
 
 msgid "1/32 note 𝅘𝅥𝅰"
-msgstr ""
+msgstr "1/32 nota"
 
 msgid "mouse x"
 msgstr "cursor x"
@@ -117,20 +125,21 @@ msgstr "cursor y"
 msgid "Show/hide blocks"
 msgstr "Mostrar u ocultar los bloques."
 
-msgid "then"
-msgstr "entonces"
+#. TRANS: do this action
+msgid "do"
+msgstr "hacer"
 
 msgid "move"
 msgstr "mover"
 
 msgid "triangle"
-msgstr ""
+msgstr "triángulo"
 
 msgid "stop turtle"
 msgstr "detener tortuga"
 
 msgid "current pitch octave"
-msgstr ""
+msgstr "octava actual"
 
 #. TRANS: robot sensors.
 msgid "distance"
@@ -180,7 +189,7 @@ msgid "mod"
 msgstr "módulo"
 
 msgid "beat factor"
-msgstr ""
+msgstr "factor de ritmo"
 
 msgid "Save project"
 msgstr "Guardar proyecto"
@@ -188,8 +197,8 @@ msgstr "Guardar proyecto"
 msgid "Copy"
 msgstr "Copiar"
 
-msgid "Open a panel for configuring Turtle Blocks."
-msgstr "Abre el panel para configurar Turtle Blocks."
+msgid "Open a panel for configuring Music Blocks."
+msgstr "Abre el panel para configurar Bloques de Música."
 
 #. TRANS: the name of a variable (stored in a box)
 msgid "name"
@@ -208,7 +217,7 @@ msgid "The paste button is enabled when there are blocks copied onto the clipboa
 msgstr "El botón de pegar está activo, por lo tanto hay bloques copiados en el portapapeles."
 
 msgid "transposition"
-msgstr ""
+msgstr "transposición"
 
 msgid "Expand/collapse toolbar"
 msgstr "Expandir o colapsar barra"
@@ -249,6 +258,7 @@ msgstr "Ayuda"
 msgid "turtle"
 msgstr "tortuga"
 
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
@@ -300,7 +310,7 @@ msgid "set shade"
 msgstr "fijar sombra"
 
 msgid "duplicate notes"
-msgstr ""
+msgstr "notas duplicadas"
 
 #. TRANS: in mathematical sense (inverse of period)
 msgid "frequency"
@@ -321,10 +331,10 @@ msgstr "Este botón abre y cierra la barra de herramientas principal."
 
 #. TRANS: index specifies a position into an array (heap)
 msgid "index"
-msgstr "posici�n en la pila"
+msgstr "posición en la pila"
 
 msgid "note volume"
-msgstr ""
+msgstr "volumen nota"
 
 msgid "hide"
 msgstr "ocultar"
@@ -334,10 +344,10 @@ msgid "show heap"
 msgstr "mostrar pila"
 
 msgid "Stop the music (and the turtles)."
-msgstr ""
+msgstr "Detener la música (y las tortugas)."
 
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
+msgstr "Ha terminado la gira. Por favor, disfrutar de Bloques de Música!"
 
 #. TRANS: vertical space
 msgid "vspace"
@@ -430,7 +440,7 @@ msgid "Show or hide a polar-coordinate grid."
 msgstr "Mostrar u ocultar la rejilla de coordenadas polares."
 
 msgid "octave"
-msgstr ""
+msgstr "octava"
 
 msgid "sweet potato"
 msgstr "boñato"
@@ -473,10 +483,10 @@ msgid "obj"
 msgstr "objeto"
 
 msgid "numerator"
-msgstr ""
+msgstr "numerador"
 
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
-msgstr ""
+msgid  "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
+msgstr "Sr. Ratón es nuestro conductor de bloques de música. Sr. Ratón le anima a explorar los Bloques Musicales."
 
 #. TRANS: store a value in a box
 msgid "store in"
@@ -489,13 +499,13 @@ msgid "maths"
 msgstr "matemáticas"
 
 msgid "denominator"
-msgstr ""
+msgstr "denominador"
 
 msgid "eighth note ♪"
-msgstr ""
+msgstr "1/8 nota"
 
 msgid "whole note 𝅝"
-msgstr ""
+msgstr "nota completa"
 
 #. TRANS: popout window (ventana emergente)
 msgid "popout"
@@ -516,14 +526,14 @@ msgid "Increase the size of the blocks."
 msgstr "Incrementa el tamaño de los bloques."
 
 msgid "set volume"
-msgstr ""
+msgstr "fijar volumen"
 
 #. TRANS: logical "or" operator
 msgid "or"
 msgstr "o"
 
 msgid "note value"
-msgstr ""
+msgstr "valor de la nota"
 
 msgid "comment"
 msgstr "comentar"
@@ -533,7 +543,7 @@ msgstr "queso"
 
 #. TRANS: lilypond is a language used to generate musical scores.
 msgid "save as lilypond"
-msgstr ""
+msgstr "guardar como lilypond"
 
 msgid "Cartesian"
 msgstr "Cartesiano"
@@ -553,7 +563,7 @@ msgid "image"
 msgstr "imagen"
 
 msgid "Click to run the music note by note."
-msgstr ""
+msgstr "Haga clic para jugar nota a nota."
 
 #. TRANS: pop a value off of the heap.
 msgid "pop"
@@ -580,7 +590,7 @@ msgid "sing"
 msgstr "cantar"
 
 msgid "play backward"
-msgstr ""
+msgstr "jugar hacia atrás"
 
 msgid "Congratulations."
 msgstr "Felicitaciones."
@@ -634,11 +644,8 @@ msgstr "subir pluma"
 msgid "Decrease the size of the blocks."
 msgstr "Disminuye el tamaño de los bloques"
 
-msgid "broccoli"
-msgstr "brócoli"
-
 msgid "Run note by note"
-msgstr ""
+msgstr "Jugar nota a nota"
 
 msgid "start"
 msgstr "iniciar"
@@ -674,7 +681,7 @@ msgid "translate"
 msgstr "traducir"
 
 msgid "quarter note ♩"
-msgstr ""
+msgstr "1/4 nota"
 
 msgid "until"
 msgstr "hasta"
@@ -694,8 +701,11 @@ msgstr "techo"
 msgid "shell"
 msgstr "caparazón"
 
+msgid "start turtle"
+msgstr "iniciar tortuga"
+
 msgid "Welcome to Music Blocks"
-msgstr ""
+msgstr "Bienvenido a Bloques de Música"
 
 #. TRANS: set language
 msgid "set lang"
@@ -722,7 +732,7 @@ msgid "begin hollow line"
 msgstr "iniciar linea sin relleno"
 
 msgid "flat"
-msgstr ""
+msgstr "planas"
 
 #. TRANS: the heap is a first-in-last-out (FILO) stack
 msgid "heap"
@@ -732,7 +742,7 @@ msgid "begin fill"
 msgstr "iniciar relleno"
 
 msgid "beats per minute"
-msgstr ""
+msgstr "pulsaciones por minuto"
 
 msgid "eat"
 msgstr "comer"
@@ -745,7 +755,7 @@ msgid "high"
 msgstr "alta"
 
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr ""
+msgstr "Bloques de Música es una colección de herramientas de manipulación para explorar conceptos musicales fundamentales de una manera integradora y divertido."
 
 #. TRANS: longitude and latitude coordinate data
 msgid "Coordinate data not available."
@@ -761,9 +771,8 @@ msgstr "moneda"
 msgid "this"
 msgstr "éste"
 
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr "espacio horizontal"
+msgid "Palette buttons"
+msgstr "Botones de paleta"
 
 msgid "potato"
 msgstr "papa"
@@ -820,9 +829,8 @@ msgstr "y"
 msgid "set grey"
 msgstr "fijar gris"
 
-#. TRANS: do this action
-msgid "do"
-msgstr "hacer"
+msgid "then"
+msgstr "entonces"
 
 msgid "calories"
 msgstr "calorías"
@@ -832,7 +840,7 @@ msgstr "Ejecutar paso a paso"
 
 #. TRANS: musical pitch
 msgid "pitch"
-msgstr ""
+msgstr "tono"
 
 msgid "Show/hide palettes"
 msgstr "Mostrar u ocultar las paletas"
@@ -848,17 +856,14 @@ msgid "stop play"
 msgstr "detener"
 
 msgid "sharp"
-msgstr ""
+msgstr "agudas"
 
 msgid "protein"
 msgstr "proteína"
 
-#. TRANS: number of notes
-msgid "# notes"
-msgstr ""
-
+#. TRANS: oscillator time
 msgid "osctime"
-msgstr ""
+msgstr "tiempo oscilador"
 
 #. TRANS: play media (audio or video)
 msgid "play back"
@@ -873,6 +878,10 @@ msgstr "Guarde proyecto en el servidor."
 
 msgid "Decrease block size"
 msgstr "Disminuir el tamaño de los bloques"
+
+#. TRANS: number of notes
+msgid "number of notes"
+msgstr "número de notas"
 
 msgid "angle"
 msgstr "ángulo"
@@ -909,13 +918,13 @@ msgid "field"
 msgstr "campo"
 
 msgid "invert"
-msgstr ""
+msgstr "invertir"
 
 msgid "square"
-msgstr ""
+msgstr "cuadrado"
 
-msgid "Palette buttons"
-msgstr "Botones de paleta"
+msgid "Meet Mr. Mouse!"
+msgstr "Conoce Sr. Ratón"
 
 msgid "set xy"
 msgstr "fijar xy"
@@ -929,8 +938,9 @@ msgstr "si"
 msgid "Paste"
 msgstr "Pegar"
 
+#. TRANS: musical key, e.g., C Major
 msgid "set key"
-msgstr ""
+msgstr "fijar clave"
 
 msgid "Delete"
 msgstr "Borrar"
@@ -952,7 +962,7 @@ msgstr "repetir"
 msgid "blocks"
 msgstr "bloques"
 
-msgid "Display statistics about your Turtle project."
+msgid "Display statistics about your Music project."
 msgstr "Analizar los tipos de bloques usados."
 
 msgid "Polar"
@@ -966,7 +976,7 @@ msgid "logic"
 msgstr "lógica"
 
 msgid "current pitch name"
-msgstr ""
+msgstr "tono actual"
 
 #. TRANS: empty the heap
 msgid "empty heap"
@@ -979,8 +989,9 @@ msgstr "luz infrarroja (derecha)"
 msgid "On my device"
 msgstr "En mi dispositivo"
 
+#. TRANS: musical key, e.g., C Major
 msgid "key"
-msgstr ""
+msgstr "clave"
 
 #. TRANS: push a value on to the heap.
 msgid "push"
@@ -1001,21 +1012,20 @@ msgid "Clean"
 msgstr "Limpiar"
 
 msgid "1/64 note 𝅘𝅥𝅱"
-msgstr ""
+msgstr "1/64 nota"
 
 #. TRANS: color refers to a hue, value, chroma triplet
 msgid "set color"
 msgstr "fijar color"
 
 msgid "Click to run just the music in slow mode."
-msgstr ""
+msgstr "Haga clic para ejecutar sólo la música en modo lento."
 
 msgid "Run fast"
 msgstr "Ejecutar rápidamente"
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
-msgstr "modificar valor en pila"
+msgid "broccoli"
+msgstr "brócoli"
 
 #. TRANS: stop playing current media file (movie or audio)
 msgid "stop media"
@@ -1054,16 +1064,16 @@ msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "Haz click en este botón para expandir o colapsar la barra de herramientas auxiliar."
 
 msgid "half note 𝅗𝅥"
-msgstr ""
+msgstr "1/2 nota"
 
 msgid "1/16 note ♬"
-msgstr ""
+msgstr "1/16 nota"
 
 msgid "extras"
 msgstr "extras"
 
 msgid "set beats per minute"
-msgstr ""
+msgstr "fijar pulsaciones por minuto"
 
 msgid "shade"
 msgstr "sombra"
@@ -1074,17 +1084,18 @@ msgstr "tiempo"
 msgid "y"
 msgstr "y"
 
-msgid "Meet Mr. Mouse!"
-msgstr ""
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
+msgstr "modificar valor en pila"
 
 msgid "multiply beat"
-msgstr ""
+msgstr "ritmo multiplican"
 
 msgid "hello"
 msgstr "hola"
 
 msgid "dot"
-msgstr ""
+msgstr "punto"
 
 msgid "left"
 msgstr "izquierda"

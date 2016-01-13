@@ -18,6 +18,9 @@
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 #. TRANS: Borrar todo
@@ -37,6 +40,7 @@ msgstr "maski kawkïrsa"
 msgid "confirm"
 msgstr "yatiyaña"
 
+#. TRANS: musical meter
 msgid "meter"
 msgstr ""
 
@@ -50,6 +54,10 @@ msgstr "mashape wakichata"
 #. TRANS: destino
 msgid "target"
 msgstr "purïwi"
+
+#. TRANS: horizontal space
+msgid "hspace"
+msgstr "ampsta sara"
 
 msgid "keyboard"
 msgstr "qillqañana thaqaña"
@@ -112,9 +120,8 @@ msgstr "jakhuxataña"
 msgid "set pen size"
 msgstr "taña chanichaña"
 
-#. TRANS: iniciar tortuga
-msgid "start turtle"
-msgstr "tortuga wakichata qalltaña"
+msgid "rhythm"
+msgstr ""
 
 #. TRANS: latitud
 msgid "latitude"
@@ -133,8 +140,9 @@ msgstr "y chimpuni thaqnaqiri lliphi qhana"
 msgid "Show/hide blocks"
 msgstr "wakichata siqinaka uñstayaña imantaña"
 
-msgid "then"
-msgstr "ukhamaxa"
+#. TRANS: hacer
+msgid "do"
+msgstr "luraña"
 
 #. TRANS: mover
 msgid "move"
@@ -282,6 +290,7 @@ msgstr "Yanapa"
 msgid "turtle"
 msgstr "tortuga wakichata"
 
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
@@ -704,9 +713,6 @@ msgstr "samichaña phuyu jithsuyaña"
 msgid "Decrease the size of the blocks."
 msgstr "wakichata siqinaka tañapa jisk’aptayaña"
 
-msgid "broccoli"
-msgstr "broccoli juyra"
-
 msgid "Run note by note"
 msgstr ""
 
@@ -769,6 +775,10 @@ msgstr "pillu"
 #. TRANS: a turtle shell
 msgid "shell"
 msgstr "tortuga uywana lip'ichipa"
+
+#. TRANS: iniciar tortuga
+msgid "start turtle"
+msgstr "tortuga wakichata qalltaña"
 
 msgid "Welcome to Music Blocks"
 msgstr ""
@@ -843,9 +853,9 @@ msgstr "qullqi"
 msgid "this"
 msgstr "akïri"
 
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr "ampsta sara"
+#. TRANS: Botones de paleta
+msgid "Palette buttons"
+msgstr "wakichatanaka apanaqaña limt’añanaka"
 
 #. TRANS: papa
 msgid "potato"
@@ -907,9 +917,8 @@ msgstr "ukata"
 msgid "set grey"
 msgstr "uqiru samiri wakichaña"
 
-#. TRANS: hacer
-msgid "do"
-msgstr "luraña"
+msgid "then"
+msgstr "ukhamaxa"
 
 #. TRANS: calorías
 msgid "calories"
@@ -945,10 +954,7 @@ msgstr ""
 msgid "protein"
 msgstr "ch’amanchiri juyra"
 
-#. TRANS: number of notes
-msgid "# notes"
-msgstr ""
-
+#. TRANS: oscillator time
 msgid "osctime"
 msgstr ""
 
@@ -965,6 +971,10 @@ msgstr "Wakichatanaka apanaqaña taypiru amtäwima imma"
 
 msgid "Decrease block size"
 msgstr "Wakichata siqi taña jisk’aptayma"
+
+#. TRANS: number of notes
+msgid "number of notes"
+msgstr ""
 
 msgid "angle"
 msgstr "k'uchu"
@@ -1008,9 +1018,8 @@ msgstr ""
 msgid "square"
 msgstr ""
 
-#. TRANS: Botones de paleta
-msgid "Palette buttons"
-msgstr "wakichatanaka apanaqaña limt’añanaka"
+msgid "Meet Mr. Mouse!"
+msgstr ""
 
 msgid "set xy"
 msgstr "xy wakichata chimpuña"
@@ -1025,6 +1034,7 @@ msgstr "jïsa"
 msgid "Paste"
 msgstr "Apxataña"
 
+#. TRANS: musical key, e.g., C Major
 msgid "set key"
 msgstr ""
 
@@ -1079,6 +1089,7 @@ msgstr ""
 msgid "On my device"
 msgstr "wakichatanaka machaqa imaña"
 
+#. TRANS: musical key, e.g., C Major
 msgid "key"
 msgstr ""
 
@@ -1114,9 +1125,8 @@ msgstr ""
 msgid "Run fast"
 msgstr "k’ataki qhantayaña"
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
-msgstr "qutunaka tama"
+msgid "broccoli"
+msgstr "broccoli juyra"
 
 #. TRANS: stop playing current media file (movie or audio)
 msgid "stop media"
@@ -1180,8 +1190,9 @@ msgstr "pacha"
 msgid "y"
 msgstr "y wakichata"
 
-msgid "Meet Mr. Mouse!"
-msgstr ""
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
+msgstr "qutunaka tama"
 
 msgid "multiply beat"
 msgstr ""
