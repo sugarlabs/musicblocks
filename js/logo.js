@@ -96,6 +96,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.keySignature = {};
     this.tupletRhythms = [];
     this.addingNotesToTuplet = false;
+	this.inSkipClamp = false;
+	this.skipRate  = [];
+	this.skipCount = [];
 
     // parameters used by pitch
     this.transposition = {};
@@ -487,8 +490,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.polyVolume[turtle] = -20;
             this.oscDuration[turtle] = 4;
             this.oscList[turtle] = [];
-        }
-
+            this.skipRate[turtle] = 1;
+            this.skipCount[turtle] = 0;
+				
+		}
+		
+	    this.inSkipClamp = false;
         this.inMatrix = false;
         this.tuplet = false;
 
@@ -1794,6 +1801,28 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 logo.setListener(turtle, listenerName, listener);
                 break;
+
+			case 'skip':
+                logo.skipRate[turtle] = args[0];
+				logo.skipCount[turtle] = 0;
+				if (!logo.inMatrix) {
+                    logo.inSkipClamp = true;
+				} 
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                var listenerName = '_skip_' + turtle;
+                logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                var listener = function (event) {
+                    logo.skipCount[turtle] = 0;
+					if (!logo.inMatrix) {
+                        logo.inSkipClamp = false;
+					}
+                }
+
+                logo.setListener(turtle, listenerName, listener);
+                break;
             case 'pitch':
                 if (args.length != 2) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -1999,7 +2028,16 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     if (logo.inMatrix) {
                         logo.processNote(noteBeatValue, turtle);
                     } else {
-                        // We start the music clock as the first note
+						if(logo.inSkipClamp){
+							if(logo.skipCount[turtle] % logo.skipRate[turtle] == 0){
+								var sr = 0;
+							} else {
+								var sr = 1;
+							}
+							logo.skipCount[turtle]+=1;
+							if(sr==0){	
+								
+						// We start the music clock as the first note
                         // is being played.
                         if (logo.firstNoteTime == null) {
                             var d = new Date();
@@ -2146,7 +2184,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             }
                         }
                         logo.pushedNote[turtle] = false;
-                    }
+                    		}
+						}
+					}
                 }
                 logo.setListener(turtle, listenerName, listener);
                 break;
