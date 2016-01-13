@@ -1257,7 +1257,7 @@ msgstr ""
 msgid "y"
 msgstr ""
 
-msgid "Meet "Mr. Mouse!"
+msgid "Meet Mr. Mouse!"
 msgstr ""
 
 msgid "multiply beat"

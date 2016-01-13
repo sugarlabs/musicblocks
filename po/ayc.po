@@ -1180,7 +1180,7 @@ msgstr "pacha"
 msgid "y"
 msgstr "y wakichata"
 
-msgid "Meet "Mr. Mouse!"
+msgid "Meet Mr. Mouse!"
 msgstr ""
 
 msgid "multiply beat"

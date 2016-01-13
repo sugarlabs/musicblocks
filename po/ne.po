@@ -1084,7 +1084,7 @@ msgstr "समय"
 msgid "y"
 msgstr "y"
 
-msgid "Meet "Mr. Mouse!"
+msgid "Meet Mr. Mouse!"
 msgstr ""
 
 msgid "multiply beat"

@@ -1083,7 +1083,7 @@ msgstr "时间"
 msgid "y"
 msgstr "纵"
 
-msgid "Meet "Mr. Mouse!"
+msgid "Meet Mr. Mouse!"
 msgstr ""
 
 msgid "multiply beat"

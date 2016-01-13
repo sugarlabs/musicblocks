@@ -1084,7 +1084,7 @@ msgstr "เวลา"
 msgid "y"
 msgstr "แกน y"
 
-msgid "Meet "Mr. Mouse!"
+msgid "Meet Mr. Mouse!"
 msgstr ""
 
 msgid "multiply beat"

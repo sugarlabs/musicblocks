@@ -1079,7 +1079,7 @@ msgstr "الوقت"
 msgid "y"
 msgstr "ص"
 
-msgid "Meet "Mr. Mouse!"
+msgid "Meet Mr. Mouse!"
 msgstr ""
 
 msgid "multiply beat"
