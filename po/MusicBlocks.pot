@@ -89,6 +89,9 @@ msgid "pen down"
 msgstr ""
 
 #. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
+msgid "fill"
+msgstr ""
+
 msgid "begin fill"
 msgstr ""
 
@@ -143,6 +146,10 @@ msgstr ""
 
 #. TRANS: a container for a variable
 msgid "box"
+msgstr ""
+
+#. TRANS: a container for a variable
+msgid "boxes"
 msgstr ""
 
 #. TRANS: the name of a stack of blocks
@@ -254,16 +261,22 @@ msgstr ""
 msgid "unknown"
 msgstr ""
 
-msgid "Welcome to Turtle Blocks"
+msgid "Welcome to Music Blocks"
 msgstr ""
 
-msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgstr ""
+
+msgid "Meet "Mr. Mouse!"
+msgstr ""
+
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
 msgstr ""
 
 msgid "Palette buttons"
 msgstr ""
 
-msgid "This toolbar contains the palette buttons: click to show the palettes of blocks (Turtle, Pen, Numbers, Boolean, Flow, Blocks, Media, etc.). You can drag blocks from the palettes onto the canvas to use them."
+msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr ""
 
 msgid "Expand/collapse toolbar"
@@ -290,10 +303,22 @@ msgstr ""
 msgid "Click to run the project step by step."
 msgstr ""
 
+msgid "Run music slow"
+msgstr ""
+
+msgid "Click to run just the music in slow mode."
+msgstr ""
+
+msgid "Run note by note"
+msgstr ""
+
+msgid "Click to run the music note by note."
+msgstr ""
+
 msgid "Stop"
 msgstr ""
 
-msgid "Stop the current project."
+msgid "Stop the music (and the turtles)."
 msgstr ""
 
 msgid "Clean"
@@ -317,7 +342,7 @@ msgstr ""
 msgid "Expand/collapse collapsable blocks"
 msgstr ""
 
-msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
+msgid "Expand or collapse start and action stacks."
 msgstr ""
 
 msgid "Help"
@@ -402,6 +427,12 @@ msgstr ""
 msgid "You can load new blocks from the file system."
 msgstr ""
 
+msgid "Enable scrolling"
+msgstr ""
+
+msgid "You can scroll the blocks on the canvas."
+msgstr ""
+
 msgid "Delete all"
 msgstr ""
 
@@ -423,7 +454,7 @@ msgstr ""
 msgid "Congratulations."
 msgstr ""
 
-msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr ""
 
 msgid "hide blocks"
@@ -552,6 +583,10 @@ msgid "Coordinate data not available."
 msgstr ""
 
 #. TRANS: the heap is a first-in-last-out (FILO) stack
+msgid "heap"
+msgstr ""
+
+#. TRANS: show the contents of the heap.
 msgid "show heap"
 msgstr ""
 
@@ -563,13 +598,32 @@ msgstr ""
 msgid "heap empty?"
 msgstr ""
 
+#. TRANS: empty the heap
 msgid "empty heap"
 msgstr ""
 
+#. TRANS: save the heap to a file
 msgid "save heap"
 msgstr ""
 
+#. TRANS: load the heap from a file
 msgid "load heap"
+msgstr ""
+
+#. TRANS: how many entries are in the heap?
+msgid "heap length"
+msgstr ""
+
+#. TRANS: retrieve the value at a specific entry (index) in the heap
+msgid "index heap"
+msgstr ""
+
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
+msgstr ""
+
+#. TRANS: index specifies a position into an array (heap)
+msgid "index"
 msgstr ""
 
 #. TRANS: push a value on to the heap.
@@ -718,18 +772,6 @@ msgstr ""
 msgid "eatme"
 msgstr ""
 
-#. TRANS: use sensor to detect objects on the left
-msgid "sense left"
-msgstr ""
-
-#. TRANS: use sensor to detect distance to objects
-msgid "see distance"
-msgstr ""
-
-#. TRANS: use sensor to detect objects on the right
-msgid "sense right"
-msgstr ""
-
 msgid "sing"
 msgstr ""
 
@@ -740,10 +782,6 @@ msgid "duration"
 msgstr ""
 
 msgid "move"
-msgstr ""
-
-#. TRANS: flash (blink) an LED light
-msgid "blink (ms)"
 msgstr ""
 
 #. TRANS: the name of a robot built in Paraguay (probably no need to translate)
@@ -797,11 +835,11 @@ msgstr ""
 msgid "day"
 msgstr ""
 
-#. TRANS: low tempurature
+#. TRANS: low temperature
 msgid "low"
 msgstr ""
 
-#. TRANS: high tempurature
+#. TRANS: high temperature
 msgid "high"
 msgstr ""
 
@@ -827,4 +865,227 @@ msgid "Download"
 msgstr ""
 
 msgid "confirm"
+msgstr ""
+
+msgid "one of"
+msgstr ""
+
+msgid "this"
+msgstr ""
+
+msgid "that"
+msgstr ""
+
+msgid "no background"
+msgstr ""
+
+#. TRANS: hollow line refers to drawing an outline around a line
+msgid "hollow line"
+msgstr ""
+
+msgid "begin hollow line"
+msgstr ""
+
+msgid "end hollow line"
+msgstr ""
+
+#. TRANS: as in broadcast a signal
+msgid "broadcast"
+msgstr ""
+
+#. TRANS: as in the event that a signal arrives
+msgid "event"
+msgstr ""
+
+#. TRANS: as in "on event do"
+msgid "on"
+msgstr ""
+
+#. TRANS: audio (as in musical note)
+msgid "tone"
+msgstr ""
+
+#. TRANS: ms is micro seconds
+msgid "duration (ms)"
+msgstr ""
+
+#. TRANS: in mathematical sense (inverse of period)
+msgid "frequency"
+msgstr ""
+
+#. TRANS: musical note to frequency
+msgid "note to frequency"
+msgstr ""
+
+#. TRANS: as in button click
+msgid "click"
+msgstr ""
+
+#. TRANS: vertical space
+msgid "vspace"
+msgstr ""
+
+#. TRANS: horizontal space
+msgid "hspace"
+msgstr ""
+
+#. TRANS: cloud as in cloud server
+msgid "cloud"
+msgstr ""
+
+#. TRANS: database fetch
+msgid "fetch"
+msgstr ""
+
+#. TRANS: unique ID
+msgid "UID"
+msgstr ""
+
+#. TRANS: field of interest in a database, e.g., temperature in a weather database
+msgid "field"
+msgstr ""
+
+#. TRANS: hours ago that the data was updated.
+msgid "hours ago"
+msgstr ""
+
+#. TRANS: robot sensors.
+msgid "distance"
+msgstr ""
+
+#. TRANS: robot sensors.
+msgid "infrared light (left)"
+msgstr ""
+
+#. TRANS: robot sensors.
+msgid "infrared light (right)"
+msgstr ""
+
+#. TRANS: as in play a musical note.
+msgid "play"
+msgstr ""
+
+#. TRANS: as in blinking an eye.
+msgid "blink"
+msgstr ""
+
+msgid "graphical notation matrix"
+msgstr ""
+
+#. TRANS: musical pitch
+msgid "pitch"
+msgstr ""
+
+msgid "octave"
+msgstr ""
+
+msgid "whole note 𝅝"
+msgstr ""
+
+msgid "half note 𝅗𝅥"
+msgstr ""
+
+msgid "quarter note ♩"
+msgstr ""
+
+msgid "eighth note ♪"
+msgstr ""
+
+msgid "1/16 note ♬"
+msgstr ""
+
+msgid "1/32 note 𝅘𝅥𝅰"
+msgstr ""
+
+msgid "1/64 note 𝅘𝅥𝅱"
+msgstr ""
+
+#. TRANS: music term for dividing the beat into a different number of equal subdivisions
+msgid "tuplet"
+msgstr ""
+
+#. TRANS: number of notes
+msgid "# notes"
+msgstr ""
+
+msgid "note value"
+msgstr ""
+
+msgid "invert"
+msgstr ""
+
+msgid "current pitch name"
+msgstr ""
+
+msgid "current pitch octave"
+msgstr ""
+
+msgid "flat"
+msgstr ""
+
+msgid "sharp"
+msgstr ""
+
+msgid "transposition"
+msgstr ""
+
+msgid "dot"
+msgstr ""
+
+msgid "multiply beat"
+msgstr ""
+
+msgid "beat factor"
+msgstr ""
+
+msgid "duplicate notes"
+msgstr ""
+
+msgid "set volume"
+msgstr ""
+
+msgid "note volume"
+msgstr ""
+
+msgid "set beats per minute"
+msgstr ""
+
+msgid "beats per minute"
+msgstr ""
+
+msgid "set key"
+msgstr ""
+
+msgid "key"
+msgstr ""
+
+msgid "meter"
+msgstr ""
+
+msgid "numerator"
+msgstr ""
+
+msgid "denominator"
+msgstr ""
+
+msgid "play backward"
+msgstr ""
+
+msgid "osctime"
+msgstr ""
+
+msgid "square"
+msgstr ""
+
+msgid "triangle"
+msgstr ""
+
+msgid "sine"
+msgstr ""
+
+msgid "sawtooth"
+msgstr ""
+
+#. TRANS: lilypond is a language used to generate musical scores.
+msgid "save as lilypond"
 msgstr ""

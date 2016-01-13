@@ -223,7 +223,7 @@ console.log(txt);
         var HELPCONTENT = [
             [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
             [_('Meet "Mr. Mouse!"'), _('Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. "Let\'s start our tour!" '), 'activity/activity-icon-mouse-color.svg'],
-            [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more). Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+            [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
             [_('Run fast'), _('Click to run the project in fast mode.'), 'header-icons/fast-button.svg'],
             [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
             [_('Run music slow'), _('Click to run just the music in slow mode.'), 'header-icons/slow-music-button.svg'],

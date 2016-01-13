@@ -232,14 +232,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     var flatBlock = new ProtoBlock('flat');
     flatBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['flat'] = flatBlock;
-    flatBlock.staticLabels.push(_('Flat'));
+    flatBlock.staticLabels.push(_('flat'));
     flatBlock.adjustWidthToLabel();
     flatBlock.flowClampZeroArgBlock();
 
     var sharpBlock = new ProtoBlock('sharp');
     sharpBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['sharp'] = sharpBlock;
-    sharpBlock.staticLabels.push(_('Sharp'));
+    sharpBlock.staticLabels.push(_('sharp'));
     sharpBlock.adjustWidthToLabel();
     sharpBlock.flowClampZeroArgBlock();
     
