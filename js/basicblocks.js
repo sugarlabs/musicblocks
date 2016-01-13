@@ -60,7 +60,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
     matrixBlock.staticLabels.push(_('graphical notation matrix'));
-    matrixBlock.extraWidth = 20;
+    matrixBlock.extraWidth = 10;
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
 
@@ -435,6 +435,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     lilypondBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['savelilypond'] = lilypondBlock;
     lilypondBlock.staticLabels.push(_('save as lilypond'));
+    lilypondBlock.extraWidth = 10;
     lilypondBlock.adjustWidthToLabel();
     lilypondBlock.oneArgBlock();
     lilypondBlock.defaults.push(_('title') + '.ly');
