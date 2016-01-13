@@ -158,41 +158,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     tuplet2Block.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['tuplet2'] = tuplet2Block;
     // FIXME: Add extra labels to basicClamp blocks when present.
-    tuplet2Block.staticLabels.push(_('tuplet'), _('# notes'), _('note value'));
+    tuplet2Block.staticLabels.push(_('tuplet'), _('number of notes'), _('note value'));
+    tuplet2Block.extraWidth = 20;
     tuplet2Block.adjustWidthToLabel();
     tuplet2Block.flowClampTwoArgBlock();
     tuplet2Block.defaults.push(1);
     tuplet2Block.defaults.push(4);
-
-    // DEPRECATED
-    var tupletBlock = new ProtoBlock('tuplet');
-    tupletBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['tuplet'] = tupletBlock;
-    tupletBlock.hidden = true;
-    tupletBlock.staticLabels.push(_('tuplet'));
-    tupletBlock.adjustWidthToLabel();
-    tupletBlock.flowClampZeroArgBlock();
-    
-    // DEPRECATED
-    var tupletParamBlock = new ProtoBlock('tupletParamBlock');
-    blocks.protoBlockDict['tupletParamBlock'] = tupletParamBlock;
-    tupletParamBlock.palette = palettes.dict['matrix'];
-    tupletParamBlock.hidden = true;
-    tupletParamBlock.staticLabels.push(_('tuplet params'), _('# notes'), _('note value'));
-    tupletParamBlock.defaults.push(1, 4);
-    tupletParamBlock.adjustWidthToLabel();
-    tupletParamBlock.twoArgBlock();
-    tupletParamBlock.dockTypes[1] = 'numberin';
-    tupletParamBlock.dockTypes[2] = 'numberin';
-
-    // Deprecated
-    var matrixData = new ProtoBlock('matrixData');
-    matrixData.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['matrixData'] = matrixData;
-    matrixData.hidden = true;
-    matrixData.staticLabels.push(_('saved matrix notes'));
-    matrixData.adjustWidthToLabel();
-    matrixData.zeroArgBlock();
 
     // Notes palette
 
