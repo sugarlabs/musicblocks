@@ -1208,6 +1208,11 @@ console.log(txt);
         }
 
         function doOpenSamples() {
+            if(document.getElementById('matrix').style.visibility != 'hidden') {
+                console.log('hide matrix');
+                document.getElementById('matrix').style.visibility = 'hidden';
+                document.getElementById('matrix').style.border = 0;
+            }
             console.log('save locally');
             saveLocally();
             thumbnails.show()
