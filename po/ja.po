@@ -30,26 +30,26 @@ msgid ""
 msgstr ""
 
 msgid "Delete all"
-msgstr ""
+msgstr "全部を消す"　#Maybe 全部を取り消す
 
 msgid "show"
-msgstr ""
+msgstr "示す" #Uncertain. Maybe 展示する。Or Maybe 現らす
 
 msgid "text"
-msgstr ""
+msgstr "文事" #Double check
 
 msgid "random"
-msgstr ""
+msgstr "でたらめな"　#Just looked it up.
 
 msgid "confirm"
-msgstr ""
+msgstr "確認する"
 
 #. TRANS: musical meter
 msgid "meter"
 msgstr ""
 
 msgid "rice and beans"
-msgstr ""
+msgstr "飯と豆"
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
@@ -57,33 +57,38 @@ msgstr ""
 
 #. TRANS: target language for translation
 msgid "target"
-msgstr ""
+msgstr "標的"
 
 #. TRANS: horizontal space
 msgid "hspace"
 msgstr ""
 
 msgid "keyboard"
-msgstr ""
+msgstr "キーボード"
 
 msgid "You can also load projects from the file system."
-msgstr ""
+msgstr "ファイルシステムからプロジェクトをロードできますよ。"
 
 #. TRANS: as in "on event do"
 msgid "on"
 msgstr ""
 
 msgid "chicken"
-msgstr ""
+msgstr "鶏肉"
 
+<<<<<<< HEAD
 msgid "Run music slow"
 msgstr ""
 
 msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr ""
+=======
+msgid "set color"
+msgstr "色を設定"　＃Maybe の　--　色の設定
+>>>>>>> japanese-translation-DU
 
 msgid "apple"
-msgstr ""
+msgstr "りんご"
 
 msgid "graphical notation matrix"
 msgstr ""
@@ -97,13 +102,13 @@ msgstr ""
 
 #. TRANS: name of project
 msgid "title"
-msgstr ""
+msgstr "名" #Maybe 題名
 
 msgid "radians"
 msgstr ""
 
 msgid "Undo"
-msgstr ""
+msgstr "取り戻す" #Uncertain about this. Maybe 元へ戻す
 
 #. TRANS: ms is micro seconds
 msgid "duration (ms)"
@@ -111,14 +116,15 @@ msgstr ""
 
 #. TRANS: as in "add 1 to"
 msgid "to"
-msgstr ""
+msgstr "最終の状態"
 
 msgid "add"
-msgstr ""
+msgstr "足し算をする"
 
 msgid "set pen size"
-msgstr ""
+msgstr "ペンの大きさの設定"
 
+<<<<<<< HEAD
 msgid "rhythm"
 msgstr ""
 
@@ -127,6 +133,23 @@ msgstr ""
 
 msgid "1/32 note 𝅘𝅥𝅰"
 msgstr ""
+=======
+msgid "start turtle"
+msgstr "タートルの動き出し"
+
+msgid "city latitude"
+msgstr "市の緯度"
+
+msgid "city longitude"
+msgstr "市の軽度"
+
+#. TRANS: longitude and latitude coordinate data
+msgid "Coordinate data not available."
+msgstr ""
+
+msgid "latitude"
+msgstr "緯度"
+>>>>>>> japanese-translation-DU
 
 msgid "mouse x"
 msgstr ""
@@ -135,20 +158,25 @@ msgid "mouse y"
 msgstr ""
 
 msgid "Show/hide blocks"
-msgstr ""
+msgstr "ブルックを見せ隠し"　#Not too sure on grammar...
 
 #. TRANS: do this action
 msgid "do"
 msgstr ""
 
 msgid "move"
-msgstr ""
+msgstr "動き出し"
 
+<<<<<<< HEAD
 msgid "triangle"
 msgstr ""
+=======
+msgid "Stop the current project."
+msgstr "プロジェクトを止めます"
+>>>>>>> japanese-translation-DU
 
 msgid "stop turtle"
-msgstr ""
+msgstr "タートルを止める"
 
 msgid "current pitch octave"
 msgstr ""
@@ -158,7 +186,7 @@ msgid "distance"
 msgstr ""
 
 msgid "food"
-msgstr ""
+msgstr "食べ物"
 
 msgid "Click to run the project in slow mode."
 msgstr ""
@@ -167,8 +195,9 @@ msgid "stop"
 msgstr "ステップ実行"
 
 msgid "fat"
-msgstr ""
+msgstr "脂肪" #Only for the noun; not adjective.
 
+<<<<<<< HEAD
 msgid "Expand or collapse start and action stacks."
 msgstr ""
 
@@ -178,33 +207,45 @@ msgstr ""
 
 msgid "get fiber"
 msgstr ""
+=======
+msgid "number"
+msgstr "数字"
+>>>>>>> japanese-translation-DU
 
 msgid "background"
-msgstr ""
+msgstr "背景"
 
 #. TRANS: logical "not" operator
 msgid "not"
 msgstr ""
 
 msgid "Google map"
-msgstr ""
+msgstr "グーグルマップ" #To verify
 
 #. TRANS: as in blinking an eye.
 msgid "blink"
 msgstr ""
 
 msgid "day"
-msgstr ""
+msgstr "曜日" #I am assuming "day of the week". 期日 for "date"
 
 #. TRANS: mathematical modular (remainder) function.
 msgid "mod"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "beat factor"
 msgstr ""
 
 msgid "Save project"
 msgstr ""
+=======
+msgid "Save project"
+msgstr "プロジェクトを確保する" #to check on computer
+
+msgid "get fiber"
+msgstr "食物繊維をとる"　#Get is ambiguous English word. Translates to "Take Dietary Fiber"
+>>>>>>> japanese-translation-DU
 
 msgid "Copy"
 msgstr "コピー"
@@ -214,7 +255,7 @@ msgstr ""
 
 #. TRANS: the name of a variable (stored in a box)
 msgid "name"
-msgstr ""
+msgstr "題名" #Name of what? Name of Turtle or Title?　If "Turtle's name" then タートルの名前。or タートルの名。
 
 msgid "turtle x"
 msgstr ""
@@ -223,7 +264,7 @@ msgid "turtle y"
 msgstr ""
 
 msgid "Download"
-msgstr ""
+msgstr "ダウンロード"
 
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
 msgstr ""
@@ -235,10 +276,10 @@ msgid "Expand/collapse toolbar"
 msgstr ""
 
 msgid "zoom"
-msgstr ""
+msgstr "ズーム"
 
 msgid "Hide or show the blocks and the palettes."
-msgstr ""
+msgstr "パレットを隠し見せ"　#Uncertain about grammar
 
 msgid "to degrees"
 msgstr ""
@@ -247,7 +288,7 @@ msgid "Restore blocks from the trash."
 msgstr ""
 
 msgid "get calories"
-msgstr ""
+msgstr "カロリーをとる"
 
 msgid "Load plugin from file"
 msgstr ""
@@ -268,17 +309,17 @@ msgid "Help"
 msgstr "ヘルプ"
 
 msgid "turtle"
-msgstr ""
+msgstr "タートル"
 
 #. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr ""
 
 msgid "right"
-msgstr ""
+msgstr "右"
 
 msgid "Load samples from server"
-msgstr ""
+msgstr "サーバから見本をダウンロード"
 
 msgid "hide blocks"
 msgstr "ブロックを非表示にする"
@@ -293,17 +334,22 @@ msgid "Enable scrolling"
 msgstr ""
 
 msgid "back"
-msgstr ""
+msgstr "後ろ"
 
 msgid "Publish"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Click to run the project step by step."
 msgstr ""
 
 #. TRANS: hollow line refers to drawing an outline around a line
 msgid "hollow line"
 msgstr ""
+=======
+msgid "grey"
+msgstr "葉色"
+>>>>>>> japanese-translation-DU
 
 msgid "arc"
 msgstr ""
@@ -315,7 +361,7 @@ msgid "longitude"
 msgstr ""
 
 msgid "duration"
-msgstr ""
+msgstr "期間の設定"
 
 #. TRANS: shade refers to value (dark to light)
 msgid "set shade"
@@ -333,10 +379,10 @@ msgid "event"
 msgstr ""
 
 msgid "pixel color"
-msgstr ""
+msgstr "ピクセルの色"
 
 msgid "eatme"
-msgstr ""
+msgstr "食べろ"
 
 msgid "This button opens and closes the primary toolbar."
 msgstr ""
@@ -378,20 +424,25 @@ msgid "hours ago"
 msgstr ""
 
 msgid "pen"
-msgstr ""
+msgstr "ペン"
 
 msgid "fish"
-msgstr ""
+msgstr "魚"
 
 msgid "print"
-msgstr ""
+msgstr "印刷"
 
+<<<<<<< HEAD
 #. TRANS: how many entries are in the heap?
 msgid "heap length"
 msgstr ""
 
 msgid "speak"
 msgstr ""
+=======
+msgid "size"
+msgstr "大きさ"
+>>>>>>> japanese-translation-DU
 
 msgid "Expand/collapse option toolbar"
 msgstr ""
@@ -411,10 +462,10 @@ msgstr ""
 
 #. TRANS: mathematical power, e.g., 2^4 == 16
 msgid "power"
-msgstr ""
+msgstr "電源"
 
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 msgid "one of"
 msgstr ""
@@ -423,7 +474,7 @@ msgid "Save stack"
 msgstr ""
 
 msgid "corn"
-msgstr ""
+msgstr "コーン"
 
 msgid "Display statistics"
 msgstr ""
@@ -435,7 +486,7 @@ msgid "to radians"
 msgstr ""
 
 msgid "water"
-msgstr ""
+msgstr "水"
 
 #. TRANS: robot sensors.
 msgid "infrared light (left)"
@@ -446,7 +497,7 @@ msgid "base"
 msgstr ""
 
 msgid "cookie"
-msgstr ""
+msgstr "クッキー"
 
 msgid "Show or hide a polar-coordinate grid."
 msgstr ""
@@ -455,17 +506,22 @@ msgid "octave"
 msgstr ""
 
 msgid "sweet potato"
-msgstr ""
+msgstr "スイートポテト"
 
+<<<<<<< HEAD
 #. TRANS: save the heap to a file
 msgid "save heap"
 msgstr ""
+=======
+msgid "maths"
+msgstr "数学"
+>>>>>>> japanese-translation-DU
 
 msgid "from"
 msgstr ""
 
 msgid "sensors"
-msgstr ""
+msgstr "センサー"
 
 msgid "pen down"
 msgstr ""
@@ -478,7 +534,7 @@ msgid "get name"
 msgstr ""
 
 msgid "wait"
-msgstr ""
+msgstr "待ち"
 
 #. TRANS: a container for a variable
 msgid "box"
@@ -507,6 +563,7 @@ msgstr ""
 msgid "digest meal"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "maths"
 msgstr ""
 
@@ -522,20 +579,24 @@ msgstr ""
 #. TRANS: popout window
 msgid "popout"
 msgstr ""
+=======
+msgid "calories"
+msgstr "カロリー"
+>>>>>>> japanese-translation-DU
 
 msgid "zoom factor"
 msgstr ""
 
 #. TRANS: the name of a stack of blocks
 msgid "action"
-msgstr ""
+msgstr "動作"
 
 #. TRANS: volume of microphone audio
 msgid "loudness"
-msgstr ""
+msgstr "音の大きさ"
 
 msgid "Increase the size of the blocks."
-msgstr ""
+msgstr "ブロックの大きさ"
 
 msgid "set volume"
 msgstr ""
@@ -548,17 +609,17 @@ msgid "note value"
 msgstr ""
 
 msgid "comment"
-msgstr ""
+msgstr "コメント"
 
 msgid "cheese"
-msgstr ""
+msgstr "チーズ"
 
 #. TRANS: lilypond is a language used to generate musical scores.
 msgid "save as lilypond"
 msgstr ""
 
 msgid "Cartesian"
-msgstr ""
+msgstr "カーテシアン"
 
 #. TRANS: audio (as in musical note)
 msgid "tone"
@@ -569,12 +630,19 @@ msgid "eval"
 msgstr ""
 
 msgid "color"
-msgstr ""
+msgstr "いろ"
 
 msgid "image"
-msgstr ""
+msgstr "画素"
 
+<<<<<<< HEAD
 msgid "Click to run the music note by note."
+=======
+msgid "Welcome to Turtle Blocks"
+msgstr "タートル・ブロックへようこそ"
+
+msgid "Increase block size"
+>>>>>>> japanese-translation-DU
 msgstr ""
 
 #. TRANS: pop a value off of the heap.
