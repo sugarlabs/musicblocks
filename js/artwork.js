@@ -90,7 +90,7 @@ function hideButtonHighlight(circles, stage) {
         stage.removeChild(circles.active, circles.highlight);
     }, 650);
 }
-var MENUWIDTH = 200;
+var MENUWIDTH = 240;
 
 var PALETTEFILLER = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="filler_height">' + '<rect width="200" height="filler_height" x="0" y="0" style="fill:#b3b3b3;fill-opacity:1;stroke:none" />' + '</svg>';
 

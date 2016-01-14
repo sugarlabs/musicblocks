@@ -778,7 +778,7 @@ function Palette(palettes, name) {
                         bitmap.visible = false;
                         palette.upButton = bitmap;
                         palette.upButton.on('click', function(event) {
-                            palette.scrollEvent(STANDARDBLOCKHEIGHT, 10);
+                            palette.scrollEvent(STANDARDBLOCKHEIGHT, 3);
                         });
 
                         function processDownIcon(palette, name, bitmap, extras) {
@@ -795,7 +795,7 @@ function Palette(palettes, name) {
                             bitmap.visible = false;
                             palette.downButton = bitmap;
                             palette.downButton.on('click', function(event) {
-                                palette.scrollEvent(-STANDARDBLOCKHEIGHT, 10);
+                                palette.scrollEvent(-STANDARDBLOCKHEIGHT, 3);
                             });
                         } 
                         makePaletteBitmap(palette, DOWNICON, name, processDownIcon, null);
@@ -1116,7 +1116,7 @@ function Palette(palettes, name) {
             this.FadedDownButton.visible = false;
             return;
         }
-        if (this.scrollDiff + diff > 0 && direction > 0) {
+        if (diff - this.scrollDiff < h  && direction > 0) {
             var x = -this.scrollDiff;
             if (x == 0) {
                 this.downButton.visible = true;
