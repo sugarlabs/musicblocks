@@ -18,80 +18,80 @@ msgstr ""
 "X-Generator: Pootle 2.0.1\n"
 
 msgid "Delete all"
-msgstr ""
+msgstr "全部を消す"　#Maybe 全部を取り消す
 
 msgid "show"
-msgstr ""
+msgstr "示す" #Uncertain. Maybe 展示する。Or Maybe 現らす
 
 msgid "text"
-msgstr ""
+msgstr "文事" #Double check
 
 msgid "random"
-msgstr ""
+msgstr "でたらめな"　#Just looked it up.
 
 msgid "confirm"
-msgstr ""
+msgstr "確認する"
 
 msgid "Expand or collapse stacks of blocks, e.g, start and action stacks."
 msgstr ""
 
 msgid "rice and beans"
-msgstr ""
+msgstr "飯と豆"
 
 msgid "mashape"
 msgstr ""
 
 msgid "target"
-msgstr ""
+msgstr "標的"
 
 msgid "keyboard"
-msgstr ""
+msgstr "キーボード"
 
 msgid "You can also load projects from the file system."
-msgstr ""
+msgstr "ファイルシステムからプロジェクトをロードできますよ。"
 
 msgid "chicken"
-msgstr ""
+msgstr "鶏肉"
 
 msgid "set color"
-msgstr ""
+msgstr "色を設定"　＃Maybe の　--　色の設定
 
 msgid "apple"
-msgstr ""
+msgstr "りんご"
 
 msgid "title"
-msgstr ""
+msgstr "名" #Maybe 題名
 
 msgid "radians"
 msgstr ""
 
 msgid "Undo"
-msgstr ""
+msgstr "取り戻す" #Uncertain about this. Maybe 元へ戻す
 
 msgid "to"
-msgstr ""
+msgstr "最終の状態"
 
 msgid "add"
-msgstr ""
+msgstr "足し算をする"
 
 msgid "set pen size"
-msgstr ""
+msgstr "ペンの大きさの設定"
 
 msgid "start turtle"
-msgstr ""
+msgstr "タートルの動き出し"
 
 msgid "city latitude"
-msgstr ""
+msgstr "市の緯度"
 
 msgid "city longitude"
-msgstr ""
+msgstr "市の軽度"
 
 #. TRANS: longitude and latitude coordinate data
 msgid "Coordinate data not available."
 msgstr ""
 
 msgid "latitude"
-msgstr ""
+msgstr "緯度"
 
 msgid "mouse x"
 msgstr ""
@@ -100,22 +100,22 @@ msgid "mouse y"
 msgstr ""
 
 msgid "Show/hide blocks"
-msgstr ""
+msgstr "ブルックを見せ隠し"　#Not too sure on grammar...
 
 msgid "then"
 msgstr ""
 
 msgid "move"
-msgstr ""
+msgstr "動き出し"
 
 msgid "Stop the current project."
-msgstr ""
+msgstr "プロジェクトを止めます"
 
 msgid "stop turtle"
-msgstr ""
+msgstr "タートルを止める"
 
 msgid "food"
-msgstr ""
+msgstr "食べ物"
 
 msgid "Click to run the project in slow mode."
 msgstr ""
@@ -124,37 +124,37 @@ msgid "stop"
 msgstr "ステップ実行"
 
 msgid "fat"
-msgstr ""
+msgstr "脂肪" #Only for the noun; not adjective.
 
 msgid "number"
-msgstr ""
+msgstr "数字"
 
 msgid "background"
-msgstr ""
+msgstr "背景"
 
 msgid "not"
 msgstr ""
 
 msgid "Google map"
-msgstr ""
+msgstr "グーグルマップ" #To verify
 
 msgid "day"
-msgstr ""
+msgstr "曜日" #I am assuming "day of the week". 期日 for "date"
 
 msgid "mod"
 msgstr ""
 
 msgid "Save project"
-msgstr ""
+msgstr "プロジェクトを確保する" #to check on computer
 
 msgid "get fiber"
-msgstr ""
+msgstr "食物繊維をとる"　#Get is ambiguous English word. Translates to "Take Dietary Fiber"
 
 msgid "Open a panel for configuring Turtle Blocks."
 msgstr ""
 
 msgid "name"
-msgstr ""
+msgstr "題名" #Name of what? Name of Turtle or Title?　If "Turtle's name" then タートルの名前。or タートルの名。
 
 msgid "turtle x"
 msgstr ""
@@ -163,7 +163,7 @@ msgid "turtle y"
 msgstr ""
 
 msgid "Download"
-msgstr ""
+msgstr "ダウンロード"
 
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
 msgstr ""
@@ -172,10 +172,10 @@ msgid "Expand/collapse toolbar"
 msgstr ""
 
 msgid "zoom"
-msgstr ""
+msgstr "ズーム"
 
 msgid "Hide or show the blocks and the palettes."
-msgstr ""
+msgstr "パレットを隠し見せ"　#Uncertain about grammar
 
 msgid "to degrees"
 msgstr ""
@@ -184,7 +184,7 @@ msgid "Restore blocks from the trash."
 msgstr ""
 
 msgid "get calories"
-msgstr ""
+msgstr "カロリーをとる"
 
 msgid "Load plugin from file"
 msgstr ""
@@ -202,13 +202,13 @@ msgid "Help"
 msgstr "ヘルプ"
 
 msgid "turtle"
-msgstr ""
+msgstr "タートル"
 
 msgid "right"
-msgstr ""
+msgstr "右"
 
 msgid "Load samples from server"
-msgstr ""
+msgstr "サーバから見本をダウンロード"
 
 msgid "hide blocks"
 msgstr "ブロックを非表示にする"
@@ -220,13 +220,13 @@ msgid "This button opens a viewer for loading example projects."
 msgstr ""
 
 msgid "back"
-msgstr ""
+msgstr "後ろ"
 
 msgid "Publish"
 msgstr ""
 
 msgid "grey"
-msgstr ""
+msgstr "葉色"
 
 msgid "arc"
 msgstr ""
@@ -238,16 +238,16 @@ msgid "longitude"
 msgstr ""
 
 msgid "duration"
-msgstr ""
+msgstr "期間の設定"
 
 msgid "set shade"
 msgstr ""
 
 msgid "pixel color"
-msgstr ""
+msgstr "ピクセルの色"
 
 msgid "eatme"
-msgstr ""
+msgstr "食べろ"
 
 msgid "This button opens and closes the primary toolbar."
 msgstr ""
@@ -268,16 +268,16 @@ msgid "forecast"
 msgstr ""
 
 msgid "pen"
-msgstr ""
+msgstr "ペン"
 
 msgid "fish"
-msgstr ""
+msgstr "魚"
 
 msgid "print"
-msgstr ""
+msgstr "印刷"
 
 msgid "size"
-msgstr ""
+msgstr "大きさ"
 
 msgid "Expand/collapse option toolbar"
 msgstr ""
@@ -292,16 +292,16 @@ msgid "You can load new blocks from the file system."
 msgstr ""
 
 msgid "power"
-msgstr ""
+msgstr "電源"
 
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 msgid "Save stack"
 msgstr ""
 
 msgid "corn"
-msgstr ""
+msgstr "コーン"
 
 msgid "Display statistics"
 msgstr ""
@@ -313,28 +313,28 @@ msgid "to radians"
 msgstr ""
 
 msgid "water"
-msgstr ""
+msgstr "水"
 
 msgid "base"
 msgstr ""
 
 msgid "cookie"
-msgstr ""
+msgstr "クッキー"
 
 msgid "Show or hide a polar-coordinate grid."
 msgstr ""
 
 msgid "sweet potato"
-msgstr ""
+msgstr "スイートポテト"
 
 msgid "maths"
-msgstr ""
+msgstr "数学"
 
 msgid "from"
 msgstr ""
 
 msgid "sensors"
-msgstr ""
+msgstr "センサー"
 
 msgid "pen down"
 msgstr ""
@@ -343,7 +343,7 @@ msgid "get name"
 msgstr ""
 
 msgid "wait"
-msgstr ""
+msgstr "待ち"
 
 msgid "box"
 msgstr ""
@@ -358,19 +358,19 @@ msgid "digest meal"
 msgstr ""
 
 msgid "calories"
-msgstr ""
+msgstr "カロリー"
 
 msgid "zoom factor"
 msgstr ""
 
 msgid "action"
-msgstr ""
+msgstr "動作"
 
 msgid "loudness"
-msgstr ""
+msgstr "音の大きさ"
 
 msgid "Increase the size of the blocks."
-msgstr ""
+msgstr "ブロックの大きさ"
 
 msgid "or"
 msgstr ""
@@ -379,25 +379,25 @@ msgid "sense left"
 msgstr ""
 
 msgid "comment"
-msgstr ""
+msgstr "コメント"
 
 msgid "cheese"
-msgstr ""
+msgstr "チーズ"
 
 msgid "Cartesian"
-msgstr ""
+msgstr "カーテシアン"
 
 msgid "eval"
 msgstr ""
 
 msgid "color"
-msgstr ""
+msgstr "いろ"
 
 msgid "image"
-msgstr ""
+msgstr "画素"
 
 msgid "Welcome to Turtle Blocks"
-msgstr ""
+msgstr "タートル・ブロックへようこそ"
 
 msgid "Increase block size"
 msgstr ""
