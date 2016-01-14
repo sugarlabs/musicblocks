@@ -2615,7 +2615,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     this.processNote = function(noteValue, turtle) {
         // FIXME: Take into account duplicate
-        noteValue /= this.beatFactor[turtle];
+        noteValue *= this.beatFactor[turtle];
         if (this.inMatrix) {
             if (this.tuplet == true) {
                 if(this.addingNotesToTuplet) {
