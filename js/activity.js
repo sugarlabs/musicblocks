@@ -140,7 +140,7 @@ console.log(txt);
         var buttonsVisible = true;
         var headerContainer = null;
         var toolbarButtonsVisible = true;
-        var menuButtonsVisible = false;
+        var menuButtonsVisible = true;
         var menuContainer = null;
         var scrollBlockContainer = false;
         var currentKey = '';
@@ -1213,6 +1213,20 @@ console.log(txt);
             thumbnails.show()
         }
 
+        function doSave() {
+            console.log('Saving .tb file');
+            var name = 'My Project';
+            download(name + '.tb',
+                'data:text/plain;charset=utf-8,' + prepareExport());
+        }
+
+        function doLoad() {
+            console.log('Loading .tb file');
+            document.querySelector('#myOpenFile').focus();
+            document.querySelector('#myOpenFile').click();
+            window.scroll(0, 0);
+        }
+
         window.prepareExport = prepareExport
         window.saveLocally = saveLocally
 
@@ -1792,9 +1806,16 @@ console.log(txt);
                 // ['smaller', doSmallerFont],
                 // ['plugin', doOpenPlugin],
                 ['utility', doUtilityBox],
+                ['save', doSave],
+                ['open', doLoad],
                 ['empty-trash', deleteBlocksBox],
                 ['restore-trash', restoreTrash]
             ];
+
+            document.querySelector('#myOpenFile')
+                    .addEventListener('change', function(event) {
+                    me.controller.hide();
+            });
 
             var btnSize = cellSize;
             var x = Math.floor(canvas.width / musicBlocksScale) - btnSize / 2;
