@@ -1808,6 +1808,8 @@ console.log(txt);
             // Misc. other buttons
             var menuNames = [
                 ['planet', doOpenSamples],
+                ['save', doSave],
+                ['open', doLoad],
                 ['paste-disabled', pasteStack],
                 ['Cartesian', doCartesian],
                 ['polar', doPolar],
@@ -1815,8 +1817,6 @@ console.log(txt);
                 // ['smaller', doSmallerFont],
                 // ['plugin', doOpenPlugin],
                 ['utility', doUtilityBox],
-                ['save', doSave],
-                ['open', doLoad],
                 ['empty-trash', deleteBlocksBox],
                 ['restore-trash', restoreTrash]
             ];
