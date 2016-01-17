@@ -1208,6 +1208,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     repeatBlock.flowClampOneArgBlock();
     repeatBlock.defaults.push(4);
 
+    var duplicateChunkBlock = new ProtoBlock('duplicatechunks');
+    duplicateChunkBlock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['duplicatechunks'] = duplicateChunkBlock;
+    duplicateChunkBlock.staticLabels.push(_('duplicate chunks'));
+    duplicateChunkBlock.adjustWidthToLabel();
+    duplicateChunkBlock.flowClampOneArgBlock();
+    duplicateChunkBlock.defaults.push(2);
+
     var foreverBlock = new ProtoBlock('forever');
     foreverBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['forever'] = foreverBlock;

@@ -907,6 +907,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'repeat':
+                console.log(args.length);
+                console.log(args);
                 if (args.length == 2) {
                     if (typeof(args[0]) == 'string') {
                         logo.errorMsg(NANERRORMSG, blk);
@@ -2167,6 +2169,26 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 logo.setListener(turtle, listenerName, listener);
                 break;
             case 'duplicatenotes':
+                var factor = args[0];
+                if (factor == 0) {
+                    logo.errorMsg(ZERODIVIDEERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    logo.duplicateFactor[turtle] *= factor;
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_duplicate_' + turtle;
+                    logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                    var listener = function (event) {
+                        logo.duplicateFactor[turtle] /= factor;
+                    }
+
+                    logo.setListener(turtle, listenerName, listener);
+                }
+                break;
+            case 'duplicatechunks':
                 var factor = args[0];
                 if (factor == 0) {
                     logo.errorMsg(ZERODIVIDEERRORMSG, blk);
