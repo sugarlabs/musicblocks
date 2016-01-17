@@ -907,6 +907,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'repeat':
+                console.log(args.length);
+                console.log(args);
                 if (args.length == 2) {
                     if (typeof(args[0]) == 'string') {
                         logo.errorMsg(NANERRORMSG, blk);
