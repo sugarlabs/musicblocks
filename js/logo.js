@@ -1897,7 +1897,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 console.log('Time Signatature' + args[0]);
                 break;
 
-            // 𝅝 𝅗𝅥 𝅘𝅥 𝅘𝅥𝅮 𝅘𝅥𝅯 𝅘𝅥𝅰 𝅘𝅥𝅱 𝅘𝅥𝅲
+            // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
             case 'wholeNote':
                 logo.processNote(1, turtle);
                 break;

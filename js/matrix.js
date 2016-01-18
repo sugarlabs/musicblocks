@@ -312,7 +312,7 @@ function Matrix() {
         cell = table.rows[table.rows.length - 1].insertCell(-1);
         cell.style.height = 30 * this.cellScale + 'px';
 
-        var noteSymbol = {1: '𝅝', 2: '𝅗𝅥', 4: '𝅘𝅥', 8: '𝅘𝅥𝅮', 16: '𝅘𝅥𝅯', 32: '𝅘𝅥𝅰', '64': '𝅘𝅥𝅱', '128': '𝅘𝅥𝅲'};
+        var noteSymbol = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', '64': '&#x1D163;', '128': '&#x1D164;'};
         var noteValue = param[0][1] / param[0][0];
         var noteValueToDisplay = null;
         if (noteValue in noteSymbol) {
@@ -322,7 +322,7 @@ function Matrix() {
         }
 
         // FIXME: DOES NOT WORK FOR DOUBLE DOT
-         var dottedNoteSymbol = {1: '𝅝.', 2: '𝅗𝅥.', 4: '𝅘𝅥.', 8: '𝅘𝅥𝅮.', 16: '𝅘𝅥𝅯.', 32: '𝅘𝅥𝅰.', '64': '𝅘𝅥𝅱.', '128': '𝅘𝅥𝅲.'};
+         var dottedNoteSymbol = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', '64': '&#x1D163;.', '128': '&#x1D164;.'};
         if (parseInt(param[0][1]) < param[0][1]) {
             noteValueToDisplay = noteValue * 1.5;
             if (noteValueToDisplay in dottedNoteSymbol) {
@@ -402,7 +402,7 @@ function Matrix() {
         console.log('addNotes ' + numBeats + ' ' + noteValue);
         var table = document.getElementById('myTable');
 
-        var noteSymbol = {1: '𝅝', 2: '𝅗𝅥', 4: '𝅘𝅥', 8: '𝅘𝅥𝅮', 16: '𝅘𝅥𝅯', 32: '𝅘𝅥𝅰', '64': '𝅘𝅥𝅱', '128': '𝅘𝅥𝅲'};
+        var noteSymbol = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', '64': '&#x1D163;', '128': '&#x1D164;'};
         var noteValueToDisplay = null;
         if (noteValue in noteSymbol) {
             noteValueToDisplay = '1/' + noteValue.toString() + ' ' + noteSymbol[noteValue];
@@ -411,7 +411,7 @@ function Matrix() {
         }
 
         // FIXME: DOES NOT WORK FOR DOUBLE DOT
-         var dottedNoteSymbol = {1: '𝅝.', 2: '𝅗𝅥.', 4: '𝅘𝅥.', 8: '𝅘𝅥𝅮.', 16: '𝅘𝅥𝅯.', 32: '𝅘𝅥𝅰.', '64': '𝅘𝅥𝅱.', '128': '𝅘𝅥𝅲.'};
+         var dottedNoteSymbol = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', '64': '&#x1D163;.', '128': '&#x1D164;.'};
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
             if (noteValueToDisplay in dottedNoteSymbol) {
@@ -645,7 +645,7 @@ function Matrix() {
                     var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
                     var note = noteObj[0] + noteObj[1];
                     var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
-                    // Remove ' 𝅘𝅥' at the end of the HTML code for the
+                    // Remove ' &#x1D15F;' at the end of the HTML code for the
                     // note value.
                     var len = noteValue.length;
                     // if (len > 2 && noteValue.charAt(len - 3) == ' ') {
