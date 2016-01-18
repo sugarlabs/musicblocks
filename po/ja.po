@@ -91,10 +91,10 @@ msgid "apple"
 msgstr "りんご"
 
 msgid "graphical notation matrix"
-msgstr ""
+msgstr "簡単なビジュアル・マトリックス"
 
 msgid "number"
-msgstr ""
+msgstr "数字"
 
 #. TRANS: unique ID
 msgid "UID"
@@ -169,7 +169,7 @@ msgstr "動き出し"
 
 <<<<<<< HEAD
 msgid "triangle"
-msgstr ""
+msgstr "三角"
 =======
 msgid "Stop the current project."
 msgstr "プロジェクトを止めます"
@@ -179,17 +179,17 @@ msgid "stop turtle"
 msgstr "タートルを止める"
 
 msgid "current pitch octave"
-msgstr ""
+msgstr "調子のオクターブ"　#Instead of 調子 one could use ピッチ (former is shorter)
 
 #. TRANS: robot sensors.
 msgid "distance"
-msgstr ""
+msgstr "距離"
 
 msgid "food"
 msgstr "食べ物"
 
 msgid "Click to run the project in slow mode."
-msgstr ""
+msgstr "プロジェクトをゆっくりなペースするため、ここでクリック"
 
 msgid "stop"
 msgstr "ステップ実行"
@@ -203,10 +203,10 @@ msgstr ""
 
 #. TRANS: a container for a variable
 msgid "boxes"
-msgstr ""
+msgstr "ボックス" #Maybe just leave in roman letters. Depends on what feels good for pedagogy...
 
 msgid "get fiber"
-msgstr ""
+msgstr "食物繊維をとる"
 =======
 msgid "number"
 msgstr "数字"
@@ -217,28 +217,28 @@ msgstr "背景"
 
 #. TRANS: logical "not" operator
 msgid "not"
-msgstr ""
+msgstr "" #Probably better in Roman letters
 
 msgid "Google map"
 msgstr "グーグルマップ" #To verify
 
 #. TRANS: as in blinking an eye.
 msgid "blink"
-msgstr ""
+msgstr "瞬く" #Blinking light is 点滅する
 
 msgid "day"
 msgstr "曜日" #I am assuming "day of the week". 期日 for "date"
 
 #. TRANS: mathematical modular (remainder) function.
 msgid "mod"
-msgstr ""
+msgstr "" #Roman probably better
 
 <<<<<<< HEAD
 msgid "beat factor"
-msgstr ""
+msgstr "リズムの倍" #probably a little wrong. This is just multiply, I think...
 
 msgid "Save project"
-msgstr ""
+msgstr "プロジェクトを確保す"
 =======
 msgid "Save project"
 msgstr "プロジェクトを確保する" #to check on computer
@@ -251,7 +251,7 @@ msgid "Copy"
 msgstr "コピー"
 
 msgid "Open a panel for configuring Music Blocks."
-msgstr ""
+msgstr "音楽ブロックを設定するためパネルの開きクリック" #A little off, I think. Also, Maybe just "Music Blocks" in Roman letters.
 
 #. TRANS: the name of a variable (stored in a box)
 msgid "name"
@@ -270,10 +270,10 @@ msgid "The paste button is enabled when there are blocks copied onto the clipboa
 msgstr ""
 
 msgid "transposition"
-msgstr ""
+msgstr "調子の高さを設定"　#Maybe 調子をトランスポーズ Non-musicians may understand first better (though I need to verify if understood)
 
 msgid "Expand/collapse toolbar"
-msgstr ""
+msgstr "ツールバーを開き隠し" #Again, I don't know how to conflate two verbs...
 
 msgid "zoom"
 msgstr "ズーム"
@@ -282,19 +282,19 @@ msgid "Hide or show the blocks and the palettes."
 msgstr "パレットを隠し見せ"　#Uncertain about grammar
 
 msgid "to degrees"
-msgstr ""
+msgstr "何度" #I don't really understand context. This says "what degree". Maybe just leave second character, which means "degree".
 
 msgid "Restore blocks from the trash."
-msgstr ""
+msgstr "ブロックをゴミ箱から取り戻す"
 
 msgid "get calories"
 msgstr "カロリーをとる"
 
 msgid "Load plugin from file"
-msgstr ""
+msgstr "プラグインをロードする" #I don't think it needs "from file" for Japanese
 
 msgid "You can scroll the blocks on the canvas."
-msgstr ""
+msgstr "カンバスにあるブロックをこれでスクロール" #Is it the blocks that are scrolled or the canvas itself?
 
 msgid "x"
 msgstr ""
@@ -325,23 +325,23 @@ msgid "hide blocks"
 msgstr "ブロックを非表示にする"
 
 msgid "Hide or show the block palettes."
-msgstr ""
+msgstr "ブロックのパレットを隠し見せ" #Check grammar
 
 msgid "This button opens a viewer for loading example projects."
-msgstr ""
+msgstr "プロジェクトをロードするためここでクリック"
 
 msgid "Enable scrolling"
-msgstr ""
+msgstr "スクロールをスターと" #Need to fix. Says "start scrolling"...
 
 msgid "back"
 msgstr "後ろ"
 
 msgid "Publish"
-msgstr ""
+msgstr "サーバにアップロードして発表する" #Verify. Says "upload to server and show (others)
 
 <<<<<<< HEAD
 msgid "Click to run the project step by step."
-msgstr ""
+msgstr "行動を一つ一つ、ここでクリック"　#Run "actions" one-by-one
 
 #. TRANS: hollow line refers to drawing an outline around a line
 msgid "hollow line"
@@ -368,7 +368,7 @@ msgid "set shade"
 msgstr ""
 
 msgid "duplicate notes"
-msgstr ""
+msgstr "音符を倍にする" #This makes sense, I think, but only if 1=1 time, 2=2 times, etc
 
 #. TRANS: in mathematical sense (inverse of period)
 msgid "frequency"
@@ -382,30 +382,30 @@ msgid "pixel color"
 msgstr "ピクセルの色"
 
 msgid "eatme"
-msgstr "食べろ"
+msgstr "私を食べろ" #I used a "me" that people would say. What context?
 
 msgid "This button opens and closes the primary toolbar."
-msgstr ""
+msgstr "ツールバーを開くためにここでクリック"
 
 #. TRANS: index specifies a position into an array (heap)
 msgid "index"
-msgstr ""
+msgstr "インデックス" #Double-check. Not sure. May be too literal.
 
 msgid "note volume"
-msgstr ""
+msgstr "音の大きさ"
 
 msgid "hide"
-msgstr ""
+msgstr "隠す"
 
 #. TRANS: the heap is a first-in-last-out (FILO) stack
 msgid "show heap"
-msgstr ""
+msgstr "ヒープを見せる" #Maybe "Heap" in English. Depends on culture of programming in Japan, maybe.
 
 msgid "Stop the music (and the turtles)."
-msgstr ""
+msgstr "音楽とタートルを止める"
 
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
+msgstr "ツアーが終わりました。音楽ブロックスを楽しんでください"
 
 #. TRANS: vertical space
 msgid "vspace"
@@ -413,15 +413,15 @@ msgstr ""
 
 #. TRANS: publish project to Facebook
 msgid "publish"
-msgstr ""
+msgstr "プロジェクトをフェースブックにアップロードする" #I was just thinking it maybe should be 現在のプロジェクト
 
 #. TRANS: weather forecast
 msgid "forecast"
-msgstr ""
+msgstr "天気予報"
 
 #. TRANS: hours ago that the data was updated.
 msgid "hours ago"
-msgstr ""
+msgstr "時間前" #If the number goes right before this, it will make sense just fine
 
 msgid "pen"
 msgstr "ペン"
@@ -430,39 +430,39 @@ msgid "fish"
 msgstr "魚"
 
 msgid "print"
-msgstr "印刷"
+msgstr "印刷" #This is like "print a piece of paper"
 
 <<<<<<< HEAD
 #. TRANS: how many entries are in the heap?
 msgid "heap length"
-msgstr ""
+msgstr "ヒープの長さ" #Maybe heap in roman letters.
 
 msgid "speak"
-msgstr ""
+msgstr "声を出す" #Maybe 話す
 =======
 msgid "size"
 msgstr "大きさ"
 >>>>>>> japanese-translation-DU
 
 msgid "Expand/collapse option toolbar"
-msgstr ""
+msgstr "オプションのツールバーを開き隠し"
 
 msgid "end hollow line"
 msgstr ""
 
 msgid "city latitude"
-msgstr ""
+msgstr "市の緯度"
 
 #. TRANS: dietary fiber
 msgid "fiber"
-msgstr ""
+msgstr "食物繊維をと"
 
 msgid "You can load new blocks from the file system."
 msgstr ""
 
 #. TRANS: mathematical power, e.g., 2^4 == 16
 msgid "power"
-msgstr "電源"
+msgstr ""
 
 msgid "Settings"
 msgstr "設定"
@@ -503,7 +503,7 @@ msgid "Show or hide a polar-coordinate grid."
 msgstr ""
 
 msgid "octave"
-msgstr ""
+msgstr "オクターヴ"
 
 msgid "sweet potato"
 msgstr "スイートポテト"
@@ -511,7 +511,7 @@ msgstr "スイートポテト"
 <<<<<<< HEAD
 #. TRANS: save the heap to a file
 msgid "save heap"
-msgstr ""
+msgstr "ヒープを確保"
 =======
 msgid "maths"
 msgstr "数学"
@@ -571,14 +571,14 @@ msgid "denominator"
 msgstr ""
 
 msgid "eighth note ♪"
-msgstr ""
+msgstr "８分音符"　#Where are other values? At any rate, they follow the same pattern as this one: ３２分音符 for 32nd 
 
 msgid "whole note 𝅝"
-msgstr ""
+msgstr "全音符"
 
 #. TRANS: popout window
 msgid "popout"
-msgstr ""
+msgstr "ポップアップ" #completely guessing
 =======
 msgid "calories"
 msgstr "カロリー"
@@ -593,20 +593,20 @@ msgstr "動作"
 
 #. TRANS: volume of microphone audio
 msgid "loudness"
-msgstr "音の大きさ"
+msgstr "マイクの音の大きさ" #This doesn't seem right to me. Maybe sensitivity.
 
 msgid "Increase the size of the blocks."
 msgstr "ブロックの大きさ"
 
 msgid "set volume"
-msgstr ""
+msgstr "音の大きさ"
 
 #. TRANS: logical "or" operator
 msgid "or"
 msgstr ""
 
 msgid "note value"
-msgstr ""
+msgstr "音符の長さ" #I doubt that this is correct.
 
 msgid "comment"
 msgstr "コメント"
@@ -616,14 +616,14 @@ msgstr "チーズ"
 
 #. TRANS: lilypond is a language used to generate musical scores.
 msgid "save as lilypond"
-msgstr ""
+msgstr "リリポンドのファイルフォーマットで確保"
 
 msgid "Cartesian"
 msgstr "カーテシアン"
 
 #. TRANS: audio (as in musical note)
 msgid "tone"
-msgstr ""
+msgstr "音色"
 
 #. TRANS: evaluate Javascript code
 msgid "eval"
@@ -643,7 +643,7 @@ msgstr "タートル・ブロックへようこそ"
 
 msgid "Increase block size"
 >>>>>>> japanese-translation-DU
-msgstr ""
+msgstr "ブロックの大きさを設定"
 
 #. TRANS: pop a value off of the heap.
 msgid "pop"
@@ -651,13 +651,13 @@ msgstr ""
 
 #. TRANS: bitcoin currency (probably no need to translate)
 msgid "bitcoin"
-msgstr ""
+msgstr "ビットコイン"　#Maybe no need, but this did seem to come up in dictionary.
 
 msgid "pen size"
-msgstr ""
+msgstr "ペンの大きさ"
 
 msgid "Clear the screen and return the turtles to their initial positions."
-msgstr ""
+msgstr "画面にあるものを全部消して最初のままに戻す"
 
 #. TRANS: Boolean logic
 msgid "boolean"
@@ -667,16 +667,16 @@ msgid "coordinates"
 msgstr ""
 
 msgid "sing"
-msgstr ""
+msgstr "歌う"
 
 msgid "play backward"
-msgstr ""
+msgstr "反対にプレーする"　#To be checked.
 
 msgid "Congratulations."
-msgstr ""
+msgstr "おめでとうございます"
 
 msgid "Run slow"
-msgstr ""
+msgstr "ゆっくりにプレーする" #to be checked.
 
 msgid "mouse button"
 msgstr ""
