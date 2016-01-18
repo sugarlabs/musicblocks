@@ -174,7 +174,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
-
+    
+    var skipBlock = new ProtoBlock('skip');
+    skipBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['skip'] = skipBlock;
+    skipBlock.staticLabels.push(_('skip'));
+    skipBlock.adjustWidthToLabel();
+    skipBlock.flowClampOneArgBlock();
+    skipBlock.defaults.push(1);
+	
     var invertblock = new ProtoBlock('invert');
     invertblock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['invert'] = invertblock;
