@@ -136,7 +136,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var sixteenthNoteBlock = new ProtoBlock('sixteenthNote');
     sixteenthNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['sixteenthNote'] = sixteenthNoteBlock;
-    sixteenthNoteBlock.staticLabels.push(_('1/16 note ♬'));
+    sixteenthNoteBlock.staticLabels.push(_('1/16 note 𝅘𝅥𝅯'));
     sixteenthNoteBlock.adjustWidthToLabel();
     sixteenthNoteBlock.zeroArgBlock();
 
