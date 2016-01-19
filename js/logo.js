@@ -902,7 +902,13 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'speak':
                 if (args.length == 1) {
                     if (logo.meSpeak) {
-                        logo.meSpeak.speak(args[0]);
+                        var text = args[0];
+                        var new_text = "";
+                        for(i=0;i<text.length;i++){
+                            if((text[i]>='a' && text[i]<='z') || (text[i]>='A' && text[i]<='Z') || text[i]==',' || text[i]=='.' || text[i]==' ')
+                                new_text+=text[i];
+                        }
+                        logo.meSpeak.speak(new_text);
                     }
                 }
                 break;
