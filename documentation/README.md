@@ -287,12 +287,6 @@ repeat x2 of 4 4 8 would result in 4 4 8 4 4 8.
 Tone Palette
 ------------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/notation.svg'</img>
-
-The *Notation* block clamp is used to generate notation for the notes
-contained in the clamp. (Note that only notes of a value of a power of
-two will work in the current implementation.)
-
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/putting-it-all-together.png'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/setbpm.svg'</img>
