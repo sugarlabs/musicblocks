@@ -1348,7 +1348,7 @@ console.log(txt);
                 }
                 try {
                     // Post the project
-                    var returnValue = httpPost(projectName, prepareExport());
+                    var returnValue = httpPost('MusicBlocks_'+projectName, prepareExport());
                     errorMsg('Saved ' + projectName + ' to ' + window.location.host);
 
                     var img = new Image();
@@ -1358,7 +1358,7 @@ console.log(txt);
                         var bounds = bitmap.getBounds();
                         bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                         // and base64-encoded png
-                        httpPost(projectName.replace('.tb', '.b64'), bitmap.getCacheDataURL());
+                        httpPost(('MusicBlocks_'+projectName).replace('.tb', '.b64'), bitmap.getCacheDataURL());
                     }
                     img.src = 'data:image/svg+xml;base64,' + window.btoa(
                         unescape(encodeURIComponent(svgData)));

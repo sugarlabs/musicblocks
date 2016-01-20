@@ -98,6 +98,8 @@ function PlanetModel(controller) {
             return;
         }
         var name = image.replace('.b64', '');
+        if(name.slice(0, 'MusicBlocks_'.length) == 'MusicBlocks_')
+        	name=name.substring('MusicBlocks_'.length);
 
         if (me.globalImagesCache[image] !== undefined) {
             me.globalProjects.push({title: name,
@@ -202,6 +204,7 @@ function PlanetModel(controller) {
         me.updated();
     }
 
+    //Opens up projects in the "On my device" section
     this.open = function (name, data) {
         localStorage.currentProject = name;
         me.controller.sendAllToTrash(false, true);
@@ -209,6 +212,8 @@ function PlanetModel(controller) {
         me.stop = true;
     }
 
+    //Adds the project from "Worldwide" to the "On my deivce" 
+    //section when download button is clicked
     this.prepLoadingProject = function (name) {
         localStorage.currentProject = name;
 
@@ -236,6 +241,7 @@ function PlanetModel(controller) {
     this.publish = function (name, data, image) {
         name = name.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^`{|}~']/g,
                             '').replace(/ /g, '_');
+        name = 'MusicBlocks_'+name;
         httpPost(name + '.tb', data);
         httpPost(name + '.b64', image);
         me.downloadWorldWideProjects();
