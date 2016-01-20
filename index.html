@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Music Blocks</title>
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
     <link rel="stylesheet" href="css/activity.css">
 
     <script src="lib/mespeak.js"></script>
@@ -21,7 +21,8 @@
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
-    <script data-main="js/loader" src="lib/require.js"> </script>
+    <script data-main="js/loader" src="lib/require.js">
+    </script>
 
     <link rel="manifest" href="android_chrome_manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
@@ -32,91 +33,113 @@
 <body data-title="index" id="body" style="background: #96D3F3;">
 
     <script>
-    window.fbAsyncInit = function() {
-        FB.init({
-          appId      : '1496189893985945',
-          xfbml      : true,
-          version    : 'v2.1'
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: '1496189893985945',
+                xfbml: true,
+                version: 'v2.1'
+            });
+        };
+
+        try {
+            (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) {
+                    return;
+                }
+                js = d.createElement(s);
+                js.id = id;
+                js.src = "//connect.facebook.net/en_US/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        } catch (e) {}
+
+        $(function() {
+            $("#musicNotation").draggable();
+            $("#matrix").draggable();
+            $("#solfamenu").draggable();
+
         });
-    };
 
-    try {
-          (function(d, s, id){
-             var js, fjs = d.getElementsByTagName(s)[0];
-             if (d.getElementById(id)) {return;}
-             js = d.createElement(s); js.id = id;
-             js.src = "//connect.facebook.net/en_US/sdk.js";
-             fjs.parentNode.insertBefore(js, fjs);
-          }(document, 'script', 'facebook-jssdk'));
-     } catch(e) {}
+        (function($) {
+            $.fn.fixMe = function() {
+                return this.each(function() {
+                    var $this = $(this),
+                        $t_fixed;
 
-     $(function() {
-          $( "#musicNotation" ).draggable();
-          $( "#matrix" ).draggable();
-          $( "#solfamenu" ).draggable();
-   
-     });    
+                    function init() {
+                        $this.wrap('<div class="container" />');
+                        $t_fixed = $this.clone();
+                        $t_fixed.find("tbody").remove().end().addClass("fixed").insertBefore($this);
+                        resizeFixed();
+                    }
 
-     (function($) {
-          $.fn.fixMe = function() {
-              return this.each(function() {
-              var $this = $(this), $t_fixed;
-              function init() {
-                  $this.wrap('<div class="container" />');
-                  $t_fixed = $this.clone();
-                  $t_fixed.find("tbody").remove().end().addClass("fixed").insertBefore($this);
-                  resizeFixed();
-              }
-              function resizeFixed() {
-                  $t_fixed.find("th").each(function(index) {
-                      $(this).css("width", $this.find("th").eq(index).outerWidth()+"px");
-                  });
-              }
-              function scrollFixed() {
-                  var offset = $(this).scrollTop(),
-                  tableOffsetTop = $this.offset().top,
-                  tableOffsetBottom = tableOffsetTop + $this.height() - $this.find("thead").height();
-                  if(offset < tableOffsetTop || offset > tableOffsetBottom)
-                      $t_fixed.hide();
-                  else if(offset >= tableOffsetTop && offset <= tableOffsetBottom && $t_fixed.is(":hidden"))
-                      $t_fixed.show();
-              }
-              $(window).resize(resizeFixed);
-              $(window).scroll(scrollFixed);
-              init();
-              });
-         };
-    })(jQuery);
+                    function resizeFixed() {
+                        $t_fixed.find("th").each(function(index) {
+                            $(this).css("width", $this.find("th").eq(index).outerWidth() + "px");
+                        });
+                    }
 
-    $(document).ready(function(){
-        $("solfa").fixMe();
-        $(".up").click(function() {
-            $('html, body').animate({
-                scrollTop: 0
-            }, 2000);
+                    function scrollFixed() {
+                        var offset = $(this).scrollTop(),
+                            tableOffsetTop = $this.offset().top,
+                            tableOffsetBottom = tableOffsetTop + $this.height() - $this.find("thead").height();
+                        if (offset < tableOffsetTop || offset > tableOffsetBottom)
+                            $t_fixed.hide();
+                        else if (offset >= tableOffsetTop && offset <= tableOffsetBottom && $t_fixed.is(":hidden"))
+                            $t_fixed.show();
+                    }
+                    $(window).resize(resizeFixed);
+                    $(window).scroll(scrollFixed);
+                    init();
+                });
+            };
+        })(jQuery);
+
+        $(document).ready(function() {
+            $("solfa").fixMe();
+            $(".up").click(function() {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 2000);
+            });
         });
-    });
 
-    function moveMatrix(event) {
-        var matrixDiv = document.getElementById('matrix');
-        matrixDivPosition = matrixDiv.getBoundingClientRect();
+        function moveMatrix(event) {
+            var matrixDiv = document.getElementById('matrix');
+            matrixDivPosition = matrixDiv.getBoundingClientRect();
 
-        var table = document.getElementById('myTable');
-        var row = table.rows.item(0);
-        row.style.left = matrixDivPosition.left + 'px';
-        row.style.top = matrixDivPosition.top + 'px';
+            var table = document.getElementById('myTable');
+            var row = table.rows.item(0);
+            row.style.left = matrixDivPosition.left + 'px';
+            row.style.top = matrixDivPosition.top + 'px';
 
-        for(i=0, row; row = table.rows[i]; i++) {
-            cell = row.cells[0];
-            cell.style.left = matrixDivPosition.left + 2 + 'px';
-            cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
+            for (i = 0, row; row = table.rows[i]; i++) {
+                cell = row.cells[0];
+                cell.style.left = matrixDivPosition.left + 2 + 'px';
+                cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
+            }
         }
-    }
     </script>
 
     <!-- see activity/activity-icon-color-loading.svg for info -->
+    <div class="canvasHolder">
+        <canvas id="myCanvas" width="1200" height="900"></canvas>
+        <canvas id="myChart" width="600" height="600"></canvas>
+        <video id="camVideo" style="visibility:hidden;"></video>
+        <canvas id="camCanvas" style="visibility:hidden;"></canvas>
+        <div id="labelDiv"></div>
+        <div id="ioDiv">
+            <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*" />
+            <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb" />
+            <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json" />
+            <input tabindex="-1" class="file" type="file" id="myOpenAll" />
+        </div>
+        <div id="audio"></div>
+        <div id="tourData"></div>
+    </div>
     <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
-        <img src= "./activity/mouse.svg" style="max-width:50%; width: 512px; margin: auto; display: block;"/>
+        <img src="./activity/mouse.svg" style="max-width:50%; width: 512px; margin: auto; display: block;" />
     </div>
 
     <div id="popdown-palette"></div>
@@ -125,62 +148,35 @@
 
     <div id="loader"></div>
 
-    <div id="header" class="EaselJS">
-        <!-- <h1>Make a Musical Matrix using Pitch and Rhythm Blocks; Perform, Save, and Manipulate Chunks.</h1> -->
-    </div>
+    <div id="header" class="EaselJS"></div>
 
     <div class="planet" style="display: none;">
-      <nav>
-        <div class="nav-container">
-          <img src="header-icons/planet-button.svg" class="logo" />
-          <h1 id="planetTitle"></h1>
-          <ul>
-            <li class="new"><img src="header-icons/add.svg" /></li>
-            <li class="open"><img src="header-icons/folder-open.svg" /></li>
-          </ul>
+        <nav>
+            <div class="nav-container">
+                <img src="header-icons/planet-button.svg" class="logo" />
+                <h1 id="planetTitle"></h1>
+                <ul>
+                    <li class="new"><img src="header-icons/add.svg" /></li>
+                    <li class="open"><img src="header-icons/folder-open.svg" /></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="nav-spacer"></div>
+        <div class="planet-content">
+            <h2 id="planetMyDevice"></h2>
+            <ul class="content l"></ul>
+
+            <h2 id="planetWorldwide"></h2>
+            <ul class="content w"></ul>
         </div>
-      </nav>
-
-      <div class="nav-spacer"></div>
-      <div class="planet-content">
-        <h2 id="planetMyDevice"></h2>
-        <ul class="content l"></ul>
-
-        <h2 id="planetWorldwide"></h2>
-        <ul class="content w"></ul>
-      </div>
     </div>
-   <div class="canvasHolder">
-          
-    </div>
-  </div>
-
-  <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
-
-  <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)" >
-  </div>
-  
-  <canvas hidden id="music" width="700"></canvas>          
-  <div id = "musicNotation"></div> 
-      <canvas id="myCanvas" width="1200" height="900"></canvas>
-      <canvas id="myChart" width="600" height="600"></canvas>
-
-        <video id="camVideo" style="visibility:hidden;"></video>
-        <canvas id="camCanvas" style="visibility:hidden;"></canvas>
-        
-        <div id="labelDiv"></div>
-        <div id="ioDiv">
-          <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*"/>
-          <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb"/>
-          <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json"/>
-          <input tabindex="-1" class="file" type="file" id="myOpenAll" />
-     <!-- <input tabindex="-1" class="file" type="file" id="mySaveFile" accept=".ta, .tb" nwsaveas="turtle-project.tb" /> -->
-        </div>
-        <div id="audio"></div>
-        <div id="tourData"></div>
-    </div>
-
+    <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
+    <canvas hidden id="music" width="700"></canvas>
+    <div id="musicNotation"></div>
+    <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="helpElem"></div>
 
 </body>
+
 </html>
