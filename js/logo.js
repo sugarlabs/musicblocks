@@ -32,7 +32,7 @@ var ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 var EMPTYHEAPERRORMSG = 'empty heap.';
 var INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
+function Logo(matrix, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -91,7 +91,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
     // matrix
     this.showMatrix = false;
-    this.notation = false;
     this.inMatrix = false;
     this.keySignature = {};
     this.tupletRhythms = [];
@@ -128,7 +127,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.lilypondNotes = {};
     this.lilypondStaging = {};
     this.lilypondOutput = LILYPONDHEADER;
-    this.notesPlayed = {};
     this.numerator = 3;
     this.denominator = 4;
 
@@ -472,7 +470,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.endOfFlowActions[turtle] = {};
             this.doBlocks[turtle] = [];
             this.transposition[turtle] = 0;
-            this.notesPlayed[turtle] = [];
             this.noteNotes[turtle] = [];
             this.noteOctaves[turtle] = [];
             this.currentNotes[turtle] = 'G';
@@ -1925,54 +1922,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             case 'sixtyfourthNote':
                 logo.processNote(64, turtle);
                 break;
-            case 'notation':
-                // FIXME: restore meter block as arg?
-                /*
-                var flagN = 0, flagD = 1, tsd = 0, tsn = 0;
-                for (var i=0; i<args[0].length; i++)
-                {
-                    console.log(args[0] +"fhf")
-                    if (flagN)
-                    {
-                        tsd += parseInt(args[0][i]);
-                        tsd *= 10;
-
-                    }
-                   if (flagD && args[0][i] != '/')
-                    {
-                        tsn += parseInt(args[0][i]);
-                        tsn *= 10;
-
-                    }
-                    if (args[0][i] == '/')
-                    {
-                        flagN = 1;
-                        flagD = 0;
-                    }
-                }
-                logo.numerator = tsn/10;
-                logo.denominator = tsd/10;
-                logo.notation = true;
-                logo.runFromBlock(logo, turtle, args[1]);
-                */
-                console.log('Generating Music Notation');
-                // Restart accumulating notes now that we are in the
-                // clamp.
-                logo.notesPlayed[turtle] = [];
-                childFlow = args[0];
-                childFlowCount = 1;
-
-                var listenerName = '_notation_' + turtle;
-                logo.updateEndBlks(childFlow, turtle, listenerName);
-
-                var listener = function (event) {
-                    console.log('NOTATION');
-                    console.log(logo.notesPlayed[turtle]);
-                    musicnotation.doNotation(logo.notesPlayed[turtle], logo.numerator, logo.denominator);
-                }
-
-                logo.setListener(turtle, listenerName, listener);
-                break;
             // FIXME: What is this supposed to do?
             case 'meter':
                 break;
@@ -2036,10 +1985,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                                     waitTime += (logo.bpmFactor * 1000 / duration);
                                 }
                             }
-
-                            // FIXME: When duplicating notes inside a
-                            // notation clamp, the playnote is in a race
-                            // condition with the notation rendering.
 
                             playnote = function() {
                                 var notes = [];
@@ -2134,11 +2079,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                                 if (insideChord > 0) {
                                     insideChord = -1;
-                                    if (logo.blocks.blockList[blk].name == 'osctime') {
-                                        // logo.updateNotation('', 1000 / duration, turtle, false);
-                                    } else {
-                                        // logo.updateNotation('', duration, turtle, false);
-                                    }
                                 }
 
                             }
@@ -2426,7 +2366,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             // if we are at the end of a loop, we need to trigger.
             // else if we are returning from an action, we need to trigger.
             // else trigger.
-            var notationDispatches = [];
             var parentActions = [];
             for (var i = logo.endOfFlowSignals[turtle][blk].length - 1; i >= 0; i--) {
                 // console.log(i + ': ' + logo.blocks.blockList[blk].name);
@@ -2457,15 +2396,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             parentActions.push(parentAction);
                         }
                     }
-                    if (logo.endOfFlowSignals[turtle][blk][i].substr(0, 10) == '_notation_') {
-                        notationDispatches.push(logo.endOfFlowSignals[turtle][blk][i]);
-                    } else {
-                        if (parentAction != null) {
-                            // console.log(logo.blocks.blockList[parentAction].name + ' ' + logo.namedActionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.actionBlock(logo.blocks.blockList[parentAction].name) + ' ' + logo.doBlocks[turtle].indexOf(parentAction) + ' ' + actionTest);
-                        }
-                        console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
-                        logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
-                    }
+                    console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                    logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     // Mark issued signals as null
                     logo.endOfFlowSignals[turtle][blk][i] = null;
                     logo.endOfFlowLoops[turtle][blk][i] = null;
@@ -2477,10 +2409,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     // console.log('setting doBlocks[' + logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] + '] to -1');
                     logo.doBlocks[turtle][logo.doBlocks[turtle].indexOf(parentAction)] = -1;
                 }
-            }
-            for (var i = 0; i < notationDispatches.length; i++) {
-                // console.log('dispatching ' + notationDispatches[i]);
-                logo.stage.dispatchEvent(notationDispatches[i]);
             }
 
             // Garbage collection
@@ -3777,11 +3705,6 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
         // Push notes for lilypond.
         this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord);
-
-        if (note != '') {
-            // Push notes for vexflow.
-            this.notesPlayed[turtle].push([[note.replace(/♭/g, 'b').replace(/♯/g, '#'), duration]]);
-        }
     }
 
     this.processLilypondNotes = function (turtle) {

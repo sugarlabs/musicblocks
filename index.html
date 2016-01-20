@@ -55,7 +55,6 @@
         } catch (e) {}
 
         $(function() {
-            $("#musicNotation").draggable();
             $("#matrix").draggable();
             $("#solfamenu").draggable();
 
@@ -173,7 +172,6 @@
     </div>
     <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
     <canvas hidden id="music" width="700"></canvas>
-    <div id="musicNotation"></div>
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="helpElem"></div>
 

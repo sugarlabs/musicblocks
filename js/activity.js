@@ -76,7 +76,6 @@ define(function (require) {
     require('activity/analytics');
     require('prefixfree.min');
     require('activity/matrix');
-    require('activity/musicnotation');
 
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {
@@ -290,12 +289,6 @@ console.log(txt);
             var canvas = document.getElementById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
-            document.getElementById('musicNotation').innerHTML = "";
-            document.getElementById('musicNotation').style.display = 'none';
-            if(musicnotation != null && musicnotation.musicContainer) {
-                musicnotation.musicContainer.removeAllChildren();
-                musicnotation.notationIndex = 0;
-            }
         }
 
         function doFastButton(env) {
@@ -513,7 +506,6 @@ console.log(txt);
             blocks = new Blocks(canvas, blocksContainer, refreshCanvas, trashcan, stage.update);
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
 
-            musicnotation = new MusicNotation(turtles, stage);
             matrix = new Matrix();
 
             palettes.setBlocks(blocks);
@@ -523,7 +515,7 @@ console.log(txt);
             blocks.makeCopyPasteButtons(makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(matrix, musicnotation, canvas,
+            logo = new Logo(matrix, canvas,
                 blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
                 onRunTurtle, getStageX, getStageY,
@@ -1154,17 +1146,6 @@ console.log(txt);
                 }
                 logo.showBlocks();
             }
-        }
-
-        function saveMusicNotations() {
-            var canvas = document.getElementById("canvasToSave");
-            var img = canvas.toDataURL("image/png");
-            //document.write('<img src="'+img+'"/>');*/
-            var link = document.createElement('a');
-            link.href = img;
-            link.download = 'Download.png';
-            document.body.appendChild(link);
-            link.click();
         }
 
         function toggleCollapsibleStacks() {

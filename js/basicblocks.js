@@ -292,15 +292,6 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // Tone (utility) palette
 
-    var notationBlock = new ProtoBlock('notation');
-    notationBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['notation'] = notationBlock;
-    notationBlock.staticLabels.push(_('notation'));
-    notationBlock.adjustWidthToLabel();
-    notationBlock.flowClampZeroArgBlock();
-    // notationBlock.flowClampOneArgBlock();
-    // notationBlock.defaults.push(parameters);
-
     var setbpmBlock = new ProtoBlock('setbpm');
     setbpmBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setbpm'] = setbpmBlock;
