@@ -171,7 +171,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) != -1) {
+            if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) != -1 && !myBlock.trash) {
                 myBlock.collapseToggle();
             }
         }
@@ -2030,7 +2030,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             console.log('myCalcArg_' + name + ' already exists.');
         }
     }
-    
     this.insideArgClamp = function (blk) {
         // Returns a containing arg clamp block or null
         if (this.blockList[blk] == null) {
