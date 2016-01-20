@@ -118,7 +118,7 @@ function Matrix() {
 
         var matrixDiv = document.getElementById('matrix');
         matrixDiv.style.paddingTop = 40 * this.cellScale + 4 + 'px';
-        matrixDiv.style.paddingLeft = 35 * this.cellScale + 4 + 'px';
+        matrixDiv.style.paddingLeft = 45 * this.cellScale + 4 + 'px';
         matrixDiv.appendChild(x);
         matrixDivPosition = matrixDiv.getBoundingClientRect();
 
@@ -210,7 +210,7 @@ function Matrix() {
             cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             cell.style.height = 30 * this.cellScale + 'px';
             cell.style.position = "fixed";
-            cell.style.width = 40 + 'px';
+            cell.style.width = 52 + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
             cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
         }
@@ -220,8 +220,8 @@ function Matrix() {
         cell.style.fontSize = this.cellScale * 50 + '%';
         cell.innerHTML = _('rhythmic note values');
         cell.style.position = "fixed";
-        cell.style.height = 40 * this.cellScale + 'px';
-        cell.style.width = 40 + 'px';
+        cell.style.height = 39 * this.cellScale + 'px';
+        cell.style.width = 52 + 'px';
         cell.style.left = matrixDivPosition.left + 2 + 'px';
         cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
