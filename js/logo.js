@@ -97,7 +97,8 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.addingNotesToTuplet = false;
     this.skipRate = {};
     this.skipCount = {};
-
+    this.skipper = {};
+	
     // parameters used by pitch
     this.transposition = {};
     this.beatFactor = {};
@@ -490,7 +491,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
             this.oscList[turtle] = [];
             this.skipRate[turtle] = [];
             this.skipCount[turtle] = [];
-
+			this.skipper[turtle] = [];
         }
         this.inMatrix = false;
         this.tuplet = false;
@@ -1801,9 +1802,17 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 if (logo.skipRate[turtle].length == 0) {
                     logo.skipRate[turtle].push(Number([args[0]]));
                     logo.skipCount[turtle].push(Number([0]));
-                } else {
-                    logo.skipRate[turtle].push(Number([args[0]]));
-                    logo.skipCount[turtle].push(Number([logo.skipCount[turtle][logo.skipCount[turtle].length - 1]]));
+                	logo.skipper[turtle].push([0,0,args[0]]);
+				} else {
+					logo.skipRate[turtle].push(Number([args[0]*logo.skipRate[turtle][logo.skipRate[turtle].length - 1]]));
+                    var sinek = ((logo.skipCount[turtle][logo.skipCount[turtle].length - 1]) % logo.skipRate[turtle][logo.skipRate[turtle].length - 2]);
+                    if(sinek== 0){
+				   	    sinek=0;
+					}else{
+						sinek= -(logo.skipRate[turtle][logo.skipRate[turtle].length - 1] - (sinek+1));
+					}
+					logo.skipper[turtle].push([0,0,args[0]]);
+					logo.skipCount[turtle].push(Number([sinek]));
                 }
                 childFlow = args[1];
                 childFlowCount = 1;
@@ -1814,13 +1823,12 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 var listener = function(event) {
 
                     if (logo.skipCount[turtle].length > 1) {
-                        logo.skipCount[turtle][logo.skipCount[turtle].length - 2] += 1;
-                        console.log(logo.skipCount[turtle][logo.skipCount[turtle].length - 2]);
-                    }
+                        logo.skipCount[turtle][logo.skipCount[turtle].length - 2] += logo.skipper[turtle][logo.skipper[turtle].length - 1][1];
+					}
 
                     logo.skipRate[turtle].pop();
                     logo.skipCount[turtle].pop();
-
+                    logo.skipper[turtle].pop();
                 }
                 logo.setListener(turtle, listenerName, listener);
                 break;
@@ -2031,26 +2039,25 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                     } else {
                         var sr = 0;
                         var len = 1;
-                        var c = 0;
                         if (logo.skipCount[turtle].length != 0) {
                             len = logo.skipCount[turtle].length;
-                            if (len > 1) {
-                                if (logo.skipCount[turtle][len - 2] % logo.skipRate[turtle][len - 2] != 0) {
-                                    sr = 0;
-                                    c = 1;
-                                }
-                            }
-                            if (logo.skipCount[turtle][len - 1] % logo.skipRate[turtle][len - 1] == 0 && c != 1) {
+
+                        	if (logo.skipCount[turtle][len - 1] % logo.skipRate[turtle][len - 1] == 0) {
                                 sr = 0;
                             } else {
                                 sr = 1;
                             }
+						    if (logo.skipper[turtle][len - 1][0] % logo.skipper[turtle][len - 1][2] == 0){
+							    logo.skipper[turtle][len-1][1] += 1;
+						    }
+							
                             logo.skipCount[turtle][len - 1] += 1;
-                        }
+                            logo.skipper[turtle][len - 1][0] += 1;
+                            
+						}
 
                         if (sr == 0) {
-
-                            // We start the music clock as the first note
+						    // We start the music clock as the first note
                             // is being played.
                             if (logo.firstNoteTime == null) {
                                 var d = new Date();
