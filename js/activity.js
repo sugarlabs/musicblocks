@@ -1103,21 +1103,42 @@ console.log(txt);
                     }
                 }
             }
-            if (addStartBlock) {
+            if (addStartBlock) {//ti la sol mi re
                 var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
-                                [1, 'matrix', 450, 150, [null, 2, null]],
+                                [1, 'matrix', 800, 50, [null, 2, null]],
+
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['solfege', {value:'sol'}], 0, 0, [2]],
+                                [3, ['solfege', {value:'ti'}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
+                                
                                 [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['solfege', {value:'mi'}], 0, 0, [5]],
+                                [6, ['solfege', {value:'la'}], 0, 0, [5]],
                                 [7, ['number', {value:'4'}], 0, 0, [5]],
+
                                 [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['solfege', {value:'re'}], 0, 0, [8]],
+                                [9, ['solfege', {value:'sol'}], 0, 0, [8]],
                                 [10, ['number', {value:'4'}], 0, 0, [8]],
-                                [11, 'rhythm', 0, 0, [8, 12, 13, null]],
-                                [12, ['number', {value:'3'}], 0, 0, [11]],
-                                [13, ['number', {value:'4'}], 0, 0, [11]]];
+
+                                [11, 'pitch', 0, 0, [8, 12, 13, 14]],
+                                [12, ['solfege', {value:'mi'}], 0, 0, [11]],
+                                [13, ['number', {value:'4'}], 0, 0, [11]],
+
+                                [14, 'pitch', 0, 0, [11, 15, 16, 17]],
+                                [15, ['solfege', {value:'re'}], 0, 0, [14]],
+                                [16, ['number', {value:'4'}], 0, 0, [14]],
+
+                                [17,"repeat",0,0,[14,18,19,null]],
+                                [18,["number", {"value":2}],0,0,[17]],
+                                
+                                [19,"rhythm",0,0,[17,20,21,22]],
+                                [20,["number", {"value":6}],0,0,[19]],
+                                [21,["number", {"value":4}],0,0,[19]],
+                                
+                                [22,"rhythm",0,0,[19,23,24,null]],
+                                [23,["number", {"value":1}],0,0,[22]],
+                                [24,["number", {"value":2}],0,0,[22]]
+                                
+                                ];
                 blocks.loadNewBlocks(dataObjs);
             } else if (!doNotSave) {
                 // Overwrite session data too.
@@ -1362,19 +1383,40 @@ console.log(txt);
             justLoadStart = function () {
                 console.log('loading start and a matrix');
                 var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
-                                [1, 'matrix', 450, 150, [null, 2, null]],
+                                [1, 'matrix', 800, 50, [null, 2, null]],
+
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['solfege', {value:'sol'}], 0, 0, [2]],
+                                [3, ['solfege', {value:'ti'}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
+                                
                                 [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['solfege', {value:'mi'}], 0, 0, [5]],
+                                [6, ['solfege', {value:'la'}], 0, 0, [5]],
                                 [7, ['number', {value:'4'}], 0, 0, [5]],
+
                                 [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['solfege', {value:'re'}], 0, 0, [8]],
+                                [9, ['solfege', {value:'sol'}], 0, 0, [8]],
                                 [10, ['number', {value:'4'}], 0, 0, [8]],
-                                [11, 'rhythm', 0, 0, [8, 12, 13, null]],
-                                [12, ['number', {value:'3'}], 0, 0, [11]],
-                                [13, ['number', {value:'4'}], 0, 0, [11]]];
+
+                                [11, 'pitch', 0, 0, [8, 12, 13, 14]],
+                                [12, ['solfege', {value:'mi'}], 0, 0, [11]],
+                                [13, ['number', {value:'4'}], 0, 0, [11]],
+
+                                [14, 'pitch', 0, 0, [11, 15, 16, 17]],
+                                [15, ['solfege', {value:'re'}], 0, 0, [14]],
+                                [16, ['number', {value:'4'}], 0, 0, [14]],
+
+                                [17,"repeat",0,0,[14,18,19,null]],
+                                [18,["number", {"value":2}],0,0,[17]],
+                                
+                                [19,"rhythm",0,0,[17,20,21,22]],
+                                [20,["number", {"value":6}],0,0,[19]],
+                                [21,["number", {"value":4}],0,0,[19]],
+                                
+                                [22,"rhythm",0,0,[19,23,24,null]],
+                                [23,["number", {"value":1}],0,0,[22]],
+                                [24,["number", {"value":2}],0,0,[22]]
+                                
+                                ];
                 blocks.loadNewBlocks(dataObjs);
             }
 
