@@ -1516,6 +1516,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     hideBlocks.adjustWidthToLabel();
     hideBlocks.zeroArgBlock();
 
+    // REMOVED UNTIL WE PLUG THE SECURITY HOLE
+    /*
     var evalBlock = new ProtoBlock('eval');
     evalBlock.palette = palettes.dict['number'];
     blocks.protoBlockDict['eval'] = evalBlock;
@@ -1527,7 +1529,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     evalBlock.dockTypes[1] = 'textin';
     evalBlock.defaults.push('x');
     evalBlock.defaults.push(100);
-
+    */
+    
     var audioBlock = new ProtoBlock('playback');
     audioBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['playback'] = audioBlock;
