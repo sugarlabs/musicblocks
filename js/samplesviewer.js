@@ -236,7 +236,19 @@ function PlanetModel(controller) {
             headers: {
                 'x-api-key' : '3tgTzMXbbw6xEKX7'
             },
-            dataType: 'text'
+            dataType: 'text',
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+            	jQuery.ajax({
+		            url: server + "MusicBlocks_" + name + ".tb",
+		            headers: {
+		                'x-api-key' : '3tgTzMXbbw6xEKX7'
+		            },
+		            dataType: 'text',
+		        }).done(function (d) {
+		            me.controller.loadRawProject(d);
+		            me.stop = true;
+		        });
+            }
         }).done(function (d) {
             me.controller.loadRawProject(d);
             me.stop = true;
