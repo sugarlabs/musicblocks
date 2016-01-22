@@ -116,6 +116,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.playedNoteTimes = {};
     this.pushedNote = {};
     this.duplicateFactor = {};
+    this.skipFactor = {};
+    this.skipIndex = {};
     this.polyVolume = {};
     this.validNote = true;
 
@@ -403,6 +405,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 case 'duplicatefactor':
                     value = this.duplicateFactor[turtle];
                     break;
+                case 'skipfactor':
+                    value = this.skipFactor[turtle];
+                    break;
                 case 'notevolumefactor':
                     value = this.polyVolume[turtle];
                     break;
@@ -479,6 +484,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.beatFactor[turtle] = 1;
             this.invertList[turtle] = [];
             this.duplicateFactor[turtle] = 1;
+	    this.skipFactor[turtle] = 1;
+	    this.skipIndex[turtle] = 0;
             this.keySignature[turtle] = 'C';
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = -20;
@@ -1978,6 +1985,19 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                         var waitTime = 0;
                         for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
+			    if (logo.skipFactor[turtle] > 1 && logo.skipIndex[turtle] % logo.skipFactor[turtle] > 0) {
+                                logo.skipIndex[turtle] += 1;
+                                // Lessen delay time by one note
+                                // FIXME: TAKE INTO ACCOUNT OSCTIME
+                                logo.waitTimes[turtle] -= ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * 1000;
+                                if (logo.waitTimes[turtle] < 0) {
+                                    logo.waitTimes[turtle] = 0;
+				}
+                                continue;
+			    }
+                            if (logo.skipFactor[turtle] > 1) {
+                                logo.skipIndex[turtle] += 1;
+                            }
                             if (j > 0) {
                                 if (logo.blocks.blockList[blk].name == 'osctime') {
                                     waitTime += duration;
@@ -1988,7 +2008,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                             playnote = function() {
                                 var notes = [];
-                                var notationNotes = [];
                                 var insideChord = -1;
                                 if ((logo.noteNotes[turtle].length + logo.oscList[turtle].length) > 1) {
                                     if (turtle in logo.lilypondStaging) {
@@ -2127,6 +2146,29 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     var listener = function (event) {
                         logo.duplicateFactor[turtle] /= factor;
+                    }
+
+                    logo.setListener(turtle, listenerName, listener);
+                }
+                break;
+            case 'skipnotes':
+                var factor = args[0];
+                if (factor == 0) {
+                    logo.errorMsg(ZERODIVIDEERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    logo.skipFactor[turtle] *= factor;
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_skip_' + turtle;
+                    logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                    var listener = function (event) {
+                        logo.skipFactor[turtle] /= factor;
+                        if (logo.skipFactor[turtle] === 1) {
+                            logo.skipIndex[turtle] = 0;
+			}
                     }
 
                     logo.setListener(turtle, listenerName, listener);
@@ -3012,6 +3054,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     break;
                 case 'duplicatefactor':
                     logo.blocks.blockList[blk].value = logo.duplicateFactor[turtle];
+                    break;
+                case 'skipfactor':
+                    logo.blocks.blockList[blk].value = logo.skipFactor[turtle];
                     break;
                 case 'notevolumefactor':
                     logo.blocks.blockList[blk].value = logo.polyVolume[turtle];

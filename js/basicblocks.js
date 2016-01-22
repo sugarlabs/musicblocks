@@ -175,18 +175,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
 
-    var invertblock = new ProtoBlock('invert');
-    invertblock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['invert'] = invertblock;
-    invertblock.staticLabels.push(_('invert'), _('note'), _('octave'));
-    invertblock.adjustWidthToLabel();
-    invertblock.flowClampTwoArgBlock();
-    invertblock.adjustWidthToLabel();
-    invertblock.defaults.push('sol');
-    invertblock.defaults.push(4);
-    invertblock.dockTypes[1] = 'solfegein';
-    invertblock.dockTypes[2] = 'anyin';
-
     var currentNoteBlock = new ProtoBlock('currentnote');
     currentNoteBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['currentnote'] = currentNoteBlock;
@@ -229,6 +217,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     transposition.staticLabels.push(_('transposition'));
     transposition.adjustWidthToLabel();
     transposition.parameterBlock();
+
+    var invertblock = new ProtoBlock('invert');
+    invertblock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['invert'] = invertblock;
+    invertblock.staticLabels.push(_('invert'), _('note'), _('octave'));
+    invertblock.adjustWidthToLabel();
+    invertblock.flowClampTwoArgBlock();
+    invertblock.adjustWidthToLabel();
+    invertblock.defaults.push('sol');
+    invertblock.defaults.push(4);
+    invertblock.dockTypes[1] = 'solfegein';
+    invertblock.dockTypes[2] = 'anyin';
 
     var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
     rhythmicdotBlock.palette = palettes.dict['notes'];
@@ -274,6 +274,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     duplicateFactor.staticLabels.push(_('duplicate factor'));
     duplicateFactor.adjustWidthToLabel();
     duplicateFactor.parameterBlock();
+
+    var skipNotesBlock = new ProtoBlock('skipnotes');
+    skipNotesBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['skipnotes'] = skipNotesBlock;
+    skipNotesBlock.staticLabels.push(_('skip notes'));
+    skipNotesBlock.adjustWidthToLabel();
+    skipNotesBlock.flowClampOneArgBlock();
+    skipNotesBlock.defaults.push(2);
+
+    var skipFactor = new ProtoBlock('skipfactor');
+    skipFactor.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['skipfactor'] = skipFactor;
+    skipFactor.staticLabels.push(_('skip factor'));
+    skipFactor.adjustWidthToLabel();
+    skipFactor.parameterBlock();
 
     var noteVolumeBlock = new ProtoBlock('setnotevolume');
     noteVolumeBlock.palette = palettes.dict['notes'];
