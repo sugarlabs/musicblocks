@@ -179,6 +179,21 @@ function Matrix() {
         }
 
         var cell = row.insertCell(4);
+        cell.innerHTML = '<img src="header-icons/export-button.svg" alt="' + _('export') + '" height="' + (iconSize-3) + '" width="' + (iconSize-3) + '" style="display:block;margin-bottom:-7px;margin-left:3px;"><p style="margin-bottom:-3px;font-size:10px;text-align:justify;width:'+ (iconSize-3) + '">HTML</p>';
+        cell.style.height = 40 * this.cellScale + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        that = this;
+        cell.onclick=function() {
+            that.exportMatrix();
+        }
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        var cell = row.insertCell(5);
         cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = 40 * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -228,6 +243,70 @@ function Matrix() {
 
         this.chkArray = new Array();
         this.chkArray.push(0);
+    }
+
+    this.generateDataURI = function(file) {
+        file=file.replace(/𝅝/g,"&#x1D15D;");
+        file=file.replace(/𝅗𝅥/g,"&#x1D15E;");
+        file=file.replace(/𝅘𝅥/g,"&#x1D15F;");
+        file=file.replace(/𝅘𝅥𝅮/g,"&#x1D160;");
+        file=file.replace(/𝅘𝅥𝅯/g,"&#x1D161;");
+        file=file.replace(/𝅘𝅥𝅰/g,"&#x1D162;");
+        file=file.replace(/𝅘𝅥𝅱/g,"&#x1D163;");
+        var data = "data:text/html;charset=utf-8," + encodeURIComponent(file);
+        return data;
+    }
+
+    this.exportMatrix = function() {
+
+        var table = document.getElementById('myTable');
+
+        var exportWindow = window.open("");
+        var exportDocument = exportWindow.document;
+        var title = exportDocument.createElement('title');
+        title.innerHTML = 'Music Matrix';
+        exportDocument.head.appendChild(title);
+
+        var w = exportDocument.createElement('H3');
+        w.innerHTML = 'Music Matrix';
+
+        exportDocument.body.appendChild(w);
+
+        var x = exportDocument.createElement('TABLE');
+        x.setAttribute('id', 'exportTable');
+        x.style.textAlign = 'center';
+
+        exportDocument.body.appendChild(x);
+
+        var exportTable = exportDocument.getElementById('exportTable');
+
+        var header = exportTable.createTHead();
+
+        for (var i=1,row;row=table.rows[i];i++) {
+            var exportRow = header.insertRow(i-1);
+            for (var j=0,col;col=row.cells[j];j++) {
+                var exportCell = exportRow.insertCell(j);
+                exportCell.style.backgroundColor = col.style.backgroundColor;
+                exportCell.innerHTML = col.innerHTML;
+                exportCell.width = 30 + 'px';
+                exportCell.height = 30 + 'px';
+                exportCell.style.fontSize = 14 + 'px';
+                exportCell.style.padding = 1 + 'px';
+            }
+        }
+        var saveDocument = exportDocument;
+        var uriData = saveDocument.documentElement.outerHTML;
+        exportDocument.body.innerHTML+='<br><a id="downloadb1" style="background:#C374E9;'+
+                                                            'border-radius:5%;'+
+                                                            'padding:0.3em;'+
+                                                            'text-decoration:none;'+
+                                                            'margin:0.5em;'+
+                                                            'color:white;" '+
+                                                            'download>Download Matrix</a>';
+        exportDocument.getElementById("downloadb1").download="MusicMatrix";
+        console.log(saveDocument.documentElement.outerHTML);
+        exportDocument.getElementById("downloadb1").href=this.generateDataURI(uriData);
+        exportDocument.close();
     }
 
     this.note2Solfege = function(note, index) {
