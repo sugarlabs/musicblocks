@@ -98,8 +98,11 @@ function PlanetModel(controller) {
             return;
         }
         var name = image.replace('.b64', '');
-        if(name.slice(0, 'MusicBlocks_'.length) == 'MusicBlocks_')
+        var mbcheck=0;
+        if(name.slice(0, 'MusicBlocks_'.length) == 'MusicBlocks_'){
         	name=name.substring('MusicBlocks_'.length);
+        	mbcheck=1;
+        }
 
         if (me.globalImagesCache[image] !== undefined) {
             me.globalProjects.push({title: name,
@@ -117,12 +120,14 @@ function PlanetModel(controller) {
                 if(!validateImageData(d)){
                     d = EMPTYIMAGE;
                 }
+                if(mbcheck) 
+                	d='images/planetgraphic.png';
                 me.globalImagesCache[image] = d;
                 me.globalProjects.push({title: name, img: d, url: image});
                 me.updated();
                 me.getImages(todo);
             });
-      }
+        }
     }
 
     this.redoLocalStorageData = function () {
