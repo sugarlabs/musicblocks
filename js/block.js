@@ -217,7 +217,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'multiplybeatfactor':
             case 'dividebeatfactor':
             case 'duplicatenotes':
-            case 'skip':
+            case 'skipnotes':
             case 'rhythmicdot':
             case 'settransposition':
             case 'tuplet':
