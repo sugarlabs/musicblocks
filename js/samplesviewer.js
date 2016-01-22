@@ -30,7 +30,7 @@ var LOCAL_PROJECT_TEMPLATE = '\
     <img class="thumbnail" src="{img}" /> \
     <div class="options"> \
         <input type="text" value="{title}"/><br/> \
-        <img class="open icon" title="{_("Open")}" alt="{_Open}" src="header-icons/edit.svg" /> \
+        <img class="open icon" title="{_Open}" alt="{_Open}" src="header-icons/edit.svg" /> \
         <img class="delete icon" title="{_Delete}" alt="{_Delete}" src="header-icons/delete.svg" /> \
         <img class="publish icon" title="{_Publish}" alt="{_Publish}" src="header-icons/publish.svg" /> \
         <img class="download icon" title="{_Download}" alt="{_Download}" src="header-icons/download.svg" /> \
