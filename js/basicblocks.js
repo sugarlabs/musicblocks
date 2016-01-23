@@ -64,24 +64,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
 
-    var solfegeBlock = new ProtoBlock('solfege');
-    solfegeBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['solfege'] = solfegeBlock;
-    solfegeBlock.valueBlock();
-    solfegeBlock.dockTypes[0] = 'solfegeout';
-
-    var notenameBlock = new ProtoBlock('notename');
-    notenameBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['notename'] = notenameBlock;
-    notenameBlock.valueBlock();
-    notenameBlock.dockTypes[0] = 'noteout';
-
-    var restBlock = new ProtoBlock('rest');
-    restBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['rest'] = restBlock;
-    restBlock.valueBlock();
-    restBlock.dockTypes[0] = 'textout';
-
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['pitch'] = pitch;
@@ -104,6 +86,35 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.twoArgBlock();
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
+
+    var tuplet2Block = new ProtoBlock('tuplet2');
+    tuplet2Block.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['tuplet2'] = tuplet2Block;
+    // FIXME: Add extra labels to basicClamp blocks when present.
+    tuplet2Block.staticLabels.push(_('tuplet'), _('number of notes'), _('note value'));
+    tuplet2Block.extraWidth = 20;
+    tuplet2Block.adjustWidthToLabel();
+    tuplet2Block.flowClampTwoArgBlock();
+    tuplet2Block.defaults.push(1);
+    tuplet2Block.defaults.push(4);
+
+    var solfegeBlock = new ProtoBlock('solfege');
+    solfegeBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['solfege'] = solfegeBlock;
+    solfegeBlock.valueBlock();
+    solfegeBlock.dockTypes[0] = 'solfegeout';
+
+    var notenameBlock = new ProtoBlock('notename');
+    notenameBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['notename'] = notenameBlock;
+    notenameBlock.valueBlock();
+    notenameBlock.dockTypes[0] = 'noteout';
+
+    var restBlock = new ProtoBlock('rest');
+    restBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['rest'] = restBlock;
+    restBlock.valueBlock();
+    restBlock.dockTypes[0] = 'textout';
 
     var wholeNoteBlock = new ProtoBlock('wholeNote');
     wholeNoteBlock.palette = palettes.dict['matrix'];
@@ -153,17 +164,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     sixtyfourthNoteBlock.staticLabels.push(_('1/64 note &#x1D163;'));
     sixtyfourthNoteBlock.adjustWidthToLabel();
     sixtyfourthNoteBlock.zeroArgBlock();
-
-    var tuplet2Block = new ProtoBlock('tuplet2');
-    tuplet2Block.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['tuplet2'] = tuplet2Block;
-    // FIXME: Add extra labels to basicClamp blocks when present.
-    tuplet2Block.staticLabels.push(_('tuplet'), _('number of notes'), _('note value'));
-    tuplet2Block.extraWidth = 20;
-    tuplet2Block.adjustWidthToLabel();
-    tuplet2Block.flowClampTwoArgBlock();
-    tuplet2Block.defaults.push(1);
-    tuplet2Block.defaults.push(4);
 
     // Notes palette
 
