@@ -458,7 +458,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         // We run the Logo commands here.
         var d = new Date();
         this.time = d.getTime();
-	      this.firstNoteTime = null;
+              this.firstNoteTime = null;
 
         // Ensure we have at least one turtle.
         if (this.turtles.turtleList.length == 0) {
@@ -484,8 +484,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.beatFactor[turtle] = 1;
             this.invertList[turtle] = [];
             this.duplicateFactor[turtle] = 1;
-	    this.skipFactor[turtle] = 1;
-	    this.skipIndex[turtle] = 0;
+            this.skipFactor[turtle] = 1;
+            this.skipIndex[turtle] = 0;
             this.keySignature[turtle] = 'C';
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = -20;
@@ -713,7 +713,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.resetbpm =function() {
-    	this.bpm = TARGETBPM;
+        this.bpm = TARGETBPM;
         this.bpmFactor = TONEBPM / TARGETBPM;
     }
 
@@ -1991,16 +1991,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                         var waitTime = 0;
                         for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
-			    if (logo.skipFactor[turtle] > 1 && logo.skipIndex[turtle] % logo.skipFactor[turtle] > 0) {
+                            if (logo.skipFactor[turtle] > 1 && logo.skipIndex[turtle] % logo.skipFactor[turtle] > 0) {
                                 logo.skipIndex[turtle] += 1;
                                 // Lessen delay time by one note
                                 // FIXME: TAKE INTO ACCOUNT OSCTIME
                                 logo.waitTimes[turtle] -= ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * 1000;
                                 if (logo.waitTimes[turtle] < 0) {
                                     logo.waitTimes[turtle] = 0;
-				}
+                                }
                                 continue;
-			    }
+                            }
                             if (logo.skipFactor[turtle] > 1) {
                                 logo.skipIndex[turtle] += 1;
                             }
@@ -2174,7 +2174,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.skipFactor[turtle] /= factor;
                         if (logo.skipFactor[turtle] === 1) {
                             logo.skipIndex[turtle] = 0;
-			}
+                        }
                     }
 
                     logo.setListener(turtle, listenerName, listener);
