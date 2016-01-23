@@ -712,6 +712,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     }
 
+    this.resetbpm =function() {
+    	this.bpm = TARGETBPM;
+        this.bpmFactor = TONEBPM / TARGETBPM;
+    }
+
     this.runFromBlockNow = function(logo, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
 
@@ -1070,6 +1075,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'clear':
                 logo.svgBackground = true;
                 logo.turtles.turtleList[turtle].doClear();
+                this.resetbpm();
                 break;
             case 'setxy':
                 if (args.length == 2) {
