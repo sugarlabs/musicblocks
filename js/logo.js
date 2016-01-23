@@ -120,7 +120,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.skipIndex = {};
     this.polyVolume = {};
     this.validNote = true;
-    this.duplicating = 0;
+    this.duplicating = false;
 
     // tuplet
     this.tuplet = false;
@@ -1856,21 +1856,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             num1 += 2 * delta;
                         }
                     }
-		if(logo.duplicating){
-			var dlen = logo.duplicateFactor[turtle];
+			if(logo.duplicating){
+				var dlen = logo.duplicateFactor[turtle];
 			} else {
-			var dlen = 1;
+				var dlen = 1;
 			}
-		for(var i = 0; i<dlen; i++){
-                        matrix.solfegeNotes.push(note);
-                        if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
-                            	matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
-                        } else {
-                            matrix.solfegeTranspositions.push(2 * delta);
-                        }
-                        matrix.solfegeOctaves.push(octave);
-		}    
-	
+			for(var i = 0; i<dlen; i++){
+				matrix.solfegeNotes.push(note);
+				if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
+					matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
+				} else {
+					matrix.solfegeTranspositions.push(2 * delta);
+					
+				}       
+				matrix.solfegeOctaves.push(octave);
+			}    
+		
 		} else {
                     logo.noteNotes[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
@@ -2142,7 +2143,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'duplicatenotes':
                 var factor = args[0];
                	if(logo.inMatrix){
-			logo.duplicating = 1;
+			logo.duplicating = true;
                 }
                 if (factor == 0) {
                     logo.errorMsg(ZERODIVIDEERRORMSG, blk);
@@ -2157,10 +2158,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     var listener = function (event) {
                         logo.duplicateFactor[turtle] /= factor;
-                    
-                    	if(logo.inMatrix){
-				logo.duplicating = 0;
-                    	}
+                   
+                      	if(logo.inMatrix){
+				logo.duplicating = false;
+                   	}
                     }
 
                     logo.setListener(turtle, listenerName, listener);
