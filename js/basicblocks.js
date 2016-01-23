@@ -175,19 +175,29 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
 
-    var currentNoteBlock = new ProtoBlock('currentnote');
-    currentNoteBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['currentnote'] = currentNoteBlock;
-    currentNoteBlock.staticLabels.push(_('current pitch name'));
-    currentNoteBlock.adjustWidthToLabel();
-    currentNoteBlock.parameterBlock();
+    var repeatBlock = new ProtoBlock('repeat');
+    repeatBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['repeat'] = repeatBlock;
+    repeatBlock.staticLabels.push(_('repeat'));
+    repeatBlock.adjustWidthToLabel();
+    repeatBlock.flowClampOneArgBlock();
+    repeatBlock.defaults.push(4);
 
-    var currentOctaveBlock = new ProtoBlock('currentoctave');
-    currentOctaveBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['currentoctave'] = currentOctaveBlock;
-    currentOctaveBlock.staticLabels.push(_('current pitch octave'));
-    currentOctaveBlock.adjustWidthToLabel();
-    currentOctaveBlock.parameterBlock();
+    var duplicateNotesBlock = new ProtoBlock('duplicatenotes');
+    duplicateNotesBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['duplicatenotes'] = duplicateNotesBlock;
+    duplicateNotesBlock.staticLabels.push(_('duplicate notes'));
+    duplicateNotesBlock.adjustWidthToLabel();
+    duplicateNotesBlock.flowClampOneArgBlock();
+    duplicateNotesBlock.defaults.push(2);
+
+    var transpositionBlock = new ProtoBlock('settransposition');
+    transpositionBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['settransposition'] = transpositionBlock;
+    transpositionBlock.staticLabels.push(_('adjust transposition'));
+    transpositionBlock.adjustWidthToLabel();
+    transpositionBlock.defaults.push('1');
+    transpositionBlock.flowClampOneArgBlock();
 
     var flatBlock = new ProtoBlock('flat');
     flatBlock.palette = palettes.dict['notes'];
@@ -203,33 +213,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     sharpBlock.adjustWidthToLabel();
     sharpBlock.flowClampZeroArgBlock();
     
-    var transpositionBlock = new ProtoBlock('settransposition');
-    transpositionBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['settransposition'] = transpositionBlock;
-    transpositionBlock.staticLabels.push(_('adjust transposition'));
-    transpositionBlock.adjustWidthToLabel();
-    transpositionBlock.defaults.push('1');
-    transpositionBlock.flowClampOneArgBlock();
+    var skipNotesBlock = new ProtoBlock('skipnotes');
+    skipNotesBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['skipnotes'] = skipNotesBlock;
+    skipNotesBlock.staticLabels.push(_('skip notes'));
+    skipNotesBlock.adjustWidthToLabel();
+    skipNotesBlock.flowClampOneArgBlock();
+    skipNotesBlock.defaults.push(2);
     
-    var transposition = new ProtoBlock('transposition');
-    transposition.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['transposition'] = transposition;
-    transposition.staticLabels.push(_('transposition'));
-    transposition.adjustWidthToLabel();
-    transposition.parameterBlock();
-
-    var invertblock = new ProtoBlock('invert');
-    invertblock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['invert'] = invertblock;
-    invertblock.staticLabels.push(_('invert'), _('note'), _('octave'));
-    invertblock.adjustWidthToLabel();
-    invertblock.flowClampTwoArgBlock();
-    invertblock.adjustWidthToLabel();
-    invertblock.defaults.push('sol');
-    invertblock.defaults.push(4);
-    invertblock.dockTypes[1] = 'solfegein';
-    invertblock.dockTypes[2] = 'anyin';
-
     var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
     rhythmicdotBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
@@ -253,42 +244,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatFactorBlock.flowClampOneArgBlock();
     beatFactorBlock.defaults.push(2);
 
-    var beatfactor = new ProtoBlock('beatfactor');
-    beatfactor.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['beatfactor'] = beatfactor;
-    beatfactor.staticLabels.push(_('beat factor'));
-    beatfactor.adjustWidthToLabel();
-    beatfactor.parameterBlock();
-
-    var duplicateNotesBlock = new ProtoBlock('duplicatenotes');
-    duplicateNotesBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['duplicatenotes'] = duplicateNotesBlock;
-    duplicateNotesBlock.staticLabels.push(_('duplicate notes'));
-    duplicateNotesBlock.adjustWidthToLabel();
-    duplicateNotesBlock.flowClampOneArgBlock();
-    duplicateNotesBlock.defaults.push(2);
-
-    var duplicateFactor = new ProtoBlock('duplicatefactor');
-    duplicateFactor.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;
-    duplicateFactor.staticLabels.push(_('duplicate factor'));
-    duplicateFactor.adjustWidthToLabel();
-    duplicateFactor.parameterBlock();
-
-    var skipNotesBlock = new ProtoBlock('skipnotes');
-    skipNotesBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['skipnotes'] = skipNotesBlock;
-    skipNotesBlock.staticLabels.push(_('skip notes'));
-    skipNotesBlock.adjustWidthToLabel();
-    skipNotesBlock.flowClampOneArgBlock();
-    skipNotesBlock.defaults.push(2);
-
-    var skipFactor = new ProtoBlock('skipfactor');
-    skipFactor.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['skipfactor'] = skipFactor;
-    skipFactor.staticLabels.push(_('skip factor'));
-    skipFactor.adjustWidthToLabel();
-    skipFactor.parameterBlock();
+    var invertblock = new ProtoBlock('invert');
+    invertblock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['invert'] = invertblock;
+    invertblock.staticLabels.push(_('invert'), _('note'), _('octave'));
+    invertblock.adjustWidthToLabel();
+    invertblock.flowClampTwoArgBlock();
+    invertblock.adjustWidthToLabel();
+    invertblock.defaults.push('sol');
+    invertblock.defaults.push(4);
+    invertblock.dockTypes[1] = 'solfegein';
+    invertblock.dockTypes[2] = 'anyin';
 
     var noteVolumeBlock = new ProtoBlock('setnotevolume');
     noteVolumeBlock.palette = palettes.dict['notes'];
@@ -297,6 +263,48 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteVolumeBlock.adjustWidthToLabel();
     noteVolumeBlock.oneArgBlock();
     noteVolumeBlock.defaults.push(50);
+
+    var currentNoteBlock = new ProtoBlock('currentnote');
+    currentNoteBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['currentnote'] = currentNoteBlock;
+    currentNoteBlock.staticLabels.push(_('current pitch name'));
+    currentNoteBlock.adjustWidthToLabel();
+    currentNoteBlock.parameterBlock();
+
+    var currentOctaveBlock = new ProtoBlock('currentoctave');
+    currentOctaveBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['currentoctave'] = currentOctaveBlock;
+    currentOctaveBlock.staticLabels.push(_('current pitch octave'));
+    currentOctaveBlock.adjustWidthToLabel();
+    currentOctaveBlock.parameterBlock();
+
+    var transposition = new ProtoBlock('transposition');
+    transposition.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['transposition'] = transposition;
+    transposition.staticLabels.push(_('transposition'));
+    transposition.adjustWidthToLabel();
+    transposition.parameterBlock();
+
+    var duplicateFactor = new ProtoBlock('duplicatefactor');
+    duplicateFactor.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;
+    duplicateFactor.staticLabels.push(_('duplicate factor'));
+    duplicateFactor.adjustWidthToLabel();
+    duplicateFactor.parameterBlock();
+
+    var skipFactor = new ProtoBlock('skipfactor');
+    skipFactor.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['skipfactor'] = skipFactor;
+    skipFactor.staticLabels.push(_('skip factor'));
+    skipFactor.adjustWidthToLabel();
+    skipFactor.parameterBlock();
+
+    var beatfactor = new ProtoBlock('beatfactor');
+    beatfactor.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['beatfactor'] = beatfactor;
+    beatfactor.staticLabels.push(_('beat factor'));
+    beatfactor.adjustWidthToLabel();
+    beatfactor.parameterBlock();
 
     var notevolumeFactor = new ProtoBlock('notevolumefactor');
     notevolumeFactor.palette = palettes.dict['notes'];
@@ -516,13 +524,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     setcolorBlock.oneArgBlock();
     setcolorBlock.defaults.push(0);
 
-    var colorBlock = new ProtoBlock('color');
-    colorBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['color'] = colorBlock;
-    colorBlock.staticLabels.push(_('color'));
-    colorBlock.adjustWidthToLabel();
-    colorBlock.parameterBlock();
-
     var sethueBlock = new ProtoBlock('sethue');
     sethueBlock.palette = palettes.dict['pen'];
     blocks.protoBlockDict['sethue'] = sethueBlock;
@@ -539,13 +540,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     setshadeBlock.oneArgBlock();
     setshadeBlock.defaults.push(50);
 
-    var shadeBlock = new ProtoBlock('shade');
-    shadeBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['shade'] = shadeBlock;
-    shadeBlock.staticLabels.push(_('shade'));
-    shadeBlock.adjustWidthToLabel();
-    shadeBlock.parameterBlock();
-
     var setchromaBlock = new ProtoBlock('setgrey');
     setchromaBlock.palette = palettes.dict['pen'];
     blocks.protoBlockDict['setgrey'] = setchromaBlock;
@@ -554,13 +548,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     setchromaBlock.oneArgBlock();
     setchromaBlock.defaults.push(100);
 
-    var chromaBlock = new ProtoBlock('grey');
-    chromaBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['grey'] = chromaBlock;
-    chromaBlock.staticLabels.push(_('grey'));
-    chromaBlock.adjustWidthToLabel();
-    chromaBlock.parameterBlock();
-
     var setpensizeBlock = new ProtoBlock('setpensize');
     setpensizeBlock.palette = palettes.dict['pen'];
     blocks.protoBlockDict['setpensize'] = setpensizeBlock;
@@ -568,13 +555,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     setpensizeBlock.adjustWidthToLabel();
     setpensizeBlock.oneArgBlock();
     setpensizeBlock.defaults.push(5);
-
-    var pensizeBlock = new ProtoBlock('pensize');
-    pensizeBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['pensize'] = pensizeBlock;
-    pensizeBlock.staticLabels.push(_('pen size'));
-    pensizeBlock.adjustWidthToLabel();
-    pensizeBlock.parameterBlock();
 
     var penupBlock = new ProtoBlock('penup');
     penupBlock.palette = palettes.dict['pen'];
@@ -596,23 +576,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     fillBlock.staticLabels.push(_('fill'));
     fillBlock.adjustWidthToLabel();
     fillBlock.flowClampZeroArgBlock();
-
-    // Deprecated
-    var startfillBlock = new ProtoBlock('beginfill');
-    startfillBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['beginfill'] = startfillBlock;
-    startfillBlock.hidden = 'true';
-    startfillBlock.staticLabels.push(_('begin fill'));
-    startfillBlock.adjustWidthToLabel();
-    startfillBlock.zeroArgBlock();
-
-    var endfillBlock = new ProtoBlock('endfill');
-    endfillBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['endfill'] = endfillBlock;
-    endfillBlock.staticLabels.push(_('end fill'));
-    endfillBlock.hidden = 'true';
-    endfillBlock.adjustWidthToLabel();
-    endfillBlock.zeroArgBlock();
 
     var setfontBlock = new ProtoBlock('setfont');
     setfontBlock.palette = palettes.dict['pen'];
@@ -645,23 +608,33 @@ function initBasicProtoBlocks(palettes, blocks) {
     hollowBlock.adjustWidthToLabel();
     hollowBlock.flowClampZeroArgBlock();
 
-    // deprecated
-    var beginHollowLineBlock = new ProtoBlock('beginhollowline');
-    beginHollowLineBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['beginhollowline'] = beginHollowLineBlock;
-    beginHollowLineBlock.hidden = 'true';
-    beginHollowLineBlock.staticLabels.push(_('begin hollow line'));
-    beginHollowLineBlock.adjustWidthToLabel();
-    beginHollowLineBlock.zeroArgBlock();
+    var colorBlock = new ProtoBlock('color');
+    colorBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['color'] = colorBlock;
+    colorBlock.staticLabels.push(_('color'));
+    colorBlock.adjustWidthToLabel();
+    colorBlock.parameterBlock();
 
-    // deprecated
-    var endHollowLineBlock = new ProtoBlock('endhollowline');
-    endHollowLineBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['endhollowline'] = endHollowLineBlock;
-    endHollowLineBlock.hidden = 'true';
-    endHollowLineBlock.staticLabels.push(_('end hollow line'));
-    endHollowLineBlock.adjustWidthToLabel();
-    endHollowLineBlock.zeroArgBlock();
+    var shadeBlock = new ProtoBlock('shade');
+    shadeBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['shade'] = shadeBlock;
+    shadeBlock.staticLabels.push(_('shade'));
+    shadeBlock.adjustWidthToLabel();
+    shadeBlock.parameterBlock();
+
+    var chromaBlock = new ProtoBlock('grey');
+    chromaBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['grey'] = chromaBlock;
+    chromaBlock.staticLabels.push(_('grey'));
+    chromaBlock.adjustWidthToLabel();
+    chromaBlock.parameterBlock();
+
+    var pensizeBlock = new ProtoBlock('pensize');
+    pensizeBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['pensize'] = pensizeBlock;
+    pensizeBlock.staticLabels.push(_('pen size'));
+    pensizeBlock.adjustWidthToLabel();
+    pensizeBlock.parameterBlock();
 
     // Numbers palette
     var numberBlock = new ProtoBlock('number');
@@ -1206,14 +1179,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     toFrequencyBlock.dockTypes[1] = 'anyin';
 
     // Flow palette
-    var repeatBlock = new ProtoBlock('repeat');
-    repeatBlock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['repeat'] = repeatBlock;
-    repeatBlock.staticLabels.push(_('repeat'));
-    repeatBlock.adjustWidthToLabel();
-    repeatBlock.flowClampOneArgBlock();
-    repeatBlock.defaults.push(4);
-
     var foreverBlock = new ProtoBlock('forever');
     foreverBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['forever'] = foreverBlock;

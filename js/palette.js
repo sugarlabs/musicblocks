@@ -18,10 +18,7 @@ var PALETTELEFTMARGIN = 10;
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-var BUILTINPALETTES = ['matrix', 'notes', 'tone',
-    'turtle', 'pen', 'number', 'boolean', 'flow', 'boxes',
-    'actions', 'media', 'sensors', 'myblocks', 'heap'
-];
+var BUILTINPALETTES = ['matrix', 'notes', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
 
 
 function maxPaletteHeight(menuSize, scale) {
@@ -1223,17 +1220,17 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan).
     add('matrix').
     add('notes').
-    add('tone').
+    add('actions').
+    add('boxes').
     add('turtle').
     add('pen').
     add('number').
     add('boolean').
     add('flow').
-    add('boxes').
-    add('actions').
     add('media').
     add('sensors').
     add('heap').
+    add('tone').
     add('extras');
     palettes.makePalettes();
     blocks = b;
