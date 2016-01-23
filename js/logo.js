@@ -98,6 +98,7 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
     this.skipRate = {};
     this.skipCount = {};
     this.skipper = {};
+    this.duplicating = 0;
 
     // parameters used by pitch
     this.transposition = {};
@@ -1884,14 +1885,20 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                             num1 += 2 * delta;
                         }
                     }
-                    matrix.solfegeNotes.push(note);
-                    if (turtle in logo.transposition) {
-                        matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
-                    } else {
-                        matrix.solfegeTranspositions.push(2 * delta);
-                    }
-
-                    matrix.solfegeOctaves.push(octave);
+                    if(logo.duplicating){
+						var dlen = logo.duplicateFactor[turtle];
+					} else {
+						var dlen = 1;
+					}
+					for(var i = 0; i<dlen; i++){
+                        matrix.solfegeNotes.push(note);
+                        if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
+                            matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
+                        } else {
+                            matrix.solfegeTranspositions.push(2 * delta);
+                        }
+                        matrix.solfegeOctaves.push(octave);
+					}
                 } else {
                     logo.noteNotes[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
@@ -2227,6 +2234,9 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
                 break;
             case 'duplicatenotes':
                 var factor = args[0];
+                if(logo.inMatrix){
+				    logo.duplicating = 1;
+			    }
                 if (factor == 0) {
                     logo.errorMsg(ZERODIVIDEERRORMSG, blk);
                     logo.stopTurtle = true;
@@ -2240,6 +2250,10 @@ function Logo(matrix, musicnotation, canvas, blocks, turtles, stage,
 
                     var listener = function(event) {
                         logo.duplicateFactor[turtle] /= factor;
+                       if(logo.inMatrix){
+			                logo.duplicating = 0;
+                        }
+                        
                     }
 
                     logo.setListener(turtle, listenerName, listener);
