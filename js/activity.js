@@ -92,12 +92,12 @@ define(function (require) {
         facebookInit();
         window.scroll(0, 0);
 
-var txt = "";
-txt += "innerWidth: " + window.innerWidth + " ";
-txt += "innerHeight: " + window.innerHeight + " ";
-txt += "outerWidth: " + window.outerWidth + " ";
-txt += "outerHeight: " + window.outerHeight + " ";
-console.log(txt);
+        var txt = "";
+        txt += "innerWidth: " + window.innerWidth + " ";
+        txt += "innerHeight: " + window.innerHeight + " ";
+        txt += "outerWidth: " + window.outerWidth + " ";
+        txt += "outerHeight: " + window.outerHeight + " ";
+        console.log(txt);
 
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
@@ -227,7 +227,7 @@ console.log(txt);
             [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
             [_('Run music slow'), _('Click to run just the music in slow mode.'), 'header-icons/slow-music-button.svg'],
             [_('Run step by step'), _('Click to run the project step by step.'), 'header-icons/step-button.svg'],
-	    [_('Run note by note'), _('Click to run the music note by note.'), 'header-icons/step-music-button.svg'],
+            [_('Run note by note'), _('Click to run the music note by note.'), 'header-icons/step-music-button.svg'],
             [_('Stop'), _('Stop the music (and the turtles).'), 'header-icons/stop-turtle-button.svg'],
             [_('Clean'), _('Clear the screen and return the turtles to their initial positions.'), 'header-icons/clear-button.svg'],
             [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
@@ -236,6 +236,7 @@ console.log(txt);
             [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
+            [_('Save project'), _('This button saves the current projects to the download directory on the local filesystem.'), 'header-icons/save-button.svg'],           [_('Load project from filesystem'), _('This button opens a viewer for loading projects from the local filesystem.'), 'header-icons/open-button.svg'],
             [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'header-icons/copy-button.svg'],
             [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'header-icons/paste-disabled-button.svg'],
             [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'header-icons/save-blocks-button.svg'],
@@ -265,7 +266,7 @@ console.log(txt);
             logo.setBackgroundColor(-1);
             logo.lilypondOutput = LILYPONDHEADER;
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-	        logo.lilypondStaging[turtle] = [];
+                logo.lilypondStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear();
             }
             blocksContainer.x = 0;
