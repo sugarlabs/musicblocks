@@ -454,6 +454,9 @@ msgstr ""
 msgid "Save your project to a server."
 msgstr ""
 
+msgid "Save your project to a file."
+msgstr ""
+
 msgid "Congratulations."
 msgstr ""
 

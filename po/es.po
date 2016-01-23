@@ -485,7 +485,7 @@ msgstr "objeto"
 msgid "numerator"
 msgstr "numerador"
 
-msgid  "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
 msgstr "Sr. Ratón es nuestro conductor de bloques de música. Sr. Ratón le anima a explorar los Bloques Musicales."
 
 #. TRANS: store a value in a box
@@ -875,6 +875,9 @@ msgstr "relleno"
 
 msgid "Save your project to a server."
 msgstr "Guarde proyecto en el servidor."
+
+msgid "Save your project to a file."
+msgstr "Guarde proyecto en archivo"
 
 msgid "Decrease block size"
 msgstr "Disminuir el tamaño de los bloques"

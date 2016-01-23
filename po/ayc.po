@@ -40,7 +40,7 @@ msgstr "maski kawkïrsa"
 msgid "confirm"
 msgstr "yatiyaña"
 
-#. TRANS: musical meter
+#. TRANS: metro de musica
 msgid "meter"
 msgstr ""
 
@@ -73,9 +73,11 @@ msgstr "on qhantayaña"
 msgid "chicken"
 msgstr "chhiwchhi"
 
+#. TRANS: Musica ejecute lentamente
 msgid "Run music slow"
 msgstr ""
 
+#. TRANS: Esta barra de herramientas contiene los botones de la paleta de Matrix, Notas, Tono, Tortuga, y mas. Haga clic para mostrar las paletas de bloques y bloques de arrastre de las gamas de colores en el lienzo para usarlos.
 msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr ""
 
@@ -83,6 +85,7 @@ msgstr ""
 msgid "apple"
 msgstr "manzana puquta"
 
+#. TRANS: matriz grafica notacion"
 msgid "graphical notation matrix"
 msgstr ""
 
@@ -120,6 +123,7 @@ msgstr "jakhuxataña"
 msgid "set pen size"
 msgstr "taña chanichaña"
 
+#. TRANS: ritmo
 msgid "rhythm"
 msgstr ""
 
@@ -148,6 +152,7 @@ msgstr "luraña"
 msgid "move"
 msgstr "unxtayaña"
 
+#. TRANS: triangulo
 msgid "triangle"
 msgstr ""
 
@@ -155,10 +160,11 @@ msgstr ""
 msgid "stop turtle"
 msgstr "tortuga wakichata sayt'ayaña"
 
+#. TRANS: octava actual
 msgid "current pitch octave"
 msgstr ""
 
-#. TRANS: robot sensors.
+#. TRANS: distancia
 msgid "distance"
 msgstr ""
 
@@ -179,7 +185,7 @@ msgstr "ch'islli"
 msgid "Expand or collapse start and action stacks."
 msgstr "siqinaka wakichaña qallta jithitatayaña jiththapiyaña"
 
-#. TRANS: a container for a variable
+#. TRANS: cajas
 msgid "boxes"
 msgstr ""
 
@@ -197,7 +203,7 @@ msgstr "janiwa"
 msgid "Google map"
 msgstr "Google pacha rixipa wakichata"
 
-#. TRANS: as in blinking an eye.
+#. TRANS: parpardear
 msgid "blink"
 msgstr ""
 
@@ -209,6 +215,7 @@ msgstr "uru"
 msgid "mod"
 msgstr "uñanaqa"
 
+#. TRANS: factor de ritmo
 msgid "beat factor"
 msgstr ""
 
@@ -242,6 +249,7 @@ msgstr "Apaqaña"
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
 msgstr "Lip'katayañataki wakichata qhantatawa, ukata wakichatanaka siqinaka apaqata utjiwa"
 
+#. TRANS: transposicion
 msgid "transposition"
 msgstr ""
 
@@ -326,7 +334,7 @@ msgstr "wakichata uñachayaña"
 msgid "Click to run the project step by step."
 msgstr "sapa mayata mayata amtäwi wakichata qalltañataki limt’aña"
 
-#. TRANS: hollow line refers to drawing an outline around a line
+#. TRANS: linea sin relleno
 msgid "hollow line"
 msgstr ""
 
@@ -348,6 +356,7 @@ msgstr "pacha chimpu"
 msgid "set shade"
 msgstr "ist'añataki wakichata wakichaña"
 
+#. TRANS: notas duplicadas
 msgid "duplicate notes"
 msgstr ""
 
@@ -370,10 +379,11 @@ msgstr "manq´antati"
 msgid "This button opens and closes the primary toolbar."
 msgstr "Aka limt’añaxa wakichatanaka wakisiri apanaqañanaka qhantayi jiwayi"
 
-#. TRANS: index specifies a position into an array (heap)
+#. TRANS: posicion en la pila
 msgid "index"
 msgstr ""
 
+#. TRANS: volumen nota
 msgid "note volume"
 msgstr ""
 
@@ -384,9 +394,11 @@ msgstr "wakichata"
 msgid "show heap"
 msgstr "siqi wakichata uñachayma"
 
+#. TRANS: Detener la musica (y las tortugas).
 msgid "Stop the music (and the turtles)."
 msgstr ""
 
+#. TRANS: Ha terminado la gira. Por favor, disfrutar de Bloques de Musica!"
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr ""
 
@@ -473,7 +485,7 @@ msgstr "radianes wakichataru"
 msgid "water"
 msgstr "uma"
 
-#. TRANS: robot sensors.
+#. TRANS: luz infrarroja (izquierda)
 msgid "infrared light (left)"
 msgstr ""
 
@@ -489,6 +501,7 @@ msgstr "khapu t’ant’a"
 msgid "Show or hide a polar-coordinate grid."
 msgstr "coordenadas polares sayt’unakapa uñachayaña chhaqtayaña"
 
+#. TRANS: octava
 msgid "octave"
 msgstr ""
 
@@ -536,10 +549,12 @@ msgstr "Uka qillqatanaka uñachayaña"
 msgid "obj"
 msgstr "apanaqaña"
 
+#. TRANS: numerador
 msgid "numerator"
 msgstr ""
 
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
+#. TRANS: Sr. Raton es nuestro conductor de bloques de musica. Sr. Raton le anima a explorar los Bloques Musicales."
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
 msgstr ""
 
 #. TRANS: store a value in a box
@@ -554,6 +569,7 @@ msgstr "qhatjayaña"
 msgid "maths"
 msgstr "jakhunaka tuqita"
 
+#. TRANS: denominador
 msgid "denominator"
 msgstr ""
 
@@ -582,6 +598,7 @@ msgstr "ist'asiñapa jithxatayaña"
 msgid "Increase the size of the blocks."
 msgstr "wakichata siqinaka tañapa jach’aptayaña"
 
+#. TRANS: fijar volumen
 msgid "set volume"
 msgstr ""
 
@@ -589,6 +606,7 @@ msgstr ""
 msgid "or"
 msgstr "o wakichata"
 
+#. TRANS: valor de la nota
 msgid "note value"
 msgstr ""
 
@@ -599,7 +617,7 @@ msgstr "amuyt'aña"
 msgid "cheese"
 msgstr "kisulla"
 
-#. TRANS: lilypond is a language used to generate musical scores.
+#. TRANS: guardar como lilypond (lilypond is a language used to generate musical scores.)
 msgid "save as lilypond"
 msgstr ""
 
@@ -621,6 +639,7 @@ msgstr "sami"
 msgid "image"
 msgstr "rixita"
 
+#. TRANS: Haga clic para jugar nota a nota
 msgid "Click to run the music note by note."
 msgstr ""
 
@@ -651,6 +670,7 @@ msgstr "coordenadas wakichata"
 msgid "sing"
 msgstr "warurt’aña"
 
+#. TRANS: jugar hacia atrias
 msgid "play backward"
 msgstr ""
 
@@ -713,6 +733,7 @@ msgstr "samichaña phuyu jithsuyaña"
 msgid "Decrease the size of the blocks."
 msgstr "wakichata siqinaka tañapa jisk’aptayaña"
 
+#. TRANS: Jugar nota a nota
 msgid "Run note by note"
 msgstr ""
 
@@ -780,6 +801,7 @@ msgstr "tortuga uywana lip'ichipa"
 msgid "start turtle"
 msgstr "tortuga wakichata qalltaña"
 
+#. TRANS: Bienvenido a Bloques de Musica
 msgid "Welcome to Music Blocks"
 msgstr ""
 
@@ -809,6 +831,7 @@ msgstr "laranja puquta"
 msgid "begin hollow line"
 msgstr "p’iyani rixita qalltaña"
 
+#. TRANS: planas
 msgid "flat"
 msgstr ""
 
@@ -820,6 +843,7 @@ msgstr "qutu"
 msgid "begin fill"
 msgstr "phuqachaña wakichaña qalltaña"
 
+#. TRANS: pulsaciones  por minuto
 msgid "beats per minute"
 msgstr ""
 
@@ -835,6 +859,7 @@ msgstr "japhalla wakichata siqinaka jach’aptayaña jani uka chhaqtayaña"
 msgid "high"
 msgstr "jach’a"
 
+#. TRANS: Bloques de Musica es una coleccion de herramientas de manipulacion para explorar conceptos musicales fundamentales de una manera integradora y divertido.
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
 msgstr ""
 
@@ -928,7 +953,7 @@ msgstr "junt’u manq’anaka"
 msgid "Run step by step"
 msgstr "mayata mayata qhantayaña"
 
-#. TRANS: musical pitch
+#. TRANS: tono de musica
 msgid "pitch"
 msgstr ""
 
@@ -947,6 +972,7 @@ msgstr "1 jakhuta jakhuña"
 msgid "stop play"
 msgstr "sayt’ayaña"
 
+#. TRANS: agudas
 msgid "sharp"
 msgstr ""
 
@@ -954,7 +980,7 @@ msgstr ""
 msgid "protein"
 msgstr "ch’amanchiri juyra"
 
-#. TRANS: oscillator time
+#. TRANS: tiempi oscilador
 msgid "osctime"
 msgstr ""
 
@@ -962,7 +988,7 @@ msgstr ""
 msgid "play back"
 msgstr "qhantayaña"
 
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
+#. TRANS: relleno
 msgid "fill"
 msgstr ""
 
@@ -972,7 +998,7 @@ msgstr "Wakichatanaka apanaqaña taypiru amtäwima imma"
 msgid "Decrease block size"
 msgstr "Wakichata siqi taña jisk’aptayma"
 
-#. TRANS: number of notes
+#. TRANS: numero de notas
 msgid "number of notes"
 msgstr ""
 
@@ -1012,12 +1038,15 @@ msgstr "qhananchäwi"
 msgid "field"
 msgstr "apanaqäwi"
 
+#. TRANS: invertir
 msgid "invert"
 msgstr ""
 
+#. TRANS: cuadrado
 msgid "square"
 msgstr ""
 
+#. TRANS: Conoce Sr. Raton
 msgid "Meet Mr. Mouse!"
 msgstr ""
 
@@ -1034,7 +1063,7 @@ msgstr "jïsa"
 msgid "Paste"
 msgstr "Apxataña"
 
-#. TRANS: musical key, e.g., C Major
+#. TRANS: fijar clave
 msgid "set key"
 msgstr ""
 
@@ -1050,7 +1079,7 @@ msgstr "tamal manq’a"
 msgid "Worldwide"
 msgstr "Aka pachana"
 
-#. TRANS: as in play a musical note.
+#. TRANS: tocar
 msgid "play"
 msgstr ""
 
@@ -1074,6 +1103,7 @@ msgstr "jilata sipana"
 msgid "logic"
 msgstr "Sara"
 
+#. TRANS: tono actual
 msgid "current pitch name"
 msgstr ""
 
@@ -1081,7 +1111,7 @@ msgstr ""
 msgid "empty heap"
 msgstr "siqi wakichata ch'ussuña"
 
-#. TRANS: robot sensors.
+#. TRANS: luz infrarrojo (derecha)
 msgid "infrared light (right)"
 msgstr ""
 
@@ -1089,7 +1119,7 @@ msgstr ""
 msgid "On my device"
 msgstr "wakichatanaka machaqa imaña"
 
-#. TRANS: musical key, e.g., C Major
+#. TRANS: clave de musica
 msgid "key"
 msgstr ""
 
@@ -1118,6 +1148,7 @@ msgstr ""
 msgid "set color"
 msgstr "sami wakichaña"
 
+#. TRANS: Haga clic para ejecutar solo la musica en modo lento.
 msgid "Click to run just the music in slow mode."
 msgstr ""
 
@@ -1178,6 +1209,7 @@ msgstr ""
 msgid "extras"
 msgstr "yaqhanaka"
 
+#. TRANS: fijar pulsciones por minuto
 msgid "set beats per minute"
 msgstr ""
 
@@ -1194,6 +1226,7 @@ msgstr "y wakichata"
 msgid "set heap"
 msgstr "qutunaka tama"
 
+#. TRANS: ritmo multiplican
 msgid "multiply beat"
 msgstr ""
 
@@ -1201,6 +1234,7 @@ msgstr ""
 msgid "hello"
 msgstr "kamisaraki"
 
+#. TRANS: punto
 msgid "dot"
 msgstr ""
 
