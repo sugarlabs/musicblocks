@@ -1732,6 +1732,34 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             // Actions for music-related blocks
             case 'setbpm':
+                var currentbpm = this.bpm;
+                if (args.length == 2 && typeof(args[0] == 'number')) {
+                    if (args[0] < 30) {
+                        logo.errorMsg(_('Beats per minute must be > 30.'))
+                        args[0] = 30;
+                    } else if (args[0] > 1000) {
+                        logo.errorMsg(_('Maximum beats per minute is 1000.'))
+                        args[0] = 1000;
+                    } else {
+                        this.bpm = args[0];
+                        this.bpmFactor = TONEBPM / this.bpm;
+                        childFlow = args[1];
+                        childFlowCount = 1;
+
+                        var listenerName = '_setbpm_' + turtle;
+                        logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                        var listener = function (event) {
+                            logo.bpm = currentbpm;
+                            logo.bpmFactor = TONEBPM / currentbpm;
+                        }
+
+                        logo.setListener(turtle, listenerName, listener);
+                    }
+                }
+                break;
+
+            case 'setgbpm':
                 if (args.length == 1 && typeof(args[0] == 'number')) {
                     if (args[0] < 30) {
                         logo.errorMsg(_('Beats per minute must be > 30.'))
@@ -1744,6 +1772,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     this.bpmFactor = TONEBPM / this.bpm;
                 }
                 break;
+
             case 'setkey':
                 if (args.length == 1) {
                     // TODO: test arg type/validity
