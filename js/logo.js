@@ -1856,22 +1856,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             num1 += 2 * delta;
                         }
                     }
-            		if(logo.duplicating){
-            	    	var dlen = logo.duplicateFactor[turtle];
-            		} else {
-            			var dlen = 1;
-            		}
-            		for(var i = 0; i<dlen; i++){
-            		    matrix.solfegeNotes.push(note);
-            		    if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
-            				matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
-            		    } else {
-            				matrix.solfegeTranspositions.push(2 * delta);
-            			}       
-            	        matrix.solfegeOctaves.push(octave);
-            			}    
-		        } else {
-                    logo.noteNotes[turtle].push(note);
+                    if(logo.duplicating){
+                        var dlen = logo.duplicateFactor[turtle];
+                    } else {
+                        var dlen = 1;
+                    }
+                    for(var i = 0; i<dlen; i++){
+                        matrix.solfegeNotes.push(note);
+                        if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
+                            matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
+                        } else {
+                            matrix.solfegeTranspositions.push(2 * delta);
+                        }       
+                        matrix.solfegeOctaves.push(octave);
+                    }    
+                } else {
+                logo.noteNotes[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
                     if (!(logo.invertList[turtle].length === 0)) {
                         var len = logo.invertList[turtle].length;
@@ -2158,9 +2158,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.duplicateFactor[turtle] /= factor;
                         if(logo.inMatrix){
                             logo.duplicating = false;
-                   	}
+                        }
                     }
-
                     logo.setListener(turtle, listenerName, listener);
                 }
                 break;
@@ -2181,9 +2180,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.skipFactor[turtle] /= factor;
                         if (logo.skipFactor[turtle] === 1) {
                             logo.skipIndex[turtle] = 0;
-			}
+                        }
                     }
-
                     logo.setListener(turtle, listenerName, listener);
                 }
                 break;
