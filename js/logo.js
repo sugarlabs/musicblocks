@@ -1856,21 +1856,21 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             num1 += 2 * delta;
                         }
                     }
-			if(logo.duplicating){
-				var dlen = logo.duplicateFactor[turtle];
-			} else {
-				var dlen = 1;
-			}
-			for(var i = 0; i<dlen; i++){
-			    matrix.solfegeNotes.push(note);
-			    if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
-				    matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
+            		if(logo.duplicating){
+            	    	var dlen = logo.duplicateFactor[turtle];
+            		} else {
+            			var dlen = 1;
+            		}
+            		for(var i = 0; i<dlen; i++){
+            		    matrix.solfegeNotes.push(note);
+            		    if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
+            				matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
+            		    } else {
+            				matrix.solfegeTranspositions.push(2 * delta);
+            			}       
+            	        matrix.solfegeOctaves.push(octave);
+            			}    
 		        } else {
-				    matrix.solfegeTranspositions.push(2 * delta);
-			    }       
-	            matrix.solfegeOctaves.push(octave);
-			}    
-		} else {
                     logo.noteNotes[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
                     if (!(logo.invertList[turtle].length === 0)) {
