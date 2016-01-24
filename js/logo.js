@@ -1864,13 +1864,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 			for(var i = 0; i<dlen; i++){
 			    matrix.solfegeNotes.push(note);
 			    if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
-				matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
-			    } else {
-				matrix.solfegeTranspositions.push(2 * delta);
+				    matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
+		        } else {
+				    matrix.solfegeTranspositions.push(2 * delta);
 			    }       
-			    matrix.solfegeOctaves.push(octave);
+	            matrix.solfegeOctaves.push(octave);
 			}    
-		
 		} else {
                     logo.noteNotes[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
@@ -2141,8 +2140,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'duplicatenotes':
                 var factor = args[0];
-               	if(logo.inMatrix){
-	            logo.duplicating = true;
+                if(logo.inMatrix){
+                    logo.duplicating = true;
                 }
                 if (factor == 0) {
                     logo.errorMsg(ZERODIVIDEERRORMSG, blk);
@@ -2158,7 +2157,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var listener = function (event) {
                         logo.duplicateFactor[turtle] /= factor;
                         if(logo.inMatrix){
-	                    logo.duplicating = false;
+                            logo.duplicating = false;
                    	}
                     }
 
