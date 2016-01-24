@@ -1862,14 +1862,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 				var dlen = 1;
 			}
 			for(var i = 0; i<dlen; i++){
-				matrix.solfegeNotes.push(note);
-				if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
-					matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
-				} else {
-					matrix.solfegeTranspositions.push(2 * delta);
-					
-				}       
-				matrix.solfegeOctaves.push(octave);
+			    matrix.solfegeNotes.push(note);
+			    if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
+				matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
+			    } else {
+				matrix.solfegeTranspositions.push(2 * delta);
+			    }       
+			    matrix.solfegeOctaves.push(octave);
 			}    
 		
 		} else {
@@ -2143,7 +2142,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'duplicatenotes':
                 var factor = args[0];
                	if(logo.inMatrix){
-			logo.duplicating = true;
+	            logo.duplicating = true;
                 }
                 if (factor == 0) {
                     logo.errorMsg(ZERODIVIDEERRORMSG, blk);
@@ -2158,9 +2157,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     var listener = function (event) {
                         logo.duplicateFactor[turtle] /= factor;
-                   
-                      	if(logo.inMatrix){
-				logo.duplicating = false;
+                        if(logo.inMatrix){
+	                    logo.duplicating = false;
                    	}
                     }
 
