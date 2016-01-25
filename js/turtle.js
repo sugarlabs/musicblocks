@@ -20,6 +20,10 @@ var DEFAULTFONT = 'sans-serif';
 var turtlePath = 'images/turtle.svg';
 var turtleBasePath = 'images/';
 
+// Default beats per minute
+var TONEBPM = 240;  // Seems to be the default.
+var TARGETBPM = 90;  // What we'd like to use for beats per minute
+
 function Turtle (name, turtles, drum) {
     this.name = name;
     this.turtles = turtles;
@@ -68,6 +72,11 @@ function Turtle (name, turtles, drum) {
     this.penState = true;
     this.font = DEFAULTFONT;
     this.media = [];  // Media (text, images) we need to remove on clear.
+
+    this.bpm = TARGETBPM;
+    this.bpmFactor = TONEBPM / TARGETBPM;
+
+    this.currentbpm = [];
 
     this.move = function(ox, oy, x, y, invert) {
         if (invert) {

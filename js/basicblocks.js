@@ -320,8 +320,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['setbpm'] = setbpmBlock;
     setbpmBlock.staticLabels.push(_('set beats per minute'));
     setbpmBlock.adjustWidthToLabel();
-    setbpmBlock.oneArgBlock();
-    setbpmBlock.defaults.push(90);
+    setbpmBlock.flowClampOneArgBlock();
+    setbpmBlock.defaults.push(0);
+
+    var setGbpmBlock = new ProtoBlock('setgbpm');
+    setGbpmBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setgbpm'] = setGbpmBlock;
+    setGbpmBlock.staticLabels.push(_('set global bpm'));
+    setGbpmBlock.adjustWidthToLabel();
+    setGbpmBlock.oneArgBlock();
+    setGbpmBlock.defaults.push(90);
 
     var bpmBlock = new ProtoBlock('bpm');
     bpmBlock.palette = palettes.dict['tone'];
