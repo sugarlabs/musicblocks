@@ -118,7 +118,7 @@ function Matrix() {
 
         var matrixDiv = document.getElementById('matrix');
         matrixDiv.style.paddingTop = 40 * this.cellScale + 4 + 'px';
-        matrixDiv.style.paddingLeft = 45 * this.cellScale + 4 + 'px';
+        matrixDiv.style.paddingLeft = 54 * this.cellScale + 4 + 'px';
         matrixDiv.appendChild(x);
         matrixDivPosition = matrixDiv.getBoundingClientRect();
 
@@ -132,6 +132,7 @@ function Matrix() {
         var cell = row.insertCell(-1);
         cell.style.fontSize = this.cellScale * 100 + '%';
         cell.innerHTML = '<b>' + _('Solfa') + '</b>';
+        cell.style.width = 52 + 'px';
         cell.style.height = 40 * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
 
@@ -220,7 +221,7 @@ function Matrix() {
         cell.style.fontSize = this.cellScale * 50 + '%';
         cell.innerHTML = _('rhythmic note values');
         cell.style.position = "fixed";
-        cell.style.height = 39 * this.cellScale + 'px';
+        cell.style.height = 30 * this.cellScale + 'px';
         cell.style.width = 52 + 'px';
         cell.style.left = matrixDivPosition.left + 2 + 'px';
         cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
