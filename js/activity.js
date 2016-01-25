@@ -1957,7 +1957,7 @@ define(function(require) {
         function doRecord() {
             var prevCount = 1;
             var count = 2;
-            var doRec = 0;
+            var doRec = true;
             var noteDB = [];
             var dataObj = [
                 [0, 'start', 250, 150, [null, null, null]],
@@ -1965,46 +1965,46 @@ define(function(require) {
             ];
 
             document.addEventListener("keydown", function(event) {
-                if (doRec == 0) {
+                if (doRec) {
                     switch (event.keyCode) {
                         case 65: //C
-                            noteDB.push('C');
+                            noteDB.push('do');
                             break;
                         case 87: //C#
-                            noteDB.push('C♯');
+                            noteDB.push('do♯');
                             break;
                         case 83: //D
-                            noteDB.push('D');
+                            noteDB.push('re');
                             break;
                         case 69: //D#
-                            noteDB.push('D♯');
+                            noteDB.push('re♯');
                             break;
                         case 68: //E
-                            noteDB.push('E');
+                            noteDB.push('mi');
                             break;
                         case 70: //F
-                            noteDB.push('F');
+                            noteDB.push('fa');
                             break;
                         case 84: //F#
-                            noteDB.push('F♯');
+                            noteDB.push('fa♯');
                             break;
                         case 71: //G
-                            noteDB.push('G');
+                            noteDB.push('sol');
                             break;
                         case 89: //G#
-                            noteDB.push('G♯');
+                            noteDB.push('sol♯');
                             break;
                         case 72: //A
-                            noteDB.push('A');
+                            noteDB.push('la');
                             break;
                         case 85: //A#
-                            noteDB.push('A♯');
+                            noteDB.push('la♯');
                             break;
                         case 74: //B
-                            noteDB.push('B');
+                            noteDB.push('ti');
                             break;
                         case 13:
-                            doRec = 1;
+                            doRec = false;
                             for (var i = 0; i < noteDB.length; i++) {
                                 dataObj.push([count, 'pitch', 0, 0, [prevCount, count + 1, count + 2, count + 3]]);
                                 dataObj.push([count + 1, ['solfege', {
