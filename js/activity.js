@@ -105,7 +105,6 @@ define(function(require) {
         }
 
         var canvas = docById('myCanvas');
-
         var queue = new createjs.LoadQueue(false);
 
         // Check for the various File API support.
@@ -1952,9 +1951,10 @@ define(function(require) {
             var p = new PopdownPalette(palettes);
             p.popdown();
         }
-
-        //Keyboard press for Taking input from keyboard for generating the Pitch blocks
+        
         function doRecord() {
+		//Keyboard press for Taking input from keyboard for generating the Pitch blocks.
+			var beatValue = String(1/4);
             var prevCount = 1;
             var count = 2;
             var doRec = true;
@@ -1969,6 +1969,8 @@ define(function(require) {
                     switch (event.keyCode) {
                         case 65: //C
                             noteDB.push('do');
+							//FIXME:
+							//logo.polySynth.triggerAttackRelease('do4',beatvalue);
                             break;
                         case 87: //C#
                             noteDB.push('do♯');
@@ -2005,7 +2007,7 @@ define(function(require) {
                             break;
                         case 13:
                             doRec = false;
-                            for (var i = 0; i < noteDB.length; i++) {
+                            for (var i = noteDB.length-1; i >= 0; i--) {
                                 dataObj.push([count, 'pitch', 0, 0, [prevCount, count + 1, count + 2, count + 3]]);
                                 dataObj.push([count + 1, ['solfege', {
                                     value: noteDB[i]
@@ -2028,7 +2030,7 @@ define(function(require) {
                             blocks.loadNewBlocks(dataObj);
                             noteDB = [];
                             break;
-                    }
+                    } 
                 }
             }, false);
 
