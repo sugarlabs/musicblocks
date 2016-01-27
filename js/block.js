@@ -223,6 +223,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'tuplet':
             case 'tuplet2':
             case 'osctime':
+            case 'setbpm':
             case 'repeat':
             case 'fill':
             case 'hollowline':

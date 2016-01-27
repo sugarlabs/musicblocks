@@ -291,8 +291,6 @@ define(function (require) {
             var canvas = document.getElementById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
-
-            logo.resetbpm();
         }
 
         //the rabbit button in the header icons
@@ -303,7 +301,6 @@ define(function (require) {
             } else {
                 logo.step(null, env);
             }
-            logo.resetbpm();
         }
 
         function doSlowButton() {
@@ -313,7 +310,6 @@ define(function (require) {
             } else {
                 logo.step();
             }
-            logo.resetbpm();
         }
 
         function doStepButton() {
@@ -334,7 +330,6 @@ define(function (require) {
                 logo.setTurtleDelay(TURTLESTEP);
                 logo.step();
             }
-            logo.resetbpm();
         }
 
         function doSlowMusicButton() {
@@ -344,7 +339,6 @@ define(function (require) {
             } else {
                 logo.stepNotes();
             }
-            logo.resetbpm();
         }
 
         function doStepMusicButton() {
@@ -365,7 +359,6 @@ define(function (require) {
                 logo.setTurtleDelay(TURTLESTEP);
                 logo.stepNote();
             }
-            logo.resetbpm();
         }
 
         var stopTurtle = false;
@@ -1156,7 +1149,6 @@ define(function (require) {
             }
 
             update = true;
-            logo.resetbpm();
         }
 
         function changePaletteVisibility() {

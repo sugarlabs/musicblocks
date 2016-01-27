@@ -108,8 +108,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.currentOctaves = {};
 
     // parameters used by the note block
-    this.bpm = TARGETBPM;
-    this.bpmFactor = TONEBPM / TARGETBPM;
+    this.bpm = {};
+    this.defaultBPMFactor = TONEBPM / TARGETBPM;
     this.turtleTime = [];
     this.noteDelay = 0;
     this.playedNote = {};
@@ -418,7 +418,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     value = this.currentoctave[turtle];
                     break;
                 case 'bpm':
-                    value = logo.bpm;
+                    if (this.bpm[turtle].length > 0) {
+                        value = last(this.bpm[turtle]);
+                    } else {
+                        value = TARGETBPM;
+                    }
                     break;
                 default:
                     if (name in this.evalParameterDict) {
@@ -491,6 +495,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.polyVolume[turtle] = -20;
             this.oscDuration[turtle] = 4;
             this.oscList[turtle] = [];
+            this.bpm[turtle] = [];
         }
 
         this.inMatrix = false;
@@ -677,9 +682,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'bpm':
-                this.bpm = value;
-                this.bpmFactor = TONEBPM / this.bpm;
-                console.log(this.bpm + ' ' + this.bpmFactor);
+                var len = this.bpm[turtle].length;
+                if (len > 0) {
+                    this.bpm[turtle][len - 1] = value;
+                } else {
+                    this.bpm[turtle].push(value);
+                }
                 break;
             case 'currentnote':
                 // A bit ugly because the setter call added the value
@@ -710,11 +718,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 this.errorMsg('Block does not support incrementing', blk);
         }
-    }
-
-    this.resetbpm =function() {
-        this.bpm = TARGETBPM;
-        this.bpmFactor = TONEBPM / TARGETBPM;
     }
 
     this.runFromBlockNow = function(logo, turtle, blk, isflow, receivedArg, queueStart) {
@@ -1075,7 +1078,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'clear':
                 logo.svgBackground = true;
                 logo.turtles.turtleList[turtle].doClear();
-                this.resetbpm();
                 break;
             case 'setxy':
                 if (args.length == 2) {
@@ -1732,16 +1734,29 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             // Actions for music-related blocks
             case 'setbpm':
-                if (args.length == 1 && typeof(args[0] == 'number')) {
+                if (args.length == 2 && typeof(args[0] == 'number')) {
                     if (args[0] < 30) {
                         logo.errorMsg(_('Beats per minute must be > 30.'))
-                        args[0] = 30;
+                        var bpm = 30;
                     } else if (args[0] > 1000) {
                         logo.errorMsg(_('Maximum beats per minute is 1000.'))
-                        args[0] = 1000;
+                        var bpm = 1000;
+                    } else {
+                        var bpm = args[0];
                     }
-                    this.bpm = args[0];
-                    this.bpmFactor = TONEBPM / this.bpm;
+
+                    logo.bpm[turtle].push(bpm);
+
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_bpm_' + turtle;
+                    logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                    var listener = function (event) {
+                        logo.bpm[turtle].pop();
+                    }
+                    logo.setListener(turtle, listenerName, listener);
                 }
                 break;
             case 'setkey':
@@ -1986,14 +2001,19 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         var turtleLag = elapsedTime - logo.turtleTime[turtle];
                         // console.log(turtleLag);
 
+                        if (logo.bpm[turtle].length > 0) {
+                            var bpmFactor = TONEBPM / last(logo.bpm[turtle]);
+                        } else {
+                            var bpmFactor = TONEBPM / TARGETBPM;
+                        }
                         if (logo.blocks.blockList[blk].name == 'osctime') {
                             var duration = noteBeatValue;  // microseconds
                             logo.turtleTime[turtle] += ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle];
                             logo.doWait(turtle, Math.max(((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle] - turtleLag, 0));
                         } else {
                             var duration = noteBeatValue * logo.beatFactor[turtle];  // beat value
-                            logo.turtleTime[turtle] += ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle];
-                            logo.doWait(turtle, Math.max(((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag, 0));
+                            logo.turtleTime[turtle] += ((bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle];
+                            logo.doWait(turtle, Math.max(((bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag, 0));
                         }
                         var waitTime = 0;
                         for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
@@ -2001,7 +2021,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 logo.skipIndex[turtle] += 1;
                                 // Lessen delay time by one note
                                 // FIXME: TAKE INTO ACCOUNT OSCTIME
-                                logo.waitTimes[turtle] -= ((logo.bpmFactor / duration) + (logo.noteDelay / 1000)) * 1000;
+                                logo.waitTimes[turtle] -= ((bpmFactor / duration) + (logo.noteDelay / 1000)) * 1000;
                                 if (logo.waitTimes[turtle] < 0) {
                                     logo.waitTimes[turtle] = 0;
                                 }
@@ -2014,7 +2034,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 if (logo.blocks.blockList[blk].name == 'osctime') {
                                     waitTime += duration;
                                 } else {
-                                    waitTime += (logo.bpmFactor * 1000 / duration);
+                                    waitTime += (bpmFactor * 1000 / duration);
                                 }
                             }
 
@@ -2048,7 +2068,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                     if (logo.blocks.blockList[blk].name == 'osctime') {
                                         var stopTime = duration;
                                     } else {
-                                        var stopTime = logo.bpmFactor * 1000 / duration;
+                                        var stopTime = bpmFactor * 1000 / duration;
                                     }
                                     setTimeout(function(){
                                         for (var i = 0; i < oscillators.length; i++) {
@@ -2097,7 +2117,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                         if (logo.blocks.blockList[blk].name == 'osctime') {
                                             var beatValue = duration / 1000;
                                         } else {
-                                            var beatValue = logo.bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                                            var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
                                         }
                                         if (logo.turtles.turtleList[turtle].drum) {
                                             logo.drumSynth.triggerAttackRelease(notes[0], beatValue);
@@ -3054,7 +3074,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                     break;
                 case 'bpm':
-                    logo.blocks.blockList[blk].value = logo.bpm;
+                    if (logo.bpm[turtle].length > 0) {
+                        logo.blocks.blockList[blk].value = last();
+                    } else {
+                        logo.blocks.blockList[blk].value = TARGETBPM;
+                    }
                     break;
                 case 'key':
                     logo.blocks.blockList[blk].value = logo.keySignature[turtle];

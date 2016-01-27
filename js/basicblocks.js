@@ -321,9 +321,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     var setbpmBlock = new ProtoBlock('setbpm');
     setbpmBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['setbpm'] = setbpmBlock;
-    setbpmBlock.staticLabels.push(_('set beats per minute'));
+    setbpmBlock.staticLabels.push(_('beats per minute'));
     setbpmBlock.adjustWidthToLabel();
-    setbpmBlock.oneArgBlock();
+    setbpmBlock.flowClampOneArgBlock();
     setbpmBlock.defaults.push(90);
 
     var noteVolumeBlock = new ProtoBlock('setnotevolume');
