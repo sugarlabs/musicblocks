@@ -1,4 +1,4 @@
-// Copyright (c) 2014,15 Walter Bender
+// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -18,7 +18,7 @@ var PALETTELEFTMARGIN = 10;
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-var BUILTINPALETTES = ['matrix', 'notes', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
+var BUILTINPALETTES = ['pitch', 'matrix', 'notes', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
 
 
 function maxPaletteHeight(menuSize, scale) {
@@ -1218,15 +1218,16 @@ var blocks = undefined;
 function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan, b) {
     // Instantiate the palettes object on first load.
     var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan).
-    add('matrix').
     add('notes').
+    add('pitch').
     add('actions').
     add('boxes').
+    add('flow').
+    add('matrix').
     add('turtle').
     add('pen').
     add('number').
     add('boolean').
-    add('flow').
     add('media').
     add('sensors').
     add('heap').
