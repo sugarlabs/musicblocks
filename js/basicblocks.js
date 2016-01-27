@@ -279,22 +279,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
 
-    var duplicateNotesBlock = new ProtoBlock('duplicatenotes');
-    duplicateNotesBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['duplicatenotes'] = duplicateNotesBlock;
-    duplicateNotesBlock.staticLabels.push(_('duplicate notes'));
-    duplicateNotesBlock.adjustWidthToLabel();
-    duplicateNotesBlock.flowClampOneArgBlock();
-    duplicateNotesBlock.defaults.push(2);
-
-    var skipNotesBlock = new ProtoBlock('skipnotes');
-    skipNotesBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['skipnotes'] = skipNotesBlock;
-    skipNotesBlock.staticLabels.push(_('skip notes'));
-    skipNotesBlock.adjustWidthToLabel();
-    skipNotesBlock.flowClampOneArgBlock();
-    skipNotesBlock.defaults.push(2);
-    
     var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
     rhythmicdotBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
@@ -318,6 +302,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatFactorBlock.flowClampOneArgBlock();
     beatFactorBlock.defaults.push(2);
 
+    var duplicateNotesBlock = new ProtoBlock('duplicatenotes');
+    duplicateNotesBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['duplicatenotes'] = duplicateNotesBlock;
+    duplicateNotesBlock.staticLabels.push(_('duplicate notes'));
+    duplicateNotesBlock.adjustWidthToLabel();
+    duplicateNotesBlock.flowClampOneArgBlock();
+    duplicateNotesBlock.defaults.push(2);
+
+    var skipNotesBlock = new ProtoBlock('skipnotes');
+    skipNotesBlock.palette = palettes.dict['notes'];
+    blocks.protoBlockDict['skipnotes'] = skipNotesBlock;
+    skipNotesBlock.staticLabels.push(_('skip notes'));
+    skipNotesBlock.adjustWidthToLabel();
+    skipNotesBlock.flowClampOneArgBlock();
+    skipNotesBlock.defaults.push(2);
+    
     var setbpmBlock = new ProtoBlock('setbpm');
     setbpmBlock.palette = palettes.dict['notes'];
     blocks.protoBlockDict['setbpm'] = setbpmBlock;
