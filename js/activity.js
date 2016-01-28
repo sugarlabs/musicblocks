@@ -1954,8 +1954,8 @@ define(function(require) {
         
         function doRecord() {
 		//Keyboard press for Taking input from keyboard for generating the Pitch blocks.
-			var beatValue = String(1/4);
-            var prevCount = 1;
+			logo.polySynth.toMaster();
+			var prevCount = 1;
             var count = 2;
             var doRec = true;
             var noteDB = [];
@@ -1967,43 +1967,54 @@ define(function(require) {
             document.addEventListener("keydown", function(event) {
                 if (doRec) {
                     switch (event.keyCode) {
+					
                         case 65: //C
                             noteDB.push('do');
-							//FIXME:
-							//logo.polySynth.triggerAttackRelease('do4',beatvalue);
-                            break;
+							logo.polySynth.triggerAttackRelease('C4',0.5);
+							break;
                         case 87: //C#
                             noteDB.push('do♯');
+							logo.polySynth.triggerAttackRelease('C#4',0.5);
                             break;
                         case 83: //D
                             noteDB.push('re');
+							logo.polySynth.triggerAttackRelease('D4',0.5);
                             break;
                         case 69: //D#
                             noteDB.push('re♯');
+							logo.polySynth.triggerAttackRelease('D#4',0.5);
                             break;
                         case 68: //E
                             noteDB.push('mi');
+							logo.polySynth.triggerAttackRelease('E4',0.5);
                             break;
                         case 70: //F
                             noteDB.push('fa');
+							logo.polySynth.triggerAttackRelease('F4',0.5);
                             break;
                         case 84: //F#
                             noteDB.push('fa♯');
+							logo.polySynth.triggerAttackRelease('F#4',0.5);
                             break;
                         case 71: //G
                             noteDB.push('sol');
+							logo.polySynth.triggerAttackRelease('G4',0.5);
                             break;
                         case 89: //G#
                             noteDB.push('sol♯');
+							logo.polySynth.triggerAttackRelease('G#4',0.5);
                             break;
                         case 72: //A
                             noteDB.push('la');
+							logo.polySynth.triggerAttackRelease('A4',0.5);
                             break;
                         case 85: //A#
                             noteDB.push('la♯');
+							logo.polySynth.triggerAttackRelease('A#4',0.5);
                             break;
                         case 74: //B
                             noteDB.push('ti');
+							logo.polySynth.triggerAttackRelease('B4',0.5);
                             break;
                         case 13:
                             doRec = false;
@@ -2030,7 +2041,7 @@ define(function(require) {
                             blocks.loadNewBlocks(dataObj);
                             noteDB = [];
                             break;
-                    } 
+                    }
                 }
             }, false);
 
