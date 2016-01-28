@@ -236,8 +236,9 @@ define(function (require) {
             [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
-            [_('Save project'), _('Save your project to a file.'), 'header-icons/save-button.svg'],
             [_('Load project from files'), _('You can also load projects from the file system.'), 'header-icons/open-button.svg'],
+            [_('Save project'), _('Save your project to a file.'), 'header-icons/save-button.svg'],
+            [_('Save sheet music'), _('Save your project to as a Lilypond file.'), 'header-icons/save-lilypond.svg'],
             [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'header-icons/copy-button.svg'],
             [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'header-icons/paste-disabled-button.svg'],
             [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'header-icons/save-blocks-button.svg'],
@@ -600,9 +601,9 @@ define(function (require) {
                         obj = processRawPluginData(reader.result, palettes, blocks, errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList);
                         // Save plugins to local storage.
                         if (obj != null) {
-                            var foo = preparePluginExports(obj);
-                            console.log(foo);
-                            storage.plugins = foo; // preparePluginExports(obj));
+                            var pluginObj = preparePluginExports(obj);
+                            console.log(pluginObj);
+                            storage.plugins = pluginObj; // preparePluginExports(obj));
                         }
 
                         // Refresh the palettes.
@@ -640,14 +641,6 @@ define(function (require) {
             var URL = window.location.href;
             var projectName = null;
             var runProjectOnLoad = false;
-            try {
-                httpGet(null);
-                console.log('running from server or the user can access to examples.');
-                server = true;
-            } catch (e) {
-                console.log('running from filesystem or the connection isnt secure');
-                server = false;
-            }
 
             setupAndroidToolbar();
 
@@ -733,7 +726,7 @@ define(function (require) {
             this.document.onkeydown = keyPressed;
         }
 
-        function setupBlocksContainerEvents() {
+	function setupBlocksContainerEvents() {
             var moving = false;
 
             stage.on('stagemousemove', function (event) {
@@ -1237,6 +1230,18 @@ define(function (require) {
             window.scroll(0, 0);
         }
 
+        function doLilypond() {
+            console.log('Saving .ly file');
+            logo.lilypondSaveOnly = true;
+            logo.lilypondOutput = LILYPONDHEADER; 
+            logo.lilypondNotes = {};
+            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                logo.lilypondStaging[turtle] = [];
+                turtles.turtleList[turtle].doClear();
+            }
+            logo.runLogoCommands();
+        }
+
         window.prepareExport = prepareExport
         window.saveLocally = saveLocally
 
@@ -1304,6 +1309,15 @@ define(function (require) {
                     projectName += '.tb';
                 }
                 try {
+                    try {
+                        httpGet(null);
+                        console.log('running from server or the user can access to examples.');
+                        server = true;
+                    } catch (e) {
+                        console.log('running from filesystem or the connection isnt secure');
+                        server = false;
+                    }
+
                     if (server) {
                         var rawData = httpGet(projectName);
                         console.log('receiving ' + rawData);
@@ -1834,8 +1848,9 @@ define(function (require) {
             // Misc. other buttons
             var menuNames = [
                 ['planet', doOpenSamples],
-                ['save', doSave],
                 ['open', doLoad],
+                ['save', doSave],
+                ['lilypond', doLilypond],
                 ['paste-disabled', pasteStack],
                 ['Cartesian', doCartesian],
                 ['polar', doPolar],
