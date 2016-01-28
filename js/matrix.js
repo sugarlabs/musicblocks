@@ -45,6 +45,10 @@ var MATRIXRHYTHMCELLCOLOR = '#c8c8c8';
 var MATRIXBUTTONCOLORHOVER = '#c894e0';
 var MATRIXNOTECELLCOLORHOVER = '#c2e820';
 
+var MATRIXSOLFEWIDTH = 52;
+var MATRIXBUTTONHEIGHT = 40;
+var MATRIXSOLFEHEIGHT = 30;
+
 function Matrix() {
     this.arr = [];
     this.secondsPerBeat = 1;
@@ -117,8 +121,8 @@ function Matrix() {
         x.style.textAlign = 'center';
 
         var matrixDiv = document.getElementById('matrix');
-        matrixDiv.style.paddingTop = 40 * this.cellScale + 4 + 'px';
-        matrixDiv.style.paddingLeft = 54 * this.cellScale + 4 + 'px';
+        matrixDiv.style.paddingTop = MATRIXBUTTONHEIGHT * this.cellScale + 4 + 'px';
+        matrixDiv.style.paddingLeft = MATRIXSOLFEWIDTH * this.cellScale + 2 + 'px';
         matrixDiv.appendChild(x);
         matrixDivPosition = matrixDiv.getBoundingClientRect();
 
@@ -126,20 +130,20 @@ function Matrix() {
         var header = table.createTHead();
         var row = header.insertRow(0);
         row.style.position = "fixed";
-        row.style.left = matrixDivPosition.left+"px";
-        row.style.top = matrixDivPosition.top+"px";
+        row.style.left = matrixDivPosition.left + "px";
+        row.style.top = matrixDivPosition.top + "px";
 
         var cell = row.insertCell(-1);
         cell.style.fontSize = this.cellScale * 100 + '%';
         cell.innerHTML = '<b>' + _('Solfa') + '</b>';
-        cell.style.width = 52 + 'px';
-        cell.style.height = 40 * this.cellScale + 'px';
+        cell.style.width = MATRIXSOLFEWIDTH * this.cellScale + 'px';
+        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
 
         var cell = row.insertCell(1);
         var iconSize = this.cellScale * 24;
         cell.innerHTML = '<img src="header-icons/play-button.svg" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">';
-        cell.style.height = 40 * this.cellScale + 'px';
+        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             logo.playMatrix();
@@ -153,7 +157,7 @@ function Matrix() {
 
         var cell = row.insertCell(2);
         cell.innerHTML = '<img src="header-icons/download.svg" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">';
-        cell.style.height = 40 * this.cellScale + 'px';
+        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             logo.saveMatrix();
@@ -167,7 +171,7 @@ function Matrix() {
 
         var cell = row.insertCell(3);
         cell.innerHTML = '<img src="header-icons/erase-button.svg" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '">';
-        cell.style.height = 40 * this.cellScale + 'px';
+        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             logo.clearMatrix();
@@ -181,7 +185,7 @@ function Matrix() {
 
         var cell = row.insertCell(4);
         cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">';
-        cell.style.height = 40 * this.cellScale + 'px';
+        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             document.getElementById('matrix').style.visibility = 'hidden';
@@ -209,9 +213,9 @@ function Matrix() {
             }
             cell.style.fontSize = this.cellScale * 100 + '%';
             cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
-            cell.style.height = 30 * this.cellScale + 'px';
+            cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
             cell.style.position = "fixed";
-            cell.style.width = 52 + 'px';
+            cell.style.width = MATRIXSOLFEWIDTH * this.cellScale + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
             cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
         }
@@ -219,10 +223,10 @@ function Matrix() {
         var row = header.insertRow(this.solfegeNotes.length + 1);
         var cell = row.insertCell(0);
         cell.style.fontSize = this.cellScale * 50 + '%';
-        cell.innerHTML = _('rhythmic note values');
+        cell.innerHTML = _('rhythmic note values').replace(/ /g, '<br>');
         cell.style.position = "fixed";
-        cell.style.height = 30 * this.cellScale + 'px';
-        cell.style.width = 52 + 'px';
+        cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
+        cell.style.width = MATRIXSOLFEWIDTH * this.cellScale + 'px';
         cell.style.left = matrixDivPosition.left + 2 + 'px';
         cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
@@ -311,7 +315,7 @@ function Matrix() {
 
         // The bottom row contains the rhythm note values
         cell = table.rows[table.rows.length - 1].insertCell(-1);
-        cell.style.height = 30 * this.cellScale + 'px';
+        cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
 
         var noteSymbol = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', '64': '&#x1D163;', '128': '&#x1D164;'};
         var noteValue = param[0][1] / param[0][0];
@@ -349,7 +353,7 @@ function Matrix() {
             if (!this.matrixHasTuplets || i == tupletCol) {
                 cell = row.insertCell(i + 1);
                 cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-                cell.style.height = 30 * this.cellScale + 'px';
+                cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
                 if (i == tupletCol) {
                     cell.style.fontSize = this.cellScale * 100 + '%';
                     cell.innerHTML = numberOfNotes.toString();
@@ -385,7 +389,7 @@ function Matrix() {
             // Add cell for tuplet note values
             cell = row.insertCell(-1);
             cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-            cell.style.height = 30 * this.cellScale + 'px';
+            cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
             // Add tuplet note values
             if (i >= tupletCol) {
                 var j = i - tupletCol;
@@ -444,7 +448,7 @@ function Matrix() {
             for (var i = 1; i <= rowCount; i++) {
                 var row = table.rows[i];
                 var cell = row.insertCell(-1);
-                cell.style.height = 30 * this.cellScale + 'px';
+                cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
                 if (i == rowCount) {
                     cell.style.fontSize = this.cellScale * 100 + '%';
                     cell.innerHTML = noteValueToDisplay;
