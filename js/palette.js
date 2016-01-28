@@ -1445,7 +1445,16 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
         if (moved) {
             moved = false;
             palette.draggingProtoBlock = false;
-            if (palette.name == 'myblocks') {
+
+            if (blkname == 'note') {
+                // Special glue for Note Blocks: load them with an
+                // embedded Pitch block
+                var obj = [[0, "note", palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ["number", {"value": 4}], 0, 0, [0]], [2, "pitch", 0, 0, [0, 3, 4, null]], [3, ["solfege", {"value": "re"}], 0, 0, [2]], [4, ["number", {"value": 4}], 0, 0, [2]]];
+                paletteBlocks.loadNewBlocks(obj);
+                var thisBlock = paletteBlocks.blockList.length - 1;
+                var topBlk = paletteBlocks.findTopBlock(thisBlock);
+                restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+            } else if (palette.name == 'myblocks') {
                 // If we are on the myblocks palette, it is a macro.
                 var macroName = blkname.replace('macro_', '');
 
