@@ -252,7 +252,7 @@ define(function (require) {
             [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-button.svg'],
             [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
             [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
-            [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-color.svg']
+            [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
         ]
 
         pluginsImages = {};
