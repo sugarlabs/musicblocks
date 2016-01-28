@@ -790,16 +790,18 @@ function Matrix() {
 
                 console.log('converting ' + note[1] + ' to ' + obj[0] + '/' + obj[1]);
 
-                // Connect the Note block flow to the vspace block below.
-                newStack[idx][4][2] = idx + 4;
+                // Add a vspace to prevent divide block from obscuring the pitch block.
+		newStack.push([idx + 1, 'vspace', 0, 0, [idx, idx + 5]]);
 
                 // Display the dotted note as a fraction.
-                newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
-                newStack.push([idx + 2, ['number', {'value': obj[0]}], 0, 0, [idx + 1]]);
-		newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
+                newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+                newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
+		newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
 
-                // Add a vspace to prevent divide block from obscuring the pitch block.
-		newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                // Connect the Note block flow to the divide and vspace blocks.
+                newStack[idx][4][1] = idx + 2;
+                newStack[idx][4][2] = idx + 1;
+
                 var delta = 5;
             } else {
                 newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
@@ -813,7 +815,7 @@ function Matrix() {
                 // We need to point to the previous note or pitch block.
                 if (j == 0) {
                     if (delta == 5) {
-                        var previousBlock = idx + 4;  // Note block
+                        var previousBlock = idx + 1;  // Vspace block
                     } else {
                         var previousBlock = idx;  // Note block
 		    }
