@@ -269,10 +269,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     keyBlock.adjustWidthToLabel();
     keyBlock.parameterBlock();
 
-    // Notes palette
+    // Rhythm palette
 
     var noteBlock = new ProtoBlock('note');
-    noteBlock.palette = palettes.dict['notes'];
+    noteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note'] = noteBlock;
     noteBlock.staticLabels.push(_('note'));
     noteBlock.adjustWidthToLabel();
@@ -280,14 +280,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.defaults.push(4);
 
     var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
-    rhythmicdotBlock.palette = palettes.dict['notes'];
+    rhythmicdotBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
     rhythmicdotBlock.staticLabels.push(_('dot'));
     rhythmicdotBlock.adjustWidthToLabel();
     rhythmicdotBlock.flowClampZeroArgBlock();
 
     var beatFactorBlock = new ProtoBlock('multiplybeatfactor');
-    beatFactorBlock.palette = palettes.dict['notes'];
+    beatFactorBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['multiplybeatfactor'] = beatFactorBlock;
     beatFactorBlock.staticLabels.push(_('multiply beat'));
     beatFactorBlock.adjustWidthToLabel();
@@ -295,7 +295,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatFactorBlock.defaults.push(2);
 
     var beatFactorBlock = new ProtoBlock('dividebeatfactor');
-    beatFactorBlock.palette = palettes.dict['notes'];
+    beatFactorBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['dividebeatfactor'] = beatFactorBlock;
     beatFactorBlock.staticLabels.push(_('divide beat'));
     beatFactorBlock.adjustWidthToLabel();
@@ -303,7 +303,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatFactorBlock.defaults.push(2);
 
     var duplicateNotesBlock = new ProtoBlock('duplicatenotes');
-    duplicateNotesBlock.palette = palettes.dict['notes'];
+    duplicateNotesBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatenotes'] = duplicateNotesBlock;
     duplicateNotesBlock.staticLabels.push(_('duplicate notes'));
     duplicateNotesBlock.adjustWidthToLabel();
@@ -311,7 +311,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     duplicateNotesBlock.defaults.push(2);
 
     var skipNotesBlock = new ProtoBlock('skipnotes');
-    skipNotesBlock.palette = palettes.dict['notes'];
+    skipNotesBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['skipnotes'] = skipNotesBlock;
     skipNotesBlock.staticLabels.push(_('skip notes'));
     skipNotesBlock.adjustWidthToLabel();
@@ -319,20 +319,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     skipNotesBlock.defaults.push(2);
     
     var setbpmBlock = new ProtoBlock('setbpm');
-    setbpmBlock.palette = palettes.dict['notes'];
+    setbpmBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['setbpm'] = setbpmBlock;
     setbpmBlock.staticLabels.push(_('beats per minute'));
     setbpmBlock.adjustWidthToLabel();
     setbpmBlock.flowClampOneArgBlock();
     setbpmBlock.defaults.push(90);
-
-    var noteVolumeBlock = new ProtoBlock('setnotevolume');
-    noteVolumeBlock.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
-    noteVolumeBlock.staticLabels.push(_('set volume'));
-    noteVolumeBlock.adjustWidthToLabel();
-    noteVolumeBlock.oneArgBlock();
-    noteVolumeBlock.defaults.push(50);
 
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['notes'];
@@ -370,13 +362,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     bpmBlock.adjustWidthToLabel();
     bpmBlock.parameterBlock();
 
-    var notevolumeFactor = new ProtoBlock('notevolumefactor');
-    notevolumeFactor.palette = palettes.dict['notes'];
-    blocks.protoBlockDict['notevolumefactor'] = notevolumeFactor;
-    notevolumeFactor.staticLabels.push(_('note volume'));
-    notevolumeFactor.adjustWidthToLabel();
-    notevolumeFactor.parameterBlock();
-
     // Tone (utility) palette
 
     var meter = new ProtoBlock('meter');
@@ -408,6 +393,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.staticLabels.push(_('play backward'));
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
+
+    var noteVolumeBlock = new ProtoBlock('setnotevolume');
+    noteVolumeBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
+    noteVolumeBlock.staticLabels.push(_('set volume'));
+    noteVolumeBlock.adjustWidthToLabel();
+    noteVolumeBlock.oneArgBlock();
+    noteVolumeBlock.defaults.push(50);
+
+    var notevolumeFactor = new ProtoBlock('notevolumefactor');
+    notevolumeFactor.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['notevolumefactor'] = notevolumeFactor;
+    notevolumeFactor.staticLabels.push(_('note volume'));
+    notevolumeFactor.adjustWidthToLabel();
+    notevolumeFactor.parameterBlock();
 
     var lilypondBlock = new ProtoBlock('savelilypond');
     lilypondBlock.palette = palettes.dict['tone'];

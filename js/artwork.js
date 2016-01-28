@@ -118,7 +118,7 @@ var BORDER = '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120">'
 var PALETTECOLORS = {
     'matrix': [37.5, 70, 50],
     'pitch': [37.5, 70, 50],
-    'notes' : [12.5, 60, 80],
+    'rhythm' : [12.5, 60, 80],
     'tone' : [57.5, 50, 28],
     'turtle': [37.5, 70, 50],
     'pen': [57.5, 50, 28],
@@ -191,7 +191,7 @@ var TONEPALETTEICON = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <s
 
 var PALETTEICONS = {
     'matrix' : MATRIXPALETTEICON,
-    'notes' : NOTESPALETTEICON,
+    'rhythm' : NOTESPALETTEICON,
     'pitch' : PITCHPALETTEICON,
     'tone' : TONEPALETTEICON,
     'turtle': TURTLEPALETTEICON,
