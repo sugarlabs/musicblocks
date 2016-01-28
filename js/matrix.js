@@ -87,8 +87,8 @@ function Matrix() {
         // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
         this.cellScale = w / 1200;
-        document.getElementById('matrix').style.width = Math.floor(w / 2) + "px";
-        document.getElementById('matrix').style.overflowX = "auto";
+        document.getElementById('matrix').style.width = Math.floor(w / 2) + 'px';
+        document.getElementById('matrix').style.overflowX = 'auto';
 
         console.log('notes ' + this.solfegeNotes + ' octave ' + this.solfegeOctaves + ' transpositions ' + this.solfegeTranspositions);
 
@@ -129,9 +129,9 @@ function Matrix() {
         var table = document.getElementById('myTable');
         var header = table.createTHead();
         var row = header.insertRow(0);
-        row.style.position = "fixed";
-        row.style.left = matrixDivPosition.left + "px";
-        row.style.top = matrixDivPosition.top + "px";
+        row.style.position = 'fixed';
+        row.style.left = matrixDivPosition.left + 'px';
+        row.style.top = matrixDivPosition.top + 'px';
 
         var cell = row.insertCell(-1);
         cell.style.fontSize = this.cellScale * 100 + '%';
@@ -214,7 +214,7 @@ function Matrix() {
             cell.style.fontSize = this.cellScale * 100 + '%';
             cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
-            cell.style.position = "fixed";
+            cell.style.position = 'fixed';
             cell.style.width = MATRIXSOLFEWIDTH * this.cellScale + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
             cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
@@ -224,7 +224,7 @@ function Matrix() {
         var cell = row.insertCell(0);
         cell.style.fontSize = this.cellScale * 50 + '%';
         cell.innerHTML = _('rhythmic note values').replace(/ /g, '<br>');
-        cell.style.position = "fixed";
+        cell.style.position = 'fixed';
         cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
         cell.style.width = MATRIXSOLFEWIDTH * this.cellScale + 'px';
         cell.style.left = matrixDivPosition.left + 2 + 'px';
@@ -730,7 +730,7 @@ function Matrix() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
         var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
-        var newStack = [[0, ["action", {"collapsed":false}], 100, 100, [null, 1, null, null]], [1, ["text", {"value":"chunk"}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': 'chunk'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         console.log('SAVE MATRIX!!!');
         for (var i = 0; i < this.notesToPlay.length; i++)
