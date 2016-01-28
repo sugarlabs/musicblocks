@@ -286,6 +286,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmicdotBlock.adjustWidthToLabel();
     rhythmicdotBlock.flowClampZeroArgBlock();
 
+    var tieBlock = new ProtoBlock('tie');
+    tieBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['tie'] = tieBlock;
+    tieBlock.staticLabels.push(_('tie'));
+    tieBlock.adjustWidthToLabel();
+    tieBlock.flowClampZeroArgBlock();
+
     var beatFactorBlock = new ProtoBlock('multiplybeatfactor');
     beatFactorBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['multiplybeatfactor'] = beatFactorBlock;
