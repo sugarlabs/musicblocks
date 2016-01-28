@@ -600,7 +600,7 @@ function Matrix() {
         }
 
         if (note[0] != 'R') {
-            synth.triggerAttackRelease(note, this.logo.bpmFactor / noteValue);
+            synth.triggerAttackRelease(note, this.logo.defaultBPMFactor / noteValue);
         }
 
         for (var i = 1; i < this.notesToPlayDirected.length; i++) {
@@ -621,9 +621,9 @@ function Matrix() {
                     note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
                 }
                 if(note != 'R') {
-                    synth.triggerAttackRelease(note, that.logo.bpmFactor / noteValue);
+                    synth.triggerAttackRelease(note, that.logo.defaultBPMFactor / noteValue);
                 }
-            }, that.logo.bpmFactor * 1000 * time);
+            }, that.logo.defaultBPMFactor * 1000 * time);
         }
     }
 

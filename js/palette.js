@@ -1,4 +1,4 @@
-// Copyright (c) 2014,15 Walter Bender
+// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -18,7 +18,7 @@ var PALETTELEFTMARGIN = 10;
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-var BUILTINPALETTES = ['matrix', 'notes', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
+var BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
 
 
 function maxPaletteHeight(menuSize, scale) {
@@ -354,7 +354,7 @@ var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
                    'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
                    'dividebeatfactor', 'notation', 'playfwd', 'playbwd',
                    'duplicatenotes', 'fill', 'hollowline', 'drum', 'osctime',
-		   'invert', 'matrix', 'skipnotes'];
+		   'invert', 'matrix', 'skipnotes', 'setbpm'];
 
 // Kinda a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {
@@ -1218,15 +1218,16 @@ var blocks = undefined;
 function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan, b) {
     // Instantiate the palettes object on first load.
     var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan).
-    add('matrix').
-    add('notes').
+    add('rhythm').
+    add('pitch').
     add('actions').
     add('boxes').
+    add('flow').
+    add('matrix').
     add('turtle').
     add('pen').
     add('number').
     add('boolean').
-    add('flow').
     add('media').
     add('sensors').
     add('heap').
@@ -1444,7 +1445,16 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
         if (moved) {
             moved = false;
             palette.draggingProtoBlock = false;
-            if (palette.name == 'myblocks') {
+
+            if (blkname == 'note') {
+                // Special glue for Note Blocks: load them with an
+                // embedded Pitch block
+                var obj = [[0, "note", palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ["number", {"value": 4}], 0, 0, [0]], [2, "pitch", 0, 0, [0, 3, 4, null]], [3, ["solfege", {"value": "re"}], 0, 0, [2]], [4, ["number", {"value": 4}], 0, 0, [2]]];
+                paletteBlocks.loadNewBlocks(obj);
+                var thisBlock = paletteBlocks.blockList.length - 1;
+                var topBlk = paletteBlocks.findTopBlock(thisBlock);
+                restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+            } else if (palette.name == 'myblocks') {
                 // If we are on the myblocks palette, it is a macro.
                 var macroName = blkname.replace('macro_', '');
 
