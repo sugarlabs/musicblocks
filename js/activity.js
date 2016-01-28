@@ -1208,6 +1208,7 @@ console.log(txt);
         }
 
         function doOpenSamples() {
+            localStorage.setItem("isMatrixHidden",document.getElementById('matrix').style.visibility);
             console.log('save locally');
             saveLocally();
             thumbnails.show()
