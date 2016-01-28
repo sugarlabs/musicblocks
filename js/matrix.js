@@ -752,15 +752,71 @@ function Matrix() {
                 newStack[endOfStackIdx][4][n - 1] = idx;
             }
             var endOfStackIdx = idx;
-            newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
+
+            // If it is a dotted note, use a divide block.
+            if (parseInt(note[1]) < note[1]) {
+                function toFraction(d) {
+                    // Convert float to its approximate fractional representation.
+                    if (d > 1) {
+                        var flip = true;
+                        d = 1 / d;
+                    } else {
+                        var flip = false;
+                    }
+
+                    var df = 1.0;
+                    var top = 1;
+                    var bot = 1;
+
+                    while (Math.abs(df - d) > 0.00000001) {
+                        if (df < d) {
+                            top += 1
+                        } else {
+                            bot += 1
+                            top = parseInt(d * bot);
+                        }
+                        df = top / bot;
+                    }
+
+                    if (flip) {
+                        var tmp = top;
+                        top = bot;
+                        bot = tmp;
+                    }
+
+                    return([top, bot]);
+                }
+                var obj = toFraction(note[1]);
+
+                console.log('converting ' + note[1] + ' to ' + obj[0] + '/' + obj[1]);
+
+                // Connect the Note block flow to the vspace block below.
+                newStack[idx][4][2] = idx + 4;
+
+                // Display the dotted note as a fraction.
+                newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
+                newStack.push([idx + 2, ['number', {'value': obj[0]}], 0, 0, [idx + 1]]);
+		newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
+
+                // Add a vspace to prevent divide block from obscuring the pitch block.
+		newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                var delta = 5;
+            } else {
+                newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
+                var delta = 2;
+            }
             // Add the pitch blocks to the Note block
             for (var j = 0; j < note[0].length; j++) {
 
-                var thisBlock = idx + 2 + (j * 3);
+                var thisBlock = idx + delta + (j * 3);
 
                 // We need to point to the previous note or pitch block.
                 if (j == 0) {
-                    var previousBlock = idx;  // Note block
+                    if (delta == 5) {
+                        var previousBlock = idx + 4;  // Note block
+                    } else {
+                        var previousBlock = idx;  // Note block
+		    }
                 } else {
                     var previousBlock = thisBlock - 3;  // Pitch block
                 }
