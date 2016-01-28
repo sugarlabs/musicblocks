@@ -1943,11 +1943,11 @@ define(function(require) {
             var p = new PopdownPalette(palettes);
             p.popdown();
         }
-        
+
         function doRecord() {
-		//Keyboard press for Taking input from keyboard for generating the Pitch blocks.
-			logo.polySynth.toMaster();
-			var prevCount = 1;
+            //Keyboard press for Taking input from keyboard for generating the Pitch blocks.
+            logo.polySynth.toMaster();
+            var prevCount = 1;
             var count = 2;
             var doRec = true;
             var noteDB = [];
@@ -1959,58 +1959,58 @@ define(function(require) {
             document.addEventListener("keydown", function(event) {
                 if (doRec) {
                     switch (event.keyCode) {
-					
+
                         case 65: //C
                             noteDB.push('do');
-							logo.polySynth.triggerAttackRelease('C4',0.5);
-							break;
+                            logo.polySynth.triggerAttackRelease('C4', 0.5);
+                            break;
                         case 87: //C#
                             noteDB.push('do♯');
-							logo.polySynth.triggerAttackRelease('C#4',0.5);
+                            logo.polySynth.triggerAttackRelease('C#4', 0.5);
                             break;
                         case 83: //D
                             noteDB.push('re');
-							logo.polySynth.triggerAttackRelease('D4',0.5);
+                            logo.polySynth.triggerAttackRelease('D4', 0.5);
                             break;
                         case 69: //D#
                             noteDB.push('re♯');
-							logo.polySynth.triggerAttackRelease('D#4',0.5);
+                            logo.polySynth.triggerAttackRelease('D#4', 0.5);
                             break;
                         case 68: //E
                             noteDB.push('mi');
-							logo.polySynth.triggerAttackRelease('E4',0.5);
+                            logo.polySynth.triggerAttackRelease('E4', 0.5);
                             break;
                         case 70: //F
                             noteDB.push('fa');
-							logo.polySynth.triggerAttackRelease('F4',0.5);
+                            logo.polySynth.triggerAttackRelease('F4', 0.5);
                             break;
                         case 84: //F#
                             noteDB.push('fa♯');
-							logo.polySynth.triggerAttackRelease('F#4',0.5);
+                            logo.polySynth.triggerAttackRelease('F#4', 0.5);
                             break;
                         case 71: //G
                             noteDB.push('sol');
-							logo.polySynth.triggerAttackRelease('G4',0.5);
+                            logo.polySynth.triggerAttackRelease('G4', 0.5);
                             break;
                         case 89: //G#
                             noteDB.push('sol♯');
-							logo.polySynth.triggerAttackRelease('G#4',0.5);
+                            logo.polySynth.triggerAttackRelease('G#4', 0.5);
                             break;
                         case 72: //A
                             noteDB.push('la');
-							logo.polySynth.triggerAttackRelease('A4',0.5);
+                            logo.polySynth.triggerAttackRelease('A4', 0.5);
                             break;
                         case 85: //A#
                             noteDB.push('la♯');
-							logo.polySynth.triggerAttackRelease('A#4',0.5);
+                            logo.polySynth.triggerAttackRelease('A#4', 0.5);
                             break;
                         case 74: //B
                             noteDB.push('ti');
-							logo.polySynth.triggerAttackRelease('B4',0.5);
+                            logo.polySynth.triggerAttackRelease('B4', 0.5);
                             break;
                         case 13:
                             doRec = false;
-                            for (var i = noteDB.length-1; i >= 0; i--) {
+                            for (var i = noteDB.length - 1; i >= 0; i--) {
                                 dataObj.push([count, 'pitch', 0, 0, [prevCount, count + 1, count + 2, count + 3]]);
                                 dataObj.push([count + 1, ['solfege', {
                                     value: noteDB[i]
