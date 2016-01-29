@@ -87,7 +87,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.saveTimeout = 0;
 
     // Music-related attributes
-    // TODO: Move the turtle-specific attributes to the turtle object itself???
 
     // matrix
     this.showMatrix = false;
@@ -99,11 +98,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     // parameters used by pitch
     this.transposition = {};
     this.beatFactor = {};
-    // TODO: better names for these lists
-    this.noteNotes = {};
+
+    // parameters used by notes
+    this.notePitches = {};
     this.noteOctaves = {};
     this.noteTranspositions = {};
     this.noteBeatValues = {};
+
+    // status of note being played
     this.currentNotes = {};
     this.currentOctaves = {};
 
@@ -482,7 +484,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.endOfFlowActions[turtle] = {};
             this.doBlocks[turtle] = [];
             this.transposition[turtle] = 0;
-            this.noteNotes[turtle] = [];
+            this.notePitches[turtle] = [];
             this.noteOctaves[turtle] = [];
             this.currentNotes[turtle] = 'G';
             this.currentOctaves[turtle] = 4;
@@ -1769,7 +1771,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         matrix.solfegeOctaves.push(octave);
                     }    
                 } else {
-                    logo.noteNotes[turtle].push(note);
+                    logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
                     if (!(logo.invertList[turtle].length === 0)) {
                         var len = logo.invertList[turtle].length;
@@ -1801,7 +1803,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'rhythm':
                 if (logo.inMatrix) {
                     for (var i = 0; i < args[0]; i++) {
-                        logo.processNote(args[1], turtle);
+                        logo.processNote(args[1], blk, turtle);
                     }
                 } else {
                     console.log('rhythm block only used inside matrix');
@@ -1814,25 +1816,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
             case 'wholeNote':
-                logo.processNote(1, turtle);
+                logo.processNote(1, blk, turtle);
                 break;
             case 'halfNote':
-                logo.processNote(2, turtle);
+                logo.processNote(2, blk, turtle);
                 break;
             case 'quarterNote':
-                logo.processNote(4, turtle);
+                logo.processNote(4, blk, turtle);
                 break;
             case 'eighthNote':
-                logo.processNote(8, turtle);
+                logo.processNote(8, blk, turtle);
                 break;
             case 'sixteenthNote':
-                logo.processNote(16, turtle);
+                logo.processNote(16, blk, turtle);
                 break;
             case 'thirtysecondNote':
-                logo.processNote(32, turtle);
+                logo.processNote(32, blk, turtle);
                 break;
             case 'sixtyfourthNote':
-                logo.processNote(64, turtle);
+                logo.processNote(64, blk, turtle);
                 break;
             // FIXME: What is this supposed to do?
             case 'meter':
@@ -1849,13 +1851,23 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // the use of the global timer in Tone.js for more
                 // accuracy.
 
+                // A note can contain multiple pitch blocks to create
+                // a chord. The chord is accumuated in these arrays,
+                // which are used when we play the note.
                 logo.oscList[turtle] = [];
-                logo.noteNotes[turtle] = [];
+                logo.notePitches[turtle] = [];
                 logo.noteOctaves[turtle] = [];
                 logo.noteTranspositions[turtle] = [];
                 logo.noteBeatValues[turtle] = [];
 
-                var noteBeatValue = args[0];
+                // Ensure that note duration is positive.
+                if (args[0] < 0) {
+                    logo.errorMsg(_('Note value must be greater than 0'), blk);
+                    var noteBeatValue = 0;
+                } else {
+                    var noteBeatValue = args[0];
+                }
+
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -1863,220 +1875,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
                 var listener = function (event) {
-                    if (logo.inMatrix) {
-                        logo.processNote(noteBeatValue, turtle);
-                    } else {
-                        // We start the music clock as the first note
-                        // is being played.
-                        if (logo.firstNoteTime === null) {
-                            var d = new Date();
-                            logo.firstNoteTime = d.getTime();
-                        }
-                        // Calculate a lag: In case this turtle has
-                        // fallen behind, we need to catch up.
-                        var d = new Date();
-                        var elapsedTime = (d.getTime() - logo.firstNoteTime) / 1000; // (d.getTime() - logo.time) / 1000;
-                        var turtleLag = elapsedTime - logo.turtleTime[turtle];
-
-                        if (logo.bpm[turtle].length > 0) {
-                            var bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                        } else {
-                            var bpmFactor = TONEBPM / TARGETBPM;
-                        }
- 
-                        // If we are in a tie, depending upon parity,
-                        // we either add the duration from the
-                        // previous note to the current note, or we
-                        // cache the duration and set the wait to
-                        // zero.
-                        // FIXME: Will not work when mixing osctimes
-                        // with noteBeatValues.
-                        // FIXME: Will not work when using dup and skip.
-                        if (logo.tie[turtle]) {
-                            if (logo.tieCarryOver[turtle] === 0) {
-                                logo.tieCarryOver[turtle] = noteBeatValue;
-                                noteBeatValue = 0;
-                            } else {
-                                if (logo.blocks.blockList[blk].name === 'osctime') {
-                                    noteBeatValue += logo.tieCarryOver[turtle];
-                                } else {
-                                    noteBeatValue = 1 / ((1 / noteBeatValue) + (1 / logo.tieCarryOver[turtle]));
-                                }
-                                logo.tieCarryOver[turtle] = 0;
-                            }
-                        }
-
-                        // duration is the duration of the note to be
-                        // played. doWait sets the wait time for the
-                        // turtle before the next block is executed.
-                        if (logo.blocks.blockList[blk].name === 'osctime') {
-                            var duration = noteBeatValue;  // microseconds
-                            logo.turtleTime[turtle] += ((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle];
-                            if (!logo.lilypondSaveOnly) {
-                                logo.doWait(turtle, Math.max(((duration + logo.noteDelay) / 1000) * logo.duplicateFactor[turtle] - turtleLag, 0));
-                            }
-                        } else {
-                            var duration = noteBeatValue * logo.beatFactor[turtle];  // beat value
-                            if (duration > 0) {
-                                logo.turtleTime[turtle] += ((bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle];
-                            }
-                            if (!logo.lilypondSaveOnly) {
-                                if (duration > 0) {
-                                    logo.doWait(turtle, Math.max(((bpmFactor / duration) + (logo.noteDelay / 1000)) * logo.duplicateFactor[turtle] - turtleLag, 0));
-                                }
-                            }
-                        }
-
-                        var waitTime = 0;
-                        for (var j = 0; j < logo.duplicateFactor[turtle]; j++) {
-                            if (logo.skipFactor[turtle] > 1 && logo.skipIndex[turtle] % logo.skipFactor[turtle] > 0) {
-                                logo.skipIndex[turtle] += 1;
-                                // Lessen delay time by one note since
-                                // we are skipping a note.
-                                // FIXME: TAKE INTO ACCOUNT OSCTIME
-                                if (duration > 0) {
-                                    logo.waitTimes[turtle] -= ((bpmFactor / duration) + (logo.noteDelay / 1000)) * 1000;
-                                    if (logo.waitTimes[turtle] < 0) {
-                                        logo.waitTimes[turtle] = 0;
-                                    }
-                                }
-                                continue;
-                            }
-                            if (logo.skipFactor[turtle] > 1) {
-                                logo.skipIndex[turtle] += 1;
-                            }
-                            if (j > 0) {
-                                if (logo.blocks.blockList[blk].name === 'osctime') {
-                                    waitTime += duration;
-                                } else {
-                                    if (duration > 0) {
-                                        waitTime += (bpmFactor * 1000 / duration);
-                                    }
-                                }
-                            }
-
-                            playnote = function() {
-                                var notes = [];
-                                var insideChord = -1;
-                                if ((logo.noteNotes[turtle].length + logo.oscList[turtle].length) > 1) {
-                                    if (turtle in logo.lilypondStaging) {
-                                        var insideChord = logo.lilypondStaging[turtle].length + 1;
-                                    } else {
-                                        var insideChord = 1;
-                                    }
-                                }
-
-                                var oscillators = [];
-                                // FIXME: Add tie to notation
-                                if (logo.oscList[turtle].length > 0 && duraction > 0) {
-                                    for (var i = 0; i < logo.oscList[turtle].length; i++) {
-                                        if (!logo.lilypondSaveOnly) {
-                                            oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
-                                        }
-                                        console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
-                                        if (logo.blocks.blockList[blk].name === 'osctime') {
-                                            logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
-                                        } else {
-                                            logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
-                                        }
-                                    }
-
-                                    if (!logo.lilypondSaveOnly && duration > 0) {
-                                        for (var i = 0; i < oscillators.length; i++) {
-                                            oscillators[i].volume.value = logo.polyVolume[turtle] * OSCVOLUMEADJUSTMENT;
-                                            oscillators[i].start();
-                                        }
-                                        if (logo.blocks.blockList[blk].name === 'osctime') {
-                                            var stopTime = duration;
-                                        } else {
-                                            if (duration > 0) {
-                                                var stopTime = bpmFactor * 1000 / duration;
-                                            } else {
-                                                var stopTime = 0;
-                                            }
-                                        }
-                                        setTimeout(function(){
-                                            for (var i = 0; i < oscillators.length; i++) {
-                                                oscillators[i].stop();
-                                            }
-                                        }, stopTime);
-                                    }
-                                }
-                                if (logo.noteNotes[turtle].length > 0) {
-                                    if (!logo.lilypondSaveOnly && duration > 0) {
-                                        if (logo.turtles.turtleList[turtle].drum) {
-                                            logo.drumSynth.toMaster();
-                                        } else {
-                                            logo.polySynth.toMaster();
-                                        }
-                                    }
-
-                                    for (i in logo.noteNotes[turtle]) {
-                                        var noteObj = logo.getNote(logo.noteNotes[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
-                                        var note = noteObj[0] + noteObj[1];
-                                        if (note !== 'R') {
-                                            notes.push(note);
-                                        }
-                                        // FIXME: add tie to notation
-                                        if (duration > 0) {
-                                            if (logo.blocks.blockList[blk].name === 'osctime') {
-                                                logo.updateNotation(note, 1000 / duration, turtle, insideChord);
-                                            } else {
-                                                logo.updateNotation(note, duration, turtle, insideChord);
-                                            }
-                                        }
-                                    }
-
-                                    console.log("notes to play " + notes + ' ' + noteBeatValue);
-                                    if (notes.length > 0) {
-                                        var len = notes[0].length;
-                                        logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
-                                        logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
-                                        if (logo.turtles.turtleList[turtle].drum) {
-                                            for (var i = 0; i < notes.length; i++) {
-                                                // Remove pitch
-                                                notes[i] = 'C2';
-                                            }
-                                        } else {
-                                            for (var i = 0; i < notes.length; i++) {
-                                                notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
-                                            }
-                                        }
-
-                                        // Use the beatValue of the first note in the
-                                        // group since there can only be one.
-                                        if (logo.blocks.blockList[blk].name === 'osctime') {
-                                            var beatValue = duration / 1000;
-                                        } else {
-                                            var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
-                                        }
-                                        if (!logo.lilypondSaveOnly && duration > 0) {
-                                            if (logo.turtles.turtleList[turtle].drum) {
-                                                logo.drumSynth.triggerAttackRelease(notes[0], beatValue);
-                                            } else {
-                                                logo.polySynth.triggerAttackRelease(notes, beatValue);
-                                            }
-                                            Tone.Transport.start();
-                                        }
-                                    }
-                                }
-
-                                if (insideChord > 0) {
-                                    insideChord = -1;
-                                }
-
-                            }
-
-                            if (waitTime === 0 || logo.lilypondSaveOnly) {
-                                playnote();
-                            } else {
-                                setTimeout(function() {
-                                    playnote();
-                                }, waitTime + logo.noteDelay);
-                            }
-                        }
-                        logo.pushedNote[turtle] = false;
-                    }
+                    logo.processNote(noteBeatValue, blk, turtle);
                 }
                 logo.setListener(turtle, listenerName, listener);
                 break;
@@ -2107,10 +1906,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
                 var listener = function (event) {
-                    // FIXME: If CarryOver > 0, we have one more note
-                    // to play.
                     logo.tie[turtle] = false;
-                    logo.tieCarryOver[turtle] = 0;
+                    // If tieCarryOver > 0, we have one more note to
+                    // play.
+                    if (logo.tieCarryOver[turtle] > 0) {
+                        var noteValue = logo.tieCarryOver[turtle];
+                        logo.tieCarryOver[turtle] = 0;
+                        logo.processNote(noteValue, blk, turtle);
+		    }
                 }
 
                 logo.setListener(turtle, listenerName, listener);
@@ -2612,23 +2415,229 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     }
 
-    this.processNote = function(noteValue, turtle) {
-        // FIXME: Take into account duplicate
-        noteValue *= this.beatFactor[turtle];
+    this.processNote = function(noteBeatValue, blk, turtle) {
         if (this.inMatrix) {
+            noteBeatValue *= this.beatFactor[turtle];
             if (this.tuplet === true) {
                 if(this.addingNotesToTuplet) {
                     var i = this.tupletRhythms.length - 1;
-                    this.tupletRhythms[i].push(noteValue);
+                    this.tupletRhythms[i].push(noteBeatValue);
                 } else {
-                    this.tupletRhythms.push(['notes', this.tupletParams.length - 1, noteValue]);
+                    this.tupletRhythms.push(['notes', this.tupletParams.length - 1, noteBeatValue]);
                     this.addingNotesToTuplet = true;
                 }
             } else {
-                this.tupletRhythms.push(['', 1, noteValue]);
+                this.tupletRhythms.push(['', 1, noteBeatValue]);
             }
         } else {
-            this.doWait(turtle, 2 / noteValue);
+            // We start the music clock as the first note is being
+            // played.
+            if (this.firstNoteTime === null) {
+                var d = new Date();
+                this.firstNoteTime = d.getTime();
+            }
+            // Calculate a lag: In case this turtle has fallen behind,
+            // we need to catch up.
+            var d = new Date();
+            var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000; // (d.getTime() - this.time) / 1000;
+            var turtleLag = elapsedTime - this.turtleTime[turtle];
+	    
+            if (this.bpm[turtle].length > 0) {
+                var bpmFactor = TONEBPM / last(this.bpm[turtle]);
+            } else {
+                var bpmFactor = TONEBPM / TARGETBPM;
+            }
+	    
+            // If we are in a tie, depending upon parity, we either
+            // add the duration from the previous note to the current
+            // note, or we cache the duration and set the wait to
+            // zero.  FIXME: Will not work when mixing osctimes with
+            // noteBeatValues.  FIXME: Will not work when using dup
+            // and skip.
+            if (this.tie[turtle]) {
+                if (this.tieCarryOver[turtle] === 0) {
+                    this.tieCarryOver[turtle] = noteBeatValue;
+                    noteBeatValue = 0;
+                } else {
+                    if (this.blocks.blockList[blk].name === 'osctime') {
+                        noteBeatValue += this.tieCarryOver[turtle];
+                    } else {
+                        noteBeatValue = 1 / ((1 / noteBeatValue) + (1 / this.tieCarryOver[turtle]));
+                    }
+                    this.tieCarryOver[turtle] = 0;
+                }
+            }
+	    
+            // Duration is the duration of the note to be
+            // played. doWait sets the wait time for the turtle before
+            // the next block is executed.
+            if (this.blocks.blockList[blk].name === 'osctime') {
+                var duration = noteBeatValue;  // microseconds
+                this.turtleTime[turtle] += ((duration + this.noteDelay) / 1000) * this.duplicateFactor[turtle];
+                if (!this.lilypondSaveOnly) {
+                    this.doWait(turtle, Math.max(((duration + this.noteDelay) / 1000) * this.duplicateFactor[turtle] - turtleLag, 0));
+                }
+            } else {
+                var duration = noteBeatValue * this.beatFactor[turtle];  // beat value
+                if (duration > 0) {
+                    this.turtleTime[turtle] += ((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle];
+                }
+                if (!this.lilypondSaveOnly) {
+                    if (duration > 0) {
+                        this.doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle] - turtleLag, 0));
+                    }
+                }
+            }
+	    
+            var waitTime = 0;
+            for (var j = 0; j < this.duplicateFactor[turtle]; j++) {
+                if (this.skipFactor[turtle] > 1 && this.skipIndex[turtle] % this.skipFactor[turtle] > 0) {
+                    this.skipIndex[turtle] += 1;
+                    // Lessen delay time by one note since we are
+                    // skipping a note.
+                    // FIXME: TAKE INTO ACCOUNT OSCTIME
+                    if (duration > 0) {
+                        this.waitTimes[turtle] -= ((bpmFactor / duration) + (this.noteDelay / 1000)) * 1000;
+                        if (this.waitTimes[turtle] < 0) {
+                            this.waitTimes[turtle] = 0;
+                        }
+                    }
+                    continue;
+                }
+                if (this.skipFactor[turtle] > 1) {
+                    this.skipIndex[turtle] += 1;
+                }
+                if (j > 0) {
+                    if (this.blocks.blockList[blk].name === 'osctime') {
+                        waitTime += duration;
+                    } else {
+                        if (duration > 0) {
+                            waitTime += (bpmFactor * 1000 / duration);
+                        }
+                    }
+                }
+		
+                playnote = function(logo) {
+                    var notes = [];
+                    var insideChord = -1;
+                    if ((logo.notePitches[turtle].length + logo.oscList[turtle].length) > 1) {
+                        if (turtle in logo.lilypondStaging) {
+                            var insideChord = logo.lilypondStaging[turtle].length + 1;
+                        } else {
+                            var insideChord = 1;
+                        }
+                    }
+		    
+                    var oscillators = [];
+                    // FIXME: Add tie to notation
+                    if (logo.oscList[turtle].length > 0 && duraction > 0) {
+                        for (var i = 0; i < logo.oscList[turtle].length; i++) {
+                            if (!logo.lilypondSaveOnly) {
+                                oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
+                            }
+                            console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
+                            if (logo.blocks.blockList[blk].name === 'osctime') {
+                                logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
+                            } else {
+                                logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
+                            }
+                        }
+			
+                        if (!logo.lilypondSaveOnly && duration > 0) {
+                            for (var i = 0; i < oscillators.length; i++) {
+                                oscillators[i].volume.value = logo.polyVolume[turtle] * OSCVOLUMEADJUSTMENT;
+                                oscillators[i].start();
+                            }
+                            if (logo.blocks.blockList[blk].name === 'osctime') {
+                                var stopTime = duration;
+                            } else {
+                                if (duration > 0) {
+                                    var stopTime = bpmFactor * 1000 / duration;
+                                } else {
+                                    var stopTime = 0;
+                                }
+                            }
+                            setTimeout(function(){
+                                for (var i = 0; i < oscillators.length; i++) {
+                                    oscillators[i].stop();
+                                }
+                            }, stopTime);
+                        }
+                    }
+                    if (logo.notePitches[turtle].length > 0) {
+                        if (!logo.lilypondSaveOnly && duration > 0) {
+                            if (logo.turtles.turtleList[turtle].drum) {
+                                logo.drumSynth.toMaster();
+                            } else {
+                                logo.polySynth.toMaster();
+                            }
+                        }
+			
+                        for (i in logo.notePitches[turtle]) {
+                            var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+                            var note = noteObj[0] + noteObj[1];
+                            if (note !== 'R') {
+                                notes.push(note);
+                            }
+                            // FIXME: add tie to notation
+                            if (duration > 0) {
+                                if (logo.blocks.blockList[blk].name === 'osctime') {
+                                    logo.updateNotation(note, 1000 / duration, turtle, insideChord);
+                                } else {
+                                    logo.updateNotation(note, duration, turtle, insideChord);
+                                }
+                            }
+                        }
+			
+                        console.log("notes to play " + notes + ' ' + noteBeatValue);
+                        if (notes.length > 0) {
+                            var len = notes[0].length;
+                            logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
+                            logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
+                            if (logo.turtles.turtleList[turtle].drum) {
+                                for (var i = 0; i < notes.length; i++) {
+                                    // Remove pitch
+                                    notes[i] = 'C2';
+                                }
+                            } else {
+                                for (var i = 0; i < notes.length; i++) {
+                                    notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
+                                }
+                            }
+			    
+                            // Use the beatValue of the first note in
+                            // the group since there can only be one.
+                            if (logo.blocks.blockList[blk].name === 'osctime') {
+                                var beatValue = duration / 1000;
+                            } else {
+                                var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                            }
+                            if (!logo.lilypondSaveOnly && duration > 0) {
+                                if (logo.turtles.turtleList[turtle].drum) {
+                                    logo.drumSynth.triggerAttackRelease(notes[0], beatValue);
+                                } else {
+                                    logo.polySynth.triggerAttackRelease(notes, beatValue);
+                                }
+                                Tone.Transport.start();
+                            }
+                        }
+                    }
+		    
+                    if (insideChord > 0) {
+                        insideChord = -1;
+                    }
+		    
+                }
+		
+                if (waitTime === 0 || this.lilypondSaveOnly) {
+                    playnote(this);
+                } else {
+                    setTimeout(function() {
+                        playnote(this);
+                    }, waitTime + this.noteDelay);
+                }
+            }
+            this.pushedNote[turtle] = false;
         }
     }
 

@@ -205,7 +205,7 @@ function Turtle (name, turtles, drum) {
         this.name = name;
 
         // Use the name on the label of the start block.
-        if (this.startBlock !== null) {
+        if (this.startBlock != null) {
             this.startBlock.overrideName = this.name;
             if (this.name === _('start drum')) {
                 this.startBlock.collapseText.text = _('drum');
@@ -588,7 +588,7 @@ function Turtle (name, turtles, drum) {
             hitArea.y = -bounds.height / 2;
             me.container.hitArea = hitArea;
 
-            if (me.startBlock !== null) {
+            if (me.startBlock != null) {
                 me.startBlock.container.removeChild(me.decorationBitmap);
                 me.decorationBitmap = new createjs.Bitmap(myImage);
                 me.startBlock.container.addChild(me.decorationBitmap);
@@ -773,7 +773,7 @@ function Turtles(canvas, stage, refreshCanvas) {
 
     this.add = function(startBlock, infoDict) {
         // Add a new turtle for each start block
-        if (startBlock !== null) {
+        if (startBlock != null) {
             console.log('adding a new turtle ' + startBlock.name);
             if (startBlock.value !== this.turtleList.length) {
                 startBlock.value = this.turtleList.length;
@@ -836,7 +836,7 @@ function Turtles(canvas, stage, refreshCanvas) {
             myTurtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
             myTurtle.startBlock = startBlock;
-            if (startBlock !== null) {
+            if (startBlock != null) {
                 myTurtle.decorationBitmap = myTurtle.bitmap.clone();
                 startBlock.container.addChild(myTurtle.decorationBitmap);
                 myTurtle.decorationBitmap.name = 'decoration';

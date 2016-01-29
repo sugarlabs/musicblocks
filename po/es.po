@@ -1108,3 +1108,6 @@ msgstr "Ahorre partituras"
 
 msgid "Save your project to as a Lilypond file."
 msgstr "Guarde el proyecto como un archivo de LilyPond."
+
+msgid "Note value must be greater than 0"
+msgstr "Valor de la nota debe ser mayor que 0"

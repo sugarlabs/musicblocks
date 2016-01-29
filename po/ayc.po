@@ -1243,3 +1243,7 @@ msgstr ""
 #. TRANS: Guarde el proyecto como un archivo de LilyPond.
 msgid "Save your project to as a Lilypond file."
 msgstr ""
+
+#. TRANS: Valor de la nota debe ser mayor que 0
+msgid "Note value must be greater than 0"
+msgstr ""

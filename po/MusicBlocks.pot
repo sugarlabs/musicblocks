@@ -1107,3 +1107,6 @@ msgstr ""
 #. TRANS: lilypond is a language used to generate musical scores.
 msgid "save as lilypond"
 msgstr ""
+
+msgid "Note value must be greater than 0"
+msgstr ""
