@@ -460,7 +460,7 @@ function PaletteModel(palette, palettes, name) {
             }
 
             var protoBlock = paletteBlocks.protoBlockDict[blkname];
-            if (protoBlock === null) {
+            if (protoBlock == null) {
                 console.log('Could not find block ' + blkname);
                 continue;
             }
@@ -725,7 +725,7 @@ function Palette(palettes, name) {
     this.count = 0;
 
     this.makeMenu = function(createHeader) {
-        if (this.menuContainer === null) {
+        if (this.menuContainer == null) {
             this.menuContainer = new createjs.Container();
             this.menuContainer.snapToPixelEnabled = true;
         }
@@ -871,7 +871,7 @@ function Palette(palettes, name) {
     }
 
     this.updateBackground = function() {
-        if (this.menuContainer === null) {
+        if (this.menuContainer == null) {
             return;
         }
 
@@ -903,7 +903,7 @@ function Palette(palettes, name) {
     }
 
     this.updateMenu = function(hide) {
-        if (this.menuContainer === null) {
+        if (this.menuContainer == null) {
             this.makeMenu(false);
         } else {
             // Hide the menu while we update.
@@ -997,7 +997,7 @@ function Palette(palettes, name) {
 
     this.moveMenu = function(x, y) {
         // :sigh: race condition on iOS 7.1.2
-        if (this.menuContainer === null) return;
+        if (this.menuContainer == null) return;
         dx = x - this.menuContainer.x;
         dy = y - this.menuContainer.y;
         this.menuContainer.x = x;

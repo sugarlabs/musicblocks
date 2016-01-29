@@ -225,7 +225,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         if (block.name === 'note') {
                           tempStepQueue[turtle] = blk;
                           notesFinish[turtle] = last(block.connections);
-                          if (notesFinish[turtle] === null) { // end of flow
+                          if (notesFinish[turtle] == null) { // end of flow
                               notesFinish[turtle] = last(logo.turtles.turtleList[turtle].queue) && last(logo.turtles.turtleList[turtle].queue).blk;
                               // catch case of null - end of project
                           }
@@ -394,7 +394,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     value = this.lastKeyCode;
                     break;
                 case 'loudness':
-                    if (logo.mic === null) {
+                    if (logo.mic == null) {
                         logo.errorMsg(NOMICERRORMSG);
                         value = 0;
                     } else {
@@ -624,7 +624,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.runFromBlock = function(logo, turtle, blk, isflow, receivedArg) {
-        if (blk === null) {
+        if (blk == null) {
             return;
         }
 
@@ -1253,7 +1253,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'startTurtle':
                 var targetTurtle = logo.getTargetTurtle(args);
-                if (targetTurtle === null) {
+                if (targetTurtle == null) {
                     logo.errorMsg('Cannot find turtle: ' + args[0], blk)
                 } else {
                     if (logo.turtles.turtleList[targetTurtle].running) {
@@ -1283,7 +1283,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'stopTurtle':
                 var targetTurtle = logo.getTargetTurtle(args);
-                if (targetTurtle === null) {
+                if (targetTurtle == null) {
                     logo.errorMsg('Cannot find turtle: ' + args[0], blk)
                 } else {
                     logo.turtles.turtleList[targetTurtle].queue = [];
@@ -2170,7 +2170,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         console.log('block: ' + blk + ' turtle: ' + turtle);
                         console.log('block name: ' + logo.blocks.blockList[blk].name);
                         console.log('block value: ' + logo.blocks.blockList[blk].value);
-                        if (logo.blocks.blockList[blk].value === null) {
+                        if (logo.blocks.blockList[blk].value == null) {
                             logo.textMsg('null block value');
                         } else {
                             logo.textMsg(logo.blocks.blockList[blk].value.toString());
@@ -2312,7 +2312,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
 
-            if (last(logo.blocks.blockList[blk].connections) === null) {
+            if (last(logo.blocks.blockList[blk].connections) == null) {
                 // If we are at the end of the child flow, queue the
                 // unhighlighting of the parent block to the flow.
                 if (logo.parentFlowQueue[turtle].length > 0 && logo.turtles.turtleList[turtle].queue.length > 0 && last(logo.turtles.turtleList[turtle].queue).parentBlk !== last(logo.parentFlowQueue[turtle])) {
@@ -2432,7 +2432,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else {
             // We start the music clock as the first note is being
             // played.
-            if (this.firstNoteTime === null) {
+            if (this.firstNoteTime == null) {
                 var d = new Date();
                 this.firstNoteTime = d.getTime();
             }
@@ -2650,7 +2650,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.updateEndBlks = function(childFlow, turtle, listenerName) {
-        if (childFlow === null) {
+        if (childFlow == null) {
             console.log('null childFlow sent to updateEndBlks');
             return;
         }
@@ -2688,7 +2688,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             if (blk !== null && this.loopBlock(this.blocks.blockList[blk].name)) {
                 // console.log(blk + ' is a loopClamp');
                 // console.log(last(this.blocks.blockList[blk].connections));
-                if (last(this.blocks.blockList[blk].connections) === null) {
+                if (last(this.blocks.blockList[blk].connections) == null) {
                     // console.log(blk + ' ' + this.blocks.blockList[blk].name + ' ' + last(this.blocks.blockList[blk].connections));
                     newLoopClamp = blk;
                 }
@@ -2699,7 +2699,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         // We want the parent loop.
-        if (loopClamp === null) {
+        if (loopClamp == null) {
             loopClamp = newLoopClamp;
         }
 
@@ -2714,7 +2714,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             var argBlk = this.blocks.blockList[lastBlk].connections[1];
             if (argBlk !== null) {
                 var name = this.blocks.blockList[argBlk].value;
-                if (doClamp === null) {
+                if (doClamp == null) {
                     doClamp = lastBlk;
                 }
                 if (name in this.actions) {
@@ -2724,7 +2724,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else if (this.namedActionBlock(this.blocks.blockList[lastBlk].name)) {
             var name = this.blocks.blockList[lastBlk].privateData;
             // console.log(name);
-            if (doClamp === null) {
+            if (doClamp == null) {
                 doClamp = lastBlk;
             }
             if (name in this.actions) {
@@ -2796,7 +2796,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             }
         }
-        if (parentLoopBlock === null) {
+        if (parentLoopBlock == null) {
             // In this case, we flush the child flow.
             this.turtles.turtleList[turtle].queue.pop();
             return;
@@ -2819,7 +2819,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
     this.parseArg = function(logo, turtle, blk, parentBlk, receivedArg) {
         // Retrieve the value of a block.
-        if (blk === null) {
+        if (blk == null) {
             logo.errorMsg('Missing argument.', parentBlk);
             logo.stopTurtle = true;
             return null

@@ -15,7 +15,7 @@ var COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
-    if (protoblock === null) {
+    if (protoblock == null) {
         console.log('null protoblock sent to Block');
         return;
     }
@@ -402,7 +402,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 myBlock.bounds = myBlock.container.getBounds();
-                if (myBlock.bounds === null) {
+                if (myBlock.bounds == null) {
 		    // FIXME: Why is this happening sometimes? Race condition?
 		    console.log('block container for ' + + ' not yet ready.' + myBlock.name);
 		} else {
@@ -488,7 +488,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Value blocks get a modifiable text label
         if (['text', 'number', 'solfege', 'notename', 'rest'].indexOf(this.name) !== -1) {
-            if (this.value === null) {
+            if (this.value == null) {
                 if (this.name === 'text') {
                     this.value = '---';
                 } else if (this.name === 'solfege') {
@@ -560,7 +560,7 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.container.addChild(myBlock.highlightCollapseBlockBitmap);
                     myBlock.highlightCollapseBlockBitmap.visible = false;
 
-                    if (myBlock.collapseText === null) {
+                    if (myBlock.collapseText == null) {
                         var fontSize = 10 * myBlock.protoblock.scale;
                         switch (myBlock.name) {
                         case 'action':
@@ -707,7 +707,7 @@ function Block(protoblock, blocks, overrideName) {
         // Load an image thumbnail onto block.
         var thisBlock = this.blocks.blockList.indexOf(this);
         var myBlock = this;
-        if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
+        if (this.blocks.blockList[thisBlock].value == null && imagePath == null) {
             // console.log('loadThumbnail: no image to load?');
             return;
         }
@@ -748,7 +748,7 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.blocks.refreshCanvas();
         }
 
-        if (imagePath === null) {
+        if (imagePath == null) {
             image.src = this.value;
         } else {
             image.src = imagePath;
@@ -795,7 +795,7 @@ function Block(protoblock, blocks, overrideName) {
 
         function toggle(myBlock) {
             var collapse = myBlock.collapsed;
-            if (myBlock.collapseBitmap === null) {
+            if (myBlock.collapseBitmap == null) {
                 console.log('collapse bitmap not ready');
                 return;
             }
@@ -1174,7 +1174,7 @@ function loadEventHandlers(myBlock) {
 
         // Track time for detecting long pause...
         // but only for top block in stack
-        if (myBlock.connections[0] === null) {
+        if (myBlock.connections[0] == null) {
             var d = new Date();
             blocks.time = d.getTime();
             blocks.timeOut = setTimeout(function() {
@@ -1592,7 +1592,7 @@ function changeLabel(myBlock) {
 
 function labelChanged(myBlock) {
     // Update the block values as they change in the DOM label.
-    if (myBlock === null) {
+    if (myBlock == null) {
         return;
     }
 

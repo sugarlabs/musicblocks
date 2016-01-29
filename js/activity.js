@@ -1482,7 +1482,7 @@ define(function (require) {
         }
 
         function textMsg(msg) {
-            if (msgText === null) {
+            if (msgText == null) {
                 // The container may not be ready yet... so do nothing
                 return;
             }
@@ -1494,7 +1494,7 @@ define(function (require) {
         }
 
         function errorMsg(msg, blk, text) {
-            if (errorMsgText === null) {
+            if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
                 return;
             }
@@ -1505,7 +1505,7 @@ define(function (require) {
                 var toX = blocks.blockList[blk].x + blocksContainer.x;
                 var toY = blocks.blockList[blk].y + blocksContainer.y;
 
-                if (errorMsgArrow === null) {
+                if (errorMsgArrow == null) {
                     errorMsgArrow = new createjs.Container();
                     stage.addChild(errorMsgArrow);
                 }
@@ -1542,7 +1542,7 @@ define(function (require) {
                     stage.setChildIndex(errorArtwork['negroot'], stage.getNumChildren() - 1);
                     break;
                 case NOACTIONERRORMSG:
-                    if (text === null) {
+                    if (text == null) {
                         text = 'foo';
                     }
                     errorArtwork['nostack'].children[1].text = text;
@@ -1551,7 +1551,7 @@ define(function (require) {
                     stage.setChildIndex(errorArtwork['nostack'], stage.getNumChildren() - 1);
                     break;
                 case NOBOXERRORMSG:
-                    if (text === null) {
+                    if (text == null) {
                         text = 'foo';
                     }
                     errorArtwork['emptybox'].children[1].text = text;
@@ -1694,7 +1694,7 @@ define(function (require) {
                 connections = [];
                 for (var c = 0; c < myBlock.connections.length; c++) {
                     var mapConnection = blockMap.indexOf(myBlock.connections[c]);
-                    if (myBlock.connections[c] === null || mapConnection === -1) {
+                    if (myBlock.connections[c] == null || mapConnection === -1) {
                         connections.push(null);
                     } else {
                         connections.push(mapConnection);
@@ -1905,7 +1905,7 @@ define(function (require) {
             helpIdx = 0;
 
             if (firstTime) {
-                if (helpContainer === null) {
+                if (helpContainer == null) {
                     helpContainer = new createjs.Container();
                     stage.addChild(helpContainer);
                     helpContainer.x = 65;

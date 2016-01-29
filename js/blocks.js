@@ -492,12 +492,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             return size;
         }
 
-        if (blk === null) {
+        if (blk == null) {
             return size;
         }
 
         var myBlock = this.blockList[blk];
-        if (myBlock === null) {
+        if (myBlock == null) {
             console.log('Something very broken in getStackSize.');
         }
 
@@ -559,11 +559,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // These checks are to test for malformed data. All blocks
         // should have connections.
-        if (myBlock === null) {
+        if (myBlock == null) {
             console.log('Saw a null block: ' + blk);
             return;
         }
-        if (myBlock.connections === null) {
+        if (myBlock.connections == null) {
             console.log('Saw a block with null connections: ' + blk);
             return;
         }
@@ -599,12 +599,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // Find the connecting block.
             var cblk = myBlock.connections[c];
             // Nothing connected here so continue to the next connection.
-            if (cblk === null) {
+            if (cblk == null) {
                 continue;
             }
 
             // Another database integrety check.
-            if (this.blockList[cblk] === null) {
+            if (this.blockList[cblk] == null) {
                 console.log('This is not good: we encountered a null block: ' + cblk);
                 continue;
             }
@@ -630,7 +630,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 // Move the connected block...
                 var dx = bdock[0] - cdock[0];
                 var dy = bdock[1] - cdock[1];
-                if (myBlock.container === null) {
+                if (myBlock.container == null) {
                     console.log('Does this ever happen any more?')
                     var nx = myBlock.x + dx;
                     var ny = myBlock.y + dy;
@@ -668,7 +668,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Find any containing expandable blocks.
         this.clampBlocksToCheck = [];
-        if (thisBlock === null) {
+        if (thisBlock == null) {
             console.log('block moved called with null block.');
             return;
         }
@@ -687,7 +687,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.checkTwoArgBlocks = [];
         var checkArgBlocks = [];
         var myBlock = this.blockList[thisBlock];
-        if (myBlock === null) {
+        if (myBlock == null) {
             console.log('null block found in blockMoved method: ' + thisBlock);
             return;
         }
@@ -782,7 +782,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // We found a match.
             myBlock.connections[0] = newBlock;
             var connection = this.blockList[newBlock].connections[newConnection];
-            if (connection === null) {
+            if (connection == null) {
                 if (this.blockList[newBlock].isArgClamp()) {
                     // If it is an arg clamp, we may have to adjust
                     // the slot size.
@@ -850,13 +850,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         var emptyConnection = null;
                         // Is there an empty slot below?
                         for (var emptySlot = si; emptySlot < slotList.length; emptySlot++) {
-                            if (this.blockList[newBlock].connections[ci + emptySlot - si] === null) {
+                            if (this.blockList[newBlock].connections[ci + emptySlot - si] == null) {
                                 emptyConnection = ci + emptySlot - si;
                                 break;
                             }
                         }
 
-                        if (emptyConnection === null) {
+                        if (emptyConnection == null) {
                             slotList.push(1);
                             this.newLocalArgBlock(slotList.length);
                             emptyConnection = ci + emptySlot - si;
@@ -1105,7 +1105,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // value yet.
         var myBlock = this.blockList[blk];
         var maxLength = 8;
-        if (myBlock.text === null) {
+        if (myBlock.text == null) {
             return;
         }
         if (myBlock.name === 'loadFile') {
@@ -1136,12 +1136,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.findTopBlock = function (blk) {
         // Find the top block in a stack.
-        if (blk === null) {
+        if (blk == null) {
             return null;
         }
 
         var myBlock = this.blockList[blk];
-        if (myBlock.connections === null) {
+        if (myBlock.connections == null) {
             return blk;
         }
 
@@ -1174,12 +1174,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.findBottomBlock = function (blk) {
         // Find the bottom block in a stack.
-        if (blk === null) {
+        if (blk == null) {
             return null;
         }
 
         var myBlock = this.blockList[blk];
-        if (myBlock.connections === null) {
+        if (myBlock.connections == null) {
             return blk;
         }
         if (myBlock.connections.length === 0) {
@@ -1204,7 +1204,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Find any blocks with null in the first connection.
         this.stackList = [];
         for (i = 0; i < this.blockList.length; i++) {
-            if (this.blockList[i].connections[0] === null) {
+            if (this.blockList[i].connections[0] == null) {
                 this.stackList.push(i)
             }
         }
@@ -1346,7 +1346,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             collapsed = false
         }
         myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
-        if (myBlock === null) {
+        if (myBlock == null) {
             console.log('could not make block ' + name);
             return;
         }
@@ -1356,7 +1356,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (c === myBlock.docks.length) {
                 break;
             }
-            if (connections[c] === null) {
+            if (connections[c] == null) {
                 myBlock.connections.push(null);
             } else {
                 myBlock.connections.push(connections[c] + blockOffset);
@@ -1371,7 +1371,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             console.log('makeNewBlock: no prototype for ' + name);
             return null;
         }
-        if (this.protoBlockDict[name] === null) {
+        if (this.protoBlockDict[name] == null) {
             // Should never happen
             console.log('makeNewBlock: no prototype for ' + name);
             return null;
@@ -1383,7 +1383,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         } else {
             this.blockList.push(new Block(this.protoBlockDict[name], this));
         }
-        if (last(this.blockList) === null) {
+        if (last(this.blockList) == null) {
             // Should never happen
             console.log('failed to make protoblock for ' + name);
             return null;
@@ -1471,7 +1471,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var thisBlock = args[0];
                 var value = args[1];
                 me.blockList[thisBlock].value = value;
-                if (value === null) {
+                if (value == null) {
                     me.blockList[thisBlock].image = 'images/load-media.svg';
                 } else {
                     me.blockList[thisBlock].image = null;
@@ -1484,7 +1484,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var thisBlock = args[0];
                 var value = args[1];
                 me.blockList[thisBlock].value = CAMERAVALUE;
-                if (value === null) {
+                if (value == null) {
                     me.blockList[thisBlock].image = 'images/camera.svg';
                 } else {
                     me.blockList[thisBlock].image = null;
@@ -1496,7 +1496,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var thisBlock = args[0];
                 var value = args[1];
                 me.blockList[thisBlock].value = VIDEOVALUE;
-                if (value === null) {
+                if (value == null) {
                     me.blockList[thisBlock].image = 'images/video.svg';
                 } else {
                     me.blockList[thisBlock].image = null;
@@ -1569,7 +1569,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             var me = this;
             var thisBlock = this.blockList.length;
             if (myBlock.docks.length > i && myBlock.docks[i + 1][2] === 'anyin') {
-                if (value === null) {
+                if (value == null) {
                     console.log('cannot set default value');
                 } else if (typeof(value) === 'string') {
                     postProcess = function (args) {
@@ -1678,20 +1678,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             return;
         }
 
-        if (blk === null) {
+        if (blk == null) {
             console.log('null block passed to calculateDragGroup');
             return;
         }
 
         var myBlock = this.blockList[blk];
         // If this happens, something is really broken.
-        if (myBlock === null) {
+        if (myBlock == null) {
             console.log('null block encountered... this is bad. ' + blk);
             return;
         }
 
         // As before, does these ever happen?
-        if (myBlock.connections === null) {
+        if (myBlock.connections == null) {
             this.dragGroup = [blk];
             return;
         }
@@ -1807,7 +1807,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (var blk = 0; blk < this.blockList.length; blk++) {
             var myBlock = this.blockList[blk];
             var blkParent = this.blockList[myBlock.connections[0]];
-            if (blkParent === null) {
+            if (blkParent == null) {
                 continue;
             }
             if (['do', 'calc', 'doArg', 'calcArg', 'action'].indexOf(blkParent.name) === -1) {
@@ -2032,11 +2032,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
     this.insideArgClamp = function (blk) {
         // Returns a containing arg clamp block or null
-        if (this.blockList[blk] === null) {
+        if (this.blockList[blk] == null) {
             // race condition?
             console.log('null block in blockList? ' + blk);
             return null;
-        } else if (this.blockList[blk].connections[0] === null) {
+        } else if (this.blockList[blk].connections[0] == null) {
             return null;
         } else {
             var cblk = this.blockList[blk].connections[0];
@@ -2050,11 +2050,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.insideExpandableBlock = function (blk) {
         // Returns a containing expandable block or null
-        if (this.blockList[blk] === null) {
+        if (this.blockList[blk] == null) {
             // race condition?
             console.log('null block in blockList? ' + blk);
             return null;
-        } else if (this.blockList[blk].connections[0] === null) {
+        } else if (this.blockList[blk].connections[0] == null) {
             return null;
         } else {
             var cblk = this.blockList[blk].connections[0];
@@ -2072,7 +2072,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.triggerLongPress = function (myBlock) {
-        this.timeOut === null;
+        this.timeOut == null;
         this.inLongPress = true;
         this.copyButton.visible = true;
         this.copyButton.x = myBlock.container.x - 27;
@@ -2091,7 +2091,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.pasteStack = function () {
         // Copy a stack of blocks by creating a blockObjs and passing
         // it to this.load.
-        if (this.selectedStack === null) {
+        if (this.selectedStack == null) {
             return;
         }
         var blockObjs = this.copyBlocksToObj();
@@ -2101,14 +2101,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.saveStack = function () {
         // Save a stack of blocks to local storage and the my-stack
         // palette by creating a blockObjs and ...
-        if (this.selectedStack === null) {
+        if (this.selectedStack == null) {
             return;
         }
         var blockObjs = this.copyBlocksToObj();
         // The first block is an action block. Its first connection is
         // the block containing its label.
         var nameBlk = blockObjs[0][4][1];
-        if (nameBlk === null) {
+        if (nameBlk == null) {
             console.log('action not named... skipping');
         } else {
             console.log(blockObjs[nameBlk][1][1]);
@@ -2166,7 +2166,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (var b = 0; b < this.dragGroup.length; b++) {
             myBlock = this.blockList[this.dragGroup[b]];
             for (var c = 0; c < myBlock.connections.length; c++) {
-                if (myBlock.connections[c] === null) {
+                if (myBlock.connections[c] == null) {
                     blockObjs[b][4].push(null);
                 } else {
                     blockObjs[b][4].push(blockMap[myBlock.connections[c]]);
@@ -2425,7 +2425,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
-            if (blkInfo[1] === null) {
+            if (blkInfo[1] == null) {
                 var value = null;
             } else {
                 var value = blkInfo[1]['value'];
@@ -2758,7 +2758,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     break;
                 default:
                     // Check that name is in the proto list
-                    if (!name in this.protoBlockDict || this.protoBlockDict[name] === null) {
+                    if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
                         // Lots of assumptions here.
                         // TODO: figure out if it is a flow or an arg block.
                         // Substitute a NOP block for an unknown block.
@@ -2787,7 +2787,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     break;
             }
             if (thisBlock === this.blockList.length - 1) {
-                if (this.blockList[thisBlock].connections[0] === null) {
+                if (this.blockList[thisBlock].connections[0] == null) {
                     this.blockList[thisBlock].x = blkData[2];
                     this.blockList[thisBlock].y = blkData[3];
                     this.adjustTheseDocks.push(thisBlock);
@@ -2949,7 +2949,7 @@ function sendStackToTrash(blocks, myBlock) {
             for (var blockId = 0; blockId < blocks.blockList.length; blockId++) {
                 var myBlock = blocks.blockList[blockId];
                 var blkParent = blocks.blockList[myBlock.connections[0]];
-                if (blkParent === null) {
+                if (blkParent == null) {
                     continue;
                 }
                 if (['namedcalc', 'calc', 'nameddo', 'do', 'action'].indexOf(blkParent.name) !== -1) {
