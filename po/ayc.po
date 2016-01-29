@@ -15,11 +15,6 @@
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: ini-to-pot script\n"
 
-
-
-msgid ""
-
-
 msgid ""
 msgstr ""
 
@@ -1240,3 +1235,11 @@ msgstr ""
 
 msgid "left"
 msgstr "ch'iqa"
+
+#. TRANS: Ahorre partituras
+msgid "Save sheet music"
+msgstr ""
+
+#. TRANS: Guarde el proyecto como un archivo de LilyPond.
+msgid "Save your project to as a Lilypond file."
+msgstr ""

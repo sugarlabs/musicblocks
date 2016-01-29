@@ -11,6 +11,14 @@ msgstr ""
 "Language: en\n"
 "X-Generator: ini-to-pot script\n"
 
+#. TRANS: Musical score
+msgid "Save sheet music"
+msgstr ""
+
+#. TRANS: Lilypond is engraving software
+msgid "Save your project to as a Lilypond file."
+msgstr ""
+
 msgid "rhythm"
 msgstr ""
 

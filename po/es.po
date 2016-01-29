@@ -1102,3 +1102,9 @@ msgstr "punto"
 
 msgid "left"
 msgstr "izquierda"
+
+msgid "Save sheet music"
+msgstr "Ahorre partituras"
+
+msgid "Save your project to as a Lilypond file."
+msgstr "Guarde el proyecto como un archivo de LilyPond."
