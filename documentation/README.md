@@ -302,8 +302,8 @@ The *Beats per Minute* block contains the current beats per minutes, which is by
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/key.svg'</img>
 
 The *Set Key* block is used to set the key for the mapping between the
-Solfage and notes using a "movable" system (See
-[Solfage](https://en.wikipedia.org/wiki/Solf%C3%A8ge) for more
+Solfege and notes using a "movable" system (See
+[Solfege](https://en.wikipedia.org/wiki/Solf%C3%A8ge) for more
 details).
 
 The *Key* block contains the current Key, by default, C Major.
