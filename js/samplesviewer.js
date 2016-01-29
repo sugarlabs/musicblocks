@@ -359,6 +359,7 @@ function PlanetView(model, controller) {
 
     this.open = function (ele) {
         return function () {
+            document.getElementById('matrix').style.visibility = localStorage.getItem("isMatrixHidden");
             if (ele.attributes.current.value === 'true') {
                 me.controller.hide();
                 return;

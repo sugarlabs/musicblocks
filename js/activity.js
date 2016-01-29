@@ -1211,6 +1211,7 @@ define(function (require) {
                 document.getElementById('matrix').style.visibility = 'hidden';
                 document.getElementById('matrix').style.border = 0;
             }
+            localStorage.setItem("isMatrixHidden",document.getElementById('matrix').style.visibility);
             console.log('save locally');
             saveLocally();
             thumbnails.show()
