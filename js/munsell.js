@@ -50,9 +50,9 @@ function getMunsellColor(hue, value, chroma) {
 
 
 interpColor = function(hex1, hex2, p) {
-    if (p == 0) {
+    if (p === 0) {
         return hex2;
-    } else if (p == 1) {
+    } else if (p === 1) {
         return hex1;
     } else {
         var r1 = parseInt(hex1.substr(1, 2), 16);
@@ -82,7 +82,7 @@ function getcolor(color) {
     }
 
     h2 = h1 + 1;
-    if (h2 == 40) {
+    if (h2 === 40) {
         h2 = 0;
     }
 

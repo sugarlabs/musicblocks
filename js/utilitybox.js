@@ -40,7 +40,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
     this.scale = 1;
 
     this.hide = function() {
-        if (this.container != null) {
+        if (this.container !== null) {
             this.container.visible = false;
             this.refreshCanvas();
         }
@@ -48,7 +48,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
 
     this.show = function(scale) {
         this.scale = scale;
-        if (this.container == null) {
+        if (this.container === null) {
             this.container = new createjs.Container();
             this.stage.addChild(this.container);
             this.container.x = Math.floor(((this.canvas.width / scale) - 360) / 2);

@@ -171,7 +171,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) != -1 && !myBlock.trash) {
+            if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                 myBlock.collapseToggle();
             }
         }
@@ -230,27 +230,27 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (this.protoBlockDict[proto].expandable) {
                 this.expandableBlocks.push(this.protoBlockDict[proto].name);
             }
-            if (this.protoBlockDict[proto].style == 'clamp') {
+            if (this.protoBlockDict[proto].style === 'clamp') {
                 this.clampBlocks.push(this.protoBlockDict[proto].name);
             }
-            if (this.protoBlockDict[proto].style == 'argclamp') {
+            if (this.protoBlockDict[proto].style === 'argclamp') {
                 this.argClampBlocks.push(this.protoBlockDict[proto].name);
             }
-            if (this.protoBlockDict[proto].style == 'argclamparg') {
+            if (this.protoBlockDict[proto].style === 'argclamparg') {
                 this.argClampBlocks.push(this.protoBlockDict[proto].name);
                 this.argBlocks.push(this.protoBlockDict[proto].name);
             }
-            if (this.protoBlockDict[proto].style == 'twoarg') {
+            if (this.protoBlockDict[proto].style === 'twoarg') {
                 this.twoArgBlocks.push(this.protoBlockDict[proto].name);
             }
-            if (this.protoBlockDict[proto].style == 'arg') {
+            if (this.protoBlockDict[proto].style === 'arg') {
                 this.argBlocks.push(this.protoBlockDict[proto].name);
             }
-            if (this.protoBlockDict[proto].style == 'value') {
+            if (this.protoBlockDict[proto].style === 'value') {
                 this.argBlocks.push(this.protoBlockDict[proto].name);
                 this.valueBlocks.push(this.protoBlockDict[proto].name);
             }
-            if (this.protoBlockDict[proto].style == 'doubleclamp') {
+            if (this.protoBlockDict[proto].style === 'doubleclamp') {
                 this.doubleExpandable.push(this.protoBlockDict[proto].name);
             }
         }
@@ -274,7 +274,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     // common operation for start and action blocks, but also for
     // repeat, forever, if, etc.
     this.adjustExpandableClampBlock = function () {
-        if (this.clampBlocksToCheck.length == 0) {
+        if (this.clampBlocksToCheck.length === 0) {
             return;
         }
         var obj = this.clampBlocksToCheck.pop();
@@ -296,7 +296,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
-            if (clamp == 0) {
+            if (clamp === 0) {
                 var c = myBlock.connections.length - 2;
             } else { // e.g., Bottom clamp in if-then-else
                 var c = myBlock.connections.length - 3;
@@ -310,8 +310,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // Adjust the clamp size to match the size of the child
             // flow.
             var plusMinus = childFlowSize - myBlock.clampCount[clamp];
-            if (plusMinus != 0) {
-                if (!(childFlowSize == 0 && myBlock.clampCount[clamp] == 1)) {
+            if (plusMinus !== 0) {
+                if (!(childFlowSize === 0 && myBlock.clampCount[clamp] === 1)) {
                     myBlock.updateSlots(clamp, plusMinus);
                 }
             }
@@ -346,7 +346,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     // Adjust the slot sizes of arg clamps.
     this.adjustArgClampBlock = function (argBlocksToCheck) {
-        if (argBlocksToCheck.length == 0) {
+        if (argBlocksToCheck.length === 0) {
             return;
         }
 
@@ -354,7 +354,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var myBlock = this.blockList[blk];
 
         // Which connection do we start with?
-        if (['doArg', 'calcArg'].indexOf(myBlock.name) != -1) {
+        if (['doArg', 'calcArg'].indexOf(myBlock.name) !== -1) {
             ci = 2;
         } else {
             ci = 1;
@@ -371,7 +371,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (c != null) {
                 size = Math.max(this.getBlockSize(c), 1);
             }
-            if (slotList[i] != size) {
+            if (slotList[i] !== size) {
                 slotList[i] = size;
                 update = true;
             }
@@ -385,7 +385,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     // we adjust clamps, but enough different that it is in its own
     // function.
     this.adjustExpandableTwoArgBlock = function (argBlocksToCheck) {
-        if (argBlocksToCheck.length == 0) {
+        if (argBlocksToCheck.length === 0) {
             return;
         }
 
@@ -401,8 +401,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Expand/contract block by plusMinus.
         var plusMinus = firstArgumentSize - myBlock.clampCount[0];
-        if (plusMinus != 0) {
-            if (!(firstArgumentSize == 0)) {
+        if (plusMinus !== 0) {
+            if (!(firstArgumentSize === 0)) {
                 myBlock.updateSlots(0, plusMinus);
             }
         }
@@ -475,7 +475,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // Need to know how many vspace blocks are below the block
             // we're checking against.
             var nextBlock = last(blockBlocks.blockList[blk].connections);
-            if (nextBlock && blockBlocks.blockList[nextBlock].name == 'vspace') {
+            if (nextBlock && blockBlocks.blockList[nextBlock].name === 'vspace') {
                 return 1 + howManyVSpaceBlocksBelow(nextBlock);
                 // Recurse until it isn't a vspace
             }
@@ -492,12 +492,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             return size;
         }
 
-        if (blk == null) {
+        if (blk === null) {
             return size;
         }
 
         var myBlock = this.blockList[blk];
-        if (myBlock == null) {
+        if (myBlock === null) {
             console.log('Something very broken in getStackSize.');
         }
 
@@ -509,7 +509,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 if (cblk != null) {
                     csize = this.getStackSize(cblk);
                 }
-                if (csize == 0) {
+                if (csize === 0) {
                     size = 1; // minimum of 1 slot in clamp
                 } else {
                     size = csize;
@@ -523,7 +523,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     if (cblk != null) {
                         var csize = this.getStackSize(cblk);
                     }
-                    if (csize == 0) {
+                    if (csize === 0) {
                         size += 1; // minimum of 1 slot in clamp
                     } else {
                         size += csize;
@@ -559,21 +559,21 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // These checks are to test for malformed data. All blocks
         // should have connections.
-        if (myBlock == null) {
+        if (myBlock === null) {
             console.log('Saw a null block: ' + blk);
             return;
         }
-        if (myBlock.connections == null) {
+        if (myBlock.connections === null) {
             console.log('Saw a block with null connections: ' + blk);
             return;
         }
-        if (myBlock.connections.length == 0) {
+        if (myBlock.connections.length === 0) {
             console.log('Saw a block with [] connections: ' + blk);
             return;
         }
 
         // Value blocks only have one dock.
-        if (myBlock.docks.length == 1) {
+        if (myBlock.docks.length === 1) {
             return;
         }
 
@@ -599,12 +599,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // Find the connecting block.
             var cblk = myBlock.connections[c];
             // Nothing connected here so continue to the next connection.
-            if (cblk == null) {
+            if (cblk === null) {
                 continue;
             }
 
             // Another database integrety check.
-            if (this.blockList[cblk] == null) {
+            if (this.blockList[cblk] === null) {
                 console.log('This is not good: we encountered a null block: ' + cblk);
                 continue;
             }
@@ -612,7 +612,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // Find the dock position in the connected block.
             var foundMatch = false;
             for (var b = 0; b < this.blockList[cblk].connections.length; b++) {
-                if (this.blockList[cblk].connections[b] == blk) {
+                if (this.blockList[cblk].connections[b] === blk) {
                     foundMatch = true;
                     break
                 }
@@ -630,7 +630,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 // Move the connected block...
                 var dx = bdock[0] - cdock[0];
                 var dy = bdock[1] - cdock[1];
-                if (myBlock.container == null) {
+                if (myBlock.container === null) {
                     console.log('Does this ever happen any more?')
                     var nx = myBlock.x + dx;
                     var ny = myBlock.y + dy;
@@ -668,7 +668,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Find any containing expandable blocks.
         this.clampBlocksToCheck = [];
-        if (thisBlock == null) {
+        if (thisBlock === null) {
             console.log('block moved called with null block.');
             return;
         }
@@ -687,7 +687,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.checkTwoArgBlocks = [];
         var checkArgBlocks = [];
         var myBlock = this.blockList[thisBlock];
-        if (myBlock == null) {
+        if (myBlock === null) {
             console.log('null block found in blockMoved method: ' + thisBlock);
             return;
         }
@@ -701,11 +701,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // We care about twoarg (2arg) blocks with
             // connections to the first arg;
             if (this.blockList[c].isTwoArgBlock() || this.blockList[c].isArgClamp()) {
-                if (cBlock.connections[1] == thisBlock) {
+                if (cBlock.connections[1] === thisBlock) {
                     this.checkTwoArgBlocks.push(c);
                 }
             } else if (this.blockList[c].isArgBlock() && this.blockList[c].isExpandableBlock() || this.blockList[c].isArgClamp()) {
-                if (cBlock.connections[1] == thisBlock) {
+                if (cBlock.connections[1] === thisBlock) {
                     this.checkTwoArgBlocks.push(c);
                 }
             }
@@ -715,7 +715,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (c != null) {
             // disconnect both ends of the connection
             for (var i = 1; i < cBlock.connections.length; i++) {
-                if (cBlock.connections[i] == thisBlock) {
+                if (cBlock.connections[i] === thisBlock) {
                     cBlock.connections[i] = null;
                     break;
                 }
@@ -736,7 +736,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var blkType = myBlock.docks[0][2]
         for (var b = 0; b < this.blockList.length; b++) {
             // Don't connect to yourself.
-            if (b == thisBlock) {
+            if (b === thisBlock) {
                 continue;
             }
 
@@ -754,7 +754,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 // When converting from Python projects to JS format,
                 // sometimes extra null connections are added. We need
                 // to ignore them.
-                if (i == this.blockList[b].docks.length) {
+                if (i === this.blockList[b].docks.length) {
                     break;
                 }
 
@@ -782,12 +782,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // We found a match.
             myBlock.connections[0] = newBlock;
             var connection = this.blockList[newBlock].connections[newConnection];
-            if (connection == null) {
+            if (connection === null) {
                 if (this.blockList[newBlock].isArgClamp()) {
                     // If it is an arg clamp, we may have to adjust
                     // the slot size.
-                    if ((this.blockList[newBlock].name == 'doArg' || this.blockList[newBlock].name == 'calcArg') && newConnection == 1) {
-                    } else if (['doArg', 'nameddoArg'].indexOf(this.blockList[newBlock].name) != -1 && newConnection == this.blockList[newBlock].connections.length - 1) {
+                    if ((this.blockList[newBlock].name === 'doArg' || this.blockList[newBlock].name === 'calcArg') && newConnection === 1) {
+                    } else if (['doArg', 'nameddoArg'].indexOf(this.blockList[newBlock].name) !== -1 && newConnection === this.blockList[newBlock].connections.length - 1) {
                     } else {
                         // Get the size of the block we are inserting
                         // adding.
@@ -797,12 +797,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         var slotList = this.blockList[newBlock].argClampSlots;
 
                         // Which slot is this block in?
-                        if (['doArg', 'calcArg'].indexOf(this.blockList[newBlock].name) != -1) {
+                        if (['doArg', 'calcArg'].indexOf(this.blockList[newBlock].name) !== -1) {
                             var si = newConnection - 2;
                         } else {
                             var si = newConnection - 1;
                         }
-                        if (slotList[si] != size) {
+                        if (slotList[si] !== size) {
                             slotList[si] = size;
                             this.blockList[newBlock].updateArgSlots(slotList);
                         }
@@ -814,7 +814,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 // (2) if it is an arg block, replace it; and
                 // (3) if it is a flow block, insert it into the flow.
                 if (this.blockList[newBlock].isArgClamp()) {
-                    if ((this.blockList[newBlock].name == 'doArg' || this.blockList[newBlock].name == 'calcArg') && newConnection == 1) {
+                    if ((this.blockList[newBlock].name === 'doArg' || this.blockList[newBlock].name === 'calcArg') && newConnection === 1) {
                         // If it is the action name then treat it like
                         // a standard replacement.
                         this.blockList[connection].connections[0] = null;
@@ -822,7 +822,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         for (var c = 0; c < this.dragGroup.length; c++) {
                             this.moveBlockRelative(this.dragGroup[c], 40, 40);
                         }
-                    } else if (['doArg', 'nameddoArg'].indexOf(this.blockList[newBlock].name) != -1 && newConnection == this.blockList[newBlock].connections.length - 1) {
+                    } else if (['doArg', 'nameddoArg'].indexOf(this.blockList[newBlock].name) !== -1 && newConnection === this.blockList[newBlock].connections.length - 1) {
                         // If it is the bottom of the flow, insert as
                         // usual.
                         var bottom = this.findBottomBlock(thisBlock);
@@ -840,7 +840,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         var slotList = this.blockList[newBlock].argClampSlots;
                         // Which slot is this block in?
                         var ci = this.blockList[newBlock].connections.indexOf(connection);
-                        if (['doArg', 'calcArg'].indexOf(this.blockList[newBlock].name) != -1) {
+                        if (['doArg', 'calcArg'].indexOf(this.blockList[newBlock].name) !== -1) {
                             var si = ci - 2;
                         } else {
                             var si = ci - 1;
@@ -850,13 +850,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         var emptyConnection = null;
                         // Is there an empty slot below?
                         for (var emptySlot = si; emptySlot < slotList.length; emptySlot++) {
-                            if (this.blockList[newBlock].connections[ci + emptySlot - si] == null) {
+                            if (this.blockList[newBlock].connections[ci + emptySlot - si] === null) {
                                 emptyConnection = ci + emptySlot - si;
                                 break;
                             }
                         }
 
-                        if (emptyConnection == null) {
+                        if (emptyConnection === null) {
                             slotList.push(1);
                             this.newLocalArgBlock(slotList.length);
                             emptyConnection = ci + emptySlot - si;
@@ -899,18 +899,18 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // If it is an arg block, where is it coming from?
         // FIXME: improve mechanism for testing block types.
-        if ((myBlock.isArgBlock() || myBlock.name == 'calcArg' || myBlock.name == 'namedcalcArg') && newBlock != null) {
+        if ((myBlock.isArgBlock() || myBlock.name === 'calcArg' || myBlock.name === 'namedcalcArg') && newBlock != null) {
             // We care about twoarg blocks with connections to the
             // first arg;
             if (this.blockList[newBlock].isTwoArgBlock()) {
-                if (this.blockList[newBlock].connections[1] == thisBlock) {
-                    if (this.checkTwoArgBlocks.indexOf(newBlock) == -1) {
+                if (this.blockList[newBlock].connections[1] === thisBlock) {
+                    if (this.checkTwoArgBlocks.indexOf(newBlock) === -1) {
                         this.checkTwoArgBlocks.push(newBlock);
                     }
                 }
             } else if (this.blockList[newBlock].isArgBlock() && this.blockList[newBlock].isExpandableBlock()) {
-                if (this.blockList[newBlock].connections[1] == thisBlock) {
-                    if (this.checkTwoArgBlocks.indexOf(newBlock) == -1) {
+                if (this.blockList[newBlock].connections[1] === thisBlock) {
+                    if (this.checkTwoArgBlocks.indexOf(newBlock) === -1) {
                         this.checkTwoArgBlocks.push(newBlock);
                     }
                 }
@@ -918,9 +918,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // We also care about the second-to-last connection to an
             // arg block.
             var n = this.blockList[newBlock].connections.length;
-            if (this.blockList[newBlock].connections[n - 2] == thisBlock) {
+            if (this.blockList[newBlock].connections[n - 2] === thisBlock) {
                 // Only flow blocks, but not ArgClamps
-                if (!this.blockList[newBlock].isArgClamp() && this.blockList[newBlock].docks[n - 1][2] == 'in') {
+                if (!this.blockList[newBlock].isArgClamp() && this.blockList[newBlock].docks[n - 1][2] === 'in') {
                     checkArgBlocks.push(newBlock);
                 }
             }
@@ -963,7 +963,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     console.log(blocks.blockList);
                     break;
                 }
-                if (blocks.blockList[blk].name == 'ifthenelse') {
+                if (blocks.blockList[blk].name === 'ifthenelse') {
                     blocks.clampBlocksToCheck.push([blk, 0]);
                     blocks.clampBlocksToCheck.push([blk, 1]);
                 } else {
@@ -978,64 +978,64 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.testConnectionType = function (type1, type2) {
         // Can these two blocks dock?
-        if (type1 == 'in' && type2 == 'out') {
+        if (type1 === 'in' && type2 === 'out') {
             return true;
         }
-        if (type1 == 'out' && type2 == 'in') {
+        if (type1 === 'out' && type2 === 'in') {
             return true;
         }
-        if (type1 == 'numberin' && ['numberout', 'anyout'].indexOf(type2) != -1) {
+        if (type1 === 'numberin' && ['numberout', 'anyout'].indexOf(type2) !== -1) {
             return true;
         }
-        if (['numberout', 'anyout'].indexOf(type1) != -1 && type2 == 'numberin') {
+        if (['numberout', 'anyout'].indexOf(type1) !== -1 && type2 === 'numberin') {
             return true;
         }
-        if (type1 == 'textin' && ['textout', 'anyout'].indexOf(type2) != -1) {
+        if (type1 === 'textin' && ['textout', 'anyout'].indexOf(type2) !== -1) {
             return true;
         }
-        if (['textout', 'anyout'].indexOf(type1) != -1 && type2 == 'textin') {
+        if (['textout', 'anyout'].indexOf(type1) !== -1 && type2 === 'textin') {
             return true;
         }
-        if (type1 == 'booleanout' && type2 == 'booleanin') {
+        if (type1 === 'booleanout' && type2 === 'booleanin') {
             return true;
         }
-        if (type1 == 'booleanin' && type2 == 'booleanout') {
+        if (type1 === 'booleanin' && type2 === 'booleanout') {
             return true;
         }
-        if (type1 == 'mediain' && type2 == 'mediaout') {
+        if (type1 === 'mediain' && type2 === 'mediaout') {
             return true;
         }
-        if (type1 == 'mediaout' && type2 == 'mediain') {
+        if (type1 === 'mediaout' && type2 === 'mediain') {
             return true;
         }
-        if (type1 == 'mediain' && type2 == 'textout') {
+        if (type1 === 'mediain' && type2 === 'textout') {
             return true;
         }
-        if (type2 == 'mediain' && type1 == 'textout') {
+        if (type2 === 'mediain' && type1 === 'textout') {
             return true;
         }
-        if (type1 == 'filein' && type2 == 'fileout') {
+        if (type1 === 'filein' && type2 === 'fileout') {
             return true;
         }
-        if (type1 == 'fileout' && type2 == 'filein') {
+        if (type1 === 'fileout' && type2 === 'filein') {
             return true;
         }
-        if (type1 == 'solfegein' && ['anyout', 'solfegeout', 'textout', 'noteout', 'numberout'].indexOf(type2) != -1) {
+        if (type1 === 'solfegein' && ['anyout', 'solfegeout', 'textout', 'noteout', 'numberout'].indexOf(type2) !== -1) {
             return true;
         }
-        if (type2 == 'solfegein' && ['anyout', 'solfegeout', 'textout', 'noteout', 'numberout'].indexOf(type1) != -1) {
+        if (type2 === 'solfegein' && ['anyout', 'solfegeout', 'textout', 'noteout', 'numberout'].indexOf(type1) !== -1) {
             return true;
         }
-        if (type1 == 'notein' && ['solfegeout', 'textout', 'noteout'].indexOf(type2) != -1) {
+        if (type1 === 'notein' && ['solfegeout', 'textout', 'noteout'].indexOf(type2) !== -1) {
             return true;
         }
-        if (type2 == 'notein' && ['solfegeout', 'textout', 'noteout'].indexOf(type1) != -1) {
+        if (type2 === 'notein' && ['solfegeout', 'textout', 'noteout'].indexOf(type1) !== -1) {
             return true;
         }
-        if (type1 == 'anyin' && ['textout', 'mediaout', 'numberout', 'anyout', 'fileout', 'solfegeout', 'noteout'].indexOf(type2) != -1) {
+        if (type1 === 'anyin' && ['textout', 'mediaout', 'numberout', 'anyout', 'fileout', 'solfegeout', 'noteout'].indexOf(type2) !== -1) {
             return true;
         }
-        if (type2 == 'anyin' && ['textout', 'mediaout', 'numberout', 'anyout', 'fileout', 'solfegeout', 'noteout'].indexOf(type1) != -1) {
+        if (type2 === 'anyin' && ['textout', 'mediaout', 'numberout', 'anyout', 'fileout', 'solfegeout', 'noteout'].indexOf(type1) !== -1) {
             return true;
         }
         return false;
@@ -1105,10 +1105,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // value yet.
         var myBlock = this.blockList[blk];
         var maxLength = 8;
-        if (myBlock.text == null) {
+        if (myBlock.text === null) {
             return;
         }
-        if (myBlock.name == 'loadFile') {
+        if (myBlock.name === 'loadFile') {
             try {
                 var label = myBlock.value[0].toString();
             } catch (e) {
@@ -1136,23 +1136,23 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.findTopBlock = function (blk) {
         // Find the top block in a stack.
-        if (blk == null) {
+        if (blk === null) {
             return null;
         }
 
         var myBlock = this.blockList[blk];
-        if (myBlock.connections == null) {
+        if (myBlock.connections === null) {
             return blk;
         }
 
-        if (myBlock.connections.length == 0) {
+        if (myBlock.connections.length === 0) {
             return blk;
         }
 
         // Test for corrupted connection scenario
         // FIXME: How does this happen?
         // FIXME: Should we try to correct it?
-        if (myBlock.connections.length > 1 && myBlock.connections[0] != null && myBlock.connections[0] == last(myBlock.connections)) {
+        if (myBlock.connections.length > 1 && myBlock.connections[0] != null && myBlock.connections[0] === last(myBlock.connections)) {
             console.log('WARNING: CORRUPTED BLOCK DATA. Block ' + myBlock.name + ' (' + blk + ') is connected to the same block ' + this.blockList[myBlock.connections[0]].name + ' (' + myBlock.connections[0] + ') twice.');
             return blk;
         }
@@ -1174,15 +1174,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.findBottomBlock = function (blk) {
         // Find the bottom block in a stack.
-        if (blk == null) {
+        if (blk === null) {
             return null;
         }
 
         var myBlock = this.blockList[blk];
-        if (myBlock.connections == null) {
+        if (myBlock.connections === null) {
             return blk;
         }
-        if (myBlock.connections.length == 0) {
+        if (myBlock.connections.length === 0) {
             return blk;
         }
 
@@ -1204,7 +1204,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Find any blocks with null in the first connection.
         this.stackList = [];
         for (i = 0; i < this.blockList.length; i++) {
-            if (this.blockList[i].connections[0] == null) {
+            if (this.blockList[i].connections[0] === null) {
                 this.stackList.push(i)
             }
         }
@@ -1266,7 +1266,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.findClamps();
         this.clampBlocksToCheck = [];
         for (i = 0; i < this.expandablesList.length; i++) {
-            if (this.blockList[this.expandablesList[i]].name == 'ifthenelse') {
+            if (this.blockList[this.expandablesList[i]].name === 'ifthenelse') {
                 this.clampBlocksToCheck.push([this.expandablesList[i], 0]);
                 this.clampBlocksToCheck.push([this.expandablesList[i], 1]);
             } else {
@@ -1283,7 +1283,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // disabled.
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (myBlock.name == name) {
+            if (myBlock.name === name) {
                 myBlock.protoblock.disabled = flag;
                 myBlock.regenerateArtwork(false);
             }
@@ -1346,17 +1346,17 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             collapsed = false
         }
         myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
-        if (myBlock == null) {
+        if (myBlock === null) {
             console.log('could not make block ' + name);
             return;
         }
 
         // myBlock.collapsed = !collapsed;
         for (var c = 0; c < connections.length; c++) {
-            if (c == myBlock.docks.length) {
+            if (c === myBlock.docks.length) {
                 break;
             }
-            if (connections[c] == null) {
+            if (connections[c] === null) {
                 myBlock.connections.push(null);
             } else {
                 myBlock.connections.push(connections[c] + blockOffset);
@@ -1371,19 +1371,19 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             console.log('makeNewBlock: no prototype for ' + name);
             return null;
         }
-        if (this.protoBlockDict[name] == null) {
+        if (this.protoBlockDict[name] === null) {
             // Should never happen
             console.log('makeNewBlock: no prototype for ' + name);
             return null;
         }
-        if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(name) != -1) {
+        if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(name) !== -1) {
             this.blockList.push(new Block(this.protoBlockDict[name], this, postProcessArg[1]));
-        } else if (name == 'namedarg') {
+        } else if (name === 'namedarg') {
             this.blockList.push(new Block(this.protoBlockDict[name], this, 'arg ' + postProcessArg[1]));
         } else {
             this.blockList.push(new Block(this.protoBlockDict[name], this));
         }
-        if (last(this.blockList) == null) {
+        if (last(this.blockList) === null) {
             // Should never happen
             console.log('failed to make protoblock for ' + name);
             return null;
@@ -1418,19 +1418,19 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var postProcessArg = null;
         var me = this;
         var thisBlock = this.blockList.length;
-        if (name == 'start') {
+        if (name === 'start') {
             postProcess = function (thisBlock) {
                 me.blockList[thisBlock].value = me.turtles.turtleList.length;
                 me.turtles.addTurtle(me.blockList[thisBlock]);
             }
             postProcessArg = thisBlock;
-        } else if (name == 'drum') {
+        } else if (name === 'drum') {
             postProcess = function (thisBlock) {
                 me.blockList[thisBlock].value = me.turtles.turtleList.length;
                 me.turtles.addDrum(me.blockList[thisBlock]);
             }
             postProcessArg = thisBlock;
-        } else if (name == 'text') {
+        } else if (name === 'text') {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
@@ -1439,7 +1439,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].container.updateCache();
             }
             postProcessArg = [thisBlock, _('text')];
-        } else if (name == 'solfege') {
+        } else if (name === 'solfege') {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
@@ -1448,7 +1448,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].container.updateCache();
             }
             postProcessArg = [thisBlock, _('sol')];
-        } else if (name == 'notename') {
+        } else if (name === 'notename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
@@ -1457,7 +1457,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].container.updateCache();
             }
             postProcessArg = [thisBlock, 'G'];
-        } else if (name == 'number') {
+        } else if (name === 'number') {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = Number(args[1]);
@@ -1466,49 +1466,49 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].container.updateCache();
             }
             postProcessArg = [thisBlock, 4];
-        } else if (name == 'media') {
+        } else if (name === 'media') {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
                 me.blockList[thisBlock].value = value;
-                if (value == null) {
+                if (value === null) {
                     me.blockList[thisBlock].image = 'images/load-media.svg';
                 } else {
                     me.blockList[thisBlock].image = null;
                 }
             }
             postProcessArg = [thisBlock, null];
-        } else if (name == 'camera') {
+        } else if (name === 'camera') {
             postProcess = function (args) {
                 console.log('post process camera ' + args[1]);
                 var thisBlock = args[0];
                 var value = args[1];
                 me.blockList[thisBlock].value = CAMERAVALUE;
-                if (value == null) {
+                if (value === null) {
                     me.blockList[thisBlock].image = 'images/camera.svg';
                 } else {
                     me.blockList[thisBlock].image = null;
                 }
             }
             postProcessArg = [thisBlock, null];
-        } else if (name == 'video') {
+        } else if (name === 'video') {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
                 me.blockList[thisBlock].value = VIDEOVALUE;
-                if (value == null) {
+                if (value === null) {
                     me.blockList[thisBlock].image = 'images/video.svg';
                 } else {
                     me.blockList[thisBlock].image = null;
                 }
             }
             postProcessArg = [thisBlock, null];
-        } else if (name == 'loadFile') {
+        } else if (name === 'loadFile') {
             postProcess = function (args) {
                 me.updateBlockText(args[0]);
             }
             postProcessArg = [thisBlock, null];
-        } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) != -1) {
+        } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
             postProcess = function (args) {
                 me.blockList[thisBlock].value = null;
                 me.blockList[thisBlock].privateData = args[1];
@@ -1518,19 +1518,19 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         var protoFound = false;
         for (var proto in me.protoBlockDict) {
-            if (me.protoBlockDict[proto].name == name) {
-                if (arg == '__NOARG__') {
+            if (me.protoBlockDict[proto].name === name) {
+                if (arg === '__NOARG__') {
                     console.log('creating ' + name + ' block with no args');
                     me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
-                } else if (me.protoBlockDict[proto].defaults[0] == arg) {
+                } else if (me.protoBlockDict[proto].defaults[0] === arg) {
                     console.log('creating ' + name + ' block with default arg ' + arg);
                     me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
-                } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) != -1) {
-                    if (me.protoBlockDict[proto].defaults[0] == undefined) {
+                } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
+                    if (me.protoBlockDict[proto].defaults[0] === undefined) {
                         me.makeNewBlock(proto, postProcess, postProcessArg);
                         protoFound = true;
                         break;
@@ -1553,12 +1553,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (var i = 0; i < myBlock.protoblock.defaults.length; i++) {
             var value = myBlock.protoblock.defaults[i];
 
-            if (myBlock.name == 'action') {
+            if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
                 console.log('calling findUniqueActionName');
                 value = this.findUniqueActionName(_('action'));
                 console.log('renaming action block to ' + value);
-                if (value != _('action')) {
+                if (value !== _('action')) {
                     console.log('calling newNameddoBlock with value ' + value);
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
@@ -1568,10 +1568,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
             var me = this;
             var thisBlock = this.blockList.length;
-            if (myBlock.docks.length > i && myBlock.docks[i + 1][2] == 'anyin') {
-                if (value == null) {
+            if (myBlock.docks.length > i && myBlock.docks[i + 1][2] === 'anyin') {
+                if (value === null) {
                     console.log('cannot set default value');
-                } else if (typeof(value) == 'string') {
+                } else if (typeof(value) === 'string') {
                     postProcess = function (args) {
                         var thisBlock = args[0];
                         var value = args[1];
@@ -1593,7 +1593,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     }
                     this.makeNewBlock('number', postProcess, [thisBlock, value]);
                 }
-            } else if (myBlock.docks[i + 1][2] == 'textin') {
+            } else if (myBlock.docks[i + 1][2] === 'textin') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
@@ -1605,7 +1605,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.blockList[thisBlock].text.text = label;
                 }
                 this.makeNewBlock('text', postProcess, [thisBlock, value]);
-            } else if (myBlock.docks[i + 1][2] == 'solfegein') {
+            } else if (myBlock.docks[i + 1][2] === 'solfegein') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
@@ -1614,7 +1614,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.blockList[thisBlock].text.text = label;
                 }
                 this.makeNewBlock('solfege', postProcess, [thisBlock, value]);
-            } else if (myBlock.docks[i + 1][2] == 'notein') {
+            } else if (myBlock.docks[i + 1][2] === 'notein') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
@@ -1623,7 +1623,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.blockList[thisBlock].text.text = label;
                 }
                 this.makeNewBlock('notename', postProcess, [thisBlock, value]);
-            } else if (myBlock.docks[i + 1][2] == 'mediain') {
+            } else if (myBlock.docks[i + 1][2] === 'mediain') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
@@ -1633,7 +1633,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     }
                 }
                 this.makeNewBlock('media', postProcess, [thisBlock, value]);
-            } else if (myBlock.docks[i + 1][2] == 'filein') {
+            } else if (myBlock.docks[i + 1][2] === 'filein') {
                 postProcess = function (blk) {
                     me.updateBlockText(blk);
                 }
@@ -1678,26 +1678,26 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             return;
         }
 
-        if (blk == null) {
+        if (blk === null) {
             console.log('null block passed to calculateDragGroup');
             return;
         }
 
         var myBlock = this.blockList[blk];
         // If this happens, something is really broken.
-        if (myBlock == null) {
+        if (myBlock === null) {
             console.log('null block encountered... this is bad. ' + blk);
             return;
         }
 
         // As before, does these ever happen?
-        if (myBlock.connections == null) {
+        if (myBlock.connections === null) {
             this.dragGroup = [blk];
             return;
         }
 
         // Some malformed blocks might have no connections.
-        if (myBlock.connections.length == 0) {
+        if (myBlock.connections.length === 0) {
             this.dragGroup = [blk];
             return;
         }
@@ -1717,21 +1717,21 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Make sure we don't make two actions with the same name.
         var actionNames = [];
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].name == 'text') {
+            if (this.blockList[blk].name === 'text') {
                 var c = this.blockList[blk].connections[0];
-                if (c != null && this.blockList[c].name == 'action') {
+                if (c != null && this.blockList[c].name === 'action') {
                     actionNames.push(this.blockList[blk].value);
                 }
             }
         }
 
-        if (actionNames.length == 1) {
+        if (actionNames.length === 1) {
             return name;
         }
 
         var i = 1;
         var value = name;
-        while (actionNames.indexOf(value) != -1) {
+        while (actionNames.indexOf(value) !== -1) {
             value = name + i.toString();
             i += 1;
         }
@@ -1739,14 +1739,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.renameBoxes = function (oldName, newName) {
-        if (oldName == newName) {
+        if (oldName === newName) {
             return;
         }
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].name == 'text') {
+            if (this.blockList[blk].name === 'text') {
                 var c = this.blockList[blk].connections[0];
-                if (c != null && this.blockList[c].name == 'box') {
-                    if (this.blockList[blk].value == oldName) {
+                if (c != null && this.blockList[c].name === 'box') {
+                    if (this.blockList[blk].value === oldName) {
                         this.blockList[blk].value = newName;
                         this.blockList[blk].text.text = newName;
                         try {
@@ -1761,13 +1761,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.renameNamedboxes = function (oldName, newName) {
-        if (oldName == newName) {
+        if (oldName === newName) {
             return;
         }
 
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].name == 'namedbox') {
-                if (this.blockList[blk].privateData == oldName) {
+            if (this.blockList[blk].name === 'namedbox') {
+                if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
                     this.blockList[blk].overrideName = newName;
                     this.blockList[blk].regenerateArtwork();
@@ -1786,7 +1786,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var nameChanged = false;
         for (var blockId = 0; blockId < blockPalette.protoList.length; blockId++) {
             var block = blockPalette.protoList[blockId];
-            if (block.name == 'namedbox' && block.defaults[0] != _('box') && block.defaults[0] == oldName) {
+            if (block.name === 'namedbox' && block.defaults[0] !== _('box') && block.defaults[0] === oldName) {
                 console.log('renaming ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
@@ -1799,7 +1799,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.renameDos = function (oldName, newName) {
-        if (oldName == newName) {
+        if (oldName === newName) {
             return;
         }
         // Update the blocks, do->oldName should be do->newName
@@ -1807,14 +1807,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (var blk = 0; blk < this.blockList.length; blk++) {
             var myBlock = this.blockList[blk];
             var blkParent = this.blockList[myBlock.connections[0]];
-            if (blkParent == null) {
+            if (blkParent === null) {
                 continue;
             }
-            if (['do', 'calc', 'doArg', 'calcArg', 'action'].indexOf(blkParent.name) == -1) {
+            if (['do', 'calc', 'doArg', 'calcArg', 'action'].indexOf(blkParent.name) === -1) {
                 continue;
             }
             var blockValue = myBlock.value;
-            if (blockValue == oldName) {
+            if (blockValue === oldName) {
                 myBlock.value = newName;
                 var label = myBlock.value;
                 if (label.length > 8) {
@@ -1827,14 +1827,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.renameNameddos = function (oldName, newName) {
-        if (oldName == newName) {
+        if (oldName === newName) {
             return;
         }
 
         // Update the blocks, do->oldName should be do->newName
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(this.blockList[blk].name) != -1) {
-                if (this.blockList[blk].privateData == oldName) {
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(this.blockList[blk].name) !== -1) {
+                if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
                     var label = newName;
                     if (label.length > 8) {
@@ -1853,7 +1853,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var nameChanged = false;
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
-            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) != -1 && block.defaults[0] != _('action') && block.defaults[0] == oldName) {
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] !== _('action') && block.defaults[0] === oldName) {
                 console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
@@ -1881,7 +1881,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         myStoreinBlock.twoArgBlock();
         myStoreinBlock.dockTypes[1] = 'anyin';
         myStoreinBlock.dockTypes[2] = 'anyin';
-        if (name == 'box') {
+        if (name === 'box') {
             return;
         }
         // Add the new block to the top of the palette.
@@ -1898,7 +1898,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         myBoxBlock.defaults.push(name);
         myBoxBlock.staticLabels.push(name);
         myBoxBlock.parameterBlock();
-        if (name == 'box') {
+        if (name === 'box') {
             return;
         }
         // Add the new block to the top of the palette.
@@ -1906,7 +1906,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.newLocalArgBlock = function (name) {
-        // name == 1, 2, 3, ...
+        // name === 1, 2, 3, ...
         var blkname = 'arg_' + name;
         if (blkname in this.protoBlockDict) {
             return;
@@ -1917,7 +1917,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         myNamedArgBlock.defaults.push(name);
         myNamedArgBlock.staticLabels.push('arg ' + name);
         myNamedArgBlock.parameterBlock();
-        if (name == 'arg 1') {
+        if (name === 'arg 1') {
             return;
         }
         myNamedArgBlock.palette.add(myNamedArgBlock);
@@ -1953,7 +1953,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // a named calc w/args.
         // console.log('NEW DO: ' + name + ' ' + hasReturn + ' ' + hasArgs);
 
-        if (name == _('action')) {
+        if (name === _('action')) {
             // 'action' already has its associated palette entries.
             return;
         }
@@ -1967,7 +1967,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         } else if (hasReturn && !hasArgs) {
             this.newNamedcalcBlock(name);
             return true;
-        } else if (this.protoBlockDict['myDo_' + name] == undefined) {
+        } else if (this.protoBlockDict['myDo_' + name] === undefined) {
             console.log('creating myDo_' + name);
             var myDoBlock = new ProtoBlock('nameddo');
             this.protoBlockDict['myDo_' + name] = myDoBlock;
@@ -1984,7 +1984,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.newNamedcalcBlock = function (name) {
-        if (this.protoBlockDict['myCalc_' + name] == undefined) {
+        if (this.protoBlockDict['myCalc_' + name] === undefined) {
             console.log('creating myCalc_' + name);
             var myCalcBlock = new ProtoBlock('namedcalc');
             this.protoBlockDict['myCalc_' + name] = myCalcBlock;
@@ -2000,7 +2000,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.newNameddoArgBlock = function (name) {
-        if (this.protoBlockDict['myDoArg_' + name] == undefined) {
+        if (this.protoBlockDict['myDoArg_' + name] === undefined) {
             console.log('creating myDoArg_' + name);
             var myDoArgBlock = new ProtoBlock('nameddoArg');
             this.protoBlockDict['myDoArg_' + name] = myDoArgBlock;
@@ -2016,7 +2016,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.newNamedcalcArgBlock = function (name) {
-        if (this.protoBlockDict['myCalcArg_' + name] == undefined) {
+        if (this.protoBlockDict['myCalcArg_' + name] === undefined) {
             console.log('creating myCalcArg_' + name);
             var myCalcArgBlock = new ProtoBlock('namedcalcArg');
             this.protoBlockDict['myCalcArg_' + name] = myCalcArgBlock;
@@ -2032,11 +2032,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
     this.insideArgClamp = function (blk) {
         // Returns a containing arg clamp block or null
-        if (this.blockList[blk] == null) {
+        if (this.blockList[blk] === null) {
             // race condition?
             console.log('null block in blockList? ' + blk);
             return null;
-        } else if (this.blockList[blk].connections[0] == null) {
+        } else if (this.blockList[blk].connections[0] === null) {
             return null;
         } else {
             var cblk = this.blockList[blk].connections[0];
@@ -2050,17 +2050,17 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.insideExpandableBlock = function (blk) {
         // Returns a containing expandable block or null
-        if (this.blockList[blk] == null) {
+        if (this.blockList[blk] === null) {
             // race condition?
             console.log('null block in blockList? ' + blk);
             return null;
-        } else if (this.blockList[blk].connections[0] == null) {
+        } else if (this.blockList[blk].connections[0] === null) {
             return null;
         } else {
             var cblk = this.blockList[blk].connections[0];
             if (this.blockList[cblk].isExpandableBlock()) {
                 // If it is the last connection, keep searching.
-                if (blk == last(this.blockList[cblk].connections)) {
+                if (blk === last(this.blockList[cblk].connections)) {
                     return this.insideExpandableBlock(cblk);
                 } else {
                     return cblk;
@@ -2072,7 +2072,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.triggerLongPress = function (myBlock) {
-        this.timeOut == null;
+        this.timeOut === null;
         this.inLongPress = true;
         this.copyButton.visible = true;
         this.copyButton.x = myBlock.container.x - 27;
@@ -2080,7 +2080,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.dismissButton.visible = true;
         this.dismissButton.x = myBlock.container.x + 27;
         this.dismissButton.y = myBlock.container.y - 27;
-        if (myBlock.name == 'action') {
+        if (myBlock.name === 'action') {
             this.saveStackButton.visible = true;
             this.saveStackButton.x = myBlock.container.x + 82;
             this.saveStackButton.y = myBlock.container.y - 27;
@@ -2091,7 +2091,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.pasteStack = function () {
         // Copy a stack of blocks by creating a blockObjs and passing
         // it to this.load.
-        if (this.selectedStack == null) {
+        if (this.selectedStack === null) {
             return;
         }
         var blockObjs = this.copyBlocksToObj();
@@ -2101,20 +2101,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.saveStack = function () {
         // Save a stack of blocks to local storage and the my-stack
         // palette by creating a blockObjs and ...
-        if (this.selectedStack == null) {
+        if (this.selectedStack === null) {
             return;
         }
         var blockObjs = this.copyBlocksToObj();
         // The first block is an action block. Its first connection is
         // the block containing its label.
         var nameBlk = blockObjs[0][4][1];
-        if (nameBlk == null) {
+        if (nameBlk === null) {
             console.log('action not named... skipping');
         } else {
             console.log(blockObjs[nameBlk][1][1]);
-            if (typeof(blockObjs[nameBlk][1][1]) == 'string') {
+            if (typeof(blockObjs[nameBlk][1][1]) === 'string') {
                 var name = blockObjs[nameBlk][1][1];
-            } else if (typeof(blockObjs[nameBlk][1][1]) == 'number') {
+            } else if (typeof(blockObjs[nameBlk][1][1]) === 'number') {
                 var name = blockObjs[nameBlk][1][1].toString();
             } else {
                 var name = blockObjs[nameBlk][1][1]['value'];
@@ -2139,7 +2139,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.findDragGroup(this.selectedStack);
         for (var b = 0; b < this.dragGroup.length; b++) {
             myBlock = this.blockList[this.dragGroup[b]];
-            if (b == 0) {
+            if (b === 0) {
                 x = 25;
                 y = 25;
             } else {
@@ -2155,7 +2155,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         blockItem = [b, [myBlock.name, myBlock.value], x, y, []];
                         break;
                 }
-            } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) != -1) {
+            } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) !== -1) {
                 blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
             } else {
                 blockItem = [b, myBlock.name, x, y, []];
@@ -2166,7 +2166,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (var b = 0; b < this.dragGroup.length; b++) {
             myBlock = this.blockList[this.dragGroup[b]];
             for (var c = 0; c < myBlock.connections.length; c++) {
-                if (myBlock.connections[c] == null) {
+                if (myBlock.connections[c] === null) {
                     blockObjs[b][4].push(null);
                 } else {
                     blockObjs[b][4].push(blockMap[myBlock.connections[c]]);
@@ -2196,7 +2196,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (var b = 0; b < blockObjs.length; b++) {
             var blkData = blockObjs[b];
             for (var c in blkData[4]) {
-                if (blkData[4][c] == blkData[0]) {
+                if (blkData[4][c] === blkData[0]) {
                     console.log('Circular connection in block data: ' + blkData);
                     console.log('Punting loading of new blocks!');
                     console.log(blockObjs);
@@ -2209,11 +2209,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var currentActionNames = [];
         var currentStoreinNames = [];
         for (var b = 0; b < this.blockList.length; b++) {
-            if (this.blockList[b].name == 'action') {
+            if (this.blockList[b].name === 'action') {
                 if (this.blockList[b].connections[1] != null) {
                     currentActionNames.push(this.blockList[this.blockList[b].connections[1]].value);
                 }
-            } else if (this.blockList[b].name == 'storein') {
+            } else if (this.blockList[b].name === 'storein') {
                 if (this.blockList[b].connections[1] != null) {
                     currentStoreinNames.push(this.blockList[this.blockList[b].connections[1]].value);
                 }
@@ -2243,7 +2243,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (var b = 0; b < blockObjs.length; b++) {
             var blkData = blockObjs[b];
             // blkData[1] could be a string or an object.
-            if (typeof(blkData[1]) == 'string') {
+            if (typeof(blkData[1]) === 'string') {
                 var name = blkData[1];
             } else {
                 var name = blkData[1][0];
@@ -2252,7 +2252,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (!(name in this.protoBlockDict)) {
                 continue;
             }
-            if (['arg', 'twoarg'].indexOf(this.protoBlockDict[name].style) != -1) {
+            if (['arg', 'twoarg'].indexOf(this.protoBlockDict[name].style) !== -1) {
                 if (this.protoBlockDict[name].expandable) {
                     this.checkTwoArgBlocks.push(this.blockList.length + b);
                 }
@@ -2261,7 +2261,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             switch (name) {
                 case 'text':
                     var key = blkData[1][1];
-                    if (stringValues[key] == undefined) {
+                    if (stringValues[key] === undefined) {
                         stringValues[key] = [];
                     }
                     stringValues[key].push(b);
@@ -2298,7 +2298,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 case 'matrix':
                 case 'drum':
                 case 'start':
-                    if (typeof(blkData[1]) == 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) == 'object' && 'collapsed' in blkData[1][1]) {
+                    if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
                         if (blkData[1][1]['collapsed']) {
                             this.blocksToCollapse.push(this.blockList.length + b);
                         }
@@ -2313,8 +2313,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Make sure new storein names have palette entries.
         for (var b in storeinNames) {
             var blkData = blockObjs[storeinNames[b]];
-            if (currentStoreinNames.indexOf(blkData[1][1]) == -1) {
-                if (typeof(blkData[1][1]) == 'string') {
+            if (currentStoreinNames.indexOf(blkData[1][1]) === -1) {
+                if (typeof(blkData[1][1]) === 'string') {
                     var name = blkData[1][1];
                 } else {
                     var name = blkData[1][1]['value'];
@@ -2332,14 +2332,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // new name.
             // Name = the value of the connected label.
             var blkData = blockObjs[actionNames[b]];
-            if (typeof(blkData[1][1]) == 'string') {
+            if (typeof(blkData[1][1]) === 'string') {
                 var name = blkData[1][1];
             } else {
                 var name = blkData[1][1]['value'];
             }
             var oldName = name;
             var i = 1;
-            while (currentActionNames.indexOf(name) != -1) {
+            while (currentActionNames.indexOf(name) !== -1) {
                 name = oldName + i.toString();
                 i += 1;
                 // Should never happen... but just in case.
@@ -2349,7 +2349,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
             }
 
-            if (oldName != name) {
+            if (oldName !== name) {
                 // Change the name of the action...
                 console.log('action ' + oldName + ' is being renamed ' + name);
                 blkData[1][1] = {'value': name};
@@ -2358,25 +2358,25 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // and any do blocks
             for (var d in doNames) {
                 var thisBlkData = blockObjs[d];
-                if (typeof(thisBlkData[1]) == 'string') {
+                if (typeof(thisBlkData[1]) === 'string') {
                     var blkName = thisBlkData[1];
                 } else {
                     var blkName = thisBlkData[1][0];
                 }
-                if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(blkName) != -1) {
-                    if (thisBlkData[1][1]['value'] == oldName) {
+                if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(blkName) !== -1) {
+                    if (thisBlkData[1][1]['value'] === oldName) {
                         // console.log('renaming ' + oldName + ' to ' + name);
                         thisBlkData[1][1] = {'value': name};
                     }
                 } else {
                     var doBlkData = blockObjs[doNames[d]];
-                    if (typeof(doBlkData[1][1]) == 'string') {
-                        if (doBlkData[1][1] == oldName) {
+                    if (typeof(doBlkData[1][1]) === 'string') {
+                        if (doBlkData[1][1] === oldName) {
                             // console.log('renaming ' + oldName + ' to ' + name);
                             doBlkData[1][1] = name;
                         }
                     } else {
-                        if (doBlkData[1][1]['value'] == oldName) {
+                        if (doBlkData[1][1]['value'] === oldName) {
                             // console.log('renaming ' + oldName + ' to ' + name);
                             doBlkData[1][1] = {'value': name};
                         }
@@ -2400,12 +2400,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             var thisBlock = blockOffset + b;
             var blkData = blockObjs[b];
 
-            if (typeof(blkData[1]) == 'object') {
-                if (blkData[1].length == 1) {
+            if (typeof(blkData[1]) === 'object') {
+                if (blkData[1].length === 1) {
                     blkInfo = [blkData[1][0], {'value': null}];
-                } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) != -1) {
+                } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) !== -1) {
                     blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1][0]) != -1) {
+                    if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1][0]) !== -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -2413,7 +2413,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
             } else {
                 blkInfo = [blkData[1], {'value': null}];
-                if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1]) != -1) {
+                if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1]) !== -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -2421,11 +2421,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (['start', 'drum', 'matrix', 'action'].indexOf(name) != -1) {
+            if (['start', 'drum', 'matrix', 'action'].indexOf(name) !== -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
-            if (blkInfo[1] == null) {
+            if (blkInfo[1] === null) {
                 var value = null;
             } else {
                 var value = blkInfo[1]['value'];
@@ -2758,7 +2758,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     break;
                 default:
                     // Check that name is in the proto list
-                    if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
+                    if (!name in this.protoBlockDict || this.protoBlockDict[name] === null) {
                         // Lots of assumptions here.
                         // TODO: figure out if it is a flow or an arg block.
                         // Substitute a NOP block for an unknown block.
@@ -2786,8 +2786,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     this.makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
                     break;
             }
-            if (thisBlock == this.blockList.length - 1) {
-                if (this.blockList[thisBlock].connections[0] == null) {
+            if (thisBlock === this.blockList.length - 1) {
+                if (this.blockList[thisBlock].connections[0] === null) {
                     this.blockList[thisBlock].x = blkData[2];
                     this.blockList[thisBlock].y = blkData[3];
                     this.adjustTheseDocks.push(thisBlock);
@@ -2852,11 +2852,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.checkPaletteEntries = function () {
         var updatePalettes = false;
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].name == 'action') {
+            if (this.blockList[blk].name === 'action') {
                 var myBlock = this.blockList[blk];
                 var arg = null;
                 var c = myBlock.connections[1];
-                if (c != null && this.blockList[c].value != _('action')) {
+                if (c != null && this.blockList[c].value !== _('action')) {
                     // console.log('calling newNameddoBlock with name ' + this.blockList[c].value);
                     if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
                         updatePalettes = true;
@@ -2871,12 +2871,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.actionHasReturn = function (blk) {
         // Look for a return block in an action stack.
-        if (this.blockList[blk].name != 'action') {
+        if (this.blockList[blk].name !== 'action') {
             return false;
         }
         this.findDragGroup(blk);
         for (var b = 0; b < this.dragGroup.length; b++) {
-            if (this.blockList[this.dragGroup[b]].name == 'return') {
+            if (this.blockList[this.dragGroup[b]].name === 'return') {
                 return true;
             }
         }
@@ -2885,12 +2885,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.actionHasArgs = function (blk) {
         // Look for an arg blocks in an action stack.
-        if (this.blockList[blk].name != 'action') {
+        if (this.blockList[blk].name !== 'action') {
             return false;
         }
         this.findDragGroup(blk);
         for (var b = 0; b < this.dragGroup.length; b++) {
-            if (this.blockList[this.dragGroup[b]].name == 'arg' || this.blockList[this.dragGroup[b]].name == 'namedarg') {
+            if (this.blockList[this.dragGroup[b]].name === 'arg' || this.blockList[this.dragGroup[b]].name === 'namedarg') {
                 return true;
             }
         }
@@ -2923,7 +2923,7 @@ function sendStackToTrash(blocks, myBlock) {
     var b = myBlock.connections[0];
     if (b != null) {
         for (var c in blocks.blockList[b].connections) {
-            if (blocks.blockList[b].connections[c] == thisBlock) {
+            if (blocks.blockList[b].connections[c] === thisBlock) {
                 blocks.blockList[b].connections[c] = null;
                 break;
             }
@@ -2931,7 +2931,7 @@ function sendStackToTrash(blocks, myBlock) {
         myBlock.connections[0] = null;
     }
 
-    if (myBlock.name == 'start' || myBlock.name == 'drum') {
+    if (myBlock.name === 'start' || myBlock.name === 'drum') {
         turtle = myBlock.value;
         if (turtle != null) {
             console.log('putting turtle ' + turtle + ' in the trash');
@@ -2942,24 +2942,24 @@ function sendStackToTrash(blocks, myBlock) {
         }
     }
 
-    if (myBlock.name == 'action') {
+    if (myBlock.name === 'action') {
         var actionArg = blocks.blockList[myBlock.connections[1]];
         if (actionArg) {
             var actionName = actionArg.value;
             for (var blockId = 0; blockId < blocks.blockList.length; blockId++) {
                 var myBlock = blocks.blockList[blockId];
                 var blkParent = blocks.blockList[myBlock.connections[0]];
-                if (blkParent == null) {
+                if (blkParent === null) {
                     continue;
                 }
-                if (['namedcalc', 'calc', 'nameddo', 'do', 'action'].indexOf(blkParent.name) != -1) {
+                if (['namedcalc', 'calc', 'nameddo', 'do', 'action'].indexOf(blkParent.name) !== -1) {
                     continue;
                 }
                 var blockValue = myBlock.value;
-                if (blockValue == _('action')) {
+                if (blockValue === _('action')) {
                     continue;
                 }
-                if (blockValue == actionName) {
+                if (blockValue === actionName) {
                     blkParent.hide();
                     myBlock.hide();
                     myBlock.trash = true;
@@ -2972,7 +2972,7 @@ function sendStackToTrash(blocks, myBlock) {
 
             for (var blockId = 0; blockId < blockPalette.protoList.length; blockId++) {
                 var block = blockPalette.protoList[blockId];
-                if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) != -1 && block.privateData != _('action')) {
+                if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.privateData !== _('action')) {
                     blockPalette.protoList.splice(blockPalette.protoList.indexOf(block), 1);
                     // Any of these could be in the palette.
                     if (blocks.protoBlockDict['myDo_' + actionName]) {

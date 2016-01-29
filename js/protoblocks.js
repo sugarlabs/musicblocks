@@ -58,7 +58,7 @@ function ProtoBlock(name) {
     this.disabled = false;
 
     this.adjustWidthToLabel = function() {
-        if (this.staticLabels.length == 0) {
+        if (this.staticLabels.length === 0) {
             return;
         }
         var labelLength = this.staticLabels[0].length;

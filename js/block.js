@@ -15,7 +15,7 @@ var COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
-    if (protoblock == null) {
+    if (protoblock === null) {
         console.log('null protoblock sent to Block');
         return;
     }
@@ -77,7 +77,7 @@ function Block(protoblock, blocks, overrideName) {
     }
 
     this.highlight = function() {
-        if (this.collapsed && COLLAPSABLES.indexOf(this.name) != -1) {
+        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
             // We may have a race condition.
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = true;
@@ -89,7 +89,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = false;
             this.highlightBitmap.visible = true;
-            if (COLLAPSABLES.indexOf(this.name) != -1) {
+            if (COLLAPSABLES.indexOf(this.name) !== -1) {
                 // There could be a race condition when making a
                 // new action block.
                 if (this.highlightCollapseBlockBitmap) {
@@ -110,7 +110,7 @@ function Block(protoblock, blocks, overrideName) {
     }
 
     this.unhighlight = function() {
-        if (this.collapsed && COLLAPSABLES.indexOf(this.name) != -1) {
+        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = false;
                 this.collapseBlockBitmap.visible = true;
@@ -121,7 +121,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = true;
             this.highlightBitmap.visible = false;
-            if (COLLAPSABLES.indexOf(this.name) != -1) {
+            if (COLLAPSABLES.indexOf(this.name) !== -1) {
                 if (this.highlightCollapseBlockBitmap) {
                     this.highlightCollapseBlockBitmap.visible = false;
                     this.collapseBlockBitmap.visible = false;
@@ -156,10 +156,10 @@ function Block(protoblock, blocks, overrideName) {
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
-            if (myBlock.name == 'start' || myBlock.name == 'drum') {
+            if (myBlock.name === 'start' || myBlock.name === 'drum') {
                 // Rescale the decoration on the start blocks.
                 for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
-                    if (myBlock.blocks.turtles.turtleList[turtle].startBlock == myBlock) {
+                    if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
                         myBlock.blocks.turtles.turtleList[turtle].resizeDecoration(blockScale, myBlock.bitmap.image.width);
                         ensureDecorationOnTop(myBlock);
                         break;
@@ -402,7 +402,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 myBlock.bounds = myBlock.container.getBounds();
-                if (myBlock.bounds == null) {
+                if (myBlock.bounds === null) {
 		    // FIXME: Why is this happening sometimes? Race condition?
 		    console.log('block container for ' + + ' not yet ready.' + myBlock.name);
 		} else {
@@ -418,7 +418,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                     myBlock.finishImageLoad();
                 } else {
-                    if (myBlock.name == 'start' || myBlock.name == 'drum') {
+                    if (myBlock.name === 'start' || myBlock.name === 'drum') {
                         ensureDecorationOnTop(myBlock);
                     }
 
@@ -437,7 +437,7 @@ function Block(protoblock, blocks, overrideName) {
                         }, 250);
                     }
 
-                    if (COLLAPSABLES.indexOf(myBlock.name) != -1) {
+                    if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
                         myBlock.bitmap.visible = !myBlock.collapsed;
                         myBlock.highlightBitmap.visible = false;
                         myBlock.container.updateCache();
@@ -487,15 +487,15 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Value blocks get a modifiable text label
-        if (['text', 'number', 'solfege', 'notename', 'rest'].indexOf(this.name) != -1) {
-            if (this.value == null) {
-                if (this.name == 'text') {
+        if (['text', 'number', 'solfege', 'notename', 'rest'].indexOf(this.name) !== -1) {
+            if (this.value === null) {
+                if (this.name === 'text') {
                     this.value = '---';
-                } else if (this.name == 'solfege') {
+                } else if (this.name === 'solfege') {
                     this.value = 'sol';
-                } else if (this.name == 'notename') {
+                } else if (this.name === 'notename') {
                     this.value = 'G';
-                } else if (this.name == 'rest') {
+                } else if (this.name === 'rest') {
                     this.value = 'rest';
                 } else {
                     this.value = 4;
@@ -514,7 +514,7 @@ function Block(protoblock, blocks, overrideName) {
             positionText(this, this.protoblock.scale);
         }
 
-        if (COLLAPSABLES.indexOf(this.name) == -1) {
+        if (COLLAPSABLES.indexOf(this.name) === -1) {
             this.loadComplete = true;
             if (this.postProcess != null) {
                 this.postProcess(this.postProcessArg);
@@ -560,7 +560,7 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.container.addChild(myBlock.highlightCollapseBlockBitmap);
                     myBlock.highlightCollapseBlockBitmap.visible = false;
 
-                    if (myBlock.collapseText == null) {
+                    if (myBlock.collapseText === null) {
                         var fontSize = 10 * myBlock.protoblock.scale;
                         switch (myBlock.name) {
                         case 'action':
@@ -641,7 +641,7 @@ function Block(protoblock, blocks, overrideName) {
     this.show = function() {
         if (!this.trash) {
             // If it is an action block or it is not collapsed then show it.
-            if (!(COLLAPSABLES.indexOf(this.name) == -1 && this.collapsed)) {
+            if (!(COLLAPSABLES.indexOf(this.name) === -1 && this.collapsed)) {
                 this.container.visible = true;
                 if (this.collapseContainer != null) {
                     this.collapseContainer.visible = true;
@@ -653,35 +653,35 @@ function Block(protoblock, blocks, overrideName) {
 
     // Utility functions
     this.isValueBlock = function() {
-        return this.protoblock.style == 'value';
+        return this.protoblock.style === 'value';
     }
 
     this.isArgBlock = function() {
-        return this.protoblock.style == 'value' || this.protoblock.style == 'arg';
+        return this.protoblock.style === 'value' || this.protoblock.style === 'arg';
     }
 
     this.isTwoArgBlock = function() {
-        return this.protoblock.style == 'twoarg';
+        return this.protoblock.style === 'twoarg';
     }
 
     this.isTwoArgBooleanBlock = function() {
-        return ['equal', 'greater', 'less'].indexOf(this.name) != -1;
+        return ['equal', 'greater', 'less'].indexOf(this.name) !== -1;
     }
 
     this.isClampBlock = function() {
-        return this.protoblock.style == 'clamp' || this.isDoubleClampBlock();
+        return this.protoblock.style === 'clamp' || this.isDoubleClampBlock();
     }
 
     this.isDoubleClampBlock = function() {
-        return this.protoblock.style == 'doubleclamp';
+        return this.protoblock.style === 'doubleclamp';
     }
 
     this.isNoRunBlock = function() {
-        return this.name == 'action';
+        return this.name === 'action';
     }
 
     this.isArgClamp = function() {
-        return this.protoblock.style == 'argclamp' || this.protoblock.style == 'argclamparg';
+        return this.protoblock.style === 'argclamp' || this.protoblock.style === 'argclamparg';
     }
 
     this.isExpandableBlock = function() {
@@ -696,7 +696,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this.removeChildBitmap = function(name) {
         for (var child = 0; child < this.container.getNumChildren(); child++) {
-            if (this.container.children[child].name == name) {
+            if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
                 break;
             }
@@ -707,7 +707,7 @@ function Block(protoblock, blocks, overrideName) {
         // Load an image thumbnail onto block.
         var thisBlock = this.blocks.blockList.indexOf(this);
         var myBlock = this;
-        if (this.blocks.blockList[thisBlock].value == null && imagePath == null) {
+        if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             // console.log('loadThumbnail: no image to load?');
             return;
         }
@@ -748,7 +748,7 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.blocks.refreshCanvas();
         }
 
-        if (imagePath == null) {
+        if (imagePath === null) {
             image.src = this.value;
         } else {
             image.src = imagePath;
@@ -764,7 +764,7 @@ function Block(protoblock, blocks, overrideName) {
             var reader = new FileReader();
             reader.onloadend = (function() {
                 if (reader.result) {
-                    if (myBlock.name == 'media') {
+                    if (myBlock.name === 'media') {
                         myBlock.value = reader.result;
                         myBlock.loadThumbnail(null);
                         return;
@@ -773,7 +773,7 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.blocks.updateBlockText(thisBlock);
                 }
             });
-            if (myBlock.name == 'media') {
+            if (myBlock.name === 'media') {
                 reader.readAsDataURL(fileChooser.files[0]);
             }
             else {
@@ -795,7 +795,7 @@ function Block(protoblock, blocks, overrideName) {
 
         function toggle(myBlock) {
             var collapse = myBlock.collapsed;
-            if (myBlock.collapseBitmap == null) {
+            if (myBlock.collapseBitmap === null) {
                 console.log('collapse bitmap not ready');
                 return;
             }
@@ -818,7 +818,7 @@ function Block(protoblock, blocks, overrideName) {
             }
             myBlock.highlightBitmap.visible = false;
 
-            if (myBlock.name == 'action') {
+            if (myBlock.name === 'action') {
                 // Label the collapsed block with the action label
                 if (myBlock.connections[1] != null) {
                     var text = myBlock.blocks.blockList[myBlock.connections[1]].value;
@@ -835,7 +835,7 @@ function Block(protoblock, blocks, overrideName) {
             var z = myBlock.container.getNumChildren() - 1;
             myBlock.container.setChildIndex(myBlock.collapseText, z);
 
-            if (myBlock.name == 'drum') {
+            if (myBlock.name === 'drum') {
                 ensureDecorationOnTop(myBlock);
             }
 
@@ -863,9 +863,9 @@ function $() {
 
     for (var i = 0; i < arguments.length; i++) {
         var element = arguments[i];
-        if (typeof element == 'string')
+        if (typeof element === 'string')
             element = docById(element);
-        if (arguments.length == 1)
+        if (arguments.length === 1)
             return element;
         elements.push(element);
     }
@@ -882,15 +882,15 @@ function positionText(myBlock, blockScale) {
     myBlock.text.y = TEXTY * blockScale / 2.;
 
     // Some special cases
-    if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) != -1) {
+    if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) !== -1) {
         myBlock.text.textAlign = 'center';
         myBlock.text.x = VALUETEXTX * blockScale / 2.;
-    } else if (myBlock.protoblock.args == 0) {
+    } else if (myBlock.protoblock.args === 0) {
         var bounds = myBlock.container.getBounds();
         myBlock.text.x = bounds.width - 25;
     } else {
         myBlock.text.textAlign = 'left';
-        if (myBlock.docks[0][2] == 'booleanout') {
+        if (myBlock.docks[0][2] === 'booleanout') {
              myBlock.text.y = myBlock.docks[0][1];
         }
     }
@@ -1059,7 +1059,7 @@ function loadCollapsibleEventHandlers(myBlock) {
         if (myBlock.blocks.dragGroup.length > 0) {
             for (var b = 0; b < myBlock.blocks.dragGroup.length; b++) {
                 var blk = myBlock.blocks.dragGroup[b];
-                if (b != 0) {
+                if (b !== 0) {
                     myBlock.blocks.moveBlockRelative(blk, dx, dy);
                 }
             }
@@ -1084,7 +1084,7 @@ function collapseOut(blocks, myBlock, thisBlock, moved, event) {
         }
     }
 
-    if (blocks.activeBlock != myBlock) {
+    if (blocks.activeBlock !== myBlock) {
         return;
     }
 
@@ -1149,11 +1149,11 @@ function loadEventHandlers(myBlock) {
                 var topBlock = blocks.findTopBlock(thisBlock);
                 blocks.selectedStack = topBlock;
                 blocks.selectingStack = false;
-            } else if (myBlock.name == 'media') {
+            } else if (myBlock.name === 'media') {
                 myBlock.doOpenMedia(myBlock, thisBlock);
-            } else if (myBlock.name == 'loadFile') {
+            } else if (myBlock.name === 'loadFile') {
                 myBlock.doOpenMedia(myBlock, thisBlock);
-            } else if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) != -1) {
+            } else if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) !== -1) {
                 if(!myBlock.trash)
                 {
                     changeLabel(myBlock);
@@ -1174,7 +1174,7 @@ function loadEventHandlers(myBlock) {
 
         // Track time for detecting long pause...
         // but only for top block in stack
-        if (myBlock.connections[0] == null) {
+        if (myBlock.connections[0] === null) {
             var d = new Date();
             blocks.time = d.getTime();
             blocks.timeOut = setTimeout(function() {
@@ -1260,7 +1260,7 @@ function loadEventHandlers(myBlock) {
                 trashcan.unhighlight();
             }
 
-            if (myBlock.isValueBlock() && myBlock.name != 'media') {
+            if (myBlock.isValueBlock() && myBlock.name !== 'media') {
                 // Ensure text is on top
                 var z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.text, z);
@@ -1276,7 +1276,7 @@ function loadEventHandlers(myBlock) {
             if (blocks.dragGroup.length > 0) {
                 for (var b = 0; b < blocks.dragGroup.length; b++) {
                     var blk = blocks.dragGroup[b];
-                    if (b != 0) {
+                    if (b !== 0) {
                         blocks.moveBlockRelative(blk, dx, dy);
                     }
                 }
@@ -1334,7 +1334,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
             // console.log('adjust Docks ' + myBlock.name);
             myBlock.blocks.adjustDocks(myBlock.blocks.blockList.indexOf(myBlock));
         }
-    } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(myBlock.name) != -1) {
+    } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(myBlock.name) !== -1) {
         if (!haveClick) {
             // Simulate click on Android.
             var d = new Date();
@@ -1343,7 +1343,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
                 {
                     var d = new Date();
                     blocks.time = d.getTime();
-                    if (myBlock.name == 'media' || myBlock.name == 'loadFile') {
+                    if (myBlock.name === 'media' || myBlock.name === 'loadFile') {
                         myBlock.doOpenMedia(myBlock, thisBlock);
                     } else {
                         changeLabel(myBlock);
@@ -1354,7 +1354,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
     }
 
     if (hideDOM) {
-        if (myBlock.blocks.activeBlock != thisBlock) {
+        if (myBlock.blocks.activeBlock !== thisBlock) {
             hideDOMLabel();
         } else {
             myBlock.blocks.unhighlight(null);
@@ -1368,9 +1368,9 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
 function ensureDecorationOnTop(myBlock) {
     // Find the turtle decoration and move it to the top.
     for (var child = 0; child < myBlock.container.getNumChildren(); child++) {
-        if (myBlock.container.children[child].name == 'decoration') {
+        if (myBlock.container.children[child].name === 'decoration') {
             // Drum block in collapsed state is less wide.
-            if (myBlock.name == 'drum') {
+            if (myBlock.name === 'drum') {
                 var bounds = myBlock.container.getBounds();
                 if (myBlock.collapsed) {
                     var dx = 25 * myBlock.protoblock.scale / 2;
@@ -1378,7 +1378,7 @@ function ensureDecorationOnTop(myBlock) {
                     var dx = 0;
                 }
                 for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
-                    if (myBlock.blocks.turtles.turtleList[turtle].startBlock == myBlock) {
+                    if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
                         myBlock.blocks.turtles.turtleList[turtle].decorationBitmap.x = bounds.width - dx - 50 * myBlock.protoblock.scale / 2;
                       break;
                     }
@@ -1423,29 +1423,29 @@ function changeLabel(myBlock) {
     var labelValue = (myBlock.label)?myBlock.label.value:myBlock.value;
     var labelElem = docById('labelDiv');
 
-    if (myBlock.name == 'text') {
+    if (myBlock.name === 'text') {
         var type = 'text';
         labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
         labelElem.classList.add('hasKeyboard');
         myBlock.label = docById('textLabel');
-    } else if (myBlock.name == 'solfege') {
+    } else if (myBlock.name === 'solfege') {
         var type = 'solfege';
         var notes = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
         var attrs = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
-            if (notes.indexOf(myBlock.value) != -1) {
+            if (notes.indexOf(myBlock.value) !== -1) {
                 var selectednote = myBlock.value;
                 var selectedattr = '♮';
-            } else if (myBlock.value.slice(0, 3) == 'sol') {
+            } else if (myBlock.value.slice(0, 3) === 'sol') {
                 var selectednote = 'sol';
-		if (myBlock.value.length == 4) {
+		if (myBlock.value.length === 4) {
                     var selectedattr = myBlock.value[3];
                 } else {
                     var selectedattr = myBlock.value[3] + myBlock.value[3];
                 }
             } else {
                 var selectednote = myBlock.value.slice(0, 2);
-		if (myBlock.value.length == 3) {
+		if (myBlock.value.length === 3) {
                     var selectedattr = myBlock.value[2];
                 } else {
                     var selectedattr = myBlock.value[2] + myBlock.value[2];
@@ -1457,7 +1457,7 @@ function changeLabel(myBlock) {
         }
         var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
         for (var i = 0; i < notes.length; i++) {
-            if (selectednote == notes[i]) {
+            if (selectednote === notes[i]) {
                 labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
 	    } else {
                 labelHTML += '<option value="' + notes[i] + '">' + notes[i] + '</option>';
@@ -1466,7 +1466,7 @@ function changeLabel(myBlock) {
         labelHTML += '</select>';
         labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
         for (var i = 0; i < attrs.length; i++) {
-            if (selectedattr == attrs[i]) {
+            if (selectedattr === attrs[i]) {
                 labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
 	    } else {
                 labelHTML += '<option value="' + attrs[i] + '">' + attrs[i] + '</option>';
@@ -1476,15 +1476,15 @@ function changeLabel(myBlock) {
         labelElem.innerHTML = labelHTML;
         myBlock.label = docById('solfegeLabel');
         myBlock.labelattr = docById('noteattrLabel');
-    } else if (myBlock.name == 'notename') {
+    } else if (myBlock.name === 'notename') {
         var type = 'notename';
         var notes = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
         var attrs = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             var selectednote = myBlock.value[0];
-            if (myBlock.value.length == 1) {
+            if (myBlock.value.length === 1) {
                 var selectedattr = '♮';
-            } else if (myBlock.value.length == 2) {
+            } else if (myBlock.value.length === 2) {
                 var selectedattr = myBlock.value[1];
             } else {
                 var selectedattr = myBlock.value[1] + myBlock.value[1];
@@ -1495,7 +1495,7 @@ function changeLabel(myBlock) {
         }
         var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
         for (var i = 0; i < notes.length; i++) {
-            if (selectednote == notes[i]) {
+            if (selectednote === notes[i]) {
                 labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
             } else {
                 labelHTML += '<option value="' + notes[i] + '">' + notes[i] + '</option>';
@@ -1504,7 +1504,7 @@ function changeLabel(myBlock) {
         labelHTML += '</select>';
         labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
         for (var i = 0; i < attrs.length; i++) {
-            if (selectedattr == attrs[i]) {
+            if (selectedattr === attrs[i]) {
                 labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
 	    } else {
                 labelHTML += '<option value="' + attrs[i] + '">' + attrs[i] + '</option>';
@@ -1544,7 +1544,7 @@ function changeLabel(myBlock) {
             blocks.updateStage();
         }
     };
-    if (myBlock.name == 'text' || myBlock.name == 'number') {
+    if (myBlock.name === 'text' || myBlock.name === 'number') {
         myBlock.label.addEventListener('blur', blur);
     }
 
@@ -1592,7 +1592,7 @@ function changeLabel(myBlock) {
 
 function labelChanged(myBlock) {
     // Update the block values as they change in the DOM label.
-    if (myBlock == null) {
+    if (myBlock === null) {
         return;
     }
 
@@ -1617,13 +1617,13 @@ function labelChanged(myBlock) {
                 break;
         }
     }
-    if (oldValue == newValue) {
+    if (oldValue === newValue) {
         // Nothing to do in this case.
         return;    
     }
 
     // Update the block value and block text.
-    if (myBlock.name == 'number') {
+    if (myBlock.name === 'number') {
         myBlock.value = Number(newValue);
         if (isNaN(myBlock.value)) {
             var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
@@ -1655,7 +1655,7 @@ function labelChanged(myBlock) {
     myBlock.blocks.refreshCanvas();
 
     var c = myBlock.connections[0];
-    if (myBlock.name == 'text' && c != null) {
+    if (myBlock.name === 'text' && c != null) {
         var cblock = myBlock.blocks.blockList[c];
         // console.log('Label changed to: ' + myBlock.value);
         switch (cblock.name) {
@@ -1665,7 +1665,7 @@ function labelChanged(myBlock) {
                 // Rename both do <- name and nameddo blocks.
                 console.log('renameDos and...');
                 myBlock.blocks.renameDos(oldValue, newValue);
-                if (oldValue == _('action')) {
+                if (oldValue === _('action')) {
                     console.log('and newNameddoBlock...');
                     myBlock.blocks.newNameddoBlock(newValue, myBlock.blocks.actionHasReturn(c), myBlock.blocks.actionHasArgs(c));
                 }
@@ -1676,7 +1676,7 @@ function labelChanged(myBlock) {
             case 'storein':
                 // If the label was the name of a storein, update the
                 //associated box myBlock.blocks and the palette buttons
-                if (myBlock.value != 'box') {
+                if (myBlock.value !== 'box') {
                     myBlock.blocks.newStoreinBlock(myBlock.value);
                     myBlock.blocks.newNamedboxBlock(myBlock.value);
                 }

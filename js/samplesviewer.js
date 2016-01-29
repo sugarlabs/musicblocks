@@ -99,9 +99,9 @@ function PlanetModel(controller) {
         }
         var name = image.replace('.b64', '');
         var mbcheck=0;
-        if(name.slice(0, 'MusicBlocks_'.length) == 'MusicBlocks_'){
-        	name=name.substring('MusicBlocks_'.length);
-        	mbcheck=1;
+        if(name.slice(0, 'MusicBlocks_'.length) === 'MusicBlocks_'){
+        	name = name.substring('MusicBlocks_'.length);
+        	mbcheck = 1;
         }
 
         if (me.globalImagesCache[image] !== undefined) {
@@ -121,7 +121,7 @@ function PlanetModel(controller) {
                     d = EMPTYIMAGE;
                 }
                 if(mbcheck) 
-                	d='images/planetgraphic.png';
+                	d = 'images/planetgraphic.png';
                 me.globalImagesCache[image] = d;
                 me.globalProjects.push({title: name, img: d, url: image});
                 me.updated();

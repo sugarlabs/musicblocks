@@ -111,7 +111,7 @@ function Matrix() {
         }
         var table = document.getElementById('myTable');
 
-        if (table != null) {
+        if (table !== null) {
             table.remove();
         }
 
@@ -203,7 +203,7 @@ function Matrix() {
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             // process transpositions
-            if (this.solfegeTranspositions[i] != 0) {
+            if (this.solfegeTranspositions[i] !== 0) {
                 // When we apply a transposition to solfege, convert
                 // to note octave format and then convert back to
                 // solfege.
@@ -237,7 +237,7 @@ function Matrix() {
 
     this.note2Solfege = function(note, index) {
         var solfegeConversionTable = {'C': 'do', 'C♯': 'do♯', 'D': 're', 'D♯': 're♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa♯', 'G': 'sol', 'G♯': 'sol♯', 'A': 'la', 'A♯': 'la♯', 'B': 'ti', 'D♭': 're♭', 'E♭': 'mi♭', 'G♭': 'sol♭', 'A♭': 'la♭', 'B♭': 'ti♭'};
-        if (['♭', '♯'].indexOf(note[1]) == -1) {
+        if (['♭', '♯'].indexOf(note[1]) === -1) {
             var octave = note[1];
             var newNote = solfegeConversionTable[note[0]];
         } else {
@@ -280,12 +280,12 @@ function Matrix() {
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 cell.onmouseover=function() {
-                    if (this.style.backgroundColor != 'black'){
+                    if (this.style.backgroundColor !== 'black'){
                         this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                     }
                 }
                 cell.onmouseout=function() {
-                    if (this.style.backgroundColor != 'black'){
+                    if (this.style.backgroundColor !== 'black'){
                         this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     }
                 }
@@ -350,11 +350,11 @@ function Matrix() {
             // Add an entry for the tuplet value in any rhythm
             // columns. If we already have tuplets, just add a cell to
             // the new tuplet column.
-            if (!this.matrixHasTuplets || i == tupletCol) {
+            if (!this.matrixHasTuplets || i === tupletCol) {
                 cell = row.insertCell(i + 1);
                 cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                 cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
-                if (i == tupletCol) {
+                if (i === tupletCol) {
                     cell.style.fontSize = this.cellScale * 100 + '%';
                     cell.innerHTML = numberOfNotes.toString();
                     cell.colSpan = numberOfNotes;
@@ -449,7 +449,7 @@ function Matrix() {
                 var row = table.rows[i];
                 var cell = row.insertCell(-1);
                 cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
-                if (i == rowCount) {
+                if (i === rowCount) {
                     cell.style.fontSize = this.cellScale * 100 + '%';
                     cell.innerHTML = noteValueToDisplay;
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
@@ -460,12 +460,12 @@ function Matrix() {
                 } else {
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     cell.onmouseover=function() {
-                        if (this.style.backgroundColor != 'black'){
+                        if (this.style.backgroundColor !== 'black'){
                             this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                         }
                     }
                     cell.onmouseout=function() {
-                        if (this.style.backgroundColor != 'black'){
+                        if (this.style.backgroundColor !== 'black'){
                             this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                         }
                     }
@@ -495,20 +495,20 @@ function Matrix() {
         for (var i = 1; i < table.rows[1].cells.length; i++) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                 cell = table.rows[j].cells[i];
-                if (cell.style.backgroundColor == 'black') {
+                if (cell.style.backgroundColor === 'black') {
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     cell.style.backgroundColor = 'black';
                     this.setNotes(i, cell.parentNode.rowIndex, false);
                 }
             }
         }
-        if (table != null) {
+        if (table !== null) {
             for (var i = 1; i < table.rows[1].cells.length; i++) {
                 for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                     var cell = table.rows[j].cells[i];
                     var that = this;
                     cell.onclick = function() {
-                        if (this.style.backgroundColor == 'black') {
+                        if (this.style.backgroundColor === 'black') {
                             this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                             that.chkArray[this.id] = 0;
                             that.notesToPlay[this.id - 1][0] = ['R'];
@@ -542,12 +542,12 @@ function Matrix() {
         console.log('MATRIX:doTransposition: ' + this.transposition);
         if (this.transposition) {
             var deltaOctave = 0;
-            if (this.transposition[0] == '-') {
+            if (this.transposition[0] === '-') {
                 var factor = this.transposition;
                 factor = factor.slice(0,0) + factor.slice(1,factor.length);
                 factor = parseInt(factor);
                 var index = this.notes.indexOf(note);
-                if (index == 0) {
+                if (index === 0) {
                     index = this.notes.length - factor % this.notes.length;
                     deltaOctave = -1
                 } else {
@@ -558,12 +558,12 @@ function Matrix() {
                     }
                 }
                 return this.notes[index] + (parseInt(octave) + parseInt(deltaOctave));
-            } else if (this.transposition[0] == '+') {
+            } else if (this.transposition[0] === '+') {
                 var factor = this.transposition;
                 factor = factor.slice(0,0) + factor.slice(1,factor.length);
                 factor = parseInt(factor);
                 var index = this.notes.indexOf(note);
-                if (index == this.notes.length - 1) {
+                if (index === this.notes.length - 1) {
                     index = factor % this.notes.length - 1;
                     deltaOctave = 1;
                 } else {
@@ -603,7 +603,7 @@ function Matrix() {
             note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
         }
 
-        if (note[0] != 'R') {
+        if (note[0] !== 'R') {
             synth.triggerAttackRelease(note, this.logo.defaultBPMFactor / noteValue);
         }
 
@@ -624,7 +624,7 @@ function Matrix() {
                 for (var i = 0; i < note.length; i++) {
                     note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
                 }
-                if(note != 'R') {
+                if(note !== 'R') {
                     synth.triggerAttackRelease(note, that.logo.defaultBPMFactor / noteValue);
                 }
             }, that.logo.defaultBPMFactor * 1000 * time);
@@ -641,10 +641,10 @@ function Matrix() {
         var table = document.getElementById('myTable');
         var transformed = false;
         this.notesToPlay[colIndex - 1][0] = [];
-        if (table != null) {
+        if (table !== null) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                 cell = table.rows[j].cells[colIndex];
-                if (cell.style.backgroundColor == 'black') {
+                if (cell.style.backgroundColor === 'black') {
                     var solfegeHTML = table.rows[j].cells[0].innerHTML;
                     // Both solfege and octave are extracted from HTML by getNote.
                     var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
@@ -653,13 +653,13 @@ function Matrix() {
                     // Remove ' &#x1D15F;' at the end of the HTML code for the
                     // note value.
                     var len = noteValue.length;
-                    // if (len > 2 && noteValue.charAt(len - 3) == ' ') {
-                    if (noteValue.indexOf(' ') != -1) {
+                    // if (len > 2 && noteValue.charAt(len - 3) === ' ') {
+                    if (noteValue.indexOf(' ') !== -1) {
                         noteValue = noteValue.slice(0, noteValue.length - 2);
                     }
                     var i = 0;
-                    if (noteValue.substr(0,3) == '1.5') {
-                        while (noteValue[i] != ' ') {
+                    if (noteValue.substr(0,3) === '1.5') {
+                        while (noteValue[i] !== ' ') {
                             i += 1;
                         }
                         noteValue = noteValue.substr(4, i - 4);
@@ -679,7 +679,7 @@ function Matrix() {
 
     this.playNotesString = function(time, synth) {
         /*plays the matrix and also the chunks*/
-        if (this.transposition != null ) {
+        if (this.transposition !== null ) {
             var transposedArray = [];
             for (var i = 0; i < this.notesToPlay.length; i++) {
                 var transposedNote = this.doTransposition(this.notesToPlay[i][0], this.octave);
@@ -711,11 +711,11 @@ function Matrix() {
             var leaveRowsFromBottom = 1;
         }
 
-        if (table != null) {
+        if (table !== null) {
             for (var i = 1; i < table.rows[1].cells.length; i++) {
                 for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
                     var cell = table.rows[j].cells[i];
-                    if (cell.style.backgroundColor == 'black') {
+                    if (cell.style.backgroundColor === 'black') {
                         cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                         this.chkArray[cell.id] = 0;
                         this.notesToPlay[cell.id - 1][0] = ['R'];
@@ -738,7 +738,7 @@ function Matrix() {
             // We want all of the notes in a column.
             // console.log(this.notesToPlay[i]);
             var note = this.notesToPlay[i].slice(0);
-            if (note[0] == '') {
+            if (note[0] === '') {
                 note[0] = 'R';
             }
 
@@ -746,7 +746,7 @@ function Matrix() {
             var idx = newStack.length;
             newStack.push([idx, 'note', 0, 0, [endOfStackIdx, idx + 1, idx + 2, null]]);
             var n = newStack[idx][4].length;
-            if (i == 0) {  // the action block
+            if (i === 0) {  // the action block
                 newStack[endOfStackIdx][4][n - 2] = idx;
             } else { // the previous note block
                 newStack[endOfStackIdx][4][n - 1] = idx;
@@ -813,8 +813,8 @@ function Matrix() {
                 var thisBlock = idx + delta + (j * 3);
 
                 // We need to point to the previous note or pitch block.
-                if (j == 0) {
-                    if (delta == 5) {
+                if (j === 0) {
+                    if (delta === 5) {
                         var previousBlock = idx + 1;  // Vspace block
                     } else {
                         var previousBlock = idx;  // Note block
@@ -824,18 +824,18 @@ function Matrix() {
                 }
 
                 // The last connection in last pitch block is null.
-                if (note[0].length == 1 || j == note[0].length - 1) {
+                if (note[0].length === 1 || j === note[0].length - 1) {
                     var lastConnection = null;
                 } else {
                     var lastConnection = thisBlock + 3;
                 }
 
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                if(['♯', '♭'].indexOf(note[0][j][1]) != -1) {
+                if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
                     newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                     newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                 } else {
-                    if (note[0][0] == 'R') {
+                    if (note[0][0] === 'R') {
                         newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': 4}], 0, 0, [thisBlock]]);
                     } else {
@@ -854,7 +854,7 @@ function Matrix() {
 
 function reducedFraction(a, b) {
     greatestCommonMultiple = function(a, b) {
-        return b == 0 ? a : greatestCommonMultiple(b, a % b);
+        return b === 0 ? a : greatestCommonMultiple(b, a % b);
     }
 
     var gcm = greatestCommonMultiple(a, b);

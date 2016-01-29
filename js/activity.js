@@ -41,7 +41,7 @@ try {
 }
 
 var lang = document.webL10n.getLanguage();
-if (lang.indexOf("-") != -1) {
+if (lang.indexOf("-") !== -1) {
     lang = lang.slice(0, lang.indexOf("-"));
     document.webL10n.setLanguage(lang);
 }
@@ -205,7 +205,7 @@ define(function (require) {
         var stageX = 0;
         var stageY = 0;
 
-        var onXO = (screen.width == 1200 && screen.height == 900) || (screen.width == 900 && screen.height == 1200);
+        var onXO = (screen.width === 1200 && screen.height === 900) || (screen.width === 900 && screen.height === 1200);
         console.log('on XO? ' + onXO);
 
         var cellSize = 55;
@@ -318,7 +318,7 @@ define(function (require) {
             for (var turtle in logo.stepQueue) {
                 turtleCount += 1;
             }
-            if (turtleCount == 0 || logo.turtleDelay != TURTLESTEP) {
+            if (turtleCount === 0 || logo.turtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
                 // switching modes.
                 logo.setTurtleDelay(TURTLESTEP);
@@ -347,7 +347,7 @@ define(function (require) {
             for (var turtle in logo.stepQueue) {
                 turtleCount += 1;
             }
-            if (turtleCount == 0 || logo.TurtleDelay != TURTLESTEP) {
+            if (turtleCount === 0 || logo.TurtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
                 // switching modes.
                 logo.setTurtleDelay(TURTLESTEP);
@@ -662,7 +662,7 @@ define(function (require) {
                                     projectName = args[1];
                                     break;
                                 case 'run':
-                                    if (args[1].toLowerCase() == 'true')
+                                    if (args[1].toLowerCase() === 'true')
                                         runProjectOnLoad = true;
                                     break;
                                 case 'inurl':
@@ -674,7 +674,7 @@ define(function (require) {
                                             xhr.responseType = 'json';
                                             xhr.onload = function () {
                                                 var status = xhr.status;
-                                                if (status == 200) {
+                                                if (status === 200) {
                                                     resolve(xhr.response);
                                                 } else {
                                                     reject(status);
@@ -703,7 +703,7 @@ define(function (require) {
                     if (urlParts[1].indexOf('=') > 0)
                         var args = urlParts[1].split('=');
                     //File is the only arg that can stand alone
-                    if (args[0].toLowerCase() == 'file') {
+                    if (args[0].toLowerCase() === 'file') {
                         projectName = args[1];
                     }
                 }
@@ -736,7 +736,7 @@ define(function (require) {
 
             stage.on('stagemousedown', function (event) {
                 stageMouseDown = true;
-                if (stage.getObjectUnderPoint() !== null | turtles.running()) {
+                if (stage.getObjectUnderPoint() != null | turtles.running()) {
                     stage.on('stagemouseup', function (event) {
                         stageMouseDown = false;
                     });
@@ -853,7 +853,7 @@ define(function (require) {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
-                    if (errorMsgArrow !== null) {
+                    if (errorMsgArrow != null) {
                         errorMsgArrow.removeAllChildren(); // Hide the error arrow.
                     }
                     update = true;
@@ -905,7 +905,7 @@ define(function (require) {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
-                    if (errorMsgArrow !== null) {
+                    if (errorMsgArrow != null) {
                         errorMsgArrow.removeAllChildren(); // Hide the error arrow.
                     }
                     update = true;
@@ -1043,7 +1043,7 @@ define(function (require) {
             }
 
             // Music stuff
-            if (matrix.isMatrix == 1) {
+            if (matrix.isMatrix === 1) {
                 matrixTable = document.getElementById("myTable");
                 if (matrixTable) {
                     matrixTable.setAttribute("width", w/2 + 'px');
@@ -1063,7 +1063,7 @@ define(function (require) {
                     blocks.blockList[blk].trash = false;
                     blocks.moveBlockRelative(blk, dx, dy);
                     blocks.blockList[blk].show();
-                    if (blocks.blockList[blk].name == 'start' || blocks.blockList[blk].name == 'drum') {
+                    if (blocks.blockList[blk].name === 'start' || blocks.blockList[blk].name === 'drum') {
                         turtle = blocks.blockList[blk].value;
                         turtles.turtleList[turtle].trash = false;
                         turtles.turtleList[turtle].container.visible = true;
@@ -1089,7 +1089,7 @@ define(function (require) {
                 blocks.blockList[blk].trash = true;
                 blocks.moveBlockRelative(blk, dx, dy);
                 blocks.blockList[blk].hide();
-                if (blocks.blockList[blk].name == 'start' || blocks.blockList[blk].name == 'drum') {
+                if (blocks.blockList[blk].name === 'start' || blocks.blockList[blk].name === 'drum') {
                     console.log('start blk ' + blk + ' value is ' + blocks.blockList[blk].value)
                     turtle = blocks.blockList[blk].value;
                     if (turtle != null) {
@@ -1206,7 +1206,7 @@ define(function (require) {
         }
 
         function doOpenSamples() {
-            if(document.getElementById('matrix').style.visibility != 'hidden') {
+            if(document.getElementById('matrix').style.visibility !== 'hidden') {
                 console.log('hide matrix');
                 document.getElementById('matrix').style.visibility = 'hidden';
                 document.getElementById('matrix').style.border = 0;
@@ -1306,7 +1306,7 @@ define(function (require) {
             document.body.style.cursor = 'wait';
             // palettes.updatePalettes();
             setTimeout(function () {
-                if (fileExt(projectName) != 'tb') {
+                if (fileExt(projectName) !== 'tb') {
                     projectName += '.tb';
                 }
                 try {
@@ -1363,7 +1363,7 @@ define(function (require) {
             setTimeout(function () {
                 var punctuationless = projectName.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^`{|}~']/g, '');
                 projectName = punctuationless.replace(/ /g, '_');
-                if (fileExt(projectName) != 'tb') {
+                if (fileExt(projectName) !== 'tb') {
                     projectName += '.tb';
                 }
                 try {
@@ -1451,7 +1451,7 @@ define(function (require) {
             sessionData = storage['SESSION' + currentProject];
             if (sessionData) {
                 try {
-                    if (sessionData == 'undefined' || sessionData == '[]') {
+                    if (sessionData === 'undefined' || sessionData === '[]') {
                         console.log('empty session found: loading start');
                         justLoadStart();
                     } else {
@@ -1471,7 +1471,7 @@ define(function (require) {
 
         function hideMsgs() {
             errorMsgText.parent.visible = false;
-            if (errorMsgArrow !== null) {
+            if (errorMsgArrow != null) {
                 errorMsgArrow.removeAllChildren();
                 refreshCanvas();
             }
@@ -1482,7 +1482,7 @@ define(function (require) {
         }
 
         function textMsg(msg) {
-            if (msgText == null) {
+            if (msgText === null) {
                 // The container may not be ready yet... so do nothing
                 return;
             }
@@ -1494,18 +1494,18 @@ define(function (require) {
         }
 
         function errorMsg(msg, blk, text) {
-            if (errorMsgText == null) {
+            if (errorMsgText === null) {
                 // The container may not be ready yet... so do nothing
                 return;
             }
 
-            if (blk !== undefined && blk !== null && !blocks.blockList[blk].collapsed) {
+            if (blk !== undefined && blk != null && !blocks.blockList[blk].collapsed) {
                 var fromX = (canvas.width - 1000) / 2;
                 var fromY = 128;
                 var toX = blocks.blockList[blk].x + blocksContainer.x;
                 var toY = blocks.blockList[blk].y + blocksContainer.y;
 
-                if (errorMsgArrow == null) {
+                if (errorMsgArrow === null) {
                     errorMsgArrow = new createjs.Container();
                     stage.addChild(errorMsgArrow);
                 }
@@ -1542,7 +1542,7 @@ define(function (require) {
                     stage.setChildIndex(errorArtwork['negroot'], stage.getNumChildren() - 1);
                     break;
                 case NOACTIONERRORMSG:
-                    if (text == null) {
+                    if (text === null) {
                         text = 'foo';
                     }
                     errorArtwork['nostack'].children[1].text = text;
@@ -1551,7 +1551,7 @@ define(function (require) {
                     stage.setChildIndex(errorArtwork['nostack'], stage.getNumChildren() - 1);
                     break;
                 case NOBOXERRORMSG:
-                    if (text == null) {
+                    if (text === null) {
                         text = 'foo';
                     }
                     errorArtwork['emptybox'].children[1].text = text;
@@ -1632,12 +1632,12 @@ define(function (require) {
                     // Don't save blocks in the trash.
                     continue;
                 }
-                if (myBlock.isValueBlock() || myBlock.name == 'loadFile') {
+                if (myBlock.isValueBlock() || myBlock.name === 'loadFile') {
                     // FIX ME: scale image if it exceeds a maximum size.
                     var args = {
                         'value': myBlock.value
                     };
-                } else if (myBlock.name == 'start' || myBlock.name == 'drum') {
+                } else if (myBlock.name === 'start' || myBlock.name === 'drum') {
                     // Find the turtle associated with this block.
                     turtle = turtles.turtleList[myBlock.value];
                     var args = {
@@ -1650,39 +1650,39 @@ define(function (require) {
                         'pensize': turtle.stroke,
                         'grey': turtle.chroma
                     };
-                } else if (myBlock.name == 'action') {
+                } else if (myBlock.name === 'action') {
                     var args = {
                         'collapsed': myBlock.collapsed
                     }
-                } else if(myBlock.name=='matrix') { 
+                } else if(myBlock.name === 'matrix') { 
                     var args = {
                         'collapsed' : myBlock.collapsed
                     }
-                } else if (myBlock.name == 'namedbox') {
+                } else if (myBlock.name === 'namedbox') {
                     var args = {
                         'value': myBlock.privateData
                     }
-                } else if (myBlock.name == 'nameddo') {
+                } else if (myBlock.name === 'nameddo') {
                     var args = {
                         'value': myBlock.privateData
                     }
-                } else if (myBlock.name == 'nameddoArg') {
+                } else if (myBlock.name === 'nameddoArg') {
                     var args = {
                         'value': myBlock.privateData
                     }
-                } else if (myBlock.name == 'namedcalc') {
+                } else if (myBlock.name === 'namedcalc') {
                     var args = {
                         'value': myBlock.privateData
                     }
-                } else if (myBlock.name == 'namedcalcArg') {
+                } else if (myBlock.name === 'namedcalcArg') {
                     var args = {
                         'value': myBlock.privateData
                     }
-                } else if (myBlock.name == 'namedarg') {
+                } else if (myBlock.name === 'namedarg') {
                     var args = {
                         'value': myBlock.privateData
                     }
-                } else if (myBlock.name == 'matrixData') {
+                } else if (myBlock.name === 'matrixData') {
                     var args = {
                         'notes': window.savedMatricesNotes, 'count': window.savedMatricesCount
                     }
@@ -1694,7 +1694,7 @@ define(function (require) {
                 connections = [];
                 for (var c = 0; c < myBlock.connections.length; c++) {
                     var mapConnection = blockMap.indexOf(myBlock.connections[c]);
-                    if (myBlock.connections[c] == null || mapConnection == -1) {
+                    if (myBlock.connections[c] === null || mapConnection === -1) {
                         connections.push(null);
                     } else {
                         connections.push(mapConnection);
@@ -1714,7 +1714,7 @@ define(function (require) {
 
         function saveToFile() {
             var filename = prompt('Filename:');
-            if (fileExt(filename) != 'tb') {
+            if (fileExt(filename) !== 'tb') {
                 filename += '.tb';
             }
             download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
@@ -1736,7 +1736,7 @@ define(function (require) {
             for (var blk in logo.blocks.blockList) {
                 var myBlock = logo.blocks.blockList[blk];
                 var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
-                if (myBlock.name == 'start' || myBlock.name == 'drum') {
+                if (myBlock.name === 'start' || myBlock.name === 'drum') {
                     var topBlock = logo.blocks.findTopBlock(thisBlock);
                     console.log('Playing through Play Button');
                     logo.runLogoCommands(topBlock);
@@ -1757,7 +1757,7 @@ define(function (require) {
                 var halfSize = Math.floor(cellSize / 2);
 
                 bitmap = new createjs.Bitmap(img);
-                if (cellSize != originalSize) {
+                if (cellSize !== originalSize) {
                     bitmap.scaleX = cellSize / originalSize;
                     bitmap.scaleY = cellSize / originalSize;
                 }
@@ -1825,7 +1825,7 @@ define(function (require) {
                 loadButtonDragHandler(container, x, y, buttonNames[name][1]);
                 onscreenButtons.push(container);
 
-                if (buttonNames[name][0] == 'stop-turtle') {
+                if (buttonNames[name][0] === 'stop-turtle') {
                     stopTurtleContainer = container;
                     stopTurtleContainerX = x;
                     stopTurtleContainerY = y;
@@ -1905,7 +1905,7 @@ define(function (require) {
             helpIdx = 0;
 
             if (firstTime) {
-                if (helpContainer == null) {
+                if (helpContainer === null) {
                     helpContainer = new createjs.Container();
                     stage.addChild(helpContainer);
                     helpContainer.x = 65;
@@ -2007,7 +2007,7 @@ define(function (require) {
 
         function doMenuAnimation() {
             var bitmap = last(menuContainer.children);
-            if (bitmap !== null) {
+            if (bitmap != null) {
                 var r = bitmap.rotation;
                 createjs.Tween.get(bitmap)
                     .to({
@@ -2051,7 +2051,7 @@ define(function (require) {
 
         function makeButton(name, x, y, size, rotation) {
             var container = new createjs.Container();
-            if (name == 'paste-disabled-button') {
+            if (name === 'paste-disabled-button') {
                 pasteContainer = container;
             }
 
@@ -2066,7 +2066,7 @@ define(function (require) {
                 var halfSize = Math.floor(size / 2);
 
                 bitmap = new createjs.Bitmap(img);
-                if (size != originalSize) {
+                if (size !== originalSize) {
                     bitmap.scaleX = size / originalSize;
                     bitmap.scaleY = size / originalSize;
                 }
@@ -2144,7 +2144,7 @@ define(function (require) {
             blocks.show();
             for (var b = 0; b < blocks.blockList.length; b++) {
                 var blk = blocks.blockList[b];
-                if (blk.name == "forever" || blk.name == 'repeat' || blk.name == 'chunkTranspose') {
+                if (blk.name === "forever" || blk.name === 'repeat' || blk.name === 'chunkTranspose') {
                     blocks.blockList[b].trash = true;
                     blocks.blockList[b].hide();
                 }
