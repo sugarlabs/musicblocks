@@ -2478,7 +2478,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 			}
           	    }
 		    if (!match) {
-                        var noteBeatValue = this.tieCarryOver[turtle];
+                        var tmpBeatValue = this.tieCarryOver[turtle];
                         this.tieCarryOver[turtle] = 0;
                         this.tie[turtle] = false;
 
@@ -2496,7 +2496,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 			    this.noteOctaves[turtle].push(this.tieNote[turtle][i][1]);
 			}
                         this.tieNote[turtle] = [];
-                        this.processNote(noteBeatValue, blk, turtle);
+                        this.processNote(tmpBeatValue, blk, turtle);
 
                         // Restore the current note.
                         this.tie[turtle] = true;
@@ -2508,7 +2508,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 			}
                     }
 		}
-
 
                 if (this.tieCarryOver[turtle] === 0) {
                     this.tieNote[turtle] = [];
