@@ -287,6 +287,11 @@ function PlanetView(model, controller) {
         window.scroll(0, 0);
     });
 
+    document.querySelector('.planet .back')
+            .addEventListener('click', function () {
+        me.controller.hide();
+    });
+
     this.update = function () {
         // This is werid
         var model = this;
