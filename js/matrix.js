@@ -184,8 +184,8 @@ function Matrix() {
         }
 
         var cell = row.insertCell(4);
-        cell.innerHTML = '<img src="header-icons/export-button.svg" alt="' + _('export') + '" height="' + (iconSize-3) + '" width="' + (iconSize-3) + '" style="display:block;margin-bottom:-7px;margin-left:3px;"><p style="margin-bottom:-3px;font-size:10px;text-align:justify;width:'+ (iconSize-3) + '">HTML</p>';
-        cell.style.height = 40 * this.cellScale + 'px';
+        cell.innerHTML = '<img src="header-icons/export-button.svg" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         that = this;
         cell.onclick=function() {
