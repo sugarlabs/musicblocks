@@ -334,7 +334,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setbpmBlock.defaults.push(90);
 
     var osctimeBlock = new ProtoBlock('osctime');
-    osctimeBlock.palette = palettes.dict['notes'];
+    osctimeBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
     osctimeBlock.staticLabels.push(_('osctime'));
     osctimeBlock.adjustWidthToLabel();
@@ -342,28 +342,28 @@ function initBasicProtoBlocks(palettes, blocks) {
     osctimeBlock.defaults.push(200);
 
     var duplicateFactor = new ProtoBlock('duplicatefactor');
-    duplicateFactor.palette = palettes.dict['notes'];
+    duplicateFactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;
     duplicateFactor.staticLabels.push(_('duplicate factor'));
     duplicateFactor.adjustWidthToLabel();
     duplicateFactor.parameterBlock();
 
     var skipFactor = new ProtoBlock('skipfactor');
-    skipFactor.palette = palettes.dict['notes'];
+    skipFactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['skipfactor'] = skipFactor;
     skipFactor.staticLabels.push(_('skip factor'));
     skipFactor.adjustWidthToLabel();
     skipFactor.parameterBlock();
 
     var beatfactor = new ProtoBlock('beatfactor');
-    beatfactor.palette = palettes.dict['notes'];
+    beatfactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['beatfactor'] = beatfactor;
     beatfactor.staticLabels.push(_('beat factor'));
     beatfactor.adjustWidthToLabel();
     beatfactor.parameterBlock();
 
     var bpmBlock = new ProtoBlock('bpm');
-    bpmBlock.palette = palettes.dict['notes'];
+    bpmBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['bpm'] = bpmBlock;
     bpmBlock.staticLabels.push(_('beats per minute'));
     bpmBlock.adjustWidthToLabel();
