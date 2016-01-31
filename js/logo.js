@@ -141,10 +141,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
     this.drumSynth = new Tone.DrumSynth().toMaster();
 
-    var toneVol = new Tone.Volume(-20);  // DEFAULT VALUE
-    this.polySynth.chain(toneVol, Tone.Master);
-    this.drumSynth.chain(toneVol, Tone.Master);
-
     Tone.Transport.bpm.value = 120;  // Doesn't seem to do anything
 
     // Oscillator parameters
@@ -406,10 +402,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     value = this.transposition[turtle];
                     break;
                 case 'staccatofactor':
-                    value = this.staccato[turtle];
+                    value = last(this.staccato[turtle]);
                     break;
                 case 'slurfactor':
-                    value = -this.staccato[turtle];
+                    value = -last(this.staccato[turtle]);
                     break;
                 case 'beatfactor':
                     value = this.beatFactor[turtle];
@@ -421,7 +417,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     value = this.skipFactor[turtle];
                     break;
                 case 'notevolumefactor':
-                    value = this.polyVolume[turtle];
+                    // FIX ME: bias and scaling
+                    value = last(this.polyVolume[turtle]);
                     break;
                 case 'currentnote':
                     value = this.currentNotes[turtle];
@@ -504,7 +501,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.skipIndex[turtle] = 0;
             this.keySignature[turtle] = 'C';
             this.pushedNote[turtle] = false;
-            this.polyVolume[turtle] = -20;
+            this.polyVolume[turtle] = [50];
             this.oscDuration[turtle] = 4;
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
@@ -513,6 +510,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.tieNote[turtle] = [];
             this.tieCarryOver[turtle] = 0;
         }
+
+        this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
+        this.drumSynth = new Tone.DrumSynth().toMaster();
+        var toneVol = new Tone.Volume(-20);  // DEFAULT VALUE
+        this.polySynth.chain(toneVol, Tone.Master);
+        this.drumSynth.chain(toneVol, Tone.Master);
 
         this.inMatrix = false;
         this.tuplet = false;
@@ -594,7 +597,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         // (2) Execute the stack.
         // A bit complicated because we have lots of corner cases:
-        if (startHere !== null) {
+        if (startHere != null) {
             console.log('startHere is ' + this.blocks.blockList[startHere].name);
 
             // If a block to start from was passed, find its
@@ -717,7 +720,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'slurfactor':
                 // Slur is stored as a negative staccato.
-            console.log(this.staccato);
                 var len = this.staccato[turtleId].length;
                 if (len > 0) {
                     this.staccato[turtleId][len - 1] = -value;
@@ -757,11 +759,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'notevolumefactor':
-                // A bit ugly because the setter call already added in
-                // the scaled polyVolume value.
-                value -= this.polyVolume[turtleId];
-                var vol = (this.polyVolume[turtleId] / 0.4) + 100;
-                this.setSynthVolume(vol + value, turtleId);
+                var len = this.transposition[turtleId].length;
+                this.polyVolume[turtleId][len - 1] = value;
+                this.setSynthVolume(value, turtleId);
                 break;
             default:
                 if (this.blocks.blockList[blk].name in this.evalSetterDict) {
@@ -2146,6 +2146,26 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 logo.setListener(turtle, listenerName, listener);
                 break;
+            case 'setnotevolume2':
+                if (args.length === 2 && typeof(args[0]) === 'number') {
+                    logo.polyVolume[turtle].push(args[0]);
+                    logo.setSynthVolume(args[0], turtle);
+
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_volume_' + turtle;
+                    logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                    var listener = function(event) {
+                        logo.polyVolume[turtle].pop();
+                        logo.setSynthVolume(last(logo.polyVolume[turtle]), turtle);
+                    }
+
+                    logo.setListener(turtle, listenerName, listener);
+                }
+                break;
+            // Deprecated
             case 'setnotevolume':
                 if (args.length === 1) {
                     if (typeof(args[0]) === 'string') {
@@ -2476,17 +2496,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.setSynthVolume = function(vol, turtle) {
         if (vol > 100) {
             vol = 100;
-        } else if (vol < 0) {
-            vol = 0;
+        } else if (vol < 1) {
+            vol = 1;
         }
         // Scale runs from 0db (max) to -40db (min)
-        // FIXME: db is logarithmic
-        console.log(Math.log10(vol));
-        vol -= 100;
-        vol *= 0.4;
-        console.log(vol);
-        this.polyVolume[turtle] = vol;
-        var toneVol = new Tone.Volume(vol);
+        var nvol = Math.log10(vol);
+	nvol *= 100;
+        var scaledVol = nvol - 200;
+        scaledVol *= 0.4;
+        console.log(scaledVol);
+        var toneVol = new Tone.Volume(scaledVol);
         if (this.turtles.turtleList[turtle].drum) {
             this.drumSynth.chain(toneVol, Tone.Master);
         } else {
@@ -2679,7 +2698,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         
                         if (!logo.lilypondSaveOnly && duration > 0) {
                             for (var i = 0; i < oscillators.length; i++) {
-                                oscillators[i].volume.value = logo.polyVolume[turtle] * OSCVOLUMEADJUSTMENT;
+                                oscillators[i].volume.value = last(logo.polyVolume[turtle]) * OSCVOLUMEADJUSTMENT;
                                 oscillators[i].start();
                             }
                             if (logo.blocks.blockList[blk].name === 'osctime') {
@@ -3220,7 +3239,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.blocks.blockList[blk].value = logo.skipFactor[turtle];
                     break;
                 case 'notevolumefactor':
-                    logo.blocks.blockList[blk].value = logo.polyVolume[turtle];
+                    logo.blocks.blockList[blk].value = last(logo.polyVolume[turtle]);
                     break;
                 case 'beatfactor':
                     logo.blocks.blockList[blk].value = logo.beatFactor[turtle];

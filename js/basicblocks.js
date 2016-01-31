@@ -399,9 +399,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
 
+    var noteVolumeBlock2 = new ProtoBlock('setnotevolume2');
+    noteVolumeBlock2.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setnotevolume2'] = noteVolumeBlock2;
+    noteVolumeBlock2.staticLabels.push(_('set volume'));
+    noteVolumeBlock2.adjustWidthToLabel();
+    noteVolumeBlock2.flowClampOneArgBlock();
+    noteVolumeBlock2.defaults.push(50);
+
     var noteVolumeBlock = new ProtoBlock('setnotevolume');
     noteVolumeBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
+    noteVolumeBlock.hidden = true;
     noteVolumeBlock.staticLabels.push(_('set volume'));
     noteVolumeBlock.adjustWidthToLabel();
     noteVolumeBlock.oneArgBlock();
