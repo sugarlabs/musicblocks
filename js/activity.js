@@ -816,6 +816,7 @@ define(function (require) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
             bitmap.visible = false;
             bitmap.updateCache();
+
             return bitmap;
         };
 

@@ -354,7 +354,8 @@ var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
                    'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
                    'dividebeatfactor', 'notation', 'playfwd', 'playbwd',
                    'duplicatenotes', 'fill', 'hollowline', 'drum', 'osctime',
-		   'invert', 'matrix', 'skipnotes', 'setbpm', 'tie'];
+                   'invert', 'matrix', 'skipnotes', 'setbpm', 'tie',
+                   'staccato', 'slur'];
 
 // Kinda a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {
@@ -1220,6 +1221,7 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan).
     add('rhythm').
     add('pitch').
+    add('tone').
     add('actions').
     add('boxes').
     add('flow').
@@ -1231,7 +1233,6 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     add('media').
     add('sensors').
     add('heap').
-    add('tone').
     add('extras');
     palettes.makePalettes();
     blocks = b;

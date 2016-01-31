@@ -119,6 +119,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.duplicateFactor = {};
     this.skipFactor = {};
     this.skipIndex = {};
+    this.staccato = {};
     this.tie = {};
     this.tieNote = {};
     this.tieCarryOver = {};
@@ -401,8 +402,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         value = Math.round(logo.mic.getLevel() * 1000);
                     }
                     break;
-                case 'transposition':
+                case 'transpositionfactor':
                     value = this.transposition[turtle];
+                    break;
+                case 'staccatofactor':
+                    value = this.staccato[turtle];
+                    break;
+                case 'slurfactor':
+                    value = -this.staccato[turtle];
                     break;
                 case 'beatfactor':
                     value = this.beatFactor[turtle];
@@ -422,7 +429,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 case 'currentoctave':
                     value = this.currentoctave[turtle];
                     break;
-                case 'bpm':
+                case 'bpmfactor':
                     if (this.bpm[turtle].length > 0) {
                         value = last(this.bpm[turtle]);
                     } else {
@@ -467,7 +474,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         // We run the Logo commands here.
         var d = new Date();
         this.time = d.getTime();
-              this.firstNoteTime = null;
+        this.firstNoteTime = null;
 
         // Ensure we have at least one turtle.
         if (this.turtles.turtleList.length === 0) {
@@ -501,6 +508,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.oscDuration[turtle] = 4;
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
+            this.staccato[turtle] = [];
             this.tie[turtle] = false;
             this.tieNote[turtle] = [];
             this.tieCarryOver[turtle] = 0;
@@ -689,12 +697,48 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     this.errorMsg(NOBOXERRORMSG, blk, name);
                 }
                 break;
-            case 'bpm':
-                var len = this.bpm[turtle].length;
+            case 'bpmfactor':
+                var len = this.bpm[turtleId].length;
                 if (len > 0) {
-                    this.bpm[turtle][len - 1] = value;
-                } else {
-                    this.bpm[turtle].push(value);
+                    this.bpm[turtleId][len - 1] = value;
+                }
+                break;
+            case 'transpositionfactor': 
+                var len = this.transposition[turtleId].length;
+                if (len > 0) {
+                    this.transposition[turtleId][len - 1] = value;
+                }
+                break;
+            case 'staccatofactor':
+                var len = this.staccato[turtleId].length;
+                if (len > 0) {
+                    this.staccato[turtleId][len - 1] = value;
+                }
+                break;
+            case 'slurfactor':
+                // Slur is stored as a negative staccato.
+            console.log(this.staccato);
+                var len = this.staccato[turtleId].length;
+                if (len > 0) {
+                    this.staccato[turtleId][len - 1] = -value;
+                }
+                break;
+            case 'beatfactor':
+                var len = this.beatFactor[turtleId].length;
+                if (len > 0) {
+                    this.beatFactor[turtleId][len - 1] = value;
+                }
+                break;
+            case 'duplicatefactor':
+                var len = this.duplicateFactor[turtleId].length;
+                if (len > 0) {
+                    this.duplicateFactor[turtleId][len - 1] = value;
+                }
+                break;
+            case 'skipfactor':
+                var len = this.skipFactor[turtleId].length;
+                if (len > 0) {
+                    this.skipFactor[turtleId][len - 1] = value;
                 }
                 break;
             case 'currentnote':
@@ -1896,6 +1940,38 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 logo.setListener(turtle, listenerName, listener);
                 break;
+            case 'staccato':
+                if (args.length > 1) {
+                    logo.staccato[turtle].push(args[0]);
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_staccato_' + turtle;
+                    logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                    var listener = function (event) {
+                        logo.staccato[turtle].pop();
+                    }
+
+                    logo.setListener(turtle, listenerName, listener);
+                }
+                break;
+            case 'slur':
+                if (args.length > 1) {
+                    logo.staccato[turtle].push(-args[0]);
+                    childFlow = args[1];
+                    childFlowCount = 1;
+
+                    var listenerName = '_staccato_' + turtle;
+                    logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                    var listener = function (event) {
+                        logo.staccato[turtle].pop();
+                    }
+
+                    logo.setListener(turtle, listenerName, listener);
+                }
+                break;
             case 'tie':
                 // Tie notes together in pairs.
                 logo.tie[turtle] = true;
@@ -2465,56 +2541,56 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var match = true;
                     if (this.tieNote[turtle].length !== this.notePitches[turtle].length) {
                         match = false;
-		    } else {
-			for (var i = 0; i < this.tieNote[turtle].length; i++) {
+                    } else {
+                        for (var i = 0; i < this.tieNote[turtle].length; i++) {
                             if (this.tieNote[turtle][i][0] != this.notePitches[turtle][i]) {
-				match = false;
-				break;
-			    }
+                                match = false;
+                                break;
+                            }
                             if (this.tieNote[turtle][i][1] != this.noteOctaves[turtle][i]) {
-				match = false;
-				break;
-			    }
-			}
-          	    }
-		    if (!match) {
+                                match = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (!match) {
                         var tmpBeatValue = this.tieCarryOver[turtle];
                         this.tieCarryOver[turtle] = 0;
                         this.tie[turtle] = false;
 
-			// Save the current note.
+                        // Save the current note.
                         var saveNote = [];
                         for (var i = 0; i < this.notePitches[turtle].length; i++) {
                             saveNote.push([this.notePitches[turtle][i], this.noteOctaves[turtle][i]]);
-			}
+                        }
 
-			// Swap in the previous note.
-			this.notePitches[turtle] = [];
-			this.noteOctaves[turtle] = [];
+                        // Swap in the previous note.
+                        this.notePitches[turtle] = [];
+                        this.noteOctaves[turtle] = [];
                         for (var i = 0; i < this.tieNote[turtle].length; i++) {
                             this.notePitches[turtle].push(this.tieNote[turtle][i][0]);
-			    this.noteOctaves[turtle].push(this.tieNote[turtle][i][1]);
-			}
+                            this.noteOctaves[turtle].push(this.tieNote[turtle][i][1]);
+                        }
                         this.tieNote[turtle] = [];
                         this.processNote(tmpBeatValue, blk, turtle);
 
                         // Restore the current note.
                         this.tie[turtle] = true;
-			this.notePitches[turtle] = [];
-			this.noteOctaves[turtle] = [];
+                        this.notePitches[turtle] = [];
+                        this.noteOctaves[turtle] = [];
                         for (var i = 0; i < saveNote.length; i++) {
                             this.notePitches[turtle].push(saveNote[i][0]);
-			    this.noteOctaves[turtle].push(saveNote[i][1]);
-			}
+                            this.noteOctaves[turtle].push(saveNote[i][1]);
+                        }
                     }
-		}
+                }
 
                 if (this.tieCarryOver[turtle] === 0) {
                     this.tieNote[turtle] = [];
                     this.tieCarryOver[turtle] = noteBeatValue;
                     for (var i = 0; i < this.notePitches[turtle].length; i++) {
                         this.tieNote[turtle].push([this.notePitches[turtle][i], this.noteOctaves[turtle][i]]);
-		    }
+                    }
                     noteBeatValue = 0;
                 } else {
                     if (this.blocks.blockList[blk].name === 'osctime') {
@@ -2668,7 +2744,20 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             if (logo.blocks.blockList[blk].name === 'osctime') {
                                 var beatValue = duration / 1000;
                             } else {
-                                var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                                if (logo.staccato[turtle].length > 0) {
+                                    var staccatoBeatValue = last(logo.staccato[turtle]);
+                                    if (staccatoBeatValue < 0) {
+                                        // slur
+                                        var beatValue = bpmFactor / ((noteBeatValue) * logo.noteBeatValues[turtle][0]) + bpmFactor / (-staccatoBeatValue * logo.noteBeatValues[turtle][0]);
+                                    } else if (staccatoBeatValue > noteBeatValue) {
+                                        // staccato
+                                        var beatValue = bpmFactor / (staccatoBeatValue * logo.noteBeatValues[turtle][0]);
+                                    } else {
+                                        var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                                    }
+                                } else {
+                                    var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                                }
                             }
                             if (!logo.lilypondSaveOnly && duration > 0) {
                                 if (logo.turtles.turtleList[turtle].drum) {
@@ -3097,17 +3186,31 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.blocks.blockList[blk].value = 0;
                     }
                     break;
-                case 'bpm':
+                case 'bpmfactor':
                     if (logo.bpm[turtle].length > 0) {
-                        logo.blocks.blockList[blk].value = last();
+                        logo.blocks.blockList[blk].value = last(logo.bpm[turtle]);
                     } else {
                         logo.blocks.blockList[blk].value = TARGETBPM;
+                    }
+                    break;
+                case 'staccatofactor':
+                    if (logo.staccato[turtle].length > 0) {
+                        logo.blocks.blockList[blk].value = last(logo.staccato[turtle]);
+                    } else {
+                        logo.blocks.blockList[blk].value = 0;
+                    }
+                    break;
+                case 'slurfactor':
+                    if (logo.staccato[turtle].length > 0) {
+                        logo.blocks.blockList[blk].value = -last(logo.staccato[turtle]);
+                    } else {
+                        logo.blocks.blockList[blk].value = 0;
                     }
                     break;
                 case 'key':
                     logo.blocks.blockList[blk].value = logo.keySignature[turtle];
                     break;
-                case 'transposition':
+                case 'transpositionfactor':
                     logo.blocks.blockList[blk].value = logo.transposition[turtle];
                     break;
                 case 'duplicatefactor':

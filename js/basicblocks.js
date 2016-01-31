@@ -132,9 +132,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     currentOctaveBlock.adjustWidthToLabel();
     currentOctaveBlock.parameterBlock();
 
-    var transposition = new ProtoBlock('transposition');
+    var transposition = new ProtoBlock('transpositionfactor');
     transposition.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['transposition'] = transposition;
+    blocks.protoBlockDict['transpositionfactor'] = transposition;
     transposition.staticLabels.push(_('transposition'));
     transposition.adjustWidthToLabel();
     transposition.parameterBlock();
@@ -362,14 +362,30 @@ function initBasicProtoBlocks(palettes, blocks) {
     beatfactor.adjustWidthToLabel();
     beatfactor.parameterBlock();
 
-    var bpmBlock = new ProtoBlock('bpm');
+    var bpmBlock = new ProtoBlock('bpmfactor');
     bpmBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['bpm'] = bpmBlock;
+    blocks.protoBlockDict['bpmfactor'] = bpmBlock;
     bpmBlock.staticLabels.push(_('beats per minute'));
     bpmBlock.adjustWidthToLabel();
     bpmBlock.parameterBlock();
 
-    // Tone (utility) palette
+    // Tone (articulation) palette
+
+    var staccatoBlock = new ProtoBlock('staccato');
+    staccatoBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['staccato'] = staccatoBlock;
+    staccatoBlock.staticLabels.push(_('staccato'));
+    staccatoBlock.adjustWidthToLabel();
+    staccatoBlock.flowClampOneArgBlock();
+    staccatoBlock.defaults.push(32);
+
+    var slurBlock = new ProtoBlock('slur');
+    slurBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['slur'] = slurBlock;
+    slurBlock.staticLabels.push(_('slur'));
+    slurBlock.adjustWidthToLabel();
+    slurBlock.flowClampOneArgBlock();
+    slurBlock.defaults.push(32);
 
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['tone'];
@@ -382,6 +398,35 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.twoArgMathBlock();
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
+
+    var noteVolumeBlock = new ProtoBlock('setnotevolume');
+    noteVolumeBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
+    noteVolumeBlock.staticLabels.push(_('set volume'));
+    noteVolumeBlock.adjustWidthToLabel();
+    noteVolumeBlock.oneArgBlock();
+    noteVolumeBlock.defaults.push(50);
+
+    var staccatoFactor = new ProtoBlock('staccatofactor');
+    staccatoFactor.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['staccatofactor'] = staccatoFactor;
+    staccatoFactor.staticLabels.push(_('staccato factor'));
+    staccatoFactor.adjustWidthToLabel();
+    staccatoFactor.parameterBlock();
+
+    var slurFactor = new ProtoBlock('slurfactor');
+    slurFactor.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['slurfactor'] = slurFactor;
+    slurFactor.staticLabels.push(_('slur factor'));
+    slurFactor.adjustWidthToLabel();
+    slurFactor.parameterBlock();
+
+    var notevolumeFactor = new ProtoBlock('notevolumefactor');
+    notevolumeFactor.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['notevolumefactor'] = notevolumeFactor;
+    notevolumeFactor.staticLabels.push(_('note volume'));
+    notevolumeFactor.adjustWidthToLabel();
+    notevolumeFactor.parameterBlock();
 
     var playfwdBlock = new ProtoBlock('playfwd');
     playfwdBlock.hidden = true;
@@ -400,31 +445,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.staticLabels.push(_('play backward'));
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
-
-    var noteVolumeBlock = new ProtoBlock('setnotevolume');
-    noteVolumeBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
-    noteVolumeBlock.staticLabels.push(_('set volume'));
-    noteVolumeBlock.adjustWidthToLabel();
-    noteVolumeBlock.oneArgBlock();
-    noteVolumeBlock.defaults.push(50);
-
-    var notevolumeFactor = new ProtoBlock('notevolumefactor');
-    notevolumeFactor.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['notevolumefactor'] = notevolumeFactor;
-    notevolumeFactor.staticLabels.push(_('note volume'));
-    notevolumeFactor.adjustWidthToLabel();
-    notevolumeFactor.parameterBlock();
-
-    var lilypondBlock = new ProtoBlock('savelilypond');
-    lilypondBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['savelilypond'] = lilypondBlock;
-    lilypondBlock.staticLabels.push(_('save as lilypond'));
-    lilypondBlock.extraWidth = 10;
-    lilypondBlock.adjustWidthToLabel();
-    lilypondBlock.oneArgBlock();
-    lilypondBlock.defaults.push(_('title') + '.ly');
-    lilypondBlock.dockTypes[1] = 'textin';
 
     // Turtle palette
     var clearBlock = new ProtoBlock('clear');
@@ -1422,6 +1442,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     loudnessBlock.staticLabels.push(_('loudness'));
     loudnessBlock.adjustWidthToLabel();
     loudnessBlock.parameterBlock();
+
+    var lilypondBlock = new ProtoBlock('savelilypond');
+    lilypondBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['savelilypond'] = lilypondBlock;
+    lilypondBlock.staticLabels.push(_('save as lilypond'));
+    lilypondBlock.extraWidth = 10;
+    lilypondBlock.adjustWidthToLabel();
+    lilypondBlock.oneArgBlock();
+    lilypondBlock.defaults.push(_('title') + '.ly');
+    lilypondBlock.dockTypes[1] = 'textin';
 
     var svgBlock = new ProtoBlock('savesvg');
     svgBlock.palette = palettes.dict['extras'];
