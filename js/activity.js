@@ -26,6 +26,7 @@ function facebookInit() {
     };
 }
 
+/*
 try {
     (function (d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
@@ -39,6 +40,7 @@ try {
     }(document, 'script', 'facebook-jssdk'));
 } catch (e) {
 }
+*/
 
 var lang = document.webL10n.getLanguage();
 if (lang.indexOf("-") !== -1) {
@@ -89,7 +91,7 @@ define(function (require) {
     });
 
     function domReady(doc) {
-        facebookInit();
+        // facebookInit();
         window.scroll(0, 0);
 
         var txt = "";
