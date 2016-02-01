@@ -21,10 +21,16 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
 msgstr "hichapụ niile"
+
+msgid "rice and beans"
+msgstr "osikapa na agwa"
 
 msgid "show"
 msgstr "show"
@@ -42,8 +48,8 @@ msgstr "gosi"
 msgid "meter"
 msgstr ""
 
-msgid "rice and beans"
-msgstr "osikapa na agwa"
+msgid "Save your project to a file."
+msgstr ""
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
@@ -73,9 +79,6 @@ msgstr "okuko"
 msgid "Run music slow"
 msgstr ""
 
-msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
-
 msgid "apple"
 msgstr "apụl"
 
@@ -95,6 +98,9 @@ msgstr "aha"
 
 msgid "radians"
 msgstr "radians"
+
+msgid "staccato"
+msgstr ""
 
 msgid "Undo"
 msgstr "Wepu"
@@ -160,6 +166,10 @@ msgstr "Pịa-agba ọsọ ahụ oru ngo na-adịghị ngwa mode"
 msgid "stop"
 msgstr "kwụsị"
 
+#. TRANS: vertical space
+msgid "vspace"
+msgstr ""
+
 msgid "fat"
 msgstr "ibu"
 
@@ -203,9 +213,6 @@ msgstr "Save oru ngo"
 msgid "Copy"
 msgstr "Detuo"
 
-msgid "Open a panel for configuring Music Blocks."
-msgstr "Mepee a panel maka configuring mbe nkanka ."
-
 #. TRANS: the name of a variable (stored in a box)
 msgid "name"
 msgstr "aha"
@@ -246,6 +253,10 @@ msgstr "ga-esi calories"
 msgid "Load plugin from file"
 msgstr "Ibu Ibu plugin si faịlụ"
 
+#. TRANS: dietary fiber
+msgid "fiber"
+msgstr "eriri"
+
 msgid "You can scroll the blocks on the canvas."
 msgstr ""
 
@@ -263,6 +274,9 @@ msgstr "Help"
 
 msgid "turtle"
 msgstr "mbe"
+
+msgid "crescendo"
+msgstr ""
 
 #. TRANS: sawtooth wave
 msgid "sawtooth"
@@ -355,8 +369,7 @@ msgstr ""
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr ""
 
-#. TRANS: vertical space
-msgid "vspace"
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
 msgstr ""
 
 #. TRANS: publish project to Facebook
@@ -369,6 +382,10 @@ msgstr "amụma"
 
 #. TRANS: hours ago that the data was updated.
 msgid "hours ago"
+msgstr ""
+
+#. TRANS: slurring of notes in music
+msgid "slur"
 msgstr ""
 
 msgid "pen"
@@ -396,9 +413,8 @@ msgstr ""
 msgid "city latitude"
 msgstr ""
 
-#. TRANS: dietary fiber
-msgid "fiber"
-msgstr "eriri"
+msgid "Display statistics about your Music project."
+msgstr "Ngosipụta ọnụ ọgụgụ banyere gị mbe oru ngo."
 
 msgid "You can load new blocks from the file system."
 msgstr "I nwere ike mara ọhụrụ blocks si faịlụ usoro"
@@ -448,8 +464,9 @@ msgstr "Egosi ma ọ bụ zoo a polar-ahazi okporo"
 msgid "octave"
 msgstr ""
 
-msgid "sweet potato"
-msgstr "ụtọ nduku"
+#. TRANS: Musical score
+msgid "Save sheet music"
+msgstr ""
 
 #. TRANS: save the heap to a file
 msgid "save heap"
@@ -491,7 +508,8 @@ msgstr "obj"
 msgid "numerator"
 msgstr ""
 
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
+#. TRANS: swing beat in music
+msgid "swing"
 msgstr ""
 
 #. TRANS: store a value in a box
@@ -686,8 +704,8 @@ msgstr "degrees"
 msgid "translate"
 msgstr "ịsụgharị"
 
-msgid "quarter note ♩"
-msgstr ""
+msgid "Open a panel for configuring Music Blocks."
+msgstr "Mepee a panel maka configuring mbe nkanka ."
 
 msgid "until"
 msgstr "ruo mgbe"
@@ -723,6 +741,9 @@ msgstr "mbe aha "
 #. TRANS: carbohydrates
 msgid "carbs"
 msgstr "carbs"
+
+msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
 
 msgid "else"
 msgstr "ọzọ"
@@ -760,6 +781,9 @@ msgstr "Ịmụbawanye / daa collapsable blocks"
 #. TRANS: high temperature
 msgid "high"
 msgstr "elu"
+
+msgid "1/16 note ♬"
+msgstr ""
 
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
 msgstr ""
@@ -813,9 +837,8 @@ msgstr "chọpụta naanị"
 msgid "cake"
 msgstr "achicha"
 
-#. TRANS: mathematical exponent
-msgid "exp"
-msgstr "exp"
+msgid "sweet potato"
+msgstr "ụtọ nduku"
 
 #. TRANS: load the heap from a file
 msgid "load heap"
@@ -867,6 +890,9 @@ msgstr ""
 
 msgid "protein"
 msgstr "protein"
+
+msgid "1/64 note 𝅘𝅥𝅱"
+msgstr ""
 
 #. TRANS: oscillator time
 msgid "osctime"
@@ -969,8 +995,9 @@ msgstr "imekwa"
 msgid "blocks"
 msgstr "blocks"
 
-msgid "Display statistics about your Music project."
-msgstr "Ngosipụta ọnụ ọgụgụ banyere gị mbe oru ngo."
+#. TRANS: mathematical exponent
+msgid "exp"
+msgstr "exp"
 
 msgid "Polar"
 msgstr "pola"
@@ -1018,7 +1045,10 @@ msgstr "ahla"
 msgid "Clean"
 msgstr "ọcha"
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "quarter note ♩"
+msgstr ""
+
+msgid "Note value must be greater than 0"
 msgstr ""
 
 #. TRANS: color refers to a hue, value, chroma triplet
@@ -1073,7 +1103,8 @@ msgstr "Pịa a button mụbaa ma ọ bụ daa na auxillary toolbar"
 msgid "half note 𝅗𝅥"
 msgstr ""
 
-msgid "1/16 note ♬"
+#. TRANS: Lilypond is engraving software
+msgid "Save your project to as a Lilypond file."
 msgstr ""
 
 msgid "extras"

@@ -17,10 +17,16 @@ msgid ""
 "X-Generator: Pootle 2.0.5\n"
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
-msgstr  "ลบทั้งหมด"
+msgstr ""ลบทั้งหมด"
+
+msgid "rice and beans"
+msgstr "ข้าวและถั่ว"
 
 msgid "show"
 msgstr "แสดง"
@@ -38,8 +44,8 @@ msgstr "ยืนยัน"
 msgid "meter"
 msgstr "อัตราจังหวะ"
 
-msgid "rice and beans"
-msgstr "ข้าวและถั่ว"
+msgid "Save your project to a file."
+msgstr ""
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
@@ -69,9 +75,6 @@ msgstr "ไก่"
 msgid "Run music slow"
 msgstr "เล่นเสียงดนตรี (ช้า)"
 
-msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr "แถบเครื่องมือนี้ปุ่มต่างๆดังนี้ เมทริก ชัค แสดง โทน เต่า และอื่นๆอีกมากมาย คลิ๊กเพื่อแสดงเมนูสีของบล๊อกและลากบล๊อกจากเมนูสีไปยังแคนวาสเพื่อใช้มัน"
-
 msgid "apple"
 msgstr "แอปเปิ้ล"
 
@@ -91,6 +94,9 @@ msgstr "หัวข้อ"
 
 msgid "radians"
 msgstr "รัศมีเส้นโค้ง"
+
+msgid "staccato"
+msgstr ""
 
 msgid "Undo"
 msgstr "ยกเลิกคำสั่งเก่า"
@@ -156,6 +162,10 @@ msgstr "คลิ๊กเพื่อเล่นโปรเจคอย่า
 msgid "stop"
 msgstr "หยุด"
 
+#. TRANS: vertical space
+msgid "vspace"
+msgstr "พื้นที่แนวตั้ง"
+
 msgid "fat"
 msgstr "อ้วน"
 
@@ -199,9 +209,6 @@ msgstr "บันทึกงาน"
 msgid "Copy"
 msgstr "คัดลอก"
 
-msgid "Open a panel for configuring Music Blocks."
-msgstr "เปิดแผงสำหรับปรับแต่ง Music Blocks"
-
 #. TRANS: the name of a variable (stored in a box)
 msgid "name"
 msgstr "ชื่อ"
@@ -242,6 +249,10 @@ msgstr "รับแคลลอรี่"
 msgid "Load plugin from file"
 msgstr "โหลดปลั๊กอินจากไฟล์"
 
+#. TRANS: dietary fiber
+msgid "fiber"
+msgstr "กาก"
+
 msgid "You can scroll the blocks on the canvas."
 msgstr "คุณสามารถเลื่อนบล๊อกสู่แคนวาส"
 
@@ -259,6 +270,9 @@ msgstr "ช่วยเหลือ"
 
 msgid "turtle"
 msgstr "เต่า"
+
+msgid "crescendo"
+msgstr ""
 
 #. TRANS: sawtooth wave
 msgid "sawtooth"
@@ -351,9 +365,8 @@ msgstr "หยุดเพลง (และเต่า)"
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "ทัวร์จบแล้ว เริ่มเล่น Music Blockกัน"
 
-#. TRANS: vertical space
-msgid "vspace"
-msgstr "พื้นที่แนวตั้ง"
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
+msgstr ""
 
 #. TRANS: publish project to Facebook
 msgid "publish"
@@ -366,6 +379,10 @@ msgstr "พยากรณ์"
 #. TRANS: hours ago that the data was updated.
 msgid "hours ago"
 msgstr "หนึ่งชั่วโมงที่แล้ว"
+
+#. TRANS: slurring of notes in music
+msgid "slur"
+msgstr ""
 
 msgid "pen"
 msgstr "ปากกา"
@@ -392,9 +409,8 @@ msgstr "จบเส้นช่องโพรง"
 msgid "city latitude"
 msgstr "เส้นรุ้งของเมือง"
 
-#. TRANS: dietary fiber
-msgid "fiber"
-msgstr "กาก"
+msgid "Display statistics about your Music project."
+msgstr ""
 
 msgid "You can load new blocks from the file system."
 msgstr "คุณสามารถโหลดบล๊อกใหม่จากไฟล์ในเครือข่าย"
@@ -444,8 +460,9 @@ msgstr "แสดง หรือซ่อนกราฟ พิกัดเช�
 msgid "octave"
 msgstr "เสียงแปดคู่"
 
-msgid "sweet potato"
-msgstr "มันหวาน"
+#. TRANS: Musical score
+msgid "Save sheet music"
+msgstr ""
 
 #. TRANS: save the heap to a file
 msgid "save heap"
@@ -487,8 +504,9 @@ msgstr "สิ่งของ"
 msgid "numerator"
 msgstr "เศษ"
 
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
-msgstr "คุณหนูคือวาทยากรของพวกเรา คุณหนูสนับสนุนให้คุณลองสำรวจ Music Block, The Matrix และการแสดง/สัญกรณ์ ความเป็นไปได้ของ Music Blocks เริ่มทัวร์กันได้เลย "
+#. TRANS: swing beat in music
+msgid "swing"
+msgstr ""
 
 #. TRANS: store a value in a box
 msgid "store in"
@@ -545,7 +563,7 @@ msgstr "ชีส"
 
 #. TRANS: lilypond is a language used to generate musical scores.
 msgid "save as lilypond"
-msgstr "จัดเก็บเป็น lilypond"
+msgstr ""
 
 msgid "Cartesian"
 msgstr "คาร์ทีเซียน"
@@ -573,7 +591,7 @@ msgstr "ป๊อบ"
 
 #. TRANS: bitcoin currency (probably no need to translate)
 msgid "bitcoin"
-msgstr “บิตคอย์น"
+msgstr "��บิตคอย์น"
 
 msgid "pen size"
 msgstr "ขนาดปากกา"
@@ -682,8 +700,8 @@ msgstr "ดีกรี"
 msgid "translate"
 msgstr "แปล"
 
-msgid "quarter note ♩"
-msgstr "โน้ต 1/4"
+msgid "Open a panel for configuring Music Blocks."
+msgstr "เปิดแผงสำหรับปรับแต่ง Music Blocks"
 
 msgid "until"
 msgstr "จนกว่า"
@@ -719,6 +737,9 @@ msgstr "ชื่อของเต่า"
 #. TRANS: carbohydrates
 msgid "carbs"
 msgstr "คาร์โบไฮเดรต"
+
+msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
 
 msgid "else"
 msgstr "ไม่งั้นให้ทำ"
@@ -756,6 +777,9 @@ msgstr "เพิ่ม/พัง บล๊อกที่สามารถพ�
 #. TRANS: high temperature
 msgid "high"
 msgstr "สูง"
+
+msgid "1/16 note ♬"
+msgstr ""
 
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
 msgstr "Music Blocksคือศูนย์ร่วมอุปกรณ์ต่างๆเพื่อสำรวจแนวคิดเรื่องดนตรีด้วยวิธีที่สนุกและครบถ้วน"
@@ -796,7 +820,6 @@ msgstr "กล้วย"
 msgid "wheat bread"
 msgstr "ขนมปังข้าวสาลี"
 
-#  "ในขณะที่"
 msgid "while"
 msgstr "สีขาว"
 
@@ -810,9 +833,8 @@ msgstr "จับภาษา"
 msgid "cake"
 msgstr "เค้ก"
 
-#. TRANS: mathematical exponent
-msgid "exp"
-msgstr "เลขยกกำลังในคณิตศาสตร์"
+msgid "sweet potato"
+msgstr "มันหวาน"
 
 #. TRANS: load the heap from a file
 msgid "load heap"
@@ -864,6 +886,9 @@ msgstr "เสียงแหลม"
 
 msgid "protein"
 msgstr "โปรตีน"
+
+msgid "1/64 note 𝅘𝅥𝅱"
+msgstr ""
 
 #. TRANS: oscillator time
 msgid "osctime"
@@ -966,8 +991,9 @@ msgstr "ซ้ำ"
 msgid "blocks"
 msgstr ""
 
-msgid "Display statistics about your Music project."
-msgstr ""
+#. TRANS: mathematical exponent
+msgid "exp"
+msgstr "เลขยกกำลังในคณิตศาสตร์"
 
 msgid "Polar"
 msgstr ""
@@ -1015,7 +1041,10 @@ msgstr ""
 msgid "Clean"
 msgstr "ล้าง"
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "quarter note ♩"
+msgstr "โน้ต 1/4"
+
+msgid "Note value must be greater than 0"
 msgstr ""
 
 #. TRANS: color refers to a hue, value, chroma triplet
@@ -1070,7 +1099,8 @@ msgstr ""
 msgid "half note 𝅗𝅥"
 msgstr ""
 
-msgid "1/16 note ♬"
+#. TRANS: Lilypond is engraving software
+msgid "Save your project to as a Lilypond file."
 msgstr ""
 
 msgid "extras"
@@ -1103,24 +1133,3 @@ msgstr ""
 
 msgid "left"
 msgstr "ซ้าย"
-
-#. TRANS: lilypond is a language used to generate musical scores.
-msgid "save as lilypond"
-msgstr ""
-
-msgid "Note value must be greater than 0"
-msgstr ""
-
-#. TRANS: slurring of notes in music
-msgid "slur"
-msgstr ""
-
-msgid "staccato"
-msgstr ""
-
-msgid "crescendo"
-msgstr ""
-
-#. TRANS: swing beat in music
-msgid "swing"
-msgstr ""

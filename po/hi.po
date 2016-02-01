@@ -24,10 +24,16 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "Delete all"
 msgstr "सब मिटाइए"
+
+msgid "rice and beans"
+msgstr "चावल और फली"
 
 msgid "show"
 msgstr "दिखाएँ"
@@ -45,8 +51,8 @@ msgstr "पक्का करीये"
 msgid "meter"
 msgstr ""
 
-msgid "rice and beans"
-msgstr "चावल और फली"
+msgid "Save your project to a file."
+msgstr ""
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
@@ -76,9 +82,6 @@ msgstr "चूज़ा"
 msgid "Run music slow"
 msgstr ""
 
-msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
-
 msgid "apple"
 msgstr "सेब"
 
@@ -98,6 +101,9 @@ msgstr "शीर्षक"
 
 msgid "radians"
 msgstr "तेज"
+
+msgid "staccato"
+msgstr ""
 
 msgid "Undo"
 msgstr "पूर्ववत् करें"
@@ -163,6 +169,10 @@ msgstr "प्रोजेक्ट को धीरे चलाने के �
 msgid "stop"
 msgstr "रोकें"
 
+#. TRANS: vertical space
+msgid "vspace"
+msgstr ""
+
 msgid "fat"
 msgstr "चर्बी"
 
@@ -206,9 +216,6 @@ msgstr "प्रोजेक्ट को संचय करे"
 msgid "Copy"
 msgstr "नक़ल"
 
-msgid "Open a panel for configuring Music Blocks."
-msgstr "कछुए ब्लाकों विन्यास के लिए एक पैनल खोलें।"
-
 #. TRANS: the name of a variable (stored in a box)
 msgid "name"
 msgstr "नाम"
@@ -249,6 +256,10 @@ msgstr "कैलोरी लें"
 msgid "Load plugin from file"
 msgstr "फाइल से प्लगइन लोड करें"
 
+#. TRANS: dietary fiber
+msgid "fiber"
+msgstr "रेशा"
+
 msgid "You can scroll the blocks on the canvas."
 msgstr ""
 
@@ -266,6 +277,9 @@ msgstr "मदद"
 
 msgid "turtle"
 msgstr "कछुआ"
+
+msgid "crescendo"
+msgstr ""
 
 #. TRANS: sawtooth wave
 msgid "sawtooth"
@@ -358,8 +372,7 @@ msgstr ""
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr ""
 
-#. TRANS: vertical space
-msgid "vspace"
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
 msgstr ""
 
 #. TRANS: publish project to Facebook
@@ -372,6 +385,10 @@ msgstr "पूर्वानुमान"
 
 #. TRANS: hours ago that the data was updated.
 msgid "hours ago"
+msgstr ""
+
+#. TRANS: slurring of notes in music
+msgid "slur"
 msgstr ""
 
 msgid "pen"
@@ -399,9 +416,8 @@ msgstr ""
 msgid "city latitude"
 msgstr "शहर अक्षांश"
 
-#. TRANS: dietary fiber
-msgid "fiber"
-msgstr "रेशा"
+msgid "Display statistics about your Music project."
+msgstr "अपने टर्टल प्रोजेक्ट के आङ्कडे  देखें"
 
 msgid "You can load new blocks from the file system."
 msgstr "आप फाइल सिस्टम से नए ब्लॉक्स लोड कर सकते हैं"
@@ -451,8 +467,9 @@ msgstr "ध्रुवीय समन्वय ग्रिड दिखाए
 msgid "octave"
 msgstr ""
 
-msgid "sweet potato"
-msgstr "शकरकन्द"
+#. TRANS: Musical score
+msgid "Save sheet music"
+msgstr ""
 
 #. TRANS: save the heap to a file
 msgid "save heap"
@@ -494,7 +511,8 @@ msgstr "वस्तु"
 msgid "numerator"
 msgstr ""
 
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
+#. TRANS: swing beat in music
+msgid "swing"
 msgstr ""
 
 #. TRANS: store a value in a box
@@ -689,8 +707,8 @@ msgstr "डिग्री"
 msgid "translate"
 msgstr "अनुवाद करें"
 
-msgid "quarter note ♩"
-msgstr ""
+msgid "Open a panel for configuring Music Blocks."
+msgstr "कछुए ब्लाकों विन्यास के लिए एक पैनल खोलें।"
 
 msgid "until"
 msgstr "जब तक"
@@ -726,6 +744,9 @@ msgstr "कछुआ नाम"
 #. TRANS: carbohydrates
 msgid "carbs"
 msgstr "कार्बोहायड्रेट"
+
+msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
 
 msgid "else"
 msgstr "अन्यथा"
@@ -763,6 +784,9 @@ msgstr "खुलने और बंधने वाले ब्लॉक क�
 #. TRANS: high temperature
 msgid "high"
 msgstr "ऊंचा"
+
+msgid "1/16 note ♬"
+msgstr ""
 
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
 msgstr ""
@@ -816,9 +840,8 @@ msgstr "भाषा पता लगएं"
 msgid "cake"
 msgstr "केक"
 
-#. TRANS: mathematical exponent
-msgid "exp"
-msgstr "ऍक्स्प"
+msgid "sweet potato"
+msgstr "शकरकन्द"
 
 #. TRANS: load the heap from a file
 msgid "load heap"
@@ -870,6 +893,9 @@ msgstr ""
 
 msgid "protein"
 msgstr "प्रोटीन"
+
+msgid "1/64 note 𝅘𝅥𝅱"
+msgstr ""
 
 #. TRANS: oscillator time
 msgid "osctime"
@@ -972,8 +998,9 @@ msgstr "दोहराएँ"
 msgid "blocks"
 msgstr "ब्लॊक्स"
 
-msgid "Display statistics about your Music project."
-msgstr "अपने टर्टल प्रोजेक्ट के आङ्कडे  देखें"
+#. TRANS: mathematical exponent
+msgid "exp"
+msgstr "ऍक्स्प"
 
 msgid "Polar"
 msgstr "ध्रुवीय"
@@ -1021,7 +1048,10 @@ msgstr "मंज़िल"
 msgid "Clean"
 msgstr "साफ"
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "quarter note ♩"
+msgstr ""
+
+msgid "Note value must be greater than 0"
 msgstr ""
 
 #. TRANS: color refers to a hue, value, chroma triplet
@@ -1076,7 +1106,8 @@ msgstr "सहायक पट्टीको खोलने या बन्�
 msgid "half note 𝅗𝅥"
 msgstr ""
 
-msgid "1/16 note ♬"
+#. TRANS: Lilypond is engraving software
+msgid "Save your project to as a Lilypond file."
 msgstr ""
 
 msgid "extras"

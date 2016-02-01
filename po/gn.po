@@ -22,10 +22,17 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 #. TRANS: Borrar todo
 msgid "Delete all"
+msgstr ""
+
+#. TRANS: arroz y frijoles
+msgid "rice and beans"
 msgstr ""
 
 #. TRANS: mostrar
@@ -48,8 +55,7 @@ msgstr ""
 msgid "meter"
 msgstr ""
 
-#. TRANS: arroz y frijoles
-msgid "rice and beans"
+msgid "Save your project to a file."
 msgstr ""
 
 #. TRANS: no se traducen mashape
@@ -83,9 +89,6 @@ msgstr ""
 msgid "Run music slow"
 msgstr ""
 
-msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
-
 #. TRANS: manzana
 msgid "apple"
 msgstr ""
@@ -107,6 +110,9 @@ msgstr ""
 
 #. TRANS: radianes (matemáticas)
 msgid "radians"
+msgstr ""
+
+msgid "staccato"
 msgstr ""
 
 #. TRANS: Deshacer
@@ -185,6 +191,10 @@ msgstr ""
 msgid "stop"
 msgstr ""
 
+#. TRANS: vertical space
+msgid "vspace"
+msgstr ""
+
 #. TRANS: grasa
 msgid "fat"
 msgstr ""
@@ -233,10 +243,6 @@ msgstr ""
 
 #. TRANS: Copiar
 msgid "Copy"
-msgstr ""
-
-#. TRANS: Abre el panel para configurar Music Blocks.
-msgid "Open a panel for configuring Music Blocks."
 msgstr ""
 
 #. TRANS: nombre
@@ -290,6 +296,10 @@ msgstr ""
 msgid "Load plugin from file"
 msgstr ""
 
+#. TRANS: fibra
+msgid "fiber"
+msgstr ""
+
 msgid "You can scroll the blocks on the canvas."
 msgstr ""
 
@@ -310,6 +320,9 @@ msgstr ""
 
 #. TRANS: tortuga
 msgid "turtle"
+msgstr ""
+
+msgid "crescendo"
 msgstr ""
 
 #. TRANS: sawtooth wave
@@ -419,8 +432,7 @@ msgstr ""
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr ""
 
-#. TRANS: vertical space
-msgid "vspace"
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
 msgstr ""
 
 #. TRANS: publicar
@@ -433,6 +445,10 @@ msgstr ""
 
 #. TRANS: hours ago that the data was updated.
 msgid "hours ago"
+msgstr ""
+
+#. TRANS: slurring of notes in music
+msgid "slur"
 msgstr ""
 
 #. TRANS: pluma
@@ -466,8 +482,8 @@ msgstr ""
 msgid "city latitude"
 msgstr ""
 
-#. TRANS: fibra
-msgid "fiber"
+#. TRANS: Analizar los tipos de bloques usados
+msgid "Display statistics about your Music project."
 msgstr ""
 
 #. TRANS: Tu puedes cargar nuevos bloques desde un archivo. 
@@ -528,8 +544,8 @@ msgstr ""
 msgid "octave"
 msgstr ""
 
-#. TRANS: boñato
-msgid "sweet potato"
+#. TRANS: Musical score
+msgid "Save sheet music"
 msgstr ""
 
 #. TRANS: guardar pila
@@ -579,7 +595,8 @@ msgstr ""
 msgid "numerator"
 msgstr ""
 
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
+#. TRANS: swing beat in music
+msgid "swing"
 msgstr ""
 
 #. TRANS: guardar en
@@ -805,7 +822,8 @@ msgstr ""
 msgid "translate"
 msgstr ""
 
-msgid "quarter note ♩"
+#. TRANS: Abre el panel para configurar Music Blocks.
+msgid "Open a panel for configuring Music Blocks."
 msgstr ""
 
 #. TRANS: hasta
@@ -847,6 +865,9 @@ msgstr ""
 msgid "carbs"
 msgstr ""
 
+msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
 #. TRANS: sino
 msgid "else"
 msgstr ""
@@ -886,6 +907,9 @@ msgstr ""
 
 #. TRANS: alta
 msgid "high"
+msgstr ""
+
+msgid "1/16 note ♬"
 msgstr ""
 
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
@@ -950,8 +974,8 @@ msgstr ""
 msgid "cake"
 msgstr ""
 
-#. TRANS: exp (matemáticas)
-msgid "exp"
+#. TRANS: boñato
+msgid "sweet potato"
 msgstr ""
 
 #. TRANS: cargar pila
@@ -1011,6 +1035,9 @@ msgstr ""
 
 #. TRANS: proteína
 msgid "protein"
+msgstr ""
+
+msgid "1/64 note 𝅘𝅥𝅱"
 msgstr ""
 
 #. TRANS: oscillator time
@@ -1128,8 +1155,8 @@ msgstr ""
 msgid "blocks"
 msgstr ""
 
-#. TRANS: Analizar los tipos de bloques usados
-msgid "Display statistics about your Music project."
+#. TRANS: exp (matemáticas)
+msgid "exp"
 msgstr ""
 
 #. TRANS: Polar
@@ -1182,7 +1209,10 @@ msgstr ""
 msgid "Clean"
 msgstr ""
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "quarter note ♩"
+msgstr ""
+
+msgid "Note value must be greater than 0"
 msgstr ""
 
 #. TRANS: fijar color
@@ -1246,7 +1276,8 @@ msgstr ""
 msgid "half note 𝅗𝅥"
 msgstr ""
 
-msgid "1/16 note ♬"
+#. TRANS: Lilypond is engraving software
+msgid "Save your project to as a Lilypond file."
 msgstr ""
 
 #. TRANS: extras
