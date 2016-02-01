@@ -1125,3 +1125,38 @@ msgstr ""
 #. TRANS: swing beat in music
 msgid "swing"
 msgstr ""
+
+#. TRANS: tying together of notes in music
+msgid "tie"
+msgstr ""
+
+msgid "divide beat"
+msgstr ""
+
+msgid "skip notes"
+msgstr ""
+
+msgid "duplicate factor"
+msgstr ""
+
+#. TRANS: slurring of notes in music
+msgid "skip factor"
+msgstr ""
+
+msgid "adjust transposition"
+msgstr ""
+
+msgid "rest"
+msgstr ""
+
+msgid "staccato factor"
+msgstr ""
+
+msgid "slur factor"
+msgstr ""
+
+msgid "crescendo factor"
+msgstr ""
+
+msgid "start drum"
+msgstr ""
