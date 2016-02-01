@@ -6,8 +6,8 @@ msgid ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-17 00:31-0400\n"
-"PO-Revision-Date: 2011-11-23 03:34+0200\n"
-"Last-Translator: Chris <cjl@laptop.org>\n"
+"PO-Revision-Date: 2016-02-01 03:34+0200\n"
+"Last-Translator: Sawaros T. <t.sawaros@hotmail.com>\n"
 "Language-Team: LANGUAGE <walter@sugarlabs.org>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -16,18 +16,11 @@ msgid ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.5\n"
 
-
-msgid ""
-
-
-msgid ""
-
-
 msgid ""
 msgstr ""
 
 msgid "Delete all"
-msgstr ""
+msgstr  "ลบทั้งหมด"
 
 msgid "show"
 msgstr "แสดง"
@@ -39,14 +32,14 @@ msgid "random"
 msgstr "สุ่ม"
 
 msgid "confirm"
-msgstr ""
+msgstr "ยืนยัน"
 
 #. TRANS: musical meter
 msgid "meter"
-msgstr ""
+msgstr "อัตราจังหวะ"
 
 msgid "rice and beans"
-msgstr ""
+msgstr "ข้าวและถั่ว"
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
@@ -54,36 +47,36 @@ msgstr ""
 
 #. TRANS: target language for translation
 msgid "target"
-msgstr ""
+msgstr "เป้าหมาย"
 
 #. TRANS: horizontal space
 msgid "hspace"
-msgstr ""
+msgstr "ช่องว่างแนวนอน"
 
 msgid "keyboard"
 msgstr "แป้นพิมพ์"
 
 msgid "You can also load projects from the file system."
-msgstr ""
+msgstr "คุณสามารถโหลดโปรเจคได้จากไฟล์ในโปรแกรม"
 
 #. TRANS: as in "on event do"
 msgid "on"
-msgstr ""
+msgstr "ตรง"
 
 msgid "chicken"
-msgstr ""
+msgstr "ไก่"
 
 msgid "Run music slow"
-msgstr ""
+msgstr "เล่นเสียงดนตรี (ช้า)"
 
 msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
+msgstr "แถบเครื่องมือนี้ปุ่มต่างๆดังนี้ เมทริก ชัค แสดง โทน เต่า และอื่นๆอีกมากมาย คลิ๊กเพื่อแสดงเมนูสีของบล๊อกและลากบล๊อกจากเมนูสีไปยังแคนวาสเพื่อใช้มัน"
 
 msgid "apple"
-msgstr ""
+msgstr "แอปเปิ้ล"
 
 msgid "graphical notation matrix"
-msgstr ""
+msgstr "คำอธิบายเมตริกซ์ภาพ"
 
 msgid "number"
 msgstr "ตัวเลข"
@@ -94,163 +87,163 @@ msgstr ""
 
 #. TRANS: name of project
 msgid "title"
-msgstr ""
+msgstr "หัวข้อ"
 
 msgid "radians"
-msgstr ""
+msgstr "รัศมีเส้นโค้ง"
 
 msgid "Undo"
-msgstr ""
+msgstr "ยกเลิกคำสั่งเก่า"
 
 #. TRANS: ms is micro seconds
 msgid "duration (ms)"
-msgstr ""
+msgstr "ระยะเวลาต่อ จุลวินาที"
 
 #. TRANS: as in "add 1 to"
 msgid "to"
-msgstr ""
+msgstr "เพิ่ม1"
 
 msgid "add"
-msgstr ""
+msgstr "เพิ่ม"
 
 msgid "set pen size"
 msgstr "ตั้งค่าขนาดปากกา"
 
 msgid "rhythm"
-msgstr ""
+msgstr "จังหวะ"
 
 msgid "latitude"
-msgstr ""
+msgstr "เส้นรุ่ง"
 
 msgid "1/32 note 𝅘𝅥𝅰"
-msgstr ""
+msgstr "โน๊ต 1/32"
 
 msgid "mouse x"
-msgstr ""
+msgstr "หนูx"
 
 msgid "mouse y"
-msgstr ""
+msgstr "หนูy"
 
 msgid "Show/hide blocks"
-msgstr ""
+msgstr "แสดง/ซ่อน บล๊อก"
 
 #. TRANS: do this action
 msgid "do"
-msgstr ""
+msgstr "ทำ"
 
 msgid "move"
-msgstr ""
+msgstr "ย้าย"
 
 msgid "triangle"
-msgstr ""
+msgstr "สามเหลี่ยม"
 
 msgid "stop turtle"
-msgstr ""
+msgstr "หยุดเต่า"
 
 msgid "current pitch octave"
-msgstr ""
+msgstr "เสียงโน้ตคู่แปด"
 
 #. TRANS: robot sensors.
 msgid "distance"
-msgstr ""
+msgstr "ระยะ"
 
 msgid "food"
-msgstr ""
+msgstr "อาหาร"
 
 msgid "Click to run the project in slow mode."
-msgstr ""
+msgstr "คลิ๊กเพื่อเล่นโปรเจคอย่างช้า"
 
 msgid "stop"
 msgstr "หยุด"
 
 msgid "fat"
-msgstr ""
+msgstr "อ้วน"
 
 msgid "Expand or collapse start and action stacks."
-msgstr ""
+msgstr "ขยายหรือล้ม เริ่มและเรียงทับกัน"
 
 #. TRANS: a container for a variable
 msgid "boxes"
-msgstr ""
+msgstr "กล่อง"
 
 msgid "get fiber"
-msgstr ""
+msgstr "รับกาก"
 
 msgid "background"
-msgstr ""
+msgstr "พื้นหลัง"
 
 #. TRANS: logical "not" operator
 msgid "not"
 msgstr "ไม่"
 
 msgid "Google map"
-msgstr ""
+msgstr "แผนที่"
 
 #. TRANS: as in blinking an eye.
 msgid "blink"
-msgstr ""
+msgstr "กระพริบตา"
 
 msgid "day"
-msgstr ""
+msgstr "วัน"
 
 #. TRANS: mathematical modular (remainder) function.
 msgid "mod"
 msgstr "หารเอาเศษ"
 
 msgid "beat factor"
-msgstr ""
+msgstr "ปัจจัยให้เกิดจังหวะ"
 
 msgid "Save project"
-msgstr ""
+msgstr "บันทึกงาน"
 
 msgid "Copy"
 msgstr "คัดลอก"
 
 msgid "Open a panel for configuring Music Blocks."
-msgstr ""
+msgstr "เปิดแผงสำหรับปรับแต่ง Music Blocks"
 
 #. TRANS: the name of a variable (stored in a box)
 msgid "name"
-msgstr ""
+msgstr "ชื่อ"
 
 msgid "turtle x"
-msgstr ""
+msgstr "เต่า x"
 
 msgid "turtle y"
-msgstr ""
+msgstr "เต่า y"
 
 msgid "Download"
-msgstr ""
+msgstr "ดาวน์โหลด"
 
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-msgstr ""
+msgstr "จะใช้ปุ่มวางได้ต่อเมื่อ คุณคัดลอกบล๊อกไว้บนคลิปบอร์ด"
 
 msgid "transposition"
-msgstr ""
+msgstr "การเปลี่ยนตำแหน่ง"
 
 msgid "Expand/collapse toolbar"
-msgstr ""
+msgstr "เพิ่ม/พัง กล่องเครื่องมือ"
 
 msgid "zoom"
-msgstr ""
+msgstr "ขยาย"
 
 msgid "Hide or show the blocks and the palettes."
-msgstr ""
+msgstr "ซ่อนหรือแสดงบล๊อกและเมนูสี"
 
 msgid "to degrees"
-msgstr ""
+msgstr "ถึงดีกรีที่"
 
 msgid "Restore blocks from the trash."
-msgstr ""
+msgstr "กู้บล๊อกจากถังขยะ"
 
 msgid "get calories"
-msgstr ""
+msgstr "รับแคลลอรี่"
 
 msgid "Load plugin from file"
-msgstr ""
+msgstr "โหลดปลั๊กอินจากไฟล์"
 
 msgid "You can scroll the blocks on the canvas."
-msgstr ""
+msgstr "คุณสามารถเลื่อนบล๊อกสู่แคนวาส"
 
 msgid "x"
 msgstr "แกน x"
@@ -265,42 +258,42 @@ msgid "Help"
 msgstr "ช่วยเหลือ"
 
 msgid "turtle"
-msgstr ""
+msgstr "เต่า"
 
 #. TRANS: sawtooth wave
 msgid "sawtooth"
-msgstr ""
+msgstr "ฟันเลื้อย"
 
 msgid "right"
 msgstr "ขวา"
 
 msgid "Load samples from server"
-msgstr ""
+msgstr "โหลดตัวอย่างจากเซอเว่อร์"
 
 msgid "hide blocks"
 msgstr "ซ่อน blocks"
 
 msgid "Hide or show the block palettes."
-msgstr ""
+msgstr "ซ้อนหรือแสดงบล๊อก"
 
 msgid "This button opens a viewer for loading example projects."
-msgstr ""
+msgstr "ปุ่มนี้เปิดหน้าต่างเพื่อโหลดโปรเจคตัวอย่าง"
 
 msgid "Enable scrolling"
-msgstr ""
+msgstr "ทำให้เลื่อนได้"
 
 msgid "back"
 msgstr "กลับ"
 
 msgid "Publish"
-msgstr ""
+msgstr "โพสสู่สาธารณะ"
 
 msgid "Click to run the project step by step."
-msgstr ""
+msgstr "คลิ๊กเพื่อให้โปรเจคเล่นทีละขั้นตอน"
 
 #. TRANS: hollow line refers to drawing an outline around a line
 msgid "hollow line"
-msgstr ""
+msgstr "เส้นช่องโพรง"
 
 msgid "arc"
 msgstr "เส้นโค้ง"
@@ -309,170 +302,170 @@ msgid "radius"
 msgstr "รัศมี"
 
 msgid "longitude"
-msgstr ""
+msgstr "เส้นแวง"
 
 msgid "duration"
-msgstr ""
+msgstr "ช่วงเวลา"
 
 #. TRANS: shade refers to value (dark to light)
 msgid "set shade"
 msgstr "ตั้งค่าเฉดสี"
 
 msgid "duplicate notes"
-msgstr ""
+msgstr "คัดลอกโน้ต"
 
 #. TRANS: in mathematical sense (inverse of period)
 msgid "frequency"
-msgstr ""
+msgstr "ความถี่"
 
 #. TRANS: as in the event that a signal arrives
 msgid "event"
-msgstr ""
+msgstr "งาน"
 
 msgid "pixel color"
-msgstr ""
+msgstr "พิเซลของสี"
 
 msgid "eatme"
-msgstr ""
+msgstr "กินฉัน"
 
 msgid "This button opens and closes the primary toolbar."
-msgstr ""
+msgstr "ปุ่มนี้เปิดและปิดแถบเครื่องมือหลัก"
 
 #. TRANS: index specifies a position into an array (heap)
 msgid "index"
-msgstr ""
+msgstr "ดัชนี"
 
 msgid "note volume"
-msgstr ""
+msgstr "เสียงของโน๊ต"
 
 msgid "hide"
-msgstr ""
+msgstr "ซ่อน"
 
 #. TRANS: show the contents of the heap.
 msgid "show heap"
 msgstr "แสดง heap"
 
 msgid "Stop the music (and the turtles)."
-msgstr ""
+msgstr "หยุดเพลง (และเต่า)"
 
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
+msgstr "ทัวร์จบแล้ว เริ่มเล่น Music Blockกัน"
 
 #. TRANS: vertical space
 msgid "vspace"
-msgstr ""
+msgstr "พื้นที่แนวตั้ง"
 
 #. TRANS: publish project to Facebook
 msgid "publish"
-msgstr ""
+msgstr "โพสสู่สาธารณะ"
 
 #. TRANS: weather forecast
 msgid "forecast"
-msgstr ""
+msgstr "พยากรณ์"
 
 #. TRANS: hours ago that the data was updated.
 msgid "hours ago"
-msgstr ""
+msgstr "หนึ่งชั่วโมงที่แล้ว"
 
 msgid "pen"
-msgstr ""
+msgstr "ปากกา"
 
 msgid "fish"
-msgstr ""
+msgstr "ปลา"
 
 msgid "print"
 msgstr "งานพิมพ์"
 
 #. TRANS: how many entries are in the heap?
 msgid "heap length"
-msgstr ""
+msgstr "ความยาวของฮีป"
 
 msgid "speak"
-msgstr ""
+msgstr "พูด"
 
 msgid "Expand/collapse option toolbar"
-msgstr ""
+msgstr "เพิ่ม/ลด แถบเครื่องมือตัวเลือก"
 
 msgid "end hollow line"
-msgstr ""
+msgstr "จบเส้นช่องโพรง"
 
 msgid "city latitude"
-msgstr ""
+msgstr "เส้นรุ้งของเมือง"
 
 #. TRANS: dietary fiber
 msgid "fiber"
-msgstr ""
+msgstr "กาก"
 
 msgid "You can load new blocks from the file system."
-msgstr ""
+msgstr "คุณสามารถโหลดบล๊อกใหม่จากไฟล์ในเครือข่าย"
 
 #. TRANS: mathematical power, e.g., 2^4 == 16
 msgid "power"
-msgstr ""
+msgstr "ยกกำลัง"
 
 msgid "Settings"
-msgstr ""
+msgstr "ตั้งค่า"
 
 msgid "one of"
-msgstr ""
+msgstr "หนึ่งใน"
 
 msgid "Save stack"
-msgstr ""
+msgstr "บันทึก"
 
 msgid "corn"
-msgstr ""
+msgstr "ข้าวโพด"
 
 msgid "Display statistics"
-msgstr ""
+msgstr "แสดงสถิติ"
 
 msgid "Remove all content on the canvas, including the blocks."
-msgstr ""
+msgstr "ลบทุกอย่าง รวมทั้งบล๊อก"
 
 msgid "to radians"
-msgstr ""
+msgstr "รัศมี"
 
 msgid "water"
-msgstr ""
+msgstr "น้ำ"
 
 #. TRANS: robot sensors.
 msgid "infrared light (left)"
-msgstr ""
+msgstr "แสงอินฟราเรท"
 
 #. TRANS: mathematical exponential base
 msgid "base"
-msgstr ""
+msgstr "ฐาน"
 
 msgid "cookie"
-msgstr ""
+msgstr "คุกกี้"
 
 msgid "Show or hide a polar-coordinate grid."
-msgstr ""
+msgstr "แสดง หรือซ่อนกราฟ พิกัดเชิงขั้ว"
 
 msgid "octave"
-msgstr ""
+msgstr "เสียงแปดคู่"
 
 msgid "sweet potato"
-msgstr ""
+msgstr "มันหวาน"
 
 #. TRANS: save the heap to a file
 msgid "save heap"
-msgstr ""
+msgstr "บันทึกฮีป"
 
 msgid "from"
-msgstr ""
+msgstr "จาก"
 
 msgid "sensors"
-msgstr ""
+msgstr "เซนเซอร์"
 
 msgid "pen down"
 msgstr "จรดปากกา"
 
 #. TRANS: retrieve the value at a specific entry (index) in the heap
 msgid "index heap"
-msgstr ""
+msgstr "ดัชนีฮีป"
 
 msgid "get name"
-msgstr ""
+msgstr "รับค่าชื่อ"
 
 msgid "wait"
 msgstr "รอ"
@@ -482,88 +475,88 @@ msgid "box"
 msgstr "กล่อง"
 
 msgid "Planet"
-msgstr ""
+msgstr "ดาวเคราะห์"
 
 msgid "Show these messages."
-msgstr ""
+msgstr "แสดงข้อความ"
 
 #. TRANS: object
 msgid "obj"
-msgstr ""
+msgstr "สิ่งของ"
 
 msgid "numerator"
-msgstr ""
+msgstr "เศษ"
 
 msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\""
-msgstr ""
+msgstr "คุณหนูคือวาทยากรของพวกเรา คุณหนูสนับสนุนให้คุณลองสำรวจ Music Block, The Matrix และการแสดง/สัญกรณ์ ความเป็นไปได้ของ Music Blocks เริ่มทัวร์กันได้เลย "
 
 #. TRANS: store a value in a box
 msgid "store in"
 msgstr "นำไปเก็บไว้"
 
 msgid "digest meal"
-msgstr ""
+msgstr "ย่อยอาหาร"
 
 msgid "maths"
-msgstr ""
+msgstr "คณิตศาสตร์"
 
 msgid "denominator"
-msgstr ""
+msgstr "ส่วน"
 
 msgid "eighth note ♪"
-msgstr ""
+msgstr "โน้ตแปด"
 
 msgid "whole note 𝅝"
-msgstr ""
+msgstr "โน้ตเต็ม"
 
 #. TRANS: popout window
 msgid "popout"
-msgstr ""
+msgstr "หน้าต่างแจ้งเตือน"
 
 msgid "zoom factor"
-msgstr ""
+msgstr "ปัจจัยที่น่าสนใจ"
 
 #. TRANS: the name of a stack of blocks
 msgid "action"
-msgstr ""
+msgstr "การกระทำ"
 
 #. TRANS: volume of microphone audio
 msgid "loudness"
 msgstr "ระดับความดัง"
 
 msgid "Increase the size of the blocks."
-msgstr ""
+msgstr "เพิ่มขนาดของบล๊อก"
 
 msgid "set volume"
-msgstr ""
+msgstr "ปรับเสียง"
 
 #. TRANS: logical "or" operator
 msgid "or"
 msgstr "หรือ"
 
 msgid "note value"
-msgstr ""
+msgstr "ค่าของโน้ต"
 
 msgid "comment"
 msgstr "หมายเหตุ"
 
 msgid "cheese"
-msgstr ""
+msgstr "ชีส"
 
 #. TRANS: lilypond is a language used to generate musical scores.
 msgid "save as lilypond"
-msgstr ""
+msgstr "จัดเก็บเป็น lilypond"
 
 msgid "Cartesian"
-msgstr ""
+msgstr "คาร์ทีเซียน"
 
 #. TRANS: audio (as in musical note)
 msgid "tone"
-msgstr ""
+msgstr "โทน"
 
 #. TRANS: evaluate Javascript code
 msgid "eval"
-msgstr ""
+msgstr "ประเมิน"
 
 msgid "color"
 msgstr "สี"
@@ -572,7 +565,7 @@ msgid "image"
 msgstr "รูปภาพ"
 
 msgid "Click to run the music note by note."
-msgstr ""
+msgstr "คลิ๊กที่นี่เพื่อเล่นดนตรีโน้ตต่อโน้ต"
 
 #. TRANS: pop a value off of the heap.
 msgid "pop"
@@ -580,256 +573,257 @@ msgstr "ป๊อบ"
 
 #. TRANS: bitcoin currency (probably no need to translate)
 msgid "bitcoin"
-msgstr ""
+msgstr “บิตคอย์น"
 
 msgid "pen size"
 msgstr "ขนาดปากกา"
 
 msgid "Clear the screen and return the turtles to their initial positions."
-msgstr ""
+msgstr "ลบจอทั้งหมด และให้เต่าไปอยู่ที่จุดตั้งต้น"
 
 #. TRANS: Boolean logic
 msgid "boolean"
-msgstr ""
+msgstr "บูลีน"
 
 msgid "coordinates"
-msgstr ""
+msgstr "พิกัด"
 
 msgid "sing"
-msgstr ""
+msgstr "ร้อง"
 
 msgid "play backward"
-msgstr ""
+msgstr "เล่นย้อนหลัง"
 
 msgid "Congratulations."
-msgstr ""
+msgstr "ยินดีด้วย"
 
 msgid "Run slow"
-msgstr ""
+msgstr "วิ่งช้า"
 
 msgid "mouse button"
-msgstr ""
+msgstr "ปุ่มหนู"
 
 #. TRANS: music term for dividing the beat into a different number of equal subdivisions
 msgid "tuplet"
-msgstr ""
+msgstr "ทูเปรท"
 
 #. TRANS: cloud as in cloud server
 msgid "cloud"
-msgstr ""
+msgstr "เครา"
 
 msgid "size"
-msgstr ""
+msgstr "ขนาด"
 
 msgid "city"
-msgstr ""
+msgstr "เมือง"
 
 #. TRANS: carbohydrates
 msgid "get carbs"
-msgstr ""
+msgstr "รับ คาร์โบไฮเดรต"
 
 msgid "sine"
-msgstr ""
+msgstr "ซายน์"
 
 msgid "Click to run the project in fast mode."
-msgstr ""
+msgstr "คลิ๊กเพื่อเล่นโปรเจคในโหมดเร็ว"
 
 msgid "beef"
-msgstr ""
+msgstr "เนื้อ"
 
 #. TRANS: source language for translation
 msgid "source"
-msgstr ""
+msgstr "แหล่ง"
 
 msgid "unknown"
-msgstr ""
+msgstr "ไม่รู้"
 
 msgid "wait for"
-msgstr ""
+msgstr "รอ"
 
 msgid "pen up"
 msgstr "ยกปากกาขึ้น"
 
 msgid "Decrease the size of the blocks."
-msgstr ""
+msgstr "ลดขนาดของบล๊อก"
 
 msgid "Run note by note"
-msgstr ""
+msgstr "เล่นโน้ตต่อโน้ต"
 
 msgid "start"
 msgstr "เริ่ม"
 
 msgid "stock price"
-msgstr ""
+msgstr "ราคาหุ้น"
 
 #. TRANS: is the heap empty?
 msgid "heap empty?"
-msgstr ""
+msgstr "ลบฮีป?"
 
 msgid "motion z"
-msgstr ""
+msgstr "การเคลื่อนไหวz"
 
 #. TRANS: low temperature
 msgid "low"
-msgstr ""
+msgstr "ต่ำ"
 
 msgid "motion x"
-msgstr ""
+msgstr "การเคลื่อนไหวx"
 
 msgid "motion y"
-msgstr ""
+msgstr "การเคลื่อนไหวy"
 
 msgid "forward"
 msgstr "เดินหน้า"
 
 #. TRANS: 360 degrees in a circle
 msgid "degrees"
-msgstr ""
+msgstr "ดีกรี"
 
 msgid "translate"
-msgstr ""
+msgstr "แปล"
 
 msgid "quarter note ♩"
-msgstr ""
+msgstr "โน้ต 1/4"
 
 msgid "until"
-msgstr ""
+msgstr "จนกว่า"
 
 msgid "define"
-msgstr ""
+msgstr "ความหมาย"
 
 #. TRANS: save project as simple vector graphic (SVG)
 msgid "save svg"
-msgstr ""
+msgstr "บันทึกโปรเจคเป็นSVG"
 
 #. TRANS: mathematical ceiling function, e.g., ceiling(2.5) == 3
 msgid "ceiling"
-msgstr ""
+msgstr "เพดาน"
 
 #. TRANS: a turtle shell
 msgid "shell"
-msgstr ""
+msgstr "กระดอง"
 
 msgid "start turtle"
-msgstr ""
+msgstr "เริ่มเต่า"
 
 msgid "Welcome to Music Blocks"
-msgstr ""
+msgstr "ยินดีต้อนรับสู่Music Blocks"
 
 #. TRANS: set language
 msgid "set lang"
-msgstr ""
+msgstr "ตั้งค่าภาษา"
 
 msgid "turtle name"
-msgstr ""
+msgstr "ชื่อของเต่า"
 
 #. TRANS: carbohydrates
 msgid "carbs"
-msgstr ""
+msgstr "คาร์โบไฮเดรต"
 
 msgid "else"
-msgstr ""
+msgstr "ไม่งั้นให้ทำ"
 
 #. TRANS: as in broadcast a signal
 msgid "broadcast"
-msgstr ""
+msgstr "ถ่ายทอด"
 
 msgid "orange"
 msgstr "สีส้ม"
 
 msgid "begin hollow line"
-msgstr ""
+msgstr "เริ่มเส้นช่องโพรง"
 
 msgid "flat"
-msgstr ""
+msgstr "ราบ"
 
 #. TRANS: the heap is a first-in-last-out (FILO) stack
 msgid "heap"
-msgstr ""
+msgstr "ฮีป"
 
 #. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
 msgid "begin fill"
-msgstr ""
+msgstr "เริ่มเติ่ม"
 
 msgid "beats per minute"
-msgstr ""
+msgstr "บีทต่อนาที"
 
 msgid "eat"
-msgstr ""
+msgstr "กิน"
 
 msgid "Expand/collapse collapsable blocks"
-msgstr ""
+msgstr "เพิ่ม/พัง บล๊อกที่สามารถพังได้"
 
 #. TRANS: high temperature
 msgid "high"
-msgstr ""
+msgstr "สูง"
 
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr ""
+msgstr "Music Blocksคือศูนย์ร่วมอุปกรณ์ต่างๆเพื่อสำรวจแนวคิดเรื่องดนตรีด้วยวิธีที่สนุกและครบถ้วน"
 
 #. TRANS: longitude and latitude coordinate data
 msgid "Coordinate data not available."
-msgstr ""
+msgstr "ไม่มีพิกัดข้อมูล"
 
 #. TRANS: hue refers to spectral hue (red, yellow, green, blue...)
 msgid "set hue"
-msgstr ""
+msgstr "ตั้งค่า ความมืดหรือความสว่างของสี "
 
 msgid "currency"
-msgstr ""
+msgstr "เงินตรา"
 
 msgid "this"
-msgstr ""
+msgstr "นี้"
 
 msgid "Palette buttons"
-msgstr ""
+msgstr "ปุ่มเมนูสี"
 
 msgid "potato"
-msgstr ""
+msgstr "มันฝรั้ง"
 
 msgid "city longitude"
-msgstr ""
+msgstr "เส้นแวงของเมือง"
 
 msgid "grey"
-msgstr ""
+msgstr "เทา"
 
 #. TRANS: the value of a variable (stored in a box)
 msgid "value"
 msgstr "ค่า"
 
 msgid "banana"
-msgstr ""
+msgstr "กล้วย"
 
 msgid "wheat bread"
-msgstr ""
+msgstr "ขนมปังข้าวสาลี"
 
+#  "ในขณะที่"
 msgid "while"
 msgstr "สีขาว"
 
 msgid "open file"
-msgstr ""
+msgstr "เปิดไฟล์"
 
 #. TRANS: detect language
 msgid "detect lang"
-msgstr ""
+msgstr "จับภาษา"
 
 msgid "cake"
-msgstr ""
+msgstr "เค้ก"
 
 #. TRANS: mathematical exponent
 msgid "exp"
-msgstr ""
+msgstr "เลขยกกำลังในคณิตศาสตร์"
 
 #. TRANS: load the heap from a file
 msgid "load heap"
-msgstr ""
+msgstr "โหลดฮีป"
 
 msgid "Open"
 msgstr "เปิด"
 
 #. TRANS: database fetch
 msgid "fetch"
-msgstr ""
+msgstr "จับ"
 
 #. TRANS: logical "and" operator
 msgid "and"
@@ -837,39 +831,39 @@ msgstr "บวก"
 
 #. TRANS: grey refers to chroma (grey to vivid)
 msgid "set grey"
-msgstr ""
+msgstr "ตั้งเป็นสีเทา"
 
 msgid "then"
 msgstr "แล้ว"
 
 msgid "calories"
-msgstr ""
+msgstr "แคลลอรี่"
 
 msgid "Run step by step"
-msgstr ""
+msgstr "เล่นที่ละขั้นตอน"
 
 #. TRANS: musical pitch
 msgid "pitch"
-msgstr ""
+msgstr "ระดับเสียง"
 
 msgid "Show/hide palettes"
-msgstr ""
+msgstr "แสดง/ซ่อนเมนูสี"
 
 msgid "set heading"
 msgstr "กำหนดทิศทาง"
 
 msgid "add 1 to"
-msgstr ""
+msgstr "เพิ่ม1ที่"
 
 #. TRANS: stop playing current media file (movie or audio)
 msgid "stop play"
-msgstr ""
+msgstr "หยุดเล่น"
 
 msgid "sharp"
-msgstr ""
+msgstr "เสียงแหลม"
 
 msgid "protein"
-msgstr ""
+msgstr "โปรตีน"
 
 #. TRANS: oscillator time
 msgid "osctime"
@@ -1109,3 +1103,20 @@ msgstr ""
 
 msgid "left"
 msgstr "ซ้าย"
+
+#. TRANS: slurring of notes in music
+msgid "slur"
+msgstr ""
+
+msgid "staccato"
+msgstr ""
+
+msgid "crescendo"
+msgstr ""
+
+#. TRANS: swing beat in music
+msgid "swing"
+msgstr ""
+
+msgid "invert"
+msgstr ""
