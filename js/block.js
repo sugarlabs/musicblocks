@@ -222,6 +222,7 @@ function Block(protoblock, blocks, overrideName) {
             case 'tie':
             case 'staccato':
             case 'slur':
+            case 'crescendo':
             case 'settransposition':
             case 'tuplet':
             case 'tuplet2':
