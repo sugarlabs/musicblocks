@@ -1111,3 +1111,17 @@ msgstr "Guarde el proyecto como un archivo de LilyPond."
 
 msgid "Note value must be greater than 0"
 msgstr "Valor de la nota debe ser mayor que 0"
+
+#. TRANS: slurring of notes in music
+msgid "slur"
+msgstr ""
+
+msgid "staccato"
+msgstr ""
+
+msgid "crescendo"
+msgstr ""
+
+#. TRANS: swing beat in music
+msgid "swing"
+msgstr ""

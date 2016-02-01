@@ -1104,6 +1104,13 @@ msgstr ""
 msgid "left"
 msgstr "ซ้าย"
 
+#. TRANS: lilypond is a language used to generate musical scores.
+msgid "save as lilypond"
+msgstr ""
+
+msgid "Note value must be greater than 0"
+msgstr ""
+
 #. TRANS: slurring of notes in music
 msgid "slur"
 msgstr ""
@@ -1116,7 +1123,4 @@ msgstr ""
 
 #. TRANS: swing beat in music
 msgid "swing"
-msgstr ""
-
-msgid "invert"
 msgstr ""

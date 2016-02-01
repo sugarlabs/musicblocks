@@ -1110,3 +1110,17 @@ msgstr ""
 
 msgid "Note value must be greater than 0"
 msgstr ""
+
+#. TRANS: slurring of notes in music
+msgid "slur"
+msgstr ""
+
+msgid "staccato"
+msgstr ""
+
+msgid "crescendo"
+msgstr ""
+
+#. TRANS: swing beat in music
+msgid "swing"
+msgstr ""
