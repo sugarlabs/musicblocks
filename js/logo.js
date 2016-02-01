@@ -518,9 +518,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         if (!this.lilypondSaveOnly) {
             // this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
             // this.drumSynth = new Tone.DrumSynth().toMaster();
-            var toneVol = new Tone.Volume(-20);  // DEFAULT VALUE
-            this.polySynth.chain(toneVol, Tone.Master);
-            this.drumSynth.chain(toneVol, Tone.Master);
+            // var toneVol = new Tone.Volume(-12);  // DEFAULT VALUE
+            // this.polySynth.chain(toneVol, Tone.Master);
+            // this.drumSynth.chain(toneVol, Tone.Master);
+            this.setSynthVolume(50, 0);
         }
 
         this.inMatrix = false;
@@ -2530,6 +2531,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var scaledVol = nvol - 200;
         scaledVol *= 0.4;
         console.log(scaledVol);
+        console.log(vol, scaledVol);
         if (!this.lilypondSaveOnly) {
             var toneVol = new Tone.Volume(scaledVol);
             if (this.turtles.turtleList[turtle].drum) {
