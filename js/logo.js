@@ -144,7 +144,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
     this.drumSynth = new Tone.DrumSynth().toMaster();
 
-    Tone.Transport.bpm.value = 120;  // Doesn't seem to do anything
+    // Tone.Transport.bpm.value = 120;  // Doesn't seem to do anything
 
     // Oscillator parameters
     this.oscDuration = {};
@@ -517,7 +517,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         if (!this.lilypondSaveOnly) {
-            this.setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
+            this.setSynthVolume(25, Math.max(this.turtles.turtleList.length - 1), 0);
         }
 
         this.inMatrix = false;
@@ -2695,7 +2695,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     
                     var oscillators = [];
                     // FIXME: Add tie to notation
-                    if (logo.oscList[turtle].length > 0 && duraction > 0) {
+                    if (logo.oscList[turtle].length > 0 && duration > 0) {
                         for (var i = 0; i < logo.oscList[turtle].length; i++) {
                             if (!logo.lilypondSaveOnly) {
                                 oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
