@@ -140,6 +140,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.numerator = 3;
     this.denominator = 4;
 
+    this.tone = new Tone();
     this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
     this.drumSynth = new Tone.DrumSynth().toMaster();
 
@@ -2517,24 +2518,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.setSynthVolume = function(vol, turtle) {
         if (vol > 100) {
             vol = 100;
-        } else if (vol < 1) {
-            vol = 1;
+        } else if (vol < 0) {
+            vol = 0;
         }
-        // Scale runs from 0db (max) to -40db (min)
-        var nvol = Math.log10(vol);
-	nvol *= 100;
-        var scaledVol = nvol - 200;
-        scaledVol *= 0.4;
-        console.log(scaledVol);
-        console.log(vol, scaledVol);
-        if (!this.lilypondSaveOnly) {
-            var toneVol = new Tone.Volume(scaledVol);
-            if (this.turtles.turtleList[turtle].drum) {
-                this.drumSynth.chain(toneVol, Tone.Master);
-            } else {
-                this.polySynth.chain(toneVol, Tone.Master);
-            }
-	}
+	var db = this.tone.gainToDb(vol);
+	Tone.Master.volume.rampTo(db, 0.01);
     }
 
     this.processNote = function(noteBeatValue, blk, turtle) {
