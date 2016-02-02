@@ -703,7 +703,7 @@ function Matrix() {
                 for (var i = 0; i < note.length; i++) {
                     note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
                 }
-                if(note !== 'R') {
+                if(note[0] !== 'R') {
                     synth.triggerAttackRelease(note, that.logo.defaultBPMFactor / noteValue);
                 }
             }, that.logo.defaultBPMFactor * 1000 * time);
