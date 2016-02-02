@@ -516,12 +516,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         if (!this.lilypondSaveOnly) {
-            // this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
-            // this.drumSynth = new Tone.DrumSynth().toMaster();
-            // var toneVol = new Tone.Volume(-12);  // DEFAULT VALUE
-            // this.polySynth.chain(toneVol, Tone.Master);
-            // this.drumSynth.chain(toneVol, Tone.Master);
-            this.setSynthVolume(50, 0);
+            this.setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
         }
 
         this.inMatrix = false;
