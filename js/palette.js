@@ -20,10 +20,6 @@ var PALETTELEFTMARGIN = 10;
 // plugins from the extras palette.
 var BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
 
-/*
-var BUILTINMACROS = {'note': [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['solfege', {'value': 're'}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]]],
-                     'matrix': [[0, 'matrix', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': 'sol'}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': 'mi'}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': 're'}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]]}
-*/
 
 function maxPaletteHeight(menuSize, scale) {
     // Palettes don't start at the top of the screen and the last
@@ -1447,94 +1443,90 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
 
 
 function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX, saveY) {
-        if (moved) {
-            moved = false;
-            palette.draggingProtoBlock = false;
+    var NOTEOBJ = [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['solfege', {'value': 're'}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]]];
+    var MATRIXOBJ = [[0, 'matrix', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': 'sol'}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': 'mi'}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': 're'}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]];
+    var BUILTINMACROS = {'note': NOTEOBJ, 'matrix': MATRIXOBJ};
 
-	    // FIXME: Use BUILTINMACROS
-            if (blkname === 'note') {
-                var obj = [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['solfege', {'value': 're'}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]]];
-                paletteBlocks.loadNewBlocks(obj);
-                var thisBlock = paletteBlocks.blockList.length - 1;
-                var topBlk = paletteBlocks.findTopBlock(thisBlock);
-                restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
-            } else if (blkname === 'matrix') {
-                var obj = [[0, 'matrix', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': 'sol'}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': 'mi'}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': 're'}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]];
-                paletteBlocks.loadNewBlocks(obj);
-                var thisBlock = paletteBlocks.blockList.length - 1;
-                var topBlk = paletteBlocks.findTopBlock(thisBlock);
-                restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
-            } else if (palette.name === 'myblocks') {
-                // If we are on the myblocks palette, it is a macro.
-                var macroName = blkname.replace('macro_', '');
+    if (moved) {
+        moved = false;
+        palette.draggingProtoBlock = false;
 
-                // We need to copy the macro data so it is not overwritten.
-                var obj = [];
-                for (var b = 0; b < palette.palettes.macroDict[macroName].length; b++) {
-                    var valueEntry = palette.palettes.macroDict[macroName][b][1];
-                    var newValue = [];
-                    if (typeof(valueEntry) === 'string') {
-                        newValue = valueEntry;
-                    } else if (typeof(valueEntry[1]) === 'string') {
-                        if (valueEntry[0] === 'number') {
-                            newValue = [valueEntry[0], Number(valueEntry[1])];
-                        } else {
-                            newValue = [valueEntry[0], valueEntry[1]];
-                        }
-                    } else if (typeof(valueEntry[1]) === 'number') {
-                        if (valueEntry[0] === 'number') {
-                            newValue = [valueEntry[0], valueEntry[1]];
-                        } else {
-                            newValue = [valueEntry[0], valueEntry[1].toString()];
-                        }
+        if (blkname in BUILTINMACROS) {
+            paletteBlocks.loadNewBlocks(BUILTINMACROS[blkname]);
+            var thisBlock = paletteBlocks.blockList.length - 1;
+            var topBlk = paletteBlocks.findTopBlock(thisBlock);
+            restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+        } else if (palette.name === 'myblocks') {
+            // If we are on the myblocks palette, it is a macro.
+            var macroName = blkname.replace('macro_', '');
+
+            // We need to copy the macro data so it is not overwritten.
+            var obj = [];
+            for (var b = 0; b < palette.palettes.macroDict[macroName].length; b++) {
+                var valueEntry = palette.palettes.macroDict[macroName][b][1];
+                var newValue = [];
+                if (typeof(valueEntry) === 'string') {
+                    newValue = valueEntry;
+                } else if (typeof(valueEntry[1]) === 'string') {
+                    if (valueEntry[0] === 'number') {
+                        newValue = [valueEntry[0], Number(valueEntry[1])];
                     } else {
-                        if (valueEntry[0] === 'number') {
-                            newValue = [valueEntry[0], Number(valueEntry[1]['value'])];
-                        } else {
-                            newValue = [valueEntry[0], {'value': valueEntry[1]['value']}];
-                        }
+                        newValue = [valueEntry[0], valueEntry[1]];
                     }
-                    var newBlock = [palette.palettes.macroDict[macroName][b][0],
-                                    newValue,
-                                    palette.palettes.macroDict[macroName][b][2],
-                                    palette.palettes.macroDict[macroName][b][3],
-                                    palette.palettes.macroDict[macroName][b][4]];
-                    obj.push(newBlock);
-                }
-
-                // Set the position of the top block in the stack
-                // before loading.
-                obj[0][2] = palette.protoContainers[blkname].x;
-                obj[0][3] = palette.protoContainers[blkname].y;
-                console.log('loading macro ' + macroName);
-                paletteBlocks.loadNewBlocks(obj);
-
-                // Ensure collapse state of new stack is set properly.
-                var thisBlock = paletteBlocks.blockList.length - 1;
-                var topBlk = paletteBlocks.findTopBlock(thisBlock);
-                setTimeout(function() {
-                    paletteBlocks.blockList[topBlk].collapseToggle();
-                }, 500);
-            } else {
-                // Create the block.
-                function myCallback (newBlock) {
-                    // Move the drag group under the cursor.
-                    paletteBlocks.findDragGroup(newBlock);
-                    for (var i in paletteBlocks.dragGroup) {
-                        paletteBlocks.moveBlockRelative(paletteBlocks.dragGroup[i], Math.round(event.stageX / palette.palettes.scale) - paletteBlocks.stage.x, Math.round(event.stageY / palette.palettes.scale) - paletteBlocks.stage.y);
+                } else if (typeof(valueEntry[1]) === 'number') {
+                    if (valueEntry[0] === 'number') {
+                        newValue = [valueEntry[0], valueEntry[1]];
+                    } else {
+                        newValue = [valueEntry[0], valueEntry[1].toString()];
                     }
-                    // Dock with other blocks if needed
-                    blocks.blockMoved(newBlock);
-                    restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+                } else {
+                    if (valueEntry[0] === 'number') {
+                        newValue = [valueEntry[0], Number(valueEntry[1]['value'])];
+                    } else {
+                        newValue = [valueEntry[0], {'value': valueEntry[1]['value']}];
+                    }
                 }
-
-                // console.log(protoblk + ' ' + blkname);
-                var newBlock = makeBlockFromPalette(protoblk, blkname, palette, myCallback);
+                var newBlock = [palette.palettes.macroDict[macroName][b][0],
+                                newValue,
+                                palette.palettes.macroDict[macroName][b][2],
+                                palette.palettes.macroDict[macroName][b][3],
+                                palette.palettes.macroDict[macroName][b][4]];
+                obj.push(newBlock);
             }
 
-            palette.updateBlockMasks();
-            palette.palettes.refreshCanvas();
+            // Set the position of the top block in the stack
+            // before loading.
+            obj[0][2] = palette.protoContainers[blkname].x;
+            obj[0][3] = palette.protoContainers[blkname].y;
+            console.log('loading macro ' + macroName);
+            paletteBlocks.loadNewBlocks(obj);
+
+            // Ensure collapse state of new stack is set properly.
+            var thisBlock = paletteBlocks.blockList.length - 1;
+            var topBlk = paletteBlocks.findTopBlock(thisBlock);
+            setTimeout(function() {
+                paletteBlocks.blockList[topBlk].collapseToggle();
+            }, 500);
+        } else {
+            // Create the block.
+            function myCallback (newBlock) {
+                // Move the drag group under the cursor.
+                paletteBlocks.findDragGroup(newBlock);
+                for (var i in paletteBlocks.dragGroup) {
+                    paletteBlocks.moveBlockRelative(paletteBlocks.dragGroup[i], Math.round(event.stageX / palette.palettes.scale) - paletteBlocks.stage.x, Math.round(event.stageY / palette.palettes.scale) - paletteBlocks.stage.y);
+                }
+                // Dock with other blocks if needed
+                blocks.blockMoved(newBlock);
+                restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+            }
+
+            // console.log(protoblk + ' ' + blkname);
+            var newBlock = makeBlockFromPalette(protoblk, blkname, palette, myCallback);
         }
+
+        palette.updateBlockMasks();
+        palette.palettes.refreshCanvas();
+    }
 }
 
 
