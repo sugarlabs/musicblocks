@@ -20,6 +20,10 @@ var PALETTELEFTMARGIN = 10;
 // plugins from the extras palette.
 var BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
 
+/*
+var BUILTINMACROS = {'note': [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['solfege', {'value': 're'}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]]],
+                     'matrix': [[0, 'matrix', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': 'sol'}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': 'mi'}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': 're'}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]]}
+*/
 
 function maxPaletteHeight(menuSize, scale) {
     // Palettes don't start at the top of the screen and the last
@@ -1447,10 +1451,15 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
             moved = false;
             palette.draggingProtoBlock = false;
 
+	    // FIXME: Use BUILTINMACROS
             if (blkname === 'note') {
-                // Special glue for Note Blocks: load them with an
-                // embedded Pitch block
                 var obj = [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['solfege', {'value': 're'}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]]];
+                paletteBlocks.loadNewBlocks(obj);
+                var thisBlock = paletteBlocks.blockList.length - 1;
+                var topBlk = paletteBlocks.findTopBlock(thisBlock);
+                restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+            } else if (blkname === 'matrix') {
+                var obj = [[0, 'matrix', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': 'sol'}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': 'mi'}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': 're'}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]];
                 paletteBlocks.loadNewBlocks(obj);
                 var thisBlock = paletteBlocks.blockList.length - 1;
                 var topBlk = paletteBlocks.findTopBlock(thisBlock);
