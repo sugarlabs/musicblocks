@@ -1956,7 +1956,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var listener = function (event) {
                         logo.crescendoDelta[turtle].pop();
 			logo.crescendoVolume[turtle].pop();
-                        logo.setSynthVolume(last(logo.polyVolume[turtle]), turtle);
                     }
 
                     logo.setListener(turtle, listenerName, listener);
@@ -2181,7 +2180,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     var listener = function(event) {
                         logo.polyVolume[turtle].pop();
-                        logo.setSynthVolume(last(logo.polyVolume[turtle]), turtle);
                     }
 
                     logo.setListener(turtle, listenerName, listener);
@@ -2526,6 +2524,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.processNote = function(noteBeatValue, blk, turtle) {
+        if (this.crescendoDelta[turtle].length === 0) {
+            this.setSynthVolume(last(this.polyVolume[turtle]), turtle);
+        }
         if (this.inMatrix) {
             noteBeatValue *= this.beatFactor[turtle];
             if (this.tuplet === true) {
