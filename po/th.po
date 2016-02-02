@@ -42,7 +42,7 @@ msgid "meter"
 msgstr "อัตราจังหวะ"
 
 msgid "Save your project to a file."
-msgstr ""
+msgstr "บันทึกโปรเจคของคุณเป็นไฟล์"
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
@@ -459,7 +459,7 @@ msgstr "เสียงแปดคู่"
 
 #. TRANS: Musical score
 msgid "Save sheet music"
-msgstr ""
+msgstr "บันทึกโน้ตเพลง"
 
 #. TRANS: save the heap to a file
 msgid "save heap"
@@ -503,7 +503,7 @@ msgstr "เศษ"
 
 #. TRANS: swing beat in music
 msgid "swing"
-msgstr ""
+msgstr "แกว่ง"
 
 #. TRANS: store a value in a box
 msgid "store in"
@@ -736,7 +736,8 @@ msgid "carbs"
 msgstr "คาร์โบไฮเดรต"
 
 msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
+msgstr "กล่องเครื่องมีนี้มีปุ่มพิกัด โน้ต โทนเต่า และอีกมากมาย คลิ๊กเพื่อแสดงแถบสีของบล๊อกและลากบล๊อกจากแถบสีไปยังแสดงแสดงผล"
+
 
 msgid "else"
 msgstr "ไม่งั้นให้ทำ"
@@ -966,7 +967,7 @@ msgstr "วาง"
 
 #. TRANS: musical key, e.g., C Major
 msgid "set key"
-msgstr ""
+msgstr "ตั้งคีย์"
 
 msgid "Delete"
 msgstr "ลบ"
@@ -993,17 +994,17 @@ msgid "exp"
 msgstr "เลขยกกำลังในคณิตศาสตร์"
 
 msgid "Polar"
-msgstr ""
+msgstr "ขั้ว"
 
 #. TRANS: maximum
 msgid "max"
 msgstr "ใหญ่สุด"
 
 msgid "logic"
-msgstr ""
+msgstr "ตรรกะ"
 
 msgid "current pitch name"
-msgstr ""
+msgstr "ชื่อระดับเสียงปัจจุบัน"
 
 #. TRANS: empty the heap
 msgid "empty heap"
@@ -1011,7 +1012,7 @@ msgstr "heap ว่าง"
 
 #. TRANS: robot sensors.
 msgid "infrared light (right)"
-msgstr ""
+msgstr "แสงอินฟราเรท(ขวา)"
 
 msgid "On my device"
 msgstr "บนเครื่องของฉัน"
@@ -1042,7 +1043,7 @@ msgid "quarter note ♩"
 msgstr "โน้ต 1/4"
 
 msgid "Note value must be greater than 0"
-msgstr ""
+msgstr "ค่าโน้ตต้องมากกว่า0"
 
 #. TRANS: color refers to a hue, value, chroma triplet
 msgid "set color"
@@ -1098,7 +1099,7 @@ msgstr "โน๊ตครึ่ง"
 
 #. TRANS: Lilypond is engraving software
 msgid "Save your project to as a Lilypond file."
-msgstr ""
+msgstr "บันทึกไฟล์เป็นไฟล์Lilypond"
 
 msgid "extras"
 msgstr "เพิ่มเติม"
@@ -1133,35 +1134,35 @@ msgstr "ซ้าย"
 
 #. TRANS: tying together of notes in music
 msgid "tie"
-msgstr ""
+msgstr "รวม"
 
 msgid "divide beat"
-msgstr ""
+msgstr "แยกบีท"
 
 msgid "skip notes"
-msgstr ""
+msgstr "ข้านโน้ต"
 
 msgid "duplicate factor"
-msgstr ""
+msgstr "ปัจจัยคักลอก"
 
 #. TRANS: slurring of notes in music
 msgid "skip factor"
-msgstr ""
+msgstr "ปัจจัยข้าม"
 
 msgid "adjust transposition"
-msgstr ""
+msgstr "ปรับการคมนาคม"
 
 msgid "rest"
-msgstr ""
+msgstr "พัก"
 
 msgid "staccato factor"
-msgstr ""
+msgstr "ปัจจัยstaccato"
 
 msgid "slur factor"
-msgstr ""
+msgstr "ปัจจัยslur"
 
 msgid "crescendo factor"
-msgstr ""
+msgstr "ปัจจัยcrescendo"
 
 msgid "start drum"
-msgstr ""
+msgstr "เริ่มเสียงกลอง"
