@@ -609,7 +609,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             // If a block to start from was passed, find its
             // associated turtle, i.e., which turtle should we use?
-            var turtle = 0;
+            var turtle = this.turtles.turtleList.length-1;
             if (this.blocks.blockList[startHere].name === 'start' || this.blocks.blockList[startHere].name === 'drum') {
                 var turtle = this.blocks.blockList[startHere].value;
                 console.log('starting on start with turtle ' + turtle);
