@@ -99,6 +99,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.beatFactor = {};
 
     // parameters used by notes
+    this.noteBeat = {};
     this.notePitches = {};
     this.noteOctaves = {};
     this.noteTranspositions = {};
@@ -491,6 +492,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.endOfFlowActions[turtle] = {};
             this.doBlocks[turtle] = [];
             this.transposition[turtle] = 0;
+            this.noteBeat[turtle] = [];
             this.notePitches[turtle] = [];
             this.noteOctaves[turtle] = [];
             this.currentNotes[turtle] = 'G';
@@ -1761,7 +1763,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 if (typeof(args[0]) === 'number') {
                     // If frequency is input, ignore octave (args[1]).
-                    var obj = frequencyToNote(args[0]);
+                    var obj = frequencyToPitch(args[0]);
                     var note = obj[0];
                     var octave = obj[1];
                     console.log(note + ' ' + octave);
@@ -1903,6 +1905,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // a chord. The chord is accumuated in these arrays,
                 // which are used when we play the note.
                 logo.oscList[turtle] = [];
+                logo.noteBeat[turtle] = [];
                 logo.notePitches[turtle] = [];
                 logo.noteOctaves[turtle] = [];
                 logo.noteTranspositions[turtle] = [];
@@ -2654,7 +2657,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                 }
             }
-            
+
             var waitTime = 0;
             for (var j = 0; j < this.duplicateFactor[turtle]; j++) {
                 if (this.skipFactor[turtle] > 1 && this.skipIndex[turtle] % this.skipFactor[turtle] > 0) {
@@ -2694,6 +2697,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                     }
                     
+                    logo.noteBeat[turtle] = noteBeatValue;
+
                     var oscillators = [];
                     // FIXME: Add tie to notation
                     if (logo.oscList[turtle].length > 0 && duration > 0) {
@@ -2701,11 +2706,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             if (!logo.lilypondSaveOnly) {
                                 oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
                             }
-                            console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1]);
+                            console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1]);
                             if (logo.blocks.blockList[blk].name === 'osctime') {
-                                logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
+                                logo.updateNotation(frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
                             } else {
-                                logo.updateNotation(frequencyToNote(logo.oscList[turtle][i][1])[0] + frequencyToNote(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
+                                logo.updateNotation(frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
                             }
                         }
                         
@@ -3263,6 +3268,66 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     break;
                 case 'beatfactor':
                     logo.blocks.blockList[blk].value = logo.beatFactor[turtle];
+                    break;
+                case 'number2pitch':
+                case 'number2octave':
+                    var cblk = logo.blocks.blockList[blk].connections[1];
+                    var num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    if (num != null && typeof(num) === 'number') {
+                        console.log(num);
+                        var obj = numberToPitch(num);
+                            if (logo.blocks.blockList[blk].name === 'number2pitch') {
+                            logo.blocks.blockList[blk].value = obj[0];
+			} else {
+                            logo.blocks.blockList[blk].value = obj[1];
+			}
+                    } else {
+                        logo.errorMsg('Invalid argument', blk);
+                        logo.stopTurtle = true;
+                    }
+                    break;
+                case 'turtlepitch':
+                    var value = null;
+                    var cblk = logo.blocks.blockList[blk].connections[1];
+                    var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    for (var i = 0; i < logo.turtles.turtleList.length; i++) {
+                        var logoTurtle = logo.turtles.turtleList[i];
+                        if (targetTurtle === logoTurtle.name) {
+                            if(logo.notePitches[i].length > 0) {
+                                var obj = logo.getNote(logo.notePitches[i][0], logo.noteOctaves[i][0], logo.noteTranspositions[i][0], logo.keySignature[i]);
+                            } else {
+                                console.log('Could not find a note for turtle ' + turtle);
+                                var obj = ['C', 0];
+			    }
+                            value = pitchToNumber(obj[0], obj[1]);
+                            logo.blocks.blockList[blk].value = value;
+                        }
+                    }
+                    if (value == null) {
+                        logo.errorMsg('Could not find turtle ' + targetTurtle, blk);
+                        logo.blocks.blockList[blk].value = 0;
+                    }
+                    break;
+                case 'turtlenote':
+                    var value = null;
+                    var cblk = logo.blocks.blockList[blk].connections[1];
+                    var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    for (var i = 0; i < logo.turtles.turtleList.length; i++) {
+                        var logoTurtle = logo.turtles.turtleList[i];
+                        if (targetTurtle === logoTurtle.name) {
+                            if(logo.notePitches[i].length > 0) {
+                                value = logo.noteBeat[i];
+                            } else {
+                                console.log('Could not find a note for turtle ' + turtle);
+                                value = -1;
+			    }
+                            logo.blocks.blockList[blk].value = value;
+                        }
+                    }
+                    if (value == null) {
+                        logo.errorMsg('Could not find turtle ' + targetTurtle, blk);
+                        logo.blocks.blockList[blk].value = -1;
+                    }
                     break;
                 case 'currentnote':
                     logo.blocks.blockList[blk].value = logo.currentNotes[turtle];
@@ -4198,25 +4263,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 }
 
 
-function frequencyToNote(hz) {
-    // Calculate the note and octave based on frequency, rounding to
+function frequencyToPitch(hz) {
+    // Calculate the pitch and octave based on frequency, rounding to
     // the nearest note.
-    var NOTES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
+    var PITCHES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
     var TWELTHROOT2 = 1.05946309435929;
     var A0 = 27.5;
     var C8 = 4186.01;
 
     if (hz < A0) {
-        return 'A0';
+        return ['A', 0];
     } else if (hz > C8) {
         // FIXME: set upper bound of C10
-        return 'C8';
+        return ['C', 8];
     }
 
     for (var i = 0; i < 88; i++) {
         var f = A0 * Math.pow(TWELTHROOT2, i);
         if (hz < f * 1.03 && hz > f * 0.97) {
-            return [NOTES[i % 12], Math.floor(i / 12)];
+            return [PITCHES[i % 12], Math.floor(i / 12)];
         }
     }
     console.log('could not find note/octave for ' + hz);
@@ -4224,12 +4289,39 @@ function frequencyToNote(hz) {
 }
 
 
-function noteToFrequency(note, octave) {
-    // Calculate the frequency based on note and octave.
-    var NOTES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
+function numberToPitch(i) {
+    // Calculate the pitch and octave based on index
+    var PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+
+    if (i < 0) {
+        return ['C', 0];
+    } else if (i > 88) {
+        return ['G', 8];
+    }
+    return [PITCHES[i % 12], Math.floor(i / 12)];
+}
+
+
+function pitchToFrequency(pitch, octave) {
+    // Calculate the frequency based on pitch and octave.
+    var pitchNumber = pitchToNumber(pitch, octave);
     var TWELTHROOT2 = 1.05946309435929;
     var A0 = 27.5;
 
-    i = octave * 12 + NOTES.index(self._note);
-    return A0 * Math.pow(TWELTHROOT2, i);
+    return A0 * Math.pow(TWELTHROOT2, pitchNumber);
+}
+
+
+function pitchToNumber(pitch, octave) {
+    // Calculate the pitch index based on pitch and octave.
+    var PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+    var SOLFAGE = ['do', '', 're', 'me', '', 'fa', '', 'sol', 'la', '', 'ti', ''];
+
+    if (PITCHES.indexOf(pitch) !== -1) {
+        return octave * 12 + PITCHES.indexOf(pitch);
+    } else if (SOLFAGE.indexOf(pitch) !== -1) {
+        return octave * 12 + SOLFAGE.indexOf(pitch);
+    } else {
+	return octave * 12;
+    }
 }

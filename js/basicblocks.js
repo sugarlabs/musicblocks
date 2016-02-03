@@ -118,19 +118,29 @@ function initBasicProtoBlocks(palettes, blocks) {
     notenameBlock.valueBlock();
     notenameBlock.dockTypes[0] = 'noteout';
 
-    var currentNoteBlock = new ProtoBlock('currentnote');
-    currentNoteBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['currentnote'] = currentNoteBlock;
-    currentNoteBlock.staticLabels.push(_('current pitch name'));
-    currentNoteBlock.adjustWidthToLabel();
-    currentNoteBlock.parameterBlock();
+    var turtlePitchBlock = new ProtoBlock('turtlepitch');
+    turtlePitchBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['turtlepitch'] = turtlePitchBlock;
+    turtlePitchBlock.staticLabels.push('turtle pitch');
+    turtlePitchBlock.oneArgMathBlock();
+    turtlePitchBlock.adjustWidthToLabel();
+    turtlePitchBlock.dockTypes[1] = 'anyin';
 
-    var currentOctaveBlock = new ProtoBlock('currentoctave');
-    currentOctaveBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['currentoctave'] = currentOctaveBlock;
-    currentOctaveBlock.staticLabels.push(_('current pitch octave'));
-    currentOctaveBlock.adjustWidthToLabel();
-    currentOctaveBlock.parameterBlock();
+    var numberToPitchBlock = new ProtoBlock('number2pitch');
+    numberToPitchBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['number2pitch'] = numberToPitchBlock;
+    numberToPitchBlock.staticLabels.push(_('number to pitch'));
+    numberToPitchBlock.oneArgMathBlock();
+    numberToPitchBlock.adjustWidthToLabel();
+    numberToPitchBlock.defaults.push(48);
+
+    var numberToOctaveBlock = new ProtoBlock('number2octave');
+    numberToOctaveBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['number2octave'] = numberToOctaveBlock;
+    numberToOctaveBlock.staticLabels.push(_('number to octave'));
+    numberToOctaveBlock.oneArgMathBlock();
+    numberToOctaveBlock.adjustWidthToLabel();
+    numberToOctaveBlock.defaults.push(48);
 
     var transposition = new ProtoBlock('transpositionfactor');
     transposition.palette = palettes.dict['pitch'];
@@ -170,7 +180,24 @@ function initBasicProtoBlocks(palettes, blocks) {
     sawtoothBlock.adjustWidthToLabel();
     sawtoothBlock.oneArgBlock();
     sawtoothBlock.defaults.push(440);
-       
+
+    // DEPRECATED
+    var currentNoteBlock = new ProtoBlock('currentnote');
+    currentNoteBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['currentnote'] = currentNoteBlock;
+    currentNoteBlock.staticLabels.push(_('current pitch name'));
+    currentNoteBlock.hidden = true;
+    currentNoteBlock.adjustWidthToLabel();
+    currentNoteBlock.parameterBlock();
+
+    var currentOctaveBlock = new ProtoBlock('currentoctave');
+    currentOctaveBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['currentoctave'] = currentOctaveBlock;
+    currentOctaveBlock.staticLabels.push(_('current pitch octave'));
+    currentOctaveBlock.hidden = true;
+    currentOctaveBlock.adjustWidthToLabel();
+    currentOctaveBlock.parameterBlock();
+
     // Matrix palette
 
     var matrixBlock = new ProtoBlock('matrix');
@@ -368,6 +395,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     bpmBlock.staticLabels.push(_('beats per minute'));
     bpmBlock.adjustWidthToLabel();
     bpmBlock.parameterBlock();
+
+    var turtleNoteBlock = new ProtoBlock('turtlenote');
+    turtleNoteBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['turtlenote'] = turtleNoteBlock;
+    turtleNoteBlock.staticLabels.push('turtle note');
+    turtleNoteBlock.oneArgMathBlock();
+    turtleNoteBlock.adjustWidthToLabel();
+    turtleNoteBlock.dockTypes[1] = 'anyin';
 
     // Tone (articulation) palette
 
