@@ -517,7 +517,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         if (!this.lilypondSaveOnly) {
-            this.setSynthVolume(25, Math.max(this.turtles.turtleList.length - 1), 0);
+            this.setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
         }
 
         this.inMatrix = false;
@@ -2519,7 +2519,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else if (vol < 0) {
             vol = 0;
         }
-	var db = this.tone.gainToDb(vol);
+	var db = this.tone.gainToDb(vol / 100);
 	Tone.Master.volume.rampTo(db, 0.01);
     }
 
