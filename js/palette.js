@@ -348,7 +348,7 @@ function loadPaletteButtonHandler(palettes, name) {
 
 
 // FIXME: this should be calculated
-var EXPANDBYTWO = ['tuplet2', 'namedcalcArg', 'nameddoArg'];
+var EXPANDBYTWO = ['tuplet2'];
 var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
                    'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
                    'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
