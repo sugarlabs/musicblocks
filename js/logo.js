@@ -1715,6 +1715,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var listener = function (event) {
                     if (logo.tupletRhythms.length === 0 || matrix.solfegeNotes.length === 0) {
                         logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
+                    } else if(document.getElementById('matrix').style.visibility === 'visible') {
+                        logo.errorMsg(_('Please close the current matrix before opening a new one.'), blk);
                     } else {
                         // Process queued up rhythms.
                         matrix.initMatrix(logo);
