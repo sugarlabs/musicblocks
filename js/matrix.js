@@ -674,6 +674,8 @@ function Matrix() {
         var that = this;
         var time = 0;
         var table = document.getElementById('myTable');
+        this.colIndex = 1;
+        this.rowIndex = table.rows.length - 1;
         var note = this.notesToPlayDirected[this.notesCounter][0];
         var noteValue = that.notesToPlayDirected[this.notesCounter][1];
         this.notesCounter += 1;
@@ -682,30 +684,47 @@ function Matrix() {
             note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
         }
 
+        console.log('playAll ' + this.colIndex);
+        var cell = table.rows[this.rowIndex].cells[this.colIndex];
+	cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        this.colIndex += 1;
         if (note[0] !== 'R') {
             synth.triggerAttackRelease(note, this.logo.defaultBPMFactor / noteValue);
         }
 
-        for (var i = 1; i < this.notesToPlayDirected.length; i++) {
+        for (var i = 1; i <= this.notesToPlayDirected.length; i++) {
             noteValue = this.notesToPlayDirected[i - 1][1];
             time += 1 / noteValue;
             var that = this;
 
             setTimeout(function() {
-                if(that.notesCounter >= that.notesToPlayDirected.length) {
-                    that.notesCounter = 1;
-                    Tone.Transport.stop();
+                if (that.colIndex > that.notesToPlayDirected.length) {
+                    var table = document.getElementById('myTable');
+                    for (var j = 1; j <= that.notesToPlayDirected.length; j++) {
+	                var cell = table.rows[that.rowIndex].cells[j];
+	                cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+		    }
+                } else {
+                    var table = document.getElementById('myTable');
+                    var cell = table.rows[that.rowIndex].cells[that.colIndex];
+	            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+                    if(that.notesCounter >= that.notesToPlayDirected.length) {
+                        that.notesCounter = 1;
+                        Tone.Transport.stop();
+                    }
+                    note = that.notesToPlayDirected[that.notesCounter][0];
+                    noteValue = that.notesToPlayDirected[that.notesCounter][1];
+                    that.notesCounter += 1;
+                    // Note can be a chord, hence it is an array.
+                    for (var i = 0; i < note.length; i++) {
+                        note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
+                    }
+                    if(note[0] !== 'R') {
+                        synth.triggerAttackRelease(note, that.logo.defaultBPMFactor / noteValue);
+                    }
                 }
-                note = that.notesToPlayDirected[that.notesCounter][0];
-                noteValue = that.notesToPlayDirected[that.notesCounter][1];
-                that.notesCounter += 1;
-                // Note can be a chord, hence it is an array.
-                for (var i = 0; i < note.length; i++) {
-                    note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
-                }
-                if(note[0] !== 'R') {
-                    synth.triggerAttackRelease(note, that.logo.defaultBPMFactor / noteValue);
-                }
+                that.colIndex += 1;
             }, that.logo.defaultBPMFactor * 1000 * time);
         }
     }
@@ -757,7 +776,7 @@ function Matrix() {
     }
 
     this.playNotesString = function(time, synth) {
-        /*plays the matrix and also the chunks*/
+        // Plays the matrix
         if (this.transposition !== null ) {
             var transposedArray = [];
             for (var i = 0; i < this.notesToPlay.length; i++) {
