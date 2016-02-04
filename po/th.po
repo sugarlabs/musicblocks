@@ -75,7 +75,7 @@ msgstr "เล่นเสียงดนตรี (ช้า)"
 msgid "apple"
 msgstr "แอปเปิ้ล"
 
-msgid "graphical notation matrix"
+msgid "pitch-time matrix"
 msgstr "คำอธิบายเมตริกซ์ภาพ"
 
 msgid "number"
@@ -118,7 +118,7 @@ msgstr "จังหวะ"
 msgid "latitude"
 msgstr "เส้นรุ่ง"
 
-msgid "1/32 note 𝅘𝅥𝅰"
+msgid "1/32 note"
 msgstr "โน๊ต 1/32"
 
 msgid "mouse x"
@@ -518,10 +518,10 @@ msgstr "คณิตศาสตร์"
 msgid "denominator"
 msgstr "ส่วน"
 
-msgid "eighth note ♪"
+msgid "eighth note"
 msgstr "โน้ตแปด"
 
-msgid "whole note 𝅝"
+msgid "whole note"
 msgstr "โน้ตเต็ม"
 
 #. TRANS: popout window
@@ -776,7 +776,7 @@ msgstr "เพิ่ม/พัง บล๊อกที่สามารถพ�
 msgid "high"
 msgstr "สูง"
 
-msgid "1/16 note ♬"
+msgid "1/16 note"
 msgstr "โน้ต 1/16"
 
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
@@ -885,7 +885,7 @@ msgstr "เสียงแหลม"
 msgid "protein"
 msgstr "โปรตีน"
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "1/64 note"
 msgstr "โน้ต 1/64"
 
 #. TRANS: oscillator time
@@ -1039,7 +1039,7 @@ msgstr "พื้น"
 msgid "Clean"
 msgstr "ล้าง"
 
-msgid "quarter note ♩"
+msgid "quarter note"
 msgstr "โน้ต 1/4"
 
 msgid "Note value must be greater than 0"
@@ -1094,7 +1094,7 @@ msgstr "ความคล่องตัว"
 msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "กดปุ่มนี้เพื่อขยายหรือลดกล่องเครื่องมือเพิ่มเติม"
 
-msgid "half note 𝅗𝅥"
+msgid "half note"
 msgstr "โน๊ตครึ่ง"
 
 #. TRANS: Lilypond is engraving software
@@ -1166,3 +1166,15 @@ msgstr "ปัจจัยcrescendo"
 
 msgid "start drum"
 msgstr "เริ่มเสียงกลอง"
+
+msgid "turtle note"
+msgstr "เต่าโน๊ต"
+
+msgid "turtle pitch number"
+msgstr ""
+
+msgid "number to pitch"
+msgstr ""
+
+msgid "number to octave"
+msgstr ""

@@ -73,8 +73,8 @@ msgstr "Esta barra de herramientas contiene los botones de la paleta de Matrix, 
 msgid "apple"
 msgstr "manzana"
 
-msgid "graphical notation matrix"
-msgstr "matriz gráfica notación"
+msgid "pitch-time matrix"
+msgstr "matriz de tono en tiempo"
 
 msgid "number"
 msgstr "número"
@@ -501,10 +501,10 @@ msgstr "matemáticas"
 msgid "denominator"
 msgstr "denominador"
 
-msgid "eighth note ♪"
+msgid "eighth note"
 msgstr "1/8 nota"
 
-msgid "whole note 𝅝"
+msgid "whole note"
 msgstr "nota completa"
 
 #. TRANS: popout window (ventana emergente)
@@ -680,7 +680,7 @@ msgstr "grados"
 msgid "translate"
 msgstr "traducir"
 
-msgid "quarter note ♩"
+msgid "quarter note"
 msgstr "1/4 nota"
 
 msgid "until"
@@ -1014,7 +1014,7 @@ msgstr "piso"
 msgid "Clean"
 msgstr "Limpiar"
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "1/64 note"
 msgstr "1/64 nota"
 
 #. TRANS: color refers to a hue, value, chroma triplet
@@ -1066,10 +1066,10 @@ msgstr "flujo"
 msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "Haz click en este botón para expandir o colapsar la barra de herramientas auxiliar."
 
-msgid "half note 𝅗𝅥"
+msgid "half note"
 msgstr "1/2 nota"
 
-msgid "1/16 note ♬"
+msgid "1/16 note"
 msgstr "1/16 nota"
 
 msgid "extras"
@@ -1160,3 +1160,15 @@ msgstr ""
 
 msgid "start drum"
 msgstr ""
+
+msgid "turtle note"
+msgstr "nota de tortugas"
+
+msgid "turtle pitch number"
+msgstr "número de tono de tortugas"
+
+msgid "number to pitch"
+msgstr "número a tono"
+
+msgid "number to octave"
+msgstr "número a octava"
