@@ -58,7 +58,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['pitch'] = pitch;
-    pitch.staticLabels.push(_('pitch'),_('name'),_('octave'));
+    pitch.staticLabels.push(_('pitch'), _('name'), _('octave'));
     pitch.adjustWidthToLabel();
     pitch.defaults.push('sol');
     pitch.defaults.push(4);
@@ -121,7 +121,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var turtlePitchBlock = new ProtoBlock('turtlepitch');
     turtlePitchBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['turtlepitch'] = turtlePitchBlock;
-    turtlePitchBlock.staticLabels.push('turtle pitch');
+    turtlePitchBlock.staticLabels.push('turtle pitch number');
     turtlePitchBlock.oneArgMathBlock();
     turtlePitchBlock.adjustWidthToLabel();
     turtlePitchBlock.dockTypes[1] = 'anyin';
@@ -203,15 +203,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
-    matrixBlock.staticLabels.push(_('graphical notation matrix'));
-    matrixBlock.extraWidth = 10;
+    matrixBlock.staticLabels.push(_('pitch-time matrix'));
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
 
     var rhythm = new ProtoBlock('rhythm');
     rhythm.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythm'] = rhythm;
-    rhythm.staticLabels.push(_('rhythm'),_('number of notes'),_('note value'));
+    rhythm.staticLabels.push(_('rhythm'), _('number of notes'), _('note value'));
     rhythm.extraWidth = 20;
     rhythm.adjustWidthToLabel();
     rhythm.defaults.push(3);
@@ -234,49 +233,49 @@ function initBasicProtoBlocks(palettes, blocks) {
     var wholeNoteBlock = new ProtoBlock('wholeNote');
     wholeNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['wholeNote'] = wholeNoteBlock;
-    wholeNoteBlock.staticLabels.push(_('whole note &#x1D15D;'));
+    wholeNoteBlock.staticLabels.push(_('whole note') + ' &#x1D15D;');
     wholeNoteBlock.adjustWidthToLabel();
     wholeNoteBlock.zeroArgBlock();
 
     var halfNoteBlock = new ProtoBlock('halfNote');
     halfNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['halfNote'] = halfNoteBlock;
-    halfNoteBlock.staticLabels.push(_('half note &#x1D15E;'));
+    halfNoteBlock.staticLabels.push(_('half note') + ' &#x1D15E;');
     halfNoteBlock.adjustWidthToLabel();
     halfNoteBlock.zeroArgBlock();
 
     var quarterNoteBlock = new ProtoBlock('quarterNote');
     quarterNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['quarterNote'] = quarterNoteBlock;
-    quarterNoteBlock.staticLabels.push(_('quarter note ♩'));
+    quarterNoteBlock.staticLabels.push(_('quarter note') + ' ♩');
     quarterNoteBlock.adjustWidthToLabel();
     quarterNoteBlock.zeroArgBlock();
 
     var eighthNoteBlock = new ProtoBlock('eighthNote');
     eighthNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['eighthNote'] = eighthNoteBlock;
-    eighthNoteBlock.staticLabels.push(_('eighth note ♪'));
+    eighthNoteBlock.staticLabels.push(_('eighth note') + ' ♪');
     eighthNoteBlock.adjustWidthToLabel();
     eighthNoteBlock.zeroArgBlock();
 
     var sixteenthNoteBlock = new ProtoBlock('sixteenthNote');
     sixteenthNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['sixteenthNote'] = sixteenthNoteBlock;
-    sixteenthNoteBlock.staticLabels.push(_('1/16 note 𝅘𝅥𝅯'));
+    sixteenthNoteBlock.staticLabels.push(_('1/16 note') + ' 𝅘𝅥𝅯');
     sixteenthNoteBlock.adjustWidthToLabel();
     sixteenthNoteBlock.zeroArgBlock();
 
     var thirtysecondNoteBlock = new ProtoBlock('thirtysecondNote');
     thirtysecondNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['thirtysecondNote'] = thirtysecondNoteBlock;
-    thirtysecondNoteBlock.staticLabels.push(_('1/32 note &#x1D162;'));
+    thirtysecondNoteBlock.staticLabels.push(_('1/32 note') + ' &#x1D162;');
     thirtysecondNoteBlock.adjustWidthToLabel();
     thirtysecondNoteBlock.zeroArgBlock();
 
     var sixtyfourthNoteBlock = new ProtoBlock('sixtyfourthNote');
     sixtyfourthNoteBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['sixtyfourthNote'] = sixtyfourthNoteBlock;
-    sixtyfourthNoteBlock.staticLabels.push(_('1/64 note &#x1D163;'));
+    sixtyfourthNoteBlock.staticLabels.push(_('1/64 note') + ' &#x1D163;');
     sixtyfourthNoteBlock.adjustWidthToLabel();
     sixtyfourthNoteBlock.zeroArgBlock();
 
