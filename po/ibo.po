@@ -82,7 +82,8 @@ msgstr ""
 msgid "apple"
 msgstr "apụl"
 
-msgid "graphical notation matrix"
+#. TRANS: matrix of pitch vs. time
+msgid "pitch-time matrix"
 msgstr ""
 
 msgid "number"
@@ -525,10 +526,10 @@ msgstr "maths"
 msgid "denominator"
 msgstr ""
 
-msgid "eighth note ♪"
+msgid "eighth note"
 msgstr ""
 
-msgid "whole note 𝅝"
+msgid "whole note"
 msgstr ""
 
 #. TRANS: popout window
@@ -782,7 +783,7 @@ msgstr "Ịmụbawanye / daa collapsable blocks"
 msgid "high"
 msgstr "elu"
 
-msgid "1/16 note ♬"
+msgid "1/16 note"
 msgstr ""
 
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
@@ -891,7 +892,7 @@ msgstr ""
 msgid "protein"
 msgstr "protein"
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "1/64 note"
 msgstr ""
 
 #. TRANS: oscillator time
@@ -1045,7 +1046,7 @@ msgstr "ahla"
 msgid "Clean"
 msgstr "ọcha"
 
-msgid "quarter note ♩"
+msgid "quarter note"
 msgstr ""
 
 msgid "Note value must be greater than 0"
@@ -1100,7 +1101,7 @@ msgstr "igba"
 msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "Pịa a button mụbaa ma ọ bụ daa na auxillary toolbar"
 
-msgid "half note 𝅗𝅥"
+msgid "half note"
 msgstr ""
 
 #. TRANS: Lilypond is engraving software
@@ -1137,3 +1138,20 @@ msgstr ""
 
 msgid "left"
 msgstr "ekpe"
+
+msgid "start drum"
+msgstr ""
+
+msgid "turtle note"
+msgstr ""
+
+msgid "turtle pitch number"
+msgstr ""
+
+#. TRANS: convert number to pitch
+msgid "number to pitch"
+msgstr ""
+
+#. TRANS: convert number to octave
+msgid "number to octave"
+msgstr ""
