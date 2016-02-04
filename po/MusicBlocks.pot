@@ -983,7 +983,8 @@ msgstr ""
 msgid "blink"
 msgstr ""
 
-msgid "graphical notation matrix"
+#. TRANS: matrix (grid) of pitch vs. time
+msgid "pitch-time matrix"
 msgstr ""
 
 #. TRANS: musical pitch
@@ -993,25 +994,25 @@ msgstr ""
 msgid "octave"
 msgstr ""
 
-msgid "whole note 𝅝"
+msgid "whole note"
 msgstr ""
 
-msgid "half note 𝅗𝅥"
+msgid "half note"
 msgstr ""
 
-msgid "quarter note ♩"
+msgid "quarter note"
 msgstr ""
 
-msgid "eighth note ♪"
+msgid "eighth note"
 msgstr ""
 
-msgid "1/16 note ♬"
+msgid "1/16 note"
 msgstr ""
 
-msgid "1/32 note 𝅘𝅥𝅰"
+msgid "1/32 note"
 msgstr ""
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "1/64 note"
 msgstr ""
 
 #. TRANS: music term for dividing the beat into a different number of equal subdivisions
@@ -1158,4 +1159,18 @@ msgid "crescendo factor"
 msgstr ""
 
 msgid "start drum"
+msgstr ""
+
+msgid "turtle note"
+msgstr ""
+
+msgid "turtle pitch number"
+msgstr ""
+
+#. TRANS: convert number to pitch
+msgid "number to pitch"
+msgstr ""
+
+#. TRANS: convert number to octave
+msgid "number to octave"
 msgstr ""

@@ -568,10 +568,10 @@ msgstr "jakhunaka tuqita"
 msgid "denominator"
 msgstr ""
 
-msgid "eighth note ♪"
+msgid "eighth note"
 msgstr ""
 
-msgid "whole note 𝅝"
+msgid "whole note"
 msgstr ""
 
 #. TRANS: popout window (ventana emergente)
@@ -770,7 +770,7 @@ msgstr "muyta taña chimpu"
 msgid "translate"
 msgstr "jaqukipaña"
 
-msgid "quarter note ♩"
+msgid "quarter note"
 msgstr ""
 
 msgid "until"
@@ -1136,7 +1136,7 @@ msgstr "uraqi"
 msgid "Clean"
 msgstr "Mayampi qalltañataki wakichaña"
 
-msgid "1/64 note 𝅘𝅥𝅱"
+msgid "1/64 note"
 msgstr ""
 
 #. TRANS: color refers to a hue, value, chroma triplet
@@ -1195,10 +1195,10 @@ msgstr "siqi"
 msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "Yanapiri apanaqaña wakichatanaka jach’aptayañataki jani ukaxa chhaqtayañataki click limt’ma"
 
-msgid "half note 𝅗𝅥"
+msgid "half note"
 msgstr ""
 
-msgid "1/16 note ♬"
+msgid "1/16 note"
 msgstr ""
 
 msgid "extras"
@@ -1295,4 +1295,20 @@ msgid "crescendo factor"
 msgstr ""
 
 msgid "start drum"
+msgstr ""
+
+#. TRANS: nota de tortugas
+msgid "turtle note"
+msgstr ""
+
+#. TRANS: nÃºmero de tono de tortugas
+msgid "turtle pitch number"
+msgstr ""
+
+#. TRANS: nÃºmero a tono
+msgid "number to pitch"
+msgstr ""
+
+#. TRANS: nÃºmero a octava
+msgid "number to octave"
 msgstr ""
