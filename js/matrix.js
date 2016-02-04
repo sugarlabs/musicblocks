@@ -121,7 +121,7 @@ function Matrix() {
         x.style.textAlign = 'center';
 
         var matrixDiv = document.getElementById('matrix');
-        matrixDiv.style.paddingTop = MATRIXBUTTONHEIGHT * this.cellScale + 4 + 'px';
+        matrixDiv.style.paddingTop = 1.67 * MATRIXBUTTONHEIGHT * this.cellScale + 4 + 'px';
         matrixDiv.style.paddingLeft = MATRIXSOLFEWIDTH * this.cellScale + 2 + 'px';
         matrixDiv.appendChild(x);
         matrixDivPosition = matrixDiv.getBoundingClientRect();
@@ -142,7 +142,9 @@ function Matrix() {
 
         var cell = row.insertCell(1);
         var iconSize = this.cellScale * 24;
-        cell.innerHTML = '<img src="header-icons/play-button.svg" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">';
+
+        cell.innerHTML = '<figure><img src="header-icons/play-button.svg" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + _('play') + '</p></figcaption></figure>';
+
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
@@ -156,7 +158,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(2);
-        cell.innerHTML = '<img src="header-icons/download.svg" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.innerHTML = '<figure><img src="header-icons/export-chunk.svg" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + _('save') + '</p></figcaption></figure>';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
@@ -170,7 +172,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(3);
-        cell.innerHTML = '<img src="header-icons/erase-button.svg" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.innerHTML = '<figure><img src="header-icons/erase-button.svg" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + _('clear') + '</p></figcaption></figure>';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
@@ -184,7 +186,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(4);
-        cell.innerHTML = '<img src="header-icons/export-button.svg" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.innerHTML = '<figure><img src="header-icons/export-button.svg" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + 'HTML ' + '</p></figcaption></figure>';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         that = this;
@@ -199,7 +201,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(5);
-        cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.innerHTML = '<figure><img src="header-icons/close-button.svg" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + _('close') + '</p></figcaption></figure>';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
