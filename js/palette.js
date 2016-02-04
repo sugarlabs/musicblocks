@@ -348,14 +348,14 @@ function loadPaletteButtonHandler(palettes, name) {
 
 
 // FIXME: this should be calculated
-var EXPANDBYTWO = ['tuplet2'];
+var EXPANDBYTWO = [];
 var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
                    'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
                    'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
                    'dividebeatfactor', 'notation', 'playfwd', 'playbwd',
                    'duplicatenotes', 'fill', 'hollowline', 'drum', 'osctime',
-                   'invert', 'matrix', 'skipnotes', 'setbpm', 'tie',
-                   'staccato', 'slur', 'setnotevolume2', 'crescendo'];
+                   'invert', 'matrix', 'skipnotes', 'setbpm', 'tie', 'slur',
+                   'staccato', 'setnotevolume2', 'crescendo', 'tuplet2'];
 
 // Kinda a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {
