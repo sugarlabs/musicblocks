@@ -511,7 +511,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
             this.crescendoDelta[turtle] = [];
-	    this.crescendoVolume[turtle] = [];
+            this.crescendoVolume[turtle] = [];
             this.staccato[turtle] = [];
             this.tie[turtle] = false;
             this.tieNote[turtle] = [];
@@ -1713,16 +1713,19 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
                 var listener = function (event) {
-                    matrix.initMatrix(logo);
-                    var addedTuplet = false;
+                    if (logo.tupletRhythms.length === 0 || matrix.solfegeNotes.length === 0) {
+                        logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
+                    } else {
+                        // Process queued up rhythms.
+                        matrix.initMatrix(logo);
+                        var addedTuplet = false;
 
-                    // Process queued up rhythms.
-                    for (var i = 0; i < logo.tupletRhythms.length; i++) {
-                        // We have two cases: (1) notes in a tuplet;
-                        // and (2) rhythm block outside of a
-                        // tuplet. Rhythm blocks in a tuplet are
-                        // converted to notes.
-                        switch (logo.tupletRhythms[i][0]) {
+                        for (var i = 0; i < logo.tupletRhythms.length; i++) {
+                            // We have two cases: (1) notes in a tuplet;
+                            // and (2) rhythm block outside of a
+                            // tuplet. Rhythm blocks in a tuplet are
+                            // converted to notes.
+                            switch (logo.tupletRhythms[i][0]) {
                             case 'notes':
                                 addedTuplet = true;
                                 var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
@@ -1735,9 +1738,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             default:
                                 matrix.addNotes(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
                                 break;
+                            }
                         }
+                        matrix.makeClickable(addedTuplet, logo.polySynth);
                     }
-                    matrix.makeClickable(addedTuplet, logo.polySynth);
                 }
 
                 logo.setListener(turtle, listenerName, listener);
@@ -1949,7 +1953,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'crescendo':
                 if (args.length > 1) {
                     logo.crescendoDelta[turtle].push(args[0]);
-		    logo.crescendoVolume[turtle].push(last(logo.polyVolume[turtle]));
+                    logo.crescendoVolume[turtle].push(last(logo.polyVolume[turtle]));
                     childFlow = args[1];
                     childFlowCount = 1;
 
@@ -1958,7 +1962,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     var listener = function (event) {
                         logo.crescendoDelta[turtle].pop();
-			logo.crescendoVolume[turtle].pop();
+                        logo.crescendoVolume[turtle].pop();
                     }
 
                     logo.setListener(turtle, listenerName, listener);
@@ -2522,8 +2526,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else if (vol < 0) {
             vol = 0;
         }
-	var db = this.tone.gainToDb(vol / 100);
-	Tone.Master.volume.rampTo(db, 0.01);
+        var db = this.tone.gainToDb(vol / 100);
+        Tone.Master.volume.rampTo(db, 0.01);
     }
 
     this.processNote = function(noteBeatValue, blk, turtle) {
@@ -3278,9 +3282,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         var obj = numberToPitch(num);
                             if (logo.blocks.blockList[blk].name === 'number2pitch') {
                             logo.blocks.blockList[blk].value = obj[0];
-			} else {
+                        } else {
                             logo.blocks.blockList[blk].value = obj[1];
-			}
+                        }
                     } else {
                         logo.errorMsg('Invalid argument', blk);
                         logo.stopTurtle = true;
@@ -3298,7 +3302,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             } else {
                                 console.log('Could not find a note for turtle ' + turtle);
                                 var obj = ['C', 0];
-			    }
+                            }
                             value = pitchToNumber(obj[0], obj[1]);
                             logo.blocks.blockList[blk].value = value;
                         }
@@ -3320,7 +3324,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             } else {
                                 console.log('Could not find a note for turtle ' + turtle);
                                 value = -1;
-			    }
+                            }
                             logo.blocks.blockList[blk].value = value;
                         }
                     }
@@ -4322,6 +4326,6 @@ function pitchToNumber(pitch, octave) {
     } else if (SOLFAGE.indexOf(pitch) !== -1) {
         return octave * 12 + SOLFAGE.indexOf(pitch);
     } else {
-	return octave * 12;
+        return octave * 12;
     }
 }
