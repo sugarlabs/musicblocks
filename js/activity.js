@@ -1871,7 +1871,7 @@ define(function (require) {
 
             document.querySelector('#myOpenFile')
                     .addEventListener('change', function(event) {
-                    me.controller.hide();
+			thumbnails.model.controller.hide();
             });
 
             var btnSize = cellSize;
