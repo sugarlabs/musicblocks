@@ -1155,3 +1155,9 @@ msgstr ""
 #. TRANS: convert number to octave
 msgid "number to octave"
 msgstr ""
+
+msgid "You must have at least one pitch block and one rhythm block in the matrix."
+msgstr ""
+
+msgid "Please close the current matrix before opening a new one."
+msgstr ""
