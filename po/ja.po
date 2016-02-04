@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR <devin@devinulibarri.com>, 2016.
 msgid ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
@@ -371,7 +371,7 @@ msgid "duplicate notes"
 msgstr "音符を倍にする" #This makes sense, I think, but only if 1=1 time, 2=2 times, etc
 
 #. TRANS: in mathematical sense (inverse of period)
-msgid "frequency"
+msgid "frequency" #like pitch frequency?
 msgstr ""
 
 #. TRANS: as in the event that a signal arrives
@@ -564,7 +564,7 @@ msgid "digest meal"
 msgstr ""
 
 <<<<<<< HEAD
-msgid "maths"
+msgid "maths" #Why is this plural??? 数学 is math (like subject)
 msgstr ""
 
 msgid "denominator"
@@ -683,17 +683,17 @@ msgstr ""
 
 #. TRANS: music term for dividing the beat into a different number of equal subdivisions
 msgid "tuplet"
-msgstr ""
+msgstr "タプル"
 
 #. TRANS: cloud as in cloud server
-msgid "cloud"
-msgstr ""
+msgid "cloud" #probably this
+msgstr "クロード"
 
 msgid "size"
-msgstr ""
+msgstr "大きさ"
 
 msgid "city"
-msgstr ""
+msgstr "市"
 
 #. TRANS: carbohydrates
 msgid "get carbs"
@@ -706,7 +706,7 @@ msgid "Click to run the project in fast mode."
 msgstr ""
 
 msgid "beef"
-msgstr ""
+msgstr "牛肉"
 
 #. TRANS: source language for translation
 msgid "source"
@@ -724,8 +724,8 @@ msgstr ""
 msgid "Decrease the size of the blocks."
 msgstr ""
 
-msgid "Run note by note"
-msgstr ""
+msgid "Run note by note" #check
+msgstr "音符を一つずつに"
 
 msgid "start"
 msgstr ""
@@ -755,16 +755,16 @@ msgstr ""
 
 #. TRANS: 360 degrees in a circle
 msgid "degrees"
-msgstr ""
+msgstr "温度"
 
 msgid "translate"
-msgstr ""
+msgstr "翻訳"
 
 msgid "quarter note ♩"
-msgstr ""
+msgstr "4部音符"
 
-msgid "until"
-msgstr ""
+msgid "until" #There is two types of until in Japanese, but think we want this one.
+msgstr "までに"
 
 msgid "define"
 msgstr ""
@@ -784,15 +784,15 @@ msgstr ""
 msgid "start turtle"
 msgstr ""
 
-msgid "Welcome to Music Blocks"
-msgstr ""
+msgid "Welcome to Music Blocks" #Maybe just have "Music Blocks" in roman. Otherwise, ミュージック・ブロックス
+msgstr "Music Blocksへようこそ"
 
 #. TRANS: set language
 msgid "set lang"
 msgstr ""
 
-msgid "turtle name"
-msgstr ""
+msgid "turtle name" #check this
+msgstr "タートルの名"
 
 #. TRANS: carbohydrates
 msgid "carbs"
@@ -806,13 +806,13 @@ msgid "broadcast"
 msgstr ""
 
 msgid "orange"
-msgstr ""
+msgstr "オレンジ"
 
 msgid "begin hollow line"
 msgstr ""
 
 msgid "flat"
-msgstr ""
+msgstr "フラット"
 
 #. TRANS: the heap is a first-in-last-out (FILO) stack
 msgid "heap"
@@ -826,7 +826,7 @@ msgid "beats per minute"
 msgstr ""
 
 msgid "eat"
-msgstr ""
+msgstr "食べる"
 
 msgid "Expand/collapse collapsable blocks"
 msgstr ""
@@ -855,21 +855,21 @@ msgstr ""
 msgid "Palette buttons"
 msgstr ""
 
-msgid "potato"
-msgstr ""
+msgid "potato" #Western potatoe only?
+msgstr "芋"
 
 msgid "city longitude"
 msgstr ""
 
-msgid "grey"
-msgstr ""
+msgid "grey" #グレー okay too
+msgstr "灰色"
 
 #. TRANS: the value of a variable (stored in a box)
 msgid "value"
 msgstr ""
 
 msgid "banana"
-msgstr ""
+msgstr "バナナ"
 
 msgid "wheat bread"
 msgstr ""
@@ -877,15 +877,15 @@ msgstr ""
 msgid "while"
 msgstr ""
 
-msgid "open file"
-msgstr ""
+msgid "open file" #I may be wrong
+msgstr "ファイルを開く"
 
 #. TRANS: detect language
 msgid "detect lang"
 msgstr ""
 
 msgid "cake"
-msgstr ""
+msgstr "ケーキ"
 
 #. TRANS: mathematical exponent
 msgid "exp"
@@ -895,7 +895,7 @@ msgstr ""
 msgid "load heap"
 msgstr ""
 
-msgid "Open"
+msgid "Open" #Like opening a file?
 msgstr ""
 
 #. TRANS: database fetch
@@ -914,14 +914,14 @@ msgid "then"
 msgstr ""
 
 msgid "calories"
-msgstr ""
+msgstr "キロカロリー"
 
 msgid "Run step by step"
 msgstr ""
 
 #. TRANS: musical pitch
-msgid "pitch"
-msgstr ""
+msgid "pitch" #I like 音高 better than ピーチ (I think) because former has "pitch height" in the word.
+msgstr "音高"
 
 msgid "Show/hide palettes"
 msgstr ""
@@ -929,18 +929,18 @@ msgstr ""
 msgid "set heading"
 msgstr ""
 
-msgid "add 1 to"
-msgstr ""
+msgid "add 1 to" #check this
+msgstr "に１を足す"
 
 #. TRANS: stop playing current media file (movie or audio)
 msgid "stop play"
 msgstr ""
 
-msgid "sharp"
-msgstr ""
+msgid "sharp" #check this
+msgstr "シャープ"
 
 msgid "protein"
-msgstr ""
+msgstr "たんぱく"
 
 #. TRANS: oscillator time
 msgid "osctime"
@@ -962,19 +962,19 @@ msgstr ""
 
 #. TRANS: number of notes
 msgid "number of notes"
-msgstr ""
+msgstr "音符の数"
 
 msgid "angle"
 msgstr ""
 
 msgid "get fat"
-msgstr ""
+msgstr "太る"
 
 #. TRANS: minimum
 msgid "min"
 msgstr ""
 
-msgid "media"
+msgid "media" #having trouble typing what I think it is
 msgstr ""
 
 msgid "that"
@@ -992,7 +992,7 @@ msgid "click"
 msgstr ""
 
 msgid "note"
-msgstr ""
+msgstr "音符"
 
 #. TRANS: field of interest in a database, e.g., temperature in a weather database
 msgid "field"
@@ -1001,11 +1001,11 @@ msgstr ""
 msgid "invert"
 msgstr ""
 
-msgid "square"
+msgid "square" #Is this square function or geometry?
 msgstr ""
 
-msgid "Meet Mr. Mouse!"
-msgstr ""
+msgid "Meet Mr. Mouse!" #Please verify
+msgstr "マウスさんに商会"
 
 msgid "set xy"
 msgstr ""
@@ -1021,10 +1021,10 @@ msgstr "貼り付け"
 
 #. TRANS: musical key, e.g., C Major
 msgid "set key"
-msgstr ""
+msgstr "調の設定"
 
 msgid "Delete"
-msgstr ""
+msgstr "消す"
 
 #. TRANS: Mexican tamale
 msgid "tamale"
@@ -1038,7 +1038,7 @@ msgid "play"
 msgstr ""
 
 msgid "repeat"
-msgstr ""
+msgstr "リピート"
 
 msgid "blocks"
 msgstr ""
@@ -1071,8 +1071,8 @@ msgid "On my device"
 msgstr ""
 
 #. TRANS: musical key, e.g., C Major
-msgid "key"
-msgstr ""
+msgid "key" #Also could be キー
+msgstr "調"
 
 #. TRANS: push a value on to the heap.
 msgid "push"
@@ -1093,10 +1093,10 @@ msgid "Clean"
 msgstr "消去"
 
 msgid "1/64 note 𝅘𝅥𝅱"
-msgstr ""
+msgstr "６４部音符"
 
 #. TRANS: color refers to a hue, value, chroma triplet
-msgid "set color"
+msgid "set color"　#色の設定
 msgstr ""
 
 msgid "Click to run just the music in slow mode."
@@ -1109,13 +1109,13 @@ msgid "broccoli"
 msgstr ""
 
 #. TRANS: stop playing current media file (movie or audio)
-msgid "stop media"
+msgid "stop media" #A/Vを停止
 msgstr ""
 
 msgid "tomato"
-msgstr ""
+msgstr "トマト"
 
-msgid "forever"
+msgid "forever" #I know 永遠but that may have different conotation
 msgstr ""
 
 #. TRANS: musical note to frequency
@@ -1126,10 +1126,10 @@ msgid "no background"
 msgstr ""
 
 msgid "Load project from file"
-msgstr ""
+msgstr "ファイルからロード"
 
 msgid "get protein"
-msgstr ""
+msgstr "たんぱくをとる"
 
 #. TRANS: clear the screen of any graphics drawn by the turtle
 msgid "clear"
@@ -1145,22 +1145,22 @@ msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr ""
 
 msgid "half note 𝅗𝅥"
-msgstr ""
+msgstr "4部音符"
 
 msgid "1/16 note ♬"
+msgstr "16部音符"
+
+msgid "extras" #May be いろいろ
 msgstr ""
 
-msgid "extras"
-msgstr ""
-
-msgid "set beats per minute"
-msgstr ""
+msgid "set beats per minute" #I put in "tempo". Something more like "Beats per Minute" is more accurate. Would Japanese understand ビート・パー・ミニット?
+msgstr "テンポ"
 
 msgid "shade"
 msgstr ""
 
 msgid "time"
-msgstr ""
+msgstr "期間"
 
 msgid "y"
 msgstr ""
@@ -1172,11 +1172,11 @@ msgstr ""
 msgid "multiply beat"
 msgstr ""
 
-msgid "hello"
+msgid "hello"　#You could say hello in Japanese, which is こんにちは but if this is like a "hello world" thing, then English may be better. Or ハロー
 msgstr ""
 
-msgid "dot"
+msgid "dot"　#I need to look this up.
 msgstr ""
 
 msgid "left"
-msgstr ""
+msgstr "左"
