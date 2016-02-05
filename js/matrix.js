@@ -150,6 +150,7 @@ function Matrix() {
     this.initMatrix = function(logo, PolySynth) {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
+        this.rests = 0;
         this.logo = logo;
         this.synth = PolySynth;
         document.getElementById('matrix').style.display = 'inline';
@@ -290,10 +291,16 @@ function Matrix() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
+        var j = 0;
         for (var i = 0; i < this.solfegeNotes.length; i++) {
-            var row = header.insertRow(i+1);
+            if (this.solfegeNotes[i] === 'rest') {
+                this.rests += 1;
+                continue;
+	    }
+            var row = header.insertRow(i + 1);
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
+
             // process transpositions
             if (this.solfegeTranspositions[i] !== 0) {
                 // When we apply a transposition to solfege, convert
@@ -309,10 +316,11 @@ function Matrix() {
             cell.style.position = 'fixed';
             cell.style.width = MATRIXSOLFEWIDTH * this.cellScale + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
-            cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
+            cell.style.top = matrixDivPosition.top + j * cell.style.height + 'px';
+            j += 1;
         }
 
-        var row = header.insertRow(this.solfegeNotes.length + 1);
+        var row = header.insertRow(this.solfegeNotes.length - this.rests + 1);
         var cell = row.insertCell(0);
         cell.style.fontSize = this.cellScale * 50 + '%';
         cell.innerHTML = _('rhythmic note values').replace(/ /g, '<br>');
@@ -595,9 +603,9 @@ function Matrix() {
         }
 
         if (this.matrixHasTuplets) {
-            var rowCount = this.solfegeNotes.length + 3;
+            var rowCount = this.solfegeNotes.length + 3 - this.rests;
         } else {
-            var rowCount = this.solfegeNotes.length + 1
+            var rowCount = this.solfegeNotes.length + 1 - this.rests;
         }
 
         for (var j = 0; j < numBeats; j++) {
@@ -609,7 +617,7 @@ function Matrix() {
                     cell.style.fontSize = this.cellScale * 100 + '%';
                     cell.innerHTML = noteValueToDisplay;
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-                } else if (this.matrixHasTuplets && i > this.solfegeNotes.length) {
+                } else if (this.matrixHasTuplets && i > this.solfegeNotes.length - this.rests) {
                     // We may need to insert some blank cells in the extra rows
                     // added by tuplets.
                     cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
@@ -693,6 +701,9 @@ function Matrix() {
                         break;
                     }
                 }
+                if (col == -1) {
+                    continue;
+		}
                 // If we found a match, mark this cell and add this
 		// note to the play list.
 		var cell = table.rows[row + 1].cells[col + 1];
@@ -838,8 +849,6 @@ function Matrix() {
         var pitchBlock = this.rowBlocks[rowIndex - 1];
         var rhythmBlockObj = this.colBlocks[colIndex - 1];
 
-        console.log(rowIndex + ', ' + colIndex + ': ' + pitchBlock + ' [' + rhythmBlockObj[0] + ', ' + rhythmBlockObj[1] + ']');
-        
         if (playNote) {
             this.addNode(pitchBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         } else {
@@ -954,7 +963,6 @@ function Matrix() {
         for (var i = 0; i < this.notesToPlay.length; i++)
         {
             // We want all of the notes in a column.
-            // console.log(this.notesToPlay[i]);
             var note = this.notesToPlay[i].slice(0);
             if (note[0] === '') {
                 note[0] = 'R';

@@ -93,6 +93,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.keySignature = {};
     this.tupletRhythms = [];
     this.addingNotesToTuplet = false;
+    this.pitchBlocks = [];
+    this.inNoteBlock = false;
 
     // parameters used by pitch
     this.transposition = {};
@@ -523,12 +525,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         this.inMatrix = false;
+        this.pitchBlocks = [];
         this.tuplet = false;
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             for (var listener in this.turtles.turtleList[turtle].listeners) {
-                // console.log('removing listener ' + listener);
                 this.stage.removeEventListener(listener, this.turtles.turtleList[turtle].listeners[listener], false);
             }
             this.turtles.turtleList[turtle].listeners = {};
@@ -870,7 +872,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var name = logo.blocks.blockList[blk].privateData;
                 if (name in logo.actions) {
                     childFlow = logo.actions[name];
-                    // console.log('child flow is ' + logo.actions[name] + ' ' + logo.blocks.blockList[logo.actions[name]].name);
                     childFlowCount = 1;
                     if (logo.doBlocks[turtle].indexOf(blk) === -1) {
                         logo.doBlocks[turtle].push(blk);
@@ -1581,7 +1582,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.errorMsg(_('You need to select a file.'));
                     } else {
                         try {
-                            // console.log(blocks.blockList[c].value);
                             logo.turtleHeaps[turtle] = JSON.parse(blocks.blockList[c].value[1]);
                             if (!Array.isArray(logo.turtleHeaps[turtle])) {
                                 throw 'is not array';
@@ -1773,7 +1773,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var obj = frequencyToPitch(args[0]);
                     var note = obj[0];
                     var octave = obj[1];
-                    console.log(note + ' ' + octave);
                     if (note === '?') {
                         logo.errorMsg(INVALIDPITCH, blk);
                     }
@@ -1798,14 +1797,18 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var delta = 0;
 
                 if (logo.inMatrix) {
-                    matrix.addRowBlock(blk);
+                    if (note !== 'rest') {
+                        matrix.addRowBlock(blk);
+                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                            logo.pitchBlocks.push(blk);
+                        }
+                    }
                     if (!(logo.invertList[turtle].length === 0)) {
                         var len = logo.invertList[turtle].length;
                         //Gets Anchor Note and it's corresponding number that is used to calculate the difference
                         var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
                         var num1 = logo.getNumber(note1[0], note1[1]);
                         for (var i = len - 1; i > -1; i--) {
-                            console.log(logo.invertList[turtle][0])
                             //Note to which delta is calculated
                             var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                             var num2 = logo.getNumber(note2[0], note2[1]);
@@ -1814,7 +1817,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             num1 += 2 * delta;
                         }
                     }
-                    if(logo.duplicateFactor[turtle].length > 0){
+                    if (logo.duplicateFactor[turtle].length > 0) {
                         var duplicateFactor = logo.duplicateFactor[turtle];
                     } else {
                         var duplicateFactor = 1;
@@ -1932,6 +1935,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var noteBeatValue = args[0];
                 }
 
+                logo.inNoteBlock = true;
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -1940,6 +1944,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function (event) {
                     logo.processNote(noteBeatValue, blk, turtle);
+                    logo.inNoteBlock = false;
+                    logo.pitchBlocks = [];
                 }
                 logo.setListener(turtle, listenerName, listener);
                 break;
@@ -2263,7 +2269,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
                 var listener = function (event) {
-                    console.log('tuplet listener');
                     if (logo.inMatrix) {
                         logo.tuplet = false;
                         logo.addingNotesToTuplet = false;
@@ -2272,27 +2277,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
 
                 logo.setListener(turtle, listenerName, listener);
-                break;
-            case 'tuplet':
-                // DEPRECATED
-                if (logo.inMatrix) {
-                    console.log('processing tuplet');
-                    logo.tuplet = true;
-                    logo.addingNotesToTuplet = false;
-                } else {
-                    console.log('tuplet only meaningful inside matrix');
-                }
-                childFlow = args[0];
-                childFlowCount = 1;
-                break;
-            case 'tupletParamBlock':
-                // DEPRECATED
-                if (logo.inMatrix) {
-                    console.log('tuplet params are ' + args[0] + ', ' + args[1]);
-                    logo.tupletParams.push([args[0], args[1]]);
-                } else {
-                    console.log('tuplet parameters only useful inside matrix');
-                }
                 break;
             default:
                 if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
@@ -2544,6 +2528,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
         if (this.inMatrix) {
+            matrix.addColBlock(blk, 1);
+            if (this.inNoteBlock) {
+                for (i = 0; i < this.pitchBlocks.length; i++) {
+                    matrix.addNode(this.pitchBlocks[i], blk, 0);
+                }
+            }
             noteBeatValue *= this.beatFactor[turtle];
             if (this.tuplet === true) {
                 if(this.addingNotesToTuplet) {
