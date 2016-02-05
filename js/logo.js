@@ -94,7 +94,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.tupletRhythms = [];
     this.addingNotesToTuplet = false;
     this.pitchBlocks = [];
-    this.inNoteBlock = false;
+    this.inNoteBlock = 0;
 
     // parameters used by pitch
     this.transposition = {};
@@ -1935,7 +1935,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var noteBeatValue = args[0];
                 }
 
-                logo.inNoteBlock = true;
+                logo.inNoteBlock += 1;
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -1944,7 +1944,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function (event) {
                     logo.processNote(noteBeatValue, blk, turtle);
-                    logo.inNoteBlock = false;
+                    logo.inNoteBlock -= 1;
                     logo.pitchBlocks = [];
                 }
                 logo.setListener(turtle, listenerName, listener);
@@ -2529,7 +2529,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
         if (this.inMatrix) {
             matrix.addColBlock(blk, 1);
-            if (this.inNoteBlock) {
+            if (this.inNoteBlock > 0) {
                 for (i = 0; i < this.pitchBlocks.length; i++) {
                     matrix.addNode(this.pitchBlocks[i], blk, 0);
                 }
