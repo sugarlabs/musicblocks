@@ -47,6 +47,7 @@ var MATRIXNOTECELLCOLORHOVER = '#c2e820';
 
 var MATRIXSOLFEWIDTH = 52;
 var MATRIXBUTTONHEIGHT = 40;
+var MATRIXBUTTONHEIGHT2 = 66;
 var MATRIXSOLFEHEIGHT = 30;
 
 function Matrix() {
@@ -75,6 +76,76 @@ function Matrix() {
     this.noteValue = 4;
     this.notesCounter = 0;
     this.playDirection = 1;
+
+    // The pitch-block number associated with a row; a rhythm block is
+    // associated with a column. We need to keep track of which
+    // intersections in the grid are populated.  The blockMap is a
+    // list of selected nodes in the matrix that map pitch blocks to
+    // rhythm blocks (note that rhythm blocks can span multiple
+    // columns).
+
+    // These arrays get created each time the matrix is built.
+    this.rowBlocks = [];  // pitch-block number
+    this.colBlocks = [];  // [rhythm-block number, note number]
+
+    // This array is preserved between sessions.
+    // We populate the blockMap whenever a note is selected and
+    // restore any notes that might be present.
+    this.blockMap = [];
+
+    this.clearBlocks = function() {
+        this.rowBlocks = [];
+        this.colBlocks = [];
+    }
+
+    this.addRowBlock = function(pitchBlock) {
+        this.rowBlocks.push(pitchBlock);
+    }
+
+    this.addColBlock = function(rhythmBlock, n) {
+        // Search for previous instance of the same block (from a repeat)
+        var startIdx = 0;
+        for (var i = 0; i < this.colBlocks.length; i++) {
+            var obj = this.colBlocks[i];
+	    if (obj[0] === rhythmBlock) {
+                startIdx += 1;
+	    }
+        }
+
+        for (var i = startIdx; i < n + startIdx; i++) {
+            this.colBlocks.push([rhythmBlock, i]);
+        }
+    }
+
+    this.addNode = function(pitchBlock, rhythmBlock, n) {
+        for (var i = 0; i < this.blockMap.length; i++) {
+            var obj = this.blockMap[i];
+            if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
+                return;  // node is already in the list
+            }
+        }
+        this.blockMap.push([pitchBlock, [rhythmBlock, n]]);
+    }
+
+    this.removeNode = function(pitchBlock, rhythmBlock, n) {
+        for (var i = 0; i < this.blockMap.length; i++) {
+            var obj = this.blockMap[i];
+            if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
+                this.blockMap[i] = [-1, [-1, -1]];  // Mark as removed
+            }
+        }
+        /*
+        // Garbage collect (FIXME)
+        var tempMap = [];
+        for (var i = 0; i < this.blockMap.length; i++) {
+            var obj = this.blockMap[i];
+            if (obj[0] !== -1) {
+                tempMap.push(obj);
+            }
+        }
+        this.blockMap = tempMap;
+        */
+    }
 
     this.initMatrix = function(logo, PolySynth) {
         // Initializes the matrix. First removes the previous matrix
@@ -121,7 +192,7 @@ function Matrix() {
         x.style.textAlign = 'center';
 
         var matrixDiv = document.getElementById('matrix');
-        matrixDiv.style.paddingTop = 1.67 * MATRIXBUTTONHEIGHT * this.cellScale + 4 + 'px';
+        matrixDiv.style.paddingTop = MATRIXBUTTONHEIGHT2 * this.cellScale + 4 + 'px';
         matrixDiv.style.paddingLeft = MATRIXSOLFEWIDTH * this.cellScale + 2 + 'px';
         matrixDiv.appendChild(x);
         matrixDivPosition = matrixDiv.getBoundingClientRect();
@@ -603,6 +674,31 @@ function Matrix() {
                 }
             }
         }
+
+        // Mark any cells found in the blockMap from previous
+        // instances of the matrix.
+        for (var i = 0; i < this.blockMap.length; i++) {
+            var obj = this.blockMap[i];
+            if (obj[0] !== -1) {
+                // Look for this note in the pitch and rhythm blocks.
+                var row = this.rowBlocks.indexOf(obj[0]);
+                var col = -1;
+                for (var j = 0; j < this.colBlocks.length; j++) {
+                    if (this.colBlocks[j][0] == obj[1][0] && this.colBlocks[j][1] == obj[1][1]) {
+                        col = j;
+                        break;
+                    }
+                }
+                // If we found a match, mark this cell and add this
+		// note to the play list.
+		var cell = table.rows[row + 1].cells[col + 1];
+		cell.style.backgroundColor = 'black';
+                if (this.notesToPlay[col][0][0] === 'R') {
+                    this.notesToPlay[col][0] = [];
+                }
+                this.setNoteCell(row + 1, col + 1, cell, false, null);
+            }
+        }
     }
 
     this.setTransposition = function(transposition) {
@@ -688,7 +784,7 @@ function Matrix() {
 
         console.log('playAll ' + this.colIndex);
         var cell = table.rows[this.rowIndex].cells[this.colIndex];
-	cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         this.colIndex += 1;
         if (note[0] !== 'R') {
             synth.triggerAttackRelease(note, this.logo.defaultBPMFactor / noteValue);
@@ -703,13 +799,13 @@ function Matrix() {
                 if (that.colIndex > that.notesToPlayDirected.length) {
                     var table = document.getElementById('myTable');
                     for (var j = 1; j <= that.notesToPlayDirected.length; j++) {
-	                var cell = table.rows[that.rowIndex].cells[j];
-	                cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-		    }
+                        var cell = table.rows[that.rowIndex].cells[j];
+                        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+                    }
                 } else {
                     var table = document.getElementById('myTable');
                     var cell = table.rows[that.rowIndex].cells[that.colIndex];
-	            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
                     if(that.notesCounter >= that.notesToPlayDirected.length) {
                         that.notesCounter = 1;
@@ -734,6 +830,18 @@ function Matrix() {
     this.setNotes = function(colIndex, rowIndex, playNote, tuplet, synth) {
         /* Sets corresponding note when user clicks on any cell and
          * plays that note*/
+
+        var pitchBlock = this.rowBlocks[rowIndex - 1];
+        var rhythmBlockObj = this.colBlocks[colIndex - 1];
+
+        console.log(rowIndex + ', ' + colIndex + ': ' + pitchBlock + ' [' + rhythmBlockObj[0] + ', ' + rhythmBlockObj[1] + ']');
+        
+        if (playNote) {
+            this.addNode(pitchBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
+        } else {
+            this.removeNode(pitchBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
+        }
+
         var leaveRowsFromBottom = 1;
         if(tuplet) {
             leaveRowsFromBottom = 3;
@@ -743,38 +851,44 @@ function Matrix() {
         this.notesToPlay[colIndex - 1][0] = [];
         if (table !== null) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
-                cell = table.rows[j].cells[colIndex];
-                if (cell.style.backgroundColor === 'black') {
-                    var solfegeHTML = table.rows[j].cells[0].innerHTML;
-                    // Both solfege and octave are extracted from HTML by getNote.
-                    var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
-                    var note = noteObj[0] + noteObj[1];
-                    var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
-                    // Remove ' &#x1D15F;' at the end of the HTML code for the
-                    // note value.
-                    var len = noteValue.length;
-                    // if (len > 2 && noteValue.charAt(len - 3) === ' ') {
-                    if (noteValue.indexOf(' ') !== -1) {
-                        noteValue = noteValue.slice(0, noteValue.length - 2);
-                    }
-                    var i = 0;
-                    if (noteValue.substr(0,3) === '1.5') {
-                        while (noteValue[i] !== ' ') {
-                            i += 1;
-                        }
-                        noteValue = noteValue.substr(4, i - 4);
-                        noteValue = parseInt(noteValue)
-                        noteValue = 1.5/noteValue;
-                        noteValue = noteValue.toString()
-                    }
-                    this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
-
-                    if (playNote) {
-                        synth.triggerAttackRelease(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue);
-                    }
-                }
+		var table = document.getElementById('myTable');
+		cell = table.rows[j].cells[colIndex];
+		if (cell.style.backgroundColor === 'black') {
+                    this.setNoteCell(j, colIndex, cell, playNote, synth);
+		}
             }
         }
+    }
+
+    this.setNoteCell = function(j, colIndex, cell, playNote, synth) {
+        var table = document.getElementById('myTable');
+        var solfegeHTML = table.rows[j].cells[0].innerHTML;
+        // Both solfege and octave are extracted from HTML by getNote.
+        var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
+        var note = noteObj[0] + noteObj[1];
+        var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
+        // Remove ' &#x1D15F;' at the end of the HTML code for the
+        // note value.
+        var len = noteValue.length;
+        // if (len > 2 && noteValue.charAt(len - 3) === ' ') {
+        if (noteValue.indexOf(' ') !== -1) {
+            noteValue = noteValue.slice(0, noteValue.length - 2);
+        }
+        var i = 0;
+        if (noteValue.substr(0,3) === '1.5') {
+            while (noteValue[i] !== ' ') {
+                i += 1;
+            }
+            noteValue = noteValue.substr(4, i - 4);
+            noteValue = parseInt(noteValue)
+            noteValue = 1.5/noteValue;
+            noteValue = noteValue.toString()
+        }
+        this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
+
+	if (playNote) {
+	    synth.triggerAttackRelease(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue);
+	}
     }
 
     this.playNotesString = function(time, synth) {
@@ -891,12 +1005,12 @@ function Matrix() {
                 console.log('converting ' + note[1] + ' to ' + obj[0] + '/' + obj[1]);
 
                 // Add a vspace to prevent divide block from obscuring the pitch block.
-		newStack.push([idx + 1, 'vspace', 0, 0, [idx, idx + 5]]);
+                newStack.push([idx + 1, 'vspace', 0, 0, [idx, idx + 5]]);
 
                 // Display the dotted note as a fraction.
                 newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
                 newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
-		newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
 
                 // Connect the Note block flow to the divide and vspace blocks.
                 newStack[idx][4][1] = idx + 2;
@@ -918,7 +1032,7 @@ function Matrix() {
                         var previousBlock = idx + 1;  // Vspace block
                     } else {
                         var previousBlock = idx;  // Note block
-		    }
+                    }
                 } else {
                     var previousBlock = thisBlock - 3;  // Pitch block
                 }
