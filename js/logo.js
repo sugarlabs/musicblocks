@@ -1704,6 +1704,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 matrix.solfegeNotes = [];
                 matrix.solfegeTranspositions = [];
                 matrix.solfegeOctaves = [];
+                matrix.clearBlocks();
 
                 logo.tupletRhythms = [];
                 logo.tupletParams = [];
@@ -1715,8 +1716,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var listener = function (event) {
                     if (logo.tupletRhythms.length === 0 || matrix.solfegeNotes.length === 0) {
                         logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
-                    } else if(document.getElementById('matrix').style.visibility === 'visible') {
-                        logo.errorMsg(_('Please close the current matrix before opening a new one.'), blk);
+                    // } else if(document.getElementById('matrix').style.visibility === 'visible') {
+                    //    logo.errorMsg(_('Please close the current matrix before opening a new one.'), blk);
                     } else {
                         // Process queued up rhythms.
                         matrix.initMatrix(logo);
@@ -1797,6 +1798,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var delta = 0;
 
                 if (logo.inMatrix) {
+                    matrix.addRowBlock(blk);
                     if (!(logo.invertList[turtle].length === 0)) {
                         var len = logo.invertList[turtle].length;
                         //Gets Anchor Note and it's corresponding number that is used to calculate the difference
@@ -1857,7 +1859,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'rhythm':
+                if (args.length < 2 || typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number' || args[0] < 1 || args[1] <= 0) {
+                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    break;
+                }
                 if (logo.inMatrix) {
+                    matrix.addColBlock(blk, args[0]);
                     for (var i = 0; i < args[0]; i++) {
                         logo.processNote(args[1], blk, turtle);
                     }
