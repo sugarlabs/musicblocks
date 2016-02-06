@@ -1131,7 +1131,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         myBlock.text.text = label;
 
         // Make sure text is on top.
-        z = myBlock.container.getNumChildren() - 1;
+        var z = myBlock.container.getNumChildren() - 1;
         myBlock.container.setChildIndex(myBlock.text, z);
 
         if (myBlock.loadComplete) {
@@ -2081,16 +2081,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.triggerLongPress = function (myBlock) {
         this.timeOut == null;
         this.inLongPress = true;
+        var z = this.stage.getNumChildren() - 1;
         this.copyButton.visible = true;
         this.copyButton.x = myBlock.container.x - 27;
         this.copyButton.y = myBlock.container.y - 27;
+        this.stage.setChildIndex(this.copyButton, z);
         this.dismissButton.visible = true;
         this.dismissButton.x = myBlock.container.x + 27;
         this.dismissButton.y = myBlock.container.y - 27;
+        this.stage.setChildIndex(this.dismissButton, z - 1);
         if (myBlock.name === 'action') {
             this.saveStackButton.visible = true;
             this.saveStackButton.x = myBlock.container.x + 82;
             this.saveStackButton.y = myBlock.container.y - 27;
+            this.stage.setChildIndex(this.saveStackButton, z - 2);
         }
         this.refreshCanvas();
     }
@@ -2909,10 +2913,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var topBlk = this.findTopBlock(blk);
         this.findDragGroup(topBlk);
 
-        var n = this.stage.getNumChildren() - 1;
+        var z = this.stage.getNumChildren() - 1;
         for (var b = 0; b < this.dragGroup.length; b++) {
-            this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, n);
-            n -= 1;
+            this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
+            z -= 1;
         }
 
         this.refreshCanvas;
