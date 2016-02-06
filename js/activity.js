@@ -593,6 +593,7 @@ define(function (require) {
                 window.scroll(0, 0);
                 this.value = null;
             });
+
             pluginChooser.addEventListener('change', function (event) {
                 window.scroll(0, 0)
 
@@ -756,6 +757,12 @@ define(function (require) {
                 stage.on('stagemousemove', function (event) {
                     if (!moving) {
                         return;
+                    }
+                    if (blocks.inLongPress) {
+                        blocks.copyButton.visible = false;
+                        blocks.saveStackButton.visible = false;
+                        blocks.dismissButton.visible = false;
+                        blocks.inLongPress = false;
                     }
                     if (scrollBlockContainer) {
                         blocksContainer.x += event.stageX - lastCords.x;
@@ -1827,7 +1834,7 @@ define(function (require) {
 
             for (var name in buttonNames) {
                 var container = makeButton(buttonNames[name][0] + '-button',
-                    x, y, btnSize);
+					   x, y, btnSize, 0);
                 loadButtonDragHandler(container, x, y, buttonNames[name][1]);
                 onscreenButtons.push(container);
 
@@ -1889,7 +1896,7 @@ define(function (require) {
                 x += dx;
                 y += dy;
                 var container = makeButton(menuNames[name][0] + '-button',
-                    x, y, btnSize);
+					   x, y, btnSize, 0);
                 loadButtonDragHandler(container, x, y, menuNames[name][1]);
                 onscreenMenu.push(container);
                 container.visible = false;
@@ -2055,13 +2062,18 @@ define(function (require) {
             update = true;
         }
 
-        function makeButton(name, x, y, size, rotation) {
+        function makeButton(name, x, y, size, rotation, parent) {
             var container = new createjs.Container();
             if (name === 'paste-disabled-button') {
                 pasteContainer = container;
             }
 
-            stage.addChild(container);
+            if (parent == undefined) {
+                stage.addChild(container);
+            } else {
+                console.log(stage + ' ' + container);
+                parent.addChild(container);
+	    }
             container.x = x;
             container.y = y;
 

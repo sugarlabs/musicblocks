@@ -182,13 +182,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var blocks = this;
         this.updatePasteButton = updatePasteButton;
 
-        this.copyButton = makeButton('copy-button', 0, 0, 55);
+        this.copyButton = makeButton('copy-button', 0, 0, 55, 0, this.stage);
         this.copyButton.visible = false;
 
-        this.dismissButton = makeButton('cancel-button', 0, 0, 55);
+        this.dismissButton = makeButton('cancel-button', 0, 0, 55, 0, this.stage);
         this.dismissButton.visible = false;
 
-        this.saveStackButton = makeButton('save-blocks-button', 0, 0, 55);
+        this.saveStackButton = makeButton('save-blocks-button', 0, 0, 55, 0, this.stage);
         this.saveStackButton.visible = false;
 
         this.copyButton.on('click', function (event) {
@@ -1083,6 +1083,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     this.moveBlockRelative = function (blk, dx, dy) {
         // Move a block (and its label) by dx, dy.
+        if (this.inLongPress) {
+            this.copyButton.visible = false;
+            this.saveStackButton.visible = false;
+            this.dismissButton.visible = false;
+	    this.inLongPress = false;
+        }
+
         var myBlock = this.blockList[blk];
         if (myBlock.container != null) {
             myBlock.container.x += dx;
