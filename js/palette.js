@@ -356,7 +356,7 @@ var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
                    'duplicatenotes', 'fill', 'hollowline', 'drum', 'osctime',
                    'invert', 'matrix', 'skipnotes', 'setbpm', 'tie', 'slur',
                    'staccato', 'setnotevolume2', 'crescendo', 'tuplet2',
-                   'drift'];
+                   'drift', 'swing'];
 
 // Kinda a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {
