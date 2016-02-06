@@ -2070,7 +2070,7 @@ define(function (require) {
             container.x = x;
             container.y = y;
 
-            text = new createjs.Text(label, '14px Sans', '#000000');
+            text = new createjs.Text(label, '14px Sans', '#282828');
             if (container.y < 55) {
 		text.textAlign = 'left';
                 text.x = -14;
