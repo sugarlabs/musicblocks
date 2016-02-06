@@ -60,10 +60,10 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
 		box.completeShow();
             }
             if (this.scrollStatus) {
-                var UTILITYBOX = UTILITYBOXSVG + FONTSMALLERSVG + FONTBIGGERSVG + STATSSVG + PLUGINSVG + SCROLLLOCKSVG + '</svg>';
+                var UTILITYBOX = UTILITYBOXSVG + STATSSVG + PLUGINSVG + SCROLLLOCKSVG + '</svg>';
                 makeBoxBitmap(this, UTILITYBOX, 'box', processBackground, null);
             } else {
-                var UTILITYBOX = UTILITYBOXSVG + FONTSMALLERSVG + FONTBIGGERSVG + STATSSVG + PLUGINSVG + SCROLLUNLOCKSVG + '</svg>';
+                var UTILITYBOX = UTILITYBOXSVG + STATSSVG + PLUGINSVG + SCROLLUNLOCKSVG + '</svg>';
                 makeBoxBitmap(this, UTILITYBOX, 'box', processBackground, null);
             }
         } else {
@@ -102,12 +102,11 @@ function loadUtilityContainerHandler(box) {
         var y = (event.stageY / box.scale) - box.container.y;
         console.log(x + ' ' + y);
         if (y < 55) {
-            console.log('closing box');
             box.hide();
         } else if (x < 75) {
-	    box.doSmaller();
+	    // box.doSmaller();
         } else if (x < 150) {
-	    box.doBigger();
+	    // box.doBigger();
         } else if (x < 225) {
             box.doStats();
             box.hide();
