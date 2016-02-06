@@ -130,6 +130,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.tieCarryOver = {};
     this.polyVolume = {};
     this.validNote = true;
+    this.drift = {};
 
     // tuplet
     this.tuplet = false;
@@ -518,6 +519,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.tie[turtle] = false;
             this.tieNote[turtle] = [];
             this.tieCarryOver[turtle] = 0;
+            this.drift[turtle] = 0;
         }
 
         if (!this.lilypondSaveOnly) {
@@ -2015,6 +2017,20 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.setListener(turtle, listenerName, listener);
                 }
                 break;
+            case 'drift':
+                logo.drift[turtle] += 1;
+                childFlow = args[0];
+                childFlowCount = 1;
+
+                var listenerName = '_drift_' + turtle;
+                logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                var listener = function (event) {
+                    logo.drift[turtle] -= 1;
+                }
+
+                logo.setListener(turtle, listenerName, listener);
+                break;
             case 'tie':
                 // Tie notes together in pairs.
                 logo.tie[turtle] = true;
@@ -2557,7 +2573,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // we need to catch up.
             var d = new Date();
             var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000; // (d.getTime() - this.time) / 1000;
-            var turtleLag = elapsedTime - this.turtleTime[turtle];
+            if (this.drift[turtle] === 0) {
+                var turtleLag = elapsedTime - this.turtleTime[turtle];
+            } else {
+                var turtleLag = 0;
+            }
             
             if (this.bpm[turtle].length > 0) {
                 var bpmFactor = TONEBPM / last(this.bpm[turtle]);

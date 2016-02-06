@@ -367,6 +367,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     osctimeBlock.flowClampOneArgBlock();
     osctimeBlock.defaults.push(200);
 
+    var driftBlock = new ProtoBlock('drift');
+    driftBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['drift'] = driftBlock;
+    driftBlock.staticLabels.push(_('drift'));
+    driftBlock.adjustWidthToLabel();
+    driftBlock.flowClampZeroArgBlock();
+
     var duplicateFactor = new ProtoBlock('duplicatefactor');
     duplicateFactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;
