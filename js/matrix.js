@@ -212,11 +212,10 @@ function Matrix() {
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
 
-        var cell = row.insertCell(1);
         var iconSize = this.cellScale * 24;
 
-        // cell.innerHTML = '<figure><img src="header-icons/play-button.svg" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + _('play') + '</p></figcaption></figure>';
-        cell.innerHTML = '<img src="header-icons/play-button.svg" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        var cell = row.insertCell(1);
+        cell.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
@@ -230,8 +229,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(2);
-        // cell.innerHTML = '<figure><img src="header-icons/export-chunk.svg" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + _('save') + '</p></figcaption></figure>';
-        cell.innerHTML = '<img src="header-icons/export-chunk.svg" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.innerHTML = '<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
@@ -245,8 +243,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(3);
-        // cell.innerHTML = '<figure><img src="header-icons/erase-button.svg" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + _('clear') + '</p></figcaption></figure>';
-        cell.innerHTML = '<img src="header-icons/erase-button.svg" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.innerHTML = '<img src="header-icons/erase-button.svg" title="' + _('clear') + '" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
@@ -260,8 +257,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(4);
-        // cell.innerHTML = '<figure><img src="header-icons/export-button.svg" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + 'HTML ' + '</p></figcaption></figure>';
-        cell.innerHTML = '<img src="header-icons/export-button.svg" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.innerHTML = '<img src="header-icons/export-button.svg" title="' + _('export') + ' HTML" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         that = this;
@@ -276,8 +272,7 @@ function Matrix() {
         }
 
         var cell = row.insertCell(5);
-        // cell.innerHTML = '<figure><img src="header-icons/close-button.svg" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '"><figcaption><p>' + _('close') + '</p></figcaption></figure>';
-        cell.innerHTML = '<img src="header-icons/close-button.svg" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">';
+        cell.innerHTML = '<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
