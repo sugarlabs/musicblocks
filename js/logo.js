@@ -1,4 +1,4 @@
-// Copyright (c) 2014,2015 Walter Bender
+// Copyright (c) 2014-2016 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
 //
 // This program is free software; you can redistribute it and/or
@@ -144,11 +144,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.numerator = 3;
     this.denominator = 4;
 
-    this.tone = new Tone();
-    this.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
-    this.drumSynth = new Tone.DrumSynth().toMaster();
-
-    // Tone.Transport.bpm.value = 120;  // Doesn't seem to do anything
+    this.synth = new Synth();
 
     // Oscillator parameters
     this.oscDuration = {};
@@ -294,7 +290,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
         this.sounds = [];
 
-        Tone.Transport.stop();
+        this.synth.stopSound();
+        this.synth.stop();
 
         if (this.cameraID != null) {
             doStopVideoCam(this.cameraID, this.setCameraID);
@@ -715,7 +712,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     this.bpm[turtleId][len - 1] = value;
                 }
                 break;
-            case 'transpositionfactor': 
+            case 'transpositionfactor':
                 var len = this.transposition[turtleId].length;
                 if (len > 0) {
                     this.transposition[turtleId][len - 1] = value;
@@ -1704,7 +1701,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 logo.inMatrix = true;
                 matrix.solfegeNotes = [];
-                matrix.solfegeTranspositions = [];
                 matrix.solfegeOctaves = [];
                 matrix.clearBlocks();
 
@@ -1745,7 +1741,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 break;
                             }
                         }
-                        matrix.makeClickable(addedTuplet, logo.polySynth);
+                        matrix.makeClickable(addedTuplet);
                     }
                 }
 
@@ -1805,13 +1801,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             logo.pitchBlocks.push(blk);
                         }
                     }
+
                     if (!(logo.invertList[turtle].length === 0)) {
                         var len = logo.invertList[turtle].length;
-                        //Gets Anchor Note and it's corresponding number that is used to calculate the difference
+                        // Get an anchor note and its corresponding
+                        // number, which is used to calculate delta.
                         var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
                         var num1 = logo.getNumber(note1[0], note1[1]);
                         for (var i = len - 1; i > -1; i--) {
-                            //Note to which delta is calculated
+                            // Note from which delta is calculated.
                             var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                             var num2 = logo.getNumber(note2[0], note2[1]);
                             var a = logo.getNumNote(num1, 0);
@@ -1819,20 +1817,23 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             num1 += 2 * delta;
                         }
                     }
+
                     if (logo.duplicateFactor[turtle].length > 0) {
                         var duplicateFactor = logo.duplicateFactor[turtle];
                     } else {
                         var duplicateFactor = 1;
                     }
                     for (var i = 0; i < duplicateFactor; i++) {
-                        matrix.solfegeNotes.push(note);
-                        if (logo.inTranspositionClamp || logo.inFlatClamp || logo.inSharpClamp) {
-                            matrix.solfegeTranspositions.push(logo.transposition[turtle] + 2 * delta);
-                        } else {
-                            matrix.solfegeTranspositions.push(2 * delta);
-                        }       
+                        // Apply transpositions
+                        var transposition = 2 * delta;
+                        if (turtle in logo.transposition) {
+                            transposition += logo.transposition[turtle];
+                        }
+
+                        note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                        matrix.solfegeNotes.push(logo.getSolfege(note));
                         matrix.solfegeOctaves.push(octave);
-                    }    
+                    }
                 } else {
                     logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
@@ -2535,8 +2536,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else if (vol < 0) {
             vol = 0;
         }
-        var db = this.tone.gainToDb(vol / 100);
-        Tone.Master.volume.rampTo(db, 0.01);
+        this.synth.setVolume(vol);
     }
 
     this.processNote = function(noteBeatValue, blk, turtle) {
@@ -2572,19 +2572,21 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // Calculate a lag: In case this turtle has fallen behind,
             // we need to catch up.
             var d = new Date();
-            var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000; // (d.getTime() - this.time) / 1000;
+            var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000;
             if (this.drift[turtle] === 0) {
+                // How far behind is this turtle lagging?
                 var turtleLag = elapsedTime - this.turtleTime[turtle];
             } else {
+                // When we are "drifting", we don't bother with lag.
                 var turtleLag = 0;
             }
-            
+
             if (this.bpm[turtle].length > 0) {
                 var bpmFactor = TONEBPM / last(this.bpm[turtle]);
             } else {
                 var bpmFactor = TONEBPM / TARGETBPM;
             }
-            
+
             // If we are in a tie, depending upon parity, we either
             // add the duration from the previous note to the current
             // note, or we cache the duration and set the wait to
@@ -2659,7 +2661,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     this.tieCarryOver[turtle] = 0;
                 }
             }
-            
+
             // Duration is the duration of the note to be
             // played. doWait sets the wait time for the turtle before
             // the next block is executed.
@@ -2708,7 +2710,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                     }
                 }
-                
+
                 playnote = function(logo) {
                     var notes = [];
                     var insideChord = -1;
@@ -2719,7 +2721,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             var insideChord = 1;
                         }
                     }
-                    
+
                     logo.noteBeat[turtle] = noteBeatValue;
 
                     var oscillators = [];
@@ -2727,7 +2729,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     if (logo.oscList[turtle].length > 0 && duration > 0) {
                         for (var i = 0; i < logo.oscList[turtle].length; i++) {
                             if (!logo.lilypondSaveOnly) {
-                                oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
+                                // oscillators.push(new Tone.Oscillator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]).toMaster());
+                                oscillators.push(logo.synth.getOscilator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]));
                             }
                             console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1]);
                             if (logo.blocks.blockList[blk].name === 'osctime') {
@@ -2736,10 +2739,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 logo.updateNotation(frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
                             }
                         }
-                        
+
                         if (!logo.lilypondSaveOnly && duration > 0) {
                             for (var i = 0; i < oscillators.length; i++) {
-                                oscillators[i].volume.value = last(logo.polyVolume[turtle]) * OSCVOLUMEADJUSTMENT;
+                                // oscillators[i].volume.value = last(logo.polyVolume[turtle]) * OSCVOLUMEADJUSTMENT;
                                 oscillators[i].start();
                             }
                             if (logo.blocks.blockList[blk].name === 'osctime') {
@@ -2760,13 +2763,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                     if (logo.notePitches[turtle].length > 0) {
                         if (!logo.lilypondSaveOnly && duration > 0) {
-                            if (logo.turtles.turtleList[turtle].drum) {
-                                logo.drumSynth.toMaster();
-                            } else {
-                                logo.polySynth.toMaster();
-                            }
+                            logo.synth.init(logo.turtles.turtleList[turtle].drum);
                         }
-                        
+
                         for (i in logo.notePitches[turtle]) {
                             var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
                             var note = noteObj[0] + noteObj[1];
@@ -2782,7 +2781,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 }
                             }
                         }
-                        
+
                         console.log("notes to play " + notes + ' ' + noteBeatValue);
                         if (notes.length > 0) {
                             var len = notes[0].length;
@@ -2798,7 +2797,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                     notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
                                 }
                             }
-                            
+
                             // Use the beatValue of the first note in
                             // the group since there can only be one.
                             if (logo.blocks.blockList[blk].name === 'osctime') {
@@ -2820,20 +2819,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 }
                             }
                             if (!logo.lilypondSaveOnly && duration > 0) {
-                                if (logo.turtles.turtleList[turtle].drum) {
-                                    logo.drumSynth.triggerAttackRelease(notes[0], beatValue);
-                                } else {
-                                    logo.polySynth.triggerAttackRelease(notes, beatValue);
-                                }
-                                Tone.Transport.start();
+                                logo.synth.trigger(notes, beatValue, logo.turtles.turtleList[turtle].drum);
+                                logo.synth.start();
                             }
                         }
                     }
-                    
+
                     if (insideChord > 0) {
                         insideChord = -1;
                     }
-                    
+
                 }
 
                 if (waitTime === 0 || this.lilypondSaveOnly) {
@@ -3721,8 +3716,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     // WHY ARE THESE HERE? Why not in matrix.js?
 
     this.playMatrix = function() {
-        Tone.Transport.stop();
-        matrix.playNotesString(0, this.polySynth);
+        this.synth.stop();
+        matrix.playNotesString(0, this.synth.poly);
         this.setTurtleDelay(4500 * parseFloat(1 / this.denominator) * (this.numerator));
         var logo = this;
         setTimeout(function() {logo.setTurtleDelay(0);}, logo.setTurtleDelay(4500 * parseFloat(1 / logo.denominator) * (logo.numerator)));
@@ -3733,7 +3728,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.clearMatrix = function() {
-        matrix.clearMatrix(this.polySynth);
+        matrix.clearMatrix();
     }
 
     this.getNumber = function(solfege, octave) {
@@ -3808,6 +3803,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             octave -= 1;
         }
         return [note, octave + 1];
+    }
+
+    this.getSolfege = function (note) {
+        var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
+        if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
+            return noteConversion[note[0][0]] + note[0][1] + note[0][2];
+        } else if(['♯', '♭'].indexOf(note[0][1]) !== -1) {
+            return noteConversion[note[0][0]] + note[0][1];
+        } else {
+            return noteConversion[note[0][0]];
+        }
     }
 
     this.getNote = function (solfege, octave, transposition, keySignature) {
@@ -4346,5 +4352,54 @@ function pitchToNumber(pitch, octave) {
         return octave * 12 + SOLFAGE.indexOf(pitch);
     } else {
         return octave * 12;
+    }
+}
+
+
+function Synth () {
+    // Isolate synth functions here.
+    this.tone = new Tone();
+    this.poly = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
+    this.drum = new Tone.DrumSynth().toMaster();
+
+    this.init = function(drum) {
+        if (drum) {
+            this.drum.toMaster();
+        } else {
+            this.poly.toMaster();
+        }
+    }
+
+    this.trigger = function(notes, beatValue, drum) {
+        if (drum) {
+            this.drum.triggerAttackRelease(notes[0], beatValue);
+        } else {
+            this.poly.triggerAttackRelease(notes, beatValue);
+        }
+    }
+
+    this.stopSound = function(drum) {
+        if (drum) {
+            this.drum.triggerRelease();
+        } else {
+            this.poly.triggerRelease();
+        }
+    }
+
+    this.start = function() {
+        Tone.Transport.start();
+    }
+
+    this.stop = function() {
+        Tone.Transport.stop();
+    }
+
+    this.setVolume = function(vol) {
+        var db = this.tone.gainToDb(vol / 100);
+        Tone.Master.volume.rampTo(db, 0.01);
+    }
+
+    this.getOscilator = function(oscillatorName, frequency) {
+        return new Tone.Oscillator(oscillatorName, frequency).toMaster();
     }
 }
