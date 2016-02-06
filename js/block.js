@@ -10,7 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 // Length of a long touch
-var LONGPRESSTIME = 2000;
+var LONGPRESSTIME = 1500;
 var COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
 
 // Define block instance objects and any methods that are intra-block.
