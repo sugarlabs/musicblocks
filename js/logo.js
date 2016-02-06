@@ -125,6 +125,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.crescendoDelta = {};
     this.crescendoVolume = {};
     this.staccato = {};
+    this.swing = {};
+    this.swingCarryOver = {};
     this.tie = {};
     this.tieNote = {};
     this.tieCarryOver = {};
@@ -513,6 +515,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.crescendoDelta[turtle] = [];
             this.crescendoVolume[turtle] = [];
             this.staccato[turtle] = [];
+            this.swing[turtle] = [];
+            this.swingCarryOver[turtle] = 0;
             this.tie[turtle] = false;
             this.tieNote[turtle] = [];
             this.tieCarryOver[turtle] = 0;
@@ -2057,6 +2061,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 logo.setListener(turtle, listenerName, listener);
                 break;
+            case 'swing':
+                // Grab a bit from the next note to give to the current note.
+                logo.swing[turtle].push(args[0]);
+                logo.swingCarryOver[turtle] = 0;
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                var listenerName = '_swing_' + turtle;
+                logo.updateEndBlks(childFlow, turtle, listenerName);
+
+                var listener = function (event) {
+                    logo.swing[turtle].pop();
+                }
+
+                logo.setListener(turtle, listenerName, listener);
+                break;
             case 'duplicatenotes':
                 var factor = args[0];
                 if (factor === 0) {
@@ -2659,6 +2679,30 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         noteBeatValue = 1 / ((1 / noteBeatValue) + (1 / this.tieCarryOver[turtle]));
                     }
                     this.tieCarryOver[turtle] = 0;
+                }
+            }
+
+            // If we are in a swing, depending upon parity, we either
+            // add the duration from the current note or
+            // we substract duration from the next note.
+            // FIXME: Will not work when mixing osctimes with
+            // noteBeatValues.  FIXME: Will not work when using dup
+            // and skip. FIXME: Could behave weirdly with tie.
+            if (this.swing[turtle].length > 0) {
+                var swingValue = last(this.swing[turtle]);
+                if (this.swingCarryOver[turtle] === 0) {
+                    noteBeatValue = 1 / ((1 / noteBeatValue) + (1 / swingValue));
+                    this.swingCarryOver[turtle] = swingValue;
+                } else {
+                    if (this.blocks.blockList[blk].name === 'osctime') {
+                        noteBeatValue -= this.swingCarryOver[turtle];
+                    } else {
+                        noteBeatValue = 1 / ((1 / noteBeatValue) - (1 / swingValue));
+                    }
+                    this.swingCarryOver[turtle] = 0;
+                }
+                if (noteBeatValue < 0) {
+                    noteBeatValue = 0;
                 }
             }
 

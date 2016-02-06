@@ -359,6 +359,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     setbpmBlock.flowClampOneArgBlock();
     setbpmBlock.defaults.push(90);
 
+    var swingBlock = new ProtoBlock('swing');
+    swingBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['swing'] = swingBlock;
+    swingBlock.staticLabels.push(_('swing'));
+    swingBlock.adjustWidthToLabel();
+    swingBlock.flowClampOneArgBlock();
+    swingBlock.defaults.push(32);
+
     var osctimeBlock = new ProtoBlock('osctime');
     osctimeBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['osctime'] = osctimeBlock;
