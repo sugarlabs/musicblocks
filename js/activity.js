@@ -1859,10 +1859,10 @@ define(function (require) {
 
             // Misc. other buttons
             var menuNames = [
-                ['planet', doOpenSamples, _('Planet')],
-                ['open', doLoad, _('open file')],
+                ['planet', doOpenSamples, _('Load samples from server')],
+                ['open', doLoad, _('Load project from files')],
                 ['save', doSave, _('Save project')],
-                ['lilypond', doLilypond, _('Lilypond')],
+                ['lilypond', doLilypond, _('Save sheet music')],
                 ['paste-disabled', pasteStack, _('Paste')],
                 ['Cartesian', doCartesian, _('Cartesian')],
                 ['polar', doPolar, _('Polar')],
@@ -2071,12 +2071,13 @@ define(function (require) {
             container.y = y;
 
             text = new createjs.Text(label, '14px Sans', '#000000');
-            console.log(container.y);
             if (container.y < 55) {
-                text.x = 0;
+		text.textAlign = 'left';
+                text.x = -14;
                 text.y = 30;
             } else {
-		text.x = -85;
+		text.textAlign = 'right';
+		text.x = -28;
                 text.y = 0;
 	    }
             text.visible = false;
@@ -2084,7 +2085,6 @@ define(function (require) {
             container.on('mouseover', function(event) {
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
-                        console.log(container.children[c].text);
                         container.children[c].visible = true;
                         break;
                     }
@@ -2094,7 +2094,6 @@ define(function (require) {
 	    container.on('mouseout', function(event) {
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
-                        console.log(container.children[c].text);
                         container.children[c].visible = false;
                         break;
                     }
@@ -2131,7 +2130,6 @@ define(function (require) {
 
             img.src = 'header-icons/' + name + '.svg';
             container.addChild(text);
-            console.log(container);
 
             return container;
         }
