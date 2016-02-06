@@ -2151,8 +2151,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         for (var b = 0; b < this.dragGroup.length; b++) {
             myBlock = this.blockList[this.dragGroup[b]];
             if (b === 0) {
-                x = 75;
-                y = 75;
+                x = 75 - this.stage.x;
+                y = 75 - this.stage.y;
             } else {
                 x = 0;
                 y = 0;
