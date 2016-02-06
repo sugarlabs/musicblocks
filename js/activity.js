@@ -294,12 +294,9 @@ define(function (require) {
             var canvas = document.getElementById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
-            logo.polySynth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
-            logo.drumSynth = new Tone.DrumSynth().toMaster();
 
         }
 
-        //the rabbit button in the header icons
         function doFastButton(env) {
             logo.setTurtleDelay(0);
             if (!turtles.running()) {
