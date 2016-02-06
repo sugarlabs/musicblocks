@@ -1799,17 +1799,17 @@ define(function (require) {
 
             // Buttons used when running turtle programs
             var buttonNames = [
-                ['fast', doFastButton],
-                ['slow', doSlowButton],
-                ['step', doStepButton],
-                ['slow-music', doSlowMusicButton],
-                ['step-music', doStepMusicButton],
-                ['stop-turtle', doStopButton],
-                ['clear', allClear],
-                ['palette', changePaletteVisibility],
-                ['hide-blocks', changeBlockVisibility],
-                ['collapse-blocks', toggleCollapsibleStacks],
-                ['help', showHelp]
+                ['fast', doFastButton, _('Run fast')],
+                ['slow', doSlowButton, _('Run slow')],
+                ['step', doStepButton, _('Run step by step')],
+                ['slow-music', doSlowMusicButton, _('Run music slow')],
+                ['step-music', doStepMusicButton, _('Run note by note')],
+                ['stop-turtle', doStopButton, _('Stop')],
+                ['clear', allClear, _('Clean')],
+                ['palette', changePaletteVisibility, _('Show/hide palettes')],
+                ['hide-blocks', changeBlockVisibility, _('Show/hide blocks')],
+                ['collapse-blocks', toggleCollapsibleStacks, _('Expand/collapse collapsable blocks')],
+                ['help', showHelp, _('Help')]
             ];
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -1832,8 +1832,7 @@ define(function (require) {
             var dy = 0;
 
             for (var name in buttonNames) {
-                var container = makeButton(buttonNames[name][0] + '-button',
-					   x, y, btnSize, 0);
+                var container = makeButton(buttonNames[name][0] + '-button', buttonNames[name][2], x, y, btnSize, 0);
                 loadButtonDragHandler(container, x, y, buttonNames[name][1]);
                 onscreenButtons.push(container);
 
@@ -1860,16 +1859,16 @@ define(function (require) {
 
             // Misc. other buttons
             var menuNames = [
-                ['planet', doOpenSamples],
-                ['open', doLoad],
-                ['save', doSave],
-                ['lilypond', doLilypond],
-                ['paste-disabled', pasteStack],
-                ['Cartesian', doCartesian],
-                ['polar', doPolar],
-                ['utility', doUtilityBox],
-                ['empty-trash', deleteBlocksBox],
-                ['restore-trash', restoreTrash]
+                ['planet', doOpenSamples, _('Planet')],
+                ['open', doLoad, _('open file')],
+                ['save', doSave, _('Save project')],
+                ['lilypond', doLilypond, _('Lilypond')],
+                ['paste-disabled', pasteStack, _('Paste')],
+                ['Cartesian', doCartesian, _('Cartesian')],
+                ['polar', doPolar, _('Polar')],
+                ['utility', doUtilityBox, _('Settings')],
+                ['empty-trash', deleteBlocksBox, _('Delete all')],
+                ['restore-trash', restoreTrash, _('Undo')]
             ];
 
             document.querySelector('#myOpenFile')
@@ -1884,15 +1883,13 @@ define(function (require) {
             var dx = 0;
             var dy = btnSize;
 
-            menuContainer = makeButton('menu-button', x, y, btnSize,
-                menuButtonsVisible ? 90 : undefined);
+            menuContainer = makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
             loadButtonDragHandler(menuContainer, x, y, doMenuButton);
 
             for (var name in menuNames) {
                 x += dx;
                 y += dy;
-                var container = makeButton(menuNames[name][0] + '-button',
-					   x, y, btnSize, 0);
+                var container = makeButton(menuNames[name][0] + '-button', menuNames[name][2], x, y, btnSize, 0);
                 loadButtonDragHandler(container, x, y, menuNames[name][1]);
                 onscreenMenu.push(container);
                 container.visible = false;
@@ -2058,7 +2055,7 @@ define(function (require) {
             update = true;
         }
 
-        function makeButton(name, x, y, size, rotation, parent) {
+        function makeButton(name, label, x, y, size, rotation, parent) {
             var container = new createjs.Container();
             if (name === 'paste-disabled-button') {
                 pasteContainer = container;
@@ -2072,6 +2069,37 @@ define(function (require) {
 	    }
             container.x = x;
             container.y = y;
+
+            text = new createjs.Text(label, '14px Sans', '#000000');
+            console.log(container.y);
+            if (container.y < 55) {
+                text.x = 0;
+                text.y = 30;
+            } else {
+		text.x = -85;
+                text.y = 0;
+	    }
+            text.visible = false;
+
+            container.on('mouseover', function(event) {
+                for (var c = 0; c < container.children.length; c++) {
+                    if (container.children[c].text != undefined) {
+                        console.log(container.children[c].text);
+                        container.children[c].visible = true;
+                        break;
+                    }
+                }
+            });
+
+	    container.on('mouseout', function(event) {
+                for (var c = 0; c < container.children.length; c++) {
+                    if (container.children[c].text != undefined) {
+                        console.log(container.children[c].text);
+                        container.children[c].visible = false;
+                        break;
+                    }
+                }
+            });
 
             var img = new Image();
 
@@ -2102,6 +2130,8 @@ define(function (require) {
             }
 
             img.src = 'header-icons/' + name + '.svg';
+            container.addChild(text);
+            console.log(container);
 
             return container;
         }

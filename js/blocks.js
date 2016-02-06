@@ -182,13 +182,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var blocks = this;
         this.updatePasteButton = updatePasteButton;
 
-        this.copyButton = makeButton('copy-button', 0, 0, 55, 0, this.stage);
+        this.copyButton = makeButton('copy-button', _('Copy'), 0, 0, 55, 0, this.stage);
         this.copyButton.visible = false;
 
-        this.dismissButton = makeButton('cancel-button', 0, 0, 55, 0, this.stage);
+        this.dismissButton = makeButton('cancel-button', '', 0, 0, 55, 0, this.stage);
         this.dismissButton.visible = false;
 
-        this.saveStackButton = makeButton('save-blocks-button', 0, 0, 55, 0, this.stage);
+        this.saveStackButton = makeButton('save-blocks-button', _('Save stack'), 0, 0, 55, 0, this.stage);
         this.saveStackButton.visible = false;
 
         this.copyButton.on('click', function (event) {
