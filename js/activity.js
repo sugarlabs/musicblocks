@@ -247,8 +247,8 @@ define(function (require) {
             [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'header-icons/Cartesian-button.svg'],
             [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
             [_('Settings'), _('Open a panel for configuring Music Blocks.'), 'header-icons/utility-button.svg'],
-            [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
-            [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
+            // [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
+            // [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
             [_('Display statistics'), _('Display statistics about your Music project.'), 'header-icons/chart-button.svg'],
             [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugin-button.svg'],
             [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-button.svg'],
@@ -431,6 +431,7 @@ define(function (require) {
             myRadarChart = new Chart(ctx).Radar(data, options);
         }
 
+        // DEPRECATED: scale browser instead
         function doBiggerFont() {
             if (blockscale < blockscales.length - 1) {
                 blockscale += 1;
@@ -438,6 +439,7 @@ define(function (require) {
             }
         }
 
+        // DEPRECATED: scale browser instead
         function doSmallerFont() {
             if (blockscale > 0) {
                 blockscale -= 1;
@@ -1868,9 +1870,6 @@ define(function (require) {
                 ['paste-disabled', pasteStack],
                 ['Cartesian', doCartesian],
                 ['polar', doPolar],
-                // ['bigger', doBiggerFont],
-                // ['smaller', doSmallerFont],
-                // ['plugin', doOpenPlugin],
                 ['utility', doUtilityBox],
                 ['empty-trash', deleteBlocksBox],
                 ['restore-trash', restoreTrash]
