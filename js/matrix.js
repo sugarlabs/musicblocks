@@ -379,7 +379,6 @@ function Matrix() {
 
     this.note2Solfege = function(note, index) {
         var solfegeConversionTable = {'C': 'do', 'C♯': 'do♯', 'D': 're', 'D♯': 're♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa♯', 'G': 'sol', 'G♯': 'sol♯', 'A': 'la', 'A♯': 'la♯', 'B': 'ti', 'D♭': 're♭', 'E♭': 'mi♭', 'G♭': 'sol♭', 'A♭': 'la♭', 'B♭': 'ti♭'};
-        // FIXME: add support for ♯♯ and ♭♭
         if (['♭', '♯'].indexOf(note[1]) === -1) {
             var octave = note[1];
             var newNote = solfegeConversionTable[note[0]];
@@ -966,10 +965,7 @@ function Matrix() {
                 }
 
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                if(['♯♯', '♭♭'].indexOf(note[0][j][1]) !== -1) {
-                    newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]] + note[0][j][1] + note[0][j][2]}], 0, 0, [thisBlock]]);
-                    newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
-                } else if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
+                if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
                     newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                     newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                 } else {
