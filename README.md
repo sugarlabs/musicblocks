@@ -18,7 +18,7 @@ directly from index.html, from the
 [github](walterbender.github.io/musicblocks) repo, or by setting up a
 local server.
 
-If you want to run Music Blocks off-line, download the [off-line branch](https://github.com/walterbender/musicblocks/archive/offline.zip),
+If you want to run Music Blocks off line, download the [off-line branch](https://github.com/walterbender/musicblocks/archive/offline.zip),
 which has been modified to avoid unnecessary access to the Internet. Point
 your browser to the index.html file found in the musicblocks directory on
 your local file system.
