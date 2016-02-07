@@ -19,7 +19,9 @@ the [github
 repo](http://rawgit.com/walterbender/musicblocks/master/index.html) or
 github io](http://walterbender.github.io/musicblocks) or by
 downloading a copy of the code and running directly from the file
-system of your computer.
+system of your computer. (Note that the [off-line
+branch](https://github.com/walterbender/musicblocks/archive/offline.zip)
+is optimized to run on systems without internet access.)
 
 For more details on how to use Music Blocks, see [Using Music
 Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation)
@@ -34,13 +36,13 @@ Many of the examples given in the guide have links to code you can
 run. Look for RUN LIVE links that will take you to
 http://turtle.sugarlabs.org.
 
-THE GRAPHICAL NOTATION MATRIX
+THE PITCH-TIME MATRIX
 -----------------------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg'</img>
 
 Once you've launched Music Blocks in your browser, start by clicking
-on the Graphical-notation Matrix that appears in the middle of the
+on the Pitch-time Matrix that appears in the middle of the
 screen. (For the moment, ignore the Start block.) You'll see a grid
 organized vertically by pitch and horizontally by rhythm.
 
@@ -68,7 +70,7 @@ row of the grid), you will hear a sequence of notes played (from left
 to right): D4 E4 G4.
 
 <img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/download.svg'
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg'
 height="36"</img> Once you have a group of notes (a "chunk") that you like, click on the
 Save button (just to the right of the Play button). This will create a
 stack of blocks that can used to play these same notes
@@ -87,6 +89,8 @@ button that will clear the grid.
 
 Don't worry. You can reopen the grid at anytime and since you can
 define as many chunks as you want, feel free to experiment.
+
+Tip: You can put a chunk inside a Pitch-time Matrix block to generate the matrix to corresponds to that chunk.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
 
@@ -111,7 +115,7 @@ About the Pitch Block
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5.svg'</img>
 
-As we have seen, Pitch blocks are used inside the Graphical-notation
+As we have seen, Pitch blocks are used inside the Pitch-time
 Matrix block to indicate pitches you may want to select. They are also
 used inside of Note blocks to specify the pitch(s) to be played when
 the Note block is run.
@@ -135,7 +139,7 @@ About the Rhythm Block
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg'</img>
 
 Rhythm blocks are used to generate rhythm patterns in the
-Graphical-notation Matrix. The top argument to the Rhythm block is the
+Pitch-time Matrix. The top argument to the Rhythm block is the
 number of notes. The bottom argument is the duration of the note. In
 the top example above, three columns for quarter notes would be
 generated in the grid. In the middle example, one column for an eighth
@@ -147,7 +151,7 @@ notes would be generated.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix8.svg'</img>
 
 You can use as many Rhythm blocks as you'd like inside the
-Graphical-notation Matrix block. In the above example, two Rhythm
+Pitch-time Matrix block. In the above example, two Rhythm
 blocks are used, resulting in three quarter notes and six eighth
 notes.
 
@@ -178,7 +182,7 @@ PROGRAMMING WITH MUSIC
 ----------------------
 
 The remainder of this guide discusses how to use the chunks created by
-the Graphical-notation Matrix when programming (You can also program
+the Pitch-time Matrix when programming (You can also program
 with chunks you create and/or modify by hand).
 
 1. A chunk of notes
