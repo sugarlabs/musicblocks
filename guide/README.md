@@ -176,7 +176,8 @@ Using individual notes in the matrix
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg'</img>
 
-You can also use individual notes when defining the grid.
+You can also use individual notes when defining the grid. These blocks
+will expand into rhythm blocks with corresponding values.
 
 PROGRAMMING WITH MUSIC
 ----------------------
@@ -222,7 +223,8 @@ A few more chunks and we can make a song. (Can you read the block notation in or
 2. Transformations
 ------------------
 
-There are many ways to transform both pitch and rhythm.
+There are many ways to transform pitch, rhythm, and other qualities of
+the sound.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
 
@@ -262,6 +264,28 @@ note in a sequence.
 In the example, on the left, the result would be Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol; on the right the result would be
 Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg'</img>
+
+Swing works on pairs of notes, adding some duration to the first note
+and taking the same amount from the second note.
+
+Tie also works on pairs of notes, combining them into one note. (The
+notes must be identical in pitch, but can vary in rhythm.)
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg'</img>
+
+Set volume will change the volume of the notes. The default is 50; the
+range is 0 (silence) to 100 (full volume).
+
+Crescendo will increase (or decrease) the volume of the contained
+notes by an amount specified.
+
+Staccato will play back notes in tight bursts while maintaining the
+specified rhymic value of the notes.
+
+Slur will run a note past its noted duration, blending it into the
+next note.
 
 3. Voices
 ---------
