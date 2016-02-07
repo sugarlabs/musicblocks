@@ -329,7 +329,14 @@ The output of the program after running five times.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg'</img>
 
-In this example, the graphics are synchronized to the music.
+In this example, the graphics are synchronized to the music by placing
+the graphics commands inside of note blocks.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg'</img>
+
+In this example, because the computation and graphics are more
+complex, a "drift" block is used to decouple the graphics from the
+master clock.
 
 5. Extras
 ---------
@@ -337,7 +344,8 @@ In this example, the graphics are synchronized to the music.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg'</img>
 
 The *Save as Lilypond* block will transcribe your composition. The
-output of the program above is saved to Downloads/hotdog.ly.
+output of the program above is saved to Downloads/hotdog.ly. There is
+also a *Save as Lilypond* button on the secondary toolbar.
 
 ```
 \version "2.18.2"
