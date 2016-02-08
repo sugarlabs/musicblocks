@@ -338,6 +338,8 @@ In this example, because the computation and graphics are more
 complex, a "drift" block is used to decouple the graphics from the
 master clock.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
+
 5. Extras
 ---------
 
