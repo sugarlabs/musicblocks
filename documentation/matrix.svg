@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   version="1.1"
-   width="268"
-   height="150"
-   id="svg3641">
+   id="svg3641"
+   height="151.1241"
+   width="210"
+   version="1.1">
   <metadata
      id="metadata3670">
     <rdf:RDF>
@@ -26,15 +24,16 @@
   <defs
      id="defs3668" />
   <path
-     d="m 1,29 0,-8 c 0,-4.18879 3.8112098,-8 8,-8 l 8,0 10,-12 10,12 18,0 196,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -196,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.617994,0 -5.219867,1.077731 -7.071068,2.928932 C 18.077731,57.780133 17,60.382006 17,63 l 0,8 0,8 0,8 c 0,2.617994 1.077731,5.219867 2.928932,7.071068 C 21.780133,95.922269 24.382006,97 27,97 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.1887902,0 -8,-3.81121 -8,-8 l 0,-8 z"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3660"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     d="m 1,29.56205 0,-8 c 0,-4.18879 3.8112098,-8 8,-8 l 8,0 10,-12.0000001 10,12.0000001 18,0 138,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -138,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.617994,0 -5.219867,1.077731 -7.071068,2.928932 C 18.077731,58.342183 17,60.944056 17,63.56205 l 0,8 0,8 0,8 c 0,2.617994 1.077731,5.219867 2.928932,7.071068 C 21.780133,96.484319 24.382006,97.56205 27,97.56205 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.1887902,0 -8,-3.81121 -8,-8 l 0,-8 z" />
   <text
-     id="text3662"
-     style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans">
+     y="0.56204993"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text3662">
     <tspan
-       x="8"
-       y="43"
-       id="tspan3664">graphical notation matrix</tspan>
+       id="tspan3664"
+       y="43.56205"
+       x="8">pitch-time matrix</tspan>
   </text>
 </svg>
