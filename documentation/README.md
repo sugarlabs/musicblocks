@@ -32,7 +32,7 @@ height="36"</img> You can playback the notes in the Graphical-notation
 Matrix by clicking on the Play button.
 
 <img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/download.svg'
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg'
 height="36"</img> Use the Save button to create a stack of blocks that
 will recreate the "chunk of notes" you've created in your working
 Graphical-notation Matrix. This new stack, labeled as "chunk" by
