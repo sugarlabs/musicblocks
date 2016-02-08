@@ -17,7 +17,7 @@ repo](http://rawgit.com/walterbender/musicblocks/master/index.html).
 src='https://rawgithub.com/walterbender/musicblocks/master/documentation/chords.png'</img>
 
 Once you've launched Music Blocks in your browser, start by clicking
-on the "Graphical-notation Matrix" block which appears on the screen
+on the "Pitch-time Matrix" block which appears on the screen
 of a new session by default. A matrix of pitch (vertical by rows) over
 time (horizontal by columns) will appear. Time is divided into
 columns, each representing a single note value (length of note), e.g.,
@@ -28,14 +28,14 @@ selecting multiple pitches within a single column, or note value.)
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg'
-height="36"</img> You can playback the notes in the Graphical-notation
+height="36"</img> You can playback the notes in the Pitch-time
 Matrix by clicking on the Play button.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg'
 height="36"</img> Use the Save button to create a stack of blocks that
 will recreate the "chunk of notes" you've created in your working
-Graphical-notation Matrix. This new stack, labeled as "chunk" by
+Pitch-time Matrix. This new stack, labeled as "chunk" by
 default, is now a script of actions under control of your program. You
 may now manipulate the notes within the chunk clamp much in the same
 ways you would for Turtle Blocks software -- you may also integrate
@@ -108,7 +108,7 @@ All of the other palettes are described in the [Turtle Blocks
 documentation
 pages](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
-Graphical-notation Matrix Palette
+Pitch-time Matrix Palette
 ---------------------------------
 
 The blocks on this palette are used to create a graphical notation
@@ -124,7 +124,7 @@ in music and those unfamiliar but familiar with math.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/matrix.svg'</img>
 
-*Graphical-notation Matrix* blocks clamp is used to define the matrix:
+*Pitch-time Matrix* blocks clamp is used to define the matrix:
 A row in the matrix is created for each Pitch block and columns are
 created for individual notes, which are created by using Rhythm
 blocks, individual note blocks, or the Tuplet block.
@@ -137,7 +137,7 @@ where do is mapped to C, re is mapped to D, etc. You can also specify
 pitch by using a note name, e.g., F#. An octave specification is also
 required (as an argument for our pitch block) and changes integers
 every cycle of "C" (i.e. C4 is higher than B3). When used with the
-*Graphical-notation Matrix* block, a row is created for each Pitch
+*Pitch-time Matrix* block, a row is created for each Pitch
 block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/solfege.svg'</img>
