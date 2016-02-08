@@ -818,7 +818,7 @@ define(function (require) {
             var container = new createjs.Container();
             stage.addChild(container);
 
-            bitmap = new createjs.Bitmap(img);
+            var bitmap = new createjs.Bitmap(img);
             container.addChild(bitmap);
             bitmap.cache(0, 0, 1200, 900);
 
@@ -1768,7 +1768,7 @@ define(function (require) {
                 var originalSize = 55; // this is the original svg size
                 var halfSize = Math.floor(cellSize / 2);
 
-                bitmap = new createjs.Bitmap(img);
+                var bitmap = new createjs.Bitmap(img);
                 if (cellSize !== originalSize) {
                     bitmap.scaleX = cellSize / originalSize;
                     bitmap.scaleY = cellSize / originalSize;
@@ -1936,7 +1936,7 @@ define(function (require) {
                     var img = new Image();
                     img.onload = function () {
                         // console.log(musicBlocksScale);
-                        bitmap = new createjs.Bitmap(img);
+                        var bitmap = new createjs.Bitmap(img);
                         if (musicBlocksScale > 1) {
                             bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
                         } else {
@@ -1978,8 +1978,10 @@ define(function (require) {
                 helpElem.style.height = h + 'px';
 
                 if (musicBlocksScale > 1) {
-                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
+                    console.log(helpContainer);
+                    // bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
                 }
+
             }
 
             doneTour = storage.doneTour === 'true'
@@ -2064,7 +2066,6 @@ define(function (require) {
             if (parent == undefined) {
                 stage.addChild(container);
             } else {
-                console.log(stage + ' ' + container);
                 parent.addChild(container);
 	    }
             container.x = x;
@@ -2106,7 +2107,7 @@ define(function (require) {
                 var originalSize = 55; // this is the original svg size
                 var halfSize = Math.floor(size / 2);
 
-                bitmap = new createjs.Bitmap(img);
+                var bitmap = new createjs.Bitmap(img);
                 if (size !== originalSize) {
                     bitmap.scaleX = size / originalSize;
                     bitmap.scaleY = size / originalSize;
