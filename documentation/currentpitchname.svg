@@ -5,12 +5,12 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg2"
-   height="42"
-   width="236"
+   id="svg3118"
+   height="41"
+   width="221"
    version="1.1">
   <metadata
-     id="metadata31">
+     id="metadata10">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -22,48 +22,19 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs29">
-    <filter
-       style="color-interpolation-filters:sRGB"
-       id="dropshadow"
-       height="1.3">
-      <feGaussianBlur
-         id="feGaussianBlur7"
-         stdDeviation="3"
-         in="SourceAlpha" />
-      <feOffset
-         id="feOffset9"
-         result="offsetblur"
-         dy="2"
-         dx="2" />
-      <feComponentTransfer
-         id="feComponentTransfer11">
-        <feFuncA
-           id="feFuncA13"
-           slope="0.2"
-           type="linear" />
-      </feComponentTransfer>
-      <feMerge
-         id="feMerge15">
-        <feMergeNode
-           id="feMergeNode17" />
-        <feMergeNode
-           id="feMergeNode19"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
-  </defs>
+     id="defs8" />
   <path
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-     id="path21"
-     d="m 17,1 218,0 0,40 -218,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+     id="path3137"
+     d="m 16.5,16.5 0,-8 c 0,-4.418278 3.581722,-8 8,-8 l 8,0 92,0 80,0 8,0 c 4.41828,0 8,3.581722 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -80,0 -92,0 -8,0 c -4.418278,0 -6.92841,-3.713641 -8,-8 l 0,-8 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 z" />
   <text
-     x="-2.0274581e-17"
-     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-     id="text23">
+     y="-0.5"
+     x="71.5"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3139">
     <tspan
-       id="tspan25"
-       y="26"
-       x="20">current pitch name</tspan>
+       id="tspan3141"
+       y="25.5"
+       x="201.5">number to pitch</tspan>
   </text>
 </svg>
