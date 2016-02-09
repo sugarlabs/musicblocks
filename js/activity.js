@@ -731,7 +731,7 @@ define(function (require) {
             this.document.onkeydown = keyPressed;
         }
 
-	function setupBlocksContainerEvents() {
+        function setupBlocksContainerEvents() {
             var moving = false;
 
             stage.on('stagemousemove', function (event) {
@@ -1873,7 +1873,7 @@ define(function (require) {
 
             document.querySelector('#myOpenFile')
                     .addEventListener('change', function(event) {
-			thumbnails.model.controller.hide();
+                        thumbnails.model.controller.hide();
             });
 
             var btnSize = cellSize;
@@ -1979,7 +1979,9 @@ define(function (require) {
 
                 if (musicBlocksScale > 1) {
                     var bitmap = helpContainer.children[0];
-                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
+                    if (bitmap != undefined) {
+                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
+                    }
                 }
 
             }
@@ -2067,20 +2069,20 @@ define(function (require) {
                 stage.addChild(container);
             } else {
                 parent.addChild(container);
-	    }
+            }
             container.x = x;
             container.y = y;
 
             text = new createjs.Text(label, '14px Sans', '#282828');
             if (container.y < 55) {
-		text.textAlign = 'left';
+                text.textAlign = 'left';
                 text.x = -14;
                 text.y = 30;
             } else {
-		text.textAlign = 'right';
-		text.x = -28;
+                text.textAlign = 'right';
+                text.x = -28;
                 text.y = 0;
-	    }
+            }
             text.visible = false;
 
             container.on('mouseover', function(event) {
@@ -2092,7 +2094,7 @@ define(function (require) {
                 }
             });
 
-	    container.on('mouseout', function(event) {
+            container.on('mouseout', function(event) {
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
                         container.children[c].visible = false;
