@@ -5,10 +5,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg2"
-   height="46"
+   version="1.1"
    width="114"
-   version="1.1">
+   height="46"
+   id="svg2">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -24,23 +24,23 @@
   <defs
      id="defs33" />
   <path
-     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,33 l 0,-8 0,-8 z"
      id="path21"
-     d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,33 l 0,-8 0,-8 z" />
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
-     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
-     id="text23">
+     id="text23"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
-       id="tspan25"
+       x="94"
        y="28"
-       x="94">sine</tspan>
+       id="tspan25">sine</tspan>
   </text>
   <text
-     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans"
-     id="text27">
+     id="text27"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans">
     <tspan
-       id="tspan29"
+       x="94"
        y="22.5"
-       x="94" />
+       id="tspan29" />
   </text>
 </svg>
