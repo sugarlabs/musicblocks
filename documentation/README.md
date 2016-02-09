@@ -102,25 +102,25 @@ programs. See the [Turtle Blocks Programming Guide]
 general details on how to use the blocks. See the [Music Blocks
 Programming
 Guide](http://github.com/walterbender/musicblocks/tree/master/guide)
-for details specific to music.
+for details specific to music: Rhythm, Pitch, Tone, and Matrix.
 
 All of the other palettes are described in the [Turtle Blocks
 documentation
 pages](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
-Pitch-time Matrix Palette
----------------------------------
+Matrix Palette
+--------------
 
-The blocks on this palette are used to create a graphical notation
-matrix of "pitch" and "note value". The matrix is a convenient and
-intuitive way for generating short musical gestures, which can be
-regenerated as a "chunks of notes" that can be played back
-programmatically. Musicians may find it helpful to think of the
-pitches within the graphical-notation matrix as being akin to a
-bellset which notes may be added and removed as desired. The "note
-value" representation acts as a kind of "rhythmic tablature" that
-should be readable by both those familiar with the concepts of rhythm
-in music and those unfamiliar but familiar with math.
+The blocks on this palette are used to create a matrix of "pitch" and
+"note value". The matrix is a convenient and intuitive way for
+generating short musical gestures, which can be regenerated as a
+"chunks of notes" that can be played back programmatically. Musicians
+may find it helpful to think of the pitches within the pitch-time
+matrix as being akin to a bellset which notes may be added and removed
+as desired. The "note value" representation acts as a kind of
+"rhythmic tablature" that should be readable by both those familiar
+with the concepts of rhythm in music and those unfamiliar but familiar
+with math.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/matrix.svg'</img>
 
@@ -158,7 +158,7 @@ The *Rhythm* block is used to specify a series of notes of the same
 duration (e.g., three quarter notes or seven eighth notes). The number
 of notes is the top argument; the bottom argument is the inverse of
 the note duration, e.g., 1 for a whole note, 2 for a half note, 4 for
-a quarter note, etc. (Recall that in traditional western notation all
+a quarter note, etc. (Recall that in traditional Western notation all
 note values are (1) in powers of two, and are (2) in relation to the
 "whole note", which is in turn (3) defined by tempo, or beats --
 usually quarter notes -- per minute) Each note is represented by a
@@ -166,7 +166,7 @@ column in the matrix.
 
 Special ratios of the whole note can be created very easily with the
 *Rhythm* block by choosing an integer other than the traditional
-"powers of two" that standard western music notation affords us. For
+"powers of two" that standard Western music notation affords us. For
 example, putting a "5" into the argument for "note value" will create
 a note value equal to "one fifth the durational length of a whole
 note". This gives the user endless rhythmic possibilities.
@@ -186,9 +186,12 @@ note". This gives the user endless rhythmic possibilities.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sixtyfourthnote.svg'</img>
 
 As a convenience, blocks for the most common note values are also
-provided (whole note through 64th note). They also create columns in
-the matrix. If you would like multiple note values in a row, simply
-use the *Repeat* block clamp or *Duplicate* block clamp.
+provided (whole note through 64th note). They are automatically
+converted into the corresponding *Rhythm* blocks, which can be used to
+create columns in the matrix.
+
+If you would like multiple note values in a row, simply use the
+*Repeat* block clamp or *Duplicate* block clamp.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/tuplet.svg'</img>
 
@@ -208,14 +211,23 @@ block to generate complex rhythms (e.g. two quarter notes plus an
 eighth note is possible within the tuplet). Each note is represented
 by a column in the matrix.
 
-Note Palette
-------------
+Note: Each time you open the matrix, it tries to reconstruct the notes
+marked from the previous matrix. If you modify the *Pitch* and
+*Rhythm* blocks in the *Pitch-time Matrix* clamp, Music Blocks will
+try to make a corresponding change in the matrix.
 
-The Note Palette contains blocks used to play music. Stacks of notes
-can be created from the matrix, by clicking on the /Save Button/, or by
-direct construction using the *Pitch* block and the blocks on this
-palette. In addition to creating notes, you can transform the notes
-using blocks such as *Sharp* and *Flat* or *Transposition*.
+Note: You can constuct a matrix from a chuck of blocks by including
+the chunk in the *Pitch0time Marix*.
+
+Rhythm Palette
+--------------
+
+The Rhythm Palette contains blocks used to play music. Stacks of notes
+can be created from the matrix, by clicking on the /Save Button/, or
+by direct construction using the *Pitch* block and the blocks on this
+palette. In addition to creating notes, you can transform the rhythmic
+value of notes using blocks such as *dot*, *tie*, *duplicate notes*,
+or *multiply beat*.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/note.svg'</img>
 
@@ -223,37 +235,6 @@ The *Note* block clamp is used to define individual notes by
 specifying a note value, e.g., whole note (1), half note (2), quarter
 note (4), etc. and a collection of pitch blocks to define individual
 tones or chords.
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/currentpitchname.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/currentpitchoctave.svg'</img>
-
-The *Current-pitch-name* and *Current-pitch-octave* blocks maintain the
-state of the note currently being played. (When the note is a chord,
-only one of the pitch/octave combinations is available.)
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/flat.svg'</img>
-
-The *Flat* block clamp to lower any contained notes by one step in a
-12-step scale (pitch space). The *Flat* block can be nestled inside
-other *Flat* blocks to lower a pitch or collection of contained
-pitches even further.
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sharp.svg'</img>
-
-The *Sharp* block clamp is used to raise any contained notes by one
-step in a 12-step scale (pitch space). The *Sharp* block can be
-nestled inside other *Sharp* blocks to raise a pitch or collection of
-contained pitches even further.
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/adjust-transposition.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/transposition.svg'</img>
-
-The *Adjust Transposition* blocks are used to transpose any contained
-notes by an integral step in a 12-step scale (pitch space). The
-Transposition block contains the current transposition (the default is
-0).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/multiply-beat.svg'</img>
 
@@ -284,18 +265,80 @@ sequence of notes multiple times, each note is repeated in turn,
 e.g. duplicate x2 of 4 4 8 would result in 4 4 4 4 8 8, where as
 repeat x2 of 4 4 8 would result in 4 4 8 4 4 8.
 
-Tone Palette
-------------
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/putting-it-all-together.png'</img>
-
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/setbpm.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/bpm.svg'</img>
 
-The *Set Beats per Minute* block is used to set the beats per minute (in our case, the number of quarter notes per minute).
+The *Set Beats per Minute* block is used to set the beats per minute
+(in our case, the number of quarter notes per minute).
 
-The *Beats per Minute* block contains the current beats per minutes, which is by default, 90.
+The *Beats per Minute* block contains the current beats per minutes,
+which is by default, 90.
+
+Pitch Palette
+-------------
+
+The Pitch Palette contains blocks used to create and modify pitches used by the *Note* block.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/currentpitchname.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/currentpitchoctave.svg'</img>
+
+The *Turtle Pitch Number* block returns an integer value corresponding to the pitch being played by a specified turtle. The 
+The *Number to Pitch* and *Number to Octave* blocks convert the number returned by the *Turtle Pitch Number* block into pitch and octave values that can be used by a *Pitch* block. (When the note is a chord, only one of the pitch/octave
+combinations is available.)
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/flat.svg'</img>
+
+The *Flat* block clamp to lower any contained notes by one step in a
+12-step scale (pitch space). The *Flat* block can be nestled inside
+other *Flat* blocks to lower a pitch or collection of contained
+pitches even further.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sharp.svg'</img>
+
+The *Sharp* block clamp is used to raise any contained notes by one
+step in a 12-step scale (pitch space). The *Sharp* block can be
+nestled inside other *Sharp* blocks to raise a pitch or collection of
+contained pitches even further.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/adjust-transposition.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/transposition.svg'</img>
+
+The *Adjust Transposition* blocks are used to transpose any contained
+notes by an integral step in a 12-step scale (pitch space). The
+Transposition block contains the current transposition (the default is
+0).
+
+The *Invert* block is used to invert a pitch around another pitch.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/osctime.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sine.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/square.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/triangle.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sawtooth.svg'</img>
+
+The *OscTime* block lets you specify note duration in milliseconds. It
+can be used with *Pitch* blocks or one of several built-in
+synthesizers, e.g., *Sine*, *Square*, *Triangle*, and *Sawtooth*
+Blocks. These blocks take as their input frequency (in Hertz).
+
+Tone Palette
+------------
+
+The Tone Palette contains blocks that change the tone or character of
+a note, without changing its rhythm or pitch. For example, the *Set
+Volume* block sets the volume of a note. The *Crescendo* block
+increases or decreases the volume of a series of notes. The
+*Staccato*, *Slur*, and *Swing* blocks change the temporal character
+of the note without impacting the overall rhythm.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/putting-it-all-together.png'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/setkey.svg'</img>
 
@@ -308,17 +351,8 @@ details).
 
 The *Key* block contains the current Key, by default, C Major.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/osctime.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sine.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/square.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/triangle.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/sawtooth.svg'</img>
-
-The *OscTime* block lets you specify note duration in milliseconds. It can be used with *Pitch* blocks or one of several built-in synthesizers, e.g., *Sine*, *Square*, *Triangle*, and *Sawtooth* Blocks. These blocks take as their input frequency (in Hertz).
+Extras Palette
+--------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/lilypond.svg'</img>
 
