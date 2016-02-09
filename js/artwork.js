@@ -115,7 +115,7 @@ var BORDER = '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120">'
 // palette artwork
 // Palettes have different colored blocks
 // hue, value, chroma
-var PALETTECOLORS = {
+var PALETTECOLORS0 = {
     'matrix': [37.5, 70, 50],
     'pitch': [37.5, 70, 50],
     'rhythm' : [12.5, 60, 80],
@@ -132,6 +132,25 @@ var PALETTECOLORS = {
     'extras': [7.5, 50, 50],
     'myblocks': [57.5, 70, 14],
     'heap': [17.5, 60, 70],    
+};
+
+var PALETTECOLORS = {
+    'matrix': [37.5, 70, 35],
+    'pitch': [37.5, 70, 42],
+    'rhythm' : [12.5, 60, 49],
+    'tone' : [57.5, 50, 21],
+    'turtle': [37.5, 70, 35],
+    'pen': [57.5, 50, 21],
+    'boxes': [12.5, 60, 49],
+    'actions': [22.5, 80, 35],
+    'media': [57.5, 70, 21],
+    'number': [0, 70, 28],
+    'boolean': [30, 80, 35],
+    'flow': [15, 60, 28],
+    'sensors': [7.5, 60, 35],
+    'extras': [7.5, 50, 28],
+    'myblocks': [57.5, 70, 14],
+    'heap': [17.5, 60, 28],    
 };
 
 // These colors are calculated at load time from the colors defined above.
