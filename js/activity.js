@@ -1978,8 +1978,8 @@ define(function (require) {
                 helpElem.style.height = h + 'px';
 
                 if (musicBlocksScale > 1) {
-                    console.log(helpContainer);
-                    // bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
+                    var bitmap = helpContainer.children[0];
+                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
                 }
 
             }
