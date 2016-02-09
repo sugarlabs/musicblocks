@@ -24,15 +24,15 @@
   <defs
      id="defs8" />
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035"
      d="M 1,17 1,9 C 1,4.8112098 4.8112098,1 9,1 l 8,0 0,4 20,0 0,-4 18,0 40,0 8,0 c 4.18879,0 8,3.8112098 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.617994,0 -5.219867,1.077731 -7.071068,2.928932 C 18.077731,45.780133 17,48.382006 17,51 l 0,8 0,8 0,8 c 0,2.617994 1.077731,5.219867 2.928932,7.071068 C 21.780133,83.922269 24.382006,85 27,85 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.1887902,0 -8,-3.81121 -8,-8 l 0,-8 z" />
   <text
-     style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
      id="text3037">
     <tspan
        id="tspan3039"
        y="30.5"
-       x="8">flat</tspan>
+       x="8">tie</tspan>
   </text>
 </svg>
