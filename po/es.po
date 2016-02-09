@@ -1117,49 +1117,49 @@ msgid "slur"
 msgstr ""
 
 msgid "staccato"
-msgstr ""
+msgstr "staccato"
 
 msgid "crescendo"
-msgstr ""
+msgstr "crescendo"
 
 #. TRANS: swing beat in music
 msgid "swing"
-msgstr ""
+msgstr "swing"
 
 #. TRANS: tying together of notes in music
 msgid "tie"
 msgstr ""
 
 msgid "divide beat"
-msgstr ""
+msgstr "dividir tiempo"
 
 msgid "skip notes"
-msgstr ""
+msgstr "saltar notas"
 
 msgid "duplicate factor"
-msgstr ""
+msgstr "duplicar factor"
 
 #. TRANS: slurring of notes in music
 msgid "skip factor"
-msgstr ""
+msgstr "factor de salteo"
 
 msgid "adjust transposition"
-msgstr ""
+msgstr "ajustar transposición"
 
 msgid "rest"
-msgstr ""
+msgstr "descanso"
 
 msgid "staccato factor"
-msgstr ""
+msgstr "factor de staccato"
 
-msgid "slur factor"
-msgstr ""
+msgid "legato factor"
+msgstr "factor de legato"
 
 msgid "crescendo factor"
-msgstr ""
+msgstr "factor de crescendo"
 
 msgid "start drum"
-msgstr ""
+msgstr "iniciar tambor"
 
 msgid "turtle note"
 msgstr "nota de tortugas"
