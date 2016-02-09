@@ -1167,7 +1167,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     saveHeapToApp.palette = palettes.dict['heap'];
     blocks.protoBlockDict['saveHeapToApp'] = saveHeapToApp;
     saveHeapToApp.staticLabels.push(_('save heap to App'));
-    saveHeapFromApp.extraWidth = 10;
+    saveHeapToApp.extraWidth = 10;
     saveHeapToApp.adjustWidthToLabel();
     saveHeapToApp.twoArgBlock();
     saveHeapToApp.dockTypes[1] = 'textin';
