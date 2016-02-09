@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   version="1.1"
-   width="84"
-   height="129"
-   id="svg2">
+   id="svg2"
+   height="193.5"
+   width="126"
+   version="1.1">
   <metadata
      id="metadata39">
     <rdf:RDF>
@@ -24,76 +22,49 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs37">
-    <filter
-       height="1.3"
-       color-interpolation-filters="sRGB"
-       id="dropshadow">
-      <feGaussianBlur
-         in="SourceAlpha"
-         stdDeviation="3"
-         id="feGaussianBlur7" />
-      <feOffset
-         dx="2"
-         dy="2"
-         result="offsetblur"
-         id="feOffset9" />
-      <feComponentTransfer
-         id="feComponentTransfer11">
-        <feFuncA
-           type="linear"
-           slope="0.2"
-           id="feFuncA13" />
-      </feComponentTransfer>
-      <feMerge
-         id="feMerge15">
-        <feMergeNode
-           id="feMergeNode17" />
-        <feMergeNode
-           in="SourceGraphic"
-           id="feMergeNode19" />
-      </feMerge>
-    </filter>
-  </defs>
+     id="defs37" />
   <path
-     d="m 0.75,12.75 0,-6 a 6,6 0 0 1 6,-6 l 6,0 0,3 15,0 0,-3 13.5,0 30,0 6,0 a 6,6 0 0 1 6,6 l 0,6 -6,0 0,-4.5 -6,0 0,15 6,0 0,-4.5 6,0 0,25.5 -6,0 0,-4.5 -6,0 0,15 6,0 0,-4.5 6,0 0,6 a 6,6 0 0 1 -6,6 l -6,0 -30,0 -1.5,0 0,3 -12,0 0,-3 -1.5,0 -6,0 a 7.5,7.5 0 0 0 -7.5,7.5 l 0,6 0,6 0,6 a 7.5,7.5 0 0 0 7.5,7.5 l 6,0 0,3 15,0 0,-3 12,0 0,9 0,9 0,6 a 6,6 0 0 1 -6,6 l -6,0 -13.5,0 -1.5,0 0,3 -12,0 0,-3 -1.5,0 -6,0 a 6,6 0 0 1 -6,-6 l 0,-6 z"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2.25;stroke-linecap:round;stroke-opacity:1"
      id="path21"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1" />
+     d="m 1.125,19.125 0,-9 a 9,9 0 0 1 9,-9 l 9,0 0,4.5 22.5,0 0,-4.5 20.25,0 45,0 9,0 a 9,9 0 0 1 9,9 l 0,9 -9,0 0,-6.75 -9,0 0,22.5 9,0 0,-6.75 9,0 0,38.25 -9,0 0,-6.75 -9,0 0,22.5 9,0 0,-6.75 9,0 0,9 a 9,9 0 0 1 -9,9 l -9,0 -45,0 -2.25,0 0,4.5 -18,0 0,-4.5 -2.25,0 -9,0 a 11.25,11.25 0 0 0 -11.25,11.25 l 0,9 0,9 0,9 a 11.25,11.25 0 0 0 11.25,11.25 l 9,0 0,4.5 22.5,0 0,-4.5 18,0 0,13.5 0,13.5 0,9 a 9,9 0 0 1 -9,9 l -9,0 -20.25,0 -2.25,0 0,4.5 -18,0 0,-4.5 -2.25,0 -9,0 a 9,9 0 0 1 -9,-9 l 0,-9 z" />
   <text
-     id="text23"
-     style="font-size:15px;text-anchor:start;fill:#000000;fill-opacity:1;font-family:sans-serif">
+     y="0"
+     style="font-size:22.5px;font-family:sans-serif;text-anchor:start;fill:#000000;fill-opacity:1"
+     id="text23">
     <tspan
-       x="8"
-       y="32.875"
+       style="fill:#000000;fill-opacity:1"
        id="tspan25"
-       style="fill:#000000;fill-opacity:1">tuplet</tspan>
+       y="49.3125"
+       x="12">tuplet</tspan>
   </text>
   <text
-     id="text27"
-     style="font-size:10px;text-anchor:end;fill:#000000;fill-opacity:1;font-family:sans-serif">
+     y="0"
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#000000;fill-opacity:1"
+     id="text27">
     <tspan
-       x="68"
-       y="16.875"
+       style="fill:#000000;fill-opacity:1"
        id="tspan29"
-       style="fill:#000000;fill-opacity:1"># of notes</tspan>
+       y="25.3125"
+       x="102"># of notes</tspan>
   </text>
   <text
-     id="text31"
-     style="font-size:10px;text-anchor:end;fill:#000000;fill-opacity:1;font-family:sans-serif">
+     y="0"
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#000000;fill-opacity:1"
+     id="text31">
     <tspan
-       x="68"
-       y="48.375"
+       style="fill:#000000;fill-opacity:1"
        id="tspan33"
-       style="fill:#000000;fill-opacity:1">note value</tspan>
+       y="72.5625"
+       x="102">note value</tspan>
   </text>
   <text
-     x="263.16779"
-     y="15.372033"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
      id="text3033"
-     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans">
+     y="79.872032"
+     x="263.16779">
     <tspan
-       x="357.16779"
-       y="37.872032"
-       id="tspan3035" />
+       id="tspan3035"
+       y="102.37203"
+       x="357.16779" />
   </text>
 </svg>
