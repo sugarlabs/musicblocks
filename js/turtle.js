@@ -377,7 +377,7 @@ function Turtle (name, turtles, drum) {
         this.container.updateCache();
 
         // Clear all media.
-        for (i = 0; i < this.media.length; i++) {
+        for (var i = 0; i < this.media.length; i++) {
             // Could be in the image Container or the Stage
             this.imageContainer.removeChild(this.media[i]);
             this.turtles.stage.removeChild(this.media[i]);
@@ -941,13 +941,13 @@ function Turtles(canvas, stage, refreshCanvas) {
     }
 
     this.markAsStopped = function() {
-        for (turtle in this.turtleList) {
+        for (var turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
         }
     }
 
     this.running = function() {
-        for (turtle in this.turtleList) {
+        for (var turtle in this.turtleList) {
             if (this.turtleList[turtle].running) {
                 return true;
             }

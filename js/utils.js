@@ -185,7 +185,7 @@ function fileBasename(file) {
 function _(text) {
     replaced = text;
     replace = [",", "(", ")", "?", "¿", "<", ">", ".", '"\n', '"', ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"];
-    for (p = 0; p < replace.length; p++) {
+    for (var p = 0; p < replace.length; p++) {
         replaced = replaced.replace(replace[p], "");
     }
     replaced = replaced.replace(/ /g, '-');
@@ -214,7 +214,7 @@ function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict,
 
     // We need to remove blank lines and comments and then
     // join the data back together for processing as JSON.
-    for (i = 0; i < lineData.length; i++) {
+    for (var i = 0; i < lineData.length; i++) {
         if (lineData[i].length === 0) {
             continue;
         }
@@ -451,7 +451,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
         var obj = JSON.parse(macroData);
         console.log('adding myblocks palette');
         palettes.add('myblocks', 'black', '#a0a0a0');
-        for (name in obj) {
+        for (var name in obj) {
             console.log('adding ' + name + ' to macroDict');
             macroDict[name] = obj[name];
             blocks.addToMyPalette(name, macroDict[name]);

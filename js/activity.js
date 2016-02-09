@@ -1784,7 +1784,7 @@ define(function (require) {
         function setupAndroidToolbar(showPalettesPopover) {
             if (headerContainer !== undefined) {
                 stage.removeChild(headerContainer);
-                for (i in onscreenButtons) {
+                for (var i in onscreenButtons) {
                     stage.removeChild(onscreenButtons[i]);
                 }
             }
@@ -1852,7 +1852,7 @@ define(function (require) {
         function setupRightMenu(musicBlocksScale) {
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
-                for (i in onscreenMenu) {
+                for (var i in onscreenMenu) {
                     stage.removeChild(onscreenMenu[i]);
                 }
             }
@@ -1896,7 +1896,7 @@ define(function (require) {
             }
 
             if (menuButtonsVisible) {
-                for (button in onscreenMenu) {
+                for (var button in onscreenMenu) {
                     onscreenMenu[button].visible = true;
                 }
             }
@@ -2033,12 +2033,12 @@ define(function (require) {
             setTimeout(function () {
                 if (menuButtonsVisible) {
                     menuButtonsVisible = false;
-                    for (button in onscreenMenu) {
+                    for (var button in onscreenMenu) {
                         onscreenMenu[button].visible = false;
                     }
                 } else {
                     menuButtonsVisible = true;
-                    for (button in onscreenMenu) {
+                    for (var button in onscreenMenu) {
                         onscreenMenu[button].visible = true;
                     }
                 }
@@ -2050,10 +2050,10 @@ define(function (require) {
             buttonsVisible = !buttonsVisible;
             menuContainer.visible = buttonsVisible;
             headerContainer.visible = buttonsVisible;
-            for (button in onscreenButtons) {
+            for (var button in onscreenButtons) {
                 onscreenButtons[button].visible = buttonsVisible;
             }
-            for (button in onscreenMenu) {
+            for (var button in onscreenMenu) {
                 onscreenMenu[button].visible = buttonsVisible;
             }
             update = true;
@@ -2171,14 +2171,14 @@ define(function (require) {
         function clearMenus() {
             if (headerContainer !== undefined) {
                 stage.removeChild(headerContainer);
-                for (i in onscreenButtons) {
+                for (var i in onscreenButtons) {
                     stage.removeChild(onscreenButtons[i]);
                 }
             }
 
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
-                for (i in onscreenMenu) {
+                for (var i in onscreenMenu) {
                     stage.removeChild(onscreenMenu[i]);
                 }
             }
