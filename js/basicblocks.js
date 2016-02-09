@@ -204,6 +204,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
     matrixBlock.staticLabels.push(_('pitch-time matrix'));
+    matrixBlock.extraWidth = 10;
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
 
@@ -1154,6 +1155,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     loadHeapFromApp.palette = palettes.dict['heap'];
     blocks.protoBlockDict['loadHeapFromApp'] = loadHeapFromApp;
     loadHeapFromApp.staticLabels.push(_('load heap from App'));
+    loadHeapFromApp.extraWidth = 10;
     loadHeapFromApp.adjustWidthToLabel();
     loadHeapFromApp.twoArgBlock();
     loadHeapFromApp.dockTypes[1] = 'textin';
@@ -1165,6 +1167,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     saveHeapToApp.palette = palettes.dict['heap'];
     blocks.protoBlockDict['saveHeapToApp'] = saveHeapToApp;
     saveHeapToApp.staticLabels.push(_('save heap to App'));
+    saveHeapFromApp.extraWidth = 10;
     saveHeapToApp.adjustWidthToLabel();
     saveHeapToApp.twoArgBlock();
     saveHeapToApp.dockTypes[1] = 'textin';

@@ -1180,3 +1180,11 @@ msgstr ""
 
 msgid "Please close the current matrix before opening a new one."
 msgstr ""
+
+#. TRANS: save the program heap to an application
+msgid "save heap to App"
+msgstr ""
+
+#. TRANS: load the program heap from an application
+msgid "load heap from App"
+msgstr ""

@@ -1174,7 +1174,15 @@ msgid "number to octave"
 msgstr "nÃºmero a octava"
 
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr ""
+msgstr "Debe tener al menos un bloque de tono y un bloque de ritmo en la matriz."
 
 msgid "Please close the current matrix before opening a new one."
-msgstr ""
+msgstr "Por favor, cierre la matriz actual antes de abrir una nueva."
+
+#. TRANS: save the program heap to an application
+msgid "save heap to App"
+msgstr "guardar pila a una aplicación"
+
+#. TRANS: load the program heap from an application
+msgid "load heap from App"
+msgstr "cargar pila desde una aplicación"
