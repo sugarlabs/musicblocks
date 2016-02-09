@@ -1322,6 +1322,7 @@ define(function (require) {
                     projectName += '.tb';
                 }
                 try {
+
                     try {
                         httpGet(null);
                         console.log('running from server or the user can access to examples.');

@@ -741,7 +741,6 @@ msgstr "คาร์โบไฮเดรต"
 msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr "กล่องเครื่องมีนี้มีปุ่มพิกัด โน้ต โทนเต่า และอีกมากมาย คลิ๊กเพื่อแสดงแถบสีของบล๊อกและลากบล๊อกจากแถบสีไปยังแสดงแสดงผล"
 
-
 msgid "else"
 msgstr "ไม่งั้นให้ทำ"
 
@@ -1180,7 +1179,7 @@ msgid "number to pitch"
 msgstr "จำนวนจนถึงระดับเสียง"
 
 msgid "number to octave"
-msgstr "จำนวนจนถึงโน้ตคู่แปด”
+msgstr "จำนวนจนถึงโน้ตคู่แปด"
 
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
 msgstr "คุณควรมีอย่างน้อยหนึ่งบล๊อกระดับเสียง และหนึ่งบล๊อกจังหวะในเมทริกซ์"
