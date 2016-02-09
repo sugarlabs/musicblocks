@@ -1,34 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   version="1.1"
-   width="150"
-   height="42"
-   id="svg3118">
+   id="svg3118"
+   height="41"
+   width="243"
+   version="1.1">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
   <path
-     d="m 17,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 80,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -80,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
      id="path3137"
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     d="m 16.5,16.5 0,-8 c 0,-4.418278 3.581722,-8 8,-8 l 8,0 114,0 80,0 8,0 c 4.41828,0 8,3.581722 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -80,0 -114,0 -8,0 c -4.418278,0 -8,-3.581722 -8,-8 l 0,-8 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 z" />
   <text
-     id="text3139"
-     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans">
+     y="-0.5"
+     x="93.5"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3139">
     <tspan
-       x="130"
-       y="26"
-       id="tspan3141">box</tspan>
-  </text>
-  <text
-     id="text3143"
-     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans">
-    <tspan
-       x="130"
-       y="22.5"
-       id="tspan3145" />
+       id="tspan3141"
+       y="25.5"
+       x="223.5">turtle pitch number</tspan>
   </text>
 </svg>
