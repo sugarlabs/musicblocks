@@ -376,7 +376,7 @@ msgstr "imprimir"
 
 #. TRANS: how many entries are in the heap?
 msgid "heap length"
-msgstr "tamaño de la pila"
+msgstr "tamaÃ±o de la pila"
 
 msgid "speak"
 msgstr "hablar"
@@ -1181,8 +1181,8 @@ msgstr "Por favor, cierre la matriz actual antes de abrir una nueva."
 
 #. TRANS: save the program heap to an application
 msgid "save heap to App"
-msgstr "guardar pila a una aplicación"
+msgstr "guardar pila a aplicaciÃ³n"
 
 #. TRANS: load the program heap from an application
 msgid "load heap from App"
-msgstr "cargar pila desde una aplicación"
+msgstr "cargar pila desde aplicaciÃ³n"
