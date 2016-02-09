@@ -563,7 +563,7 @@ msgid "image"
 msgstr "imagen"
 
 msgid "Click to run the music note by note."
-msgstr "Haga clic para jugar nota a nota."
+msgstr "Haga clic para reproducir nota a nota."
 
 #. TRANS: pop a value off of the heap.
 msgid "pop"
@@ -645,7 +645,7 @@ msgid "Decrease the size of the blocks."
 msgstr "Disminuye el tamaño de los bloques"
 
 msgid "Run note by note"
-msgstr "Jugar nota a nota"
+msgstr "Reproducir nota a nota"
 
 msgid "start"
 msgstr "iniciar"
