@@ -121,7 +121,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var turtlePitchBlock = new ProtoBlock('turtlepitch');
     turtlePitchBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['turtlepitch'] = turtlePitchBlock;
-    turtlePitchBlock.staticLabels.push('turtle pitch number');
+    turtlePitchBlock.staticLabels.push(_('turtle pitch number'));
     turtlePitchBlock.oneArgMathBlock();
     turtlePitchBlock.adjustWidthToLabel();
     turtlePitchBlock.dockTypes[1] = 'anyin';
@@ -406,7 +406,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var turtleNoteBlock = new ProtoBlock('turtlenote');
     turtleNoteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['turtlenote'] = turtleNoteBlock;
-    turtleNoteBlock.staticLabels.push('turtle note');
+    turtleNoteBlock.staticLabels.push(_('turtle note'));
     turtleNoteBlock.oneArgMathBlock();
     turtleNoteBlock.adjustWidthToLabel();
     turtleNoteBlock.dockTypes[1] = 'anyin';
@@ -441,7 +441,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.palette = palettes.dict['tone'];
     blocks.protoBlockDict['meter'] = meter;
     meter.hidden = true;
-    meter.staticLabels.push('meter', 'numerator', 'denominator');
+    meter.staticLabels.push(_('meter'), _('numerator'), _('denominator'));
     meter.adjustWidthToLabel();
     meter.defaults.push(3);
     meter.defaults.push(4);
