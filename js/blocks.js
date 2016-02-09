@@ -114,12 +114,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.blockScale = scale;
 
         // Regenerate all of the artwork at the new scale.
-        for (blk = 0; blk < this.blockList.length; blk++) {
+        for (var blk = 0; blk < this.blockList.length; blk++) {
             this.blockList[blk].resize(scale);
         }
 
 	this.findStacks();
-        for (stack = 0; stack < this.stackList.length; stack++) {
+        for (var stack = 0; stack < this.stackList.length; stack++) {
             // Just in case the block list is corrupted, count iterations.
             this.loopCounter = 0;
             // console.log('Adjust Docks: ' + this.blockList[this.stackList[stack]].name);
@@ -128,8 +128,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // We reset the protoblock scale on the palettes, but don't
         // modify the palettes themselves.
-        for (palette in this.palettes.dict) {
-            for (blk = 0; blk < this.palettes.dict[palette].protoList.length; blk++) {
+        for (var palette in this.palettes.dict) {
+            for (var blk = 0; blk < this.palettes.dict[palette].protoList.length; blk++) {
                 this.palettes.dict[palette].protoList[blk].scale = scale;
             }
         }
@@ -365,7 +365,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         var update = false;
         // Determine the size of each argument.
-        for (i = 0; i < slotList.length; i++) {
+        for (var i = 0; i < slotList.length; i++) {
             var c = myBlock.connections[ci + i];
             var size = 1; // Minimum size
             if (c != null) {
@@ -563,10 +563,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             console.log('Saw a null block: ' + blk);
             return;
         }
+
         if (myBlock.connections == null) {
             console.log('Saw a block with null connections: ' + blk);
             return;
         }
+
         if (myBlock.connections.length === 0) {
             console.log('Saw a block with [] connections: ' + blk);
             return;
@@ -691,6 +693,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             console.log('null block found in blockMoved method: ' + thisBlock);
             return;
         }
+
         var c = myBlock.connections[0];
         if (c != null) {
             var cBlock = this.blockList[c];
@@ -759,9 +762,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
 
                 // Look for available connections.
-                if (this.testConnectionType(
-                        blkType,
-                        this.blockList[b].docks[i][2])) {
+                if (this.testConnectionType(blkType, this.blockList[b].docks[i][2])) {
                     x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];
                     y2 = this.blockList[b].container.y + this.blockList[b].docks[i][1];
                     dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
@@ -1210,7 +1211,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.findStacks = function () {
         // Find any blocks with null in the first connection.
         this.stackList = [];
-        for (i = 0; i < this.blockList.length; i++) {
+        for (var i = 0; i < this.blockList.length; i++) {
             if (this.blockList[i].connections[0] == null) {
                 this.stackList.push(i)
             }
@@ -1272,7 +1273,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Expand expandable clamp blocks as needed.
         this.findClamps();
         this.clampBlocksToCheck = [];
-        for (i = 0; i < this.expandablesList.length; i++) {
+        for (var i = 0; i < this.expandablesList.length; i++) {
             if (this.blockList[this.expandablesList[i]].name === 'ifthenelse') {
                 this.clampBlocksToCheck.push([this.expandablesList[i], 0]);
                 this.clampBlocksToCheck.push([this.expandablesList[i], 1]);
@@ -2037,6 +2038,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             console.log('myCalcArg_' + name + ' already exists.');
         }
     }
+
     this.insideArgClamp = function (blk) {
         // Returns a containing arg clamp block or null
         if (this.blockList[blk] == null) {
@@ -2819,8 +2821,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (this.checkArgClampBlocks.length > 0) {
             // We make multiple passes because we need to account for nesting.
             // FIXME: needs to be interwoven with TwoArgBlocks check.
-            for (i = 0; i < this.checkArgClampBlocks.length; i++) {
-                for (b = 0; b < this.checkArgClampBlocks.length; b++) {
+            for (var i = 0; i < this.checkArgClampBlocks.length; i++) {
+                for (var b = 0; b < this.checkArgClampBlocks.length; b++) {
                     this.adjustArgClampBlock([this.checkArgClampBlocks[b]]);
                 }
             }
@@ -2828,8 +2830,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         if (this.checkTwoArgBlocks.length > 0) {
             // We make multiple passes because we need to account for nesting.
-            for (i = 0; i < this.checkTwoArgBlocks.length; i++) {
-                for (b = 0; b < this.checkTwoArgBlocks.length; b++) {
+            for (var i = 0; i < this.checkTwoArgBlocks.length; i++) {
+                for (var b = 0; b < this.checkTwoArgBlocks.length; b++) {
                     this.adjustExpandableTwoArgBlock([this.checkTwoArgBlocks[b]]);
                 }
             }

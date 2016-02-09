@@ -1582,7 +1582,7 @@ function loadPaletteMenuHandler(palette) {
             locked = false;
         }, 500);
 
-        for (p in palette.palettes.dict) {
+        for (var p in palette.palettes.dict) {
             if (palette.name != p) {
                 if (palette.palettes.dict[p].visible) {
                     palette.palettes.dict[p].hideMenuItems(false);

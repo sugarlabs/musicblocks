@@ -695,7 +695,7 @@ function Matrix() {
 
     this.playAll = function() {
         var notes = [];
-        for (i in this.notesToPlay) {
+        for (var i in this.notesToPlay) {
             notes.push(this.notesToPlay[i]);
         }
         if (this.playDirection > 0) {

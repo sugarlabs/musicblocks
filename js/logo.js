@@ -246,7 +246,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // At this point, some turtles have played notes and others
             // have not. We need to keep stepping until they all have.
             var keepGoing = false;
-            for (turtle in logo.stepQueue) {
+            for (var turtle in logo.stepQueue) {
                 if (logo.stepQueue[turtle].length > 0 && !logo.playedNote[turtle]) {
                     keepGoing = true;
                     break;
@@ -257,7 +257,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // logo.step();
             } else {
                 var notesArray = [];
-                for (turtle in logo.playedNote) {
+                for (var turtle in logo.playedNote) {
                     logo.playedNote[turtle] = false;
                     notesArray.push(logo.playedNoteTimes[turtle]);
                 }
@@ -977,8 +977,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     if (logo.meSpeak) {
                         var text = args[0];
                         var new_text = "";
-                        for(i=0;i<text.length;i++){
-                            if((text[i] >= 'a' && text[i] <= 'z') || (text[i] >= 'A' && text[i] <= 'Z') || text[i] === ',' || text[i] === '.' || text[i] === ' ')
+                        for (var i = 0; i < text.length; i++){
+                            if ((text[i] >= 'a' && text[i] <= 'z') || (text[i] >= 'A' && text[i] <= 'Z') || text[i] === ',' || text[i] === '.' || text[i] === ' ')
                                 new_text += text[i];
                         }
                         logo.meSpeak.speak(new_text);
@@ -1516,7 +1516,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 sound.play();
                 break;
             case 'stopplayback':
-                for (sound in logo.sounds) {
+                for (var sound in logo.sounds) {
                     logo.sounds[sound].stop();
                 }
                 logo.sounds = [];
@@ -2566,7 +2566,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         if (this.inMatrix) {
             matrix.addColBlock(blk, 1);
             if (this.inNoteBlock > 0) {
-                for (i = 0; i < this.pitchBlocks.length; i++) {
+                for (var i = 0; i < this.pitchBlocks.length; i++) {
                     matrix.addNode(this.pitchBlocks[i], blk, 0);
                 }
             }
@@ -2810,7 +2810,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             logo.synth.init(logo.turtles.turtleList[turtle].drum);
                         }
 
-                        for (i in logo.notePitches[turtle]) {
+                        for (var i in logo.notePitches[turtle]) {
                             var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
                             var note = noteObj[0] + noteObj[1];
                             if (note !== 'R') {

@@ -96,7 +96,7 @@ function getcolor(color) {
 function searchColors(r, g, b) {
     var nearestColor = -1;
     var distance = 10000000;
-    for (i = 0; i < 100; i++) {
+    for (var i = 0; i < 100; i++) {
 	var color = getcolor(i);
         var r1 = parseInt(color[2].substr(1, 2), 16);
         var g1 = parseInt(color[2].substr(3, 2), 16);

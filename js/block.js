@@ -158,7 +158,7 @@ function Block(protoblock, blocks, overrideName) {
             }
             if (myBlock.name === 'start' || myBlock.name === 'drum') {
                 // Rescale the decoration on the start blocks.
-                for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
+                for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
                         myBlock.blocks.turtles.turtleList[turtle].resizeDecoration(blockScale, myBlock.bitmap.image.width);
                         ensureDecorationOnTop(myBlock);
@@ -1383,7 +1383,7 @@ function ensureDecorationOnTop(myBlock) {
                 } else {
                     var dx = 0;
                 }
-                for (turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
+                for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
                         myBlock.blocks.turtles.turtleList[turtle].decorationBitmap.x = bounds.width - dx - 50 * myBlock.protoblock.scale / 2;
                       break;
