@@ -131,14 +131,14 @@ blocks, individual note blocks, or the Tuplet block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/pitch.svg'</img>
 
-The *Pitch* block is used to specify the pitch of a note. By default,
-we use traditional western Solfege, i.e., do, re, mi, fa, sol, la, ti,
-where do is mapped to C, re is mapped to D, etc. You can also specify
-pitch by using a note name, e.g., F#. An octave specification is also
-required (as an argument for our pitch block) and changes integers
-every cycle of "C" (i.e. C4 is higher than B3). When used with the
-*Pitch-time Matrix* block, a row is created for each Pitch
-block.
+The *Pitch* block (found on the Pitch Palette) is used to specify the
+pitch of a note. By default, we use traditional western Solfege, i.e.,
+do, re, mi, fa, sol, la, ti, where do is mapped to C, re is mapped to
+D, etc. You can also specify pitch by using a note name, e.g., F#. An
+octave specification is also required (as an argument for our pitch
+block) and changes integers every cycle of "C" (i.e. C4 is higher than
+B3). When used with the *Pitch-time Matrix* block, a row is created
+for each Pitch block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/solfege.svg'</img>
 
@@ -338,7 +338,8 @@ increases or decreases the volume of a series of notes. The
 *Staccato*, *Slur*, and *Swing* blocks change the temporal character
 of the note without impacting the overall rhythm.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/putting-it-all-together.png'</img>
+<img
+src='https://rawgithub.com/walterbender/musicblocks/master/screenshots/Screenshot-1.png'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/documentation/setkey.svg'</img>
 
