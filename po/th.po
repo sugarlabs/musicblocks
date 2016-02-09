@@ -76,6 +76,9 @@ msgid "apple"
 msgstr "แอปเปิ้ล"
 
 msgid "pitch-time matrix"
+msgstr "ระดับเสียง-เวลา เมทริกซ์"
+
+msgis "graphical-notation matrix"
 msgstr "คำอธิบายเมตริกซ์ภาพ"
 
 msgid "number"
@@ -1171,16 +1174,16 @@ msgid "turtle note"
 msgstr "เต่าโน๊ต"
 
 msgid "turtle pitch number"
-msgstr ""
+msgstr "จำนวนเต่าระดับเสียง"
 
 msgid "number to pitch"
-msgstr ""
+msgstr "จำนวนจนถึงระดับเสียง"
 
 msgid "number to octave"
-msgstr ""
+msgstr "จำนวนจนถึงโน้ตคู่แปด”
 
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr ""
+msgstr "คุณควรมีอย่างน้อยหนึ่งบล๊อกระดับเสียง และหนึ่งบล๊อกจังหวะในเมทริกซ์"
 
 msgid "Please close the current matrix before opening a new one."
-msgstr ""
+msgstr "กรุณาปิดเมทริกซ์ปัจจุบันก่อนที่จะเปิดอันใหม่"
