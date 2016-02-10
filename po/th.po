@@ -296,6 +296,9 @@ msgstr "ปุ่มนี้เปิดหน้าต่างเพื่อ
 msgid "Enable scrolling"
 msgstr "ทำให้เลื่อนได้"
 
+msgid "Disable scrolling"
+msgstr ""
+
 msgid "back"
 msgstr "กลับ"
 

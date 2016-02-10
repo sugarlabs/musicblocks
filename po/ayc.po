@@ -318,6 +318,10 @@ msgstr "akïri limt'añaxa yant'aña wakichatanaka qhantayañatakiwa"
 msgid "Enable scrolling"
 msgstr "apanaqaña wakichata qhantayaña"
 
+#. TRANS: Desactivar scroll
+msgid "Disable scrolling"
+msgstr ""
+
 msgid "back"
 msgstr "qhipäxa"
 
