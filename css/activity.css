@@ -64,7 +64,8 @@ div.back {
   height: 75vw;
   overflow: hidden;
   z-index: 0;
-  background: #99CCFF; }
+  background:  #a0b3ba; /*  #99CCFF; */
+}
 
 .canvasHolder.hide canvas {
   width: 100%;
@@ -171,7 +172,7 @@ img.icon:hover {
   z-index: 99999; }
 
 body {
-  background-color: #99CCFF;
+  background-color: #92b5c8 !important; /*  2.5B 7/4 */
   padding: 0;
   margin: 0;
   font-family: sans-serif;
@@ -190,7 +191,7 @@ select {
   width: 20px; }
 
 input.text {
-  background-color: #987aff;
+  background-color: #76dbd7 !important; /* 7.5BG 8/6 */
   text-align: center;
   font-weight: bold !important;
   resize: none !important;
@@ -199,7 +200,7 @@ input.text {
   width: 100px; }
 
 input.number {
-  background-color: #ff00ff !important;
+  background-color: #ffb2bc !important; /* 0RP 8/10 */
   text-align: center;
   font-weight: bold !important;
   resize: none !important;

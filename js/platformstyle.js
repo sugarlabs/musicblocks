@@ -30,9 +30,11 @@ console.log('On platform: ', platform);
 
 
 window.platformColor = {
-    header: platform.FF? '#00539F' : '#2196F3',
+    // header: platform.FF? '#00539F' : '#2196F3',
+    header: platform.FF? '#2584af' : '#2584af',  // 2.5B 5/10
     doHeaderShadow: !platform.FF,
-    background: platform.FF? '#00CAF2' : '#96D3F3'
+    // background: platform.FF? '#00CAF2' : '#96D3F3'
+    background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
 }
 
 document.querySelector('meta[name=theme-color]')
