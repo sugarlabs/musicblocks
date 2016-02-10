@@ -218,6 +218,7 @@ define(function (require) {
 
         var onscreenButtons = [];
         var onscreenMenu = [];
+        var utilityButton = null;
 
         var helpContainer = null;
         var helpIdx = 0;
@@ -1090,10 +1091,9 @@ define(function (require) {
         }
 
         function doUtilityBox() {
-            utilityBox.show(musicBlocksScale);
+            utilityBox.init(musicBlocksScale, utilityButton.x - 27, utilityButton.y, makeButton);
         }
 
-        // FIXME: confirm???
         function sendAllToTrash(addStartBlock, doNotSave) {
             var dx = 0;
             var dy = cellSize * 3;
@@ -1893,6 +1893,9 @@ define(function (require) {
                 var container = makeButton(menuNames[name][0] + '-button', menuNames[name][2], x, y, btnSize, 0);
                 loadButtonDragHandler(container, x, y, menuNames[name][1]);
                 onscreenMenu.push(container);
+                if (menuNames[name][0] === 'utility') {
+                    utilityButton = container;
+                }
                 container.visible = false;
             }
 
