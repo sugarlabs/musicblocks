@@ -280,6 +280,9 @@ msgstr "Este botón abre la pantalla de carga de proyectos de ejemplo."
 msgid "Enable scrolling"
 msgstr "Activar scroll"
 
+msgid "Disable scrolling"
+msgstr "Desactivar scroll"
+
 msgid "back"
 msgstr "atrás"
 

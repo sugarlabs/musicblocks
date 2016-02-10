@@ -27,150 +27,41 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
-msgid "Delete all"
-msgstr "מחק הכל"
-
-msgid "rice and beans"
-msgstr "אורז ושעועית"
-
-msgid "show"
-msgstr "הצג"
-
-msgid "text"
-msgstr "טקסט"
-
-msgid "random"
-msgstr "מספר אקראי"
-
-msgid "confirm"
-msgstr "אישור"
-
-#. TRANS: musical meter
-msgid "meter"
+msgid "crescendo factor"
 msgstr ""
 
-msgid "Save your project to a file."
+msgid "quarter note"
 msgstr ""
 
-#. TRANS: Do not translate
-msgid "mashape"
+msgid "eighth note"
 msgstr ""
 
-#. TRANS: target language for translation
-msgid "target"
-msgstr "יעד"
+#. TRANS: color refers to a hue, value, chroma triplet
+msgid "set color"
+msgstr "קבע צבע"
 
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr ""
-
-msgid "keyboard"
-msgstr "קלט מקלדת"
-
-msgid "You can also load projects from the file system."
-msgstr "ניתן להעלות פרויקטים מתוך מערכת הקבצים"
-
-#. TRANS: as in "on event do"
-msgid "on"
-msgstr ""
-
-msgid "chicken"
-msgstr "עוף"
-
-msgid "Run music slow"
-msgstr ""
-
-msgid "apple"
-msgstr "תפוח"
-
-msgid "graphical notation matrix"
-msgstr ""
-
-msgid "number"
-msgstr "מספר"
-
-#. TRANS: unique ID
-msgid "UID"
-msgstr ""
-
-#. TRANS: name of project
-msgid "title"
-msgstr "כותרת"
-
-msgid "radians"
-msgstr "רדיאנים"
-
-msgid "staccato"
-msgstr ""
-
-msgid "Undo"
-msgstr "לבטל"
-
-#. TRANS: ms is micro seconds
-msgid "duration (ms)"
-msgstr ""
+msgid "pen"
+msgstr "עט"
 
 #. TRANS: as in "add 1 to"
 msgid "to"
 msgstr "אל"
 
-msgid "add"
-msgstr "הוסף"
-
-msgid "set pen size"
-msgstr "קבע עובי עט"
-
 msgid "rhythm"
 msgstr ""
-
-msgid "latitude"
-msgstr "קו רוחב"
-
-msgid "1/32 note 𝅘𝅥𝅰"
-msgstr ""
-
-msgid "mouse x"
-msgstr "עכבר x"
-
-msgid "mouse y"
-msgstr "עכבר y"
 
 msgid "Show/hide blocks"
 msgstr "הצג או הסתר את הבלוקים"
 
-#. TRANS: do this action
-msgid "do"
-msgstr "בצע"
-
-msgid "move"
-msgstr "זוז"
-
-msgid "triangle"
-msgstr ""
-
-msgid "stop turtle"
-msgstr "עצור צב"
-
-msgid "current pitch octave"
-msgstr ""
-
-#. TRANS: robot sensors.
-msgid "distance"
-msgstr ""
-
-msgid "food"
-msgstr "מזון"
-
 msgid "Click to run the project in slow mode."
 msgstr "לחצו כדי להריץ את הפרויקט במצב איטי"
 
-msgid "stop"
-msgstr "עצור"
-
-#. TRANS: vertical space
-msgid "vspace"
+msgid "turtle note"
 msgstr ""
 
 msgid "fat"
@@ -179,15 +70,246 @@ msgstr "שומן"
 msgid "Expand or collapse start and action stacks."
 msgstr "הרחב או צמצם קבוצת בלוקים כמו קבוצת התחל או פעולה"
 
-#. TRANS: a container for a variable
-msgid "boxes"
+#. TRANS: load the program heap from an application
+msgid "load heap from App"
 msgstr ""
 
-msgid "get fiber"
-msgstr "קבל סיבים"
+msgid "turtle x"
+msgstr "צב x"
 
-msgid "background"
-msgstr "מלא מסך"
+msgid "turtle y"
+msgstr "y צב"
+
+msgid "Restore blocks from the trash."
+msgstr "שחזור בלוקים מסל המחזור"
+
+msgid "heading"
+msgstr "כיוון (אזימוט)"
+
+msgid "Hide or show the block palettes."
+msgstr "הצג או הסתר את סרגלי הכלים"
+
+#. TRANS: hollow line refers to drawing an outline around a line
+msgid "hollow line"
+msgstr ""
+
+#. TRANS: horizontal space
+msgid "hspace"
+msgstr ""
+
+#. TRANS: as in button click
+msgid "click"
+msgstr ""
+
+#. TRANS: index specifies a position into an array (heap)
+msgid "index"
+msgstr ""
+
+msgid "hide"
+msgstr ""
+
+msgid "while"
+msgstr "כל-עוד"
+
+msgid "to degrees"
+msgstr "למעלות"
+
+msgid "water"
+msgstr "מים"
+
+msgid "octave"
+msgstr ""
+
+msgid "sing"
+msgstr "לשיר"
+
+msgid "pen down"
+msgstr "הורד עט"
+
+msgid "wait"
+msgstr "המתן"
+
+#. TRANS: a container for a variable
+msgid "box"
+msgstr "תיבה"
+
+msgid "duplicate factor"
+msgstr ""
+
+#. TRANS: popout window
+msgid "popout"
+msgstr ""
+
+msgid "Download"
+msgstr "הורדה"
+
+msgid "Increase the size of the blocks."
+msgstr "הגדל את גודל הבלוקים"
+
+msgid "set volume"
+msgstr ""
+
+msgid "Cartesian"
+msgstr "קוארדינטות קרטזיות"
+
+msgid "apple"
+msgstr "תפוח"
+
+msgid "Increase block size"
+msgstr "הגדל את גודל הבלוק"
+
+#. TRANS: Boolean logic
+msgid "boolean"
+msgstr "בוליאני"
+
+msgid "Run slow"
+msgstr "הרצה איטית"
+
+msgid "turtle pitch number"
+msgstr ""
+
+#. TRANS: cloud as in cloud server
+msgid "cloud"
+msgstr "ענן"
+
+#. TRANS: hours ago that the data was updated.
+msgid "hours ago"
+msgstr ""
+
+msgid "from"
+msgstr "מ"
+
+msgid "half note"
+msgstr ""
+
+#. TRANS: is the heap empty?
+msgid "heap empty?"
+msgstr ""
+
+msgid "You must have at least one pitch block and one rhythm block in the matrix."
+msgstr ""
+
+msgid "whole note"
+msgstr ""
+
+msgid "until"
+msgstr "עד_ש"
+
+msgid "flat"
+msgstr ""
+
+msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+msgid "Expand/collapse collapsable blocks"
+msgstr "צמצם/הרחב את הבלוקים הניתנים לצמצום"
+
+msgid "Show/hide palettes"
+msgstr "הצג/הראה "
+
+#. TRANS: hue refers to spectral hue (red, yellow, green, blue...)
+msgid "set hue"
+msgstr "קבע צבע"
+
+msgid "set heading"
+msgstr "קבע אזימוט (כיוון)"
+
+msgid "this"
+msgstr "זה"
+
+msgid "play backward"
+msgstr ""
+
+msgid "longitude"
+msgstr "קו אורך"
+
+#. TRANS: database fetch
+msgid "fetch"
+msgstr ""
+
+#. TRANS: RoDi robot
+msgid "rodi"
+msgstr "RoDi"
+
+#. TRANS: high temperature
+msgid "high"
+msgstr "גבוה"
+
+msgid "currency"
+msgstr "מטבע"
+
+#. TRANS: stop playing current media file (movie or audio)
+msgid "stop play"
+msgstr "הפסקת נגן"
+
+msgid "sharp"
+msgstr ""
+
+msgid "Save your project to a server."
+msgstr "שמור את הפרויקט שלך בשרת"
+
+msgid "Decrease block size"
+msgstr "הקטן גודל בלוק"
+
+msgid "blocks"
+msgstr "בלוקים"
+
+msgid "eatme"
+msgstr "לאכול"
+
+#. TRANS: maximum
+msgid "max"
+msgstr "מקסימום"
+
+msgid "Click to run just the music in slow mode."
+msgstr ""
+
+msgid "tomato"
+msgstr "עגבניות"
+
+msgid "shade"
+msgstr "גוון"
+
+msgid "no background"
+msgstr "ללא רקע"
+
+msgid "staccato factor"
+msgstr ""
+
+msgid "move"
+msgstr "זוז"
+
+#. TRANS: musical meter
+msgid "meter"
+msgstr ""
+
+msgid "Save your project to a file."
+msgstr ""
+
+msgid "keyboard"
+msgstr "קלט מקלדת"
+
+msgid "coordinates"
+msgstr "קואורדינטות"
+
+msgid "pen up"
+msgstr "הרם עט"
+
+#. TRANS: 360 degrees in a circle
+msgid "degrees"
+msgstr "מעלות"
+
+msgid "start turtle"
+msgstr "התחל צב"
+
+msgid "latitude"
+msgstr "קו רוחב"
+
+msgid "then"
+msgstr "אז"
+
+msgid "food"
+msgstr "מזון"
 
 #. TRANS: logical "not" operator
 msgid "not"
@@ -196,143 +318,35 @@ msgstr "לא"
 msgid "Google map"
 msgstr "גוגל מפות"
 
-#. TRANS: as in blinking an eye.
-msgid "blink"
-msgstr ""
-
 msgid "day"
 msgstr "יום"
 
-#. TRANS: mathematical modular (remainder) function.
-msgid "mod"
-msgstr "mod"
-
-msgid "beat factor"
-msgstr ""
-
-msgid "Save project"
-msgstr "שמור פרויקט"
-
-msgid "Copy"
-msgstr "העתק"
+msgid "get fiber"
+msgstr "קבל סיבים"
 
 #. TRANS: the name of a variable (stored in a box)
 msgid "name"
 msgstr "שם"
 
-msgid "turtle x"
-msgstr "צב x"
-
-msgid "turtle y"
-msgstr "y צב"
-
-msgid "Download"
-msgstr "הורדה"
-
-msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-msgstr "כפתור הדבק פעיל כאשר ישנם בלוקים שהועתקו אל הלוח"
-
-msgid "transposition"
-msgstr ""
-
-msgid "Expand/collapse toolbar"
-msgstr "הרחב/כווץ את סרגל הכלים"
-
-msgid "zoom"
-msgstr "זום"
-
-msgid "Hide or show the blocks and the palettes."
-msgstr "הצג או הסתר את הבלוקים ואת הכלים"
-
-msgid "to degrees"
-msgstr "למעלות"
-
-msgid "Restore blocks from the trash."
-msgstr "שחזור בלוקים מסל המחזור"
-
-msgid "get calories"
-msgstr "קבל קלוריות"
-
-msgid "Load plugin from file"
-msgstr "העלאת פלאגין מקובץ"
-
-#. TRANS: dietary fiber
-msgid "fiber"
-msgstr "סיבים"
-
 msgid "You can scroll the blocks on the canvas."
 msgstr ""
 
-msgid "x"
-msgstr "x"
-
-msgid "show blocks"
-msgstr "הראה בלוקים"
-
-msgid "heading"
-msgstr "כיוון (אזימוט)"
-
-msgid "Help"
-msgstr "עזרה"
+msgid "radians"
+msgstr "רדיאנים"
 
 msgid "turtle"
 msgstr "צב"
 
-msgid "crescendo"
+msgid "square"
 msgstr ""
-
-#. TRANS: sawtooth wave
-msgid "sawtooth"
-msgstr ""
-
-msgid "right"
-msgstr "ימינה"
-
-msgid "Load samples from server"
-msgstr "העלאת דוגמאות מן השרת"
 
 msgid "hide blocks"
 msgstr "הסתר בלוקים"
 
-msgid "Hide or show the block palettes."
-msgstr "הצג או הסתר את סרגלי הכלים"
+msgid "fish"
+msgstr "דג"
 
-msgid "This button opens a viewer for loading example projects."
-msgstr "כפתור זה פותח מציג להעלאת פרויקטים"
-
-msgid "Enable scrolling"
-msgstr ""
-
-msgid "back"
-msgstr "אחורה"
-
-msgid "Publish"
-msgstr "פרסום"
-
-msgid "Click to run the project step by step."
-msgstr "לחצו כדי להריץ את הפרויקט צעד אחרי צעד"
-
-#. TRANS: hollow line refers to drawing an outline around a line
-msgid "hollow line"
-msgstr ""
-
-msgid "arc"
-msgstr "קשת"
-
-msgid "radius"
-msgstr "רדיוס"
-
-msgid "longitude"
-msgstr "קו אורך"
-
-msgid "duration"
-msgstr "משך זמן"
-
-#. TRANS: shade refers to value (dark to light)
-msgid "set shade"
-msgstr "קבע גוון"
-
-msgid "duplicate notes"
+msgid "1/32 note"
 msgstr ""
 
 #. TRANS: in mathematical sense (inverse of period)
@@ -343,35 +357,6 @@ msgstr ""
 msgid "event"
 msgstr ""
 
-msgid "pixel color"
-msgstr "צבע פיקסל"
-
-msgid "eatme"
-msgstr "לאכול"
-
-msgid "This button opens and closes the primary toolbar."
-msgstr "כפתור זה פותח וסוגר את סרגל הכלים הראשי"
-
-#. TRANS: index specifies a position into an array (heap)
-msgid "index"
-msgstr ""
-
-msgid "note volume"
-msgstr ""
-
-msgid "hide"
-msgstr ""
-
-#. TRANS: show the contents of the heap.
-msgid "show heap"
-msgstr "הצג מחסנית FILO"
-
-msgid "Stop the music (and the turtles)."
-msgstr ""
-
-msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
-
 msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
 msgstr ""
 
@@ -379,39 +364,339 @@ msgstr ""
 msgid "publish"
 msgstr "פרסום"
 
-#. TRANS: weather forecast
-msgid "forecast"
-msgstr "תחזית מזג אוויר"
-
-#. TRANS: hours ago that the data was updated.
-msgid "hours ago"
-msgstr ""
-
-#. TRANS: slurring of notes in music
-msgid "slur"
-msgstr ""
-
-msgid "pen"
-msgstr "עט"
-
-msgid "fish"
-msgstr "דג"
-
 msgid "print"
 msgstr "הודעה"
 
-#. TRANS: how many entries are in the heap?
-msgid "heap length"
-msgstr ""
-
-msgid "speak"
-msgstr "דבר"
+msgid "size"
+msgstr "גודל"
 
 msgid "Expand/collapse option toolbar"
 msgstr "הרחב/צמצם סרגל האפשרויות"
 
-msgid "end hollow line"
-msgstr "סיים קו"
+#. TRANS: save the heap to a file
+msgid "save heap"
+msgstr "שמור FILO"
+
+#. TRANS: dietary fiber
+msgid "fiber"
+msgstr "סיבים"
+
+msgid "Planet"
+msgstr "כוכב"
+
+#. TRANS: mathematical exponential base
+msgid "base"
+msgstr "בסיס"
+
+msgid "cookie"
+msgstr "עוגייה"
+
+#. TRANS: Musical score
+msgid "Save sheet music"
+msgstr ""
+
+msgid "maths"
+msgstr "מתמטיקה"
+
+msgid "sensors"
+msgstr "חיישנים"
+
+#. TRANS: retrieve the value at a specific entry (index) in the heap
+msgid "index heap"
+msgstr ""
+
+msgid "Delete"
+msgstr "מחיקה"
+
+msgid "digest meal"
+msgstr "לעכל"
+
+msgid "calories"
+msgstr "קלוריות"
+
+#. TRANS: swing beat in music
+msgid "swing"
+msgstr ""
+
+#. TRANS: volume of microphone audio
+msgid "loudness"
+msgstr "עוצמת קול"
+
+msgid "get protein"
+msgstr "קבל חלבון"
+
+msgid "cheese"
+msgstr "גבינה"
+
+msgid "number"
+msgstr "מספר"
+
+#. TRANS: as in blinking an eye.
+msgid "blink"
+msgstr ""
+
+#. TRANS: oscillator time
+msgid "osctime"
+msgstr ""
+
+msgid "Congratulations."
+msgstr "איחולנו"
+
+msgid "adjust transposition"
+msgstr ""
+
+msgid "rice and beans"
+msgstr "אורז ושעועית"
+
+msgid "city"
+msgstr "עיר"
+
+msgid "Click to run the project in fast mode."
+msgstr "לחצו כדי להריץ את הפרויקט במצב מהיר"
+
+msgid "unknown"
+msgstr "לא ידוע"
+
+#. TRANS: bitcoin currency (probably no need to translate)
+msgid "bitcoin"
+msgstr "ביטקוין"
+
+msgid "Run note by note"
+msgstr ""
+
+msgid "motion z"
+msgstr "z תנועת"
+
+msgid "motion x"
+msgstr "x תנועת"
+
+msgid "motion y"
+msgstr "y תנועת"
+
+msgid "Open a panel for configuring Music Blocks."
+msgstr "פתיחת פאנל להתאמת בלוקים"
+
+msgid "get name"
+msgstr "קבל שם"
+
+#. TRANS: mathematical ceiling function, e.g., ceiling(2.5) == 3
+msgid "ceiling"
+msgstr "תקרה"
+
+#. TRANS: a turtle shell
+msgid "shell"
+msgstr "שריון"
+
+msgid "that"
+msgstr "זה"
+
+#. TRANS: as in broadcast a signal
+msgid "broadcast"
+msgstr ""
+
+msgid "beats per minute"
+msgstr ""
+
+#. TRANS: robot sensors.
+msgid "distance"
+msgstr ""
+
+#. TRANS: target language for translation
+msgid "target"
+msgstr "יעד"
+
+msgid "grey"
+msgstr "אפור"
+
+msgid "banana"
+msgstr "בננה"
+
+msgid "wheat bread"
+msgstr "לחם"
+
+#. TRANS: detect language
+msgid "detect lang"
+msgstr "זיהוי שפה"
+
+msgid "sweet potato"
+msgstr "בַּטָטָה"
+
+#. TRANS: logical "and" operator
+msgid "and"
+msgstr "וגם"
+
+msgid "add 1 to"
+msgstr "הוסף 1 ל"
+
+msgid "angle"
+msgstr "זווית"
+
+#. TRANS: minimum
+msgid "min"
+msgstr "מינימום"
+
+msgid "note"
+msgstr "הערה"
+
+msgid "Please close the current matrix before opening a new one."
+msgstr ""
+
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr "כפתור הדבק פעיל כאשר ישנם בלוקים שהועתקו אל הלוח"
+
+msgid "Worldwide"
+msgstr "בעולם כולו"
+
+#. TRANS: as in play a musical note.
+msgid "play"
+msgstr ""
+
+msgid "denominator"
+msgstr ""
+
+msgid "Run fast"
+msgstr "הרצה מהירה"
+
+#. TRANS: set the value at a specific entry (index) in the heap
+msgid "set heap"
+msgstr ""
+
+msgid "forever"
+msgstr "תמיד"
+
+#. TRANS: save the program heap to an application
+msgid "save heap to App"
+msgstr ""
+
+#. TRANS: musical note to frequency
+msgid "note to frequency"
+msgstr ""
+
+#. TRANS: clear the screen of any graphics drawn by the turtle
+msgid "clear"
+msgstr "נקה"
+
+msgid "flow"
+msgstr "זרם"
+
+#. TRANS: Lilypond is engraving software
+msgid "Save your project to as a Lilypond file."
+msgstr ""
+
+msgid "beat factor"
+msgstr ""
+
+#. TRANS: convert number to octave
+msgid "number to octave"
+msgstr ""
+
+msgid "dot"
+msgstr ""
+
+msgid "show"
+msgstr "הצג"
+
+msgid "text"
+msgstr "טקסט"
+
+msgid "random"
+msgstr "מספר אקראי"
+
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr "הצג או הסתר רשת של קואורדינטות קרטזיות"
+
+#. TRANS: Do not translate
+msgid "mashape"
+msgstr ""
+
+msgid "chicken"
+msgstr "עוף"
+
+#. TRANS: name of project
+msgid "title"
+msgstr "כותרת"
+
+msgid "Undo"
+msgstr "לבטל"
+
+#. TRANS: ms is micro seconds
+msgid "duration (ms)"
+msgstr ""
+
+msgid "set pen size"
+msgstr "קבע עובי עט"
+
+msgid "mouse x"
+msgstr "עכבר x"
+
+msgid "mouse y"
+msgstr "עכבר y"
+
+#. TRANS: do this action
+msgid "do"
+msgstr "בצע"
+
+msgid "triangle"
+msgstr ""
+
+msgid "stop turtle"
+msgstr "עצור צב"
+
+msgid "stop"
+msgstr "עצור"
+
+msgid "Help"
+msgstr "עזרה"
+
+msgid "transposition"
+msgstr ""
+
+msgid "Expand/collapse toolbar"
+msgstr "הרחב/כווץ את סרגל הכלים"
+
+msgid "Note value must be greater than 0"
+msgstr ""
+
+msgid "x"
+msgstr "x"
+
+msgid "Load samples from server"
+msgstr "העלאת דוגמאות מן השרת"
+
+#. TRANS: musical pitch
+msgid "pitch"
+msgstr ""
+
+msgid "Publish"
+msgstr "פרסום"
+
+msgid "arc"
+msgstr "קשת"
+
+msgid "radius"
+msgstr "רדיוס"
+
+#. TRANS: shade refers to value (dark to light)
+msgid "set shade"
+msgstr "קבע גוון"
+
+msgid "This button opens and closes the primary toolbar."
+msgstr "כפתור זה פותח וסוגר את סרגל הכלים הראשי"
+
+msgid "Show these messages."
+msgstr "הצג את הודעות אלה"
+
+#. TRANS: show the contents of the heap.
+msgid "show heap"
+msgstr "הצג מחסנית FILO"
+
+#. TRANS: matrix (grid) of pitch vs. time
+msgid "pitch-time matrix"
+msgstr ""
+
+#. TRANS: weather forecast
+msgid "forecast"
+msgstr "תחזית מזג אוויר"
 
 msgid "city latitude"
 msgstr "קו רוחב של עיר"
@@ -422,172 +707,38 @@ msgstr "הצג סטטיסטיקות אודות פרויקט הצב שלך"
 msgid "You can load new blocks from the file system."
 msgstr "ניתן להעלות בלוקים חדשים מתוך מערכת הקבצים"
 
-#. TRANS: mathematical power, e.g., 2^4 == 16
-msgid "power"
-msgstr "כוח"
-
 msgid "Settings"
 msgstr "הגדרות"
-
-msgid "one of"
-msgstr "אחד מ"
-
-msgid "Save stack"
-msgstr "שמור את הקבוצה"
-
-msgid "corn"
-msgstr "תירס"
-
-msgid "Display statistics"
-msgstr "הצג סטטיסטיקות"
-
-msgid "Remove all content on the canvas, including the blocks."
-msgstr "הסר את כל תוכן הקנבס, כולל הבלוקים"
 
 msgid "to radians"
 msgstr "לרדיאנים"
 
-msgid "water"
-msgstr "מים"
-
-#. TRANS: robot sensors.
-msgid "infrared light (left)"
+msgid "1/64 note"
 msgstr ""
-
-#. TRANS: mathematical exponential base
-msgid "base"
-msgstr "בסיס"
-
-msgid "cookie"
-msgstr "עוגייה"
 
 msgid "Show or hide a polar-coordinate grid."
 msgstr "הצג או הסתר רשת קוארדינטות פולריות"
 
-msgid "octave"
+#. TRANS: musical key, e.g., C Major
+msgid "key"
 msgstr ""
 
-#. TRANS: Musical score
-msgid "Save sheet music"
-msgstr ""
+msgid "logic"
+msgstr "לוגיקה"
 
-#. TRANS: save the heap to a file
-msgid "save heap"
-msgstr "שמור FILO"
-
-msgid "from"
-msgstr "מ"
-
-msgid "sensors"
-msgstr "חיישנים"
-
-msgid "pen down"
-msgstr "הורד עט"
-
-#. TRANS: retrieve the value at a specific entry (index) in the heap
-msgid "index heap"
-msgstr ""
-
-msgid "get name"
-msgstr "קבל שם"
-
-msgid "wait"
-msgstr "המתן"
-
-#. TRANS: a container for a variable
-msgid "box"
-msgstr "תיבה"
-
-msgid "Planet"
-msgstr "כוכב"
-
-msgid "Show these messages."
-msgstr "הצג את הודעות אלה"
-
-#. TRANS: object
-msgid "obj"
-msgstr "אובייקט"
-
-msgid "numerator"
-msgstr ""
-
-#. TRANS: swing beat in music
-msgid "swing"
-msgstr ""
-
-#. TRANS: store a value in a box
-msgid "store in"
-msgstr "שמור ב"
-
-msgid "digest meal"
-msgstr "לעכל"
-
-msgid "maths"
-msgstr "מתמטיקה"
-
-msgid "denominator"
-msgstr ""
-
-msgid "eighth note ♪"
-msgstr ""
-
-msgid "whole note 𝅝"
-msgstr ""
-
-#. TRANS: popout window
-msgid "popout"
-msgstr ""
-
-msgid "zoom factor"
-msgstr "גורם זום"
-
-#. TRANS: the name of a stack of blocks
-msgid "action"
-msgstr "פעולה"
-
-#. TRANS: volume of microphone audio
-msgid "loudness"
-msgstr "עוצמת קול"
-
-msgid "Increase the size of the blocks."
-msgstr "הגדל את גודל הבלוקים"
-
-msgid "set volume"
-msgstr ""
-
-#. TRANS: logical "or" operator
-msgid "or"
-msgstr "או"
-
-msgid "note value"
+msgid "1/16 note"
 msgstr ""
 
 msgid "comment"
 msgstr "הערה"
 
-msgid "cheese"
-msgstr "גבינה"
-
-#. TRANS: lilypond is a language used to generate musical scores.
-msgid "save as lilypond"
-msgstr ""
-
-msgid "Cartesian"
-msgstr "קוארדינטות קרטזיות"
-
 #. TRANS: audio (as in musical note)
 msgid "tone"
 msgstr ""
 
-#. TRANS: evaluate Javascript code
-msgid "eval"
+#. TRANS: robot sensors.
+msgid "infrared light (left)"
 msgstr ""
-
-msgid "color"
-msgstr "צבע"
-
-msgid "image"
-msgstr "תמונה"
 
 msgid "Click to run the music note by note."
 msgstr ""
@@ -596,61 +747,17 @@ msgstr ""
 msgid "pop"
 msgstr "שלוף\\טען ערך"
 
-#. TRANS: bitcoin currency (probably no need to translate)
-msgid "bitcoin"
-msgstr "ביטקוין"
-
 msgid "pen size"
 msgstr "עובי עט"
 
 msgid "Clear the screen and return the turtles to their initial positions."
 msgstr "נקה את המסך והחזר את הצבים למיקום הראשוני"
 
-#. TRANS: Boolean logic
-msgid "boolean"
-msgstr "בוליאני"
-
-msgid "coordinates"
-msgstr "קואורדינטות"
-
-msgid "sing"
-msgstr "לשיר"
-
-msgid "play backward"
-msgstr ""
-
-msgid "Congratulations."
-msgstr "איחולנו"
-
-msgid "Run slow"
-msgstr "הרצה איטית"
-
-msgid "mouse button"
-msgstr "כפתור לחוץ"
-
-#. TRANS: music term for dividing the beat into a different number of equal subdivisions
-msgid "tuplet"
-msgstr ""
-
-#. TRANS: cloud as in cloud server
-msgid "cloud"
-msgstr "ענן"
-
-msgid "size"
-msgstr "גודל"
-
-msgid "city"
-msgstr "עיר"
-
-#. TRANS: carbohydrates
-msgid "get carbs"
-msgstr "קבל קלפים"
+msgid "speak"
+msgstr "דבר"
 
 msgid "sine"
 msgstr ""
-
-msgid "Click to run the project in fast mode."
-msgstr "לחצו כדי להריץ את הפרויקט במצב מהיר"
 
 msgid "beef"
 msgstr "בשר בקר"
@@ -659,101 +766,28 @@ msgstr "בשר בקר"
 msgid "source"
 msgstr "מקור"
 
-msgid "unknown"
-msgstr "לא ידוע"
-
-msgid "wait for"
-msgstr "לחכות ל"
-
-msgid "pen up"
-msgstr "הרם עט"
-
-msgid "Decrease the size of the blocks."
-msgstr "הקטן את גודל הבלוקים"
-
-msgid "Run note by note"
+msgid "invert"
 msgstr ""
 
-msgid "start"
-msgstr "התחל"
-
-msgid "stock price"
-msgstr "מחיר מניה"
-
-#. TRANS: is the heap empty?
-msgid "heap empty?"
-msgstr ""
-
-msgid "motion z"
-msgstr "z תנועת"
-
-#. TRANS: low temperature
-msgid "low"
-msgstr "נמוך"
-
-msgid "motion x"
-msgstr "x תנועת"
-
-msgid "motion y"
-msgstr "y תנועת"
-
-msgid "forward"
-msgstr "קדימה"
-
-#. TRANS: 360 degrees in a circle
-msgid "degrees"
-msgstr "מעלות"
-
-msgid "translate"
-msgstr "תרגם"
-
-msgid "Open a panel for configuring Music Blocks."
-msgstr "פתיחת פאנל להתאמת בלוקים"
-
-msgid "until"
-msgstr "עד_ש"
+msgid "end hollow line"
+msgstr "סיים קו"
 
 msgid "define"
 msgstr "הגדר"
 
-#. TRANS: save project as simple vector graphic (SVG)
-msgid "save svg"
-msgstr "שמור SVG"
-
-#. TRANS: mathematical ceiling function, e.g., ceiling(2.5) == 3
-msgid "ceiling"
-msgstr "תקרה"
-
-#. TRANS: a turtle shell
-msgid "shell"
-msgstr "שריון"
-
-msgid "start turtle"
-msgstr "התחל צב"
-
-msgid "Welcome to Music Blocks"
+#. TRANS: sawtooth wave
+msgid "sawtooth"
 msgstr ""
 
-#. TRANS: set language
-msgid "set lang"
-msgstr "קבע שפה"
+#. TRANS: slurring of notes in music
+msgid "skip factor"
+msgstr ""
 
 msgid "turtle name"
 msgstr "שם צב"
 
-#. TRANS: carbohydrates
-msgid "carbs"
-msgstr "קלפים"
-
-msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
-
 msgid "else"
 msgstr "ואם לא"
-
-#. TRANS: as in broadcast a signal
-msgid "broadcast"
-msgstr ""
 
 msgid "orange"
 msgstr "תפוז"
@@ -761,179 +795,45 @@ msgstr "תפוז"
 msgid "begin hollow line"
 msgstr "התחל קו"
 
-msgid "flat"
-msgstr ""
-
-#. TRANS: the heap is a first-in-last-out (FILO) stack
-msgid "heap"
-msgstr ""
-
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
-msgid "begin fill"
-msgstr "התחל מילוי"
-
-msgid "beats per minute"
-msgstr ""
-
-msgid "eat"
-msgstr "לאכול"
-
-msgid "Expand/collapse collapsable blocks"
-msgstr "צמצם/הרחב את הבלוקים הניתנים לצמצום"
-
-#. TRANS: high temperature
-msgid "high"
-msgstr "גבוה"
-
-msgid "1/16 note ♬"
-msgstr ""
-
-msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr ""
-
 #. TRANS: longitude and latitude coordinate data
 msgid "Coordinate data not available."
 msgstr "נתוני הקואורדינטות אינם זמינים"
 
-#. TRANS: hue refers to spectral hue (red, yellow, green, blue...)
-msgid "set hue"
-msgstr "קבע צבע"
-
-msgid "currency"
-msgstr "מטבע"
-
-msgid "this"
-msgstr "זה"
-
-msgid "Palette buttons"
-msgstr "סרגל כלים"
-
-msgid "potato"
-msgstr "תַפּוּד"
-
-msgid "city longitude"
-msgstr "קו אורך של עיר"
-
-msgid "grey"
-msgstr "אפור"
+msgid "Click to run the project step by step."
+msgstr "לחצו כדי להריץ את הפרויקט צעד אחרי צעד"
 
 #. TRANS: the value of a variable (stored in a box)
 msgid "value"
 msgstr "ערך"
 
-msgid "banana"
-msgstr "בננה"
-
-msgid "wheat bread"
-msgstr "לחם"
-
-msgid "while"
-msgstr "כל-עוד"
+#. TRANS: vertical space
+msgid "vspace"
+msgstr ""
 
 msgid "open file"
 msgstr "פתיחת קובץ"
 
-#. TRANS: detect language
-msgid "detect lang"
-msgstr "זיהוי שפה"
-
-msgid "cake"
-msgstr "עוגה"
-
-msgid "sweet potato"
-msgstr "בַּטָטָה"
-
-#. TRANS: load the heap from a file
-msgid "load heap"
-msgstr "פתח FILO"
-
 msgid "Open"
 msgstr "פתיחה"
-
-#. TRANS: database fetch
-msgid "fetch"
-msgstr ""
-
-#. TRANS: logical "and" operator
-msgid "and"
-msgstr "וגם"
 
 #. TRANS: grey refers to chroma (grey to vivid)
 msgid "set grey"
 msgstr "קבע אפור"
 
-msgid "then"
-msgstr "אז"
-
-msgid "calories"
-msgstr "קלוריות"
-
 msgid "Run step by step"
 msgstr "הרצה צעד אחרי צעד"
-
-#. TRANS: musical pitch
-msgid "pitch"
-msgstr ""
-
-msgid "Show/hide palettes"
-msgstr "הצג/הראה "
-
-msgid "set heading"
-msgstr "קבע אזימוט (כיוון)"
-
-msgid "add 1 to"
-msgstr "הוסף 1 ל"
-
-#. TRANS: stop playing current media file (movie or audio)
-msgid "stop play"
-msgstr "הפסקת נגן"
-
-msgid "sharp"
-msgstr ""
 
 msgid "protein"
 msgstr "חלבון"
 
-msgid "1/64 note 𝅘𝅥𝅱"
-msgstr ""
-
-#. TRANS: oscillator time
-msgid "osctime"
-msgstr ""
-
-#. TRANS: play media (audio or video)
-msgid "play back"
-msgstr "נגן"
-
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
-msgid "fill"
-msgstr ""
-
-msgid "Save your project to a server."
-msgstr "שמור את הפרויקט שלך בשרת"
-
-msgid "Decrease block size"
-msgstr "הקטן גודל בלוק"
-
-#. TRANS: number of notes
-msgid "number of notes"
-msgstr ""
-
-msgid "angle"
-msgstr "זווית"
+msgid "if"
+msgstr "אם"
 
 msgid "get fat"
 msgstr "קבל שומן"
 
-#. TRANS: minimum
-msgid "min"
-msgstr "מינימום"
-
 msgid "media"
 msgstr "מדיה"
-
-msgid "that"
-msgstr "זה"
 
 msgid "Stop"
 msgstr "עצור"
@@ -942,78 +842,26 @@ msgstr "עצור"
 msgid "sqrt"
 msgstr "שורש ריבועי"
 
-#. TRANS: as in button click
-msgid "click"
+msgid "skip notes"
 msgstr ""
 
-msgid "note"
-msgstr "הערה"
-
-#. TRANS: field of interest in a database, e.g., temperature in a weather database
-msgid "field"
-msgstr ""
-
-msgid "invert"
-msgstr ""
-
-msgid "square"
-msgstr ""
-
-msgid "Meet Mr. Mouse!"
-msgstr ""
-
-msgid "set xy"
-msgstr "XY קבע ערך"
+msgid "Palette buttons"
+msgstr "סרגל כלים"
 
 msgid "end fill"
 msgstr "סיים מילוי"
 
-msgid "if"
-msgstr "אם"
+msgid "Copy"
+msgstr "העתק"
 
 msgid "Paste"
 msgstr "הדבק"
 
-#. TRANS: musical key, e.g., C Major
-msgid "set key"
-msgstr ""
-
-msgid "Delete"
-msgstr "מחיקה"
-
-#. TRANS: Mexican tamale
-msgid "tamale"
-msgstr ""
-
-msgid "Worldwide"
-msgstr "בעולם כולו"
-
-#. TRANS: as in play a musical note.
-msgid "play"
-msgstr ""
-
-msgid "repeat"
-msgstr "חזור"
-
-msgid "blocks"
-msgstr "בלוקים"
-
-#. TRANS: mathematical exponent
-msgid "exp"
-msgstr "ביטוי"
+msgid "Remove all content on the canvas, including the blocks."
+msgstr "הסר את כל תוכן הקנבס, כולל הבלוקים"
 
 msgid "Polar"
 msgstr "קוארדינטות פולריות"
-
-#. TRANS: maximum
-msgid "max"
-msgstr "מקסימום"
-
-msgid "logic"
-msgstr "לוגיקה"
-
-msgid "current pitch name"
-msgstr ""
 
 #. TRANS: empty the heap
 msgid "empty heap"
@@ -1026,43 +874,18 @@ msgstr ""
 msgid "On my device"
 msgstr "במכשיר שלי"
 
-#. TRANS: musical key, e.g., C Major
-msgid "key"
+#. TRANS: the name of a stack of blocks
+msgid "action"
+msgstr "פעולה"
+
+msgid "note value"
 msgstr ""
-
-#. TRANS: push a value on to the heap.
-msgid "push"
-msgstr "דחוף\\שמור ערך"
-
-#. TRANS: RoDi robot
-msgid "rodi"
-msgstr "RoDi"
-
-msgid "Increase block size"
-msgstr "הגדל את גודל הבלוק"
-
-#. TRANS: mathematical floor function, e.g., floor(2.5) == 2
-msgid "floor"
-msgstr "רצפה"
 
 msgid "Clean"
 msgstr "נקה"
 
-msgid "quarter note ♩"
+msgid "note volume"
 msgstr ""
-
-msgid "Note value must be greater than 0"
-msgstr ""
-
-#. TRANS: color refers to a hue, value, chroma triplet
-msgid "set color"
-msgstr "קבע צבע"
-
-msgid "Click to run just the music in slow mode."
-msgstr ""
-
-msgid "Run fast"
-msgstr "הרצה מהירה"
 
 msgid "broccoli"
 msgstr "ברוקולי"
@@ -1071,72 +894,319 @@ msgstr "ברוקולי"
 msgid "stop media"
 msgstr "הפסק מדיה"
 
-msgid "tomato"
-msgstr "עגבניות"
-
-msgid "forever"
-msgstr "תמיד"
-
-#. TRANS: musical note to frequency
-msgid "note to frequency"
-msgstr ""
-
-msgid "no background"
-msgstr "ללא רקע"
-
 msgid "Load project from file"
 msgstr "העלאת פרויקטים מקובץ"
-
-msgid "get protein"
-msgstr "קבל חלבון"
-
-#. TRANS: clear the screen of any graphics drawn by the turtle
-msgid "clear"
-msgstr "נקה"
-
-msgid "Show or hide a Cartesian-coordinate grid."
-msgstr "הצג או הסתר רשת של קואורדינטות קרטזיות"
-
-msgid "flow"
-msgstr "זרם"
-
-msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "לחצו על כפתור זה כדי להרחיב או לצמצם את סרגל כלי העזר"
-
-msgid "half note 𝅗𝅥"
-msgstr ""
-
-#. TRANS: Lilypond is engraving software
-msgid "Save your project to as a Lilypond file."
-msgstr ""
-
-msgid "extras"
-msgstr "אקסטרה"
-
-msgid "set beats per minute"
-msgstr ""
-
-msgid "shade"
-msgstr "גוון"
-
-msgid "time"
-msgstr "זמן"
 
 msgid "y"
 msgstr "y"
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
+msgid "set beats per minute"
+msgstr ""
+
+msgid "left"
+msgstr "שמאלה"
+
+msgid "Delete all"
+msgstr "מחק הכל"
+
+msgid "rest"
+msgstr ""
+
+msgid "This button opens a viewer for loading example projects."
+msgstr "כפתור זה פותח מציג להעלאת פרויקטים"
+
+msgid "You can also load projects from the file system."
+msgstr "ניתן להעלות פרויקטים מתוך מערכת הקבצים"
+
+msgid "Run music slow"
+msgstr ""
+
+#. TRANS: unique ID
+msgid "UID"
+msgstr ""
+
+msgid "color"
+msgstr "צבע"
+
+msgid "add"
+msgstr "הוסף"
+
+#. TRANS: music term for dividing the beat into a different number of equal subdivisions
+msgid "tuplet"
+msgstr ""
+
+msgid "Meet Mr. Mouse!"
+msgstr ""
+
+#. TRANS: a container for a variable
+msgid "boxes"
+msgstr ""
+
+msgid "background"
+msgstr "מלא מסך"
+
+#. TRANS: mathematical modular (remainder) function.
+msgid "mod"
+msgstr "mod"
+
+msgid "zoom"
+msgstr "זום"
+
+msgid "Hide or show the blocks and the palettes."
+msgstr "הצג או הסתר את הבלוקים ואת הכלים"
+
+msgid "show blocks"
+msgstr "הראה בלוקים"
+
+msgid "crescendo"
+msgstr ""
+
+msgid "right"
+msgstr "ימינה"
+
+msgid "one of"
+msgstr "אחד מ"
+
+msgid "Enable scrolling"
+msgstr ""
+
+msgid "back"
+msgstr "אחורה"
+
+msgid "duration"
+msgstr "משך זמן"
+
+msgid "pixel color"
+msgstr "צבע פיקסל"
+
+msgid "get calories"
+msgstr "קבל קלוריות"
+
+msgid "confirm"
+msgstr "אישור"
+
+msgid "You have finished the tour. Please enjoy Music Blocks!"
+msgstr ""
+
+msgid "staccato"
+msgstr ""
+
+#. TRANS: how many entries are in the heap?
+msgid "heap length"
+msgstr ""
+
+msgid "Load plugin from file"
+msgstr "העלאת פלאגין מקובץ"
+
+#. TRANS: mathematical power, e.g., 2^4 == 16
+msgid "power"
+msgstr "כוח"
+
+#. TRANS: slurring of notes in music
+msgid "slur"
+msgstr ""
+
+msgid "Save stack"
+msgstr "שמור את הקבוצה"
+
+msgid "corn"
+msgstr "תירס"
+
+msgid "Display statistics"
+msgstr "הצג סטטיסטיקות"
+
+#. TRANS: as in "on event do"
+msgid "on"
+msgstr ""
+
+#. TRANS: object
+msgid "obj"
+msgstr "אובייקט"
+
+#. TRANS: store a value in a box
+msgid "store in"
+msgstr "שמור ב"
+
+msgid "numerator"
 msgstr ""
 
 msgid "multiply beat"
 msgstr ""
 
-msgid "hello"
-msgstr "שלום"
+#. TRANS: logical "or" operator
+msgid "or"
+msgstr "או"
 
-msgid "dot"
+#. TRANS: lilypond is a language used to generate musical scores.
+msgid "save as lilypond"
 msgstr ""
 
-msgid "left"
-msgstr "שמאלה"
+msgid "image"
+msgstr "תמונה"
+
+msgid "Save project"
+msgstr "שמור פרויקט"
+
+#. TRANS: convert number to pitch
+msgid "number to pitch"
+msgstr ""
+
+msgid "mouse button"
+msgstr "כפתור לחוץ"
+
+#. TRANS: carbohydrates
+msgid "get carbs"
+msgstr "קבל קלפים"
+
+msgid "wait for"
+msgstr "לחכות ל"
+
+msgid "Decrease the size of the blocks."
+msgstr "הקטן את גודל הבלוקים"
+
+msgid "start"
+msgstr "התחל"
+
+msgid "stock price"
+msgstr "מחיר מניה"
+
+#. TRANS: low temperature
+msgid "low"
+msgstr "נמוך"
+
+msgid "forward"
+msgstr "קדימה"
+
+msgid "translate"
+msgstr "תרגם"
+
+#. TRANS: load the heap from a file
+msgid "load heap"
+msgstr "פתח FILO"
+
+msgid "Welcome to Music Blocks"
+msgstr ""
+
+#. TRANS: the heap is a first-in-last-out (FILO) stack
+msgid "heap"
+msgstr ""
+
+#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
+msgid "begin fill"
+msgstr "התחל מילוי"
+
+msgid "eat"
+msgstr "לאכול"
+
+msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgstr ""
+
+msgid "city longitude"
+msgstr "קו אורך של עיר"
+
+msgid "duplicate notes"
+msgstr ""
+
+#. TRANS: musical key, e.g., C Major
+msgid "set key"
+msgstr ""
+
+msgid "slur factor"
+msgstr ""
+
+msgid "cake"
+msgstr "עוגה"
+
+msgid "start drum"
+msgstr ""
+
+msgid "Disable scrolling"
+msgstr ""
+
+#. TRANS: set language
+msgid "set lang"
+msgstr "קבע שפה"
+
+#. TRANS: play media (audio or video)
+msgid "play back"
+msgstr "נגן"
+
+#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
+msgid "fill"
+msgstr ""
+
+#. TRANS: save project as simple vector graphic (SVG)
+msgid "save svg"
+msgstr "שמור SVG"
+
+#. TRANS: number of notes
+msgid "number of notes"
+msgstr ""
+
+#. TRANS: mathematical floor function, e.g., floor(2.5) == 2
+msgid "floor"
+msgstr "רצפה"
+
+#. TRANS: field of interest in a database, e.g., temperature in a weather database
+msgid "field"
+msgstr ""
+
+msgid "zoom factor"
+msgstr "גורם זום"
+
+msgid "set xy"
+msgstr "XY קבע ערך"
+
+#. TRANS: tying together of notes in music
+msgid "tie"
+msgstr ""
+
+msgid "divide beat"
+msgstr ""
+
+#. TRANS: Mexican tamale
+msgid "tamale"
+msgstr ""
+
+msgid "repeat"
+msgstr "חזור"
+
+#. TRANS: mathematical exponent
+msgid "exp"
+msgstr "ביטוי"
+
+msgid "current pitch octave"
+msgstr ""
+
+msgid "current pitch name"
+msgstr ""
+
+#. TRANS: evaluate Javascript code
+msgid "eval"
+msgstr ""
+
+#. TRANS: carbohydrates
+msgid "carbs"
+msgstr "קלפים"
+
+msgid "potato"
+msgstr "תַפּוּד"
+
+msgid "Stop the music (and the turtles)."
+msgstr ""
+
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr "לחצו על כפתור זה כדי להרחיב או לצמצם את סרגל כלי העזר"
+
+msgid "extras"
+msgstr "אקסטרה"
+
+msgid "time"
+msgstr "זמן"
+
+#. TRANS: push a value on to the heap.
+msgid "push"
+msgstr "דחוף\\שמור ערך"
+
+msgid "hello"
+msgstr "שלום"

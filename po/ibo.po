@@ -301,6 +301,9 @@ msgstr "Nke a ga-emepe button a na-ekiri maka loading atụ oru ngo"
 msgid "Enable scrolling"
 msgstr ""
 
+msgid "Disable scrolling"
+msgstr ""
+
 msgid "back"
 msgstr "azụ"
 

@@ -441,6 +441,9 @@ msgstr ""
 msgid "Enable scrolling"
 msgstr ""
 
+msgid "Disable scrolling"
+msgstr ""
+
 msgid "You can scroll the blocks on the canvas."
 msgstr ""
 
