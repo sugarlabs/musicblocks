@@ -895,7 +895,7 @@ function Palette(palettes, name) {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
 
         var shape = new createjs.Shape();
-        shape.graphics.f('#b3b3b3').r(0, 0, MENUWIDTH, h).ef();
+        shape.graphics.f('#949494').r(0, 0, MENUWIDTH, h).ef();
         shape.width = MENUWIDTH;
         shape.height = h;
         this.background.addChild(shape);
