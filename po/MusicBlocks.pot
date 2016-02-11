@@ -1022,6 +1022,9 @@ msgstr ""
 msgid "tuplet"
 msgstr ""
 
+msgid "tuplet value"
+msgstr ""
+
 msgid "number of notes"
 msgstr ""
 

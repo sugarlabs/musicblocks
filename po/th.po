@@ -628,6 +628,9 @@ msgstr "ปุ่มหนู"
 msgid "tuplet"
 msgstr "ทูเปรท"
 
+msgid "tuplet value"
+msgstr "ค่าทูเปรท"
+
 #. TRANS: cloud as in cloud server
 msgid "cloud"
 msgstr "เครา"

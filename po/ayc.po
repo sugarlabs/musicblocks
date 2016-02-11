@@ -688,6 +688,10 @@ msgstr "limt'aña limxatata"
 msgid "tuplet"
 msgstr ""
 
+#. TRANS: valor del tuplet
+msgid "tuplet value"
+msgstr ""
+
 #. TRANS: cloud as in cloud server
 msgid "cloud"
 msgstr "qinaya"

@@ -608,6 +608,9 @@ msgstr "botón del ratón"
 msgid "tuplet"
 msgstr ""
 
+msgid "tuplet value"
+msgstr "valor del tuplet"
+
 #. TRANS: cloud as in cloud server
 msgid "cloud"
 msgstr "nube"
