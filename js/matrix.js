@@ -85,6 +85,8 @@ function Matrix() {
     // This array is preserved between sessions.
     // We populate the blockMap whenever a note is selected and
     // restore any notes that might be present.
+
+    // FIXME: Doesn't properly account for Tuplets
     this.blockMap = [];
 
     this.clearBlocks = function() {
@@ -736,18 +738,25 @@ function Matrix() {
             time += 1 / noteValue;
             var that = this;
 
+            // FIXME: Highlight does not work properly with tuplets:
+            // each note in the tuplet is counted once, but since the
+            // bottom cell of the tuplet spams multiple columns, the
+            // highlight gets ahead of itself.
             setTimeout(function() {
+                var table = docById('myTable');
                 if (that.colIndex > that.notesToPlayDirected.length) {
-                    var table = docById('myTable');
                     for (var j = 1; j <= that.notesToPlayDirected.length; j++) {
                         var cell = table.rows[that.rowIndex].cells[j];
-                        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+                        if (cell != undefined) {
+                            cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+                        }
                     }
                 } else {
-                    var table = docById('myTable');
                     var cell = table.rows[that.rowIndex].cells[that.colIndex];
-                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+                    if (cell != undefined) {
+                        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+		    }
+		    
                     if(that.notesCounter >= that.notesToPlayDirected.length) {
                         that.notesCounter = 1;
                         that.logo.synth.stop()
