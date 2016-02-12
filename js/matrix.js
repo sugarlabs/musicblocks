@@ -50,6 +50,9 @@ var MATRIXBUTTONHEIGHT = 40;
 var MATRIXBUTTONHEIGHT2 = 66;
 var MATRIXSOLFEHEIGHT = 30;
 
+var NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', '64': '&#x1D163;', '128': '&#x1D164;'};
+var DOTTEDNOTESYMBOLS = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', '64': '&#x1D163;.', '128': '&#x1D164;.'};
+
 function Matrix() {
     this.arr = [];
     this.secondsPerBeat = 1;
@@ -97,7 +100,8 @@ function Matrix() {
         this.rowBlocks.push(pitchBlock);
     }
 
-    this.addColBlock = function(rhythmBlock, n) {
+    this.addColBlock = function(rhythmBlock, n, inTuplet) {
+        // FIXME: What to do when in a tuplet
         // Search for previous instance of the same block (from a repeat)
         var startIdx = 0;
         for (var i = 0; i < this.colBlocks.length; i++) {
@@ -453,22 +457,18 @@ function Matrix() {
         cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
 
         var noteValue = param[0][1] / param[0][0];
-        var noteValueToDisplay = reducedFraction(param[0][0], param[0][1]) + '<br><br>';
-        // noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString();
+        var noteValueToDisplay = reducedFraction(param[0][0], param[0][1]);
 
         if (parseInt(param[0][1]) < param[0][1]) {
             noteValueToDisplay = noteValue * 1.5;
             noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString();
         }
 
+        cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
         cell.style.lineHeight = 60 + '%';
+        cell.style.width = this.noteWidth(noteValue);
         cell.innerHTML = noteValueToDisplay;
-
-        console.log(w + ' ' + param[0][0] + '/' + param[0][1]);
-        // cell.width = this.cellScale * w * param[0][0] / param[0][1] + 'px';
-        cell.width = this.noteWidth(param[0][1]/param[0][0]);
-        cell.colSpan = numberOfNotes;
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
         var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
@@ -524,7 +524,6 @@ function Matrix() {
             // Add tuplet note values
             if (i >= tupletCol) {
                 var j = i - tupletCol;
-                console.log(i + ' ' + j + ' ' + param[1][j]);
                 var numerator = 32 / param[1][j];
                 cell.style.lineHeight = 60 + '%';
                 cell.style.fontSize = this.cellScale * 75 + '%';
@@ -543,23 +542,22 @@ function Matrix() {
         console.log('addNotes ' + numBeats + ' ' + noteValue);
         var table = docById('myTable');
 
-        var noteSymbol = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', '64': '&#x1D163;', '128': '&#x1D164;'};
         var noteValueToDisplay = null;
-        if (noteValue in noteSymbol) {
+        if (noteValue in NOTESYMBOLS) {
             // noteValueToDisplay = '1/' + noteValue.toString() + '<br>' + noteSymbol[noteValue];
-            noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>' + noteSymbol[noteValue];
+            noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>' + NOTESYMBOLS[noteValue];
         } else {
             noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>';
         }
 
         // FIXME: DOES NOT WORK FOR DOUBLE DOT
-         var dottedNoteSymbol = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', '64': '&#x1D163;.', '128': '&#x1D164;.'};
+         
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
-            if (noteValueToDisplay in dottedNoteSymbol) {
-                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + dottedNoteSymbol[noteValueToDisplay];
+            if (noteValueToDisplay in DOTTEDNOTESYMBOLS) {
+                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + DOTTEDNOTESYMBOLS[noteValueToDisplay];
             } else {
-                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>(dot)';
+                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>';
             }
         }
 
@@ -712,71 +710,101 @@ function Matrix() {
 
         this.playDirection = 1;
         this.notesCounter = 0;
-        var that = this;
-        var time = 0;
         var table = docById('myTable');
-        this.colIndex = 1;
-        this.rowIndex = table.rows.length - 1;
-        var note = this.notesToPlayDirected[this.notesCounter][0];
-        var noteValue = that.notesToPlayDirected[this.notesCounter][1];
-        this.notesCounter += 1;
 
+        // We have an array of pitches and note values.
+        var note = this.notesToPlayDirected[this.notesCounter][0];
         // Note can be a chord, hence it is an array.
         for (var i = 0; i < note.length; i++) {
             note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
         }
+        var noteValue = this.notesToPlayDirected[this.notesCounter][1];
 
-        console.log('playAll ' + this.colIndex);
+        this.notesCounter += 1;
+
+        console.log('playAll');
+        // Notes begin in Column 1.
+        this.colIndex = 1;
+        // We highlight the note-value cells (bottom row).
+        this.rowIndex = table.rows.length - 1;
+        // Highlight first note.
         var cell = table.rows[this.rowIndex].cells[this.colIndex];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        this.colIndex += 1;
+
+        // If we are in a tuplet, we don't update the column until
+        // we've played all of the notes in the column span.
+	if (cell.colSpan > 1) {
+            this.spanCounter = 1;
+        } else {
+            this.spanCounter = 0;
+            this.colIndex += 1;
+	}
 
         if (note[0] !== 'R') {
             this.logo.synth.trigger(note, this.logo.defaultBPMFactor / noteValue, false);
         }
 
-        for (var i = 1; i <= this.notesToPlayDirected.length; i++) {
-            noteValue = this.notesToPlayDirected[i - 1][1];
-            time += 1 / noteValue;
-            var that = this;
+        this.playNote(0, 0);
+    }
 
-            // FIXME: Highlight does not work properly with tuplets:
-            // each note in the tuplet is counted once, but since the
-            // bottom cell of the tuplet spams multiple columns, the
-            // highlight gets ahead of itself.
-            setTimeout(function() {
-                var table = docById('myTable');
-                if (that.colIndex > that.notesToPlayDirected.length) {
-                    for (var j = 1; j <= that.notesToPlayDirected.length; j++) {
-                        var cell = table.rows[that.rowIndex].cells[j];
-                        if (cell != undefined) {
-                            cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-                        }
-                    }
-                } else {
-                    var cell = table.rows[that.rowIndex].cells[that.colIndex];
+    this.playNote = function(time, noteCounter) {
+        noteValue = this.notesToPlayDirected[noteCounter][1];
+        time = 1 / noteValue;
+        var that = this;
+
+        // FIXME: Highlight does not work properly with tuplets: each
+        // note in the tuplet is counted once, but since the bottom
+        // cell of the tuplet spams multiple columns, the highlight
+        // gets ahead of itself.
+        setTimeout(function() {
+            var table = docById('myTable');
+            // Did we just play the last note?
+            if (noteCounter === that.notesToPlayDirected.length - 1) {
+                for (var j = 1; j <= that.notesToPlayDirected.length; j++) {
+                    var cell = table.rows[that.rowIndex].cells[j];
                     if (cell != undefined) {
-                        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-		    }
-		    
-                    if(that.notesCounter >= that.notesToPlayDirected.length) {
-                        that.notesCounter = 1;
-                        that.logo.synth.stop()
-                    }
-                    note = that.notesToPlayDirected[that.notesCounter][0];
-                    noteValue = that.notesToPlayDirected[that.notesCounter][1];
-                    that.notesCounter += 1;
-                    // Note can be a chord, hence it is an array.
-                    for (var i = 0; i < note.length; i++) {
-                        note[i] = note[i].replace(/♭/g, 'b').replace(/♯/g, '#');
-                    }
-                    if(note[0] !== 'R') {
-                        that.logo.synth.trigger(note, that.logo.defaultBPMFactor / noteValue, false);
+                        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                     }
                 }
+            } else {
+                var cell = table.rows[that.rowIndex].cells[that.colIndex];
+                if (cell != undefined) {
+                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+		}
+		    
+                if(that.notesCounter >= that.notesToPlayDirected.length) {
+                    that.notesCounter = 1;
+                    that.logo.synth.stop()
+                }
+                note = that.notesToPlayDirected[that.notesCounter][0];
+                noteValue = that.notesToPlayDirected[that.notesCounter][1];
+                that.notesCounter += 1;
+                // Note can be a chord, hence it is an array.
+                for (var j = 0; j < note.length; j++) {
+                    note[j] = note[j].replace(/♭/g, 'b').replace(/♯/g, '#');
+                }
+                if(note[0] !== 'R') {
+                    that.logo.synth.trigger(note, that.logo.defaultBPMFactor / noteValue, false);
+                }
+            }
+            var cell = table.rows[that.rowIndex].cells[that.colIndex];
+            if (cell != undefined) {
+            if (cell.colSpan > 1) {
+                that.spanCounter += 1;
+                if (that.spanCounter === cell.colSpan) {
+                    that.spanCounter = 0;
+                    that.colIndex += 1;
+		}
+            } else {
+                that.spanCounter = 0;
                 that.colIndex += 1;
-            }, that.logo.defaultBPMFactor * 1000 * time);
-        }
+            }
+            noteCounter += 1;
+	    if (noteCounter < that.notesToPlayDirected.length) {
+		that.playNote(time, noteCounter);
+            }
+            }
+        }, that.logo.defaultBPMFactor * 1000 * time);
     }
 
     this.setNotes = function(colIndex, rowIndex, playNote, tuplet) {
@@ -999,5 +1027,9 @@ function reducedFraction(a, b) {
     }
 
     var gcm = greatestCommonMultiple(a, b);
-    return (a / gcm) + '<br>&mdash;<br>' + (b / gcm);
+    if (b / gcm in NOTESYMBOLS) {
+	return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>' + NOTESYMBOLS[b / gcm];
+    } else {
+	return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
+    }
 }
