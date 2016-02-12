@@ -58,7 +58,6 @@ function Matrix() {
     this.numberOfNotesToPlay = 0;
     this.chkArray = null;
     this.octave = 0;
-    this.i = 0;
     this.matrixContainer = null;
     this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
 
@@ -205,13 +204,14 @@ function Matrix() {
         var iconSize = Math.floor(this.cellScale * 24);
 
         // Add the buttons to the top row.
+        var thisMatrix = this;
 
         var cell = row.insertCell(1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
-            logo.playMatrix();
+            thisMatrix.playAll();
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
@@ -225,7 +225,7 @@ function Matrix() {
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
-            logo.saveMatrix();
+            thisMatrix.saveMatrix();
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
@@ -239,7 +239,7 @@ function Matrix() {
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
-            logo.clearMatrix();
+            thisMatrix.clearMatrix();
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
@@ -252,9 +252,8 @@ function Matrix() {
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-button.svg" title="' + _('export') + ' HTML" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        that = this;
         cell.onclick=function() {
-            that.exportMatrix();
+            thisMatrix.exportMatrix();
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
@@ -696,6 +695,9 @@ function Matrix() {
     }
 
     this.playAll = function() {
+        // Play all of the notes in the matrix.
+        this.logo.synth.stop();
+
         var notes = [];
 
         for (var i in this.notesToPlay) {
@@ -839,19 +841,6 @@ function Matrix() {
         if (playNote) {
             this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, false);
         }
-    }
-
-    this.playNotesString = function(time) {
-        // Plays the matrix
-        console.log('notes to be played ' + JSON.stringify(this.notesToPlay));
-
-        this.i = 0;
-
-        var that = this;
-        setTimeout(function() {
-            console.log('playing after ' + time + 'ms');
-            that.playAll();
-        }, time);
     }
 
     this.clearMatrix = function() {

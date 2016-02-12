@@ -3755,26 +3755,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.refreshCanvas();
     }
 
-
-    // Music extensions
-    // WHY ARE THESE HERE? Why not in matrix.js?
-
-    this.playMatrix = function() {
-        this.synth.stop();
-        matrix.playNotesString(0, this.synth.poly);
-        this.setTurtleDelay(4500 * parseFloat(1 / this.denominator) * (this.numerator));
-        var logo = this;
-        setTimeout(function() {logo.setTurtleDelay(0);}, logo.setTurtleDelay(4500 * parseFloat(1 / logo.denominator) * (logo.numerator)));
-    }
-
-    this.saveMatrix = function() {
-        matrix.saveMatrix();
-    }
-
-    this.clearMatrix = function() {
-        matrix.clearMatrix();
-    }
-
     this.getNumber = function(solfege, octave) {
          // converts a note to a number
 
