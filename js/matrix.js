@@ -496,7 +496,7 @@ function Matrix() {
             var cell = row.insertCell(-1);
             cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
+            cell.style.height = 1.5 * MATRIXSOLFEHEIGHT * this.cellScale + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
             cell.style.top = matrixDivPosition.top + (table.rows.length - 2) * cell.style.height + 'px';
             cell.style.fontSize = this.cellScale * 75 + '%';
@@ -722,7 +722,6 @@ function Matrix() {
 
         this.notesCounter += 1;
 
-        console.log('playAll');
         // Notes begin in Column 1.
         this.colIndex = 1;
         // We highlight the note-value cells (bottom row).
@@ -760,19 +759,28 @@ function Matrix() {
             var table = docById('myTable');
             // Did we just play the last note?
             if (noteCounter === that.notesToPlayDirected.length - 1) {
-                for (var j = 1; j <= that.notesToPlayDirected.length; j++) {
+                for (var j = 1; j < table.rows[that.rowIndex].cells.length; j++) {
                     var cell = table.rows[that.rowIndex].cells[j];
-                    if (cell != undefined) {
-                        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-                    }
+                    cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                 }
+                if (that.matrixHasTuplets) {
+                    for (var j = 1; j < table.rows[that.rowIndex - 2].cells.length; j++) {
+                    var cell = table.rows[that.rowIndex - 2].cells[j];
+                    cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+		    }
+		}
             } else {
                 var cell = table.rows[that.rowIndex].cells[that.colIndex];
+
                 if (cell != undefined) {
                     cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    if (cell.colSpan > 1) {
+                        var tupletCell = table.rows[that.rowIndex - 2].cells[that.notesCounter + 1];
+	                tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    }
 		}
-		    
-                if(that.notesCounter >= that.notesToPlayDirected.length) {
+
+                if (that.notesCounter >= that.notesToPlayDirected.length) {
                     that.notesCounter = 1;
                     that.logo.synth.stop()
                 }
