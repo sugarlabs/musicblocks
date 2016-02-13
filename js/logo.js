@@ -1874,7 +1874,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     break;
                 }
                 if (logo.inMatrix) {
-                    matrix.addColBlock(blk, args[0]);
+                    matrix.addColBlock(blk, args[0], logo.tuplet);
                     for (var i = 0; i < args[0]; i++) {
                         logo.processNote(args[1], blk, turtle);
                     }
