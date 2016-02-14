@@ -4009,11 +4009,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     }
 
-    this.stageNotesForLilypond = function (turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord) {
+    this.stageNotesForLilypond = function (turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato) {
         if (turtle in this.lilypondStaging) {
-            this.lilypondStaging[turtle].push([note, duration, dotted, doubleDotted, tupletValue, insideChord]);
+            this.lilypondStaging[turtle].push([note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0]);
         } else {
-            this.lilypondStaging[turtle] = [[note, duration, dotted, doubleDotted, tupletValue, insideChord]];
+            this.lilypondStaging[turtle] = [[note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0]];
         }
     }
 
@@ -4067,7 +4067,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         // Push notes for lilypond.
-        this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord);
+        this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, this.staccato[turtle]);
     }
 
     this.processLilypondNotes = function (turtle) {
@@ -4075,8 +4075,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         // time so that you can generate tuplets.
 
         // obj = [instructions] or
-        // obj = [note, duration, dotted, doubleDotted, tupletValue, insideChord]
+        // obj = [note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato]
 
+        var LYNOTE = 0;
+	var LYDURATION = 1;
+	var LYDOTTED = 2;
+	var LYDOUBLEDOTTED = 3;
+	var LYTUPLETVALUE = 4;
+	var LYINSIDECHORD = 5;
+	var LYSTACCATO = 6;
+	
         this.lilypondNotes[turtle] = '';
 
         function toLilynote (note) {
@@ -4088,22 +4096,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         for (var i = 0; i < this.lilypondStaging[turtle].length; i++) {
             obj = this.lilypondStaging[turtle][i];
-            var note = toLilynote(obj[0]);
+            var note = toLilynote(obj[LYNOTE]);
             var singleton = false;
 
             // If it is a tuplet, look ahead to see if it is complete.
-            if (obj[4] > 0) {  // tupletValue
+            if (obj[LYTUPLETVALUE] > 0) {
                 var j = 1;
                 var k = 1;
-                while (k < obj[4]) {
+                while (k < obj[LYTUPLETVALUE]) {
                     if (i + j >= this.lilypondStaging[turtle].length) {
                         singleton = true;
                         break;
                     }
-                    if (this.lilypondStaging[turtle][i + j][5] > 0 && this.lilypondStaging[turtle][i + j][5] === this.lilypondStaging[turtle][i + j - 1][5]) {
+                    if (this.lilypondStaging[turtle][i + j][LYINSIDECHORD] > 0 && this.lilypondStaging[turtle][i + j][LYINSIDECHORD] === this.lilypondStaging[turtle][i + j - 1][LYINSIDECHORD]) {
                         // In a chord, so jump to next note.
                         j++;
-                    } else if (this.lilypondStaging[turtle][i + j][4] !== obj[4]) {
+                    } else if (this.lilypondStaging[turtle][i + j][LYTUPLETVALUE] !== obj[LYTUPLETVALUE]) {
                         singleton = true;
                         break;
                     } else {
@@ -4113,42 +4121,42 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
 
-            if (obj[4] > 0 && !singleton) {
+            if (obj[LYTUPLETVALUE] > 0 && !singleton) {
                 // lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
                 // multiplier = tuplet_duration / target_duration
                 // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
                 // There may be chords embedded.
-                tuplet_count = obj[4];
-                if ((obj[1] / 2) * 2 === obj[1]) {
-                    var target_duration = obj[1] / 2;
+                tuplet_count = obj[LYTUPLETVALUE];
+                if ((obj[LYDURATION] / 2) * 2 === obj[LYDURATION]) {
+                    var target_duration = obj[LYDURATION] / 2;
                 } else {
                     tuplet_count *= 2;
-                    var target_duration = obj[1];
+                    var target_duration = obj[LYDURATION];
                 }
                 this.lilypondNotes[turtle] += '%5Ctuplet ' + tuplet_count + '%2F' + target_duration + ' { ';
-                var tuplet_duration = 2 * obj[1];
+                var tuplet_duration = 2 * obj[LYDURATION];
 
                 var j = 0;
                 var k = 0;
-                while (k < obj[4]) {
-                    var tuplet_duration = 2 * this.lilypondStaging[turtle][i + j][1];
+                while (k < obj[LYTUPLETVALUE]) {
+                    var tuplet_duration = 2 * this.lilypondStaging[turtle][i + j][LYDURATION];
                     // Are we in a chord?
-                    if (this.lilypondStaging[turtle][i + j][5] > 0) {
+                    if (this.lilypondStaging[turtle][i + j][LYINSIDECHORD] > 0) {
                         // Is this the first note in the chord?
-                        if ((i === 0 && j === 0) || this.lilypondStaging[turtle][i + j - 1][5] !== this.lilypondStaging[turtle][i + j][5]) {
+                        if ((i === 0 && j === 0) || this.lilypondStaging[turtle][i + j - 1][LYINSIDECHORD] !== this.lilypondStaging[turtle][i + j][LYINSIDECHORD]) {
                             this.lilypondNotes[turtle] += '< ';
                         }
 
-                        this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][0]) + ' ';
+                        this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][LYNOTE]) + ' ';
 
                         // Is this the last note in the chord?
-                        if (i + j === this.lilypondStaging[turtle].length - 1 || this.lilypondStaging[turtle][i + j + 1][5] !== this.lilypondStaging[turtle][i + j][5]) {
+                        if (i + j === this.lilypondStaging[turtle].length - 1 || this.lilypondStaging[turtle][i + j + 1][LYINSIDECHORD] !== this.lilypondStaging[turtle][i + j][LYINSIDECHORD]) {
                             this.lilypondNotes[turtle] += ' > ' + tuplet_duration + ' ';
                             k++;  // Increment notes in tuplet.
                         }
                         j++;
                     } else {
-                        this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][0]) + tuplet_duration + ' ';
+                        this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][LYNOTE]) + tuplet_duration + ' ';
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
@@ -4156,28 +4164,33 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 this.lilypondNotes[turtle] += '} ';
                 i += j - 1;
-            } else {
-                if (obj[5] > 0) {  // insideChord
+           } else {
+                if (obj[LYINSIDECHORD] > 0) {
                     // Is this the first note in the chord?
-                    if (i === 0 || this.lilypondStaging[turtle][i - 1][5] !== obj[5]) {
+                    if (i === 0 || this.lilypondStaging[turtle][i - 1][LYINSIDECHORD] !== obj[LYINSIDECHORD]) {
                         this.lilypondNotes[turtle] += '< ';
                     }
                     this.lilypondNotes[turtle] += (note);
                     // Is this the last note in the chord?
-                    if (i === this.lilypondStaging[turtle].length - 1 || this.lilypondStaging[turtle][i + 1][5] !== obj[5]) {
+                    if (i === this.lilypondStaging[turtle].length - 1 || this.lilypondStaging[turtle][i + 1][LYINSIDECHORD] !== obj[LYINSIDECHORD]) {
                         this.lilypondNotes[turtle] += '> ';
                     }
-                } else if (obj[2]) {  // dotted
-                    this.lilypondNotes[turtle] += (note + obj[1] + '.');
-                } else if (obj[3]) {  // doubleDotted
-                    this.lilypondNotes[turtle] += (note + obj[1] + '..');
+                } else if (obj[LYDOTTED]) {
+                    this.lilypondNotes[turtle] += (note + obj[LYDURATION] + '.');
+                } else if (obj[LYDOUBLEDOTTED]) {
+                    this.lilypondNotes[turtle] += (note + obj[LYDURATION] + '..');
                 } else {
-                    this.lilypondNotes[turtle] += (note + obj[1]);
+                    this.lilypondNotes[turtle] += (note + obj[LYDURATION]);
                 }
+
                 // singleton (incomplete tuplets)
                 if (singleton) {
-                    this.lilypondNotes[turtle] += '-' + obj[4];  // tupletValue
+                    this.lilypondNotes[turtle] += '-' + obj[LYTUPLETVALUE];
                 }
+
+                if (obj[LYSTACCATO]) {
+                    this.lilypondNotes[turtle] += '%5Cstaccato';
+		}
             }
             this.lilypondNotes[turtle] += ' ';
         }
