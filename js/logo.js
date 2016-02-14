@@ -1745,7 +1745,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 break;
                             }
                         }
-                        matrix.makeClickable(addedTuplet);
+                        matrix.makeClickable();
                     }
                 }
 
@@ -1874,7 +1874,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     break;
                 }
                 if (logo.inMatrix) {
-                    matrix.addColBlock(blk, args[0], logo.tuplet);
+                    matrix.addColBlock(blk, args[0]);
                     for (var i = 0; i < args[0]; i++) {
                         logo.processNote(args[1], blk, turtle);
                     }
@@ -2564,8 +2564,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
         if (this.inMatrix) {
-            matrix.addColBlock(blk, 1);
             if (this.inNoteBlock > 0) {
+                matrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
                     matrix.addNode(this.pitchBlocks[i], blk, 0);
                 }

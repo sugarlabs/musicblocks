@@ -59,7 +59,6 @@ function Matrix() {
     this.notesToPlay = [];
     this.notesToPlayDirected = [];
     this.numberOfNotesToPlay = 0;
-    this.chkArray = null;
     this.octave = 0;
     this.matrixContainer = null;
     this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
@@ -100,8 +99,7 @@ function Matrix() {
         this.rowBlocks.push(pitchBlock);
     }
 
-    this.addColBlock = function(rhythmBlock, n, inTuplet) {
-        // FIXME: What to do when in a tuplet
+    this.addColBlock = function(rhythmBlock, n) {
         // Search for previous instance of the same block (from a repeat)
         var startIdx = 0;
         for (var i = 0; i < this.colBlocks.length; i++) {
@@ -130,7 +128,7 @@ function Matrix() {
         for (var i = 0; i < this.blockMap.length; i++) {
             var obj = this.blockMap[i];
             if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                this.blockMap[i] = [-1, [-1, -1]];  // Mark as removed
+                this.blockMap[i] = [-1, [-1, 1, 0]];  // Mark as removed
             }
         }
     }
@@ -310,9 +308,6 @@ function Matrix() {
         cell.style.left = matrixDivPosition.left + 2 + 'px';
         cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
-
-        this.chkArray = new Array();
-        this.chkArray.push(0);
     }
 
     this.generateDataURI = function(file) {
@@ -429,7 +424,6 @@ function Matrix() {
 
         // Set the cells to "rest"
         for (var j = 0; j < numberOfNotes; j++) {
-            this.chkArray.push(0);
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
             this.notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])]);
@@ -569,10 +563,6 @@ function Matrix() {
             this.notesToPlay.push([['R'], noteValue]);
         }
 
-        for (var i = 1; i <= numBeats; i++) {
-             this.chkArray.push(0);
-        }
-
         if (this.matrixHasTuplets) {
             var rowCount = this.solfegeNotes.length + 3 - this.rests;
         } else {
@@ -616,12 +606,12 @@ function Matrix() {
         }
 
         // Does not work...
-        // for (var i = table.rows[1].cells.length - numBeats; i < table.rows[1].cells.length; i++) {
-        //     table.rows[1].cells[i].width = this.noteWidth(noteValue);
-        // }
+        for (var i = table.rows[1].cells.length - numBeats; i < table.rows[1].cells.length; i++) {
+            table.rows[1].cells[i].width = this.noteWidth(noteValue);
+        }
     }
 
-    this.makeClickable = function(tuplet) {
+    this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
         var table = docById('myTable');
@@ -642,22 +632,18 @@ function Matrix() {
             }
         }
 
-        if (table !== null) {
-            for (var i = 1; i < table.rows[1].cells.length; i++) {
-                for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
-                    var cell = table.rows[j].cells[i];
-                    var that = this;
-                    cell.onclick = function() {
-                        if (this.style.backgroundColor === 'black') {
-                            this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                            that.chkArray[this.id] = 0;
-                            that.notesToPlay[this.id - 1][0] = ['R'];
-                            that.setNotes(this.id, this.parentNode.rowIndex, false, tuplet);
-                        } else {
-                            this.style.backgroundColor = 'black';
-                            that.chkArray[this.id] = 1;
-                            that.setNotes(this.id, this.parentNode.rowIndex, true, tuplet);
-                        }
+        for (var i = 1; i < table.rows[1].cells.length; i++) {
+            for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
+                var cell = table.rows[j].cells[i];
+                var that = this;
+                cell.onclick = function() {
+                    if (this.style.backgroundColor === 'black') {
+                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        that.notesToPlay[this.id - 1][0] = ['R'];
+                        that.setNotes(this.id, this.parentNode.rowIndex, false);
+                    } else {
+                        this.style.backgroundColor = 'black';
+                        that.setNotes(this.id, this.parentNode.rowIndex, true);
                     }
                 }
             }
@@ -672,7 +658,7 @@ function Matrix() {
                 var row = this.rowBlocks.indexOf(obj[0]);
                 var col = -1;
                 for (var j = 0; j < this.colBlocks.length; j++) {
-                    if (this.colBlocks[j][0] == obj[1][0] && this.colBlocks[j][1] == obj[1][1]) {
+                    if (this.colBlocks[j][0] === obj[1][0] && this.colBlocks[j][1] === obj[1][1]) {
                         col = j;
                         break;
                     }
@@ -683,11 +669,13 @@ function Matrix() {
                 // If we found a match, mark this cell and add this
                 // note to the play list.
                 var cell = table.rows[row + 1].cells[col + 1];
-                cell.style.backgroundColor = 'black';
-                if (this.notesToPlay[col][0][0] === 'R') {
-                    this.notesToPlay[col][0] = [];
+                if (cell != undefined) {
+                    cell.style.backgroundColor = 'black';
+                    if (this.notesToPlay[col][0][0] === 'R') {
+                        this.notesToPlay[col][0] = [];
+                    }
+                    this.setNoteCell(row + 1, col + 1, cell, false, null);
                 }
-                this.setNoteCell(row + 1, col + 1, cell, false, null);
             }
         }
     }
@@ -732,12 +720,12 @@ function Matrix() {
 
         // If we are in a tuplet, we don't update the column until
         // we've played all of the notes in the column span.
-	if (cell.colSpan > 1) {
+        if (cell.colSpan > 1) {
             this.spanCounter = 1;
         } else {
             this.spanCounter = 0;
             this.colIndex += 1;
-	}
+        }
 
         if (note[0] !== 'R') {
             this.logo.synth.trigger(note, this.logo.defaultBPMFactor / noteValue, false);
@@ -767,8 +755,8 @@ function Matrix() {
                     for (var j = 1; j < table.rows[that.rowIndex - 2].cells.length; j++) {
                     var cell = table.rows[that.rowIndex - 2].cells[j];
                     cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-		    }
-		}
+                    }
+                }
             } else {
                 var cell = table.rows[that.rowIndex].cells[that.colIndex];
 
@@ -776,9 +764,9 @@ function Matrix() {
                     cell.style.backgroundColor = MATRIXBUTTONCOLOR;
                     if (cell.colSpan > 1) {
                         var tupletCell = table.rows[that.rowIndex - 2].cells[that.notesCounter + 1];
-	                tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                        tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
                     }
-		}
+                }
 
                 if (that.notesCounter >= that.notesToPlayDirected.length) {
                     that.notesCounter = 1;
@@ -802,35 +790,37 @@ function Matrix() {
                 if (that.spanCounter === cell.colSpan) {
                     that.spanCounter = 0;
                     that.colIndex += 1;
-		}
+                }
             } else {
                 that.spanCounter = 0;
                 that.colIndex += 1;
             }
             noteCounter += 1;
-	    if (noteCounter < that.notesToPlayDirected.length) {
-		that.playNote(time, noteCounter);
+            if (noteCounter < that.notesToPlayDirected.length) {
+                that.playNote(time, noteCounter);
             }
             }
         }, that.logo.defaultBPMFactor * 1000 * time);
     }
 
-    this.setNotes = function(colIndex, rowIndex, playNote, tuplet) {
+    this.setNotes = function(colIndex, rowIndex, playNote) {
         // Sets corresponding note when user clicks on any cell and
         // plays that note
 
+        console.log('setNotes rhythm block: ' + colIndex + ' ' + this.colBlocks[colIndex - 1]);
         var pitchBlock = this.rowBlocks[rowIndex - 1];
         var rhythmBlockObj = this.colBlocks[colIndex - 1];
 
         if (playNote) {
-            this.addNode(pitchBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
+            this.addNode(pitchBlock, rhythmBlockObj[0], rhythmBlockObj[1], rhythmBlockObj[2]);
         } else {
             this.removeNode(pitchBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         }
 
-        var leaveRowsFromBottom = 1;
-        if(tuplet) {
-            leaveRowsFromBottom = 3;
+        if (this.matrixHasTuplets) {
+            var leaveRowsFromBottom = 3;
+        } else {
+            var leaveRowsFromBottom = 1;
         }
 
         var table = docById('myTable');
@@ -895,9 +885,8 @@ function Matrix() {
                     var cell = table.rows[j].cells[i];
                     if (cell.style.backgroundColor === 'black') {
                         cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        this.chkArray[cell.id] = 0;
                         this.notesToPlay[cell.id - 1][0] = ['R'];
-                        this.setNotes(cell.id, cell.parentNode.rowIndex, false, this.matrixHasTuplets);
+                        this.setNotes(cell.id, cell.parentNode.rowIndex, false);
                     }
                 }
             }
@@ -1036,8 +1025,8 @@ function reducedFraction(a, b) {
 
     var gcm = greatestCommonMultiple(a, b);
     if (b / gcm in NOTESYMBOLS) {
-	return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>' + NOTESYMBOLS[b / gcm];
+        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>' + NOTESYMBOLS[b / gcm];
     } else {
-	return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
+        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
     }
 }
