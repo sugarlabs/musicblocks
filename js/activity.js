@@ -996,7 +996,6 @@ define(function (require) {
             }
 
             if (!platform.androidWebkit) {
-
                 var w = window.innerWidth;
                 var h = window.innerHeight;
             } else {
@@ -1014,10 +1013,10 @@ define(function (require) {
                 }
             } else {
                 var mobileSize = false;
-                if (w > h) {
+                if (w / 1200 > h / 900) {
                     musicBlocksScale = w / 1200;
                 } else {
-                    musicBlocksScale = w / 900;
+                    musicBlocksScale = h / 900;
                 }
             }
             stage.scaleX = musicBlocksScale;

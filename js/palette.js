@@ -26,8 +26,7 @@ function maxPaletteHeight(menuSize, scale) {
     // block in a palette cannot start at the bottom of the screen,
     // hence - 2 * menuSize.
 
-    var fudgeScale = window.innerHeight / 900;
-    var h = (windowHeight() * canvasPixelRatio() * fudgeScale) / scale - (3 * menuSize);
+    var h = (windowHeight() * canvasPixelRatio()) / scale - (2 * menuSize);
     return h - (h % STANDARDBLOCKHEIGHT) + (STANDARDBLOCKHEIGHT / 2);
 }
 
