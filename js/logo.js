@@ -2059,7 +2059,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     // play.
                     if (logo.tieCarryOver[turtle] > 0) {
                         // Remove the note from the Lilypond list.
-                        logo.lilypondStaging[turtle].pop();
+                        for (var i = 0; i < logo.notePitches[turtle].length; i++) {
+                            logo.lilypondRemoveTie(turtle);
+		        }
                         var noteValue = logo.tieCarryOver[turtle];
                         logo.tieCarryOver[turtle] = 0;
                         logo.processNote(noteValue, blk, turtle);
@@ -2663,7 +2665,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                         this.tieNote[turtle] = [];
                         // Remove the note from the Lilypond list.
-                        this.lilypondStaging[turtle].pop();
+                        for (var i = 0; i < this.notePitches[turtle].length; i++) {
+                            this.lilypondRemoveTie(turtle);
+                        }
 
                         this.processNote(tmpBeatValue, blk, turtle);
 
@@ -2823,7 +2827,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             logo.synth.init(logo.turtles.turtleList[turtle].drum);
                         }
 
-                        for (var i in logo.notePitches[turtle]) {
+                        for (var i = 0; i < logo.notePitches[turtle].length; i++) {
                             var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
                             var note = noteObj[0] + noteObj[1];
                             if (note !== 'R') {
@@ -2835,6 +2839,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 } else {
                                     // FIXME: Osc Time
                                     if (carry > 0) {
+                                        if (i === 0) {
+                                            logo.lilypondInsertTie(turtle);
+                                        }
                                         originalDuration = 1 / ((1 / duration) - (1 / carry));
                                     } else {
                                         originalDuration = duration;
@@ -4088,7 +4095,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         // Push notes for lilypond.
-        this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, this.staccato[turtle], this.tieCarryOver[turtle]);
+        this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, this.staccato[turtle], false); //this.tieCarryOver[turtle]);
     }
 
     this.processLilypondNotes = function (turtle) {
@@ -4196,9 +4203,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 this.lilypondNotes[turtle] += '%5Cstaccato';
                             }
 
-                            if (obj[LYTIE]) {
-                                this.lilypondNotes[turtle] += '~';
-                            }
                             this.lilypondNotes[turtle] += ' ';
 
                             // Is this the last note in the chord?
@@ -4213,9 +4217,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 this.lilypondNotes[turtle] += '%5Cstaccato';
                             }
 
-                            if (obj[LYTIE]) {
-                                this.lilypondNotes[turtle] += '~';
-                            }
                             this.lilypondNotes[turtle] += ' ';
                             j++;  // Jump to next note.
                             k++;  // Increment notes in tuplet.
@@ -4234,7 +4235,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             this.lilypondNotes[turtle] += '} ';
                         }
                     } else {
-			this.lilypondNotes[turtle] += '} ';
+                        this.lilypondNotes[turtle] += '} ';
                     }
 
                     i += j - 1;
@@ -4247,7 +4248,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         this.lilypondNotes[turtle] += (note);
                         // Is this the last note in the chord?
                         if (i === this.lilypondStaging[turtle].length - 1 || this.lilypondStaging[turtle][i + 1][LYINSIDECHORD] !== obj[LYINSIDECHORD]) {
-                            this.lilypondNotes[turtle] += '> ';
+                            this.lilypondNotes[turtle] += '>';
+                            if (obj[LYDOTTED]) {
+                                this.lilypondNotes[turtle] += (obj[LYDURATION] + '. ');
+                            } else if (obj[LYDOUBLEDOTTED]) {
+                                this.lilypondNotes[turtle] += (obj[LYDURATION] + '.. ');
+                            } else {
+                                this.lilypondNotes[turtle] += (obj[LYDURATION] + ' ');
+                            }
                         }
                     } else if (obj[LYDOTTED]) {
                         this.lilypondNotes[turtle] += (note + obj[LYDURATION] + '.');
@@ -4267,7 +4275,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
 
                     if (obj[LYTIE]) {
-                        this.lilypondNotes[turtle] += '~';
+                        // this.lilypondNotes[turtle] += '~';
                     }
                 }
                 this.lilypondNotes[turtle] += ' ';
@@ -4280,15 +4288,29 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.lilypondLineBreak = function(turtle) {
+        if (this.lilypondStaging[turtle] == undefined) {
+            this.lilypondStaging[turtle] = [];
+        }
         this.lilypondStaging[turtle].push('break');
     }
 
     this.lilypondBeginSlur = function(turtle) {
+        if (this.lilypondStaging[turtle] == undefined) {
+            this.lilypondStaging[turtle] = [];
+        }
         this.lilypondStaging[turtle].push('(');
     }
 
     this.lilypondEndSlur = function(turtle) {
         this.lilypondStaging[turtle].push(')');
+    }
+
+    this.lilypondInsertTie = function(turtle) {
+        this.lilypondStaging[turtle].push('~');
+    }
+
+    this.lilypondRemoveTie = function(turtle) {
+        this.lilypondStaging[turtle].pop();
     }
 
     this.saveLilypondOutput = function(saveName) {
