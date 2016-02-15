@@ -630,11 +630,6 @@ function Matrix() {
                 cell.setAttribute('id', table.rows[1].cells.length - 1);
             }
         }
-
-        // Does not work...
-        for (var i = table.rows[1].cells.length - numBeats; i < table.rows[1].cells.length; i++) {
-            table.rows[1].cells[i].width = this.noteWidth(noteValue);
-        }
     }
 
     this.makeClickable = function() {
