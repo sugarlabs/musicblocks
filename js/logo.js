@@ -2013,6 +2013,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'slur':
                 if (args.length > 1) {
                     logo.staccato[turtle].push(-args[0]);
+                    logo.lilypondStaging[turtle].push('(');
                     childFlow = args[1];
                     childFlowCount = 1;
 
@@ -2021,6 +2022,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     var listener = function (event) {
                         logo.staccato[turtle].pop();
+                        logo.lilypondStaging[turtle].push(')');
                     }
 
                     logo.setListener(turtle, listenerName, listener);
@@ -4030,9 +4032,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
     this.stageNotesForLilypond = function (turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato, tie) {
         if (turtle in this.lilypondStaging) {
-            this.lilypondStaging[turtle].push([note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0, tie > 0]);
+            this.lilypondStaging[turtle].push([note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0 && last(staccato) > 0, tie > 0]);
         } else {
-            this.lilypondStaging[turtle] = [[note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0, tie > 0]];
+            this.lilypondStaging[turtle] = [[note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0 && last(staccato) > 0, tie > 0]];
         }
     }
 
@@ -4115,13 +4117,23 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         var counter = 0;
+	var queueSlur = false; 
         for (var i = 0; i < this.lilypondStaging[turtle].length; i++) {
             obj = this.lilypondStaging[turtle][i];
 
             if (typeof(obj) === 'string') {
-		if (obj === 'break' && i > 0) {
-                    this.lilypondNotes[turtle] += '%0A';
-                }
+		if (obj === 'break') {
+                    if (i > 0) {
+                        this.lilypondNotes[turtle] += '%0A';
+                    }
+                } else {
+                    if (obj === '(') {
+                        // The ( is added after the first note.
+			queueSlur = true; 
+		    } else {
+                        this.lilypondNotes[turtle] += obj;
+		    }
+		}
             } else {
                 if (counter%8 === 0 && counter > 0) {
                     this.lilypondNotes[turtle] += '%0A';
@@ -4245,6 +4257,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                 }
                 this.lilypondNotes[turtle] += ' ';
+                if (queueSlur) {
+                    queueSlur = false;
+                    this.lilypondNotes[turtle] += '(';
+                }
             }
         }
     }
