@@ -368,7 +368,11 @@ function Matrix() {
                 var exportCell = exportRow.insertCell(j);
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.innerHTML = col.innerHTML;
-                exportCell.width = col.style.width;
+                exportCell.width = col.width;
+                if(exportCell.width == ""){
+                    exportCell.width = col.style.width;
+                }
+                exportCell.colSpan = col.colSpan;
                 exportCell.style.minWidth = col.style.width;
                 exportCell.style.maxWidth = col.style.width;
                 exportCell.height = 30 + 'px';
@@ -426,6 +430,7 @@ function Matrix() {
             for (var j = 0; j < numberOfNotes; j++) {
                 cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
+                cell.style.height=30+'px';
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
