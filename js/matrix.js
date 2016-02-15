@@ -200,6 +200,8 @@ function Matrix() {
         cell.style.fontSize = this.cellScale * 100 + '%';
         cell.innerHTML = '<b>' + _('Solfa') + '</b>';
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
 
@@ -211,6 +213,8 @@ function Matrix() {
         var cell = row.insertCell(1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
+        cell.style.maxWidth=iconSize;
+        cell.style.minWidth=iconSize;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             thisMatrix.playAll();
@@ -225,6 +229,8 @@ function Matrix() {
         var cell = row.insertCell(2);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
+        cell.style.maxWidth=iconSize;
+        cell.style.minWidth=iconSize;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             thisMatrix.saveMatrix();
@@ -239,6 +245,8 @@ function Matrix() {
         var cell = row.insertCell(3);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/erase-button.svg" title="' + _('clear') + '" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
+        cell.style.maxWidth=iconSize;
+        cell.style.minWidth=iconSize;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             thisMatrix.clearMatrix();
@@ -253,6 +261,8 @@ function Matrix() {
         var cell = row.insertCell(4);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-button.svg" title="' + _('export') + ' HTML" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
+        cell.style.maxWidth=iconSize;
+        cell.style.minWidth=iconSize;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             thisMatrix.exportMatrix();
@@ -267,6 +277,8 @@ function Matrix() {
         var cell = row.insertCell(5);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
+        cell.style.maxWidth=iconSize;
+        cell.style.minWidth=iconSize;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             docById('matrix').style.visibility = 'hidden';
@@ -293,6 +305,8 @@ function Matrix() {
             cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
             cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
             cell.style.top = matrixDivPosition.top + j * cell.style.height + 'px';
             j += 1;
@@ -305,6 +319,8 @@ function Matrix() {
         cell.style.position = 'fixed';
         cell.style.height = 1.5 * MATRIXSOLFEHEIGHT * this.cellScale + 'px';
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
         cell.style.left = matrixDivPosition.left + 2 + 'px';
         cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
@@ -437,6 +453,8 @@ function Matrix() {
             cell.style.fontSize = this.cellScale * 75 + '%';
             cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
             cell.style.top = matrixDivPosition.top + (table.rows.length - 1) * cell.style.height + 'px';
@@ -462,6 +480,8 @@ function Matrix() {
         cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
         cell.style.lineHeight = 60 + '%';
         cell.style.width = this.noteWidth(noteValue);
+        cell.style.minWidth = this.noteWidth(noteValue);
+        cell.style.maxWidth = this.noteWidth(noteValue);
         cell.innerHTML = noteValueToDisplay;
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
@@ -490,6 +510,8 @@ function Matrix() {
             var cell = row.insertCell(-1);
             cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.height = 1.5 * MATRIXSOLFEHEIGHT * this.cellScale + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
             cell.style.top = matrixDivPosition.top + (table.rows.length - 2) * cell.style.height + 'px';
@@ -576,6 +598,8 @@ function Matrix() {
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
                 cell.width = this.noteWidth(noteValue);
                 cell.style.width = this.noteWidth(noteValue);
+                cell.style.maxWidth = this.noteWidth(noteValue);
+                cell.style.minWidth = this.noteWidth(noteValue);
                 if (i === rowCount) {
                     cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
                     cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
