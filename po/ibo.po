@@ -33,7 +33,7 @@ msgid "rice and beans"
 msgstr "osikapa na agwa"
 
 msgid "show"
-msgstr "show"
+msgstr "zie"
 
 msgid "text"
 msgstr "ederede"
@@ -46,10 +46,10 @@ msgstr "gosi"
 
 #. TRANS: musical meter
 msgid "meter"
-msgstr ""
+msgstr "mita"
 
 msgid "Save your project to a file."
-msgstr ""
+msgstr "Azọpụta gị oru ngo a faịlụ."
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
@@ -61,36 +61,36 @@ msgstr "lekwasịrị"
 
 #. TRANS: horizontal space
 msgid "hspace"
-msgstr ""
+msgstr "hspace"
 
 msgid "keyboard"
-msgstr "keyboard"
+msgstr "kiiboodu"
 
 msgid "You can also load projects from the file system."
 msgstr "giwa nwekwara ike mara oru ngo si faịlụ usoro"
 
 #. TRANS: as in "on event do"
 msgid "on"
-msgstr ""
+msgstr "inwu"
 
 msgid "chicken"
 msgstr "okuko"
 
 msgid "Run music slow"
-msgstr ""
+msgstr "Agba ọsọ egwu ngwa ngwa"
 
 msgid "apple"
 msgstr "apụl"
 
 msgid "graphical notation matrix"
-msgstr ""
+msgstr "graphical notation matrix"
 
 msgid "number"
 msgstr "nọmba"
 
 #. TRANS: unique ID
 msgid "UID"
-msgstr ""
+msgstr "UID"
 
 #. TRANS: name of project
 msgid "title"
@@ -100,14 +100,14 @@ msgid "radians"
 msgstr "radians"
 
 msgid "staccato"
-msgstr ""
+msgstr "staccato"
 
 msgid "Undo"
 msgstr "Wepu"
 
 #. TRANS: ms is micro seconds
 msgid "duration (ms)"
-msgstr ""
+msgstr "Na oge (ms)"
 
 #. TRANS: as in "add 1 to"
 msgid "to"
@@ -126,7 +126,7 @@ msgid "latitude"
 msgstr "ohere"
 
 msgid "1/32 note 𝅘𝅥𝅰"
-msgstr ""
+msgstr "1/32 note 𝅘𝅥𝅰"
 
 msgid "mouse x"
 msgstr "oke x"
@@ -145,17 +145,17 @@ msgid "move"
 msgstr "ije"
 
 msgid "triangle"
-msgstr ""
+msgstr "triangul"
 
 msgid "stop turtle"
 msgstr "kwusi mbe "
 
 msgid "current pitch octave"
-msgstr ""
+msgstr "pitch octave ugbu a"
 
 #. TRANS: robot sensors.
 msgid "distance"
-msgstr ""
+msgstr "ntoanya"
 
 msgid "food"
 msgstr "nri"
@@ -168,7 +168,7 @@ msgstr "kwụsị"
 
 #. TRANS: vertical space
 msgid "vspace"
-msgstr ""
+msgstr "v ohere"
 
 msgid "fat"
 msgstr "ibu"
@@ -178,7 +178,7 @@ msgstr "Ịmụbawanye ma ọ bụ daa stacks nke blocks, dịka, na-amalite na 
 
 #. TRANS: a container for a variable
 msgid "boxes"
-msgstr ""
+msgstr "akpati"
 
 msgid "get fiber"
 msgstr "na-eriri"
@@ -195,7 +195,7 @@ msgstr "Google map"
 
 #. TRANS: as in blinking an eye.
 msgid "blink"
-msgstr ""
+msgstr "itabi anya"
 
 msgid "day"
 msgstr "ụbọchị"
@@ -205,10 +205,10 @@ msgid "mod"
 msgstr "mod"
 
 msgid "beat factor"
-msgstr ""
+msgstr "ụda ihe na-akpata"
 
 msgid "Save project"
-msgstr "Save oru ngo"
+msgstr "zoputa oru ngo"
 
 msgid "Copy"
 msgstr "Detuo"
@@ -230,7 +230,7 @@ msgid "The paste button is enabled when there are blocks copied onto the clipboa
 msgstr "The tapawa button na-nyeere e nwere blocks depụtaghachiri n'elu clipboard"
 
 msgid "transposition"
-msgstr ""
+msgstr "transposition"
 
 msgid "Expand/collapse toolbar"
 msgstr "Ịmụbawanye / ida toolbar"
@@ -258,7 +258,7 @@ msgid "fiber"
 msgstr "eriri"
 
 msgid "You can scroll the blocks on the canvas."
-msgstr ""
+msgstr "Ị nwere ike pịgharịa na blocks na kwaaji."
 
 msgid "x"
 msgstr "x"
@@ -276,11 +276,11 @@ msgid "turtle"
 msgstr "mbe"
 
 msgid "crescendo"
-msgstr ""
+msgstr "crescendo"
 
 #. TRANS: sawtooth wave
 msgid "sawtooth"
-msgstr ""
+msgstr "sawtooth"
 
 msgid "right"
 msgstr "nri"
@@ -298,7 +298,7 @@ msgid "This button opens a viewer for loading example projects."
 msgstr "Nke a ga-emepe button a na-ekiri maka loading atụ oru ngo"
 
 msgid "Enable scrolling"
-msgstr ""
+msgstr "Kwado pịgharịwa"
 
 msgid "back"
 msgstr "azụ"
@@ -311,7 +311,7 @@ msgstr "Pịa na-agba ọsọ ngo nzọụkwụ site nzọụkwụ"
 
 #. TRANS: hollow line refers to drawing an outline around a line
 msgid "hollow line"
-msgstr ""
+msgstr "oghere ogbara"
 
 msgid "arc"
 msgstr "aak"
@@ -330,15 +330,15 @@ msgid "set shade"
 msgstr "set ndo"
 
 msgid "duplicate notes"
-msgstr ""
+msgstr "oyiri ndetu"
 
 #. TRANS: in mathematical sense (inverse of period)
 msgid "frequency"
-msgstr ""
+msgstr "ugboro ole"
 
 #. TRANS: as in the event that a signal arrives
 msgid "event"
-msgstr ""
+msgstr "omume"
 
 msgid "pixel color"
 msgstr "pixel agba"
@@ -351,26 +351,26 @@ msgstr "Nke a button emepekwa na-emechi isi toolbar."
 
 #. TRANS: index specifies a position into an array (heap)
 msgid "index"
-msgstr ""
+msgstr "ndeksi"
 
 msgid "note volume"
-msgstr ""
+msgstr "dee olu"
 
 msgid "hide"
-msgstr ""
+msgstr "zie"
 
 #. TRANS: show the contents of the heap.
 msgid "show heap"
 msgstr "show kpokọtara"
 
 msgid "Stop the music (and the turtles)."
-msgstr ""
+msgstr "Kwụsị egwu (na mbe)."
 
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
+msgstr "Ị na-okokụre na njegharị. Biko enwe egwu nkwa ngọngọ!"
 
 msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-msgstr ""
+msgstr "Mr. Òké bụ anyị Egwú nkanka eduzi. Mr. Òké na i kwesịrị inyocha Egwú nkanka. Ka anyị na-amalite anyị njegharị!"
 
 #. TRANS: publish project to Facebook
 msgid "publish"
@@ -382,11 +382,11 @@ msgstr "amụma"
 
 #. TRANS: hours ago that the data was updated.
 msgid "hours ago"
-msgstr ""
+msgstr "awa gara aga"
 
 #. TRANS: slurring of notes in music
 msgid "slur"
-msgstr ""
+msgstr "slur"
 
 msgid "pen"
 msgstr "pen"
@@ -399,7 +399,7 @@ msgstr "ebipụta"
 
 #. TRANS: how many entries are in the heap?
 msgid "heap length"
-msgstr ""
+msgstr "obo ogologo"
 
 msgid "speak"
 msgstr "kwo"
@@ -408,10 +408,10 @@ msgid "Expand/collapse option toolbar"
 msgstr "Ịmụbawanye / daa nhọrọ toolbar"
 
 msgid "end hollow line"
-msgstr ""
+msgstr "akwụsị oghere ogbara"
 
 msgid "city latitude"
-msgstr ""
+msgstr "obodo ohere"
 
 msgid "Display statistics about your Music project."
 msgstr "Ngosipụta ọnụ ọgụgụ banyere gị mbe oru ngo."
@@ -427,7 +427,7 @@ msgid "Settings"
 msgstr "Ntọala"
 
 msgid "one of"
-msgstr ""
+msgstr "otu n'ime"
 
 msgid "Save stack"
 msgstr "ịzọpụta tojupụtara"
@@ -449,7 +449,7 @@ msgstr "imiri"
 
 #. TRANS: robot sensors.
 msgid "infrared light (left)"
-msgstr ""
+msgstr "infrared oku (n'aka ekpe)"
 
 #. TRANS: mathematical exponential base
 msgid "base"
@@ -462,11 +462,11 @@ msgid "Show or hide a polar-coordinate grid."
 msgstr "Egosi ma ọ bụ zoo a polar-ahazi okporo"
 
 msgid "octave"
-msgstr ""
+msgstr "octave"
 
 #. TRANS: Musical score
 msgid "Save sheet music"
-msgstr ""
+msgstr "Zọpụta mpempe akwụkwọ egwu"
 
 #. TRANS: save the heap to a file
 msgid "save heap"
@@ -483,7 +483,7 @@ msgstr "pen ala"
 
 #. TRANS: retrieve the value at a specific entry (index) in the heap
 msgid "index heap"
-msgstr ""
+msgstr "ndeksi obo"
 
 msgid "get name"
 msgstr "na-aha"
