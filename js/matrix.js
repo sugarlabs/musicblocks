@@ -368,7 +368,9 @@ function Matrix() {
                 var exportCell = exportRow.insertCell(j);
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.innerHTML = col.innerHTML;
-                exportCell.width = 30 + 'px';
+                exportCell.width = col.style.width;
+                exportCell.style.minWidth = col.style.width;
+                exportCell.style.maxWidth = col.style.width;
                 exportCell.height = 30 + 'px';
                 exportCell.style.fontSize = 14 + 'px';
                 exportCell.style.padding = 1 + 'px';
