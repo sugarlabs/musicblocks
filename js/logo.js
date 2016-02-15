@@ -874,7 +874,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'nameddo':
                 var name = logo.blocks.blockList[blk].privateData;
                 if (name in logo.actions) {
-                    logo.lilypondStaging[turtle].push('break');
+                    logo.lilypondLineBreak(turtle);
                     childFlow = logo.actions[name];
                     childFlowCount = 1;
                     if (logo.doBlocks[turtle].indexOf(blk) === -1) {
@@ -891,7 +891,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'do':
                 if (args.length === 1) {
                     if (args[0] in logo.actions) {
-                        logo.lilypondStaging[turtle].push('break');
+                        logo.lilypondLineBreak(turtle);
                         childFlow = logo.actions[args[0]];
                         childFlowCount = 1;
                         if (logo.doBlocks[turtle].indexOf(blk) === -1) {
@@ -915,7 +915,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                 }
                 if (name in logo.actions) {
-                    logo.lilypondStaging[turtle].push('break');
+                    logo.lilypondLineBreak(turtle);
                     childFlow = logo.actions[name]
                     childFlowCount = 1;
                     if (logo.doBlocks[turtle].indexOf(blk) === -1) {
@@ -938,7 +938,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 if (args.length >= 1) {
                     if (args[0] in logo.actions) {
-                        logo.lilypondStaging[turtle].push('break');
+                        logo.lilypondLineBreak(turtle);
                         actionName = args[0];
                         childFlow = logo.actions[args[0]];
                         childFlowCount = 1;
@@ -2013,7 +2013,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'slur':
                 if (args.length > 1) {
                     logo.staccato[turtle].push(-args[0]);
-                    logo.lilypondStaging[turtle].push('(');
+                    logo.lilypondBeginSlur(turtle);
                     childFlow = args[1];
                     childFlowCount = 1;
 
@@ -2022,7 +2022,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     var listener = function (event) {
                         logo.staccato[turtle].pop();
-                        logo.lilypondStaging[turtle].push(')');
+                        logo.lilypondEndSlur(turtle);
                     }
 
                     logo.setListener(turtle, listenerName, listener);
@@ -4117,29 +4117,29 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         var counter = 0;
-	var queueSlur = false; 
+        var queueSlur = false; 
         for (var i = 0; i < this.lilypondStaging[turtle].length; i++) {
             obj = this.lilypondStaging[turtle][i];
 
             if (typeof(obj) === 'string') {
-		if (obj === 'break') {
+                if (obj === 'break') {
                     if (i > 0) {
                         this.lilypondNotes[turtle] += '%0A';
                     }
                 } else {
                     if (obj === '(') {
                         // The ( is added after the first note.
-			queueSlur = true; 
-		    } else {
+                        queueSlur = true; 
+                    } else {
                         this.lilypondNotes[turtle] += obj;
-		    }
-		}
+                    }
+                }
             } else {
                 if (counter%8 === 0 && counter > 0) {
                     this.lilypondNotes[turtle] += '%0A';
                 }
-		counter += 1;
-		
+                counter += 1;
+                
                 var note = toLilynote(obj[LYNOTE]);
                 var singleton = false;
 
@@ -4222,7 +4222,21 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                     }
 
-                    this.lilypondNotes[turtle] += '} ';
+                    // Workaround to Lilypond bug: if a slur ends on a
+                    // tuplet, the closing ) must be inside the
+                    // closing } of the tuplet.
+                    if (i + j - 1 < this.lilypondStaging[turtle].length - 1) {
+                        var nextObj = this.lilypondStaging[turtle][i + j];
+                        if (typeof(nextObj) === 'string' && nextObj === ')') {
+                            this.lilypondNotes[turtle] += ')} ';
+                            i += 1;
+                        } else {
+                            this.lilypondNotes[turtle] += '} ';
+                        }
+                    } else {
+			this.lilypondNotes[turtle] += '} ';
+                    }
+
                     i += j - 1;
                 } else {
                     if (obj[LYINSIDECHORD] > 0) {
@@ -4263,6 +4277,18 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
         }
+    }
+
+    this.lilypondLineBreak = function(turtle) {
+        this.lilypondStaging[turtle].push('break');
+    }
+
+    this.lilypondBeginSlur = function(turtle) {
+        this.lilypondStaging[turtle].push('(');
+    }
+
+    this.lilypondEndSlur = function(turtle) {
+        this.lilypondStaging[turtle].push(')');
     }
 
     this.saveLilypondOutput = function(saveName) {
