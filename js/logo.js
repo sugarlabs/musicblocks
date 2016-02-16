@@ -2795,7 +2795,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             }
                             console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1]);
                             if (logo.blocks.blockList[blk].name === 'osctime') {
-                                logo.updateNotation(frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1], 1000 / duration, turtle, insideChord);
+                                logo.updateNotation(frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1], (bpmFactor * 1000) / duration, turtle, insideChord);
                             } else {
                                 logo.updateNotation(frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
                             }
@@ -2815,6 +2815,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                     var stopTime = 0;
                                 }
                             }
+
                             setTimeout(function(){
                                 for (var i = 0; i < oscillators.length; i++) {
                                     oscillators[i].stop();
