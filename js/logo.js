@@ -2286,7 +2286,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'square':
             case 'sawtooth':
                 if (args.length === 1) {
-                    logo.oscList[turtle].push([logo.blocks.blockList[blk].name, args[0]]);
+                    if (logo.inMatrix) {
+                        matrix.addRowBlock(blk);
+                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                            logo.pitchBlocks.push(blk);
+                        }
+			var obj = frequencyToPitch(args[0]);
+                        matrix.solfegeNotes.push(logo.getSolfege(obj[0]));
+                        matrix.solfegeOctaves.push(obj[1]);
+                    } else {
+                        logo.oscList[turtle].push([logo.blocks.blockList[blk].name, args[0]]);
+		    }
                 }
                 break;
             case 'playfwd':
