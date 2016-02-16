@@ -1345,6 +1345,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var vspaceBlock = new ProtoBlock('vspace');
     vspaceBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['vspace'] = vspaceBlock;
+    vspaceBlock.extraWidth = -10;
     vspaceBlock.zeroArgBlock();
 
     var hspaceBlock = new ProtoBlock('hspace');
