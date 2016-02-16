@@ -73,18 +73,18 @@ function analyzeProject(blocks) {
     // Parse block data and generate score based on rubric
 
     var blockList = [];
-    for (blk = 0; blk < blocks.blockList.length; blk++) {
+    for (var blk = 0; blk < blocks.blockList.length; blk++) {
         blockList.push(blocks.blockList[blk].name);
     }
 
     scores = [];
-    for (i = 0; i < PALS.length; i++) {
+    for (var i = 0; i < PALS.length; i++) {
         scores.push(0);
     }
     cats = [];
     pals = [];
 
-    for (b = 0; b < blockList.length; b++) {
+    for (var b = 0; b < blockList.length; b++) {
         if (blockList[b] in TACAT) {
             if (!(TACAT[blockList[b]] in cats)) {
                 cats.push(TACAT[blockList[b]]);
@@ -93,7 +93,7 @@ function analyzeProject(blocks) {
            console.log(blockList[b] + ' not in catelog');
         }
     }
-    for (c = 0; c < cats.length; c++) {
+    for (var c = 0; c < cats.length; c++) {
         if (cats[c] in TAPAL) {
             if (!(TAPAL[cats[c]] in pals)) {
                 pals.push(TAPAL[cats[c]]);
@@ -101,13 +101,13 @@ function analyzeProject(blocks) {
         }
     }
 
-    for (c = 0; c < cats.length; c++) {
+    for (var c = 0; c < cats.length; c++) {
         if (cats[c] in TASCORE) {
             scores[PALS.indexOf(TAPAL[cats[c]])] += TASCORE[cats[c]];
         }
     }
 
-    for (p = 0; p < pals.length; p++) {
+    for (var p = 0; p < pals.length; p++) {
         if (pals[p] in TASCORE) {
             scores[PALS.indexOf(pals[p])] += TASCORE[pals[p]];
         }
@@ -120,7 +120,7 @@ function analyzeProject(blocks) {
 function scoreToChartData(scores) {
     var normalizedScores = [];
     var maxScore = 0;
-    for (i = 0; i < scores.length; i++) {
+    for (var i = 0; i < scores.length; i++) {
         if (scores[i] > maxScore) {
             maxScore = scores[i];
         }
@@ -134,7 +134,7 @@ function scoreToChartData(scores) {
     if (scale > 1) {
         scale = 1;
     }
-    for (i = 0; i < scores.length; i++) {
+    for (var i = 0; i < scores.length; i++) {
         normalizedScores.push(scores[i] * scale);
     }
 
