@@ -251,8 +251,8 @@ define(function (require) {
             // [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
             // [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
             [_('Display statistics'), _('Display statistics about your Music project.'), 'header-icons/chart-button.svg'],
-            [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugin-button.svg'],
-            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-button.svg'],
+            [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugins-button-white.svg'],
+            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-unlock-button-white.svg'],
             [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
             [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
