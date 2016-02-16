@@ -264,7 +264,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // If some notes are supposed to play for longer, add them back to the queue
                 var shortestNote = Math.min.apply(null, notesArray);
                 var continueFrom;
-                for (turtle in logo.playedNoteTimes) {
+                for (var turtle in logo.playedNoteTimes) {
                     if (logo.playedNoteTimes[turtle] > shortestNote) {
                         continueFrom = tempStepQueue[turtle];
                         // Subtract the time, as if we haven't played it yet
