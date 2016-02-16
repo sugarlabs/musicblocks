@@ -2567,6 +2567,24 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.processNote = function(noteValue, blk, turtle) {
+        if (this.bpm[turtle].length > 0) {
+            var bpmFactor = TONEBPM / last(this.bpm[turtle]);
+        } else {
+            var bpmFactor = TONEBPM / TARGETBPM;
+        }
+
+        if (this.blocks.blockList[blk].name === 'osctime') {
+	    // Convert msecs to note value.
+            if (noteValue == 0) {
+                var noteBeatValue = 0;
+            } else {
+                var noteBeatValue = (bpmFactor * 1000) / noteValue;
+            }
+        } else {
+            var noteBeatValue = noteValue;
+	}
+        console.log('noteValue: ' + noteValue + ' ' + noteBeatValue);
+
         var carry = 0;
 
         if (this.crescendoDelta[turtle].length === 0) {
@@ -2579,7 +2597,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     matrix.addNode(this.pitchBlocks[i], blk, 0);
                 }
             }
-            var noteBeatValue = noteValue * this.beatFactor[turtle];
+            noteBeatValue *= this.beatFactor[turtle];
             if (this.tuplet === true) {
                 if(this.addingNotesToTuplet) {
                     var i = this.tupletRhythms.length - 1;
@@ -2610,24 +2628,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // When we are "drifting", we don't bother with lag.
                 var turtleLag = 0;
             }
-
-            if (this.bpm[turtle].length > 0) {
-                var bpmFactor = TONEBPM / last(this.bpm[turtle]);
-            } else {
-                var bpmFactor = TONEBPM / TARGETBPM;
-            }
-
-            if (this.blocks.blockList[blk].name === 'osctime') {
-		// Convert msecs to note value.
-                if (noteValue == 0) {
-                    var noteBeatValue = 0;
-                } else {
-                    var noteBeatValue = (bpmFactor * 1000) / noteValue;
-                }
-            } else {
-                var noteBeatValue = noteValue;
-	    }
-            console.log('noteValue: ' + noteValue + ' ' + noteBeatValue);
 
             // If we are in a tie, depending upon parity, we either
             // add the duration from the previous note to the current
