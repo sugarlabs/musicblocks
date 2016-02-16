@@ -83,7 +83,7 @@ function Matrix() {
         // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
         this.cellScale = w / 1200;
-        document.getElementById('matrix').style.width = Math.floor(w / 2) + "px";
+        document.getElementById('matrix').style.maxWidth = Math.floor(w / 2) + "px";
         document.getElementById('matrix').style.overflowX = "auto";
 
         console.log('notes ' + this.solfegeNotes + ' octave ' + this.solfegeOctaves + ' transpositions ' + this.solfegeTranspositions);
