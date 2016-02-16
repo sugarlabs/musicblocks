@@ -33,7 +33,7 @@ function maxPaletteHeight(menuSize, scale) {
 
 function paletteBlockButtonPush(name, arg) {
     // console.log('paletteBlockButtonPush: ' + name + ' ' + arg);
-    blk = paletteBlocks.makeBlock(name, arg);
+    var blk = paletteBlocks.makeBlock(name, arg);
     return blk;
 }
 
@@ -298,14 +298,14 @@ function loadPaletteButtonHandler(palettes, name) {
 
     palettes.buttons[name].on('mousedown', function(event) {
         scrolling = true;
-        lastY = event.stageY;
+        var lastY = event.stageY;
 
         palettes.buttons[name].on('pressmove', function(event) {
             if (!scrolling) {
                 return;
             }
 
-            diff = event.stageY - lastY;
+            var diff = event.stageY - lastY;
             palettes.menuScrollEvent(diff, 10);
             lastY = event.stageY;
         });
@@ -999,8 +999,8 @@ function Palette(palettes, name) {
     this.moveMenu = function(x, y) {
         // :sigh: race condition on iOS 7.1.2
         if (this.menuContainer == null) return;
-        dx = x - this.menuContainer.x;
-        dy = y - this.menuContainer.y;
+        var dx = x - this.menuContainer.x;
+        var dy = y - this.menuContainer.y;
         this.menuContainer.x = x;
         this.menuContainer.y = y;
         this.moveMenuItemsRelative(dx, dy);
@@ -1234,6 +1234,8 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     add('sensors').
     add('heap').
     add('extras');
+
+    // Define some globals.
     palettes.makePalettes();
     blocks = b;
 
@@ -1457,17 +1459,17 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
     var SIXTYFOURTHOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 64}], 0, 0, [0]]];
     var BUILTINMACROS = {'note': NOTEOBJ,
                          'osctime': OSCTIMEOBJ,
-			 'matrix': MATRIXOBJ,
-			 'turtlepitch': TURTLEPITCHOBJ,
-			 'setturtlename': SETTURTLENAMEOBJ,
-			 'wholeNote': WHOLEOBJ,
-			 'halfNote': HALFOBJ,
-			 'quarterNote': QUARTEROBJ,
-			 'eighthNote': EIGHTHOBJ,
-			 'sixteenthNote': SIXTEENTHOBJ,
-			 'thirtysecondNote': THIRTYSECONDOBJ,
-			 'sixtyfourthNote': SIXTYFOURTHOBJ,
-			};
+                         'matrix': MATRIXOBJ,
+                         'turtlepitch': TURTLEPITCHOBJ,
+                         'setturtlename': SETTURTLENAMEOBJ,
+                         'wholeNote': WHOLEOBJ,
+                         'halfNote': HALFOBJ,
+                         'quarterNote': QUARTEROBJ,
+                         'eighthNote': EIGHTHOBJ,
+                         'sixteenthNote': SIXTEENTHOBJ,
+                         'thirtysecondNote': THIRTYSECONDOBJ,
+                         'sixtyfourthNote': SIXTYFOURTHOBJ,
+                        };
 
     if (moved) {
         moved = false;
@@ -1723,7 +1725,7 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
     // Works with Chrome, Safari, Firefox (untested on IE)
     var img = new Image();
     img.onload = function() {
-        bitmap = new createjs.Bitmap(img);
+        var bitmap = new createjs.Bitmap(img);
         callback(palette, name, bitmap, extras);
     }
     img.src = 'data:image/svg+xml;base64,' + window.btoa(
