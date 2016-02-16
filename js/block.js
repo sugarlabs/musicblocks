@@ -103,7 +103,11 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
-        this.container.updateCache();
+        try {
+            this.container.updateCache();
+        } catch (e) {
+            console.log(e);
+	}
         this.blocks.refreshCanvas();
     }
 
@@ -127,7 +131,11 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
-        this.container.updateCache();
+        try {
+            this.container.updateCache();
+	} catch (e) {
+            console.log(e);
+	}
         this.blocks.refreshCanvas();
     }
 
@@ -405,53 +413,63 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.container.uncache();
                 }
 
-                myBlock.bounds = myBlock.container.getBounds();
-                if (myBlock.bounds == null) {
-		    // FIXME: Why is this happening sometimes? Race condition?
-		    console.log('block container for ' + + ' not yet ready.' + myBlock.name);
-		} else {
-		    myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
-                }
+                function finishProcess(myBlock) {
+                    myBlock.blocks.refreshCanvas();
 
-                myBlock.blocks.refreshCanvas();
+                    if (firstTime) {
+                        loadEventHandlers(myBlock);
+                        if (myBlock.image != null) {
+                            myBlock.addImage();
+                        }
+                        myBlock.finishImageLoad();
+                    } else {
+                        if (myBlock.name === 'start' || myBlock.name === 'drum') {
+                            ensureDecorationOnTop(myBlock);
+                        }
 
-                if (firstTime) {
-                    loadEventHandlers(myBlock);
-                    if (myBlock.image != null) {
-                        myBlock.addImage();
+                        // Adjust the docks.
+                        myBlock.blocks.loopCounter = 0;
+                        // console.log('adjust Docks ' + myBlock.name);
+                        myBlock.blocks.adjustDocks(thisBlock);
+
+                        // Adjust the text position.
+                        positionText(myBlock, myBlock.protoblock.scale);
+
+                        // Are there clamp blocks that need expanding?
+                        if (myBlock.blocks.clampBlocksToCheck.length > 0) {
+                            setTimeout(function () {
+                                myBlock.blocks.adjustExpandableClampBlock();
+                            }, 250);
+                        }
+
+                        if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
+                            myBlock.bitmap.visible = !myBlock.collapsed;
+                            myBlock.highlightBitmap.visible = false;
+                            myBlock.container.updateCache();
+                            myBlock.blocks.refreshCanvas();
+                        }
+                        if (myBlock.postProcess != null) {
+                            myBlock.postProcess(myBlock);
+                            myBlock.postProcess = null;
+                        }
                     }
-                    myBlock.finishImageLoad();
-                } else {
-                    if (myBlock.name === 'start' || myBlock.name === 'drum') {
-                        ensureDecorationOnTop(myBlock);
-                    }
+		}
 
-                    // Adjust the docks.
-                    myBlock.blocks.loopCounter = 0;
-                    // console.log('adjust Docks ' + myBlock.name);
-                    myBlock.blocks.adjustDocks(thisBlock);
+		// Workaround for a race condition.
+                function createCache(myBlock) {
+                    myBlock.bounds = myBlock.container.getBounds();
+                    if (myBlock.bounds == null) {
+			console.log('block container for ' + thisBlock + ' not yet ready. (' + myBlock.name + ')');
+			setTimeout(function() {
+                            createCache(myBlock);
+			}, 250);
+		    } else {
+                        myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
+                        finishProcess(myBlock);
+		    }
+		}
+                createCache(myBlock);
 
-                    // Adjust the text position.
-                    positionText(myBlock, myBlock.protoblock.scale);
-
-                    // Are there clamp blocks that need expanding?
-                    if (myBlock.blocks.clampBlocksToCheck.length > 0) {
-                        setTimeout(function () {
-                            myBlock.blocks.adjustExpandableClampBlock();
-                        }, 250);
-                    }
-
-                    if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
-                        myBlock.bitmap.visible = !myBlock.collapsed;
-                        myBlock.highlightBitmap.visible = false;
-                        myBlock.container.updateCache();
-                        myBlock.blocks.refreshCanvas();
-                    }
-                    if (myBlock.postProcess != null) {
-                        myBlock.postProcess(myBlock);
-                        myBlock.postProcess = null;
-                    }
-                }
             }
 
             if (myBlock.protoblock.disabled) {
