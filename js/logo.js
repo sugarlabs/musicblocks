@@ -2058,7 +2058,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         // Remove the note from the Lilypond list.
                         for (var i = 0; i < logo.notePitches[turtle].length; i++) {
                             logo.lilypondRemoveTie(turtle);
-		        }
+                        }
                         var noteValue = logo.tieCarryOver[turtle];
                         logo.tieCarryOver[turtle] = 0;
                         logo.processNote(noteValue, blk, turtle);
@@ -2291,12 +2291,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         if (logo.pitchBlocks.indexOf(blk) === -1) {
                             logo.pitchBlocks.push(blk);
                         }
-			var obj = frequencyToPitch(args[0]);
+                        // TODO: add frequency instead of approximate note to matrix
+                        var obj = frequencyToPitch(args[0]);
                         matrix.solfegeNotes.push(logo.getSolfege(obj[0]));
                         matrix.solfegeOctaves.push(obj[1]);
                     } else {
                         logo.oscList[turtle].push([logo.blocks.blockList[blk].name, args[0]]);
-		    }
+                    }
                 }
                 break;
             case 'playfwd':
@@ -2584,7 +2585,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         if (this.blocks.blockList[blk].name === 'osctime') {
-	    // Convert msecs to note value.
+            // Convert msecs to note value.
             if (noteValue == 0) {
                 var noteBeatValue = 0;
             } else {
@@ -2592,7 +2593,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
         } else {
             var noteBeatValue = noteValue;
-	}
+        }
         console.log('noteValue: ' + noteValue + ' ' + noteBeatValue);
 
         var carry = 0;
