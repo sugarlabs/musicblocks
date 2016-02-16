@@ -1,4 +1,4 @@
-// Copyright (c) 2014,2015 Walter Bender
+// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -30,6 +30,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     } else {
         storage = localStorage;
     }
+
     this.canvas = canvas;
     this.stage = stage;
     this.refreshCanvas = refreshCanvas;
@@ -42,8 +43,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.blockList = [];
 
     // Track the time with mouse down.
-    this.time = 0;
-    this.timeOut = null;
+    this.mouseDownTime = 0;
+    this.longPressTimeout = null;
 
     // "Copy stack" selects a stack for pasting. Are we selecting?
     this.selectingStack = false;
@@ -355,9 +356,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Which connection do we start with?
         if (['doArg', 'calcArg'].indexOf(myBlock.name) !== -1) {
-            ci = 2;
+            var ci = 2;
         } else {
-            ci = 1;
+            var ci = 1;
         }
 
         // Get the current slot list.
@@ -450,8 +451,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var lastDock = last(thisBlock.docks);
                 var dx = lastDock[0] - vspaceBlock.docks[0][0];
                 var dy = lastDock[1] - vspaceBlock.docks[0][1];
-                vspaceBlock.x = thisBlock.container.x + dx;
-                vspaceBlock.y = thisBlock.container.y + dy;
                 vspaceBlock.container.x = thisBlock.container.x + dx;
                 vspaceBlock.container.y = thisBlock.container.y + dy;
                 vspaceBlock.connections[0] = blockBlocks.blockList.indexOf(thisBlock);
@@ -634,8 +633,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var dy = bdock[1] - cdock[1];
                 if (myBlock.container == null) {
                     console.log('Does this ever happen any more?')
-                    var nx = myBlock.x + dx;
-                    var ny = myBlock.y + dy;
                 } else {
                     var nx = myBlock.container.x + dx;
                     var ny = myBlock.container.y + dy;
@@ -763,9 +760,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
                 // Look for available connections.
                 if (this.testConnectionType(blkType, this.blockList[b].docks[i][2])) {
-                    x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];
-                    y2 = this.blockList[b].container.y + this.blockList[b].docks[i][1];
-                    dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+                    var x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];
+                    var y2 = this.blockList[b].container.y + this.blockList[b].docks[i][1];
+                    var dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
                     if (dist < min) {
                         newBlock = b;
                         newConnection = i;
@@ -1045,7 +1042,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.updateBlockPositions = function () {
         // Create the block image if it doesn't yet exist.
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            this.moveBlock(blk, this.blockList[blk].x, this.blockList[blk].y);
+            this.moveBlock(blk, this.blockList[blk].container.x, this.blockList[blk].container.y);
         }
     }
 
@@ -1069,16 +1066,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (myBlock.container != null) {
             myBlock.container.x = x;
             myBlock.container.y = y;
-            myBlock.x = x
-            myBlock.y = y
             if (myBlock.collapseContainer != null) {
                 myBlock.collapseContainer.x = x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
                 myBlock.collapseContainer.y = y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
         } else {
             console.log('no container yet');
-            myBlock.x = x
-            myBlock.y = y
         }
     }
 
@@ -1095,16 +1088,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (myBlock.container != null) {
             myBlock.container.x += dx;
             myBlock.container.y += dy;
-            myBlock.x = myBlock.container.x;
-            myBlock.y = myBlock.container.y;
             if (myBlock.collapseContainer != null) {
                 myBlock.collapseContainer.x += dx;
                 myBlock.collapseContainer.y += dy;
             }
         } else {
             console.log('no container yet');
-            myBlock.x += dx
-            myBlock.y += dy
         }
     }
 
@@ -1409,8 +1398,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         myBlock.container = new createjs.Container();
         this.stage.addChild(myBlock.container);
         myBlock.container.snapToPixelEnabled = true;
-        myBlock.container.x = myBlock.x;
-        myBlock.container.y = myBlock.y;
+        myBlock.container.x = 0;
+        myBlock.container.y = 0;
 
         // and we need to load the images into the container.
         myBlock.imageLoad();
@@ -2801,8 +2790,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
             if (thisBlock === this.blockList.length - 1) {
                 if (this.blockList[thisBlock].connections[0] == null) {
-                    this.blockList[thisBlock].x = blkData[2];
-                    this.blockList[thisBlock].y = blkData[3];
+                    this.blockList[thisBlock].container.x = blkData[2];
+                    this.blockList[thisBlock].container.y = blkData[3];
                     this.adjustTheseDocks.push(thisBlock);
                 }
             }

@@ -1,4 +1,4 @@
-// Copyright (c) 2014,2015 Walter Bender
+// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -23,8 +23,6 @@ function Block(protoblock, blocks, overrideName) {
     this.name = protoblock.name;
     this.overrideName = overrideName;
     this.blocks = blocks;
-    this.x = 0;
-    this.y = 0;
     this.collapsed = false; // Is this block in a collapsed stack?
     this.trash = false; // Is this block in the trash?
     this.loadComplete = false; // Has the block finished loading?
@@ -765,7 +763,7 @@ function Block(protoblock, blocks, overrideName) {
         var fileChooser = docById('myOpenAll');
 
         readerAction = function (event) {
-            window.scroll(0, 0)
+            window.scroll(0, 0);
 
             var reader = new FileReader();
             reader.onloadend = (function() {
@@ -791,7 +789,7 @@ function Block(protoblock, blocks, overrideName) {
         fileChooser.addEventListener('change', readerAction, false);
         fileChooser.focus();
         fileChooser.click();
-        window.scroll(0, 0)
+        window.scroll(0, 0);
     }
 
     this.collapseToggle = function () {
@@ -942,8 +940,8 @@ function positionCollapseLabel(myBlock, blockScale) {
 
 
 function positionCollapseContainer(myBlock, blockScale) {
-    myBlock.collapseContainer.x = myBlock.container.x + COLLAPSEBUTTONXOFF * blockScale / 2;
-    myBlock.collapseContainer.y = myBlock.container.y + COLLAPSEBUTTONYOFF * blockScale / 2;
+    myBlock.collapseContainer.x = myBlock.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2);
+    myBlock.collapseContainer.y = myBlock.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2);
 }
 
 
@@ -988,7 +986,7 @@ function loadCollapsibleEventHandlers(myBlock) {
         moved = false;
         mousedown = true;
         var d = new Date();
-        blocks.time = d.getTime();
+        blocks.mouseDownTime = d.getTime();
         offset = {
             x: myBlock.collapseContainer.x - Math.round(event.stageX / myBlock.blocks.blockScale),
             y: myBlock.collapseContainer.y - Math.round(event.stageY / myBlock.blocks.blockScale)
@@ -1007,9 +1005,9 @@ function loadCollapsibleEventHandlers(myBlock) {
             moved = false;
         } else {
             var d = new Date();
-            if ((d.getTime() - blocks.time) > 1000) {
+            if ((d.getTime() - blocks.mouseDownTime) > 1000) {
                 var d = new Date();
-                blocks.time = d.getTime();
+                blocks.mouseDownTime = d.getTime();
                 handleClick();
             }
         }
@@ -1027,11 +1025,11 @@ function loadCollapsibleEventHandlers(myBlock) {
         } else {
             // Maybe restrict to Android?
             var d = new Date();
-            // var diff = (d.getTime() - blocks.time);
+            // var diff = (d.getTime() - blocks.mouseDownTime);
             // console.log(diff);
-            if ((d.getTime() - blocks.time) < 200) {
+            if ((d.getTime() - blocks.mouseDownTime) < 200) {
                 var d = new Date();
-                blocks.time = d.getTime();
+                blocks.mouseDownTime = d.getTime();
                 handleClick();
             }
         }
@@ -1045,14 +1043,12 @@ function loadCollapsibleEventHandlers(myBlock) {
         moved = true;
         var oldX = myBlock.collapseContainer.x;
         var oldY = myBlock.collapseContainer.y;
-        myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.blockScale + offset.x);
-        myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.blockScale + offset.y);
+        myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.blockScale) + offset.x;
+        myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.blockScale) + offset.y;
         var dx = myBlock.collapseContainer.x - oldX;
         var dy = myBlock.collapseContainer.y - oldY;
         myBlock.container.x += dx;
         myBlock.container.y += dy;
-        myBlock.x = myBlock.container.x;
-        myBlock.y = myBlock.container.y;
 
         // If we are over the trash, warn the user.
         if (trashcan.overTrashcan(event.stageX / myBlock.blocks.blockScale, event.stageY / myBlock.blocks.blockScale)) {
@@ -1138,10 +1134,12 @@ function loadEventHandlers(myBlock) {
     var moved = false;
     var locked = false;
     var getInput = window.hasMouse;
+
     myBlock.container.on('click', function(event) {
         // console.log('CLICK');
-    blocks.activeBlock = thisBlock;
-    haveClick = true;
+        blocks.activeBlock = thisBlock;
+        haveClick = true;
+
         if (locked) {
             return;
         }
@@ -1149,7 +1147,9 @@ function loadEventHandlers(myBlock) {
         setTimeout(function() {
             locked = false;
         }, 500);
+
         hideDOMLabel();
+
         if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
             if (blocks.selectingStack) {
                 var topBlock = blocks.findTopBlock(thisBlock);
@@ -1182,8 +1182,8 @@ function loadEventHandlers(myBlock) {
         // but only for top block in stack
         if (myBlock.connections[0] == null) {
             var d = new Date();
-            blocks.time = d.getTime();
-            blocks.timeOut = setTimeout(function() {
+            blocks.mouseDownTime = d.getTime();
+            blocks.longPressTimeout = setTimeout(function() {
                 blocks.triggerLongPress(myBlock);
             }, LONGPRESSTIME);
         }
@@ -1227,16 +1227,16 @@ function loadEventHandlers(myBlock) {
             moved = false;
         });
 
-        var original = {x: event.stageX, y: event.stageY};
+        var original = {x: event.stageX / blocks.blockScale, y: event.stageY / blocks.blockScale};
         myBlock.container.on('pressmove', function(event) {
             // console.log('PRESSMOVE');
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
 
             // FIXME: need to remove timer
-            if (blocks.timeOut != null) {
-                clearTimeout(blocks.timeOut);
-                blocks.timeOut = null;
+            if (blocks.longPressTimeout != null) {
+                clearTimeout(blocks.longPressTimeout);
+                blocks.longPressTimeout = null;
             }
             if (!moved && myBlock.label != null) {
                 myBlock.label.style.display = 'none';
@@ -1247,17 +1247,19 @@ function loadEventHandlers(myBlock) {
             } else {
                 // Make it eaiser to select text on mobile
                 setTimeout(function () {
-                    moved = Math.abs(event.stageX - original.x) + Math.abs(event.stageY - original.y) > 20 && !window.hasMouse;
+                    moved = Math.abs((event.stageX / blocks.blockScale) - original.x) + Math.abs((event.stageY / blocks.blockScale) - original.y) > 20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
             }
 
             var oldX = myBlock.container.x;
             var oldY = myBlock.container.y;
-            myBlock.container.x = Math.round(event.stageX / blocks.blockScale) + offset.x;
-            myBlock.container.y = Math.round(event.stageY / blocks.blockScale) + offset.y;
-            myBlock.x = myBlock.container.x;
-            myBlock.y = myBlock.container.y;
+
+            var dx = Math.round(Math.round(event.stageX / blocks.blockScale) + offset.x - oldX);
+            var dy = Math.round(Math.round(event.stageY / blocks.blockScale) + offset.y - oldY);
+
+            // Move this block...
+            blocks.moveBlockRelative(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
             if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
@@ -1274,10 +1276,7 @@ function loadEventHandlers(myBlock) {
                 positionCollapseContainer(myBlock, myBlock.protoblock.scale);
             }
 
-            // Move any connected blocks.
-            var dx = Math.round(myBlock.container.x - oldX);
-            var dy = Math.round(myBlock.container.y - oldY);
-
+            // ...and move any connected blocks.
             blocks.findDragGroup(thisBlock)
             if (blocks.dragGroup.length > 0) {
                 for (var b = 0; b < blocks.dragGroup.length; b++) {
@@ -1316,9 +1315,9 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
     var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
     // Always hide the trash when there is no block selected.
     // FIXME: need to remove timer
-    if (myBlock.blocks.timeOut != null) {
-        clearTimeout(myBlock.blocks.timeOut);
-        myBlock.blocks.timeOut = null;
+    if (myBlock.blocks.longPressTimeout != null) {
+        clearTimeout(myBlock.blocks.longPressTimeout);
+        myBlock.blocks.longPressTimeout = null;
     }
     trashcan.hide();
 
@@ -1330,7 +1329,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
             // Otherwise, process move.
             // Keep track of time of last move
             var d = new Date();
-            blocks.time = d.getTime();
+            blocks.mouseDownTime = d.getTime();
             myBlock.blocks.blockMoved(thisBlock);
 
             // Just incase the blocks are not properly docked after
@@ -1344,11 +1343,11 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
         if (!haveClick) {
             // Simulate click on Android.
             var d = new Date();
-            if ((d.getTime() - blocks.time) < 500) {
+            if ((d.getTime() - blocks.mouseDownTime) < 500) {
                 if(!myBlock.trash)
                 {
                     var d = new Date();
-                    blocks.time = d.getTime();
+                    blocks.mouseDownTime = d.getTime();
                     if (myBlock.name === 'media' || myBlock.name === 'loadFile') {
                         myBlock.doOpenMedia(myBlock, thisBlock);
                     } else {
