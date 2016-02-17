@@ -1261,11 +1261,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     var toFrequencyBlock = new ProtoBlock('tofrequency');
     toFrequencyBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['tofrequency'] = toFrequencyBlock;
-    toFrequencyBlock.staticLabels.push(_('note to frequency'));
+    toFrequencyBlock.staticLabels.push(_('note to frequency'), _('note'), _('octave'));
     toFrequencyBlock.adjustWidthToLabel();
-    toFrequencyBlock.defaults.push("A4");
-    toFrequencyBlock.oneArgMathBlock();
+    toFrequencyBlock.defaults.push('A');
+    toFrequencyBlock.defaults.push('4');
+    toFrequencyBlock.twoArgMathBlock();
     toFrequencyBlock.dockTypes[1] = 'anyin';
+    toFrequencyBlock.dockTypes[2] = 'numberin';
 
     // Flow palette
     var repeatBlock = new ProtoBlock('repeat');

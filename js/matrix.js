@@ -754,7 +754,7 @@ function Matrix() {
         }
 
         if (note[0] !== 'R') {
-            this.logo.synth.trigger(note, this.logo.defaultBPMFactor / noteValue, false);
+            this.logo.synth.trigger(note, this.logo.defaultBPMFactor / noteValue, 'default');
         }
 
         this.playNote(0, 0);
@@ -806,7 +806,7 @@ function Matrix() {
                     note[j] = note[j].replace(/♭/g, 'b').replace(/♯/g, '#');
                 }
                 if(note[0] !== 'R') {
-                    that.logo.synth.trigger(note, that.logo.defaultBPMFactor / noteValue, false);
+                    that.logo.synth.trigger(note, that.logo.defaultBPMFactor / noteValue, 'default');
                 }
             }
             var cell = table.rows[that.rowIndex].cells[that.colIndex];
@@ -891,7 +891,7 @@ function Matrix() {
         this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
         if (playNote) {
-            this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, false);
+            this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default');
         }
     }
 
