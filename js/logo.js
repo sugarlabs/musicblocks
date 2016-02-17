@@ -2286,7 +2286,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'square':
             case 'sawtooth':
                 if (args.length === 1) {
-		    var obj = frequencyToPitch(args[0]);
+                    var obj = frequencyToPitch(args[0]);
                     if (logo.inMatrix) {
                         matrix.addRowBlock(blk);
                         if (logo.pitchBlocks.indexOf(blk) === -1) {
@@ -2301,7 +2301,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.noteOctaves[turtle].push(obj[1]);
                         logo.noteBeatValues[turtle].push(1);
                         logo.oscList[turtle].push(blocks.blockList[blk].name);
-			logo.pushedNote[turtle] = true;
+                        logo.pushedNote[turtle] = true;
                     }
                 }
                 break;
@@ -2791,12 +2791,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     if (logo.notePitches[turtle].length > 0) {
                         if (!logo.lilypondSaveOnly && duration > 0) {
                             if (logo.oscList[turtle].length > 0) {
-				logo.synth.init(last(logo.oscList[turtle]));
+                                logo.synth.init(last(logo.oscList[turtle]));
                             } else if (logo.turtles.turtleList[turtle].drum) {
-				logo.synth.init('drum');
+                                logo.synth.init('drum');
                             } else {
-				logo.synth.init('default');
-			    }
+                                logo.synth.init('default');
+                            }
                         }
 
                         for (var i = 0; i < logo.notePitches[turtle].length; i++) {
@@ -2855,13 +2855,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                             if (!logo.lilypondSaveOnly && duration > 0) {
                                 if (logo.oscList[turtle].length > 0) {
-				    logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
-				    logo.oscList[turtle].pop();
+                                    logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
+                                    logo.oscList[turtle].pop();
                                 } else if (logo.turtles.turtleList[turtle].drum) {
-				    logo.synth.trigger(notes, beatValue, 'drum');
-				} else {
-				    logo.synth.trigger(notes, beatValue, 'default');
-				}
+                                    logo.synth.trigger(notes, beatValue, 'drum');
+                                } else {
+                                    logo.synth.trigger(notes, beatValue, 'default');
+                                }
                                 logo.synth.start();
                             }
                         }
@@ -3333,7 +3333,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var cblk = logo.blocks.blockList[blk].connections[1];
                     var num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                     if (num != null && typeof(num) === 'number') {
-                        console.log(num);
                         var obj = numberToPitch(num);
                             if (logo.blocks.blockList[blk].name === 'number2pitch') {
                             logo.blocks.blockList[blk].value = obj[0];
@@ -4437,7 +4436,7 @@ function numberToPitch(i) {
         return ['C', 8];
     }
     // We start at A0.
-    return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor(i / 12)];
+    return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
 }
 
 
@@ -4469,15 +4468,15 @@ function pitchToNumber(pitch, octave) {
 
     var pitchNumber = 0;
     if (PITCHES0.indexOf(pitch) !== -1) {
-        pitchNumber = PITCHES0.indexOf(pitch);
-    } else if (PITCHES1.indexOf(pitch) !== -1) {
-        pitchNumber = PITCHES1.indexOf(pitch);
-    } else if (PITCHES2.indexOf(pitch) !== -1) {
-        pitchNumber = PITCHES2.indexOf(pitch);
-    } else if (PITCHES3.indexOf(pitch) !== -1) {
-        pitchNumber = PITCHES3.indexOf(pitch);
-    } else if (SOLFAGE.indexOf(pitch) !== -1) {
-        pitchNumber = SOLFAGE.indexOf(pitch);
+        pitchNumber = PITCHES0.indexOf(pitch.toUpperCase());
+    } else if (PITCHES1.indexOf(pitch.toUpperCase()) !== -1) {
+        pitchNumber = PITCHES1.indexOf(pitch.toUpperCase());
+    } else if (PITCHES2.indexOf(pitch.toUpperCase()) !== -1) {
+        pitchNumber = PITCHES2.indexOf(pitch.toUpperCase());
+    } else if (PITCHES3.indexOf(pitch.toUpperCase()) !== -1) {
+        pitchNumber = PITCHES3.indexOf(pitch.toUpperCase());
+    } else if (SOLFAGE.indexOf(pitch.toUpperCase()) !== -1) {
+        pitchNumber = SOLFAGE.indexOf(pitch.toUpperCase());
     }
 
     // We start at A0.
