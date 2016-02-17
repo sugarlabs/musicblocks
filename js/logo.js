@@ -98,9 +98,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
     // parameters used by pitch
     this.transposition = {};
-    this.beatFactor = {};
 
     // parameters used by notes
+    this.beatFactor = {};
+    this.dotCount = {};
     this.noteBeat = {};
     this.noteFrequencies = {};
     this.notePitches = {};
@@ -504,6 +505,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.beatFactor[turtle] = 1;
+	    this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
             this.duplicateFactor[turtle] = 1;
             this.skipFactor[turtle] = 1;
@@ -1966,9 +1968,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.setListener(turtle, listenerName, listener);
                 break;
             case 'rhythmicdot':
-                // Dotting a note will increase its play time by 50%
-                // so we divide the beat factor by 1.5.
-                logo.beatFactor[turtle] /= 1.5;
+                // Dotting a note will increase its play time by
+                // a(2 - 1/2^n)
+                var currentDotFactor = 2 - (1 / Math.pow(2, logo.dotCount[turtle]));
+                logo.beatFactor[turtle] *= currentDotFactor;
+                logo.dotCount[turtle] += 1;
+                var newDotFactor = 2 - (1 / Math.pow(2, logo.dotCount[turtle]));
+                logo.beatFactor[turtle] /= newDotFactor;
                 childFlow = args[0];
                 childFlowCount = 1;
 
@@ -1976,7 +1982,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
                 var listener = function (event) {
-                    logo.beatFactor[turtle] *= 1.5;
+                    var currentDotFactor = 2 - (1 / Math.pow(2, logo.dotCount[turtle]));
+                    logo.beatFactor[turtle] *= currentDotFactor;
+                    logo.dotCount[turtle] -= 1;
+                    var newDotFactor = 2 - (1 / Math.pow(2, logo.dotCount[turtle]));
+                    logo.beatFactor[turtle] /= newDotFactor;
                 }
 
                 logo.setListener(turtle, listenerName, listener);
