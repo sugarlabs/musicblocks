@@ -837,7 +837,7 @@ function Matrix() {
         // Sets corresponding note when user clicks on any cell and
         // plays that note
 
-        console.log('setNotes rhythm block: ' + colIndex + ' ' + this.colBlocks[colIndex - 1]);
+        // console.log('setNotes rhythm block: ' + colIndex + ' ' + this.colBlocks[colIndex - 1]);
         var pitchBlock = this.rowBlocks[rowIndex - 1];
         var rhythmBlockObj = this.colBlocks[colIndex - 1];
 
@@ -874,23 +874,10 @@ function Matrix() {
         var note = noteObj[0] + noteObj[1];
         var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
 
-        // Remove ' &#x1D15F;' at the end of the HTML code for the
-        // note value.
-        var len = noteValue.length;
-        if (noteValue.indexOf(' ') !== -1) {
-            noteValue = noteValue.slice(0, noteValue.length - 2);
-        }
-
-        var i = 0;
-        if (noteValue.substr(0,3) === '1.5') {
-            while (noteValue[i] !== ' ') {
-                i += 1;
-            }
-            noteValue = noteValue.substr(4, i - 4);
-            noteValue = parseInt(noteValue)
-            noteValue = 1.5/noteValue;
-            noteValue = noteValue.toString()
-        }
+        // innerHTML looks something like: 1<br>&mdash;<br>4<br>&#x1D15F;
+        noteParts = noteValue.split('<br>');
+	noteValue = Number(noteParts[0])/Number(noteParts[2]);
+        noteValue = noteValue.toString();
 
         this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
