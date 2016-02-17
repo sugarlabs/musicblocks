@@ -371,7 +371,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var driftBlock = new ProtoBlock('drift');
     driftBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['drift'] = driftBlock;
-    driftBlock.staticLabels.push(_('drift'));
+    driftBlock.staticLabels.push(_('free play'));
     driftBlock.adjustWidthToLabel();
     driftBlock.flowClampZeroArgBlock();
 
@@ -1249,10 +1249,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     var toneBlock = new ProtoBlock('tone');
     toneBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['tone'] = toneBlock;
-    toneBlock.hidden = true;
     toneBlock.staticLabels.push(_('tone'),  _('frequency'), _('duration (ms)'));
     toneBlock.adjustWidthToLabel();
-    // A4, 200ms.
     toneBlock.defaults.push(440, 200);
     toneBlock.twoArgBlock();
     toneBlock.dockTypes[1] = 'numberin';
