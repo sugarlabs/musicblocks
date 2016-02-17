@@ -4006,9 +4006,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.updateNotation = function (note, duration, turtle, insideChord) {
-        // FIXME: try approximating duration using ties???
-
         var POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
+        // FIXME: generalize to n dots.
         var dotted = false;
         var doubleDotted = false;
         var tupletValue = -1;
