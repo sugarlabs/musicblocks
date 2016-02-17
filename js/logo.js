@@ -953,7 +953,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'forever':
                 if (args.length === 1) {
                     childFlow = args[0];
-                    childFlowCount = -1;
+                    // If we are running in non-interactive mode, we
+                    // need to put a bounds on "forever".
+                    if (logo.lilypondSaveOnly) {
+                        childFlowCount = 10;
+                    } else {
+                        childFlowCount = -1;
+                    }
                 }
                 break;
             case 'break':
