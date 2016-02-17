@@ -102,6 +102,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
     // parameters used by notes
     this.noteBeat = {};
+    this.noteFrequencies = {};
     this.notePitches = {};
     this.noteOctaves = {};
     this.noteTranspositions = {};
@@ -495,6 +496,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.doBlocks[turtle] = [];
             this.transposition[turtle] = 0;
             this.noteBeat[turtle] = [];
+            this.noteFrequencies[turtle] = [];
             this.notePitches[turtle] = [];
             this.noteOctaves[turtle] = [];
             this.currentNotes[turtle] = 'G';
@@ -2262,24 +2264,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                 }
                 break;
-            // DEPRECATED P5 TONE GENERATOR
+            // Deprecated P5 tone generator replaced by macro.
             case 'tone':
-                if (typeof(logo.turtleOscs[turtle]) === 'undefined') {
-                    logo.turtleOscs[turtle] = new p5.TriOsc();
-                }
-
-                osc = logo.turtleOscs[turtle];
-                osc.stop();
-                osc.start();
-                osc.amp(0);
-
-                osc.freq(args[0]);
-                osc.fade(0.5, 0.2);
-
-                setTimeout(function(osc) {
-                    osc.fade(0, 0.2);
-                }, args[1], osc);
-
                 break;
             case 'triangle':
             case 'sine':
@@ -2296,7 +2282,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         matrix.solfegeNotes.push(logo.getSolfege(obj[0]));
                         matrix.solfegeOctaves.push(obj[1]);
                     } else {
-                        // TODO: add frequency instead of approximate note to playnote
+                        // TODO: add transpositions to frequency?
+                        logo.noteFrequencies[turtle].push(args[0]);
+                        // We keep track of pitch and octave for notation purposes.
                         logo.notePitches[turtle].push(obj[0]);
                         logo.noteOctaves[turtle].push(obj[1]);
                         logo.noteBeatValues[turtle].push(1);
@@ -2855,7 +2843,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                             if (!logo.lilypondSaveOnly && duration > 0) {
                                 if (logo.oscList[turtle].length > 0) {
-                                    logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
+                                    // FIXME: synth cannot play chords.
+                                    logo.synth.trigger([last(logo.noteFrequencies[turtle])], beatValue, last(logo.oscList[turtle]));
+                                    logo.noteFrequencies[turtle].pop();
                                     logo.oscList[turtle].pop();
                                 } else if (logo.turtles.turtleList[turtle].drum) {
                                     logo.synth.trigger(notes, beatValue, 'drum');
@@ -4570,16 +4560,16 @@ function Synth () {
             this.drum.triggerAttackRelease(notes[0], beatValue);
             break;
         case 'triangle':
-            this.triangle.triggerAttackRelease(noteToFrequency(notes[0]), beatValue);
+            this.triangle.triggerAttackRelease(notes[0], beatValue);
             break;
         case 'square':
-            this.square.triggerAttackRelease(noteToFrequency(notes[0]), beatValue);
+            this.square.triggerAttackRelease(notes[0], beatValue);
             break;
         case 'sawtooth':
-            this.sawtooth.triggerAttackRelease(noteToFrequency(notes[0]), beatValue);
+            this.sawtooth.triggerAttackRelease(notes[0], beatValue);
             break;
         case 'sine':
-            this.sine.triggerAttackRelease(noteToFrequency(notes[0]), beatValue);
+            this.sine.triggerAttackRelease(notes[0], beatValue);
             break;
         default:
             this.poly.triggerAttackRelease(notes, beatValue);
