@@ -50,8 +50,9 @@ var MATRIXBUTTONHEIGHT = 40;
 var MATRIXBUTTONHEIGHT2 = 66;
 var MATRIXSOLFEHEIGHT = 30;
 
-var NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', '64': '&#x1D163;', '128': '&#x1D164;'};
-var DOTTEDNOTESYMBOLS = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', '64': '&#x1D163;.', '128': '&#x1D164;.'};
+var NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', 64: '&#x1D163;', 128: '&#x1D164;'};
+var DOTTEDNOTESYMBOLS = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', 64: '&#x1D163;.', 128: '&#x1D164;.'};
+var DOUBLEDOTTEDNOTESYMBOLS = {1: '&#x1D15D;..', 2: '&#x1D15E;..', 4: '&#x1D15F;..', 8: '&#x1D160;..', 16: '&#x1D161;..', 32: '&#x1D162;..', 64: '&#x1D163;..', 128: '&#x1D164;..'};
 
 function Matrix() {
     this.arr = [];
@@ -573,14 +574,17 @@ function Matrix() {
             noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>';
         }
 
-        // FIXME: DOES NOT WORK FOR DOUBLE DOT
-         
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
             if (noteValueToDisplay in DOTTEDNOTESYMBOLS) {
                 noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + DOTTEDNOTESYMBOLS[noteValueToDisplay];
             } else {
-                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>';
+                noteValueToDisplay = parseInt((noteValue * 1.75))
+		if (noteValueToDisplay in DOTTEDNOTESYMBOLS) {
+                    noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + DOUBLEDOTTEDNOTESYMBOLS[noteValueToDisplay];
+		} else {
+                    noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>';
+                }
             }
         }
 
