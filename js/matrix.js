@@ -477,7 +477,7 @@ function Matrix() {
         cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
 
         var noteValue = param[0][1] / param[0][0];
-        var noteValueToDisplay = this.calcNoteValueToDisplay(noteValue);
+        var noteValueToDisplay = this.calcNoteValueToDisplay(param[0][1], param[0][0]);
 	
         cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
@@ -557,13 +557,13 @@ function Matrix() {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
     }
 
-    this.calcNoteValueToDisplay = function (noteValue) {
+    this.calcNoteValueToDisplay = function (a, b) {
+        var noteValue = a / b;
         var noteValueToDisplay = null;
         if (noteValue in NOTESYMBOLS) {
-            // noteValueToDisplay = '1/' + noteValue.toString() + '<br>' + noteSymbol[noteValue];
             noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>' + NOTESYMBOLS[noteValue];
         } else {
-            noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>';
+            noteValueToDisplay = reducedFraction(b, a);
         }
 
         if (parseInt(noteValue) < noteValue) {
@@ -575,7 +575,7 @@ function Matrix() {
 		if (noteValueToDisplay in DOTTEDNOTESYMBOLS) {
                     noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + DOUBLEDOTTEDNOTESYMBOLS[noteValueToDisplay];
 		} else {
-                    noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>';
+		    noteValueToDisplay = reducedFraction(b, a);
                 }
             }
         }
@@ -587,7 +587,7 @@ function Matrix() {
         console.log('addNotes ' + numBeats + ' ' + noteValue);
         var table = docById('myTable');
 
-        var noteValueToDisplay = this.calcNoteValueToDisplay(noteValue);
+        var noteValueToDisplay = this.calcNoteValueToDisplay(noteValue, 1);
 
         if (this.noteValue > noteValue) {
             this.noteValue = noteValue;
