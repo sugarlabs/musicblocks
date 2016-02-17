@@ -292,7 +292,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
         this.sounds = [];
 
-        this.synth.stopSound();
+        this.synth.stopSound('default');
         this.synth.stop();
 
         if (this.cameraID != null) {
@@ -2286,17 +2286,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'square':
             case 'sawtooth':
                 if (args.length === 1) {
+		    var obj = frequencyToPitch(args[0]);
                     if (logo.inMatrix) {
                         matrix.addRowBlock(blk);
                         if (logo.pitchBlocks.indexOf(blk) === -1) {
                             logo.pitchBlocks.push(blk);
                         }
                         // TODO: add frequency instead of approximate note to matrix
-                        var obj = frequencyToPitch(args[0]);
                         matrix.solfegeNotes.push(logo.getSolfege(obj[0]));
                         matrix.solfegeOctaves.push(obj[1]);
                     } else {
-                        logo.oscList[turtle].push([logo.blocks.blockList[blk].name, args[0]]);
+                        // TODO: add frequency instead of approximate note to playnote
+                        logo.notePitches[turtle].push(obj[0]);
+                        logo.noteOctaves[turtle].push(obj[1]);
+                        logo.noteBeatValues[turtle].push(1);
+                        logo.oscList[turtle].push(blocks.blockList[blk].name);
+			logo.pushedNote[turtle] = true;
                     }
                 }
                 break;
@@ -2783,37 +2788,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     logo.noteBeat[turtle] = noteBeatValue;
 
-                    var oscillators = [];
-                    if (logo.oscList[turtle].length > 0 && duration > 0) {
-                        for (var i = 0; i < logo.oscList[turtle].length; i++) {
-                            if (!logo.lilypondSaveOnly) {
-                                oscillators.push(logo.synth.getOscilator(logo.oscList[turtle][i][1], logo.oscList[turtle][i][0]));
-                            }
-                            console.log("tone to play " + logo.oscList[turtle][i][1] + ' ' + frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1]);
-                            logo.updateNotation(frequencyToPitch(logo.oscList[turtle][i][1])[0] + frequencyToPitch(logo.oscList[turtle][i][1])[1], duration, turtle, insideChord);
-                        }
-
-                        if (!logo.lilypondSaveOnly && duration > 0) {
-                            for (var i = 0; i < oscillators.length; i++) {
-                                // oscillators[i].volume.value = last(logo.polyVolume[turtle]) * OSCVOLUMEADJUSTMENT;
-                                oscillators[i].start();
-                            }
-                            if (duration > 0) {
-                                var stopTime = bpmFactor * 1000 / duration;
-                            } else {
-                                var stopTime = 0;
-                            }
-
-                            setTimeout(function(){
-                                for (var i = 0; i < oscillators.length; i++) {
-                                    oscillators[i].stop();
-                                }
-                            }, stopTime);
-                        }
-                    }
                     if (logo.notePitches[turtle].length > 0) {
                         if (!logo.lilypondSaveOnly && duration > 0) {
-                            logo.synth.init(logo.turtles.turtleList[turtle].drum);
+                            if (logo.oscList[turtle].length > 0) {
+				logo.synth.init(last(logo.oscList[turtle]));
+                            } else if (logo.turtles.turtleList[turtle].drum) {
+				logo.synth.init('drum');
+                            } else {
+				logo.synth.init('default');
+			    }
                         }
 
                         for (var i = 0; i < logo.notePitches[turtle].length; i++) {
@@ -2869,8 +2852,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             } else {
                                 var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
                             }
+
                             if (!logo.lilypondSaveOnly && duration > 0) {
-                                logo.synth.trigger(notes, beatValue, logo.turtles.turtleList[turtle].drum);
+                                if (logo.oscList[turtle].length > 0) {
+				    logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
+				    logo.oscList[turtle].pop();
+                                } else if (logo.turtles.turtleList[turtle].drum) {
+				    logo.synth.trigger(notes, beatValue, 'drum');
+				} else {
+				    logo.synth.trigger(notes, beatValue, 'default');
+				}
                                 logo.synth.start();
                             }
                         }
@@ -3476,25 +3467,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     break;
                 case 'tofrequency':
                     var block = logo.blocks.blockList[blk];
-                    var cblk = block.connections[1];
-                    var v = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    try {
-                        if (typeof(v) === 'string') {
-                            v = v.toUpperCase();
-                            var note = ['A', 'A♯/B♭', 'B', 'C', 'C♯/D♭', 'D', 'D♯/E♭', 'E', 'F', 'F♯/G♭', 'G', 'G♯/A♭'].indexOf(v[0]);
-                            var octave = v[1];
-                            if (note > 2) {
-                                octave -= 1;  // New octave starts on C
-                            }
-                            var i = octave * 12 + note;
-                            block.value = 27.5 * Math.pow(1.05946309435929, i);
-                        } else {
-                            block.value = 440 * Math.pow(2, (v - 69) / 12);
-                        }
-                    } catch (e) {
-                        this.errorMsg(v + ' is not a note.');
-                        block.value = 440;
-                    }
+                    var cblk1 = logo.blocks.blockList[blk].connections[1];
+                    var cblk2 = logo.blocks.blockList[blk].connections[2];
+                    var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    block.value = Math.round(pitchToFrequency(a, b));
                     break;
                 case 'pop':
                     var block = logo.blocks.blockList[blk];
@@ -4024,7 +4001,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.updateNotation = function (note, duration, turtle, insideChord) {
-        console.log(note + ' ' + duration);
         // FIXME: try approximating duration using ties???
 
         var POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
@@ -4456,11 +4432,20 @@ function numberToPitch(i) {
     var PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
 
     if (i < 0) {
-        return ['C', 0];
-    } else if (i > 88) {
-        return ['G', 8];
+        return ['A', 0];
+    } else if (i > 87) {
+        return ['C', 8];
     }
-    return [PITCHES[i % 12], Math.floor(i / 12)];
+    // We start at A0.
+    return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor(i / 12)];
+}
+
+
+function noteToFrequency(note) {
+    var len = note.length;
+    var octave = last(note);
+    var pitch = note.substring(0, len - 1);
+    return pitchToFrequency(pitch, Number(octave));
 }
 
 
@@ -4476,16 +4461,27 @@ function pitchToFrequency(pitch, octave) {
 
 function pitchToNumber(pitch, octave) {
     // Calculate the pitch index based on pitch and octave.
-    var PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+    var PITCHES0 = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+    var PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    var PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+    var PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     var SOLFAGE = ['do', '', 're', 'me', '', 'fa', '', 'sol', 'la', '', 'ti', ''];
 
-    if (PITCHES.indexOf(pitch) !== -1) {
-        return octave * 12 + PITCHES.indexOf(pitch);
+    var pitchNumber = 0;
+    if (PITCHES0.indexOf(pitch) !== -1) {
+        pitchNumber = PITCHES0.indexOf(pitch);
+    } else if (PITCHES1.indexOf(pitch) !== -1) {
+        pitchNumber = PITCHES1.indexOf(pitch);
+    } else if (PITCHES2.indexOf(pitch) !== -1) {
+        pitchNumber = PITCHES2.indexOf(pitch);
+    } else if (PITCHES3.indexOf(pitch) !== -1) {
+        pitchNumber = PITCHES3.indexOf(pitch);
     } else if (SOLFAGE.indexOf(pitch) !== -1) {
-        return octave * 12 + SOLFAGE.indexOf(pitch);
-    } else {
-        return octave * 12;
+        pitchNumber = SOLFAGE.indexOf(pitch);
     }
+
+    // We start at A0.
+    return Math.max(octave, 0) * 12 + pitchNumber - PITCHES0.indexOf('A');
 }
 
 
@@ -4494,28 +4490,124 @@ function Synth () {
     this.tone = new Tone();
     this.poly = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
     this.drum = new Tone.DrumSynth().toMaster();
+    var synthOptions = {
+        oscillator: {
+            type: "triangle"
+        },
+        envelope: {
+            attack: 0.03,
+            decay: 0,
+            sustain: 1,
+            release: 0.03
+        },
+    };                        
+    this.triangle = new Tone.SimpleSynth(synthOptions);
 
-    this.init = function(drum) {
-        if (drum) {
+    var synthOptions = {
+        oscillator: {
+            type: "square"
+        },
+        envelope: {
+            attack: 0.03,
+            decay: 0,
+            sustain: 1,
+            release: 0.03
+        },
+    };                        
+    this.square = new Tone.SimpleSynth(synthOptions);
+
+    var synthOptions = {
+        oscillator: {
+            type: "sawtooth"
+        },
+        envelope: {
+            attack: 0.03,
+            decay: 0,
+            sustain: 1,
+            release: 0.03
+        },
+    };                        
+    this.sawtooth = new Tone.SimpleSynth(synthOptions);
+
+    var synthOptions = {
+        oscillator: {
+            type: "sine"
+        },
+        envelope: {
+            attack: 0.03,
+            decay: 0,
+            sustain: 1,
+            release: 0.03
+        },
+    };                        
+    this.sine = new Tone.SimpleSynth(synthOptions);
+
+    this.init = function(name) {
+        switch (name) {
+        case 'drum':
             this.drum.toMaster();
-        } else {
+            break;
+        case 'triangle':
+            this.triangle.toMaster();
+            break;
+        case 'square':
+            this.square.toMaster();
+            break;
+        case 'sawtooth':
+            this.sawtooth.toMaster();
+            break;
+        case 'sine':
+            this.sine.toMaster();
+            break;
+        default:
             this.poly.toMaster();
+            break;
         }
     }
 
-    this.trigger = function(notes, beatValue, drum) {
-        if (drum) {
+    this.trigger = function(notes, beatValue, name) {
+        switch (name) {
+        case 'drum':
             this.drum.triggerAttackRelease(notes[0], beatValue);
-        } else {
+            break;
+        case 'triangle':
+            this.triangle.triggerAttackRelease(noteToFrequency(notes[0]), beatValue);
+            break;
+        case 'square':
+            this.square.triggerAttackRelease(noteToFrequency(notes[0]), beatValue);
+            break;
+        case 'sawtooth':
+            this.sawtooth.triggerAttackRelease(noteToFrequency(notes[0]), beatValue);
+            break;
+        case 'sine':
+            this.sine.triggerAttackRelease(noteToFrequency(notes[0]), beatValue);
+            break;
+        default:
             this.poly.triggerAttackRelease(notes, beatValue);
+            break;
         }
     }
 
-    this.stopSound = function(drum) {
-        if (drum) {
+    this.stopSound = function(name) {
+        switch (name) {
+        case 'drum':
             this.drum.triggerRelease();
-        } else {
+            break;
+        case 'triangle':
+            this.triangle.triggerRelease();
+            break;
+        case 'square':
+            this.square.triggerRelease();
+            break;
+        case 'sawtooth':
+            this.sawtooth.triggerRelease();
+            break;
+        case 'sine':
+            this.sine.triggerRelease();
+            break;
+        default:
             this.poly.triggerRelease();
+            break;
         }
     }
 
