@@ -84,6 +84,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     transpositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;
     transpositionBlock.staticLabels.push(_('adjust transposition'));
+    transpositionBlock.extraWidth = 5;
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
@@ -1572,6 +1573,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['nobackground'] = noBackgroundBlock;
     noBackgroundBlock.palette = palettes.dict['extras'];
     noBackgroundBlock.staticLabels.push(_('no background'));
+    noBackgroundBlock.extraWidth = 5;
     noBackgroundBlock.adjustWidthToLabel();
     noBackgroundBlock.zeroArgBlock();
 
