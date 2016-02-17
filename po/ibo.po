@@ -1167,3 +1167,6 @@ msgstr ""
 
 msgid "Please close the current matrix before opening a new one."
 msgstr ""
+
+msgid "set font"
+msgstr ""

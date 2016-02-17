@@ -1192,3 +1192,6 @@ msgstr "guardar pila a aplicación"
 #. TRANS: load the program heap from an application
 msgid "load heap from App"
 msgstr "cargar pila desde aplicación"
+
+msgid "set font"
+msgstr "fijar font"

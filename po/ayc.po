@@ -1336,3 +1336,7 @@ msgstr ""
 #. TRANS: cargar pila desde una aplicación
 msgid "load heap from App"
 msgstr ""
+
+#. TRANS: fijar font
+msgid "set font"
+msgstr ""
