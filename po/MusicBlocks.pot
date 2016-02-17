@@ -1194,3 +1194,6 @@ msgstr ""
 #. TRANS: load the program heap from an application
 msgid "load heap from App"
 msgstr ""
+
+msgid "set font"
+msgstr ""

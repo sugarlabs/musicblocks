@@ -1192,3 +1192,6 @@ msgstr "คุณควรมีอย่างน้อยหนึ่งบล
 
 msgid "Please close the current matrix before opening a new one."
 msgstr "กรุณาปิดเมทริกซ์ปัจจุบันก่อนที่จะเปิดอันใหม่"
+
+msgid "set font"
+msgstr ""
