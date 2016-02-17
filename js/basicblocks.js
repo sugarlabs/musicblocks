@@ -84,7 +84,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     transpositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;
     transpositionBlock.staticLabels.push(_('adjust transposition'));
-    transpositionBlock.extraWidth = 5;
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
@@ -205,7 +204,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
     matrixBlock.staticLabels.push(_('pitch-time matrix'));
-    matrixBlock.extraWidth = 10;
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
 
@@ -213,7 +211,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythm'] = rhythm;
     rhythm.staticLabels.push(_('rhythm'), _('number of notes'), _('note value'));
-    rhythm.extraWidth = 20;
+    rhythm.extraWidth = 10;
     rhythm.adjustWidthToLabel();
     rhythm.defaults.push(3);
     rhythm.defaults.push(4);
@@ -827,16 +825,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     lessBlock.palette = palettes.dict['boolean'];
     blocks.protoBlockDict['less'] = lessBlock;
     lessBlock.fontsize = 14;
-    lessBlock.extraWidth = 20;
     lessBlock.staticLabels.push('&lt;');
+    lessBlock.extraWidth = 20;
     lessBlock.booleanTwoArgBlock();
 
     var equalBlock = new ProtoBlock('equal');
     equalBlock.palette = palettes.dict['boolean'];
     blocks.protoBlockDict['equal'] = equalBlock;
     equalBlock.fontsize = 14;
-    equalBlock.extraWidth = 20;
     equalBlock.staticLabels.push('=');
+    equalBlock.extraWidth = 20;
     equalBlock.booleanTwoArgBlock();
     equalBlock.dockTypes[0] = 'booleanout';
     equalBlock.dockTypes[1] = 'anyin';
@@ -1156,7 +1154,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     loadHeapFromApp.palette = palettes.dict['heap'];
     blocks.protoBlockDict['loadHeapFromApp'] = loadHeapFromApp;
     loadHeapFromApp.staticLabels.push(_('load heap from App'));
-    loadHeapFromApp.extraWidth = 10;
     loadHeapFromApp.adjustWidthToLabel();
     loadHeapFromApp.twoArgBlock();
     loadHeapFromApp.dockTypes[1] = 'textin';
@@ -1168,7 +1165,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     saveHeapToApp.palette = palettes.dict['heap'];
     blocks.protoBlockDict['saveHeapToApp'] = saveHeapToApp;
     saveHeapToApp.staticLabels.push(_('save heap to App'));
-    saveHeapToApp.extraWidth = 10;
     saveHeapToApp.adjustWidthToLabel();
     saveHeapToApp.twoArgBlock();
     saveHeapToApp.dockTypes[1] = 'textin';
@@ -1518,7 +1514,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     lilypondBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['savelilypond'] = lilypondBlock;
     lilypondBlock.staticLabels.push(_('save as lilypond'));
-    lilypondBlock.extraWidth = 10;
     lilypondBlock.adjustWidthToLabel();
     lilypondBlock.oneArgBlock();
     lilypondBlock.defaults.push(_('title') + '.ly');
@@ -1573,7 +1568,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['nobackground'] = noBackgroundBlock;
     noBackgroundBlock.palette = palettes.dict['extras'];
     noBackgroundBlock.staticLabels.push(_('no background'));
-    noBackgroundBlock.extraWidth = 5;
     noBackgroundBlock.adjustWidthToLabel();
     noBackgroundBlock.zeroArgBlock();
 

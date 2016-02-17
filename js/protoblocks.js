@@ -61,11 +61,11 @@ function ProtoBlock(name) {
         if (this.staticLabels.length === 0) {
             return;
         }
-        var labelLength = this.staticLabels[0].length;
-        if ((labelLength - 6) > 0) {
-            // TODO: better estimation of label size
-            this.extraWidth += (labelLength - 6) * 4;
-        }
+        var c = new createjs.Container();
+        var text = new createjs.Text(this.staticLabels[0], this.fontSize + 'px Sans', '#000000');
+        c.addChild(text);
+        var b = c.getBounds();
+        this.extraWidth += Math.max(b.width - 30, 0);
     }
 
     // What follows are the initializations for different block
