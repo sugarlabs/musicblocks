@@ -2320,7 +2320,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'tuplet2':
                 // Replaces tupletParamBlock/tuplet combination
                 if (logo.inMatrix) {
-                    logo.tupletParams.push([args[0], args[1] / logo.beatFactor[turtle]]);
+                    logo.tupletParams.push([args[0], args[1] * logo.beatFactor[turtle]]);
                     logo.tuplet = true;
                     logo.addingNotesToTuplet = false;
                 } else {

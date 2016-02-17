@@ -82,7 +82,7 @@ function Matrix() {
 
     // These arrays get created each time the matrix is built.
     this.rowBlocks = [];  // pitch-block number
-    this.colBlocks = [];  // [rhythm-block number, note number]
+   this.colBlocks = [];  // [rhythm-block number, note number]
 
     // This array is preserved between sessions.
     // We populate the blockMap whenever a note is selected and
@@ -477,13 +477,8 @@ function Matrix() {
         cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
 
         var noteValue = param[0][1] / param[0][0];
-        var noteValueToDisplay = reducedFraction(param[0][0], param[0][1]);
-
-        if (parseInt(param[0][1]) < param[0][1]) {
-            noteValueToDisplay = noteValue * 1.5;
-            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString();
-        }
-
+        var noteValueToDisplay = this.calcNoteValueToDisplay(noteValue);
+	
         cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
         cell.style.lineHeight = 60 + '%';
@@ -562,10 +557,7 @@ function Matrix() {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
     }
 
-    this.addNotes = function(numBeats, noteValue) {
-        console.log('addNotes ' + numBeats + ' ' + noteValue);
-        var table = docById('myTable');
-
+    this.calcNoteValueToDisplay = function (noteValue) {
         var noteValueToDisplay = null;
         if (noteValue in NOTESYMBOLS) {
             // noteValueToDisplay = '1/' + noteValue.toString() + '<br>' + noteSymbol[noteValue];
@@ -587,6 +579,15 @@ function Matrix() {
                 }
             }
         }
+
+        return noteValueToDisplay;
+    }
+
+    this.addNotes = function(numBeats, noteValue) {
+        console.log('addNotes ' + numBeats + ' ' + noteValue);
+        var table = docById('myTable');
+
+        var noteValueToDisplay = this.calcNoteValueToDisplay(noteValue);
 
         if (this.noteValue > noteValue) {
             this.noteValue = noteValue;
