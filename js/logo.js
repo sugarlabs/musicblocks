@@ -3987,11 +3987,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     }
 
-    this.stageNotesForLilypond = function (turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato, tie) {
+    this.stageNotesForLilypond = function (turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato) {
         if (turtle in this.lilypondStaging) {
-            this.lilypondStaging[turtle].push([note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0 && last(staccato) > 0, tie > 0]);
+            this.lilypondStaging[turtle].push([note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0 && last(staccato) > 0]);
         } else {
-            this.lilypondStaging[turtle] = [[note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0 && last(staccato) > 0, tie > 0]];
+            this.lilypondStaging[turtle] = [[note, duration, dotted, doubleDotted, tupletValue, insideChord, staccato.length > 0 && last(staccato) > 0]];
         }
     }
 
@@ -4045,7 +4045,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         // Push notes for lilypond.
-        this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, this.staccato[turtle], false); //this.tieCarryOver[turtle]);
+        this.stageNotesForLilypond(turtle, note, duration, dotted, doubleDotted, tupletValue, insideChord, this.staccato[turtle]);
     }
 
     this.processLilypondNotes = function (turtle) {
@@ -4062,7 +4062,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var LYTUPLETVALUE = 4;
         var LYINSIDECHORD = 5;
         var LYSTACCATO = 6;
-        var LYTIE = 7;
         
         this.lilypondNotes[turtle] = '';
 
@@ -4070,7 +4069,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // Lilypond notes use is for sharp, es for flat,
             // , and ' for shifts in octave.
             // Also, notes must be lowercase.
-            return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
+            // And the octave bounday is at C, not A.
+            if (note[0] === 'A' || note[0] === 'B') {
+		return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "'''''''").replace(/1/g, ',,,').replace(/2/g, ',,').replace(/3/g, ',').replace(/4/g, "").replace(/5/g, "'").replace(/6/g, "''").replace(/7/g, "'''").replace(/8/g, "'''''").replace(/9/g, "''''''").toLowerCase();
+            } else {
+		return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
+            }
         }
 
         var counter = 0;
@@ -4222,10 +4226,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     if (obj[LYSTACCATO]) {
                         this.lilypondNotes[turtle] += '%5Cstaccato';
-                    }
-
-                    if (obj[LYTIE]) {
-                        // this.lilypondNotes[turtle] += '~';
                     }
                 }
                 this.lilypondNotes[turtle] += ' ';
