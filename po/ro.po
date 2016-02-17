@@ -29,6 +29,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "crescendo factor"
@@ -105,6 +108,9 @@ msgid "index"
 msgstr ""
 
 msgid "hide"
+msgstr ""
+
+msgid "tuplet value"
 msgstr ""
 
 msgid "while"
@@ -935,6 +941,9 @@ msgid "tuplet"
 msgstr ""
 
 msgid "Meet Mr. Mouse!"
+msgstr ""
+
+msgid "set font"
 msgstr ""
 
 #. TRANS: a container for a variable
