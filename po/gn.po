@@ -28,6 +28,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "crescendo factor"
@@ -114,6 +117,9 @@ msgstr ""
 
 #. TRANS: ocultar
 msgid "hide"
+msgstr ""
+
+msgid "tuplet value"
 msgstr ""
 
 #. TRANS: mientras
@@ -1077,6 +1083,9 @@ msgid "tuplet"
 msgstr ""
 
 msgid "Meet Mr. Mouse!"
+msgstr ""
+
+msgid "set font"
 msgstr ""
 
 #. TRANS: a container for a variable
