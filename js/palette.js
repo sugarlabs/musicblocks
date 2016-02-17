@@ -1430,6 +1430,12 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
         });
     });
 
+    palette.protoContainers[blkname].on('mouseout', function(event) {
+        // Catch case when pressup event is missed.
+        // Put the protoblock back on the palette...
+        restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+    });
+
     palette.protoContainers[blkname].on('pressup', function(event) {
         if (pressupLock) {
             return;
@@ -1445,6 +1451,7 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
 
 
 function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX, saveY) {
+    // Some blocks are expanded on load.
     var NOTEOBJ = [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['solfege', {'value': 'la'}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]]];
     var OSCTIMEOBJ = [[0, 'osctime', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 2, 1, null]], [1, 'vspace', 0, 0, [0, 5]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1000}], 0, 0, [2]], [4, ['number', {'value': 3}], 0, 0, [2]], [5, 'triangle', 0, 0, [1, 6, null]], [6, ['number', {'value': 440}], 0, 0, [5]]];
     var MATRIXOBJ = [[0, 'matrix', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': 'sol'}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': 'mi'}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': 're'}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]];
@@ -1478,11 +1485,13 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
         moved = false;
         palette.draggingProtoBlock = false;
 
+        // Put the protoblock back on the palette...
+        restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+
         if (blkname in BUILTINMACROS) {
             paletteBlocks.loadNewBlocks(BUILTINMACROS[blkname]);
             var thisBlock = paletteBlocks.blockList.length - 1;
             var topBlk = paletteBlocks.findTopBlock(thisBlock);
-            restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
         } else if (palette.name === 'myblocks') {
             // If we are on the myblocks palette, it is a macro.
             var macroName = blkname.replace('macro_', '');
@@ -1535,7 +1544,6 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                 paletteBlocks.blockList[topBlk].collapseToggle();
             }, 500);
         } else {
-            // Create the block.
             function myCallback (newBlock) {
                 // Move the drag group under the cursor.
                 paletteBlocks.findDragGroup(newBlock);
@@ -1544,7 +1552,6 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                 }
                 // Dock with other blocks if needed
                 blocks.blockMoved(newBlock);
-                restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
             }
 
             // console.log(protoblk + ' ' + blkname);
