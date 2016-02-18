@@ -126,6 +126,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.skipIndex = {};
     this.crescendoDelta = {};
     this.crescendoVolume = {};
+    this.crescendoInitialVolume = {};
     this.staccato = {};
     this.swing = {};
     this.swingTarget = {};
@@ -518,6 +519,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
             this.crescendoDelta[turtle] = [];
+	    this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
             this.staccato[turtle] = [];
             this.swing[turtle] = [];
@@ -1994,9 +1996,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.setListener(turtle, listenerName, listener);
                 break;
             case 'crescendo':
-                if (args.length > 1) {
+                if (args.length > 1 && args[0] !== 0) {
                     logo.crescendoDelta[turtle].push(args[0]);
                     logo.crescendoVolume[turtle].push(last(logo.polyVolume[turtle]));
+		    logo.crescendoInitialVolume[turtle].push(last(logo.polyVolume[turtle]));
                     childFlow = args[1];
                     childFlowCount = 1;
 
@@ -2006,6 +2009,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var listener = function (event) {
                         logo.crescendoDelta[turtle].pop();
                         logo.crescendoVolume[turtle].pop();
+			logo.crescendoInitialVolume[turtle].pop();
+                        logo.lilypondEndCrescendo(turtle);
                     }
 
                     logo.setListener(turtle, listenerName, listener);
@@ -2615,6 +2620,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         if (this.crescendoDelta[turtle].length === 0) {
             this.setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
+
         if (this.inMatrix) {
             if (this.inNoteBlock > 0) {
                 matrix.addColBlock(blk, 1);
@@ -2905,6 +2911,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
 
                 if (this.crescendoDelta[turtle].length > 0) {
+		    if (last(this.crescendoVolume[turtle]) === last(this.crescendoInitialVolume[turtle])) {
+			this.lilypondBeginCrescendo(turtle, last(this.crescendoDelta[turtle]));
+		    }
                     var len = this.crescendoVolume[turtle].length
                     this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
                     this.setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
@@ -3932,11 +3941,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var thisScale = notesSharp;
             }
 
-            var twoCharSolfege = solfege.toUpperCase().substr(0,2);
             if(solfege.toLowerCase().substr(0,4) === _('rest')) {
                 return ['R', ''];
-            } else if (halfSteps.indexOf(twoCharSolfege.toLowerCase()) !== -1) {
-                var index = halfSteps.indexOf(twoCharSolfege.toLowerCase()) + offset;
+            } else if (halfSteps.indexOf(solfege.toLowerCase()) !== -1) {
+                var index = halfSteps.indexOf(solfege.toLowerCase()) + offset;
                 if (index > 11) {
                     index -= 12;
                     octave += 1;
@@ -4264,6 +4272,21 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.lilypondStaging[turtle].push('break');
     }
 
+    this.lilypondBeginCrescendo = function(turtle, factor) {
+        if (this.lilypondStaging[turtle] == undefined) {
+            this.lilypondStaging[turtle] = [];
+        }
+        if (factor > 0) {
+            this.lilypondStaging[turtle].push('%5C< ');
+	} else {
+	    this.lilypondStaging[turtle].push('%5C> ');
+	}
+    }
+
+    this.lilypondEndCrescendo = function(turtle) {
+	this.lilypondStaging[turtle].push('%5C! ');
+    }
+
     this.lilypondBeginSlur = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
@@ -4272,10 +4295,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.lilypondEndSlur = function(turtle) {
-        this.lilypondStaging[turtle].push(')');
+        this.lilypondStaging[turtle].push(') ');
     }
 
     this.lilypondInsertTie = function(turtle) {
+        if (this.lilypondStaging[turtle] == undefined) {
+            this.lilypondStaging[turtle] = [];
+        }
         this.lilypondStaging[turtle].push('~');
     }
 
