@@ -4273,7 +4273,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var turtleCount = 0;
         var clef = [];
         var RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
-        var RODENTSSHORT = [_('ra'), _('rb'), _('rc'), _('rd'), _('re'), _('rf'), _('rg'), _('rh'), _('ri'), _('rj'), _('rk'), _('rl')];
+        var RODENTSSHORT = [_('m'), _('br'), _('ml'), _('ch'), _('rs'), _('gp'), _('cb'), _('cp'), _('bk'), _('gs'), _('fs'), _('bt')];
         for (var t in this.lilypondStaging) {
             turtleCount += 1;
         }
