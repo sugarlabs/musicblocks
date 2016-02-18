@@ -294,7 +294,7 @@ function Matrix() {
 
         var j = 0;
         for (var i = 0; i < this.solfegeNotes.length; i++) {
-            if (this.solfegeNotes[i] === 'rest') {
+            if (this.solfegeNotes[i].toLowerCase() === _('rest')) {
                 this.rests += 1;
                 continue;
             }
@@ -391,7 +391,7 @@ function Matrix() {
     }
 
     this.note2Solfege = function(note, index) {
-        var solfegeConversionTable = {'C': 'do', 'C♯': 'do♯', 'D': 're', 'D♯': 're♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa♯', 'G': 'sol', 'G♯': 'sol♯', 'A': 'la', 'A♯': 'la♯', 'B': 'ti', 'D♭': 're♭', 'E♭': 'mi♭', 'G♭': 'sol♭', 'A♭': 'la♭', 'B♭': 'ti♭'};
+        var solfegeConversionTable = {'C': _('do'), 'C♯': _('do') + '♯', 'D': _('re'), 'D♯': _('re') + '♯', 'E': _('mi'), 'F': _('fa'), 'F♯': _('fa') + '♯', 'G': _('sol'), 'G♯': _('sol') + '♯', 'A': _('la'), 'A♯': _('la') + '♯', 'B': _('ti'), 'D♭': _('re') + '♭', 'E♭': _('mi') + '♭', 'G♭': _('sol') + '♭', 'A♭': _('la') + '♭', 'B♭': _('ti') + '♭'};
         if (['♭', '♯'].indexOf(note[1]) === -1) {
             var octave = note[1];
             var newNote = solfegeConversionTable[note[0]];
@@ -914,7 +914,7 @@ function Matrix() {
     this.saveMatrix = function() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
-        var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
+        var noteConversion = {'C': _('do'), 'D': _('re'), 'E': _('mi'), 'F': _('fa'), 'G': _('sol'), 'A': _('la'), 'B': _('ti'), 'R': _('rest')};
         var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': 'chunk'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 

@@ -518,7 +518,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else if (this.name === 'notename') {
                     this.value = 'G';
                 } else if (this.name === 'rest') {
-                    this.value = 'rest';
+                    this.value = _('rest');
                 } else {
                     this.value = 4;
                 }
@@ -1453,13 +1453,13 @@ function changeLabel(myBlock) {
         myBlock.label = docById('textLabel');
     } else if (myBlock.name === 'solfege') {
         var type = 'solfege';
-        var notes = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+        var notes = [_('ti'), _('la'), _('sol'), _('fa'), _('mi'), _('re'), _('do')];
         var attrs = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             if (notes.indexOf(myBlock.value) !== -1) {
                 var selectednote = myBlock.value;
                 var selectedattr = '♮';
-            } else if (myBlock.value.slice(0, 3) === 'sol') {
+            } else if (myBlock.value.slice(0, 3) === _('sol')) {
                 var selectednote = 'sol';
 		if (myBlock.value.length === 4) {
                     var selectedattr = myBlock.value[3];
