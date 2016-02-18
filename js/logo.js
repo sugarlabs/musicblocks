@@ -4335,6 +4335,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 this.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
                 this.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
                 this.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
+		// Automatic note splitting
+		this.lilypondOutput += '%0A   %5Cremove "Note_heads_engraver"%0A   %5Cconsists "Completion_heads_engraver"%0A   %5Cremove "Rest_engraver"%0A   %5Cconsists "Completion_rest_engraver"%0A'
+
                 this.lilypondOutput += '} { %5Cclef ' + last(clef) + ' %5C' + instrumentName.replace(/ /g, '_') + ' }%0A%0A';
             }
             c += 1;
