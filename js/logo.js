@@ -1812,7 +1812,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var delta = 0;
 
                 if (logo.inMatrix) {
-                    if (note !== 'rest') {
+                    if (note.toLowerCase() !== _('rest')) {
                         matrix.addRowBlock(blk);
                         if (logo.pitchBlocks.indexOf(blk) === -1) {
                             logo.pitchBlocks.push(blk);
@@ -3836,7 +3836,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
 
     this.getSolfege = function (note) {
-        var noteConversion = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa', 'G': 'sol', 'A': 'la', 'B': 'ti', 'R': 'rest'};
+        var noteConversion = {'C': _('do'), 'D': _('re'), 'E': _('mi'), 'F': _('fa'), 'G': _('sol'), 'A': _('la'), 'B': _('ti'), 'R': _('rest')};
         if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
             return noteConversion[note[0][0]] + note[0][1] + note[0][2];
         } else if(['♯', '♭'].indexOf(note[0][1]) !== -1) {
@@ -3876,11 +3876,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var notesSharp = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
         var notesFlat = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
         var notesFlat2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
-        var extraTranspositions = {'E♯':['F', 0], 'B♯':['C', 1], 'C♭':['B', -1], 'F♭':['E', 0], 'e♯':['F', 0], 'b♯':['C', 1], 'c♭':['B', -1], 'f♭':['E', 0]};
-        var majorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 3, 'ME': 3, 'MI': 4, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 8, 'LO': 8, 'LA': 9, 'LI': 10, 'TE': 10, 'TA': 10, 'TI': 11};
-        // Is this correct, or is minor solfege expressed by using
-        // DO RE MA FA SOL LE TE?
-        var minorHalfSteps = {'DO': 0, 'DI': 1, 'RA': 1, 'RE': 2, 'RI': 3, 'MA': 2, 'ME': 2, 'MI': 3, 'FA': 5, 'FI': 6, 'SE': 6, 'SO': 7, 'SOL': 7, 'SI': 8, 'LE': 7, 'LO': 7, 'LA': 8, 'LI': 9, 'TE': 9, 'TA': 9,  'TI': 10};
+        var extraTranspositions = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
+        var majorHalfSteps = [_('do'), '', _('re'), '', _('mi'), _('fa'), '', _('sol'), '', _('la'), '', _('ti')];
+        var minorHalfSteps = [_('do'), '', _('re'), _('mi'), '', _('fa'), '', _('sol'), _('la'), '', _('ti'), ''];
 
         // Already a note? No need to convert from solfege.
         if (solfege in bToFlat) {
@@ -3935,11 +3933,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
 
             var twoCharSolfege = solfege.toUpperCase().substr(0,2);
-            if(solfege.toUpperCase().substr(0,4) === 'REST') {
+            if(solfege.toLowerCase().substr(0,4) === _('rest')) {
                 return ['R', ''];
-            } else if (twoCharSolfege in halfSteps) {
-                var index = halfSteps[twoCharSolfege] + offset;
-                // console.log(solfege + ' ' + twoCharSolfege + ' ' + offset + ' ' + index + ' ' + thisScale[index]);
+            } else if (halfSteps.indexOf(twoCharSolfege.toLowerCase()) !== -1) {
+                var index = halfSteps.indexOf(twoCharSolfege.toLowerCase()) + offset;
                 if (index > 11) {
                     index -= 12;
                     octave += 1;
@@ -4486,7 +4483,7 @@ function pitchToNumber(pitch, octave) {
     var PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
     var PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
     var PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    var SOLFAGE = ['do', '', 're', 'me', '', 'fa', '', 'sol', 'la', '', 'ti', ''];
+    var SOLFAGE = [_('do'), '', _('re'), _('me'), '', _('fa'), '', _('sol'), _('la'), '', _('ti'), ''];
 
     var pitchNumber = 0;
     if (PITCHES0.indexOf(pitch) !== -1) {

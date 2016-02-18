@@ -1115,23 +1115,23 @@ define(function (require) {
                                 [1, 'matrix', 800, 50, [null, 2, null]],
 
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['solfege', {value:'ti'}], 0, 0, [2]],
+                                [3, ['solfege', {value:_('ti')}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
                                 
                                 [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['solfege', {value:'la'}], 0, 0, [5]],
+                                [6, ['solfege', {value:_('la')}], 0, 0, [5]],
                                 [7, ['number', {value:'4'}], 0, 0, [5]],
 
                                 [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['solfege', {value:'sol'}], 0, 0, [8]],
+                                [9, ['solfege', {value:_('sol')}], 0, 0, [8]],
                                 [10, ['number', {value:'4'}], 0, 0, [8]],
 
                                 [11, 'pitch', 0, 0, [8, 12, 13, 14]],
-                                [12, ['solfege', {value:'mi'}], 0, 0, [11]],
+                                [12, ['solfege', {value:_('mi')}], 0, 0, [11]],
                                 [13, ['number', {value:'4'}], 0, 0, [11]],
 
                                 [14, 'pitch', 0, 0, [11, 15, 16, 17]],
-                                [15, ['solfege', {value:'re'}], 0, 0, [14]],
+                                [15, ['solfege', {value:_('re')}], 0, 0, [14]],
                                 [16, ['number', {value:'4'}], 0, 0, [14]],
 
                                 [17,"repeat",0,0,[14,18,19,null]],
