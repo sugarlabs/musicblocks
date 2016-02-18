@@ -103,6 +103,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.beatFactor = {};
     this.dotCount = {};
     this.noteBeat = {};
+    this.oscList = {};
     this.noteFrequencies = {};
     this.notePitches = {};
     this.noteOctaves = {};
@@ -152,10 +153,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
     this.synth = new Synth();
 
-    // Oscillator parameters
-    this.oscDuration = {};
-    this.oscList = {};
-
     // When running in step-by-step mode, the next command to run is
     // queued here.
     this.stepQueue = {};
@@ -173,9 +170,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     }
     */
     this.mic = null;
-
-    this.turtleOscs = {};
-    this.notesOscs = {};
 
     // Used to pause between each block as the program executes.
     this.setTurtleDelay = function(turtleDelay) {
@@ -515,7 +509,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.keySignature[turtle] = 'C';
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = [50];
-            this.oscDuration[turtle] = 4;
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
             this.crescendoDelta[turtle] = [];
@@ -2905,8 +2898,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (waitTime === 0 || this.lilypondSaveOnly) {
                     playnote(this);
                 } else {
+                    var logo = this;
                     setTimeout(function() {
-                        playnote(this);
+                        playnote(logo);
                     }, waitTime + this.noteDelay);
                 }
 
@@ -3941,10 +3935,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var thisScale = notesSharp;
             }
 
-            if(solfege.toLowerCase().substr(0,4) === _('rest')) {
+            if(solfege.toLowerCase().substr(0, 4) === _('rest')) {
                 return ['R', ''];
-            } else if (halfSteps.indexOf(solfege.toLowerCase()) !== -1) {
-                var index = halfSteps.indexOf(solfege.toLowerCase()) + offset;
+            } else if (halfSteps.indexOf(solfege.substr(0, 2).toLowerCase()) !== -1) {
+                var index = halfSteps.indexOf(solfege.substr(0, 2).toLowerCase()) + offset;
+                if (index > 11) {
+                    index -= 12;
+                    octave += 1;
+                }
+                note = thisScale[index];
+            } else if (halfSteps.indexOf(solfege.substr(0, 3).toLowerCase()) !== -1) {
+                var index = halfSteps.indexOf(solfege.substr(0, 3).toLowerCase()) + offset;
                 if (index > 11) {
                     index -= 12;
                     octave += 1;
