@@ -1170,3 +1170,6 @@ msgstr ""
 
 msgid "set font"
 msgstr ""
+
+msgid "free time"
+msgstr ""

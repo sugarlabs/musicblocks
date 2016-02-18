@@ -28,6 +28,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "crescendo factor"
@@ -632,6 +635,9 @@ msgstr "muis x"
 
 msgid "mouse y"
 msgstr "muis y"
+
+msgid "free time"
+msgstr ""
 
 #. TRANS: do this action
 msgid "do"
