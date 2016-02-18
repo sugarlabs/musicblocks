@@ -505,7 +505,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.beatFactor[turtle] = 1;
-	    this.dotCount[turtle] = 0;
+            this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
             this.duplicateFactor[turtle] = 1;
             this.skipFactor[turtle] = 1;
@@ -2859,6 +2859,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                             if (!logo.lilypondSaveOnly && duration > 0) {
                                 if (logo.oscList[turtle].length > 0) {
+                                    console.log(last(logo.noteFrequencies[turtle]));
                                     // FIXME: synth cannot play chords.
                                     logo.synth.trigger([last(logo.noteFrequencies[turtle])], beatValue, last(logo.oscList[turtle]));
                                     logo.noteFrequencies[turtle].pop();
@@ -4079,11 +4080,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // , and ' for shifts in octave.
             // Also, notes must be lowercase.
             // And the octave bounday is at C, not A.
-            if (false) { // (note[0] === 'A' || note[0] === 'B') {
-		return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "'''''''").replace(/1/g, ',,,').replace(/2/g, ',,').replace(/3/g, ',').replace(/4/g, "").replace(/5/g, "'").replace(/6/g, "''").replace(/7/g, "'''").replace(/8/g, "'''''").replace(/9/g, "''''''").toLowerCase();
-            } else {
-		return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
-            }
+            return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
         }
 
         var counter = 0;
@@ -4408,7 +4405,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 function frequencyToPitch(hz) {
     // Calculate the pitch and octave based on frequency, rounding to
     // the nearest note.
-    var PITCHES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
+    var PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
     var TWELTHROOT2 = 1.05946309435929;
     var A0 = 27.5;
     var C8 = 4186.01;
@@ -4423,7 +4420,7 @@ function frequencyToPitch(hz) {
     for (var i = 0; i < 88; i++) {
         var f = A0 * Math.pow(TWELTHROOT2, i);
         if (hz < f * 1.03 && hz > f * 0.97) {
-            return [PITCHES[i % 12], Math.floor(i / 12)];
+            return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
         }
     }
     console.log('could not find note/octave for ' + hz);
