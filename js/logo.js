@@ -128,6 +128,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.crescendoVolume = {};
     this.staccato = {};
     this.swing = {};
+    this.swingTarget = {};
     this.swingCarryOver = {};
     this.tie = {};
     this.tieNote = {};
@@ -520,6 +521,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.crescendoVolume[turtle] = [];
             this.staccato[turtle] = [];
             this.swing[turtle] = [];
+            this.swingTarget[turtle] = [];
             this.swingCarryOver[turtle] = 0;
             this.tie[turtle] = false;
             this.tieNote[turtle] = [];
@@ -2088,6 +2090,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'swing':
                 // Grab a bit from the next note to give to the current note.
+                logo.swingTarget[turtle].push(null);
                 logo.swing[turtle].push(args[0]);
                 logo.swingCarryOver[turtle] = 0;
                 childFlow = args[1];
@@ -2097,7 +2100,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.updateEndBlks(childFlow, turtle, listenerName);
 
                 var listener = function (event) {
+                    logo.swingTarget[turtle].pop();
                     logo.swing[turtle].pop();
+                    logo.swingCarryOver[turtle] = 0;
                 }
 
                 logo.setListener(turtle, listenerName, listener);
@@ -2726,20 +2731,32 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             // If we are in a swing, depending upon parity, we either
             // add the duration from the current note or we substract
-            // duration from the next note.  FIXME: Will not work when
-            // using dup and skip. FIXME: Could behave weirdly with
-            // tie.
+            // duration from the next note. Swing is triggered by an
+            // initial notevalue. When that notevalue is encountered
+            // again, the swing terminates, e.g., 8->4->4->4->8
+            // 8->4->4->4->8
+            // FIXME: Will not work when using dup and skip.
+            // FIXME: Could behave weirdly with tie.
             if (this.swing[turtle].length > 0) {
-                var swingValue = last(this.swing[turtle]);
-                if (this.swingCarryOver[turtle] === 0) {
-                    noteBeatValue = 1 / ((1 / noteBeatValue) + (1 / swingValue));
-                    this.swingCarryOver[turtle] = swingValue;
-                } else {
-                    noteBeatValue = 1 / ((1 / noteBeatValue) - (1 / swingValue));
-                    this.swingCarryOver[turtle] = 0;
+                if (last(this.swingTarget[turtle]) == null) {
+                    // When we start a swing we need to keep track of
+                    // the initial beat value.
+                    this.swingTarget[turtle][this.swingTarget[turtle].length - 1] = noteBeatValue;
                 }
-                if (noteBeatValue < 0) {
-                    noteBeatValue = 0;
+                var swingValue = last(this.swing[turtle]);
+                // If this notevalue matches the target, either we are
+                // starting a swing or ending a swing.
+                if (noteBeatValue === last(this.swingTarget[turtle])) {
+                    if (this.swingCarryOver[turtle] === 0) {
+                        noteBeatValue = 1 / ((1 / noteBeatValue) + (1 / swingValue));
+                        this.swingCarryOver[turtle] = swingValue;
+                    } else {
+                        noteBeatValue = 1 / ((1 / noteBeatValue) - (1 / swingValue));
+                        this.swingCarryOver[turtle] = 0;
+                    }
+                    if (noteBeatValue < 0) {
+                        noteBeatValue = 0;
+                    }
                 }
             }
 
@@ -4335,8 +4352,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 this.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
                 this.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
                 this.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
-		// Automatic note splitting
-		this.lilypondOutput += '%0A   %5Cremove "Note_heads_engraver"%0A   %5Cconsists "Completion_heads_engraver"%0A   %5Cremove "Rest_engraver"%0A   %5Cconsists "Completion_rest_engraver"%0A'
+                // Automatic note splitting
+                this.lilypondOutput += '%0A   %5Cremove "Note_heads_engraver"%0A   %5Cconsists "Completion_heads_engraver"%0A   %5Cremove "Rest_engraver"%0A   %5Cconsists "Completion_rest_engraver"%0A'
 
                 this.lilypondOutput += '} { %5Cclef ' + last(clef) + ' %5C' + instrumentName.replace(/ /g, '_') + ' }%0A%0A';
             }
