@@ -202,110 +202,109 @@ function Block(protoblock, blocks, overrideName) {
 
     this.newArtwork = function(plusMinus) {
         switch (this.name) {
-            case 'start':
-            case 'drum':
-            case 'action':
-            case 'matrix':
-                var proto = new ProtoBlock('collapse');
-                proto.scale = this.protoblock.scale;
-                proto.extraWidth = 10;
-                proto.basicBlockCollapsed();
-                var obj = proto.generator();
-                this.collapseArtwork = obj[0];
-
+        case 'start':
+        case 'drum':
+        case 'action':
+        case 'matrix':
+            var proto = new ProtoBlock('collapse');
+            proto.scale = this.protoblock.scale;
+            proto.extraWidth = 10;
+            proto.basicBlockCollapsed();
+            var obj = proto.generator();
+            this.collapseArtwork = obj[0];
+            var obj = this.protoblock.generator(this.clampCount[0]);
+            break;
+        case 'note':
+        case 'invert':
+        case 'notation':
+        case 'flat':
+        case 'sharp':
+        case 'multiplybeatfactor':
+        case 'dividebeatfactor':
+        case 'duplicatenotes':
+        case 'skipnotes':
+        case 'rhythmicdot':
+        case 'tie':
+        case 'swing':
+        case 'drift':
+        case 'staccato':
+        case 'slur':
+        case 'crescendo':
+        case 'settransposition':
+        case 'tuplet':
+        case 'tuplet2':
+        case 'osctime':
+        case 'setbpm':
+        case 'setnotevolume2':
+        case 'repeat':
+        case 'fill':
+        case 'hollowline':
+        case 'clamp':
+        case 'forever':
+        case 'if':
+        case 'while':
+        case 'until':
+            var obj = this.protoblock.generator(this.clampCount[0]);
+            break;
+        case 'less':
+        case 'greater':
+        case 'equal':
+            var obj = this.protoblock.generator(this.clampCount[0]);
+            break;
+        case 'ifthenelse':
+            var obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
+            break;
+        case 'nameddoArg':
+        case 'namedcalcArg':
+        case 'doArg':
+        case 'calcArg':
+            var obj = this.protoblock.generator(this.argClampSlots);
+            this.size = 2;
+            for (var i = 0; i < this.argClampSlots.length; i++) {
+                this.size += this.argClampSlots[i];
+            }
+            this.docks = [];
+            this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
+            break;
+        default:
+            if (this.isArgBlock()) {
                 var obj = this.protoblock.generator(this.clampCount[0]);
-                break;
-            case 'note':
-            case 'invert':
-            case 'notation':
-            case 'flat':
-            case 'sharp':
-            case 'multiplybeatfactor':
-            case 'dividebeatfactor':
-            case 'duplicatenotes':
-            case 'skipnotes':
-            case 'rhythmicdot':
-            case 'tie':
-            case 'swing':
-            case 'drift':
-            case 'staccato':
-            case 'slur':
-            case 'crescendo':
-            case 'settransposition':
-            case 'tuplet':
-            case 'tuplet2':
-            case 'osctime':
-            case 'setbpm':
-            case 'setnotevolume2':
-            case 'repeat':
-            case 'fill':
-            case 'hollowline':
-            case 'clamp':
-            case 'forever':
-            case 'if':
-            case 'while':
-            case 'until':
+            } else if (this.isTwoArgBlock()) {
                 var obj = this.protoblock.generator(this.clampCount[0]);
-                break;
-            case 'less':
-            case 'greater':
-            case 'equal':
-                var obj = this.protoblock.generator(this.clampCount[0]);
-                break;
-            case 'ifthenelse':
-                var obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
-                break;
-            case 'nameddoArg':
-            case 'namedcalcArg':
-            case 'doArg':
-            case 'calcArg':
-                var obj = this.protoblock.generator(this.argClampSlots);
-                this.size = 2;
-                for (var i = 0; i < this.argClampSlots.length; i++) {
-                    this.size += this.argClampSlots[i];
-                }
-                this.docks = [];
-                this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
-                break;
-            default:
-                if (this.isArgBlock()) {
-                    var obj = this.protoblock.generator(this.clampCount[0]);
-                } else if (this.isTwoArgBlock()) {
-                    var obj = this.protoblock.generator(this.clampCount[0]);
-                } else {
-                    var obj = this.protoblock.generator();
-                }
-                this.size += plusMinus;
-                break;
+            } else {
+                var obj = this.protoblock.generator();
+            }
+            this.size += plusMinus;
+            break;
         }
 
         switch (this.name) {
-            case 'nameddoArg':
-                for (var i = 1; i < obj[1].length - 1; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
-                }
-                this.docks.push([obj[1][2][0], obj[1][2][1], 'in']);
-                break;
-            case 'namedcalcArg':
-                for (var i = 1; i < obj[1].length; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
-                }
-                break;
-            case 'doArg':
-                this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
-                for (var i = 2; i < obj[1].length - 1; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
-                }
-                this.docks.push([obj[1][3][0], obj[1][3][1], 'in']);
-                break;
-            case 'calcArg':
-                this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
-                for (var i = 2; i < obj[1].length; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
-                }
-                break;
-            default:
-                break;
+        case 'nameddoArg':
+            for (var i = 1; i < obj[1].length - 1; i++) {
+                this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
+            }
+            this.docks.push([obj[1][2][0], obj[1][2][1], 'in']);
+            break;
+        case 'namedcalcArg':
+            for (var i = 1; i < obj[1].length; i++) {
+                this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
+            }
+            break;
+        case 'doArg':
+            this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+            for (var i = 2; i < obj[1].length - 1; i++) {
+                this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
+            }
+            this.docks.push([obj[1][3][0], obj[1][3][1], 'in']);
+            break;
+        case 'calcArg':
+            this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+            for (var i = 2; i < obj[1].length; i++) {
+                this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
+            }
+            break;
+        default:
+            break;
         }
 
         // Save new artwork and dock positions.
@@ -1543,7 +1542,7 @@ function changeLabel(myBlock) {
         labelElem.classList.add('hasKeyboard');
         myBlock.label = docById('numberLabel');
     }
-    
+
     var focused = false;
     var blur = function (event) {
         // Not sure why the change in the input is not available
@@ -1630,19 +1629,19 @@ function labelChanged(myBlock) {
     if (myBlock.labelattr != null) {
         var attrValue = myBlock.labelattr.value;
         switch (attrValue) {
-            case '♯♯':
-            case '♯':
-            case '♭♭':
-            case '♭':
-                newValue = newValue + attrValue;
-                break;
-            default:
-                break;
+        case '♯♯':
+        case '♯':
+        case '♭♭':
+        case '♭':
+            newValue = newValue + attrValue;
+            break;
+        default:
+            break;
         }
     }
     if (oldValue === newValue) {
         // Nothing to do in this case.
-        return;    
+        return;
     }
 
     // Update the block value and block text.
@@ -1682,34 +1681,34 @@ function labelChanged(myBlock) {
         var cblock = myBlock.blocks.blockList[c];
         // console.log('Label changed to: ' + myBlock.value);
         switch (cblock.name) {
-            case 'action':
-                // If the label was the name of an action, update the
-                // associated run myBlock.blocks and the palette buttons
-                // Rename both do <- name and nameddo blocks.
-                console.log('renameDos and...');
-                myBlock.blocks.renameDos(oldValue, newValue);
-                if (oldValue === _('action')) {
-                    console.log('and newNameddoBlock...');
-                    myBlock.blocks.newNameddoBlock(newValue, myBlock.blocks.actionHasReturn(c), myBlock.blocks.actionHasArgs(c));
-                }
-                console.log('renameNameddos.');
-                myBlock.blocks.renameNameddos(oldValue, newValue);
-                myBlock.blocks.palettes.updatePalettes('actions');
-                break;
-            case 'storein':
-                // If the label was the name of a storein, update the
-                //associated box myBlock.blocks and the palette buttons
-                if (myBlock.value !== 'box') {
-                    myBlock.blocks.newStoreinBlock(myBlock.value);
-                    myBlock.blocks.newNamedboxBlock(myBlock.value);
-                }
-                // Rename both box <- name and namedbox blocks.
-                myBlock.blocks.renameBoxes(oldValue, newValue);
-                myBlock.blocks.renameNamedboxes(oldValue, newValue);
-                myBlock.blocks.palettes.updatePalettes('boxes');
-                break;
-            default:
-                break;
+        case 'action':
+            // If the label was the name of an action, update the
+            // associated run myBlock.blocks and the palette buttons
+            // Rename both do <- name and nameddo blocks.
+            console.log('renameDos and...');
+            myBlock.blocks.renameDos(oldValue, newValue);
+            if (oldValue === _('action')) {
+                console.log('and newNameddoBlock...');
+                myBlock.blocks.newNameddoBlock(newValue, myBlock.blocks.actionHasReturn(c), myBlock.blocks.actionHasArgs(c));
+            }
+            console.log('renameNameddos.');
+            myBlock.blocks.renameNameddos(oldValue, newValue);
+            myBlock.blocks.palettes.updatePalettes('actions');
+            break;
+        case 'storein':
+            // If the label was the name of a storein, update the
+            //associated box myBlock.blocks and the palette buttons
+            if (myBlock.value !== 'box') {
+                myBlock.blocks.newStoreinBlock(myBlock.value);
+                myBlock.blocks.newNamedboxBlock(myBlock.value);
+            }
+            // Rename both box <- name and namedbox blocks.
+            myBlock.blocks.renameBoxes(oldValue, newValue);
+            myBlock.blocks.renameNamedboxes(oldValue, newValue);
+            myBlock.blocks.palettes.updatePalettes('boxes');
+            break;
+        default:
+            break;
         }
     }
 }

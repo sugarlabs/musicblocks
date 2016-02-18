@@ -2150,12 +2150,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
             if (myBlock.isValueBlock()) {
                 switch (myBlock.name) {
-                    case 'media':
-                        blockItem = [b, [myBlock.name, null], x, y, []];
-                        break;
-                    default:
-                        blockItem = [b, [myBlock.name, myBlock.value], x, y, []];
-                        break;
+                case 'media':
+                    blockItem = [b, [myBlock.name, null], x, y, []];
+                    break;
+                default:
+                    blockItem = [b, [myBlock.name, myBlock.value], x, y, []];
+                    break;
                 }
             } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) !== -1) {
                 blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
@@ -2261,53 +2261,53 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
 
             switch (name) {
-                case 'text':
-                    var key = blkData[1][1];
-                    if (stringValues[key] === undefined) {
-                        stringValues[key] = [];
-                    }
-                    stringValues[key].push(b);
-                    break;
-                case 'action':
-                case 'hat':
-                    if (blkData[4][1] != null) {
-                        actionNames[b] = blkData[4][1];
-                    }
-                    break;
-                case 'storein':
-                    if (blkData[4][1] != null) {
-                        storeinNames[b] = blkData[4][1];
-                    }
-                    break;
-                case 'nameddo':
-                case 'namedcalc':
-                case 'nameddoArg':
-                case 'namedcalcArg':
-                    doNames[b] = blkData[1][1]['value'];
-                    break;
-                case 'do':
-                case 'stack':
-                    if (blkData[4][1] != null) {
-                        doNames[b] = blkData[4][1];
-                    }
-                    break;
-                default:
-                    break;
+            case 'text':
+                var key = blkData[1][1];
+                if (stringValues[key] === undefined) {
+                    stringValues[key] = [];
+                }
+                stringValues[key].push(b);
+                break;
+            case 'action':
+            case 'hat':
+                if (blkData[4][1] != null) {
+                    actionNames[b] = blkData[4][1];
+                }
+                break;
+            case 'storein':
+                if (blkData[4][1] != null) {
+                    storeinNames[b] = blkData[4][1];
+                }
+                break;
+            case 'nameddo':
+            case 'namedcalc':
+            case 'nameddoArg':
+            case 'namedcalcArg':
+                doNames[b] = blkData[1][1]['value'];
+                break;
+            case 'do':
+            case 'stack':
+                if (blkData[4][1] != null) {
+                    doNames[b] = blkData[4][1];
+                }
+                break;
+            default:
+                break;
             }
 
             switch (name) {
-                case 'action':
-                case 'matrix':
-                case 'drum':
-                case 'start':
-                    if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
-                        if (blkData[1][1]['collapsed']) {
-                            this.blocksToCollapse.push(this.blockList.length + b);
-                        }
+            case 'action':
+            case 'matrix':
+            case 'drum':
+            case 'start':
+                if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
+                    if (blkData[1][1]['collapsed']) {
+                        this.blocksToCollapse.push(this.blockList.length + b);
                     }
-                    break;
-                default:
-                    break;
+                }
+                break;
+            default:
+                break;
             }
         }
 
@@ -2441,352 +2441,352 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // A few special cases.
             switch (name) {
                 // Only add 'collapsed' arg to start, action blocks.
-                case 'start':
-                    blkData[4][0] = null;
-                    blkData[4][2] = null;
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var blkInfo = args[1];
-                        me.blockList[thisBlock].value = me.turtles.turtleList.length;
-                        me.turtles.addTurtle(me.blockList[thisBlock], blkInfo);
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
-                    break;
-                case 'drum':
-                    blkData[4][0] = null;
-                    blkData[4][2] = null;
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var blkInfo = args[1];
-                        me.blockList[thisBlock].value = me.turtles.turtleList.length;
-                        me.turtles.addDrum(me.blockList[thisBlock], blkInfo);
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
-                    break;
-                case 'action':
-                case 'hat':
-                    blkData[4][0] = null;
-                    blkData[4][3] = null;
-                    this.makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
-                    break;
-
+            case 'start':
+                blkData[4][0] = null;
+                blkData[4][2] = null;
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var blkInfo = args[1];
+                    me.blockList[thisBlock].value = me.turtles.turtleList.length;
+                    me.turtles.addTurtle(me.blockList[thisBlock], blkInfo);
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
+                break;
+            case 'drum':
+                blkData[4][0] = null;
+                blkData[4][2] = null;
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var blkInfo = args[1];
+                    me.blockList[thisBlock].value = me.turtles.turtleList.length;
+                    me.turtles.addDrum(me.blockList[thisBlock], blkInfo);
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
+                break;
+            case 'action':
+            case 'hat':
+                blkData[4][0] = null;
+                blkData[4][3] = null;
+                this.makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
+                break;
+		
                 // Named boxes and dos need private data.
-                case 'namedbox':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].privateData = value;
-                        me.blockList[thisBlock].value = null;
-                    }
-                    this.makeNewBlockWithConnections('namedbox', blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'namedarg':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].privateData = value;
-                        me.blockList[thisBlock].value = null;
-                    }
-                    this.makeNewBlockWithConnections('namedarg', blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'namedcalc':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].privateData = value;
-                        me.blockList[thisBlock].value = null;
-                    }
-                    this.makeNewBlockWithConnections('namedcalc', blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'nameddo':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].privateData = value;
-                        me.blockList[thisBlock].value = null;
-                    }
-                    this.makeNewBlockWithConnections('nameddo', blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
+            case 'namedbox':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].privateData = value;
+                    me.blockList[thisBlock].value = null;
+                }
+                this.makeNewBlockWithConnections('namedbox', blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'namedarg':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].privateData = value;
+                    me.blockList[thisBlock].value = null;
+                }
+                this.makeNewBlockWithConnections('namedarg', blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'namedcalc':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].privateData = value;
+                    me.blockList[thisBlock].value = null;
+                }
+                this.makeNewBlockWithConnections('namedcalc', blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'nameddo':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].privateData = value;
+                    me.blockList[thisBlock].value = null;
+                }
+                this.makeNewBlockWithConnections('nameddo', blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
 
                 // Arg clamps may need extra slots added.
-                case 'doArg':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var extraSlots = args[1].length - 4;
-                        if (extraSlots > 0) {
-                            var slotList = me.blockList[thisBlock].argClampSlots;
-                            for (var i = 0; i < extraSlots; i++) {
-                                slotList.push(1);
-                                me.newLocalArgBlock(slotList.length);
-                                me.blockList[thisBlock].connections.push(null);
-                            }
-                            me.blockList[thisBlock].updateArgSlots(slotList);
-                            for (var i = 0; i < args[1].length; i++) {
-                                me.blockList[thisBlock].connections[i] = args[1][i];
-                            }
+            case 'doArg':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var extraSlots = args[1].length - 4;
+                    if (extraSlots > 0) {
+                        var slotList = me.blockList[thisBlock].argClampSlots;
+                        for (var i = 0; i < extraSlots; i++) {
+                            slotList.push(1);
+                            me.newLocalArgBlock(slotList.length);
+                            me.blockList[thisBlock].connections.push(null);
                         }
-                        me.checkArgClampBlocks.push(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('doArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
-                    break;
-                case 'nameddoArg':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].privateData = value;
-                        me.blockList[thisBlock].value = null;
-                        var extraSlots = args[2].length - 3;
-                        if (extraSlots > 0) {
-                            var slotList = me.blockList[thisBlock].argClampSlots;
-                            for (var i = 0; i < extraSlots; i++) {
-                                slotList.push(1);
-                                me.newLocalArgBlock(slotList.length);
-                                me.blockList[thisBlock].connections.push(null);
-                            }
-                            me.blockList[thisBlock].updateArgSlots(slotList);
-                            for (var i = 0; i < args[2].length; i++) {
-                                me.blockList[thisBlock].connections[i] = args[2][i];
-                            }
+                        me.blockList[thisBlock].updateArgSlots(slotList);
+                        for (var i = 0; i < args[1].length; i++) {
+                            me.blockList[thisBlock].connections[i] = args[1][i];
                         }
-                        me.checkArgClampBlocks.push(thisBlock);
                     }
-                    this.makeNewBlockWithConnections('nameddoArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
-                    break;
-                case 'calcArg':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var extraSlots = args[1].length - 3;
-                        if (extraSlots > 0) {
-                            var slotList = me.blockList[thisBlock].argClampSlots;
-                            for (var i = 0; i < extraSlots; i++) {
-                                slotList.push(1);
-                                me.newLocalArgBlock(slotList.length);
-                                me.blockList[thisBlock].connections.push(null);
-                            }
-                            me.blockList[thisBlock].updateArgSlots(slotList);
-                            for (var i = 0; i < args[1].length; i++) {
-                                me.blockList[thisBlock].connections[i] = args[1][i];
-                            }
+                    me.checkArgClampBlocks.push(thisBlock);
+                }
+                this.makeNewBlockWithConnections('doArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
+                break;
+            case 'nameddoArg':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].privateData = value;
+                    me.blockList[thisBlock].value = null;
+                    var extraSlots = args[2].length - 3;
+                    if (extraSlots > 0) {
+                        var slotList = me.blockList[thisBlock].argClampSlots;
+                        for (var i = 0; i < extraSlots; i++) {
+                            slotList.push(1);
+                            me.newLocalArgBlock(slotList.length);
+                            me.blockList[thisBlock].connections.push(null);
                         }
-                        me.checkArgClampBlocks.push(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('calcArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
-                    break;
-                case 'namedcalcArg':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].privateData = value;
-                        me.blockList[thisBlock].value = null;
-                        var extraSlots = args[2].length - 2;
-                        if (extraSlots > 0) {
-                            var slotList = me.blockList[thisBlock].argClampSlots;
-                            for (var i = 0; i < extraSlots; i++) {
-                                slotList.push(1);
-                                me.newLocalArgBlock(slotList.length);
-                                me.blockList[thisBlock].connections.push(null);
-                            }
-                            me.blockList[thisBlock].updateArgSlots(slotList);
-                            for (var i = 0; i < args[2].length; i++) {
-                                me.blockList[thisBlock].connections[i] = args[2][i];
-                            }
+                        me.blockList[thisBlock].updateArgSlots(slotList);
+                        for (var i = 0; i < args[2].length; i++) {
+                            me.blockList[thisBlock].connections[i] = args[2][i];
                         }
-                        me.checkArgClampBlocks.push(thisBlock);
                     }
-                    this.makeNewBlockWithConnections('namedcalcArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
-                    break;
+                    me.checkArgClampBlocks.push(thisBlock);
+                }
+                this.makeNewBlockWithConnections('nameddoArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
+                break;
+            case 'calcArg':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var extraSlots = args[1].length - 3;
+                    if (extraSlots > 0) {
+                        var slotList = me.blockList[thisBlock].argClampSlots;
+                        for (var i = 0; i < extraSlots; i++) {
+                            slotList.push(1);
+                            me.newLocalArgBlock(slotList.length);
+                            me.blockList[thisBlock].connections.push(null);
+                        }
+                        me.blockList[thisBlock].updateArgSlots(slotList);
+                        for (var i = 0; i < args[1].length; i++) {
+                            me.blockList[thisBlock].connections[i] = args[1][i];
+                        }
+                    }
+                    me.checkArgClampBlocks.push(thisBlock);
+                }
+                this.makeNewBlockWithConnections('calcArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
+                break;
+            case 'namedcalcArg':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].privateData = value;
+                    me.blockList[thisBlock].value = null;
+                    var extraSlots = args[2].length - 2;
+                    if (extraSlots > 0) {
+                        var slotList = me.blockList[thisBlock].argClampSlots;
+                        for (var i = 0; i < extraSlots; i++) {
+                            slotList.push(1);
+                            me.newLocalArgBlock(slotList.length);
+                            me.blockList[thisBlock].connections.push(null);
+                        }
+                        me.blockList[thisBlock].updateArgSlots(slotList);
+                        for (var i = 0; i < args[2].length; i++) {
+                            me.blockList[thisBlock].connections[i] = args[2][i];
+                        }
+                    }
+                    me.checkArgClampBlocks.push(thisBlock);
+                }
+                this.makeNewBlockWithConnections('namedcalcArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
+                break;
 
                 // Value blocks need a default value set.
-                case 'number':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].value = Number(value);
-                        me.updateBlockText(thisBlock);
+            case 'number':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = Number(value);
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'text':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'solfege':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'notename':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'media':
+                // Load a thumbnail into a media blocks.
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    if (value != null) {
+                        // Load artwork onto media block.
+                        me.blockList[thisBlock].loadThumbnail(null);
                     }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'text':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].value = value;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'solfege':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].value = value;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'notename':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].value = value;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'media':
-                    // Load a thumbnail into a media blocks.
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].value = value;
-                        if (value != null) {
-                            // Load artwork onto media block.
-                            me.blockList[thisBlock].loadThumbnail(null);
-                        }
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'camera':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].value = CAMERAVALUE;
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                case 'video':
-                    postProcess = function (args) {
-                        var thisBlock = args[0];
-                        var value = args[1];
-                        me.blockList[thisBlock].value = VIDEOVALUE;
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'camera':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = CAMERAVALUE;
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'video':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = VIDEOVALUE;
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
 
                 // Define some constants for legacy blocks for
                 // backward compatibility with Python projects.
-                case 'red':
-                case 'black':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = 0;
-                        me.updateBlockText(thisBlock);
+            case 'red':
+            case 'black':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = 0;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'white':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = 100;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'orange':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = 10;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'yellow':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = 20;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'green':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = 40;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'blue':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = 70;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'leftpos':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = -(canvas.width / 2);
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'rightpos':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = (canvas.width / 2);
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'toppos':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = (canvas.height / 2);
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'botpos':
+            case 'bottompos':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = -(canvas.height / 2);
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'width':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = canvas.width;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'height':
+                postProcess = function (thisBlock) {
+                    me.blockList[thisBlock].value = canvas.height;
+                    me.updateBlockText(thisBlock);
+                }
+                this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
+                break;
+            case 'loadFile':
+                postProcess = function (args) {
+                    me.blockList[args[0]].value = args[1];
+                    me.updateBlockText(args[0]);
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            default:
+                // Check that name is in the proto list
+                if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
+                    // Lots of assumptions here.
+                    // TODO: figure out if it is a flow or an arg block.
+                    // Substitute a NOP block for an unknown block.
+                    n = blkData[4].length;
+                    console.log(n + ': substituting nop block for ' + name);
+                    switch (n) {
+                    case 1:
+                        name = 'nopValueBlock';
+                        break;
+                    case 2:
+                        name = 'nopZeroArgBlock';
+                        break;
+                    case 3:
+                        name = 'nopOneArgBlock';
+                        break;
+                    case 4:
+                        name = 'nopTwoArgBlock';
+                        break;
+                    case 5:
+                    default:
+                        name = 'nopThreeArgBlock';
+                        break;
                     }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'white':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = 100;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'orange':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = 10;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'yellow':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = 20;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'green':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = 40;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'blue':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = 70;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'leftpos':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = -(canvas.width / 2);
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'rightpos':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = (canvas.width / 2);
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'toppos':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = (canvas.height / 2);
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'botpos':
-                case 'bottompos':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = -(canvas.height / 2);
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'width':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = canvas.width;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'height':
-                    postProcess = function (thisBlock) {
-                        me.blockList[thisBlock].value = canvas.height;
-                        me.updateBlockText(thisBlock);
-                    }
-                    this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
-                    break;
-                case 'loadFile':
-                    postProcess = function (args) {
-                        me.blockList[args[0]].value = args[1];
-                        me.updateBlockText(args[0]);
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-                    break;
-                default:
-                    // Check that name is in the proto list
-                    if (!name in this.protoBlockDict || this.protoBlockDict[name] == null) {
-                        // Lots of assumptions here.
-                        // TODO: figure out if it is a flow or an arg block.
-                        // Substitute a NOP block for an unknown block.
-                        n = blkData[4].length;
-                        console.log(n + ': substituting nop block for ' + name);
-                        switch (n) {
-                            case 1:
-                                name = 'nopValueBlock';
-                                break;
-                            case 2:
-                                name = 'nopZeroArgBlock';
-                                break;
-                            case 3:
-                                name = 'nopOneArgBlock';
-                                break;
-                            case 4:
-                                name = 'nopTwoArgBlock';
-                                break;
-                            case 5:
-                            default:
-                                name = 'nopThreeArgBlock';
-                                break;
-                        }
-                    }
-                    this.makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
-                    break;
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
+                break;
             }
             if (thisBlock === this.blockList.length - 1) {
                 if (this.blockList[thisBlock].connections[0] == null) {

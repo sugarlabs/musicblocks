@@ -664,44 +664,44 @@ define(function (require) {
                         if (newUrlParts[i].indexOf('=') > 0) {
                             var args = newUrlParts[i].split('=');
                             switch (args[0].toLowerCase()) {
-                                case 'file':
-                                    projectName = args[1];
-                                    break;
-                                case 'run':
-                                    if (args[1].toLowerCase() === 'true')
-                                        runProjectOnLoad = true;
-                                    break;
-                                case 'inurl':
-                                    var url = args[1];
-                                    var getJSON = function (url) {
-                                        return new Promise(function (resolve, reject) {
-                                            var xhr = new XMLHttpRequest();
-                                            xhr.open('get', url, true);
-                                            xhr.responseType = 'json';
-                                            xhr.onload = function () {
-                                                var status = xhr.status;
-                                                if (status === 200) {
-                                                    resolve(xhr.response);
-                                                } else {
-                                                    reject(status);
-                                                }
-                                            };
-                                            xhr.send();
-                                        });
-                                    };
-                                    getJSON(url).then(function (data) {
-                                        console.log('Your Json result is:  ' + data.arg); //you can comment this, i used it to debug
-                                        n = data.arg;
-                                        env.push(parseInt(n));
-                                    }, function (status) { //error detection....
-                                        alert('Something went wrong.');
+                            case 'file':
+                                projectName = args[1];
+                                break;
+                            case 'run':
+                                if (args[1].toLowerCase() === 'true')
+                                    runProjectOnLoad = true;
+                                break;
+                            case 'inurl':
+                                var url = args[1];
+                                var getJSON = function (url) {
+                                    return new Promise(function (resolve, reject) {
+                                        var xhr = new XMLHttpRequest();
+                                        xhr.open('get', url, true);
+                                        xhr.responseType = 'json';
+                                        xhr.onload = function () {
+                                            var status = xhr.status;
+                                            if (status === 200) {
+                                                resolve(xhr.response);
+                                            } else {
+                                                reject(status);
+                                            }
+                                        };
+                                        xhr.send();
                                     });
-                                    break;
-                                case 'outurl':
-                                    var url = args[1];
-                                    break;
-                                default:
-                                    errorMsg("Invalid parameters");
+                                };
+                                getJSON(url).then(function (data) {
+                                    console.log('Your Json result is:  ' + data.arg); //you can comment this, i used it to debug
+                                    n = data.arg;
+                                    env.push(parseInt(n));
+                                }, function (status) { //error detection....
+                                    alert('Something went wrong.');
+                                });
+                                break;
+                            case 'outurl':
+                                var url = args[1];
+                                break;
+                            default:
+                                errorMsg("Invalid parameters");
                             }
                         }
                     }
@@ -950,33 +950,33 @@ define(function (require) {
 
             if (event.altKey) {
                 switch (event.keyCode) {
-                    case 69: // 'E'
-                        allClear();
-                        break;
-                    case 82: // 'R'
-                        doFastButton();
-                        break;
-                    case 83: // 'S'
-                        logo.doStopTurtle();
-                        break;
+                case 69: // 'E'
+                    allClear();
+                    break;
+                case 82: // 'R'
+                    doFastButton();
+                    break;
+                case 83: // 'S'
+                    logo.doStopTurtle();
+                    break;
                 }
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
-                    case TAB:
-                        break;
-                    case ESC:
-                        // toggle full screen
-                        toggleToolbar();
-                        break
-                    case RETURN:
-                        // toggle run
-                        logo.runLogoCommands();
-                        break
-                    default:
-                        currentKey = String.fromCharCode(event.keyCode);
-                        currentKeyCode = event.keyCode;
-                        break;
+                case TAB:
+                    break;
+                case ESC:
+                    // toggle full screen
+                    toggleToolbar();
+                    break
+                case RETURN:
+                    // toggle run
+                    logo.runLogoCommands();
+                    break
+                default:
+                    currentKey = String.fromCharCode(event.keyCode);
+                    currentKeyCode = event.keyCode;
+                    break;
                 }
             }
         }
@@ -1117,7 +1117,7 @@ define(function (require) {
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
                                 [3, ['solfege', {value:_('ti')}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
-                                
+
                                 [5, 'pitch', 0, 0, [2, 6, 7, 8]],
                                 [6, ['solfege', {value:_('la')}], 0, 0, [5]],
                                 [7, ['number', {value:'4'}], 0, 0, [5]],
@@ -1136,15 +1136,14 @@ define(function (require) {
 
                                 [17,"repeat",0,0,[14,18,19,null]],
                                 [18,["number", {"value":2}],0,0,[17]],
-                                
+
                                 [19,"rhythm",0,0,[17,20,21,22]],
                                 [20,["number", {"value":6}],0,0,[19]],
                                 [21,["number", {"value":4}],0,0,[19]],
-                                
+
                                 [22,"rhythm",0,0,[19,23,24,null]],
                                 [23,["number", {"value":1}],0,0,[22]],
                                 [24,["number", {"value":2}],0,0,[22]]
-                                
                                 ];
                 blocks.loadNewBlocks(dataObjs);
             } else if (!doNotSave) {
@@ -1245,7 +1244,7 @@ define(function (require) {
         function doLilypond() {
             console.log('Saving .ly file');
             logo.lilypondSaveOnly = true;
-            logo.lilypondOutput = LILYPONDHEADER; 
+            logo.lilypondOutput = LILYPONDHEADER;
             logo.lilypondNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.lilypondStaging[turtle] = [];
@@ -1418,7 +1417,7 @@ define(function (require) {
                                 [2, 'pitch', 0, 0, [1, 3, 4, 5]],
                                 [3, ['solfege', {value:'ti'}], 0, 0, [2]],
                                 [4, ['number', {value:'4'}], 0, 0, [2]],
-                                
+
                                 [5, 'pitch', 0, 0, [2, 6, 7, 8]],
                                 [6, ['solfege', {value:'la'}], 0, 0, [5]],
                                 [7, ['number', {value:'4'}], 0, 0, [5]],
@@ -1437,15 +1436,14 @@ define(function (require) {
 
                                 [17,"repeat",0,0,[14,18,19,null]],
                                 [18,["number", {"value":2}],0,0,[17]],
-                                
+
                                 [19,"rhythm",0,0,[17,20,21,22]],
                                 [20,["number", {"value":6}],0,0,[19]],
                                 [21,["number", {"value":4}],0,0,[19]],
-                                
+
                                 [22,"rhythm",0,0,[19,23,24,null]],
                                 [23,["number", {"value":1}],0,0,[22]],
                                 [24,["number", {"value":2}],0,0,[22]]
-                                
                                 ];
                 blocks.loadNewBlocks(dataObjs);
             }
@@ -1537,59 +1535,59 @@ define(function (require) {
             }
 
             switch (msg) {
-                case NOMICERRORMSG:
-                    errorArtwork['nomicrophone'].visible = true;
-                    stage.setChildIndex(errorArtwork['nomicrophone'], stage.getNumChildren() - 1);
-                    break;
-                case NOSTRINGERRORMSG:
-                    errorArtwork['notastring'].visible = true;
-                    stage.setChildIndex(errorArtwork['notastring'], stage.getNumChildren() - 1);
-                    break;
-                case EMPTYHEAPERRORMSG:
-                    errorArtwork['emptyheap'].visible = true;
-                    stage.setChildIndex(errorArtwork['emptyheap'], stage.getNumChildren() - 1);
-                    break;
-                case NOSQRTERRORMSG:
-                    errorArtwork['negroot'].visible = true;
-                    stage.setChildIndex(errorArtwork['negroot'], stage.getNumChildren() - 1);
-                    break;
-                case NOACTIONERRORMSG:
-                    if (text == null) {
-                        text = 'foo';
-                    }
-                    errorArtwork['nostack'].children[1].text = text;
-                    errorArtwork['nostack'].visible = true;
-                    errorArtwork['nostack'].updateCache();
-                    stage.setChildIndex(errorArtwork['nostack'], stage.getNumChildren() - 1);
-                    break;
-                case NOBOXERRORMSG:
-                    if (text == null) {
-                        text = 'foo';
-                    }
-                    errorArtwork['emptybox'].children[1].text = text;
-                    errorArtwork['emptybox'].visible = true;
-                    errorArtwork['emptybox'].updateCache();
-                    stage.setChildIndex(errorArtwork['emptybox'], stage.getNumChildren() - 1);
-                    break;
-                case ZERODIVIDEERRORMSG:
-                    errorArtwork['zerodivide'].visible = true;
-                    stage.setChildIndex(errorArtwork['zerodivide'], stage.getNumChildren() - 1);
-                    break;
-                case NANERRORMSG:
-                    errorArtwork['notanumber'].visible = true;
-                    stage.setChildIndex(errorArtwork['notanumber'], stage.getNumChildren() - 1);
-                    break;
-                case NOINPUTERRORMSG:
-                    errorArtwork['noinput'].visible = true;
-                    stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
-                    break;
-                default:
-                    var errorMsgContainer = errorMsgText.parent;
-                    errorMsgContainer.visible = true;
-                    errorMsgText.text = msg;
-                    stage.setChildIndex(errorMsgContainer, stage.getNumChildren() - 1);
-                    errorMsgContainer.updateCache();
-                    break;
+            case NOMICERRORMSG:
+                errorArtwork['nomicrophone'].visible = true;
+                stage.setChildIndex(errorArtwork['nomicrophone'], stage.getNumChildren() - 1);
+                break;
+            case NOSTRINGERRORMSG:
+                errorArtwork['notastring'].visible = true;
+                stage.setChildIndex(errorArtwork['notastring'], stage.getNumChildren() - 1);
+                break;
+            case EMPTYHEAPERRORMSG:
+                errorArtwork['emptyheap'].visible = true;
+                stage.setChildIndex(errorArtwork['emptyheap'], stage.getNumChildren() - 1);
+                break;
+            case NOSQRTERRORMSG:
+                errorArtwork['negroot'].visible = true;
+                stage.setChildIndex(errorArtwork['negroot'], stage.getNumChildren() - 1);
+                break;
+            case NOACTIONERRORMSG:
+                if (text == null) {
+                    text = 'foo';
+                }
+                errorArtwork['nostack'].children[1].text = text;
+                errorArtwork['nostack'].visible = true;
+                errorArtwork['nostack'].updateCache();
+                stage.setChildIndex(errorArtwork['nostack'], stage.getNumChildren() - 1);
+                break;
+            case NOBOXERRORMSG:
+                if (text == null) {
+                    text = 'foo';
+                }
+                errorArtwork['emptybox'].children[1].text = text;
+                errorArtwork['emptybox'].visible = true;
+                errorArtwork['emptybox'].updateCache();
+                stage.setChildIndex(errorArtwork['emptybox'], stage.getNumChildren() - 1);
+                break;
+            case ZERODIVIDEERRORMSG:
+                errorArtwork['zerodivide'].visible = true;
+                stage.setChildIndex(errorArtwork['zerodivide'], stage.getNumChildren() - 1);
+                break;
+            case NANERRORMSG:
+                errorArtwork['notanumber'].visible = true;
+                stage.setChildIndex(errorArtwork['notanumber'], stage.getNumChildren() - 1);
+                break;
+            case NOINPUTERRORMSG:
+                errorArtwork['noinput'].visible = true;
+                stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
+                break;
+            default:
+                var errorMsgContainer = errorMsgText.parent;
+                errorMsgContainer.visible = true;
+                errorMsgText.text = msg;
+                stage.setChildIndex(errorMsgContainer, stage.getNumChildren() - 1);
+                errorMsgContainer.updateCache();
+                break;
             }
 
             update = true;
@@ -1666,7 +1664,7 @@ define(function (require) {
                     var args = {
                         'collapsed': myBlock.collapsed
                     }
-                } else if(myBlock.name === 'matrix') { 
+                } else if(myBlock.name === 'matrix') {
                     var args = {
                         'collapsed' : myBlock.collapsed
                     }
