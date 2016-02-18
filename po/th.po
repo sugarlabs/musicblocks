@@ -1195,3 +1195,6 @@ msgstr "กรุณาปิดเมทริกซ์ปัจจุบัน
 
 msgid "set font"
 msgstr ""
+
+msgid "free time"
+msgstr ""

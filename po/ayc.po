@@ -1340,3 +1340,7 @@ msgstr ""
 #. TRANS: fijar font
 msgid "set font"
 msgstr ""
+
+#. TRANS: tiempo libre
+msgid "free time"
+msgstr ""

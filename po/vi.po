@@ -31,6 +31,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "crescendo factor"
@@ -635,6 +638,9 @@ msgstr "Tọa độ x của chuột(vói x là tọa độ của trục hoành)"
 
 msgid "mouse y"
 msgstr "Tọa độ y của chuột(vói y là tọa độ của trục hoành)"
+
+msgid "free time"
+msgstr ""
 
 #. TRANS: do this action
 msgid "do"

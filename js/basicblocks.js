@@ -370,7 +370,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var driftBlock = new ProtoBlock('drift');
     driftBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['drift'] = driftBlock;
-    driftBlock.staticLabels.push(_('free play'));
+    driftBlock.staticLabels.push(_('free time'));
     driftBlock.adjustWidthToLabel();
     driftBlock.flowClampZeroArgBlock();
 
