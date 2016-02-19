@@ -388,13 +388,12 @@ function Matrix() {
     }
 
     this.note2Solfege = function(note, index) {
-        var solfegeConversionTable = {'C': _('do'), 'C♯': _('do') + '♯', 'D': _('re'), 'D♯': _('re') + '♯', 'E': _('mi'), 'F': _('fa'), 'F♯': _('fa') + '♯', 'G': _('sol'), 'G♯': _('sol') + '♯', 'A': _('la'), 'A♯': _('la') + '♯', 'B': _('ti'), 'D♭': _('re') + '♭', 'E♭': _('mi') + '♭', 'G♭': _('sol') + '♭', 'A♭': _('la') + '♭', 'B♭': _('ti') + '♭'};
         if (['♭', '♯'].indexOf(note[1]) === -1) {
             var octave = note[1];
-            var newNote = solfegeConversionTable[note[0]];
+            var newNote = SOLFEGECONVERSIONTABLE[note[0]];
         } else {
             var octave = note[2];
-            var newNote = solfegeConversionTable[note.substr(0,2)];
+            var newNote = SOLFEGECONVERSIONTABLE[note.substr(0,2)];
         }
         console.log(index + ': ' + newNote + '/' + octave);
         this.solfegeNotes[index] = newNote;
@@ -986,14 +985,14 @@ function Matrix() {
 
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
                 if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
-                    newStack.push([thisBlock + 1, ['solfege', {'value': NOTECONVERSION[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                     newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                 } else {
                     if (note[0][0] === 'R') {
-                        newStack.push([thisBlock + 1, ['text', {'value': NOTECONVERSION[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 1, ['text', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': 4}], 0, 0, [thisBlock]]);
                     } else {
-                        newStack.push([thisBlock + 1, ['solfege', {'value': NOTECONVERSION[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
                     }
                 }
