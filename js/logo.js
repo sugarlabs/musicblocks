@@ -2610,7 +2610,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         // console.log('noteValue: ' + noteValue + ' ' + noteBeatValue);
 
         var carry = 0;
-
+	
         if (this.crescendoDelta[turtle].length === 0) {
             this.setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
@@ -2877,7 +2877,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             if (!logo.lilypondSaveOnly && duration > 0) {
                                 if (logo.oscList[turtle].length > 0) {
                                     console.log(last(logo.noteFrequencies[turtle]));
-                                    // FIXME: synth cannot play chords.
+                                    if (insideChord > 0) {
+                                        logo.errorMsg( last(logo.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
+                                    }
                                     logo.synth.trigger([last(logo.noteFrequencies[turtle])], beatValue, last(logo.oscList[turtle]));
                                     logo.noteFrequencies[turtle].pop();
                                     logo.oscList[turtle].pop();
@@ -2913,7 +2915,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
                     this.setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
                 }
-
             }
             this.pushedNote[turtle] = false;
         }
