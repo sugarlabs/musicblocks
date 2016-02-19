@@ -2545,7 +2545,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.onStopTurtle();
             }
 
-            if (logo.lilypondSaveOnly) {
+	    if (!logo.turtles.running() && logo.lilypondSaveOnly) {
                 logo.saveLilypondOutput(_('My Project') + '.ly');
                 logo.lilypondSaveOnly = false;
             }
@@ -2570,6 +2570,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             for (var arg in logo.evalOnStopList) {
                 eval(logo.evalOnStopList[arg]);
             }
+
         }
 
         clearTimeout(this.saveTimeout);
