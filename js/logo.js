@@ -2607,7 +2607,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else {
             var noteBeatValue = noteValue;
         }
-        console.log('noteValue: ' + noteValue + ' ' + noteBeatValue);
+        // console.log('noteValue: ' + noteValue + ' ' + noteBeatValue);
 
         var carry = 0;
 
