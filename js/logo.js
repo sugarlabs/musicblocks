@@ -4330,12 +4330,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var noteCount = 0;
                 for (var i = 0; i < this.lilypondStaging[t].length; i++) {
                     obj = this.lilypondStaging[t][i];
-                    if (obj.length > 1) {
-                        octaveTotal += parseInt(obj[0].substr(obj[0].length - 1));
+                    if (typeof(obj) !== 'string') {
+                        octaveTotal += Number(obj[0].substr(-1));
                         noteCount += 1;
                     }
                 }
                 if (noteCount > 0) {
+                    console.log(t + ': ' + octaveTotal + ' ' + noteCount);
                     switch (Math.floor(octaveTotal / noteCount)) {
                     case 0:
                     case 1:
