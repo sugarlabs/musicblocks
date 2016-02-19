@@ -2409,7 +2409,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             parentActions.push(parentAction);
                         }
                     }
-                    console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                    // console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                     logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     // Mark issued signals as null
                     logo.endOfFlowSignals[turtle][blk][i] = null;
