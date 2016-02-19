@@ -12,14 +12,66 @@
 var NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', 64: '&#x1D163;', 128: '&#x1D164;'};
 var DOTTEDNOTESYMBOLS = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', 64: '&#x1D163;.', 128: '&#x1D164;.'};
 var DOUBLEDOTTEDNOTESYMBOLS = {1: '&#x1D15D;..', 2: '&#x1D15E;..', 4: '&#x1D15F;..', 8: '&#x1D160;..', 16: '&#x1D161;..', 32: '&#x1D162;..', 64: '&#x1D163;..', 128: '&#x1D164;..'};
-var NOTECONVERSION = {'C': _('do'), 'D': _('re'), 'E': _('mi'), 'F': _('fa'), 'G': _('sol'), 'A': _('la'), 'B': _('ti'), 'R': _('rest')};
-var SOLFEGECONVERSIONTABLE = {'C': _('do'), 'C♯': _('do') + '♯', 'D': _('re'), 'D♯': _('re') + '♯', 'E': _('mi'), 'F': _('fa'), 'F♯': _('fa') + '♯', 'G': _('sol'), 'G♯': _('sol') + '♯', 'A': _('la'), 'A♯': _('la') + '♯', 'B': _('ti'), 'D♭': _('re') + '♭', 'E♭': _('mi') + '♭', 'G♭': _('sol') + '♭', 'A♭': _('la') + '♭', 'B♭': _('ti') + '♭'};
+var SOLFEGECONVERSIONTABLE = {'C': _('do'), 'C♯': _('do') + '♯', 'D': _('re'), 'D♯': _('re') + '♯', 'E': _('mi'), 'F': _('fa'), 'F♯': _('fa') + '♯', 'G': _('sol'), 'G♯': _('sol') + '♯', 'A': _('la'), 'A♯': _('la') + '♯', 'B': _('ti'), 'D♭': _('re') + '♭', 'E♭': _('mi') + '♭', 'G♭': _('sol') + '♭', 'A♭': _('la') + '♭', 'B♭': _('ti') + '♭', 'R': _('rest')};
 var PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
 var PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 var PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 var PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 var SOLFAGE = [_('do'), '', _('re'), _('me'), '', _('fa'), '', _('sol'), _('la'), '', _('ti'), ''];
 var TWELTHROOT2 = 1.05946309435929;
+
+
+function durationToNoteValue(duration) {
+    // returns [note value, no. of dots, tuplet factor]
+    var POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
+    var dotCount = 0;
+
+    // Try to find a match or a dotted match.
+    for (dotCount = 0; dotCount < 3; dotCount++) {
+        var currentDotFactor = 2 - (1 / Math.pow(2, dotCount));
+        var d = duration * currentDotFactor;
+        if (POWER2.indexOf(d) !== -1) {
+	    console.log('Note Value is ' + d + ' and ' + dotCount + ' dots');
+            return [d, dotCount, null];
+	}
+    }
+    // First, see if the note is a tuplet (e.g., has a factor of 2).
+    var factorOfTwo = 1;
+    console.log(duration + ' ' + Math.floor(duration / 2));
+    var d = duration;
+    while (Math.floor(d / 2) * 2 === d) {
+        factorOfTwo *= 2;
+        d /= 2;
+    }
+    if (factorOfTwo > 1) {
+        // We have a tuplet of sorts
+        console.log('tuplet ' + factorOfTwo + ' ' + d);
+        tupletValue = d;
+        d = factorOfTwo;
+        return [d, 0, tupletValue];
+    }
+
+    // Next, generate a false tuplet.
+    console.log('cannot convert ' + duration + ' to a note');
+    var d = duration;
+    for (var i = 1; i < POWER2.length; i++) {
+        // Rounding down
+        if (d < POWER2[i]) {
+            d = POWER2[i - 1];
+            break;
+        }
+    }
+
+    var factorOfTwo = 1;
+    while (Math.floor(d / 2) * 2 === d) {
+        factorOfTwo *= 2;
+        d /= 2;
+    }
+    console.log('tuplet ' + d + ' ' + factorOfTwo + ' ' + duration);
+    return [factorOfTwo, 0, duration];
+    //console.log('substituting in ' + factorOfTwo);
+    //return [factorOfTwo, 0, null];
+}
 
 
 function reducedFraction(a, b) {
