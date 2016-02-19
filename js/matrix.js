@@ -478,7 +478,7 @@ function Matrix() {
 
         var noteValue = param[0][1] / param[0][0];
         var noteValueToDisplay = this.calcNoteValueToDisplay(param[0][1], param[0][0]);
-	
+
         cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
         cell.style.lineHeight = 60 + '%';
@@ -547,11 +547,11 @@ function Matrix() {
                 cell.style.lineHeight = 60 + '%';
                 cell.style.fontSize = this.cellScale * 75 + '%';
                 var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
-		if (obj[1] in NOTESYMBOLS) {
-   		    cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>' + NOTESYMBOLS[obj[1]];
-		} else {
-   		    cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
-		}
+                if (obj[1] in NOTESYMBOLS) {
+                       cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>' + NOTESYMBOLS[obj[1]];
+                } else {
+                       cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
+                }
             }
         }
 
@@ -577,10 +577,10 @@ function Matrix() {
                 noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + DOTTEDNOTESYMBOLS[noteValueToDisplay];
             } else {
                 noteValueToDisplay = parseInt((noteValue * 1.75))
-		if (noteValueToDisplay in DOTTEDNOTESYMBOLS) {
+                if (noteValueToDisplay in DOTTEDNOTESYMBOLS) {
                     noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + DOUBLEDOTTEDNOTESYMBOLS[noteValueToDisplay];
-		} else {
-		    noteValueToDisplay = reducedFraction(b, a);
+                } else {
+                    noteValueToDisplay = reducedFraction(b, a);
                 }
             }
         }
@@ -882,7 +882,7 @@ function Matrix() {
 
         // innerHTML looks something like: 1<br>&mdash;<br>4<br>&#x1D15F;
         noteParts = noteValue.split('<br>');
-	noteValue = Number(noteParts[0])/Number(noteParts[2]);
+        noteValue = Number(noteParts[0])/Number(noteParts[2]);
         noteValue = noteValue.toString();
 
         this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
