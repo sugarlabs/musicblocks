@@ -70,6 +70,7 @@ define(function (require) {
     require('activity/blocks');
     require('activity/block');
     require('activity/logo');
+    require('activity/musicutils');
     require('activity/clearbox');
     require('activity/utilitybox');
     require('activity/samplesviewer');

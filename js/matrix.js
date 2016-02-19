@@ -50,9 +50,6 @@ var MATRIXBUTTONHEIGHT = 40;
 var MATRIXBUTTONHEIGHT2 = 66;
 var MATRIXSOLFEHEIGHT = 30;
 
-var NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', 64: '&#x1D163;', 128: '&#x1D164;'};
-var DOTTEDNOTESYMBOLS = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', 64: '&#x1D163;.', 128: '&#x1D164;.'};
-var DOUBLEDOTTEDNOTESYMBOLS = {1: '&#x1D15D;..', 2: '&#x1D15E;..', 4: '&#x1D15F;..', 8: '&#x1D160;..', 16: '&#x1D161;..', 32: '&#x1D162;..', 64: '&#x1D163;..', 128: '&#x1D164;..'};
 
 function Matrix() {
     this.arr = [];
@@ -919,7 +916,6 @@ function Matrix() {
     this.saveMatrix = function() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
-        var noteConversion = {'C': _('do'), 'D': _('re'), 'E': _('mi'), 'F': _('fa'), 'G': _('sol'), 'A': _('la'), 'B': _('ti'), 'R': _('rest')};
         var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': 'chunk'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 
@@ -990,14 +986,14 @@ function Matrix() {
 
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
                 if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
-                    newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
+                    newStack.push([thisBlock + 1, ['solfege', {'value': NOTECONVERSION[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                     newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                 } else {
                     if (note[0][0] === 'R') {
-                        newStack.push([thisBlock + 1, ['text', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 1, ['text', {'value': NOTECONVERSION[note[0][j][0]]}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': 4}], 0, 0, [thisBlock]]);
                     } else {
-                        newStack.push([thisBlock + 1, ['solfege', {'value': noteConversion[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 1, ['solfege', {'value': NOTECONVERSION[note[0][j][0]]}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
                     }
                 }
@@ -1008,51 +1004,4 @@ function Matrix() {
         console.log(newStack);
         this.logo.blocks.loadNewBlocks(newStack);
     }
-}
-
-
-function reducedFraction(a, b) {
-    greatestCommonMultiple = function(a, b) {
-        return b === 0 ? a : greatestCommonMultiple(b, a % b);
-    }
-
-    var gcm = greatestCommonMultiple(a, b);
-    if (b / gcm in NOTESYMBOLS) {
-        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>' + NOTESYMBOLS[b / gcm];
-    } else {
-        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
-    }
-}
-
-
-function toFraction(d) {
-    // Convert float to its approximate fractional representation.
-    if (d > 1) {
-        var flip = true;
-        d = 1 / d;
-    } else {
-        var flip = false;
-    }
-
-    var df = 1.0;
-    var top = 1;
-    var bot = 1;
-
-    while (Math.abs(df - d) > 0.00000001) {
-        if (df < d) {
-            top += 1
-        } else {
-            bot += 1
-            top = parseInt(d * bot);
-        }
-        df = top / bot;
-    }
-
-    if (flip) {
-        var tmp = top;
-        top = bot;
-        bot = tmp;
-    }
-
-    return([top, bot]);
 }
