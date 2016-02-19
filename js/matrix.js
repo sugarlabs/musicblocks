@@ -546,7 +546,12 @@ function Matrix() {
                 var numerator = 32 / param[1][j];
                 cell.style.lineHeight = 60 + '%';
                 cell.style.fontSize = this.cellScale * 75 + '%';
-                cell.innerHTML = reducedFraction(numerator, totalNoteInterval / tupletTimeFactor);
+                var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
+		if (obj[1] in NOTESYMBOLS) {
+   		    cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>' + NOTESYMBOLS[obj[1]];
+		} else {
+   		    cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
+		}
             }
         }
 
@@ -939,37 +944,6 @@ function Matrix() {
 
             // If it is a dotted note, use a divide block.
             if (parseInt(note[1]) < note[1]) {
-                function toFraction(d) {
-                    // Convert float to its approximate fractional representation.
-                    if (d > 1) {
-                        var flip = true;
-                        d = 1 / d;
-                    } else {
-                        var flip = false;
-                    }
-
-                    var df = 1.0;
-                    var top = 1;
-                    var bot = 1;
-
-                    while (Math.abs(df - d) > 0.00000001) {
-                        if (df < d) {
-                            top += 1
-                        } else {
-                            bot += 1
-                            top = parseInt(d * bot);
-                        }
-                        df = top / bot;
-                    }
-
-                    if (flip) {
-                        var tmp = top;
-                        top = bot;
-                        bot = tmp;
-                    }
-
-                    return([top, bot]);
-                }
                 var obj = toFraction(note[1]);
 
                 console.log('converting ' + note[1] + ' to ' + obj[0] + '/' + obj[1]);
@@ -1036,6 +1010,7 @@ function Matrix() {
     }
 }
 
+
 function reducedFraction(a, b) {
     greatestCommonMultiple = function(a, b) {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
@@ -1047,4 +1022,37 @@ function reducedFraction(a, b) {
     } else {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
     }
+}
+
+
+function toFraction(d) {
+    // Convert float to its approximate fractional representation.
+    if (d > 1) {
+        var flip = true;
+        d = 1 / d;
+    } else {
+        var flip = false;
+    }
+
+    var df = 1.0;
+    var top = 1;
+    var bot = 1;
+
+    while (Math.abs(df - d) > 0.00000001) {
+        if (df < d) {
+            top += 1
+        } else {
+            bot += 1
+            top = parseInt(d * bot);
+        }
+        df = top / bot;
+    }
+
+    if (flip) {
+        var tmp = top;
+        top = bot;
+        bot = tmp;
+    }
+
+    return([top, bot]);
 }
