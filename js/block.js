@@ -746,8 +746,8 @@ function Block(protoblock, blocks, overrideName) {
             myContainer.addChild(bitmap);
 
             // Resize the image to a reasonable maximum.
-            var MAXWIDTH = 600;
-            var MAXHEIGHT = 450;
+            const MAXWIDTH = 600;
+            const MAXHEIGHT = 450;
             if (image.width > image.height) {
                 if (image.width > MAXWIDTH) {
                     bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXWIDTH / image.width;

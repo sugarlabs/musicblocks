@@ -13,11 +13,11 @@ var blockBlocks = null;
 
 // Minimum distance (squared) between to docks required before
 // connecting them.
-var MINIMUMDOCKDISTANCE = 400;
+const MINIMUMDOCKDISTANCE = 400;
 
 // Special value flags to uniquely identify these media blocks.
-var CAMERAVALUE = '##__CAMERA__##';
-var VIDEOVALUE = '##__VIDEO__##';
+const CAMERAVALUE = '##__CAMERA__##';
+const VIDEOVALUE = '##__VIDEO__##';
 
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
