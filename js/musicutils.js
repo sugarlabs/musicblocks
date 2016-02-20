@@ -9,21 +9,35 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-var NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', 64: '&#x1D163;', 128: '&#x1D164;'};
-var DOTTEDNOTESYMBOLS = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', 64: '&#x1D163;.', 128: '&#x1D164;.'};
-var DOUBLEDOTTEDNOTESYMBOLS = {1: '&#x1D15D;..', 2: '&#x1D15E;..', 4: '&#x1D15F;..', 8: '&#x1D160;..', 16: '&#x1D161;..', 32: '&#x1D162;..', 64: '&#x1D163;..', 128: '&#x1D164;..'};
-var SOLFEGECONVERSIONTABLE = {'C': _('do'), 'C♯': _('do') + '♯', 'D': _('re'), 'D♯': _('re') + '♯', 'E': _('mi'), 'F': _('fa'), 'F♯': _('fa') + '♯', 'G': _('sol'), 'G♯': _('sol') + '♯', 'A': _('la'), 'A♯': _('la') + '♯', 'B': _('ti'), 'D♭': _('re') + '♭', 'E♭': _('mi') + '♭', 'G♭': _('sol') + '♭', 'A♭': _('la') + '♭', 'B♭': _('ti') + '♭', 'R': _('rest')};
-var PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
-var PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-var PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
-var PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-var SOLFAGE = [_('do'), '', _('re'), _('me'), '', _('fa'), '', _('sol'), _('la'), '', _('ti'), ''];
-var TWELTHROOT2 = 1.05946309435929;
+const SHARP = '♯';
+const FLAT = '♭';
+const BTOFLAT = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
+const NOTESSHARP = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+const NOTESFLAT = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+const NOTESFLAT2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
+const EXTRATRANSPOSITIONS = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
+const MAJORHALFSTEPS = [_('do'), '', _('re'), '', _('mi'), _('fa'), '', _('sol'), '', _('la'), '', _('ti')];
+const MINORHALFSTEPS = [_('do'), '', _('re'), _('mi'), '', _('fa'), '', _('sol'), _('la'), '', _('ti'), ''];
+const NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', 64: '&#x1D163;', 128: '&#x1D164;'};
+const DOTTEDNOTESYMBOLS = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', 64: '&#x1D163;.', 128: '&#x1D164;.'};
+const DOUBLEDOTTEDNOTESYMBOLS = {1: '&#x1D15D;..', 2: '&#x1D15E;..', 4: '&#x1D15F;..', 8: '&#x1D160;..', 16: '&#x1D161;..', 32: '&#x1D162;..', 64: '&#x1D163;..', 128: '&#x1D164;..'};
+const SOLFEGECONVERSIONTABLE = {'C': _('do'), 'C♯': _('do') + '♯', 'D': _('re'), 'D♯': _('re') + '♯', 'E': _('mi'), 'F': _('fa'), 'F♯': _('fa') + '♯', 'G': _('sol'), 'G♯': _('sol') + '♯', 'A': _('la'), 'A♯': _('la') + '♯', 'B': _('ti'), 'D♭': _('re') + '♭', 'E♭': _('mi') + '♭', 'G♭': _('sol') + '♭', 'A♭': _('la') + '♭', 'B♭': _('ti') + '♭', 'R': _('rest')};
+const PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+const PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+const PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+const PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const SOLFAGE = [_('do'), '', _('re'), _('me'), '', _('fa'), '', _('sol'), _('la'), '', _('ti'), ''];
+const NOTESTABLE = {1: "do", 2: "do♯", 3: "re", 4: "re♯", 5: "mi", 6: "fa", 7: "fa♯", 8: "sol", 9: "sol♯", 10: "la", 11: "la♯", 0: "ti"};
+const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
+
+const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
+const TWELTHROOT2 = 1.05946309435929;
+const A0 = 27.5;
+const C8 = 4186.01;
 
 
 function durationToNoteValue(duration) {
     // returns [note value, no. of dots, tuplet factor]
-    var POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
     var dotCount = 0;
 
     // Try to find a match or a dotted match.
@@ -117,8 +131,6 @@ function toFraction(d) {
 function frequencyToPitch(hz) {
     // Calculate the pitch and octave based on frequency, rounding to
     // the nearest note.
-    var A0 = 27.5;
-    var C8 = 4186.01;
 
     if (hz < A0) {
         return ['A', 0];
@@ -161,8 +173,6 @@ function noteToFrequency(note) {
 function pitchToFrequency(pitch, octave) {
     // Calculate the frequency based on pitch and octave.
     var pitchNumber = pitchToNumber(pitch, octave);
-    var TWELTHROOT2 = 1.05946309435929;
-    var A0 = 27.5;
 
     return A0 * Math.pow(TWELTHROOT2, pitchNumber);
 }
@@ -186,6 +196,70 @@ function pitchToNumber(pitch, octave) {
 
     // We start at A0.
     return Math.max(octave, 0) * 12 + pitchNumber - PITCHES.indexOf('A');
+}
+
+
+function getSolfege(note) {
+    if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
+        return SOLFEGECONVERSIONTABLE[note[0][0]] + note[0][1] + note[0][2];
+    } else if(['♯', '♭'].indexOf(note[0][1]) !== -1) {
+        return SOLFEGECONVERSIONTABLE[note[0][0]] + note[0][1];
+    } else {
+        return SOLFEGECONVERSIONTABLE[note[0][0]];
+    }
+}
+
+
+function getNumber(solfege, octave) {
+    // converts a note to a number
+
+    if (octave < 1) {
+        var num = 0;
+    } else if (octave > 10) {
+        var num = 9 * 12;
+    } else {
+        var num = 12 * (octave - 1);
+    }
+    solfege = String(solfege);
+    if (solfege.substring(0, 1) in NOTESTEP) {
+        num += NOTESTEP[solfege.substring(0, 1)];
+        if (solfege.length >= 1) {
+            var delta = solfege.substring(1);
+            if (delta === 'bb' || delta === '♭♭') {
+                num -= 2;
+            } else if (delta === '##' || delta === '♯♯') {
+                num += 2;
+            } else if (delta === 'b' || delta === '♭') {
+                num -= 1;
+            } else if (delta === '#' || delta === '♯') {
+                num += 1;
+            }
+        }
+    }
+    return num;
+}
+
+
+function getNumNote(value, delta) {
+    // Converts from number to note
+    var num = value + delta;
+    if (num < 0) {
+        num = 1;
+        var octave = 1;
+    } else if (num > 10 * 12) {
+        num = 12;
+        var octave = 10;
+    } else {
+        var octave = Math.floor(num / 12);
+        num = num % 12;
+    }
+
+    var note = NOTESTABLE[num];
+
+    if (notes[num] === "ti") {
+        octave -= 1;
+    }
+    return [note, octave + 1];
 }
 
 

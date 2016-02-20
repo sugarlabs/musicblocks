@@ -10,27 +10,37 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-var TONEBPM = 240;  // Seems to be the default.
-var TARGETBPM = 90;  // What we'd like to use for beats per minute
-var DEFAULTDELAY = 500; // milleseconds
-var TURTLESTEP = -1;  // Run in step-by-step mode
-var OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
+const TONEBPM = 240;  // Seems to be the default.
+const TARGETBPM = 90;  // What we'd like to use for beats per minute
+const DEFAULTDELAY = 500; // milleseconds
+const TURTLESTEP = -1;  // Run in step-by-step mode
+const OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
                                // to scale back its volume.
 
 // This header is prepended to the Lilypond output.
 // Note: We are using URL encoding, e.g., \ (%5C) and newline (%0A)
-var LILYPONDHEADER = '%5Cversion "2.18.2"%0A%0A%25 ****************************************************************%0A%25 %0A%25 WHAT IS THIS? -- This is a LilyPond file generated from Music%0A%25 Blocks software (Read about it at www.musicblocks.net).%0A%25 %0A%25 DOWNLOAD LILYPOND -- In order to create notation with this file,%0A%25 you will need to download and install LilyPond software onto your%0A%25 computer (http:%2F%2Flilypond.org%2Fdownload.html). Frescobaldi%0A%25 software is also handy for editing LilyPond files%0A%25 (http:%2F%2Ffrescobaldi.org%2Fdownload).%0A%25 %0A%25 LILYPOND INSTRUCTIONS -- For instructions on how to further%0A%25 manipulate musical notation using LilyPond software, please%0A%25 read the Introduction (http:%2F%2Flilypond.org%2Ftext-input.html) and%0A%25 the Manual%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2FDocumentation%2Flearning%2Findex.html).%0A%25 %0A%25 GLOSSARY -- A glossary with helpful examples may be found here%0A%25 (http:%2F%2Fwww.lilypond.org%2Fdoc%2Fv2.19%2FDocumentation%2Fmusic-glossary%2F).%0A%25 %0A%25 MUTOPIA -- You may also benefit from studying scores from the%0A%25 Mutopia Project website, which has freely sharable music notation%0A%25 generated with LilyPond (http:%2F%2Fwww.mutopiaproject.org%2F).%0A%25 %0A%25 TUNEFL -- You can explore your Lilypond output in a web browser at%0A%25 (https://www.tunefl.com/).%0A%25 %0A%25 COMMENTS -- Some of the code below is commented out. You can%0A%25 enable it by deleting the %25 that precedes the text or, in the%0A%25 case of a commented section, deleting the %{ and %} that surrounds%0A%25 the section.%0A%25 %0A%25 ****************************************************************%0A%0A%25 Please add your own name, the title of your musical creation,%0A%25 and the intended copyright below.%0A%25 The copyright is great for sharing (and re-sharing)!%0A%25 Read more about it here (http:%2F%2Fcreativecommons.org%2Flicenses%2Fby-sa%2F4.0%2F).%0A%25 Of course, you can use any copyright you like -- you made it!%0A%5Cheader {%0A   dedication = "Made with LilyPond and Music Blocks (http:%2F%2Fwalterbender.github.io%2Fmusicblocks%2F)"%0A   title = "My Music Blocks Creation"%0A%25   subtitle = "Subtitle"%0A%25   instrument = "Instrument"%0A   composer = "Mr. Mouse"%0A%25   arranger = "Arranger"%0A   copyright = "Mr. Mouse (c) 2015 -- CC-BY-SA"%0A   tagline = "Made from Music Blocks v.0.9"%0A}%0A%0A%25 To change the meter make adjustments in the following section.%0A%25 You must also delete the %25 before %5Cmeter everywhere it appears below.%0Ameter = {%0A   %5Ctime 3%2F4%0A   %5Ckey c %5Cminor%0A   %5CnumericTimeSignature%0A   %5Cpartial 4 %0A   %5Ctempo "Andante" 4=90%0A}%0A%0A'
+const LILYPONDHEADER = '%5Cversion "2.18.2"%0A%0A%25 ****************************************************************%0A%25 %0A%25 WHAT IS THIS? -- This is a LilyPond file generated from Music%0A%25 Blocks software (Read about it at www.musicblocks.net).%0A%25 %0A%25 DOWNLOAD LILYPOND -- In order to create notation with this file,%0A%25 you will need to download and install LilyPond software onto your%0A%25 computer (http:%2F%2Flilypond.org%2Fdownload.html). Frescobaldi%0A%25 software is also handy for editing LilyPond files%0A%25 (http:%2F%2Ffrescobaldi.org%2Fdownload).%0A%25 %0A%25 LILYPOND INSTRUCTIONS -- For instructions on how to further%0A%25 manipulate musical notation using LilyPond software, please%0A%25 read the Introduction (http:%2F%2Flilypond.org%2Ftext-input.html) and%0A%25 the Manual%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2FDocumentation%2Flearning%2Findex.html).%0A%25 %0A%25 GLOSSARY -- A glossary with helpful examples may be found here%0A%25 (http:%2F%2Fwww.lilypond.org%2Fdoc%2Fv2.19%2FDocumentation%2Fmusic-glossary%2F).%0A%25 %0A%25 MUTOPIA -- You may also benefit from studying scores from the%0A%25 Mutopia Project website, which has freely sharable music notation%0A%25 generated with LilyPond (http:%2F%2Fwww.mutopiaproject.org%2F).%0A%25 %0A%25 TUNEFL -- You can explore your Lilypond output in a web browser at%0A%25 (https://www.tunefl.com/).%0A%25 %0A%25 COMMENTS -- Some of the code below is commented out. You can%0A%25 enable it by deleting the %25 that precedes the text or, in the%0A%25 case of a commented section, deleting the %{ and %} that surrounds%0A%25 the section.%0A%25 %0A%25 ****************************************************************%0A%0A%25 Please add your own name, the title of your musical creation,%0A%25 and the intended copyright below.%0A%25 The copyright is great for sharing (and re-sharing)!%0A%25 Read more about it here (http:%2F%2Fcreativecommons.org%2Flicenses%2Fby-sa%2F4.0%2F).%0A%25 Of course, you can use any copyright you like -- you made it!%0A%5Cheader {%0A   dedication = "Made with LilyPond and Music Blocks (http:%2F%2Fwalterbender.github.io%2Fmusicblocks%2F)"%0A   title = "My Music Blocks Creation"%0A%25   subtitle = "Subtitle"%0A%25   instrument = "Instrument"%0A   composer = "Mr. Mouse"%0A%25   arranger = "Arranger"%0A   copyright = "Mr. Mouse (c) 2015 -- CC-BY-SA"%0A   tagline = "Made from Music Blocks v.0.9"%0A}%0A%0A%25 To change the meter make adjustments in the following section.%0A%25 You must also delete the %25 before %5Cmeter everywhere it appears below.%0Ameter = {%0A   %5Ctime 3%2F4%0A   %5Ckey c %5Cminor%0A   %5CnumericTimeSignature%0A   %5Cpartial 4 %0A   %5Ctempo "Andante" 4=90%0A}%0A%0A'
+const RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
+const RODENTSSHORT = [_('m'), _('br'), _('ml'), _('ch'), _('rs'), _('gp'), _('cb'), _('cp'), _('bk'), _('gs'), _('fs'), _('bt')];
+const LYNOTE = 0;
+const LYDURATION = 1;
+const LYDOTCOUNT = 2;
+const LYTUPLETVALUE = 3;
+const LYROUNDDOWN = 4;
+const LYINSIDECHORD = 5;
+const LYSTACCATO = 6;
+const CLEFS = ['treble', 'bass', 'bass_8'];
 
-var NOMICERRORMSG = 'The microphone is not available.';
-var NANERRORMSG = 'Not a number.';
-var NOSTRINGERRORMSG = 'Not a string.';
-var NOBOXERRORMSG = 'Cannot find box';
-var NOACTIONERRORMSG = 'Cannot find action.';
-var NOINPUTERRORMSG = 'Missing argument.';
-var NOSQRTERRORMSG = 'Cannot take square root of negative number.';
-var ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
-var EMPTYHEAPERRORMSG = 'empty heap.';
-var INVALIDPITCH = 'Not a valid pitch name';
+const NOMICERRORMSG = 'The microphone is not available.';
+const NANERRORMSG = 'Not a number.';
+const NOSTRINGERRORMSG = 'Not a string.';
+const NOBOXERRORMSG = 'Cannot find box';
+const NOACTIONERRORMSG = 'Cannot find action.';
+const NOINPUTERRORMSG = 'Missing argument.';
+const NOSQRTERRORMSG = 'Cannot take square root of negative number.';
+const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
+const EMPTYHEAPERRORMSG = 'empty heap.';
+const INVALIDPITCH = 'Not a valid pitch name';
 
 function Logo(matrix, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
@@ -756,7 +766,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // to the current note.
             var len = this.currentNotes[turtleId].length;
             value = parseInt(value.slice(len));
-            var newNoteObj = logo.getNote(this.currentNotes[turtleId], this.currentOctaves[turtleId], value, this.keySignature[turtleId]);
+            var newNoteObj = getNote(this.currentNotes[turtleId], this.currentOctaves[turtleId], value, this.keySignature[turtleId]);
             this.currentNotes[turtleId] = newNoteObj[0];
             this.currentOctaves[turtleId] = newNoteObj[1];
             break;
@@ -1823,8 +1833,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     for (var i = len - 1; i > -1; i--) {
                         // Note from which delta is calculated.
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
-                        var num2 = logo.getNumber(note2[0], note2[1]);
-                        var a = logo.getNumNote(num1, 0);
+                        var num2 = getNumber(note2[0], note2[1]);
+                        var a = getNumNote(num1, 0);
                         delta += num2 - num1;
                         num1 += 2 * delta;
                     }
@@ -1843,7 +1853,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
 
                     note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
-                    matrix.solfegeNotes.push(logo.getSolfege(note));
+                    matrix.solfegeNotes.push(getSolfege(note));
                     matrix.solfegeOctaves.push(octave);
                 }
             } else {
@@ -1852,11 +1862,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (!(logo.invertList[turtle].length === 0)) {
                     var len = logo.invertList[turtle].length;
                     var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
-                    var num1 = logo.getNumber(note1[0], note1[1]);
+                    var num1 = getNumber(note1[0], note1[1]);
                     for (var i = len - 1; i > -1; i--) {
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
-                        var num2 = logo.getNumber(note2[0], note2[1]);
-                        var a = logo.getNumNote(num1, 0);
+                        var num2 = getNumber(note2[0], note2[1]);
+                        var a = getNumNote(num1, 0);
                         delta += num2 - num1;
                         num1 += 2 * delta;
                     }
@@ -2298,7 +2308,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.pitchBlocks.push(blk);
                     }
                     // TODO: add frequency instead of approximate note to matrix
-                    matrix.solfegeNotes.push(logo.getSolfege(obj[0]));
+                    matrix.solfegeNotes.push(getSolfege(obj[0]));
                     matrix.solfegeOctaves.push(obj[1]);
                 } else {
                     // TODO: add transpositions to frequency?
@@ -3765,95 +3775,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.refreshCanvas();
     }
 
-    this.getNumber = function(solfege, octave) {
-         // converts a note to a number
-
-         if (octave < 1) {
-             var num = 0;
-         } else if (octave > 10) {
-             var num = 9 * 12;
-         } else {
-             var num = 12 * (octave - 1);
-         }
-         var notes = {
-             'C': 1,
-             'D': 3,
-             'E': 5,
-             'F': 6,
-             'G': 8,
-             'A': 10,
-             'B': 12
-         };
-         solfege = String(solfege);
-         if (solfege.substring(0, 1) in notes) {
-             num += notes[solfege.substring(0, 1)];
-             if (solfege.length >= 1) {
-                 var delta = solfege.substring(1);
-                 if (delta === 'bb' || delta === '♭♭') {
-                     num -= 2;
-                 } else if (delta === '##' || delta === '♯♯') {
-                     num += 2;
-                 } else if (delta === 'b' || delta === '♭') {
-                     num -= 1;
-                 } else if (delta === '#' || delta === '♯') {
-                     num += 1;
-                 }
-             }
-         }
-         return num;
-    }
-
-    this.getNumNote = function(value, delta) {
-        // Converts from number to note
-        var num = value + delta;
-        if (num < 0) {
-            num = 1;
-            var octave = 1;
-        } else if (num > 10 * 12) {
-            num = 12;
-            var octave = 10;
-        } else {
-            var octave = Math.floor(num / 12);
-            num = num % 12;
-        }
-
-        var notes = {
-            1: "do",
-            2: "do♯",
-            3: "re",
-            4: "re♯",
-            5: "mi",
-            6: "fa",
-            7: "fa♯",
-            8: "sol",
-            9: "sol♯",
-            10: "la",
-            11: "la♯",
-            0: "ti"
-        };
-        var note = notes[num];
-
-        if (notes[num] === "ti") {
-            octave -= 1;
-        }
-        return [note, octave + 1];
-    }
-
-    this.getSolfege = function (note) {
-        var noteConversion = {'C': _('do'), 'D': _('re'), 'E': _('mi'), 'F': _('fa'), 'G': _('sol'), 'A': _('la'), 'B': _('ti'), 'R': _('rest')};
-        if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
-            return noteConversion[note[0][0]] + note[0][1] + note[0][2];
-        } else if(['♯', '♭'].indexOf(note[0][1]) !== -1) {
-            return noteConversion[note[0][0]] + note[0][1];
-        } else {
-            return noteConversion[note[0][0]];
-        }
-    }
-
     this.getNote = function (solfege, octave, transposition, keySignature) {
-        SHARP = '♯';
-        FLAT = '♭';
-
         this.validNote = true;
         var sharpFlat = false;
 
@@ -3876,28 +3798,20 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
         }
 
-        var bToFlat = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
-        var notesSharp = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
-        var notesFlat = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
-        var notesFlat2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
-        var extraTranspositions = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
-        var majorHalfSteps = [_('do'), '', _('re'), '', _('mi'), _('fa'), '', _('sol'), '', _('la'), '', _('ti')];
-        var minorHalfSteps = [_('do'), '', _('re'), _('mi'), '', _('fa'), '', _('sol'), _('la'), '', _('ti'), ''];
-
         // Already a note? No need to convert from solfege.
-        if (solfege in bToFlat) {
-            solfege = bToFlat[solfege];
+        if (solfege in BTOFLAT) {
+            solfege = BTOFLAT[solfege];
         }
-        if (solfege in extraTranspositions) {
-            octave += extraTranspositions[solfege][1];
-            note = extraTranspositions[solfege][0];
-        } else if (notesSharp.indexOf(solfege.toUpperCase()) !== -1) {
+        if (solfege in EXTRATRANSPOSITIONS) {
+            octave += EXTRATRANSPOSITIONS[solfege][1];
+            note = EXTRATRANSPOSITIONS[solfege][0];
+        } else if (NOTESSHARP.indexOf(solfege.toUpperCase()) !== -1) {
             note = solfege.toUpperCase();
-        } else if (notesFlat.indexOf(solfege) !== -1) {
+        } else if (NOTESFLAT.indexOf(solfege) !== -1) {
             note = solfege;
-        } else if (notesFlat2.indexOf(solfege) !== -1) {
+        } else if (NOTESFLAT2.indexOf(solfege) !== -1) {
             // Convert to uppercase, e.g., d♭ -> D♭.
-            note = notesFlat[notesFlat2.indexOf(solfege)];
+            note = NOTESFLAT[notesFlat2.indexOf(solfege)];
         } else {
             // Not a note, so convert from Solfege.
             // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
@@ -3914,26 +3828,26 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 keySignature = 'C';
             }
             if (keySignature.substr(-1) === 'm' || keySignature.slice(1).toLowerCase() === 'minor') {
-                var thisScale = notesFlat;
-                var halfSteps = minorHalfSteps;  // 0 2 3 5 7 8 10
+                var thisScale = NOTESFLAT;
+                var halfSteps = MINORHALFSTEPS;  // 0 2 3 5 7 8 10
                 var keySignature = keySignature.substr(0, keySignature.length - 1);
                 var major = false;
             } else {
-                var thisScale = notesSharp;
-                var halfSteps = majorHalfSteps;  // 0 2 4 5 7 9 11
+                var thisScale = NOTESSHARP;
+                var halfSteps = MAJORHALFSTEPS;  // 0 2 4 5 7 9 11
                 var keySignature = keySignature;
                 var major = true;
             }
 
-            if (keySignature in extraTranspositions) {
-                keySignature = extraTranspositions[keySignature][0];
+            if (keySignature in EXTRATRANSPOSITIONS) {
+                keySignature = EXTRATRANSPOSITIONS[keySignature][0];
             }
 
             offset = thisScale.indexOf(keySignature);
             if (offset === -1) {
                 console.log('WARNING: Key ' + keySignature + ' not found in ' + thisScale + '. Using default of C');
                 var offset = 0;
-                var thisScale = notesSharp;
+                var thisScale = NOTESSHARP;
             }
 
             if(solfege.toLowerCase().substr(0, 4) === _('rest')) {
@@ -3968,9 +3882,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else if(solfege.substr(-1) === 'b') {
                     note = note + '♭';
                 }
-                if (note in extraTranspositions) {
-                    octave += extraTranspositions[note][1];
-                    note = extraTranspositions[note][0];
+                if (note in EXTRATRANSPOSITIONS) {
+                    octave += EXTRATRANSPOSITIONS[note][1];
+                    note = EXTRATRANSPOSITIONS[note][0];
                 }
             }
         }
@@ -3986,8 +3900,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             octave += deltaOctave;
 
-            if (notesSharp.indexOf(note) !== -1) {
-                i = notesSharp.indexOf(note);
+            if (NOTESSHARP.indexOf(note) !== -1) {
+                i = NOTESSHARP.indexOf(note);
                 i += deltaNote;
                 if (i < 0) {
                     i += 12;
@@ -3996,9 +3910,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     i -= 12;
                     octave += 1;
                 }
-                note = notesSharp[i];
-            } else if (notesFlat.indexOf(note) !== -1) {
-                i = notesFlat.indexOf(note);
+                note = NOTESSHARP[i];
+            } else if (NOTESFLAT.indexOf(note) !== -1) {
+                i = NOTESFLAT.indexOf(note);
                 i += deltaNote;
                 if (i < 0) {
                     i += 12;
@@ -4007,7 +3921,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     i -= 12;
                     octave += 1;
                 }
-                note = notesFlat[i];
+                note = NOTESFLAT[i];
             } else {
                 console.log('note not found? ' + note);
             }
@@ -4034,14 +3948,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var obj = durationToNoteValue(duration);
         this.stageNotesForLilypond(turtle, note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle]);
     }
-
-    var LYNOTE = 0;
-    var LYDURATION = 1;
-    var LYDOTCOUNT = 2;
-    var LYTUPLETVALUE = 3;
-    var LYROUNDDOWN = 4;
-    var LYINSIDECHORD = 5;
-    var LYSTACCATO = 6;
 
     this.processLilypondNotes = function (turtle) {
         // TODO: process all the notes together rather than one at a
@@ -4281,8 +4187,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.saveLilypondOutput = function(saveName) {
         var turtleCount = 0;
         var clef = [];
-        var RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
-        var RODENTSSHORT = [_('m'), _('br'), _('ml'), _('ch'), _('rs'), _('gp'), _('cb'), _('cp'), _('bk'), _('gs'), _('fs'), _('bt')];
         for (var t in this.lilypondStaging) {
             turtleCount += 1;
         }
@@ -4358,7 +4262,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.lilypondOutput += '   <<%0A';
 
         // Sort the staffs, treble on top, bass_8 on the bottom.
-        var CLEFS = ['treble', 'bass', 'bass_8'];
         for (var c = 0; c < CLEFS.length; c++) {
             var i = 0;
             for (var t in this.lilypondNotes) {

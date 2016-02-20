@@ -13,12 +13,13 @@
 require(['activity/utils']);
 
 var paletteBlocks = null;
-var PROTOBLOCKSCALE = 1.0;
-var PALETTELEFTMARGIN = 10;
+
+const PROTOBLOCKSCALE = 1.0;
+const PALETTELEFTMARGIN = 10;
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-var BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
+const BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
 
 
 function maxPaletteHeight(menuSize, scale) {
@@ -347,15 +348,15 @@ function loadPaletteButtonHandler(palettes, name) {
 
 
 // FIXME: this should be calculated
-var EXPANDBYTWO = [];
-var EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
-                   'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
-                   'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
-                   'dividebeatfactor', 'notation', 'playfwd', 'playbwd',
-                   'duplicatenotes', 'fill', 'hollowline', 'drum', 'osctime',
-                   'invert', 'matrix', 'skipnotes', 'setbpm', 'tie', 'slur',
-                   'staccato', 'setnotevolume2', 'crescendo', 'tuplet2',
-                   'drift', 'swing'];
+const EXPANDBYTWO = [];
+const EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
+                    'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
+                    'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
+                    'dividebeatfactor', 'notation', 'playfwd', 'playbwd',
+                    'duplicatenotes', 'fill', 'hollowline', 'drum', 'osctime',
+                    'invert', 'matrix', 'skipnotes', 'setbpm', 'tie', 'slur',
+                    'staccato', 'setnotevolume2', 'crescendo', 'tuplet2',
+                    'drift', 'swing'];
 
 // Kinda a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {
@@ -1247,10 +1248,10 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
 }
 
 
-var MODEUNSURE = 0;
-var MODEDRAG = 1;
-var MODESCROLL = 2;
-var DECIDEDISTANCE = 20;
+const MODEUNSURE = 0;
+const MODEDRAG = 1;
+const MODESCROLL = 2;
+const DECIDEDISTANCE = 20;
 
 
 function setupBackgroundEvents(palette) {
@@ -1450,22 +1451,23 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
 
 
 function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX, saveY) {
-    // Some blocks are expanded on load.
-    var NOTEOBJ = [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['solfege', {'value': _('la')}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]]];
-    var OSCTIMEOBJ = [[0, 'osctime', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 2, 1, null]], [1, 'vspace', 0, 0, [0, 5]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1000}], 0, 0, [2]], [4, ['number', {'value': 3}], 0, 0, [2]], [5, 'triangle', 0, 0, [1, 6, null]], [6, ['number', {'value': 440}], 0, 0, [5]]];
-    var MATRIXOBJ = [[0, 'matrix', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': _('sol')}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': _('mi')}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': _('re')}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]];
-    var TURTLEPITCHOBJ = [[0, 'turtlepitch', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'turtlename', 0, 0, [0]]]
-    var SETTURTLENAMEOBJ = [[0, 'setturtlename', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, 'turtlename', 0, 0, [0]], [2, ['text', {'value': 'Yertle'}], 0, 0, [0]]];
-    var WHOLEOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 1}], 0, 0, [0]]];
-    var HALFOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 2}], 0, 0, [0]]];
-    var QUARTEROBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]];
-    var EIGHTHOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 8}], 0, 0, [0]]];
-    var SIXTEENTHOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 16}], 0, 0, [0]]];
-    var THIRTYSECONDOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 32}], 0, 0, [0]]];
-    var SIXTYFOURTHOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 64}], 0, 0, [0]]];
-    var TONEOBJ = [[0, 'drift', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'triangle', 0, 0, [2, 7, null]], [7, ['number', {'value': 440}], 0, 0, [6]]];
 
-    var BUILTINMACROS = {'note': NOTEOBJ,
+    // Some blocks are expanded on load.
+    const NOTEOBJ = [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['solfege', {'value': _('la')}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]]];
+    const OSCTIMEOBJ = [[0, 'osctime', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 2, 1, null]], [1, 'vspace', 0, 0, [0, 5]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1000}], 0, 0, [2]], [4, ['number', {'value': 3}], 0, 0, [2]], [5, 'triangle', 0, 0, [1, 6, null]], [6, ['number', {'value': 440}], 0, 0, [5]]];
+    const MATRIXOBJ = [[0, 'matrix', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': _('sol')}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': _('mi')}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': _('re')}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]];
+    const TURTLEPITCHOBJ = [[0, 'turtlepitch', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'turtlename', 0, 0, [0]]]
+    const SETTURTLENAMEOBJ = [[0, 'setturtlename', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, 'turtlename', 0, 0, [0]], [2, ['text', {'value': 'Yertle'}], 0, 0, [0]]];
+    const WHOLEOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 1}], 0, 0, [0]]];
+    const HALFOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 2}], 0, 0, [0]]];
+    const QUARTEROBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]];
+    const EIGHTHOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 8}], 0, 0, [0]]];
+    const SIXTEENTHOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 16}], 0, 0, [0]]];
+    const THIRTYSECONDOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 32}], 0, 0, [0]]];
+    const SIXTYFOURTHOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 64}], 0, 0, [0]]];
+    const TONEOBJ = [[0, 'drift', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'triangle', 0, 0, [2, 7, null]], [7, ['number', {'value': 440}], 0, 0, [6]]];
+
+    const BUILTINMACROS = {'note': NOTEOBJ,
                          'osctime': OSCTIMEOBJ,
                          'matrix': MATRIXOBJ,
                          'turtlepitch': TURTLEPITCHOBJ,

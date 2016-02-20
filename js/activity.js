@@ -14,6 +14,7 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+
 function facebookInit() {
     window.fbAsyncInit = function () {
         FB.init({
@@ -188,11 +189,11 @@ define(function (require) {
         var scrollY = 0;
 
         // default values
-        var CAMERAVALUE = '##__CAMERA__##';
-        var VIDEOVALUE = '##__VIDEO__##';
+        const CAMERAVALUE = '##__CAMERA__##';
+        const VIDEOVALUE = '##__VIDEO__##';
 
-        var DEFAULTDELAY = 500; // milleseconds
-        var TURTLESTEP = -1; // Run in step-by-step mode
+        const DEFAULTDELAY = 500; // milleseconds
+        const TURTLESTEP = -1; // Run in step-by-step mode
 
         var blockscale = 2;
         var blockscales = [1, 1.5, 2, 3, 4];
@@ -223,7 +224,7 @@ define(function (require) {
 
         var helpContainer = null;
         var helpIdx = 0;
-        var HELPCONTENT = [
+        const HELPCONTENT = [
             [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
             [_('Meet Mr. Mouse!'), _('Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!'), 'activity/activity-icon-mouse-color.svg'],
             [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
@@ -258,6 +259,42 @@ define(function (require) {
             [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
         ]
+
+        const DATAOBJS =
+            [[0, 'start', 250, 150, [null, null, null]],
+             [1, 'matrix', 800, 50, [null, 2, null]],
+
+             [2, 'pitch', 0, 0, [1, 3, 4, 5]],
+             [3, ['solfege', {value:'ti'}], 0, 0, [2]],
+             [4, ['number', {value:'4'}], 0, 0, [2]],
+
+             [5, 'pitch', 0, 0, [2, 6, 7, 8]],
+             [6, ['solfege', {value:'la'}], 0, 0, [5]],
+             [7, ['number', {value:'4'}], 0, 0, [5]],
+
+             [8, 'pitch', 0, 0, [5, 9, 10, 11]],
+             [9, ['solfege', {value:'sol'}], 0, 0, [8]],
+             [10, ['number', {value:'4'}], 0, 0, [8]],
+
+             [11, 'pitch', 0, 0, [8, 12, 13, 14]],
+             [12, ['solfege', {value:'mi'}], 0, 0, [11]],
+             [13, ['number', {value:'4'}], 0, 0, [11]],
+
+             [14, 'pitch', 0, 0, [11, 15, 16, 17]],
+             [15, ['solfege', {value:'re'}], 0, 0, [14]],
+             [16, ['number', {value:'4'}], 0, 0, [14]],
+
+             [17,"repeat",0,0,[14,18,19,null]],
+             [18,["number", {"value":2}],0,0,[17]],
+
+             [19,"rhythm",0,0,[17,20,21,22]],
+             [20,["number", {"value":6}],0,0,[19]],
+             [21,["number", {"value":4}],0,0,[19]],
+
+             [22,"rhythm",0,0,[19,23,24,null]],
+             [23,["number", {"value":1}],0,0,[22]],
+             [24,["number", {"value":2}],0,0,[22]]
+            ];
 
         pluginsImages = {};
 
@@ -468,7 +505,7 @@ define(function (require) {
         var errorMsgText = null;
         var errorMsgArrow = null;
         var errorArtwork = {};
-        var ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
+        const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
 
         // Get things started
         init();
@@ -933,21 +970,21 @@ define(function (require) {
                 return;
             }
 
-            var TAB = 9;
-            var ESC = 27;
-            var ALT = 18;
-            var CTRL = 17;
-            var SHIFT = 16;
-            var RETURN = 13;
-            var SPACE = 32;
+            const TAB = 9;
+            const ESC = 27;
+            const ALT = 18;
+            const CTRL = 17;
+            const SHIFT = 16;
+            const RETURN = 13;
+            const SPACE = 32;
 
             // Captured by browser
-            var PAGE_UP = 33;
-            var PAGE_DOWN = 34;
-            var KEYCODE_LEFT = 37;
-            var KEYCODE_RIGHT = 39;
-            var KEYCODE_UP = 38;
-            var KEYCODE_DOWN = 40;
+            const PAGE_UP = 33;
+            const PAGE_DOWN = 34;
+            const KEYCODE_LEFT = 37;
+            const KEYCODE_RIGHT = 39;
+            const KEYCODE_UP = 38;
+            const KEYCODE_DOWN = 40;
 
             if (event.altKey) {
                 switch (event.keyCode) {
@@ -1112,41 +1149,7 @@ define(function (require) {
                 }
             }
             if (addStartBlock) {//ti la sol mi re
-                var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
-                                [1, 'matrix', 800, 50, [null, 2, null]],
-
-                                [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['solfege', {value:_('ti')}], 0, 0, [2]],
-                                [4, ['number', {value:'4'}], 0, 0, [2]],
-
-                                [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['solfege', {value:_('la')}], 0, 0, [5]],
-                                [7, ['number', {value:'4'}], 0, 0, [5]],
-
-                                [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['solfege', {value:_('sol')}], 0, 0, [8]],
-                                [10, ['number', {value:'4'}], 0, 0, [8]],
-
-                                [11, 'pitch', 0, 0, [8, 12, 13, 14]],
-                                [12, ['solfege', {value:_('mi')}], 0, 0, [11]],
-                                [13, ['number', {value:'4'}], 0, 0, [11]],
-
-                                [14, 'pitch', 0, 0, [11, 15, 16, 17]],
-                                [15, ['solfege', {value:_('re')}], 0, 0, [14]],
-                                [16, ['number', {value:'4'}], 0, 0, [14]],
-
-                                [17,"repeat",0,0,[14,18,19,null]],
-                                [18,["number", {"value":2}],0,0,[17]],
-
-                                [19,"rhythm",0,0,[17,20,21,22]],
-                                [20,["number", {"value":6}],0,0,[19]],
-                                [21,["number", {"value":4}],0,0,[19]],
-
-                                [22,"rhythm",0,0,[19,23,24,null]],
-                                [23,["number", {"value":1}],0,0,[22]],
-                                [24,["number", {"value":2}],0,0,[22]]
-                                ];
-                blocks.loadNewBlocks(dataObjs);
+                blocks.loadNewBlocks(DATAOBJS);
             } else if (!doNotSave) {
                 // Overwrite session data too.
                 saveLocally();
@@ -1412,41 +1415,7 @@ define(function (require) {
             console.log(" LOAD START")
             justLoadStart = function () {
                 console.log('loading start and a matrix');
-                var dataObjs = [[0, 'start', 250, 150, [null, null, null]],
-                                [1, 'matrix', 800, 50, [null, 2, null]],
-
-                                [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-                                [3, ['solfege', {value:'ti'}], 0, 0, [2]],
-                                [4, ['number', {value:'4'}], 0, 0, [2]],
-
-                                [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-                                [6, ['solfege', {value:'la'}], 0, 0, [5]],
-                                [7, ['number', {value:'4'}], 0, 0, [5]],
-
-                                [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-                                [9, ['solfege', {value:'sol'}], 0, 0, [8]],
-                                [10, ['number', {value:'4'}], 0, 0, [8]],
-
-                                [11, 'pitch', 0, 0, [8, 12, 13, 14]],
-                                [12, ['solfege', {value:'mi'}], 0, 0, [11]],
-                                [13, ['number', {value:'4'}], 0, 0, [11]],
-
-                                [14, 'pitch', 0, 0, [11, 15, 16, 17]],
-                                [15, ['solfege', {value:'re'}], 0, 0, [14]],
-                                [16, ['number', {value:'4'}], 0, 0, [14]],
-
-                                [17,"repeat",0,0,[14,18,19,null]],
-                                [18,["number", {"value":2}],0,0,[17]],
-
-                                [19,"rhythm",0,0,[17,20,21,22]],
-                                [20,["number", {"value":6}],0,0,[19]],
-                                [21,["number", {"value":4}],0,0,[19]],
-
-                                [22,"rhythm",0,0,[19,23,24,null]],
-                                [23,["number", {"value":1}],0,0,[22]],
-                                [24,["number", {"value":2}],0,0,[22]]
-                                ];
-                blocks.loadNewBlocks(dataObjs);
+                blocks.loadNewBlocks(DATAOBJS);
             }
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
