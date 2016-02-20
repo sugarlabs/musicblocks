@@ -31,46 +31,39 @@ function durationToNoteValue(duration) {
         var currentDotFactor = 2 - (1 / Math.pow(2, dotCount));
         var d = duration * currentDotFactor;
         if (POWER2.indexOf(d) !== -1) {
-	    console.log('Note Value is ' + d + ' and ' + dotCount + ' dots');
             return [d, dotCount, null];
-	}
-    }
-    // First, see if the note is a tuplet (e.g., has a factor of 2).
-    var factorOfTwo = 1;
-    console.log(duration + ' ' + Math.floor(duration / 2));
-    var d = duration;
-    while (Math.floor(d / 2) * 2 === d) {
-        factorOfTwo *= 2;
-        d /= 2;
-    }
-    if (factorOfTwo > 1) {
-        // We have a tuplet of sorts
-        console.log('tuplet ' + factorOfTwo + ' ' + d);
-        tupletValue = d;
-        d = factorOfTwo;
-        return [d, 0, tupletValue];
+        }
     }
 
-    // Next, generate a false tuplet.
-    console.log('cannot convert ' + duration + ' to a note');
-    var d = duration;
+    // First, round down.
+    var roundDown = duration;
     for (var i = 1; i < POWER2.length; i++) {
         // Rounding down
-        if (d < POWER2[i]) {
-            d = POWER2[i - 1];
+        if (roundDown < POWER2[i]) {
+            roundDown = POWER2[i - 1];
             break;
         }
     }
 
-    var factorOfTwo = 1;
-    while (Math.floor(d / 2) * 2 === d) {
-        factorOfTwo *= 2;
-        d /= 2;
+    if (POWER2.indexOf(roundDown) === -1) {
+        roundDown = 128;
     }
-    console.log('tuplet ' + d + ' ' + factorOfTwo + ' ' + duration);
-    return [factorOfTwo, 0, duration];
-    //console.log('substituting in ' + factorOfTwo);
-    //return [factorOfTwo, 0, null];
+
+    // Next, see if the note has a factor of 2.
+    var factorOfTwo = 1;
+    var tupletValue = duration;
+    while (Math.floor(tupletValue / 2) * 2 === tupletValue) {
+        factorOfTwo *= 2;
+        tupletValue /= 2;
+    }
+
+    if (factorOfTwo > 1) {
+        // We have a tuplet of sorts
+        return [duration, 0, tupletValue, roundDown];
+    }
+
+    // Next, generate a fauve tuplet for a singleton.
+    return [1, 0, duration, roundDown];
 }
 
 
