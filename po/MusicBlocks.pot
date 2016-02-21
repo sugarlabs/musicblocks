@@ -1152,6 +1152,9 @@ msgstr ""
 msgid "adjust transposition"
 msgstr ""
 
+msgid "silence"
+msgstr ""
+
 msgid "rest"
 msgstr ""
 

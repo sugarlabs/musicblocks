@@ -1160,6 +1160,9 @@ msgstr "ปัจจัยข้าม"
 msgid "adjust transposition"
 msgstr "ปรับการคมนาคม"
 
+msgid "silence"
+msgstr "พัก"
+
 msgid "rest"
 msgstr "พัก"
 

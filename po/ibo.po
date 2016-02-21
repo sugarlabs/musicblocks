@@ -1175,3 +1175,5 @@ msgstr ""
 msgid "free time"
 msgstr "aka ekpe"
 
+msgid "silence"
+msgstr ""
