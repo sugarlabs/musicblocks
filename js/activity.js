@@ -450,7 +450,7 @@ define(function (require) {
                 var imageData = myRadarChart.toBase64Image();
                 var img = new Image();
                 img.onload = function () {
-                    chartBitmap = new createjs.Bitmap(img);
+                    var chartBitmap = new createjs.Bitmap(img);
                     stage.addChild(chartBitmap);
                     chartBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (300);
                     chartBitmap.y = 0;
@@ -883,8 +883,7 @@ define(function (require) {
             img.onload = function () {
                 var msgBlock = new createjs.Bitmap(img);
                 container.addChild(msgBlock);
-                text = new createjs.Text('your message here',
-                    '20px Arial', '#000000');
+                var text = new createjs.Text('your message here', '20px Arial', '#000000');
                 container.addChild(text);
                 text.textAlign = 'center';
                 text.textBaseline = 'alphabetic';
@@ -2044,7 +2043,7 @@ define(function (require) {
             container.x = x;
             container.y = y;
 
-            text = new createjs.Text(label, '14px Sans', '#282828');
+            var text = new createjs.Text(label, '14px Sans', '#282828');
             if (container.y < 55) {
                 text.textAlign = 'left';
                 text.x = -14;

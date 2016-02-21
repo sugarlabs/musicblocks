@@ -1452,7 +1452,7 @@ function changeLabel(myBlock) {
         myBlock.label = docById('textLabel');
     } else if (myBlock.name === 'solfege') {
         var type = 'solfege';
-        const SOLFNOTES = [_('ti'), _('la'), _('sol'), _('fa'), _('mi'), _('re'), _('do'), _('rest')];
+        const SOLFNOTES = [_('ti'), _('la'), _('sol'), _('fa'), _('mi'), _('re'), _('do')];
         const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             if (SOLFNOTES.indexOf(myBlock.value) !== -1) {
@@ -1500,7 +1500,7 @@ function changeLabel(myBlock) {
         myBlock.labelattr = docById('noteattrLabel');
     } else if (myBlock.name === 'notename') {
         var type = 'notename';
-        const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C', _('rest')];
+        const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
         const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             var selectednote = myBlock.value[0];
@@ -1549,6 +1549,7 @@ function changeLabel(myBlock) {
         // immediately in FireFox. We need a workaround if hardware
 	// acceleration is enabled.
 
+	
         if (!focused) {
             return;
         }

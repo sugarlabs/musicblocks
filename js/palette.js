@@ -1466,7 +1466,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
     const THIRTYSECONDOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 32}], 0, 0, [0]]];
     const SIXTYFOURTHOBJ = [[0, 'rhythm', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 64}], 0, 0, [0]]];
     const TONEOBJ = [[0, 'drift', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'triangle', 0, 0, [2, 7, null]], [7, ['number', {'value': 440}], 0, 0, [6]]];
-    const RESTOBJ = [[0, ['solfege', {'value': _('rest')}], palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null]]];
+    const RESTOBJ = [[0, 'note', palette.protoContainers[blkname].x, palette.protoContainers[blkname].y, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'rest2', 0, 0, [0, null]]];
 
     const BUILTINMACROS = {'note': NOTEOBJ,
                            'osctime': OSCTIMEOBJ,
@@ -1481,7 +1481,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                            'thirtysecondNote': THIRTYSECONDOBJ,
                            'sixtyfourthNote': SIXTYFOURTHOBJ,
                            'tone': TONEOBJ,
-                           'rest': RESTOBJ,
+			   'rest2': RESTOBJ,
                         };
 
     if (moved) {

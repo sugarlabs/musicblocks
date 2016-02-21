@@ -671,7 +671,9 @@ function Matrix() {
                 cell.onclick = function() {
                     if (this.style.backgroundColor === 'black') {
                         this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        console.log(this.id + ': ' + that.notesToPlay[this.id - 1][0]);
                         that.notesToPlay[this.id - 1][0] = ['R'];
+                        console.log(this.id + ': ' + that.notesToPlay[this.id - 1][0]);
                         that.setNotes(this.id, this.parentNode.rowIndex, false);
                     } else {
                         this.style.backgroundColor = 'black';
@@ -960,37 +962,48 @@ function Matrix() {
                 newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
                 var delta = 2;
             }
-            // Add the pitch blocks to the Note block
-            for (var j = 0; j < note[0].length; j++) {
 
-                var thisBlock = idx + delta + (j * 3);
-
-                // We need to point to the previous note or pitch block.
-                if (j === 0) {
-                    if (delta === 5) {
-                        var previousBlock = idx + 1;  // Vspace block
-                    } else {
-                        var previousBlock = idx;  // Note block
-                    }
-                } else {
-                    var previousBlock = thisBlock - 3;  // Pitch block
-                }
-
+            // FIXME: Does the undefined case ever occur?
+            if (note[0][0] === 'R' || note[0][0] == undefined) {
                 // The last connection in last pitch block is null.
-                if (note[0].length === 1 || j === note[0].length - 1) {
-                    var lastConnection = null;
-                } else {
-                    var lastConnection = thisBlock + 3;
-                }
+		var lastConnection = null;
+		if (delta === 5) {
+                    var previousBlock = idx + 1;  // Vspace block
+		} else {
+                    var previousBlock = idx;  // Note block
+		}
+                delta -= 2;
+		var thisBlock = idx + delta;
+                previousBlock += delta;
+                newStack.push([thisBlock + 1, 'rest2', 0, 0, [previousBlock, lastConnection]]);
+            } else {
+		// Add the pitch blocks to the Note block
+		for (var j = 0; j < note[0].length; j++) {
 
-                newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
-                    newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
-                    newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
-                } else {
-                    if (note[0][0] === 'R') {
-                        newStack.push([thisBlock + 1, ['solfege', {'value': _('rest')}], 0, 0, [thisBlock]]);
-                        newStack.push([thisBlock + 2, ['number', {'value': 4}], 0, 0, [thisBlock]]);
+                    var thisBlock = idx + delta + (j * 3);
+
+                    // We need to point to the previous note or pitch block.
+                    if (j === 0) {
+			if (delta === 5) {
+                            var previousBlock = idx + 1;  // Vspace block
+			} else {
+                            var previousBlock = idx;  // Note block
+			}
+                    } else {
+			var previousBlock = thisBlock - 3;  // Pitch block
+                    }
+
+                    // The last connection in last pitch block is null.
+                    if (note[0].length === 1 || j === note[0].length - 1) {
+			var lastConnection = null;
+                    } else {
+			var lastConnection = thisBlock + 3;
+                    }
+
+                    newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                    if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
+                        newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                     } else {
                         newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
