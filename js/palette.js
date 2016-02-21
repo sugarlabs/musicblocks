@@ -725,6 +725,11 @@ function Palette(palettes, name) {
     this.FadedUpButton = null;
     this.FadedDownButton = null;
     this.count = 0;
+    this.shiftOnRestore = 0;
+
+    this.setShiftOnRestore = function(n) {
+	this.shiftOnRestore = n * STANDARDBLOCKHEIGHT * this.palettes.scale;
+    }
 
     this.makeMenu = function(createHeader) {
         if (this.menuContainer == null) {
@@ -1376,6 +1381,7 @@ function makeBlockFromPalette(protoblk, blkname, palette, callback) {
 function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
     // A menu item is a protoblock that is used to create a new block.
     var pressupLock = false;
+    var pressed = false;
     var moved = false;
     var saveX = palette.protoContainers[blkname].x;
     var saveY = palette.protoContainers[blkname].y;
@@ -1393,6 +1399,7 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
         palette.protoContainers[blkname].mask = null;
 
         moved = false;
+	pressed = true;
         saveX = palette.protoContainers[blkname].x;
         saveY = palette.protoContainers[blkname].y - palette.scrollDiff;
         var startX = event.stageX;
@@ -1433,7 +1440,12 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
     palette.protoContainers[blkname].on('mouseout', function(event) {
         // Catch case when pressup event is missed.
         // Put the protoblock back on the palette...
-        restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+        if (pressed && moved) {
+            restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+	    palette.shiftOnRestore = 0;
+            pressed = false;
+            moved = false;
+        }
     });
 
     palette.protoContainers[blkname].on('pressup', function(event) {
@@ -1481,15 +1493,12 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                            'thirtysecondNote': THIRTYSECONDOBJ,
                            'sixtyfourthNote': SIXTYFOURTHOBJ,
                            'tone': TONEOBJ,
-			   'rest2': RESTOBJ,
+                           'rest2': RESTOBJ,
                         };
 
     if (moved) {
         moved = false;
         palette.draggingProtoBlock = false;
-
-        // Put the protoblock back on the palette...
-        restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
 
         if (blkname in BUILTINMACROS) {
             paletteBlocks.loadNewBlocks(BUILTINMACROS[blkname]);
@@ -1561,6 +1570,10 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
             var newBlock = makeBlockFromPalette(protoblk, blkname, palette, myCallback);
         }
 
+        // Put the protoblock back on the palette...
+        // console.log('RESTORING');
+        // restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+
         palette.updateBlockMasks();
         palette.palettes.refreshCanvas();
     }
@@ -1570,7 +1583,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
 function restoreProtoblock(palette, name, x, y) {
     // Return protoblock we've been dragging back to the palette.
     palette.protoContainers[name].x = x;
-    palette.protoContainers[name].y = y;
+    palette.protoContainers[name].y = y + palette.shiftOnRestore;
 }
 
 
