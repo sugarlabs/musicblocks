@@ -102,6 +102,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     var restBlock = new ProtoBlock('rest');
     restBlock.palette = palettes.dict['pitch'];
+    restBlock.hidden = true;
     blocks.protoBlockDict['rest'] = restBlock;
     restBlock.valueBlock();
     restBlock.dockTypes[0] = 'textout';
