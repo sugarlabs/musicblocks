@@ -1290,6 +1290,10 @@ msgstr ""
 msgid "adjust transposition"
 msgstr ""
 
+#. TRANS: silencio
+msgid "silence"
+msgstr ""
+
 msgid "rest"
 msgstr ""
 

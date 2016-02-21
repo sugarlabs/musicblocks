@@ -1152,6 +1152,9 @@ msgstr "factor de salteo"
 msgid "adjust transposition"
 msgstr "ajustar transposición"
 
+msgid "silence"
+msgstr "silencio"
+
 msgid "rest"
 msgstr "descanso"
 
