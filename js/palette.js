@@ -1481,7 +1481,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                            'thirtysecondNote': THIRTYSECONDOBJ,
                            'sixtyfourthNote': SIXTYFOURTHOBJ,
                            'tone': TONEOBJ,
-			   'rest': RESTOBJ,
+                           'rest': RESTOBJ,
                         };
 
     if (moved) {
