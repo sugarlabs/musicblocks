@@ -1452,10 +1452,10 @@ function changeLabel(myBlock) {
         myBlock.label = docById('textLabel');
     } else if (myBlock.name === 'solfege') {
         var type = 'solfege';
-        var notes = [_('ti'), _('la'), _('sol'), _('fa'), _('mi'), _('re'), _('do')];
-        var attrs = ['♯♯', '♯', '♮', '♭', '♭♭'];
+        const SOLFNOTES = [_('ti'), _('la'), _('sol'), _('fa'), _('mi'), _('re'), _('do'), _('rest')];
+        const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
-            if (notes.indexOf(myBlock.value) !== -1) {
+            if (SOLFNOTES.indexOf(myBlock.value) !== -1) {
                 var selectednote = myBlock.value;
                 var selectedattr = '♮';
             } else if (myBlock.value.slice(0, 3) === _('sol')) {
@@ -1478,20 +1478,20 @@ function changeLabel(myBlock) {
             var selectedattr = '♮'
         }
         var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
-        for (var i = 0; i < notes.length; i++) {
-            if (selectednote === notes[i]) {
+        for (var i = 0; i < SOLFNOTES.length; i++) {
+            if (selectednote === SOLFNOTES[i]) {
                 labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
 	    } else {
-                labelHTML += '<option value="' + notes[i] + '">' + notes[i] + '</option>';
+                labelHTML += '<option value="' + SOLFNOTES[i] + '">' + SOLFNOTES[i] + '</option>';
             }
         }
         labelHTML += '</select>';
         labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-        for (var i = 0; i < attrs.length; i++) {
-            if (selectedattr === attrs[i]) {
+        for (var i = 0; i < SOLFATTRS.length; i++) {
+            if (selectedattr === SOLFATTRS[i]) {
                 labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
 	    } else {
-                labelHTML += '<option value="' + attrs[i] + '">' + attrs[i] + '</option>';
+                labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
             }
         }
         labelHTML += '</select>';
@@ -1500,8 +1500,8 @@ function changeLabel(myBlock) {
         myBlock.labelattr = docById('noteattrLabel');
     } else if (myBlock.name === 'notename') {
         var type = 'notename';
-        var notes = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
-        var attrs = ['♯♯', '♯', '♮', '♭', '♭♭'];
+        const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C', _('rest')];
+        const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             var selectednote = myBlock.value[0];
             if (myBlock.value.length === 1) {
@@ -1516,20 +1516,20 @@ function changeLabel(myBlock) {
             var selectedattr = '♮'
         }
         var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
-        for (var i = 0; i < notes.length; i++) {
-            if (selectednote === notes[i]) {
+        for (var i = 0; i < NOTENOTES.length; i++) {
+            if (selectednote === NOTENOTES[i]) {
                 labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
             } else {
-                labelHTML += '<option value="' + notes[i] + '">' + notes[i] + '</option>';
+                labelHTML += '<option value="' + NOTENOTES[i] + '">' + NOTENOTES[i] + '</option>';
             }
         }
         labelHTML += '</select>';
         labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-        for (var i = 0; i < attrs.length; i++) {
-            if (selectedattr === attrs[i]) {
+        for (var i = 0; i < NOTEATTRS.length; i++) {
+            if (selectedattr === NOTEATTRS[i]) {
                 labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
 	    } else {
-                labelHTML += '<option value="' + attrs[i] + '">' + attrs[i] + '</option>';
+                labelHTML += '<option value="' + NOTEATTRS[i] + '">' + NOTEATTRS[i] + '</option>';
             }
         }
         labelHTML += '</select>';

@@ -989,7 +989,7 @@ function Matrix() {
                     newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
                 } else {
                     if (note[0][0] === 'R') {
-                        newStack.push([thisBlock + 1, ['text', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 1, ['solfege', {'value': _('rest')}], 0, 0, [thisBlock]]);
                         newStack.push([thisBlock + 2, ['number', {'value': 4}], 0, 0, [thisBlock]]);
                     } else {
                         newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
