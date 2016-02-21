@@ -1782,6 +1782,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             logo.setListener(turtle, listenerName, listener);
             break;
+        case 'rest2':
+            logo.notePitches[turtle].push(_('rest'));
+            logo.noteOctaves[turtle].push(4);
+            logo.noteBeatValues[turtle].push(1);
+            logo.pushedNote[turtle] = true;
+	    break;
         case 'pitch':
             if (args.length !== 2) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -3850,7 +3856,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var thisScale = NOTESSHARP;
             }
 
-            if(solfege.toLowerCase().substr(0, 4) === _('rest')) {
+            if (solfege.toLowerCase().substr(0, 4) === _('rest')) {
                 return ['R', ''];
             } else if (halfSteps.indexOf(solfege.substr(0, 2).toLowerCase()) !== -1) {
                 var index = halfSteps.indexOf(solfege.substr(0, 2).toLowerCase()) + offset;

@@ -103,6 +103,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var restBlock = new ProtoBlock('rest');
     restBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['rest'] = restBlock;
+    restBlock.hidden = true;
     restBlock.valueBlock();
     restBlock.dockTypes[0] = 'textout';
 
@@ -304,6 +305,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
+
+    var rest2Block = new ProtoBlock('rest2');
+    rest2Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['rest2'] = rest2Block;
+    rest2Block.staticLabels.push(_('silence'));
+    rest2Block.adjustWidthToLabel();
+    rest2Block.zeroArgBlock();
 
     var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
     rhythmicdotBlock.palette = palettes.dict['rhythm'];
