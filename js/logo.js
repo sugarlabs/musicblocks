@@ -4202,12 +4202,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 for (var i = 0; i < this.lilypondStaging[t].length; i++) {
                     obj = this.lilypondStaging[t][i];
                     if (typeof(obj) === 'object') {
-                        octaveTotal += Number(obj[0].substr(-1));
-                        noteCount += 1;
+                        if (obj[0].length < 2) {
+                            // Test for rests
+                        } else {
+                            octaveTotal += Number(obj[0].substr(-1));
+                            noteCount += 1;
+                        }
                     }
                 }
                 if (noteCount > 0) {
-                    console.log(t + ': ' + octaveTotal + ' ' + noteCount);
+                    // console.log(t + ': ' + octaveTotal + ' ' + noteCount);
                     switch (Math.floor(octaveTotal / noteCount)) {
                     case 0:
                     case 1:
@@ -4252,7 +4256,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // Automatic note splitting
                 this.lilypondOutput += '%0A   %5Cremove "Note_heads_engraver"%0A   %5Cconsists "Completion_heads_engraver"%0A   %5Cremove "Rest_engraver"%0A   %5Cconsists "Completion_rest_engraver"%0A'
 
-                this.lilypondOutput += '} { %5Cclef ' + last(clef) + ' %5C' + instrumentName.replace(/ /g, '_') + ' }%0A%0A';
+                this.lilypondOutput += '} { %5Cclef "' + last(clef) + '" %5C' + instrumentName.replace(/ /g, '_') + ' }%0A%0A';
             }
             c += 1;
         }
