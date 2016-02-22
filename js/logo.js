@@ -1405,6 +1405,18 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
             break;
+        case 'settranslucency':
+            if (args.length === 1) {
+                if (typeof(args[0]) === 'string') {
+                    logo.errorMsg(NANERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    args[0] %= 101;
+                    var alpha = 1.0 - (args[0] / 100);
+                    logo.turtles.turtleList[turtle].doSetPenAlpha(alpha);
+                }
+            }
+            break;
         case 'setgrey':
             if (args.length === 1) {
                 if (typeof(args[0]) === 'string') {
@@ -1527,7 +1539,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'vspace':
             break;
         case 'playback':
-            sound = new Howl({
+            var sound = new Howl({
                 urls: [args[0]]
             });
             logo.sounds.push(sound);
@@ -1787,7 +1799,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.noteOctaves[turtle].push(4);
             logo.noteBeatValues[turtle].push(1);
             logo.pushedNote[turtle] = true;
-	    break;
+            break;
         case 'pitch':
             if (args.length !== 2) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
