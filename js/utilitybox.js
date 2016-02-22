@@ -8,6 +8,7 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+//
 
 const UTILITYBOXSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="133" width="360" version="1.1"> <rect style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" y="0" x="0" height="133" width="360" /> <g style="fill:#000000;display:block" transform="translate(306.943,-1.053)"> <path style="fill:#000000;display:inline" d="m 27.557,5.053 c -12.43,0 -22.5,10.076 -22.5,22.497 0,12.432 10.07,22.503 22.5,22.503 12.431,0 22.5,-10.071 22.5,-22.503 0,-12.421 -10.07,-22.497 -22.5,-22.497 z m 10.199,28.159 c 1.254,1.256 1.257,3.291 0,4.545 -0.628,0.629 -1.451,0.943 -2.274,0.943 -0.822,0 -1.644,-0.314 -2.27,-0.94 l -5.76,-5.761 -5.76,5.761 c -0.627,0.626 -1.449,0.94 -2.271,0.94 -0.823,0 -1.647,-0.314 -2.275,-0.943 -1.254,-1.254 -1.254,-3.289 0.004,-4.545 l 5.758,-5.758 -5.758,-5.758 c -1.258,-1.254 -1.258,-3.292 -0.004,-4.546 1.255,-1.254 3.292,-1.259 4.546,0 l 5.76,5.759 5.76,-5.759 c 1.252,-1.259 3.288,-1.254 4.544,0 1.257,1.254 1.254,3.292 0,4.546 l -5.758,5.758 5.758,5.758 z" /> </g> <rect style="fill:#92b5c8;fill-opacity:1;stroke:none" y="51" x="0" height="82" width="360" /> <rect y="0.76763773" x="0.76764059" height="131.46472" width="358.46472" style="display:inline;visibility:visible;opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;" /></svg>';
 
@@ -32,7 +33,23 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
             this.createBox(scale, x, y);
             var box = this;
 
-            this.statsButton = makeButton('stats-button', _('Display statistics'), this.container.x + 55, this.container.y + 85, 55, 0, this.stage);
+            this.smallerButton = makeButton('smaller-button', _('Decrease block size'), this.container.x + 55, this.container.y + 85, 55, 0, this.stage);
+            this.smallerButton.visible = true;
+            this.positionHoverText(this.smallerButton);
+            this.smallerButton.on('click', function(event) {
+                box.doSmaller();
+                box.hide();
+            });
+
+            this.biggerButton = makeButton('bigger-button', _('Increase block size'), this.container.x + 120, this.container.y + 85, 55, 0, this.stage);
+            this.biggerButton.visible = true;
+            this.positionHoverText(this.biggerButton);
+            this.biggerButton.on('click', function(event) {
+                box.doBigger();
+                box.hide();
+            });
+
+            this.statsButton = makeButton('stats-button', _('Display statistics'), this.container.x + 185, this.container.y + 85, 55, 0, this.stage);
             this.statsButton.visible = true;
             this.positionHoverText(this.statsButton);
             this.statsButton.on('click', function(event) {
@@ -40,7 +57,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
                 box.hide();
             });
 
-            this.pluginsButton = makeButton('plugins-button', _('Load plugin from file'), this.container.x + 120, this.container.y + 85, 55, 0, this.stage);
+            this.pluginsButton = makeButton('plugins-button', _('Load plugin from file'), this.container.x + 250, this.container.y + 85, 55, 0, this.stage);
             this.pluginsButton.visible = true;
             this.positionHoverText(this.pluginsButton);
             this.pluginsButton.on('click', function(event) {
@@ -48,7 +65,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
                 box.hide();
             });
 
-            this.scrollButton = makeButton('scroll-unlock-button', _('Enable scrolling'), this.container.x + 175, this.container.y + 85, 55, 0, this.stage);
+            this.scrollButton = makeButton('scroll-unlock-button', _('Enable scrolling'), this.container.x + 315, this.container.y + 85, 55, 0, this.stage);
             this.scrollButton.visible = true;
             this.positionHoverText(this.scrollButton);
             this.scrollButton.on('click', function(event) {
@@ -57,7 +74,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
                 box.scrollStatus = !box.scrollStatus;
             });
 
-            this.scrollButton2 = makeButton('scroll-lock-button', _('Disable scrolling'), this.container.x + 175, this.container.y + 85, 55, 0, this.stage);
+            this.scrollButton2 = makeButton('scroll-lock-button', _('Disable scrolling'), this.container.x + 315, this.container.y + 85, 55, 0, this.stage);
             this.scrollButton2.visible = false;
             this.positionHoverText(this.scrollButton2);
             this.scrollButton2.on('click', function(event) {
@@ -84,6 +101,8 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
 
     this.hide = function() {
         if (this.container !== null) {
+            this.smallerButton.visible = false;
+            this.biggerButton.visible = false;
             this.statsButton.visible = false;
             this.pluginsButton.visible = false;
             this.scrollButton.visible = false;
@@ -95,6 +114,8 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
 
     this.show = function() {
         if (this.container !== null) {
+            this.smallerButton.visible = true;
+            this.biggerButton.visible = true;
             this.statsButton.visible = true;
             this.pluginsButton.visible = true;
             this.scrollButton.visible = !this.scrollStatus;
@@ -149,3 +170,4 @@ function loadUtilityContainerHandler(box) {
         }
     });
 }
+
