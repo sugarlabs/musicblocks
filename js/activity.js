@@ -1,4 +1,4 @@
-// Copyright (c) 2014,2015 Walter Bender
+// Copyright (c) 2014-16 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 //
 // This program is free software; you can redistribute it and/or
@@ -216,7 +216,6 @@ define(function (require) {
         if (onXO) {
             cellSize = 75;
         }
-        ;
 
         var onscreenButtons = [];
         var onscreenMenu = [];
@@ -297,6 +296,40 @@ define(function (require) {
             ];
 
         pluginsImages = {};
+
+        function findBlocks() {
+            var x = 100;
+	    var y = 100;
+            logo.showBlocks();
+            for (var blk in blocks.blockList) {
+                var myBlock = blocks.blockList[blk];
+                if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                    if (!myBlock.collapsed) {
+                        myBlock.collapseToggle();
+		    }
+		}
+
+		if (myBlock.connections[0] == null) {
+                    var dx = x - myBlock.container.x;
+		    var dy = y - myBlock.container.y;
+		    blocks.moveBlockRelative(blk, dx, dy);
+		    blocks.findDragGroup(blk);
+                    if (blocks.dragGroup.length > 0) {
+                        for (var b = 0; b < blocks.dragGroup.length; b++) {
+                            var bblk = blocks.dragGroup[b];
+                            if (b !== 0) {
+                                blocks.moveBlockRelative(bblk, dx, dy);
+                            }
+                        }
+                    }
+		    x += 200 * musicBlocksScale;
+		    if (x > (canvas.width - 100) / (musicBlocksScale)) {
+			x = 100;
+			y += 100 * musicBlocksScale;
+                    }
+                }
+            }
+        }
 
         function allClear() {
             if (chartBitmap != null) {
@@ -976,6 +1009,7 @@ define(function (require) {
             const SHIFT = 16;
             const RETURN = 13;
             const SPACE = 32;
+            const HOME = 36;
 
             // Captured by browser
             const PAGE_UP = 33;
@@ -1000,6 +1034,9 @@ define(function (require) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
+                case HOME:
+                    findBlocks();
+                    break;
                 case TAB:
                     break;
                 case ESC:
