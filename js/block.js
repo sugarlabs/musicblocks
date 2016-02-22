@@ -10,8 +10,9 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 // Length of a long touch
-var LONGPRESSTIME = 1500;
-var COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
+const LONGPRESSTIME = 1500;
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
+
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -1419,7 +1420,7 @@ function makeBitmap(data, name, callback, args) {
     // Works with Chrome, Safari, Firefox (untested on IE)
     var img = new Image();
     img.onload = function() {
-        bitmap = new createjs.Bitmap(img);
+        var bitmap = new createjs.Bitmap(img);
         callback(name, bitmap, args);
     }
     img.src = 'data:image/svg+xml;base64,' + window.btoa(

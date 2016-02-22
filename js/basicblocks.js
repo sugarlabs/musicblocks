@@ -1,4 +1,4 @@
-// Copyright (c) 2014,15 Walter Bender
+// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -641,6 +641,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     setchromaBlock.adjustWidthToLabel();
     setchromaBlock.oneArgBlock();
     setchromaBlock.defaults.push(100);
+
+    var settranslucencyBlock = new ProtoBlock('settranslucency');
+    settranslucencyBlock.palette = palettes.dict['pen'];
+    blocks.protoBlockDict['settranslucency'] = settranslucencyBlock;
+    settranslucencyBlock.staticLabels.push(_('set translucency'));
+    settranslucencyBlock.adjustWidthToLabel();
+    settranslucencyBlock.oneArgBlock();
+    settranslucencyBlock.defaults.push(50);
 
     var setpensizeBlock = new ProtoBlock('setpensize');
     setpensizeBlock.palette = palettes.dict['pen'];
