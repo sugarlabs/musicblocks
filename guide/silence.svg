@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="svg4075"
+   viewBox="0 0 234 130"
+   height="36.688889mm"
+   width="66.040001mm">
+  <defs
+     id="defs4077" />
+  <metadata
+     id="metadata4080">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3058"
+     d="m 19,58.999992 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 80,0 8,0 a 8,8 0 0 1 8,8 l 0,8 0,8 0,8 a 8,8 0 0 1 -8,8.000004 l -8,0 -80,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8.000004 l 0,-8 z" />
+  <text
+     y="41.999992"
+     x="18"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3060">
+    <tspan
+       id="tspan3062"
+       y="69.999992"
+       x="132">silence</tspan>
+  </text>
+  <path
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3035"
+     d="M 1,16.999992 1,8.9999924 A 8,8 0 0 1 9,0.99999237 l 8,0 0,4.00000003 20,0 0,-4.00000003 18,0 40,0 8,0 a 8,8 0 0 1 8,8.00000003 l 0,7.9999996 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 10,10 0 0 0 -10,10 l 0,8 0,8 0,8 a 10,10 0 0 0 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,11.999998 0,8 a 8,8 0 0 1 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 z" />
+  <text
+     y="-7.6293945e-06"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text3037">
+    <tspan
+       id="tspan3039"
+       y="30.499992"
+       x="8">note</tspan>
+  </text>
+  <path
+     d="m 113,0.999994 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-72-7"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-5-1"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="148"
+     y="-5.6381837e-06">
+    <tspan
+       x="168"
+       y="25.999994"
+       id="tspan25-8-7-6">4</tspan>
+  </text>
+</svg>

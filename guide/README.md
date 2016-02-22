@@ -41,19 +41,28 @@ THE PITCH-TIME MATRIX
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg'</img>
 
+Music Blocks provides a widget, the Pitch-time Matrix, as a scaffold
+for getting started.
+
 Once you've launched Music Blocks in your browser, start by clicking
-on the Pitch-time Matrix that appears in the middle of the
+on the Pitch-time Matrix stack that appears in the middle of the
 screen. (For the moment, ignore the Start block.) You'll see a grid
 organized vertically by pitch and horizontally by rhythm.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg'</img>
 
-Because the matrix had three pitch blocks, you see three rows, one for
-each pitch. (A fourth row at the bottom is used for specifying the
-rhythms associated with each note.)
+The default matrix has five pitch blocks, hence, you will see five rows,
+one for each pitch. (A sixth row at the bottom is used for specifying
+the rhythms associated with each note.)
 
-Because there is just one Rhythm block, which specifies three quarter
-notes, there are just three columns for selecting notes.
+Also by default, there are two Rhythm blocks, which specifies six
+quarter notes followed by one half note. Since the Rhythm blocks are
+inside of a Repeat block, there are fourteen (2 x 7) columns for
+selecting notes.
+
+Note that the matrix in the figure above has three Pitch blocks and
+one Rhythm block, which is used to create a 3 x 3 grid of pitch and
+time.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg'</img>
 
@@ -71,26 +80,29 @@ to right): D4 E4 G4.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg'
-height="36"</img> Once you have a group of notes (a "chunk") that you like, click on the
-Save button (just to the right of the Play button). This will create a
-stack of blocks that can used to play these same notes
-programmatically. (More on that below.)
+height="36"</img> Once you have a group of notes (a "chunk") that you
+like, click on the Save button (just to the right of the Play
+button). This will create a stack of blocks that can used to play
+these same notes programmatically. (More on that below.)
 
 You can rearrange the selected notes in the grid and safe other chunks
 as well.
 
 <img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg' height="36"</img> Or hide the grid by clicking on the Close button (the
-right-most button in the top row of the grid.)
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg'
+height="36"</img> Or hide the grid by clicking on the Close button
+(the right-most button in the top row of the grid.)
 
 <img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg' height="36"</img> There is also an Erase
-button that will clear the grid.
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg'
+height="36"</img> There is also an Erase button that will clear the
+grid.
 
 Don't worry. You can reopen the grid at anytime and since you can
 define as many chunks as you want, feel free to experiment.
 
-Tip: You can put a chunk inside a Pitch-time Matrix block to generate the matrix to corresponds to that chunk.
+Tip: You can put a chunk inside a Pitch-time Matrix block to generate
+the matrix to corresponds to that chunk.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
 
@@ -130,8 +142,6 @@ a Text block.
 The octave is specified using a number block and is restricted to
 whole numbers. In the case where the pitch name is specified by
 frequency, the octave is ignored.
-
-Note that the rest keyword used in a Pitch block will not be voiced.
 
 About the Rhythm Block
 ----------------------
@@ -179,12 +189,17 @@ Using individual notes in the matrix
 You can also use individual notes when defining the grid. These blocks
 will expand into rhythm blocks with corresponding values.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg'</img>
+
+A Silence block can be used in combination with the Note block to
+create "rests".
+
 PROGRAMMING WITH MUSIC
 ----------------------
 
 The remainder of this guide discusses how to use the chunks created by
-the Pitch-time Matrix when programming (You can also program
-with chunks you create and/or modify by hand).
+the Pitch-time Matrix when programming (You can also program with
+chunks you create and/or modify by hand).
 
 1. A chunk of notes
 --------------------
@@ -312,16 +327,21 @@ And even more interesting if we bring the various voices offset in time.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg'</img>
 
-We can also launch the phrases (chunks) interactively. In this case, when the mouse is in the lower-left quadrant, `chunk` is played; lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and upper-right quadrant, `chunk3`.
+We can also launch the phrases (chunks) interactively. In this case,
+when the mouse is in the lower-left quadrant, `chunk` is played;
+lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
+upper-right quadrant, `chunk3`.
 
 4. Adding graphics
 ------------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'</img>
 
-Turtle graphics can be combined with the music blocks. In this
-example, each time the pitch is raised by one half step, the pen size
-decreases and the pen color increases.
+Turtle graphics can be combined with the music blocks. By placing
+graphics blocks, e.g., Forward, inside of Note blocks, the graphics
+stay in sync with the music. In this example, each time the pitch is
+raised by one half step, the pen size decreases and the pen color
+increases.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
 
@@ -335,7 +355,7 @@ the graphics commands inside of note blocks.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg'</img>
 
 In this example, because the computation and graphics are more
-complex, a "drift" block is used to decouple the graphics from the
+complex, a Free-time block is used to decouple the graphics from the
 master clock.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
