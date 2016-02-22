@@ -298,8 +298,8 @@ define(function (require) {
         pluginsImages = {};
 
         function findBlocks() {
-            var x = 100;
-	    var y = 100;
+            var x = 100 * musicBlocksScale;
+	    var y = 100 * musicBlocksScale;
             logo.showBlocks();
             for (var blk in blocks.blockList) {
                 var myBlock = blocks.blockList[blk];
@@ -324,7 +324,7 @@ define(function (require) {
                     }
 		    x += 200 * musicBlocksScale;
 		    if (x > (canvas.width - 100) / (musicBlocksScale)) {
-			x = 100;
+			x = 100 * musicBlocksScale;
 			y += 100 * musicBlocksScale;
                     }
                 }
