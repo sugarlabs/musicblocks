@@ -337,15 +337,13 @@ upper-right quadrant, `chunk3`.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'</img>
 
-Turtle graphics can be combined with the music blocks. By placing
-graphics blocks, e.g., Forward, inside of Note blocks, the graphics
-stay in sync with the music. In this example, each time the pitch is
-raised by one half step, the pen size decreases and the pen color
-increases.
-
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
 
-The output of the program after running five times.
+Turtle graphics can be combined with the music blocks. By placing
+graphics blocks, e.g., Forward and Right, inside of Note blocks, the graphics
+stay in sync with the music. In this example, the turtle moves forward each time a quarter note is played. It turns right during the eighth note. The pitch is
+raised by one half step, the pen size decreases, and the pen color
+increases at each step in the inner repeat loop.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg'</img>
 
