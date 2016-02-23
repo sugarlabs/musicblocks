@@ -1453,13 +1453,13 @@ function changeLabel(myBlock) {
         myBlock.label = docById('textLabel');
     } else if (myBlock.name === 'solfege') {
         var type = 'solfege';
-        const SOLFNOTES = [_('ti'), _('la'), _('sol'), _('fa'), _('mi'), _('re'), _('do')];
+        const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
         const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
         if (myBlock.value != null) {
             if (SOLFNOTES.indexOf(myBlock.value) !== -1) {
                 var selectednote = myBlock.value;
                 var selectedattr = '♮';
-            } else if (myBlock.value.slice(0, 3) === _('sol')) {
+            } else if (myBlock.value.slice(0, 3) === 'sol') {
                 var selectednote = 'sol';
 		if (myBlock.value.length === 4) {
                     var selectedattr = myBlock.value[3];
