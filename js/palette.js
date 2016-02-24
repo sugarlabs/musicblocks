@@ -33,7 +33,6 @@ function maxPaletteHeight(menuSize, scale) {
 
 
 function paletteBlockButtonPush(name, arg) {
-    // console.log('paletteBlockButtonPush: ' + name + ' ' + arg);
     var blk = paletteBlocks.makeBlock(name, arg);
     return blk;
 }
@@ -174,6 +173,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.showPalette = function (name) {
         for (var i in this.dict) {
             if (this.dict[i] === this.dict[name]) {
+                this.dict[name].resetLayout();
                 this.dict[name].showMenu(true);
                 this.dict[name].showMenuItems(true);
             } else {
@@ -271,6 +271,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 this.stage.removeChild(this.dict[name].protoContainers[item]);
                 this.stage.addChild(this.dict[name].protoContainers[item]);
             }
+	    this.dict[name].resetLayout();
         }
         this.refreshCanvas();
     }
@@ -341,6 +342,7 @@ function loadPaletteButtonHandler(palettes, name) {
         setTimeout(function() {
             locked = false;
         }, 500);
+
         palettes.showPalette(name);
         palettes.refreshCanvas();
     });
@@ -507,8 +509,8 @@ function PaletteModel(palette, palettes, name) {
                     label = blkname;
                 }
             }
-            if (['do', 'nameddo', 'namedbox', 'namedcalc', 'doArg', 'calcArg', 'nameddoArg', 'namedcalcArg'].indexOf(protoBlock.name) != -1
-             && label.length > 8) {
+
+            if (['do', 'nameddo', 'namedbox', 'namedcalc', 'doArg', 'calcArg', 'nameddoArg', 'namedcalcArg'].indexOf(protoBlock.name) != -1 && label.length > 8) {
                 label = label.substr(0, 7) + '...';
             }
 
@@ -575,9 +577,9 @@ function PaletteModel(palette, palettes, name) {
                          PALETTESTROKECOLORS[protoBlock.palette.name])
                     .replace('block_label', label);
             }
+
             for (var i = 0; i <= protoBlock.args; i++) {
-                artwork = artwork.replace('arg_label_' + i,
-                                          protoBlock.staticLabels[i] || '');
+                artwork = artwork.replace('arg_label_' + i, protoBlock.staticLabels[i] || '');
             }
 
             // TODO: use ES6 format so there is less "X: X"
@@ -588,8 +590,7 @@ function PaletteModel(palette, palettes, name) {
                 height: this.calculateHeight(blk, blkname),
                 label: label,
                 artwork: artwork,
-                artwork64: 'data:image/svg+xml;base64,'
-                    + window.btoa(unescape(encodeURIComponent(artwork))),
+                artwork64: 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))),
                 docks: docks,
                 image: block.image,
                 scale: block.scale,
@@ -679,12 +680,7 @@ function PopdownPalette(palettes) {
                     // Move the drag group under the cursor.
                     paletteBlocks.findDragGroup(newBlock);
                     for (var i in paletteBlocks.dragGroup) {
-                        paletteBlocks.moveBlockRelative(
-                            paletteBlocks.dragGroup[i],
-                            Math.round(event.clientX / palette.palettes.scale)
-                                - paletteBlocks.stage.x,
-                            Math.round(event.clientY / palette.palettes.scale)
-                                - paletteBlocks.stage.y);
+                        paletteBlocks.moveBlockRelative(paletteBlocks.dragGroup[i], Math.round(event.clientX / palette.palettes.scale) - paletteBlocks.stage.x, Math.round(event.clientY / palette.palettes.scale) - paletteBlocks.stage.y);
                     }
                     // Dock with other blocks if needed
                     blocks.blockMoved(newBlock);
@@ -725,11 +721,6 @@ function Palette(palettes, name) {
     this.FadedUpButton = null;
     this.FadedDownButton = null;
     this.count = 0;
-    this.shiftOnRestore = 0;
-
-    this.setShiftOnRestore = function(n) {
-	this.shiftOnRestore = n * STANDARDBLOCKHEIGHT * this.palettes.scale;
-    }
 
     this.makeMenu = function(createHeader) {
         if (this.menuContainer == null) {
@@ -909,6 +900,40 @@ function Palette(palettes, name) {
         this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
     }
 
+    this.resetLayout = function() {
+	// Account for menu toolbar
+        if (this.menuContainer == null) {
+            console.log('MENU NOT READY');
+            return;
+	}
+
+        for (var i in this.protoContainers) {
+            this.protoContainers[i].y -= this.scrollDiff;
+	}
+
+        this.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
+        var items = [];
+        // Reverse order
+        for (var i in this.protoContainers) {
+            items.push(this.protoContainers[i]);
+        }
+        var n = items.length;
+        for (var j = 0; j < n; j++) {
+            var i = items.pop();
+            i.x = this.menuContainer.x;
+            i.y = this.y;
+            var bounds = i.getBounds();
+            if (bounds != null) {
+                // Pack them in a bit tighter
+                this.y += bounds.height - (STANDARDBLOCKHEIGHT * 0.1);
+            }
+        }
+
+        for (var i in this.protoContainers) {
+            this.protoContainers[i].y += this.scrollDiff;
+	}
+    }
+
     this.updateMenu = function(hide) {
         if (this.menuContainer == null) {
             this.makeMenu(false);
@@ -929,8 +954,7 @@ function Palette(palettes, name) {
                 this.protoContainers[b.modname].snapToPixelEnabled = true;
 
                 this.protoContainers[b.modname].x = this.menuContainer.x;
-                this.protoContainers[b.modname].y = this.menuContainer.y
-                    + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
+                this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
                 this.palettes.stage.addChild(this.protoContainers[b.modname]);
                 this.protoContainers[b.modname].visible = false;
 
@@ -994,8 +1018,7 @@ function Palette(palettes, name) {
                     b.modname, processFiller, [b, blk]);
             } else {
                 this.protoContainers[b.modname].x = this.menuContainer.x;
-                this.protoContainers[b.modname].y = this.menuContainer.y
-                    + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
+                this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
                 this.y += Math.ceil(b.height * PROTOBLOCKSCALE);
             }
         }
@@ -1122,20 +1145,20 @@ function Palette(palettes, name) {
             return;
         }
         if (this.scrollDiff + diff > 0 && direction > 0) {
-            var x = -this.scrollDiff;
-            if (x === 0) {
+            var dy = -this.scrollDiff;
+            if (dy === 0) {
                 this.downButton.visible = true;
                 this.upButton.visible = false;
                 this.FadedUpButton.visible = true;
                 this.FadedDownButton.visible = false;
                 return;
             }
-            this.scrollDiff += x;
+            this.scrollDiff += dy;
             this.FadedDownButton.visible = false;
             this.downButton.visible = true;
 
             for (var i in this.protoContainers) {
-                this.protoContainers[i].y += x;
+                this.protoContainers[i].y += dy;
                 this.protoContainers[i].visible = true;
 
                 if (this.scrollDiff === 0) {
@@ -1146,8 +1169,8 @@ function Palette(palettes, name) {
                 }
             }
         } else if (this.y + this.scrollDiff + diff < h && direction < 0) {
-            var x = -this.y + h - this.scrollDiff;
-            if (x === 0) {
+            var dy = -this.y + h - this.scrollDiff;
+            if (dy === 0) {
                 this.upButton.visible = true;
                 this.downButton.visible = false;
                 this.FadedDownButton.visible = true;
@@ -1159,7 +1182,7 @@ function Palette(palettes, name) {
             this.upButton.visible = true;
 
             for (var i in this.protoContainers) {
-                this.protoContainers[i].y += x;
+                this.protoContainers[i].y += dy;
                 this.protoContainers[i].visible = true;
             }
 
@@ -1442,7 +1465,6 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
         // Put the protoblock back on the palette...
         if (pressed && moved) {
             restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
-	    palette.shiftOnRestore = 0;
             pressed = false;
             moved = false;
         }
@@ -1583,7 +1605,10 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
 function restoreProtoblock(palette, name, x, y) {
     // Return protoblock we've been dragging back to the palette.
     palette.protoContainers[name].x = x;
-    palette.protoContainers[name].y = y + palette.shiftOnRestore;
+    palette.protoContainers[name].y = y;
+
+    console.log('reset palette layout');
+    palette.resetLayout();
 }
 
 
