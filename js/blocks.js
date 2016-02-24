@@ -1560,7 +1560,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 if (value !== _('action')) {
                     console.log('calling newNameddoBlock with value ' + value);
                     // TODO: are there return or arg blocks?
-                    this.newNameddoBlock(value, false, false, true);
+                    this.newNameddoBlock(value, false, false);
                     this.palettes.updatePalettes();
                 }
             }
@@ -1941,7 +1941,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
     }
 
-    this.newNameddoBlock = function (name, hasReturn, hasArgs, shift) {
+    this.newNameddoBlock = function (name, hasReturn, hasArgs) {
         // Depending upon the form of the associated action block, we
         // want to add a named do, a named calc, a named do w/args, or
         // a named calc w/args.
@@ -1966,11 +1966,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             var myDoBlock = new ProtoBlock('nameddo');
             this.protoBlockDict['myDo_' + name] = myDoBlock;
             myDoBlock.palette = this.palettes.dict['actions'];
-            // FIXME: We need to sort this out with the other styles
-            // of action block.
-            if (shift) {
-		myDoBlock.palette.setShiftOnRestore(1);
-            }
             myDoBlock.defaults.push(name);
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
