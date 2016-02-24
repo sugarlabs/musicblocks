@@ -116,7 +116,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Regenerate all of the artwork at the new scale.
         for (var blk = 0; blk < this.blockList.length; blk++) {
-	     if (this.blockList[blk].trash == false) {
+	     if (!this.blockList[blk].trash) {
                  this.blockList[blk].resize(scale);
 	     }
         }

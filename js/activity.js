@@ -298,34 +298,36 @@ define(function (require) {
         pluginsImages = {};
 
         function findBlocks() {
-            var x = 100 * musicBlocksScale;
-	    var y = 100 * musicBlocksScale;
             logo.showBlocks();
+            var x = 100 * musicBlocksScale;
+            var y = 100 * musicBlocksScale;
             for (var blk in blocks.blockList) {
-                var myBlock = blocks.blockList[blk];
-                if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
-                    if (!myBlock.collapsed) {
-                        myBlock.collapseToggle();
-		    }
-		}
-
-		if (myBlock.connections[0] == null) {
-                    var dx = x - myBlock.container.x;
-		    var dy = y - myBlock.container.y;
-		    blocks.moveBlockRelative(blk, dx, dy);
-		    blocks.findDragGroup(blk);
-                    if (blocks.dragGroup.length > 0) {
-                        for (var b = 0; b < blocks.dragGroup.length; b++) {
-                            var bblk = blocks.dragGroup[b];
-                            if (b !== 0) {
-                                blocks.moveBlockRelative(bblk, dx, dy);
-                            }
+                if (!blocks.blockList[blk].trash) {
+                    var myBlock = blocks.blockList[blk];
+                    if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                        if (!myBlock.collapsed) {
+                            myBlock.collapseToggle();
                         }
                     }
-		    x += 200 * musicBlocksScale;
-		    if (x > (canvas.width - 100) / (musicBlocksScale)) {
-			x = 100 * musicBlocksScale;
-			y += 100 * musicBlocksScale;
+
+                    if (myBlock.connections[0] == null) {
+                        var dx = x - myBlock.container.x;
+                        var dy = y - myBlock.container.y;
+                        blocks.moveBlockRelative(blk, dx, dy);
+                        blocks.findDragGroup(blk);
+                        if (blocks.dragGroup.length > 0) {
+                            for (var b = 0; b < blocks.dragGroup.length; b++) {
+                                var bblk = blocks.dragGroup[b];
+                                if (b !== 0) {
+                                    blocks.moveBlockRelative(bblk, dx, dy);
+                                }
+                            }
+                        }
+                        x += 200 * musicBlocksScale;
+                        if (x > (canvas.width - 100) / (musicBlocksScale)) {
+                            x = 100 * musicBlocksScale;
+                            y += 100 * musicBlocksScale;
+                        }
                     }
                 }
             }
