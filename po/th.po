@@ -1201,3 +1201,6 @@ msgstr ""
 
 msgid "free time"
 msgstr ""
+
+msgid "do re mi fa sol la ti"
+msgstr ""

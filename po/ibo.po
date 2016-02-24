@@ -1177,3 +1177,6 @@ msgstr "aka ekpe"
 
 msgid "silence"
 msgstr ""
+
+msgid "do re mi fa sol la ti"
+msgstr ""
