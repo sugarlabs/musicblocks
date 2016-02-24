@@ -56,8 +56,25 @@
           -->
 
         $(function() {
-            $("#matrix").draggable();
-        });
+            $("#matrix").draggable({
+            
+            start: function() {
+            // if we're scrolling, don't start and cancel drag
+                if ($(this).data("scrolled")) {
+                    $(this).data("scrolled", false).trigger("mouseup");
+                    return false;
+                }
+            }
+
+            }).find("*").andSelf().scroll(function() {               
+            // bind to the scroll event on current elements, and all children.
+            //  we have to bind to all of them, because scroll doesn't propagate.
+
+             //set a scrolled data variable for any parents that are draggable, so they don't drag on scroll.
+            $(this).parents(".ui-draggable").data("scrolled", true);
+
+            });
+        }); 
 
         (function($) {
             $.fn.fixMe = function() {
@@ -172,7 +189,9 @@
     </div>
     <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
     <canvas hidden id="music" width="700"></canvas>
-    <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
+     <div id="matrix" >
+        <div  class="content" overflow-x="auto" onmousedown="moveMatrix(event)" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)" ></div>
+    </div>
     <div id="helpElem"></div>
 
 </body>
