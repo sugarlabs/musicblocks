@@ -1348,3 +1348,7 @@ msgstr ""
 #. TRANS: tiempo libre
 msgid "free time"
 msgstr ""
+
+#. TRANS: "do re mi fa sol la si"
+msgid "do re mi fa sol la ti"
+msgstr ""

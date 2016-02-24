@@ -1202,24 +1202,5 @@ msgstr "fijar font"
 msgid "free time"
 msgstr "tiempo libre"
 
-msgid "do"
-msgstr ""
-
-msgid "re"
-msgstr ""
-
-msgid "mi"
-msgstr ""
-
-msgid "fa"
-msgstr ""
-
-msgid "sol"
-msgstr ""
-
-msgid "la"
-msgstr ""
-
-msgid "ti"
-msgstr "si"
-
+msgid "do re mi fa sol la ti"
+msgstr "do re mi fa sol la si"
