@@ -59,7 +59,7 @@ function Matrix() {
     this.numberOfNotesToPlay = 0;
     this.octave = 0;
     this.matrixContainer = null;
-    this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+    // this.notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
 
     this.matrixHasTuplets = false;
 
@@ -79,7 +79,7 @@ function Matrix() {
 
     // These arrays get created each time the matrix is built.
     this.rowBlocks = [];  // pitch-block number
-   this.colBlocks = [];  // [rhythm-block number, note number]
+    this.colBlocks = [];  // [rhythm-block number, note number]
 
     // This array is preserved between sessions.
     // We populate the blockMap whenever a note is selected and
@@ -756,6 +756,8 @@ function Matrix() {
         // we've played all of the notes in the column span.
         if (cell.colSpan > 1) {
             this.spanCounter = 1;
+            var tupletCell = table.rows[this.rowIndex - 2].cells[this.colIndex];
+            tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
         } else {
             this.spanCounter = 0;
             this.colIndex += 1;
