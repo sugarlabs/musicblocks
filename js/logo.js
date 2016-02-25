@@ -2904,7 +2904,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             if (!logo.lilypondSaveOnly && duration > 0) {
                                 if (logo.oscList[turtle].length > 0) {
                                     console.log(last(logo.noteFrequencies[turtle]));
-                                    if (insideChord > 0) {
+                                    if (notes.length > 1) {  // (insideChord > 0) {
                                         logo.errorMsg( last(logo.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
                                     logo.synth.trigger([last(logo.noteFrequencies[turtle])], beatValue, last(logo.oscList[turtle]));
