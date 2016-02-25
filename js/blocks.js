@@ -1602,8 +1602,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         label = label.substr(0, 7) + '...';
                     }
                     me.blockList[thisBlock].text.text = label;
+		}
                 this.makeNewBlock('text', postProcess, [thisBlock, value]);
-            } else if (myBlock.docks[i + 1][2] === 'solfegein') {
+	    } else if (myBlock.docks[i + 1][2] === 'solfegein') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
