@@ -351,40 +351,12 @@ function loadPaletteButtonHandler(palettes, name) {
 }
 
 
-// FIXME: this should be calculated
-var EXPANDBYTWO = [];
-const EXPANDBYONE = ['repeat', 'forever', 'media', 'camera', 'video', 'action',
-                    'start', 'and', 'or', 'flat', 'sharp', 'settransposition',
-                    'tuplet', 'rhythmicdot', 'note', 'multiplybeatfactor',
-                    'dividebeatfactor', 'notation', 'playfwd', 'playbwd',
-                    'duplicatenotes', 'fill', 'hollowline', 'drum', 'osctime',
-                    'invert', 'matrix', 'skipnotes', 'setbpm', 'tie', 'slur',
-                    'staccato', 'setnotevolume2', 'crescendo', 'tuplet2',
-                    'drift', 'swing'];
-
 // Kinda a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {
     this.palette = palette;
     this.palettes = palettes;
     this.name = name;
     this.blocks = [];
-
-    this.calculateHeight = function (blk, blkname) {
-        var size = this.palette.protoList[blk].size;
-        if (['if', 'while', 'until', 'ifthenelse', 'waitFor']
-            .indexOf(blkname) != -1) {
-            // Some blocks are not shown full-size on the palette.
-            size = 1;
-        } else if (EXPANDBYONE.indexOf(blkname) != -1
-                || this.palette.protoList[blk].image) {
-                    size += 1;
-        } else if (EXPANDBYTWO.indexOf(blkname) != -1
-                || this.palette.protoList[blk].image) {
-                    size += 2;
-        }
-        return STANDARDBLOCKHEIGHT * size
-               * this.palette.protoList[blk].scale / 2.0;
-    }
 
     this.update = function () {
         this.blocks = [];
@@ -589,7 +561,7 @@ function PaletteModel(palette, palettes, name) {
                 blk: blk,
                 blkname: blkname,
                 modname: modname,
-                height: this.calculateHeight(blk, blkname),
+                height: STANDARDBLOCKHEIGHT,
                 label: label,
                 artwork: artwork,
                 artwork64: 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))),
@@ -840,13 +812,8 @@ function Palette(palettes, name) {
     }
 
     this.getDownButtonY = function () {
-        var h = this.y;
-        var max = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
-        if (this.y > max) {
-            h = max;
-        }
-        // return this.menuContainer.y + h - STANDARDBLOCKHEIGHT / 2;
-        return this.menuContainer.y + h; // - STANDARDBLOCKHEIGHT * 3;
+        var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
+        return h + STANDARDBLOCKHEIGHT;
     }
 
     this.resizeEvent = function() {
@@ -877,7 +844,7 @@ function Palette(palettes, name) {
 
         if (this.background !== null) {
             this.background.removeAllChildren();
-        } else {
+        } else { 
             this.background = new createjs.Container();
             this.background.snapToPixelEnabled = true;
             this.background.visible = false;
