@@ -17,7 +17,7 @@ has been done in Chrome, but it should also work in Firefox (although
 you may need to disable hardware acceleration). You can run it from
 the [github
 repo](http://rawgit.com/walterbender/musicblocks/master/index.html) or
-github io](http://walterbender.github.io/musicblocks) or by
+[github io](http://walterbender.github.io/musicblocks) or by
 downloading a copy of the code and running directly from the file
 system of your computer. (Note that the [off-line
 branch](https://github.com/walterbender/musicblocks/archive/offline.zip)
