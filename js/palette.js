@@ -132,11 +132,11 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         }
     }
 
-    this.makePalettes = function() {
+    this.makePalettes = function(hide) {
         // First, an icon/button for each palette
         for (var name in this.dict) {
             if (name in this.buttons) {
-                this.dict[name].updateMenu(true);
+                this.dict[name].updateMenu(hide);
             } else {
                 this.buttons[name] = new createjs.Container();
                 this.buttons[name].snapToPixelEnabled = true;
@@ -214,15 +214,17 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     }
 
     this.updatePalettes = function(showPalette) {
-        this.makePalettes();
         if (showPalette) {
+            this.makePalettes(false);
             var myPalettes = this;
             setTimeout(function() {
+                myPalettes.dict[showPalette].resetLayout();
                 myPalettes.dict[showPalette].showMenu();
                 myPalettes.dict[showPalette].showMenuItems();
                 myPalettes.refreshCanvas();
-            }, 250);
+            }, 100);
         } else {
+	    this.makePalettes(true);
             this.refreshCanvas();
         }
     }
@@ -259,7 +261,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         delete this.buttons[name];
         delete this.dict[name];
         this.y -= this.cellSize;
-        this.makePalettes();
+        this.makePalettes(true);
     }
 
     this.bringToTop = function() {
@@ -1264,7 +1266,7 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     add('extras');
 
     // Define some globals.
-    palettes.makePalettes();
+    palettes.makePalettes(true);
     blocks = b;
 
     // Give the palettes time to load.

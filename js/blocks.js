@@ -1561,7 +1561,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     console.log('calling newNameddoBlock with value ' + value);
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
-                    this.palettes.updatePalettes();
+                    this.palettes.updatePalettes('actions');
                 }
             }
 
@@ -1602,7 +1602,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         label = label.substr(0, 7) + '...';
                     }
                     me.blockList[thisBlock].text.text = label;
-                }
                 this.makeNewBlock('text', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'solfegein') {
                 postProcess = function (args) {
@@ -1969,6 +1968,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             myDoBlock.defaults.push(name);
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
+            console.log('calling palette.add');
             myDoBlock.palette.add(myDoBlock, true);
             return true;
         } else {
