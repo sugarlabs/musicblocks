@@ -905,7 +905,6 @@ function Palette(palettes, name) {
     this.resetLayout = function() {
 	// Account for menu toolbar
         if (this.menuContainer == null) {
-            console.log('MENU NOT READY');
             return;
 	}
 
@@ -1597,8 +1596,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
         }
 
         // Put the protoblock back on the palette...
-        // console.log('RESTORING');
-        // restoreProtoblock(palette, blkname, saveX, saveY + palette.scrollDiff);
+	palette.resetLayout();
 
         palette.updateBlockMasks();
         palette.palettes.refreshCanvas();
@@ -1611,7 +1609,6 @@ function restoreProtoblock(palette, name, x, y) {
     palette.protoContainers[name].x = x;
     palette.protoContainers[name].y = y;
 
-    console.log('reset palette layout');
     palette.resetLayout();
 }
 
