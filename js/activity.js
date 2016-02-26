@@ -237,6 +237,7 @@ define(function (require) {
             [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
             [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'header-icons/hide-blocks-button.svg'],
             [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
+            [_('Home'), _('Bring all blocks home to the center of the screen.'), 'header-icons/go-home-button.svg'],
             [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
@@ -1817,6 +1818,7 @@ define(function (require) {
                 ['palette', changePaletteVisibility, _('Show/hide palettes')],
                 ['hide-blocks', changeBlockVisibility, _('Show/hide blocks')],
                 ['collapse-blocks', toggleCollapsibleStacks, _('Expand/collapse collapsable blocks')],
+                ['go-home', findBlocks, _('Home')],
                 ['help', showHelp, _('Help')]
             ];
 
