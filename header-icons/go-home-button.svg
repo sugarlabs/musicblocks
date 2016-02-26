@@ -1,11 +1,71 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
-  <!ENTITY fill_color "#FFFFFF">
-  <!ENTITY stroke_color "#010101">
-]>
-<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55">
-  <g id="go-home">
-    <path d="M 27.5 15.96256 L 8.48131 32.4005 L 8.55256 48.0374 L 17 48.0052 L 17 30.9243 L 26 30.9243 L 26 48.0052 L 47.59 48.0052 L 47.4221 32.2792 Z M 31.5 30.9243 l 8 0 l 0 8 l -8 0 Z" stroke="none" fill="&fill_color;" stroke-linecap="round" stroke-width="3.5" />
-    <path d="M 5.48131 27.4005 L 27.5 8.96256 L 38.8997 18.0775 L 38.8637 9.26122 L 42.8936 9.27163 L 42.8832 21.3246 L 50.4221 27.2792" stroke="&fill_color;" fill="none" stroke-linecap="round" stroke-width="4.5" />
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="55"
+   height="55"
+   id="svg2"
+   version="1.1">
+  <metadata
+     id="metadata13">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs11" />
+  <g
+     id="go-home">
+    <path
+       d="M 27.5 15.96256 L 8.48131 32.4005 L 8.55256 48.0374 L 17 48.0052 L 17 30.9243 L 26 30.9243 L 26 48.0052 L 47.59 48.0052 L 47.4221 32.2792 Z M 31.5 30.9243 l 8 0 l 0 8 l -8 0 Z"
+       stroke="none"
+       fill="#FFFFFF"
+       stroke-linecap="round"
+       stroke-width="3.5"
+       id="path5" />
+    <path
+       d="M 5.48131 27.4005 L 27.5 8.96256 L 38.8997 18.0775 L 38.8637 9.26122 L 42.8936 9.27163 L 42.8832 21.3246 L 50.4221 27.2792"
+       stroke="#FFFFFF"
+       fill="none"
+       stroke-linecap="round"
+       stroke-width="4.5"
+       id="path7" />
+  </g>
+  <g
+     transform="matrix(0.75,0,0,0.75,23.5,18.001394)"
+     id="g4391">
+    <path
+       style="fill:#ed001d;fill-opacity:1;fill-rule:nonzero;stroke:#ed001d;stroke-width:2.84546471;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path2985"
+       d="m 26.577267,24.995205 a 9.5772676,9.5772676 0 0 0 -19.1545343,0 9.5772676,9.5772676 0 1 0 19.1545343,0 z" />
+    <g
+       id="g4374"
+       transform="translate(-0.50000015,0.1382739)">
+      <path
+         id="path4135"
+         d="m 17.501661,14.750042 0,7.409769 3.510699,-4.388373 -3.510699,4.388373 -3.510699,-4.388373"
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.75534916px;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+      <path
+         id="path4135-0"
+         d="m 17.501661,34.969692 0,-7.409771 3.510699,4.388374 -3.510699,-4.388374 -3.510698,4.388374"
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.75534916px;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+      <path
+         id="path4135-3"
+         d="m 27.609825,24.861527 -7.409771,0 4.388375,3.510698 -4.388375,-3.510698 4.388375,-3.510699"
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.75534916px;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+      <path
+         id="path4135-7"
+         d="m 7.390175,24.861527 7.40977,0 -4.388373,3.510698 4.388373,-3.510698 -4.388373,-3.510699"
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.75534916px;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+    </g>
   </g>
 </svg>
