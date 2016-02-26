@@ -158,7 +158,6 @@ define(function (require) {
             PALETTESTROKECOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] - 30, PALETTECOLORS[p][2]);
             PALETTEHIGHLIGHTCOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] + 10, PALETTECOLORS[p][2]);
             HIGHLIGHTSTROKECOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] - 50, PALETTECOLORS[p][2]);
-            // console.log(p + ' ' + PALETTEFILLCOLORS[p]  + ' ' + PALETTESTROKECOLORS[p] + ' ' + PALETTEHIGHLIGHTCOLORS[p] + ' ' + HIGHLIGHTSTROKECOLORS[p]);
         }
 
         pluginObjs = {
@@ -189,9 +188,6 @@ define(function (require) {
         var scrollY = 0;
 
         // default values
-        const CAMERAVALUE = '##__CAMERA__##';
-        const VIDEOVALUE = '##__VIDEO__##';
-
         const DEFAULTDELAY = 500; // milleseconds
         const TURTLESTEP = -1; // Run in step-by-step mode
 
@@ -199,7 +195,7 @@ define(function (require) {
         var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
         if (blockscale === -1) {
             blockscale = 1;
-	}
+        }
 
         // Time when we hit run
         var time = 0;
@@ -240,7 +236,7 @@ define(function (require) {
             [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
             [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'header-icons/hide-blocks-button.svg'],
             [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
-            [_('Home'), _('Bring all blocks home to the center of the screen.'), 'header-icons/go-home-button.svg'],
+            [_('Home'), _('Return all blocks to the center of the screen.'), 'header-icons/go-home-button.svg'],
             [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
             [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
