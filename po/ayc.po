@@ -1352,3 +1352,9 @@ msgstr ""
 #. TRANS: "do re mi fa sol la si"
 msgid "do re mi fa sol la ti"
 msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "Return all blocks to the center of the screen."
+msgstr ""
