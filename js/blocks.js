@@ -37,6 +37,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.trashcan = trashcan;
     this.updateStage = updateStage;
 
+    // We keep a list of stacks in the trash.
+    this.trashStacks = [];
+
     // We keep a dictionary for the proto blocks,
     this.protoBlockDict = {}
     // and a list of the blocks we create.
@@ -2936,6 +2939,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
 function sendStackToTrash(blocks, myBlock) {
     var thisBlock = blocks.blockList.indexOf(myBlock);
+
+    // Add this block to the list of blocks in the trash so we can
+    // undo this action.
+    blocks.trashStacks.push(thisBlock);
 
     // Disconnect block.
     var b = myBlock.connections[0];
