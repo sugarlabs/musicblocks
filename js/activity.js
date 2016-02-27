@@ -340,7 +340,7 @@ define(function (require) {
             }
             // Blocks are all home, so reset go-home-button.
             homeButtonContainers[0].visible = false;
-	    homeButtonContainers[1].visible = true;
+            homeButtonContainers[1].visible = true;
         }
 
         function allClear() {
@@ -1152,21 +1152,32 @@ define(function (require) {
         }
 
         function restoreTrash() {
+            // Restore last stack pushed to trashStack.
             var dx = 0;
             var dy = -cellSize * 3; // Reposition blocks about trash area.
-            for (var blk in blocks.blockList) {
-                if (blocks.blockList[blk].trash) {
-                    blocks.blockList[blk].trash = false;
-                    blocks.moveBlockRelative(blk, dx, dy);
-                    blocks.blockList[blk].show();
-                    if (blocks.blockList[blk].name === 'start' || blocks.blockList[blk].name === 'drum') {
-                        turtle = blocks.blockList[blk].value;
-                        turtles.turtleList[turtle].trash = false;
-                        turtles.turtleList[turtle].container.visible = true;
-                    }
-                }
+
+            if (blocks.trashStacks.length === 0) {
+                console.log('Trash is empty--nothing to do');
+                return;
             }
-            update = true;
+
+            var thisBlock = blocks.trashStacks.pop();
+            if (blocks.blockList[thisBlock].name === 'start' || blocks.blockList[thisBlock].name === 'drum') {
+                turtle = blocks.blockList[thisBlock].value;
+                turtles.turtleList[turtle].trash = false;
+                turtles.turtleList[turtle].container.visible = true;
+            }
+
+            // put drag group in trash
+            blocks.findDragGroup(thisBlock);
+            for (var b = 0; b < blocks.dragGroup.length; b++) {
+                var blk = blocks.dragGroup[b];
+                console.log('Restoring ' + blocks.blockList[blk].name + ' from the trash.');
+                blocks.blockList[blk].trash = false;
+                blocks.moveBlockRelative(blk, dx, dy);
+                blocks.blockList[blk].show();
+            }
+            blocks.refreshCanvas();
         }
 
         function deleteBlocksBox() {
@@ -1181,6 +1192,12 @@ define(function (require) {
             var dx = 0;
             var dy = cellSize * 3;
             for (var blk in blocks.blockList) {
+                // If this block is at the top of a stack, push it
+                // onto the trashStacks list.
+                if (blocks.blockList[blk].connections[0] == null) {
+                    blocks.trashStacks.push(blk);
+                }
+
                 blocks.blockList[blk].trash = true;
                 blocks.moveBlockRelative(blk, dx, dy);
                 blocks.blockList[blk].hide();
@@ -1858,15 +1875,15 @@ define(function (require) {
                 } else if (buttonNames[name][0] === 'go-home') {
                     homeButtonContainers = [];
                     homeButtonContainers.push(container);
-		    homeButtonContainersX = x;
-		    homeButtonContainersY = y;
+                    homeButtonContainersX = x;
+                    homeButtonContainersY = y;
                     var container2 = makeButton('go-home-faded-button', '', x, y, btnSize, 0);
                     loadButtonDragHandler(container2, x, y, buttonNames[name][1]);
                     homeButtonContainers.push(container2);
                     onscreenButtons.push(container2);
-		    homeButtonContainers[0].visible = false;
-		    homeButtonContainers[1].visible = true;
-		    blocks.setHomeContainers(homeButtonContainers);
+                    homeButtonContainers[0].visible = false;
+                    homeButtonContainers[1].visible = true;
+                    blocks.setHomeContainers(homeButtonContainers);
                 }
 
                 x += dx;
