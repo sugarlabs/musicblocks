@@ -104,6 +104,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     // Blocks that don't run when clicked.
     this.noRunBlocks = [];
 
+    this.homeButtonContainers = [];
     this.blockScale = DEFAULTBLOCKSCALE;
 
     // We need to know if we are processing a copy or save stack command.
@@ -182,7 +183,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
     // We need access to the go-home buttons.
     this.setHomeContainers = function (containers) {
-        this.homeContainer = containers;
+        this.homeButtonContainers = containers;
     }
 
     // set up copy/paste, dismiss, and copy-stack buttons
@@ -1078,8 +1079,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 myBlock.collapseContainer.y = y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
             if (myBlock.offScreen(canvas)) {
-                this.homeContainer[0].visible = true;
-                this.homeContainer[1].visible = false;
+                this.homeButtonContainers[0].visible = true;
+                this.homeButtonContainers[1].visible = false;
             }
         } else {
             console.log('no container yet');
@@ -1104,8 +1105,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 myBlock.collapseContainer.y += dy;
             }
             if (myBlock.offScreen(canvas)) {
-                this.homeContainer[0].visible = true;
-                this.homeContainer[1].visible = false;
+                this.homeButtonContainers[0].visible = true;
+                this.homeButtonContainers[1].visible = false;
             }
         } else {
             console.log('no container yet');
@@ -2805,8 +2806,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     this.blockList[thisBlock].container.y = blkData[3];
                     this.adjustTheseDocks.push(thisBlock);
                     if (blkData[2] < 0 || blkData[3] < 0 || blkData[2] > canvas.width || blkData[3] > canvas.height) {
-                        this.homeContainer[0].visible = true;
-                        this.homeContainer[1].visible = false;
+                        this.homeButtonContainers[0].visible = true;
+                        this.homeButtonContainers[1].visible = false;
                     }
                 }
             }
