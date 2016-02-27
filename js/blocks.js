@@ -180,6 +180,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
     }
 
+    // We need access to the go-home buttons.
+    this.setHomeContainers = function (containers) {
+        this.homeContainer = containers;
+    }
+
     // set up copy/paste, dismiss, and copy-stack buttons
     this.makeCopyPasteButtons = function (makeButton, updatePasteButton) {
         var blocks = this;
@@ -1072,6 +1077,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 myBlock.collapseContainer.x = x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
                 myBlock.collapseContainer.y = y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
+	    if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) {
+                this.homeContainer[0].visible = true;
+                this.homeContainer[1].visible = false;
+            }
         } else {
             console.log('no container yet');
         }
@@ -1093,6 +1102,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (myBlock.collapseContainer != null) {
                 myBlock.collapseContainer.x += dx;
                 myBlock.collapseContainer.y += dy;
+            }
+	    if (myBlock.container.x < 0 || myBlock.container.y < 0 || myBlock.container.x > canvas.width || myBlock.container.y > canvas.height) {
+                this.homeContainer[0].visible = true;
+                this.homeContainer[1].visible = false;
             }
         } else {
             console.log('no container yet');
@@ -2791,6 +2804,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     this.blockList[thisBlock].container.x = blkData[2];
                     this.blockList[thisBlock].container.y = blkData[3];
                     this.adjustTheseDocks.push(thisBlock);
+                    if (blkData[2] < 0 || blkData[3] < 0 || blkData[2] > canvas.width || blkData[3] > canvas.height) {
+                        this.homeContainer[0].visible = true;
+                        this.homeContainer[1].visible = false;
+                    }
                 }
             }
         }

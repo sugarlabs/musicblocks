@@ -179,6 +179,9 @@ define(function (require) {
         var stopTurtleContainer = null;
         var stopTurtleContainerX = 0;
         var stopTurtleContainerY = 0;
+        var homeContainer = [];
+        var homeContainerX = 0;
+        var homeContainerY = 0;
         var cameraID = null;
         var toLang = null;
         var fromLang = null;
@@ -333,6 +336,8 @@ define(function (require) {
             }
             blocksContainer.x = 0;
             blocksContainer.y = 0;
+            homeContainer[0].visible = false;
+	    homeContainer[1].visible = true;
         }
 
         function allClear() {
@@ -840,6 +845,9 @@ define(function (require) {
                     if (scrollBlockContainer) {
                         blocksContainer.x += event.stageX - lastCords.x;
                         blocksContainer.y += event.stageY - lastCords.y;
+                        // If we are dragging the blocks, should we highlight home button? Not unless we create blocks?
+			// homeContainer[0].visible = true;
+			// homeContainer[1].visible = false;
                         lastCords = {
                             x: event.stageX,
                             y: event.stageY
@@ -1847,6 +1855,18 @@ define(function (require) {
                     stopTurtleContainer = container;
                     stopTurtleContainerX = x;
                     stopTurtleContainerY = y;
+                } else if (buttonNames[name][0] === 'go-home') {
+                    homeContainer = [];
+                    homeContainer.push(container);
+		    homeContainerX = x;
+		    homeContainerY = y;
+                    var container2 = makeButton('go-home-faded-button', '', x, y, btnSize, 0);
+                    loadButtonDragHandler(container2, x, y, buttonNames[name][1]);
+                    homeContainer.push(container2);
+                    onscreenButtons.push(container2);
+		    homeContainer[0].visible = false;
+		    homeContainer[1].visible = true;
+		    blocks.setHomeContainers(homeContainer);
                 }
 
                 x += dx;
