@@ -179,9 +179,9 @@ define(function (require) {
         var stopTurtleContainer = null;
         var stopTurtleContainerX = 0;
         var stopTurtleContainerY = 0;
-        var homeContainer = [];
-        var homeContainerX = 0;
-        var homeContainerY = 0;
+        var homeButtonContainers = [];
+        var homeButtonContainersX = 0;
+        var homeButtonContainersY = 0;
         var cameraID = null;
         var toLang = null;
         var fromLang = null;
@@ -302,17 +302,13 @@ define(function (require) {
 
         function findBlocks() {
             logo.showBlocks();
+            blocksContainer.x = 0;
+            blocksContainer.y = 0;
             var x = 100 * musicBlocksScale;
             var y = 100 * musicBlocksScale;
             for (var blk in blocks.blockList) {
                 if (!blocks.blockList[blk].trash) {
                     var myBlock = blocks.blockList[blk];
-                    if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
-                        if (!myBlock.collapsed) {
-                            myBlock.collapseToggle();
-                        }
-                    }
-
                     if (myBlock.connections[0] == null) {
                         var dx = x - myBlock.container.x;
                         var dy = y - myBlock.container.y;
@@ -332,12 +328,19 @@ define(function (require) {
                             y += 100 * musicBlocksScale;
                         }
                     }
+                    /*
+                    // Collapse collapsible stacks.
+                    if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                        if (!myBlock.collapsed) {
+                            myBlock.collapseToggle();
+                        }
+                    }
+                    */
                 }
             }
-            blocksContainer.x = 0;
-            blocksContainer.y = 0;
-            homeContainer[0].visible = false;
-	    homeContainer[1].visible = true;
+            // Blocks are all home, so reset go-home-button.
+            homeButtonContainers[0].visible = false;
+	    homeButtonContainers[1].visible = true;
         }
 
         function allClear() {
@@ -845,9 +848,6 @@ define(function (require) {
                     if (scrollBlockContainer) {
                         blocksContainer.x += event.stageX - lastCords.x;
                         blocksContainer.y += event.stageY - lastCords.y;
-                        // If we are dragging the blocks, should we highlight home button? Not unless we create blocks?
-			// homeContainer[0].visible = true;
-			// homeContainer[1].visible = false;
                         lastCords = {
                             x: event.stageX,
                             y: event.stageY
@@ -1856,17 +1856,17 @@ define(function (require) {
                     stopTurtleContainerX = x;
                     stopTurtleContainerY = y;
                 } else if (buttonNames[name][0] === 'go-home') {
-                    homeContainer = [];
-                    homeContainer.push(container);
-		    homeContainerX = x;
-		    homeContainerY = y;
+                    homeButtonContainers = [];
+                    homeButtonContainers.push(container);
+		    homeButtonContainersX = x;
+		    homeButtonContainersY = y;
                     var container2 = makeButton('go-home-faded-button', '', x, y, btnSize, 0);
                     loadButtonDragHandler(container2, x, y, buttonNames[name][1]);
-                    homeContainer.push(container2);
+                    homeButtonContainers.push(container2);
                     onscreenButtons.push(container2);
-		    homeContainer[0].visible = false;
-		    homeContainer[1].visible = true;
-		    blocks.setHomeContainers(homeContainer);
+		    homeButtonContainers[0].visible = false;
+		    homeButtonContainers[1].visible = true;
+		    blocks.setHomeContainers(homeButtonContainers);
                 }
 
                 x += dx;
