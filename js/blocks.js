@@ -116,12 +116,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         // Regenerate all of the artwork at the new scale.
         for (var blk = 0; blk < this.blockList.length; blk++) {
-	     if (!this.blockList[blk].trash) {
+             if (!this.blockList[blk].trash) {
                  this.blockList[blk].resize(scale);
-	     }
+             }
         }
 
-	this.findStacks();
+        this.findStacks();
         for (var stack = 0; stack < this.stackList.length; stack++) {
             // Just in case the block list is corrupted, count iterations.
             this.loopCounter = 0;
@@ -1077,7 +1077,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 myBlock.collapseContainer.x = x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
                 myBlock.collapseContainer.y = y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
-	    if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) {
+            if (myBlock.offScreen(canvas)) {
                 this.homeContainer[0].visible = true;
                 this.homeContainer[1].visible = false;
             }
@@ -1092,7 +1092,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             this.copyButton.visible = false;
             this.saveStackButton.visible = false;
             this.dismissButton.visible = false;
-	    this.inLongPress = false;
+            this.inLongPress = false;
         }
 
         var myBlock = this.blockList[blk];
@@ -1103,7 +1103,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 myBlock.collapseContainer.x += dx;
                 myBlock.collapseContainer.y += dy;
             }
-	    if (myBlock.container.x < 0 || myBlock.container.y < 0 || myBlock.container.x > canvas.width || myBlock.container.y > canvas.height) {
+            if (myBlock.offScreen(canvas)) {
                 this.homeContainer[0].visible = true;
                 this.homeContainer[1].visible = false;
             }
@@ -1615,9 +1615,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         label = label.substr(0, 7) + '...';
                     }
                     me.blockList[thisBlock].text.text = label;
-		}
+                }
                 this.makeNewBlock('text', postProcess, [thisBlock, value]);
-	    } else if (myBlock.docks[i + 1][2] === 'solfegein') {
+            } else if (myBlock.docks[i + 1][2] === 'solfegein') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
@@ -2480,7 +2480,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 blkData[4][3] = null;
                 this.makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
                 break;
-		
+
                 // Named boxes and dos need private data.
             case 'namedbox':
                 postProcess = function (args) {

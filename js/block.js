@@ -67,6 +67,10 @@ function Block(protoblock, blocks, overrideName) {
     this.postProcess = null;
     this.postProcessArg = null;
 
+    this.offScreen = function (canvas) {
+        return !this.trash && this.connections[0] == null && (this.container.x < 0 || this.container.y < 55 || this.container.x > canvas.width || this.container.y > canvas.height);
+    }
+
     this.copySize = function() {
         this.size = this.protoblock.size;
     }
@@ -108,7 +112,7 @@ function Block(protoblock, blocks, overrideName) {
             this.container.updateCache();
         } catch (e) {
             console.log(e);
-	}
+        }
         this.blocks.refreshCanvas();
     }
 
@@ -134,9 +138,9 @@ function Block(protoblock, blocks, overrideName) {
         }
         try {
             this.container.updateCache();
-	} catch (e) {
+        } catch (e) {
             console.log(e);
-	}
+        }
         this.blocks.refreshCanvas();
     }
 
@@ -315,14 +319,14 @@ function Block(protoblock, blocks, overrideName) {
                 this.docks[i][0] = obj[1][i][0];
                 this.docks[i][1] = obj[1][i][1];
             }
-	} catch (e) {
+        } catch (e) {
             // FIXME: For some reason, ifthenelse blocks are missing
             // an arg in the obj dock after a rescale (sometimes).
             console.log(i + ' ' + e);
-	    console.log(this.name);
-	    console.log(this.docks);
-	    console.log(obj);
-	}
+            console.log(this.name);
+            console.log(this.docks);
+            console.log(obj);
+        }
     }
 
     this.imageLoad = function() {
@@ -453,21 +457,21 @@ function Block(protoblock, blocks, overrideName) {
                             myBlock.postProcess = null;
                         }
                     }
-		}
+                }
 
-		// Workaround for a race condition.
+                // Workaround for a race condition.
                 function createCache(myBlock) {
                     myBlock.bounds = myBlock.container.getBounds();
                     if (myBlock.bounds == null) {
-			console.log('block container for ' + thisBlock + ' not yet ready. (' + myBlock.name + ')');
-			setTimeout(function() {
+                        console.log('block container for ' + thisBlock + ' not yet ready. (' + myBlock.name + ')');
+                        setTimeout(function() {
                             createCache(myBlock);
-			}, 250);
-		    } else {
+                        }, 250);
+                    } else {
                         myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
                         finishProcess(myBlock);
-		    }
-		}
+                    }
+                }
                 createCache(myBlock);
 
             }
@@ -1304,9 +1308,9 @@ function loadEventHandlers(myBlock) {
                     }
                 }
             }
-	    // if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
+            // if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
             //     myBlock.blocks.adjustDocks(thisBlock);
-	    // }
+            // }
             blocks.refreshCanvas();
         });
     });
@@ -1461,14 +1465,14 @@ function changeLabel(myBlock) {
                 var selectedattr = '♮';
             } else if (myBlock.value.slice(0, 3) === 'sol') {
                 var selectednote = 'sol';
-		if (myBlock.value.length === 4) {
+                if (myBlock.value.length === 4) {
                     var selectedattr = myBlock.value[3];
                 } else {
                     var selectedattr = myBlock.value[3] + myBlock.value[3];
                 }
             } else {
                 var selectednote = myBlock.value.slice(0, 2);
-		if (myBlock.value.length === 3) {
+                if (myBlock.value.length === 3) {
                     var selectedattr = myBlock.value[2];
                 } else {
                     var selectedattr = myBlock.value[2] + myBlock.value[2];
@@ -1482,7 +1486,7 @@ function changeLabel(myBlock) {
         for (var i = 0; i < SOLFNOTES.length; i++) {
             if (selectednote === SOLFNOTES[i]) {
                 labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
-	    } else {
+            } else {
                 labelHTML += '<option value="' + SOLFNOTES[i] + '">' + SOLFNOTES[i] + '</option>';
             }
         }
@@ -1491,7 +1495,7 @@ function changeLabel(myBlock) {
         for (var i = 0; i < SOLFATTRS.length; i++) {
             if (selectedattr === SOLFATTRS[i]) {
                 labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-	    } else {
+            } else {
                 labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
             }
         }
@@ -1529,7 +1533,7 @@ function changeLabel(myBlock) {
         for (var i = 0; i < NOTEATTRS.length; i++) {
             if (selectedattr === NOTEATTRS[i]) {
                 labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-	    } else {
+            } else {
                 labelHTML += '<option value="' + NOTEATTRS[i] + '">' + NOTEATTRS[i] + '</option>';
             }
         }
@@ -1548,9 +1552,8 @@ function changeLabel(myBlock) {
     var blur = function (event) {
         // Not sure why the change in the input is not available
         // immediately in FireFox. We need a workaround if hardware
-	// acceleration is enabled.
+        // acceleration is enabled.
 
-	
         if (!focused) {
             return;
         }
