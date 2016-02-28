@@ -972,6 +972,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
             break;
+        case 'hidden':
+            // Hidden block is used at end of clamps and actions to
+            // trigger listeners.
+	    break;
         case 'break':
             logo.doBreak(turtle);
             // Since we pop the queue, we need to unhighlight our
@@ -1444,7 +1448,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlow = args[0];
             childFlowCount = 1;
 
-            var listenerName = '_fill_';
+            var listenerName = '_fill_' + turtle;
             logo.updateEndBlks(childFlow, turtle, listenerName);
 
             var listener = function (event) {
@@ -1467,7 +1471,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlow = args[0];
             childFlowCount = 1;
 
-            var listenerName = '_hollowline_';
+            var listenerName = '_hollowline_' + turtle;
             logo.updateEndBlks(childFlow, turtle, listenerName);
 
             var listener = function (event) {
@@ -1743,7 +1747,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.tupletParams = [];
             logo.addingNotesToTuplet = false;
 
-            var listenerName = '_matrix_';
+            var listenerName = '_matrix_' + turtle;
             logo.updateEndBlks(childFlow, turtle, listenerName);
 
             var listener = function (event) {
@@ -2360,7 +2364,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlow = args[2];
             childFlowCount = 1;
 
-            var listenerName = '_tuplet_';
+            var listenerName = '_tuplet_' + turtle;
             logo.updateEndBlks(childFlow, turtle, listenerName);
 
             var listener = function (event) {
@@ -2409,17 +2413,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // else trigger.
             var parentActions = [];
             for (var i = logo.endOfFlowSignals[turtle][blk].length - 1; i >= 0; i--) {
-                // console.log(i + ': ' + logo.blocks.blockList[blk].name);
+                console.log(i + ': ' + logo.blocks.blockList[blk].name + ' turtle: ' + turtle);
                 var parentLoop = logo.endOfFlowLoops[turtle][blk][i];
                 var parentAction = logo.endOfFlowActions[turtle][blk][i];
                 var signal = logo.endOfFlowSignals[turtle][blk][i];
-                // console.log('parent loop = ' + parentLoop + ' ' + 'parentAction = ' + parentAction);
+                console.log('parent loop = ' + parentLoop + ' ' + 'parentAction = ' + parentAction);
                 var loopTest = parentLoop != null && logo.parentFlowQueue[turtle].indexOf(parentLoop) !== -1 && logo.loopBlock(logo.blocks.blockList[parentLoop].name);
                 var actionTest = (parentAction != null && (logo.namedActionBlock(logo.blocks.blockList[parentAction].name) || logo.actionBlock(logo.blocks.blockList[parentAction].name)) && logo.doBlocks[turtle].indexOf(parentAction) === -1);
                 var stillInLoop = false;
                 if (loopTest) {
                     for (var j = 0; j < logo.turtles.turtleList[turtle].queue.length; j++) {
-                        // console.log(logo.turtles.turtleList[turtle].queue[j].parentBlk);
+                        console.log(parentLoop + ' ==? ' + logo.turtles.turtleList[turtle].queue[j].parentBlk);
                         if (parentLoop === logo.turtles.turtleList[turtle].queue[j].parentBlk) {
                             stillInLoop = true;
                             break;
@@ -2427,17 +2431,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                 }
                 if (loopTest && stillInLoop) {
-                    // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of loop block');
+                    console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of loop block');
                 } else if (actionTest) {
-                    // console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of action block');
+                    console.log(logo.endOfFlowSignals[turtle][blk][i] + ' still in child flow of action block');
                 } else if (signal != null) {
                     if (logo.doBlocks[turtle].indexOf(parentAction) !== -1) {
-                        // console.log('queuing parent action');
+                        console.log('queuing parent action');
                         if (parentActions.indexOf(parentAction) === -1) {
                             parentActions.push(parentAction);
                         }
                     }
-                    // console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
+                    console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfFlowSignals[turtle][blk][i]);
                     logo.stage.dispatchEvent(logo.endOfFlowSignals[turtle][blk][i]);
                     // Mark issued signals as null
                     logo.endOfFlowSignals[turtle][blk][i] = null;
@@ -2575,6 +2579,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.onStopTurtle();
             }
 
+            // Because flow can come from calc blocks, we are not
+            // ensured that the turtle is really finished running
+            // yet. Hence the timeout.
             checkLilypond = function() {
                 if (!logo.turtles.running() && queueStart === 0 && logo.lilypondSaveOnly) {
                     console.log('saving lilypond output: ' + this.lilypondStaging);
