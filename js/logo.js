@@ -154,6 +154,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.tupletParams = [];
 
     // parameters used by notations
+    this.checkingLilypond = false;
     this.lilypondSaveOnly = false;
     this.lilypondNotes = {};
     this.lilypondStaging = {};
@@ -1915,7 +1916,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.processNote(args[1], blk, turtle);
                 }
             } else {
-                console.log('rhythm block only used inside matrix');
+                logo.errorMsg('Rhythm Block: Did you mean to use a Note block?', blk);
             }
             break;
             // FIXME: What is this supposed to do?
@@ -2349,13 +2350,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.runFromBlock(logo, turtle, args[0]);
             break;
         case 'tuplet2':
-            // Replaces tupletParamBlock/tuplet combination
             if (logo.inMatrix) {
                 logo.tupletParams.push([args[0], args[1] * logo.beatFactor[turtle]]);
                 logo.tuplet = true;
                 logo.addingNotesToTuplet = false;
             } else {
-                console.log('tuplet only useful inside matrix');
+                logo.errorMsg('Tuplet Block: Did you mean to use a Note block?', blk);
             }
             childFlow = args[2];
             childFlowCount = 1;
@@ -2565,17 +2565,36 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                 }
             }
+
             // Make sure SVG path is closed.
             logo.turtles.turtleList[turtle].closeSVG();
+
             // Mark the turtle as not running.
             logo.turtles.turtleList[turtle].running = false;
             if (!logo.turtles.running()) {
                 logo.onStopTurtle();
             }
 
-            if (!logo.turtles.running() && logo.lilypondSaveOnly) {
-                logo.saveLilypondOutput(_('My Project') + '.ly');
-                logo.lilypondSaveOnly = false;
+            checkLilypond = function() {
+                if (!logo.turtles.running() && queueStart === 0 && logo.lilypondSaveOnly) {
+                    console.log('saving lilypond output: ' + this.lilypondStaging);
+                    logo.saveLilypondOutput(_('My Project') + '.ly');
+                    logo.lilypondSaveOnly = false;
+                    logo.checkingLilypond = false;
+                } else if (logo.lilypondSaveOnly) {
+                    setTimeout(function() {
+                        checkLilypond();
+                    }, 250);
+		}
+	    }
+
+            if (!logo.turtles.running() && queueStart === 0 && logo.lilypondSaveOnly) {
+                if (!logo.checkingLilypond) {
+                    logo.checkingLilypond = true;
+                    setTimeout(function() {
+			checkLilypond();
+                    }, 250);
+                }
             }
 
             // Nothing else to do... so cleaning up.
@@ -2865,7 +2884,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 logo.updateNotation(note, originalDuration, turtle, insideChord);
                             } else if (logo.tieCarryOver[turtle] > 0) {
                                 logo.updateNotation(note, logo.tieCarryOver[turtle], turtle, insideChord);
-                            }
+                            } else {
+                                console.log('durarion == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
+			    }
                         }
 
                         console.log("notes to play " + notes + ' ' + noteBeatValue);
@@ -3573,6 +3594,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 actionArgs = receivedArg;
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
+                    logo.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.shift();
                 } else {
@@ -3587,6 +3609,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 actionArgs = receivedArg;
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
+		    logo.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.shift();
                 } else {
@@ -3606,6 +3629,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var cblk = logo.blocks.blockList[blk].connections[1];
                 var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
+		    logo.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.pop();
                 } else {
@@ -3625,6 +3649,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 if (name in logo.actions) {
                     // Just run the stack.
+		    logo.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.pop();
                 } else {
