@@ -2585,14 +2585,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     setTimeout(function() {
                         checkLilypond();
                     }, 250);
-		}
-	    }
+                }
+            }
 
             if (!logo.turtles.running() && queueStart === 0 && logo.lilypondSaveOnly) {
                 if (!logo.checkingLilypond) {
                     logo.checkingLilypond = true;
                     setTimeout(function() {
-			checkLilypond();
+                        checkLilypond();
                     }, 250);
                 }
             }
@@ -2886,7 +2886,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 logo.updateNotation(note, logo.tieCarryOver[turtle], turtle, insideChord);
                             } else {
                                 console.log('durarion == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
-			    }
+                            }
                         }
 
                         console.log("notes to play " + notes + ' ' + noteBeatValue);
@@ -3609,7 +3609,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 actionArgs = receivedArg;
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
-		    logo.turtles.turtleList[turtle].running = true;
+                    logo.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.shift();
                 } else {
@@ -3629,7 +3629,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var cblk = logo.blocks.blockList[blk].connections[1];
                 var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
-		    logo.turtles.turtleList[turtle].running = true;
+                    logo.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.pop();
                 } else {
@@ -3649,7 +3649,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 if (name in logo.actions) {
                     // Just run the stack.
-		    logo.turtles.turtleList[turtle].running = true;
+                    logo.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.pop();
                 } else {
