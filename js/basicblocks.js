@@ -1299,6 +1299,12 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // FLOW PALETTE
 
+    var hiddenBlock = new ProtoBlock('hidden');
+    hiddenBlock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['hidden'] = hiddenBlock;
+    hiddenBlock.hidden = true;  // Now there is a surprise :)
+    hiddenBlock.hiddenBlockNoFlow();
+
     var clampBlock = new ProtoBlock('clamp');
     clampBlock.palette = palettes.dict['heap'];
     blocks.protoBlockDict['clamp'] = clampBlock;

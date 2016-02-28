@@ -769,6 +769,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     break;
                 }
 
+                if ((i === this.blockList[b].connections.length - 1) && (this.blockList[b].connections[i] != null) && (this.blockList[this.blockList[b].connections[i]].isNoHitBlock())) {
+                    // Don't break the connection between a block and
+                    // a hidden block below it.
+                    continue;
+		}
+
                 // Look for available connections.
                 if (this.testConnectionType(blkType, this.blockList[b].docks[i][2])) {
                     var x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];

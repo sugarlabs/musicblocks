@@ -224,7 +224,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 myPalettes.refreshCanvas();
             }, 100);
         } else {
-	    this.makePalettes(true);
+            this.makePalettes(true);
             this.refreshCanvas();
         }
     }
@@ -273,7 +273,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 this.stage.removeChild(this.dict[name].protoContainers[item]);
                 this.stage.addChild(this.dict[name].protoContainers[item]);
             }
-	    this.dict[name].resetLayout();
+            this.dict[name].resetLayout();
         }
         this.refreshCanvas();
     }
@@ -870,14 +870,14 @@ function Palette(palettes, name) {
     }
 
     this.resetLayout = function() {
-	// Account for menu toolbar
+        // Account for menu toolbar
         if (this.menuContainer == null) {
             return;
-	}
+        }
 
         for (var i in this.protoContainers) {
             this.protoContainers[i].y -= this.scrollDiff;
-	}
+        }
 
         this.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
         var items = [];
@@ -899,7 +899,7 @@ function Palette(palettes, name) {
 
         for (var i in this.protoContainers) {
             this.protoContainers[i].y += this.scrollDiff;
-	}
+        }
     }
 
     this.updateMenu = function(hide) {
@@ -1390,7 +1390,7 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
         palette.protoContainers[blkname].mask = null;
 
         moved = false;
-	pressed = true;
+        pressed = true;
         saveX = palette.protoContainers[blkname].x;
         saveY = palette.protoContainers[blkname].y - palette.scrollDiff;
         var startX = event.stageX;
@@ -1470,6 +1470,8 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
     const TONEOBJ = [[0, 'drift', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'triangle', 0, 0, [2, 7, null]], [7, ['number', {'value': 440}], 0, 0, [6]]];
     const RESTOBJ = [[0, 'note', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'rest2', 0, 0, [0, null]]];
     const TUPLETOBJ = [[0, 'tuplet2', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 3, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]], [3, 'rhythm', 0, 0, [0, 4, 5, null]], [4, ['number', {'value': 3}], 0, 0, [3]], [5, ['number', {'value': 4}], 0, 0, [3]]];
+    const REPEATOBJ = [[0, 'repeat', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+    const FOREVEROBJ = [[0, 'forever', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
 
     const BUILTINMACROS = {'note': NOTEOBJ,
                            'osctime': OSCTIMEOBJ,
@@ -1486,6 +1488,8 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                            'tone': TONEOBJ,
                            'rest2': RESTOBJ,
                            'tuplet2': TUPLETOBJ,
+                           'repeat': REPEATOBJ,
+                           'forever': FOREVEROBJ,
                         };
 
     if (moved) {
@@ -1563,7 +1567,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
         }
 
         // Put the protoblock back on the palette...
-	palette.resetLayout();
+        palette.resetLayout();
 
         palette.updateBlockMasks();
         palette.palettes.refreshCanvas();
