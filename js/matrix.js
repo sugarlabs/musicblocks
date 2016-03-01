@@ -290,6 +290,7 @@ function Matrix() {
         }
 
         var j = 0;
+        var marginFromTop = matrixDivPosition.top + parseInt(matrixDiv.style.paddingTop);
         for (var i = 0; i < this.solfegeNotes.length; i++) {
             if (this.solfegeNotes[i].toLowerCase() === _('rest')) {
                 this.rests += 1;
@@ -306,10 +307,10 @@ function Matrix() {
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
-            cell.style.top = matrixDivPosition.top + j * cell.style.height + 'px';
+            cell.style.top = marginFromTop + 'px';
+            marginFromTop += parseInt(cell.style.height);
             j += 1;
         }
-
         var row = header.insertRow(this.solfegeNotes.length - this.rests + 1);
         var cell = row.insertCell(0);
         cell.style.fontSize = this.cellScale * 75 + '%';
@@ -320,7 +321,7 @@ function Matrix() {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
         cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
         cell.style.left = matrixDivPosition.left + 2 + 'px';
-        cell.style.top = matrixDivPosition.top + i * cell.style.height + 'px';
+        cell.style.top = marginFromTop + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
     }
 
