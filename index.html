@@ -106,11 +106,13 @@
         function moveMatrix(event) {
             var matrixDiv = document.getElementById('matrix');
             matrixDivPosition = matrixDiv.getBoundingClientRect();
+
             var table = document.getElementById('myTable');
             var row = table.rows.item(0);
             row.style.left = matrixDivPosition.left + 'px';
             row.style.top = matrixDivPosition.top + 'px';
             var marginFromTop = Math.floor(matrixDivPosition.top) + parseInt(matrixDiv.style.paddingTop);
+
             for (i = 1, row; row = table.rows[i]; i++) {
                 cell = row.cells[0];
                 cell.style.left = matrixDivPosition.left + 2 + 'px';

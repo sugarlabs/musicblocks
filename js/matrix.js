@@ -311,6 +311,7 @@ function Matrix() {
             marginFromTop += parseInt(cell.style.height);
             j += 1;
         }
+
         var row = header.insertRow(this.solfegeNotes.length - this.rests + 1);
         var cell = row.insertCell(0);
         cell.style.fontSize = this.cellScale * 75 + '%';
