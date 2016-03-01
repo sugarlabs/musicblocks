@@ -264,7 +264,7 @@ define(function (require) {
 
         const DATAOBJS =
             [[0, 'start', 250, 150, [null, null, null]],
-             [1, 'matrix', 800, 50, [null, 2, null]],
+             [1, 'matrix', 800, 50, [null, 2, 25]],
 
              [2, 'pitch', 0, 0, [1, 3, 4, 5]],
              [3, ['solfege', {value:'ti'}], 0, 0, [2]],
@@ -286,16 +286,17 @@ define(function (require) {
              [15, ['solfege', {value:'re'}], 0, 0, [14]],
              [16, ['number', {value:'4'}], 0, 0, [14]],
 
-             [17,"repeat",0,0,[14,18,19,null]],
-             [18,["number", {"value":2}],0,0,[17]],
+             [17, "repeat", 0, 0, [14, 18, 19, null]],
+             [18, ["number", {"value":2}], 0, 0, [17]],
 
-             [19,"rhythm",0,0,[17,20,21,22]],
-             [20,["number", {"value":6}],0,0,[19]],
-             [21,["number", {"value":4}],0,0,[19]],
+             [19, "rhythm", 0, 0, [17, 20, 21, 22]],
+             [20, ["number", {"value":6}], 0, 0, [19]],
+             [21, ["number", {"value":4}], 0, 0, [19]],
 
-             [22,"rhythm",0,0,[19,23,24,null]],
-             [23,["number", {"value":1}],0,0,[22]],
-             [24,["number", {"value":2}],0,0,[22]]
+             [22, "rhythm", 0, 0, [19, 23, 24, null]],
+             [23, ["number", {"value":1}], 0, 0, [22]],
+             [24, ["number", {"value":2}], 0, 0, [22]],
+             [25, 'hidden', 0, 0, [1, null]]
             ];
 
         pluginsImages = {};
