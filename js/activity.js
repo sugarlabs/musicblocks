@@ -1878,7 +1878,7 @@ define(function (require) {
                     homeButtonContainers.push(container);
                     homeButtonContainersX = x;
                     homeButtonContainersY = y;
-                    var container2 = makeButton('go-home-faded-button', '', x, y, btnSize, 0);
+                    var container2 = makeButton('go-home-faded-button', _('Home'), x, y, btnSize, 0);
                     loadButtonDragHandler(container2, x, y, buttonNames[name][1]);
                     homeButtonContainers.push(container2);
                     onscreenButtons.push(container2);
@@ -2123,9 +2123,13 @@ define(function (require) {
 
             var text = new createjs.Text(label, '14px Sans', '#282828');
             if (container.y < 55) {
-                text.textAlign = 'left';
-                // To center the text on the menu button 
-                text.x = text.getMeasuredWidth() / -2;
+                if (container.x < 55) {
+                    text.textAlign = 'left';
+                    text.x = -14;
+                } else {
+                    text.textAlign = 'center';
+                    text.x = 0;
+                }
                 text.y = 30;
             } else {
                 text.textAlign = 'right';
