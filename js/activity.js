@@ -978,7 +978,7 @@ define(function (require) {
 
             var img = new Image();
             img.onload = function () {
-                console.log('creating error message artwork for ' + img.src);
+                // console.log('creating error message artwork for ' + img.src);
                 var artwork = new createjs.Bitmap(img);
                 container.addChild(artwork);
                 var text = new createjs.Text('', '20px Sans', '#000000');
@@ -1546,8 +1546,8 @@ define(function (require) {
             if (blk !== undefined && blk != null && !blocks.blockList[blk].collapsed) {
                 var fromX = (canvas.width - 1000) / 2;
                 var fromY = 128;
-                var toX = blocks.blockList[blk].x + blocksContainer.x;
-                var toY = blocks.blockList[blk].y + blocksContainer.y;
+                var toX = blocks.blockList[blk].container.x + blocksContainer.x;
+                var toY = blocks.blockList[blk].container.y + blocksContainer.y;
 
                 if (errorMsgArrow == null) {
                     errorMsgArrow = new createjs.Container();
