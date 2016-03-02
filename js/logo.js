@@ -958,7 +958,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'hidden':
             // Hidden block is used at end of clamps and actions to
             // trigger listeners.
-	    break;
+            break;
         case 'break':
             logo.doBreak(turtle);
             // Since we pop the queue, we need to unhighlight our
@@ -2391,7 +2391,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             for (var i = logo.endOfClampSignals[turtle][blk].length - 1; i >= 0; i--) {
                 // console.log(blk + ': ' + logo.blocks.blockList[blk].name + ' turtle: ' + turtle);
                 var signal = logo.endOfClampSignals[turtle][blk][i];
-		if (signal != null) {
+                if (signal != null) {
                     // console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfClampSignals[turtle][blk][i]);
                     logo.stage.dispatchEvent(logo.endOfClampSignals[turtle][blk][i]);
                     // Mark issued signals as null
@@ -2909,9 +2909,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.setDispatchBlock = function(blk, turtle, listenerName) {
         var nextBlock = last(this.blocks.blockList[blk].connections);
         if (nextBlock == null) {
-            console.log('next block not found when setting dispatcher');
+            // console.log('next block not found when setting dispatcher');
             return;
         }
+        // console.log('setting dispatch block for ' + blk + ' to ' + nextBlock);
         this.endOfClampSignals[turtle][nextBlock] = [listenerName];
     }
 

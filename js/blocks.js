@@ -773,7 +773,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     // Don't break the connection between a block and
                     // a hidden block below it.
                     continue;
-		}
+                }
 
                 // Look for available connections.
                 if (this.testConnectionType(blkType, this.blockList[b].docks[i][2])) {
@@ -2418,6 +2418,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // We add new blocks to the end of the block list.
         var blockOffset = this.blockList.length;
 
+        var hiddenBlocks = [];
         console.log(this.loadCounter + ' blocks to load');
         for (var b = 0; b < this.loadCounter; b++) {
             var thisBlock = blockOffset + b;
@@ -2461,6 +2462,43 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             var me = this;
             // A few special cases.
             switch (name) {
+                // Add a hidden block to the end of any clamp blocks.
+            case 'note':
+            case 'rhythmicdot':
+            case 'tie':
+            case 'dividebeatfactor':
+            case 'multiplybeatfactor':
+            case 'duplicatenotes':
+            case 'skipnotes':
+            case 'setbpm':
+            case 'drift':
+            case 'osctime':
+            case 'sharp':
+            case 'flat':
+            case 'settransposition':
+            case 'invert':
+            case 'staccato':
+            case 'slur':
+            case 'swing':
+            case 'crescendo':
+            case 'setnotevolume2':
+            case 'matrix':
+            case 'tuplet2':
+            case 'fill':
+            case 'hollowline':
+                if (last(blkData[4]) == null) {
+                    var len = blkData[4].length;
+                    blkData[4][len - 1] = this.loadCounter + hiddenBlocks.length;  // blockOffset is added in later.
+                    hiddenBlocks.push([thisBlock, null]);
+                } else if (blockObjs[last(blkData[4])][1] !== 'hidden') {
+                    var len = blkData[4].length;
+                    var nextBlock = last(blkData[4]);
+                    blkData[4][len - 1] = this.loadCounter + hiddenBlocks.length;  // blockOffset is added in later.
+                    blockObjs[nextBlock][4][0] = this.loadCounter + hiddenBlocks.length;  // blockOffset is added in later.
+                    hiddenBlocks.push([thisBlock, blockOffset + nextBlock]);
+                }
+                this.makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
+                break;
                 // Only add 'collapsed' arg to start, action blocks.
             case 'start':
                 blkData[4][0] = null;
@@ -2809,6 +2847,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
                 break;
             }
+
             if (thisBlock === this.blockList.length - 1) {
                 if (this.blockList[thisBlock].connections[0] == null) {
                     this.blockList[thisBlock].container.x = blkData[2];
@@ -2820,6 +2859,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     }
                 }
             }
+
+        }
+        var blockOffset = this.blockList.length;
+        for (var b = 0; b < hiddenBlocks.length; b++) {
+            var thisBlock = blockOffset + b;
+            this.makeNewBlockWithConnections('hidden', 0, [hiddenBlocks[b][0], hiddenBlocks[b][1]], null);
         }
     }
 
