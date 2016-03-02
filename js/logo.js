@@ -1789,14 +1789,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.pushedNote[turtle] = true;
             break;
         case 'pitch':
-            if (args.length !== 2) {
+            if (args.length !== 2 || args[0] == null || args[1] == null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
+                logo.stopTurtle = true;
                 break;
             }
 
             if (typeof(args[1]) !== 'number') {
                 logo.errorMsg(NANERRORMSG, blk);
                 logo.stopTurtle = true;
+                break;
             }
 
             if (typeof(args[0]) === 'number') {
@@ -1806,22 +1808,28 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var octave = obj[1];
                 if (note === '?') {
                     logo.errorMsg(INVALIDPITCH, blk);
+                    logo.stopTurtle = true;
+                    break;
                 }
             } else {
                 var note = args[0];
                 if (args[1] < 1) {
+                    console.log('minimum allowable octave is 1');
                     var octave = 1;
                 } else if (args[1] > 10) {
                     // Humans can only hear 10 octaves.
                     console.log('clipping octave at 10');
                     var octave = 10;
                 } else {
-                    var octave = args[1];
+                    // Octave must be a whole number.
+                    var octave = Math.floor(args[1]);
                 }
 
-                logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]); // 'C');
+                logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
                 if (!logo.validNote) {
                     logo.errorMsg(INVALIDPITCH, blk);
+                    logo.stopTurtle = true;
+                    break;
                 }
             }
 
@@ -2282,7 +2290,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (newVolume > 100) {
                     console.log('articulated volume exceeds 100%. clipping');
                     newVolume = 100;
-		}
+                }
                 logo.polyVolume[turtle].push(newVolume);
                 logo.setSynthVolume(newVolume, turtle);
                 logo.lilypondBeginArticulation(turtle);
