@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2015 Sam Parkinson
+Copyright (C) 2016 Walter Bender
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,17 +16,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-APIKEY = '3tgTzMXbbw6xEKX7';
-EMPTYIMAGE = 'data:image/svg+xml;base64,' + btoa('<svg \
+const APIKEY = '3tgTzMXbbw6xEKX7';
+const EMPTYIMAGE = 'data:image/svg+xml;base64,' + btoa('<svg \
               xmlns="http://www.w3.org/2000/svg" width="320" height="240" \
               viewBox="0 0 320 240"></svg>')
 
-window.server = '/server/';
-jQuery.ajax('/server/').error(function () {
-    server = 'https://turtle.sugarlabs.org/server/';
-});
+const SERVER = 'https://turtle.sugarlabs.org/server/';
+window.server = SERVER; 'https://turtle.sugarlabs.org/server/'; // '/server/';
 
-var LOCAL_PROJECT_TEMPLATE = '\
+const LOCAL_PROJECT_TEMPLATE = '\
 <li data=\'{data}\' title="{title}" current="{current}"> \
     <img class="thumbnail" src="{img}" /> \
     <div class="options"> \
@@ -37,7 +36,7 @@ var LOCAL_PROJECT_TEMPLATE = '\
     </div> \
 </li>'
 
-var GLOBAL_PROJECT_TEMPLATE = '\
+const GLOBAL_PROJECT_TEMPLATE = '\
 <li url="{url}" title="{title}"> \
     <img class="thumbnail" src="{img}" /> \
     <div class="options"> \
@@ -69,7 +68,7 @@ function PlanetModel(controller) {
 
     this.downloadWorldWideProjects = function () {
         jQuery.ajax({
-            url: server,
+            url: SERVER,
             headers: {
                 'x-api-key' : APIKEY
             }
@@ -111,7 +110,7 @@ function PlanetModel(controller) {
             me.getImages(todo);
         } else {
             jQuery.ajax({
-  	            url: server + image,
+  	            url: SERVER + image,
                 headers: {
                     'x-api-key' : '3tgTzMXbbw6xEKX7'
                 },
@@ -232,14 +231,14 @@ function PlanetModel(controller) {
         me.controller.sendAllToTrash(false, false);
 
         jQuery.ajax({
-            url: server + name + ".tb",
+            url: SERVER + name + ".tb",
             headers: {
                 'x-api-key' : '3tgTzMXbbw6xEKX7'
             },
             dataType: 'text',
             error: function(XMLHttpRequest, textStatus, errorThrown){
             	jQuery.ajax({
-		            url: server + "MusicBlocks_" + name + ".tb",
+		            url: SERVER + "MusicBlocks_" + name + ".tb",
 		            headers: {
 		                'x-api-key' : '3tgTzMXbbw6xEKX7'
 		            },
