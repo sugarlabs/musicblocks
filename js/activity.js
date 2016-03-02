@@ -2124,7 +2124,8 @@ define(function (require) {
             var text = new createjs.Text(label, '14px Sans', '#282828');
             if (container.y < 55) {
                 text.textAlign = 'left';
-                text.x = -14;
+                // To center the text on the menu button 
+                text.x = text.getMeasuredWidth() / -2;
                 text.y = 30;
             } else {
                 text.textAlign = 'right';
