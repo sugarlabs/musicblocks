@@ -2270,6 +2270,26 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             logo.setListener(turtle, listenerName, listener);
             break;
+        case 'articulation':
+            if (args.length === 2 && typeof(args[0]) === 'number' && args[0] > 0) {
+            
+		var newVolume = last(logo.polyVolume[turtle]) * (100 + args[0]) / 100;
+                logo.polyVolume[turtle].push(newVolume);
+                logo.setSynthVolume(newVolume, turtle);
+
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                var listenerName = '_articulation_' + turtle;
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+                var listener = function(event) {
+                    logo.polyVolume[turtle].pop();
+                }
+
+                logo.setListener(turtle, listenerName, listener);
+            }
+            break;
         case 'setnotevolume2':
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 logo.polyVolume[turtle].push(args[0]);
