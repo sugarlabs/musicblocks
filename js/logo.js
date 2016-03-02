@@ -102,7 +102,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.tupletRhythms = [];
     this.addingNotesToTuplet = false;
     this.pitchBlocks = [];
-    this.inNoteBlock = 0;
+    this.inNoteBlock = [];
 
     // parameters used by pitch
     this.transposition = {};
@@ -497,6 +497,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.turtleTime[turtle] = 0;
             this.waitTimes[turtle] = 0;
             this.endOfClampSignals[turtle] = {};
+            this.inNoteBlock[turtle] = 0;
             this.transposition[turtle] = 0;
             this.noteBeat[turtle] = [];
             this.noteFrequencies[turtle] = [];
@@ -1875,7 +1876,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     matrix.solfegeNotes.push(getSolfege(note));
                     matrix.solfegeOctaves.push(octave);
                 }
-            } else {
+            } else if (logo.inNoteBlock[turtle] > 0) {
                 logo.notePitches[turtle].push(note);
                 logo.noteOctaves[turtle].push(octave);
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -1903,11 +1904,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
 
                 logo.pushedNote[turtle] = true;
+            } else {
+                logo.errorMsg('Pitch Block: Did you mean to use a Note block?', blk);
+                console.log('pitch block found outside of note block');
             }
             break;
         case 'rhythm':
             if (args.length < 2 || typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number' || args[0] < 1 || args[1] <= 0) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
+                logo.stopTurtle = true;
                 break;
             }
             if (logo.inMatrix) {
@@ -1979,7 +1984,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var noteBeatValue = args[0];
             }
 
-            logo.inNoteBlock += 1;
+            logo.inNoteBlock[turtle] += 1;
             childFlow = args[1];
             childFlowCount = 1;
 
@@ -1988,7 +1993,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             var listener = function (event) {
                 logo.processNote(noteBeatValue, blk, turtle);
-                logo.inNoteBlock -= 1;
+                logo.inNoteBlock[turtle] -= 1;
                 logo.pitchBlocks = [];
             }
             logo.setListener(turtle, listenerName, listener);
@@ -2631,7 +2636,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         if (this.inMatrix) {
-            if (this.inNoteBlock > 0) {
+            if (this.inNoteBlock[turtle] > 0) {
                 matrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
                     matrix.addNode(this.pitchBlocks[i], blk, 0);
