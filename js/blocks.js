@@ -2423,6 +2423,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.loadCounter = blockObjs.length;
         // We add new blocks to the end of the block list.
         var blockOffset = this.blockList.length;
+        var firstBlock = this.blockList.length;
 
         var hiddenBlocks = [];
         console.log(this.loadCounter + ' blocks to load');
@@ -2587,7 +2588,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                         me.blockList[thisBlock].updateArgSlots(slotList);
                         for (var i = 0; i < args[1].length; i++) {
-                            me.blockList[thisBlock].connections[i] = args[1][i];
+                            if (args[1][i] != null) {
+                                me.blockList[thisBlock].connections[i] = args[1][i] + firstBlock;
+                            } else {
+                                me.blockList[thisBlock].connections[i] = args[1][i];
+                            }
                         }
                     }
                     me.checkArgClampBlocks.push(thisBlock);
@@ -2610,7 +2615,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                         me.blockList[thisBlock].updateArgSlots(slotList);
                         for (var i = 0; i < args[2].length; i++) {
-                            me.blockList[thisBlock].connections[i] = args[2][i];
+                            if (args[2][i] != null) {
+                                me.blockList[thisBlock].connections[i] = args[2][i] + firstBlock;
+                            } else {
+                                me.blockList[thisBlock].connections[i] = args[2][i];
+                            }
                         }
                     }
                     me.checkArgClampBlocks.push(thisBlock);
@@ -2630,7 +2639,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                         me.blockList[thisBlock].updateArgSlots(slotList);
                         for (var i = 0; i < args[1].length; i++) {
-                            me.blockList[thisBlock].connections[i] = args[1][i];
+                            if (args[1][i] != null) {
+                                me.blockList[thisBlock].connections[i] = args[1][i] + firstBlock;
+                            } else {
+                                me.blockList[thisBlock].connections[i] = args[1][i];
+                            }
                         }
                     }
                     me.checkArgClampBlocks.push(thisBlock);
@@ -2653,7 +2666,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                         me.blockList[thisBlock].updateArgSlots(slotList);
                         for (var i = 0; i < args[2].length; i++) {
-                            me.blockList[thisBlock].connections[i] = args[2][i];
+                            if (args[2][i] != null) {
+                                me.blockList[thisBlock].connections[i] = args[2][i] + firstBlock;
+                            } else {
+                                me.blockList[thisBlock].connections[i] = args[2][i];
+                            }
                         }
                     }
                     me.checkArgClampBlocks.push(thisBlock);
