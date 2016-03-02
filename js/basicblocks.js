@@ -207,7 +207,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitch.defaults.push(4);
     pitch.twoArgBlock();
     pitch.dockTypes[1] = 'solfegein';
-    pitch.dockTypes[2] = 'anyin';
+    pitch.dockTypes[2] = 'numberin';
 
     // MATRIX PALETTE
 
