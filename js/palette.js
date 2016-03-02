@@ -1489,6 +1489,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
     const SWINGOBJ = [[0, 'swing', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 32}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const CRESCENDOOBJ = [[0, 'crescendo', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const VOLOBJ = [[0, 'setnotevolume2', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 50}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+    const ARTICULATIONOOBJ = [[0, 'articulation', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 25}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const MATRIXOBJ = [[0, 'matrix', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 13]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': _('sol')}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': _('mi')}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': _('re')}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]], [13, 'hidden', 0, 0, [0, null]]];
     const TURTLEPITCHOBJ = [[0, 'turtlepitch', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'turtlename', 0, 0, [0]]]
     const SETTURTLENAMEOBJ = [[0, 'setturtlename', palette.protoContainers[blkname].x - paletteBlocks.stage.x, palette.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]], [1, 'turtlename', 0, 0, [0]], [2, ['text', {'value': 'Yertle'}], 0, 0, [0]]];
@@ -1507,23 +1508,24 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
 
     const BUILTINMACROS = {'note': NOTEOBJ,
                            'rhythmicdot': DOTOBJ,
-			   'tie': TIEOBJ,
-			   'dividebeatfactor': DIVBEATOBJ,
-			   'multiplybeatfactor': MULTBEATOBJ,
+                           'tie': TIEOBJ,
+                           'dividebeatfactor': DIVBEATOBJ,
+                           'multiplybeatfactor': MULTBEATOBJ,
                            'duplicatenotes': DUPOBJ,
                            'skipnotes': SKIPOBJ,
                            'setbpm': BPMOBJ,
                            'drift': DRIFTOBJ,
                            'osctime': OSCTIMEOBJ,
                            'sharp': SHARPOBJ,
-			   'flat': FLATOBJ,
+                           'flat': FLATOBJ,
                            'settransposition': TRANSPOBJ,
-			   'invert': INVERTOBJ,
+                           'invert': INVERTOBJ,
                            'staccato': STACCATOOBJ,
-			   'slur': SLUROBJ,
-			   'swing': SWINGOBJ,
-			   'crescendo': CRESCENDOOBJ,
-			   'setnotevolume2': VOLOBJ,
+                           'slur': SLUROBJ,
+                           'swing': SWINGOBJ,
+                           'crescendo': CRESCENDOOBJ,
+                           'setnotevolume2': VOLOBJ,
+                           'articulation': ARTICULATIONOOBJ,
                            'matrix': MATRIXOBJ,
                            'turtlepitch': TURTLEPITCHOBJ,
                            'setturtlename': SETTURTLENAMEOBJ,
@@ -1538,7 +1540,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                            'rest2': RESTOBJ,
                            'tuplet2': TUPLETOBJ,
                            'fill': FILLOBJ,
-			   'hollowline': HOLLOWOBJ,
+                           'hollowline': HOLLOWOBJ,
                         };
 
     if (moved) {

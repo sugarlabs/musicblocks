@@ -2273,9 +2273,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'articulation':
             if (args.length === 2 && typeof(args[0]) === 'number' && args[0] > 0) {
             
-		var newVolume = last(logo.polyVolume[turtle]) * (100 + args[0]) / 100;
+                var newVolume = last(logo.polyVolume[turtle]) * (100 + args[0]) / 100;
                 logo.polyVolume[turtle].push(newVolume);
                 logo.setSynthVolume(newVolume, turtle);
+                logo.lilypondBeginArticulation(turtle);
 
                 childFlow = args[1];
                 childFlowCount = 1;
@@ -2285,6 +2286,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function(event) {
                     logo.polyVolume[turtle].pop();
+                    logo.lilypondEndArticulation(turtle);
                 }
 
                 logo.setListener(turtle, listenerName, listener);
@@ -3712,7 +3714,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 solfege = solfege.slice(0, len - 1);
                 transposition += 1;
             } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
-		// Not sure this could occur... but just in case.
+                // Not sure this could occur... but just in case.
                 solfege = solfege.slice(0, len - 2);
             }
         }
@@ -3781,7 +3783,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else if(solfege.substr(-1) === 'b') {
                     offset -= 1;
                 }
-	    }
+            }
 
             if (solfege.toLowerCase().substr(0, 4) === _('rest')) {
                 return ['R', ''];
@@ -3890,6 +3892,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         var counter = 0;
         var queueSlur = false;
+        var articulation = false;
         var targetDuration = 0;
         var tupletDuration = 0;
         for (var i = 0; i < this.lilypondStaging[turtle].length; i++) {
@@ -3903,6 +3906,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     if (obj === '(') {
                         // The ( is added after the first note.
                         queueSlur = true;
+                    } else if (obj === 'begin articulation') {
+                        articulation = true;
+                    } else if (obj === 'end articulation') {
+                        articulation = false;
                     } else {
                         this.lilypondNotes[turtle] += obj;
                     }
@@ -4029,6 +4036,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             for (var d = 0; d < obj[LYDOTCOUNT]; d++) {
                                 this.lilypondNotes[turtle] += '.';
                             }
+                            if (articulation) {
+                                this.lilypondNotes[turtle] += '->';
+                            }
+
                             this.lilypondNotes[turtle] += ' ';
                         }
                     } else {
@@ -4039,6 +4050,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                         for (var d = 0; d < obj[LYDOTCOUNT]; d++) {
                             this.lilypondNotes[turtle] += '.';
+                        }
+                        if (articulation) {
+                            this.lilypondNotes[turtle] += '->';
                         }
                     }
 
@@ -4067,6 +4081,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('break');
+    }
+
+    this.lilypondBeginArticulation = function(turtle) {
+        if (this.lilypondStaging[turtle] == undefined) {
+            this.lilypondStaging[turtle] = [];
+        }
+        this.lilypondStaging[turtle].push('begin articulation');
+    }
+
+    this.lilypondEndArticulation = function(turtle) {
+        this.lilypondStaging[turtle].push('end articulation');
     }
 
     this.lilypondBeginCrescendo = function(turtle, factor) {
