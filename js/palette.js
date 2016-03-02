@@ -844,7 +844,7 @@ function Palette(palettes, name) {
 
         if (this.background !== null) {
             this.background.removeAllChildren();
-        } else { 
+        } else {
             this.background = new createjs.Container();
             this.background.snapToPixelEnabled = true;
             this.background.visible = false;
@@ -1274,6 +1274,11 @@ function setupBackgroundEvents(palette) {
 
 
 function makeBlockFromPalette(protoblk, blkname, palette, callback) {
+    const BUILTINMACROS= ['note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm',
+    'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2',
+    'matrix', 'turtlepitch', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote',
+    'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline' ];
+
     switch (protoblk.name) {
     case 'do':
         blkname = 'do ' + protoblk.defaults[0];
@@ -1363,8 +1368,18 @@ function makeBlockFromPalette(protoblk, blkname, palette, callback) {
         var arg = '__NOARG__';
         break;
     }
-    var newBlock = paletteBlockButtonPush(newBlk, arg);
-    callback(newBlock);
+    if(BUILTINMACROS.indexOf(blkname) > -1)
+    {
+      moved = true;
+      saveX = palette.protoContainers[blkname].x;
+      saveY = palette.protoContainers[blkname].y;
+      makeBlockFromProtoblock(palette, protoblk, moved, blkname, null, saveX, saveY);
+    }
+    else
+    {
+      var newBlock = paletteBlockButtonPush(newBlk, arg);
+      callback(newBlock);
+    }
 }
 
 
