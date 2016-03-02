@@ -632,7 +632,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
             // Yet another database integrety check.
             if (!foundMatch) {
-                console.log('Did not find match for ' + myBlock.name + ' and ' + this.blockList[cblk].name);
+                console.log('Did not find match for ' + myBlock.name + ' (' + blk + ') and ' + this.blockList[cblk].name + ' (' + cblk + ')');
                 break;
             }
 
@@ -1751,6 +1751,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 }
             }
         }
+
         var i = 1;
         var value = name;
         while (actionNames.indexOf(value) !== -1) {
