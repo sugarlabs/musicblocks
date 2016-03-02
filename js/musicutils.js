@@ -256,7 +256,7 @@ function getNumNote(value, delta) {
 
     var note = NOTESTABLE[num];
 
-    if (notes[num] === "ti") {
+    if (note[num] === "ti") {
         octave -= 1;
     }
     return [note, octave + 1];
