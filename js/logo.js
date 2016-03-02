@@ -1794,6 +1794,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             }
 
+            if (typeof(args[1]) !== 'number') {
+                logo.errorMsg(NANERRORMSG, blk);
+                logo.stopTurtle = true;
+            }
+
             if (typeof(args[0]) === 'number') {
                 // If frequency is input, ignore octave (args[1]).
                 var obj = frequencyToPitch(args[0]);
@@ -2274,6 +2279,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             if (args.length === 2 && typeof(args[0]) === 'number' && args[0] > 0) {
             
                 var newVolume = last(logo.polyVolume[turtle]) * (100 + args[0]) / 100;
+                if (newVolume > 100) {
+                    console.log('articulated volume exceeds 100%. clipping');
+                    newVolume = 100;
+		}
                 logo.polyVolume[turtle].push(newVolume);
                 logo.setSynthVolume(newVolume, turtle);
                 logo.lilypondBeginArticulation(turtle);
