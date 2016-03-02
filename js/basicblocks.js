@@ -414,6 +414,7 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // TONE (ARTICULATION) PALETTE
 
+    // Deprecated
     var noteVolumeBlock = new ProtoBlock('setnotevolume');
     noteVolumeBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
@@ -489,6 +490,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.twoArgMathBlock();
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
+
+    var articulationBlock = new ProtoBlock('articulation');
+    articulationBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['articulation'] = articulationBlock;
+    articulationBlock.staticLabels.push(_('articulation'));
+    articulationBlock.adjustWidthToLabel();
+    articulationBlock.flowClampOneArgBlock();
+    articulationBlock.defaults.push(10);
 
     var noteVolumeBlock2 = new ProtoBlock('setnotevolume2');
     noteVolumeBlock2.palette = palettes.dict['tone'];
