@@ -1814,7 +1814,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var octave = args[1];
                 }
 
-                logo.getNote(args[0], args[1], 0, 'C');
+                logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]); // 'C');
                 if (!logo.validNote) {
                     logo.errorMsg(INVALIDPITCH, blk);
                 }
@@ -3711,6 +3711,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             } else if (lastTwo === '##' || lastTwo === '♯♯') {
                 solfege = solfege.slice(0, len - 1);
                 transposition += 1;
+            } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
+		// Not sure this could occur... but just in case.
+                solfege = solfege.slice(0, len - 2);
             }
         }
 
@@ -3743,6 +3746,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             if (!keySignature) {
                 keySignature = 'C';
             }
+
             if (keySignature.substr(-1) === 'm' || keySignature.slice(1).toLowerCase() === 'minor') {
                 var thisScale = NOTESFLAT;
                 var halfSteps = MINORHALFSTEPS;  // 0 2 3 5 7 8 10
@@ -3759,12 +3763,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 keySignature = EXTRATRANSPOSITIONS[keySignature][0];
             }
 
+            // Ensure it is a valid key signature.
             offset = thisScale.indexOf(keySignature);
             if (offset === -1) {
                 console.log('WARNING: Key ' + keySignature + ' not found in ' + thisScale + '. Using default of C');
                 var offset = 0;
                 var thisScale = NOTESSHARP;
             }
+
+            if (sharpFlat) {
+                if (solfege.substr(-1) === '#') {
+                    offset += 1;
+                } else if (solfege.substr(-1) === '♯') {
+                    offset += 1;
+                } else if (solfege.substr(-1) === '♭') {
+                    offset -= 1;
+                } else if(solfege.substr(-1) === 'b') {
+                    offset -= 1;
+                }
+	    }
 
             if (solfege.toLowerCase().substr(0, 4) === _('rest')) {
                 return ['R', ''];
@@ -3788,20 +3805,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 return ['C', octave];
             }
 
-            if (sharpFlat) {
-                if (solfege.substr(-1) === '#') {
-                    note = note + '♯';
-                } else if (solfege.substr(-1) === '♯') {
-                    note = note + '♯';
-                } else if (solfege.substr(-1) === '♭') {
-                    note = note + '♭';
-                } else if(solfege.substr(-1) === 'b') {
-                    note = note + '♭';
-                }
-                if (note in EXTRATRANSPOSITIONS) {
-                    octave += EXTRATRANSPOSITIONS[note][1];
-                    note = EXTRATRANSPOSITIONS[note][0];
-                }
+            if (note in EXTRATRANSPOSITIONS) {
+                octave += EXTRATRANSPOSITIONS[note][1];
+                note = EXTRATRANSPOSITIONS[note][0];
             }
         }
 
