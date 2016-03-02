@@ -1268,6 +1268,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 this.expandablesList.push(blk);
                 var c = this.blockList[blk].connections.length - 2;
                 this.searchForExpandables(this.blockList[blk].connections[c]);
+                if (this.blockList[blk].name === 'ifthenelse') {
+                    // search top clamp too
+                    var c = 2;
+                    this.searchForExpandables(this.blockList[blk].connections[c]);
+                }
             } else if (this.blockList[blk].isArgClamp()) {
                 // FIXME: We need to do something with ArgClampArg blocks too.
                 this.expandablesList.push(blk);
