@@ -1210,3 +1210,12 @@ msgstr ""
 
 msgid "Return all blocks to the center of the screen."
 msgstr ""
+
+msgid "Rhythm Block: Did you mean to use a Note block?"
+msgstr "Bloque de ritmo: Quizás quiso decir utilizar un bloque de nota?"
+
+msgid "Pitch Block: Did you mean to use a Note block?"
+msgstr "Bloque de tono: Quizás quiso decir utilizar un bloque de nota?"
+
+msgid "articulation"
+msgstr "articulación"

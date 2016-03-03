@@ -34,6 +34,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "crescendo factor"
@@ -165,6 +168,9 @@ msgstr ""
 
 #. TRANS: Descargar
 msgid "Download"
+msgstr ""
+
+msgid "Home"
 msgstr ""
 
 #. TRANS: Incrementa el tamaño de los bloques
@@ -354,6 +360,9 @@ msgstr ""
 
 #. TRANS: entonces
 msgid "then"
+msgstr ""
+
+msgid "articulation"
 msgstr ""
 
 #. TRANS: alimentos
@@ -556,6 +565,9 @@ msgstr ""
 
 #. TRANS: obtener nombre
 msgid "get name"
+msgstr ""
+
+msgid "Return all blocks to the center of the screen."
 msgstr ""
 
 #. TRANS techo (matemáticas)
@@ -924,6 +936,9 @@ msgstr ""
 msgid "begin hollow line"
 msgstr ""
 
+msgid "Rhythm Block: Did you mean to use a Note block?"
+msgstr ""
+
 #. TRANS: longitude and latitude coordinate data
 msgid "Coordinate data not available."
 msgstr ""
@@ -1207,6 +1222,9 @@ msgstr ""
 msgid "or"
 msgstr ""
 
+msgid "silence"
+msgstr ""
+
 #. TRANS: lilypond is a language used to generate musical scores.
 msgid "save as lilypond"
 msgstr ""
@@ -1255,6 +1273,9 @@ msgstr ""
 msgid "forward"
 msgstr ""
 
+msgid "do re mi fa sol la ti"
+msgstr ""
+
 #. TRANS: traducir
 msgid "translate"
 msgstr ""
@@ -1290,6 +1311,9 @@ msgstr ""
 
 #. TRANS: musical key, e.g., C Major
 msgid "set key"
+msgstr ""
+
+msgid "Pitch Block: Did you mean to use a Note block?"
 msgstr ""
 
 msgid "slur factor"
