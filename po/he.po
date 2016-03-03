@@ -36,6 +36,9 @@ msgid ""
 
 
 msgid ""
+
+
+msgid ""
 msgstr ""
 
 msgid "crescendo factor"
@@ -151,6 +154,9 @@ msgstr ""
 
 msgid "Download"
 msgstr "הורדה"
+
+msgid "Home"
+msgstr ""
 
 msgid "Increase the size of the blocks."
 msgstr "הגדל את גודל הבלוקים"
@@ -316,6 +322,9 @@ msgstr "קו רוחב"
 
 msgid "then"
 msgstr "אז"
+
+msgid "articulation"
+msgstr ""
 
 msgid "food"
 msgstr "מזון"
@@ -487,6 +496,9 @@ msgstr "פתיחת פאנל להתאמת בלוקים"
 
 msgid "get name"
 msgstr "קבל שם"
+
+msgid "Return all blocks to the center of the screen."
+msgstr ""
 
 #. TRANS: mathematical ceiling function, e.g., ceiling(2.5) == 3
 msgid "ceiling"
@@ -807,6 +819,9 @@ msgstr "תפוז"
 msgid "begin hollow line"
 msgstr "התחל קו"
 
+msgid "Rhythm Block: Did you mean to use a Note block?"
+msgstr ""
+
 #. TRANS: longitude and latitude coordinate data
 msgid "Coordinate data not available."
 msgstr "נתוני הקואורדינטות אינם זמינים"
@@ -1052,6 +1067,9 @@ msgstr ""
 msgid "or"
 msgstr "או"
 
+msgid "silence"
+msgstr ""
+
 #. TRANS: lilypond is a language used to generate musical scores.
 msgid "save as lilypond"
 msgstr ""
@@ -1092,6 +1110,9 @@ msgstr "נמוך"
 msgid "forward"
 msgstr "קדימה"
 
+msgid "do re mi fa sol la ti"
+msgstr ""
+
 msgid "translate"
 msgstr "תרגם"
 
@@ -1124,6 +1145,9 @@ msgstr ""
 
 #. TRANS: musical key, e.g., C Major
 msgid "set key"
+msgstr ""
+
+msgid "Pitch Block: Did you mean to use a Note block?"
 msgstr ""
 
 msgid "slur factor"
