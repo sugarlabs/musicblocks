@@ -1905,7 +1905,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 logo.pushedNote[turtle] = true;
             } else {
-                logo.errorMsg('Pitch Block: Did you mean to use a Note block?', blk);
+                logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?)', blk);
                 console.log('pitch block found outside of note block');
             }
             break;
@@ -1921,7 +1921,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.processNote(args[1], blk, turtle);
                 }
             } else {
-                logo.errorMsg('Rhythm Block: Did you mean to use a Note block?', blk);
+                logo.errorMsg(_('Rhythm Block: Did you mean to use a Note block?)', blk);
             }
             break;
             // FIXME: What is this supposed to do?
