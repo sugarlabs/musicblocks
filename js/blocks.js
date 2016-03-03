@@ -2281,11 +2281,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (!(name in this.protoBlockDict)) {
                 continue;
             }
+
             if (['arg', 'twoarg'].indexOf(this.protoBlockDict[name].style) !== -1) {
                 if (this.protoBlockDict[name].expandable) {
                     this.checkTwoArgBlocks.push(this.blockList.length + b);
                 }
             }
+
+            if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp'].indexOf(this.protoBlockDict[name].style) !== -1) {
+		this.checkArgClampBlocks.push(this.blockList.length + b);
+	    }
 
             switch (name) {
             case 'text':
