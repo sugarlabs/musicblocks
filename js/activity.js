@@ -483,14 +483,41 @@ define(function (require) {
             scrollBlockContainer = !scrollBlockContainer;
         }
 
+        function closeAnalytics(chartBitmap, ctx) {
+            var button = this;
+            button.x = (canvas.width / (2 * musicBlocksScale))  + (300 / Math.sqrt(2));
+            button.y = 300.00 - (300.00 / Math.sqrt(2));
+            this.closeButton = makeButton('cancel-button', _('Close'), button.x, button.y, 55, 0);
+            this.closeButton.on('click', function(event) {
+                console.log('Deleting Chart');
+                button.closeButton.visible = false;
+                stage.removeChild(chartBitmap);
+                logo.showBlocks();
+                update = true;
+                ctx.clearRect(0, 0, 600, 600);
+            });
+        }
+
+        function isCanvasBlank(canvas) {
+            var blank = document.createElement('canvas');
+            blank.width = canvas.width;
+            blank.height = canvas.height;
+            return canvas.toDataURL() == blank.toDataURL();
+        }
+
         function doAnalytics() {
-            document.body.style.cursor = 'wait';
             var myChart = docById('myChart');
+	     if(isCanvasBlank(myChart) == false) {
+                return ;
+	     }
             var ctx = myChart.getContext('2d');
+            document.body.style.cursor = 'wait';
             var myRadarChart = null;
             var scores = analyzeProject(blocks);
             console.log(scores);
             var data = scoreToChartData(scores);
+            var Analytics = this;
+            Analytics.close = closeAnalytics;
 
             var callback = function () {
                 var imageData = myRadarChart.toBase64Image();
@@ -504,6 +531,7 @@ define(function (require) {
                     logo.hideBlocks();
                     update = true;
                     document.body.style.cursor = 'default';
+                    Analytics.close(chartBitmap, ctx);
                 };
                 img.src = imageData;
             }
