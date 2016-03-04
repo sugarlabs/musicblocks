@@ -1327,12 +1327,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     breakBlock.adjustWidthToLabel();
     breakBlock.basicBlockNoFlow();
 
-    var ifBlock = new ProtoBlock('if');
-    ifBlock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['if'] = ifBlock;
-    ifBlock.staticLabels.push(_('if'), _('then'));
-    ifBlock.adjustWidthToLabel();
-    ifBlock.flowClampBooleanArgBlock();
+    var waitForBlock = new ProtoBlock('waitFor');
+    waitForBlock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['waitFor'] = waitForBlock;
+    waitForBlock.staticLabels.push(_('wait for'));
+    waitForBlock.adjustWidthToLabel();
+    waitForBlock.oneBooleanArgBlock();
 
     var untilBlock = new ProtoBlock('until');
     untilBlock.palette = palettes.dict['flow'];
@@ -1340,13 +1340,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     untilBlock.staticLabels.push(_('until'), _('do'));
     untilBlock.adjustWidthToLabel();
     untilBlock.flowClampBooleanArgBlock();
-
-    var waitForBlock = new ProtoBlock('waitFor');
-    waitForBlock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['waitFor'] = waitForBlock;
-    waitForBlock.staticLabels.push(_('wait for'));
-    waitForBlock.adjustWidthToLabel();
-    waitForBlock.oneBooleanArgBlock();
 
     var whileBlock = new ProtoBlock('while');
     whileBlock.palette = palettes.dict['flow'];
@@ -1361,6 +1354,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     ifthenelseBlock.staticLabels.push(_('if'), _('then'), _('else'));
     ifthenelseBlock.adjustWidthToLabel();
     ifthenelseBlock.doubleFlowClampBooleanArgBlock();
+
+    var ifBlock = new ProtoBlock('if');
+    ifBlock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['if'] = ifBlock;
+    ifBlock.staticLabels.push(_('if'), _('then'));
+    ifBlock.adjustWidthToLabel();
+    ifBlock.flowClampBooleanArgBlock();
 
     var foreverBlock = new ProtoBlock('forever');
     foreverBlock.palette = palettes.dict['flow'];

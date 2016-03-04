@@ -842,7 +842,6 @@ function Turtles(canvas, stage, refreshCanvas) {
 
         // Each turtle needs its own canvas.
         myTurtle.imageContainer = new createjs.Container();
-        console.log('creating image container');
         this.stage.addChild(myTurtle.imageContainer);
         myTurtle.drawingCanvas = new createjs.Shape();
         this.stage.addChild(myTurtle.drawingCanvas);
