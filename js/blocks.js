@@ -2904,6 +2904,29 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         this.updateBlockPositions();
 
+        this.cleanupStacks();
+
+        for (var i = 0; i < this.blocksToCollapse.length; i++) {
+            // console.log('collapse ' + this.blockList[this.blocksToCollapse[i]].name);
+            this.blockList[this.blocksToCollapse[i]].collapseToggle();
+        }
+        this.blocksToCollapse = [];
+
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].collapseContainer != null) {
+                this.blockList[blk].collapseContainer.x = this.blockList[blk].container.x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
+                this.blockList[blk].collapseContainer.y = this.blockList[blk].container.y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
+            }
+        }
+        this.refreshCanvas();
+
+        if (['action', 'nameddo', 'namedarg', 'nameddoArg', 'calc', 'calcArg', 'namedcalcArg', 'storein'].indexOf(name) != -1) {
+            // console.log(name);
+            this.checkPaletteEntries(name);
+        }
+    }
+
+    this.cleanupStacks = function() {
         if (this.checkArgClampBlocks.length > 0) {
             // We make multiple passes because we need to account for nesting.
             // FIXME: needs to be interwoven with TwoArgBlocks check.
@@ -2929,25 +2952,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             this.adjustDocks(this.adjustTheseDocks[blk]);
             // blockBlocks.expandTwoArgs();
             blockBlocks.expandClamps();
-        }
-
-        for (var i = 0; i < this.blocksToCollapse.length; i++) {
-            // console.log('collapse ' + this.blockList[this.blocksToCollapse[i]].name);
-            this.blockList[this.blocksToCollapse[i]].collapseToggle();
-        }
-        this.blocksToCollapse = [];
-
-        for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].collapseContainer != null) {
-                this.blockList[blk].collapseContainer.x = this.blockList[blk].container.x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
-                this.blockList[blk].collapseContainer.y = this.blockList[blk].container.y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
-            }
-        }
-        this.refreshCanvas();
-
-        if (['action', 'nameddo', 'namedarg', 'nameddoArg', 'calc', 'calcArg', 'namedcalcArg', 'storein'].indexOf(name) != -1) {
-            // console.log(name);
-            this.checkPaletteEntries(name);
         }
     }
 
@@ -3026,11 +3030,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.trashStacks.push(thisBlock);
 
         // Disconnect block.
-        var b = myBlock.connections[0];
-        if (b != null) {
-            for (var c in this.blockList[b].connections) {
-                if (this.blockList[b].connections[c] === thisBlock) {
-                    this.blockList[b].connections[c] = null;
+        var parentBlock = myBlock.connections[0];
+        if (parentBlock != null) {
+            for (var c in this.blockList[parentBlock].connections) {
+                if (this.blockList[parentBlock].connections[c] === thisBlock) {
+                    this.blockList[parentBlock].connections[c] = null;
                     break;
                 }
             }
@@ -3072,7 +3076,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         blkParent.trash = true;
                     }
                 }
-                
+
                 var blockPalette = this.palettes.dict['actions'];
                 var blockRemoved = false;
 
@@ -3116,6 +3120,32 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // console.log('putting ' + this.blockList[blk].name + ' in the trash');
             this.blockList[blk].trash = true;
             this.blockList[blk].hide();
+            this.refreshCanvas();
+        }
+
+        // Adjust the stack from which we just deleted blocks.
+        if (parentBlock != null) {
+            var topBlk = this.findTopBlock(parentBlock);
+            this.findDragGroup(topBlk);
+
+            // We need to track two-arg blocks in case they need expanding.
+            this.checkTwoArgBlocks = [];
+
+            // And arg clamp blocks in case they need expanding.
+            this.checkArgClampBlocks = [];
+
+            for (var b = 0; b < this.dragGroup.length; b++) {
+                var blk = this.dragGroup[b];
+                var myBlock = this.blockList[blk];
+		if (myBlock.isTwoArgBlock()) {
+                    this.checkTwoArgBlocks.push(blk);
+		} else if (myBlock.isArgBlock() && myBlock.isExpandableBlock() || myBlock.isArgClamp()) {
+                    this.checkTwoArgBlocks.push(blk);
+		} else if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp'].indexOf(myBlock.protoblock.style) !== -1) {
+                    this.checkArgClampBlocks.push(blk);
+		}
+	    }
+            this.cleanupStacks();
             this.refreshCanvas();
         }
     }
