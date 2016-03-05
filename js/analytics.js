@@ -13,60 +13,95 @@
 
 // TODO: CLEAN UP THIS LIST
 
-TACAT = {'clear': 'forward', 'forward': 'forward', 'back': 'forward',
-         'left': 'forward', 'right': 'forward', 'arc': 'arc',
-         'x': 'coord', 'y': 'coord', 'heading': 'coord',
-         'setxy': 'setxy', 'seth': 'setxy', 'penup': 'pen',
-         'setpensize': 'pen', 'setcolor': 'pen', 'pensize': 'pen',
-         'color': 'pen', 'setshade': 'pen', 'setgray': 'pen',
-         'gray': 'pen', 'fillscreen': 'pen', 'beginfill': 'fill',
-         'endfill': 'fill', 'plus': 'number', 'minus': 'number',
-         'multiply': 'number', 'divide': 'number',
-         'pendown': 'pen', 'shade': 'pen', 'mod': 'number',
-         'sqrt': 'number', 'identity': 'number', 'and': 'boolean',
-         'or': 'boolean', 'not': 'boolean', 'greater': 'boolean',
-         'less': 'boolean', 'equal': 'boolean', 'random': 'random',
-         'repeat': 'repeat', 'forever': 'repeat', 'if': 'ifthen',
-         'ifthenelse': 'ifthen', 'while': 'ifthen', 'until': 'ifthen',
-         'action': 'action', 'do': 'action', 'nameddo': 'action',
-         'listen': 'action', 'broadcast': 'action',
-         'storein': 'box', 'namedbox': 'box', 'incrementOne': 'box',
-         'luminance': 'sensor', 'mousex': 'sensor', 'mousey': 'sensor',
-         'start': 'action', 'mousebutton': 'sensor', 'keyboard': 'sensor',
-         'readpixel': 'sensor', 'see': 'sensor', 'time': 'sensor',
-         'sound': 'sensor', 'volume': 'sensor', 'pitch': 'sensor',
-         'resistance': 'sensor', 'voltage': 'sensor', 'video': 'media',
-         'wait': 'media', 'camera': 'media', 'journal': 'media',
-         'audio': 'media', 'show': 'media', 'setscale': 'media',
-         'savepix': 'media', 'savesvg': 'media', 'mediawait': 'media',
-         'mediapause': 'media', 'mediastop': 'media', 'mediaplay': 'media',
-         'speak': 'media', 'sinewave': 'media', 'description': 'media',
-         'push': 'extras', 'pop': 'extras', 'printheap': 'extras',
-         'clearheap': 'extras', 'isheapempty': 'extras', 'chr': 'extras',
-         'int': 'number', 'myfunction': 'python', 'userdefined': 'python',
-         'box': 'box', 'kbinput': 'sensor', 'showHeap': 'extras',
-         'emptyHeap': 'extras',
-         'loadblock': 'python', 'loadpalette': 'python',
-         'text': 'ignore', 'number': 'ignore', 'vspace': 'ignore'};
+// Assign each block to a bin.
+const TACAT = {
+    'note': 'note', 'rhythmicdot': 'rhythm', 'tie': 'rhythm', 'drift': 'rhythm',
+    'turtlenote': 'note', 'duplicationfactor': 'rhythm', 'osctime': 'note',
+    'skipfactor': 'rhythm', 'beatfactor': 'rhythm', 'bpmfactor': 'rhythm',
+    'tuplet2': 'rhythm', 'setbpm': 'rhythm', 'skipnotes': 'rhythm',
+    'duplicatenotes': 'rhythm', 'multiplybeatfactor': 'rhythm',
+    'dividebeatfactor': 'rhythm',
+    'pitch': 'pitch', 'sharp': 'pitch', 'flat': 'pitch',
+    'square': 'pitch', 'triangle': 'pitch', 'sawtooth': 'pitch', 'sine': 'pitch',
+    'transpositionfactor': 'transpose', 'turtlepitch': 'transpose',
+    'number2pitch': 'transpose', 'number2octave': 'transpose',
+    'notename': 'ignore', 'solfege': 'ignore',
+    'settransposition': 'transpose', 'invert': 'transpose',
+    'setnotevolume': 'tone', 'staccatofactor': 'tone',
+    'sluffactor': 'tone', 'notevolumefactor': 'tone', 'key': 'tone',
+    'setkey': 'tone', 'articulation': 'tone', 'setnotevolume2': 'tone',
+    'staccato': 'tone', 'slur': 'tone', 'swing': 'tone',
+    'crescendo': 'tone','articulation': 'tone',
+    'clear': 'forward', 'forward': 'forward', 'back': 'forward',
+    'left': 'forward', 'right': 'forward', 'arc': 'arc',
+    'x': 'coord', 'y': 'coord', 'heading': 'coord',
+    'settranslucency': 'pen', 'sethue': 'pen',
+    'setxy': 'setxy', 'seth': 'setxy', 'penup': 'pen',
+    'setpensize': 'pen', 'setcolor': 'pen', 'pensize': 'pen',
+    'color': 'pen', 'setshade': 'pen', 'setgray': 'pen',
+    'gray': 'pen', 'fillscreen': 'pen', 'beginfill': 'fill',
+    'fill': 'fill', 'setfont': 'fill', 'hollowline': 'fill',
+    'endfill': 'fill', 'plus': 'number', 'minus': 'number',
+    'multiply': 'number', 'divide': 'number', 'oneOf': 'number',
+    'pendown': 'pen', 'shade': 'pen', 'mod': 'number', 'int': 'number',
+    'sqrt': 'number', 'identity': 'number', 'and': 'boolean',
+    'or': 'boolean', 'not': 'boolean', 'greater': 'boolean',
+    'less': 'boolean', 'equal': 'boolean', 'random': 'random',
+    'repeat': 'repeat', 'forever': 'repeat', 'if': 'ifthen',
+    'ifthenelse': 'ifthen', 'while': 'ifthen', 'until': 'ifthen',
+    'action': 'action', 'do': 'action', 'nameddo': 'action',
+    'listen': 'action', 'broadcast': 'action', 'calc': 'action',
+    'doArg': 'action', 'calcArg': 'action', 'dispatch': 'action',
+    'namedcalc': 'action', 'nameddoArg': 'action', 'namedcalcArg': 'action',
+    'storein': 'box', 'namedbox': 'box', 'incrementOne': 'box',
+    'luminance': 'sensor', 'mousex': 'sensor', 'mousey': 'sensor',
+    'drum': 'action',
+    'start': 'action', 'mousebutton': 'sensor', 'keyboard': 'sensor',
+    'readpixel': 'sensor', 'see': 'sensor', 'time': 'sensor',
+    'sound': 'sensor', 'volume': 'sensor',
+    'resistance': 'sensor', 'voltage': 'sensor', 'video': 'media',
+    'wait': 'media', 'camera': 'media', 'journal': 'media',
+    'audio': 'media', 'show': 'media', 'setscale': 'media',
+    'savepix': 'media', 'savesvg': 'media', 'mediawait': 'media',
+    'mediapause': 'media', 'mediastop': 'media', 'mediaplay': 'media',
+    'speak': 'media', 'sinewave': 'media', 'description': 'media',
+    'push': 'extras', 'pop': 'extras', 'printheap': 'extras',
+    'clearheap': 'extras', 'isheapempty': 'extras', 'chr': 'extras',
+    'int': 'number', 'myfunction': 'python', 'userdefined': 'python',
+    'box': 'box', 'kbinput': 'sensor', 'showHeap': 'extras',
+    'emptyHeap': 'extras',
+    'loadblock': 'python', 'loadpalette': 'python',
+    'matrix': 'ignore', 'hidden': 'ignore',
+    'rest2': 'ignore', 'rhythm': 'ignore',
+    'text': 'ignore', 'number': 'ignore', 'vspace': 'ignore'};
 
-TAPAL = {'forward': 'turtlep', 'arc': 'turtlep', 'coord': 'turtlep',
-         'setxy': 'turtlep', 'pen': 'penp', 'fill': 'penp',
-         'random': 'numberp', 'boolean': 'numberp', 'repeat': 'flowp',
-         'ifthen': 'flowp', 'action': 'boxp', 'box': 'boxp',
-         'sensor': 'sensorp', 'media': 'mediap', 'extras': 'extrasp',
-         'number': 'numberp', 'python': 'extrasp', 'ignore': 'numberp'};
+// Assign each bin to a palette.
+const TAPAL = {
+    'note': 'notesp', 'rhythm': 'notesp', 'pitch': 'pitchp',
+    'transpose': 'pitchp', 'tone': 'tonep',
+    'forward': 'turtlep', 'arc': 'turtlep', 'coord': 'turtlep',
+    'setxy': 'turtlep', 'pen': 'penp', 'fill': 'penp',
+    'random': 'numberp', 'boolean': 'numberp', 'repeat': 'flowp',
+    'ifthen': 'flowp', 'action': 'boxp', 'box': 'boxp',
+    'sensor': 'sensorp', 'media': 'mediap', 'extras': 'extrasp',
+    'number': 'numberp', 'python': 'extrasp', 'ignore': 'numberp'};
 
-TASCORE = {'forward': 3, 'arc': 3, 'setxy': 2.5, 'coord': 4, 'turtlep': 5,
-           'pen': 2.5, 'fill': 2.5, 'penp': 5,
-           'number': 2.5, 'boolean': 2.5, 'random': 2.5, 'numberp': 0,
-           'repeat': 2.5, 'ifthen': 7.5, 'flowp': 10,
-           'box': 7.5, 'action': 7.5, 'boxp': 0,
-           'media': 5, 'mediap': 0,
-           'python': 5, 'extras': 5, 'extrasp': 0, 'ignore': 0,
-           'sensor': 5, 'sensorp': 0};
+// Assign a score for each bin.
+const TASCORE = {
+    'note': 1, 'rhythm': 5, 'pitch': 1, 'transpose': 5, 'tone': 5,
+    'forward': 3, 'arc': 3, 'setxy': 2.5, 'coord': 4, 'turtlep': 5,
+    'pen': 2.5, 'fill': 2.5, 'penp': 5,
+    'number': 2.5, 'boolean': 2.5, 'random': 2.5, 'numberp': 0,
+    'repeat': 2.5, 'ifthen': 7.5, 'flowp': 10,
+    'box': 7.5, 'action': 7.5, 'boxp': 0,
+    'media': 5, 'mediap': 0,
+    'python': 5, 'extras': 5, 'extrasp': 0, 'ignore': 0,
+    'sensor': 5, 'sensorp': 0};
 
-PALS = ['turtlep', 'penp', 'numberp', 'flowp', 'boxp', 'sensorp', 'mediap',
-        'extrasp'];
+// The list of palettes.
+const PALS = ['notesp', 'pitchp', 'tonep', 'turtlep', 'penp', 'numberp', 'flowp', 'boxp', 'sensorp', 'mediap', 'extrasp'];
+
+const PALLABELS = [_('rhythm'), _('pitch'), _('tone'), _('turtle'), _('pen'), _('number'), _('flow'), _('box'), _('sensors'), _('media'), _('extras')];
 
 
 function analyzeProject(blocks) {
@@ -90,7 +125,7 @@ function analyzeProject(blocks) {
                 cats.push(TACAT[blockList[b]]);
             }
         } else {
-           console.log(blockList[b] + ' not in catelog');
+           console.log(blockList[b] + ' not in catalog');
         }
     }
     for (var c = 0; c < cats.length; c++) {
@@ -130,7 +165,7 @@ function scoreToChartData(scores) {
     } else {
         var scale = 1;
     }
-    console.log(scale);
+
     if (scale > 1) {
         scale = 1;
     }
@@ -139,7 +174,7 @@ function scoreToChartData(scores) {
     }
 
     var data = {
-        labels: [_('turtle'), _('pen'), _('number'), _('flow'), _('box'), _('sensors'), _('media'), _('extras')],
+        labels: PALLABELS,
         datasets: [
             {
                 label: '',
