@@ -395,7 +395,9 @@ define(function (require) {
 
         function doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
-            if (!turtles.running()) {
+            if (docById('matrix').style.visibility === 'visible') {
+		matrix.playAll();
+            } else if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
                 logo.step();
@@ -424,7 +426,9 @@ define(function (require) {
 
         function doSlowMusicButton() {
             logo.setNoteDelay(DEFAULTDELAY);
-            if (!turtles.running()) {
+            if (docById('matrix').style.visibility === 'visible') {
+		matrix.playAll();
+            } else if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
                 logo.stepNotes();

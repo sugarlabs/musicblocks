@@ -215,6 +215,7 @@ function Matrix() {
         cell.style.minWidth=iconSize;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
+            thisMatrix.logo.setTurtleDelay(0);
             thisMatrix.playAll();
         }
         cell.onmouseover=function() {
@@ -838,7 +839,7 @@ function Matrix() {
                 that.playNote(time, noteCounter);
             }
             }
-        }, that.logo.defaultBPMFactor * 1000 * time);
+        }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
     }
 
     this.setNotes = function(colIndex, rowIndex, playNote) {
