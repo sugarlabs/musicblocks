@@ -633,6 +633,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // Yet another database integrety check.
             if (!foundMatch) {
                 console.log('Did not find match for ' + myBlock.name + ' (' + blk + ') and ' + this.blockList[cblk].name + ' (' + cblk + ')');
+                console.log(myBlock.connections);
+		console.log(this.blockList[cblk].connections);
                 break;
             }
 
@@ -2500,12 +2502,21 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 if (last(blkData[4]) == null) {
                     var len = blkData[4].length;
                     blkData[4][len - 1] = this.loadCounter + hiddenBlocks.length;  // blockOffset is added in later.
+                    // console.log('adding hidden block ' + hiddenBlocks.length + ' to ' + thisBlock + ': ' + (this.loadCounter + hiddenBlocks.length + blockOffset));
                     hiddenBlocks.push([thisBlock, null]);
                 } else if (blockObjs[last(blkData[4])][1] !== 'hidden') {
                     var len = blkData[4].length;
                     var nextBlock = last(blkData[4]);
+                    // console.log('inserting hidden block ' + hiddenBlocks.length + ' between ' + thisBlock + ' and ' + nextBlock + ': ' + (this.loadCounter + hiddenBlocks.length + blockOffset));
                     blkData[4][len - 1] = this.loadCounter + hiddenBlocks.length;  // blockOffset is added in later.
-                    blockObjs[nextBlock][4][0] = this.loadCounter + hiddenBlocks.length;  // blockOffset is added in later.
+                    // If we are looking into the future, we are
+                    // OK. If we are looking into the past, we need to
+                    // update a previously made connnection.
+                    if (thisBlock < nextBlock + blockOffset) {
+                        blockObjs[nextBlock][4][0] = this.loadCounter + hiddenBlocks.length;  // blockOffset is added in later.
+                    } else {
+                        this.blockList[nextBlock + blockOffset].connections[0] = this.loadCounter + hiddenBlocks.length + blockOffset;
+                    }
                     hiddenBlocks.push([thisBlock, blockOffset + nextBlock]);
                 }
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
@@ -2891,6 +2902,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         var blockOffset = this.blockList.length;
         for (var b = 0; b < hiddenBlocks.length; b++) {
             var thisBlock = blockOffset + b;
+            // console.log('adding hidden block ' + b + ' with connections to ' + hiddenBlocks[b][0] + ' and ' + hiddenBlocks[b][1]);
             this.makeNewBlockWithConnections('hidden', 0, [hiddenBlocks[b][0], hiddenBlocks[b][1]], null);
         }
     }
