@@ -1206,11 +1206,13 @@ define(function (require) {
             blocks.findDragGroup(thisBlock);
             for (var b = 0; b < blocks.dragGroup.length; b++) {
                 var blk = blocks.dragGroup[b];
-                console.log('Restoring ' + blocks.blockList[blk].name + ' from the trash.');
+                // console.log('Restoring ' + blocks.blockList[blk].name + ' from the trash.');
                 blocks.blockList[blk].trash = false;
                 blocks.moveBlockRelative(blk, dx, dy);
                 blocks.blockList[blk].show();
             }
+
+            blocks.raiseStackToTop(thisBlock);
             blocks.refreshCanvas();
         }
 
