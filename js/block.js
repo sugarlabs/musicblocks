@@ -1107,7 +1107,7 @@ function collapseOut(blocks, myBlock, thisBlock, moved, event) {
     if (moved) {
         // Check if block is in the trash.
         if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
-            sendStackToTrash(blocks, myBlock);
+            blocks.sendStackToTrash(myBlock);
         } else {
             // Otherwise, process move.
             blocks.blockMoved(thisBlock);
@@ -1357,7 +1357,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
     if (moved) {
         // Check if block is in the trash.
         if (trashcan.overTrashcan(event.stageX / myBlock.blocks.blockScale, event.stageY / myBlock.blocks.blockScale)) {
-            sendStackToTrash(blocks, myBlock);
+            blocks.sendStackToTrash(myBlock);
         } else {
             // Otherwise, process move.
             // Keep track of time of last move
