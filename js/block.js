@@ -455,7 +455,7 @@ function Block(protoblock, blocks, overrideName) {
                             myBlock.blocks.refreshCanvas();
                         }
                         if (myBlock.postProcess != null) {
-                            myBlock.postProcess(myBlock);
+                            myBlock.postProcess(myBlock.postProcessArg);
                             myBlock.postProcess = null;
                         }
                     }
