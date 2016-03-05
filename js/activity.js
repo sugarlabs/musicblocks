@@ -384,7 +384,9 @@ define(function (require) {
 
         function doFastButton(env) {
             logo.setTurtleDelay(0);
-            if (!turtles.running()) {
+            if (docById('matrix').style.visibility === 'visible') {
+		matrix.playAll();
+            } else if (!turtles.running()) {
                 logo.runLogoCommands(null, env);
             } else {
                 logo.step(null, env);
