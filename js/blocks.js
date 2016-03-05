@@ -2288,8 +2288,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
 
             if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp'].indexOf(this.protoBlockDict[name].style) !== -1) {
-		this.checkArgClampBlocks.push(this.blockList.length + b);
-	    }
+                this.checkArgClampBlocks.push(this.blockList.length + b);
+            }
 
             switch (name) {
             case 'text':
@@ -2948,7 +2948,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (['action', 'nameddo', 'namedarg', 'nameddoArg', 'calc', 'calcArg', 'namedcalcArg', 'storein'].indexOf(name) != -1) {
             // console.log(name);
             this.checkPaletteEntries(name);
-	}
+        }
     }
 
     this.checkPaletteEntries = function (name) {
@@ -2969,9 +2969,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (updatePalettes) {
             // console.log('in checkPaletteEntries');
             if (name === 'storein') {
-		this.palettes.updatePalettes('boxes');
+                this.palettes.updatePalettes('boxes');
             } else {
-		this.palettes.updatePalettes('actions');
+                this.palettes.updatePalettes('actions');
             }
         }
     }
@@ -3018,109 +3018,108 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.refreshCanvas;
     }
 
+    this.sendStackToTrash = function (myBlock) {
+        var thisBlock = this.blockList.indexOf(myBlock);
+
+        // Add this block to the list of blocks in the trash so we can
+        // undo this action.
+        this.trashStacks.push(thisBlock);
+
+        // Disconnect block.
+        var b = myBlock.connections[0];
+        if (b != null) {
+            for (var c in this.blockList[b].connections) {
+                if (this.blockList[b].connections[c] === thisBlock) {
+                    this.blockList[b].connections[c] = null;
+                    break;
+                }
+            }
+            myBlock.connections[0] = null;
+        }
+
+        if (myBlock.name === 'start' || myBlock.name === 'drum') {
+            turtle = myBlock.value;
+            if (turtle != null) {
+                console.log('putting turtle ' + turtle + ' in the trash');
+                this.turtles.turtleList[turtle].trash = true;
+                this.turtles.turtleList[turtle].container.visible = false;
+            } else {
+                console.log('null turtle');
+            }
+        }
+
+        if (myBlock.name === 'action') {
+            var actionArg = this.blockList[myBlock.connections[1]];
+            if (actionArg) {
+                var actionName = actionArg.value;
+                for (var blockId = 0; blockId < this.blockList.length; blockId++) {
+                    var myBlock = this.blockList[blockId];
+                    var blkParent = this.blockList[myBlock.connections[0]];
+                    if (blkParent == null) {
+                        continue;
+                    }
+                    if (['namedcalc', 'calc', 'nameddo', 'do', 'action'].indexOf(blkParent.name) !== -1) {
+                        continue;
+                    }
+                    var blockValue = myBlock.value;
+                    if (blockValue === _('action')) {
+                        continue;
+                    }
+                    if (blockValue === actionName) {
+                        blkParent.hide();
+                        myBlock.hide();
+                        myBlock.trash = true;
+                        blkParent.trash = true;
+                    }
+                }
+                
+                var blockPalette = this.palettes.dict['actions'];
+                var blockRemoved = false;
+
+                for (var blockId = 0; blockId < blockPalette.protoList.length; blockId++) {
+                    var block = blockPalette.protoList[blockId];
+                    if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.privateData !== _('action')) {
+                        blockPalette.protoList.splice(blockPalette.protoList.indexOf(block), 1);
+                        // Any of these could be in the palette.
+                        if (this.protoBlockDict['myDo_' + actionName]) {
+                            // console.log('deleting protoblocks for action ' + actionName);
+                            this.protoBlockDict['myDo_' + actionName].hide = true;
+                            delete this.protoBlockDict['myDo_' + actionName];
+                        } else if (this.protoBlockDict['myCalc_' + actionName]) {
+                            // console.log('deleting protoblocks for action ' + actionName);
+                            this.protoBlockDict['myCalc_' + actionName].hide = true;
+                            delete this.protoBlockDict['myCalc_' + actionName];
+                        } else if (this.protoBlockDict['myDoArg_' + actionName]) {
+                            // console.log('deleting protoblocks for action ' + actionName);
+                            this.protoBlockDict['myDoArg_' + actionName].hide = true;
+                            delete this.protoBlockDict['myDoArg_' + actionName];
+                        } else if (this.protoBlockDict['myCalcArg_' + actionName]) {
+                            // console.log('deleting protoblocks for action ' + actionName);
+                            this.protoBlockDict['myCalcArg_' + actionName].hide = true;
+                            delete this.protoBlockDict['myCalcArg_' + actionName];
+                        }
+                        blockPalette.y = 0;
+                        blockRemoved = true;
+                    }
+                }
+                // Force an update if a block was removed.
+                if (blockRemoved) {
+                    regeneratePalette(blockPalette);
+                }
+            }
+        }
+
+        // put drag group in trash
+        this.findDragGroup(thisBlock);
+        for (var b = 0; b < this.dragGroup.length; b++) {
+            var blk = this.dragGroup[b];
+            // console.log('putting ' + this.blockList[blk].name + ' in the trash');
+            this.blockList[blk].trash = true;
+            this.blockList[blk].hide();
+            this.refreshCanvas();
+        }
+    }
+
     blockBlocks = this;
     return this;
-}
-
-
-function sendStackToTrash(blocks, myBlock) {
-    var thisBlock = blocks.blockList.indexOf(myBlock);
-
-    // Add this block to the list of blocks in the trash so we can
-    // undo this action.
-    blocks.trashStacks.push(thisBlock);
-
-    // Disconnect block.
-    var b = myBlock.connections[0];
-    if (b != null) {
-        for (var c in blocks.blockList[b].connections) {
-            if (blocks.blockList[b].connections[c] === thisBlock) {
-                blocks.blockList[b].connections[c] = null;
-                break;
-            }
-        }
-        myBlock.connections[0] = null;
-    }
-
-    if (myBlock.name === 'start' || myBlock.name === 'drum') {
-        turtle = myBlock.value;
-        if (turtle != null) {
-            console.log('putting turtle ' + turtle + ' in the trash');
-            blocks.turtles.turtleList[turtle].trash = true;
-            blocks.turtles.turtleList[turtle].container.visible = false;
-        } else {
-            console.log('null turtle');
-        }
-    }
-
-    if (myBlock.name === 'action') {
-        var actionArg = blocks.blockList[myBlock.connections[1]];
-        if (actionArg) {
-            var actionName = actionArg.value;
-            for (var blockId = 0; blockId < blocks.blockList.length; blockId++) {
-                var myBlock = blocks.blockList[blockId];
-                var blkParent = blocks.blockList[myBlock.connections[0]];
-                if (blkParent == null) {
-                    continue;
-                }
-                if (['namedcalc', 'calc', 'nameddo', 'do', 'action'].indexOf(blkParent.name) !== -1) {
-                    continue;
-                }
-                var blockValue = myBlock.value;
-                if (blockValue === _('action')) {
-                    continue;
-                }
-                if (blockValue === actionName) {
-                    blkParent.hide();
-                    myBlock.hide();
-                    myBlock.trash = true;
-                    blkParent.trash = true;
-                }
-            }
-
-            var blockPalette = blocks.palettes.dict['actions'];
-            var blockRemoved = false;
-
-            for (var blockId = 0; blockId < blockPalette.protoList.length; blockId++) {
-                var block = blockPalette.protoList[blockId];
-                if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.privateData !== _('action')) {
-                    blockPalette.protoList.splice(blockPalette.protoList.indexOf(block), 1);
-                    // Any of these could be in the palette.
-                    if (blocks.protoBlockDict['myDo_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        blocks.protoBlockDict['myDo_' + actionName].hide = true;
-                        delete blocks.protoBlockDict['myDo_' + actionName];
-                    } else if (blocks.protoBlockDict['myCalc_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        blocks.protoBlockDict['myCalc_' + actionName].hide = true;
-                        delete blocks.protoBlockDict['myCalc_' + actionName];
-                    } else if (blocks.protoBlockDict['myDoArg_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        blocks.protoBlockDict['myDoArg_' + actionName].hide = true;
-                        delete blocks.protoBlockDict['myDoArg_' + actionName];
-                    } else if (blocks.protoBlockDict['myCalcArg_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        blocks.protoBlockDict['myCalcArg_' + actionName].hide = true;
-                        delete blocks.protoBlockDict['myCalcArg_' + actionName];
-                    }
-                    blockPalette.y = 0;
-                    blockRemoved = true;
-                }
-            }
-            // Force an update if a block was removed.
-            if (blockRemoved) {
-                regeneratePalette(blockPalette);
-            }
-        }
-    }
-
-    // put drag group in trash
-    blocks.findDragGroup(thisBlock);
-    for (var b = 0; b < blocks.dragGroup.length; b++) {
-        var blk = blocks.dragGroup[b];
-        // console.log('putting ' + blocks.blockList[blk].name + ' in the trash');
-        blocks.blockList[blk].trash = true;
-        blocks.blockList[blk].hide();
-        blocks.refreshCanvas();
-    }
 }
