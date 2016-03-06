@@ -109,6 +109,9 @@ function analyzeProject(blocks) {
 
     var blockList = [];
     for (var blk = 0; blk < blocks.blockList.length; blk++) {
+        if (blocks.blockList[blk].trash) {
+            continue;
+        }
         blockList.push(blocks.blockList[blk].name);
     }
 
