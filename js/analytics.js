@@ -101,7 +101,7 @@ const TASCORE = {
 // The list of palettes.
 const PALS = ['notesp', 'pitchp', 'tonep', 'turtlep', 'penp', 'numberp', 'flowp', 'boxp', 'sensorp', 'mediap', 'extrasp'];
 
-const PALLABELS = [_('rhythm'), _('pitch'), _('tone'), _('turtle'), _('pen'), _('number'), _('flow'), _('box'), _('sensors'), _('media'), _('extras')];
+const PALLABELS = [_('rhythm'), _('pitch'), _('tone'), _('turtle'), _('pen'), _('number'), _('flow'), _('action'), _('sensors'), _('media'), _('extras')];
 
 
 function analyzeProject(blocks) {
@@ -112,6 +112,50 @@ function analyzeProject(blocks) {
         if (blocks.blockList[blk].trash) {
             continue;
         }
+        // Check to see if the block is solo or has no child flow..
+        switch(blocks.blockList[blk].name) {
+        case 'rhythmicdot':
+        case 'tie':
+        case 'drift':
+        case 'osctime':
+        case 'sharp':
+        case 'flat':
+        case 'fill':
+        case 'hollowline':
+	case 'start':
+            if (blocks.blockList[blk].connections[1] == null) {
+		continue;
+	    }
+            break;
+        case 'note':
+        case 'dividebeatfactor':
+        case 'multiplybeatfactor':
+        case 'duplicatenotes':
+        case 'skipnotes':
+        case 'setbpm':
+        case 'settransposition':
+        case 'staccato':
+        case 'slur':
+        case 'swing':
+        case 'crescendo':
+        case 'setnotevolume2':
+        case 'action':
+            if (blocks.blockList[blk].connections[2] == null) {
+		continue;
+	    }
+	    break;
+        case 'invert':
+        case 'tuplet2':
+            if (blocks.blockList[blk].connections[3] == null) {
+		continue;
+	    }
+	    break;
+	default:
+            if (blocks.blockList[blk].connections[0] == null && last(blocks.blockList[blk].connections) == null) {
+		continue;
+	    }
+	    break;
+	}
         blockList.push(blocks.blockList[blk].name);
     }
 
