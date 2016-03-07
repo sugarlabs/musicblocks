@@ -68,6 +68,38 @@ function Block(protoblock, blocks, overrideName) {
     this.postProcess = null;
     this.postProcessArg = null;
 
+    // Internal function for creating cache.
+    // Includes workaround for a race condition.
+    this.createCache = function() {
+        var myBlock = this;
+        myBlock.bounds = myBlock.container.getBounds();
+
+        if (myBlock.bounds == null) {
+            // console.log('Block container for ' + myBlock.name + ' not yet ready.');
+            setTimeout(function() {
+                myBlock.createCache();
+            }, 200);
+        } else {
+            myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
+        }
+    }
+
+    // Internal function for creating cache.
+    // Includes workaround for a race condition.
+    this.updateCache = function() {
+        var myBlock = this;
+
+        if (myBlock.bounds == null) {
+            // console.log('Block container for ' + myBlock.name + ' not yet ready.');
+            setTimeout(function() {
+                myBlock.updateCache();
+            }, 300);
+        } else {
+            myBlock.container.updateCache();
+            myBlock.blocks.refreshCanvas();
+        }
+    }
+
     this.offScreen = function (canvas) {
         return !this.trash && this.connections[0] == null && (this.container.x < 0 || this.container.y < 55 || this.container.x > canvas.width || this.container.y > canvas.height);
     }
@@ -109,12 +141,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
-        try {
-            this.container.updateCache();
-        } catch (e) {
-            console.log(e);
-        }
-        this.blocks.refreshCanvas();
+        this.updateCache();
     }
 
     this.unhighlight = function() {
@@ -137,12 +164,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
-        try {
-            this.container.updateCache();
-        } catch (e) {
-            console.log(e);
-        }
-        this.blocks.refreshCanvas();
+        this.updateCache();
     }
 
     this.updateArgSlots = function(slotList) {
@@ -178,7 +200,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
             }
-            myBlock.container.updateCache();
+            myBlock.updateCache();
             calculateBlockHitArea(myBlock);
         }
         this.protoblock.scale = blockScale;
@@ -270,6 +292,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < this.argClampSlots.length; i++) {
                 this.size += this.argClampSlots[i];
             }
+            // Regenerate the docks.
             this.docks = [];
             this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
             break;
@@ -355,8 +378,7 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.container.addChild(bitmap);
             positionMedia(bitmap, myBlock, image.width, image.height, myBlock.protoblock.scale);
             myBlock.imageBitmap = bitmap;
-            myBlock.container.updateCache();
-            myBlock.blocks.refreshCanvas();
+            myBlock.updateCache();
         }
         image.src = this.image;
     }
@@ -366,8 +388,12 @@ function Block(protoblock, blocks, overrideName) {
         // to regenerate the artwork associated with a block.
 
         // First we need to remove the old artwork.
-        this.container.removeChild(this.bitmap);
-        this.container.removeChild(this.highlightBitmap);
+        if (this.bitmap != null) {
+            this.container.removeChild(this.bitmap);
+        }
+        if (this.highlightBitmap != null) {
+            this.container.removeChild(this.highlightBitmap);
+        }
         if (collapse && this.collapseBitmap != null) {
             this.collapseContainer.removeChild(this.collapseBitmap);
             this.collapseContainer.removeChild(this.expandBitmap);
@@ -394,6 +420,9 @@ function Block(protoblock, blocks, overrideName) {
 
         // Create the bitmap for the block.
         function processBitmap(name, bitmap, myBlock) {
+            if (myBlock.bitmap != null) {
+                myBlock.container.removeChild(myBlock.bitmap);
+            }
             myBlock.bitmap = bitmap;
             myBlock.container.addChild(myBlock.bitmap);
             myBlock.bitmap.x = 0;
@@ -404,6 +433,9 @@ function Block(protoblock, blocks, overrideName) {
 
             // Create the highlight bitmap for the block.
             function processHighlightBitmap(name, bitmap, myBlock) {
+                if (myBlock.highlightBitmap != null) {
+                    myBlock.container.removeChild(myBlock.highlightBitmap);
+                }
                 myBlock.highlightBitmap = bitmap;
                 myBlock.container.addChild(myBlock.highlightBitmap);
                 myBlock.highlightBitmap.x = 0;
@@ -419,63 +451,47 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.container.uncache();
                 }
 
-                function finishProcess(myBlock) {
-                    myBlock.blocks.refreshCanvas();
+                myBlock.createCache();
+                myBlock.blocks.refreshCanvas();
 
-                    if (firstTime) {
-                        loadEventHandlers(myBlock);
-                        if (myBlock.image != null) {
-                            myBlock.addImage();
-                        }
-                        myBlock.finishImageLoad();
-                    } else {
-                        if (myBlock.name === 'start' || myBlock.name === 'drum') {
-                            ensureDecorationOnTop(myBlock);
-                        }
-
-                        // Adjust the docks.
-                        myBlock.blocks.loopCounter = 0;
-                        // console.log('adjust Docks ' + myBlock.name);
-                        myBlock.blocks.adjustDocks(thisBlock);
-
-                        // Adjust the text position.
-                        positionText(myBlock, myBlock.protoblock.scale);
-
-                        // Are there clamp blocks that need expanding?
-                        if (myBlock.blocks.clampBlocksToCheck.length > 0) {
-                            setTimeout(function () {
-                                myBlock.blocks.adjustExpandableClampBlock();
-                            }, 250);
-                        }
-
-                        if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
-                            myBlock.bitmap.visible = !myBlock.collapsed;
-                            myBlock.highlightBitmap.visible = false;
-                            myBlock.container.updateCache();
-                            myBlock.blocks.refreshCanvas();
-                        }
-                        if (myBlock.postProcess != null) {
-                            myBlock.postProcess(myBlock.postProcessArg);
-                            myBlock.postProcess = null;
-                        }
+                if (firstTime) {
+                    loadEventHandlers(myBlock);
+                    if (myBlock.image != null) {
+                        myBlock.addImage();
                     }
-                }
+                    myBlock.finishImageLoad();
+                } else {
+                    if (myBlock.name === 'start' || myBlock.name === 'drum') {
+                        ensureDecorationOnTop(myBlock);
+                    }
 
-                // Workaround for a race condition.
-                function createCache(myBlock) {
-                    myBlock.bounds = myBlock.container.getBounds();
-                    if (myBlock.bounds == null) {
-                        console.log('block container for ' + thisBlock + ' not yet ready. (' + myBlock.name + ')');
-                        setTimeout(function() {
-                            createCache(myBlock);
+                    // Adjust the docks.
+                    myBlock.blocks.loopCounter = 0;
+                    // console.log('adjust Docks ' + myBlock.name);
+                    myBlock.blocks.adjustDocks(thisBlock);
+
+                    // Adjust the text position.
+                    positionText(myBlock, myBlock.protoblock.scale);
+
+                    /*
+                    // Are there clamp blocks that need expanding?
+                    if (myBlock.blocks.clampBlocksToCheck.length > 0) {
+                        setTimeout(function () {
+                            myBlock.blocks.adjustExpandableClampBlock();
                         }, 250);
-                    } else {
-                        myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
-                        finishProcess(myBlock);
+                    }
+                    */
+
+                    if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
+                        myBlock.bitmap.visible = !myBlock.collapsed;
+                        myBlock.highlightBitmap.visible = false;
+                        myBlock.updateCache();
+                    }
+                    if (myBlock.postProcess != null) {
+                        myBlock.postProcess(myBlock.postProcessArg);
+                        myBlock.postProcess = null;
                     }
                 }
-                createCache(myBlock);
-
             }
 
             if (myBlock.protoblock.disabled) {
@@ -487,6 +503,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 1; i < myBlock.protoblock.staticLabels.length; i++) {
                 artwork = artwork.replace('arg_label_' + i, myBlock.protoblock.staticLabels[i]);
             }
+
             makeBitmap(artwork, myBlock.name, processHighlightBitmap, myBlock);
         }
 
@@ -613,8 +630,7 @@ function Block(protoblock, blocks, overrideName) {
 
                     ensureDecorationOnTop(myBlock);
 
-                    myBlock.container.updateCache();
-                    myBlock.blocks.refreshCanvas();
+                    myBlock.updateCache();
 
                     myBlock.collapseContainer = new createjs.Container();
                     myBlock.collapseContainer.snapToPixelEnabled = true;
@@ -776,8 +792,7 @@ function Block(protoblock, blocks, overrideName) {
             // Next, scale the bitmap for the thumbnail.
             positionMedia(bitmap, myBlock, bitmap.image.width, bitmap.image.height, myBlock.protoblock.scale);
             myBlock.container.addChild(bitmap);
-            myBlock.container.updateCache();
-            myBlock.blocks.refreshCanvas();
+            myBlock.updateCache();
         }
 
         if (imagePath == null) {
@@ -846,7 +861,7 @@ function Block(protoblock, blocks, overrideName) {
                 myBlock.bitmap.visible = true;
             } else {
                 myBlock.bitmap.visible = false;
-                myBlock.container.updateCache();
+                myBlock.updateCache();
             }
             myBlock.highlightBitmap.visible = false;
 
@@ -881,8 +896,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             myBlock.collapseContainer.updateCache();
-            myBlock.container.updateCache();
-            myBlock.blocks.refreshCanvas();
+            myBlock.updateCache();
         }
 
         toggle(this);
@@ -930,7 +944,7 @@ function positionText(myBlock, blockScale) {
     // Ensure text is on top.
     z = myBlock.container.getNumChildren() - 1;
     myBlock.container.setChildIndex(myBlock.text, z);
-    myBlock.container.updateCache();
+    myBlock.updateCache();
 }
 
 
@@ -1501,7 +1515,7 @@ function changeLabel(myBlock) {
                 labelHTML += '<option value="' + SOLFNOTES[i] + '">' + SOLFNOTES[i] + '</option>';
             }
         }
-        labelHTML += '</select>';
+       labelHTML += '</select>';
         labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
         for (var i = 0; i < SOLFATTRS.length; i++) {
             if (selectedattr === SOLFATTRS[i]) {
@@ -1685,12 +1699,7 @@ function labelChanged(myBlock) {
     // Make sure text is on top.
     var z = myBlock.container.getNumChildren() - 1;
     myBlock.container.setChildIndex(myBlock.text, z);
-    try {
-        myBlock.container.updateCache();
-    } catch (e) {
-        console.log(e);
-    }
-    myBlock.blocks.refreshCanvas();
+    myBlock.updateCache();
 
     var c = myBlock.connections[0];
     if (myBlock.name === 'text' && c != null) {

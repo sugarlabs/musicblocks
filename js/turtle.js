@@ -212,7 +212,7 @@ function Turtle (name, turtles, drum) {
             } else {
                 this.startBlock.collapseText.text = this.name;
             }
-	    this.startBlock.regenerateArtwork(false);
+            this.startBlock.regenerateArtwork(false);
             this.startBlock.value = this.turtles.turtleList.indexOf(this);
         }
     }
@@ -374,7 +374,7 @@ function Turtle (name, turtles, drum) {
         }
 
         this.bitmap.rotation = this.orientation;
-        this.container.updateCache();
+        this.updateCache();
 
         // Clear all media.
         for (var i = 0; i < this.media.length; i++) {
@@ -617,7 +617,7 @@ function Turtle (name, turtles, drum) {
                 me.decorationBitmap.scaleX = (27.5 / image.width) * me.startBlock.protoblock.scale / 2;
                 me.decorationBitmap.scaleY = (27.5 / image.height) * me.startBlock.protoblock.scale / 2;
                 me.decorationBitmap.scale = (27.5 / image.width) * me.startBlock.protoblock.scale / 2;
-                me.startBlock.container.updateCache();
+                me.startBlock.updateCache();
             }
             me.turtles.refreshCanvas();
         }
@@ -653,7 +653,7 @@ function Turtle (name, turtles, drum) {
         this.orientation += Number(degrees);
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
-        this.container.updateCache();
+        this.updateCache();
         this.turtles.refreshCanvas();
     }
 
@@ -662,13 +662,13 @@ function Turtle (name, turtles, drum) {
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
         this.turtles.refreshCanvas();
-        this.container.updateCache();
+        this.updateCache();
     }
 
     this.doSetFont = function(font) {
         this.font = font;
         this.turtles.refreshCanvas();
-        this.container.updateCache();
+        this.updateCache();
     }
 
 
@@ -777,6 +777,37 @@ function Turtle (name, turtles, drum) {
             this.svgPath = false;
         }
     }
+
+    // Internal function for creating cache.
+    // Includes workaround for a race condition.
+    this.createCache = function() {
+        var myTurtle = this;
+        myTurtle.bounds = myTurtle.container.getBounds();
+
+        if (myTurtle.bounds == null) {
+            setTimeout(function() {
+                myTurtle.createCache();
+            }, 200);
+        } else {
+            myTurtle.container.cache(myTurtle.bounds.x, myTurtle.bounds.y, myTurtle.bounds.width, myTurtle.bounds.height);
+        }
+    }
+
+    // Internal function for creating cache.
+    // Includes workaround for a race condition.
+    this.updateCache = function() {
+        var myTurtle = this;
+
+        if (myTurtle.bounds == null) {
+            console.log('Block container for ' + myTurtle.name + ' not yet ready.');
+            setTimeout(function() {
+                myTurtle.updateCache();
+            }, 300);
+        } else {
+            myTurtle.container.updateCache();
+            myTurtle.turtles.refreshCanvas();
+        }
+    }
 };
 
 
@@ -869,19 +900,30 @@ function Turtles(canvas, stage, refreshCanvas) {
             myTurtle.bitmap.cursor = 'pointer';
             myTurtle.container.addChild(myTurtle.bitmap);
 
+            myTurtle.createCache();
+            /*
             var bounds = myTurtle.container.getBounds();
             myTurtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-
+            */
             myTurtle.startBlock = startBlock;
             if (startBlock != null) {
+                startBlock.updateCache();
                 myTurtle.decorationBitmap = myTurtle.bitmap.clone();
                 startBlock.container.addChild(myTurtle.decorationBitmap);
                 myTurtle.decorationBitmap.name = 'decoration';
                 var bounds = startBlock.container.getBounds();
-                myTurtle.decorationBitmap.x = bounds.width - 40 * startBlock.protoblock.scale / 2;
+
+                // Race condition with collapse/expand bitmap generation.
+                if (startBlock.expandBitmap == null) {
+                    var offset = 75;
+                } else {
+                    var offset = 40;
+                }
+                myTurtle.decorationBitmap.x = bounds.width - offset * startBlock.protoblock.scale / 2;
+
                 myTurtle.decorationBitmap.y = 35 * startBlock.protoblock.scale / 2;
                 myTurtle.decorationBitmap.scaleX = myTurtle.decorationBitmap.scaleY = myTurtle.decorationBitmap.scale = 0.5 * startBlock.protoblock.scale / 2
-                startBlock.container.updateCache();
+                startBlock.updateCache();
             }
 
             me.refreshCanvas();
