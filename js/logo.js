@@ -1,4 +1,4 @@
-8// Copyright (c) 2014-2016 Walter Bender
+// Copyright (c) 2014-2016 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
 //
 // This program is free software; you can redistribute it and/or
