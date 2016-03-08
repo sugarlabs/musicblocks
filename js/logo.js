@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2016 Walter Bender
+8// Copyright (c) 2014-2016 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
 //
 // This program is free software; you can redistribute it and/or
@@ -15,7 +15,7 @@ const TARGETBPM = 90;  // What we'd like to use for beats per minute
 const DEFAULTDELAY = 500; // milleseconds
 const TURTLESTEP = -1;  // Run in step-by-step mode
 const OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
-                               // to scale back its volume.
+                                 // to scale back its volume.
 
 // This header is prepended to the Lilypond output.
 // Note: We are using URL encoding, e.g., \ (%5C) and newline (%0A)
@@ -29,7 +29,7 @@ const LYTUPLETVALUE = 3;
 const LYROUNDDOWN = 4;
 const LYINSIDECHORD = 5;
 const LYSTACCATO = 6;
-const CLEFS = ['treble', 'bass', 'bass_8'];
+const CLEFS = ['treble', 'bass', 'bass_8', 'percussion'];
 
 const NOMICERRORMSG = 'The microphone is not available.';
 const NANERRORMSG = 'Not a number.';
@@ -2555,6 +2555,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.saveLilypondOutput(_('My Project') + '.ly');
                     logo.lilypondSaveOnly = false;
                     logo.checkingLilypond = false;
+                    // Show busy cursor.
+                    document.body.style.cursor = 'default';
                 } else if (logo.lilypondSaveOnly) {
                     setTimeout(function() {
                         checkLilypond();
@@ -3882,17 +3884,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     }
 
-    this.stageNotesForLilypond = function (turtle, note, duration, dotcount, tupletValue, roundDown, insideChord, staccato) {
-        if (turtle in this.lilypondStaging) {
-            this.lilypondStaging[turtle].push([note, duration, dotcount, tupletValue, roundDown, insideChord, staccato.length > 0 && last(staccato) > 0]);
-        } else {
-            this.lilypondStaging[turtle] = [[note, duration, dotcount, tupletValue, roundDown, insideChord, staccato.length > 0 && last(staccato) > 0]];
-        }
-    }
-
     this.updateNotation = function (note, duration, turtle, insideChord) {
         var obj = durationToNoteValue(duration);
-        this.stageNotesForLilypond(turtle, note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle]);
+        if (!(turtle in this.lilypondStaging)) {
+            this.lilypondStaging[turtle] = [];
+        }
+        if (this.turtles.turtleList[turtle].drum) {
+            note = "c'";
+        }
+        this.lilypondStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
     }
 
     this.processLilypondNotes = function (turtle) {
@@ -4026,10 +4026,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             this.lilypondNotes[turtle] += ')} ';
                             i += 1;
                         } else {
-                            this.lilypondNotes[turtle] += ' } ';
+                            this.lilypondNotes[turtle] += '} ';
                         }
                     } else {
-                        this.lilypondNotes[turtle] += ' } ';
+                        this.lilypondNotes[turtle] += '} ';
                     }
                     targetDuration = 0;
                     tupletDuration = 0;
@@ -4179,7 +4179,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                     }
                 }
-                if (noteCount > 0) {
+                if (this.turtles.turtleList[t].drum) {
+                    clef.push('percussion');
+                } else if (noteCount > 0) {
                     // console.log(t + ': ' + octaveTotal + ' ' + noteCount);
                     switch (Math.floor(octaveTotal / noteCount)) {
                     case 0:
@@ -4197,13 +4199,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else {
                     clef.push('treble');
                 }
+
                 this.processLilypondNotes(t);
+
                 var instrumentName = this.turtles.turtleList[t].name;
-                if (instrumentName === _('start')) {
-                    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                if (instrumentName === _('start') || instrumentName === _('start drum')) {
+                    instrumentName = RODENTS[t % 12];
                 } else if (instrumentName === t.toString()) {
-                    instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                    instrumentName = RODENTS[t % 12];
                 }
+                instrumentName = instrumentName.replace(/ /g, '_');
+
                 this.lilypondOutput += instrumentName + ' = {%0A';
                 this.lilypondOutput += '%25 %5Cmeter%0A';
                 this.lilypondOutput += this.lilypondNotes[t];
@@ -4217,7 +4223,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var shortInstrumentName = RODENTSSHORT[t % 12];
 
                 this.lilypondOutput += instrumentName.replace(/ /g, '_') + 'Voice = ';
-                this.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
+                if (this.turtles.turtleList[t].drum) {
+                    this.lilypondOutput += '%5Cnew DrumStaff %5Cwith {%0A';
+                    // this.lilypondOutput += '   %5Cdrummode {%0A      hihat4 hh bassdrum bd%0A   }%0A';
+                } else {
+                    this.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
+                }
                 this.lilypondOutput += '   %5Cclef "' + last(clef) + '"%0A';
                 this.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
                 this.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
@@ -4241,12 +4252,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (clef[i] === CLEFS[c]) {
                     if (this.lilypondStaging[t].length > 0) {
                         var instrumentName = this.turtles.turtleList[t].name;
-                        if (instrumentName === _('start')) {
-                            instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                        if (instrumentName === _('start') || instrumentName === _('start drum')) {
+                            instrumentName = RODENTS[t % 12];
                         } else if (instrumentName === t.toString()) {
                             instrumentName = RODENTS[t % 12];
                         }
-                        this.lilypondOutput += '      %5C' + instrumentName.replace(/ /g, '_') + 'Voice%0A';
+                        instrumentName = instrumentName.replace(/ /g, '_');
+                        this.lilypondOutput += '      %5C' + instrumentName + 'Voice%0A';
                     }
                 }
             }
@@ -4260,11 +4272,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (clef[i] === CLEFS[c]) {
                     if (this.lilypondStaging[t].length > 0) {
                         var instrumentName = this.turtles.turtleList[t].name;
-                        if (instrumentName === _('start')) {
-                            instrumentName = RODENTS[t % 12].replace(/ /g, '_');
+                        if (instrumentName === _('start') || instrumentName === _('start drum')) {
+                            instrumentName = RODENTS[t % 12]
                         } else if (instrumentName === t.toString()) {
                             instrumentName = RODENTS[t % 12];
                         }
+                        instrumentName = instrumentName.replace(/ /g, '_');
                         this.lilypondOutput += '         %5Ccontext TabVoice = "'+ instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A';
                     }
                 }

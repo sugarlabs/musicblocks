@@ -1351,6 +1351,9 @@ define(function (require) {
         }
 
         function doLilypond() {
+            // Show busy cursor.
+            document.body.style.cursor = 'wait';
+
             console.log('Saving .ly file');
             logo.lilypondSaveOnly = true;
             logo.lilypondOutput = LILYPONDHEADER;
