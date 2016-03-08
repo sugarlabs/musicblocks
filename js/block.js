@@ -190,6 +190,7 @@ function Block(protoblock, blocks, overrideName) {
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
+
             if (myBlock.name === 'start' || myBlock.name === 'drum') {
                 // Rescale the decoration on the start blocks.
                 for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
@@ -203,6 +204,7 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.updateCache();
             calculateBlockHitArea(myBlock);
         }
+
         this.protoblock.scale = blockScale;
         this.newArtwork(0);
         this.regenerateArtwork(true, []);
@@ -210,6 +212,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.text != null) {
             positionText(this, blockScale);
         }
+
         if (this.collapseContainer != null) {
             this.collapseContainer.uncache();
             var postProcess = function(myBlock) {
@@ -391,15 +394,18 @@ function Block(protoblock, blocks, overrideName) {
         if (this.bitmap != null) {
             this.container.removeChild(this.bitmap);
         }
+
         if (this.highlightBitmap != null) {
             this.container.removeChild(this.highlightBitmap);
         }
+
         if (collapse && this.collapseBitmap != null) {
             this.collapseContainer.removeChild(this.collapseBitmap);
             this.collapseContainer.removeChild(this.expandBitmap);
             this.container.removeChild(this.collapseBlockBitmap);
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
+
         // Then we generate new artwork.
         this.generateArtwork(false);
     }
@@ -423,6 +429,7 @@ function Block(protoblock, blocks, overrideName) {
             if (myBlock.bitmap != null) {
                 myBlock.container.removeChild(myBlock.bitmap);
             }
+
             myBlock.bitmap = bitmap;
             myBlock.container.addChild(myBlock.bitmap);
             myBlock.bitmap.x = 0;
@@ -436,6 +443,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (myBlock.highlightBitmap != null) {
                     myBlock.container.removeChild(myBlock.highlightBitmap);
                 }
+
                 myBlock.highlightBitmap = bitmap;
                 myBlock.container.addChild(myBlock.highlightBitmap);
                 myBlock.highlightBitmap.x = 0;
@@ -459,6 +467,7 @@ function Block(protoblock, blocks, overrideName) {
                     if (myBlock.image != null) {
                         myBlock.addImage();
                     }
+
                     myBlock.finishImageLoad();
                 } else {
                     if (myBlock.name === 'start' || myBlock.name === 'drum') {
@@ -467,6 +476,7 @@ function Block(protoblock, blocks, overrideName) {
 
                     // Adjust the docks.
                     myBlock.blocks.loopCounter = 0;
+
                     // console.log('adjust Docks ' + myBlock.name);
                     myBlock.blocks.adjustDocks(thisBlock);
 
@@ -487,6 +497,7 @@ function Block(protoblock, blocks, overrideName) {
                         myBlock.highlightBitmap.visible = false;
                         myBlock.updateCache();
                     }
+
                     if (myBlock.postProcess != null) {
                         myBlock.postProcess(myBlock.postProcessArg);
                         myBlock.postProcess = null;

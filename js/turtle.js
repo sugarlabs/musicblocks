@@ -654,20 +654,17 @@ function Turtle (name, turtles, drum) {
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
         this.updateCache();
-        this.turtles.refreshCanvas();
     }
 
     this.doSetHeading = function(degrees) {
         this.orientation = Number(degrees);
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
-        this.turtles.refreshCanvas();
         this.updateCache();
     }
 
     this.doSetFont = function(font) {
         this.font = font;
-        this.turtles.refreshCanvas();
         this.updateCache();
     }
 
@@ -901,10 +898,7 @@ function Turtles(canvas, stage, refreshCanvas) {
             myTurtle.container.addChild(myTurtle.bitmap);
 
             myTurtle.createCache();
-            /*
-            var bounds = myTurtle.container.getBounds();
-            myTurtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            */
+
             myTurtle.startBlock = startBlock;
             if (startBlock != null) {
                 startBlock.updateCache();
@@ -919,6 +913,7 @@ function Turtles(canvas, stage, refreshCanvas) {
                 } else {
                     var offset = 40;
                 }
+
                 myTurtle.decorationBitmap.x = bounds.width - offset * startBlock.protoblock.scale / 2;
 
                 myTurtle.decorationBitmap.y = 35 * startBlock.protoblock.scale / 2;
