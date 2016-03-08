@@ -922,6 +922,14 @@ function Matrix() {
     this.saveMatrix = function() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
+
+	// First, hide the palettes as they will need updating.
+        for (var name in this.logo.blocks.palettes.dict) {
+            this.logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+        this.logo.refreshCanvas();
+
+
         var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': 'chunk'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 
