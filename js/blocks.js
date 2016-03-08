@@ -2504,7 +2504,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     blkData[4][len - 1] = this.loadCounter + hiddenBlocks.length;  // blockOffset is added in later.
                     // console.log('adding hidden block ' + hiddenBlocks.length + ' to ' + thisBlock + ': ' + (this.loadCounter + hiddenBlocks.length + blockOffset));
                     hiddenBlocks.push([thisBlock, null]);
-                } else if (blockObjs[last(blkData[4])][1] !== 'hidden') {
+                } else if (blockObjs[last(blkData[4])][1][0] !== 'hidden' && blockObjs[last(blkData[4])][1] !== 'hidden') {
                     var len = blkData[4].length;
                     var nextBlock = last(blkData[4]);
                     // console.log('inserting hidden block ' + hiddenBlocks.length + ' between ' + thisBlock + ' and ' + nextBlock + ': ' + (this.loadCounter + hiddenBlocks.length + blockOffset));
