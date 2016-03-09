@@ -3055,7 +3055,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
         if (myBlock.name === 'start' || myBlock.name === 'drum') {
             turtle = myBlock.value;
-            if (turtle != null) {
+            var turtleNotInTrash = 0;
+            for(var i = 0; i < this.turtles.turtleList.length; i++) {
+                if(!blocks.turtles.turtleList[i].trash) {
+                    turtleNotInTrash += 1;
+                }
+            }
+            if (turtle != null && turtleNotInTrash > 1) {
                 console.log('putting turtle ' + turtle + ' in the trash');
                 this.turtles.turtleList[turtle].trash = true;
                 this.turtles.turtleList[turtle].container.visible = false;
