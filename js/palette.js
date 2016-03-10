@@ -66,7 +66,9 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.refreshCanvas = refreshCanvas;
     this.originalSize = 55; // this is the original svg size
     this.trashcan = trashcan;
-
+    this.initial_x = 55;
+    this.initial_y = 55;
+    
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
@@ -345,7 +347,7 @@ function loadPaletteButtonHandler(palettes, name) {
         setTimeout(function() {
             locked = false;
         }, 500);
-
+        palettes.dict[name].moveMenu(palettes.initial_x,palettes.initial_y);
         palettes.showPalette(name);
         palettes.refreshCanvas();
     });
@@ -1719,6 +1721,8 @@ function loadPaletteMenuHandler(palette) {
             palette.palettes.refreshCanvas();
             var dx = palette.menuContainer.x - oldX;
             var dy = palette.menuContainer.y - oldY;
+            palette.palettes.initial_x = palette.menuContainer.x;
+            palette.palettes.initial_y = palette.menuContainer.y;
 
             // If we are over the trash, warn the user.
             if (trashcan.overTrashcan(event.stageX / palette.palettes.scale, event.stageY / palette.palettes.scale)) {
