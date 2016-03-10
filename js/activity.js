@@ -381,10 +381,10 @@ define(function (require) {
             if(table != null) {
                 table.remove();
             }
+
             var canvas = document.getElementById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
-
         }
 
         function doFastButton(env) {
@@ -1244,6 +1244,12 @@ define(function (require) {
         }
 
         function sendAllToTrash(addStartBlock, doNotSave) {
+            // First, hide the palettes as they will need updating.
+            for (var name in blocks.palettes.dict) {
+                blocks.palettes.dict[name].hideMenu(true);
+            }
+            refreshCanvas();
+
             var dx = 0;
             var dy = cellSize * 3;
             for (var blk in blocks.blockList) {
@@ -1266,7 +1272,8 @@ define(function (require) {
                     }
                 }
             }
-            if (addStartBlock) {//ti la sol mi re
+
+            if (addStartBlock) {
                 blocks.loadNewBlocks(DATAOBJS);
             } else if (!doNotSave) {
                 // Overwrite session data too.
@@ -1442,11 +1449,12 @@ define(function (require) {
             document.body.style.cursor = 'wait';
             // palettes.updatePalettes();
             setTimeout(function () {
-                if (fileExt(projectName) !== 'tb') {
+                if (fileExt(projectName) !== 'tb')
+		{
                     projectName += '.tb';
                 }
-                try {
 
+                try {
                     try {
                         httpGet(null);
                         console.log('running from server or the user can access to examples.');
@@ -1461,6 +1469,12 @@ define(function (require) {
                         console.log('receiving ' + rawData);
                         var cleanData = rawData.replace('\n', '');
                     }
+
+                    // First, hide the palettes as they will need updating.
+                    for (var name in blocks.palettes.dict) {
+                        blocks.palettes.dict[name].hideMenu(true);
+                    }
+
                     var obj = JSON.parse(cleanData);
                     blocks.loadNewBlocks(obj);
                     console.log('save locally');
@@ -1486,6 +1500,12 @@ define(function (require) {
             console.log('loadRawProject ' + data);
             document.body.style.cursor = 'wait';
             allClear();
+
+            // First, hide the palettes as they will need updating.
+            for (var name in blocks.palettes.dict) {
+                blocks.palettes.dict[name].hideMenu(true);
+            }
+
             var obj = JSON.parse(data);
             blocks.loadNewBlocks(obj);
 
@@ -1559,6 +1579,10 @@ define(function (require) {
                         justLoadStart();
                     } else {
                         console.log('restoring session: ' + sessionData);
+                        // First, hide the palettes as they will need updating.
+                        for (var name in blocks.palettes.dict) {
+                            blocks.palettes.dict[name].hideMenu(true);
+                        }
                         blocks.loadNewBlocks(JSON.parse(sessionData));
                     }
                 } catch (e) {
