@@ -111,13 +111,13 @@
             var row = table.rows.item(0);
             row.style.left = matrixDivPosition.left + 'px';
             row.style.top = matrixDivPosition.top + 'px';
-            var marginFromTop = Math.floor(matrixDivPosition.top) + parseInt(matrixDiv.style.paddingTop);
 
+            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
             for (i = 1, row; row = table.rows[i]; i++) {
                 cell = row.cells[0];
                 cell.style.left = matrixDivPosition.left + 2 + 'px';
                 cell.style.top = marginFromTop + 'px';
-                marginFromTop +=  parseInt(cell.style.height);
+                marginFromTop += parseInt(cell.style.height);
             }
         }
     </script>
