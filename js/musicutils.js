@@ -18,9 +18,6 @@ const NOTESFLAT2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a'
 const EXTRATRANSPOSITIONS = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
 const MAJORHALFSTEPS = ['do', '', 're', '', 'mi', 'fa', '', 'sol', '', 'la', '', 'ti'];
 const MINORHALFSTEPS = ['do', '', 're', 'mi', '', 'fa', '', 'sol', 'la', '', 'ti', ''];
-const NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', 64: '&#x1D163;', 128: '&#x1D164;'};
-const DOTTEDNOTESYMBOLS = {1: '&#x1D15D;.', 2: '&#x1D15E;.', 4: '&#x1D15F;.', 8: '&#x1D160;.', 16: '&#x1D161;.', 32: '&#x1D162;.', 64: '&#x1D163;.', 128: '&#x1D164;.'};
-const DOUBLEDOTTEDNOTESYMBOLS = {1: '&#x1D15D;..', 2: '&#x1D15E;..', 4: '&#x1D15F;..', 8: '&#x1D160;..', 16: '&#x1D161;..', 32: '&#x1D162;..', 64: '&#x1D163;..', 128: '&#x1D164;..'};
 const SOLFEGECONVERSIONTABLE = {'C': 'do', 'C♯': 'do' + '♯', 'D': 're', 'D♯': 're' + '♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa' + '♯', 'G': 'sol', 'G♯': 'sol' + '♯', 'A': 'la', 'A♯': 'la' + '♯', 'B': 'ti', 'D♭': 're' + '♭', 'E♭': 'mi' + '♭', 'G♭': 'sol' + '♭', 'A♭': 'la' + '♭', 'B♭': 'ti' + '♭', 'R': _('rest')};
 const PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
 const PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
@@ -34,7 +31,6 @@ const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 const TWELTHROOT2 = 1.05946309435929;
 const A0 = 27.5;
 const C8 = 4186.01;
-
 
 function durationToNoteValue(duration) {
     // returns [note value, no. of dots, tuplet factor]
@@ -78,20 +74,6 @@ function durationToNoteValue(duration) {
 
     // Next, generate a fauve tuplet for a singleton.
     return [1, 0, duration, roundDown];
-}
-
-
-function reducedFraction(a, b) {
-    greatestCommonMultiple = function(a, b) {
-        return b === 0 ? a : greatestCommonMultiple(b, a % b);
-    }
-
-    var gcm = greatestCommonMultiple(a, b);
-    if (b / gcm in NOTESYMBOLS) {
-        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>' + NOTESYMBOLS[b / gcm];
-    } else {
-        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
-    }
 }
 
 

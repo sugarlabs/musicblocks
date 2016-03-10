@@ -35,20 +35,31 @@ savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.
 */
 
-var MATRIXBUTTONCOLOR = '#c374e9';
-var MATRIXLABELCOLOR = '#90c100';
-var MATRIXNOTECELLCOLOR = '#b1db00';
-var MATRIXTUPLETCELLCOLOR = '#57e751';
-var MATRIXRHYTHMCELLCOLOR = '#c8c8c8';
+const MATRIXBUTTONCOLOR = '#c374e9';
+const MATRIXLABELCOLOR = '#90c100';
+const MATRIXNOTECELLCOLOR = '#b1db00';
+const MATRIXTUPLETCELLCOLOR = '#57e751';
+const MATRIXRHYTHMCELLCOLOR = '#c8c8c8';
 
-var MATRIXBUTTONCOLORHOVER = '#c894e0';
-var MATRIXNOTECELLCOLORHOVER = '#c2e820';
+const MATRIXBUTTONCOLORHOVER = '#c894e0';
+const MATRIXNOTECELLCOLORHOVER = '#c2e820';
 
-var MATRIXSOLFEWIDTH = 52;
-var EIGHTHNOTEWIDTH = 24;
-var MATRIXBUTTONHEIGHT = 40;
-var MATRIXBUTTONHEIGHT2 = 66;
-var MATRIXSOLFEHEIGHT = 30;
+const MATRIXSOLFEWIDTH = 52;
+const EIGHTHNOTEWIDTH = 24;
+const MATRIXBUTTONHEIGHT = 40;
+const MATRIXBUTTONHEIGHT2 = 66;
+const MATRIXSOLFEHEIGHT = 30;
+
+const wholeNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(WHOLENOTE)));
+const halfNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HALFNOTE)));
+const quarterNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(QUARTERNOTE)));
+const eighthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EIGHTHNOTE)));
+const sixteenthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SIXTEENTHNOTE)));
+const thirtysecondNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(THIRTYSECONDNOTE)));
+const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SIXTYFOURTHNOTE)));
+
+var NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
+// var NOTESYMBOLS = {1: '&#x1D15D;', 2: '&#x1D15E;', 4: '&#x1D15F;', 8: '&#x1D160;', 16: '&#x1D161;', 32: '&#x1D162;', 64: '&#x1D163;', 128: '&#x1D164;'};
 
 
 function Matrix() {
@@ -191,17 +202,17 @@ function Matrix() {
         var header = table.createTHead();
         var row = header.insertRow(0);
         row.style.position = 'fixed';
-        row.style.left = matrixDivPosition.left + 'px';
-        row.style.top = matrixDivPosition.top + 'px';
+        row.style.left = Math.floor(matrixDivPosition.left) + 'px';
+        row.style.top = Math.floor(matrixDivPosition.top) + 'px';
 
-        var cell = row.insertCell(-1);
-        cell.style.fontSize = this.cellScale * 100 + '%';
-        cell.innerHTML = '<b>' + _('Solfa') + '</b>';
-        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXLABELCOLOR;
+        var solfaCell = row.insertCell(-1);
+        solfaCell.style.fontSize = this.cellScale * 100 + '%';
+        solfaCell.innerHTML = '<b>' + _('Solfa') + '</b>';
+        solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        solfaCell.style.minWidth = solfaCell.style.width;
+        solfaCell.style.maxWidth = solfaCell.style.width;
+        solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        solfaCell.style.backgroundColor = MATRIXLABELCOLOR;
 
         var iconSize = Math.floor(this.cellScale * 24);
 
@@ -210,9 +221,10 @@ function Matrix() {
 
         var cell = row.insertCell(1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
-        cell.style.maxWidth=iconSize;
-        cell.style.minWidth=iconSize;
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+	cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             thisMatrix.logo.setTurtleDelay(0);
@@ -227,9 +239,10 @@ function Matrix() {
 
         var cell = row.insertCell(2);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
-        cell.style.maxWidth=iconSize;
-        cell.style.minWidth=iconSize;
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+	cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             thisMatrix.saveMatrix();
@@ -243,9 +256,10 @@ function Matrix() {
 
         var cell = row.insertCell(3);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/erase-button.svg" title="' + _('clear') + '" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
-        cell.style.maxWidth=iconSize;
-        cell.style.minWidth=iconSize;
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+	cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             thisMatrix.clearMatrix();
@@ -259,9 +273,10 @@ function Matrix() {
 
         var cell = row.insertCell(4);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-button.svg" title="' + _('export') + ' HTML" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
-        cell.style.maxWidth=iconSize;
-        cell.style.minWidth=iconSize;
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+	cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             thisMatrix.exportMatrix();
@@ -275,9 +290,10 @@ function Matrix() {
 
         var cell = row.insertCell(5);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-        cell.style.height = MATRIXBUTTONHEIGHT * this.cellScale + 'px';
-        cell.style.maxWidth=iconSize;
-        cell.style.minWidth=iconSize;
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+	cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
             docById('matrix').style.visibility = 'hidden';
@@ -291,43 +307,48 @@ function Matrix() {
         }
 
         var j = 0;
-        var marginFromTop = matrixDivPosition.top + parseInt(matrixDiv.style.paddingTop);
+        var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
+        console.log(marginFromTop);
         for (var i = 0; i < this.solfegeNotes.length; i++) {
             if (this.solfegeNotes[i].toLowerCase() === _('rest')) {
                 this.rests += 1;
                 continue;
             }
             var row = header.insertRow(i + 1);
+            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale + i * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             cell.style.fontSize = this.cellScale * 100 + '%';
             cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
-            cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
-            cell.style.position = 'fixed';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.left = matrixDivPosition.left + 2 + 'px';
-            cell.style.top = marginFromTop + 'px';
-            marginFromTop += parseInt(cell.style.height);
+            cell.style.maxWidth = cell.style.minWidth;
+            cell.style.position = 'fixed';
+            cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
+            // cell.style.top = Math.floor(marginFromTop + (i * this.cellScale * 2)) + 'px';
+            marginFromTop += parseInt(cell.style.height.replace('px', ''));
             j += 1;
         }
 
         var row = header.insertRow(this.solfegeNotes.length - this.rests + 1);
+        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale + i * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
         var cell = row.insertCell(0);
         cell.style.fontSize = this.cellScale * 75 + '%';
         cell.innerHTML = _('note value');
         cell.style.position = 'fixed';
-        cell.style.height = 1.5 * MATRIXSOLFEHEIGHT * this.cellScale + 'px';
+        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
         cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        cell.style.left = matrixDivPosition.left + 2 + 'px';
-        cell.style.top = marginFromTop + 'px';
+        cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
+        // cell.style.top = Math.floor(marginFromTop + (i * this.cellScale * 2)) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
     }
 
     this.generateDataURI = function(file) {
+	// Deprecated since we now use SVG for note artwork.
+        /*
         file=file.replace(/𝅝/g,"&#x1D15D;");
         file=file.replace(/𝅗𝅥/g,"&#x1D15E;");
         file=file.replace(/𝅘𝅥/g,"&#x1D15F;");
@@ -335,6 +356,7 @@ function Matrix() {
         file=file.replace(/𝅘𝅥𝅯/g,"&#x1D161;");
         file=file.replace(/𝅘𝅥𝅰/g,"&#x1D162;");
         file=file.replace(/𝅘𝅥𝅱/g,"&#x1D163;");
+        */
         var data = "data:text/html;charset=utf-8," + encodeURIComponent(file);
         return data;
     }
@@ -369,6 +391,7 @@ function Matrix() {
                 var exportCell = exportRow.insertCell(j);
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.innerHTML = col.innerHTML;
+                console.log(col.innerHTML);
                 exportCell.width = col.width;
                 if(exportCell.width == ""){
                     exportCell.width = col.style.width;
@@ -430,7 +453,7 @@ function Matrix() {
             for (var j = 0; j < numberOfNotes; j++) {
                 cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
-                cell.style.height=30+'px';
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
@@ -460,11 +483,11 @@ function Matrix() {
             cell.style.fontSize = this.cellScale * 75 + '%';
             cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
-            cell.style.left = matrixDivPosition.left + 2 + 'px';
-            cell.style.top = matrixDivPosition.top + (table.rows.length - 1) * cell.style.height + 'px';
+            cell.style.minWidth = cell.style.width;
+            cell.style.maxWidth = cell.style.minWidth;
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
+            // cell.style.top = matrixDivPosition.top + (table.rows.length - 1) * cell.style.height + 'px';
             cell.innerHTML = _('tuplet value');
             cell.style.backgroundColor = MATRIXLABELCOLOR;
         }
@@ -473,7 +496,7 @@ function Matrix() {
         w = (2 * w) / 5;
 
         cell = table.rows[table.rows.length - 1].insertCell(-1);
-        cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
+        cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
 
         var noteValue = param[0][1] / param[0][0];
         var noteValueToDisplay = this.calcNoteValueToDisplay(param[0][1], param[0][0]);
@@ -512,11 +535,11 @@ function Matrix() {
             var cell = row.insertCell(-1);
             cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.height = 1.5 * MATRIXSOLFEHEIGHT * this.cellScale + 'px';
+            cell.style.minWidth = cell.style.width;
+            cell.style.maxWidth = cell.style.width;
+            cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
-            cell.style.top = matrixDivPosition.top + (table.rows.length - 2) * cell.style.height + 'px';
+            // cell.style.top = matrixDivPosition.top + (table.rows.length - 2) * cell.style.height + 'px';
             cell.style.fontSize = this.cellScale * 75 + '%';
             cell.innerHTML = _('note value');
             cell.style.backgroundColor = MATRIXLABELCOLOR;
@@ -538,7 +561,7 @@ function Matrix() {
             // Add cell for tuplet note values
             cell = row.insertCell(-1);
             cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-            cell.style.height = MATRIXSOLFEHEIGHT * this.cellScale + 'px';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
             // Add tuplet note values
             if (i >= tupletCol) {
                 var j = i - tupletCol;
@@ -547,7 +570,7 @@ function Matrix() {
                 cell.style.fontSize = this.cellScale * 75 + '%';
                 var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
                 if (obj[1] in NOTESYMBOLS) {
-                       cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>' + NOTESYMBOLS[obj[1]];
+                       cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '>';
                 } else {
                        cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
                 }
@@ -565,19 +588,19 @@ function Matrix() {
         var noteValue = a / b;
         var noteValueToDisplay = null;
         if (noteValue in NOTESYMBOLS) {
-            noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br><br>' + NOTESYMBOLS[noteValue];
+            noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '>';
         } else {
             noteValueToDisplay = reducedFraction(b, a);
         }
 
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
-            if (noteValueToDisplay in DOTTEDNOTESYMBOLS) {
-                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + DOTTEDNOTESYMBOLS[noteValueToDisplay];
+            if (noteValueToDisplay in NOTESYMBOLS) {
+                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '> .';
             } else {
                 noteValueToDisplay = parseInt((noteValue * 1.75))
-                if (noteValueToDisplay in DOTTEDNOTESYMBOLS) {
-                    noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br><br>' + DOUBLEDOTTEDNOTESYMBOLS[noteValueToDisplay];
+                if (noteValueToDisplay in NOTESYMBOLS) {
+                    noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '> ..';
                 } else {
                     noteValueToDisplay = reducedFraction(b, a);
                 }
@@ -613,9 +636,9 @@ function Matrix() {
                 var cell = row.insertCell(-1);
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
                 cell.width = this.noteWidth(noteValue);
-                cell.style.width = this.noteWidth(noteValue);
-                cell.style.maxWidth = this.noteWidth(noteValue);
-                cell.style.minWidth = this.noteWidth(noteValue);
+                cell.style.width = cell.width;
+                cell.style.minWidth = cell.style.width;
+                cell.style.maxWidth = cell.style.width;
                 if (i === rowCount) {
                     cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
                     cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
@@ -1028,5 +1051,18 @@ function Matrix() {
         // Create a new stack for the chunk.
         console.log(newStack);
         this.logo.blocks.loadNewBlocks(newStack);
+    }
+}
+
+function reducedFraction(a, b) {
+    greatestCommonMultiple = function(a, b) {
+        return b === 0 ? a : greatestCommonMultiple(b, a % b);
+    }
+
+    var gcm = greatestCommonMultiple(a, b);
+    if (b / gcm in [1, 2, 4, 8, 16, 32, 64]) {
+        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
+    } else {
+        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
     }
 }
