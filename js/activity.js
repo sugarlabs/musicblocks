@@ -697,6 +697,12 @@ define(function (require) {
                         console.log(cleanData);
                         var obj = JSON.parse(cleanData);
                         console.log(obj)
+                        // First, hide the palettes as they will need updating.
+                        for (var name in blocks.palettes.dict) {
+                            blocks.palettes.dict[name].hideMenu(true);
+                        }
+                        refreshCanvas();
+
                         blocks.loadNewBlocks(obj);
                         // Restore default cursor.
                         document.body.style.cursor = 'default';
