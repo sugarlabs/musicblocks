@@ -2142,6 +2142,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (this.selectedStack == null) {
             return;
         }
+        // First, hide the palettes as they will need updating.
+        for (var name in this.palettes.dict) {
+            this.palettes.dict[name].hideMenu(true);
+        }
+
         var blockObjs = this.copyBlocksToObj();
         this.loadNewBlocks(blockObjs);
     }
@@ -2439,6 +2444,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
 
         if (updatePalettes) {
+            console.log('UPDATING ACTION PALETTE');
             this.palettes.updatePalettes('actions');
         }
 
@@ -2970,6 +2976,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             // console.log('collapse ' + this.blockList[this.blocksToCollapse[i]].name);
             this.blockList[this.blocksToCollapse[i]].collapseToggle();
         }
+
         this.blocksToCollapse = [];
 
         for (var blk = 0; blk < this.blockList.length; blk++) {
@@ -2978,10 +2985,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 this.blockList[blk].collapseContainer.y = this.blockList[blk].container.y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
         }
+
         this.refreshCanvas();
 
-        if (['action', 'nameddo', 'namedarg', 'nameddoArg', 'calc', 'calcArg', 'namedcalcArg', 'storein'].indexOf(name) != -1) {
-            // console.log(name);
+        if (['start', 'action', 'nameddo', 'namedarg', 'nameddoArg', 'calc', 'calcArg', 'namedcalcArg', 'storein'].indexOf(name) != -1) {
             this.checkPaletteEntries(name);
         }
     }
@@ -3083,6 +3090,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     }
 
     this.sendStackToTrash = function (myBlock) {
+        // First, hide the palettes as they will need updating.
+        for (var name in this.palettes.dict) {
+            this.palettes.dict[name].hideMenu(true);
+        }
+        refreshCanvas();
+
         var thisBlock = this.blockList.indexOf(myBlock);
 
         // Add this block to the list of blocks in the trash so we can
@@ -3152,7 +3165,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         blockPalette.protoList.splice(blockPalette.protoList.indexOf(block), 1);
                         // Any of these could be in the palette.
                         if (this.protoBlockDict['myDo_' + actionName]) {
-                            // console.log('deleting protoblocks for action ' + actionName);
+                            console.log('deleting protoblocks for action ' + actionName);
                             this.protoBlockDict['myDo_' + actionName].hide = true;
                             delete this.protoBlockDict['myDo_' + actionName];
                         } else if (this.protoBlockDict['myCalc_' + actionName]) {
