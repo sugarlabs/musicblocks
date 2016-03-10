@@ -127,7 +127,7 @@ define(function (require) {
         // Set up a file chooser for the doOpenPlugin function.
         var pluginChooser = docById('myOpenPlugin');
         // The file chooser for all files.
-        var allFilesChooser = docById('myOpenAll')
+        var allFilesChooser = docById('myOpenAll');
 
         // Are we running off of a server?
         var server = true;
@@ -663,7 +663,7 @@ define(function (require) {
             initBasicProtoBlocks(palettes, blocks);
 
             // Load any macros saved in local storage.
-            macroData = storage.macros
+            macroData = storage.macros;
             if (macroData != null) {
                 processMacroData(macroData, palettes, blocks, macroDict);
             }
@@ -714,7 +714,7 @@ define(function (require) {
             });
 
             pluginChooser.addEventListener('change', function (event) {
-                window.scroll(0, 0)
+                window.scroll(0, 0);
 
                 // Read file here.
                 var reader = new FileReader();
@@ -1095,11 +1095,11 @@ define(function (require) {
                 case ESC:
                     // toggle full screen
                     toggleToolbar();
-                    break
+                    break;
                 case RETURN:
                     // toggle run
                     logo.runLogoCommands();
-                    break
+                    break;
                 default:
                     currentKey = String.fromCharCode(event.keyCode);
                     currentKeyCode = event.keyCode;
@@ -1368,8 +1368,8 @@ define(function (require) {
             logo.runLogoCommands();
         }
 
-        window.prepareExport = prepareExport
-        window.saveLocally = saveLocally
+        window.prepareExport = prepareExport;
+        window.saveLocally = saveLocally;
 
         function saveLocally() {
 
@@ -2023,7 +2023,7 @@ define(function (require) {
                                 helpIdx = 0;
                             }
                             var imageScale = 55 * musicBlocksScale;
-                            helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>'
+                            helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
                         }
                         update = true;
                     });
@@ -2046,7 +2046,7 @@ define(function (require) {
                         hitArea.y = 0;
                         helpContainer.hitArea = hitArea;
 
-                        docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>'
+                        docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
                         if (!doneTour) {
                             docById('helpElem').style.visibility = 'visible';
                         }
@@ -2081,18 +2081,18 @@ define(function (require) {
 
             }
 
-            doneTour = storage.doneTour === 'true'
+            doneTour = storage.doneTour === 'true';
 
             if (firstTime && doneTour) {
                 docById('helpElem').style.visibility = 'hidden';
                 helpContainer.visible = false;
             } else {
                 if (sugarizerCompatibility.isInsideSugarizer()) {
-                    sugarizerCompatibility.data.doneTour = 'true'
+                    sugarizerCompatibility.data.doneTour = 'true';
                 } else {
-                    storage.doneTour = 'true'
+                    storage.doneTour = 'true';
                 }
-                docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>'
+                docById('helpElem').innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '"</img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
                 docById('helpElem').style.visibility = 'visible';
                 helpContainer.visible = true;
                 update = true;
