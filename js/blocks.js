@@ -634,7 +634,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (!foundMatch) {
                 console.log('Did not find match for ' + myBlock.name + ' (' + blk + ') and ' + this.blockList[cblk].name + ' (' + cblk + ')');
                 console.log(myBlock.connections);
-		console.log(this.blockList[cblk].connections);
+                console.log(this.blockList[cblk].connections);
                 break;
             }
 
@@ -3155,14 +3155,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             for (var b = 0; b < this.dragGroup.length; b++) {
                 var blk = this.dragGroup[b];
                 var myBlock = this.blockList[blk];
-		if (myBlock.isTwoArgBlock()) {
+                if (myBlock.isTwoArgBlock()) {
                     this.checkTwoArgBlocks.push(blk);
-		} else if (myBlock.isArgBlock() && myBlock.isExpandableBlock() || myBlock.isArgClamp()) {
+                } else if (myBlock.isArgBlock() && myBlock.isExpandableBlock() || myBlock.isArgClamp()) {
                     this.checkTwoArgBlocks.push(blk);
-		} else if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp'].indexOf(myBlock.protoblock.style) !== -1) {
+                } else if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp'].indexOf(myBlock.protoblock.style) !== -1) {
                     this.checkArgClampBlocks.push(blk);
-		}
-	    }
+                }
+            }
             this.cleanupStacks();
             this.refreshCanvas();
         }
