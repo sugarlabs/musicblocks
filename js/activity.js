@@ -305,6 +305,9 @@ define(function (require) {
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
+            palettes.initial_x = 55;
+            palettes.initial_y = 55;
+            palettes.updatePalettes();
             var x = 100 * musicBlocksScale;
             var y = 100 * musicBlocksScale;
             for (var blk in blocks.blockList) {
