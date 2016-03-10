@@ -203,7 +203,7 @@ function Block(protoblock, blocks, overrideName) {
             }
             myBlock.updateCache();
             calculateBlockHitArea(myBlock);
-        }
+        };
 
         this.protoblock.scale = blockScale;
         this.newArtwork(0);
@@ -222,7 +222,7 @@ function Block(protoblock, blocks, overrideName) {
                 myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 positionCollapseContainer(myBlock, myBlock.protoblock.scale);
                 calculateCollapseHitArea(myBlock);
-            }
+            };
 
             this.generateCollapseArtwork(postProcess);
             var fontSize = 10 * blockScale;
@@ -382,7 +382,8 @@ function Block(protoblock, blocks, overrideName) {
             positionMedia(bitmap, myBlock, image.width, image.height, myBlock.protoblock.scale);
             myBlock.imageBitmap = bitmap;
             myBlock.updateCache();
-        }
+        };
+
         image.src = this.image;
     }
 
@@ -595,7 +596,8 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.postProcess(myBlock.postProcessArg);
                     myBlock.postProcess = null;
                 }
-            }
+            };
+
             this.generateCollapseArtwork(postProcess);
         }
     }
@@ -653,7 +655,8 @@ function Block(protoblock, blocks, overrideName) {
                         myBlock.collapseContainer.addChild(myBlock.collapseBitmap);
                         myBlock.collapseBitmap.visible = !myBlock.collapsed;
                         finishCollapseButton(myBlock);
-                    }
+                    };
+
                     image.src = 'images/collapse.svg';
 
                     finishCollapseButton = function(myBlock) {
@@ -674,12 +677,12 @@ function Block(protoblock, blocks, overrideName) {
                             myBlock.blocks.cleanupAfterLoad(myBlock.name);
                         }
                         image.src = 'images/expand.svg';
-                    }
-                }
+                    };
+                };
 
                 var artwork = myBlock.collapseArtwork;
                 makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', ''), '', processHighlightCollapseBitmap, myBlock);
-            }
+            };
 
             var artwork = this.collapseArtwork;
             makeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), '', processCollapseBitmap, this);
@@ -1462,7 +1465,8 @@ function makeBitmap(data, name, callback, args) {
     img.onload = function() {
         var bitmap = new createjs.Bitmap(img);
         callback(name, bitmap, args);
-    }
+    };
+
     img.src = 'data:image/svg+xml;base64,' + window.btoa(
         unescape(encodeURIComponent(data)));
 }
@@ -1607,6 +1611,7 @@ function changeLabel(myBlock) {
             blocks.updateStage();
         }
     };
+
     if (myBlock.name === 'text' || myBlock.name === 'number') {
         myBlock.label.addEventListener('blur', blur);
     }

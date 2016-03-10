@@ -981,7 +981,8 @@ function Palette(palettes, name) {
                                 bitmap.x = MEDIASAFEAREA[0] * (b.scale / 2);
                                 bitmap.y = MEDIASAFEAREA[1] * (b.scale / 2);
                                 calculateBounds(palette, blk, modname);
-                            }
+                            };
+
                             image.src = b.image;
                         } else {
                             calculateBounds(palette, blk, modname);
@@ -1810,7 +1811,8 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
     img.onload = function() {
         var bitmap = new createjs.Bitmap(img);
         callback(palette, name, bitmap, extras);
-    }
+    };
+
     img.src = 'data:image/svg+xml;base64,' + window.btoa(
         unescape(encodeURIComponent(data)));
 }
