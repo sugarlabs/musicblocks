@@ -865,7 +865,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 logo.runFromBlock(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
                             }
                         }
-                    }
+                    };
+
                     // If there is already a listener, remove it
                     // before adding the new one.
                     logo.setListener(turtle, args[0], listener);
@@ -1206,7 +1207,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     if(xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                         alert(xmlHttp.responseText);
                     }
-                }
+                };
+
                 xmlHttp.send(json);
             }
             break;
@@ -1440,7 +1442,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             var listener = function (event) {
                 logo.turtles.turtleList[turtle].doEndFill();
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -1463,7 +1465,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             var listener = function (event) {
                 logo.turtles.turtleList[turtle].doEndHollowLine();
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -1710,7 +1712,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function (event) {
                     logo.bpm[turtle].pop();
-                }
+                };
+
                 logo.setListener(turtle, listenerName, listener);
             }
             break;
@@ -1769,7 +1772,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                     matrix.makeClickable();
                 }
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -1783,7 +1786,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             var listener = function(event) {
                 logo.invertList[turtle].pop();
-            }
+            };
+
             logo.setListener(turtle, listenerName, listener);
             break;
         case 'rest2':
@@ -1998,7 +2002,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.processNote(noteBeatValue, blk, turtle);
                 logo.inNoteBlock[turtle] -= 1;
                 logo.pitchBlocks = [];
-            }
+            };
+
             logo.setListener(turtle, listenerName, listener);
             break;
         case 'rhythmicdot':
@@ -2021,7 +2026,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.dotCount[turtle] -= 1;
                 var newDotFactor = 2 - (1 / Math.pow(2, logo.dotCount[turtle]));
                 logo.beatFactor[turtle] /= newDotFactor;
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -2041,7 +2046,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.crescendoVolume[turtle].pop();
                     logo.crescendoInitialVolume[turtle].pop();
                     logo.lilypondEndCrescendo(turtle);
-                }
+                };
 
                 logo.setListener(turtle, listenerName, listener);
             }
@@ -2057,7 +2062,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function (event) {
                     logo.staccato[turtle].pop();
-                }
+                };
 
                 logo.setListener(turtle, listenerName, listener);
             }
@@ -2075,7 +2080,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var listener = function (event) {
                     logo.staccato[turtle].pop();
                     logo.lilypondEndSlur(turtle);
-                }
+                };
 
                 logo.setListener(turtle, listenerName, listener);
             }
@@ -2090,7 +2095,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             var listener = function (event) {
                 logo.drift[turtle] -= 1;
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -2119,7 +2124,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.processNote(noteValue, blk, turtle);
                 }
                 logo.tieNote[turtle] = [];
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -2138,7 +2143,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.swingTarget[turtle].pop();
                 logo.swing[turtle].pop();
                 logo.swingCarryOver[turtle] = 0;
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -2157,7 +2162,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function (event) {
                     logo.duplicateFactor[turtle] /= factor;
-                }
+                };
+
                 logo.setListener(turtle, listenerName, listener);
             }
             break;
@@ -2179,7 +2185,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     if (logo.skipFactor[turtle] === 1) {
                         logo.skipIndex[turtle] = 0;
                     }
-                }
+                };
+
                 logo.setListener(turtle, listenerName, listener);
             }
             break;
@@ -2198,7 +2205,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function (event) {
                     logo.beatFactor[turtle] /= factor;
-                }
+                };
 
                 logo.setListener(turtle, listenerName, listener);
             }
@@ -2218,7 +2225,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function (event) {
                     logo.beatFactor[turtle] /= factor;
-                }
+                };
 
                 logo.setListener(turtle, listenerName, listener);
             }
@@ -2243,7 +2250,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else {
                     logo.transposition[turtle] -= transValue;
                 }
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -2265,7 +2272,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else {
                     logo.transposition[turtle] -= 1;
                 }
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -2287,7 +2294,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else {
                     logo.transposition[turtle] += 1;
                 }
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -2312,7 +2319,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var listener = function(event) {
                     logo.polyVolume[turtle].pop();
                     logo.lilypondEndArticulation(turtle);
-                }
+                };
 
                 logo.setListener(turtle, listenerName, listener);
             }
@@ -2330,7 +2337,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 var listener = function(event) {
                     logo.polyVolume[turtle].pop();
-                }
+                };
 
                 logo.setListener(turtle, listenerName, listener);
             }
@@ -2403,7 +2410,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.addingNotesToTuplet = false;
                 } else {
                 }
-            }
+            };
 
             logo.setListener(turtle, listenerName, listener);
             break;
@@ -2923,7 +2930,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     if (insideChord > 0) {
                         insideChord = -1;
                     }
-                }
+                };
 
                 if (waitTime === 0 || this.lilypondSaveOnly) {
                     playnote(this);

@@ -1451,13 +1451,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             postProcess = function (thisBlock) {
                 me.blockList[thisBlock].value = me.turtles.turtleList.length;
                 me.turtles.addTurtle(me.blockList[thisBlock]);
-            }
+            };
+
             postProcessArg = thisBlock;
         } else if (name === 'drum') {
             postProcess = function (thisBlock) {
                 me.blockList[thisBlock].value = me.turtles.turtleList.length;
                 me.turtles.addDrum(me.blockList[thisBlock]);
-            }
+            };
+
             postProcessArg = thisBlock;
         } else if (name === 'text') {
             postProcess = function (args) {
@@ -1466,7 +1468,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].value = value;
                 me.blockList[thisBlock].text.text = value;
                 me.blockList[thisBlock].container.updateCache();
-            }
+            };
+
             postProcessArg = [thisBlock, _('text')];
         } else if (name === 'solfege') {
             postProcess = function (args) {
@@ -1475,7 +1478,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].value = value;
                 me.blockList[thisBlock].text.text = value;
                 me.blockList[thisBlock].container.updateCache();
-            }
+            };
+
             postProcessArg = [thisBlock, _('sol')];
         } else if (name === 'notename') {
             postProcess = function (args) {
@@ -1484,7 +1488,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].value = value;
                 me.blockList[thisBlock].text.text = value;
                 me.blockList[thisBlock].container.updateCache();
-            }
+            };
+
             postProcessArg = [thisBlock, 'G'];
         } else if (name === 'number') {
             postProcess = function (args) {
@@ -1493,7 +1498,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 me.blockList[thisBlock].value = value;
                 me.blockList[thisBlock].text.text = value.toString();
                 me.blockList[thisBlock].container.updateCache();
-            }
+            };
+
             postProcessArg = [thisBlock, 4];
         } else if (name === 'media') {
             postProcess = function (args) {
@@ -1505,7 +1511,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 } else {
                     me.blockList[thisBlock].image = null;
                 }
-            }
+            };
+
             postProcessArg = [thisBlock, null];
         } else if (name === 'camera') {
             postProcess = function (args) {
@@ -1518,7 +1525,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 } else {
                     me.blockList[thisBlock].image = null;
                 }
-            }
+            };
+
             postProcessArg = [thisBlock, null];
         } else if (name === 'video') {
             postProcess = function (args) {
@@ -1530,18 +1538,21 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 } else {
                     me.blockList[thisBlock].image = null;
                 }
-            }
+            };
+
             postProcessArg = [thisBlock, null];
         } else if (name === 'loadFile') {
             postProcess = function (args) {
                 me.updateBlockText(args[0]);
-            }
+            };
+
             postProcessArg = [thisBlock, null];
         } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
             postProcess = function (args) {
                 me.blockList[thisBlock].value = null;
                 me.blockList[thisBlock].privateData = args[1];
-            }
+            };
+
             postProcessArg = [thisBlock, arg];
         }
 
@@ -1611,7 +1622,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                         me.blockList[thisBlock].text.text = label;
                         me.blockList[thisBlock].container.updateCache();
-                    }
+                    };
+
                     this.makeNewBlock('text', postProcess, [thisBlock, value]);
                 } else {
                     postProcess = function (args) {
@@ -1619,7 +1631,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         var value = Number(args[1]);
                         me.blockList[thisBlock].value = value;
                         me.blockList[thisBlock].text.text = value.toString();
-                    }
+                    };
+
                     this.makeNewBlock('number', postProcess, [thisBlock, value]);
                 }
             } else if (myBlock.docks[i + 1][2] === 'textin') {
@@ -1632,7 +1645,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         label = label.substr(0, 7) + '...';
                     }
                     me.blockList[thisBlock].text.text = label;
-                }
+                };
+
                 this.makeNewBlock('text', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'solfegein') {
                 postProcess = function (args) {
@@ -1641,7 +1655,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.blockList[thisBlock].value = value;
                     var label = value.toString();
                     me.blockList[thisBlock].text.text = label;
-                }
+                };
+
                 this.makeNewBlock('solfege', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'notein') {
                 postProcess = function (args) {
@@ -1650,7 +1665,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     me.blockList[thisBlock].value = value;
                     var label = value.toString();
                     me.blockList[thisBlock].text.text = label;
-                }
+                };
+
                 this.makeNewBlock('notename', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'mediain') {
                 postProcess = function (args) {
@@ -1660,7 +1676,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     if (value != null) {
                         // loadThumbnail(me, thisBlock, null);
                     }
-                }
+                };
+
                 this.makeNewBlock('media', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'filein') {
                 postProcess = function (blk) {
@@ -1673,7 +1690,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].value = value;
                     me.blockList[thisBlock].text.text = value.toString();
-                }
+                };
+
                 this.makeNewBlock('number', postProcess, [thisBlock, value]);
             }
 
@@ -2530,7 +2548,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var blkInfo = args[1];
                     me.blockList[thisBlock].value = me.turtles.turtleList.length;
                     me.turtles.addTurtle(me.blockList[thisBlock], blkInfo);
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
                 break;
             case 'drum':
@@ -2541,7 +2560,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var blkInfo = args[1];
                     me.blockList[thisBlock].value = me.turtles.turtleList.length;
                     me.turtles.addDrum(me.blockList[thisBlock], blkInfo);
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
                 break;
             case 'action':
@@ -2558,7 +2578,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].privateData = value;
                     me.blockList[thisBlock].value = null;
-                }
+                };
+
                 this.makeNewBlockWithConnections('namedbox', blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'namedarg':
@@ -2567,7 +2588,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].privateData = value;
                     me.blockList[thisBlock].value = null;
-                }
+                };
+
                 this.makeNewBlockWithConnections('namedarg', blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'namedcalc':
@@ -2576,7 +2598,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].privateData = value;
                     me.blockList[thisBlock].value = null;
-                }
+                };
+
                 this.makeNewBlockWithConnections('namedcalc', blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'nameddo':
@@ -2585,7 +2608,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].privateData = value;
                     me.blockList[thisBlock].value = null;
-                }
+                };
+
                 this.makeNewBlockWithConnections('nameddo', blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
 
@@ -2611,7 +2635,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                     }
                     me.checkArgClampBlocks.push(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('doArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
                 break;
             case 'nameddoArg':
@@ -2638,7 +2663,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                     }
                     me.checkArgClampBlocks.push(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('nameddoArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
                 break;
             case 'calcArg':
@@ -2662,7 +2688,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                     }
                     me.checkArgClampBlocks.push(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('calcArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
                 break;
             case 'namedcalcArg':
@@ -2689,7 +2716,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         }
                     }
                     me.checkArgClampBlocks.push(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('namedcalcArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
                 break;
 
@@ -2700,7 +2728,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].value = Number(value);
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'text':
@@ -2709,7 +2738,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'solfege':
@@ -2718,7 +2748,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'notename':
@@ -2727,7 +2758,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var value = args[1];
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'media':
@@ -2740,7 +2772,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                         // Load artwork onto media block.
                         me.blockList[thisBlock].loadThumbnail(null);
                     }
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'camera':
@@ -2748,7 +2781,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var thisBlock = args[0];
                     var value = args[1];
                     me.blockList[thisBlock].value = CAMERAVALUE;
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'video':
@@ -2756,7 +2790,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     var thisBlock = args[0];
                     var value = args[1];
                     me.blockList[thisBlock].value = VIDEOVALUE;
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
 
@@ -2767,63 +2802,72 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = 0;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'white':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = 100;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'orange':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = 10;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'yellow':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = 20;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'green':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = 40;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'blue':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = 70;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'leftpos':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = -(canvas.width / 2);
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'rightpos':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = (canvas.width / 2);
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'toppos':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = (canvas.height / 2);
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'botpos':
@@ -2831,28 +2875,32 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = -(canvas.height / 2);
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'width':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = canvas.width;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'height':
                 postProcess = function (thisBlock) {
                     me.blockList[thisBlock].value = canvas.height;
                     me.updateBlockText(thisBlock);
-                }
+                };
+
                 this.makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'loadFile':
                 postProcess = function (args) {
                     me.blockList[args[0]].value = args[1];
                     me.updateBlockText(args[0]);
-                }
+                };
+
                 this.makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             default:

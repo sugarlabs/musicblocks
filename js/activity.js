@@ -367,14 +367,16 @@ define(function (require) {
             // Code specific to cleaning up music blocks
             Element.prototype.remove = function() {
                 this.parentElement.removeChild(this);
-            }
+            };
+
             NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
                 for (var i = 0, len = this.length; i < len; i++) {
                     if(this[i] && this[i].parentElement) {
                         this[i].parentElement.removeChild(this[i]);
                     }
                 }
-            }
+            };
+
             var table = document.getElementById("myTable");
             if(table != null) {
                 table.remove();
@@ -543,7 +545,7 @@ define(function (require) {
                     Analytics.close(chartBitmap, ctx);
                 };
                 img.src = imageData;
-            }
+            };
 
             var options = getChartOptions(callback);
             console.log('creating new chart');
@@ -991,7 +993,8 @@ define(function (require) {
                 });
                 callback(text);
                 blocks.setMsgText(text);
-            }
+            };
+
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(svgData)));
         };
@@ -1041,7 +1044,8 @@ define(function (require) {
                     }
                     update = true;
                 });
-            }
+            };
+
             img.src = 'images/' + name + '.svg';
         }
 
@@ -1192,7 +1196,7 @@ define(function (require) {
 
         window.onresize = function () {
             onResize();
-        }
+        };
 
         function restoreTrash() {
             // Restore last stack pushed to trashStack.
@@ -1415,7 +1419,8 @@ define(function (require) {
                 } catch (e) {
                     console.log(e);
                 }
-            }
+            };
+
             img.src = 'data:image/svg+xml;base64,' +
             window.btoa(unescape(encodeURIComponent(svgData)));
             // console.log(img.src);
@@ -1505,7 +1510,8 @@ define(function (require) {
                         bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                         // and base64-encoded png
                         httpPost(('MusicBlocks_'+projectName).replace('.tb', '.b64'), bitmap.getCacheDataURL());
-                    }
+                    };
+
                     img.src = 'data:image/svg+xml;base64,' + window.btoa(
                         unescape(encodeURIComponent(svgData)));
                     // Restore default cursor
@@ -1527,7 +1533,7 @@ define(function (require) {
             justLoadStart = function () {
                 console.log('loading start and a matrix');
                 blocks.loadNewBlocks(DATAOBJS);
-            }
+            };
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 storage = sugarizerCompatibility.data;
@@ -1856,7 +1862,8 @@ define(function (require) {
                 bitmap.regY = halfSize / bitmap.scaleY;
                 pasteContainer.addChild(bitmap)
                 update = true;
-            }
+            };
+
             img.src = 'header-icons/paste-button.svg';
         }
 
@@ -2051,7 +2058,7 @@ define(function (require) {
                             docById('helpElem').style.visibility = 'visible';
                         }
                         update = true;
-                    }
+                    };
 
                     img.src = 'images/help-container.svg';
                 }
@@ -2229,7 +2236,7 @@ define(function (require) {
                 bitmap.cache(0, 0, size, size);
                 bitmap.updateCache();
                 update = true;
-            }
+            };
 
             img.src = 'header-icons/' + name + '.svg';
             container.addChild(text);
