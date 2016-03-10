@@ -347,7 +347,7 @@ function loadPaletteButtonHandler(palettes, name) {
         setTimeout(function() {
             locked = false;
         }, 500);
-        palettes.dict[name].moveMenu(palettes.initial_x,palettes.initial_y);
+        palettes.dict[name].moveMenu(palettes.initial_x, palettes.initial_y);
         palettes.showPalette(name);
         palettes.refreshCanvas();
     });

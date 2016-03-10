@@ -222,7 +222,7 @@ function Matrix() {
         var cell = row.insertCell(1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-	cell.style.minWidth = cell.style.width;
+        cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -240,7 +240,7 @@ function Matrix() {
         var cell = row.insertCell(2);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-	cell.style.minWidth = cell.style.width;
+        cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -257,7 +257,7 @@ function Matrix() {
         var cell = row.insertCell(3);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/erase-button.svg" title="' + _('clear') + '" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-	cell.style.minWidth = cell.style.width;
+        cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -274,7 +274,7 @@ function Matrix() {
         var cell = row.insertCell(4);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-button.svg" title="' + _('export') + ' HTML" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-	cell.style.minWidth = cell.style.width;
+        cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -291,7 +291,7 @@ function Matrix() {
         var cell = row.insertCell(5);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-	cell.style.minWidth = cell.style.width;
+        cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -347,7 +347,7 @@ function Matrix() {
     }
 
     this.generateDataURI = function(file) {
-	// Deprecated since we now use SVG for note artwork.
+        // Deprecated since we now use SVG for note artwork.
         /*
         file=file.replace(/𝅝/g,"&#x1D15D;");
         file=file.replace(/𝅗𝅥/g,"&#x1D15E;");
@@ -946,7 +946,7 @@ function Matrix() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
 
-	// First, hide the palettes as they will need updating.
+        // First, hide the palettes as they will need updating.
         for (var name in this.logo.blocks.palettes.dict) {
             this.logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -1002,38 +1002,38 @@ function Matrix() {
             // FIXME: Does the undefined case ever occur?
             if (note[0][0] === 'R' || note[0][0] == undefined) {
                 // The last connection in last pitch block is null.
-		var lastConnection = null;
-		if (delta === 5) {
+                var lastConnection = null;
+                if (delta === 5) {
                     var previousBlock = idx + 1;  // Vspace block
-		} else {
+                } else {
                     var previousBlock = idx;  // Note block
-		}
+                }
                 delta -= 2;
-		var thisBlock = idx + delta;
+                var thisBlock = idx + delta;
                 previousBlock += delta;
                 newStack.push([thisBlock + 1, 'rest2', 0, 0, [previousBlock, lastConnection]]);
             } else {
-		// Add the pitch blocks to the Note block
-		for (var j = 0; j < note[0].length; j++) {
+                // Add the pitch blocks to the Note block
+                for (var j = 0; j < note[0].length; j++) {
 
                     var thisBlock = idx + delta + (j * 3);
 
                     // We need to point to the previous note or pitch block.
                     if (j === 0) {
-			if (delta === 5) {
+                        if (delta === 5) {
                             var previousBlock = idx + 1;  // Vspace block
-			} else {
+                        } else {
                             var previousBlock = idx;  // Note block
-			}
+                        }
                     } else {
-			var previousBlock = thisBlock - 3;  // Pitch block
+                        var previousBlock = thisBlock - 3;  // Pitch block
                     }
 
                     // The last connection in last pitch block is null.
                     if (note[0].length === 1 || j === note[0].length - 1) {
-			var lastConnection = null;
+                        var lastConnection = null;
                     } else {
-			var lastConnection = thisBlock + 3;
+                        var lastConnection = thisBlock + 3;
                     }
 
                     newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);

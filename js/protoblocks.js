@@ -115,7 +115,7 @@ function ProtoBlock(name) {
         // We need to generate the artwork in order to generate the dock.
         var artwork = svg.basicBlock();
         // Then we replace the artwork with a single pixel.
-	var artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
+        var artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
         // And bring the last dock position to the top.
         svg.docks[1][1] = svg.docks[0][1];
         return [artwork, svg.docks];

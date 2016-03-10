@@ -388,7 +388,7 @@ define(function (require) {
         function doFastButton(env) {
             logo.setTurtleDelay(0);
             if (docById('matrix').style.visibility === 'visible') {
-		matrix.playAll();
+                matrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands(null, env);
             } else {
@@ -399,7 +399,7 @@ define(function (require) {
         function doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
             if (docById('matrix').style.visibility === 'visible') {
-		matrix.playAll();
+                matrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
@@ -430,7 +430,7 @@ define(function (require) {
         function doSlowMusicButton() {
             logo.setNoteDelay(DEFAULTDELAY);
             if (docById('matrix').style.visibility === 'visible') {
-		matrix.playAll();
+                matrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
@@ -516,9 +516,9 @@ define(function (require) {
 
         function doAnalytics() {
             var myChart = docById('myChart');
-	     if(isCanvasBlank(myChart) == false) {
+             if(isCanvasBlank(myChart) == false) {
                 return ;
-	     }
+             }
             var ctx = myChart.getContext('2d');
             document.body.style.cursor = 'wait';
             var myRadarChart = null;
