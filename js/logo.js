@@ -118,6 +118,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.noteTranspositions = {};
     this.noteBeatValues = {};
 
+    // graphics listeners during note play
+    this.forwardListener = {};
+    this.rightListener = {};
+
     // status of note being played
     this.currentNotes = {};
     this.currentOctaves = {};
@@ -507,6 +511,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.currentOctaves[turtle] = 4;
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
+            this.forwardListener = {};
+            this.rightListener = {};
             this.beatFactor[turtle] = 1;
             this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
@@ -1217,6 +1223,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inNoteBlock[turtle] > 0) {
+                    var dist = args[0] / 8;
+                    var listenerName = '_forward_' + turtle;
+
+                    var listener = function (event) {
+                        logo.turtles.turtleList[turtle].doForward(dist);
+                    };
+                    logo.forwardListener[turtle] = listener;
+
+                    logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(args[0]);
                 }
@@ -1227,6 +1243,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inNoteBlock[turtle] > 0) {
+                    var dist = -args[0] / 8;
+                    var listenerName = '_forward_' + turtle;
+
+                    var listener = function (event) {
+                        logo.turtles.turtleList[turtle].doForward(dist);
+                    };
+                    logo.forwardListener[turtle] = listener;
+
+                    logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(-args[0]);
                 }
@@ -1237,6 +1263,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inNoteBlock[turtle] > 0) {
+                    var delta = args[0] / 8;
+                    var listenerName = '_right_' + turtle;
+
+                    var listener = function (event) {
+                        logo.turtles.turtleList[turtle].doRight(delta);
+                    };
+                    logo.rightListener[turtle] = listener;
+
+                    logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(args[0]);
                 }
@@ -1247,6 +1283,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inNoteBlock[turtle] > 0) {
+                    var delta = -args[0] / 8;
+                    var listenerName = '_right_' + turtle;
+
+                    var listener = function (event) {
+                        logo.turtles.turtleList[turtle].doRight(delta);
+                    };
+                    logo.rightListener[turtle] = listener;
+
+                    logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(-args[0]);
                 }
@@ -2876,6 +2922,26 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
 
                         console.log("notes to play " + notes + ' ' + noteBeatValue);
+
+                        // Use the beatValue of the first note in
+                        // the group since there can only be one.
+                        if (logo.staccato[turtle].length > 0) {
+                            var staccatoBeatValue = last(logo.staccato[turtle]);
+                            if (staccatoBeatValue < 0) {
+                                // slur
+                                var beatValue = bpmFactor / ((noteBeatValue) * logo.noteBeatValues[turtle][0]) + bpmFactor / (-staccatoBeatValue * logo.noteBeatValues[turtle][0]);
+                            } else if (staccatoBeatValue > noteBeatValue) {
+                                // staccato
+                                var beatValue = bpmFactor / (staccatoBeatValue * logo.noteBeatValues[turtle][0]);
+                            } else {
+                                var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                            }
+                        } else {
+                            var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                        }
+
+                        logo.dispatchTurtleSignals(turtle, beatValue);
+
                         if (notes.length > 0) {
                             var len = notes[0].length;
                             logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
@@ -2889,23 +2955,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 for (var i = 0; i < notes.length; i++) {
                                     notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
                                 }
-                            }
-
-                            // Use the beatValue of the first note in
-                            // the group since there can only be one.
-                            if (logo.staccato[turtle].length > 0) {
-                                var staccatoBeatValue = last(logo.staccato[turtle]);
-                                if (staccatoBeatValue < 0) {
-                                    // slur
-                                    var beatValue = bpmFactor / ((noteBeatValue) * logo.noteBeatValues[turtle][0]) + bpmFactor / (-staccatoBeatValue * logo.noteBeatValues[turtle][0]);
-                                } else if (staccatoBeatValue > noteBeatValue) {
-                                    // staccato
-                                    var beatValue = bpmFactor / (staccatoBeatValue * logo.noteBeatValues[turtle][0]);
-                                } else {
-                                    var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
-                                }
-                            } else {
-                                var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
                             }
 
                             if (!logo.lilypondSaveOnly && duration > 0) {
@@ -2952,6 +3001,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             this.pushedNote[turtle] = false;
         }
+    }
+
+    this.dispatchTurtleSignals = function(turtle, beatValue) {
+        // When turtle commands (foward, right) are inside of Notes,
+        // they are progressive. (FIXME: Add arc)
+        var logo = this;
+        for (var t = 0; t < 8; t++) {
+            setTimeout(function() {
+                logo.stage.dispatchEvent('_forward_' + turtle);
+                logo.stage.dispatchEvent('_right_' + turtle);
+            }, t * beatValue * 125);
+        }
+        setTimeout(function() {
+            logo.stage.removeEventListener('_forward_' + turtle, logo.forwardListener[turtle], false);
+            logo.stage.removeEventListener('_right_' + turtle, logo.rightListener[turtle], false);
+        }, t * beatValue * 125);
     }
 
     this.setListener = function(turtle, listenerName, listener) {
