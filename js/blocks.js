@@ -1837,7 +1837,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
         // Force an update if the name has changed.
         if (nameChanged) {
-	    this.palettes.updatePalettes('boxes');
+            this.palettes.updatePalettes('boxes');
         }
     }
 
@@ -1904,7 +1904,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
         // Force an update if the name has changed.
         if (nameChanged) {
-	    this.palettes.updatePalettes('actions');
+            this.palettes.updatePalettes('actions');
         }
     }
 
@@ -2303,18 +2303,18 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
 
             if (!(name in this.protoBlockDict)) {
-		switch (name) {
-		case 'hat':
-		    name = 'action';
-		    break;
-		case 'string':
-		    name = 'text';
-		    break;
-		default:
+                switch (name) {
+                case 'hat':
+                    name = 'action';
+                    break;
+                case 'string':
+                    name = 'text';
+                    break;
+                default:
                     console.log('skipping ' + name);
                     continue;
-		    break;
-		}
+                    break;
+                }
             }
 
             if (['arg', 'twoarg'].indexOf(this.protoBlockDict[name].style) !== -1) {
@@ -2585,9 +2585,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             case 'hat':
                 blkData[4][0] = null;
                 blkData[4][3] = null;
-                if (blkData[4][1] != null) {
-                    var argblk = blockObjs[blkData[4][1]];
-		}
                 this.makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
                 break;
 
