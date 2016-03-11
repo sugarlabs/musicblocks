@@ -1215,13 +1215,8 @@ define(function (require) {
             }
 
             var thisBlock = blocks.trashStacks.pop();
-            if (blocks.blockList[thisBlock].name === 'start' || blocks.blockList[thisBlock].name === 'drum') {
-                turtle = blocks.blockList[thisBlock].value;
-                turtles.turtleList[turtle].trash = false;
-                turtles.turtleList[turtle].container.visible = true;
-            }
 
-            // put drag group in trash
+            // Restore drag group in trash
             blocks.findDragGroup(thisBlock);
             for (var b = 0; b < blocks.dragGroup.length; b++) {
                 var blk = blocks.dragGroup[b];
@@ -1232,6 +1227,22 @@ define(function (require) {
             }
 
             blocks.raiseStackToTop(thisBlock);
+
+            if (blocks.blockList[thisBlock].name === 'start' || blocks.blockList[thisBlock].name === 'drum') {
+                turtle = blocks.blockList[thisBlock].value;
+                turtles.turtleList[turtle].trash = false;
+                turtles.turtleList[turtle].container.visible = true;
+            } else if (blocks.blockList[thisBlock].name === 'action') {
+                // We need to add a palette entry for this action.
+                var actionArg = blocks.blockList[blocks.blockList[thisBlock].connections[1]];
+                if (actionArg) {
+                    var actionName = actionArg.value;
+                    if (actionName !== _('action')) {
+                        blocks.checkPaletteEntries('action');
+                    }
+                }
+            }
+
             blocks.refreshCanvas();
         }
 
@@ -1272,7 +1283,7 @@ define(function (require) {
                     }
                 } else if (blocks.blockList[blk].name === 'action') {
                     blocks.deleteActionBlock(blocks.blockList[blk]);
-		}
+                }
             }
 
             if (addStartBlock) {
@@ -1452,7 +1463,7 @@ define(function (require) {
             // palettes.updatePalettes();
             setTimeout(function () {
                 if (fileExt(projectName) !== 'tb')
-		{
+                {
                     projectName += '.tb';
                 }
 

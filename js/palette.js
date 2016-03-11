@@ -1816,12 +1816,3 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
     img.src = 'data:image/svg+xml;base64,' + window.btoa(
         unescape(encodeURIComponent(data)));
 }
-
-
-function regeneratePalette(palette) {
-    // palette.visible = false;
-    // palette.hideMenuItems();
-    // palette.protoContainers = {};
-    palette.palettes.updatePalettes(palette.name);
-    palette.resetLayout();
-}
