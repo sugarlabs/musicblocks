@@ -1764,7 +1764,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         // Make sure we don't make two actions with the same name.
         var actionNames = [];
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].name === 'text') {
+            if (this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') {
                 var c = this.blockList[blk].connections[0];
                 if (c != null && this.blockList[c].name === 'action') {
                     actionNames.push(this.blockList[blk].value);
@@ -2303,7 +2303,18 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             }
 
             if (!(name in this.protoBlockDict)) {
-                continue;
+		switch (name) {
+		case 'hat':
+		    name = 'action';
+		    break;
+		case 'string':
+		    name = 'text';
+		    break;
+		default:
+                    console.log('skipping ' + name);
+                    continue;
+		    break;
+		}
             }
 
             if (['arg', 'twoarg'].indexOf(this.protoBlockDict[name].style) !== -1) {
@@ -2395,6 +2406,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             } else {
                 var name = blkData[1][1]['value'];
             }
+
             var oldName = name;
             var i = 1;
             while (currentActionNames.indexOf(name) !== -1) {
@@ -2409,7 +2421,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
 
             if (oldName !== name) {
                 // Change the name of the action...
-                // console.log('action ' + oldName + ' is being renamed ' + name);
+                console.log('action ' + oldName + ' is being renamed ' + name);
                 blkData[1][1] = {'value': name};
             }
 
@@ -2573,6 +2585,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             case 'hat':
                 blkData[4][0] = null;
                 blkData[4][3] = null;
+                if (blkData[4][1] != null) {
+                    var argblk = blockObjs[blkData[4][1]];
+		}
                 this.makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
                 break;
 
