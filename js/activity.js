@@ -1270,7 +1270,9 @@ define(function (require) {
                         turtles.turtleList[turtle].trash = true;
                         turtles.turtleList[turtle].container.visible = false;
                     }
-                }
+                } else if (blocks.blockList[blk].name === 'action') {
+                    blocks.deleteActionBlock(blocks.blockList[blk]);
+		}
             }
 
             if (addStartBlock) {

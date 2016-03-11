@@ -216,7 +216,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     }
 
     this.updatePalettes = function(showPalette) {
-        if (showPalette) {
+        if (showPalette != null) {
             this.makePalettes(false);
             var myPalettes = this;
             setTimeout(function() {
@@ -518,24 +518,6 @@ function PaletteModel(palette, palettes, name) {
                 var artwork = svg.basicBlock();
                 var docks = svg.docks;
                 break;
-            /*
-            case 'ifthenelse':
-                label = protoBlock.staticLabels[0]
-                    + ' ' + protoBlock.staticLabels[2];
-            case 'if':
-            case 'until':
-            case 'while':
-            case 'waitFor':
-                // so the block will fit
-                var svg = new SVG();
-                svg.init();
-                svg.setScale(protoBlock.scale);
-                svg.setTab(true);
-                svg.setSlot(true);
-                var artwork = svg.basicBlock();
-                var docks = svg.docks;
-                break;
-            */
             default:
                 var obj = protoBlock.generator();
                 var artwork = obj[0];
@@ -654,8 +636,7 @@ function PopdownPalette(palettes) {
 
                 console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = makeBlockFromPalette(
-                    palette.protoList[e.dataset.blk], e.dataset.modname,
-                    palette, function (newBlock) {
+                    palette.protoList[e.dataset.blk], e.dataset.modname, palette, function (newBlock) {
                     // Move the drag group under the cursor.
                     paletteBlocks.findDragGroup(newBlock);
                     for (var i in paletteBlocks.dragGroup) {
@@ -1204,6 +1185,25 @@ function Palette(palettes, name) {
         }
         return returnString;
     };
+
+    this.remove = function(protoblock, name) {
+        // Remove the protoblock and its associated artwork container.
+        console.log('removing action ' + name);
+        var i = this.protoList.indexOf(protoblock);
+        if (i !== -1) {
+            this.protoList.splice(i, 1);
+        }
+
+        for (var i = 0; i < this.model.blocks.length; i++) {
+            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.model.blocks[i].name) !== -1 && this.model.blocks[i].label === name) {
+                console.log(this.model.blocks[i]);
+                this.model.blocks.splice(i, 1);
+                break;
+            }
+        }
+        this.palettes.stage.removeChild(this.protoContainers[name]);
+        delete this.protoContainers[name];
+    }
 
     this.add = function(protoblock, top) {
         // Add a new palette entry to the end of the list (default) or
@@ -1819,9 +1819,9 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
 
 
 function regeneratePalette(palette) {
-    palette.visible = false;
-    palette.hideMenuItems();
-    palette.protoContainers = {};
-
+    // palette.visible = false;
+    // palette.hideMenuItems();
+    // palette.protoContainers = {};
     palette.palettes.updatePalettes(palette.name);
+    palette.resetLayout();
 }
