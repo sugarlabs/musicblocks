@@ -37,7 +37,7 @@ msgstr "yatiyaña"
 
 #. TRANS: metro de musica
 msgid "meter"
-msgstr ""
+msgstr "warurt'äwi qhatu"
 
 msgid "rice and beans"
 msgstr "arroz ukata frijoles juyranaka"
@@ -58,7 +58,7 @@ msgid "keyboard"
 msgstr "qillqañana thaqaña"
 
 msgid "You can also load projects from the file system."
-msgstr ""
+msgstr "Imata wakichatanaka amtäwinaka qhantayarakikismawa"
 
 #. TRANS: as in "on event do"
 msgid "on"
@@ -70,11 +70,11 @@ msgstr "chhiwchhi"
 
 #. TRANS: Musica ejecute lentamente
 msgid "Run music slow"
-msgstr ""
+msgstr "K'achata t'ijuña warurt'äwi"
 
 #. TRANS: Esta barra de herramientas contiene los botones de la paleta de Matrix, Notas, Tono, Tortuga, y mas. Haga clic para mostrar las paletas de bloques y bloques de arrastre de las gamas de colores en el lienzo para usarlos.
 msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
+msgstr "Aka wakichatanaka qhantayaña limt'añanakaxa Matrix, Chunk, ejecutar, Tono, tortuga, ukata juk'ampi wakichatanaka qhantayañatakiwa. Limt'ma uka wakichatanaka apanaqañaru ukata samichaña wakichatanaka wayt'añataki samichañaru limt'ma."
 
 #. TRANS: manzana
 msgid "apple"
@@ -82,7 +82,7 @@ msgstr "manzana puquta"
 
 #. TRANS: matriz grafica notacion"
 msgid "graphical notation matrix"
-msgstr ""
+msgstr "rixita qhananchaña wakichata"
 
 msgid "number"
 msgstr "jakhu"
@@ -120,14 +120,14 @@ msgstr "taña chanichaña"
 
 #. TRANS: ritmo
 msgid "rhythm"
-msgstr ""
+msgstr "Warurt'äwi ira"
 
 #. TRANS: latitud
 msgid "latitude"
 msgstr "ampsta"
 
 msgid "1/32 note 𝅘𝅥𝅰"
-msgstr ""
+msgstr "1/32 chimpu 𝅘𝅥𝅰"
 
 msgid "mouse x"
 msgstr "x chimpuni thaqnaqiri lliphi qhana"
@@ -149,7 +149,7 @@ msgstr "unxtayaña"
 
 #. TRANS: triangulo
 msgid "triangle"
-msgstr ""
+msgstr "Kimsa k'uchuni rixita"
 
 #. TRANS: detener tortuga
 msgid "stop turtle"
@@ -157,11 +157,11 @@ msgstr "tortuga wakichata sayt'ayaña"
 
 #. TRANS: octava actual
 msgid "current pitch octave"
-msgstr ""
+msgstr "Akïri q'ucht'awi chimpu kimsaqallqu chimpu"
 
 #. TRANS: distancia
 msgid "distance"
-msgstr ""
+msgstr "jaya"
 
 #. TRANS: alimentos
 msgid "food"
@@ -182,7 +182,7 @@ msgstr "siqinaka wakichaña qallta jithitatayaña jiththapiyaña"
 
 #. TRANS: cajas
 msgid "boxes"
-msgstr ""
+msgstr "kajunanaka"
 
 msgid "get fiber"
 msgstr "llika wakichata katuña"
@@ -200,7 +200,7 @@ msgstr "Google pacha rixipa wakichata"
 
 #. TRANS: parpardear
 msgid "blink"
-msgstr ""
+msgstr "lliphiqi"
 
 #. TRANS: día
 msgid "day"
@@ -212,7 +212,7 @@ msgstr "uñanaqa"
 
 #. TRANS: factor de ritmo
 msgid "beat factor"
-msgstr ""
+msgstr "warurt'äwi ira wakisiyiri"
 
 #. TRANS: Guardar proyecto
 msgid "Save project"
@@ -246,7 +246,7 @@ msgstr "Lip'katayañataki wakichata qhantatawa, ukata wakichatanaka siqinaka apa
 
 #. TRANS: transposicion
 msgid "transposition"
-msgstr ""
+msgstr "jarantäwi"
 
 #. TRANS: Expandir o colapsar barra
 msgid "Expand/collapse toolbar"
@@ -295,7 +295,7 @@ msgstr "tortuga wakichata"
 
 #. TRANS: sawtooth wave
 msgid "sawtooth"
-msgstr ""
+msgstr "khuchuña laka"
 
 msgid "right"
 msgstr "kupi"
@@ -320,7 +320,7 @@ msgstr "apanaqaña wakichata qhantayaña"
 
 #. TRANS: Desactivar scroll
 msgid "Disable scrolling"
-msgstr ""
+msgstr "qhantäwi wayt'ayaña"
 
 msgid "back"
 msgstr "qhipäxa"
@@ -335,7 +335,7 @@ msgstr "sapa mayata mayata amtäwi wakichata qalltañataki limt’aña"
 
 #. TRANS: linea sin relleno
 msgid "hollow line"
-msgstr ""
+msgstr "ch'usa qhanayäwi"
 
 msgid "arc"
 msgstr "sawana"
@@ -357,7 +357,7 @@ msgstr "ist'añataki wakichata wakichaña"
 
 #. TRANS: notas duplicadas
 msgid "duplicate notes"
-msgstr ""
+msgstr "warurt'äwi chimpu payachäwi"
 
 #. TRANS: in mathematical sense (inverse of period)
 msgid "frequency"
@@ -380,11 +380,11 @@ msgstr "Aka limt’añaxa wakichatanaka wakisiri apanaqañanaka qhantayi jiwayi"
 
 #. TRANS: posicion en la pila
 msgid "index"
-msgstr ""
+msgstr "wakichatanaka"
 
 #. TRANS: volumen nota
 msgid "note volume"
-msgstr ""
+msgstr "warurt'äwi jach'ata qhantayaña"
 
 msgid "hide"
 msgstr "wakichata"
@@ -395,11 +395,11 @@ msgstr "siqi wakichata uñachayma"
 
 #. TRANS: Detener la musica (y las tortugas).
 msgid "Stop the music (and the turtles)."
-msgstr ""
+msgstr "warurt'äwi ch'ujtayaña (ukata khirkhisti"
 
 #. TRANS: Ha terminado la gira. Por favor, disfrutar de Bloques de Musica!"
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
+msgstr "Warurt'awimpi muyuñaxa tukusxiwa. Yaqha siqi warurt'äwi ist'ma"
 
 #. TRANS: vertical space
 msgid "vspace"
@@ -486,7 +486,7 @@ msgstr "uma"
 
 #. TRANS: luz infrarroja (izquierda)
 msgid "infrared light (left)"
-msgstr ""
+msgstr "Surump'iyasiri qhana (ch'iqäxa)"
 
 #. TRANS: mathematical exponential base
 msgid "base"
@@ -502,7 +502,7 @@ msgstr "coordenadas polares sayt’unakapa uñachayaña chhaqtayaña"
 
 #. TRANS: octava
 msgid "octave"
-msgstr ""
+msgstr "kimsaqallaqu chimpu"
 
 msgid "sweet potato"
 msgstr "kamuti juyra"
@@ -550,11 +550,11 @@ msgstr "apanaqaña"
 
 #. TRANS: numerador
 msgid "numerator"
-msgstr ""
+msgstr "Jakhuriri"
 
 #. TRANS: Sr. Raton es nuestro conductor de bloques de musica. Sr. Raton le anima a explorar los Bloques Musicales."
 msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-msgstr ""
+msgstr "Achaku tatawa siqi warurt'äwinaka qhanayirixa. Achaku tata siqi warurt'äwi warurt'ayma. Ukhamaxa warurt'awimpi muyt'pxañäni!"
 
 #. TRANS: store a value in a box
 msgid "store in"
@@ -570,13 +570,13 @@ msgstr "jakhunaka tuqita"
 
 #. TRANS: denominador
 msgid "denominator"
-msgstr ""
+msgstr "sutichriri"
 
 msgid "eighth note"
-msgstr ""
+msgstr "kimsaqallqu warurt'äwi chimpu"
 
 msgid "whole note"
-msgstr ""
+msgstr "phuqata warurt'äwi chimpu"
 
 #. TRANS: popout window (ventana emergente)
 msgid "popout"
@@ -599,7 +599,7 @@ msgstr "wakichata siqinaka tañapa jach’aptayaña"
 
 #. TRANS: fijar volumen
 msgid "set volume"
-msgstr ""
+msgstr "siqinaka jach'ata warurt'ayaña"
 
 #. TRANS: logical "or" operator
 msgid "or"
@@ -607,7 +607,7 @@ msgstr "o wakichata"
 
 #. TRANS: valor de la nota
 msgid "note value"
-msgstr ""
+msgstr "warurt'äwi chimpu chani"
 
 msgid "comment"
 msgstr "amuyt'aña"
@@ -618,7 +618,7 @@ msgstr "kisulla"
 
 #. TRANS: guardar como lilypond (lilypond is a language used to generate musical scores.)
 msgid "save as lilypond"
-msgstr ""
+msgstr "Ukawa warurt'awi chimpu..."
 
 #. TRANS: Cartesiano
 msgid "Cartesian"
@@ -640,7 +640,7 @@ msgstr "rixita"
 
 #. TRANS: Haga clic para jugar nota a nota
 msgid "Click to run the music note by note."
-msgstr ""
+msgstr "Warurt'äwi chimpupatjama warurt'ayañataki akaru limt'ma"
 
 #. TRANS: pop a value off of the heap.
 msgid "pop"
@@ -671,7 +671,7 @@ msgstr "warurt’aña"
 
 #. TRANS: jugar hacia atrias
 msgid "play backward"
-msgstr ""
+msgstr "warurt'äwi qhiparu jit'tayma"
 
 #. TRANS: Felicitaciones
 msgid "Congratulations."
@@ -686,11 +686,11 @@ msgstr "limt'aña limxatata"
 
 #. TRANS: music term for dividing the beat into a different number of equal subdivisions
 msgid "tuplet"
-msgstr ""
+msgstr "tupla chimpu"
 
 #. TRANS: valor del tuplet
 msgid "tuplet value"
-msgstr ""
+msgstr "tupla chimpu chani"
 
 #. TRANS: cloud as in cloud server
 msgid "cloud"
@@ -709,7 +709,7 @@ msgid "get carbs"
 msgstr "carbohidratos ch’amanchirinaka katuña"
 
 msgid "sine"
-msgstr ""
+msgstr "seno chimpu"
 
 #. TRANS: Haga clic para ejecutar el proyecto en modo rápido.
 msgid "Click to run the project in fast mode."
@@ -738,7 +738,7 @@ msgstr "wakichata siqinaka tañapa jisk’aptayaña"
 
 #. TRANS: Jugar nota a nota
 msgid "Run note by note"
-msgstr ""
+msgstr "Run sapa chimputa chimpuru"
 
 msgid "start"
 msgstr "qalltaña"
@@ -779,7 +779,7 @@ msgid "translate"
 msgstr "jaqukipaña"
 
 msgid "quarter note"
-msgstr ""
+msgstr "pusïri chimpu"
 
 msgid "until"
 msgstr "akakama"
@@ -806,7 +806,7 @@ msgstr "tortuga wakichata qalltaña"
 
 #. TRANS: Bienvenido a Bloques de Musica
 msgid "Welcome to Music Blocks"
-msgstr ""
+msgstr "Warurt'äwinaka wakichata waliki qhantaytaxa"
 
 #. TRANS: combiar idioma
 msgid "set lang"
@@ -836,7 +836,7 @@ msgstr "p’iyani rixita qalltaña"
 
 #. TRANS: planas
 msgid "flat"
-msgstr ""
+msgstr "chiqa"
 
 #. TRANS: the heap is a first-in-last-out (FILO) stack
 msgid "heap"
@@ -846,9 +846,9 @@ msgstr "qutu"
 msgid "begin fill"
 msgstr "phuqachaña wakichaña qalltaña"
 
-#. TRANS: pulsaciones  por minuto
+#. TRANS: pulsaciones por minuto
 msgid "beats per minute"
-msgstr ""
+msgstr "Sapa t'ijta pacha t'aqana putuqi"
 
 #. TRANS: comer
 msgid "eat"
@@ -864,7 +864,7 @@ msgstr "jach’a"
 
 #. TRANS: Bloques de Musica es una coleccion de herramientas de manipulacion para explorar conceptos musicales fundamentales de una manera integradora y divertido.
 msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr ""
+msgstr "Warurt'äwinaka wakichata pankaxa warurt'äwinaka tuqita suma qawayata wali k'uchi yatxatañataki wakichatawa"
 
 #. TRANS: longitude and latitude coordinate data
 msgid "Coordinate data not available."
@@ -958,7 +958,7 @@ msgstr "mayata mayata qhantayaña"
 
 #. TRANS: tono de musica
 msgid "pitch"
-msgstr ""
+msgstr "ira"
 
 #. TRANS: Mostrar u ocultar paletas
 msgid "Show/hide palettes"
@@ -977,7 +977,7 @@ msgstr "sayt’ayaña"
 
 #. TRANS: agudas
 msgid "sharp"
-msgstr ""
+msgstr "ch'iriqi"
 
 #. TRANS: proteína
 msgid "protein"
@@ -985,7 +985,7 @@ msgstr "ch’amanchiri juyra"
 
 #. TRANS: tiempi oscilador
 msgid "osctime"
-msgstr ""
+msgstr "asctime wakichata"
 
 #. TRANS: reproducir
 msgid "play back"
@@ -993,7 +993,7 @@ msgstr "qhantayaña"
 
 #. TRANS: relleno
 msgid "fill"
-msgstr ""
+msgstr "phuqantaña"
 
 msgid "Save your project to a server."
 msgstr "Wakichatanaka apanaqaña taypiru amtäwima imma"
@@ -1003,7 +1003,7 @@ msgstr "Wakichata siqi taña jisk’aptayma"
 
 #. TRANS: numero de notas
 msgid "number of notes"
-msgstr ""
+msgstr "warurt'anaka chimpu jakhunaka"
 
 msgid "angle"
 msgstr "k'uchu"
@@ -1043,15 +1043,15 @@ msgstr "apanaqäwi"
 
 #. TRANS: invertir
 msgid "invert"
-msgstr ""
+msgstr "kutjtayaña"
 
 #. TRANS: cuadrado
 msgid "square"
-msgstr ""
+msgstr "kajuna"
 
 #. TRANS: Conoce Sr. Raton
 msgid "Meet Mr. Mouse!"
-msgstr ""
+msgstr "Tata Achakuru uñt'tati!"
 
 msgid "set xy"
 msgstr "xy wakichata chimpuña"
@@ -1068,7 +1068,7 @@ msgstr "Apxataña"
 
 #. TRANS: fijar clave
 msgid "set key"
-msgstr ""
+msgstr "imañanaka wakichata limt'aña"
 
 #. TRANS: Borrar
 msgid "Delete"
@@ -1084,7 +1084,7 @@ msgstr "Aka pachana"
 
 #. TRANS: tocar
 msgid "play"
-msgstr ""
+msgstr "qhantayaña"
 
 msgid "repeat"
 msgstr "kutxataña"
@@ -1108,7 +1108,7 @@ msgstr "Sara"
 
 #. TRANS: tono actual
 msgid "current pitch name"
-msgstr ""
+msgstr "jichha warurt'a irana sutipa"
 
 #. TRANS: empty the heap
 msgid "empty heap"
@@ -1116,7 +1116,7 @@ msgstr "siqi wakichata ch'ussuña"
 
 #. TRANS: luz infrarrojo (derecha)
 msgid "infrared light (right)"
-msgstr ""
+msgstr "Surump'iyasiri qhana (Kupïxa)"
 
 #. TRANS: En mu dispositivo
 msgid "On my device"
@@ -1124,7 +1124,7 @@ msgstr "wakichatanaka machaqa imaña"
 
 #. TRANS: clave de musica
 msgid "key"
-msgstr ""
+msgstr "qallu llawi"
 
 #. TRANS: push a value on to the heap.
 msgid "push"
@@ -1145,7 +1145,7 @@ msgid "Clean"
 msgstr "Mayampi qalltañataki wakichaña"
 
 msgid "1/64 note"
-msgstr ""
+msgstr "1/64 warurt'a chimpu"
 
 #. TRANS: color refers to a hue, value, chroma triplet
 msgid "set color"
@@ -1153,7 +1153,7 @@ msgstr "sami wakichaña"
 
 #. TRANS: Haga clic para ejecutar solo la musica en modo lento.
 msgid "Click to run just the music in slow mode."
-msgstr ""
+msgstr "Warurt'äwi k'achata warurt'ayañataki limt'ma"
 
 #. TRANS: Ejecutar rápidamente
 msgid "Run fast"
@@ -1204,17 +1204,17 @@ msgid "Click this button to expand or collapse the auxillary toolbar."
 msgstr "Yanapiri apanaqaña wakichatanaka jach’aptayañataki jani ukaxa chhaqtayañataki click limt’ma"
 
 msgid "half note"
-msgstr ""
+msgstr "chikata warurt'a chimpu"
 
 msgid "1/16 note"
-msgstr ""
+msgstr "1/16 warurt'a chimpu"
 
 msgid "extras"
 msgstr "yaqhanaka"
 
 #. TRANS: fijar pulsciones por minuto
 msgid "set beats per minute"
-msgstr ""
+msgstr "t'ijtäwi pacha chani putuqi"
 
 msgid "shade"
 msgstr "ist'añataki wakichata"
@@ -1231,7 +1231,7 @@ msgstr "qutunaka tama"
 
 #. TRANS: ritmo multiplican
 msgid "multiply beat"
-msgstr ""
+msgstr "putuqi jakhu p'asi"
 
 #. TRANS: hola
 msgid "hello"
@@ -1239,131 +1239,131 @@ msgstr "kamisaraki"
 
 #. TRANS: punto
 msgid "dot"
-msgstr ""
+msgstr "tukuya chimpu"
 
 msgid "left"
 msgstr "ch'iqa"
 
 #. TRANS: Ahorre partituras
 msgid "Save sheet music"
-msgstr ""
+msgstr "Warurt'äwi qillqatanaka imaña"
 
 #. TRANS: Guarde el proyecto como un archivo de LilyPond.
 msgid "Save your project to as a Lilypond file."
-msgstr ""
+msgstr "LilyPond imata wakichata amtäwi imaña"
 
 #. TRANS: Valor de la nota debe ser mayor que 0
 msgid "Note value must be greater than 0"
-msgstr ""
+msgstr "Warurt'äwi jakhu chimpuxa 0 jilañapawa"
 
 #. TRANS: slurring of notes in music
 msgid "slur"
-msgstr ""
+msgstr "Jaquntäwi"
 
 msgid "staccato"
-msgstr ""
+msgstr "staccato wakichata"
 
 msgid "crescendo"
-msgstr ""
+msgstr "crescendo wakichata"
 
 #. TRANS: swing beat in music
 msgid "swing"
-msgstr ""
+msgstr "jiwalachi"
 
 #. TRANS: tying together of notes in music
 msgid "tie"
-msgstr ""
+msgstr "sincha"
 
 msgid "divide beat"
-msgstr ""
+msgstr "putuqi chimpu"
 
 msgid "skip notes"
-msgstr ""
+msgstr "warurt'a chimpunaka taktaña"
 
 msgid "duplicate factor"
-msgstr ""
+msgstr "panichiri chimpu"
 
 #. TRANS: slurring of notes in music
 msgid "skip factor"
-msgstr ""
+msgstr "skip wakichata chimpu"
 
 msgid "adjust transposition"
-msgstr ""
+msgstr "jarantäwi ch'amanchaña"
 
 #. TRANS: silencio
 msgid "silence"
-msgstr ""
+msgstr "ch'ujtata"
 
 msgid "rest"
-msgstr ""
+msgstr "samart'a"
 
 msgid "staccato factor"
-msgstr ""
+msgstr "staccato wakichata chimpu"
 
 msgid "slur factor"
-msgstr ""
+msgstr "jist'thapiña wakichata chimpu"
 
 msgid "crescendo factor"
-msgstr ""
+msgstr "crescendo wakichata chimpu"
 
 msgid "start drum"
-msgstr ""
+msgstr "tarula qhantayaña"
 
 #. TRANS: nota de tortugas
 msgid "turtle note"
-msgstr ""
+msgstr "khirkhinchu warurt'a chimpu"
 
 #. TRANS: nÃºmero de tono de tortugas
 msgid "turtle pitch number"
-msgstr ""
+msgstr "khirkhinchunaka jakhu chimpu"
 
 #. TRANS: nÃºmero a tono
 msgid "number to pitch"
-msgstr ""
+msgstr "Jaqtäwinaka jakhu chimpu"
 
 #. TRANS: nÃºmero a octava
 msgid "number to octave"
-msgstr ""
+msgstr "kimsaqallqu jakhu chimpu"
 
 #. TRANS: Debe tener al menos un bloque de tono y un bloque de ritmo en la matriz.
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr ""
+msgstr "Maya siqi warurt'a arka ukata maya siqi warurt'a arka utjañapapuniwa"
 
 #. TRANS: Por favor, cierre la matriz actual antes de abrir una nueva.
 msgid "Please close the current matrix before opening a new one."
-msgstr ""
+msgstr "jichha wakichata jist'antma yaqha qalltañataki"
 
 #. TRANS: guardar pila a una aplicación"
 msgid "save heap to App"
-msgstr ""
+msgstr "App kunaymana wakichatanaka imaña chimpu"
 
 #. TRANS: cargar pila desde una aplicación
 msgid "load heap from App"
-msgstr ""
+msgstr "App taypita kunaymana wakichaña"
 
 #. TRANS: fijar font
 msgid "set font"
-msgstr ""
+msgstr "qillqañanaka tama"
 
 #. TRANS: tiempo libre
 msgid "free time"
-msgstr ""
+msgstr "jani kuna lurañani"
 
 #. TRANS: "do re mi fa sol la si"
 msgid "do re mi fa sol la ti"
-msgstr ""
+msgstr "do re mi fa sol la ti"
 
 msgid "Home"
-msgstr ""
+msgstr "Uta"
 
 msgid "Return all blocks to the center of the screen."
-msgstr ""
+msgstr "taqi wakichatanaka uñtaña taypiwjaru waythapiña"
 
 msgid "Rhythm Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "siqi warurt'a ira: Maya siqi warurt'a chimpcha?"
 
 msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "Pitch larama wakichata: Maya siqi warurt'a chimpcha?"
 
 msgid "articulation"
-msgstr ""
+msgstr "chikanchäwi"
