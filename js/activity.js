@@ -701,6 +701,7 @@ define(function (require) {
                         for (var name in blocks.palettes.dict) {
                             blocks.palettes.dict[name].hideMenu(true);
                         }
+
                         refreshCanvas();
 
                         blocks.loadNewBlocks(obj);
@@ -1206,6 +1207,12 @@ define(function (require) {
 
         function restoreTrash() {
             // Restore last stack pushed to trashStack.
+            // First, hide the palettes as they will need updating.
+            for (var name in blocks.palettes.dict) {
+                blocks.palettes.dict[name].hideMenu(true);
+            }
+            refreshCanvas();
+
             var dx = 0;
             var dy = -cellSize * 3; // Reposition blocks about trash area.
 
@@ -1229,7 +1236,7 @@ define(function (require) {
             blocks.raiseStackToTop(thisBlock);
 
             if (blocks.blockList[thisBlock].name === 'start' || blocks.blockList[thisBlock].name === 'drum') {
-                turtle = blocks.blockList[thisBlock].value;
+                var turtle = blocks.blockList[thisBlock].value;
                 turtles.turtleList[turtle].trash = false;
                 turtles.turtleList[turtle].container.visible = true;
             } else if (blocks.blockList[thisBlock].name === 'action') {
@@ -1275,7 +1282,7 @@ define(function (require) {
                 blocks.blockList[blk].hide();
                 if (blocks.blockList[blk].name === 'start' || blocks.blockList[blk].name === 'drum') {
                     console.log('start blk ' + blk + ' value is ' + blocks.blockList[blk].value)
-                    turtle = blocks.blockList[blk].value;
+                    var turtle = blocks.blockList[blk].value;
                     if (turtle != null) {
                         console.log('sending turtle ' + turtle + ' to trash');
                         turtles.turtleList[turtle].trash = true;
@@ -1596,6 +1603,7 @@ define(function (require) {
                         for (var name in blocks.palettes.dict) {
                             blocks.palettes.dict[name].hideMenu(true);
                         }
+
                         blocks.loadNewBlocks(JSON.parse(sessionData));
                     }
                 } catch (e) {
@@ -1604,6 +1612,7 @@ define(function (require) {
             } else {
                 justLoadStart();
             }
+
             update = true;
 
             docById('loading-image-container').style.display = 'none';
@@ -1779,7 +1788,7 @@ define(function (require) {
                     };
                 } else if (myBlock.name === 'start' || myBlock.name === 'drum') {
                     // Find the turtle associated with this block.
-                    turtle = turtles.turtleList[myBlock.value];
+                    var turtle = turtles.turtleList[myBlock.value];
                     var args = {
                         'collapsed': myBlock.collapsed,
                         'xcor': turtle.x,
