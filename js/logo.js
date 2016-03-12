@@ -14,6 +14,7 @@ const TONEBPM = 240;  // Seems to be the default.
 const TARGETBPM = 90;  // What we'd like to use for beats per minute
 const DEFAULTDELAY = 500; // milleseconds
 const TURTLESTEP = -1;  // Run in step-by-step mode
+const NOTEDIV = 8;  // Number of steps to divide turtle graphics
 const OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
                                  // to scale back its volume.
 
@@ -1196,7 +1197,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var delta = args[0] / 8;
+                    var delta = args[0] / NOTEDIV;
                     var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
@@ -1257,7 +1258,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var dist = args[0] / 8;
+                    var dist = args[0] / NOTEDIV;
                     var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
@@ -1277,7 +1278,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var dist = -args[0] / 8;
+                    var dist = -args[0] / NOTEDIV;
                     var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
@@ -1297,7 +1298,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var delta = args[0] / 8;
+                    var delta = args[0] / NOTEDIV;
                     var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
@@ -1317,7 +1318,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var delta = -args[0] / 8;
+                    var delta = -args[0] / NOTEDIV;
                     var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
@@ -3060,7 +3061,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         // When turtle commands (forward, right, arc) are inside of Notes,
         // they are progressive.
         var logo = this;
-        for (var t = 0; t < 8; t++) {
+        for (var t = 0; t < NOTEDIV; t++) {
             setTimeout(function() {
                 if (turtle in logo.forwardListener && blk in logo.forwardListener[turtle]) {
                     logo.stage.dispatchEvent('_forward_' + turtle + '_' + blk);
@@ -3071,7 +3072,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (turtle in logo.arcListener && blk in logo.arcListener[turtle]) {
                     logo.stage.dispatchEvent('_arc_' + turtle + '_' + blk);
                 }
-            }, t * beatValue * 125);
+            }, t * beatValue * 1000 / NOTEDIV);
         }
 
         setTimeout(function() {
