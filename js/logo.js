@@ -426,7 +426,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'slurfactor':
                 value = -last(this.staccato[turtle]);
-                break;
+               break;
             case 'beatfactor':
                 value = this.beatFactor[turtle];
                 break;
@@ -500,19 +500,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         for (var turtle in this.forwardListener) {
             for (var b in this.forwardListener[turtle]) {
-                this.stage.removeEventListener('_forward_' + turtle, this.forwardListener[turtle][b], false);
+                for (var i = 0; i < this.forwardListener[turtle][b].length; i++) {
+                    this.stage.removeEventListener('_forward_' + turtle, this.forwardListener[turtle][b][i], false);
+                }
             }
         }
 
         for (var turtle in this.rightListener) {
             for (var b in this.rightListener[turtle]) {
-                this.stage.removeEventListener('_right_' + turtle, this.rightListener[turtle][b], false);
+                for (var i = 0; i < this.rightListener[turtle][b].length; i++) {
+                    this.stage.removeEventListener('_right_' + turtle, this.rightListener[turtle][b][i], false);
+                }
             }
         }
 
         for (var turtle in this.arcListener) {
             for (var b in this.arcListener[turtle]) {
-                this.stage.removeEventListener('_arc_' + turtle, this.arcListener[turtle][b], false);
+                for (var i = 0; i < this.arcListener[turtle][b].length; i++) {
+                    this.stage.removeEventListener('_arc_' + turtle, this.arcListener[turtle][b][i], false);
+                }
             }
         }
 
@@ -614,7 +620,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             } else if (this.blocks.blockList[this.blocks.stackList[blk]].name === 'action') {
                 // Does the action stack have a name?
                 var c = this.blocks.blockList[this.blocks.stackList[blk]].connections[1];
-                var b = this.blocks.blockList[this.blocks.stackList[blk]].connections[2];
+               var b = this.blocks.blockList[this.blocks.stackList[blk]].connections[2];
                 if (c != null && b != null) {
                     // Don't use an action block in the trash.
                     if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
@@ -1204,7 +1210,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.turtles.turtleList[turtle].doArc(delta, args[1]);
                     };
 
-                    logo.arcListener[turtle][logo.whichNoteBlock[turtle]] = listener;
+                    if (logo.whichNoteBlock[turtle] in logo.arcListener[turtle]) {
+                        logo.arcListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                    } else {
+                        logo.arcListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                    }
+
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
@@ -1265,7 +1276,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.turtles.turtleList[turtle].doForward(dist);
                     };
 
-                    logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = listener;
+                    if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
+                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                    } else {
+                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                    }
+
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(args[0]);
@@ -1285,7 +1301,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.turtles.turtleList[turtle].doForward(dist);
                     };
 
-                    logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = listener;
+                    if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
+                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                    } else {
+                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                    }
+
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(-args[0]);
@@ -1305,7 +1326,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.turtles.turtleList[turtle].doRight(delta);
                     };
 
-                    logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = listener;
+                    if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
+                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                    } else {
+                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                    }
+
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(args[0]);
@@ -1325,7 +1351,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.turtles.turtleList[turtle].doRight(delta);
                     };
 
-                    logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = listener;
+                    if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
+                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                    } else {
+                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                    }
+
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(-args[0]);
@@ -2631,19 +2662,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             if (turtle in logo.forwardListener) {
                 for (var b in logo.forwardListener[turtle]) {
-                    logo.stage.removeEventListener('_forward_' + turtle, logo.forwardListener[turtle][b], false);
+                    for (var i = 0; i < this.forwardListener[turtle][b].length; i++) {
+                        logo.stage.removeEventListener('_forward_' + turtle, logo.forwardListener[turtle][b][i], false);
+                    }
                 }
             }
 
             if (turtle in logo.rightListener) {
                 for (var b in logo.rightListener[turtle]) {
-                    logo.stage.removeEventListener('_right_' + turtle, logo.rightListener[turtle][b], false);
+                    for (var i = 0; i < this.rightListener[turtle][b].length; i++) {
+                        logo.stage.removeEventListener('_right_' + turtle, logo.rightListener[turtle][b][i], false);
+                    }
                 }
             }
 
             if (turtle in logo.arcListener) {
                 for (var b in logo.arcListener[turtle]) {
-                    logo.stage.removeEventListener('_arc_' + turtle, logo.arcListener[turtle][b], false);
+                    for (var i = 0; i < this.arcListener[turtle][b].length; i++) {
+                        logo.stage.removeEventListener('_arc_' + turtle, logo.arcListener[turtle][b][i], false);
+                    }
                 }
             }
 
@@ -3077,16 +3114,26 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         setTimeout(function() {
             if (turtle in logo.forwardListener && blk in logo.forwardListener[turtle]) {
-                logo.stage.removeEventListener('_forward_' + turtle + '_' + blk, logo.forwardListener[turtle][blk], false);
+                for (var i = 0; i < logo.forwardListener[turtle][blk].length; i++) {
+                    logo.stage.removeEventListener('_forward_' + turtle + '_' + blk, logo.forwardListener[turtle][blk][i], false);
+                }
+                delete logo.forwardListener[turtle][blk];
             }
 
             if (turtle in logo.rightListener && blk in logo.rightListener[turtle]) {
-                logo.stage.removeEventListener('_right_' + turtle + '_' + blk, logo.rightListener[turtle][blk], false);
+                for (var i = 0; i < logo.rightListener[turtle][blk].length; i++) {
+                    logo.stage.removeEventListener('_right_' + turtle + '_' + blk, logo.rightListener[turtle][blk][i], false);
+                }
+                delete logo.rightListener[turtle][blk];
             }
 
             if (turtle in logo.arcListener && blk in logo.arcListener[turtle]) {
-                logo.stage.removeEventListener('_arc_' + turtle + '_' + blk, logo.arcListener[turtle][blk], false);
+                for (var i = 0; i < logo.arcListener[turtle][blk].length; i++) {
+                    logo.stage.removeEventListener('_arc_' + turtle + '_' + blk, logo.arcListener[turtle][blk][i], false);
+                }
+                delete logo.arcListener[turtle][blk];    
             }
+
         }, beatValue * 1000);
     }
 
