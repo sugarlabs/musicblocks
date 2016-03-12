@@ -1,0 +1,16 @@
+ul {
+    overflow: auto;  
+   }
+
+li {
+  float: left;
+  list-style: none;
+  width: 1000px;
+  height: 60px;
+  box-shadow:0 -1px 1em hsl(60, 60%, 84%) inset;
+  background-color: #FF7F50;
+  display: inline;
+  text-align: center;
+  padding: 2px;
+  
+  }
