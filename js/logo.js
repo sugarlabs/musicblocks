@@ -103,6 +103,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.addingNotesToTuplet = false;
     this.pitchBlocks = [];
     this.inNoteBlock = [];
+    this.whichNoteBlock = [];
 
     // parameters used by pitch
     this.transposition = {};
@@ -121,6 +122,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     // graphics listeners during note play
     this.forwardListener = {};
     this.rightListener = {};
+    this.arcListener = {};
 
     // status of note being played
     this.currentNotes = {};
@@ -495,6 +497,26 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.turtles.add(null);
         }
 
+        for (var turtle in this.forwardListener) {
+            for (var b in this.forwardListener[turtle]) {
+                this.stage.removeEventListener('_forward_' + turtle, this.forwardListener[turtle][b], false);
+            }
+        }
+
+        for (var turtle in this.rightListener) {
+            for (var b in this.rightListener[turtle]) {
+                this.stage.removeEventListener('_right_' + turtle, this.rightListener[turtle][b], false);
+            }
+        }
+
+        for (var turtle in this.arcListener) {
+            for (var b in this.arcListener[turtle]) {
+                this.stage.removeEventListener('_arc_' + turtle, this.arcListener[turtle][b], false);
+            }
+        }
+
+
+
         // Each turtle needs to keep its own wait time and music
         // states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -511,8 +533,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.currentOctaves[turtle] = 4;
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
-            this.forwardListener = {};
-            this.rightListener = {};
+            this.forwardListener[turtle] = {};
+            this.rightListener[turtle] = {};
+            this.arcListener[turtle] = {};
             this.beatFactor[turtle] = 1;
             this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
@@ -1172,6 +1195,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inNoteBlock[turtle] > 0) {
+                    var delta = args[0] / 8;
+                    var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
+
+                    var listener = function (event) {
+                        logo.turtles.turtleList[turtle].doArc(delta, args[1]);
+                    };
+
+                    logo.arcListener[turtle][logo.whichNoteBlock[turtle]] = listener;
+                    logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
                 }
@@ -1225,13 +1258,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var dist = args[0] / 8;
-                    var listenerName = '_forward_' + turtle;
+                    var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
                         logo.turtles.turtleList[turtle].doForward(dist);
                     };
-                    logo.forwardListener[turtle] = listener;
 
+                    logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = listener;
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(args[0]);
@@ -1245,13 +1278,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var dist = -args[0] / 8;
-                    var listenerName = '_forward_' + turtle;
+                    var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
                         logo.turtles.turtleList[turtle].doForward(dist);
                     };
-                    logo.forwardListener[turtle] = listener;
 
+                    logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = listener;
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(-args[0]);
@@ -1265,13 +1298,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var delta = args[0] / 8;
-                    var listenerName = '_right_' + turtle;
+                    var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
                         logo.turtles.turtleList[turtle].doRight(delta);
                     };
-                    logo.rightListener[turtle] = listener;
 
+                    logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = listener;
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(args[0]);
@@ -1285,13 +1318,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var delta = -args[0] / 8;
-                    var listenerName = '_right_' + turtle;
+                    var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var listener = function (event) {
                         logo.turtles.turtleList[turtle].doRight(delta);
                     };
-                    logo.rightListener[turtle] = listener;
 
+                    logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = listener;
                     logo.stage.addEventListener(listenerName, listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(-args[0]);
@@ -2038,6 +2071,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
 
             logo.inNoteBlock[turtle] += 1;
+            logo.whichNoteBlock[turtle] = blk;
+
             childFlow = args[1];
             childFlowCount = 1;
 
@@ -2593,6 +2628,24 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
 
+            if (turtle in logo.forwardListener) {
+                for (var b in logo.forwardListener[turtle]) {
+                    logo.stage.removeEventListener('_forward_' + turtle, logo.forwardListener[turtle][b], false);
+                }
+            }
+
+            if (turtle in logo.rightListener) {
+                for (var b in logo.rightListener[turtle]) {
+                    logo.stage.removeEventListener('_right_' + turtle, logo.rightListener[turtle][b], false);
+                }
+            }
+
+            if (turtle in logo.arcListener) {
+                for (var b in logo.arcListener[turtle]) {
+                    logo.stage.removeEventListener('_arc_' + turtle, logo.arcListener[turtle][b], false);
+                }
+            }
+
             // Make sure SVG path is closed.
             logo.turtles.turtleList[turtle].closeSVG();
 
@@ -2940,7 +2993,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
                         }
 
-                        logo.dispatchTurtleSignals(turtle, beatValue);
+                        logo.dispatchTurtleSignals(turtle, beatValue, blk);
 
                         if (notes.length > 0) {
                             var len = notes[0].length;
@@ -3003,20 +3056,37 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     }
 
-    this.dispatchTurtleSignals = function(turtle, beatValue) {
-        // When turtle commands (foward, right) are inside of Notes,
-        // they are progressive. (FIXME: Add arc)
+    this.dispatchTurtleSignals = function(turtle, beatValue, blk) {
+        // When turtle commands (forward, right, arc) are inside of Notes,
+        // they are progressive.
         var logo = this;
         for (var t = 0; t < 8; t++) {
             setTimeout(function() {
-                logo.stage.dispatchEvent('_forward_' + turtle);
-                logo.stage.dispatchEvent('_right_' + turtle);
+                if (turtle in logo.forwardListener && blk in logo.forwardListener[turtle]) {
+                    logo.stage.dispatchEvent('_forward_' + turtle + '_' + blk);
+                }
+                if (turtle in logo.rightListener && blk in logo.rightListener[turtle]) {
+                    logo.stage.dispatchEvent('_right_' + turtle + '_' + blk);
+                }
+                if (turtle in logo.arcListener && blk in logo.arcListener[turtle]) {
+                    logo.stage.dispatchEvent('_arc_' + turtle + '_' + blk);
+                }
             }, t * beatValue * 125);
         }
+
         setTimeout(function() {
-            logo.stage.removeEventListener('_forward_' + turtle, logo.forwardListener[turtle], false);
-            logo.stage.removeEventListener('_right_' + turtle, logo.rightListener[turtle], false);
-        }, t * beatValue * 125);
+            if (turtle in logo.forwardListener && blk in logo.forwardListener[turtle]) {
+                logo.stage.removeEventListener('_forward_' + turtle + '_' + blk, logo.forwardListener[turtle][blk], false);
+            }
+
+            if (turtle in logo.rightListener && blk in logo.rightListener[turtle]) {
+                logo.stage.removeEventListener('_right_' + turtle + '_' + blk, logo.rightListener[turtle][blk], false);
+            }
+
+            if (turtle in logo.arcListener && blk in logo.arcListener[turtle]) {
+                logo.stage.removeEventListener('_arc_' + turtle + '_' + blk, logo.arcListener[turtle][blk], false);
+            }
+        }, beatValue * 1000);
     }
 
     this.setListener = function(turtle, listenerName, listener) {
