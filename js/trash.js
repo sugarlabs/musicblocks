@@ -39,7 +39,8 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
             me.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             // Hide the trash until a block is moved.
             me.container.visible = false;
-        }
+        };
+
         img.src = 'data:image/svg+xml;base64,' + window.btoa(
             unescape(encodeURIComponent(BORDER.replace('stroke_color', '#000000'))));
     }
@@ -52,7 +53,8 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
             bitmap.scaleY = me.size / me.iconsize;
             me.container.addChild(border);
             makeBorderHighlight(me);
-        }
+        };
+
         img.src = 'data:image/svg+xml;base64,' + window.btoa(
             unescape(encodeURIComponent(BORDER.replace('stroke_color', '#e0e0e0'))));
     }
@@ -68,13 +70,14 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
             bitmap.x = ((TRASHWIDTH - size) / 2) * bitmap.scaleX;
             bitmap.y = ((TRASHHEIGHT - size) / 2) * bitmap.scaleY;
             makeBorder(me);
-        }
+        };
+
         img.src = 'images/trash.svg';
     }
 
     this.resizeEvent = function(scale) {
-        this.container.x = (this.canvas.width * 1/scale / 2) - ((TRASHWIDTH / 2) * (this.size / this.iconsize));
-        this.container.y = (this.canvas.height * 1/scale) - (TRASHHEIGHT * (this.size / this.iconsize));
+        this.container.x = (this.canvas.width * 1 / scale / 2) - ((TRASHWIDTH / 2) * (this.size / this.iconsize));
+        this.container.y = (this.canvas.height * 1 / scale) - (TRASHHEIGHT * (this.size / this.iconsize));
     }
 
     this.stage.addChild(this.container);
