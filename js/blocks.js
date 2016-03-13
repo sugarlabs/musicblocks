@@ -184,9 +184,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
     }
 
-    // We need access to the go-home buttons.
-    this.setHomeContainers = function (containers) {
+    // We need access to the go-home buttons and boundary.
+    this.setHomeContainers = function (containers, boundary) {
         this.homeButtonContainers = containers;
+        this.boundary = boundary;
     }
 
     // set up copy/paste, dismiss, and copy-stack buttons
@@ -1092,6 +1093,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (myBlock.offScreen(canvas)) {
                 this.homeButtonContainers[0].visible = true;
                 this.homeButtonContainers[1].visible = false;
+                this.boundary.show();
             }
         } else {
             console.log('no container yet');
@@ -1118,6 +1120,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
             if (myBlock.offScreen(canvas)) {
                 this.homeButtonContainers[0].visible = true;
                 this.homeButtonContainers[1].visible = false;
+                this.boundary.show();
             }
         } else {
             console.log('no container yet');

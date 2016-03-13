@@ -118,6 +118,9 @@ const PREVBUTTON = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width=
 // for print and error messages
 const MSGBLOCK = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1000" height="42">' + '<g transform="matrix(2,0,0,2,0,8)">' + '<path d="m 0.5,8.5 0,-8 c 0,-2.09 1.91,-4 4,-4 l 4,0 10,0 473,0 4,0 c 2.09,0 4.26,1.92 4,4 l 0,8 0,4 c 0,2.09 -1.91,4 -4,4 l -4,0 -473,0 -10,0 -4,0 c -2.09,0 -4,-1.91 -4,-4 z" style="fill:fill_color;fill-opacity:1;stroke:stroke_color;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />' + '</g>' + '</svg>';
 
+// boundary for screen
+const BOUNDARY = '<svg xmlns="http://www.w3.org/2000/svg" height="HEIGHT" width="WIDTH"> <rect style="fill:none;stroke:stroke_color;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:9, 9;stroke-dashoffset:0;stroke-opacity:1" y="Y" x="X" height="DY" width="DX" /></svg>';
+
 // border for trashcan
 const BORDER = '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120">' + '<rect width="315" height="115" x="2.5" y="2.5" style="fill:none;stroke:stroke_color;stroke-width:5.0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:15, 15;stroke-dashoffset:0" />' + '</svg>';
 

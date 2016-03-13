@@ -65,6 +65,7 @@ define(function (require) {
     require('activity/artwork');
     require('activity/munsell');
     require('activity/trash');
+    require('activity/boundary');
     require('activity/turtle');
     require('activity/palette');
     require('activity/protoblocks');
@@ -345,6 +346,7 @@ define(function (require) {
             // Blocks are all home, so reset go-home-button.
             homeButtonContainers[0].visible = false;
             homeButtonContainers[1].visible = true;
+            boundary.hide();
         }
 
         function allClear() {
@@ -627,12 +629,14 @@ define(function (require) {
             trashContainer = new createjs.Container();
             turtleContainer = new createjs.Container();
 
-            stage.addChild(turtleContainer, trashContainer, blocksContainer,
-                palettesContainer);
+            stage.addChild(turtleContainer, trashContainer, blocksContainer, palettesContainer);
             setupBlocksContainerEvents();
 
             trashcan = new Trashcan(canvas, trashContainer, cellSize, refreshCanvas);
             turtles = new Turtles(canvas, turtleContainer, refreshCanvas);
+            // Put the boundary in the blocks container so it scrolls
+            // with the blocks.
+            boundary = new Boundary(canvas, blocksContainer, refreshCanvas);
             blocks = new Blocks(canvas, blocksContainer, refreshCanvas, trashcan, stage.update);
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
 
@@ -1170,6 +1174,7 @@ define(function (require) {
 
             turtles.setScale(musicBlocksScale);
             blocks.setScale(musicBlocksScale);
+	    boundary.setScale(musicBlocksScale);
             palettes.setScale(musicBlocksScale);
             trashcan.resizeEvent(musicBlocksScale);
             setupAndroidToolbar(mobileSize);
@@ -1990,7 +1995,8 @@ define(function (require) {
                     onscreenButtons.push(container2);
                     homeButtonContainers[0].visible = false;
                     homeButtonContainers[1].visible = true;
-                    blocks.setHomeContainers(homeButtonContainers);
+		    boundary.hide();
+                    blocks.setHomeContainers(homeButtonContainers, boundary);
                 }
 
                 x += dx;
