@@ -2978,6 +2978,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     logo.noteBeat[turtle] = noteBeatValue;
 
+                    // Use the beatValue of the first note in
+                    // the group since there can only be one.
+                    if (logo.staccato[turtle].length > 0) {
+                        var staccatoBeatValue = last(logo.staccato[turtle]);
+                        if (staccatoBeatValue < 0) {
+                            // slur
+                            var beatValue = bpmFactor / ((noteBeatValue) * logo.noteBeatValues[turtle][0]) + bpmFactor / (-staccatoBeatValue * logo.noteBeatValues[turtle][0]);
+                        } else if (staccatoBeatValue > noteBeatValue) {
+                            // staccato
+                            var beatValue = bpmFactor / (staccatoBeatValue * logo.noteBeatValues[turtle][0]);
+                        } else {
+                            var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                        }
+                    } else {
+                        var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
+                    }
+
+                    logo.dispatchTurtleSignals(turtle, beatValue, blk);
+
                     if (logo.notePitches[turtle].length > 0) {
                         if (!logo.lilypondSaveOnly && duration > 0) {
                             if (logo.oscList[turtle].length > 0) {
@@ -3013,25 +3032,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
 
                         console.log("notes to play " + notes + ' ' + noteBeatValue);
-
-                        // Use the beatValue of the first note in
-                        // the group since there can only be one.
-                        if (logo.staccato[turtle].length > 0) {
-                            var staccatoBeatValue = last(logo.staccato[turtle]);
-                            if (staccatoBeatValue < 0) {
-                                // slur
-                                var beatValue = bpmFactor / ((noteBeatValue) * logo.noteBeatValues[turtle][0]) + bpmFactor / (-staccatoBeatValue * logo.noteBeatValues[turtle][0]);
-                            } else if (staccatoBeatValue > noteBeatValue) {
-                                // staccato
-                                var beatValue = bpmFactor / (staccatoBeatValue * logo.noteBeatValues[turtle][0]);
-                            } else {
-                                var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
-                            }
-                        } else {
-                            var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
-                        }
-
-                        logo.dispatchTurtleSignals(turtle, beatValue, blk);
 
                         if (notes.length > 0) {
                             var len = notes[0].length;
