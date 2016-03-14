@@ -1088,16 +1088,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                     this.homeButtonContainers[0].visible = true;
                     this.homeButtonContainers[1].visible = false;
                     this.boundary.show();
-		    onScreen = false;
+                    onScreen = false;
                     break;
-		}
+                }
             }
-	}
+        }
         if (onScreen) {
             this.homeButtonContainers[0].visible = false;
             this.homeButtonContainers[1].visible = true;
             this.boundary.hide();
-	}
+        }
     }
 
     this.moveBlock = function (blk, x, y) {
@@ -1106,11 +1106,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (myBlock.container != null) {
             myBlock.container.x = x;
             myBlock.container.y = y;
+
             if (myBlock.collapseContainer != null) {
                 myBlock.collapseContainer.x = x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
                 myBlock.collapseContainer.y = y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
-	    this.checkBounds();
+
+            this.checkBounds();
         } else {
             console.log('no container yet');
         }
@@ -1129,11 +1131,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         if (myBlock.container != null) {
             myBlock.container.x += dx;
             myBlock.container.y += dy;
+
             if (myBlock.collapseContainer != null) {
                 myBlock.collapseContainer.x += dx;
                 myBlock.collapseContainer.y += dy;
             }
-	    this.checkBounds();
+
+            this.checkBounds();
         } else {
             console.log('no container yet');
         }

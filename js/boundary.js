@@ -40,7 +40,7 @@ function Boundary (canvas, stage, refreshCanvas) {
     this.destroy = function() {
         if (this.container.children.length > 0) {
             this.container.removeChild(this.container.children[0]);
-	}
+        }
     }
 
     this.offScreen = function(x, y) {

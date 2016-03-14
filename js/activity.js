@@ -1174,7 +1174,7 @@ define(function (require) {
 
             turtles.setScale(musicBlocksScale);
             blocks.setScale(musicBlocksScale);
-	    boundary.setScale(musicBlocksScale);
+            boundary.setScale(musicBlocksScale);
             palettes.setScale(musicBlocksScale);
             trashcan.resizeEvent(musicBlocksScale);
             setupAndroidToolbar(mobileSize);
@@ -1995,7 +1995,7 @@ define(function (require) {
                     onscreenButtons.push(container2);
                     homeButtonContainers[0].visible = false;
                     homeButtonContainers[1].visible = true;
-		    boundary.hide();
+                    boundary.hide();
                     blocks.setHomeContainers(homeButtonContainers, boundary);
                 }
 
