@@ -1080,6 +1080,26 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         this.refreshCanvas();
     }
 
+    this.checkBounds = function() {
+        var onScreen = true;
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].connections[0] == null) {
+                if (this.blockList[blk].offScreen(this.boundary)) {
+                    this.homeButtonContainers[0].visible = true;
+                    this.homeButtonContainers[1].visible = false;
+                    this.boundary.show();
+		    onScreen = false;
+                    break;
+		}
+            }
+	}
+        if (onScreen) {
+            this.homeButtonContainers[0].visible = false;
+            this.homeButtonContainers[1].visible = true;
+            this.boundary.hide();
+	}
+    }
+
     this.moveBlock = function (blk, x, y) {
         // Move a block (and its label) to x, y.
         var myBlock = this.blockList[blk];
@@ -1090,11 +1110,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 myBlock.collapseContainer.x = x + COLLAPSEBUTTONXOFF * (this.blockList[blk].protoblock.scale / 2);
                 myBlock.collapseContainer.y = y + COLLAPSEBUTTONYOFF * (this.blockList[blk].protoblock.scale / 2);
             }
-            if (myBlock.offScreen(canvas)) {
-                this.homeButtonContainers[0].visible = true;
-                this.homeButtonContainers[1].visible = false;
-                this.boundary.show();
-            }
+	    this.checkBounds();
         } else {
             console.log('no container yet');
         }
@@ -1117,11 +1133,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 myBlock.collapseContainer.x += dx;
                 myBlock.collapseContainer.y += dy;
             }
-            if (myBlock.offScreen(canvas)) {
-                this.homeButtonContainers[0].visible = true;
-                this.homeButtonContainers[1].visible = false;
-                this.boundary.show();
-            }
+	    this.checkBounds();
         } else {
             console.log('no container yet');
         }

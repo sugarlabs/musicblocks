@@ -43,13 +43,17 @@ function Boundary (canvas, stage, refreshCanvas) {
 	}
     }
 
+    this.offScreen = function(x, y) {
+        return (x < this.x || x > this.x + this.dx || y < this.y || y > this.y + this.dy);
+    }
+
     this.create = function(scale) {
-        var w = this.canvas.width / scale;
-        var h = this.canvas.height / scale;
-        var x = 55 + 13;
-        var y = 55 + 13;
-        var dx = w - 110 - 13;
-        var dy = h - 55 - 13;
+        this.w = this.canvas.width / scale;
+        this.h = this.canvas.height / scale;
+        this.x = (55 + 13) / scale;
+        this.y = (55 + 13) / scale;
+        this.dx = this.w - ((110 + 13) / scale);
+        this.dy = this.h - ((55 + 13) / scale);
 
         function makeBoundary(me) {
             var img = new Image();
@@ -59,7 +63,7 @@ function Boundary (canvas, stage, refreshCanvas) {
             };
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(BOUNDARY.replace('HEIGHT', h).replace('WIDTH', w).replace('Y', y).replace('X', x).replace('DY', dy).replace('DX', dx).replace('stroke_color', '#e08080'))));
+                unescape(encodeURIComponent(BOUNDARY.replace('HEIGHT', me.h).replace('WIDTH', me.w).replace('Y', me.y).replace('X', me.x).replace('DY', me.dy).replace('DX', me.dx).replace('stroke_color', '#e08080'))));
         }
 
         makeBoundary(this);

@@ -100,8 +100,8 @@ function Block(protoblock, blocks, overrideName) {
         }
     }
 
-    this.offScreen = function (canvas) {
-        return !this.trash && this.connections[0] == null && (this.container.x < 0 || this.container.y < 55 || this.container.x > canvas.width || this.container.y > canvas.height);
+    this.offScreen = function (boundary) {
+        return !this.trash && boundary.offScreen(this.container.x, this.container.y);
     }
 
     this.copySize = function() {
