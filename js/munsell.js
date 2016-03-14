@@ -24,6 +24,7 @@ function getMunsellColor(hue, value, chroma) {
     while (h < 0) {
         h += 40;
     }
+
     var v1 = Math.floor(value / 10);
     var v2 = v1 + 1;
     if (v1 < 0) {
@@ -33,12 +34,14 @@ function getMunsellColor(hue, value, chroma) {
         v1 = 10;
         v2 = 10;
     }
+
     var p = (v2 * 10 - value) / 10.;
     if (p > 1) {
         p = 1;
     } else if (p < 0) {
         p = 0;
     }
+
     var c = Math.round((chroma * 14) / 100);
     if (c < 0) {
         c = 0;
@@ -46,7 +49,7 @@ function getMunsellColor(hue, value, chroma) {
         c = 14;
     }
     return interpColor(MUNSELL[h * 165 + v1 * 15 + c], MUNSELL[h * 165 + v2 * 15 + c], p);
-}
+};
 
 
 interpColor = function(hex1, hex2, p) {
@@ -89,7 +92,7 @@ function getcolor(color) {
     var v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
     var c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
     return [v * 10., c * 100. / 14, interpColor(COLORS40[h1][2], COLORS40[h2][2], p)];
-}
+};
 
 
 // Searches for nearest match to high chroma colors, scaled from 0-100
@@ -108,7 +111,7 @@ function searchColors(r, g, b) {
 	}
     }
     return nearestColor;
-}
+};
 
 
 // 40 high-chroma colors [value, chroma, RGB]
@@ -639,4 +642,3 @@ MUNSELL = [
     "#e3e3e3", "#f2e2e5", "#ffdbe3", "#ffd4e1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1", "#ffcde1",
     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"
 ];
-

@@ -102,11 +102,11 @@ function Matrix() {
     this.clearBlocks = function() {
         this.rowBlocks = [];
         this.colBlocks = [];
-    }
+    };
 
     this.addRowBlock = function(pitchBlock) {
         this.rowBlocks.push(pitchBlock);
-    }
+    };
 
     this.addColBlock = function(rhythmBlock, n) {
         // Search for previous instance of the same block (from a repeat)
@@ -121,7 +121,7 @@ function Matrix() {
         for (var i = startIdx; i < n + startIdx; i++) {
             this.colBlocks.push([rhythmBlock, i]);
         }
-    }
+    };
 
     this.addNode = function(pitchBlock, rhythmBlock, n) {
         for (var i = 0; i < this.blockMap.length; i++) {
@@ -131,7 +131,7 @@ function Matrix() {
             }
         }
         this.blockMap.push([pitchBlock, [rhythmBlock, n]]);
-    }
+    };
 
     this.removeNode = function(pitchBlock, rhythmBlock, n) {
         for (var i = 0; i < this.blockMap.length; i++) {
@@ -140,7 +140,7 @@ function Matrix() {
                 this.blockMap[i] = [-1, [-1, 1, 0]];  // Mark as removed
             }
         }
-    }
+    };
 
     this.initMatrix = function(logo) {
         // Initializes the matrix. First removes the previous matrix
@@ -344,7 +344,7 @@ function Matrix() {
         cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
         // cell.style.top = Math.floor(marginFromTop + (i * this.cellScale * 2)) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
-    }
+    };
 
     this.generateDataURI = function(file) {
         // Deprecated since we now use SVG for note artwork.
@@ -359,7 +359,7 @@ function Matrix() {
         */
         var data = "data:text/html;charset=utf-8," + encodeURIComponent(file);
         return data;
-    }
+    };
 
     this.exportMatrix = function() {
         var table = docById('myTable');
@@ -411,7 +411,7 @@ function Matrix() {
         console.log(saveDocument.documentElement.outerHTML);
         exportDocument.getElementById("downloadb1").href = this.generateDataURI(uriData);
         exportDocument.close();
-    }
+    };
 
     this.note2Solfege = function(note, index) {
         if (['♭', '♯'].indexOf(note[1]) === -1) {
@@ -424,7 +424,7 @@ function Matrix() {
         console.log(index + ': ' + newNote + '/' + octave);
         this.solfegeNotes[index] = newNote;
         this.solfegeOctaves[index] = octave;
-    }
+    };
 
     this.addTuplet = function(param) {
         // The first two parameters are the interval for the tuplet,
@@ -578,11 +578,11 @@ function Matrix() {
         }
 
         this.matrixHasTuplets = true;
-    }
+    };
 
     this.noteWidth = function (noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
-    }
+    };
 
     this.calcNoteValueToDisplay = function (a, b) {
         var noteValue = a / b;
@@ -608,7 +608,7 @@ function Matrix() {
         }
 
         return noteValueToDisplay;
-    }
+    };
 
     this.addNotes = function(numBeats, noteValue) {
         console.log('addNotes ' + numBeats + ' ' + noteValue);
@@ -667,7 +667,7 @@ function Matrix() {
                 cell.setAttribute('id', table.rows[1].cells.length - 1);
             }
         }
-    }
+    };
 
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
@@ -738,7 +738,7 @@ function Matrix() {
                 }
             }
         }
-    }
+    };
 
     this.playAll = function() {
         // Play all of the notes in the matrix.
@@ -794,7 +794,7 @@ function Matrix() {
         }
 
         this.playNote(0, 0);
-    }
+    };
 
     this.playNote = function(time, noteCounter) {
         noteValue = this.notesToPlayDirected[noteCounter][1];
@@ -863,7 +863,7 @@ function Matrix() {
             }
             }
         }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
-    }
+    };
 
     this.setNotes = function(colIndex, rowIndex, playNote) {
         // Sets corresponding note when user clicks on any cell and
@@ -896,7 +896,7 @@ function Matrix() {
                 }
             }
         }
-    }
+    };
 
     this.setNoteCell = function(j, colIndex, cell, playNote) {
         var table = docById('myTable');
@@ -916,7 +916,7 @@ function Matrix() {
         if (playNote) {
             this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default');
         }
-    }
+    };
 
     this.clearMatrix = function() {
         // "Unclick" every entry in the matrix.
@@ -940,7 +940,7 @@ function Matrix() {
                 }
             }
         }
-    }
+    };
 
     this.saveMatrix = function() {
         /* Saves the current matrix as an action stack consisting of
@@ -1051,8 +1051,8 @@ function Matrix() {
         // Create a new stack for the chunk.
         console.log(newStack);
         this.logo.blocks.loadNewBlocks(newStack);
-    }
-}
+    };
+};
 
 function reducedFraction(a, b) {
     greatestCommonMultiple = function(a, b) {
@@ -1065,4 +1065,4 @@ function reducedFraction(a, b) {
     } else {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
     }
-}
+};

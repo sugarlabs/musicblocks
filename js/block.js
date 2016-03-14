@@ -82,7 +82,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
         }
-    }
+    };
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
@@ -98,19 +98,19 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.container.updateCache();
             myBlock.blocks.refreshCanvas();
         }
-    }
+    };
 
     this.offScreen = function (boundary) {
         return !this.trash && boundary.offScreen(this.container.x, this.container.y);
-    }
+    };
 
     this.copySize = function() {
         this.size = this.protoblock.size;
-    }
+    };
 
     this.getInfo = function() {
         return this.name + ' block';
-    }
+    };
 
     this.highlight = function() {
         if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
@@ -142,7 +142,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
         this.updateCache();
-    }
+    };
 
     this.unhighlight = function() {
         if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
@@ -165,21 +165,21 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
         this.updateCache();
-    }
+    };
 
     this.updateArgSlots = function(slotList) {
         // Resize and update number of slots in argClamp
         this.argClampSlots = slotList;
         this.newArtwork();
         this.regenerateArtwork(false);
-    }
+    };
 
     this.updateSlots = function(clamp, plusMinus) {
         // Resize an expandable block.
         this.clampCount[clamp] += plusMinus;
         this.newArtwork(plusMinus);
         this.regenerateArtwork(false);
-    }
+    };
 
     this.resize = function(blockScale) {
         // If the block scale changes, we need to regenerate the
@@ -229,7 +229,7 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseText.font = fontSize + 'px Sans';
             positionCollapseLabel(this, blockScale);
         }
-    }
+    };
 
     this.newArtwork = function(plusMinus) {
         switch (this.name) {
@@ -355,7 +355,7 @@ function Block(protoblock, blocks, overrideName) {
             console.log(this.docks);
             console.log(obj);
         }
-    }
+    };
 
     this.imageLoad = function() {
         // Load any artwork associated with the block and create any
@@ -369,7 +369,7 @@ function Block(protoblock, blocks, overrideName) {
         this.text = new createjs.Text('', fontSize + 'px Sans', '#000000');
 
         this.generateArtwork(true, []);
-    }
+    };
 
     this.addImage = function() {
         var image = new Image();
@@ -385,7 +385,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         image.src = this.image;
-    }
+    };
 
     this.regenerateArtwork = function(collapse) {
         // Sometimes (in the case of namedboxes and nameddos) we need
@@ -409,7 +409,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Then we generate new artwork.
         this.generateArtwork(false);
-    }
+    };
 
     this.generateArtwork = function(firstTime) {
         // Get the block labels from the protoblock
@@ -517,7 +517,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             makeBitmap(artwork, myBlock.name, processHighlightBitmap, myBlock);
-        }
+        };
 
         if (firstTime) {
             // Create artwork and dock.
@@ -538,7 +538,7 @@ function Block(protoblock, blocks, overrideName) {
             artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
         makeBitmap(artwork, this.name, processBitmap, this);
-    }
+    };
 
     this.finishImageLoad = function() {
         var thisBlock = this.blocks.blockList.indexOf(this);
@@ -600,7 +600,7 @@ function Block(protoblock, blocks, overrideName) {
 
             this.generateCollapseArtwork(postProcess);
         }
-    }
+    };
 
     this.generateCollapseArtwork = function(postProcess) {
         var thisBlock = this.blocks.blockList.indexOf(this);
@@ -686,7 +686,7 @@ function Block(protoblock, blocks, overrideName) {
 
             var artwork = this.collapseArtwork;
             makeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), '', processCollapseBitmap, this);
-    }
+    };
 
     this.hide = function() {
         this.container.visible = false;
@@ -694,7 +694,7 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseContainer.visible = false;
             this.collapseText.visible = false;
         }
-    }
+    };
 
     this.show = function() {
         if (!this.trash) {
@@ -707,54 +707,54 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
-    }
+    };
 
     // Utility functions
     this.isValueBlock = function() {
         return this.protoblock.style === 'value';
-    }
+    };
 
     this.isNoHitBlock = function() {
         return NOHIT.indexOf(this.name) !== -1;
-    }
+    };
 
     this.isArgBlock = function() {
         return this.protoblock.style === 'value' || this.protoblock.style === 'arg';
-    }
+    };
 
     this.isTwoArgBlock = function() {
         return this.protoblock.style === 'twoarg';
-    }
+    };
 
     this.isTwoArgBooleanBlock = function() {
         return ['equal', 'greater', 'less'].indexOf(this.name) !== -1;
-    }
+    };
 
     this.isClampBlock = function() {
         return this.protoblock.style === 'clamp' || this.isDoubleClampBlock();
-    }
+    };
 
     this.isDoubleClampBlock = function() {
         return this.protoblock.style === 'doubleclamp';
-    }
+    };
 
     this.isNoRunBlock = function() {
         return this.name === 'action';
-    }
+    };
 
     this.isArgClamp = function() {
         return this.protoblock.style === 'argclamp' || this.protoblock.style === 'argclamparg';
-    }
+    };
 
     this.isExpandableBlock = function() {
         return this.protoblock.expandable;
-    }
+    };
 
     // Based on the block index into the blockList.
     this.getBlockId = function() {
         var number = blockBlocks.blockList.indexOf(this);
         return '_' + number.toString();
-    }
+    };
 
     this.removeChildBitmap = function(name) {
         for (var child = 0; child < this.container.getNumChildren(); child++) {
@@ -763,7 +763,7 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
-    }
+    };
 
     this.loadThumbnail = function (imagePath) {
         // Load an image thumbnail onto block.
@@ -807,14 +807,14 @@ function Block(protoblock, blocks, overrideName) {
             positionMedia(bitmap, myBlock, bitmap.image.width, bitmap.image.height, myBlock.protoblock.scale);
             myBlock.container.addChild(bitmap);
             myBlock.updateCache();
-        }
+        };
 
         if (imagePath == null) {
             image.src = this.value;
         } else {
             image.src = imagePath;
         }
-    }
+    };
 
     this.doOpenMedia = function (myBlock, thisBlock) {
         var fileChooser = docById('myOpenAll');
@@ -847,7 +847,7 @@ function Block(protoblock, blocks, overrideName) {
         fileChooser.focus();
         fileChooser.click();
         window.scroll(0, 0);
-    }
+    };
 
     this.collapseToggle = function () {
         // Find the blocks to collapse/expand
@@ -911,11 +911,11 @@ function Block(protoblock, blocks, overrideName) {
 
             myBlock.collapseContainer.updateCache();
             myBlock.updateCache();
-        }
+        };
 
         toggle(this);
-    }
-}
+    };
+};
 
 
 function $() {
@@ -930,7 +930,7 @@ function $() {
         elements.push(element);
     }
     return elements;
-}
+};
 
 
 function positionText(myBlock, blockScale) {
@@ -959,7 +959,7 @@ function positionText(myBlock, blockScale) {
     z = myBlock.container.getNumChildren() - 1;
     myBlock.container.setChildIndex(myBlock.text, z);
     myBlock.updateCache();
-}
+};
 
 
 function positionMedia(bitmap, myBlock, width, height, blockScale) {
@@ -970,7 +970,7 @@ function positionMedia(bitmap, myBlock, width, height, blockScale) {
     }
     bitmap.x = (MEDIASAFEAREA[0] - 10) * blockScale / 2;
     bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
-}
+};
 
 
 function calculateCollapseHitArea(myBlock) {
@@ -982,7 +982,7 @@ function calculateCollapseHitArea(myBlock) {
     hitArea.x = w2 / 2;
     hitArea.y = h2 / 2;
     myBlock.collapseContainer.hitArea = hitArea;
-}
+};
 
 
 function positionCollapseLabel(myBlock, blockScale) {
@@ -992,13 +992,13 @@ function positionCollapseLabel(myBlock, blockScale) {
     // Ensure text is on top.
     z = myBlock.container.getNumChildren() - 1;
     myBlock.container.setChildIndex(myBlock.collapseText, z);
-}
+};
 
 
 function positionCollapseContainer(myBlock, blockScale) {
     myBlock.collapseContainer.x = myBlock.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2);
     myBlock.collapseContainer.y = myBlock.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2);
-}
+};
 
 
 // These are the event handlers for collapsible blocks.
@@ -1125,7 +1125,7 @@ function loadCollapsibleEventHandlers(myBlock) {
 
         myBlock.blocks.refreshCanvas();
     });
-}
+};
 
 
 function collapseOut(blocks, myBlock, thisBlock, moved, event) {
@@ -1149,7 +1149,7 @@ function collapseOut(blocks, myBlock, thisBlock, moved, event) {
     blocks.unhighlight(null);
     blocks.activeBlock = null;
     blocks.refreshCanvas();
-}
+};
 
 
 window.hasMouse = false;
@@ -1175,7 +1175,7 @@ function calculateBlockHitArea(myBlock) {
         hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
     }
     myBlock.container.hitArea = hitArea;
-}
+};
 
 
 // These are the event handlers for block containers.
@@ -1369,7 +1369,7 @@ function loadEventHandlers(myBlock) {
         }
         moved = false;
     });
-}
+};
 
 
 function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
@@ -1428,7 +1428,7 @@ function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
         }
         myBlock.blocks.activeBlock = null;
     }
-}
+};
 
 
 function ensureDecorationOnTop(myBlock) {
@@ -1455,7 +1455,7 @@ function ensureDecorationOnTop(myBlock) {
             break;
         }
     }
-}
+};
 
 
 function makeBitmap(data, name, callback, args) {
@@ -1469,7 +1469,7 @@ function makeBitmap(data, name, callback, args) {
 
     img.src = 'data:image/svg+xml;base64,' + window.btoa(
         unescape(encodeURIComponent(data)));
-}
+};
 
 
 function changeLabel(myBlock) {
@@ -1655,7 +1655,7 @@ function changeLabel(myBlock) {
         myBlock.label.focus();
         focused = true;
     }, 100);
-}
+};
 
 
 function labelChanged(myBlock) {
@@ -1752,4 +1752,4 @@ function labelChanged(myBlock) {
             break;
         }
     }
-}
+};

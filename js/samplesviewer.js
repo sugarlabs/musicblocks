@@ -63,7 +63,7 @@ function PlanetModel(controller) {
         me.updated();
 
         this.downloadWorldWideProjects();
-    }
+    };
 
     this.downloadWorldWideProjects = function () {
         jQuery.ajax({
@@ -84,7 +84,7 @@ function PlanetModel(controller) {
 
             me.getImages(todo);
         });
-    }
+    };
 
     this.getImages = function (todo) {
         if (me.stop === true) {
@@ -95,6 +95,7 @@ function PlanetModel(controller) {
         if (image === undefined) {
             return;
         }
+
         var name = image.replace('.b64', '');
         var mbcheck=0;
         if(name.slice(0, 'MusicBlocks_'.length) === 'MusicBlocks_'){
@@ -126,7 +127,7 @@ function PlanetModel(controller) {
                 me.getImages(todo);
             });
         }
-    }
+    };
 
     this.redoLocalStorageData = function () {
         this.localProjects = [];
@@ -151,7 +152,7 @@ function PlanetModel(controller) {
             }
         });
         this.localChanged = true;
-    }
+    };
 
     this.uniqueName = function (base) {
         var l = JSON.parse(localStorage.allProjects);
@@ -167,14 +168,14 @@ function PlanetModel(controller) {
             }
             i++;
         }
-    }
+    };
 
     this.newProject = function () {
         var name = this.uniqueName('My Project');
         me.prepLoadingProject(name);
         this.controller.sendAllToTrash(true, true);
         me.stop = true;
-    }
+    };
 
     this.renameProject = function (oldName, newName, current) {
         if (current) {
@@ -193,7 +194,7 @@ function PlanetModel(controller) {
         localStorage['SESSION' + oldName] = undefined;
 
         me.redoLocalStorageData();
-    }
+    };
 
     this.delete = function (name) {
         var l = JSON.parse(localStorage.allProjects);
@@ -205,7 +206,7 @@ function PlanetModel(controller) {
 
         me.redoLocalStorageData();
         me.updated();
-    }
+    };
 
     //Opens up projects in the "On my device" section
     this.open = function (name, data) {
@@ -213,7 +214,7 @@ function PlanetModel(controller) {
         me.controller.sendAllToTrash(false, true);
         me.controller.loadRawProject(data);
         me.stop = true;
-    }
+    };
 
     //Adds the project from "Worldwide" to the "On my deivce" 
     //section when download button is clicked
@@ -223,7 +224,7 @@ function PlanetModel(controller) {
         var l = JSON.parse(localStorage.allProjects);
         l.push(name);
         localStorage.allProjects = JSON.stringify(l);
-    }
+    };
 
     this.load = function (name) {
         me.prepLoadingProject(name);
@@ -251,7 +252,7 @@ function PlanetModel(controller) {
             me.controller.loadRawProject(d);
             me.stop = true;
         });
-    }
+    };
 
     this.publish = function (name, data, image) {
         name = name.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^`{|}~']/g,
@@ -260,8 +261,9 @@ function PlanetModel(controller) {
         httpPost(name + '.tb', data);
         httpPost(name + '.b64', image);
         me.downloadWorldWideProjects();
-    }
-}
+    };
+};
+
 
 function PlanetView(model, controller) {
     this.model = model;
@@ -278,6 +280,7 @@ function PlanetView(model, controller) {
             .addEventListener('change', function(event) {
         me.controller.hide();
     });
+
     document.querySelector('.planet .open')
             .addEventListener('click', function () {
         document.querySelector('#myOpenFile').focus();
@@ -299,6 +302,7 @@ function PlanetView(model, controller) {
             model.localProjects.forEach(function (project, i) {
                 html = html + format(LOCAL_PROJECT_TEMPLATE, project);
             });
+
             document.querySelector('.planet .content.l').innerHTML = html;
 
             var eles = document.querySelectorAll('.planet .content.l li');
@@ -316,6 +320,7 @@ function PlanetView(model, controller) {
                 ele.querySelector('.thumbnail')
                    .addEventListener('click', me.open(ele));
             });
+
             model.localChanged = false;
         }
 
@@ -323,13 +328,14 @@ function PlanetView(model, controller) {
         model.globalProjects.forEach(function (project, i) {
             html += format(GLOBAL_PROJECT_TEMPLATE, project);
         });
+
         document.querySelector('.planet .content.w').innerHTML = html;
 
         var eles = document.querySelectorAll('.planet .content.w li');
         Array.prototype.forEach.call(eles, function (ele, i) {
             ele.addEventListener('click', me.load(ele))
         });
-    }
+    };
 
     this.load = function (ele) {
         return function () {
@@ -339,7 +345,7 @@ function PlanetView(model, controller) {
             me.model.load(ele.attributes.title.value);
             me.controller.hide();
         }
-    }
+    };
 
     this.publish = function (ele) {
         return function () {
@@ -351,14 +357,14 @@ function PlanetView(model, controller) {
             document.querySelector('#loading-image-container')
                     .style.display = 'none';
         }
-    }
+    };
 
     this.download = function (ele) {
         return function () {
             download(ele.attributes.title.value + '.tb',
                 'data:text/plain;charset=utf-8,' + ele.attributes.data.value);
         }
-    }
+    };
 
     this.open = function (ele) {
         return function () {
@@ -372,14 +378,14 @@ function PlanetView(model, controller) {
                           ele.attributes.data.value);
             me.controller.hide();
         }
-    }
+    };
 
     this.delete = function (ele) {
         return function () {
             var title = ele.attributes.title.value;
             me.model.delete(title);
         }
-    }
+    };
 
     this.input = function (ele) {
         return function () {
@@ -389,8 +395,9 @@ function PlanetView(model, controller) {
             me.model.renameProject(oldName, newName, current);
             ele.attributes.title.value = newName;
         }
-    }
-}
+    };
+};
+
 
 // A viewer for sample projects
 function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash) {
@@ -410,7 +417,7 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
 
     this.setServer = function(server) {
         this.server = server;
-    }
+    };
 
     this.hide = function() {
         document.querySelector('.planet').style.display = 'none';
@@ -419,7 +426,7 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
         document.querySelector('#theme-color').content = platformColor.header;
         me.stage.enableDOMEvents(true);
         window.scroll(0, 0);
-    }
+    };
 
     this.show = function() {
         document.querySelector('.planet').style.display = '';
@@ -434,8 +441,10 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
 
         this.model.start(this.view.update);
         return true;
-    }
-}
+    };
+};
+
+
 function validateImageData(d) {
     if(d === undefined) {
         return false;
@@ -443,12 +452,11 @@ function validateImageData(d) {
     
     if(d.indexOf('data:image') !== 0){
         return false;
-    }
-    else {
+    } else {
         var data = d.split(",");
         if(data[1].length == 0){
             return false;
         }
     }
     return true;
-}
+};

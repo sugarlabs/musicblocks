@@ -74,7 +74,7 @@ function durationToNoteValue(duration) {
 
     // Next, generate a fauve tuplet for a singleton.
     return [1, 0, duration, roundDown];
-}
+};
 
 
 function toFraction(d) {
@@ -107,7 +107,7 @@ function toFraction(d) {
     }
 
     return([top, bot]);
-}
+};
 
 
 function frequencyToPitch(hz) {
@@ -129,7 +129,7 @@ function frequencyToPitch(hz) {
     }
     console.log('could not find note/octave for ' + hz);
     return ['?', -1];
-}
+};
 
 
 function numberToPitch(i) {
@@ -141,7 +141,7 @@ function numberToPitch(i) {
     }
     // We start at A0.
     return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
-}
+};
 
 
 function noteToFrequency(note) {
@@ -149,7 +149,7 @@ function noteToFrequency(note) {
     var octave = last(note);
     var pitch = note.substring(0, len - 1);
     return pitchToFrequency(pitch, Number(octave));
-}
+};
 
 
 function pitchToFrequency(pitch, octave) {
@@ -157,7 +157,7 @@ function pitchToFrequency(pitch, octave) {
     var pitchNumber = pitchToNumber(pitch, octave);
 
     return A0 * Math.pow(TWELTHROOT2, pitchNumber);
-}
+};
 
 
 function pitchToNumber(pitch, octave) {
@@ -178,7 +178,7 @@ function pitchToNumber(pitch, octave) {
 
     // We start at A0.
     return Math.max(octave, 0) * 12 + pitchNumber - PITCHES.indexOf('A');
-}
+};
 
 
 function getSolfege(note) {
@@ -189,7 +189,7 @@ function getSolfege(note) {
     } else {
         return SOLFEGECONVERSIONTABLE[note[0][0]];
     }
-}
+};
 
 
 function getNumber(solfege, octave) {
@@ -219,7 +219,7 @@ function getNumber(solfege, octave) {
         }
     }
     return num;
-}
+};
 
 
 function getNumNote(value, delta) {
@@ -242,7 +242,7 @@ function getNumNote(value, delta) {
         octave -= 1;
     }
     return [note, octave + 1];
-}
+};
 
 
 function Synth () {
@@ -323,7 +323,7 @@ function Synth () {
             this.poly.toMaster();
             break;
         }
-    }
+    };
 
     this.trigger = function(notes, beatValue, name) {
         switch (name) {
@@ -346,7 +346,7 @@ function Synth () {
             this.poly.triggerAttackRelease(notes, beatValue);
             break;
         }
-    }
+    };
 
     this.stopSound = function(name) {
         switch (name) {
@@ -369,22 +369,22 @@ function Synth () {
             this.poly.triggerRelease();
             break;
         }
-    }
+    };
 
     this.start = function() {
         Tone.Transport.start();
-    }
+    };
 
     this.stop = function() {
         Tone.Transport.stop();
-    }
+    };
 
     this.setVolume = function(vol) {
         var db = this.tone.gainToDb(vol / 100);
         Tone.Master.volume.rampTo(db, 0.01);
-    }
+    };
 
     this.getOscilator = function(oscillatorName, frequency) {
         return new Tone.Oscillator(oscillatorName, frequency).toMaster();
-    }
-}
+    };
+};

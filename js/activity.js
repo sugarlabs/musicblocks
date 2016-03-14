@@ -25,7 +25,7 @@ function facebookInit() {
 
         // ADD ADDITIONAL FACEBOOK CODE HERE
     };
-}
+};
 
 /*
 try {
@@ -40,7 +40,7 @@ try {
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
 } catch (e) {
-}
+};
 */
 
 var lang = document.webL10n.getLanguage();
@@ -261,7 +261,7 @@ define(function (require) {
             [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
             [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
-        ]
+        ];
 
         const DATAOBJS =
             [[0, 'start', 250, 150, [null, null, null]],
@@ -343,17 +343,19 @@ define(function (require) {
                     */
                 }
             }
+
             // Blocks are all home, so reset go-home-button.
             homeButtonContainers[0].visible = false;
             homeButtonContainers[1].visible = true;
             boundary.hide();
-        }
+        };
 
         function allClear() {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
             }
+
             logo.boxes = {};
             logo.time = 0;
             hideMsgs();
@@ -363,6 +365,7 @@ define(function (require) {
                 logo.lilypondStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear();
             }
+
             blocksContainer.x = 0;
             blocksContainer.y = 0;
 
@@ -387,7 +390,7 @@ define(function (require) {
             var canvas = document.getElementById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
-        }
+        };
 
         function doFastButton(env) {
             logo.setTurtleDelay(0);
@@ -398,7 +401,7 @@ define(function (require) {
             } else {
                 logo.step(null, env);
             }
-        }
+        };
 
         function doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
@@ -409,13 +412,14 @@ define(function (require) {
             } else {
                 logo.step();
             }
-        }
+        };
 
         function doStepButton() {
             var turtleCount = 0;
             for (var turtle in logo.stepQueue) {
                 turtleCount += 1;
             }
+
             if (turtleCount === 0 || logo.turtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
                 // switching modes.
@@ -429,10 +433,11 @@ define(function (require) {
                 logo.setTurtleDelay(TURTLESTEP);
                 logo.step();
             }
-        }
+        };
 
         function doSlowMusicButton() {
             logo.setNoteDelay(DEFAULTDELAY);
+
             if (docById('matrix').style.visibility === 'visible') {
                 matrix.playAll();
             } else if (!turtles.running()) {
@@ -440,13 +445,14 @@ define(function (require) {
             } else {
                 logo.stepNotes();
             }
-        }
+        };
 
         function doStepMusicButton() {
             var turtleCount = 0;
             for (var turtle in logo.stepQueue) {
                 turtleCount += 1;
             }
+
             if (turtleCount === 0 || logo.TurtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
                 // switching modes.
@@ -460,13 +466,13 @@ define(function (require) {
                 logo.setTurtleDelay(TURTLESTEP);
                 logo.stepNote();
             }
-        }
+        };
 
         var stopTurtle = false;
 
         function doStopButton() {
             logo.doStopTurtle();
-        }
+        };
 
         var cartesianVisible = false;
 
@@ -478,7 +484,7 @@ define(function (require) {
                 showCartesian();
                 cartesianVisible = true;
             }
-        }
+        };
 
         var polarVisible = false;
 
@@ -490,11 +496,11 @@ define(function (require) {
                 showPolar();
                 polarVisible = true;
             }
-        }
+        };
 
         function toggleScroller() {
             scrollBlockContainer = !scrollBlockContainer;
-        }
+        };
 
         function closeAnalytics(chartBitmap, ctx) {
             var button = this;
@@ -509,20 +515,22 @@ define(function (require) {
                 update = true;
                 ctx.clearRect(0, 0, 600, 600);
             });
-        }
+        };
 
         function isCanvasBlank(canvas) {
             var blank = document.createElement('canvas');
             blank.width = canvas.width;
             blank.height = canvas.height;
             return canvas.toDataURL() == blank.toDataURL();
-        }
+        };
 
         function doAnalytics() {
             var myChart = docById('myChart');
+
              if(isCanvasBlank(myChart) == false) {
                 return ;
              }
+
             var ctx = myChart.getContext('2d');
             document.body.style.cursor = 'wait';
             var myRadarChart = null;
@@ -552,21 +560,21 @@ define(function (require) {
             var options = getChartOptions(callback);
             console.log('creating new chart');
             myRadarChart = new Chart(ctx).Radar(data, options);
-        }
+        };
 
         function doBiggerFont() {
             if (blockscale < BLOCKSCALES.length - 1) {
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
-        }
+        };
 
         function doSmallerFont() {
             if (blockscale > 0) {
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
-        }
+        };
 
         // Do we need to update the stage?
         var update = true;
@@ -661,11 +669,8 @@ define(function (require) {
             logo.setBackgroundColor(-1);
 
             clearBox = new ClearBox(canvas, stage, refreshCanvas, sendAllToTrash);
-
             utilityBox = new UtilityBox(canvas, stage, refreshCanvas, doBiggerFont, doSmallerFont, doOpenPlugin, doAnalytics, toggleScroller);
-
             thumbnails = new SamplesViewer(canvas, stage, refreshCanvas, loadProject, loadRawProject, sendAllToTrash);
-
             initBasicProtoBlocks(palettes, blocks);
 
             // Load any macros saved in local storage.
@@ -673,6 +678,7 @@ define(function (require) {
             if (macroData != null) {
                 processMacroData(macroData, palettes, blocks, macroDict);
             }
+
             // Blocks and palettes need access to the macros dictionary.
             blocks.setMacroDictionary(macroDict);
             palettes.setMacroDictionary(macroDict);
@@ -687,8 +693,8 @@ define(function (require) {
             fileChooser.addEventListener('click', function (event) {
                 this.value = null;
             });
-            fileChooser.addEventListener('change', function (event) {
 
+            fileChooser.addEventListener('change', function (event) {
                 // Read file here.
                 var reader = new FileReader();
 
@@ -862,7 +868,7 @@ define(function (require) {
             document.addEventListener('DOMMouseScroll', scrollEvent, false);
 
             this.document.onkeydown = keyPressed;
-        }
+        };
 
         function setupBlocksContainerEvents() {
             var moving = false;
@@ -912,7 +918,7 @@ define(function (require) {
                     moving = false;
                 }, null, true); // once = true
             });
-        }
+        };
 
         function scrollEvent(event) {
             var data = event.wheelDelta || -event.detail;
@@ -927,23 +933,23 @@ define(function (require) {
                     palette.scrollEvent(delta, scrollSpeed);
                 }
             }
-        }
+        };
 
         function getStageX() {
             return turtles.screenX2turtleX(stageX / musicBlocksScale);
-        }
+        };
 
         function getStageY() {
             return turtles.screenY2turtleY(stageY / musicBlocksScale);
-        }
+        };
 
         function getStageMouseDown() {
             return stageMouseDown;
-        }
+        };
 
         function setCameraID(id) {
             cameraID = id;
-        }
+        };
 
         function createGrid(imagePath) {
             var img = new Image();
@@ -1016,7 +1022,7 @@ define(function (require) {
                 var name = ERRORARTWORK[i];
                 makeErrorArtwork(name);
             }
-        }
+        };
 
         function makeErrorArtwork(name) {
             var container = new createjs.Container();
@@ -1058,7 +1064,7 @@ define(function (require) {
             };
 
             img.src = 'images/' + name + '.svg';
-        }
+        };
 
         function keyPressed(event) {
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
@@ -1071,6 +1077,7 @@ define(function (require) {
                 // Prevent browser from grabbing TAB key
                 event.preventDefault();
             }
+
             const ESC = 27;
             const ALT = 18;
             const CTRL = 17;
@@ -1121,16 +1128,16 @@ define(function (require) {
                     break;
                 }
             }
-        }
+        };
 
         function getCurrentKeyCode() {
             return currentKeyCode;
-        }
+        };
 
         function clearCurrentKeyCode() {
             currentKey = '';
             currentKeyCode = 0;
-        }
+        };
 
         function onResize() {
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
@@ -1204,7 +1211,7 @@ define(function (require) {
                     matrixTable.setAttribute("width", w/2 + 'px');
                 }
             }
-        }
+        };
 
         window.onresize = function () {
             onResize();
@@ -1256,15 +1263,15 @@ define(function (require) {
             }
 
             blocks.refreshCanvas();
-        }
+        };
 
         function deleteBlocksBox() {
             clearBox.show(musicBlocksScale);
-        }
+        };
 
         function doUtilityBox() {
             utilityBox.init(musicBlocksScale, utilityButton.x - 27, utilityButton.y, makeButton);
-        }
+        };
 
         function sendAllToTrash(addStartBlock, doNotSave) {
             // First, hide the palettes as they will need updating.
@@ -1306,7 +1313,7 @@ define(function (require) {
             }
 
             update = true;
-        }
+        };
 
         function changePaletteVisibility() {
             if (palettes.visible) {
@@ -1315,7 +1322,7 @@ define(function (require) {
                 palettes.show();
                 palettes.bringToTop();
             }
-        }
+        };
 
         function changeBlockVisibility() {
             if (blocks.visible) {
@@ -1327,26 +1334,26 @@ define(function (require) {
                 }
                 logo.showBlocks();
             }
-        }
+        };
 
         function toggleCollapsibleStacks() {
             if (blocks.visible) {
                 console.log('calling toggleCollapsibles');
                 blocks.toggleCollapsibles();
             }
-        }
+        };
 
         function stop() {
             // FIXME: who calls this???
             createjs.Ticker.removeEventListener('tick', tick);
-        }
+        };
 
         function onStopTurtle() {
             // TODO: plugin support
             if (!buttonsVisible) {
                 hideStopButton();
             }
-        }
+        };
 
         function onRunTurtle() {
             // TODO: plugin support
@@ -1354,11 +1361,11 @@ define(function (require) {
             if (!buttonsVisible) {
                 showStopButton();
             }
-        }
+        };
 
         function refreshCanvas() {
             update = true;
-        }
+        };
 
         function tick(event) {
             // This set makes it so the stage only re-renders when an
@@ -1367,7 +1374,7 @@ define(function (require) {
                 update = false; // Only update once
                 stage.update(event);
             }
-        }
+        };
 
         function doOpenSamples() {
             if(document.getElementById('matrix').style.visibility !== 'hidden') {
@@ -1379,21 +1386,20 @@ define(function (require) {
             console.log('save locally');
             saveLocally();
             thumbnails.show()
-        }
+        };
 
         function doSave() {
             console.log('Saving .tb file');
             var name = 'My Project';
-            download(name + '.tb',
-                'data:text/plain;charset=utf-8,' + prepareExport());
-        }
+            download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
+        };
 
         function doLoad() {
             console.log('Loading .tb file');
             document.querySelector('#myOpenFile').focus();
             document.querySelector('#myOpenFile').click();
             window.scroll(0, 0);
-        }
+        };
 
         function doLilypond() {
             // Show busy cursor.
@@ -1408,7 +1414,7 @@ define(function (require) {
                 turtles.turtleList[turtle].doClear();
             }
             logo.runLogoCommands();
-        }
+        };
 
         window.prepareExport = prepareExport;
         window.saveLocally = saveLocally;
@@ -1465,7 +1471,7 @@ define(function (require) {
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 sugarizerCompatibility.saveLocally();
             }
-        }
+        };
 
         function loadProject(projectName, run, env) {
             //set default value of run
@@ -1508,18 +1514,21 @@ define(function (require) {
                     console.log(e);
                     loadStart();
                 }
+
                 // Restore default cursor
                 document.body.style.cursor = 'default';
                 update = true;
             }, 200);
+
             if (run) {
                 setTimeout(function () {
                     changeBlockVisibility();
                     doFastButton(env);
                 }, 2000);
             }
+
             docById('loading-image-container').style.display = 'none';
-        }
+        };
 
         function loadRawProject(data) {
             console.log('loadRawProject ' + data);
@@ -1536,7 +1545,7 @@ define(function (require) {
 
             docById('loading-image-container').style.display = 'none';
             document.body.style.cursor = 'default';
-        }
+        };
 
         function saveProject(projectName) {
             // palettes.updatePalettes();
@@ -1575,7 +1584,7 @@ define(function (require) {
                     return;
                 }
             }, 200);
-        }
+        };
 
         function loadStart() {
             // where to put this?
@@ -1621,7 +1630,7 @@ define(function (require) {
             update = true;
 
             docById('loading-image-container').style.display = 'none';
-        }
+        };
 
         function hideMsgs() {
             errorMsgText.parent.visible = false;
@@ -1629,11 +1638,12 @@ define(function (require) {
                 errorMsgArrow.removeAllChildren();
                 refreshCanvas();
             }
+
             msgText.parent.visible = false;
             for (var i in errorArtwork) {
                 errorArtwork[i].visible = false;
             }
-        }
+        };
 
         function textMsg(msg) {
             if (msgText == null) {
@@ -1645,7 +1655,7 @@ define(function (require) {
             msgText.text = msg;
             msgContainer.updateCache();
             stage.setChildIndex(msgContainer, stage.getNumChildren() - 1);
-        }
+        };
 
         function errorMsg(msg, blk, text) {
             if (errorMsgText == null) {
@@ -1735,35 +1745,35 @@ define(function (require) {
             }
 
             update = true;
-        }
+        };
 
         function hideCartesian() {
             cartesianBitmap.visible = false;
             cartesianBitmap.updateCache();
             update = true;
-        }
+        };
 
         function showCartesian() {
             cartesianBitmap.visible = true;
             cartesianBitmap.updateCache();
             update = true;
-        }
+        };
 
         function hidePolar() {
             polarBitmap.visible = false;
             polarBitmap.updateCache();
             update = true;
-        }
+        };
 
         function showPolar() {
             polarBitmap.visible = true;
             polarBitmap.updateCache();
             update = true;
-        }
+        };
 
         function pasteStack() {
             blocks.pasteStack();
-        }
+        };
 
         function prepareExport() {
             // We don't save blocks in the trash, so we need to
@@ -1786,6 +1796,7 @@ define(function (require) {
                     // Don't save blocks in the trash.
                     continue;
                 }
+
                 if (myBlock.isValueBlock() || myBlock.name === 'loadFile') {
                     // FIX ME: scale image if it exceeds a maximum size.
                     var args = {
@@ -1858,13 +1869,13 @@ define(function (require) {
             }
 
             return JSON.stringify(data);
-        }
+        };
 
         function doOpenPlugin() {
             // Click on the plugin open chooser in the DOM (.json).
             pluginChooser.focus();
             pluginChooser.click();
-        }
+        };
 
         function saveToFile() {
             var filename = prompt('Filename:');
@@ -1878,13 +1889,13 @@ define(function (require) {
             stopTurtleContainer.x = stopTurtleContainerX;
             stopTurtleContainer.y = stopTurtleContainerY;
             stopTurtleContainer.visible = false;
-        }
+        };
 
         function showStopButton() {
             stopTurtleContainer.x = onscreenButtons[0].x;
             stopTurtleContainer.y = onscreenButtons[0].y;
             stopTurtleContainer.visible = true;
-        }
+        };
 
         function playMusic(){
             for (var blk in logo.blocks.blockList) {
@@ -1896,16 +1907,17 @@ define(function (require) {
                     logo.runLogoCommands(topBlock);
                 }
             }
-        }
+        };
 
         function stopMusic() {
             logo.doStopTurtle();
             Tone.Transport.stop();
-        }
+        };
 
         function updatePasteButton() {
             pasteContainer.removeChild(pasteContainer.children[0]);
             var img = new Image();
+
             img.onload = function () {
                 var originalSize = 55; // this is the original svg size
                 var halfSize = Math.floor(cellSize / 2);
@@ -1922,7 +1934,7 @@ define(function (require) {
             };
 
             img.src = 'header-icons/paste-button.svg';
-        }
+        };
 
         function setupAndroidToolbar(showPalettesPopover) {
             if (headerContainer !== undefined) {
@@ -1935,9 +1947,11 @@ define(function (require) {
             headerContainer = new createjs.Shape();
             headerContainer.graphics.f(platformColor.header).r(0, 0,
                 screen.width / musicBlocksScale, cellSize);
+
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
             }
+
             stage.addChild(headerContainer);
 
             // Buttons used when running turtle programs
@@ -2004,7 +2018,7 @@ define(function (require) {
             }
 
             setupRightMenu(musicBlocksScale);
-        }
+        };
 
         function setupRightMenu(musicBlocksScale) {
             if (menuContainer !== undefined) {
@@ -2060,12 +2074,12 @@ define(function (require) {
                     onscreenMenu[button].visible = true;
                 }
             }
-        }
+        };
 
         function doPopdownPalette() {
             var p = new PopdownPalette(palettes);
             p.popdown();
-        }
+        };
 
         function showHelp(firstTime) {
             helpIdx = 0;
@@ -2169,11 +2183,11 @@ define(function (require) {
                     doMenuAnimation(1);
                 }
             }
-        }
+        };
 
         function doMenuButton() {
             doMenuAnimation(1);
-        }
+        };
 
         function doMenuAnimation() {
             var bitmap = last(menuContainer.children);
@@ -2190,6 +2204,7 @@ define(function (require) {
                 // Race conditions during load
                 setTimeout(doMenuAnimation, 50);
             }
+
             setTimeout(function () {
                 if (menuButtonsVisible) {
                     menuButtonsVisible = false;
@@ -2204,7 +2219,7 @@ define(function (require) {
                 }
                 update = true;
             }, 500);
-        }
+        };
 
         function toggleToolbar() {
             buttonsVisible = !buttonsVisible;
@@ -2213,11 +2228,13 @@ define(function (require) {
             for (var button in onscreenButtons) {
                 onscreenButtons[button].visible = buttonsVisible;
             }
+
             for (var button in onscreenMenu) {
                 onscreenMenu[button].visible = buttonsVisible;
             }
+
             update = true;
-        }
+        };
 
         function makeButton(name, label, x, y, size, rotation, parent) {
             var container = new createjs.Container();
@@ -2230,6 +2247,7 @@ define(function (require) {
             } else {
                 parent.addChild(container);
             }
+
             container.x = x;
             container.y = y;
 
@@ -2248,6 +2266,7 @@ define(function (require) {
                 text.x = -28;
                 text.y = 0;
             }
+
             text.visible = false;
 
             container.on('mouseover', function(event) {
@@ -2279,6 +2298,7 @@ define(function (require) {
                     bitmap.scaleX = size / originalSize;
                     bitmap.scaleY = size / originalSize;
                 }
+
                 bitmap.regX = halfSize / bitmap.scaleX;
                 bitmap.regY = halfSize / bitmap.scaleY;
                 if (rotation !== undefined) {
@@ -2300,7 +2320,7 @@ define(function (require) {
             container.addChild(text);
 
             return container;
-        }
+        };
 
         function loadButtonDragHandler(container, ox, oy, action) {
             // Prevent multiple button presses (i.e., debounce).
@@ -2330,7 +2350,7 @@ define(function (require) {
                     moved = false;
                 });
             });
-        }
+        };
 
         // More music stuff we may not need
         function clearMenus() {
@@ -2347,7 +2367,7 @@ define(function (require) {
                     stage.removeChild(onscreenMenu[i]);
                 }
             }
-        }
+        };
 
         function restoreHome() {
             setupAndroidToolbar();
@@ -2361,7 +2381,7 @@ define(function (require) {
                 blocks.refreshCanvas();
                 palettes.show();
             }
-        }
+        };
 
-    }
+    };
 });

@@ -20,7 +20,7 @@ window.platform = {
     FF:      /Firefox/i.test(navigator.userAgent),
     mobile:  /Mobi/i   .test(navigator.userAgent),
     tablet:  /Tablet/i .test(navigator.userAgent)
-}
+};
 
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF
@@ -35,7 +35,7 @@ window.platformColor = {
     doHeaderShadow: !platform.FF,
     // background: platform.FF? '#00CAF2' : '#96D3F3'
     background: platform.FF? '#92b5c8' : '#92b5c8' // 2.5B 7/4
-}
+};
 
 document.querySelector('meta[name=theme-color]')
         .content = platformColor.header;
@@ -44,4 +44,4 @@ document.querySelector('meta[name=theme-color]')
 function showButtonHighlight(x, y, r, event, scale, stage) {
     if (platform.FFOS) return {};
     return showMaterialHighlight(x, y, r, event, scale, stage);
-}
+};

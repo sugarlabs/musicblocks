@@ -27,7 +27,7 @@ function Boundary (canvas, stage, refreshCanvas) {
 
 
     this.resizeEvent = function(scale) {
-    }
+    };
 
     this.stage.addChild(this.container);
     this.stage.setChildIndex(this.container, 0);
@@ -35,17 +35,17 @@ function Boundary (canvas, stage, refreshCanvas) {
     this.setScale = function(scale) {
         this.destroy();
         this.create(scale);
-    }
+    };
 
     this.destroy = function() {
         if (this.container.children.length > 0) {
             this.container.removeChild(this.container.children[0]);
         }
-    }
+    };
 
     this.offScreen = function(x, y) {
         return (x < this.x || x > this.x + this.dx || y < this.y || y > this.y + this.dy);
-    }
+    };
 
     this.create = function(scale) {
         this.w = this.canvas.width / scale;
@@ -64,20 +64,20 @@ function Boundary (canvas, stage, refreshCanvas) {
 
             img.src = 'data:image/svg+xml;base64,' + window.btoa(
                 unescape(encodeURIComponent(BOUNDARY.replace('HEIGHT', me.h).replace('WIDTH', me.w).replace('Y', me.y).replace('X', me.x).replace('DY', me.dy).replace('DX', me.dx).replace('stroke_color', '#e08080'))));
-        }
+        };
 
         makeBoundary(this);
-    }
+    };
 
     this.hide = function() {
         createjs.Tween.get(this.container)
             .to({alpha: 0}, 200)
             .set({visible: false});
-    }
+    };
 
     this.show = function() {
         createjs.Tween.get(this.container)
             .to({alpha: 0.0, visible: true})
             .to({alpha: 1.0}, 200);
-    }
-}
+    };
+};
