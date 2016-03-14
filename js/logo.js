@@ -191,13 +191,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.setTurtleDelay = function(turtleDelay) {
         this.turtleDelay = turtleDelay;
         this.noteDelay = 0;
-    }
+    };
 
     // Used to pause between each note as the program executes.
     this.setNoteDelay = function(noteDelay) {
         this.noteDelay = noteDelay;
         this.turtleDelay = 0;
-    }
+    };
 
     this.step = function() {
         // Take one step for each turtle in excuting Logo commands.
@@ -213,7 +213,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
         }
-    }
+    };
 
     this.stepNote = function() {
         // Step through one note for each turtle in excuting Logo
@@ -292,8 +292,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.playedNoteTimes = {};
                 }
             }
-          }
-    }
+        };
+    };
 
     this.doStopTurtle = function() {
         // The stop button was pressed. Stop the turtle and clean up a
@@ -318,7 +318,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         this.stepQueue = {};
         this.unhighlightQueue = {};
-    }
+    };
 
     this.clearParameterBlocks = function() {
         for (var blk in this.blocks.blockList) {
@@ -328,7 +328,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
         }
         this.refreshCanvas();
-    }
+    };
 
     this.updateParameterBlock = function(logo, turtle, blk) {
         // Update the label on parameter blocks.
@@ -472,7 +472,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.blocks.blockList[blk].container.updateCache();
             this.refreshCanvas();
         }
-    }
+    };
 
     this.runLogoCommands = function(startHere, env) {
         // Save the state before running.
@@ -521,8 +521,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
         }
-
-
 
         // Each turtle needs to keep its own wait time and music
         // states.
@@ -690,7 +688,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             console.log('nothing to run');
         }
         this.refreshCanvas();
-    }
+    };
 
     this.runFromBlock = function(logo, turtle, blk, isflow, receivedArg) {
         if (blk == null) {
@@ -713,7 +711,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }, delay);
             }
         }
-    }
+    };
 
     this.blockSetter = function(blk, value, turtleId) {
         var turtle = this.turtles.turtleList[turtleId];
@@ -824,7 +822,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             this.errorMsg('Block does not support incrementing', blk);
         }
-    }
+    };
 
     this.runFromBlockNow = function(logo, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
@@ -2749,7 +2747,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // Save at the end to save an image
             me.saveLocally();
         }, DEFAULTDELAY * 1.5)
-    }
+    };
 
     this.setSynthVolume = function(vol, turtle) {
         if (vol > 100) {
@@ -2758,7 +2756,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             vol = 0;
         }
         this.synth.setVolume(vol);
-    }
+    };
 
     this.processNote = function(noteValue, blk, turtle) {
         if (this.bpm[turtle].length > 0) {
@@ -3092,7 +3090,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             this.pushedNote[turtle] = false;
         }
-    }
+    };
 
     this.dispatchTurtleSignals = function(turtle, beatValue, blk) {
         // When turtle commands (forward, right, arc) are inside of Notes,
@@ -3135,7 +3133,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
 
         }, beatValue * 1000);
-    }
+    };
 
     this.setListener = function(turtle, listenerName, listener) {
         if (listenerName in this.turtles.turtleList[turtle].listeners) {
@@ -3143,7 +3141,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
         this.turtles.turtleList[turtle].listeners[listenerName] = listener;
         this.stage.addEventListener(listenerName, listener, false);
-    }
+    };
 
     this.setDispatchBlock = function(blk, turtle, listenerName) {
         var nextBlock = last(this.blocks.blockList[blk].connections);
@@ -3153,7 +3151,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
         // console.log('setting dispatch block for ' + blk + ' to ' + nextBlock);
         this.endOfClampSignals[turtle][nextBlock] = [listenerName];
-    }
+    };
 
     this.getTargetTurtle = function(args) {
         // The target turtle name can be a string or an int. Make
@@ -3178,20 +3176,20 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         return null;
-    }
+    };
 
     // FIXME: do we need to worry about calc blocks too?
     this.actionBlock = function(name) {
         return ['do', 'doArg', 'calc', 'calcArg'].indexOf(name) !== -1;
-    }
+    };
 
     this.namedActionBlock = function(name) {
         return ['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(name) !== -1;
-    }
+    };
 
     this.loopBlock = function(name) {
         return ['forever', 'repeat', 'while', 'until'].indexOf(name) !== -1;
-    }
+    };
 
     this.doBreak = function(turtle) {
         // Look for a parent loopBlock in queue and set its count to 1.
@@ -3234,7 +3232,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 this.turtles.turtleList[turtle].queue.push(queueBlock);
             }
         }
-    }
+    };
 
     this.parseArg = function(logo, turtle, blk, parentBlk, receivedArg) {
         // Retrieve the value of a block.
@@ -3775,11 +3773,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else {
             return blk;
         }
-    }
+    };
 
     this.doWait = function(turtle, secs) {
         this.waitTimes[turtle] = Number(secs) * 1000;
-    }
+    };
 
     // Math functions
     this.doRandom = function(a, b) {
@@ -3789,7 +3787,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             return 0;
         }
         return Math.floor(Math.random() * (Number(b) - Number(a) + 1) + Number(a));
-    }
+    };
 
     this.doOneOf = function(a, b) {
         if (Math.random() < 0.5) {
@@ -3797,7 +3795,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else {
             return b;
         }
-    }
+    };
 
     this.doMod = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
@@ -3806,7 +3804,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             return 0;
         }
         return Number(a) % Number(b);
-    }
+    };
 
     this.doSqrt = function(a) {
         if (typeof(a) === 'string') {
@@ -3815,7 +3813,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             return 0;
         }
         return Math.sqrt(Number(a));
-    }
+    };
 
     this.doPlus = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
@@ -3833,7 +3831,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else {
             return Number(a) + Number(b);
         }
-    }
+    };
 
     this.doMinus = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
@@ -3842,7 +3840,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             return 0;
         }
         return Number(a) - Number(b);
-    }
+    };
 
     this.doMultiply = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
@@ -3851,7 +3849,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             return 0;
         }
         return Number(a) * Number(b);
-    }
+    };
 
     this.doDivide = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
@@ -3866,7 +3864,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else {
             return Number(a) / Number(b);
         }
-    }
+    };
 
     this.setBackgroundColor = function(turtle) {
         /// Change body background in DOM to current color.
@@ -3880,11 +3878,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         body.style.background = c;
         document.querySelector('.canvasHolder').style.background = c;
         this.svgOutput = '';
-    }
+    };
 
     this.setCameraID = function(id) {
         this.cameraID = id;
-    }
+    };
 
     this.hideBlocks = function() {
         // Hide all the blocks.
@@ -3896,7 +3894,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         //trashcan.hide();
         //palettes.hide();
         this.refreshCanvas();
-    }
+    };
 
     this.showBlocks = function() {
         // Show all the blocks.
@@ -3908,7 +3906,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         // }
         // trashcan.show();
         this.refreshCanvas();
-    }
+    };
 
     this.getNote = function (solfege, octave, transposition, keySignature) {
         this.validNote = true;
@@ -4075,7 +4073,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else {
             return [note, octave];
         }
-    }
+    };
 
     this.updateNotation = function (note, duration, turtle, insideChord) {
         var obj = durationToNoteValue(duration);
@@ -4086,7 +4084,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             note = "c'";
         }
         this.lilypondStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
-    }
+    };
 
     this.processLilypondNotes = function (turtle) {
         // TODO: process all the notes together rather than one at a
@@ -4103,7 +4101,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // Also, notes must be lowercase.
             // And the octave bounday is at C, not A.
             return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
-        }
+        };
 
         var counter = 0;
         var queueSlur = false;
@@ -4289,25 +4287,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
         }
-    }
+    };
 
     this.lilypondLineBreak = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('break');
-    }
+    };
 
     this.lilypondBeginArticulation = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('begin articulation');
-    }
+    };
 
     this.lilypondEndArticulation = function(turtle) {
         this.lilypondStaging[turtle].push('end articulation');
-    }
+    };
 
     this.lilypondBeginCrescendo = function(turtle, factor) {
         if (this.lilypondStaging[turtle] == undefined) {
@@ -4318,33 +4316,33 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         } else {
             this.lilypondStaging[turtle].push('%5C> ');
         }
-    }
+    };
 
     this.lilypondEndCrescendo = function(turtle) {
         this.lilypondStaging[turtle].push('%5C! ');
-    }
+    };
 
     this.lilypondBeginSlur = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('(');
-    }
+    };
 
     this.lilypondEndSlur = function(turtle) {
         this.lilypondStaging[turtle].push(') ');
-    }
+    };
 
     this.lilypondInsertTie = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('~');
-    }
+    };
 
     this.lilypondRemoveTie = function(turtle) {
         this.lilypondStaging[turtle].pop();
-    }
+    };
 
     this.saveLilypondOutput = function(saveName) {
         var turtleCount = 0;
@@ -4493,5 +4491,5 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.lilypondOutput += '%0A%25}%0A%0A';
 
         doSaveLilypond(this, saveName);
-    }
-}
+    };
+};

@@ -27,7 +27,7 @@ function ClearBox(canvas, stage, refreshCanvas, clear) {
             this.container.visible = false;
             this.refreshCanvas();
         }
-    }
+    };
 
     this.show = function(scale) {
         this.scale = scale;
@@ -46,13 +46,13 @@ function ClearBox(canvas, stage, refreshCanvas, clear) {
         } else {
             this.completeShow();
         }
-    }
+    };
 
     this.completeShow = function() {
 	this.container.visible = true;
 	this.refreshCanvas();
-    }
-}
+    };
+};
 
 
 function loadClearContainerHandler(box) {
@@ -86,7 +86,7 @@ function loadClearContainerHandler(box) {
 	    box.hide();
         }
     });
-}
+};
 
 
 function makeBoxBitmap(box, data, name, callback, extras) {
@@ -96,7 +96,8 @@ function makeBoxBitmap(box, data, name, callback, extras) {
     img.onload = function() {
         bitmap = new createjs.Bitmap(img);
         callback(box, name, bitmap, extras);
-    }
+    };
+
     img.src = 'data:image/svg+xml;base64,' + window.btoa(
         unescape(encodeURIComponent(data)));
-}
+};

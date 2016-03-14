@@ -66,7 +66,7 @@ function ProtoBlock(name) {
         c.addChild(text);
         var b = c.getBounds();
         this.extraWidth += Math.max(b.width - 30, 0);
-    }
+    };
 
     // What follows are the initializations for different block
     // styles.
@@ -77,7 +77,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('out');
         this.dockTypes.push('in');
         this.generator = this.zeroArgBlockGenerator;
-    }
+    };
 
     this.zeroArgBlockGenerator = function() {
         var svg = new SVG();
@@ -91,7 +91,7 @@ function ProtoBlock(name) {
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., hidden (used at end of clamp)
     this.hiddenBlockNoFlow = function() {
@@ -100,7 +100,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('out');
         this.dockTypes.push('in');
         this.generator = this.hiddenBlockNoFlowGenerator;
-    }
+    };
 
     this.hiddenBlockNoFlowGenerator = function() {
         // TODO: return empty SVG
@@ -119,7 +119,7 @@ function ProtoBlock(name) {
         // And bring the last dock position to the top.
         svg.docks[1][1] = svg.docks[0][1];
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., break
     this.basicBlockNoFlow = function() {
@@ -127,7 +127,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('out');
         this.dockTypes.push('unavailable');
         this.generator = this.basicBlockNoFlowGenerator;
-    }
+    };
 
     this.basicBlockNoFlowGenerator = function() {
         var svg = new SVG();
@@ -141,7 +141,7 @@ function ProtoBlock(name) {
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., collapsed
     this.basicBlockCollapsed = function() {
@@ -149,7 +149,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('unavailable');
         this.dockTypes.push('unavailable');
         this.generator = this.basicBlockCollapsedGenerator;
-    }
+    };
 
     this.basicBlockCollapsedGenerator = function() {
         var svg = new SVG();
@@ -163,7 +163,7 @@ function ProtoBlock(name) {
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., forward, right
     this.oneArgBlock = function() {
@@ -172,7 +172,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('numberin');
         this.dockTypes.push('in');
         this.generator = this.oneArgBlockGenerator;
-    }
+    };
 
     this.oneArgBlockGenerator = function() {
         var svg = new SVG();
@@ -187,7 +187,7 @@ function ProtoBlock(name) {
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., wait for
     this.oneBooleanArgBlock = function() {
@@ -197,7 +197,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('booleanin');
         this.dockTypes.push('out');
         this.generator = this.oneBooleanArgBlockGenerator;
-    }
+    };
 
     this.oneBooleanArgBlockGenerator = function() {
         var svg = new SVG();
@@ -214,7 +214,7 @@ function ProtoBlock(name) {
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., setxy. These are expandable.
     this.twoArgBlock = function() {
@@ -227,7 +227,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('numberin');
         this.dockTypes.push('in');
         this.generator = this.twoArgBlockGenerator;
-    }
+    };
 
     this.twoArgBlockGenerator = function(expandY) {
         var svg = new SVG();
@@ -246,7 +246,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., ??? These are expandable.
     this.threeArgBlock = function() {
@@ -260,7 +260,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('numberin');
         this.dockTypes.push('in');
         this.generator = this.threeArgBlockGenerator;
-    }
+    };
 
     this.threeArgBlockGenerator = function(expandY) {
         var svg = new SVG();
@@ -279,7 +279,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., sqrt, box
     this.oneArgMathBlock = function() {
@@ -290,7 +290,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('numberout');
         this.dockTypes.push('numberin');
         this.generator = this.oneArgMathBlockGenerator;
-    }
+    };
 
     this.oneArgMathBlockGenerator = function() {
         var svg = new SVG();
@@ -306,7 +306,7 @@ function ProtoBlock(name) {
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., plus, minus, multiply, divide. These are also expandable.
     this.twoArgMathBlock = function() {
@@ -319,7 +319,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('numberin');
         this.dockTypes.push('numberin');
         this.generator = this.twoArgMathBlockGenerator;
-    }
+    };
 
     this.twoArgMathBlockGenerator = function(expandY) {
         var svg = new SVG();
@@ -339,7 +339,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     //
     this.threeArgMathBlock = function() {
@@ -353,7 +353,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('numberin');
         this.dockTypes.push('numberin');
         this.generator = this.threeArgMathBlockGenerator;
-    }
+    };
 
     this.threeArgMathBlockGenerator = function(expandY) {
         var svg = new SVG();
@@ -373,7 +373,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicBlock();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., number, string. Value blocks get DOM textareas associated
     // with them so their values can be edited by the user.
@@ -383,7 +383,7 @@ function ProtoBlock(name) {
         this.args = 0;
         this.dockTypes.push('numberout');
         this.generator = this.valueBlockGenerator;
-    }
+    };
 
     this.valueBlockGenerator = function() {
         var svg = new SVG();
@@ -397,7 +397,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicBox();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., media. Media blocks invoke a chooser and a thumbnail
     // image is overlayed to represent the data associated with the
@@ -408,7 +408,7 @@ function ProtoBlock(name) {
         this.args = 0;
         this.dockTypes.push('mediaout');
         this.generator = this.mediaBlockGenerator;
-    }
+    };
 
     this.mediaBlockGenerator = function() {
         var svg = new SVG();
@@ -422,7 +422,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicBox();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., start. A "child" flow is docked in an expandable clamp.
     // There are no additional arguments and no flow above or below.
@@ -435,7 +435,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('unavailable');
         this.generator = this.stackClampZeroArgBlockGenerator;
-    }
+    };
 
     this.stackClampZeroArgBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -454,7 +454,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., emptyclamp. Unlike start, there is a flow above and below.
     this.flowClampBlock = function() {
@@ -466,7 +466,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('in');
         this.generator = this.flowClampBlockGenerator;
-    }
+    };
 
     this.flowClampBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -486,7 +486,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., repeat. Unlike action, there is a flow above and below.
     this.flowClampOneArgBlock = function() {
@@ -499,7 +499,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('in');
         this.generator = this.flowClampOneArgBlockGenerator;
-    }
+    };
 
     this.flowClampOneArgBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -519,7 +519,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., tuplet, which takes two args plus an interior flow. There is a flow above and below.
     this.flowClampTwoArgBlock = function() {
@@ -533,7 +533,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('in');
         this.generator = this.flowClampTwoArgBlockGenerator;
-    }
+    };
 
     this.flowClampTwoArgBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -553,7 +553,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., do with args: innies instead of interior slots.
     this.argClampOneArgBlock = function() {
@@ -566,7 +566,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('anyin');
         this.dockTypes.push('in');
         this.generator = this.argClampOneArgBlockGenerator;
-    }
+    };
 
     this.argClampOneArgBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -586,7 +586,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.argClamp();
     return [artwork, svg.docks];
-    }
+    };
 
     // E.g., calculate with args: innies instead of interior slots.
     this.argClampOneArgMathBlock = function() {
@@ -598,7 +598,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('textin');
         this.dockTypes.push('anyin');
         this.generator = this.argClampOneArgMathBlockGenerator;
-    }
+    };
 
     this.argClampOneArgMathBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -619,7 +619,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.argClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., named do with args: innies instead of interior slots.
     this.argClampBlock = function() {
@@ -631,7 +631,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('anyin');
         this.dockTypes.push('in');
         this.generator = this.argClampBlockGenerator;
-    }
+    };
 
     this.argClampBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -650,7 +650,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.argClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., named calculate with args: innies instead of interior slots.
     this.argClampMathBlock = function() {
@@ -661,7 +661,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('anyout');
         this.dockTypes.push('anyin');
         this.generator = this.argClampMathBlockGenerator;
-    }
+    };
 
     this.argClampMathBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -681,7 +681,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.argClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., if.  A "child" flow is docked in an expandable clamp. The
     // additional argument is a boolean. There is flow above and below.
@@ -695,7 +695,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('in');
         this.generator = this.flowClampBooleanArgBlockGenerator;
-    }
+    };
 
     this.flowClampBooleanArgBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -715,7 +715,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., if then else.  Two "child" flows are docked in expandable
     // clamps. The additional argument is a boolean. There is flow
@@ -731,7 +731,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('in');
         this.generator = this.doubleFlowClampBooleanArgBlockGenerator;
-    }
+    };
 
     this.doubleFlowClampBooleanArgBlockGenerator = function(bottomSlots, topSlots) {
         var svg = new SVG();
@@ -757,7 +757,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., forever. Unlike start, there is flow above and below.
     this.flowClampZeroArgBlock = function() {
@@ -769,7 +769,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('in');
         this.generator = this.flowClampZeroArgBlockGenerator;
-    }
+    };
 
     this.flowClampZeroArgBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -788,7 +788,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., action. A "child" flow is docked in an expandable clamp.
     // The additional argument is a name. Again, no flow above or below.
@@ -802,7 +802,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('in');
         this.dockTypes.push('unavailable');
         this.generator = this.stackClampOneArgBlockGenerator;
-    }
+    };
 
     this.stackClampOneArgBlockGenerator = function(slots) {
         var svg = new SVG();
@@ -822,7 +822,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., mouse button.
     this.booleanZeroArgBlock = function() {
@@ -831,7 +831,7 @@ function ProtoBlock(name) {
         this.args = 0;
         this.dockTypes.push('booleanout');
         this.generator = this.booleanZeroArgBlockGenerator;
-    }
+    };
 
     this.booleanZeroArgBlockGenerator = function() {
         var svg = new SVG();
@@ -843,7 +843,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.booleanNot(true);
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., named sensor blocks
     this.booleanOneArgBlock = function() {
@@ -854,7 +854,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('booleanout');
         this.dockTypes.push('textin');
         this.generator = this.booleanOneArgBlockGenerator;
-    }
+    };
 
     this.booleanOneArgBlockGenerator = function() {
         var svg = new SVG();
@@ -867,7 +867,7 @@ function ProtoBlock(name) {
         svg.setInnies([true]);
         var artwork = svg.booleanNot(true);  // OneArg
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., not
     this.booleanOneBooleanArgBlock = function() {
@@ -878,7 +878,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('booleanout');
         this.dockTypes.push('booleanin');
         this.generator = this.booleanOneBooleanArgBlockGenerator;
-    }
+    };
 
     this.booleanOneBooleanArgBlockGenerator = function() {
         var svg = new SVG();
@@ -890,7 +890,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.booleanNot(false);
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., and, or
     this.booleanTwoBooleanArgBlock = function() {
@@ -902,7 +902,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('booleanin');
         this.dockTypes.push('booleanin');
         this.generator = this.booleanTwoBooleanArgBlockGenerator;
-    }
+    };
 
     this.booleanTwoBooleanArgBlockGenerator = function() {
         var svg = new SVG();
@@ -914,7 +914,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.booleanAndOr();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., greater, less, equal
     this.booleanTwoArgBlock = function() {
@@ -927,7 +927,7 @@ function ProtoBlock(name) {
         this.dockTypes.push('numberin');
         this.dockTypes.push('numberin');
         this.generator = this.booleanTwoArgBlockGenerator;
-    }
+    };
 
     this.booleanTwoArgBlockGenerator = function(expandY) {
         var svg = new SVG();
@@ -943,7 +943,7 @@ function ProtoBlock(name) {
         }
         var artwork = svg.booleanCompare();
         return [artwork, svg.docks];
-    }
+    };
 
     // E.g., color, shade, pensize, ...
     this.parameterBlock = function() {
@@ -953,7 +953,7 @@ function ProtoBlock(name) {
         this.args = 0;
         this.dockTypes.push('numberout');
         this.generator = this.parameterBlockGenerator;
-    }
+    };
 
     this.parameterBlockGenerator = function() {
         var svg = new SVG();
@@ -967,5 +967,5 @@ function ProtoBlock(name) {
         }
         var artwork = svg.basicBox();
         return [artwork, svg.docks];
-    }
-}
+    };
+};

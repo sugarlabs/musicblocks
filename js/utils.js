@@ -25,7 +25,7 @@ function format(str, data) {
                      function (match, item) {
     return _(item);
   });
-}
+};
 
 
 function canvasPixelRatio() {
@@ -37,7 +37,7 @@ function canvasPixelRatio() {
                             context.oBackingStorePixelRatio ||
                             context.backingStorePixelRatio || 1;
     return devicePixelRatio / backingStoreRatio;
-}
+};
 
 
 function windowHeight() {
@@ -47,7 +47,7 @@ function windowHeight() {
     } else {
         return window.innerHeight;
     }
-}
+};
 
 
 function httpGet(projectName) {
@@ -67,7 +67,7 @@ function httpGet(projectName) {
         throw 'Error from server';
     }
     return xmlHttp.responseText;
-}
+};
 
 
 function httpPost(projectName, data) {
@@ -78,7 +78,7 @@ function httpPost(projectName, data) {
     xmlHttp.send(data);
     // return xmlHttp.responseText;
     return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
-}
+};
 
 
 function HttpRequest(url, loadCallback, userCallback) {
@@ -88,6 +88,7 @@ function HttpRequest(url, loadCallback, userCallback) {
     this.url = url;
     this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
     this.userCallback = userCallback;
+
     var objref = this;
     try {
         req.open('GET', url);
@@ -99,17 +100,17 @@ function HttpRequest(url, loadCallback, userCallback) {
         if (typeof userCallback === 'function') userCallback(false, 'network error');
         this.request = this.handler = this.userCallback = null;
     }
-}
+};
 
 
 function docByTagName(tag) {
     document.getElementsByTagName(tag);
-}
+};
 
 
 function docById(id) {
     return document.getElementById(id);
-}
+};
 
 
 function last(myList) {
@@ -119,7 +120,7 @@ function last(myList) {
     } else {
         return myList[i - 1];
     }
-}
+};
 
 
 function doSVG(canvas, logo, turtles, width, height, scale) {
@@ -140,11 +141,11 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
     if (turtleSVG === '') {
         svg += MUSICICON;
     } else {
-	svg += turtleSVG;
+        svg += turtleSVG;
     }
     svg += '</svg>';
     return svg;
-}
+};
 
 
 function isSVGEmpty(turtles) {
@@ -155,7 +156,7 @@ function isSVGEmpty(turtles) {
         }
     }
     return true;
-}
+};
 
 
 function fileExt(file) {
@@ -164,7 +165,7 @@ function fileExt(file) {
         return '';
     }
     return parts.pop();
-}
+};
 
 
 function fileBasename(file) {
@@ -177,7 +178,7 @@ function fileBasename(file) {
         parts.pop(); // throw away suffix
         return parts.join('.');
     }
-}
+};
 
 
 // Needed to generate new data for localization.ini
@@ -233,7 +234,7 @@ function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict,
     //    errorMsg('Error loading plugin: ' + e);
     //}
     return obj;
-}
+};
 
 
 function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
@@ -391,50 +392,61 @@ function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDi
 
     // Return the object in case we need to save it to local storage.
     return obj;
-}
+};
 
 
 function updatePluginObj(obj) {
     for (var name in obj['PALETTEPLUGINS']) {
         pluginObjs['PALETTEPLUGINS'][name] = obj['PALETTEPLUGINS'][name];
     }
+
     for (var name in obj['PALETTEFILLCOLORS']) {
         pluginObjs['PALETTEFILLCOLORS'][name] = obj['PALETTEFILLCOLORS'][name];
     }
+
     for (var name in obj['PALETTESTROKECOLORS']) {
         pluginObjs['PALETTESTROKECOLORS'][name] = obj['PALETTESTROKECOLORS'][name];
     }
+
     for (var name in obj['PALETTEHIGHLIGHTCOLORS']) {
         pluginObjs['PALETTEHIGHLIGHTCOLORS'][name] = obj['PALETTEHIGHLIGHTCOLORS'][name];
     }
+
     for (var flow in obj['FLOWPLUGINS']) {
         pluginObjs['FLOWPLUGINS'][flow] = obj['FLOWPLUGINS'][flow];
     }
+
     for (var arg in obj['ARGPLUGINS']) {
         pluginObjs['ARGPLUGINS'][arg] = obj['ARGPLUGINS'][arg];
     }
+
     for (var block in obj['BLOCKPLUGINS']) {
         pluginObjs['BLOCKPLUGINS'][block] = obj['BLOCKPLUGINS'][block];
     }
+
     if ('GLOBALS' in obj) {
         if (!('GLOBALS' in pluginObjs)) {
             pluginObjs['GLOBALS'] = '';
         }
         pluginObjs['GLOBALS'] += obj['GLOBALS'];
     }
+
     if ('IMAGES' in obj) {
         pluginObjs['IMAGES'] = obj['IMAGES'];
     }
+
     for (var name in obj['ONLOAD']) {
         pluginObjs['ONLOAD'][name] = obj['ONLOAD'][name];
     }
+
     for (var name in obj['ONSTART']) {
         pluginObjs['ONSTART'][name] = obj['ONSTART'][name];
     }
+
     for (var name in obj['ONSTOP']) {
         pluginObjs['ONSTOP'][name] = obj['ONSTOP'][name];
     }
-}
+};
 
 
 function preparePluginExports(obj) {
@@ -442,7 +454,7 @@ function preparePluginExports(obj) {
     updatePluginObj(obj);
 
     return JSON.stringify(pluginObjs);
-}
+};
 
 
 function processMacroData(macroData, palettes, blocks, macroDict) {
@@ -458,26 +470,27 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
         }
         palettes.makePalettes();
     }
-}
+};
 
 
 function prepareMacroExports(name, stack, macroDict) {
     if (name !== null) {
         macroDict[name] = stack;
     }
+
     return JSON.stringify(macroDict);
-}
+};
 
 
 function doSaveSVG(logo, desc) {
     var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
     download(desc, 'data:image/svg+xml;utf8,' + svg, desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-}
+};
 
 
 function doSaveLilypond(logo, desc) {
     download(desc, 'data:text;utf8,' + logo.lilypondOutput, desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
-}
+};
 
 
 function download(filename, data) {
@@ -487,7 +500,7 @@ function download(filename, data) {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-}
+};
 
 // Some block-specific code
 
@@ -507,7 +520,7 @@ function doPublish(desc) {
     FB.login(post_cb, {
         scope: 'publish_actions'
     });
-}
+};
 
 
 // TODO: Move to camera plugin
@@ -578,17 +591,18 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
         canvas.getContext('2d').drawImage(video, 0, 0, w, h);
         var data = canvas.toDataURL('image/png');
         turtles.turtleList[turtle].doShowImage(args[0], data);
-    }
-}
+    };
+};
 
 
 function doStopVideoCam(cameraID, setCameraID) {
     if (cameraID !== null) {
         window.clearInterval(cameraID);
     }
+
     setCameraID(null);
     document.querySelector('#camVideo').pause();
-}
+};
 
 
 function hideDOMLabel() {
@@ -596,30 +610,35 @@ function hideDOMLabel() {
     if (textLabel !== null) {
         textLabel.style.display = 'none';
     }
+
     var numberLabel = docById('numberLabel');
     if (numberLabel !== null) {
         numberLabel.style.display = 'none';
     }
+
     var solfegeLabel = docById('solfegeLabel');
     if (solfegeLabel !== null) {
         solfegeLabel.style.display = 'none';
     }
+
     var notenameLabel = docById('notenameLabel');
     if (notenameLabel !== null) {
         notenameLabel.style.display = 'none';
     }
+
     var noteattrLabel = docById('noteattrLabel');
     if (noteattrLabel !== null) {
         noteattrLabel.style.display = 'none';
     }
-}
+};
 
 
 function displayMsg(blocks, text) {
     return;
+
     var msgContainer = blocks.msgText.parent;
     msgContainer.visible = true;
     blocks.msgText.text = text;
     msgContainer.updateCache();
     blocks.stage.setChildIndex(msgContainer, blocks.stage.getNumChildren() - 1);
-}
+};

@@ -29,13 +29,13 @@ function maxPaletteHeight(menuSize, scale) {
 
     var h = (windowHeight() * canvasPixelRatio()) / scale - (2 * menuSize);
     return h - (h % STANDARDBLOCKHEIGHT) + (STANDARDBLOCKHEIGHT / 2);
-}
+};
 
 
 function paletteBlockButtonPush(name, arg) {
     var blk = paletteBlocks.makeBlock(name, arg);
     return blk;
-}
+};
 
 
 // There are several components to the palette system:
@@ -97,12 +97,12 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         for (var i in this.dict) {
             this.dict[i].resizeEvent();
         }
-    }
+    };
 
     // We need access to the macro dictionary because we load them.
     this.setMacroDictionary = function(obj) {
         this.macroDict = obj;
-    }
+    };
 
     this.menuScrollEvent = function(direction, scrollSpeed) {
         var keys = Object.keys(this.buttons);
@@ -122,7 +122,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         }
         this.updateButtonMasks();
         this.refreshCanvas();
-    }
+    };
 
     this.updateButtonMasks = function() {
         for (var name in this.buttons) {
@@ -132,7 +132,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             s.y = this.cellSize / 2;
             this.buttons[name].mask = s;
         }
-    }
+    };
 
     this.makePalettes = function(hide) {
         // First, an icon/button for each palette
@@ -170,7 +170,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 makePaletteBitmap(me, PALETTEICONS[name], name, processButtonIcon, null);
             }
         }
-    }
+    };
 
     this.showPalette = function (name) {
         for (var i in this.dict) {
@@ -185,7 +185,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 }
             }
         }
-    }
+    };
 
     this.showMenus = function() {
         // Show the menu buttons, but not the palettes.
@@ -196,7 +196,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             // this.dict[name].showMenu(true);
         }
         this.refreshCanvas();
-    }
+    };
 
     this.hideMenus = function() {
         // Hide the menu buttons and the palettes themselves.
@@ -207,13 +207,13 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.dict[name].hideMenu(true);
         }
         this.refreshCanvas();
-    }
+    };
 
     this.getInfo = function() {
         for (var key in this.dict) {
             console.log(this.dict[key].getInfo());
         }
-    }
+    };
 
     this.updatePalettes = function(showPalette) {
         if (showPalette != null) {
@@ -229,26 +229,26 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.makePalettes(true);
             this.refreshCanvas();
         }
-    }
+    };
 
     this.hide = function() {
         this.hideMenus();
         this.visible = false;
-    }
+    };
 
     this.show = function() {
         this.showMenus();
         this.visible = true;
-    }
+    };
 
     this.setBlocks = function(blocks) {
         paletteBlocks = blocks;
-    }
+    };
 
     this.add = function(name) {
         this.dict[name] = new Palette(this, name);
         return this;
-    }
+    };
 
     this.remove = function(name) {
         if (!(name in this.buttons)) {
@@ -264,7 +264,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         delete this.dict[name];
         this.y -= this.cellSize;
         this.makePalettes(true);
-    }
+    };
 
     this.bringToTop = function() {
         // Move all the palettes to the top layer of the stage
@@ -279,7 +279,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             // this.dict[name].resetLayout();
         }
         this.refreshCanvas();
-    }
+    };
 
     this.findPalette = function(x, y) {
         for (var name in this.dict) {
@@ -292,7 +292,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             }
         }
         return null;
-    }
+    };
 
     return this;
 }
@@ -351,7 +351,7 @@ function loadPaletteButtonHandler(palettes, name) {
         palettes.showPalette(name);
         palettes.refreshCanvas();
     });
-}
+};
 
 
 // Kinda a model, but it only keeps a list of SVGs
@@ -558,7 +558,7 @@ function PaletteModel(palette, palettes, name) {
                 palettename: this.palette.name
             });
         }
-    }
+    };
 }
 
 
@@ -570,7 +570,7 @@ function PopdownPalette(palettes) {
     for (var name in this.palettes.dict) {
         this.models[name] = new PaletteModel(this.palettes.dict[name],
                                              this.palettes, name);
-    }
+    };
 
     this.update = function () {
         var html = '<div class="back"><h2>' + _('back') + '</h2></div>';
@@ -647,16 +647,16 @@ function PopdownPalette(palettes) {
                 });
             });
         });
-    }
+    };
 
     this.popdown = function () {
         this.update();
         document.querySelector('#popdown-palette').classList.add('show');
-    }
+    };
 
     this.popup = function () {
         document.querySelector('#popdown-palette').classList.remove('show');
-    }
+    };
 }
 
 
@@ -800,12 +800,12 @@ function Palette(palettes, name) {
         }
         makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', '#282828').replace('palette_label', _(this.name)).replace(/header_width/g, paletteWidth), this.name, processHeader, null);
 
-    }
+    };
 
     this.getDownButtonY = function () {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
         return h + STANDARDBLOCKHEIGHT;
-    }
+    };
 
     this.resizeEvent = function() {
         this.hide();
@@ -816,7 +816,7 @@ function Palette(palettes, name) {
             this.downButton.y = this.getDownButtonY();
             this.fadedDownButton.y = this.getDownButtonY();
         }
-    }
+    };
 
     this.updateBlockMasks = function() {
         var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
@@ -827,7 +827,7 @@ function Palette(palettes, name) {
             s.y = this.background.y;
             this.protoContainers[i].mask = s;
         }
-    }
+    };
 
     this.updateBackground = function() {
         if (this.menuContainer == null) {
@@ -859,7 +859,7 @@ function Palette(palettes, name) {
 
         this.background.x = this.menuContainer.x;
         this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT;
-    }
+    };
 
     this.resetLayout = function() {
         // Account for menu toolbar
@@ -892,7 +892,7 @@ function Palette(palettes, name) {
         for (var i in this.protoContainers) {
             this.protoContainers[i].y += this.scrollDiff;
         }
-    }
+    };
 
     this.updateMenu = function(hide) {
         if (this.menuContainer == null) {
@@ -984,7 +984,7 @@ function Palette(palettes, name) {
             }
         }
         this.makeMenu(false);
-    }
+    };
 
     this.moveMenu = function(x, y) {
         // :sigh: race condition on iOS 7.1.2
@@ -994,17 +994,17 @@ function Palette(palettes, name) {
         this.menuContainer.x = x;
         this.menuContainer.y = y;
         this.moveMenuItemsRelative(dx, dy);
-    }
+    };
 
     this.moveMenuRelative = function(dx, dy) {
         this.menuContainer.x += dx;
         this.menuContainer.y += dy;
         this.moveMenuItemsRelative(dx, dy);
-    }
+    };
 
     this.hide = function() {
         this.hideMenu();
-    }
+    };
 
     this.show = function() {
         this.showMenu();
@@ -1016,7 +1016,7 @@ function Palette(palettes, name) {
         if (this.background !== null) {
             this.background.visible = true;
         }
-    }
+    };
 
     this.hideMenu = function() {
         if (this.menuContainer != null) {
@@ -1024,11 +1024,11 @@ function Palette(palettes, name) {
             this.hideMenuItems(true);
         }
         this.moveMenu(this.palettes.cellSize, this.palettes.cellSize);
-    }
+    };
 
     this.showMenu = function() {
         this.menuContainer.visible = true;
-    }
+    };
 
     this.hideMenuItems = function(init) {
         for (var i in this.protoContainers) {
@@ -1044,7 +1044,7 @@ function Palette(palettes, name) {
             this.fadedDownButton.visible = false;
         }
         this.visible = false;
-    }
+    };
 
     this.showMenuItems = function(init) {
         if (this.scrollDiff === 0) {
@@ -1060,7 +1060,7 @@ function Palette(palettes, name) {
         // Use scroll position to determine visibility
         this.scrollEvent(0, 10);
         this.visible = true;
-    }
+    };
 
     this.moveMenuItems = function(x, y) {
         for (var i in this.protoContainers) {
@@ -1071,7 +1071,7 @@ function Palette(palettes, name) {
             this.background.x = x;
             this.background.y = y;
         }
-    }
+    };
 
     this.moveMenuItemsRelative = function(dx, dy) {
         for (var i in this.protoContainers) {
@@ -1092,7 +1092,7 @@ function Palette(palettes, name) {
             this.fadedDownButton.x += dx;
             this.fadedDownButton.y += dy;
         }
-    }
+    };
 
     this.scrollEvent = function(direction, scrollSpeed) {
         var diff = direction * scrollSpeed;
@@ -1176,7 +1176,7 @@ function Palette(palettes, name) {
         stage.setChildIndex(this.menuContainer, stage.getNumChildren() - 1);
         this.palettes.refreshCanvas();
         this.count += 1;
-    }
+    };
 
     this.getInfo = function() {
         var returnString = this.name + ' palette:';
@@ -1184,7 +1184,7 @@ function Palette(palettes, name) {
             returnString += ' ' + this.protoList[thisBlock].name;
         }
         return returnString;
-    };
+    };;
 
     this.remove = function(protoblock, name) {
         // Remove the protoblock and its associated artwork container.
@@ -1203,7 +1203,7 @@ function Palette(palettes, name) {
         }
         this.palettes.stage.removeChild(this.protoContainers[name]);
         delete this.protoContainers[name];
-    }
+    };
 
     this.add = function(protoblock, top) {
         // Add a new palette entry to the end of the list (default) or
@@ -1216,7 +1216,7 @@ function Palette(palettes, name) {
             }
         }
         return this;
-    }
+    };
 
     return this;
 };
@@ -1253,7 +1253,7 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
         palettes.bringToTop();
     }, 2000);
     return palettes;
-}
+};
 
 
 const MODEUNSURE = 0;
@@ -1282,7 +1282,7 @@ function setupBackgroundEvents(palette) {
             scrolling = false;
         }, null, true); // once = true
     });
-}
+};
 
 
 function makeBlockFromPalette(protoblk, blkname, palette, callback) {
@@ -1392,7 +1392,7 @@ function makeBlockFromPalette(protoblk, blkname, palette, callback) {
       var newBlock = paletteBlockButtonPush(newBlk, arg);
       callback(newBlock);
     }
-}
+};
 
 
 // Menu Item event handlers
@@ -1476,7 +1476,7 @@ function loadPaletteMenuItemHandler(palette, protoblk, blkname) {
         }
         makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX, saveY);
     });
-}
+};
 
 
 function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX, saveY) {
@@ -1622,7 +1622,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                 }
                 // Dock with other blocks if needed
                 blocks.blockMoved(newBlock);
-            }
+            };
 
             var newBlock = makeBlockFromPalette(protoblk, blkname, palette, myCallback);
         }
@@ -1633,7 +1633,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
         palette.updateBlockMasks();
         palette.palettes.refreshCanvas();
     }
-}
+};
 
 
 function restoreProtoblock(palette, name, x, y) {
@@ -1642,7 +1642,7 @@ function restoreProtoblock(palette, name, x, y) {
     palette.protoContainers[name].y = y;
 
     palette.resetLayout();
-}
+};
 
 
 // Palette Menu event handlers
@@ -1740,7 +1740,7 @@ function loadPaletteMenuHandler(palette) {
 
     palette.menuContainer.on('mouseout', function(event) {
     });
-}
+};
 
 
 function promptPaletteDelete(palette) {
@@ -1782,7 +1782,7 @@ function promptPaletteDelete(palette) {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         sugarizerCompatibility.saveLocally();
     }
-}
+};
 
 
 function promptMacrosDelete(palette) {
@@ -1801,7 +1801,7 @@ function promptMacrosDelete(palette) {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         sugarizerCompatibility.saveLocally();
     }
-}
+};
 
 
 function makePaletteBitmap(palette, data, name, callback, extras) {
@@ -1813,6 +1813,5 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
         callback(palette, name, bitmap, extras);
     };
 
-    img.src = 'data:image/svg+xml;base64,' + window.btoa(
-        unescape(encodeURIComponent(data)));
-}
+    img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
+};

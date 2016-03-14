@@ -43,7 +43,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
 
         img.src = 'data:image/svg+xml;base64,' + window.btoa(
             unescape(encodeURIComponent(BORDER.replace('stroke_color', '#000000'))));
-    }
+    };
 
     function makeBorder(me) {
         var img = new Image();
@@ -57,7 +57,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
 
         img.src = 'data:image/svg+xml;base64,' + window.btoa(
             unescape(encodeURIComponent(BORDER.replace('stroke_color', '#e0e0e0'))));
-    }
+    };
 
     function makeTrash(me) {
         var img = new Image();
@@ -73,12 +73,12 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
         };
 
         img.src = 'images/trash.svg';
-    }
+    };
 
     this.resizeEvent = function(scale) {
         this.container.x = (this.canvas.width * 1 / scale / 2) - ((TRASHWIDTH / 2) * (this.size / this.iconsize));
         this.container.y = (this.canvas.height * 1 / scale) - (TRASHHEIGHT * (this.size / this.iconsize));
-    }
+    };
 
     this.stage.addChild(this.container);
     this.stage.setChildIndex(this.container, 0);
@@ -89,13 +89,13 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
         createjs.Tween.get(this.container)
             .to({alpha: 0}, 200)
             .set({visible: false});
-    }
+    };
 
     this.show = function() {
         createjs.Tween.get(this.container)
             .to({alpha: 0.0, visible: true})
             .to({alpha: 1.0}, 200);
-    }
+    };
 
     this.highlight = function() {
         if (!last(this.container.children).visible) {
@@ -105,7 +105,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
             this.container.updateCache();
             this.refreshCanvas();
         }
-    }
+    };
 
     this.unhighlight = function() {
         if (last(this.container.children).visible) {
@@ -115,7 +115,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
             this.container.updateCache();
             this.refreshCanvas();
         }
-    }
+    };
 
     this.overTrashcan = function(x, y) {
         var tx = this.container.x;
@@ -125,9 +125,10 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
         } else if (x > tx + (TRASHWIDTH * this.size / this.iconsize)) {
             return false;
         }
+
         if (y < ty) {
             return false;
         }
         return true;
-    }
-}
+    };
+};

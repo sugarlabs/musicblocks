@@ -163,6 +163,7 @@ function analyzeProject(blocks) {
     for (var i = 0; i < PALS.length; i++) {
         scores.push(0);
     }
+
     cats = [];
     pals = [];
 
@@ -196,7 +197,7 @@ function analyzeProject(blocks) {
     }
 
     return scores;
-}
+};
 
 
 function scoreToChartData(scores) {
@@ -207,6 +208,7 @@ function scoreToChartData(scores) {
             maxScore = scores[i];
         }
     }
+
     if (maxScore > 0) {
         var scale = 100 / maxScore;
     } else {
@@ -216,6 +218,7 @@ function scoreToChartData(scores) {
     if (scale > 1) {
         scale = 1;
     }
+
     for (var i = 0; i < scores.length; i++) {
         normalizedScores.push(scores[i] * scale);
     }
@@ -237,7 +240,7 @@ function scoreToChartData(scores) {
     };
 
     return data;
-}
+};
 
 
 function getChartOptions(callback) {
@@ -298,6 +301,5 @@ function getChartOptions(callback) {
 
     //String - A legend template
     legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-
     }
-}
+};

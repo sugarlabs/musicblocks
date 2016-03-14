@@ -86,7 +86,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
         } else {
             this.show();
         }
-    }
+    };
 
     this.positionHoverText = function(button) {
         for (var c = 0; c < button.children.length; c++) {
@@ -97,7 +97,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
                 break;
             }
         }
-    }
+    };
 
     this.hide = function() {
         if (this.container !== null) {
@@ -110,7 +110,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
             this.container.visible = false;
             this.refreshCanvas();
         }
-    }
+    };
 
     this.show = function() {
         if (this.container !== null) {
@@ -123,7 +123,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
             this.container.visible = true;
             this.refreshCanvas();
         }
-    }
+    };
 
     this.createBox = function(scale, x, y) {
         this.scale = scale;
@@ -135,12 +135,13 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
             function processBackground(box, name, bitmap, extras) {
                 box.container.addChild(bitmap);
                 loadUtilityContainerHandler(box);
-            }
+            };
+
             var UTILITYBOX = UTILITYBOXSVG;
             makeBoxBitmap(this, UTILITYBOX, 'box', processBackground, null);
         }
-    }
-}
+    };
+};
 
 
 function loadUtilityContainerHandler(box) {
@@ -169,5 +170,4 @@ function loadUtilityContainerHandler(box) {
             box.hide();
         }
     });
-}
-
+};

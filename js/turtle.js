@@ -189,6 +189,7 @@ function Turtle (name, turtles, drum) {
         } else {
             this.drawingCanvas.graphics.moveTo(nx, ny);
         }
+
         // Update turtle position on screen.
         this.container.x = nx;
         this.container.y = ny;
@@ -199,7 +200,7 @@ function Turtle (name, turtles, drum) {
             this.x = this.turtles.screenX2turtleX(x);
             this.y = this.turtles.screenY2turtleY(y);
         }
-    }
+    };
 
     this.rename = function(name) {
         this.name = name;
@@ -215,7 +216,7 @@ function Turtle (name, turtles, drum) {
             this.startBlock.regenerateArtwork(false);
             this.startBlock.value = this.turtles.turtleList.indexOf(this);
         }
-    }
+    };
     
     this.arc = function(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
         if (invert) {
@@ -342,7 +343,7 @@ function Turtle (name, turtles, drum) {
             this.x = this.screenX2turtles.turtleX(x);
             this.y = this.screenY2turtles.turtleY(y);
         }
-    }
+    };
 
     // Turtle functions
     this.doClear = function() {
@@ -394,6 +395,7 @@ function Turtle (name, turtles, drum) {
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
+
         this.drawingCanvas.graphics.clear();
         var subrgb = this.canvasColor.substr(0, this.canvasColor.length-2);
         this.drawingCanvas.graphics.beginStroke(subrgb + this.canvasAlpha + ")");
@@ -403,7 +405,7 @@ function Turtle (name, turtles, drum) {
         this.svgPath = false;
 
         this.turtles.refreshCanvas();
-    }
+    };
 
     this.doForward = function(steps) {
         if (!this.fillState) {
@@ -427,7 +429,7 @@ function Turtle (name, turtles, drum) {
 
         this.move(ox, oy, nx, ny, true);
         this.turtles.refreshCanvas();
-    }
+    };
 
     this.doSetXY = function(x, y) {
         if (!this.fillState) {
@@ -450,7 +452,7 @@ function Turtle (name, turtles, drum) {
 
         this.move(ox, oy, nx, ny, true);
         this.turtles.refreshCanvas();
-    }
+    };
 
     this.doArc = function(angle, radius) {
         // Break up arcs into chucks of 90 degrees or less (in order
@@ -473,7 +475,7 @@ function Turtle (name, turtles, drum) {
         if (remainder > 0) {
             this.doArcPart(remainder * factor, radius);
         }
-    }
+    };
 
     this.doArcPart = function(angle, radius) {
         if (!this.fillState) {
@@ -513,6 +515,7 @@ function Turtle (name, turtles, drum) {
             var nx = cx - Math.cos(oAngleRadians + angleRadians) * r;
             var ny = cy + Math.sin(oAngleRadians + angleRadians) * r;
         }
+
         this.arc(cx, cy, ox, oy, nx, ny, r, oAngleRadians, oAngleRadians + angleRadians, anticlockwise, true);
 
         if (anticlockwise) {
@@ -521,7 +524,7 @@ function Turtle (name, turtles, drum) {
             this.doRight(adeg);
         }
         this.turtles.refreshCanvas();
-    }
+    };
 
     this.doShowImage = function(size, myImage) {
         // Add an image object to the canvas
@@ -529,6 +532,7 @@ function Turtle (name, turtles, drum) {
         if (myImage === null) {
             return;
         }
+
         var image = new Image();
         var me = this;
         image.onload = function() {
@@ -544,9 +548,9 @@ function Turtle (name, turtles, drum) {
             bitmap.regY = image.height / 2;
             bitmap.rotation = me.orientation;
             me.turtles.refreshCanvas();
-        }
+        };
         image.src = myImage;
-    }
+    };
 
     this.doShowURL = function(size, myURL) {
         // Add an image object from a URL to the canvas
@@ -569,8 +573,8 @@ function Turtle (name, turtles, drum) {
             bitmap.regY = image.height / 2;
             bitmap.rotation = me.orientation;
             me.turtles.refreshCanvas();
-        }
-    }
+        };
+    };
 
     this.doTurtleShell = function(size, myImage) {
         // Add image to turtle
@@ -620,14 +624,14 @@ function Turtle (name, turtles, drum) {
                 me.startBlock.updateCache();
             }
             me.turtles.refreshCanvas();
-        }
-    }
+        };
+    };
 
     this.resizeDecoration = function(scale, width) {
         this.decorationBitmap.x = width - 30 * scale / 2;
         this.decorationBitmap.y = 35 * scale / 2;
         this.decorationBitmap.scaleX = this.decorationBitmap.scaleY = this.decorationBitmap.scale = 0.5 * scale / 2
-    }
+    };
 
     this.doShowText = function(size, myText) {
         // Add a text or image object to the canvas
@@ -646,7 +650,7 @@ function Turtle (name, turtles, drum) {
         var sizeScaled = size * this.turtles.scale;
         this.svgOutput += '<text x="' + xScaled + '" y = "' + yScaled + '" fill="' + this.canvasColor + '" font-family = "' + this.font + '" font-size = "' + sizeScaled + '">' + myText + '</text>';
         this.turtles.refreshCanvas();
-    }
+    };
 
     this.doRight = function(degrees) {
         // Turn right and display corresponding turtle graphic.
@@ -654,19 +658,19 @@ function Turtle (name, turtles, drum) {
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
         this.updateCache();
-    }
+    };
 
     this.doSetHeading = function(degrees) {
         this.orientation = Number(degrees);
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
         this.updateCache();
-    }
+    };
 
     this.doSetFont = function(font) {
         this.font = font;
         this.updateCache();
-    }
+    };
 
 
     this.doSetColor = function(color) {
@@ -680,13 +684,14 @@ function Turtle (name, turtles, drum) {
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
+
         var subrgb = this.canvasColor.substr(0, this.canvasColor.length-2);
         this.drawingCanvas.graphics.beginStroke(subrgb + this.canvasAlpha + ")");
-    }
+    };
 
     this.doSetPenAlpha = function(alpha) {
         this.canvasAlpha = alpha;
-    }
+    };
 
     this.doSetHue = function(hue) {
         this.closeSVG();
@@ -695,9 +700,10 @@ function Turtle (name, turtles, drum) {
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
+
         var subrgb = this.canvasColor.substr(0, this.canvasColor.length-2);
         this.drawingCanvas.graphics.beginStroke(subrgb + this.canvasAlpha + ")");
-    }
+    };
 
     this.doSetValue = function(shade) {
         this.closeSVG();
@@ -706,9 +712,10 @@ function Turtle (name, turtles, drum) {
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
+
         var subrgb = this.canvasColor.substr(0, this.canvasColor.length-2);
         this.drawingCanvas.graphics.beginStroke(subrgb + this.canvasAlpha + ")");
-    }
+    };
 
     this.doSetChroma = function(chroma) {
         this.closeSVG();
@@ -718,47 +725,48 @@ function Turtle (name, turtles, drum) {
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
+
         var subrgb = this.canvasColor.substr(0, this.canvasColor.length-2);
         this.drawingCanvas.graphics.beginStroke(subrgb + this.canvasAlpha + ")");
-    }
+    };
 
     this.doSetPensize = function(size) {
         this.closeSVG();
         this.stroke = size;
         this.drawingCanvas.graphics.setStrokeStyle(this.stroke, 'round', 'round');
-    }
+    };
 
     this.doPenUp = function() {
         this.closeSVG();
         this.penState = false;
-    }
+    };
 
     this.doPenDown = function() {
         this.penState = true;
-    }
+    };
 
     this.doStartFill = function() {
         /// start tracking points here
         this.drawingCanvas.graphics.beginFill(this.canvasColor);
         this.fillState = true;
-    }
+    };
 
     this.doEndFill = function() {
         /// redraw the points with fill enabled
         this.drawingCanvas.graphics.endFill();
         this.closeSVG();
         this.fillState = false;
-    }
+    };
 
     this.doStartHollowLine = function() {
         /// start tracking points here
         this.hollowState = true;
-    }
+    };
 
     this.doEndHollowLine = function() {
         /// redraw the points with fill enabled
         this.hollowState = false;
-    }
+    };
 
     this.closeSVG = function() {
         if (this.svgPath) {
@@ -768,12 +776,13 @@ function Turtle (name, turtles, drum) {
             } else {
                 this.svgOutput += 'none;';
             }
+
             this.svgOutput += 'stroke:' + this.canvasColor + ';';
             var strokeScaled = this.stroke * this.turtles.scale;
             this.svgOutput += 'stroke-width:' + strokeScaled + 'pt;" />';
             this.svgPath = false;
         }
-    }
+    };
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
@@ -788,7 +797,7 @@ function Turtle (name, turtles, drum) {
         } else {
             myTurtle.container.cache(myTurtle.bounds.x, myTurtle.bounds.y, myTurtle.bounds.width, myTurtle.bounds.height);
         }
-    }
+    };
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
@@ -804,7 +813,7 @@ function Turtle (name, turtles, drum) {
             myTurtle.container.updateCache();
             myTurtle.turtles.refreshCanvas();
         }
-    }
+    };
 };
 
 
@@ -818,11 +827,11 @@ function Turtles(canvas, stage, refreshCanvas) {
 
     this.setScale = function(scale) {
         this.scale = scale;
-    }
+    };
 
     this.setBlocks = function(blocks) {
         this.blocks = blocks;
-    }
+    };
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
@@ -830,12 +839,12 @@ function Turtles(canvas, stage, refreshCanvas) {
     this.addDrum = function(startBlock, infoDict) {
         this.drum = true;
         this.add(startBlock, infoDict);
-    }
+    };
 
     this.addTurtle = function(startBlock, infoDict) {
         this.drum = false;
         this.add(startBlock, infoDict);
-    }
+    };
 
     this.add = function(startBlock, infoDict) {
         // Add a new turtle for each start block
@@ -847,14 +856,14 @@ function Turtles(canvas, stage, refreshCanvas) {
             }
         } else {
             console.log('adding a new turtle startBlock is null');
-        };
+        }
 
         var blkInfoAvailable = false;
 
         if (typeof(infoDict) === 'object') {
-          if (Object.keys(infoDict).length === 8) {
-            blkInfoAvailable = true;
-          }
+            if (Object.keys(infoDict).length === 8) {
+                blkInfoAvailable = true;
+            }
         }
 
         var i = this.turtleList.length;
@@ -922,7 +931,7 @@ function Turtles(canvas, stage, refreshCanvas) {
             }
 
             me.refreshCanvas();
-        }
+        };
 
         if (this.drum) {
            var artwork = DRUMSVG;
@@ -931,9 +940,9 @@ function Turtles(canvas, stage, refreshCanvas) {
         }
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
-          makeTurtleBitmap(this, artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke), 'turtle', processTurtleBitmap, startBlock);
+            makeTurtleBitmap(this, artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke), 'turtle', processTurtleBitmap, startBlock);
         } else {
-          makeTurtleBitmap(this, artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', processTurtleBitmap, startBlock);
+            makeTurtleBitmap(this, artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', processTurtleBitmap, startBlock);
         }
 
         myTurtle.color = i * 10;
@@ -992,33 +1001,33 @@ function Turtles(canvas, stage, refreshCanvas) {
             }
         }, 1000);
         this.refreshCanvas();
-    }
+    };
 
     this.screenX2turtleX = function(x) {
         return x - (this.canvas.width / (2.0 * this.scale));
-    }
+    };
 
     this.screenY2turtleY = function(y) {
         return this.invertY(y);
-    }
+    };
 
     this.turtleX2screenX = function(x) {
         return (this.canvas.width / (2.0 * this.scale)) + x;
-    }
+    };
 
     this.turtleY2screenY = function(y) {
         return this.invertY(y);
-    }
+    };
 
     this.invertY = function(y) {
         return this.canvas.height / (2.0 * this.scale) - y;
-    }
+    };
 
     this.markAsStopped = function() {
         for (var turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
         }
-    }
+    };
 
     this.running = function() {
         for (var turtle in this.turtleList) {
@@ -1027,8 +1036,9 @@ function Turtles(canvas, stage, refreshCanvas) {
             }
         }
         return false;
-    }
-}
+    };
+};
+
 
 // Queue entry for managing running blocks.
 function Queue (blk, count, parentBlk, args) {
@@ -1036,7 +1046,7 @@ function Queue (blk, count, parentBlk, args) {
     this.count = count;
     this.parentBlk = parentBlk;
     this.args = args
-}
+};
 
 
 function makeTurtleBitmap(me, data, name, callback, extras) {
@@ -1059,4 +1069,4 @@ function hex2rgb(hex) {
     var b = bigint & 255;
 
     return "rgba(" + r + "," + g + "," + b + ",1)";
-}
+};
