@@ -255,9 +255,9 @@ define(function (require) {
             [_('Settings'), _('Open a panel for configuring Music Blocks.'), 'header-icons/utility-button.svg'],
             [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
             [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
-            [_('Display statistics'), _('Display statistics about your Music project.'), 'header-icons/chart-button.svg'],
-            [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugins-button-white.svg'],
-            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-unlock-button-white.svg'],
+            [_('Display statistics'), _('Display statistics about your Music project.'), 'header-icons/stats-button.svg'],
+            [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugins-button.svg'],
+            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-unlock-button.svg'],
             [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
             [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
@@ -2109,15 +2109,21 @@ define(function (require) {
 
                     var img = new Image();
                     img.onload = function () {
-                        // console.log(musicBlocksScale);
+                        console.log(musicBlocksScale);
                         var bitmap = new createjs.Bitmap(img);
+                        /*
                         if (musicBlocksScale > 1) {
                             bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
                         } else {
                             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1.125;
                         }
-
+                        */
+                        if (helpContainer.children.length > 0) {
+                            console.log('delete old help container');
+                            helpContainer.removeChild(helpContainer.children[0]);
+                        }
                         helpContainer.addChild(bitmap)
+
                         var bounds = helpContainer.getBounds();
                         var hitArea = new createjs.Shape();
                         hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -2142,12 +2148,12 @@ define(function (require) {
                 helpElem.style.paddingRight = 20 * musicBlocksScale + 'px';
                 helpElem.style.paddingTop = '0px';
                 helpElem.style.paddingBottom = 20 * musicBlocksScale + 'px';
-                helpElem.style.fontSize = 20 * musicBlocksScale + 'px';
-                helpElem.style.color = '#ffffff';
+                helpElem.style.fontSize = 20 + 'px'; //  * musicBlocksScale + 'px';
+                helpElem.style.color = '#000000';  // '#ffffff';
                 helpElem.style.left = 65 * musicBlocksScale + 'px';
                 helpElem.style.top = 105 * musicBlocksScale + 'px';
-                var w = Math.min(300, 300 * musicBlocksScale);
-                var h = Math.min(300, 300 * musicBlocksScale);
+                var w = Math.min(300, 300); //  * musicBlocksScale);
+                var h = Math.min(300, 300); //  * musicBlocksScale);
                 helpElem.style.width = w + 'px';
                 helpElem.style.height = h + 'px';
 
