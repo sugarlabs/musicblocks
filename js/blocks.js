@@ -3078,7 +3078,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
                 var arg = null;
                 var c = myBlock.connections[1];
                 if (c != null && this.blockList[c].value !== _('action')) {
-                    console.log('calling newNameddoBlock with name ' + this.blockList[c].value);
                     if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
                         updatePalettes = true;
                     }
