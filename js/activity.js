@@ -2160,7 +2160,7 @@ define(function (require) {
                 if (musicBlocksScale > 1) {
                     var bitmap = helpContainer.children[0];
                     if (bitmap != undefined) {
-                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
+                        // bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
                     }
                 }
 
