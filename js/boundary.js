@@ -70,14 +70,10 @@ function Boundary (canvas, stage, refreshCanvas) {
     };
 
     this.hide = function() {
-        createjs.Tween.get(this.container)
-            .to({alpha: 0}, 200)
-            .set({visible: false});
+        this.container.visible = false;
     };
 
     this.show = function() {
-        createjs.Tween.get(this.container)
-            .to({alpha: 0.0, visible: true})
-            .to({alpha: 1.0}, 200);
+        this.container.visible = true;
     };
 };
