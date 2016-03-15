@@ -1181,7 +1181,7 @@ define(function (require) {
 
             turtles.setScale(musicBlocksScale);
             blocks.setScale(musicBlocksScale);
-            boundary.setScale(musicBlocksScale);
+            boundary.setScale(w, h, musicBlocksScale);
             palettes.setScale(musicBlocksScale);
             trashcan.resizeEvent(musicBlocksScale);
             setupAndroidToolbar(mobileSize);
