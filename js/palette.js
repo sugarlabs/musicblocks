@@ -1622,6 +1622,7 @@ function makeBlockFromProtoblock(palette, protoblk, moved, blkname, event, saveX
                 }
                 // Dock with other blocks if needed
                 blocks.blockMoved(newBlock);
+                paletteBlocks.checkBounds();
             };
 
             var newBlock = makeBlockFromPalette(protoblk, blkname, palette, myCallback);
