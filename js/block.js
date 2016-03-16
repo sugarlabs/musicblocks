@@ -27,7 +27,7 @@ function Block(protoblock, blocks, overrideName) {
     this.blocks = blocks;
     this.collapsed = false; // Is this block in a collapsed stack?
     this.trash = false; // Is this block in the trash?
-    this.loadComplete = false; // Has the block finished loading?
+    this._loadComplete = false; // Has the block finished loading?
     this.label = null; // Editable textview in DOM.
     this.labelattr = null;  // Secondary select in DOM.
     this.text = null; // A dynamically generated text label on block itself.
@@ -65,19 +65,19 @@ function Block(protoblock, blocks, overrideName) {
     this.argClampSlots = [1];
 
     // Some blocks have some post process after they are first loaded.
-    this.postProcess = null;
-    this.postProcessArg = null;
+    this._postProcess = null;
+    this._postProcessArg = null;
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this.createCache = function() {
+    this._createCache = function() {
         var myBlock = this;
         myBlock.bounds = myBlock.container.getBounds();
 
         if (myBlock.bounds == null) {
             // console.log('Block container for ' + myBlock.name + ' not yet ready.');
             setTimeout(function() {
-                myBlock.createCache();
+                myBlock._createCache();
             }, 200);
         } else {
             myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
@@ -170,23 +170,23 @@ function Block(protoblock, blocks, overrideName) {
     this.updateArgSlots = function(slotList) {
         // Resize and update number of slots in argClamp
         this.argClampSlots = slotList;
-        this.newArtwork();
+        this._newArtwork();
         this.regenerateArtwork(false);
     };
 
     this.updateSlots = function(clamp, plusMinus) {
         // Resize an expandable block.
         this.clampCount[clamp] += plusMinus;
-        this.newArtwork(plusMinus);
+        this._newArtwork(plusMinus);
         this.regenerateArtwork(false);
     };
 
     this.resize = function(blockScale) {
         // If the block scale changes, we need to regenerate the
         // artwork and recalculate the hitarea.
-        this.postProcess = function(myBlock) {
+        this._postProcess = function(myBlock) {
             if (myBlock.imageBitmap != null) {
-                positionMedia(myBlock.imageBitmap, myBlock, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, blockScale);
+                myBlock._positionMedia(myBlock.imageBitmap, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, blockScale);
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
@@ -196,42 +196,42 @@ function Block(protoblock, blocks, overrideName) {
                 for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
                         myBlock.blocks.turtles.turtleList[turtle].resizeDecoration(blockScale, myBlock.bitmap.image.width);
-                        ensureDecorationOnTop(myBlock);
+                        myBlock._ensureDecorationOnTop();
                         break;
                     }
                 }
             }
             myBlock.updateCache();
-            calculateBlockHitArea(myBlock);
+            myBlock._calculateBlockHitArea();
         };
 
         this.protoblock.scale = blockScale;
-        this.newArtwork(0);
+        this._newArtwork(0);
         this.regenerateArtwork(true, []);
 
         if (this.text != null) {
-            positionText(this, blockScale);
+            this._positionText(blockScale);
         }
 
         if (this.collapseContainer != null) {
             this.collapseContainer.uncache();
-            var postProcess = function(myBlock) {
+            var __postProcess = function(myBlock) {
                 myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = blockScale / 2;
                 myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = blockScale / 2;
                 var bounds = myBlock.collapseContainer.getBounds();
                 myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                positionCollapseContainer(myBlock, myBlock.protoblock.scale);
-                calculateCollapseHitArea(myBlock);
+                myBlock._positionCollapseContainer(myBlock.protoblock.scale);
+                myBlock._calculateCollapseHitArea();
             };
 
-            this.generateCollapseArtwork(postProcess);
+            this._generateCollapseArtwork(__postProcess);
             var fontSize = 10 * blockScale;
             this.collapseText.font = fontSize + 'px Sans';
-            positionCollapseLabel(this, blockScale);
+            this._positionCollapseLabel(blockScale);
         }
     };
 
-    this.newArtwork = function(plusMinus) {
+    this._newArtwork = function(plusMinus) {
         switch (this.name) {
         case 'start':
         case 'drum':
@@ -371,7 +371,7 @@ function Block(protoblock, blocks, overrideName) {
         this.generateArtwork(true, []);
     };
 
-    this.addImage = function() {
+    this._addImage = function() {
         var image = new Image();
         var myBlock = this;
 
@@ -379,7 +379,7 @@ function Block(protoblock, blocks, overrideName) {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
             myBlock.container.addChild(bitmap);
-            positionMedia(bitmap, myBlock, image.width, image.height, myBlock.protoblock.scale);
+            myBlock._positionMedia(bitmap, image.width, image.height, myBlock.protoblock.scale);
             myBlock.imageBitmap = bitmap;
             myBlock.updateCache();
         };
@@ -426,7 +426,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // Create the bitmap for the block.
-        function processBitmap(name, bitmap, myBlock) {
+        function __processBitmap(name, bitmap, myBlock) {
             if (myBlock.bitmap != null) {
                 myBlock.container.removeChild(myBlock.bitmap);
             }
@@ -440,7 +440,7 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.blocks.refreshCanvas();
 
             // Create the highlight bitmap for the block.
-            function processHighlightBitmap(name, bitmap, myBlock) {
+            function __processHighlightBitmap(name, bitmap, myBlock) {
                 if (myBlock.highlightBitmap != null) {
                     myBlock.container.removeChild(myBlock.highlightBitmap);
                 }
@@ -460,19 +460,19 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.container.uncache();
                 }
 
-                myBlock.createCache();
+                myBlock._createCache();
                 myBlock.blocks.refreshCanvas();
 
                 if (firstTime) {
-                    loadEventHandlers(myBlock);
+                    myBlock._loadEventHandlers();
                     if (myBlock.image != null) {
-                        myBlock.addImage();
+                        myBlock._addImage();
                     }
 
-                    myBlock.finishImageLoad();
+                    myBlock._finishImageLoad();
                 } else {
                     if (myBlock.name === 'start' || myBlock.name === 'drum') {
-                        ensureDecorationOnTop(myBlock);
+                        myBlock._ensureDecorationOnTop();
                     }
 
                     // Adjust the docks.
@@ -482,7 +482,7 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.blocks.adjustDocks(thisBlock);
 
                     // Adjust the text position.
-                    positionText(myBlock, myBlock.protoblock.scale);
+                    myBlock._positionText(myBlock.protoblock.scale);
 
                     /*
                     // Are there clamp blocks that need expanding?
@@ -499,9 +499,9 @@ function Block(protoblock, blocks, overrideName) {
                         myBlock.updateCache();
                     }
 
-                    if (myBlock.postProcess != null) {
-                        myBlock.postProcess(myBlock.postProcessArg);
-                        myBlock.postProcess = null;
+                    if (myBlock._postProcess != null) {
+                        myBlock._postProcess(myBlock._postProcessArg);
+                        myBlock._postProcess = null;
                     }
                 }
             }
@@ -516,7 +516,7 @@ function Block(protoblock, blocks, overrideName) {
                 artwork = artwork.replace('arg_label_' + i, myBlock.protoblock.staticLabels[i]);
             }
 
-            makeBitmap(artwork, myBlock.name, processHighlightBitmap, myBlock);
+            _makeBitmap(artwork, myBlock.name, __processHighlightBitmap, myBlock);
         };
 
         if (firstTime) {
@@ -537,10 +537,10 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
             artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
-        makeBitmap(artwork, this.name, processBitmap, this);
+        _makeBitmap(artwork, this.name, __processBitmap, this);
     };
 
-    this.finishImageLoad = function() {
+    this._finishImageLoad = function() {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Value blocks get a modifiable text label
@@ -564,18 +564,18 @@ function Block(protoblock, blocks, overrideName) {
             }
             this.text.text = label;
             this.container.addChild(this.text);
-            positionText(this, this.protoblock.scale);
+            this._positionText(this.protoblock.scale);
         } else if (this.protoblock.parameter) {
             // Parameter blocks get a text label to show their current value
             this.container.addChild(this.text);
-            positionText(this, this.protoblock.scale);
+            this._positionText(this.protoblock.scale);
         }
 
         if (COLLAPSABLES.indexOf(this.name) === -1) {
-            this.loadComplete = true;
-            if (this.postProcess != null) {
-                this.postProcess(this.postProcessArg);
-                this.postProcess = null;
+            this._loadComplete = true;
+            if (this._postProcess != null) {
+                this._postProcess(this._postProcessArg);
+                this._postProcess = null;
             }
             this.blocks.refreshCanvas();
             this.blocks.cleanupAfterLoad(this.name);
@@ -588,31 +588,31 @@ function Block(protoblock, blocks, overrideName) {
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
-            var postProcess = function(myBlock) {
-                loadCollapsibleEventHandlers(myBlock);
-                myBlock.loadComplete = true;
+            var __postProcess = function(myBlock) {
+                myBlock._loadCollapsibleEventHandlers();
+                myBlock._loadComplete = true;
 
-                if (myBlock.postProcess != null) {
-                    myBlock.postProcess(myBlock.postProcessArg);
-                    myBlock.postProcess = null;
+                if (myBlock._postProcess != null) {
+                    myBlock._postProcess(myBlock._postProcessArg);
+                    myBlock._postProcess = null;
                 }
             };
 
-            this.generateCollapseArtwork(postProcess);
+            this._generateCollapseArtwork(__postProcess);
         }
     };
 
-    this.generateCollapseArtwork = function(postProcess) {
+    this._generateCollapseArtwork = function(postProcess) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-            function processCollapseBitmap(name, bitmap, myBlock) {
+            function __processCollapseBitmap(name, bitmap, myBlock) {
                 myBlock.collapseBlockBitmap = bitmap;
                 myBlock.collapseBlockBitmap.name = 'collapse_' + thisBlock;
                 myBlock.container.addChild(myBlock.collapseBlockBitmap);
                 myBlock.collapseBlockBitmap.visible = myBlock.collapsed;
                 myBlock.blocks.refreshCanvas();
 
-                function processHighlightCollapseBitmap(name, bitmap, myBlock) {
+                function __processHighlightCollapseBitmap(name, bitmap, myBlock) {
                     myBlock.highlightCollapseBlockBitmap = bitmap;
                     myBlock.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
                     myBlock.container.addChild(myBlock.highlightCollapseBlockBitmap);
@@ -638,10 +638,10 @@ function Block(protoblock, blocks, overrideName) {
                         myBlock.collapseText.textBaseline = 'alphabetic';
                         myBlock.container.addChild(myBlock.collapseText);
                     }
-                    positionCollapseLabel(myBlock, myBlock.protoblock.scale);
+                    myBlock._positionCollapseLabel(myBlock.protoblock.scale);
                     myBlock.collapseText.visible = myBlock.collapsed;
 
-                    ensureDecorationOnTop(myBlock);
+                    myBlock._ensureDecorationOnTop();
 
                     myBlock.updateCache();
 
@@ -654,12 +654,12 @@ function Block(protoblock, blocks, overrideName) {
                         myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = myBlock.protoblock.scale / 2;
                         myBlock.collapseContainer.addChild(myBlock.collapseBitmap);
                         myBlock.collapseBitmap.visible = !myBlock.collapsed;
-                        finishCollapseButton(myBlock);
+                        __finishCollapseButton(myBlock);
                     };
 
                     image.src = 'images/collapse.svg';
 
-                    finishCollapseButton = function(myBlock) {
+                    __finishCollapseButton = function(myBlock) {
                         var image = new Image();
                         image.onload = function() {
                             myBlock.expandBitmap = new createjs.Bitmap(image);
@@ -681,11 +681,11 @@ function Block(protoblock, blocks, overrideName) {
                 };
 
                 var artwork = myBlock.collapseArtwork;
-                makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', ''), '', processHighlightCollapseBitmap, myBlock);
+                _makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', ''), '', __processHighlightCollapseBitmap, myBlock);
             };
 
             var artwork = this.collapseArtwork;
-            makeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), '', processCollapseBitmap, this);
+            _makeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), '', __processCollapseBitmap, this);
     };
 
     this.hide = function() {
@@ -756,7 +756,7 @@ function Block(protoblock, blocks, overrideName) {
         return '_' + number.toString();
     };
 
-    this.removeChildBitmap = function(name) {
+    this._removeChildBitmap = function(name) {
         for (var child = 0; child < this.container.getNumChildren(); child++) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
@@ -777,7 +777,7 @@ function Block(protoblock, blocks, overrideName) {
 
         image.onload = function() {
             // Before adding new artwork, remove any old artwork.
-            myBlock.removeChildBitmap('media');
+            myBlock._removeChildBitmap('media');
 
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -804,7 +804,7 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.imageBitmap = bitmap;
 
             // Next, scale the bitmap for the thumbnail.
-            positionMedia(bitmap, myBlock, bitmap.image.width, bitmap.image.height, myBlock.protoblock.scale);
+            myBlock._positionMedia(bitmap, bitmap.image.width, bitmap.image.height, myBlock.protoblock.scale);
             myBlock.container.addChild(bitmap);
             myBlock.updateCache();
         };
@@ -816,7 +816,7 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
-    this.doOpenMedia = function (myBlock, thisBlock) {
+    this._doOpenMedia = function (thisBlock) {
         var fileChooser = docById('myOpenAll');
 
         readerAction = function (event) {
@@ -854,7 +854,7 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
         this.blocks.findDragGroup(thisBlock)
 
-        function toggle(myBlock) {
+        function __toggle(myBlock) {
             var collapse = myBlock.collapsed;
             if (myBlock.collapseBitmap == null) {
                 console.log('collapse bitmap not ready');
@@ -897,7 +897,7 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.container.setChildIndex(myBlock.collapseText, z);
 
             if (myBlock.name === 'drum') {
-                ensureDecorationOnTop(myBlock);
+                myBlock._ensureDecorationOnTop();
             }
 
             // Set collapsed state of blocks in drag group.
@@ -913,7 +913,804 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.updateCache();
         };
 
-        toggle(this);
+        __toggle(this);
+    };
+
+    this._positionText = function(blockScale) {
+        this.text.textBaseline = 'alphabetic';
+        this.text.textAlign = 'right';
+        var fontSize = 10 * blockScale;
+        this.text.font = fontSize + 'px Sans';
+        this.text.x = TEXTX * blockScale / 2.;
+        this.text.y = TEXTY * blockScale / 2.;
+
+        // Some special cases
+        if (['text', 'number', 'solfege', 'notename'].indexOf(this.name) !== -1) {
+            this.text.textAlign = 'center';
+            this.text.x = VALUETEXTX * blockScale / 2.;
+        } else if (this.protoblock.args === 0) {
+            var bounds = this.container.getBounds();
+            this.text.x = bounds.width - 25;
+        } else {
+            this.text.textAlign = 'left';
+            if (this.docks[0][2] === 'booleanout') {
+                this.text.y = this.docks[0][1];
+            }
+        }
+
+        // Ensure text is on top.
+        z = this.container.getNumChildren() - 1;
+        this.container.setChildIndex(this.text, z);
+        this.updateCache();
+    };
+
+    this._positionMedia = function(bitmap, width, height, blockScale) {
+        if (width > height) {
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
+        } else {
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / height * blockScale / 2;
+        }
+        bitmap.x = (MEDIASAFEAREA[0] - 10) * blockScale / 2;
+        bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
+    };
+
+    this._calculateCollapseHitArea = function() {
+        var bounds = this.collapseContainer.getBounds();
+        var hitArea = new createjs.Shape();
+        var w2 = bounds.width;
+        var h2 = bounds.height;
+        hitArea.graphics.beginFill('#FFF').drawEllipse(-w2 / 2, -h2 / 2, w2, h2);
+        hitArea.x = w2 / 2;
+        hitArea.y = h2 / 2;
+        this.collapseContainer.hitArea = hitArea;
+    };
+
+
+    this._positionCollapseLabel = function(blockScale) {
+        this.collapseText.x = COLLAPSETEXTX * blockScale / 2;
+        this.collapseText.y = COLLAPSETEXTY * blockScale / 2;
+
+        // Ensure text is on top.
+        z = this.container.getNumChildren() - 1;
+        this.container.setChildIndex(this.collapseText, z);
+    };
+
+    this._positionCollapseContainer = function(blockScale) {
+        this.collapseContainer.x = this.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2);
+        this.collapseContainer.y = this.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2);
+    };
+
+    // These are the event handlers for collapsible blocks.
+    this._loadCollapsibleEventHandlers = function() {
+        var myBlock = this;
+        var thisBlock = this.blocks.blockList.indexOf(this);
+        this._calculateCollapseHitArea();
+
+        this.collapseContainer.on('mouseover', function(event) {
+            myBlock.blocks.highlight(thisBlock, true);
+            myBlock.blocks.activeBlock = thisBlock;
+            myBlock.blocks.refreshCanvas();
+        });
+
+        var moved = false;
+        var locked = false;
+        var mousedown = false;
+        var offset = {x:0, y:0};
+
+        function handleClick () {
+            if (locked) {
+                return;
+            }
+            locked = true;
+            setTimeout(function() {
+                locked = false;
+            }, 500);
+            hideDOMLabel();
+            if (!moved) {
+                myBlock.collapseToggle();
+            }
+        }
+
+        this.collapseContainer.on('click', function(event) {
+            handleClick();
+        });
+
+        this.collapseContainer.on('mousedown', function(event) {
+            hideDOMLabel();
+            // Always show the trash when there is a block selected.
+            trashcan.show();
+            moved = false;
+            mousedown = true;
+            var d = new Date();
+            blocks.mouseDownTime = d.getTime();
+            offset = {
+                x: myBlock.collapseContainer.x - Math.round(event.stageX / myBlock.blocks.blockScale),
+                y: myBlock.collapseContainer.y - Math.round(event.stageY / myBlock.blocks.blockScale)
+            };
+        });
+
+        this.collapseContainer.on('pressup', function(event) {
+            if (!mousedown) {
+                // console.log('pressup w/o mouse down?');
+                return;
+            }
+            mousedown = false;
+            if (moved) {
+                myBlock._collapseOut(blocks, thisBlock, moved, event);
+                moved = false;
+            } else {
+                var d = new Date();
+                if ((d.getTime() - blocks.mouseDownTime) > 1000) {
+                    var d = new Date();
+                    blocks.mouseDownTime = d.getTime();
+                    handleClick();
+                }
+            }
+        });
+
+        this.collapseContainer.on('mouseout', function(event) {
+            if (!mousedown) {
+                // console.log('mouseout w/o mouse down?');
+                return;
+            }
+            mousedown = false;
+            if (moved) {
+                myBlock._collapseOut(blocks, thisBlock, moved, event);
+                moved = false;
+            } else {
+                // Maybe restrict to Android?
+                var d = new Date();
+                // var diff = (d.getTime() - blocks.mouseDownTime);
+                // console.log(diff);
+                if ((d.getTime() - blocks.mouseDownTime) < 200) {
+                    var d = new Date();
+                    blocks.mouseDownTime = d.getTime();
+                    handleClick();
+                }
+            }
+        });
+
+        this.collapseContainer.on('pressmove', function(event) {
+            if (!mousedown) {
+                // console.log('pressmove w/o mouse down?');
+                return;
+            }
+            moved = true;
+            var oldX = myBlock.collapseContainer.x;
+            var oldY = myBlock.collapseContainer.y;
+            myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.blockScale) + offset.x;
+            myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.blockScale) + offset.y;
+            var dx = myBlock.collapseContainer.x - oldX;
+            var dy = myBlock.collapseContainer.y - oldY;
+            myBlock.container.x += dx;
+            myBlock.container.y += dy;
+
+            // If we are over the trash, warn the user.
+            if (trashcan.overTrashcan(event.stageX / myBlock.blocks.blockScale, event.stageY / myBlock.blocks.blockScale)) {
+                trashcan.highlight();
+            } else {
+                trashcan.unhighlight();
+            }
+
+            myBlock.blocks.findDragGroup(thisBlock)
+            if (myBlock.blocks.dragGroup.length > 0) {
+                for (var b = 0; b < myBlock.blocks.dragGroup.length; b++) {
+                    var blk = myBlock.blocks.dragGroup[b];
+                    if (b !== 0) {
+                        myBlock.blocks.moveBlockRelative(blk, dx, dy);
+                    }
+                }
+            }
+
+            myBlock.blocks.refreshCanvas();
+        });
+    };
+
+    this._collapseOut = function(blocks, thisBlock, moved, event) {
+        // Always hide the trash when there is no block selected.
+        trashcan.hide();
+        blocks.unhighlight(thisBlock);
+        if (moved) {
+            // Check if block is in the trash.
+            if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+                blocks.sendStackToTrash(this);
+            } else {
+                // Otherwise, process move.
+                blocks.blockMoved(thisBlock);
+            }
+        }
+
+        if (blocks.activeBlock !== myBlock) {
+            return;
+        }
+
+        blocks.unhighlight(null);
+        blocks.activeBlock = null;
+        blocks.refreshCanvas();
+    };
+
+    this._calculateBlockHitArea = function() {
+        var hitArea = new createjs.Shape();
+        var bounds = this.container.getBounds()
+
+        // Only detect hits on top section of block.
+        if (this.isClampBlock() || this.isArgClamp()) {
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT);
+        } else if (this.isNoHitBlock()) {
+            // No hit area
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, 0, 0);
+        } else {
+            // Shrinking the height makes it easier to grab blocks below
+            // in the stack.
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
+        }
+        this.container.hitArea = hitArea;
+    };
+
+    // These are the event handlers for block containers.
+    this._loadEventHandlers = function() {
+        var myBlock = this;
+        var thisBlock = this.blocks.blockList.indexOf(this);
+        var blocks = this.blocks;
+
+        this._calculateBlockHitArea();
+
+        this.container.on('mouseover', function(event) {
+            blocks.highlight(thisBlock, true);
+            // blocks.activeBlock = thisBlock;
+            blocks.refreshCanvas();
+        });
+
+        var haveClick = false;
+        var moved = false;
+        var locked = false;
+        var getInput = window.hasMouse;
+
+        this.container.on('click', function(event) {
+            // console.log('CLICK');
+            blocks.activeBlock = thisBlock;
+            haveClick = true;
+
+            if (locked) {
+                return;
+            }
+            locked = true;
+            setTimeout(function() {
+                locked = false;
+            }, 500);
+
+            hideDOMLabel();
+
+            if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
+                if (blocks.selectingStack) {
+                    var topBlock = blocks.findTopBlock(thisBlock);
+                    blocks.selectedStack = topBlock;
+                    blocks.selectingStack = false;
+                } else if (myBlock.name === 'media') {
+                    myBlock._doOpenMedia(thisBlock);
+                } else if (myBlock.name === 'loadFile') {
+                    myBlock._doOpenMedia(thisBlock);
+                } else if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) !== -1) {
+                    if(!myBlock.trash)
+                    {
+                        myBlock._changeLabel();
+                    }
+                } else {
+                    if (!blocks.inLongPress) {
+                        var topBlock = blocks.findTopBlock(thisBlock);
+                        console.log('running from ' + blocks.blockList[topBlock].name);
+                        blocks.logo.runLogoCommands(topBlock);
+                    }
+                }
+            }
+        });
+
+        this.container.on('mousedown', function(event) {
+            // console.log('MOUSEDOWN');
+            // hideDOMLabel();
+
+            // Track time for detecting long pause...
+            // but only for top block in stack
+            if (myBlock.connections[0] == null) {
+                var d = new Date();
+                blocks.mouseDownTime = d.getTime();
+                blocks.longPressTimeout = setTimeout(function() {
+                    blocks.triggerLongPress(myBlock);
+                }, LONGPRESSTIME);
+            }
+
+            // Always show the trash when there is a block selected.
+            trashcan.show();
+
+            // Raise entire stack to the top.
+            blocks.raiseStackToTop(thisBlock);
+
+            // And possibly the collapse button.
+            if (myBlock.collapseContainer != null) {
+                blocks.stage.setChildIndex(myBlock.collapseContainer, blocks.stage.getNumChildren() - 1);
+            }
+
+            moved = false;
+            var offset = {
+                x: myBlock.container.x - Math.round(event.stageX / blocks.blockScale),
+                y: myBlock.container.y - Math.round(event.stageY / blocks.blockScale)
+            };
+
+            myBlock.container.on('mouseout', function(event) {
+                if (haveClick) {
+                    return;
+                }
+                // console.log('MOUSEOUT');
+                if (!blocks.inLongPress) {
+                    myBlock._mouseoutCallback(event, moved, haveClick, true);
+                }
+                moved = false;
+            });
+
+            myBlock.container.on('pressup', function(event) {
+                if (haveClick) {
+                    return;
+                }
+                // console.log('PRESSUP');
+                if (!blocks.inLongPress) {
+                    myBlock._mouseoutCallback(event, moved, haveClick, true);
+                }
+                moved = false;
+            });
+
+            var original = {x: event.stageX / blocks.blockScale, y: event.stageY / blocks.blockScale};
+            myBlock.container.on('pressmove', function(event) {
+                // console.log('PRESSMOVE');
+                // FIXME: More voodoo
+                event.nativeEvent.preventDefault();
+
+                // FIXME: need to remove timer
+                if (blocks.longPressTimeout != null) {
+                    clearTimeout(blocks.longPressTimeout);
+                    blocks.longPressTimeout = null;
+                }
+                if (!moved && myBlock.label != null) {
+                    myBlock.label.style.display = 'none';
+                }
+
+                if (window.hasMouse) {
+                    moved = true;
+                } else {
+                    // Make it eaiser to select text on mobile
+                    setTimeout(function () {
+                        moved = Math.abs((event.stageX / blocks.blockScale) - original.x) + Math.abs((event.stageY / blocks.blockScale) - original.y) > 20 && !window.hasMouse;
+                        getInput = !moved;
+                    }, 200);
+                }
+
+                var oldX = myBlock.container.x;
+                var oldY = myBlock.container.y;
+
+                var dx = Math.round(Math.round(event.stageX / blocks.blockScale) + offset.x - oldX);
+                var dy = Math.round(Math.round(event.stageY / blocks.blockScale) + offset.y - oldY);
+
+                // Move this block...
+                blocks.moveBlockRelative(thisBlock, dx, dy);
+
+                // If we are over the trash, warn the user.
+                if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+                    trashcan.highlight();
+                } else {
+                    trashcan.unhighlight();
+                }
+
+                if (myBlock.isValueBlock() && myBlock.name !== 'media') {
+                    // Ensure text is on top
+                    var z = myBlock.container.getNumChildren() - 1;
+                    myBlock.container.setChildIndex(myBlock.text, z);
+                } else if (myBlock.collapseContainer != null) {
+                    myBlock._positionCollapseContainer(myBlock.protoblock.scale);
+                }
+
+                // ...and move any connected blocks.
+                blocks.findDragGroup(thisBlock)
+                if (blocks.dragGroup.length > 0) {
+                    for (var b = 0; b < blocks.dragGroup.length; b++) {
+                        var blk = blocks.dragGroup[b];
+                        if (b !== 0) {
+                            blocks.moveBlockRelative(blk, dx, dy);
+                        }
+                    }
+                }
+                // if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
+                //     myBlock.blocks.adjustDocks(thisBlock);
+                // }
+                blocks.refreshCanvas();
+            });
+        });
+
+        this.container.on('mouseout', function(event) {
+            if (!blocks.inLongPress) {
+                // console.log('MOUSEOUT (OUT)');
+                myBlock._mouseoutCallback(event, moved, haveClick, true);
+            }
+            moved = false;
+        });
+
+        this.container.on('pressup', function(event) {
+            if (!blocks.inLongPress) {
+                // console.log('PRESSUP (OUT)');
+                myBlock._mouseoutCallback(event, moved, haveClick, false);
+            }
+            moved = false;
+        });
+    };
+
+    this._mouseoutCallback = function(event, moved, haveClick, hideDOM) {
+        var thisBlock = this.blocks.blockList.indexOf(this);
+        // Always hide the trash when there is no block selected.
+        // FIXME: need to remove timer
+        if (this.blocks.longPressTimeout != null) {
+            clearTimeout(this.blocks.longPressTimeout);
+            this.blocks.longPressTimeout = null;
+        }
+        trashcan.hide();
+
+        if (moved) {
+            // Check if block is in the trash.
+            if (trashcan.overTrashcan(event.stageX / this.blocks.blockScale, event.stageY / this.blocks.blockScale)) {
+                blocks.sendStackToTrash(this);
+            } else {
+                // Otherwise, process move.
+                // Keep track of time of last move
+                var d = new Date();
+                blocks.mouseDownTime = d.getTime();
+                this.blocks.blockMoved(thisBlock);
+
+                // Just incase the blocks are not properly docked after
+                // the move (workaround for issue #38 -- Blocks fly
+                // apart). Still need to get to the root cause.
+                this.blocks.loopCounter = 0;
+                // console.log('adjust Docks ' + this.name);
+                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this));
+            }
+        } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
+            if (!haveClick) {
+                // Simulate click on Android.
+                var d = new Date();
+                if ((d.getTime() - blocks.mouseDownTime) < 500) {
+                    if(!this.trash)
+                    {
+                        var d = new Date();
+                        blocks.mouseDownTime = d.getTime();
+                        if (this.name === 'media' || this.name === 'loadFile') {
+                            this._doOpenMedia(thisBlock);
+                        } else {
+                            this._changeLabel();
+                        }
+                    }
+                }
+            }
+        }
+
+        if (hideDOM) {
+            if (this.blocks.activeBlock !== thisBlock) {
+                hideDOMLabel();
+            } else {
+                this.blocks.unhighlight(null);
+                this.blocks.refreshCanvas();
+            }
+            this.blocks.activeBlock = null;
+        }
+    };
+
+    this._ensureDecorationOnTop = function() {
+        // Find the turtle decoration and move it to the top.
+        for (var child = 0; child < this.container.getNumChildren(); child++) {
+            if (this.container.children[child].name === 'decoration') {
+                // Drum block in collapsed state is less wide.
+                if (this.name === 'drum') {
+                    var bounds = this.container.getBounds();
+                    if (this.collapsed) {
+                        var dx = 25 * this.protoblock.scale / 2;
+                    } else {
+                        var dx = 0;
+                    }
+                    for (var turtle = 0; turtle < this.blocks.turtles.turtleList.length; turtle++) {
+                        if (this.blocks.turtles.turtleList[turtle].startBlock === this) {
+                            this.blocks.turtles.turtleList[turtle].decorationBitmap.x = bounds.width - dx - 50 * this.protoblock.scale / 2;
+                            break;
+                        }
+                    }
+                }
+
+                this.container.setChildIndex(this.container.children[child], this.container.getNumChildren() - 1);
+                break;
+            }
+        }
+    };
+
+    this._changeLabel = function() {
+        var myBlock = this;
+        var blocks = this.blocks;
+        var x = this.container.x;
+        var y = this.container.y;
+        var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.blockScale;
+        var canvasTop = blocks.canvas.offsetTop + 6 * blocks.blockScale;
+
+        var movedStage = false;
+        if (!window.hasMouse && blocks.stage.y + y > 75) {
+            movedStage = true;
+            var fromY = blocks.stage.y;
+            blocks.stage.y = -y + 75;
+        }
+
+        // A place in the DOM to put modifiable labels (textareas).
+        var labelValue = (this.label)?this.label.value:this.value;
+        var labelElem = docById('labelDiv');
+
+        if (this.name === 'text') {
+            var type = 'text';
+            labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
+            labelElem.classList.add('hasKeyboard');
+            this.label = docById('textLabel');
+        } else if (this.name === 'solfege') {
+            var type = 'solfege';
+            const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+            const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
+            if (this.value != null) {
+                if (SOLFNOTES.indexOf(this.value) !== -1) {
+                    var selectednote = this.value;
+                    var selectedattr = '♮';
+                } else if (this.value.slice(0, 3) === 'sol') {
+                    var selectednote = 'sol';
+                    if (this.value.length === 4) {
+                        var selectedattr = this.value[3];
+                    } else {
+                        var selectedattr = this.value[3] + this.value[3];
+                    }
+                } else {
+                    var selectednote = this.value.slice(0, 2);
+                    if (this.value.length === 3) {
+                        var selectedattr = this.value[2];
+                    } else {
+                        var selectedattr = this.value[2] + this.value[2];
+                    }
+                }
+            } else {
+                var selectednote = 'sol';
+                var selectedattr = '♮'
+            }
+
+            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
+            for (var i = 0; i < SOLFNOTES.length; i++) {
+                if (selectednote === SOLFNOTES[i]) {
+                    labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
+                } else {
+                    labelHTML += '<option value="' + SOLFNOTES[i] + '">' + SOLFNOTES[i] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
+            for (var i = 0; i < SOLFATTRS.length; i++) {
+                if (selectedattr === SOLFATTRS[i]) {
+                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
+                } else {
+                    labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('solfegeLabel');
+            this.labelattr = docById('noteattrLabel');
+        } else if (this.name === 'notename') {
+            var type = 'notename';
+            const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
+            const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
+            if (this.value != null) {
+                var selectednote = this.value[0];
+                if (this.value.length === 1) {
+                    var selectedattr = '♮';
+                } else if (this.value.length === 2) {
+                    var selectedattr = this.value[1];
+                } else {
+                    var selectedattr = this.value[1] + this.value[1];
+                }
+            } else {
+                var selectednote = 'G';
+                var selectedattr = '♮'
+            }
+
+            var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            for (var i = 0; i < NOTENOTES.length; i++) {
+                if (selectednote === NOTENOTES[i]) {
+                    labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
+                } else {
+                    labelHTML += '<option value="' + NOTENOTES[i] + '">' + NOTENOTES[i] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
+
+            for (var i = 0; i < NOTEATTRS.length; i++) {
+                if (selectedattr === NOTEATTRS[i]) {
+                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
+                } else {
+                    labelHTML += '<option value="' + NOTEATTRS[i] + '">' + NOTEATTRS[i] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('notenameLabel');
+            this.labelattr = docById('noteattrLabel');
+        } else {
+            var type = 'number';
+            labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
+            labelElem.classList.add('hasKeyboard');
+            this.label = docById('numberLabel');
+        }
+
+        var focused = false;
+        var __blur = function (event) {
+            // Not sure why the change in the input is not available
+            // immediately in FireFox. We need a workaround if hardware
+            // acceleration is enabled.
+
+            if (!focused) {
+                return;
+            }
+            this._labelChanged();
+
+            event.preventDefault();
+
+            labelElem.classList.remove('hasKeyboard');
+
+            window.scroll(0, 0);
+            myBlock.label.removeEventListener('keypress', keypress);
+
+            if (movedStage) {
+                blocks.stage.y = fromY;
+                blocks.updateStage();
+            }
+        };
+
+        if (this.name === 'text' || this.name === 'number') {
+            this.label.addEventListener('blur', __blur);
+        }
+
+        var __keypress = function (event) {
+            if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
+                __blur(event);
+            }
+        };
+
+        this.label.addEventListener('keypress', __keypress);
+
+        this.label.addEventListener('change', function() {
+            this._labelChanged();
+        });
+
+        if (this.labelattr != null) {
+            this.labelattr.addEventListener('change', function() {
+                this._labelChanged();
+            });
+        }
+
+        this.label.style.left = Math.round((x + blocks.stage.x) * blocks.blockScale + canvasLeft) + 'px';
+        this.label.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
+
+        // There may be a second select used for # and b.
+        if (this.labelattr != null) {
+            this.label.style.width = Math.round(60 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            this.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * blocks.blockScale + canvasLeft) + 'px';
+            this.labelattr.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
+            this.labelattr.style.width = Math.round(60 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            this.labelattr.style.fontSize = Math.round(20 * blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        } else {
+            this.label.style.width = Math.round(100 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+        }
+
+        this.label.style.fontSize = Math.round(20 * blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        this.label.style.display = '';
+        this.label.focus();
+
+        // Firefox fix
+        setTimeout(function () {
+            myBlock.label.style.display = '';
+            myBlock.label.focus();
+            focused = true;
+        }, 100);
+    };
+
+    this._labelChanged = function() {
+        // Update the block values as they change in the DOM label.
+        if (this == null) {
+            return;
+        }
+
+        this.label.style.display = 'none';
+        if (this.labelattr != null) {
+            this.labelattr.style.display = 'none';
+        }
+
+        var oldValue = this.value;
+        var newValue = this.label.value;
+
+        if (this.labelattr != null) {
+            var attrValue = this.labelattr.value;
+            switch (attrValue) {
+            case '♯♯':
+            case '♯':
+            case '♭♭':
+            case '♭':
+                newValue = newValue + attrValue;
+                break;
+            default:
+                break;
+            }
+        }
+        if (oldValue === newValue) {
+            // Nothing to do in this case.
+            return;
+        }
+
+        // Update the block value and block text.
+        if (this.name === 'number') {
+            this.value = Number(newValue);
+            if (isNaN(this.value)) {
+                var thisBlock = this.blocks.blockList.indexOf(this);
+                this.blocks.errorMsg(newValue + ': Not a number', thisBlock);
+                this.blocks.refreshCanvas();
+                this.value = oldValue;
+            }
+        } else {
+            this.value = newValue;
+        }
+
+        var label = this.value.toString();
+        if (label.length > 8) {
+            label = label.substr(0, 7) + '...';
+        }
+        this.text.text = label;
+
+        // and hide the DOM textview...
+        this.label.style.display = 'none';
+
+        // Make sure text is on top.
+        var z = this.container.getNumChildren() - 1;
+        this.container.setChildIndex(this.text, z);
+        this.updateCache();
+
+        var c = this.connections[0];
+        if (this.name === 'text' && c != null) {
+            var cblock = this.blocks.blockList[c];
+            switch (cblock.name) {
+            case 'action':
+                // If the label was the name of an action, update the
+                // associated run this.blocks and the palette buttons
+                // Rename both do <- name and nameddo blocks.
+                this.blocks.renameDos(oldValue, newValue);
+                if (oldValue === _('action')) {
+                    this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+                }
+                this.blocks.renameNameddos(oldValue, newValue);
+                this.blocks.palettes.updatePalettes('actions');
+                break;
+            case 'storein':
+                // If the label was the name of a storein, update the
+                //associated box this.blocks and the palette buttons
+                if (this.value !== 'box') {
+                    this.blocks.newStoreinBlock(this.value);
+                    this.blocks.newNamedboxBlock(this.value);
+                }
+                // Rename both box <- name and namedbox blocks.
+                this.blocks.renameBoxes(oldValue, newValue);
+                this.blocks.renameNamedboxes(oldValue, newValue);
+                this.blocks.palettes.updatePalettes('boxes');
+                break;
+            default:
+                break;
+            }
+        }
     };
 };
 
@@ -933,225 +1730,6 @@ function $() {
 };
 
 
-function positionText(myBlock, blockScale) {
-    myBlock.text.textBaseline = 'alphabetic';
-    myBlock.text.textAlign = 'right';
-    var fontSize = 10 * blockScale;
-    myBlock.text.font = fontSize + 'px Sans';
-    myBlock.text.x = TEXTX * blockScale / 2.;
-    myBlock.text.y = TEXTY * blockScale / 2.;
-
-    // Some special cases
-    if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) !== -1) {
-        myBlock.text.textAlign = 'center';
-        myBlock.text.x = VALUETEXTX * blockScale / 2.;
-    } else if (myBlock.protoblock.args === 0) {
-        var bounds = myBlock.container.getBounds();
-        myBlock.text.x = bounds.width - 25;
-    } else {
-        myBlock.text.textAlign = 'left';
-        if (myBlock.docks[0][2] === 'booleanout') {
-             myBlock.text.y = myBlock.docks[0][1];
-        }
-    }
-
-    // Ensure text is on top.
-    z = myBlock.container.getNumChildren() - 1;
-    myBlock.container.setChildIndex(myBlock.text, z);
-    myBlock.updateCache();
-};
-
-
-function positionMedia(bitmap, myBlock, width, height, blockScale) {
-    if (width > height) {
-        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
-    } else {
-        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / height * blockScale / 2;
-    }
-    bitmap.x = (MEDIASAFEAREA[0] - 10) * blockScale / 2;
-    bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
-};
-
-
-function calculateCollapseHitArea(myBlock) {
-    var bounds = myBlock.collapseContainer.getBounds();
-    var hitArea = new createjs.Shape();
-    var w2 = bounds.width;
-    var h2 = bounds.height;
-    hitArea.graphics.beginFill('#FFF').drawEllipse(-w2 / 2, -h2 / 2, w2, h2);
-    hitArea.x = w2 / 2;
-    hitArea.y = h2 / 2;
-    myBlock.collapseContainer.hitArea = hitArea;
-};
-
-
-function positionCollapseLabel(myBlock, blockScale) {
-    myBlock.collapseText.x = COLLAPSETEXTX * blockScale / 2;
-    myBlock.collapseText.y = COLLAPSETEXTY * blockScale / 2;
-
-    // Ensure text is on top.
-    z = myBlock.container.getNumChildren() - 1;
-    myBlock.container.setChildIndex(myBlock.collapseText, z);
-};
-
-
-function positionCollapseContainer(myBlock, blockScale) {
-    myBlock.collapseContainer.x = myBlock.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2);
-    myBlock.collapseContainer.y = myBlock.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2);
-};
-
-
-// These are the event handlers for collapsible blocks.
-function loadCollapsibleEventHandlers(myBlock) {
-    var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
-    calculateCollapseHitArea(myBlock);
-
-    myBlock.collapseContainer.on('mouseover', function(event) {
-        myBlock.blocks.highlight(thisBlock, true);
-        myBlock.blocks.activeBlock = thisBlock;
-        myBlock.blocks.refreshCanvas();
-    });
-
-    var moved = false;
-    var locked = false;
-    var mousedown = false;
-    var offset = {x:0, y:0};
-
-    function handleClick () {
-        if (locked) {
-            return;
-        }
-        locked = true;
-        setTimeout(function() {
-            locked = false;
-        }, 500);
-        hideDOMLabel();
-        if (!moved) {
-            myBlock.collapseToggle();
-        }
-    }
-
-    myBlock.collapseContainer.on('click', function(event) {
-        handleClick();
-    });
-
-    myBlock.collapseContainer.on('mousedown', function(event) {
-        hideDOMLabel();
-        // Always show the trash when there is a block selected.
-        trashcan.show();
-        moved = false;
-        mousedown = true;
-        var d = new Date();
-        blocks.mouseDownTime = d.getTime();
-        offset = {
-            x: myBlock.collapseContainer.x - Math.round(event.stageX / myBlock.blocks.blockScale),
-            y: myBlock.collapseContainer.y - Math.round(event.stageY / myBlock.blocks.blockScale)
-        };
-
-    });
-
-    myBlock.collapseContainer.on('pressup', function(event) {
-        if (!mousedown) {
-            // console.log('pressup w/o mouse down?');
-            return;
-        }
-        mousedown = false;
-        if (moved) {
-            collapseOut(blocks, myBlock, thisBlock, moved, event);
-            moved = false;
-        } else {
-            var d = new Date();
-            if ((d.getTime() - blocks.mouseDownTime) > 1000) {
-                var d = new Date();
-                blocks.mouseDownTime = d.getTime();
-                handleClick();
-            }
-        }
-    });
-
-    myBlock.collapseContainer.on('mouseout', function(event) {
-        if (!mousedown) {
-            // console.log('mouseout w/o mouse down?');
-            return;
-        }
-        mousedown = false;
-        if (moved) {
-            collapseOut(blocks, myBlock, thisBlock, moved, event);
-            moved = false;
-        } else {
-            // Maybe restrict to Android?
-            var d = new Date();
-            // var diff = (d.getTime() - blocks.mouseDownTime);
-            // console.log(diff);
-            if ((d.getTime() - blocks.mouseDownTime) < 200) {
-                var d = new Date();
-                blocks.mouseDownTime = d.getTime();
-                handleClick();
-            }
-        }
-    });
-
-    myBlock.collapseContainer.on('pressmove', function(event) {
-        if (!mousedown) {
-            // console.log('pressmove w/o mouse down?');
-            return;
-        }
-        moved = true;
-        var oldX = myBlock.collapseContainer.x;
-        var oldY = myBlock.collapseContainer.y;
-        myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.blockScale) + offset.x;
-        myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.blockScale) + offset.y;
-        var dx = myBlock.collapseContainer.x - oldX;
-        var dy = myBlock.collapseContainer.y - oldY;
-        myBlock.container.x += dx;
-        myBlock.container.y += dy;
-
-        // If we are over the trash, warn the user.
-        if (trashcan.overTrashcan(event.stageX / myBlock.blocks.blockScale, event.stageY / myBlock.blocks.blockScale)) {
-            trashcan.highlight();
-        } else {
-            trashcan.unhighlight();
-        }
-
-        myBlock.blocks.findDragGroup(thisBlock)
-        if (myBlock.blocks.dragGroup.length > 0) {
-            for (var b = 0; b < myBlock.blocks.dragGroup.length; b++) {
-                var blk = myBlock.blocks.dragGroup[b];
-                if (b !== 0) {
-                    myBlock.blocks.moveBlockRelative(blk, dx, dy);
-                }
-            }
-        }
-
-        myBlock.blocks.refreshCanvas();
-    });
-};
-
-
-function collapseOut(blocks, myBlock, thisBlock, moved, event) {
-    // Always hide the trash when there is no block selected.
-    trashcan.hide();
-    blocks.unhighlight(thisBlock);
-    if (moved) {
-        // Check if block is in the trash.
-        if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
-            blocks.sendStackToTrash(myBlock);
-        } else {
-            // Otherwise, process move.
-            blocks.blockMoved(thisBlock);
-        }
-    }
-
-    if (blocks.activeBlock !== myBlock) {
-        return;
-    }
-
-    blocks.unhighlight(null);
-    blocks.activeBlock = null;
-    blocks.refreshCanvas();
-};
-
-
 window.hasMouse = false;
 // Mousemove is not emulated for touch
 document.addEventListener('mousemove', function (e) {
@@ -1159,306 +1737,7 @@ document.addEventListener('mousemove', function (e) {
 });
 
 
-function calculateBlockHitArea(myBlock) {
-    var hitArea = new createjs.Shape();
-    var bounds = myBlock.container.getBounds()
-
-    // Only detect hits on top section of block.
-    if (myBlock.isClampBlock() || myBlock.isArgClamp()) {
-        hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT);
-    } else if (myBlock.isNoHitBlock()) {
-        // No hit area
-        hitArea.graphics.beginFill('#FFF').drawRect(0, 0, 0, 0);
-    } else {
-        // Shrinking the height makes it easier to grab blocks below
-        // in the stack.
-        hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
-    }
-    myBlock.container.hitArea = hitArea;
-};
-
-
-// These are the event handlers for block containers.
-function loadEventHandlers(myBlock) {
-    var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
-    var blocks = myBlock.blocks;
-
-    calculateBlockHitArea(myBlock);
-
-    myBlock.container.on('mouseover', function(event) {
-        blocks.highlight(thisBlock, true);
-        // blocks.activeBlock = thisBlock;
-        blocks.refreshCanvas();
-    });
-
-    var haveClick = false;
-    var moved = false;
-    var locked = false;
-    var getInput = window.hasMouse;
-
-    myBlock.container.on('click', function(event) {
-        // console.log('CLICK');
-        blocks.activeBlock = thisBlock;
-        haveClick = true;
-
-        if (locked) {
-            return;
-        }
-        locked = true;
-        setTimeout(function() {
-            locked = false;
-        }, 500);
-
-        hideDOMLabel();
-
-        if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
-            if (blocks.selectingStack) {
-                var topBlock = blocks.findTopBlock(thisBlock);
-                blocks.selectedStack = topBlock;
-                blocks.selectingStack = false;
-            } else if (myBlock.name === 'media') {
-                myBlock.doOpenMedia(myBlock, thisBlock);
-            } else if (myBlock.name === 'loadFile') {
-                myBlock.doOpenMedia(myBlock, thisBlock);
-            } else if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) !== -1) {
-                if(!myBlock.trash)
-                {
-                    changeLabel(myBlock);
-                }
-            } else {
-                if (!blocks.inLongPress) {
-                    var topBlock = blocks.findTopBlock(thisBlock);
-                    console.log('running from ' + blocks.blockList[topBlock].name);
-                    blocks.logo.runLogoCommands(topBlock);
-                }
-            }
-        }
-    });
-
-    myBlock.container.on('mousedown', function(event) {
-        // console.log('MOUSEDOWN');
-        // hideDOMLabel();
-
-        // Track time for detecting long pause...
-        // but only for top block in stack
-        if (myBlock.connections[0] == null) {
-            var d = new Date();
-            blocks.mouseDownTime = d.getTime();
-            blocks.longPressTimeout = setTimeout(function() {
-                blocks.triggerLongPress(myBlock);
-            }, LONGPRESSTIME);
-        }
-
-        // Always show the trash when there is a block selected.
-        trashcan.show();
-
-        // Raise entire stack to the top.
-        blocks.raiseStackToTop(thisBlock);
-
-        // And possibly the collapse button.
-        if (myBlock.collapseContainer != null) {
-            blocks.stage.setChildIndex(myBlock.collapseContainer, blocks.stage.getNumChildren() - 1);
-        }
-
-        moved = false;
-        var offset = {
-            x: myBlock.container.x - Math.round(event.stageX / blocks.blockScale),
-            y: myBlock.container.y - Math.round(event.stageY / blocks.blockScale)
-        };
-
-        myBlock.container.on('mouseout', function(event) {
-            if (haveClick) {
-               return;
-            }
-            // console.log('MOUSEOUT');
-            if (!blocks.inLongPress) {
-                mouseoutCallback(myBlock, event, moved, haveClick, true);
-            }
-            moved = false;
-        });
-
-        myBlock.container.on('pressup', function(event) {
-            if (haveClick) {
-               return;
-            }
-            // console.log('PRESSUP');
-            if (!blocks.inLongPress) {
-                mouseoutCallback(myBlock, event, moved, haveClick, true);
-            }
-            moved = false;
-        });
-
-        var original = {x: event.stageX / blocks.blockScale, y: event.stageY / blocks.blockScale};
-        myBlock.container.on('pressmove', function(event) {
-            // console.log('PRESSMOVE');
-            // FIXME: More voodoo
-            event.nativeEvent.preventDefault();
-
-            // FIXME: need to remove timer
-            if (blocks.longPressTimeout != null) {
-                clearTimeout(blocks.longPressTimeout);
-                blocks.longPressTimeout = null;
-            }
-            if (!moved && myBlock.label != null) {
-                myBlock.label.style.display = 'none';
-            }
-
-            if (window.hasMouse) {
-                moved = true;
-            } else {
-                // Make it eaiser to select text on mobile
-                setTimeout(function () {
-                    moved = Math.abs((event.stageX / blocks.blockScale) - original.x) + Math.abs((event.stageY / blocks.blockScale) - original.y) > 20 && !window.hasMouse;
-                    getInput = !moved;
-                }, 200);
-            }
-
-            var oldX = myBlock.container.x;
-            var oldY = myBlock.container.y;
-
-            var dx = Math.round(Math.round(event.stageX / blocks.blockScale) + offset.x - oldX);
-            var dy = Math.round(Math.round(event.stageY / blocks.blockScale) + offset.y - oldY);
-
-            // Move this block...
-            blocks.moveBlockRelative(thisBlock, dx, dy);
-
-            // If we are over the trash, warn the user.
-            if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
-                trashcan.highlight();
-            } else {
-                trashcan.unhighlight();
-            }
-
-            if (myBlock.isValueBlock() && myBlock.name !== 'media') {
-                // Ensure text is on top
-                var z = myBlock.container.getNumChildren() - 1;
-                myBlock.container.setChildIndex(myBlock.text, z);
-            } else if (myBlock.collapseContainer != null) {
-                positionCollapseContainer(myBlock, myBlock.protoblock.scale);
-            }
-
-            // ...and move any connected blocks.
-            blocks.findDragGroup(thisBlock)
-            if (blocks.dragGroup.length > 0) {
-                for (var b = 0; b < blocks.dragGroup.length; b++) {
-                    var blk = blocks.dragGroup[b];
-                    if (b !== 0) {
-                        blocks.moveBlockRelative(blk, dx, dy);
-                    }
-                }
-            }
-            // if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
-            //     myBlock.blocks.adjustDocks(thisBlock);
-            // }
-            blocks.refreshCanvas();
-        });
-    });
-
-    myBlock.container.on('mouseout', function(event) {
-        if (!blocks.inLongPress) {
-            // console.log('MOUSEOUT (OUT)');
-            mouseoutCallback(myBlock, event, moved, haveClick, true);
-        }
-        moved = false;
-    });
-
-    myBlock.container.on('pressup', function(event) {
-        if (!blocks.inLongPress) {
-            // console.log('PRESSUP (OUT)');
-            mouseoutCallback(myBlock, event, moved, haveClick, false);
-        }
-        moved = false;
-    });
-};
-
-
-function mouseoutCallback(myBlock, event, moved, haveClick, hideDOM) {
-    var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
-    // Always hide the trash when there is no block selected.
-    // FIXME: need to remove timer
-    if (myBlock.blocks.longPressTimeout != null) {
-        clearTimeout(myBlock.blocks.longPressTimeout);
-        myBlock.blocks.longPressTimeout = null;
-    }
-    trashcan.hide();
-
-    if (moved) {
-        // Check if block is in the trash.
-        if (trashcan.overTrashcan(event.stageX / myBlock.blocks.blockScale, event.stageY / myBlock.blocks.blockScale)) {
-            blocks.sendStackToTrash(myBlock);
-        } else {
-            // Otherwise, process move.
-            // Keep track of time of last move
-            var d = new Date();
-            blocks.mouseDownTime = d.getTime();
-            myBlock.blocks.blockMoved(thisBlock);
-
-            // Just incase the blocks are not properly docked after
-            // the move (workaround for issue #38 -- Blocks fly
-            // apart). Still need to get to the root cause.
-            myBlock.blocks.loopCounter = 0;
-            // console.log('adjust Docks ' + myBlock.name);
-            myBlock.blocks.adjustDocks(myBlock.blocks.blockList.indexOf(myBlock));
-        }
-    } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(myBlock.name) !== -1) {
-        if (!haveClick) {
-            // Simulate click on Android.
-            var d = new Date();
-            if ((d.getTime() - blocks.mouseDownTime) < 500) {
-                if(!myBlock.trash)
-                {
-                    var d = new Date();
-                    blocks.mouseDownTime = d.getTime();
-                    if (myBlock.name === 'media' || myBlock.name === 'loadFile') {
-                        myBlock.doOpenMedia(myBlock, thisBlock);
-                    } else {
-                        changeLabel(myBlock);
-                    }
-                }
-            }
-        }
-    }
-
-    if (hideDOM) {
-        if (myBlock.blocks.activeBlock !== thisBlock) {
-            hideDOMLabel();
-        } else {
-            myBlock.blocks.unhighlight(null);
-            myBlock.blocks.refreshCanvas();
-        }
-        myBlock.blocks.activeBlock = null;
-    }
-};
-
-
-function ensureDecorationOnTop(myBlock) {
-    // Find the turtle decoration and move it to the top.
-    for (var child = 0; child < myBlock.container.getNumChildren(); child++) {
-        if (myBlock.container.children[child].name === 'decoration') {
-            // Drum block in collapsed state is less wide.
-            if (myBlock.name === 'drum') {
-                var bounds = myBlock.container.getBounds();
-                if (myBlock.collapsed) {
-                    var dx = 25 * myBlock.protoblock.scale / 2;
-                } else {
-                    var dx = 0;
-                }
-                for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
-                    if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
-                        myBlock.blocks.turtles.turtleList[turtle].decorationBitmap.x = bounds.width - dx - 50 * myBlock.protoblock.scale / 2;
-                      break;
-                    }
-                }
-            }
-
-            myBlock.container.setChildIndex(myBlock.container.children[child], myBlock.container.getNumChildren() - 1);
-            break;
-        }
-    }
-};
-
-
-function makeBitmap(data, name, callback, args) {
+function _makeBitmap(data, name, callback, args) {
     // Async creation of bitmap from SVG data
     // Works with Chrome, Safari, Firefox (untested on IE)
     var img = new Image();
@@ -1469,287 +1748,4 @@ function makeBitmap(data, name, callback, args) {
 
     img.src = 'data:image/svg+xml;base64,' + window.btoa(
         unescape(encodeURIComponent(data)));
-};
-
-
-function changeLabel(myBlock) {
-    var blocks = myBlock.blocks;
-    var x = myBlock.container.x;
-    var y = myBlock.container.y;
-    var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.blockScale;
-    var canvasTop = blocks.canvas.offsetTop + 6 * blocks.blockScale;
-
-    var movedStage = false;
-    if (!window.hasMouse && blocks.stage.y + y > 75) {
-        movedStage = true;
-        var fromY = blocks.stage.y;
-        blocks.stage.y = -y + 75;
-    }
-
-    // A place in the DOM to put modifiable labels (textareas).
-    var labelValue = (myBlock.label)?myBlock.label.value:myBlock.value;
-    var labelElem = docById('labelDiv');
-
-    if (myBlock.name === 'text') {
-        var type = 'text';
-        labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
-        labelElem.classList.add('hasKeyboard');
-        myBlock.label = docById('textLabel');
-    } else if (myBlock.name === 'solfege') {
-        var type = 'solfege';
-        const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
-        const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
-        if (myBlock.value != null) {
-            if (SOLFNOTES.indexOf(myBlock.value) !== -1) {
-                var selectednote = myBlock.value;
-                var selectedattr = '♮';
-            } else if (myBlock.value.slice(0, 3) === 'sol') {
-                var selectednote = 'sol';
-                if (myBlock.value.length === 4) {
-                    var selectedattr = myBlock.value[3];
-                } else {
-                    var selectedattr = myBlock.value[3] + myBlock.value[3];
-                }
-            } else {
-                var selectednote = myBlock.value.slice(0, 2);
-                if (myBlock.value.length === 3) {
-                    var selectedattr = myBlock.value[2];
-                } else {
-                    var selectedattr = myBlock.value[2] + myBlock.value[2];
-                }
-            }
-        } else {
-            var selectednote = 'sol';
-            var selectedattr = '♮'
-        }
-        var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
-        for (var i = 0; i < SOLFNOTES.length; i++) {
-            if (selectednote === SOLFNOTES[i]) {
-                labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
-            } else {
-                labelHTML += '<option value="' + SOLFNOTES[i] + '">' + SOLFNOTES[i] + '</option>';
-            }
-        }
-       labelHTML += '</select>';
-        labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-        for (var i = 0; i < SOLFATTRS.length; i++) {
-            if (selectedattr === SOLFATTRS[i]) {
-                labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-            } else {
-                labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
-            }
-        }
-        labelHTML += '</select>';
-        labelElem.innerHTML = labelHTML;
-        myBlock.label = docById('solfegeLabel');
-        myBlock.labelattr = docById('noteattrLabel');
-    } else if (myBlock.name === 'notename') {
-        var type = 'notename';
-        const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
-        const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
-        if (myBlock.value != null) {
-            var selectednote = myBlock.value[0];
-            if (myBlock.value.length === 1) {
-                var selectedattr = '♮';
-            } else if (myBlock.value.length === 2) {
-                var selectedattr = myBlock.value[1];
-            } else {
-                var selectedattr = myBlock.value[1] + myBlock.value[1];
-            }
-        } else {
-            var selectednote = 'G';
-            var selectedattr = '♮'
-        }
-        var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
-        for (var i = 0; i < NOTENOTES.length; i++) {
-            if (selectednote === NOTENOTES[i]) {
-                labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
-            } else {
-                labelHTML += '<option value="' + NOTENOTES[i] + '">' + NOTENOTES[i] + '</option>';
-            }
-        }
-        labelHTML += '</select>';
-        labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
-        for (var i = 0; i < NOTEATTRS.length; i++) {
-            if (selectedattr === NOTEATTRS[i]) {
-                labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
-            } else {
-                labelHTML += '<option value="' + NOTEATTRS[i] + '">' + NOTEATTRS[i] + '</option>';
-            }
-        }
-        labelHTML += '</select>';
-        labelElem.innerHTML = labelHTML;
-        myBlock.label = docById('notenameLabel');
-        myBlock.labelattr = docById('noteattrLabel');
-    } else {
-        var type = 'number';
-        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
-        labelElem.classList.add('hasKeyboard');
-        myBlock.label = docById('numberLabel');
-    }
-
-    var focused = false;
-    var blur = function (event) {
-        // Not sure why the change in the input is not available
-        // immediately in FireFox. We need a workaround if hardware
-        // acceleration is enabled.
-
-        if (!focused) {
-            return;
-        }
-        labelChanged(myBlock);
-
-        event.preventDefault();
-
-        labelElem.classList.remove('hasKeyboard');
-
-        window.scroll(0, 0);
-        myBlock.label.removeEventListener('keypress', keypress);
-
-        if (movedStage) {
-            blocks.stage.y = fromY;
-            blocks.updateStage();
-        }
-    };
-
-    if (myBlock.name === 'text' || myBlock.name === 'number') {
-        myBlock.label.addEventListener('blur', blur);
-    }
-
-    var keypress = function (event) {
-        if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
-            blur(event);
-        }
-    };
-    myBlock.label.addEventListener('keypress', keypress);
-
-    myBlock.label.addEventListener('change', function() {
-        labelChanged(myBlock);
-    });
-
-    if (myBlock.labelattr != null) {
-        myBlock.labelattr.addEventListener('change', function() {
-            labelChanged(myBlock);
-        });
-    }
-
-    myBlock.label.style.left = Math.round((x + blocks.stage.x) * blocks.blockScale + canvasLeft) + 'px';
-    myBlock.label.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
-    // There may be a second select used for # and b.
-    if (myBlock.labelattr != null) {
-        myBlock.label.style.width = Math.round(60 * blocks.blockScale) * myBlock.protoblock.scale / 2 + 'px';
-        myBlock.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * blocks.blockScale + canvasLeft) + 'px';
-        myBlock.labelattr.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
-        myBlock.labelattr.style.width = Math.round(60 * blocks.blockScale) * myBlock.protoblock.scale / 2 + 'px';
-        myBlock.labelattr.style.fontSize = Math.round(20 * blocks.blockScale * myBlock.protoblock.scale / 2) + 'px';
-    } else {
-        myBlock.label.style.width = Math.round(100 * blocks.blockScale) * myBlock.protoblock.scale / 2 + 'px';
-    }
-    myBlock.label.style.fontSize = Math.round(20 * blocks.blockScale * myBlock.protoblock.scale / 2) + 'px';
-    myBlock.label.style.display = '';
-    myBlock.label.focus();
-
-    // Firefox fix
-    setTimeout(function () {
-        myBlock.label.style.display = '';
-        myBlock.label.focus();
-        focused = true;
-    }, 100);
-};
-
-
-function labelChanged(myBlock) {
-    // Update the block values as they change in the DOM label.
-    if (myBlock == null) {
-        return;
-    }
-
-    myBlock.label.style.display = 'none';
-    if (myBlock.labelattr != null) {
-        myBlock.labelattr.style.display = 'none';
-    }
-
-    var oldValue = myBlock.value;
-    var newValue = myBlock.label.value;
-
-    if (myBlock.labelattr != null) {
-        var attrValue = myBlock.labelattr.value;
-        switch (attrValue) {
-        case '♯♯':
-        case '♯':
-        case '♭♭':
-        case '♭':
-            newValue = newValue + attrValue;
-            break;
-        default:
-            break;
-        }
-    }
-    if (oldValue === newValue) {
-        // Nothing to do in this case.
-        return;
-    }
-
-    // Update the block value and block text.
-    if (myBlock.name === 'number') {
-        myBlock.value = Number(newValue);
-        if (isNaN(myBlock.value)) {
-            var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
-            myBlock.blocks.errorMsg(newValue + ': Not a number', thisBlock);
-            myBlock.blocks.refreshCanvas();
-            myBlock.value = oldValue;
-        }
-    } else {
-        myBlock.value = newValue;
-    }
-
-    var label = myBlock.value.toString();
-    if (label.length > 8) {
-        label = label.substr(0, 7) + '...';
-    }
-    myBlock.text.text = label;
-
-    // and hide the DOM textview...
-    myBlock.label.style.display = 'none';
-
-    // Make sure text is on top.
-    var z = myBlock.container.getNumChildren() - 1;
-    myBlock.container.setChildIndex(myBlock.text, z);
-    myBlock.updateCache();
-
-    var c = myBlock.connections[0];
-    if (myBlock.name === 'text' && c != null) {
-        var cblock = myBlock.blocks.blockList[c];
-        // console.log('Label changed to: ' + myBlock.value);
-        switch (cblock.name) {
-        case 'action':
-            // If the label was the name of an action, update the
-            // associated run myBlock.blocks and the palette buttons
-            // Rename both do <- name and nameddo blocks.
-            console.log('renameDos and...');
-            myBlock.blocks.renameDos(oldValue, newValue);
-            if (oldValue === _('action')) {
-                console.log('and newNameddoBlock...');
-                myBlock.blocks.newNameddoBlock(newValue, myBlock.blocks.actionHasReturn(c), myBlock.blocks.actionHasArgs(c));
-            }
-            console.log('renameNameddos.');
-            myBlock.blocks.renameNameddos(oldValue, newValue);
-            myBlock.blocks.palettes.updatePalettes('actions');
-            break;
-        case 'storein':
-            // If the label was the name of a storein, update the
-            //associated box myBlock.blocks and the palette buttons
-            if (myBlock.value !== 'box') {
-                myBlock.blocks.newStoreinBlock(myBlock.value);
-                myBlock.blocks.newNamedboxBlock(myBlock.value);
-            }
-            // Rename both box <- name and namedbox blocks.
-            myBlock.blocks.renameBoxes(oldValue, newValue);
-            myBlock.blocks.renameNamedboxes(oldValue, newValue);
-            myBlock.blocks.palettes.updatePalettes('boxes');
-            break;
-        default:
-            break;
-        }
-    }
 };
