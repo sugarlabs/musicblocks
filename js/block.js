@@ -184,6 +184,7 @@ function Block(protoblock, blocks, overrideName) {
     this.resize = function(blockScale) {
         // If the block scale changes, we need to regenerate the
         // artwork and recalculate the hitarea.
+
         this._postProcess = function(myBlock) {
             if (myBlock.imageBitmap != null) {
                 myBlock._positionMedia(myBlock.imageBitmap, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, blockScale);
@@ -1558,14 +1559,14 @@ function Block(protoblock, blocks, overrideName) {
             if (!focused) {
                 return;
             }
-            this._labelChanged();
+            myBlock._labelChanged();
 
             event.preventDefault();
 
             labelElem.classList.remove('hasKeyboard');
 
             window.scroll(0, 0);
-            myBlock.label.removeEventListener('keypress', keypress);
+            myBlock.label.removeEventListener('keypress', __keypress);
 
             if (movedStage) {
                 blocks.stage.y = fromY;
@@ -1586,12 +1587,12 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function() {
-            this._labelChanged();
+            myBlock._labelChanged();
         });
 
         if (this.labelattr != null) {
             this.labelattr.addEventListener('change', function() {
-                this._labelChanged();
+                myBlock._labelChanged();
             });
         }
 
