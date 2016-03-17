@@ -8,16 +8,17 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+//
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
+const COLLAPSABLES = ['start', 'action'];
 const NOHIT = ['hidden'];
 
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
-    if (protoblock == null) {
+    if (protoblock === null) {
         console.log('null protoblock sent to Block');
         return;
     }
@@ -27,9 +28,8 @@ function Block(protoblock, blocks, overrideName) {
     this.blocks = blocks;
     this.collapsed = false; // Is this block in a collapsed stack?
     this.trash = false; // Is this block in the trash?
-    this._loadComplete = false; // Has the block finished loading?
+    this.loadComplete = false; // Has the block finished loading?
     this.label = null; // Editable textview in DOM.
-    this.labelattr = null;  // Secondary select in DOM.
     this.text = null; // A dynamically generated text label on block itself.
     this.value = null; // Value for number, text, and media blocks.
     this.privateData = null; // A block may have some private data,
@@ -65,8 +65,8 @@ function Block(protoblock, blocks, overrideName) {
     this.argClampSlots = [1];
 
     // Some blocks have some post process after they are first loaded.
-    this._postProcess = null;
-    this._postProcessArg = null;
+    this.postProcess = null;
+    this.postProcessArg = null;
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
@@ -113,7 +113,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.highlight = function() {
-        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
+        if (this.collapsed && ['start', 'action'].indexOf(this.name) !== -1) {
             // We may have a race condition.
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = true;
@@ -125,17 +125,17 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = false;
             this.highlightBitmap.visible = true;
-            if (COLLAPSABLES.indexOf(this.name) !== -1) {
+            if (['start', 'action'].indexOf(this.name) !== -1) {
                 // There could be a race condition when making a
                 // new action block.
                 if (this.highlightCollapseBlockBitmap) {
-                    if (this.collapseText != null) {
+                    if (this.collapseText !== null) {
                         this.collapseText.visible = false;
                     }
-                    if (this.collapseBlockBitmap.visible != null) {
+                    if (this.collapseBlockBitmap.visible !== null) {
                         this.collapseBlockBitmap.visible = false;
                     }
-                    if (this.highlightCollapseBlockBitmap.visible != null) {
+                    if (this.highlightCollapseBlockBitmap.visible !== null) {
                         this.highlightCollapseBlockBitmap.visible = false;
                     }
                 }
@@ -145,7 +145,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.unhighlight = function() {
-        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
+        if (this.collapsed && ['start', 'action'].indexOf(this.name) !== -1) {
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = false;
                 this.collapseBlockBitmap.visible = true;
@@ -156,7 +156,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = true;
             this.highlightBitmap.visible = false;
-            if (COLLAPSABLES.indexOf(this.name) !== -1) {
+            if (['start', 'action'].indexOf(this.name) !== -1) {
                 if (this.highlightCollapseBlockBitmap) {
                     this.highlightCollapseBlockBitmap.visible = false;
                     this.collapseBlockBitmap.visible = false;
@@ -170,33 +170,34 @@ function Block(protoblock, blocks, overrideName) {
     this.updateArgSlots = function(slotList) {
         // Resize and update number of slots in argClamp
         this.argClampSlots = slotList;
-        this._newArtwork();
+        this.newArtwork();
         this.regenerateArtwork(false);
     };
 
     this.updateSlots = function(clamp, plusMinus) {
         // Resize an expandable block.
         this.clampCount[clamp] += plusMinus;
-        this._newArtwork(plusMinus);
+        this.newArtwork(plusMinus);
         this.regenerateArtwork(false);
     };
 
-    this.resize = function(blockScale) {
+    this.resize = function(scale) {
         // If the block scale changes, we need to regenerate the
         // artwork and recalculate the hitarea.
+        var myBlock = this;
 
-        this._postProcess = function(myBlock) {
-            if (myBlock.imageBitmap != null) {
-                myBlock._positionMedia(myBlock.imageBitmap, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, blockScale);
+        this.postProcess = function(args) {
+            if (myBlock.imageBitmap !== null) {
+                myBlock._positionMedia(myBlock.imageBitmap, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, scale);
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
 
-            if (myBlock.name === 'start' || myBlock.name === 'drum') {
+            if (myBlock.name === 'start') {
                 // Rescale the decoration on the start blocks.
                 for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
-                        myBlock.blocks.turtles.turtleList[turtle].resizeDecoration(blockScale, myBlock.bitmap.image.width);
+                        myBlock.blocks.turtles.turtleList[turtle].resizeDecoration(scale, myBlock.bitmap.image.width);
                         myBlock._ensureDecorationOnTop();
                         break;
                     }
@@ -206,44 +207,45 @@ function Block(protoblock, blocks, overrideName) {
             myBlock._calculateBlockHitArea();
         };
 
-        this.protoblock.scale = blockScale;
-        this._newArtwork(0);
+        this.postProcessArg = null;
+
+        this.protoblock.scale = scale;
+        this.newArtwork(0);
         this.regenerateArtwork(true, []);
 
-        if (this.text != null) {
-            this._positionText(blockScale);
+        if (this.text !== null) {
+            this._positionText(scale);
         }
 
-        if (this.collapseContainer != null) {
+        if (this.collapseContainer !== null) {
             this.collapseContainer.uncache();
-            var __postProcess = function(myBlock) {
-                myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = blockScale / 2;
-                myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = blockScale / 2;
+            var postProcess = function(myBlock) {
+                myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = scale / 2;
+                myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = scale / 2;
                 var bounds = myBlock.collapseContainer.getBounds();
                 myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 myBlock._positionCollapseContainer(myBlock.protoblock.scale);
                 myBlock._calculateCollapseHitArea();
             };
 
-            this._generateCollapseArtwork(__postProcess);
-            var fontSize = 10 * blockScale;
+            this._generateCollapseArtwork(postProcess);
+            var fontSize = 10 * scale;
             this.collapseText.font = fontSize + 'px Sans';
-            this._positionCollapseLabel(blockScale);
+            this._positionCollapseLabel(scale);
         }
     };
 
-    this._newArtwork = function(plusMinus) {
+    this.newArtwork = function(plusMinus) {
         switch (this.name) {
         case 'start':
-        case 'drum':
         case 'action':
-        case 'matrix':
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
+
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
         case 'note':
@@ -296,7 +298,6 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < this.argClampSlots.length; i++) {
                 this.size += this.argClampSlots[i];
             }
-            // Regenerate the docks.
             this.docks = [];
             this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
             break;
@@ -317,6 +318,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 1; i < obj[1].length - 1; i++) {
                 this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
             }
+
             this.docks.push([obj[1][2][0], obj[1][2][1], 'in']);
             break;
         case 'namedcalcArg':
@@ -329,6 +331,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 2; i < obj[1].length - 1; i++) {
                 this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
             }
+
             this.docks.push([obj[1][3][0], obj[1][3][1], 'in']);
             break;
         case 'calcArg':
@@ -343,18 +346,9 @@ function Block(protoblock, blocks, overrideName) {
 
         // Save new artwork and dock positions.
         this.artwork = obj[0];
-        try {
-            for (var i = 0; i < this.docks.length; i++) {
-                this.docks[i][0] = obj[1][i][0];
-                this.docks[i][1] = obj[1][i][1];
-            }
-        } catch (e) {
-            // FIXME: For some reason, ifthenelse blocks are missing
-            // an arg in the obj dock after a rescale (sometimes).
-            console.log(i + ' ' + e);
-            console.log(this.name);
-            console.log(this.docks);
-            console.log(obj);
+        for (var i = 0; i < this.docks.length; i++) {
+            this.docks[i][0] = obj[1][i][0];
+            this.docks[i][1] = obj[1][i][1];
         }
     };
 
@@ -384,7 +378,6 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.imageBitmap = bitmap;
             myBlock.updateCache();
         };
-
         image.src = this.image;
     };
 
@@ -401,7 +394,7 @@ function Block(protoblock, blocks, overrideName) {
             this.container.removeChild(this.highlightBitmap);
         }
 
-        if (collapse && this.collapseBitmap != null) {
+        if (collapse && this.collapseBitmap !== null) {
             this.collapseContainer.removeChild(this.collapseBitmap);
             this.collapseContainer.removeChild(this.expandBitmap);
             this.container.removeChild(this.collapseBlockBitmap);
@@ -414,17 +407,66 @@ function Block(protoblock, blocks, overrideName) {
 
     this.generateArtwork = function(firstTime) {
         // Get the block labels from the protoblock
+        var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         var block_label = '';
-        if (this.overrideName) {
-            block_label = this.overrideName;
-        } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
-            // Label should be defined inside _().
-            block_label = this.protoblock.staticLabels[0];
-        }
-        while (this.protoblock.staticLabels.length < this.protoblock.args + 1) {
-            this.protoblock.staticLabels.push('');
-        }
+
+        // Create the highlight bitmap for the block.
+        function __processHighlightBitmap(name, bitmap, myBlock) {
+            if (myBlock.highlightBitmap != null) {
+                myBlock.container.removeChild(myBlock.highlightBitmap);
+            }
+
+            myBlock.highlightBitmap = bitmap;
+            myBlock.container.addChild(myBlock.highlightBitmap);
+            myBlock.highlightBitmap.x = 0;
+            myBlock.highlightBitmap.y = 0;
+            myBlock.highlightBitmap.name = 'bmp_highlight_' + thisBlock;
+            myBlock.highlightBitmap.cursor = 'pointer';
+            // Hide it to start
+            myBlock.highlightBitmap.visible = false;
+
+            // At me point, it should be safe to calculate the
+            // bounds of the container and cache its contents.
+            if (!firstTime) {
+                myBlock.container.uncache();
+            }
+
+            myBlock._createCache();
+            myBlock.blocks.refreshCanvas();
+
+            if (firstTime) {
+                myBlock._loadEventHandlers();
+                if (myBlock.image !== null) {
+                    myBlock._addImage();
+                }
+                myBlock._finishImageLoad();
+            } else {
+                if (myBlock.name === 'start') {
+                    myBlock._ensureDecorationOnTop();
+                }
+
+                // Adjust the docks.
+                myBlock.blocks.loopCounter = 0;
+
+                // console.log('adjust Docks ' + myBlock.name);
+                myBlock.blocks.adjustDocks(thisBlock);
+
+                // Adjust the text position.
+                myBlock._positionText(myBlock.protoblock.scale);
+
+                if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
+                    myBlock.bitmap.visible = !myBlock.collapsed;
+                    myBlock.highlightBitmap.visible = false;
+                    myBlock.updateCache();
+                }
+
+                if (myBlock.postProcess != null) {
+                    myBlock.postProcess(myBlock.postProcessArg);
+                    myBlock.postProcess = null;
+                }
+            }
+        };
 
         // Create the bitmap for the block.
         function __processBitmap(name, bitmap, myBlock) {
@@ -440,73 +482,6 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.bitmap.cursor = 'pointer';
             myBlock.blocks.refreshCanvas();
 
-            // Create the highlight bitmap for the block.
-            function __processHighlightBitmap(name, bitmap, myBlock) {
-                if (myBlock.highlightBitmap != null) {
-                    myBlock.container.removeChild(myBlock.highlightBitmap);
-                }
-
-                myBlock.highlightBitmap = bitmap;
-                myBlock.container.addChild(myBlock.highlightBitmap);
-                myBlock.highlightBitmap.x = 0;
-                myBlock.highlightBitmap.y = 0;
-                myBlock.highlightBitmap.name = 'bmp_highlight_' + thisBlock;
-                myBlock.highlightBitmap.cursor = 'pointer';
-                // Hide it to start
-                myBlock.highlightBitmap.visible = false;
-
-                // At this point, it should be safe to calculate the
-                // bounds of the container and cache its contents.
-                if (!firstTime) {
-                    myBlock.container.uncache();
-                }
-
-                myBlock._createCache();
-                myBlock.blocks.refreshCanvas();
-
-                if (firstTime) {
-                    myBlock._loadEventHandlers();
-                    if (myBlock.image != null) {
-                        myBlock._addImage();
-                    }
-
-                    myBlock._finishImageLoad();
-                } else {
-                    if (myBlock.name === 'start' || myBlock.name === 'drum') {
-                        myBlock._ensureDecorationOnTop();
-                    }
-
-                    // Adjust the docks.
-                    myBlock.blocks.loopCounter = 0;
-
-                    // console.log('adjust Docks ' + myBlock.name);
-                    myBlock.blocks.adjustDocks(thisBlock);
-
-                    // Adjust the text position.
-                    myBlock._positionText(myBlock.protoblock.scale);
-
-                    /*
-                    // Are there clamp blocks that need expanding?
-                    if (myBlock.blocks.clampBlocksToCheck.length > 0) {
-                        setTimeout(function () {
-                            myBlock.blocks.adjustExpandableClampBlock();
-                        }, 250);
-                    }
-                    */
-
-                    if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
-                        myBlock.bitmap.visible = !myBlock.collapsed;
-                        myBlock.highlightBitmap.visible = false;
-                        myBlock.updateCache();
-                    }
-
-                    if (myBlock._postProcess != null) {
-                        myBlock._postProcess(myBlock._postProcessArg);
-                        myBlock._postProcess = null;
-                    }
-                }
-            }
-
             if (myBlock.protoblock.disabled) {
                 var artwork = myBlock.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', block_label);
             } else {
@@ -519,6 +494,17 @@ function Block(protoblock, blocks, overrideName) {
 
             _makeBitmap(artwork, myBlock.name, __processHighlightBitmap, myBlock);
         };
+
+        if (this.overrideName) {
+            block_label = this.overrideName;
+        } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
+            // Label should be defined inside _().
+            block_label = this.protoblock.staticLabels[0];
+        }
+
+        while (this.protoblock.staticLabels.length < this.protoblock.args + 1) {
+            this.protoblock.staticLabels.push('');
+        }
 
         if (firstTime) {
             // Create artwork and dock.
@@ -538,6 +524,7 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
             artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
+
         _makeBitmap(artwork, this.name, __processBitmap, this);
     };
 
@@ -546,7 +533,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Value blocks get a modifiable text label
         if (['text', 'number', 'solfege', 'notename', 'rest'].indexOf(this.name) !== -1) {
-            if (this.value == null) {
+            if (this.value === null) {
                 if (this.name === 'text') {
                     this.value = '---';
                 } else if (this.name === 'solfege') {
@@ -559,10 +546,12 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = 4;
                 }
             }
+
             var label = this.value.toString();
             if (label.length > 8) {
                 label = label.substr(0, 7) + '...';
             }
+
             this.text.text = label;
             this.container.addChild(this.text);
             this._positionText(this.protoblock.scale);
@@ -572,12 +561,13 @@ function Block(protoblock, blocks, overrideName) {
             this._positionText(this.protoblock.scale);
         }
 
-        if (COLLAPSABLES.indexOf(this.name) === -1) {
-            this._loadComplete = true;
-            if (this._postProcess != null) {
-                this._postProcess(this._postProcessArg);
-                this._postProcess = null;
+        if (['start', 'action'].indexOf(this.name) === -1) {
+            this.loadComplete = true;
+            if (this.postProcess !== null) {
+                this.postProcess(this.postProcessArg);
+                this.postProcess = null;
             }
+
             this.blocks.refreshCanvas();
             this.blocks.cleanupAfterLoad(this.name);
         } else {
@@ -589,109 +579,103 @@ function Block(protoblock, blocks, overrideName) {
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
-            var __postProcess = function(myBlock) {
+            var postProcess = function(myBlock) {
                 myBlock._loadCollapsibleEventHandlers();
-                myBlock._loadComplete = true;
+                myBlock.loadComplete = true;
 
-                if (myBlock._postProcess != null) {
-                    myBlock._postProcess(myBlock._postProcessArg);
-                    myBlock._postProcess = null;
+                if (myBlock.postProcess !== null) {
+                    myBlock.postProcess(myBlock.postProcessArg);
+                    myBlock.postProcess = null;
                 }
             };
 
-            this._generateCollapseArtwork(__postProcess);
+            this._generateCollapseArtwork(postProcess);
         }
     };
 
     this._generateCollapseArtwork = function(postProcess) {
+        var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-            function __processCollapseBitmap(name, bitmap, myBlock) {
-                myBlock.collapseBlockBitmap = bitmap;
-                myBlock.collapseBlockBitmap.name = 'collapse_' + thisBlock;
-                myBlock.container.addChild(myBlock.collapseBlockBitmap);
-                myBlock.collapseBlockBitmap.visible = myBlock.collapsed;
-                myBlock.blocks.refreshCanvas();
+        function __processHighlightCollapseBitmap(name, bitmap, myBlock) {
+            myBlock.highlightCollapseBlockBitmap = bitmap;
+            myBlock.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
+            myBlock.container.addChild(myBlock.highlightCollapseBlockBitmap);
+            myBlock.highlightCollapseBlockBitmap.visible = false;
 
-                function __processHighlightCollapseBitmap(name, bitmap, myBlock) {
-                    myBlock.highlightCollapseBlockBitmap = bitmap;
-                    myBlock.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
-                    myBlock.container.addChild(myBlock.highlightCollapseBlockBitmap);
-                    myBlock.highlightCollapseBlockBitmap.visible = false;
+            if (myBlock.collapseText === null) {
+                var fontSize = 10 * myBlock.protoblock.scale;
+                if (myBlock.name === 'action') {
+                    myBlock.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
+                } else {
+                    myBlock.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
+                }
+                myBlock.collapseText.textAlign = 'left';
+                myBlock.collapseText.textBaseline = 'alphabetic';
+                myBlock.container.addChild(myBlock.collapseText);
+            }
+            myBlock._positionCollapseLabel(myBlock.protoblock.scale);
+            myBlock.collapseText.visible = myBlock.collapsed;
 
-                    if (myBlock.collapseText == null) {
-                        var fontSize = 10 * myBlock.protoblock.scale;
-                        switch (myBlock.name) {
-                        case 'action':
-                            myBlock.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
-                            break;
-                        case 'start':
-                            myBlock.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
-                            break;
-                        case 'matrix':
-                            myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
-                            break;
-                        case 'drum':
-                            myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
-                            break;
-                        }
-                        myBlock.collapseText.textAlign = 'left';
-                        myBlock.collapseText.textBaseline = 'alphabetic';
-                        myBlock.container.addChild(myBlock.collapseText);
-                    }
-                    myBlock._positionCollapseLabel(myBlock.protoblock.scale);
-                    myBlock.collapseText.visible = myBlock.collapsed;
+            myBlock._ensureDecorationOnTop();
 
-                    myBlock._ensureDecorationOnTop();
+            myBlock.updateCache();
 
-                    myBlock.updateCache();
+            myBlock.collapseContainer = new createjs.Container();
+            myBlock.collapseContainer.snapToPixelEnabled = true;
 
-                    myBlock.collapseContainer = new createjs.Container();
-                    myBlock.collapseContainer.snapToPixelEnabled = true;
-
-                    var image = new Image();
-                    image.onload = function() {
-                        myBlock.collapseBitmap = new createjs.Bitmap(image);
-                        myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = myBlock.protoblock.scale / 2;
-                        myBlock.collapseContainer.addChild(myBlock.collapseBitmap);
-                        myBlock.collapseBitmap.visible = !myBlock.collapsed;
-                        __finishCollapseButton(myBlock);
-                    };
-
-                    image.src = 'images/collapse.svg';
-
-                    __finishCollapseButton = function(myBlock) {
-                        var image = new Image();
-                        image.onload = function() {
-                            myBlock.expandBitmap = new createjs.Bitmap(image);
-                            myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = myBlock.protoblock.scale / 2;
-                            myBlock.collapseContainer.addChild(myBlock.expandBitmap);
-                            myBlock.expandBitmap.visible = myBlock.collapsed;
-
-                            var bounds = myBlock.collapseContainer.getBounds();
-                            myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                            myBlock.blocks.stage.addChild(myBlock.collapseContainer);
-                            if (postProcess != null) {
-                                postProcess(myBlock);
-                            }
-                            myBlock.blocks.refreshCanvas();
-                            myBlock.blocks.cleanupAfterLoad(myBlock.name);
-                        }
-                        image.src = 'images/expand.svg';
-                    };
-                };
-
-                var artwork = myBlock.collapseArtwork;
-                _makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', ''), '', __processHighlightCollapseBitmap, myBlock);
+            var image = new Image();
+            image.onload = function() {
+                myBlock.collapseBitmap = new createjs.Bitmap(image);
+                myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = myBlock.protoblock.scale / 2;
+                myBlock.collapseContainer.addChild(myBlock.collapseBitmap);
+                myBlock.collapseBitmap.visible = !myBlock.collapsed;
+                finishCollapseButton(myBlock);
             };
 
-            var artwork = this.collapseArtwork;
-            _makeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), '', __processCollapseBitmap, this);
+            image.src = 'images/collapse.svg';
+
+            finishCollapseButton = function(myBlock) {
+                var image = new Image();
+                image.onload = function() {
+                    myBlock.expandBitmap = new createjs.Bitmap(image);
+                    myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = myBlock.protoblock.scale / 2;
+                    myBlock.collapseContainer.addChild(myBlock.expandBitmap);
+                    myBlock.expandBitmap.visible = myBlock.collapsed;
+
+                    var bounds = myBlock.collapseContainer.getBounds();
+                    myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                    myBlock.blocks.stage.addChild(myBlock.collapseContainer);
+                    if (postProcess !== null) {
+                        postProcess(myBlock);
+                    }
+
+                    myBlock.blocks.refreshCanvas();
+                    myBlock.blocks.cleanupAfterLoad(myBlock.name);
+                };
+
+                image.src = 'images/expand.svg';
+            }
+        };
+
+        function __processCollapseBitmap(name, bitmap, myBlock) {
+            myBlock.collapseBlockBitmap = bitmap;
+            myBlock.collapseBlockBitmap.name = 'collapse_' + thisBlock;
+            myBlock.container.addChild(myBlock.collapseBlockBitmap);
+            myBlock.collapseBlockBitmap.visible = myBlock.collapsed;
+            myBlock.blocks.refreshCanvas();
+
+            var artwork = myBlock.collapseArtwork;
+            _makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', ''), '', __processHighlightCollapseBitmap, myBlock);
+        };
+
+        var artwork = this.collapseArtwork;
+        _makeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), '', __processCollapseBitmap, this);
     };
 
     this.hide = function() {
         this.container.visible = false;
-        if (this.collapseContainer != null) {
+        if (this.collapseContainer !== null) {
             this.collapseContainer.visible = false;
             this.collapseText.visible = false;
         }
@@ -700,9 +684,9 @@ function Block(protoblock, blocks, overrideName) {
     this.show = function() {
         if (!this.trash) {
             // If it is an action block or it is not collapsed then show it.
-            if (!(COLLAPSABLES.indexOf(this.name) === -1 && this.collapsed)) {
+            if (!(['action', 'start'].indexOf(this.name) === -1 && this.collapsed)) {
                 this.container.visible = true;
-                if (this.collapseContainer != null) {
+                if (this.collapseContainer !== null) {
                     this.collapseContainer.visible = true;
                     this.collapseText.visible = true;
                 }
@@ -757,7 +741,7 @@ function Block(protoblock, blocks, overrideName) {
         return '_' + number.toString();
     };
 
-    this._removeChildBitmap = function(name) {
+    this.removeChildBitmap = function(name) {
         for (var child = 0; child < this.container.getNumChildren(); child++) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
@@ -770,7 +754,7 @@ function Block(protoblock, blocks, overrideName) {
         // Load an image thumbnail onto block.
         var thisBlock = this.blocks.blockList.indexOf(this);
         var myBlock = this;
-        if (this.blocks.blockList[thisBlock].value == null && imagePath == null) {
+        if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             // console.log('loadThumbnail: no image to load?');
             return;
         }
@@ -778,7 +762,7 @@ function Block(protoblock, blocks, overrideName) {
 
         image.onload = function() {
             // Before adding new artwork, remove any old artwork.
-            myBlock._removeChildBitmap('media');
+            myBlock.removeChildBitmap('media');
 
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -788,8 +772,8 @@ function Block(protoblock, blocks, overrideName) {
             myContainer.addChild(bitmap);
 
             // Resize the image to a reasonable maximum.
-            const MAXWIDTH = 600;
-            const MAXHEIGHT = 450;
+            var MAXWIDTH = 600;
+            var MAXHEIGHT = 450;
             if (image.width > image.height) {
                 if (image.width > MAXWIDTH) {
                     bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXWIDTH / image.width;
@@ -810,14 +794,14 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.updateCache();
         };
 
-        if (imagePath == null) {
+        if (imagePath === null) {
             image.src = this.value;
         } else {
             image.src = imagePath;
         }
     };
 
-    this._doOpenMedia = function (thisBlock) {
+    this._doOpenMedia = function (myBlock, thisBlock) {
         var fileChooser = docById('myOpenAll');
 
         readerAction = function (event) {
@@ -842,22 +826,23 @@ function Block(protoblock, blocks, overrideName) {
                 reader.readAsText(fileChooser.files[0]);
             }
             fileChooser.removeEventListener('change', readerAction);
-        }
+        };
 
         fileChooser.addEventListener('change', readerAction, false);
         fileChooser.focus();
         fileChooser.click();
-        window.scroll(0, 0);
+        window.scroll(0, 0)
     };
 
     this.collapseToggle = function () {
         // Find the blocks to collapse/expand
+        var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
-        this.blocks.findDragGroup(thisBlock)
+        this.blocks.findDragGroup(thisBlock);
 
-        function __toggle(myBlock) {
+        function __toggle() {
             var collapse = myBlock.collapsed;
-            if (myBlock.collapseBitmap == null) {
+            if (myBlock.collapseBitmap === null) {
                 console.log('collapse bitmap not ready');
                 return;
             }
@@ -882,7 +867,7 @@ function Block(protoblock, blocks, overrideName) {
 
             if (myBlock.name === 'action') {
                 // Label the collapsed block with the action label
-                if (myBlock.connections[1] != null) {
+                if (myBlock.connections[1] !== null) {
                     var text = myBlock.blocks.blockList[myBlock.connections[1]].value;
                     if (text.length > 8) {
                         text = text.substr(0, 7) + '...';
@@ -897,10 +882,6 @@ function Block(protoblock, blocks, overrideName) {
             var z = myBlock.container.getNumChildren() - 1;
             myBlock.container.setChildIndex(myBlock.collapseText, z);
 
-            if (myBlock.name === 'drum') {
-                myBlock._ensureDecorationOnTop();
-            }
-
             // Set collapsed state of blocks in drag group.
             if (myBlock.blocks.dragGroup.length > 0) {
                 for (var b = 1; b < myBlock.blocks.dragGroup.length; b++) {
@@ -912,9 +893,9 @@ function Block(protoblock, blocks, overrideName) {
 
             myBlock.collapseContainer.updateCache();
             myBlock.updateCache();
-        };
+        }
 
-        __toggle(this);
+        __toggle();
     };
 
     this._positionText = function(blockScale) {
@@ -1713,6 +1694,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
+
 };
 
 
@@ -1728,7 +1710,7 @@ function $() {
         elements.push(element);
     }
     return elements;
-};
+}
 
 
 window.hasMouse = false;
@@ -1747,6 +1729,5 @@ function _makeBitmap(data, name, callback, args) {
         callback(name, bitmap, args);
     };
 
-    img.src = 'data:image/svg+xml;base64,' + window.btoa(
-        unescape(encodeURIComponent(data)));
-};
+    img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
+}
