@@ -187,8 +187,8 @@ function Matrix() {
         x.style.textAlign = 'center';
 
         var matrixDiv = docById('matrix');
-        matrixDiv.style.paddingTop = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale + 4) + 'px';
-        matrixDiv.style.paddingLeft = Math.floor(MATRIXSOLFEWIDTH * this.cellScale + 2) + 'px';
+        matrixDiv.style.paddingTop = 0 + 'px';
+        matrixDiv.style.paddingLeft = 0 + 'px';
         matrixDiv.appendChild(x);
         matrixDivPosition = matrixDiv.getBoundingClientRect();
 
@@ -201,7 +201,6 @@ function Matrix() {
 
         var header = table.createTHead();
         var row = header.insertRow(0);
-        row.style.position = 'fixed';
         row.style.left = Math.floor(matrixDivPosition.left) + 'px';
         row.style.top = Math.floor(matrixDivPosition.top) + 'px';
 
@@ -324,7 +323,6 @@ function Matrix() {
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.maxWidth = cell.style.minWidth;
-            cell.style.position = 'fixed';
             cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
             // cell.style.top = Math.floor(marginFromTop + (i * this.cellScale * 2)) + 'px';
             marginFromTop += parseInt(cell.style.height.replace('px', ''));
@@ -336,7 +334,6 @@ function Matrix() {
         var cell = row.insertCell(0);
         cell.style.fontSize = this.cellScale * 75 + '%';
         cell.innerHTML = _('note value');
-        cell.style.position = 'fixed';
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
@@ -481,7 +478,6 @@ function Matrix() {
             var row = table.insertRow(table.rows.length - 1);
             var cell = row.insertCell(-1);
             cell.style.fontSize = this.cellScale * 75 + '%';
-            cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.minWidth;
@@ -533,7 +529,6 @@ function Matrix() {
             // Add row for tuplet note values
             var row = table.insertRow(table.rows.length - 2);
             var cell = row.insertCell(-1);
-            cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
