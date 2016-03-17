@@ -248,6 +248,7 @@ function Block(protoblock, blocks, overrideName) {
 
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
+        case 'matrix':
         case 'note':
         case 'invert':
         case 'notation':
