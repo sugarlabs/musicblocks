@@ -209,7 +209,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 var blk = this.stepQueue[turtle].pop();
                 if (blk != null) {
-                    this.runFromBlockNow(this, turtle, blk, 0, null);
+                    this._runFromBlockNow(this, turtle, blk, 0, null);
                 }
             }
         }
@@ -224,7 +224,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var logo = this;
         stepNote();
 
-        function stepNote() {
+        function __stepNote() {
             for (var turtle in logo.stepQueue) {
                 // Have we already played a note for this turtle?
                 if (turtle in logo.playedNote && logo.playedNote[turtle]) {
@@ -247,16 +247,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                           }
                             // logo.playedNote[turtle] = true;
                             logo.playedNoteTimes[turtle] = logo.playedNoteTimes[turtle] || 0;
-                            thisNote[turtle] = Math.pow(logo.parseArg(logo, turtle, block.connections[1], blk, null), -1);
+                            thisNote[turtle] = Math.pow(logo._parseArg(logo, turtle, block.connections[1], blk, null), -1);
                             logo.playedNoteTimes[turtle] += thisNote[turtle];
                             // Keep track of how long the note played for, so we can go back and play it again if needed
                         }
-                        logo.runFromBlockNow(logo, turtle, blk, 0, null);
+                        logo._runFromBlockNow(logo, turtle, blk, 0, null);
                     } else {
                         logo.playedNote[turtle] = true;
                     }
                 }
             }
+
             // At this point, some turtles have played notes and others
             // have not. We need to keep stepping until they all have.
             var keepGoing = false;
@@ -267,7 +268,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
             if (keepGoing) {
-                stepNote();
+                __stepNote();
                 // logo.step();
             } else {
                 var notesArray = [];
@@ -286,7 +287,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     } else {
                         continueFrom = notesFinish[turtle];
                     }
-                    logo.runFromBlock(logo, turtle, continueFrom, 0, null);
+                    logo._runFromBlock(logo, turtle, continueFrom, 0, null);
                 }
                 if (shortestNote === Math.max.apply(null, notesArray)) {
                     logo.playedNoteTimes = {};
@@ -320,7 +321,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.unhighlightQueue = {};
     };
 
-    this.clearParameterBlocks = function() {
+    this._clearParameterBlocks = function() {
         for (var blk in this.blocks.blockList) {
             if (this.blocks.blockList[blk].parameter) {
                 this.blocks.blockList[blk].text.text = '';
@@ -330,7 +331,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.refreshCanvas();
     };
 
-    this.updateParameterBlock = function(logo, turtle, blk) {
+    this._updateParameterBlock = function(logo, turtle, blk) {
         // Update the label on parameter blocks.
         if (this.blocks.blockList[blk].protoblock.parameter) {
             var name = this.blocks.blockList[blk].name;
@@ -368,7 +369,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'box':
                 var cblk = this.blocks.blockList[blk].connections[1];
-                var boxname = this.parseArg(logo, turtle, cblk, blk);
+                var boxname = this._parseArg(logo, turtle, cblk, blk);
                 if (boxname in this.boxes) {
                     value = this.boxes[boxname];
                 } else {
@@ -566,7 +567,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         if (!this.lilypondSaveOnly) {
-            this.setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
+            this._setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
         }
 
         this.inMatrix = false;
@@ -637,7 +638,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         if (this.turtleDelay === 0) {
             // Don't update parameters when running full speed.
-            this.clearParameterBlocks();
+            this._clearParameterBlocks();
         }
 
         this.onRunTurtle();
@@ -670,7 +671,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.unhightlightQueue[turtle] = [];
             this.parameterQueue[turtle] = [];
             this.turtles.turtleList[turtle].running = true;
-            this.runFromBlock(this, turtle, startHere, 0, env);
+            this._runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             // If there are start blocks, run them all.
             for (var b = 0; b < startBlocks.length; b++) {
@@ -681,7 +682,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 this.parameterQueue[turtle] = [];
                 if (!this.turtles.turtleList[turtle].trash) {
                     this.turtles.turtleList[turtle].running = true;
-                    this.runFromBlock(this, turtle, startBlocks[b], 0, env);
+                    this._runFromBlock(this, turtle, startBlocks[b], 0, env);
                 }
             }
         } else {
@@ -690,7 +691,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.refreshCanvas();
     };
 
-    this.runFromBlock = function(logo, turtle, blk, isflow, receivedArg) {
+    this._runFromBlock = function(logo, turtle, blk, isflow, receivedArg) {
         if (blk == null) {
             return;
         }
@@ -707,13 +708,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.stepQueue[turtle].push(blk);
             } else {
                 setTimeout(function() {
-                    logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+                    logo._runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
                 }, delay);
             }
         }
     };
 
-    this.blockSetter = function(blk, value, turtleId) {
+    this._blockSetter = function(blk, value, turtleId) {
         var turtle = this.turtles.turtleList[turtleId];
 
         switch (this.blocks.blockList[blk].name) {
@@ -748,7 +749,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             break;
         case 'box':
             var cblk = this.blocks.blockList[blk].connections[1];
-            var name = this.parseArg(this, turtle, cblk, blk);
+            var name = this._parseArg(this, turtle, cblk, blk);
             if (name in this.boxes) {
                 this.boxes[name] = value;
             } else {
@@ -813,7 +814,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'notevolumefactor':
             var len = this.transposition[turtleId].length;
             this.polyVolume[turtleId][len - 1] = value;
-            this.setSynthVolume(value, turtleId);
+            this._setSynthVolume(value, turtleId);
             break;
         default:
             if (this.blocks.blockList[blk].name in this.evalSetterDict) {
@@ -824,7 +825,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     };
 
-    this.runFromBlockNow = function(logo, turtle, blk, isflow, receivedArg, queueStart) {
+    this._runFromBlockNow = function(logo, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
 
         // Sometimes we don't want to unwind the entire queue.
@@ -836,7 +837,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var args = [];
         if (logo.blocks.blockList[blk].protoblock.args > 0) {
             for (var i = 1; i < logo.blocks.blockList[blk].protoblock.args + 1; i++) {
-                args.push(logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i], blk, receivedArg));
+                args.push(logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i], blk, receivedArg));
             }
         }
 
@@ -882,7 +883,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
                     logo.stopTurtle = true;
                 } else {
-                    var listener = function (event) {
+                    var __listener = function (event) {
                         if (logo.turtles.turtleList[turtle].running) {
                             var queueBlock = new Queue(logo.actions[args[1]], 1, blk);
                             logo.parentFlowQueue[turtle].push(blk);
@@ -893,17 +894,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             // from here.
                             if (isflow) {
                                 console.log('calling runFromBlockNow with ' + logo.actions[args[1]]);
-                                logo.runFromBlockNow(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
+                                logo._runFromBlockNow(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
                             } else {
                                 console.log('calling runFromBlock with ' + logo.actions[args[1]]);
-                                logo.runFromBlock(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
+                                logo._runFromBlock(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
                             }
                         }
                     };
 
                     // If there is already a listener, remove it
                     // before adding the new one.
-                    logo.setListener(turtle, args[0], listener);
+                    logo._setListener(turtle, args[0], __listener);
                 }
             }
             break;
@@ -917,7 +918,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'nameddo':
             var name = logo.blocks.blockList[blk].privateData;
             if (name in logo.actions) {
-                logo.lilypondLineBreak(turtle);
+                logo._lilypondLineBreak(turtle);
                 childFlow = logo.actions[name];
                 childFlowCount = 1;
             } else {
@@ -931,7 +932,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'do':
             if (args.length === 1) {
                 if (args[0] in logo.actions) {
-                    logo.lilypondLineBreak(turtle);
+                    logo._lilypondLineBreak(turtle);
                     childFlow = logo.actions[args[0]];
                     childFlowCount = 1;
                 } else {
@@ -947,12 +948,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                    var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i+1], blk, receivedArg));
+                    var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i+1], blk, receivedArg));
                     actionArgs.push(t);
                 }
             }
             if (name in logo.actions) {
-                logo.lilypondLineBreak(turtle);
+                logo._lilypondLineBreak(turtle);
                 childFlow = logo.actions[name]
                 childFlowCount = 1;
             } else{
@@ -966,13 +967,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                    var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i+2], blk, receivedArg));
+                    var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i+2], blk, receivedArg));
                     actionArgs.push(t);
                 }
             }
             if (args.length >= 1) {
                 if (args[0] in logo.actions) {
-                    logo.lilypondLineBreak(turtle);
+                    logo._lilypondLineBreak(turtle);
                     actionName = args[0];
                     childFlow = logo.actions[args[0]];
                     childFlowCount = 1;
@@ -999,7 +1000,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // trigger listeners.
             break;
         case 'break':
-            logo.doBreak(turtle);
+            logo._doBreak(turtle);
             // Since we pop the queue, we need to unhighlight our
             // parent.
             var parentBlk = logo.blocks.blockList[blk].connections[0];
@@ -1009,7 +1010,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             break;
         case 'wait':
             if (args.length === 1) {
-                logo.doWait(turtle, args[0]);
+                logo._doWait(turtle, args[0]);
             }
             break;
         case 'print':
@@ -1090,7 +1091,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var queueBlock = new Queue(blk, 1, parentBlk);
                     logo.parentFlowQueue[turtle].push(parentBlk);
                     logo.turtles.turtleList[turtle].queue.push(queueBlock);
-                    logo.doWait(0.05);
+                    logo._doWait(0.05);
                 } else {
                     // Since a wait for block was requeued each
                     // time, we need to flush the queue of all but
@@ -1178,7 +1179,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             if (args.length >= 1) {
                 var settingBlk = logo.blocks.blockList[blk].connections[1];
-                logo.blockSetter(settingBlk, args[0] + i, turtle);
+                logo._blockSetter(settingBlk, args[0] + i, turtle);
             }
             break;
         case 'clear':
@@ -1202,9 +1203,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var delta = args[0] / NOTEDIV;
-                    var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
+                    var istenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var listener = function (event) {
+                    var __listener = function (event) {
                         logo.turtles.turtleList[turtle].doArc(delta, args[1]);
                     };
 
@@ -1214,7 +1215,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.arcListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
                     }
 
-                    logo.stage.addEventListener(listenerName, listener, false);
+                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
                 }
@@ -1270,7 +1271,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var dist = args[0] / NOTEDIV;
                     var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var listener = function (event) {
+                    var __listener = function (event) {
                         logo.turtles.turtleList[turtle].doForward(dist);
                     };
 
@@ -1280,7 +1281,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
                     }
 
-                    logo.stage.addEventListener(listenerName, listener, false);
+                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(args[0]);
                 }
@@ -1295,7 +1296,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var dist = -args[0] / NOTEDIV;
                     var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var listener = function (event) {
+                    var __listener = function (event) {
                         logo.turtles.turtleList[turtle].doForward(dist);
                     };
 
@@ -1305,7 +1306,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
                     }
 
-                    logo.stage.addEventListener(listenerName, listener, false);
+                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(-args[0]);
                 }
@@ -1320,7 +1321,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var delta = args[0] / NOTEDIV;
                     var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var listener = function (event) {
+                    var __listener = function (event) {
                         logo.turtles.turtleList[turtle].doRight(delta);
                     };
 
@@ -1330,7 +1331,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
                     }
 
-                    logo.stage.addEventListener(listenerName, listener, false);
+                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(args[0]);
                 }
@@ -1345,7 +1346,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var delta = -args[0] / NOTEDIV;
                     var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var listener = function (event) {
+                    var __listener = function (event) {
                         logo.turtles.turtleList[turtle].doRight(delta);
                     };
 
@@ -1355,7 +1356,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
                     }
 
-                    logo.stage.addEventListener(listenerName, listener, false);
+                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(-args[0]);
                 }
@@ -1427,7 +1428,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             break;
         case 'startTurtle':
-            var targetTurtle = logo.getTargetTurtle(args);
+            var targetTurtle = logo._getTargetTurtle(args);
             if (targetTurtle == null) {
                 logo.errorMsg('Cannot find turtle: ' + args[0], blk)
             } else {
@@ -1450,14 +1451,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 if (foundStartBlock) {
                     console.log('calling runFromBlock with ' + i);
-                    logo.runFromBlock(logo, targetTurtle, i, isflow, receivedArg);
+                    logo._runFromBlock(logo, targetTurtle, i, isflow, receivedArg);
                 } else {
                     logo.errorMsg('Cannot find start block for turtle: ' + args[0], blk)
                 }
             }
             break;
         case 'stopTurtle':
-            var targetTurtle = logo.getTargetTurtle(args);
+            var targetTurtle = logo._getTargetTurtle(args);
             if (targetTurtle == null) {
                 logo.errorMsg('Cannot find turtle: ' + args[0], blk)
             } else {
@@ -1465,7 +1466,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.parentFlowQueue[targetTurtle] = [];
                 logo.unhightlightQueue[targetTurtle] = [];
                 logo.parameterQueue[targetTurtle] = [];
-                logo.doBreak(targetTurtle);
+                logo._doBreak(targetTurtle);
             }
             break;
         case 'setcolor':
@@ -1547,13 +1548,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_fill_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
+            var __listener = function (event) {
                 logo.turtles.turtleList[turtle].doEndFill();
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
             // Deprecated
         case 'beginfill':
@@ -1570,13 +1571,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_hollowline_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
+            var __listener = function (event) {
                 logo.turtles.turtleList[turtle].doEndHollowLine();
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
             // Deprecated
         case 'beginhollowline':
@@ -1614,6 +1615,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             break;
         case 'openProject':
             url = args[0];
+
             function ValidURL(str) {
                 var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
                                          '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
@@ -1627,7 +1629,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else {
                     return true;
                 }
-            }
+            };
+
             if (ValidURL(url)) {
                 var win = window.open(url, '_blank')
                 if (win) {
@@ -1700,7 +1703,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 document.body.appendChild(download);
                 download.click();
                 document.body.removeChild(download);
-            }
+            };
+
             if (args[0] && turtle in logo.turtleHeaps) {
                 downloadFile(args[0], 'text/json', JSON.stringify(logo.turtleHeaps[turtle]));
             }
@@ -1796,7 +1800,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // Actions for music-related blocks
         case 'savelilypond':
             if (args.length === 1) {
-                logo.saveLilypondOutput(args[0]);
+                logo._saveLilypondOutput(args[0]);
             }
             break;
         case 'setbpm':
@@ -1817,13 +1821,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 childFlowCount = 1;
 
                 var listenerName = '_bpm_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function (event) {
+                var __listener = function (event) {
                     logo.bpm[turtle].pop();
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'setkey':
@@ -1847,9 +1851,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.addingNotesToTuplet = false;
 
             var listenerName = '_matrix_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
+            var __listener = function (event) {
                 if (logo.tupletRhythms.length === 0 || matrix.solfegeNotes.length === 0) {
                     logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
                     // } else if(document.getElementById('matrix').style.visibility === 'visible') {
@@ -1883,7 +1887,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'invert':
             logo.invertList[turtle].push([args[0], args[1]]);
@@ -1891,13 +1895,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_invert_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function(event) {
+            var __listener = function(event) {
                 logo.invertList[turtle].pop();
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'rest2':
             logo.notePitches[turtle].push(_('rest'));
@@ -2034,7 +2038,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             if (logo.inMatrix) {
                 matrix.addColBlock(blk, args[0]);
                 for (var i = 0; i < args[0]; i++) {
-                    logo.processNote(args[1], blk, turtle);
+                    logo._processNote(args[1], blk, turtle);
                 }
             } else {
                 logo.errorMsg(_('Rhythm Block: Did you mean to use a Note block?)', blk));
@@ -2047,25 +2051,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
         case 'wholeNote':
-            logo.processNote(1, blk, turtle);
+            logo._processNote(1, blk, turtle);
             break;
         case 'halfNote':
-            logo.processNote(2, blk, turtle);
+            logo._processNote(2, blk, turtle);
             break;
         case 'quarterNote':
-            logo.processNote(4, blk, turtle);
+            logo._processNote(4, blk, turtle);
             break;
         case 'eighthNote':
-            logo.processNote(8, blk, turtle);
+            logo._processNote(8, blk, turtle);
             break;
         case 'sixteenthNote':
-            logo.processNote(16, blk, turtle);
+            logo._processNote(16, blk, turtle);
             break;
         case 'thirtysecondNote':
-            logo.processNote(32, blk, turtle);
+            logo._processNote(32, blk, turtle);
             break;
         case 'sixtyfourthNote':
-            logo.processNote(64, blk, turtle);
+            logo._processNote(64, blk, turtle);
             break;
             // FIXME: What is this supposed to do?
         case 'meter':
@@ -2107,15 +2111,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_playnote_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
-                logo.processNote(noteBeatValue, blk, turtle);
+            var __listener = function (event) {
+                logo._processNote(noteBeatValue, blk, turtle);
                 logo.inNoteBlock[turtle] -= 1;
                 logo.pitchBlocks = [];
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'rhythmicdot':
             // Dotting a note will increase its play time by
@@ -2129,9 +2133,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_dot_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
+            var __listener = function (event) {
                 var currentDotFactor = 2 - (1 / Math.pow(2, logo.dotCount[turtle]));
                 logo.beatFactor[turtle] *= currentDotFactor;
                 logo.dotCount[turtle] -= 1;
@@ -2139,7 +2143,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.beatFactor[turtle] /= newDotFactor;
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'crescendo':
             if (args.length > 1 && args[0] !== 0) {
@@ -2150,16 +2154,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 childFlowCount = 1;
 
                 var listenerName = '_crescendo_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function (event) {
+                var __listener = function (event) {
                     logo.crescendoDelta[turtle].pop();
                     logo.crescendoVolume[turtle].pop();
                     logo.crescendoInitialVolume[turtle].pop();
-                    logo.lilypondEndCrescendo(turtle);
+                    logo._lilypondEndCrescendo(turtle);
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'staccato':
@@ -2169,31 +2173,31 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 childFlowCount = 1;
 
                 var listenerName = '_staccato_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function (event) {
+                var __listener = function (event) {
                     logo.staccato[turtle].pop();
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'slur':
             if (args.length > 1) {
                 logo.staccato[turtle].push(-args[0]);
-                logo.lilypondBeginSlur(turtle);
+                logo._lilypondBeginSlur(turtle);
                 childFlow = args[1];
                 childFlowCount = 1;
 
                 var listenerName = '_staccato_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function (event) {
+                var __listener = function (event) {
                     logo.staccato[turtle].pop();
-                    logo.lilypondEndSlur(turtle);
+                    logo._lilypondEndSlur(turtle);
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'drift':
@@ -2202,13 +2206,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_drift_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
+            var __listener = function (event) {
                 logo.drift[turtle] -= 1;
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'tie':
             // Tie notes together in pairs.
@@ -2219,25 +2223,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_tie_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
+            var __listener = function (event) {
                 logo.tie[turtle] = false;
                 // If tieCarryOver > 0, we have one more note to
                 // play.
                 if (logo.tieCarryOver[turtle] > 0) {
                     // Remove the note from the Lilypond list.
                     for (var i = 0; i < logo.notePitches[turtle].length; i++) {
-                        logo.lilypondRemoveTie(turtle);
+                        logo._lilypondRemoveTie(turtle);
                     }
                     var noteValue = logo.tieCarryOver[turtle];
                     logo.tieCarryOver[turtle] = 0;
-                    logo.processNote(noteValue, blk, turtle);
+                    logo._processNote(noteValue, blk, turtle);
                 }
                 logo.tieNote[turtle] = [];
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'swing':
             // Grab a bit from the next note to give to the current note.
@@ -2248,15 +2252,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_swing_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
+            var __listener = function (event) {
                 logo.swingTarget[turtle].pop();
                 logo.swing[turtle].pop();
                 logo.swingCarryOver[turtle] = 0;
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'duplicatenotes':
             var factor = args[0];
@@ -2269,13 +2273,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 childFlowCount = 1;
 
                 var listenerName = '_duplicate_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function (event) {
+                var __listener = function (event) {
                     logo.duplicateFactor[turtle] /= factor;
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'skipnotes':
@@ -2289,16 +2293,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 childFlowCount = 1;
 
                 var listenerName = '_skip_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function (event) {
+                var __listener = function (event) {
                     logo.skipFactor[turtle] /= factor;
                     if (logo.skipFactor[turtle] === 1) {
                         logo.skipIndex[turtle] = 0;
                     }
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'multiplybeatfactor':
@@ -2312,13 +2316,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 childFlowCount = 1;
 
                 var listenerName = '_multiplybeat_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function (event) {
+                var __listener = function (event) {
                     logo.beatFactor[turtle] /= factor;
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'dividebeatfactor':
@@ -2332,13 +2336,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 childFlowCount = 1;
 
                 var listenerName = '_dividebeat_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function (event) {
+                var __listener = function (event) {
                     logo.beatFactor[turtle] /= factor;
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'settransposition':
@@ -2353,9 +2357,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_transposition_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function(event) {
+            var __listener = function(event) {
                 if (!(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] += transValue;
                 } else {
@@ -2363,7 +2367,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'sharp':
             if (!(logo.invertList[turtle].length === 0)) {
@@ -2375,9 +2379,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_sharp_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function(event) {
+            var __listener = function(event) {
                 if (!(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] += 1;
                 } else {
@@ -2385,7 +2389,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'flat':
             if (!(logo.invertList[turtle].length === 0)) {
@@ -2397,9 +2401,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_flat_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function(event) {
+            var __listener = function(event) {
                 if (!(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] -= 1;
                 } else {
@@ -2407,7 +2411,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'articulation':
             if (args.length === 2 && typeof(args[0]) === 'number' && args[0] > 0) {
@@ -2418,39 +2422,39 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     newVolume = 100;
                 }
                 logo.polyVolume[turtle].push(newVolume);
-                logo.setSynthVolume(newVolume, turtle);
-                logo.lilypondBeginArticulation(turtle);
+                logo._setSynthVolume(newVolume, turtle);
+                logo._lilypondBeginArticulation(turtle);
 
                 childFlow = args[1];
                 childFlowCount = 1;
 
                 var listenerName = '_articulation_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function(event) {
+                var __listener = function(event) {
                     logo.polyVolume[turtle].pop();
-                    logo.lilypondEndArticulation(turtle);
+                    logo._lilypondEndArticulation(turtle);
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
         case 'setnotevolume2':
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 logo.polyVolume[turtle].push(args[0]);
-                logo.setSynthVolume(args[0], turtle);
+                logo._setSynthVolume(args[0], turtle);
 
                 childFlow = args[1];
                 childFlowCount = 1;
 
                 var listenerName = '_volume_' + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var listener = function(event) {
+                var __listener = function(event) {
                     logo.polyVolume[turtle].pop();
                 };
 
-                logo.setListener(turtle, listenerName, listener);
+                logo._setListener(turtle, listenerName, __listener);
             }
             break;
             // Deprecated
@@ -2460,7 +2464,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
-                    logo.setSynthVolume(args[0], turtle);
+                    logo._setSynthVolume(args[0], turtle);
                 }
             }
             break;
@@ -2495,11 +2499,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             break;
         case 'playfwd':
             matrix.playDirection = 1;
-            logo.runFromBlock(logo, turtle, args[0]);
+            logo._runFromBlock(logo, turtle, args[0]);
             break;
         case 'playbwd':
             matrix.playDirection = -1;
-            logo.runFromBlock(logo, turtle, args[0]);
+            logo._runFromBlock(logo, turtle, args[0]);
             break;
         case 'tuplet2':
             if (logo.inMatrix) {
@@ -2513,9 +2517,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlowCount = 1;
 
             var listenerName = '_tuplet_' + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var listener = function (event) {
+            var __listener = function (event) {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
                     logo.addingNotesToTuplet = false;
@@ -2523,7 +2527,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             };
 
-            logo.setListener(turtle, listenerName, listener);
+            logo._setListener(turtle, listenerName, __listener);
             break;
         default:
             if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
@@ -2532,7 +2536,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // Could be an arg block, so we need to print its value.
                 console.log('running an arg block?');
                 if (logo.blocks.blockList[blk].isArgBlock()) {
-                    args.push(logo.parseArg(logo, turtle, blk));
+                    args.push(logo._parseArg(logo, turtle, blk));
                     console.log('block: ' + blk + ' turtle: ' + turtle);
                     console.log('block name: ' + logo.blocks.blockList[blk].name);
                     console.log('block value: ' + logo.blocks.blockList[blk].value);
@@ -2638,14 +2642,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             if (logo.turtleDelay !== 0) {
                 for (var pblk in logo.parameterQueue[turtle]) {
-                    logo.updateParameterBlock(logo, turtle, logo.parameterQueue[turtle][pblk]);
+                    logo._updateParameterBlock(logo, turtle, logo.parameterQueue[turtle][pblk]);
                 }
             }
             if (isflow){
-                logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
+                logo._runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
             }
             else{
-                logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
+                logo._runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
         } else {
             // Make sure any unissued signals are dispatched.
@@ -2694,26 +2698,26 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // Because flow can come from calc blocks, we are not
             // ensured that the turtle is really finished running
             // yet. Hence the timeout.
-            checkLilypond = function() {
+            __checkLilypond = function() {
                 if (!logo.turtles.running() && queueStart === 0 && logo.lilypondSaveOnly) {
                     console.log('saving lilypond output: ' + this.lilypondStaging);
-                    logo.saveLilypondOutput(_('My Project') + '.ly');
+                    logo._saveLilypondOutput(_('My Project') + '.ly');
                     logo.lilypondSaveOnly = false;
                     logo.checkingLilypond = false;
                     // Show busy cursor.
                     document.body.style.cursor = 'default';
                 } else if (logo.lilypondSaveOnly) {
                     setTimeout(function() {
-                        checkLilypond();
+                        __checkLilypond();
                     }, 250);
                 }
-            }
+            };
 
             if (!logo.turtles.running() && queueStart === 0 && logo.lilypondSaveOnly) {
                 if (!logo.checkingLilypond) {
                     logo.checkingLilypond = true;
                     setTimeout(function() {
-                        checkLilypond();
+                        __checkLilypond();
                     }, 250);
                 }
             }
@@ -2742,23 +2746,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         clearTimeout(this.saveTimeout);
+
         var me = this;
         this.saveTimeout = setTimeout(function () {
             // Save at the end to save an image
             me.saveLocally();
-        }, DEFAULTDELAY * 1.5)
+        }, DEFAULTDELAY * 1.5);
     };
 
-    this.setSynthVolume = function(vol, turtle) {
+    this._setSynthVolume = function(vol, turtle) {
         if (vol > 100) {
             vol = 100;
         } else if (vol < 0) {
             vol = 0;
         }
+
         this.synth.setVolume(vol);
     };
 
-    this.processNote = function(noteValue, blk, turtle) {
+    this._processNote = function(noteValue, blk, turtle) {
         if (this.bpm[turtle].length > 0) {
             var bpmFactor = TONEBPM / last(this.bpm[turtle]);
         } else {
@@ -2779,7 +2785,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var carry = 0;
 
         if (this.crescendoDelta[turtle].length === 0) {
-            this.setSynthVolume(last(this.polyVolume[turtle]), turtle);
+            this._setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
 
         if (this.inMatrix) {
@@ -2866,10 +2872,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         this.tieNote[turtle] = [];
                         // Remove the note from the Lilypond list.
                         for (var i = 0; i < this.notePitches[turtle].length; i++) {
-                            this.lilypondRemoveTie(turtle);
+                            this._lilypondRemoveTie(turtle);
                         }
 
-                        this.processNote(tmpBeatValue, blk, turtle);
+                        this._processNote(tmpBeatValue, blk, turtle);
 
                         // Restore the current note.
                         this.tie[turtle] = true;
@@ -2936,7 +2942,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             if (!this.lilypondSaveOnly) {
                 if (duration > 0) {
-                    this.doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle] - turtleLag, 0));
+                    this._doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle] - turtleLag, 0));
                 }
             }
 
@@ -2963,7 +2969,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                 }
 
-                playnote = function(logo) {
+                __playnote = function(logo) {
                     var notes = [];
                     var insideChord = -1;
                     if ((logo.notePitches[turtle].length + logo.oscList[turtle].length) > 1) {
@@ -2993,7 +2999,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
                     }
 
-                    logo.dispatchTurtleSignals(turtle, beatValue, blk);
+                    logo._dispatchTurtleSignals(turtle, beatValue, blk);
 
                     if (logo.notePitches[turtle].length > 0) {
                         if (!logo.lilypondSaveOnly && duration > 0) {
@@ -3015,15 +3021,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             if (duration > 0) {
                                 if (carry > 0) {
                                     if (i === 0) {
-                                        logo.lilypondInsertTie(turtle);
+                                        logo._lilypondInsertTie(turtle);
                                     }
                                     originalDuration = 1 / ((1 / duration) - (1 / carry));
                                 } else {
                                     originalDuration = duration;
                                 }
-                                logo.updateNotation(note, originalDuration, turtle, insideChord);
+                                logo._updateNotation(note, originalDuration, turtle, insideChord);
                             } else if (logo.tieCarryOver[turtle] > 0) {
-                                logo.updateNotation(note, logo.tieCarryOver[turtle], turtle, insideChord);
+                                logo._updateNotation(note, logo.tieCarryOver[turtle], turtle, insideChord);
                             } else {
                                 console.log('durarion == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
                             }
@@ -3071,28 +3077,28 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 };
 
                 if (waitTime === 0 || this.lilypondSaveOnly) {
-                    playnote(this);
+                    __playnote(this);
                 } else {
                     var logo = this;
                     setTimeout(function() {
-                        playnote(logo);
+                        __playnote(logo);
                     }, waitTime + this.noteDelay);
                 }
 
                 if (this.crescendoDelta[turtle].length > 0) {
                     if (last(this.crescendoVolume[turtle]) === last(this.crescendoInitialVolume[turtle])) {
-                        this.lilypondBeginCrescendo(turtle, last(this.crescendoDelta[turtle]));
+                        this._lilypondBeginCrescendo(turtle, last(this.crescendoDelta[turtle]));
                     }
                     var len = this.crescendoVolume[turtle].length
                     this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
-                    this.setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
+                    this._setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
                 }
             }
             this.pushedNote[turtle] = false;
         }
     };
 
-    this.dispatchTurtleSignals = function(turtle, beatValue, blk) {
+    this._dispatchTurtleSignals = function(turtle, beatValue, blk) {
         // When turtle commands (forward, right, arc) are inside of Notes,
         // they are progressive.
         var logo = this;
@@ -3135,7 +3141,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }, beatValue * 1000);
     };
 
-    this.setListener = function(turtle, listenerName, listener) {
+    this._setListener = function(turtle, listenerName, listener) {
         if (listenerName in this.turtles.turtleList[turtle].listeners) {
             this.stage.removeEventListener(listenerName, this.turtles.turtleList[turtle].listeners[listenerName], false);
         }
@@ -3143,7 +3149,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.stage.addEventListener(listenerName, listener, false);
     };
 
-    this.setDispatchBlock = function(blk, turtle, listenerName) {
+    this._setDispatchBlock = function(blk, turtle, listenerName) {
         var nextBlock = last(this.blocks.blockList[blk].connections);
         if (nextBlock == null) {
             // console.log('next block not found when setting dispatcher');
@@ -3153,7 +3159,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.endOfClampSignals[turtle][nextBlock] = [listenerName];
     };
 
-    this.getTargetTurtle = function(args) {
+    this._getTargetTurtle = function(args) {
         // The target turtle name can be a string or an int. Make
         // sure there is a turtle by this name and then find the
         // associated start block.
@@ -3178,33 +3184,24 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         return null;
     };
 
-    // FIXME: do we need to worry about calc blocks too?
-    this.actionBlock = function(name) {
-        return ['do', 'doArg', 'calc', 'calcArg'].indexOf(name) !== -1;
-    };
-
-    this.namedActionBlock = function(name) {
-        return ['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(name) !== -1;
-    };
-
-    this.loopBlock = function(name) {
+    this._loopBlock = function(name) {
         return ['forever', 'repeat', 'while', 'until'].indexOf(name) !== -1;
     };
 
-    this.doBreak = function(turtle) {
+    this._doBreak = function(turtle) {
         // Look for a parent loopBlock in queue and set its count to 1.
         var parentLoopBlock = null;
         var loopBlkIdx = -1;
         var queueLength = this.turtles.turtleList[turtle].queue.length;
         for (var i = queueLength - 1; i > -1; i--) {
-            if (this.loopBlock(this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].blk].name)) {
+            if (this._loopBlock(this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].blk].name)) {
                 // while or until
                 loopBlkIdx = this.turtles.turtleList[turtle].queue[i].blk;
                 parentLoopBlock = this.blocks.blockList[loopBlkIdx];
                 // Flush the parent from the queue.
                 this.turtles.turtleList[turtle].queue.pop();
                 break;
-            } else if (this.loopBlock(this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].parentBlk].name)) {
+            } else if (this._loopBlock(this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].parentBlk].name)) {
                 // repeat or forever
                 loopBlkIdx = this.turtles.turtleList[turtle].queue[i].parentBlk;
                 parentLoopBlock = this.blocks.blockList[loopBlkIdx];
@@ -3234,7 +3231,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     };
 
-    this.parseArg = function(logo, turtle, blk, parentBlk, receivedArg) {
+    this._parseArg = function(logo, turtle, blk, parentBlk, receivedArg) {
         // Retrieve the value of a block.
         if (blk == null) {
             logo.errorMsg('Missing argument.', parentBlk);
@@ -3276,13 +3273,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'eval':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = Number(eval(a.replace(/x/g, b.toString())));
                 break;
             case 'arg':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var name = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 var action_args=receivedArg
                 if(action_args.length >= Number(name)){
                     var value = action_args[Number(name)-1];
@@ -3295,7 +3292,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'box':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var name = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.boxes) {
                     logo.blocks.blockList[blk].value = logo.boxes[name];
                 } else {
@@ -3330,99 +3327,99 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'sqrt':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (a < 0) {
                     logo.errorMsg(NOSQRTERRORMSG, blk);
                     logo.stopTurtle = true;
                     a = -a;
                 }
-                logo.blocks.blockList[blk].value = logo.doSqrt(a);
+                logo.blocks.blockList[blk].value = logo._doSqrt(a);
                 break;
             case 'int':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 logo.blocks.blockList[blk].value = Math.floor(a);
                 break;
             case 'mod':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo.doMod(a, b);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                logo.blocks.blockList[blk].value = logo._doMod(a, b);
                 break;
             case 'not':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 logo.blocks.blockList[blk].value = !a;
                 break;
             case 'greater':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = (Number(a) > Number(b));
                 break;
             case 'equal':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = (a === b);
                 break;
             case 'less':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
                 var result = (Number(a) < Number(b));
                 logo.blocks.blockList[blk].value = result;
                 break;
             case 'random':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo.doRandom(a, b);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                logo.blocks.blockList[blk].value = logo._doRandom(a, b);
                 break;
             case 'oneOf':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo.doOneOf(a, b);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                logo.blocks.blockList[blk].value = logo._doOneOf(a, b);
                 break;
             case 'plus':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo.doPlus(a, b);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                logo.blocks.blockList[blk].value = logo._doPlus(a, b);
                 break;
             case 'multiply':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo.doMultiply(a, b);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                logo.blocks.blockList[blk].value = logo._doMultiply(a, b);
                 break;
             case 'divide':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo.doDivide(a, b);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                logo.blocks.blockList[blk].value = logo._doDivide(a, b);
                 break;
             case 'minus':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo.doMinus(a, b);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                logo.blocks.blockList[blk].value = logo._doMinus(a, b);
                 break;
             case 'neg':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo.doMinus(0, a);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                logo.blocks.blockList[blk].value = logo._doMinus(0, a);
                 break;
             case 'myclick':
                 logo.blocks.blockList[blk].value = 'click' + logo.turtles.turtleList[turtle].name;
@@ -3439,7 +3436,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'xturtle':
             case 'yturtle':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var targetTurtle = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 for (var i = 0; i < logo.turtles.turtleList.length; i++) {
                     var logoTurtle = logo.turtles.turtleList[i];
                     if (targetTurtle === logoTurtle.name) {
@@ -3498,7 +3495,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'number2pitch':
             case 'number2octave':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var num = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (num != null && typeof(num) === 'number') {
                     var obj = numberToPitch(num);
                     if (logo.blocks.blockList[blk].name === 'number2pitch') {
@@ -3514,7 +3511,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'turtlepitch':
                 var value = null;
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var targetTurtle = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 for (var i = 0; i < logo.turtles.turtleList.length; i++) {
                     var logoTurtle = logo.turtles.turtleList[i];
                     if (targetTurtle === logoTurtle.name) {
@@ -3536,7 +3533,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'turtlenote':
                 var value = null;
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var targetTurtle = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 for (var i = 0; i < logo.turtles.turtleList.length; i++) {
                     var logoTurtle = logo.turtles.turtleList[i];
                     if (targetTurtle === logoTurtle.name) {
@@ -3576,15 +3573,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'and':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = a && b;
                 break;
             case 'or':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = a || b;
                 break;
             case 'time':
@@ -3593,7 +3590,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             case 'hspace':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var v = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var v = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 logo.blocks.blockList[blk].value = v;
                 break;
             case 'mousex':
@@ -3635,8 +3632,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var block = logo.blocks.blockList[blk];
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
                 block.value = Math.round(pitchToFrequency(a, b));
                 break;
             case 'pop':
@@ -3651,7 +3648,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'indexHeap':
                 var block = logo.blocks.blockList[blk];
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (!(turtle in logo.turtleHeaps)) {
                     logo.turtleHeaps[turtle] = [];
                 }
@@ -3680,12 +3677,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'calc':
                 var actionArgs = [];
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var name = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 actionArgs = receivedArg;
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
                     logo.turtles.turtleList[turtle].running = true;
-                    logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
+                    logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.shift();
                 } else {
                     logo.errorMsg(NOACTIONERRORMSG, blk, name);
@@ -3700,7 +3697,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
                     logo.turtles.turtleList[turtle].running = true;
-                    logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
+                    logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.shift();
                 } else {
                     logo.errorMsg(NOACTIONERRORMSG, blk, name);
@@ -3712,15 +3709,15 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // logo.getBlockAtStartOfArg(blk);
                 if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                     for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                        var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
+                        var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
                         actionArgs.push(t);
                     }
                 }
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                var name = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
                     logo.turtles.turtleList[turtle].running = true;
-                    logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
+                    logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.pop();
                 } else {
                     logo.errorMsg(NOACTIONERRORMSG, blk, name);
@@ -3733,14 +3730,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // logo.getBlockAtStartOfArg(blk);
                 if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                     for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                        var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
+                        var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
                         actionArgs.push(t);
                     }
                 }
                 if (name in logo.actions) {
                     // Just run the stack.
                     logo.turtles.turtleList[turtle].running = true;
-                    logo.runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
+                    logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
                     logo.blocks.blockList[blk].value = logo.returns.pop();
                 } else {
                     logo.errorMsg(NOACTIONERRORMSG, blk, name);
@@ -3775,21 +3772,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     };
 
-    this.doWait = function(turtle, secs) {
+    this._doWait = function(turtle, secs) {
         this.waitTimes[turtle] = Number(secs) * 1000;
     };
 
     // Math functions
-    this.doRandom = function(a, b) {
+    this._doRandom = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
+
         return Math.floor(Math.random() * (Number(b) - Number(a) + 1) + Number(a));
     };
 
-    this.doOneOf = function(a, b) {
+    this._doOneOf = function(a, b) {
         if (Math.random() < 0.5) {
             return a;
         } else {
@@ -3797,66 +3795,73 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     };
 
-    this.doMod = function(a, b) {
+    this._doMod = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
+
         return Number(a) % Number(b);
     };
 
-    this.doSqrt = function(a) {
+    this._doSqrt = function(a) {
         if (typeof(a) === 'string') {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
+
         return Math.sqrt(Number(a));
     };
 
-    this.doPlus = function(a, b) {
+    this._doPlus = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             if (typeof(a) === 'string') {
                 var aString = a;
             } else {
                 var aString = a.toString();
             }
+
             if (typeof(b) === 'string') {
                 var bString = b;
             } else {
                 var bString = b.toString();
             }
+
             return aString + bString;
         } else {
             return Number(a) + Number(b);
         }
     };
 
-    this.doMinus = function(a, b) {
+    this._doMinus = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
+
         return Number(a) - Number(b);
     };
 
-    this.doMultiply = function(a, b) {
+    this._doMultiply = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
+
         return Number(a) * Number(b);
     };
 
-    this.doDivide = function(a, b) {
+    this._doDivide = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
+
         if (Number(b) === 0) {
             this.errorMsg(ZERODIVIDEERRORMSG);
             this.stopTurtle = true;
@@ -3887,12 +3892,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.hideBlocks = function() {
         // Hide all the blocks.
         this.blocks.hide();
-        // And hide some other things.
-        // for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-            // this.turtles.turtleList[turtle].container.visible = false;
-        // }
-        //trashcan.hide();
-        //palettes.hide();
         this.refreshCanvas();
     };
 
@@ -3900,11 +3899,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         // Show all the blocks.
         this.blocks.show();
         this.blocks.bringToTop();
-        // And show some other things.
-        // for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-            // this.turtles.turtleList[turtle].container.visible = true;
-        // }
-        // trashcan.show();
         this.refreshCanvas();
     };
 
@@ -4075,7 +4069,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     };
 
-    this.updateNotation = function (note, duration, turtle, insideChord) {
+    this._updateNotation = function (note, duration, turtle, insideChord) {
         var obj = durationToNoteValue(duration);
         if (!(turtle in this.lilypondStaging)) {
             this.lilypondStaging[turtle] = [];
@@ -4086,7 +4080,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         this.lilypondStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
     };
 
-    this.processLilypondNotes = function (turtle) {
+    this._processLilypondNotes = function (turtle) {
         // TODO: process all the notes together rather than one at a
         // time so that you can generate tuplets.
 
@@ -4095,7 +4089,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         this.lilypondNotes[turtle] = '';
 
-        function toLilynote (note) {
+        function __toLilynote (note) {
             // Lilypond notes use is for sharp, es for flat,
             // , and ' for shifts in octave.
             // Also, notes must be lowercase.
@@ -4133,7 +4127,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 counter += 1;
 
-                var note = toLilynote(obj[LYNOTE]);
+                var note = __toLilynote(obj[LYNOTE]);
                 var singleton = false;
 
                 // If it is a tuplet, look ahead to see if it is complete.
@@ -4289,25 +4283,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     };
 
-    this.lilypondLineBreak = function(turtle) {
+    this._lilypondLineBreak = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('break');
     };
 
-    this.lilypondBeginArticulation = function(turtle) {
+    this._lilypondBeginArticulation = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('begin articulation');
     };
 
-    this.lilypondEndArticulation = function(turtle) {
+    this._lilypondEndArticulation = function(turtle) {
         this.lilypondStaging[turtle].push('end articulation');
     };
 
-    this.lilypondBeginCrescendo = function(turtle, factor) {
+    this._lilypondBeginCrescendo = function(turtle, factor) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
@@ -4318,33 +4312,33 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     };
 
-    this.lilypondEndCrescendo = function(turtle) {
+    this._lilypondEndCrescendo = function(turtle) {
         this.lilypondStaging[turtle].push('%5C! ');
     };
 
-    this.lilypondBeginSlur = function(turtle) {
+    this._lilypondBeginSlur = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('(');
     };
 
-    this.lilypondEndSlur = function(turtle) {
+    this._lilypondEndSlur = function(turtle) {
         this.lilypondStaging[turtle].push(') ');
     };
 
-    this.lilypondInsertTie = function(turtle) {
+    this._lilypondInsertTie = function(turtle) {
         if (this.lilypondStaging[turtle] == undefined) {
             this.lilypondStaging[turtle] = [];
         }
         this.lilypondStaging[turtle].push('~');
     };
 
-    this.lilypondRemoveTie = function(turtle) {
+    this._lilypondRemoveTie = function(turtle) {
         this.lilypondStaging[turtle].pop();
     };
 
-    this.saveLilypondOutput = function(saveName) {
+    this._saveLilypondOutput = function(saveName) {
         var turtleCount = 0;
         var clef = [];
         for (var t in this.lilypondStaging) {
@@ -4391,7 +4385,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     clef.push('treble');
                 }
 
-                this.processLilypondNotes(t);
+                this._processLilypondNotes(t);
 
                 var instrumentName = this.turtles.turtleList[t].name;
                 if (instrumentName === _('start') || instrumentName === _('start drum')) {
