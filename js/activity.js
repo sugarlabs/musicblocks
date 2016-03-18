@@ -302,7 +302,7 @@ define(function (require) {
 
         pluginsImages = {};
 
-        function findBlocks() {
+        function _findBlocks() {
             logo.showBlocks();
             blocksContainer.x = 0;
             blocksContainer.y = 0;
@@ -350,7 +350,7 @@ define(function (require) {
             boundary.hide();
         };
 
-        function allClear() {
+        function _allClear() {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
@@ -392,7 +392,7 @@ define(function (require) {
             context.clearRect(0, 0, canvas.width, canvas.height);
         };
 
-        function doFastButton(env) {
+        function _doFastButton(env) {
             logo.setTurtleDelay(0);
             if (docById('matrix').style.visibility === 'visible') {
                 matrix.playAll();
@@ -403,7 +403,7 @@ define(function (require) {
             }
         };
 
-        function doSlowButton() {
+        function _doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
             if (docById('matrix').style.visibility === 'visible') {
                 matrix.playAll();
@@ -414,7 +414,7 @@ define(function (require) {
             }
         };
 
-        function doStepButton() {
+        function _doStepButton() {
             var turtleCount = 0;
             for (var turtle in logo.stepQueue) {
                 turtleCount += 1;
@@ -435,7 +435,7 @@ define(function (require) {
             }
         };
 
-        function doSlowMusicButton() {
+        function _doSlowMusicButton() {
             logo.setNoteDelay(DEFAULTDELAY);
 
             if (docById('matrix').style.visibility === 'visible') {
@@ -447,7 +447,7 @@ define(function (require) {
             }
         };
 
-        function doStepMusicButton() {
+        function _doStepMusicButton() {
             var turtleCount = 0;
             for (var turtle in logo.stepQueue) {
                 turtleCount += 1;
@@ -476,24 +476,24 @@ define(function (require) {
 
         var cartesianVisible = false;
 
-        function doCartesian() {
+        function _doCartesian() {
             if (cartesianVisible) {
-                hideCartesian();
+                _hideCartesian();
                 cartesianVisible = false;
             } else {
-                showCartesian();
+                _showCartesian();
                 cartesianVisible = true;
             }
         };
 
         var polarVisible = false;
 
-        function doPolar() {
+        function _doPolar() {
             if (polarVisible) {
-                hidePolar();
+                _hidePolar();
                 polarVisible = false;
             } else {
-                showPolar();
+                _showPolar();
                 polarVisible = true;
             }
         };
@@ -506,7 +506,7 @@ define(function (require) {
             var button = this;
             button.x = (canvas.width / (2 * musicBlocksScale))  + (300 / Math.sqrt(2));
             button.y = 300.00 - (300.00 / Math.sqrt(2));
-            this.closeButton = makeButton('cancel-button', _('Close'), button.x, button.y, 55, 0);
+            this.closeButton = _makeButton('cancel-button', _('Close'), button.x, button.y, 55, 0);
             this.closeButton.on('click', function(event) {
                 console.log('Deleting Chart');
                 button.closeButton.visible = false;
@@ -517,7 +517,7 @@ define(function (require) {
             });
         };
 
-        function isCanvasBlank(canvas) {
+        function _isCanvasBlank(canvas) {
             var blank = document.createElement('canvas');
             blank.width = canvas.width;
             blank.height = canvas.height;
@@ -527,7 +527,7 @@ define(function (require) {
         function doAnalytics() {
             var myChart = docById('myChart');
 
-             if(isCanvasBlank(myChart) == false) {
+             if(_isCanvasBlank(myChart) == false) {
                 return ;
              }
 
@@ -540,7 +540,7 @@ define(function (require) {
             var Analytics = this;
             Analytics.close = closeAnalytics;
 
-            var callback = function () {
+            var __callback = function () {
                 var imageData = myRadarChart.toBase64Image();
                 var img = new Image();
                 img.onload = function () {
@@ -557,7 +557,7 @@ define(function (require) {
                 img.src = imageData;
             };
 
-            var options = getChartOptions(callback);
+            var options = getChartOptions(__callback);
             console.log('creating new chart');
             myRadarChart = new Chart(ctx).Radar(data, options);
         };
@@ -612,17 +612,17 @@ define(function (require) {
             createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
             createjs.Ticker.setFPS(30);
             createjs.Ticker.addEventListener('tick', stage);
-            createjs.Ticker.addEventListener('tick', tick);
+            createjs.Ticker.addEventListener('tick', __tick);
 
-            createMsgContainer('#ffffff', '#7a7a7a', function (text) {
+            _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
                 msgText = text;
             }, 55);
 
-            createMsgContainer('#ffcbc4', '#ff0031', function (text) {
+            _createMsgContainer('#ffcbc4', '#ff0031', function (text) {
                 errorMsgText = text;
             }, 110);
 
-            createErrorContainers();
+            _createErrorContainers();
 
             /* Z-Order (top to bottom):
              *   menus
@@ -638,7 +638,7 @@ define(function (require) {
             turtleContainer = new createjs.Container();
 
             stage.addChild(turtleContainer, trashContainer, blocksContainer, palettesContainer);
-            setupBlocksContainerEvents();
+            _setupBlocksContainerEvents();
 
             trashcan = new Trashcan(canvas, trashContainer, cellSize, refreshCanvas);
             turtles = new Turtles(canvas, turtleContainer, refreshCanvas);
@@ -654,7 +654,7 @@ define(function (require) {
             turtles.setBlocks(blocks);
             blocks.setTurtles(turtles);
             blocks.setErrorMsg(errorMsg);
-            blocks.makeCopyPasteButtons(makeButton, updatePasteButton);
+            blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
             logo = new Logo(matrix, canvas,
@@ -778,18 +778,18 @@ define(function (require) {
             // Enabled mouse over and mouse out events.
             stage.enableMouseOver(10); // default is 20
 
-            cartesianBitmap = createGrid('images/Cartesian.svg');
+            cartesianBitmap = _createGrid('images/Cartesian.svg');
 
-            polarBitmap = createGrid('images/polar.svg');
+            polarBitmap = _createGrid('images/polar.svg');
 
             var URL = window.location.href;
             var projectName = null;
             var runProjectOnLoad = false;
 
-            setupAndroidToolbar();
+            _setupAndroidToolbar();
 
             // Scale the canvas relative to the screen size.
-            onResize();
+            _onResize();
 
             var urlParts;
             var env = [];
@@ -860,17 +860,17 @@ define(function (require) {
                 }, 2000);
             } else {
                 setTimeout(function () {
-                    loadStart();
+                    _loadStart();
                 }, 2000);
             }
 
             document.addEventListener('mousewheel', scrollEvent, false);
             document.addEventListener('DOMMouseScroll', scrollEvent, false);
 
-            this.document.onkeydown = keyPressed;
+            this.document.onkeydown = __keyPressed;
         };
 
-        function setupBlocksContainerEvents() {
+        function _setupBlocksContainerEvents() {
             var moving = false;
 
             stage.on('stagemousemove', function (event) {
@@ -951,7 +951,7 @@ define(function (require) {
             cameraID = id;
         };
 
-        function createGrid(imagePath) {
+        function _createGrid(imagePath) {
             var img = new Image();
             img.src = imagePath;
             var container = new createjs.Container();
@@ -970,7 +970,7 @@ define(function (require) {
             return bitmap;
         };
 
-        function createMsgContainer(fillColor, strokeColor, callback, y) {
+        function _createMsgContainer(fillColor, strokeColor, callback, y) {
             var container = new createjs.Container();
             stage.addChild(container);
             container.x = (canvas.width - 1000) / 2;
@@ -980,6 +980,7 @@ define(function (require) {
             var img = new Image();
             var svgData = MSGBLOCK.replace('fill_color', fillColor).replace(
                 'stroke_color', strokeColor);
+
             img.onload = function () {
                 var msgBlock = new createjs.Bitmap(img);
                 container.addChild(msgBlock);
@@ -1016,15 +1017,15 @@ define(function (require) {
                 unescape(encodeURIComponent(svgData)));
         };
 
-        function createErrorContainers() {
+        function _createErrorContainers() {
             // Some error messages have special artwork.
             for (var i = 0; i < ERRORARTWORK.length; i++) {
                 var name = ERRORARTWORK[i];
-                makeErrorArtwork(name);
+                _makeErrorArtwork(name);
             }
         };
 
-        function makeErrorArtwork(name) {
+        function _makeErrorArtwork(name) {
             var container = new createjs.Container();
             stage.addChild(container);
             container.x = (canvas.width - 1000) / 2;
@@ -1066,7 +1067,7 @@ define(function (require) {
             img.src = 'images/' + name + '.svg';
         };
 
-        function keyPressed(event) {
+        function __keyPressed(event) {
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
                 return;
             }
@@ -1097,10 +1098,10 @@ define(function (require) {
             if (event.altKey) {
                 switch (event.keyCode) {
                 case 69: // 'E'
-                    allClear();
+                    _allClear();
                     break;
                 case 82: // 'R'
-                    doFastButton();
+                    _doFastButton();
                     break;
                 case 83: // 'S'
                     logo.doStopTurtle();
@@ -1110,13 +1111,13 @@ define(function (require) {
             } else {
                 switch (event.keyCode) {
                 case HOME:
-                    findBlocks();
+                    _findBlocks();
                     break;
                 case TAB:
                     break;
                 case ESC:
                     // toggle full screen
-                    toggleToolbar();
+                    _toggleToolbar();
                     break;
                 case RETURN:
                     // toggle run
@@ -1139,7 +1140,7 @@ define(function (require) {
             currentKeyCode = 0;
         };
 
-        function onResize() {
+        function _onResize() {
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
                 return;
             }
@@ -1168,6 +1169,7 @@ define(function (require) {
                     musicBlocksScale = h / 900;
                 }
             }
+
             stage.scaleX = musicBlocksScale;
             stage.scaleY = musicBlocksScale;
 
@@ -1184,7 +1186,7 @@ define(function (require) {
             boundary.setScale(w, h, musicBlocksScale);
             palettes.setScale(musicBlocksScale);
             trashcan.resizeEvent(musicBlocksScale);
-            setupAndroidToolbar(mobileSize);
+            _setupAndroidToolbar(mobileSize);
 
             // Reposition coordinate grids.
             cartesianBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (600);
@@ -1194,7 +1196,7 @@ define(function (require) {
             update = true;
 
             // Setup help now that we have calculated musicBlocksScale.
-            showHelp(true);
+            _showHelp(true);
 
             // Hide palette icons on mobile
             if (mobileSize) {
@@ -1214,10 +1216,10 @@ define(function (require) {
         };
 
         window.onresize = function () {
-            onResize();
+            _onResize();
         };
 
-        function restoreTrash() {
+        function _restoreTrash() {
             // Restore last stack pushed to trashStack.
             // First, hide the palettes as they will need updating.
             for (var name in blocks.palettes.dict) {
@@ -1265,12 +1267,12 @@ define(function (require) {
             blocks.refreshCanvas();
         };
 
-        function deleteBlocksBox() {
+        function _deleteBlocksBox() {
             clearBox.show(musicBlocksScale);
         };
 
-        function doUtilityBox() {
-            utilityBox.init(musicBlocksScale, utilityButton.x - 27, utilityButton.y, makeButton);
+        function _doUtilityBox() {
+            utilityBox.init(musicBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
         };
 
         function sendAllToTrash(addStartBlock, doNotSave) {
@@ -1315,7 +1317,7 @@ define(function (require) {
             update = true;
         };
 
-        function changePaletteVisibility() {
+        function _changePaletteVisibility() {
             if (palettes.visible) {
                 palettes.hide();
             } else {
@@ -1324,7 +1326,7 @@ define(function (require) {
             }
         };
 
-        function changeBlockVisibility() {
+        function _changeBlockVisibility() {
             if (blocks.visible) {
                 logo.hideBlocks();
             } else {
@@ -1336,7 +1338,7 @@ define(function (require) {
             }
         };
 
-        function toggleCollapsibleStacks() {
+        function _toggleCollapsibleStacks() {
             if (blocks.visible) {
                 console.log('calling toggleCollapsibles');
                 blocks.toggleCollapsibles();
@@ -1345,21 +1347,24 @@ define(function (require) {
 
         function stop() {
             // FIXME: who calls this???
-            createjs.Ticker.removeEventListener('tick', tick);
+            createjs.Ticker.removeEventListener('tick', __tick);
         };
 
         function onStopTurtle() {
             // TODO: plugin support
-            if (!buttonsVisible) {
-                hideStopButton();
+            if (stopTurtleContainer.visible) {
+                console.log('HIDE');
+                _hideStopButton();
             }
         };
 
         function onRunTurtle() {
+            console.log('ONRUNTURTLE');
             // TODO: plugin support
             // If the stop button is hidden, show it.
-            if (!buttonsVisible) {
-                showStopButton();
+            if (!stopTurtleContainer.visible) {
+                console.log('SHOW');
+                _showStopButton();
             }
         };
 
@@ -1367,7 +1372,7 @@ define(function (require) {
             update = true;
         };
 
-        function tick(event) {
+        function __tick(event) {
             // This set makes it so the stage only re-renders when an
             // event handler indicates a change has happened.
             if (update) {
@@ -1376,7 +1381,7 @@ define(function (require) {
             }
         };
 
-        function doOpenSamples() {
+        function _doOpenSamples() {
             if(document.getElementById('matrix').style.visibility !== 'hidden') {
                 console.log('hide matrix');
                 document.getElementById('matrix').style.visibility = 'hidden';
@@ -1401,7 +1406,7 @@ define(function (require) {
             window.scroll(0, 0);
         };
 
-        function doLilypond() {
+        function _doLilypond() {
             // Show busy cursor.
             document.body.style.cursor = 'wait';
 
@@ -1512,7 +1517,7 @@ define(function (require) {
                     saveLocally();
                 } catch (e) {
                     console.log(e);
-                    loadStart();
+                    _loadStart();
                 }
 
                 // Restore default cursor
@@ -1523,7 +1528,7 @@ define(function (require) {
             if (run) {
                 setTimeout(function () {
                     changeBlockVisibility();
-                    doFastButton(env);
+                    _doFastButton(env);
                 }, 2000);
             }
 
@@ -1533,7 +1538,7 @@ define(function (require) {
         function loadRawProject(data) {
             console.log('loadRawProject ' + data);
             document.body.style.cursor = 'wait';
-            allClear();
+            _allClear();
 
             // First, hide the palettes as they will need updating.
             for (var name in blocks.palettes.dict) {
@@ -1586,7 +1591,7 @@ define(function (require) {
             }, 200);
         };
 
-        function loadStart() {
+        function _loadStart() {
             // where to put this?
             // palettes.updatePalettes();
             console.log(" LOAD START")
@@ -1747,25 +1752,25 @@ define(function (require) {
             update = true;
         };
 
-        function hideCartesian() {
+        function _hideCartesian() {
             cartesianBitmap.visible = false;
             cartesianBitmap.updateCache();
             update = true;
         };
 
-        function showCartesian() {
+        function _showCartesian() {
             cartesianBitmap.visible = true;
             cartesianBitmap.updateCache();
             update = true;
         };
 
-        function hidePolar() {
+        function _hidePolar() {
             polarBitmap.visible = false;
             polarBitmap.updateCache();
             update = true;
         };
 
-        function showPolar() {
+        function _showPolar() {
             polarBitmap.visible = true;
             polarBitmap.updateCache();
             update = true;
@@ -1885,18 +1890,19 @@ define(function (require) {
             download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
         };
 
-        function hideStopButton() {
-            stopTurtleContainer.x = stopTurtleContainerX;
-            stopTurtleContainer.y = stopTurtleContainerY;
+        function _hideStopButton() {
+            // stopTurtleContainer.x = stopTurtleContainerX;
+            // stopTurtleContainer.y = stopTurtleContainerY;
             stopTurtleContainer.visible = false;
         };
 
-        function showStopButton() {
-            stopTurtleContainer.x = onscreenButtons[0].x;
-            stopTurtleContainer.y = onscreenButtons[0].y;
+        function _showStopButton() {
+            // stopTurtleContainer.x = onscreenButtons[0].x;
+            // stopTurtleContainer.y = onscreenButtons[0].y;
             stopTurtleContainer.visible = true;
         };
 
+        /*
         function playMusic(){
             for (var blk in logo.blocks.blockList) {
                 var myBlock = logo.blocks.blockList[blk];
@@ -1913,6 +1919,7 @@ define(function (require) {
             logo.doStopTurtle();
             Tone.Transport.stop();
         };
+        */
 
         function updatePasteButton() {
             pasteContainer.removeChild(pasteContainer.children[0]);
@@ -1936,7 +1943,7 @@ define(function (require) {
             img.src = 'header-icons/paste-button.svg';
         };
 
-        function setupAndroidToolbar(showPalettesPopover) {
+        function _setupAndroidToolbar(showPalettesPopover) {
             if (headerContainer !== undefined) {
                 stage.removeChild(headerContainer);
                 for (var i in onscreenButtons) {
@@ -1956,18 +1963,18 @@ define(function (require) {
 
             // Buttons used when running turtle programs
             var buttonNames = [
-                ['fast', doFastButton, _('Run fast')],
-                ['slow', doSlowButton, _('Run slow')],
-                ['step', doStepButton, _('Run step by step')],
-                ['slow-music', doSlowMusicButton, _('Run music slow')],
-                ['step-music', doStepMusicButton, _('Run note by note')],
+                ['fast', _doFastButton, _('Run fast')],
+                ['slow', _doSlowButton, _('Run slow')],
+                ['step', _doStepButton, _('Run step by step')],
+                ['slow-music', _doSlowMusicButton, _('Run music slow')],
+                ['step-music', _doStepMusicButton, _('Run note by note')],
                 ['stop-turtle', doStopButton, _('Stop')],
-                ['clear', allClear, _('Clean')],
-                ['palette', changePaletteVisibility, _('Show/hide palettes')],
-                ['hide-blocks', changeBlockVisibility, _('Show/hide blocks')],
-                ['collapse-blocks', toggleCollapsibleStacks, _('Expand/collapse collapsable blocks')],
-                ['go-home', findBlocks, _('Home')],
-                ['help', showHelp, _('Help')]
+                ['clear', _allClear, _('Clean')],
+                ['palette', _changePaletteVisibility, _('Show/hide palettes')],
+                ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks')],
+                ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks')],
+                ['go-home', _findBlocks, _('Home')],
+                ['help', _showHelp, _('Help')]
             ];
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -1990,8 +1997,8 @@ define(function (require) {
             var dy = 0;
 
             for (var name in buttonNames) {
-                var container = makeButton(buttonNames[name][0] + '-button', buttonNames[name][2], x, y, btnSize, 0);
-                loadButtonDragHandler(container, x, y, buttonNames[name][1]);
+                var container = _makeButton(buttonNames[name][0] + '-button', buttonNames[name][2], x, y, btnSize, 0);
+                _loadButtonDragHandler(container, x, y, buttonNames[name][1]);
                 onscreenButtons.push(container);
 
                 if (buttonNames[name][0] === 'stop-turtle') {
@@ -2003,8 +2010,8 @@ define(function (require) {
                     homeButtonContainers.push(container);
                     homeButtonContainersX = x;
                     homeButtonContainersY = y;
-                    var container2 = makeButton('go-home-faded-button', _('Home'), x, y, btnSize, 0);
-                    loadButtonDragHandler(container2, x, y, buttonNames[name][1]);
+                    var container2 = _makeButton('go-home-faded-button', _('Home'), x, y, btnSize, 0);
+                    _loadButtonDragHandler(container2, x, y, buttonNames[name][1]);
                     homeButtonContainers.push(container2);
                     onscreenButtons.push(container2);
                     homeButtonContainers[0].visible = false;
@@ -2017,10 +2024,10 @@ define(function (require) {
                 y += dy;
             }
 
-            setupRightMenu(musicBlocksScale);
+            _setupRightMenu(musicBlocksScale);
         };
 
-        function setupRightMenu(musicBlocksScale) {
+        function _setupRightMenu(musicBlocksScale) {
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
                 for (var i in onscreenMenu) {
@@ -2030,16 +2037,16 @@ define(function (require) {
 
             // Misc. other buttons
             var menuNames = [
-                ['planet', doOpenSamples, _('Load samples from server')],
+                ['planet', _doOpenSamples, _('Load samples from server')],
                 ['open', doLoad, _('Load project from files')],
                 ['save', doSave, _('Save project')],
-                ['lilypond', doLilypond, _('Save sheet music')],
+                ['lilypond', _doLilypond, _('Save sheet music')],
                 ['paste-disabled', pasteStack, _('Paste')],
-                ['Cartesian', doCartesian, _('Cartesian')],
-                ['polar', doPolar, _('Polar')],
-                ['utility', doUtilityBox, _('Settings')],
-                ['empty-trash', deleteBlocksBox, _('Delete all')],
-                ['restore-trash', restoreTrash, _('Undo')]
+                ['Cartesian', _doCartesian, _('Cartesian')],
+                ['polar', _doPolar, _('Polar')],
+                ['utility', _doUtilityBox, _('Settings')],
+                ['empty-trash', _deleteBlocksBox, _('Delete all')],
+                ['restore-trash', _restoreTrash, _('Undo')]
             ];
 
             document.querySelector('#myOpenFile')
@@ -2054,14 +2061,14 @@ define(function (require) {
             var dx = 0;
             var dy = btnSize;
 
-            menuContainer = makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
-            loadButtonDragHandler(menuContainer, x, y, doMenuButton);
+            menuContainer = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
+            _loadButtonDragHandler(menuContainer, x, y, _doMenuButton);
 
             for (var name in menuNames) {
                 x += dx;
                 y += dy;
-                var container = makeButton(menuNames[name][0] + '-button', menuNames[name][2], x, y, btnSize, 0);
-                loadButtonDragHandler(container, x, y, menuNames[name][1]);
+                var container = _makeButton(menuNames[name][0] + '-button', menuNames[name][2], x, y, btnSize, 0);
+                _loadButtonDragHandler(container, x, y, menuNames[name][1]);
                 onscreenMenu.push(container);
                 if (menuNames[name][0] === 'utility') {
                     utilityButton = container;
@@ -2081,7 +2088,7 @@ define(function (require) {
             p.popdown();
         };
 
-        function showHelp(firstTime) {
+        function _showHelp(firstTime) {
             helpIdx = 0;
 
             if (firstTime) {
@@ -2191,11 +2198,11 @@ define(function (require) {
             }
         };
 
-        function doMenuButton() {
-            doMenuAnimation(1);
+        function _doMenuButton() {
+            _doMenuAnimation(1);
         };
 
-        function doMenuAnimation() {
+        function _doMenuAnimation() {
             var bitmap = last(menuContainer.children);
             if (bitmap != null) {
                 var r = bitmap.rotation;
@@ -2208,7 +2215,7 @@ define(function (require) {
                     }, 500);
             } else {
                 // Race conditions during load
-                setTimeout(doMenuAnimation, 50);
+                setTimeout(_doMenuAnimation, 50);
             }
 
             setTimeout(function () {
@@ -2227,7 +2234,7 @@ define(function (require) {
             }, 500);
         };
 
-        function toggleToolbar() {
+        function _toggleToolbar() {
             buttonsVisible = !buttonsVisible;
             menuContainer.visible = buttonsVisible;
             headerContainer.visible = buttonsVisible;
@@ -2242,7 +2249,7 @@ define(function (require) {
             update = true;
         };
 
-        function makeButton(name, label, x, y, size, rotation, parent) {
+        function _makeButton(name, label, x, y, size, rotation, parent) {
             var container = new createjs.Container();
             if (name === 'paste-disabled-button') {
                 pasteContainer = container;
@@ -2328,7 +2335,7 @@ define(function (require) {
             return container;
         };
 
-        function loadButtonDragHandler(container, ox, oy, action) {
+        function _loadButtonDragHandler(container, ox, oy, action) {
             // Prevent multiple button presses (i.e., debounce).
             var locked = false;
 
@@ -2358,6 +2365,7 @@ define(function (require) {
             });
         };
 
+        /*
         // More music stuff we may not need
         function clearMenus() {
             if (headerContainer !== undefined) {
@@ -2375,8 +2383,8 @@ define(function (require) {
             }
         };
 
-        function restoreHome() {
-            setupAndroidToolbar();
+        function _restoreHome() {
+            _setupAndroidToolbar();
             blocks.show();
             for (var b = 0; b < blocks.blockList.length; b++) {
                 var blk = blocks.blockList[b];
@@ -2388,6 +2396,6 @@ define(function (require) {
                 palettes.show();
             }
         };
-
+        */
     };
 });
