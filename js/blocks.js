@@ -22,7 +22,7 @@ const VIDEOVALUE = '##__VIDEO__##';
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
 
-function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
+function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageScale) {
     // Things we need from outside include access to the canvas, the
     // stage, and the trashcan.
     if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -36,6 +36,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
     this.refreshCanvas = refreshCanvas;
     this.trashcan = trashcan;
     this.updateStage = updateStage;
+    this.getStageScale = getStageScale;
 
     // We keep a list of stacks in the trash.
     this.trashStacks = [];

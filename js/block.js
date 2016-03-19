@@ -1430,8 +1430,10 @@ function Block(protoblock, blocks, overrideName) {
         var blocks = this.blocks;
         var x = this.container.x;
         var y = this.container.y;
-        var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.blockScale;
-        var canvasTop = blocks.canvas.offsetTop + 6 * blocks.blockScale;
+        var scale = blocks.getStageScale();
+
+        var canvasLeft = blocks.canvas.offsetLeft + 28 * scale;
+        var canvasTop = blocks.canvas.offsetTop + 6 * scale;
 
         var movedStage = false;
         if (!window.hasMouse && blocks.stage.y + y > 75) {
@@ -1595,21 +1597,21 @@ function Block(protoblock, blocks, overrideName) {
             });
         }
 
-        this.label.style.left = Math.round((x + blocks.stage.x) * blocks.blockScale + canvasLeft) + 'px';
-        this.label.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
+        this.label.style.left = Math.round((x + blocks.stage.x) * scale + canvasLeft) + 'px';
+        this.label.style.top = Math.round((y + blocks.stage.y) * scale + canvasTop) + 'px';
 
         // There may be a second select used for # and b.
         if (this.labelattr != null) {
-            this.label.style.width = Math.round(60 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * blocks.blockScale + canvasLeft) + 'px';
-            this.labelattr.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
-            this.labelattr.style.width = Math.round(60 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.fontSize = Math.round(20 * blocks.blockScale * this.protoblock.scale / 2) + 'px';
+            this.label.style.width = Math.round(60 * scale) * this.protoblock.scale / 2 + 'px';
+            this.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * scale + canvasLeft) + 'px';
+            this.labelattr.style.top = Math.round((y + blocks.stage.y) * scale + canvasTop) + 'px';
+            this.labelattr.style.width = Math.round(60 * scale) * this.protoblock.scale / 2 + 'px';
+            this.labelattr.style.fontSize = Math.round(20 * scale * this.protoblock.scale / 2) + 'px';
         } else {
-            this.label.style.width = Math.round(100 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            this.label.style.width = Math.round(100 * scale) * this.protoblock.scale / 2 + 'px';
         }
 
-        this.label.style.fontSize = Math.round(20 * blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        this.label.style.fontSize = Math.round(20 * scale * this.protoblock.scale / 2) + 'px';
         this.label.style.display = '';
         this.label.focus();
 
