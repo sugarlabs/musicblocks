@@ -222,6 +222,7 @@ function Block(protoblock, blocks, overrideName) {
             var postProcess = function(myBlock) {
                 myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = scale / 2;
                 myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = scale / 2;
+
                 var bounds = myBlock.collapseContainer.getBounds();
                 myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 myBlock._positionCollapseContainer(myBlock.protoblock.scale);
@@ -784,6 +785,7 @@ function Block(protoblock, blocks, overrideName) {
                     bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXHEIGHT / image.height;
                 }
             }
+
             var bounds = myContainer.getBounds();
             myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             myBlock.value = myContainer.getCacheDataURL();
@@ -1115,6 +1117,11 @@ function Block(protoblock, blocks, overrideName) {
     this._calculateBlockHitArea = function() {
         var hitArea = new createjs.Shape();
         var bounds = this.container.getBounds()
+
+        if (bounds == null) {
+            this._createCache();
+            bounds = this.bounds;
+        }
 
         // Only detect hits on top section of block.
         if (this.isClampBlock() || this.isArgClamp()) {

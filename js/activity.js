@@ -1353,17 +1353,14 @@ define(function (require) {
         function onStopTurtle() {
             // TODO: plugin support
             if (stopTurtleContainer.visible) {
-                console.log('HIDE');
                 _hideStopButton();
             }
         };
 
         function onRunTurtle() {
-            console.log('ONRUNTURTLE');
             // TODO: plugin support
             // If the stop button is hidden, show it.
             if (!stopTurtleContainer.visible) {
-                console.log('SHOW');
                 _showStopButton();
             }
         };

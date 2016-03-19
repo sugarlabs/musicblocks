@@ -269,6 +269,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage) {
         }
     };
 
+    this._actionBlock = function(name) {
+        return ['do', 'doArg', 'calc', 'calcArg'].indexOf(name) !== -1;
+    };
+
+    this._namedActionBlock = function(name) {
+        return ['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(name) !== -1;
+    };
+
     // Adjust the docking postions of all blocks in the current drag
     // group.
     this._adjustBlockPositions = function () {

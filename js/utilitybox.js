@@ -127,47 +127,65 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
 
     this.createBox = function(scale, x, y) {
         this.scale = scale;
-        if (this.container === null) {
+
+        function __processBackground(box, name, bitmap, extras) {
+            box.container.addChild(bitmap);
+            box._loadUtilityContainerHandler();
+
+            var hitArea = new createjs.Shape();
+            box.bounds = box.container.getBounds();
+            box.container.cache(box.bounds.x, box.bounds.y, box.bounds.width, box.bounds.height);
+            hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            hitArea.x = 0;
+            hitArea.y = 0;
+            box.container.hitArea = hitArea;
+        };
+
+        if (this.container == null) {
             this.container = new createjs.Container();
             this.stage.addChild(this.container);
             this.container.x = x - 360;
             this.container.y = y - 133;
-            function processBackground(box, name, bitmap, extras) {
-                box.container.addChild(bitmap);
-                loadUtilityContainerHandler(box);
-            };
 
             var UTILITYBOX = UTILITYBOXSVG;
-            makeBoxBitmap(this, UTILITYBOX, 'box', processBackground, null);
+            this._makeBoxBitmap(UTILITYBOX, 'box', __processBackground, null);
         }
     };
-};
 
+    this._makeBoxBitmap = function(data, name, callback, extras) {
+        // Async creation of bitmap from SVG data
+        // Works with Chrome, Safari, Firefox (untested on IE)
+        var img = new Image();
+        var box = this;
 
-function loadUtilityContainerHandler(box) {
-    var hitArea = new createjs.Shape();
-    this.bounds = box.container.getBounds();
-    hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds. width, bounds.height);
-    hitArea.x = 0;
-    hitArea.y = 0;
-    box.container.hitArea = hitArea;
+        img.onload = function() {
+            bitmap = new createjs.Bitmap(img);
+            callback(box, name, bitmap, extras);
+        };
 
-    var locked = false;
-    box.container.on('click', function(event) {
-        // We need a lock to "debouce" the click.
-        if (locked) {
-            console.log('debouncing click');
-            return;
-        }
-        locked = true;
-        setTimeout(function() {
-            locked = false;
-        }, 500);
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
+    };
 
-        var x = (event.stageX / box.scale) - box.container.x;
-        var y = (event.stageY / box.scale) - box.container.y;
-        if (y < 55) {
-            box.hide();
-        }
-    });
+    this._loadUtilityContainerHandler = function() {
+        var locked = false;
+        var box = this;
+
+        box.container.on('click', function(event) {
+            // We need a lock to "debouce" the click.
+            if (locked) {
+                console.log('debouncing click');
+                return;
+            }
+            locked = true;
+            setTimeout(function() {
+                locked = false;
+            }, 500);
+            
+            var x = (event.stageX / box.scale) - box.container.x;
+            var y = (event.stageY / box.scale) - box.container.y;
+            if (y < 55) {
+                box.hide();
+            }
+        });
+    };
 };

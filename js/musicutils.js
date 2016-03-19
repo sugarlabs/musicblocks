@@ -249,10 +249,26 @@ function Synth () {
     // Isolate synth functions here.
     this.tone = new Tone();
     this.poly = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
-    this.drum = new Tone.DrumSynth().toMaster();
+
     var synthOptions = {
         oscillator: {
-            type: "triangle"
+            type: 'sine'
+        },
+        envelope: {
+            attack: 0.001,
+            decay: 0.4,
+            sustain: 0.01,
+            release: 1.4,
+            attackCurve:'exponential'
+        }
+    }
+
+    // this.drum = new Tone.SimpleSynth(synthOptions);
+    this.drum = new Tone.DrumSynth().toMaster();
+
+    var synthOptions = {
+        oscillator: {
+            type: 'triangle'
         },
         envelope: {
             attack: 0.03,
@@ -261,11 +277,12 @@ function Synth () {
             release: 0.03
         },
     };
+
     this.triangle = new Tone.SimpleSynth(synthOptions);
 
     var synthOptions = {
         oscillator: {
-            type: "square"
+            type: 'square'
         },
         envelope: {
             attack: 0.03,
@@ -274,11 +291,12 @@ function Synth () {
             release: 0.03
         },
     };
+
     this.square = new Tone.SimpleSynth(synthOptions);
 
     var synthOptions = {
         oscillator: {
-            type: "sawtooth"
+            type: 'sawtooth'
         },
         envelope: {
             attack: 0.03,
@@ -287,11 +305,12 @@ function Synth () {
             release: 0.03
         },
     };
+
     this.sawtooth = new Tone.SimpleSynth(synthOptions);
 
     var synthOptions = {
         oscillator: {
-            type: "sine"
+            type: 'sine'
         },
         envelope: {
             attack: 0.03,
@@ -300,6 +319,7 @@ function Synth () {
             release: 0.03
         },
     };
+
     this.sine = new Tone.SimpleSynth(synthOptions);
 
     this.init = function(name) {
@@ -384,7 +404,7 @@ function Synth () {
         Tone.Master.volume.rampTo(db, 0.01);
     };
 
-    this.getOscilator = function(oscillatorName, frequency) {
+    this.getOscillator = function(oscillatorName, frequency) {
         return new Tone.Oscillator(oscillatorName, frequency).toMaster();
     };
 };

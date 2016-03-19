@@ -37,67 +37,70 @@ function ClearBox(canvas, stage, refreshCanvas, clear) {
             this.container.x = Math.floor(((this.canvas.width / scale) - 180) / 2);
             this.container.y = 27;
 
-            function processBackground(box, name, bitmap, extras) {
+            function __processBackground(box, name, bitmap, extras) {
                 box.container.addChild(bitmap);
-		loadClearContainerHandler(box);
-		box.completeShow();
+                box._loadClearContainerHandler();
+                box.completeShow();
             }
-            makeBoxBitmap(this, CONFIRMBOX.replace(/confirm/g, _('confirm')), 'box', processBackground, null);
+
+            this._makeBoxBitmap(CONFIRMBOX.replace(/confirm/g, _('confirm')), 'box', __processBackground, null);
         } else {
             this.completeShow();
         }
     };
 
     this.completeShow = function() {
-	this.container.visible = true;
-	this.refreshCanvas();
-    };
-};
-
-
-function loadClearContainerHandler(box) {
-    var hitArea = new createjs.Shape();
-    this.bounds = box.container.getBounds();
-    hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds. width, bounds.height);
-    hitArea.x = 0;
-    hitArea.y = 0;
-    box.container.hitArea = hitArea;
-
-    var locked = false;
-    box.container.on('click', function(event) {
-        // We need a lock to "debouce" the click.
-        if (locked) {
-            console.log('debouncing click');
-            return;
-        }
-        locked = true;
-        setTimeout(function() {
-            locked = false;
-        }, 500);
-
-        var x = (event.stageX / box.scale) - box.container.x;
-        var y = (event.stageY / box.scale) - box.container.y;
-        if (x > 125 && y < 55) {
-            console.log('closing box');
-            box.hide();
-        } else if (y > 55) {
-	    // Clear
-	    box.doClear(true);
-	    box.hide();
-        }
-    });
-};
-
-
-function makeBoxBitmap(box, data, name, callback, extras) {
-    // Async creation of bitmap from SVG data
-    // Works with Chrome, Safari, Firefox (untested on IE)
-    var img = new Image();
-    img.onload = function() {
-        bitmap = new createjs.Bitmap(img);
-        callback(box, name, bitmap, extras);
+        this.container.visible = true;
+        this.refreshCanvas();
     };
 
-    img.src = 'data:image/svg+xml;base64,' + window.btoa(
-        unescape(encodeURIComponent(data)));
+    this._loadClearContainerHandler = function() {
+        var hitArea = new createjs.Shape();
+        this.bounds = this.container.getBounds();
+        hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds. width, bounds.height);
+        hitArea.x = 0;
+        hitArea.y = 0;
+        this.container.hitArea = hitArea;
+
+        var locked = false;
+        var box = this;
+
+        this.container.on('click', function(event) {
+            // We need a lock to "debouce" the click.
+            if (locked) {
+                console.log('debouncing click');
+                return;
+            }
+
+            locked = true;
+            setTimeout(function() {
+                locked = false;
+            }, 500);
+
+            var x = (event.stageX / box.scale) - box.container.x;
+            var y = (event.stageY / box.scale) - box.container.y;
+            if (x > 125 && y < 55) {
+                box.hide();
+            } else if (y > 55) {
+                // Clear
+                box.doClear(true);
+                box.hide();
+            }
+        });
+    };
+
+    this._makeBoxBitmap = function(data, name, callback, extras) {
+        // Async creation of bitmap from SVG data
+        // Works with Chrome, Safari, Firefox (untested on IE)
+        var img = new Image();
+        var box = this;
+
+        img.onload = function() {
+            bitmap = new createjs.Bitmap(img);
+            callback(box, name, bitmap, extras);
+        };
+
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
+    };
+
 };
