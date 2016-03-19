@@ -991,6 +991,7 @@ function Block(protoblock, blocks, overrideName) {
         var locked = false;
         var mousedown = false;
         var offset = {x:0, y:0};
+        var scale = blocks.getStageScale();
 
         function handleClick () {
             if (locked) {
@@ -1019,8 +1020,8 @@ function Block(protoblock, blocks, overrideName) {
             var d = new Date();
             blocks.mouseDownTime = d.getTime();
             offset = {
-                x: myBlock.collapseContainer.x - Math.round(event.stageX / myBlock.blocks.blockScale),
-                y: myBlock.collapseContainer.y - Math.round(event.stageY / myBlock.blocks.blockScale)
+                x: myBlock.collapseContainer.x - Math.round(event.stageX / scale),
+                y: myBlock.collapseContainer.y - Math.round(event.stageY / scale)
             };
         });
 
@@ -1073,15 +1074,15 @@ function Block(protoblock, blocks, overrideName) {
             moved = true;
             var oldX = myBlock.collapseContainer.x;
             var oldY = myBlock.collapseContainer.y;
-            myBlock.collapseContainer.x = Math.round(event.stageX / myBlock.blocks.blockScale) + offset.x;
-            myBlock.collapseContainer.y = Math.round(event.stageY / myBlock.blocks.blockScale) + offset.y;
+            myBlock.collapseContainer.x = Math.round(event.stageX / scale) + offset.x;
+            myBlock.collapseContainer.y = Math.round(event.stageY / scale) + offset.y;
             var dx = myBlock.collapseContainer.x - oldX;
             var dy = myBlock.collapseContainer.y - oldY;
             myBlock.container.x += dx;
             myBlock.container.y += dy;
 
             // If we are over the trash, warn the user.
-            if (trashcan.overTrashcan(event.stageX / myBlock.blocks.blockScale, event.stageY / myBlock.blocks.blockScale)) {
+            if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
                 trashcan.highlight();
             } else {
                 trashcan.unhighlight();
@@ -1107,7 +1108,7 @@ function Block(protoblock, blocks, overrideName) {
         blocks.unhighlight(thisBlock);
         if (moved) {
             // Check if block is in the trash.
-            if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+            if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
                 blocks.sendStackToTrash(this);
             } else {
                 // Otherwise, process move.
@@ -1152,6 +1153,7 @@ function Block(protoblock, blocks, overrideName) {
         var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         var blocks = this.blocks;
+        var scale = blocks.getStageScale();
 
         this._calculateBlockHitArea();
 
@@ -1232,8 +1234,8 @@ function Block(protoblock, blocks, overrideName) {
 
             moved = false;
             var offset = {
-                x: myBlock.container.x - Math.round(event.stageX / blocks.blockScale),
-                y: myBlock.container.y - Math.round(event.stageY / blocks.blockScale)
+                x: myBlock.container.x - Math.round(event.stageX / scale),
+                y: myBlock.container.y - Math.round(event.stageY / scale)
             };
 
             myBlock.container.on('mouseout', function(event) {
@@ -1258,7 +1260,7 @@ function Block(protoblock, blocks, overrideName) {
                 moved = false;
             });
 
-            var original = {x: event.stageX / blocks.blockScale, y: event.stageY / blocks.blockScale};
+            var original = {x: event.stageX / scale, y: event.stageY / scale};
             myBlock.container.on('pressmove', function(event) {
                 // console.log('PRESSMOVE');
                 // FIXME: More voodoo
@@ -1278,7 +1280,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else {
                     // Make it eaiser to select text on mobile
                     setTimeout(function () {
-                        moved = Math.abs((event.stageX / blocks.blockScale) - original.x) + Math.abs((event.stageY / blocks.blockScale) - original.y) > 20 && !window.hasMouse;
+                        moved = Math.abs((event.stageX / scale) - original.x) + Math.abs((event.stageY / scale) - original.y) > 20 && !window.hasMouse;
                         getInput = !moved;
                     }, 200);
                 }
@@ -1286,14 +1288,14 @@ function Block(protoblock, blocks, overrideName) {
                 var oldX = myBlock.container.x;
                 var oldY = myBlock.container.y;
 
-                var dx = Math.round(Math.round(event.stageX / blocks.blockScale) + offset.x - oldX);
-                var dy = Math.round(Math.round(event.stageY / blocks.blockScale) + offset.y - oldY);
+                var dx = Math.round(Math.round(event.stageX / scale) + offset.x - oldX);
+                var dy = Math.round(Math.round(event.stageY / scale) + offset.y - oldY);
 
                 // Move this block...
                 blocks.moveBlockRelative(thisBlock, dx, dy);
 
                 // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+                if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
                     trashcan.highlight();
                 } else {
                     trashcan.unhighlight();
@@ -1343,6 +1345,8 @@ function Block(protoblock, blocks, overrideName) {
 
     this._mouseoutCallback = function(event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
+        var scale = blocks.getStageScale();
+
         // Always hide the trash when there is no block selected.
         // FIXME: need to remove timer
         if (this.blocks.longPressTimeout != null) {
@@ -1353,7 +1357,7 @@ function Block(protoblock, blocks, overrideName) {
 
         if (moved) {
             // Check if block is in the trash.
-            if (trashcan.overTrashcan(event.stageX / this.blocks.blockScale, event.stageY / this.blocks.blockScale)) {
+            if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
                 blocks.sendStackToTrash(this);
             } else {
                 // Otherwise, process move.
