@@ -645,7 +645,7 @@ define(function (require) {
             // Put the boundary in the blocks container so it scrolls
             // with the blocks.
             boundary = new Boundary(canvas, blocksContainer, refreshCanvas);
-            blocks = new Blocks(canvas, blocksContainer, refreshCanvas, trashcan, stage.update);
+            blocks = new Blocks(canvas, blocksContainer, refreshCanvas, trashcan, stage.update, getStageScale);
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
 
             matrix = new Matrix();
@@ -933,6 +933,10 @@ define(function (require) {
                     palette.scrollEvent(delta, scrollSpeed);
                 }
             }
+        };
+
+        function getStageScale() {
+            return musicBlocksScale;
         };
 
         function getStageX() {
