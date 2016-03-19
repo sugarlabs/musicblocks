@@ -27,49 +27,53 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this.iconsize = 55;  // default value
     this.container = new createjs.Container();
 
-    function makeBorderHighlight(me) {
+    this._makeBorderHighlight = function() {
         var img = new Image();
+        var trash = this;
+
         img.onload = function () {
             bitmap = new createjs.Bitmap(img);
-            bitmap.scaleX = size / me.iconsize;
-            bitmap.scaleY = size / me.iconsize;
-            me.container.addChild(bitmap);
+            bitmap.scaleX = size / trash.iconsize;
+            bitmap.scaleY = size / trash.iconsize;
+            trash.container.addChild(bitmap);
             bitmap.visible = false;
-            bounds = me.container.getBounds();
-            me.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds = trash.container.getBounds();
+            trash.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             // Hide the trash until a block is moved.
-            me.container.visible = false;
+            trash.container.visible = false;
         };
 
-        img.src = 'data:image/svg+xml;base64,' + window.btoa(
-            unescape(encodeURIComponent(BORDER.replace('stroke_color', '#000000'))));
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', '#000000'))));
     };
 
-    function makeBorder(me) {
+    this._makeBorder = function() {
         var img = new Image();
+        var trash = this;
+
         img.onload = function () {
             border = new createjs.Bitmap(img);
-            bitmap.scaleX = me.size / me.iconsize;
-            bitmap.scaleY = me.size / me.iconsize;
-            me.container.addChild(border);
-            makeBorderHighlight(me);
+            bitmap.scaleX = trash.size / trash.iconsize;
+            bitmap.scaleY = trash.size / trash.iconsize;
+            trash.container.addChild(border);
+            trash._makeBorderHighlight();
         };
 
-        img.src = 'data:image/svg+xml;base64,' + window.btoa(
-            unescape(encodeURIComponent(BORDER.replace('stroke_color', '#e0e0e0'))));
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', '#e0e0e0'))));
     };
 
-    function makeTrash(me) {
+    this._makeTrash = function() {
         var img = new Image();
+        var trash = this;
+
         img.onload = function () {
             bitmap = new createjs.Bitmap(img);
-            me.container.addChild(bitmap);
-            me.iconsize = bitmap.getBounds().width;
-            bitmap.scaleX = me.size / me.iconsize;
-            bitmap.scaleY = me.size / me.iconsize;
+            trash.container.addChild(bitmap);
+            trash.iconsize = bitmap.getBounds().width;
+            bitmap.scaleX = trash.size / trash.iconsize;
+            bitmap.scaleY = trash.size / trash.iconsize;
             bitmap.x = ((TRASHWIDTH - size) / 2) * bitmap.scaleX;
             bitmap.y = ((TRASHHEIGHT - size) / 2) * bitmap.scaleY;
-            makeBorder(me);
+            trash._makeBorder();
         };
 
         img.src = 'images/trash.svg';
@@ -83,18 +87,14 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this.stage.addChild(this.container);
     this.stage.setChildIndex(this.container, 0);
     this.resizeEvent(1);
-    makeTrash(this);
+    this._makeTrash();
 
     this.hide = function() {
-        createjs.Tween.get(this.container)
-            .to({alpha: 0}, 200)
-            .set({visible: false});
+        createjs.Tween.get(this.container).to({alpha: 0}, 200).set({visible: false});
     };
 
     this.show = function() {
-        createjs.Tween.get(this.container)
-            .to({alpha: 0.0, visible: true})
-            .to({alpha: 1.0}, 200);
+        createjs.Tween.get(this.container).to({alpha: 0.0, visible: true}).to({alpha: 1.0}, 200);
     };
 
     this.highlight = function() {
@@ -120,6 +120,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this.overTrashcan = function(x, y) {
         var tx = this.container.x;
         var ty = this.container.y;
+
         if (x < tx) {
             return false;
         } else if (x > tx + (TRASHWIDTH * this.size / this.iconsize)) {
@@ -129,6 +130,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
         if (y < ty) {
             return false;
         }
+
         return true;
     };
 };

@@ -2691,7 +2691,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             // Mark the turtle as not running.
             logo.turtles.turtleList[turtle].running = false;
-            if (!logo.turtles.running()) {
+            if (!logo.turtles.running() && queueStart === 0) {
                 logo.onStopTurtle();
             }
 
