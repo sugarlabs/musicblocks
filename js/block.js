@@ -12,7 +12,7 @@
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['start', 'action'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
 const NOHIT = ['hidden'];
 
 
@@ -113,7 +113,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.highlight = function() {
-        if (this.collapsed && ['start', 'action'].indexOf(this.name) !== -1) {
+        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
             // We may have a race condition.
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = true;
@@ -125,7 +125,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = false;
             this.highlightBitmap.visible = true;
-            if (['start', 'action'].indexOf(this.name) !== -1) {
+            if (COLLAPSABLES.indexOf(this.name) !== -1) {
                 // There could be a race condition when making a
                 // new action block.
                 if (this.highlightCollapseBlockBitmap) {
@@ -145,7 +145,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.unhighlight = function() {
-        if (this.collapsed && ['start', 'action'].indexOf(this.name) !== -1) {
+        if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = false;
                 this.collapseBlockBitmap.visible = true;
@@ -156,7 +156,7 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.bitmap.visible = true;
             this.highlightBitmap.visible = false;
-            if (['start', 'action'].indexOf(this.name) !== -1) {
+            if (COLLAPSABLES.indexOf(this.name) !== -1) {
                 if (this.highlightCollapseBlockBitmap) {
                     this.highlightCollapseBlockBitmap.visible = false;
                     this.collapseBlockBitmap.visible = false;
@@ -193,7 +193,7 @@ function Block(protoblock, blocks, overrideName) {
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
 
-            if (myBlock.name === 'start') {
+            if (myBlock.name === 'start' || myBlock.name === 'drum') {
                 // Rescale the decoration on the start blocks.
                 for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
                     if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
@@ -239,7 +239,9 @@ function Block(protoblock, blocks, overrideName) {
     this.newArtwork = function(plusMinus) {
         switch (this.name) {
         case 'start':
+        case 'drum':
         case 'action':
+        case 'matrix':
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
@@ -249,7 +251,6 @@ function Block(protoblock, blocks, overrideName) {
 
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
-        case 'matrix':
         case 'note':
         case 'invert':
         case 'notation':
@@ -444,7 +445,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
                 myBlock._finishImageLoad();
             } else {
-                if (myBlock.name === 'start') {
+                if (myBlock.name === 'start' || myBlock.name === 'drum') {
                     myBlock._ensureDecorationOnTop();
                 }
 
@@ -563,7 +564,7 @@ function Block(protoblock, blocks, overrideName) {
             this._positionText(this.protoblock.scale);
         }
 
-        if (['start', 'action'].indexOf(this.name) === -1) {
+        if (COLLAPSABLES.indexOf(this.name) === -1) {
             this.loadComplete = true;
             if (this.postProcess !== null) {
                 this.postProcess(this.postProcessArg);
@@ -607,10 +608,19 @@ function Block(protoblock, blocks, overrideName) {
 
             if (myBlock.collapseText === null) {
                 var fontSize = 10 * myBlock.protoblock.scale;
-                if (myBlock.name === 'action') {
+                switch (myBlock.name) {
+                case 'action':
                     myBlock.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
-                } else {
+                    break;
+                case 'start':
                     myBlock.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'matrix':
+                    myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'drum':
+                    myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                    break;
                 }
                 myBlock.collapseText.textAlign = 'left';
                 myBlock.collapseText.textBaseline = 'alphabetic';
@@ -686,7 +696,7 @@ function Block(protoblock, blocks, overrideName) {
     this.show = function() {
         if (!this.trash) {
             // If it is an action block or it is not collapsed then show it.
-            if (!(['action', 'start'].indexOf(this.name) === -1 && this.collapsed)) {
+            if (!(COLLAPSABLES.indexOf(this.name) === -1 && this.collapsed)) {
                 this.container.visible = true;
                 if (this.collapseContainer !== null) {
                     this.collapseContainer.visible = true;
