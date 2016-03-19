@@ -205,6 +205,11 @@ function Block(protoblock, blocks, overrideName) {
             }
             myBlock.updateCache();
             myBlock._calculateBlockHitArea();
+
+            // If it is in the trash, make sure it remains hidden.
+            if (myBlock.trash) {
+		myBlock.hide();
+            }
         };
 
         this.postProcessArg = null;
