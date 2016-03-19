@@ -959,12 +959,12 @@ function Block(protoblock, blocks, overrideName) {
         var hitArea = new createjs.Shape();
         var w2 = bounds.width;
         var h2 = bounds.height;
+
         hitArea.graphics.beginFill('#FFF').drawEllipse(-w2 / 2, -h2 / 2, w2, h2);
         hitArea.x = w2 / 2;
         hitArea.y = h2 / 2;
         this.collapseContainer.hitArea = hitArea;
     };
-
 
     this._positionCollapseLabel = function(blockScale) {
         this.collapseText.x = COLLAPSETEXTX * blockScale / 2;
@@ -1109,6 +1109,8 @@ function Block(protoblock, blocks, overrideName) {
 
     this._collapseOut = function(blocks, thisBlock, moved, event) {
         // Always hide the trash when there is no block selected.
+        var scale = blocks.getStageScale();
+
         trashcan.hide();
         blocks.unhighlight(thisBlock);
         if (moved) {
