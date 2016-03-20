@@ -128,10 +128,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
         this.findStacks();
         for (var stack = 0; stack < this.stackList.length; stack++) {
-            // Just in case the block list is corrupted, count iterations.
-            this._loopCounter = 0;
             // console.log('Adjust Docks: ' + this.blockList[this.stackList[stack]].name);
-            this.adjustDocks(this.stackList[stack]);
+            this.adjustDocks(this.stackList[stack], true);
         }
 
         // We reset the protoblock scale on the palettes, but don't
@@ -285,10 +283,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return;
         }
 
-        // Just in case the block list is corrupted, count iterations.
-        this._loopCounter = 0;
         // console.log('Adjust Docks: ' + this.blockList[this.dragGroup[0]].name);
-        this.adjustDocks(this.dragGroup[0])
+        this.adjustDocks(this.dragGroup[0], true)
     };
 
     // Adjust the size of the clamp in an expandable block when blocks
@@ -661,7 +657,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
             if (c > 0) {
                 // Recurse on connected blocks.
-                this.adjustDocks(cblk);
+                this.adjustDocks(cblk, true);
             }
         }
     };
@@ -906,10 +902,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
                 }
             }
+
             this.blockList[newBlock].connections[newConnection] = thisBlock;
-            this._loopCounter = 0;
             // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
-            this.adjustDocks(newBlock);
+            this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
         }
 
@@ -964,7 +960,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             // had a vspace added.
             for (var i = 0; i < checkArgBlocks.length; i++) {
                 // console.log('Adjust Docks: ' + this.blockList[checkArgBlocks[i]].name);
-                blocks.adjustDocks(checkArgBlocks[i]);
+                blocks.adjustDocks(checkArgBlocks[i], true);
             }
 
             // Next, recheck if the connection is inside of a
@@ -3060,9 +3056,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
 
         for (var blk = 0; blk < this._adjustTheseDocks.length; blk++) {
-            this._loopCounter = 0;
             // console.log('Adjust Docks: ' + this.blockList[this._adjustTheseDocks[blk]].name);
-            this.adjustDocks(this._adjustTheseDocks[blk]);
+            this.adjustDocks(this._adjustTheseDocks[blk], true);
             // blockBlocks._expandTwoArgs();
             blockBlocks._expandClamps();
         }
