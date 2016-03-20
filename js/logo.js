@@ -1263,6 +1263,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             break;
         case 'forward':
+            console.log('forward');
             if (args.length === 1) {
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
@@ -2577,7 +2578,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
 
         // If there is a child flow, queue it.
-        if (childFlow) {
+        if (childFlow != null) {
             // console.log('child flow is ' + childFlow + ' '  + logo.blocks.blockList[childFlow].name);
 
             if (logo.blocks.blockList[blk].name==='doArg' || logo.blocks.blockList[blk].name==='nameddoArg') {
