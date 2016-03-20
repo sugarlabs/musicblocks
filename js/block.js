@@ -455,10 +455,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 // Adjust the docks.
-                myBlock.blocks.loopCounter = 0;
-
-                // console.log('adjust Docks ' + myBlock.name);
-                myBlock.blocks.adjustDocks(thisBlock);
+                myBlock.blocks.adjustDocks(thisBlock, true);
 
                 // Adjust the text position.
                 myBlock._positionText(myBlock.protoblock.scale);
@@ -1326,9 +1323,7 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 }
-                // if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
-                //     myBlock.blocks.adjustDocks(thisBlock);
-                // }
+
                 blocks.refreshCanvas();
             });
         });
@@ -1376,9 +1371,7 @@ function Block(protoblock, blocks, overrideName) {
                 // Just incase the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
-                this.blocks.loopCounter = 0;
-                // console.log('adjust Docks ' + this.name);
-                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this));
+                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
             }
         } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
             if (!haveClick) {
