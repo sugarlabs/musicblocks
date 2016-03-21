@@ -4164,8 +4164,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
                     // There may be chords embedded.
 
-                    var tupletFraction = toFraction(tupletDuration/targetDuration);
+                    var tupletFraction = toFraction(tupletDuration / targetDuration);
                     this.lilypondNotes[turtle] += '%5Ctuplet ' + tupletFraction[0] + '%2F' + tupletFraction[1] + ' { ';
+		    
+                    // console.log(tupletDuration + ' / ' + targetDuration + ' ---> ' + tupletFraction[0] + ' / ' + tupletFraction[1]);
 
                     var j = 0;
                     var k = 0;
@@ -4223,7 +4225,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else {
                     if (singleton) {
                         var tuplet_count = obj[LYTUPLETVALUE];
-                        this.lilypondNotes[turtle] += '%5Ctuplet ' + tuplet_count + '%2F' + 1 + ' { ';
+
+			var tupletFraction = toFraction(tuplet_count);
+			this.lilypondNotes[turtle] += '%5Ctuplet ' + tupletFraction[0] + '%2F' + tupletFraction[1] + ' { ';
+
+			// console.log(tuplet_count + ' / 1 ---> ' + tupletFraction[0] + ' / ' + tupletFraction[1]);
+
                     }
                     if (obj[LYINSIDECHORD] > 0) {
                         // Is this the first note in the chord?
