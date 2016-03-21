@@ -4178,7 +4178,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 this.lilypondNotes[turtle] += '<';
                             }
 
-                            this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][LYNOTE]);
+                            this.lilypondNotes[turtle] += __toLilynote(this.lilypondStaging[turtle][i + j][LYNOTE]);
                             if (obj[LYSTACCATO]) {
                                 this.lilypondNotes[turtle] += '%5Cstaccato';
                             }
@@ -4192,7 +4192,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             }
                             j++;
                         } else {
-                            this.lilypondNotes[turtle] += toLilynote(this.lilypondStaging[turtle][i + j][LYNOTE]) + this.lilypondStaging[turtle][i + j][LYROUNDDOWN];
+                            this.lilypondNotes[turtle] += __toLilynote(this.lilypondStaging[turtle][i + j][LYNOTE]) + this.lilypondStaging[turtle][i + j][LYROUNDDOWN];
                             if (obj[LYSTACCATO]) {
                                 this.lilypondNotes[turtle] += '%5Cstaccato';
                             }
