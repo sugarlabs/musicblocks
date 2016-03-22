@@ -1697,6 +1697,7 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.renameDos(oldValue, newValue);
                 if (oldValue === _('action')) {
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+		    this.blocks.setActionProtoVisiblity(false);
                 }
                 this.blocks.renameNameddos(oldValue, newValue);
                 this.blocks.palettes.updatePalettes('actions');

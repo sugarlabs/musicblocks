@@ -1772,15 +1772,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
 
-    this._makeActionProtoVisible = function() {
+    this.setActionProtoVisiblity = function(state) {
         // By default, the nameddo protoblock is hidden.
         var actionsPalette = this.palettes.dict['actions'];
         var stateChanged = false;
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
-            if (['nameddo'].indexOf(block.name) !== -1 && block.defaults.length === 0) {
-                if (block.hidden) {
-                    block.hidden = false;
+            if ('nameddo' === block.name && block.defaults.length === 0) {
+                if (block.hidden === state) {
+                    block.hidden = !state;
                     stateChanged = true;
                 }
             }
@@ -1795,7 +1795,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this._findUniqueActionName = function (name) {
         // If we have a stack named 'action', make te protoblock visible.
         if (name === _('action')) {
-            this._makeActionProtoVisible();
+            this.setActionProtoVisiblity(true);
         }
 
         // Make sure we don't make two actions with the same name.
@@ -2464,7 +2464,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
             // If we have a stack named 'action', make te protoblock visible.
             if (name === _('action')) {
-                this._makeActionProtoVisible();
+                this.setActionProtoVisiblity(true);
             }
 
             var oldName = name;
