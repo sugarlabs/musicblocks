@@ -1608,7 +1608,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
-                // console.log('calling findUniqueActionName');
                 value = this._findUniqueActionName(_('action'));
                 // console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
@@ -1773,7 +1772,32 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
 
+    this._makeActionProtoVisible = function() {
+        // By default, the nameddo protoblock is hidden.
+        var actionsPalette = this.palettes.dict['actions'];
+        var stateChanged = false;
+        for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
+            var block = actionsPalette.protoList[blockId];
+            if (['nameddo'].indexOf(block.name) !== -1 && block.defaults.length === 0) {
+                if (block.hidden) {
+                    block.hidden = false;
+                    stateChanged = true;
+                }
+            }
+        }
+
+        // Force an update if the name has changed.
+        if (stateChanged) {
+            this.palettes.updatePalettes('actions');
+        }
+    }
+
     this._findUniqueActionName = function (name) {
+        // If we have a stack named 'action', make te protoblock visible.
+        if (name === _('action')) {
+            this._makeActionProtoVisible();
+        }
+
         // Make sure we don't make two actions with the same name.
         var actionNames = [];
         for (var blk = 0; blk < this.blockList.length; blk++) {
@@ -2436,6 +2460,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 var name = blkData[1][1];
             } else {
                 var name = blkData[1][1]['value'];
+            }
+
+            // If we have a stack named 'action', make te protoblock visible.
+            if (name === _('action')) {
+                this._makeActionProtoVisible();
             }
 
             var oldName = name;
