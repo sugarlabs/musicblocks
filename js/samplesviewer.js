@@ -23,10 +23,10 @@ const LOCAL_PROJECT_TEMPLATE = '\
     <img class="thumbnail" src="{img}" /> \
     <div class="options"> \
         <input type="text" value="{title}"/><br/> \
-        <img class="open icon" title="{_Open}" alt="{_Open}" src="header-icons/edit.svg" /> \
-        <img class="delete icon" title="{_Delete}" alt="{_Delete}" src="header-icons/delete.svg" /> \
-        <img class="publish icon" title="{_Publish}" alt="{_Publish}" src="header-icons/publish.svg" /> \
-        <img class="download icon" title="{_Download}" alt="{_Download}" src="header-icons/download.svg" /> \
+        <img class="open icon" title="' + _('Open') + '" alt="' + _('Open') + '" src="header-icons/edit.svg" /> \
+        <img class="delete icon" title="' + _('Delete') + '" alt="' + _('Delete') + '" src="header-icons/delete.svg" /> \
+        <img class="publish icon" title="' + _('Publish') + '" alt="' + _('Publish') + '" src="header-icons/publish.svg" /> \
+        <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
     </div> \
 </li>'
 
@@ -35,7 +35,7 @@ const GLOBAL_PROJECT_TEMPLATE = '\
     <img class="thumbnail" src="{img}" /> \
     <div class="options"> \
         <span>{title}</span><br/> \
-        <img class="download icon" title="{_Download}" alt="{_Download}" src="header-icons/download.svg" /> \
+        <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
     </div> \
 </li>';
 
@@ -256,7 +256,6 @@ function PlanetModel(controller) {
     };
 
     this.publish = function (name, data, image) {
-        console.log('Publishing');
         // Show busy cursor.
         document.body.style.cursor = 'wait';
 
