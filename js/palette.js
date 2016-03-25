@@ -247,9 +247,14 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         for (var name in this.buttons) {
             this.buttons[name].visible = false;
         }
+
         for (var name in this.dict) {
             this.dict[name].hideMenu(true);
         }
+
+        this.upButton.visible = false;
+        this.downButton.visible = false;
+
         this.refreshCanvas();
     };
 
