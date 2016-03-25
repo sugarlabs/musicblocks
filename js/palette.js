@@ -53,7 +53,7 @@ function paletteBlockButtonPush(name, arg) {
 // menu. There is a background behind each protoblock that is part of
 // the palette container.
 //
-// loadPaletteMenuItemHandler
+// loadPaletteMenuItemHandler is the event handler for the palette menu.
 
 
 function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan) {
@@ -68,7 +68,9 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.trashcan = trashcan;
     this.initial_x = 55;
     this.initial_y = 55;
-    
+    this.upButton = null;
+    this.downButton = null;
+
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
@@ -94,8 +96,13 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         this.scale = scale;
 
         this._updateButtonMasks();
+
         for (var i in this.dict) {
             this.dict[i]._resizeEvent();
+        }
+
+        if (this.downButton != null) {
+            this.downButton.bitmap.y = (windowHeight() * canvasPixelRatio()) / palettes.scale - 27;
         }
     };
 
@@ -109,17 +116,28 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
         var diff = direction * scrollSpeed;
         if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
+            this.upButton.visible = false;
+            this.refreshCanvas();
             return;
+        } else {
+            this.upButton.visible = true;
         }
+
         if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
+            this.downButton.visible = false;
+            this.refreshCanvas();
             return;
+        } else {
+            this.downButton.visible = true;
         }
 
         this.scrollDiff += diff;
+
         for (var name in this.buttons) {
             this.buttons[name].y += diff;
             this.buttons[name].visible = true;
         }
+
         this._updateButtonMasks();
         this.refreshCanvas();
     };
@@ -135,7 +153,30 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
 
     this.makePalettes = function(hide) {
-        // First, an icon/button for each palette
+        function __processUpIcon(palettes, name, bitmap, args) {
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
+            palettes.stage.addChild(bitmap);
+            bitmap.x = 55;
+            bitmap.y = 55;
+            bitmap.visible = false;
+            palettes.upButton = bitmap;
+        };
+
+        function __processDownIcon(palettes, name, bitmap, args) {
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
+            palettes.stage.addChild(bitmap);
+            bitmap.x = 55;
+            bitmap.y = (windowHeight() * canvasPixelRatio()) / palettes.scale - 27;
+            bitmap.visible = true;
+            palettes.downButton = bitmap;
+        };
+
+        if (this.upButton == null) {
+            makePaletteBitmap(this, UPICON.replace('#000000', '#FFFFFF'), 'up', __processUpIcon, null);
+            makePaletteBitmap(this, DOWNICON.replace('#000000', '#FFFFFF'), 'down', __processDownIcon, null);
+        }
+
+        // Make an icon/button for each palette
 
         var palettes = this;
 
