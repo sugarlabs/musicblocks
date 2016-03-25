@@ -163,9 +163,6 @@ img.icon {
   width: 30px; }
 
 img.icon:hover {
-  background-color: rgba(139, 195, 74, 0.3); }
-
-img.icon:hover {
   background-color: rgba(139, 195, 74, 0.8); }
 
 #loading-image-container {
