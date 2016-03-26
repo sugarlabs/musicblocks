@@ -105,7 +105,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         }
 
         if (this.downButton != null) {
-            this.downButton.bitmap.y = (windowHeight() * canvasPixelRatio()) / palettes.scale - 27;
+            this.downButton.y = (windowHeight() * canvasPixelRatio()) / this.scale - 27;
         }
     };
 
