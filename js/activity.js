@@ -1164,6 +1164,8 @@ define(function (require) {
                         var dy = Math.max(55 - palettes.buttons['rhythm'].y, 0);
                         palettes.menuScrollEvent(1, dy);
                         palettes.hidePaletteIconCircles();
+                    } else if (palettes.activePalette != null) {
+                        palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
                     } else {
                         _findBlocks();
                     }
