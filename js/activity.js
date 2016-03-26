@@ -1114,7 +1114,11 @@ define(function (require) {
             } else {
                 switch (event.keyCode) {
                 case KEYCODE_UP:
-                    if (palettes.mouseOver) {
+                    if (blocks.activeBlock != null) {
+                        blocks.moveStackRelative(blocks.activeBlock, 0, -21);
+                        blocks.blockMoved(blocks.activeBlock);
+                        blocks.adjustDocks(blocks.activeBlock, true);
+                    } else if (palettes.mouseOver) {
                         palettes.menuScrollEvent(1, 10);
                         palettes.hidePaletteIconCircles();
                     } else if (scrollBlockContainer) {
@@ -1122,7 +1126,11 @@ define(function (require) {
                     }
                     break;
                 case KEYCODE_DOWN:
-                    if (palettes.mouseOver) {
+                    if (blocks.activeBlock != null) {
+                        blocks.moveStackRelative(blocks.activeBlock, 0, 21);
+                        blocks.blockMoved(blocks.activeBlock);
+                        blocks.adjustDocks(blocks.activeBlock, true);
+                    } else if (palettes.mouseOver) {
                         palettes.menuScrollEvent(-1, 10);
                         palettes.hidePaletteIconCircles();
                     } else if (scrollBlockContainer) {
@@ -1130,12 +1138,20 @@ define(function (require) {
                     }
                     break;
                 case KEYCODE_LEFT:
-                    if (scrollBlockContainer) {
+                    if (blocks.activeBlock != null) {
+                        blocks.moveStackRelative(blocks.activeBlock, -21, 0);
+                        blocks.blockMoved(blocks.activeBlock);
+                        blocks.adjustDocks(blocks.activeBlock, true);
+                    } else if (scrollBlockContainer) {
                         blocksContainer.x -= 21;
                     }
                     break;
                 case KEYCODE_RIGHT:
-                    if (scrollBlockContainer) {
+                    if (blocks.activeBlock != null) {
+                        blocks.moveStackRelative(blocks.activeBlock, 21, 0);
+                        blocks.blockMoved(blocks.activeBlock);
+                        blocks.adjustDocks(blocks.activeBlock, true);
+                    } else if (scrollBlockContainer) {
                         blocksContainer.x += 21;
                     }
                     break;

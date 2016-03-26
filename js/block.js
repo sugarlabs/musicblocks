@@ -1163,7 +1163,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.container.on('mouseover', function(event) {
             blocks.highlight(thisBlock, true);
-            // blocks.activeBlock = thisBlock;
+            blocks.activeBlock = thisBlock;
             blocks.refreshCanvas();
         });
 
@@ -1246,6 +1246,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (haveClick) {
                     return;
                 }
+
                 // console.log('MOUSEOUT');
                 if (!blocks.inLongPress) {
                     myBlock._mouseoutCallback(event, moved, haveClick, true);
@@ -1257,6 +1258,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (haveClick) {
                     return;
                 }
+
                 // console.log('PRESSUP');
                 if (!blocks.inLongPress) {
                     myBlock._mouseoutCallback(event, moved, haveClick, true);
