@@ -71,6 +71,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.upButton = null;
     this.downButton = null;
     this.circles = {};
+    this.mouseOver = false;
     
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
@@ -375,6 +376,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
         // A palette button opens or closes a palette.
         this.buttons[name].on('mouseover', function(event) {
+            palettes.mouseOver = true;
             var r = palettes.cellSize / 2;
             circles = showButtonHighlight(
                 palettes.buttons[name].x + r, palettes.buttons[name].y + r, r,
@@ -382,10 +384,12 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         });
 
         this.buttons[name].on('pressup', function(event) {
+            palettes.mouseOver = false;
             hideButtonHighlight(circles, palettes.stage);
         });
 
         this.buttons[name].on('mouseout', function(event) {
+            palettes.mouseOver = false;
             hideButtonHighlight(circles, palettes.stage);
         });
 
@@ -394,9 +398,11 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 return;
             }
             locked = true;
+
             setTimeout(function() {
                 locked = false;
             }, 500);
+
             palettes.dict[name]._moveMenu(palettes.initial_x, palettes.initial_y);
             palettes.showPalette(name);
             palettes.refreshCanvas();

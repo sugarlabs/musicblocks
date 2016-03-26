@@ -1091,8 +1091,6 @@ define(function (require) {
             const RETURN = 13;
             const SPACE = 32;
             const HOME = 36;
-
-            // Captured by browser
             const PAGE_UP = 33;
             const PAGE_DOWN = 34;
             const KEYCODE_LEFT = 37;
@@ -1116,12 +1114,18 @@ define(function (require) {
             } else {
                 switch (event.keyCode) {
                 case KEYCODE_UP:
-                    if (scrollBlockContainer) {
+                    if (palettes.mouseOver) {
+                        palettes.menuScrollEvent(1, 10);
+                        palettes.hidePaletteIconCircles();
+                    } else if (scrollBlockContainer) {
                         blocksContainer.y -= 21;
                     }
                     break;
                 case KEYCODE_DOWN:
-                    if (scrollBlockContainer) {
+                    if (palettes.mouseOver) {
+                        palettes.menuScrollEvent(-1, 10);
+                        palettes.hidePaletteIconCircles();
+                    } else if (scrollBlockContainer) {
                         blocksContainer.y += 21;
                     }
                     break;
@@ -1136,7 +1140,13 @@ define(function (require) {
                     }
                     break;
                 case HOME:
-                    _findBlocks();
+                    if (palettes.mouseOver) {
+                        var dy = Math.max(55 - palettes.buttons['rhythm'].y, 0);
+                        palettes.menuScrollEvent(1, dy);
+                        palettes.hidePaletteIconCircles();
+                    } else {
+                        _findBlocks();
+                    }
                     break;
                 case TAB:
                     break;
@@ -2368,56 +2378,26 @@ define(function (require) {
                     y: container.y - Math.round(event.stageY / musicBlocksScale)
                 };
 
-                var circles = showButtonHighlight(ox, oy, cellSize / 2,
-                    event, musicBlocksScale, stage);
+                var circles = showButtonHighlight(ox, oy, cellSize / 2, event, musicBlocksScale, stage);
+
                 container.on('pressup', function (event) {
                     hideButtonHighlight(circles, stage);
-
                     container.x = ox;
                     container.y = oy;
+
                     if (action != null && moved && !locked) {
                         locked = true;
+
                         setTimeout(function () {
                             locked = false;
                         }, 500);
+
                         action();
                     }
+
                     moved = false;
                 });
             });
         };
-
-        /*
-        // More music stuff we may not need
-        function clearMenus() {
-            if (headerContainer !== undefined) {
-                stage.removeChild(headerContainer);
-                for (var i in onscreenButtons) {
-                    stage.removeChild(onscreenButtons[i]);
-                }
-            }
-
-            if (menuContainer !== undefined) {
-                stage.removeChild(menuContainer);
-                for (var i in onscreenMenu) {
-                    stage.removeChild(onscreenMenu[i]);
-                }
-            }
-        };
-
-        function _restoreHome() {
-            _setupAndroidToolbar();
-            blocks.show();
-            for (var b = 0; b < blocks.blockList.length; b++) {
-                var blk = blocks.blockList[b];
-                if (blk.name === "forever" || blk.name === 'repeat' || blk.name === 'chunkTranspose') {
-                    blocks.blockList[b].trash = true;
-                    blocks.blockList[b].hide();
-                }
-                blocks.refreshCanvas();
-                palettes.show();
-            }
-        };
-        */
     };
 });
