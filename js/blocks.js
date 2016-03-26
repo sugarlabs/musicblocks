@@ -1137,6 +1137,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
 
+    this.moveStackRelative = function (blk, dx, dy) {
+        this.findDragGroup(blk)
+        if (this.dragGroup.length > 0) {
+            for (var b = 0; b < this.dragGroup.length; b++) {
+                this.moveBlockRelative(this.dragGroup[b], dx, dy);
+            }
+        }
+    };
+
     this.updateBlockText = function (blk) {
         // When we create new blocks, we may not have assigned the
         // value yet.
