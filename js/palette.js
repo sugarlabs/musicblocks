@@ -72,6 +72,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.downButton = null;
     this.circles = {};
     this.mouseOver = false;
+    this.activePalette = null;
     
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
@@ -1275,6 +1276,14 @@ function Palette(palettes, name) {
         var palette = this;
         var scrolling = false;
 
+        this.background.on('mouseover', function(event) {
+            palette.palettes.activePalette = palette;
+        });
+
+        this.background.on('mouseout', function(event) {
+            palette.palettes.activePalette = null;
+        });
+
         this.background.on('mousedown', function(event) {
             scrolling = true;
             var lastY = event.stageY;
@@ -1290,6 +1299,7 @@ function Palette(palettes, name) {
             });
 
             palette.background.on('pressup', function(event) {
+                palette.palettes.activePalette = null;
                 scrolling = false;
             }, null, true); // once = true
         });
@@ -1389,9 +1399,6 @@ function Palette(palettes, name) {
                 palette._moveMenuItemsRelative(dx, dy);
             });
         });
-
-        this.menuContainer.on('mouseout', function(event) {
-        });
     };
 
     // Menu Item event handlers
@@ -1404,6 +1411,10 @@ function Palette(palettes, name) {
         var saveX = this.protoContainers[blkname].x;
         var saveY = this.protoContainers[blkname].y;
         var bgScrolling = false;
+
+        this.protoContainers[blkname].on('mouseover', function(event) {
+            palette.palettes.activePalette = palette;
+        });
 
         this.protoContainers[blkname].on('mousedown', function(event) {
             var stage = palette.palettes.stage;
@@ -1458,6 +1469,8 @@ function Palette(palettes, name) {
         this.protoContainers[blkname].on('mouseout', function(event) {
             // Catch case when pressup event is missed.
             // Put the protoblock back on the palette...
+            palette.palettes.activePalette = null;
+
             if (pressed && moved) {
                 palette._restoreProtoblock(blkname, saveX, saveY + palette.scrollDiff);
                 pressed = false;
@@ -1466,6 +1479,8 @@ function Palette(palettes, name) {
         });
 
         this.protoContainers[blkname].on('pressup', function(event) {
+            palette.palettes.activePalette = null;
+
             if (pressupLock) {
                 return;
             } else {
@@ -1474,6 +1489,7 @@ function Palette(palettes, name) {
                     pressupLock = false;
                 }, 1000);
             }
+
             palette._makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY);
         });
     };
