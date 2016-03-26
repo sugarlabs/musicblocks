@@ -1115,31 +1115,35 @@ define(function (require) {
                 switch (event.keyCode) {
                 case KEYCODE_UP:
                     if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 0, -21);
+                        blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
                     } else if (palettes.mouseOver) {
                         palettes.menuScrollEvent(1, 10);
                         palettes.hidePaletteIconCircles();
+                    } else if (palettes.activePalette != null) {
+                        palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
                     } else if (scrollBlockContainer) {
                         blocksContainer.y -= 21;
                     }
                     break;
                 case KEYCODE_DOWN:
                     if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 0, 21);
+                        blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
                     } else if (palettes.mouseOver) {
                         palettes.menuScrollEvent(-1, 10);
                         palettes.hidePaletteIconCircles();
+                    } else if (palettes.activePalette != null) {
+                        palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
                     } else if (scrollBlockContainer) {
                         blocksContainer.y += 21;
                     }
                     break;
                 case KEYCODE_LEFT:
                     if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, -21, 0);
+                        blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
                     } else if (scrollBlockContainer) {
@@ -1148,7 +1152,7 @@ define(function (require) {
                     break;
                 case KEYCODE_RIGHT:
                     if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 21, 0);
+                        blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
                     } else if (scrollBlockContainer) {
