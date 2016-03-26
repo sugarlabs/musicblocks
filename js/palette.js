@@ -70,7 +70,8 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.initial_y = 55;
     this.upButton = null;
     this.downButton = null;
-
+    this.circles = {};
+    
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
@@ -151,6 +152,10 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.buttons[name].mask = s;
         }
     };
+     
+    this.hidePaletteIconCircles = function(){
+        hideButtonHighlight(circles, this.stage);
+    }
 
     this.makePalettes = function(hide) {
         function __processUpIcon(palettes, name, bitmap, args) {
@@ -369,7 +374,6 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         });
 
         // A palette button opens or closes a palette.
-        var circles = {};
         this.buttons[name].on('mouseover', function(event) {
             var r = palettes.cellSize / 2;
             circles = showButtonHighlight(

@@ -927,6 +927,7 @@ define(function (require) {
 
             if (event.clientX < cellSize) {
                 palettes.menuScrollEvent(delta, scrollSpeed);
+                palettes.hidePaletteIconCircles();
             } else {
                 palette = palettes.findPalette(event.clientX / musicBlocksScale, event.clientY / musicBlocksScale);
                 if (palette) {
