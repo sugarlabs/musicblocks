@@ -1115,6 +1115,26 @@ define(function (require) {
             } else if (event.ctrlKey) {
             } else {
                 switch (event.keyCode) {
+                case KEYCODE_UP:
+                    if (scrollBlockContainer) {
+                        blocksContainer.y -= 21;
+                    }
+                    break;
+                case KEYCODE_DOWN:
+                    if (scrollBlockContainer) {
+                        blocksContainer.y += 21;
+                    }
+                    break;
+                case KEYCODE_LEFT:
+                    if (scrollBlockContainer) {
+                        blocksContainer.x -= 21;
+                    }
+                    break;
+                case KEYCODE_RIGHT:
+                    if (scrollBlockContainer) {
+                        blocksContainer.x += 21;
+                    }
+                    break;
                 case HOME:
                     _findBlocks();
                     break;
