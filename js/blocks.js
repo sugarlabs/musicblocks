@@ -1396,7 +1396,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (typeof(collapsed) === 'undefined') {
             collapsed = false
         }
-        myBlock = this._makeNewBlock(name, postProcess, postProcessArg);
+        myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
         if (myBlock == null) {
             console.log('could not make block ' + name);
             return;
@@ -1415,7 +1415,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
 
-    this._makeNewBlock = function (name, postProcess, postProcessArg) {
+    this.makeNewBlock = function (name, postProcess, postProcessArg) {
         // Create a new block
         if (!name in this.protoBlockDict) {
             // Should never happen: nop blocks should be substituted
@@ -1522,7 +1522,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
 
-            postProcessArg = [thisBlock, 4];
+            postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
         } else if (name === 'media') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1583,17 +1583,17 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (me.protoBlockDict[proto].name === name) {
                 if (arg === '__NOARG__') {
                     // console.log('creating ' + name + ' block with no args');
-                    me._makeNewBlock(proto, postProcess, postProcessArg);
+                    me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
                 } else if (me.protoBlockDict[proto].defaults[0] === arg) {
                     // console.log('creating ' + name + ' block with default arg ' + arg);
-                    me._makeNewBlock(proto, postProcess, postProcessArg);
+                    me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
                 } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
                     if (me.protoBlockDict[proto].defaults[0] === undefined) {
-                        me._makeNewBlock(proto, postProcess, postProcessArg);
+                        me.makeNewBlock(proto, postProcess, postProcessArg);
                         protoFound = true;
                         break;
                     }
@@ -1645,7 +1645,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         me.blockList[thisBlock].container.updateCache();
                     };
 
-                    this._makeNewBlock('text', postProcess, [thisBlock, value]);
+                    this.makeNewBlock('text', postProcess, [thisBlock, value]);
                 } else {
                     postProcess = function (args) {
                         var thisBlock = args[0];
@@ -1654,7 +1654,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         me.blockList[thisBlock].text.text = value.toString();
                     };
 
-                    this._makeNewBlock('number', postProcess, [thisBlock, value]);
+                    this.makeNewBlock('number', postProcess, [thisBlock, value]);
                 }
             } else if (myBlock.docks[i + 1][2] === 'textin') {
                 postProcess = function (args) {
@@ -1668,7 +1668,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].text.text = label;
                 };
 
-                this._makeNewBlock('text', postProcess, [thisBlock, value]);
+                this.makeNewBlock('text', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'solfegein') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -1678,7 +1678,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].text.text = label;
                 };
 
-                this._makeNewBlock('solfege', postProcess, [thisBlock, value]);
+                this.makeNewBlock('solfege', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'notein') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -1688,7 +1688,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].text.text = label;
                 };
 
-                this._makeNewBlock('notename', postProcess, [thisBlock, value]);
+                this.makeNewBlock('notename', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'mediain') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -1699,12 +1699,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     }
                 };
 
-                this._makeNewBlock('media', postProcess, [thisBlock, value]);
+                this.makeNewBlock('media', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'filein') {
                 postProcess = function (blk) {
                     me.updateBlockText(blk);
                 }
-                this._makeNewBlock('loadFile', postProcess, thisBlock);
+                this.makeNewBlock('loadFile', postProcess, thisBlock);
             } else {
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -1713,7 +1713,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].text.text = value.toString();
                 };
 
-                this._makeNewBlock('number', postProcess, [thisBlock, value]);
+                this.makeNewBlock('number', postProcess, [thisBlock, value]);
             }
 
             var myConnectionBlock = this.blockList[cblk + i];
@@ -1969,7 +1969,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         this.protoBlockDict['myStorein_' + name] = myStoreinBlock;
         myStoreinBlock.palette = this.palettes.dict['boxes'];
         myStoreinBlock.defaults.push(name);
-        myStoreinBlock.defaults.push(4);
+        myStoreinBlock.defaults.push(NUMBERBLOCKDEFAULT);
         myStoreinBlock.staticLabels.push(_('store in'), _('name'), _('value'));
         myStoreinBlock.adjustWidthToLabel();
         myStoreinBlock.twoArgBlock();
