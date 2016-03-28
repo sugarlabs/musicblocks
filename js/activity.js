@@ -14,6 +14,8 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+const NUMBERBLOCKDEFAULT = 4;
+
 
 function facebookInit() {
     window.fbAsyncInit = function () {

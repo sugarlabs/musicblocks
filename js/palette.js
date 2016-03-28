@@ -518,7 +518,7 @@ function PaletteModel(palette, palettes, name) {
                 label = 'G';
                 break;
             case 'number':
-                label = '4';
+                label = NUMBERBLOCKDEFAULT.toString();
                 break;
             case 'less':
             case 'greater':
