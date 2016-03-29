@@ -14,8 +14,6 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
-const NUMBERBLOCKDEFAULT = 4;
-
 
 function facebookInit() {
     window.fbAsyncInit = function () {
@@ -29,7 +27,7 @@ function facebookInit() {
     };
 };
 
-/*
+
 try {
     (function (d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
@@ -43,7 +41,6 @@ try {
     }(document, 'script', 'facebook-jssdk'));
 } catch (e) {
 };
-*/
 
 var lang = document.webL10n.getLanguage();
 if (lang.indexOf("-") !== -1) {
@@ -57,12 +54,15 @@ if (lang.indexOf("-") !== -1) {
 define(function (require) {
     require("activity/sugarizer-compatibility");
     require('activity/platformstyle');
+
     require('easeljs');
     require('tweenjs');
     require('preloadjs');
+    require('prefixfree.min');
     require('howler');
     require('mespeak');
     require('Chart');
+
     require('activity/utils');
     require('activity/artwork');
     require('activity/munsell');
@@ -73,15 +73,17 @@ define(function (require) {
     require('activity/protoblocks');
     require('activity/blocks');
     require('activity/block');
-    require('activity/logo');
-    require('activity/musicutils');
     require('activity/clearbox');
     require('activity/utilitybox');
     require('activity/samplesviewer');
-    require('activity/basicblocks');
     require('activity/blockfactory');
+
+    // Music Block-specific modules
+    require('activity/turtledefs');
+    require('activity/logo');
+    require('activity/basicblocks');
     require('activity/analytics');
-    require('prefixfree.min');
+    require('activity/musicutils');
     require('activity/matrix');
 
     // Manipulate the DOM only when it is ready.
@@ -96,6 +98,8 @@ define(function (require) {
     });
 
     function domReady(doc) {
+        createDefaultStack();
+	createHelpContent();
         // facebookInit();
         window.scroll(0, 0);
 
@@ -134,7 +138,7 @@ define(function (require) {
 
         // Are we running off of a server?
         var server = true;
-        var musicBlocksScale = 1;
+        var turlteBlocksScale = 1;
         var stage;
         var turtles;
         var palettes;
@@ -185,6 +189,7 @@ define(function (require) {
         var homeButtonContainers = [];
         var homeButtonContainersX = 0;
         var homeButtonContainersY = 0;
+
         var cameraID = null;
         var toLang = null;
         var fromLang = null;
@@ -228,79 +233,6 @@ define(function (require) {
 
         var helpContainer = null;
         var helpIdx = 0;
-        const HELPCONTENT = [
-            [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
-            [_('Meet Mr. Mouse!'), _('Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!'), 'activity/activity-icon-mouse-color.svg'],
-            [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
-            [_('Run fast'), _('Click to run the project in fast mode.'), 'header-icons/fast-button.svg'],
-            [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
-            [_('Run music slow'), _('Click to run just the music in slow mode.'), 'header-icons/slow-music-button.svg'],
-            [_('Run step by step'), _('Click to run the project step by step.'), 'header-icons/step-button.svg'],
-            [_('Run note by note'), _('Click to run the music note by note.'), 'header-icons/step-music-button.svg'],
-            [_('Stop'), _('Stop the music (and the turtles).'), 'header-icons/stop-turtle-button.svg'],
-            [_('Clean'), _('Clear the screen and return the turtles to their initial positions.'), 'header-icons/clear-button.svg'],
-            [_('Show/hide palettes'), _('Hide or show the block palettes.'), 'header-icons/palette-button.svg'],
-            [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'header-icons/hide-blocks-button.svg'],
-            [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'header-icons/collapse-blocks-button.svg'],
-            [_('Home'), _('Return all blocks to the center of the screen.'), 'header-icons/go-home-button.svg'],
-            [_('Help'), _('Show these messages.'), 'header-icons/help-button.svg'],
-            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'header-icons/menu-button.svg'],
-            [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'header-icons/planet-button.svg'],
-            [_('Load project from files'), _('You can also load projects from the file system.'), 'header-icons/open-button.svg'],
-            [_('Save project'), _('Save your project to a file.'), 'header-icons/save-button.svg'],
-            [_('Save sheet music'), _('Save your project to as a Lilypond file.'), 'header-icons/lilypond-button.svg'],
-            [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'header-icons/copy-button.svg'],
-            [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'header-icons/paste-disabled-button.svg'],
-            [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'header-icons/save-blocks-button.svg'],
-            [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'header-icons/Cartesian-button.svg'],
-            [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
-            [_('Settings'), _('Open a panel for configuring Music Blocks.'), 'header-icons/utility-button.svg'],
-            [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
-            [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
-            [_('Display statistics'), _('Display statistics about your Music project.'), 'header-icons/stats-button.svg'],
-            [_('Load plugin from file'), _('You can load new blocks from the file system.'), 'header-icons/plugins-button.svg'],
-            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'header-icons/scroll-unlock-button.svg'],
-            [_('Delete all'), _('Remove all content on the canvas, including the blocks.'), 'header-icons/empty-trash-button.svg'],
-            [_('Undo'), _('Restore blocks from the trash.'), 'header-icons/restore-trash-button.svg'],
-            [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'activity/activity-icon-mouse-color.svg']
-        ];
-
-        const DATAOBJS =
-            [[0, 'start', 250, 150, [null, null, null]],
-             [1, 'matrix', 800, 50, [null, 2, 25]],
-
-             [2, 'pitch', 0, 0, [1, 3, 4, 5]],
-             [3, ['solfege', {value:'ti'}], 0, 0, [2]],
-             [4, ['number', {value:'4'}], 0, 0, [2]],
-
-             [5, 'pitch', 0, 0, [2, 6, 7, 8]],
-             [6, ['solfege', {value:'la'}], 0, 0, [5]],
-             [7, ['number', {value:'4'}], 0, 0, [5]],
-
-             [8, 'pitch', 0, 0, [5, 9, 10, 11]],
-             [9, ['solfege', {value:'sol'}], 0, 0, [8]],
-             [10, ['number', {value:'4'}], 0, 0, [8]],
-
-             [11, 'pitch', 0, 0, [8, 12, 13, 14]],
-             [12, ['solfege', {value:'mi'}], 0, 0, [11]],
-             [13, ['number', {value:'4'}], 0, 0, [11]],
-
-             [14, 'pitch', 0, 0, [11, 15, 16, 17]],
-             [15, ['solfege', {value:'re'}], 0, 0, [14]],
-             [16, ['number', {value:'4'}], 0, 0, [14]],
-
-             [17, "repeat", 0, 0, [14, 18, 19, null]],
-             [18, ["number", {"value":2}], 0, 0, [17]],
-
-             [19, "rhythm", 0, 0, [17, 20, 21, 22]],
-             [20, ["number", {"value":6}], 0, 0, [19]],
-             [21, ["number", {"value":4}], 0, 0, [19]],
-
-             [22, "rhythm", 0, 0, [19, 23, 24, null]],
-             [23, ["number", {"value":1}], 0, 0, [22]],
-             [24, ["number", {"value":2}], 0, 0, [22]],
-             [25, 'hidden', 0, 0, [1, null]]
-            ];
 
         pluginsImages = {};
 
@@ -311,8 +243,8 @@ define(function (require) {
             palettes.initial_x = 55;
             palettes.initial_y = 55;
             palettes.updatePalettes();
-            var x = 100 * musicBlocksScale;
-            var y = 100 * musicBlocksScale;
+            var x = 100 * turlteBlocksScale;
+            var y = 100 * turlteBlocksScale;
             for (var blk in blocks.blockList) {
                 if (!blocks.blockList[blk].trash) {
                     var myBlock = blocks.blockList[blk];
@@ -329,10 +261,10 @@ define(function (require) {
                                 }
                             }
                         }
-                        x += 200 * musicBlocksScale;
-                        if (x > (canvas.width - 100) / (musicBlocksScale)) {
-                            x = 100 * musicBlocksScale;
-                            y += 100 * musicBlocksScale;
+                        x += 200 * turlteBlocksScale;
+                        if (x > (canvas.width - 100) / (turlteBlocksScale)) {
+                            x = 100 * turlteBlocksScale;
+                            y += 100 * turlteBlocksScale;
                         }
                     }
                     /*
@@ -506,7 +438,7 @@ define(function (require) {
 
         function closeAnalytics(chartBitmap, ctx) {
             var button = this;
-            button.x = (canvas.width / (2 * musicBlocksScale))  + (300 / Math.sqrt(2));
+            button.x = (canvas.width / (2 * turlteBlocksScale))  + (300 / Math.sqrt(2));
             button.y = 300.00 - (300.00 / Math.sqrt(2));
             this.closeButton = _makeButton('cancel-button', _('Close'), button.x, button.y, 55, 0);
             this.closeButton.on('click', function(event) {
@@ -548,7 +480,7 @@ define(function (require) {
                 img.onload = function () {
                     var chartBitmap = new createjs.Bitmap(img);
                     stage.addChild(chartBitmap);
-                    chartBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (300);
+                    chartBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (300);
                     chartBitmap.y = 0;
                     chartBitmap.scaleX = chartBitmap.scaleY = chartBitmap.scale = 600 / chartBitmap.image.width;
                     logo.hideBlocks();
@@ -931,7 +863,7 @@ define(function (require) {
                 palettes.menuScrollEvent(delta, scrollSpeed);
                 palettes.hidePaletteIconCircles();
             } else {
-                palette = palettes.findPalette(event.clientX / musicBlocksScale, event.clientY / musicBlocksScale);
+                palette = palettes.findPalette(event.clientX / turlteBlocksScale, event.clientY / turlteBlocksScale);
                 if (palette) {
                     palette.scrollEvent(delta, scrollSpeed);
                 }
@@ -939,15 +871,15 @@ define(function (require) {
         };
 
         function getStageScale() {
-            return musicBlocksScale;
+            return turlteBlocksScale;
         };
 
         function getStageX() {
-            return turtles.screenX2turtleX(stageX / musicBlocksScale);
+            return turtles.screenX2turtleX(stageX / turlteBlocksScale);
         };
 
         function getStageY() {
-            return turtles.screenY2turtleY(stageY / musicBlocksScale);
+            return turtles.screenY2turtleY(stageY / turlteBlocksScale);
         };
 
         function getStageMouseDown() {
@@ -1216,45 +1148,45 @@ define(function (require) {
             if (smallSide < cellSize * 11) {
                 var mobileSize = true;
                 if (w < cellSize * 10) {
-                    musicBlocksScale = smallSide / (cellSize * 11);
+                    turlteBlocksScale = smallSide / (cellSize * 11);
                 } else {
-                    musicBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
+                    turlteBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
                 }
             } else {
                 var mobileSize = false;
                 if (w / 1200 > h / 900) {
-                    musicBlocksScale = w / 1200;
+                    turlteBlocksScale = w / 1200;
                 } else {
-                    musicBlocksScale = h / 900;
+                    turlteBlocksScale = h / 900;
                 }
             }
 
-            stage.scaleX = musicBlocksScale;
-            stage.scaleY = musicBlocksScale;
+            stage.scaleX = turlteBlocksScale;
+            stage.scaleY = turlteBlocksScale;
 
             stage.canvas.width = w;
             stage.canvas.height = h;
 
-            console.log('Resize: scale ' + musicBlocksScale +
+            console.log('Resize: scale ' + turlteBlocksScale +
             ', windowW ' + w + ', windowH ' + h +
             ', canvasW ' + canvas.width + ', canvasH ' + canvas.height +
             ', screenW ' + screen.width + ', screenH ' + screen.height);
 
-            turtles.setScale(musicBlocksScale);
-            blocks.setScale(musicBlocksScale);
-            boundary.setScale(w, h, musicBlocksScale);
-            palettes.setScale(musicBlocksScale);
-            trashcan.resizeEvent(musicBlocksScale);
+            turtles.setScale(turlteBlocksScale);
+            blocks.setScale(turlteBlocksScale);
+            boundary.setScale(w, h, turlteBlocksScale);
+            palettes.setScale(turlteBlocksScale);
+            trashcan.resizeEvent(turlteBlocksScale);
             _setupAndroidToolbar(mobileSize);
 
             // Reposition coordinate grids.
-            cartesianBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (600);
-            cartesianBitmap.y = (canvas.height / (2 * musicBlocksScale)) - (450);
-            polarBitmap.x = (canvas.width / (2 * musicBlocksScale)) - (600);
-            polarBitmap.y = (canvas.height / (2 * musicBlocksScale)) - (450);
+            cartesianBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (600);
+            cartesianBitmap.y = (canvas.height / (2 * turlteBlocksScale)) - (450);
+            polarBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (600);
+            polarBitmap.y = (canvas.height / (2 * turlteBlocksScale)) - (450);
             update = true;
 
-            // Setup help now that we have calculated musicBlocksScale.
+            // Setup help now that we have calculated turlteBlocksScale.
             _showHelp(true);
 
             // Hide palette icons on mobile
@@ -1327,11 +1259,11 @@ define(function (require) {
         };
 
         function _deleteBlocksBox() {
-            clearBox.show(musicBlocksScale);
+            clearBox.show(turlteBlocksScale);
         };
 
         function _doUtilityBox() {
-            utilityBox.init(musicBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
+            utilityBox.init(turlteBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
         };
 
         function sendAllToTrash(addStartBlock, doNotSave) {
@@ -1958,25 +1890,6 @@ define(function (require) {
             stopTurtleContainer.visible = true;
         };
 
-        /*
-        function playMusic(){
-            for (var blk in logo.blocks.blockList) {
-                var myBlock = logo.blocks.blockList[blk];
-                var thisBlock = myBlock.blocks.blockList.indexOf(myBlock);
-                if (myBlock.name === 'start' || myBlock.name === 'drum') {
-                    var topBlock = logo.blocks.findTopBlock(thisBlock);
-                    console.log('Playing through Play Button');
-                    logo.runLogoCommands(topBlock);
-                }
-            }
-        };
-
-        function stopMusic() {
-            logo.doStopTurtle();
-            Tone.Transport.stop();
-        };
-        */
-
         function updatePasteButton() {
             pasteContainer.removeChild(pasteContainer.children[0]);
             var img = new Image();
@@ -2009,7 +1922,7 @@ define(function (require) {
 
             headerContainer = new createjs.Shape();
             headerContainer.graphics.f(platformColor.header).r(0, 0,
-                screen.width / musicBlocksScale, cellSize);
+                screen.width / turlteBlocksScale, cellSize);
 
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
@@ -2052,22 +1965,26 @@ define(function (require) {
             var dx = btnSize;
             var dy = 0;
 
-            for (var name in buttonNames) {
-                var container = _makeButton(buttonNames[name][0] + '-button', buttonNames[name][2], x, y, btnSize, 0);
-                _loadButtonDragHandler(container, x, y, buttonNames[name][1]);
+            for (var i = 0; i < buttonNames.length; i++) {
+                if (!getMainToolbarButtonNames(buttonNames[i][0])) {
+                    continue;
+                }
+
+                var container = _makeButton(buttonNames[i][0] + '-button', buttonNames[i][2], x, y, btnSize, 0);
+                _loadButtonDragHandler(container, x, y, buttonNames[i][1]);
                 onscreenButtons.push(container);
 
-                if (buttonNames[name][0] === 'stop-turtle') {
+                if (buttonNames[i][0] === 'stop-turtle') {
                     stopTurtleContainer = container;
                     stopTurtleContainerX = x;
                     stopTurtleContainerY = y;
-                } else if (buttonNames[name][0] === 'go-home') {
+                } else if (buttonNames[i][0] === 'go-home') {
                     homeButtonContainers = [];
                     homeButtonContainers.push(container);
                     homeButtonContainersX = x;
                     homeButtonContainersY = y;
                     var container2 = _makeButton('go-home-faded-button', _('Home'), x, y, btnSize, 0);
-                    _loadButtonDragHandler(container2, x, y, buttonNames[name][1]);
+                    _loadButtonDragHandler(container2, x, y, buttonNames[i][1]);
                     homeButtonContainers.push(container2);
                     onscreenButtons.push(container2);
                     homeButtonContainers[0].visible = false;
@@ -2080,10 +1997,10 @@ define(function (require) {
                 y += dy;
             }
 
-            _setupRightMenu(musicBlocksScale);
+            _setupRightMenu(turlteBlocksScale);
         };
 
-        function _setupRightMenu(musicBlocksScale) {
+        function _setupRightMenu(turlteBlocksScale) {
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
                 for (var i in onscreenMenu) {
@@ -2111,22 +2028,26 @@ define(function (require) {
             });
 
             var btnSize = cellSize;
-            var x = Math.floor(canvas.width / musicBlocksScale) - btnSize / 2;
+            var x = Math.floor(canvas.width / turlteBlocksScale) - btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
             var dx = 0;
             var dy = btnSize;
 
-            menuContainer = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
-            _loadButtonDragHandler(menuContainer, x, y, _doMenuButton);
+            container = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
+            _loadButtonDragHandler(container, x, y, _doMenuButton);
 
-            for (var name in menuNames) {
+            for (var i = 0; i < menuNames.length; i++) {
+                if (!getAuxToolbarButtonNames(menuNames[i][0])) {
+                    continue;
+                }
+
                 x += dx;
                 y += dy;
-                var container = _makeButton(menuNames[name][0] + '-button', menuNames[name][2], x, y, btnSize, 0);
-                _loadButtonDragHandler(container, x, y, menuNames[name][1]);
+                var container = _makeButton(menuNames[i][0] + '-button', menuNames[i][2], x, y, btnSize, 0);
+                _loadButtonDragHandler(container, x, y, menuNames[i][1]);
                 onscreenMenu.push(container);
-                if (menuNames[name][0] === 'utility') {
+                if (menuNames[i][0] === 'utility') {
                     utilityButton = container;
                 }
                 container.visible = false;
@@ -2164,7 +2085,7 @@ define(function (require) {
                             if (helpIdx >= HELPCONTENT.length) {
                                 helpIdx = 0;
                             }
-                            var imageScale = 55 * musicBlocksScale;
+                            var imageScale = 55 * turlteBlocksScale;
                             helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
                         }
                         update = true;
@@ -2172,11 +2093,11 @@ define(function (require) {
 
                     var img = new Image();
                     img.onload = function () {
-                        console.log(musicBlocksScale);
+                        console.log(turlteBlocksScale);
                         var bitmap = new createjs.Bitmap(img);
                         /*
-                        if (musicBlocksScale > 1) {
-                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
+                        if (turlteBlocksScale > 1) {
+                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = turlteBlocksScale;
                         } else {
                             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1.125;
                         }
@@ -2207,23 +2128,23 @@ define(function (require) {
                 var helpElem = docById('helpElem');
                 helpElem.style.position = 'absolute';
                 helpElem.style.display = 'block';
-                helpElem.style.paddingLeft = 20 * musicBlocksScale + 'px';
-                helpElem.style.paddingRight = 20 * musicBlocksScale + 'px';
+                helpElem.style.paddingLeft = 20 * turlteBlocksScale + 'px';
+                helpElem.style.paddingRight = 20 * turlteBlocksScale + 'px';
                 helpElem.style.paddingTop = '0px';
-                helpElem.style.paddingBottom = 20 * musicBlocksScale + 'px';
-                helpElem.style.fontSize = 20 + 'px'; //  * musicBlocksScale + 'px';
+                helpElem.style.paddingBottom = 20 * turlteBlocksScale + 'px';
+                helpElem.style.fontSize = 20 + 'px'; //  * turlteBlocksScale + 'px';
                 helpElem.style.color = '#000000';  // '#ffffff';
-                helpElem.style.left = 65 * musicBlocksScale + 'px';
-                helpElem.style.top = 105 * musicBlocksScale + 'px';
-                var w = Math.min(300, 300); //  * musicBlocksScale);
-                var h = Math.min(300, 300); //  * musicBlocksScale);
+                helpElem.style.left = 65 * turlteBlocksScale + 'px';
+                helpElem.style.top = 105 * turlteBlocksScale + 'px';
+                var w = Math.min(300, 300); //  * turlteBlocksScale);
+                var h = Math.min(300, 300); //  * turlteBlocksScale);
                 helpElem.style.width = w + 'px';
                 helpElem.style.height = h + 'px';
 
-                if (musicBlocksScale > 1) {
+                if (turlteBlocksScale > 1) {
                     var bitmap = helpContainer.children[0];
                     if (bitmap != undefined) {
-                        // bitmap.scaleX = bitmap.scaleY = bitmap.scale = musicBlocksScale;
+                        // bitmap.scaleX = bitmap.scaleY = bitmap.scale = turlteBlocksScale;
                     }
                 }
 
@@ -2398,11 +2319,11 @@ define(function (require) {
             container.on('mousedown', function (event) {
                 var moved = true;
                 var offset = {
-                    x: container.x - Math.round(event.stageX / musicBlocksScale),
-                    y: container.y - Math.round(event.stageY / musicBlocksScale)
+                    x: container.x - Math.round(event.stageX / turlteBlocksScale),
+                    y: container.y - Math.round(event.stageY / turlteBlocksScale)
                 };
 
-                var circles = showButtonHighlight(ox, oy, cellSize / 2, event, musicBlocksScale, stage);
+                var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turlteBlocksScale, stage);
 
                 container.on('pressup', function (event) {
                     hideButtonHighlight(circles, stage);
