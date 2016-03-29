@@ -19,13 +19,6 @@ const DEFAULTPALETTE = 'rhythm';
 BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
 
 
-function turtleRequires () {
-    // These modules are not used in all forks of Turtle Blocks, e.g., Music Blocks.
-    require('activity/musicutils');
-    require('activity/matrix');
-};
-
-
 function getMainToolbarButtonNames(name) {
     return (['fast', 'slow', 'slow-music', 'step', 'step-music', 'stop-turtle', 'clear', 'palette', 'hide-blocks', 'collapse-blocks', 'go-home', 'help'].indexOf(name) > -1);
 };
@@ -38,8 +31,8 @@ function getAuxToolbarButtonNames(name) {
 
 function createDefaultStack() {
     DATAOBJS =
-        [[0, 'start', 250, 150, [null, null, null]],
-         [1, 'matrix', 800, 50, [null, 2, 25]],
+        [[0, 'start', 250, 100, [null, null, null]],
+         [1, 'matrix', 800, 100, [null, 2, 25]],
 
          [2, 'pitch', 0, 0, [1, 3, 4, 5]],
          [3, ['solfege', {value:'ti'}], 0, 0, [2]],

@@ -17,10 +17,6 @@ var paletteBlocks = null;
 const PROTOBLOCKSCALE = 1.0;
 const PALETTELEFTMARGIN = 10;
 
-// We don't include 'extras' since we want to be able to delete
-// plugins from the extras palette.
-const BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
-
 
 function maxPaletteHeight(menuSize, scale) {
     // Palettes don't start at the top of the screen and the last
@@ -89,7 +85,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.x = 0;
     this.y = this.cellSize;
 
-    this.current = 'turtle';
+    this.current = DEFAULTPALETTE;
 
     this.container = new createjs.Container();
     this.container.snapToPixelEnabled = true;
@@ -1841,22 +1837,10 @@ var blocks = undefined;
 
 function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan, b) {
     // Instantiate the palettes object on first load.
-    var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan).
-    add('rhythm').
-    add('pitch').
-    add('tone').
-    add('actions').
-    add('boxes').
-    add('flow').
-    add('matrix').
-    add('turtle').
-    add('pen').
-    add('number').
-    add('boolean').
-    add('media').
-    add('sensors').
-    add('heap').
-    add('extras');
+    var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan);
+    for (var i = 0; i < BUILTINPALETTES.length; i++) {
+	palettes.add(BUILTINPALETTES[i]);
+    }
 
     // Define some globals.
     palettes.makePalettes(true);
