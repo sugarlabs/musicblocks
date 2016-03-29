@@ -16,7 +16,7 @@ const DEFAULTPALETTE = 'rhythm';
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'myblocks', 'heap'];
+BUILTINPALETTES = ['pitch', 'matrix', 'rhythm', 'tone', 'actions', 'boxes', 'turtle', 'pen', 'number', 'boolean', 'flow', 'media', 'sensors', 'heap', 'extras'];
 
 
 function getMainToolbarButtonNames(name) {

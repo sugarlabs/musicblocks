@@ -461,13 +461,14 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
     // Macros are stored in a JSON-encoded dictionary.
     if (macroData !== '{}') {
         var obj = JSON.parse(macroData);
-        console.log('adding myblocks palette');
         palettes.add('myblocks', 'black', '#a0a0a0');
+
         for (var name in obj) {
             console.log('adding ' + name + ' to macroDict');
             macroDict[name] = obj[name];
             blocks.addToMyPalette(name, macroDict[name]);
         }
+
         palettes.makePalettes();
     }
 };

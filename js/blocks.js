@@ -2217,10 +2217,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return;
         }
 
+        this.palettes.hide();
+
         var blockObjs = this._copyBlocksToObj();
         // The first block is an action block. Its first connection is
         // the block containing its label.
         var nameBlk = blockObjs[0][4][1];
+
         if (nameBlk == null) {
             console.log('action not named... skipping');
         } else {
@@ -2236,11 +2239,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 sugarizerCompatibility.saveLocally(function () {
                     this.addToMyPalette(name, blockObjs);
-                    this.palettes.updatePalettes('myblocks');
+                    // this.palettes.updatePalettes('myblocks');
                 });
             } else {
                 this.addToMyPalette(name, blockObjs);
-                this.palettes.updatePalettes('myblocks');
+                // this.palettes.updatePalettes('myblocks');
             }
         }
     };

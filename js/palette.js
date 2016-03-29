@@ -303,10 +303,12 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
 
     this.remove = function(name) {
+        console.log(this.buttons);
         if (!(name in this.buttons)) {
             console.log('Palette.remove: Cannot find palette ' + name);
             return;
         }
+
         this.buttons[name].removeAllChildren();
         var btnKeys = Object.keys(this.dict);
         for (var btnKey = btnKeys.indexOf(name) + 1; btnKey < btnKeys.length; btnKey++) {
@@ -1355,10 +1357,10 @@ function Palette(palettes, name) {
                     palette.hide();
                     palette.palettes.refreshCanvas();
                     // Only delete plugin palettes.
-                    if (BUILTINPALETTES.indexOf(palette.name) === -1) {
-                        palette._promptPaletteDelete();
-                    } else if (palette.name === 'myblocks') {
+		    if (palette.name === 'myblocks') {
                         palette._promptMacrosDelete();
+                    } else if (BUILTINPALETTES.indexOf(palette.name) === -1) {
+                        palette._promptPaletteDelete();
                     }
                 }
                 trashcan.hide();
@@ -1553,7 +1555,8 @@ function Palette(palettes, name) {
         }
 
         this.palettes.updatePalettes('myblocks');
-        storage.macros =  prepareMacroExports(null, null, {});
+        storage.macros = prepareMacroExports(null, null, {});
+
         if (sugarizerCompatibility.isInsideSugarizer()) {
             sugarizerCompatibility.saveLocally();
         }
