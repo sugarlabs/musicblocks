@@ -64,8 +64,9 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.trashcan = trashcan;
     this.initial_x = 55;
     this.initial_y = 55;
-    this.upButton = null;
-    this.downButton = null;
+    this.firstTime = true;
+    this.upIndicator = null;
+    this.downIndicator = null;
     this.circles = {};
     this.mouseOver = false;
     this.activePalette = null;
@@ -100,8 +101,8 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.dict[i]._resizeEvent();
         }
 
-        if (this.downButton != null) {
-            this.downButton.y = (windowHeight() * canvasPixelRatio()) / this.scale - 27;
+        if (this.downIndicator != null) {
+            this.downIndicator.y = (windowHeight() * canvasPixelRatio()) / this.scale - 27;
         }
     };
 
@@ -115,19 +116,19 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
         var diff = direction * scrollSpeed;
         if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
-            this.upButton.visible = false;
+            this.upIndicator.visible = false;
             this.refreshCanvas();
             return;
         } else {
-            this.upButton.visible = true;
+            this.upIndicator.visible = true;
         }
 
         if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
-            this.downButton.visible = false;
+            this.downIndicator.visible = false;
             this.refreshCanvas();
             return;
         } else {
-            this.downButton.visible = true;
+            this.downIndicator.visible = true;
         }
 
         this.scrollDiff += diff;
@@ -162,7 +163,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             bitmap.x = 55;
             bitmap.y = 55;
             bitmap.visible = false;
-            palettes.upButton = bitmap;
+            palettes.upIndicator = bitmap;
         };
 
         function __processDownIcon(palettes, name, bitmap, args) {
@@ -171,13 +172,17 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             bitmap.x = 55;
             bitmap.y = (windowHeight() * canvasPixelRatio()) / palettes.scale - 27;
             bitmap.visible = true;
-            palettes.downButton = bitmap;
+            palettes.downIndicator = bitmap;
         };
 
-        if (this.upButton == null) {
+        if (this.upIndicator == null && this.firstTime) {
             makePaletteBitmap(this, UPICON.replace('#000000', '#FFFFFF'), 'up', __processUpIcon, null);
+        }
+        if (this.downbIndicator == null && this.firstTime) {
             makePaletteBitmap(this, DOWNICON.replace('#000000', '#FFFFFF'), 'down', __processDownIcon, null);
         }
+
+        this.firstTime = false;
 
         // Make an icon/button for each palette
 
@@ -255,8 +260,8 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.dict[name].hideMenu(true);
         }
 
-        this.upButton.visible = false;
-        this.downButton.visible = false;
+        this.upIndicator.visible = false;
+        this.downIndicator.visible = false;
 
         this.refreshCanvas();
     };
@@ -305,7 +310,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.remove = function(name) {
         console.log(this.buttons);
         if (!(name in this.buttons)) {
-            console.log('Palette.remove: Cannot find palette ' + name);
+            consolpe.log('Palette.remove: Cannot find palette ' + name);
             return;
         }
 
