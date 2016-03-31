@@ -310,7 +310,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.remove = function(name) {
         console.log(this.buttons);
         if (!(name in this.buttons)) {
-            consolpe.log('Palette.remove: Cannot find palette ' + name);
+            console.log('Palette.remove: Cannot find palette ' + name);
             return;
         }
 
