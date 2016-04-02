@@ -1203,16 +1203,16 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.stopTurtle = true;
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var delta = args[0] / NOTEDIV;
-                    var istenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
+                    var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                     var __listener = function (event) {
                         logo.turtles.turtleList[turtle].doArc(delta, args[1]);
                     };
 
                     if (logo.whichNoteBlock[turtle] in logo.arcListener[turtle]) {
-                        logo.arcListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                        logo.arcListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
                     } else {
-                        logo.arcListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                        logo.arcListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
                     }
 
                     logo.stage.addEventListener(listenerName, __listener, false);
@@ -1263,7 +1263,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             break;
         case 'forward':
-            console.log('forward');
             if (args.length === 1) {
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
@@ -1277,9 +1276,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     };
 
                     if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
-                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
                     } else {
-                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
                     }
 
                     logo.stage.addEventListener(listenerName, __listener, false);
@@ -1302,9 +1301,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     };
 
                     if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
-                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
                     } else {
-                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
                     }
 
                     logo.stage.addEventListener(listenerName, __listener, false);
