@@ -816,8 +816,9 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
-    this._doOpenMedia = function (myBlock, thisBlock) {
+    this._doOpenMedia = function (thisBlock) {
         var fileChooser = docById('myOpenAll');
+        var myBlock = this;
 
         readerAction = function (event) {
             window.scroll(0, 0);
