@@ -2179,6 +2179,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         this.copyButton.visible = true;
         this.copyButton.x = myBlock.container.x - 27;
         this.copyButton.y = myBlock.container.y - 27;
+
+        // Auto-select stack for copying -- no need to actually click on
+        // the copy button.
+        var topBlock = this.findTopBlock(this.activeBlock);
+        this.selectedStack = topBlock;
+        this.updatePasteButton();
+
         this.stage.setChildIndex(this.copyButton, z);
         this.dismissButton.visible = true;
         this.dismissButton.x = myBlock.container.x + 27;
