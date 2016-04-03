@@ -194,28 +194,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         var blocks = this;
         this.updatePasteButton = updatePasteButton;
 
-        this.copyButton = makeButton('copy-button', _('Copy'), 0, 0, 55, 0, this.stage);
-        this.copyButton.visible = false;
-
         this.dismissButton = makeButton('cancel-button', '', 0, 0, 55, 0, this.stage);
         this.dismissButton.visible = false;
 
         this.saveStackButton = makeButton('save-blocks-button', _('Save stack'), 0, 0, 55, 0, this.stage);
         this.saveStackButton.visible = false;
 
-        this.copyButton.on('click', function (event) {
-            var topBlock = blocks.findTopBlock(blocks.activeBlock);
-            blocks.selectedStack = topBlock;
-            blocks.copyButton.visible = false;
-            blocks.saveStackButton.visible = false;
-            blocks.dismissButton.visible = false;
-            blocks.inLongPress = false;
-            blocks.updatePasteButton();
-            blocks.refreshCanvas();
-        });
-
         this.dismissButton.on('click', function (event) {
-            blocks.copyButton.visible = false;
             blocks.saveStackButton.visible = false;
             blocks.dismissButton.visible = false;
             blocks.inLongPress = false;
@@ -227,7 +212,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var topBlock = blocks.findTopBlock(blocks.activeBlock);
             blocks.inLongPress = false;
             blocks.selectedStack = topBlock;
-            blocks.copyButton.visible = false;
             blocks.saveStackButton.visible = false;
             blocks.dismissButton.visible = false;
             blocks.saveStack();
@@ -1115,7 +1099,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this.moveBlockRelative = function (blk, dx, dy) {
         // Move a block (and its label) by dx, dy.
         if (this.inLongPress) {
-            this.copyButton.visible = false;
             this.saveStackButton.visible = false;
             this.dismissButton.visible = false;
             this.inLongPress = false;
@@ -2176,9 +2159,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         this.timeOut == null;
         this.inLongPress = true;
         var z = this.stage.getNumChildren() - 1;
-        this.copyButton.visible = true;
-        this.copyButton.x = myBlock.container.x - 27;
-        this.copyButton.y = myBlock.container.y - 27;
 
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.
@@ -2186,14 +2166,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         this.selectedStack = topBlock;
         this.updatePasteButton();
 
-        this.stage.setChildIndex(this.copyButton, z);
-        this.dismissButton.visible = true;
-        this.dismissButton.x = myBlock.container.x + 27;
-        this.dismissButton.y = myBlock.container.y - 27;
-        this.stage.setChildIndex(this.dismissButton, z - 1);
         if (myBlock.name === 'action') {
+            this.dismissButton.visible = true;
+            this.dismissButton.x = myBlock.container.x - 27;
+            this.dismissButton.y = myBlock.container.y - 27;
+            this.stage.setChildIndex(this.dismissButton, z - 1);
             this.saveStackButton.visible = true;
-            this.saveStackButton.x = myBlock.container.x + 82;
+            this.saveStackButton.x = myBlock.container.x + 27;
             this.saveStackButton.y = myBlock.container.y - 27;
             this.stage.setChildIndex(this.saveStackButton, z - 2);
         }

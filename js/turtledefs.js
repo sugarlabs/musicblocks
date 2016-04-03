@@ -91,7 +91,6 @@ function createHelpContent() {
         [_('Load project from files'), _('You can also load projects from the file system.'), 'header-icons/open-button.svg'],
         [_('Save project'), _('Save your project to a file.'), 'header-icons/save-button.svg'],
         [_('Save sheet music'), _('Save your project to as a Lilypond file.'), 'header-icons/lilypond-button.svg'],
-        [_('Copy'), _('The copy button copies a stack to the clipboard. It appears after a "long press" on a stack.'), 'header-icons/copy-button.svg'],
         [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'header-icons/paste-disabled-button.svg'],
         [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'header-icons/save-blocks-button.svg'],
         [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'header-icons/Cartesian-button.svg'],
