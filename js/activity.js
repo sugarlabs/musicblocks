@@ -831,7 +831,6 @@ define(function (require) {
                         return;
                     }
                     if (blocks.inLongPress) {
-                        blocks.copyButton.visible = false;
                         blocks.saveStackButton.visible = false;
                         blocks.dismissButton.visible = false;
                         blocks.inLongPress = false;
