@@ -1362,7 +1362,7 @@ function Palette(palettes, name) {
                     palette.hide();
                     palette.palettes.refreshCanvas();
                     // Only delete plugin palettes.
-		    if (palette.name === 'myblocks') {
+                    if (palette.name === 'myblocks') {
                         palette._promptMacrosDelete();
                     } else if (BUILTINPALETTES.indexOf(palette.name) === -1) {
                         palette._promptPaletteDelete();
@@ -1571,7 +1571,7 @@ function Palette(palettes, name) {
         const BUILTINMACROS= ['note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm',
                               'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2',
                               'matrix', 'turtlepitch', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote',
-                              'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline' ];
+                              'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline', 'note2', 'note3'];
 
         switch (protoblk.name) {
         case 'do':
@@ -1717,6 +1717,8 @@ function Palette(palettes, name) {
         const TUPLETOBJ = [[0, 'tuplet2', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 3, 6]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]], [3, 'rhythm', 0, 0, [0, 4, 5, null]], [4, ['number', {'value': 3}], 0, 0, [3]], [5, ['number', {'value': 4}], 0, 0, [3]], [6, 'hidden', 0, 0, [0, null]]];
         const FILLOBJ = [[0, 'fill', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
         const HOLLOWOBJ = [[0, 'hollowline', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const NOTE2OBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 5]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['notename', {'value': 'A'}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]], [5, 'hidden', 0, 0, [0, null]]];
+        const NOTE3OBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'sine', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
 
         const BUILTINMACROS = {'note': NOTEOBJ,
                                'rhythmicdot': DOTOBJ,
@@ -1753,6 +1755,8 @@ function Palette(palettes, name) {
                                'tuplet2': TUPLETOBJ,
                                'fill': FILLOBJ,
                                'hollowline': HOLLOWOBJ,
+                               'note2': NOTE2OBJ,
+                               'note3': NOTE3OBJ,
                               };
 
         function __myCallback (newBlock) {
@@ -1847,7 +1851,7 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     // Instantiate the palettes object on first load.
     var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan);
     for (var i = 0; i < BUILTINPALETTES.length; i++) {
-	palettes.add(BUILTINPALETTES[i]);
+        palettes.add(BUILTINPALETTES[i]);
     }
 
     // Define some globals.

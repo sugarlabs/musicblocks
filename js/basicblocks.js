@@ -404,13 +404,27 @@ function initBasicProtoBlocks(palettes, blocks) {
     rest2Block.adjustWidthToLabel();
     rest2Block.zeroArgBlock();
 
+    var note3Block = new ProtoBlock('note3');
+    note3Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['note3'] = note3Block;
+    note3Block.staticLabels.push('440 8');
+    note3Block.adjustWidthToLabel();
+    note3Block.zeroArgBlock();
+
+    var note2Block = new ProtoBlock('note2');
+    note2Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['note2'] = note2Block;
+    note2Block.staticLabels.push('A4 8');
+    note2Block.adjustWidthToLabel();
+    note2Block.zeroArgBlock();
+
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note'] = noteBlock;
     noteBlock.staticLabels.push(_('note'));
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
-    noteBlock.defaults.push(4);
+    noteBlock.defaults.push(8);
 
     // TONE (ARTICULATION) PALETTE
 
