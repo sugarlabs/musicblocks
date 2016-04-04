@@ -529,6 +529,34 @@ function initBasicProtoBlocks(palettes, blocks) {
     crescendoBlock.flowClampOneArgBlock();
     crescendoBlock.defaults.push(5);
 
+    var thirdsBlock = new ProtoBlock('thirds');
+    thirdsBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['thirds'] = thirdsBlock;
+    thirdsBlock.staticLabels.push(_('thirds'));
+    thirdsBlock.adjustWidthToLabel();
+    thirdsBlock.flowClampZeroArgBlock();
+
+    var fourthsBlock = new ProtoBlock('fourths');
+    fourthsBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['fourths'] = fourthsBlock;
+    fourthsBlock.staticLabels.push(_('fourths'));
+    fourthsBlock.adjustWidthToLabel();
+    fourthsBlock.flowClampZeroArgBlock();
+
+    var tritoneBlock = new ProtoBlock('tritone');
+    tritoneBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['tritone'] = tritoneBlock;
+    tritoneBlock.staticLabels.push(_('tritone'));
+    tritoneBlock.adjustWidthToLabel();
+    tritoneBlock.flowClampZeroArgBlock();
+
+    var fifthsBlock = new ProtoBlock('fifths');
+    fifthsBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['fifths'] = fifthsBlock;
+    fifthsBlock.staticLabels.push(_('fifths'));
+    fifthsBlock.adjustWidthToLabel();
+    fifthsBlock.flowClampZeroArgBlock();
+
     var swingBlock = new ProtoBlock('swing');
     swingBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['swing'] = swingBlock;
@@ -552,34 +580,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     staccatoBlock.adjustWidthToLabel();
     staccatoBlock.flowClampOneArgBlock();
     staccatoBlock.defaults.push(32);
-
-    var fifthsBlock = new ProtoBlock('fifths');
-    fifthsBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['fifths'] = fifthsBlock;
-    fifthsBlock.staticLabels.push(_('fifths'));
-    fifthsBlock.adjustWidthToLabel();
-    fifthsBlock.flowClampZeroArgBlock();
-
-    var tritoneBlock = new ProtoBlock('tritone');
-    tritoneBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['tritone'] = tritoneBlock;
-    tritoneBlock.staticLabels.push(_('tritone'));
-    tritoneBlock.adjustWidthToLabel();
-    tritoneBlock.flowClampZeroArgBlock();
-
-    var fourthsBlock = new ProtoBlock('fourths');
-    fourthsBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['fourths'] = fourthsBlock;
-    fourthsBlock.staticLabels.push(_('fourths'));
-    fourthsBlock.adjustWidthToLabel();
-    fourthsBlock.flowClampZeroArgBlock();
-
-    var thirdsBlock = new ProtoBlock('thirds');
-    thirdsBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['thirds'] = thirdsBlock;
-    thirdsBlock.staticLabels.push(_('thirds'));
-    thirdsBlock.adjustWidthToLabel();
-    thirdsBlock.flowClampZeroArgBlock();
 
     // TURTLE PALETTE
 
