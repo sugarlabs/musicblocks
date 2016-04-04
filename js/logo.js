@@ -143,6 +143,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.crescendoDelta = {};
     this.crescendoVolume = {};
     this.crescendoInitialVolume = {};
+    this.fifths = {};
+    this.tritones = {};
+    this.fourths = {};
+    this.thirds = {};
     this.staccato = {};
     this.swing = {};
     this.swingTarget = {};
@@ -556,6 +560,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
+            this.fifths[turtle] = [];
+            this.tritones[turtle] = [];
+            this.fourths[turtle] = [];
+            this.thirds[turtle] = [];
             this.staccato[turtle] = [];
             this.swing[turtle] = [];
             this.swingTarget[turtle] = [];
@@ -1965,6 +1973,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
 
                 if (!(logo.invertList[turtle].length === 0)) {
+                    var delta = 0;
                     var len = logo.invertList[turtle].length;
                     // Get an anchor note and its corresponding
                     // number, which is used to calculate delta.
@@ -1997,8 +2006,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     matrix.solfegeOctaves.push(octave);
                 }
             } else if (logo.inNoteBlock[turtle] > 0) {
-                logo.notePitches[turtle].push(note);
-                logo.noteOctaves[turtle].push(octave);
+                function addPitch(note, octave) {
+                    logo.notePitches[turtle].push(note);
+                    logo.noteOctaves[turtle].push(octave);
+                }
+
                 if (!(logo.invertList[turtle].length === 0)) {
                     var len = logo.invertList[turtle].length;
                     var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
@@ -2011,6 +2023,29 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         num1 += 2 * delta;
                     }
                 }
+
+                addPitch(note, octave);
+
+                if (turtle in logo.fifths && logo.fifths[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, 7, logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1]);
+                }
+
+                if (turtle in logo.tritones && logo.tritones[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, 6, logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1]);
+                }
+		
+                if (turtle in logo.fourths && logo.fourths[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, 5, logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1]);
+                }
+		
+                if (turtle in logo.thirds && logo.thirds[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, 4, logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1]);
+                }
+		
                 if (turtle in logo.transposition) {
                     logo.noteTranspositions[turtle].push(logo.transposition[turtle] + 2 * delta);
                 } else {
@@ -2165,6 +2200,62 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 logo._setListener(turtle, listenerName, __listener);
             }
+            break;
+        case 'fifths':
+            logo.fifths[turtle].push(true);
+            childFlow = args[0];
+            childFlowCount = 1;
+
+            var listenerName = '_fifths_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.fifths[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'tritone':
+            logo.tritones[turtle].push(true);
+            childFlow = args[0];
+            childFlowCount = 1;
+
+            var listenerName = '_tritone_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.tritones[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'fourths':
+            logo.fourths[turtle].push(true);
+            childFlow = args[0];
+            childFlowCount = 1;
+
+            var listenerName = '_fourths_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.fourths[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'thirds':
+            logo.thirds[turtle].push(true);
+            childFlow = args[0];
+            childFlowCount = 1;
+
+            var listenerName = '_thirds_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.thirds[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'staccato':
             if (args.length > 1) {
