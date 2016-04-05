@@ -22,6 +22,7 @@ const OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
 // Note: We are using URL encoding, e.g., \ (%5C) and newline (%0A)
 const LILYPONDHEADER = '%5Cversion "2.18.2"%0A%0A%25 ****************************************************************%0A%25 %0A%25 WHAT IS THIS? -- This is a LilyPond file generated from Music%0A%25 Blocks software (Read about it at www.musicblocks.net).%0A%25 %0A%25 DOWNLOAD LILYPOND -- In order to create notation with this file,%0A%25 you will need to download and install LilyPond software onto your%0A%25 computer (http:%2F%2Flilypond.org%2Fdownload.html). Frescobaldi%0A%25 software is also handy for editing LilyPond files%0A%25 (http:%2F%2Ffrescobaldi.org%2Fdownload).%0A%25 %0A%25 LILYPOND INSTRUCTIONS -- For instructions on how to further%0A%25 manipulate musical notation using LilyPond software, please%0A%25 read the Introduction (http:%2F%2Flilypond.org%2Ftext-input.html) and%0A%25 the Manual%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2FDocumentation%2Flearning%2Findex.html).%0A%25 %0A%25 GLOSSARY -- A glossary with helpful examples may be found here%0A%25 (http:%2F%2Fwww.lilypond.org%2Fdoc%2Fv2.19%2FDocumentation%2Fmusic-glossary%2F).%0A%25 %0A%25 MUTOPIA -- You may also benefit from studying scores from the%0A%25 Mutopia Project website, which has freely sharable music notation%0A%25 generated with LilyPond (http:%2F%2Fwww.mutopiaproject.org%2F).%0A%25 %0A%25 TUNEFL -- You can explore your Lilypond output in a web browser at%0A%25 (https://www.tunefl.com/).%0A%25 %0A%25 COMMENTS -- Some of the code below is commented out. You can%0A%25 enable it by deleting the %25 that precedes the text or, in the%0A%25 case of a commented section, deleting the %{ and %} that surrounds%0A%25 the section.%0A%25 %0A%25 ****************************************************************%0A%0A%25 Please add your own name, the title of your musical creation,%0A%25 and the intended copyright below.%0A%25 The copyright is great for sharing (and re-sharing)!%0A%25 Read more about it here (http:%2F%2Fcreativecommons.org%2Flicenses%2Fby-sa%2F4.0%2F).%0A%25 Of course, you can use any copyright you like -- you made it!%0A%5Cheader {%0A   dedication = "Made with LilyPond and Music Blocks (http:%2F%2Fwalterbender.github.io%2Fmusicblocks%2F)"%0A   title = "My Music Blocks Creation"%0A%25   subtitle = "Subtitle"%0A%25   instrument = "Instrument"%0A   composer = "Mr. Mouse"%0A%25   arranger = "Arranger"%0A   copyright = "Mr. Mouse (c) 2015 -- CC-BY-SA"%0A   tagline = "Made from Music Blocks v.0.9"%0A}%0A%0A%25 To change the meter make adjustments in the following section.%0A%25 You must also delete the %25 before %5Cmeter everywhere it appears below.%0Ameter = {%0A   %5Ctime 3%2F4%0A   %5Ckey c %5Cminor%0A   %5CnumericTimeSignature%0A   %5Cpartial 4 %0A   %5Ctempo "Andante" 4=90%0A}%0A%0A'
 const RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
+//.TRANS Abbreviations for names used in Lilypind output, e.g., m for mouse
 const RODENTSSHORT = [_('m'), _('br'), _('ml'), _('ch'), _('rs'), _('gp'), _('cb'), _('cp'), _('bk'), _('gs'), _('fs'), _('bt')];
 const LYNOTE = 0;
 const LYDURATION = 1;
@@ -1785,7 +1786,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
                 xmlHttp.send(data);
             } else {
-                logo.errorMsg(_('turtleHeaps does not contain a valid heap for '+name));
+                logo.errorMsg(_('turtleHeaps does not contain a valid heap for') + ' ' + name);
             }
             break;
         case 'setHeapEntry':
@@ -2060,7 +2061,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 logo.pushedNote[turtle] = true;
             } else {
-                logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?)', blk));
+                logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
                 console.log('pitch block found outside of note block');
             }
             break;
@@ -2076,7 +2077,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo._processNote(args[1], blk, turtle);
                 }
             } else {
-                logo.errorMsg(_('Rhythm Block: Did you mean to use a Note block?)', blk));
+                logo.errorMsg(_('Rhythm Block: Did you mean to use a Matrix block?'), blk);
             }
             break;
             // FIXME: What is this supposed to do?
@@ -2602,7 +2603,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.tuplet = true;
                 logo.addingNotesToTuplet = false;
             } else {
-                logo.errorMsg('Tuplet Block: Did you mean to use a Note block?', blk);
+                logo.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
             }
             childFlow = args[2];
             childFlowCount = 1;
