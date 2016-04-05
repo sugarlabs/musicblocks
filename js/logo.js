@@ -1728,7 +1728,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             var c = block.connections[1];
             if (c != null && blocks.blockList[c].name === 'loadFile') {
                 if (args.length !== 1) {
-                    logo.errorMsg(_('You need to select a file.'));
+                    logo.errorMsg(_('You must select a file.'));
                 } else {
                     try {
                         logo.turtleHeaps[turtle] = JSON.parse(blocks.blockList[c].value[1]);
