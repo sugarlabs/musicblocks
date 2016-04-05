@@ -241,7 +241,6 @@ msgstr: ""
 
 #: logo.js:26
 #.TRANS:  Abbreviations for names used in Lilypind output, e.g., m for mouse
-
 msgid: "m"
 msgstr: ""
 
