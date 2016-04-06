@@ -37,1213 +37,2287 @@ msgid ""
 
 
 msgid ""
-msgstr ""
-
-msgid "crescendo factor"
-msgstr ""
-
-msgid "quarter note"
-msgstr ""
-
-msgid "eighth note"
-msgstr ""
-
-#. TRANS: color refers to a hue, value, chroma triplet
-msgid "set color"
-msgstr ""
-
-msgid "pen"
-msgstr ""
-
-#. TRANS: as in "add 1 to"
-msgid "to"
-msgstr ""
-
-msgid "rhythm"
-msgstr ""
-
-msgid "Show/hide blocks"
-msgstr ""
-
-msgid "Click to run the project in slow mode."
-msgstr ""
-
-msgid "turtle note"
-msgstr ""
-
-msgid "fat"
-msgstr ""
-
-msgid "Expand or collapse start and action stacks."
-msgstr ""
-
-#. TRANS: load the program heap from an application
-msgid "load heap from App"
-msgstr ""
-
-msgid "turtle x"
-msgstr ""
-
-msgid "turtle y"
-msgstr ""
-
-msgid "Restore blocks from the trash."
-msgstr ""
-
-msgid "heading"
-msgstr ""
-
-msgid "Hide or show the block palettes."
-msgstr ""
-
-#. TRANS: hollow line refers to drawing an outline around a line
-msgid "hollow line"
-msgstr ""
-
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr ""
-
-#. TRANS: as in button click
-msgid "click"
-msgstr ""
-
-#. TRANS: index specifies a position into an array (heap)
-msgid "index"
-msgstr ""
-
-msgid "hide"
-msgstr ""
-
-msgid "tuplet value"
-msgstr ""
-
-msgid "while"
-msgstr ""
-
-msgid "to degrees"
-msgstr ""
-
-msgid "water"
-msgstr ""
-
-msgid "octave"
-msgstr ""
-
-msgid "sing"
-msgstr ""
-
-msgid "pen down"
-msgstr ""
-
-msgid "wait"
-msgstr "esperar"
-
-#. TRANS: a container for a variable
-msgid "box"
-msgstr "caixa"
-
-msgid "duplicate factor"
-msgstr ""
-
-#. TRANS: popout window
-msgid "popout"
-msgstr ""
-
-msgid "Download"
-msgstr ""
-
-msgid "Home"
-msgstr ""
-
-msgid "Increase the size of the blocks."
-msgstr ""
-
-msgid "set volume"
-msgstr ""
-
-msgid "Cartesian"
-msgstr ""
-
-msgid "apple"
-msgstr ""
-
-msgid "Increase block size"
-msgstr ""
-
-#. TRANS: Boolean logic
-msgid "boolean"
-msgstr ""
-
-msgid "Run slow"
-msgstr ""
-
-msgid "turtle pitch number"
-msgstr ""
-
-#. TRANS: cloud as in cloud server
-msgid "cloud"
-msgstr ""
-
-#. TRANS: hours ago that the data was updated.
-msgid "hours ago"
-msgstr ""
-
-msgid "from"
-msgstr ""
-
-msgid "half note"
-msgstr ""
-
-#. TRANS: is the heap empty?
-msgid "heap empty?"
-msgstr ""
-
-msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr ""
-
-msgid "whole note"
-msgstr ""
-
-msgid "until"
-msgstr ""
-
-msgid "flat"
-msgstr ""
-
-msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
-
-msgid "Expand/collapse collapsable blocks"
-msgstr ""
-
-msgid "Show/hide palettes"
-msgstr ""
-
-#. TRANS: hue refers to spectral hue (red, yellow, green, blue...)
-msgid "set hue"
-msgstr ""
-
-msgid "set heading"
-msgstr "seth"
-
-msgid "this"
-msgstr ""
-
-msgid "play backward"
-msgstr ""
-
-msgid "longitude"
-msgstr ""
-
-#. TRANS: database fetch
-msgid "fetch"
-msgstr ""
-
-#. TRANS: the name of a robot built in Paraguay (probably no need to translate)
-msgid "rodi"
-msgstr ""
-
-#. TRANS: high temperature
-msgid "high"
-msgstr ""
-
-msgid "currency"
-msgstr ""
-
-#. TRANS: stop playing current media file (movie or audio)
-msgid "stop play"
-msgstr ""
-
-msgid "sharp"
-msgstr ""
-
-msgid "Save your project to a server."
-msgstr ""
-
-msgid "Decrease block size"
-msgstr ""
-
-msgid "blocks"
-msgstr ""
-
-msgid "eatme"
-msgstr ""
-
-#. TRANS: maximum
-msgid "max"
-msgstr "màxim"
-
-msgid "Click to run just the music in slow mode."
-msgstr ""
-
-msgid "tomato"
-msgstr ""
-
-msgid "shade"
-msgstr "tonalitat"
-
-msgid "no background"
-msgstr ""
-
-msgid "staccato factor"
-msgstr ""
-
-msgid "move"
-msgstr ""
-
-#. TRANS: musical meter
-msgid "meter"
-msgstr ""
-
-msgid "Save your project to a file."
-msgstr ""
-
-msgid "keyboard"
-msgstr "teclat"
-
-msgid "coordinates"
-msgstr ""
-
-msgid "pen up"
-msgstr ""
-
-#. TRANS: 360 degrees in a circle
-msgid "degrees"
-msgstr ""
-
-msgid "start turtle"
-msgstr ""
-
-msgid "latitude"
-msgstr ""
-
-msgid "then"
-msgstr ""
-
-msgid "articulation"
-msgstr ""
-
-msgid "food"
-msgstr ""
-
-#. TRANS: logical "not" operator
-msgid "not"
-msgstr "no"
-
-msgid "Google map"
-msgstr ""
-
-msgid "day"
-msgstr ""
-
-msgid "get fiber"
-msgstr ""
-
-#. TRANS: the name of a variable (stored in a box)
-msgid "name"
-msgstr ""
-
-msgid "You can scroll the blocks on the canvas."
-msgstr ""
-
-msgid "radians"
-msgstr ""
-
-msgid "turtle"
-msgstr "Tortuga"
-
-msgid "square"
-msgstr ""
-
-msgid "hide blocks"
-msgstr ""
-
-msgid "fish"
-msgstr ""
-
-msgid "1/32 note"
-msgstr ""
-
-#. TRANS: in mathematical sense (inverse of period)
-msgid "frequency"
-msgstr ""
-
-#. TRANS: as in the event that a signal arrives
-msgid "event"
-msgstr ""
-
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-msgstr ""
-
-#. TRANS: publish project to Facebook
-msgid "publish"
-msgstr ""
-
-msgid "print"
-msgstr "imprimir"
-
-msgid "size"
-msgstr ""
-
-msgid "Expand/collapse option toolbar"
-msgstr ""
-
-#. TRANS: save the heap to a file
-msgid "save heap"
-msgstr ""
-
-#. TRANS: dietary fiber
-msgid "fiber"
-msgstr ""
-
-msgid "Planet"
-msgstr ""
-
-#. TRANS: mathematical exponential base
-msgid "base"
-msgstr ""
-
-msgid "cookie"
-msgstr ""
-
-#. TRANS: Musical score
-msgid "Save sheet music"
-msgstr ""
-
-msgid "maths"
-msgstr ""
-
-msgid "sensors"
-msgstr ""
-
-#. TRANS: retrieve the value at a specific entry (index) in the heap
-msgid "index heap"
-msgstr ""
-
-msgid "Delete"
-msgstr ""
-
-msgid "digest meal"
-msgstr ""
-
-msgid "calories"
-msgstr ""
-
-#. TRANS: swing beat in music
-msgid "swing"
-msgstr ""
-
-#. TRANS: volume of microphone audio
-msgid "loudness"
-msgstr ""
-
-msgid "get protein"
-msgstr ""
-
-msgid "cheese"
-msgstr ""
-
-msgid "number"
-msgstr "nombre"
-
-#. TRANS: as in blinking an eye.
-msgid "blink"
-msgstr ""
-
-#. TRANS: oscillator time
-msgid "osctime"
-msgstr ""
-
-msgid "Congratulations."
-msgstr ""
-
-msgid "adjust transposition"
-msgstr ""
-
-msgid "rice and beans"
-msgstr ""
-
-msgid "city"
-msgstr ""
-
-msgid "Click to run the project in fast mode."
-msgstr ""
-
-msgid "unknown"
-msgstr ""
-
-#. TRANS: bitcoin currency (probably no need to translate)
-msgid "bitcoin"
-msgstr ""
-
-msgid "Run note by note"
-msgstr ""
-
-msgid "motion z"
-msgstr ""
-
-msgid "motion x"
-msgstr ""
-
-msgid "motion y"
-msgstr ""
-
-msgid "Open a panel for configuring Music Blocks."
-msgstr ""
-
-msgid "get name"
-msgstr ""
-
-msgid "Return all blocks to the center of the screen."
-msgstr ""
-
-#. TRANS: mathematical ceiling function, e.g., ceiling(2.5) == 3
-msgid "ceiling"
-msgstr ""
-
-#. TRANS: a turtle shell
-msgid "shell"
-msgstr ""
-
-msgid "that"
-msgstr ""
-
-#. TRANS: as in broadcast a signal
-msgid "broadcast"
-msgstr ""
-
-msgid "beats per minute"
-msgstr ""
-
-#. TRANS: robot sensors.
-msgid "distance"
-msgstr ""
-
-#. TRANS: target language for translation
-msgid "target"
-msgstr ""
-
-msgid "grey"
-msgstr ""
-
-msgid "banana"
-msgstr ""
-
-msgid "wheat bread"
-msgstr ""
-
-#. TRANS: detect language
-msgid "detect lang"
-msgstr ""
-
-msgid "sweet potato"
-msgstr ""
-
-#. TRANS: logical "and" operator
-msgid "and"
-msgstr "i"
-
-msgid "add 1 to"
-msgstr ""
-
-msgid "angle"
-msgstr "angle"
-
-#. TRANS: minimum
-msgid "min"
-msgstr "mínim"
-
-msgid "note"
-msgstr ""
-
-msgid "Please close the current matrix before opening a new one."
-msgstr ""
-
-msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-msgstr ""
-
-msgid "Worldwide"
-msgstr ""
-
-#. TRANS: as in play a musical note.
-msgid "play"
-msgstr ""
-
-msgid "denominator"
-msgstr ""
 
+#: js/activity.js:443
+msgid "Close"
+msgstr ""
+
+#: js/activity.js:1251
+#: js/block.js:619
+#: js/block.js:1705
+#: js/analytics.js:104
+#: js/blocks.js:1603
+#: js/blocks.js:1605
+#: js/blocks.js:1789
+#: js/blocks.js:1932
+#: js/blocks.js:2038
+#: js/blocks.js:2464
+#: js/blocks.js:3100
+#: js/blocks.js:3175
+#: js/palette.js:471
+#: js/palette.js:480
+#: js/palette.js:489
+#: js/palette.js:498
+#: js/palette.js:1620
+#: js/palette.js:1631
+#: js/palette.js:1642
+#: js/palette.js:1653
+#: js/basicblocks.js:1003
+#: js/basicblocks.js:1032
+#: js/basicblocks.js:1039
+#: js/basicblocks.js:1067
+#: js/basicblocks.js:1077
+#: js/basicblocks.js:1106
+#: js/basicblocks.js:1138
+#: js/basicblocks.js:1142
+#: js/basicblocks.js:1148
+msgid "action"
+msgstr ""
+
+#: js/activity.js:1934
+#: js/turtledefs.js:78
 msgid "Run fast"
 msgstr ""
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
+#: js/activity.js:1935
+#: js/turtledefs.js:79
+msgid "Run slow"
 msgstr ""
 
-msgid "forever"
-msgstr "per sempre"
-
-#. TRANS: save the program heap to an application
-msgid "save heap to App"
+#: js/activity.js:1936
+#: js/turtledefs.js:81
+msgid "Run step by step"
 msgstr ""
 
-#. TRANS: musical note to frequency
-msgid "note to frequency"
+#: js/activity.js:1937
+#: js/turtledefs.js:80
+msgid "Run music slow"
 msgstr ""
 
-#. TRANS: clear the screen of any graphics drawn by the turtle
+#: js/activity.js:1938
+#: js/turtledefs.js:82
+msgid "Run note by note"
+msgstr ""
+
+#: js/activity.js:1939
+#: js/turtledefs.js:83
+msgid "Stop"
+msgstr ""
+
+#: js/activity.js:1940
+#: js/turtledefs.js:84
+msgid "Clean"
+msgstr "netejar"
+
+#: js/activity.js:1941
+#: js/turtledefs.js:85
+msgid "Show/hide palettes"
+msgstr ""
+
+#: js/activity.js:1942
+#: js/turtledefs.js:86
+msgid "Show/hide blocks"
+msgstr ""
+
+#: js/activity.js:1943
+#: js/turtledefs.js:87
+msgid "Expand/collapse collapsable blocks"
+msgstr ""
+
+#: js/activity.js:1944
+#: js/activity.js:1985
+#: js/turtledefs.js:88
+msgid "Home"
+msgstr ""
+
+#: js/activity.js:1945
+#: js/turtledefs.js:89
+msgid "Help"
+msgstr ""
+
+#: js/activity.js:2012
+#: js/turtledefs.js:91
+msgid "Load samples from server"
+msgstr ""
+
+#: js/activity.js:2013
+#: js/turtledefs.js:92
+msgid "Load project from files"
+msgstr ""
+
+#: js/activity.js:2014
+#: js/turtledefs.js:93
+msgid "Save project"
+msgstr ""
+
+#: js/activity.js:2015
+#: js/turtledefs.js:94
+msgid "Save sheet music"
+msgstr ""
+
+#: js/activity.js:2016
+#: js/turtledefs.js:96
+msgid "Paste"
+msgstr ""
+
+#: js/activity.js:2017
+#: js/turtledefs.js:98
+msgid "Cartesian"
+msgstr ""
+
+#: js/activity.js:2018
+#: js/turtledefs.js:99
+msgid "Polar"
+msgstr ""
+
+#: js/activity.js:2019
+#: js/turtledefs.js:100
+msgid "Settings"
+msgstr ""
+
+#: js/activity.js:2020
+#: js/turtledefs.js:106
+msgid "Delete all"
+msgstr ""
+
+#: js/activity.js:2021
+#: js/turtledefs.js:107
+msgid "Undo"
+msgstr ""
+
+#: js/clearbox.js:46
+msgid "confirm"
+msgstr ""
+
+#: js/block.js:553
+#: js/logo.js:1916
+#: js/logo.js:1969
+#: js/logo.js:4089
+#: js/matrix.js:312
+#: js/musicutils.js:21
+msgid "rest"
+msgstr ""
+
+#: js/block.js:622
+#: js/logo.js:4494
+#: js/logo.js:4543
+#: js/logo.js:4563
+#: js/turtle.js:361
+#: js/turtle.js:362
+#: js/basicblocks.js:1130
+msgid "start"
+msgstr "començar"
+
+#: js/block.js:625
+#: js/turtledefs.js:21
+msgid "matrix"
+msgstr ""
+
+#: js/block.js:628
+#: js/turtle.js:219
+msgid "drum"
+msgstr ""
+
+#: js/logo.js:24
+msgid "mouse"
+msgstr ""
+
+#: js/logo.js:24
+msgid "brown rat"
+msgstr ""
+
+#: js/logo.js:24
+msgid "mole"
+msgstr ""
+
+#: js/logo.js:24
+msgid "chipmunk"
+msgstr ""
+
+#: js/logo.js:24
+msgid "red squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "guinea pig"
+msgstr ""
+
+#: js/logo.js:24
+msgid "capybara"
+msgstr ""
+
+#: js/logo.js:24
+msgid "coypu"
+msgstr ""
+
+#: js/logo.js:24
+msgid "black rat"
+msgstr ""
+
+#: js/logo.js:24
+msgid "grey squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "flying squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "bat"
+msgstr ""
+
+#: js/logo.js:26
+#.TRANS: Abbreviations for names used in Lilypind output, e.g., m for mouse
+msgid "m"
+msgstr ""
+
+#: js/logo.js:26
+msgid "br"
+msgstr ""
+
+#: js/logo.js:26
+msgid "ml"
+msgstr ""
+
+#: js/logo.js:26
+msgid "ch"
+msgstr ""
+
+#: js/logo.js:26
+msgid "rs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "gp"
+msgstr ""
+
+#: js/logo.js:26
+msgid "cb"
+msgstr ""
+
+#: js/logo.js:26
+msgid "cp"
+msgstr ""
+
+#: js/logo.js:26
+msgid "bk"
+msgstr ""
+
+#: js/logo.js:26
+msgid "gs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "fs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "bt"
+msgstr ""
+
+#: js/logo.js:352
+msgid "true"
+msgstr ""
+
+#: js/logo.js:354
+msgid "false"
+msgstr ""
+
+#: js/logo.js:1407
+#: js/logo.js:1731
+msgid "You must select a file."
+msgstr ""
+
+#: js/logo.js:1740
+#: plugins/heap.rtp:96
+msgid "The file you selected does not contain a valid heap."
+msgstr ""
+
+#: js/logo.js:1744
+#: plugins/heap.rtp:102
+msgid "The loadHeap block needs a loadFile block."
+msgstr ""
+
+#: js/logo.js:1760
+msgid "Error parsing JSON data:"
+msgstr ""
+
+#: js/logo.js:1765
+msgid "404: Page not found"
+msgstr ""
+
+#: js/logo.js:1789
+msgid "turtleHeaps does not contain a valid heap for"
+msgstr ""
+
+#: js/logo.js:1799
+msgid "Index must be > 0."
+msgstr ""
+
+#: js/logo.js:1818
+msgid "Beats per minute must be > 30."
+msgstr ""
+
+#: js/logo.js:1821
+msgid "Maximum beats per minute is 1000."
+msgstr ""
+
+#: js/logo.js:1867
+msgid "You must have at least one pitch block and one rhythm block in the matrix."
+msgstr ""
+
+#: js/logo.js:1869
+msgid "Please close the current matrix before opening a new one."
+msgstr ""
+
+#: js/logo.js:2064
+msgid "Pitch Block: Did you mean to use a Note block?"
+msgstr ""
+
+#: js/logo.js:2080
+msgid "Rhythm Block: Did you mean to use a Matrix block?"
+msgstr ""
+
+#: js/logo.js:2137
+msgid "Note value must be greater than 0"
+msgstr ""
+
+#: js/logo.js:2606
+msgid "Tuplet Block: Did you mean to use a Matrix block?"
+msgstr ""
+
+#: js/logo.js:2796
+msgid "My Project"
+msgstr ""
+
+#: js/logo.js:3151
+msgid "synth cannot play chords."
+msgstr ""
+
+#: js/logo.js:3736
+#: js/basicblocks.js:1213
+#: plugins/heap.rtp:42
+#: plugins/heap.rtp:142
+msgid "empty heap"
+msgstr "buidar la pila"
+
+#: js/logo.js:4494
+#: js/logo.js:4543
+#: js/logo.js:4563
+#: js/turtle.js:218
+#: js/turtle.js:357
+#: js/turtle.js:358
+#: js/basicblocks.js:1122
+msgid "start drum"
+msgstr ""
+
+#: js/matrix.js:209
+msgid "Solfa"
+msgstr ""
+
+#: plugins/rodi.rtp:181
+msgid "play"
+msgstr ""
+
+#: js/matrix.js:240
+#: js/matrix.js:240
+msgid "save"
+msgstr ""
+
+#: js/matrix.js:257
+#: js/matrix.js:257
+#: js/basicblocks.js:610
 msgid "clear"
 msgstr ""
 
+#: js/matrix.js:274
+#: js/matrix.js:274
+msgid "export"
+msgstr ""
+
+#: js/matrix.js:291
+#: js/matrix.js:291
+msgid "close"
+msgstr ""
+
+#: js/matrix.js:336
+#: js/matrix.js:539
+#: js/basicblocks.js:267
+#: js/basicblocks.js:277
+msgid "note value"
+msgstr ""
+
+#: js/matrix.js:487
+msgid "tuplet value"
+msgstr ""
+
+#: js/utilitybox.js:36
+#: js/turtledefs.js:101
+msgid "Decrease block size"
+msgstr ""
+
+#: js/utilitybox.js:44
+#: js/turtledefs.js:102
+msgid "Increase block size"
+msgstr ""
+
+#: js/utilitybox.js:52
+#: js/turtledefs.js:103
+msgid "Display statistics"
+msgstr ""
+
+#: js/utilitybox.js:60
+#: js/turtledefs.js:104
+msgid "Load plugin from file"
+msgstr ""
+
+#: js/utilitybox.js:68
+#: js/turtledefs.js:105
+msgid "Enable scrolling"
+msgstr ""
+
+#: js/utilitybox.js:77
+msgid "Disable scrolling"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:277
+msgid "rhythm"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:204
+msgid "pitch"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:1299
+msgid "tone"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
 msgid "flow"
 msgstr ""
 
-#. TRANS: Lilypond is engraving software
+#: js/turtledefs.js:21
+msgid "actions"
+msgstr ""
+
+#: js/turtledefs.js:21
+msgid "boxes"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "turtle"
+msgstr "Tortuga"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "pen"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "number"
+msgstr "nombre"
+
+#: js/turtledefs.js:21
+msgid "boolean"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "media"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "sensors"
+msgstr ""
+
+#: js/turtledefs.js:21
+msgid "heap"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "extras"
+msgstr ""
+
+#: js/turtledefs.js:75
+msgid "Welcome to Music Blocks"
+msgstr ""
+
+#: js/turtledefs.js:75
+msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgstr ""
+
+#: js/turtledefs.js:76
+msgid "Meet Mr. Mouse!"
+msgstr ""
+
+#: js/turtledefs.js:76
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
+msgstr ""
+
+#: js/turtledefs.js:77
+msgid "Palette buttons"
+msgstr ""
+
+#: js/turtledefs.js:77
+msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+#: js/turtledefs.js:78
+msgid "Click to run the project in fast mode."
+msgstr ""
+
+#: js/turtledefs.js:79
+msgid "Click to run the project in slow mode."
+msgstr ""
+
+#: js/turtledefs.js:80
+msgid "Click to run just the music in slow mode."
+msgstr ""
+
+#: js/turtledefs.js:81
+msgid "Click to run the project step by step."
+msgstr ""
+
+#: js/turtledefs.js:82
+msgid "Click to run the music note by note."
+msgstr ""
+
+#: js/turtledefs.js:83
+msgid "Stop the music (and the turtles)."
+msgstr ""
+
+#: js/turtledefs.js:84
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr ""
+
+#: js/turtledefs.js:85
+msgid "Hide or show the block palettes."
+msgstr ""
+
+#: js/turtledefs.js:86
+msgid "Hide or show the blocks and the palettes."
+msgstr ""
+
+#: js/turtledefs.js:87
+msgid "Expand or collapse start and action stacks."
+msgstr ""
+
+#: js/turtledefs.js:88
+msgid "Return all blocks to the center of the screen."
+msgstr ""
+
+#: js/turtledefs.js:89
+msgid "Show these messages."
+msgstr ""
+
+#: js/turtledefs.js:90
+msgid "Expand/collapse option toolbar"
+msgstr ""
+
+#: js/turtledefs.js:90
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr ""
+
+#: js/turtledefs.js:91
+msgid "This button opens a viewer for loading example projects."
+msgstr ""
+
+#: js/turtledefs.js:92
+msgid "You can also load projects from the file system."
+msgstr ""
+
+#: js/turtledefs.js:93
+msgid "Save your project to a file."
+msgstr ""
+
+#: js/turtledefs.js:94
 msgid "Save your project to as a Lilypond file."
 msgstr ""
 
-msgid "beat factor"
+#: js/turtledefs.js:95
+msgid "Copy"
 msgstr ""
 
-#. TRANS: convert number to octave
-msgid "number to octave"
+#: js/turtledefs.js:95
+msgid "To copy a stack to the clipboard, do a \"long press\" on the stack. The Paste Button will highlight."
 msgstr ""
 
-msgid "dot"
+#: js/turtledefs.js:96
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
 msgstr ""
 
-msgid "show"
+#: js/turtledefs.js:97
+#: js/blocks.js:200
+msgid "Save stack"
 msgstr ""
 
+#: js/turtledefs.js:97
+msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+msgstr ""
+
+#: js/turtledefs.js:98
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr ""
+
+#: js/turtledefs.js:99
+msgid "Show or hide a polar-coordinate grid."
+msgstr ""
+
+#: js/turtledefs.js:100
+msgid "Open a panel for configuring Music Blocks."
+msgstr ""
+
+#: js/turtledefs.js:101
+msgid "Decrease the size of the blocks."
+msgstr ""
+
+#: js/turtledefs.js:102
+msgid "Increase the size of the blocks."
+msgstr ""
+
+#: js/turtledefs.js:103
+msgid "Display statistics about your Music project."
+msgstr ""
+
+#: js/turtledefs.js:104
+msgid "You can load new blocks from the file system."
+msgstr ""
+
+#: js/turtledefs.js:105
+msgid "You can scroll the blocks on the canvas."
+msgstr ""
+
+#: js/turtledefs.js:106
+msgid "Remove all content on the canvas, including the blocks."
+msgstr ""
+
+#: js/turtledefs.js:107
+msgid "Restore blocks from the trash."
+msgstr ""
+
+#: js/turtledefs.js:108
+msgid "Congratulations."
+msgstr ""
+
+#: js/turtledefs.js:108
+msgid "You have finished the tour. Please enjoy Music Blocks!"
+msgstr ""
+
+#: js/samplesviewer.js:26
+#: js/samplesviewer.js:26
+msgid "Open"
+msgstr ""
+
+#: js/samplesviewer.js:27
+#: js/samplesviewer.js:27
+msgid "Delete"
+msgstr ""
+
+#: js/samplesviewer.js:28
+#: js/samplesviewer.js:28
+msgid "Publish"
+msgstr ""
+
+#: js/samplesviewer.js:29
+#: js/samplesviewer.js:29
+#: js/samplesviewer.js:38
+#: js/samplesviewer.js:38
+msgid "Download"
+msgstr ""
+
+#: js/samplesviewer.js:419
+msgid "Planet"
+msgstr ""
+
+#: js/samplesviewer.js:420
+msgid "On my device"
+msgstr ""
+
+#: js/samplesviewer.js:421
+msgid "Worldwide"
+msgstr ""
+
+#: js/blocks.js:1144
+#: js/palette.js:543
+msgid "open file"
+msgstr ""
+
+#: js/blocks.js:1478
+#: js/palette.js:515
+#: js/basicblocks.js:1335
 msgid "text"
 msgstr "text"
 
+#: js/blocks.js:1488
+#: js/palette.js:518
+#: js/palette.js:1698
+#: js/palette.js:1705
+msgid "sol"
+msgstr ""
+
+#: js/blocks.js:1861
+#: js/palette.js:453
+#: js/palette.js:1598
+#: js/basicblocks.js:965
+#: js/basicblocks.js:969
+#: js/basicblocks.js:981
+#: js/basicblocks.js:989
+msgid "box"
+msgstr "caixa"
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:978
+msgid "store in"
+msgstr ""
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:204
+#: js/basicblocks.js:978
+msgid "name"
+msgstr ""
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:956
+#: js/basicblocks.js:978
+#: js/basicblocks.js:1180
+#: plugins/bitcoin.rtp:27
+msgid "value"
+msgstr ""
+
+#: js/palette.js:639
+#: js/basicblocks.js:661
+msgid "back"
+msgstr "enrere"
+
+#: js/palette.js:647
+#: js/palette.js:648
+msgid "hide"
+msgstr ""
+
+#: js/palette.js:650
+#: js/palette.js:651
+#: js/basicblocks.js:1331
+msgid "show"
+msgstr ""
+
+#: js/palette.js:653
+#: js/palette.js:654
+msgid "popout"
+msgstr ""
+
+#: js/palette.js:1685
+msgid "la"
+msgstr ""
+
+#: js/palette.js:1705
+msgid "mi"
+msgstr ""
+
+#: js/palette.js:1705
+msgid "re"
+msgstr ""
+
+#: js/basicblocks.js:74
+msgid "current pitch name"
+msgstr ""
+
+#: js/basicblocks.js:83
+msgid "current pitch octave"
+msgstr ""
+
+#: js/basicblocks.js:92
+msgid "square"
+msgstr ""
+
+#: js/basicblocks.js:100
+msgid "triangle"
+msgstr ""
+
+#: js/basicblocks.js:108
+msgid "sine"
+msgstr ""
+
+#: js/basicblocks.js:116
+msgid "sawtooth"
+msgstr ""
+
+#: js/basicblocks.js:125
+msgid "transposition"
+msgstr ""
+
+#: js/basicblocks.js:132
+msgid "turtle pitch number"
+msgstr ""
+
+#: js/basicblocks.js:140
+msgid "number to pitch"
+msgstr ""
+
+#: js/basicblocks.js:148
+msgid "number to octave"
+msgstr ""
+
+#: js/basicblocks.js:170
+msgid "invert"
+msgstr ""
+
+#: js/basicblocks.js:170
+#: js/basicblocks.js:424
+#: js/basicblocks.js:1309
+#: plugins/rodi.rtp:170
+msgid "note"
+msgstr ""
+
+#: js/basicblocks.js:170
+#: js/basicblocks.js:204
+#: js/basicblocks.js:1309
+msgid "octave"
+msgstr ""
+
+#: js/basicblocks.js:182
+msgid "adjust transposition"
+msgstr ""
+
+#: js/basicblocks.js:190
+msgid "flat"
+msgstr ""
+
+#: js/basicblocks.js:197
+msgid "sharp"
+msgstr ""
+
+#: js/basicblocks.js:217
+msgid "1/64 note"
+msgstr ""
+
+#: js/basicblocks.js:224
+msgid "1/32 note"
+msgstr ""
+
+#: js/basicblocks.js:231
+msgid "1/16 note"
+msgstr ""
+
+#: js/basicblocks.js:238
+msgid "eighth note"
+msgstr ""
+
+#: js/basicblocks.js:245
+msgid "quarter note"
+msgstr ""
+
+#: js/basicblocks.js:252
+msgid "half note"
+msgstr ""
+
+#: js/basicblocks.js:259
+msgid "whole note"
+msgstr ""
+
+#: js/basicblocks.js:267
+msgid "tuplet"
+msgstr ""
+
+#: js/basicblocks.js:267
+#: js/basicblocks.js:277
+msgid "number of notes"
+msgstr ""
+
+#: js/basicblocks.js:289
+msgid "pitch-time matrix"
+msgstr ""
+
+#: js/basicblocks.js:298
+msgid "turtle note"
+msgstr ""
+
+#: js/basicblocks.js:306
+msgid "duplicate factor"
+msgstr ""
+
+#: js/basicblocks.js:313
+msgid "skip factor"
+msgstr ""
+
+#: js/basicblocks.js:320
+msgid "beat factor"
+msgstr ""
+
+#: js/basicblocks.js:327
+#: js/basicblocks.js:349
+msgid "beats per minute"
+msgstr ""
+
+#: js/basicblocks.js:334
+msgid "free time"
+msgstr ""
+
+#: js/basicblocks.js:341
+msgid "osctime"
+msgstr ""
+
+#: js/basicblocks.js:357
+msgid "skip notes"
+msgstr ""
+
+#: js/basicblocks.js:365
+msgid "duplicate notes"
+msgstr ""
+
+#: js/basicblocks.js:373
+msgid "multiply beat"
+msgstr ""
+
+#: js/basicblocks.js:381
+msgid "divide beat"
+msgstr ""
+
+#: js/basicblocks.js:389
+msgid "tie"
+msgstr ""
+
+#: js/basicblocks.js:396
+msgid "dot"
+msgstr ""
+
+#: js/basicblocks.js:403
+msgid "silence"
+msgstr ""
+
+#: js/basicblocks.js:436
+#: js/basicblocks.js:519
+msgid "set volume"
+msgstr ""
+
+#: js/basicblocks.js:444
+msgid "staccato factor"
+msgstr ""
+
+#: js/basicblocks.js:451
+msgid "slur factor"
+msgstr ""
+
+#: js/basicblocks.js:458
+msgid "note volume"
+msgstr ""
+
+#: js/basicblocks.js:467
+msgid "play forward"
+msgstr ""
+
+#: js/basicblocks.js:476
+msgid "play backward"
+msgstr ""
+
+#: js/basicblocks.js:483
+msgid "key"
+msgstr ""
+
+#: js/basicblocks.js:490
+msgid "set key"
+msgstr ""
+
+#: js/basicblocks.js:500
+msgid "meter"
+msgstr ""
+
+#: js/basicblocks.js:500
+msgid "numerator"
+msgstr ""
+
+#: js/basicblocks.js:500
+msgid "denominator"
+msgstr ""
+
+#: js/basicblocks.js:511
+msgid "articulation"
+msgstr ""
+
+#: js/basicblocks.js:527
+msgid "crescendo"
+msgstr ""
+
+#: js/basicblocks.js:535
+msgid "thirds"
+msgstr ""
+
+#: js/basicblocks.js:542
+msgid "fourths"
+msgstr ""
+
+#: js/basicblocks.js:549
+msgid "tritone"
+msgstr ""
+
+#: js/basicblocks.js:556
+msgid "fifths"
+msgstr ""
+
+#: js/basicblocks.js:563
+msgid "swing"
+msgstr ""
+
+#: js/basicblocks.js:571
+msgid "slur"
+msgstr ""
+
+#: js/basicblocks.js:579
+msgid "staccato"
+msgstr ""
+
+#: js/basicblocks.js:589
+msgid "heading"
+msgstr ""
+
+#: js/basicblocks.js:596
+#: js/basicblocks.js:635
+msgid "x"
+msgstr "x"
+
+#: js/basicblocks.js:603
+#: js/basicblocks.js:635
+msgid "y"
+msgstr ""
+
+#: js/basicblocks.js:617
+msgid "arc"
+msgstr "arc"
+
+#: js/basicblocks.js:617
+msgid "angle"
+msgstr "angle"
+
+#: js/basicblocks.js:617
+msgid "radius"
+msgstr ""
+
+#: js/basicblocks.js:627
+msgid "set heading"
+msgstr "seth"
+
+#: js/basicblocks.js:635
+msgid "set xy"
+msgstr ""
+
+#: js/basicblocks.js:645
+#: plugins/rodi.rtp:59
+msgid "right"
+msgstr "dreta"
+
+#: js/basicblocks.js:653
+#: plugins/rodi.rtp:58
+msgid "left"
+msgstr "esquerra"
+
+#: js/basicblocks.js:669
+msgid "forward"
+msgstr "endavant"
+
+#: js/basicblocks.js:680
+#: js/basicblocks.js:724
+msgid "background"
+msgstr ""
+
+#: js/basicblocks.js:687
+msgid "color"
+msgstr "color"
+
+#: js/basicblocks.js:694
+msgid "shade"
+msgstr "tonalitat"
+
+#: js/basicblocks.js:701
+msgid "grey"
+msgstr ""
+
+#: js/basicblocks.js:708
+msgid "pen size"
+msgstr ""
+
+#: js/basicblocks.js:715
+msgid "set font"
+msgstr ""
+
+#: js/basicblocks.js:731
+msgid "hollow line"
+msgstr ""
+
+#: js/basicblocks.js:738
+msgid "fill"
+msgstr ""
+
+#: js/basicblocks.js:745
+msgid "pen up"
+msgstr ""
+
+#: js/basicblocks.js:752
+msgid "pen down"
+msgstr ""
+
+#: js/basicblocks.js:759
+msgid "set pen size"
+msgstr ""
+
+#: js/basicblocks.js:767
+msgid "set translucency"
+msgstr ""
+
+#: js/basicblocks.js:775
+msgid "set hue"
+msgstr ""
+
+#: js/basicblocks.js:783
+msgid "set shade"
+msgstr ""
+
+#: js/basicblocks.js:791
+msgid "set grey"
+msgstr ""
+
+#: js/basicblocks.js:799
+msgid "set color"
+msgstr ""
+
+#: js/basicblocks.js:809
+msgid "int"
+msgstr ""
+
+#: js/basicblocks.js:845
+msgid "and"
+msgstr "i"
+
+#: js/basicblocks.js:852
+msgid "or"
+msgstr "o"
+
+#: js/basicblocks.js:859
+msgid "not"
+msgstr "no"
+
+#: js/basicblocks.js:865
+msgid "mod"
+msgstr ""
+
+#: js/basicblocks.js:873
+msgid "sqrt"
+msgstr ""
+
+#: js/basicblocks.js:923
+msgid "one of"
+msgstr ""
+
+#: js/basicblocks.js:923
+msgid "this"
+msgstr ""
+
+#: js/basicblocks.js:923
+msgid "that"
+msgstr ""
+
+#: js/basicblocks.js:934
 msgid "random"
 msgstr "aleatori"
 
-msgid "Show or hide a Cartesian-coordinate grid."
+#: js/basicblocks.js:934
+msgid "min"
+msgstr "mínim"
+
+#: js/basicblocks.js:934
+msgid "max"
+msgstr "màxim"
+
+#: js/basicblocks.js:949
+msgid "add 1 to"
+msgstr ""
+
+#: js/basicblocks.js:956
+msgid "add"
+msgstr ""
+
+#: js/basicblocks.js:956
+#: plugins/finance.rtp:28
+msgid "to"
+msgstr ""
+
+#: js/basicblocks.js:1000
+#: js/basicblocks.js:1047
+#: js/basicblocks.js:1064
+#: js/basicblocks.js:1102
+#: js/basicblocks.js:1383
+#: js/basicblocks.js:1390
+msgid "do"
+msgstr ""
+
+#: js/basicblocks.js:1009
+msgid "return"
+msgstr ""
+
+#: js/basicblocks.js:1019
+msgid "return to URL"
+msgstr ""
+
+#: js/basicblocks.js:1023
+msgid "100"
+msgstr ""
+
+#: js/basicblocks.js:1029
+#: js/basicblocks.js:1055
+#: js/basicblocks.js:1074
+msgid "calculate"
+msgstr ""
+
+#: js/basicblocks.js:1102
+msgid "on"
+msgstr ""
+
+#: js/basicblocks.js:1102
+#: js/basicblocks.js:1105
+#: js/basicblocks.js:1116
+msgid "event"
+msgstr ""
+
+#: js/basicblocks.js:1113
+msgid "broadcast"
+msgstr ""
+
+#: js/basicblocks.js:1158
+msgid "load heap from App"
+msgstr ""
+
+#: js/basicblocks.js:1169
+msgid "save heap to App"
+msgstr ""
+
+#: js/basicblocks.js:1180
+msgid "set heap"
+msgstr ""
+
+#: js/basicblocks.js:1180
+msgid "index"
+msgstr ""
+
+#: js/basicblocks.js:1191
+#: plugins/heap.rtp:126
+msgid "show heap"
+msgstr "mostrar la pila"
+
+#: js/basicblocks.js:1198
+msgid "heap length"
+msgstr ""
+
+#: js/basicblocks.js:1206
+#: plugins/heap.rtp:134
+msgid "heap empty?"
+msgstr ""
+
+#: js/basicblocks.js:1220
+#: plugins/heap.rtp:150
+msgid "save heap"
+msgstr ""
+
+#: js/basicblocks.js:1229
+#: plugins/heap.rtp:160
+msgid "load heap"
+msgstr ""
+
+#: js/basicblocks.js:1238
+msgid "index heap"
+msgstr ""
+
+#: js/basicblocks.js:1247
+#: plugins/heap.rtp:109
+msgid "push"
+msgstr ""
+
+#: js/basicblocks.js:1255
+#: plugins/heap.rtp:118
+msgid "pop"
+msgstr "treure"
+
+#: js/basicblocks.js:1264
+msgid "speak"
+msgstr ""
+
+#: js/basicblocks.js:1292
+msgid "stop media"
+msgstr ""
+
+#: js/basicblocks.js:1299
+msgid "frequency"
+msgstr ""
+
+#: js/basicblocks.js:1299
+msgid "duration (ms)"
+msgstr ""
+
+#: js/basicblocks.js:1309
+msgid "note to frequency"
+msgstr ""
+
+#: js/basicblocks.js:1320
+msgid "shell"
+msgstr ""
+
+#: js/basicblocks.js:1320
+#: js/basicblocks.js:1331
+msgid "size"
+msgstr ""
+
+#: js/basicblocks.js:1320
+msgid "image"
+msgstr ""
+
+#: js/basicblocks.js:1331
+msgid "obj"
+msgstr ""
+
+#: js/basicblocks.js:1369
+msgid "stop"
+msgstr ""
+
+#: js/basicblocks.js:1376
+msgid "wait for"
+msgstr ""
+
+#: js/basicblocks.js:1383
+msgid "until"
+msgstr ""
+
+#: js/basicblocks.js:1390
+msgid "while"
+msgstr ""
+
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1404
+msgid "if"
+msgstr "si"
+
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1404
+msgid "then"
+msgstr ""
+
+#: js/basicblocks.js:1397
+msgid "else"
+msgstr "sinó"
+
+#: js/basicblocks.js:1411
+msgid "forever"
+msgstr "per sempre"
+
+#: js/basicblocks.js:1418
+msgid "repeat"
+msgstr "repetir"
+
+#: js/basicblocks.js:1430
+#: js/basicblocks.js:1441
+#: js/basicblocks.js:1450
+#: js/basicblocks.js:1460
+#: js/basicblocks.js:1468
+#: js/basicblocks.js:1477
+#: js/basicblocks.js:1487
+msgid "unknown"
+msgstr ""
+
+#: js/basicblocks.js:1498
+msgid "play back"
+msgstr ""
+
+#: js/basicblocks.js:1506
+msgid "stop play"
+msgstr ""
+
+#: js/basicblocks.js:1513
+msgid "loudness"
+msgstr ""
+
+#: js/basicblocks.js:1520
+msgid "save as lilypond"
+msgstr ""
+
+#: js/basicblocks.js:1523
+#: js/basicblocks.js:1532
+msgid "title"
+msgstr ""
+
+#: js/basicblocks.js:1529
+msgid "save svg"
+msgstr ""
+
+#: js/basicblocks.js:1538
+#: plugins/turtle.rtp:42
+msgid "turtle x"
+msgstr ""
+
+#: js/basicblocks.js:1547
+#: plugins/turtle.rtp:52
+msgid "turtle y"
+msgstr ""
+
+#: js/basicblocks.js:1556
+#: plugins/turtle.rtp:62
+msgid "start turtle"
+msgstr ""
+
+#: js/basicblocks.js:1565
+#: plugins/turtle.rtp:72
+msgid "stop turtle"
+msgstr ""
+
+#: js/basicblocks.js:1574
+msgid "no background"
+msgstr ""
+
+#: js/basicblocks.js:1581
+msgid "show blocks"
+msgstr ""
+
+#: js/basicblocks.js:1588
+msgid "hide blocks"
+msgstr ""
+
+#: js/basicblocks.js:1595
+msgid "open project"
+msgstr ""
+
+#: js/basicblocks.js:1619
+msgid "wait"
+msgstr "esperar"
+
+#: js/basicblocks.js:1627
+msgid "print"
+msgstr "imprimir"
+
+#: js/basicblocks.js:1635
+#: js/basicblocks.js:1643
+#: plugins/turtle.rtp:82
+msgid "turtle name"
+msgstr ""
+
+#: js/basicblocks.js:1644
+#: plugins/translate.rtp:95
+#: plugins/turtle.rtp:83
+msgid "source"
+msgstr ""
+
+#: js/basicblocks.js:1645
+#: plugins/translate.rtp:95
+#: plugins/turtle.rtp:84
+msgid "target"
+msgstr ""
+
+#: js/basicblocks.js:1659
+msgid "click"
+msgstr ""
+
+#: js/basicblocks.js:1667
+msgid "pixel color"
+msgstr ""
+
+#: js/basicblocks.js:1674
+msgid "time"
+msgstr ""
+
+#: js/basicblocks.js:1681
+msgid "mouse x"
+msgstr ""
+
+#: js/basicblocks.js:1689
+msgid "mouse y"
+msgstr ""
+
+#: js/basicblocks.js:1697
+msgid "mouse button"
+msgstr ""
+
+#: js/basicblocks.js:1704
+msgid "keyboard"
+msgstr "teclat"
+
+#: js/basicblocks.js:1713
+msgid "eval"
+msgstr ""
+
+#: plugins/gmap.rtp:30
+msgid "city latitude"
+msgstr ""
+
+#: plugins/gmap.rtp:40
+msgid "city longitude"
+msgstr ""
+
+#: plugins/gmap.rtp:71
+#: plugins/gmap.rtp:74
+#: plugins/gmap.rtp:104
+#: plugins/gmap.rtp:107
+msgid "Coordinate data not available."
+msgstr ""
+
+#: plugins/gmap.rtp:116
+msgid "Google map"
+msgstr ""
+
+#: plugins/gmap.rtp:116
+#: plugins/gmap.rtp:160
+msgid "coordinates"
+msgstr ""
+
+#: plugins/gmap.rtp:116
+msgid "zoom factor"
+msgstr ""
+
+#: plugins/gmap.rtp:144
+msgid "zoom"
+msgstr ""
+
+#: plugins/gmap.rtp:160
+msgid "latitude"
+msgstr ""
+
+#: plugins/gmap.rtp:160
+msgid "longitude"
+msgstr ""
+
+#: plugins/dictionary.rtp:25
+msgid "define"
+msgstr ""
+
+#: plugins/bitcoin.rtp:27
+msgid "bitcoin"
+msgstr ""
+
+#: plugins/bitcoin.rtp:27
+#: plugins/finance.rtp:28
+msgid "from"
+msgstr ""
+
+#: plugins/maths.rtp:47
+msgid "power"
+msgstr ""
+
+#: plugins/maths.rtp:47
+msgid "base"
+msgstr ""
+
+#: plugins/maths.rtp:47
+msgid "exp"
+msgstr ""
+
+#: plugins/maths.rtp:69
+msgid "floor"
+msgstr ""
+
+#: plugins/maths.rtp:71
+msgid "ceiling"
+msgstr ""
+
+#: plugins/maths.rtp:74
+msgid "degrees"
+msgstr ""
+
+#: plugins/maths.rtp:74
+msgid "to degrees"
+msgstr ""
+
+#: plugins/maths.rtp:76
+msgid "radians"
+msgstr ""
+
+#: plugins/maths.rtp:76
+msgid "to radians"
+msgstr ""
+
+#: plugins/heap.rtp:81
+#: plugins/heap.rtp:85
+msgid "You need to select a file."
+msgstr ""
+
+#: plugins/translate.rtp:73
+msgid "translate"
+msgstr ""
+
+#: plugins/translate.rtp:78
+#: plugins/translate.rtp:89
+msgid "hello"
+msgstr ""
+
+#: plugins/translate.rtp:84
+msgid "detect lang"
+msgstr ""
+
+#: plugins/translate.rtp:95
+msgid "set lang"
+msgstr ""
+
+#: plugins/rodi.rtp:30
+msgid "blink (ms)"
+msgstr ""
+
+#: plugins/rodi.rtp:129
+msgid "move"
+msgstr ""
+
+#: plugins/rodi.rtp:91
+msgid "sense left"
+msgstr ""
+
+#: plugins/rodi.rtp:130
+msgid "sense right"
+msgstr ""
+
+#: plugins/rodi.rtp:169
+msgid "sing"
+msgstr ""
+
+#: plugins/rodi.rtp:183
+msgid "duration"
+msgstr ""
+
+#: plugins/rodi.rtp:203
+msgid "see distance"
+msgstr ""
+
+#: plugins/finance.rtp:28
+msgid "currency"
+msgstr ""
+
+#: plugins/finance.rtp:69
+msgid "stock price"
+msgstr ""
+
+#: plugins/facebook.rtp:27
+msgid "publish"
+msgstr ""
+
+#: plugins/facebook.rtp:30
+msgid "comment"
+msgstr ""
+
+#: plugins/weather.rtp:62
+#: plugins/weather.rtp:86
+msgid "Days ahead must be in the range of -1 to 5."
+msgstr ""
+
+#: plugins/weather.rtp:107
+msgid "forecast"
+msgstr ""
+
+#: plugins/weather.rtp:108
+#: plugins/weather.rtp:122
+#: plugins/weather.rtp:135
+msgid "city"
+msgstr ""
+
+#: plugins/weather.rtp:109
+#: plugins/weather.rtp:123
+#: plugins/weather.rtp:136
+msgid "day"
+msgstr ""
+
+#: plugins/weather.rtp:121
+msgid "high"
+msgstr ""
+
+#: plugins/weather.rtp:134
+msgid "low"
+msgstr ""
+
+#: plugins/nutrition.rtp:104
+msgid "get calories"
+msgstr ""
+
+#: plugins/nutrition.rtp:107
+msgid "get protein"
+msgstr ""
+
+#: plugins/nutrition.rtp:110
+msgid "get carbs"
+msgstr ""
+
+#: plugins/nutrition.rtp:113
+msgid "get fiber"
+msgstr ""
+
+#: plugins/nutrition.rtp:116
+msgid "get fat"
+msgstr ""
+
+#: plugins/nutrition.rtp:119
+msgid "get name"
+msgstr ""
+
+#: plugins/nutrition.rtp:122
+msgid "calories"
+msgstr ""
+
+#: plugins/nutrition.rtp:128
+msgid "protein"
+msgstr ""
+
+#: plugins/nutrition.rtp:134
+msgid "carbs"
+msgstr ""
+
+#: plugins/nutrition.rtp:140
+msgid "fiber"
+msgstr ""
+
+#: plugins/nutrition.rtp:146
+msgid "fat"
+msgstr ""
+
+#: plugins/nutrition.rtp:152
+msgid "eat"
+msgstr ""
+
+#: plugins/nutrition.rtp:155
+msgid "digest meal"
+msgstr ""
+
+#: plugins/nutrition.rtp:158
+msgid "apple"
+msgstr ""
+
+#: plugins/nutrition.rtp:161
+msgid "banana"
+msgstr ""
+
+#: plugins/nutrition.rtp:164
+msgid "orange"
+msgstr ""
+
+#: plugins/nutrition.rtp:167
+msgid "wheat bread"
+msgstr ""
+
+#: plugins/nutrition.rtp:170
+msgid "corn"
+msgstr ""
+
+#: plugins/nutrition.rtp:173
+msgid "potato"
+msgstr ""
+
+#: plugins/nutrition.rtp:176
+msgid "sweet potato"
+msgstr ""
+
+#: plugins/nutrition.rtp:179
+msgid "tomato"
+msgstr ""
+
+#: plugins/nutrition.rtp:182
+msgid "broccoli"
+msgstr ""
+
+#: plugins/nutrition.rtp:185
+msgid "rice and beans"
+msgstr ""
+
+#: plugins/nutrition.rtp:188
+msgid "tamale"
+msgstr ""
+
+#: plugins/nutrition.rtp:191
+msgid "cheese"
+msgstr ""
+
+#: plugins/nutrition.rtp:194
+msgid "chicken"
+msgstr ""
+
+#: plugins/nutrition.rtp:197
+msgid "fish"
+msgstr ""
+
+#: plugins/nutrition.rtp:200
+msgid "beef"
+msgstr ""
+
+#: plugins/nutrition.rtp:203
+msgid "cake"
+msgstr ""
+
+#: plugins/nutrition.rtp:206
+msgid "cookie"
+msgstr ""
+
+#: plugins/nutrition.rtp:209
+msgid "water"
+msgstr ""
+
+#: plugins/accelerometer.rtp:48
+msgid "motion x"
+msgstr ""
+
+#: plugins/accelerometer.rtp:56
+msgid "motion y"
+msgstr ""
+
+#: plugins/accelerometer.rtp:64
+msgid "motion z"
+msgstr ""
+
+#: plugins/gmap.rtp:30
+msgid "city latitude"
+msgstr ""
+
+#: plugins/gmap.rtp:40
+msgid "city longitude"
+msgstr ""
+
+#: plugins/gmap.rtp:71
+#: plugins/gmap.rtp:74
+#: plugins/gmap.rtp:104
+#: plugins/gmap.rtp:107
+msgid "Coordinate data not available."
+msgstr ""
+
+#: plugins/gmap.rtp:116
+msgid "Google map"
+msgstr ""
+
+#: plugins/gmap.rtp:116
+#: plugins/gmap.rtp:160
+msgid "coordinates"
+msgstr ""
+
+#: plugins/gmap.rtp:116
+msgid "zoom factor"
+msgstr ""
+
+#: plugins/gmap.rtp:144
+msgid "zoom"
+msgstr ""
+
+#: plugins/gmap.rtp:160
+msgid "latitude"
+msgstr ""
+
+#: plugins/gmap.rtp:160
+msgid "longitude"
+msgstr ""
+
+#: plugins/dictionary.rtp:25
+msgid "define"
+msgstr ""
+
+#: plugins/bitcoin.rtp:27
+msgid "bitcoin"
+msgstr ""
+
+#: plugins/bitcoin.rtp:27
+#: plugins/finance.rtp:28
+msgid "from"
+msgstr ""
+
+#: plugins/maths.rtp:47
+msgid "power"
+msgstr ""
+
+#: plugins/maths.rtp:47
+msgid "base"
+msgstr ""
+
+#: plugins/maths.rtp:47
+msgid "exp"
+msgstr ""
+
+#: plugins/maths.rtp:69
+msgid "floor"
+msgstr ""
+
+#: plugins/maths.rtp:71
+msgid "ceiling"
+msgstr ""
+
+#: plugins/maths.rtp:74
+msgid "degrees"
+msgstr ""
+
+#: plugins/maths.rtp:74
+msgid "to degrees"
+msgstr ""
+
+#: plugins/maths.rtp:76
+msgid "radians"
+msgstr ""
+
+#: plugins/maths.rtp:76
+msgid "to radians"
+msgstr ""
+
+#: plugins/heap.rtp:81
+#: plugins/heap.rtp:85
+msgid "You need to select a file."
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "fetch"
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "UID"
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "field"
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "hours ago"
+msgstr ""
+
+#: plugins/impact.rtp:63
+#: plugins/impact.rtp:127
+msgid "Impact data not available."
+msgstr ""
+
+#: plugins/impact.rtp:69
+msgid "Cannot parse Impact data."
+msgstr ""
+
+#: plugins/impact.rtp:100
+#: plugins/impact.rtp:114
+msgid "Impact field not found."
+msgstr ""
+
+#: plugins/impact.rtp:122
+msgid "Impact UID not found."
+msgstr ""
+
+#: plugins/impact.rtp:124
+msgid "Impact Time not found."
+msgstr ""
+
+#: plugins/translate.rtp:73
+msgid "translate"
+msgstr ""
+
+#: plugins/translate.rtp:78
+#: plugins/translate.rtp:89
+msgid "hello"
+msgstr ""
+
+#: plugins/translate.rtp:84
+msgid "detect lang"
+msgstr ""
+
+#: plugins/translate.rtp:95
+msgid "set lang"
+msgstr ""
+
+#: plugins/rodi.rtp:110
+msgid "blink"
+msgstr ""
+
+#: plugins/rodi.rtp:129
+msgid "move"
+msgstr ""
+
+#: plugins/rodi.rtp:153
+msgid "infrared light (left)"
+msgstr ""
+
+#: plugins/rodi.rtp:167
+msgid "infrared light (right)"
+msgstr ""
+
+#: plugins/rodi.rtp:181
+msgid "play"
+msgstr ""
+
+#: plugins/rodi.rtp:183
+msgid "duration"
+msgstr ""
+
+#: plugins/rodi.rtp:206
+msgid "distance"
+msgstr ""
+
+#: plugins/rodi.rtp:292
+msgid "red"
+msgstr ""
+
+#: plugins/rodi.rtp:293
+msgid "green"
+msgstr ""
+
+#: plugins/rodi.rtp:294
+msgid "blue"
+msgstr ""
+
+#: plugins/rodi.rtp:321
+msgid "light intensity"
+msgstr ""
+
+#: plugins/rodi.rtp:338
+msgid "led"
+msgstr ""
+
+#: plugins/finance.rtp:28
+msgid "currency"
+msgstr ""
+
+#: plugins/finance.rtp:69
+msgid "stock price"
+msgstr ""
+
+#: plugins/facebook.rtp:27
+msgid "publish"
+msgstr ""
+
+#: plugins/facebook.rtp:30
+msgid "comment"
+msgstr ""
+
+#: plugins/weather.rtp:62
+#: plugins/weather.rtp:86
+msgid "Days ahead must be in the range of -1 to 5."
+msgstr ""
+
+#: plugins/weather.rtp:107
+msgid "forecast"
+msgstr ""
+
+#: plugins/weather.rtp:108
+#: plugins/weather.rtp:122
+#: plugins/weather.rtp:135
+msgid "city"
+msgstr ""
+
+#: plugins/weather.rtp:109
+#: plugins/weather.rtp:123
+#: plugins/weather.rtp:136
+msgid "day"
+msgstr ""
+
+#: plugins/weather.rtp:121
+msgid "high"
+msgstr ""
+
+#: plugins/weather.rtp:134
+msgid "low"
+msgstr ""
+
+#: plugins/nutrition.rtp:104
+msgid "get calories"
+msgstr ""
+
+#: plugins/nutrition.rtp:107
+msgid "get protein"
+msgstr ""
+
+#: plugins/nutrition.rtp:110
+msgid "get carbs"
+msgstr ""
+
+#: plugins/nutrition.rtp:113
+msgid "get fiber"
+msgstr ""
+
+#: plugins/nutrition.rtp:116
+msgid "get fat"
+msgstr ""
+
+#: plugins/nutrition.rtp:119
+msgid "get name"
+msgstr ""
+
+#: plugins/nutrition.rtp:122
+msgid "calories"
+msgstr ""
+
+#: plugins/nutrition.rtp:128
+msgid "protein"
+msgstr ""
+
+#: plugins/nutrition.rtp:134
+msgid "carbs"
+msgstr ""
+
+#: plugins/nutrition.rtp:140
+msgid "fiber"
+msgstr ""
+
+#: plugins/nutrition.rtp:146
+msgid "fat"
+msgstr ""
+
+#: plugins/nutrition.rtp:152
+msgid "eat"
+msgstr ""
+
+#: plugins/nutrition.rtp:155
+msgid "digest meal"
+msgstr ""
+
+#: plugins/nutrition.rtp:158
+msgid "apple"
+msgstr ""
+
+#: plugins/nutrition.rtp:161
+msgid "banana"
+msgstr ""
+
+#: plugins/nutrition.rtp:164
+msgid "orange"
+msgstr ""
+
+#: plugins/nutrition.rtp:167
+msgid "wheat bread"
+msgstr ""
+
+#: plugins/nutrition.rtp:170
+msgid "corn"
+msgstr ""
+
+#: plugins/nutrition.rtp:173
+msgid "potato"
+msgstr ""
+
+#: plugins/nutrition.rtp:176
+msgid "sweet potato"
+msgstr ""
+
+#: plugins/nutrition.rtp:179
+msgid "tomato"
+msgstr ""
+
+#: plugins/nutrition.rtp:182
+msgid "broccoli"
+msgstr ""
+
+#: plugins/nutrition.rtp:185
+msgid "rice and beans"
+msgstr ""
+
+#: plugins/nutrition.rtp:188
+msgid "tamale"
+msgstr ""
+
+#: plugins/nutrition.rtp:191
+msgid "cheese"
+msgstr ""
+
+#: plugins/nutrition.rtp:194
+msgid "chicken"
+msgstr ""
+
+#: plugins/nutrition.rtp:197
+msgid "fish"
+msgstr ""
+
+#: plugins/nutrition.rtp:200
+msgid "beef"
+msgstr ""
+
+#: plugins/nutrition.rtp:203
+msgid "cake"
+msgstr ""
+
+#: plugins/nutrition.rtp:206
+msgid "cookie"
+msgstr ""
+
+#: plugins/nutrition.rtp:209
+msgid "water"
+msgstr ""
+
+#: plugins/accelerometer.rtp:48
+msgid "motion x"
+msgstr ""
+
+#: plugins/accelerometer.rtp:56
+msgid "motion y"
+msgstr ""
+
+#: plugins/accelerometer.rtp:64
+msgid "motion z"
 msgstr ""
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
 msgstr ""
 
-msgid "chicken"
-msgstr ""
-
-#. TRANS: name of project
-msgid "title"
-msgstr ""
-
-msgid "Undo"
-msgstr ""
-
-#. TRANS: ms is micro seconds
-msgid "duration (ms)"
-msgstr ""
-
-msgid "set pen size"
-msgstr ""
-
-msgid "mouse x"
-msgstr ""
-
-msgid "mouse y"
-msgstr ""
-
-msgid "free time"
-msgstr ""
-
-#. TRANS: do this action
-msgid "do"
-msgstr ""
-
-msgid "triangle"
-msgstr ""
-
-msgid "stop turtle"
-msgstr ""
-
-msgid "stop"
-msgstr ""
-
-msgid "Help"
-msgstr ""
-
-msgid "transposition"
-msgstr ""
-
-msgid "Expand/collapse toolbar"
-msgstr ""
-
-msgid "Note value must be greater than 0"
-msgstr ""
-
-msgid "x"
-msgstr "x"
-
-msgid "Load samples from server"
-msgstr ""
-
-#. TRANS: musical pitch
-msgid "pitch"
-msgstr ""
-
-msgid "Publish"
-msgstr ""
-
-msgid "arc"
-msgstr "arc"
-
-msgid "radius"
-msgstr ""
-
-#. TRANS: shade refers to value (dark to light)
-msgid "set shade"
-msgstr ""
-
-msgid "This button opens and closes the primary toolbar."
-msgstr ""
-
-msgid "Show these messages."
-msgstr ""
-
-#. TRANS: the heap is a first-in-last-out (FILO) stack
-msgid "show heap"
-msgstr "mostrar la pila"
-
-#. TRANS: matrix (grid) of pitch vs. time
-msgid "pitch-time matrix"
-msgstr ""
-
-#. TRANS: weather forecast
-msgid "forecast"
-msgstr ""
-
-msgid "city latitude"
-msgstr ""
-
-msgid "Display statistics about your Music project."
-msgstr ""
-
-msgid "You can load new blocks from the file system."
-msgstr ""
-
-msgid "Settings"
-msgstr ""
-
-msgid "to radians"
-msgstr ""
-
-msgid "1/64 note"
-msgstr ""
-
-msgid "Show or hide a polar-coordinate grid."
-msgstr ""
-
-#. TRANS: musical key, e.g., C Major
-msgid "key"
-msgstr ""
-
 msgid "logic"
 msgstr ""
 
-msgid "1/16 note"
+msgid "maths"
 msgstr ""
 
-msgid "comment"
+msgid "food"
 msgstr ""
 
-#. TRANS: audio (as in musical note)
-msgid "tone"
+msgid "eatme"
 msgstr ""
 
-#. TRANS: robot sensors.
-msgid "infrared light (left)"
+#: plugins/rodi.rtp:169
+msgid "sing"
 msgstr ""
-
-msgid "Click to run the music note by note."
-msgstr ""
-
-#. TRANS: pop a value off of the heap.
-msgid "pop"
-msgstr "treure"
-
-msgid "pen size"
-msgstr ""
-
-msgid "Clear the screen and return the turtles to their initial positions."
-msgstr ""
-
-msgid "speak"
-msgstr ""
-
-msgid "sine"
-msgstr ""
-
-msgid "beef"
-msgstr ""
-
-#. TRANS: source language for translation
-msgid "source"
-msgstr ""
-
-msgid "invert"
-msgstr ""
-
-msgid "end hollow line"
-msgstr ""
-
-msgid "define"
-msgstr ""
-
-#. TRANS: sawtooth wave
-msgid "sawtooth"
-msgstr ""
-
-#. TRANS: slurring of notes in music
-msgid "skip factor"
-msgstr ""
-
-msgid "turtle name"
-msgstr ""
-
-msgid "else"
-msgstr "sinó"
-
-msgid "orange"
-msgstr ""
-
-msgid "begin hollow line"
-msgstr ""
-
-msgid "Rhythm Block: Did you mean to use a Note block?"
-msgstr ""
-
-#. TRANS: longitude and latitude coordinate data
-msgid "Coordinate data not available."
-msgstr ""
-
-msgid "Click to run the project step by step."
-msgstr ""
-
-#. TRANS: the value of a variable (stored in a box)
-msgid "value"
-msgstr ""
-
-#. TRANS: vertical space
-msgid "vspace"
-msgstr ""
-
-msgid "open file"
-msgstr ""
-
-msgid "Open"
-msgstr ""
-
-#. TRANS: grey refers to chroma (grey to vivid)
-msgid "set grey"
-msgstr ""
-
-msgid "Run step by step"
-msgstr ""
-
-msgid "protein"
-msgstr ""
-
-msgid "if"
-msgstr "si"
-
-msgid "get fat"
-msgstr ""
-
-msgid "media"
-msgstr ""
-
-msgid "Stop"
-msgstr ""
-
-#. TRANS: square root
-msgid "sqrt"
-msgstr ""
-
-msgid "skip notes"
-msgstr ""
-
-msgid "Palette buttons"
-msgstr ""
-
-msgid "end fill"
-msgstr ""
-
-msgid "Copy"
-msgstr ""
-
-msgid "Paste"
-msgstr ""
-
-msgid "Remove all content on the canvas, including the blocks."
-msgstr ""
-
-msgid "Polar"
-msgstr ""
-
-#. TRANS: empty the heap
-msgid "empty heap"
-msgstr "buidar la pila"
-
-#. TRANS: robot sensors.
-msgid "infrared light (right)"
-msgstr ""
-
-msgid "On my device"
-msgstr ""
-
-#. TRANS: the name of a stack of blocks
-msgid "action"
-msgstr ""
-
-msgid "note value"
-msgstr ""
-
-msgid "Clean"
-msgstr "netejar"
-
-msgid "note volume"
-msgstr ""
-
-msgid "broccoli"
-msgstr ""
-
-#. TRANS: stop playing current media file (movie or audio)
-msgid "stop media"
-msgstr ""
-
-msgid "Load project from file"
-msgstr ""
-
-msgid "y"
-msgstr ""
-
-msgid "set beats per minute"
-msgstr ""
-
-msgid "left"
-msgstr "esquerra"
-
-msgid "Delete all"
-msgstr ""
-
-msgid "rest"
-msgstr ""
-
-msgid "This button opens a viewer for loading example projects."
-msgstr ""
-
-msgid "You can also load projects from the file system."
-msgstr ""
-
-msgid "Run music slow"
-msgstr ""
-
-#. TRANS: unique ID
-msgid "UID"
-msgstr ""
-
-msgid "color"
-msgstr "color"
-
-msgid "add"
-msgstr ""
-
-#. TRANS: music term for dividing the beat into a different number of equal subdivisions
-msgid "tuplet"
-msgstr ""
-
-msgid "Meet Mr. Mouse!"
-msgstr ""
-
-msgid "set font"
-msgstr ""
-
-#. TRANS: a container for a variable
-msgid "boxes"
-msgstr ""
-
-msgid "background"
-msgstr ""
-
-#. TRANS: mathematical modular (remainder) function.
-msgid "mod"
-msgstr ""
-
-msgid "zoom"
-msgstr ""
-
-msgid "Hide or show the blocks and the palettes."
-msgstr ""
-
-msgid "show blocks"
-msgstr ""
-
-msgid "crescendo"
-msgstr ""
-
-msgid "right"
-msgstr "dreta"
-
-msgid "one of"
-msgstr ""
-
-msgid "Enable scrolling"
-msgstr ""
-
-msgid "back"
-msgstr "enrere"
-
-msgid "duration"
-msgstr ""
-
-msgid "pixel color"
-msgstr ""
-
-msgid "get calories"
-msgstr ""
-
-msgid "confirm"
-msgstr ""
-
-msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
-
-msgid "staccato"
-msgstr ""
-
-#. TRANS: how many entries are in the heap?
-msgid "heap length"
-msgstr ""
-
-msgid "Load plugin from file"
-msgstr ""
-
-#. TRANS: mathematical power, e.g., 2^4 == 16
-msgid "power"
-msgstr ""
-
-#. TRANS: slurring of notes in music
-msgid "slur"
-msgstr ""
-
-msgid "Save stack"
-msgstr ""
-
-msgid "corn"
-msgstr ""
-
-msgid "Display statistics"
-msgstr ""
-
-#. TRANS: as in "on event do"
-msgid "on"
-msgstr ""
-
-#. TRANS: object
-msgid "obj"
-msgstr ""
-
-#. TRANS: store a value in a box
-msgid "store in"
-msgstr ""
-
-msgid "numerator"
-msgstr ""
-
-msgid "multiply beat"
-msgstr ""
-
-#. TRANS: logical "or" operator
-msgid "or"
-msgstr "o"
-
-msgid "silence"
-msgstr ""
-
-#. TRANS: lilypond is a language used to generate musical scores.
-msgid "save as lilypond"
-msgstr ""
-
-msgid "image"
-msgstr ""
-
-msgid "Save project"
-msgstr ""
-
-#. TRANS: convert number to pitch
-msgid "number to pitch"
-msgstr ""
-
-msgid "mouse button"
-msgstr ""
-
-#. TRANS: carbohydrates
-msgid "get carbs"
-msgstr ""
-
-msgid "wait for"
-msgstr ""
-
-msgid "Decrease the size of the blocks."
-msgstr ""
-
-msgid "start"
-msgstr "començar"
-
-msgid "stock price"
-msgstr ""
-
-#. TRANS: low temperature
-msgid "low"
-msgstr ""
-
-msgid "forward"
-msgstr "endavant"
 
 msgid "do re mi fa sol la ti"
 msgstr ""
 
-msgid "translate"
-msgstr ""
+#~msgid "crescendo factor"
+#~msgstr ""
 
-#. TRANS: load the heap from a file
-msgid "load heap"
-msgstr ""
+#~msgid "hspace"
+#~msgstr ""
 
-msgid "Welcome to Music Blocks"
-msgstr ""
+#~msgid "cloud"
+#~msgstr ""
 
-#. TRANS: the heap is a first-in-last-out (FILO) stack
-msgid "heap"
-msgstr ""
+#~msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+#~msgstr ""
 
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
-msgid "begin fill"
-msgstr ""
+#~msgid "rodi"
+#~msgstr ""
 
-msgid "eat"
-msgstr ""
+#~msgid "Save your project to a server."
+#~msgstr ""
 
-msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr ""
+#~msgid "blocks"
+#~msgstr ""
 
-msgid "city longitude"
-msgstr ""
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr ""
 
-msgid "duplicate notes"
-msgstr ""
+#~msgid "Expand/collapse toolbar"
+#~msgstr ""
 
-#. TRANS: musical key, e.g., C Major
-msgid "set key"
-msgstr ""
+#~msgid "end hollow line"
+#~msgstr ""
 
-msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr ""
+#~msgid "begin hollow line"
+#~msgstr ""
 
-msgid "slur factor"
-msgstr ""
+#~msgid "Rhythm Block: Did you mean to use a Note block?"
+#~msgstr ""
 
-msgid "cake"
-msgstr ""
+#~msgid "vspace"
+#~msgstr ""
 
-msgid "start drum"
-msgstr ""
+#~msgid "end fill"
+#~msgstr ""
 
-msgid "Disable scrolling"
-msgstr ""
+#~msgid "Load project from file"
+#~msgstr ""
 
-#. TRANS: set language
-msgid "set lang"
-msgstr ""
+#~msgid "set beats per minute"
+#~msgstr ""
 
-#. TRANS: play media (audio or video)
-msgid "play back"
-msgstr ""
+#~msgid "begin fill"
+#~msgstr ""
 
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
-msgid "fill"
-msgstr ""
-
-#. TRANS: save project as simple vector graphic (SVG)
-msgid "save svg"
-msgstr ""
-
-#. TRANS: number of notes
-msgid "number of notes"
-msgstr ""
-
-#. TRANS: mathematical floor function, e.g., floor(2.5) == 2
-msgid "floor"
-msgstr ""
-
-#. TRANS: field of interest in a database, e.g., temperature in a weather database
-msgid "field"
-msgstr ""
-
-msgid "zoom factor"
-msgstr ""
-
-msgid "set xy"
-msgstr ""
-
-#. TRANS: tying together of notes in music
-msgid "tie"
-msgstr ""
-
-msgid "divide beat"
-msgstr ""
-
-#. TRANS: Mexican tamale
-msgid "tamale"
-msgstr ""
-
-msgid "repeat"
-msgstr "repetir"
-
-#. TRANS: mathematical exponent
-msgid "exp"
-msgstr ""
-
-msgid "current pitch octave"
-msgstr ""
-
-msgid "current pitch name"
-msgstr ""
-
-#. TRANS: evaluate Javascript code
-msgid "eval"
-msgstr ""
-
-#. TRANS: carbohydrates
-msgid "carbs"
-msgstr ""
-
-msgid "potato"
-msgstr ""
-
-msgid "Stop the music (and the turtles)."
-msgstr ""
-
-msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr ""
-
-msgid "extras"
-msgstr ""
-
-msgid "time"
-msgstr ""
-
-#. TRANS: push a value on to the heap.
-msgid "push"
-msgstr ""
-
-msgid "hello"
-msgstr ""

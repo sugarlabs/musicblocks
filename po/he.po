@@ -39,1213 +39,2287 @@ msgid ""
 
 
 msgid ""
+
+#: js/activity.js:443
+msgid "Close"
 msgstr ""
 
-msgid "crescendo factor"
-msgstr ""
-
-msgid "quarter note"
-msgstr ""
-
-msgid "eighth note"
-msgstr ""
-
-#. TRANS: color refers to a hue, value, chroma triplet
-msgid "set color"
-msgstr "קבע צבע"
-
-msgid "pen"
-msgstr "עט"
-
-#. TRANS: as in "add 1 to"
-msgid "to"
-msgstr "אל"
-
-msgid "rhythm"
-msgstr ""
-
-msgid "Show/hide blocks"
-msgstr "הצג או הסתר את הבלוקים"
-
-msgid "Click to run the project in slow mode."
-msgstr "לחצו כדי להריץ את הפרויקט במצב איטי"
-
-msgid "turtle note"
-msgstr ""
-
-msgid "fat"
-msgstr "שומן"
-
-msgid "Expand or collapse start and action stacks."
-msgstr "הרחב או צמצם קבוצת בלוקים כמו קבוצת התחל או פעולה"
-
-#. TRANS: load the program heap from an application
-msgid "load heap from App"
-msgstr ""
-
-msgid "turtle x"
-msgstr "צב x"
-
-msgid "turtle y"
-msgstr "y צב"
-
-msgid "Restore blocks from the trash."
-msgstr "שחזור בלוקים מסל המחזור"
-
-msgid "heading"
-msgstr "כיוון (אזימוט)"
-
-msgid "Hide or show the block palettes."
-msgstr "הצג או הסתר את סרגלי הכלים"
-
-#. TRANS: hollow line refers to drawing an outline around a line
-msgid "hollow line"
-msgstr ""
-
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr ""
-
-#. TRANS: as in button click
-msgid "click"
-msgstr ""
-
-#. TRANS: index specifies a position into an array (heap)
-msgid "index"
-msgstr ""
-
-msgid "hide"
-msgstr ""
-
-msgid "tuplet value"
-msgstr ""
-
-msgid "while"
-msgstr "כל-עוד"
-
-msgid "to degrees"
-msgstr "למעלות"
-
-msgid "water"
-msgstr "מים"
-
-msgid "octave"
-msgstr ""
-
-msgid "sing"
-msgstr "לשיר"
-
-msgid "pen down"
-msgstr "הורד עט"
-
-msgid "wait"
-msgstr "המתן"
-
-#. TRANS: a container for a variable
-msgid "box"
-msgstr "תיבה"
-
-msgid "duplicate factor"
-msgstr ""
-
-#. TRANS: popout window
-msgid "popout"
-msgstr ""
-
-msgid "Download"
-msgstr "הורדה"
-
-msgid "Home"
-msgstr ""
-
-msgid "Increase the size of the blocks."
-msgstr "הגדל את גודל הבלוקים"
-
-msgid "set volume"
-msgstr ""
-
-msgid "Cartesian"
-msgstr "קוארדינטות קרטזיות"
-
-msgid "apple"
-msgstr "תפוח"
-
-msgid "Increase block size"
-msgstr "הגדל את גודל הבלוק"
-
-#. TRANS: Boolean logic
-msgid "boolean"
-msgstr "בוליאני"
-
-msgid "Run slow"
-msgstr "הרצה איטית"
-
-msgid "turtle pitch number"
-msgstr ""
-
-#. TRANS: cloud as in cloud server
-msgid "cloud"
-msgstr "ענן"
-
-#. TRANS: hours ago that the data was updated.
-msgid "hours ago"
-msgstr ""
-
-msgid "from"
-msgstr "מ"
-
-msgid "half note"
-msgstr ""
-
-#. TRANS: is the heap empty?
-msgid "heap empty?"
-msgstr ""
-
-msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr ""
-
-msgid "whole note"
-msgstr ""
-
-msgid "until"
-msgstr "עד_ש"
-
-msgid "flat"
-msgstr ""
-
-msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
-
-msgid "Expand/collapse collapsable blocks"
-msgstr "צמצם/הרחב את הבלוקים הניתנים לצמצום"
-
-msgid "Show/hide palettes"
-msgstr "הצג/הראה "
-
-#. TRANS: hue refers to spectral hue (red, yellow, green, blue...)
-msgid "set hue"
-msgstr "קבע צבע"
-
-msgid "set heading"
-msgstr "קבע אזימוט (כיוון)"
-
-msgid "this"
-msgstr "זה"
-
-msgid "play backward"
-msgstr ""
-
-msgid "longitude"
-msgstr "קו אורך"
-
-#. TRANS: database fetch
-msgid "fetch"
-msgstr ""
-
-#. TRANS: RoDi robot
-msgid "rodi"
-msgstr "RoDi"
-
-#. TRANS: high temperature
-msgid "high"
-msgstr "גבוה"
-
-msgid "currency"
-msgstr "מטבע"
-
-#. TRANS: stop playing current media file (movie or audio)
-msgid "stop play"
-msgstr "הפסקת נגן"
-
-msgid "sharp"
-msgstr ""
-
-msgid "Save your project to a server."
-msgstr "שמור את הפרויקט שלך בשרת"
-
-msgid "Decrease block size"
-msgstr "הקטן גודל בלוק"
-
-msgid "blocks"
-msgstr "בלוקים"
-
-msgid "eatme"
-msgstr "לאכול"
-
-#. TRANS: maximum
-msgid "max"
-msgstr "מקסימום"
-
-msgid "Click to run just the music in slow mode."
-msgstr ""
-
-msgid "tomato"
-msgstr "עגבניות"
-
-msgid "shade"
-msgstr "גוון"
-
-msgid "no background"
-msgstr "ללא רקע"
-
-msgid "staccato factor"
-msgstr ""
-
-msgid "move"
-msgstr "זוז"
-
-#. TRANS: musical meter
-msgid "meter"
-msgstr ""
-
-msgid "Save your project to a file."
-msgstr ""
-
-msgid "keyboard"
-msgstr "קלט מקלדת"
-
-msgid "coordinates"
-msgstr "קואורדינטות"
-
-msgid "pen up"
-msgstr "הרם עט"
-
-#. TRANS: 360 degrees in a circle
-msgid "degrees"
-msgstr "מעלות"
-
-msgid "start turtle"
-msgstr "התחל צב"
-
-msgid "latitude"
-msgstr "קו רוחב"
-
-msgid "then"
-msgstr "אז"
-
-msgid "articulation"
-msgstr ""
-
-msgid "food"
-msgstr "מזון"
-
-#. TRANS: logical "not" operator
-msgid "not"
-msgstr "לא"
-
-msgid "Google map"
-msgstr "גוגל מפות"
-
-msgid "day"
-msgstr "יום"
-
-msgid "get fiber"
-msgstr "קבל סיבים"
-
-#. TRANS: the name of a variable (stored in a box)
-msgid "name"
-msgstr "שם"
-
-msgid "You can scroll the blocks on the canvas."
-msgstr ""
-
-msgid "radians"
-msgstr "רדיאנים"
-
-msgid "turtle"
-msgstr "צב"
-
-msgid "square"
-msgstr ""
-
-msgid "hide blocks"
-msgstr "הסתר בלוקים"
-
-msgid "fish"
-msgstr "דג"
-
-msgid "1/32 note"
-msgstr ""
-
-#. TRANS: in mathematical sense (inverse of period)
-msgid "frequency"
-msgstr ""
-
-#. TRANS: as in the event that a signal arrives
-msgid "event"
-msgstr ""
-
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-msgstr ""
-
-#. TRANS: publish project to Facebook
-msgid "publish"
-msgstr "פרסום"
-
-msgid "print"
-msgstr "הודעה"
-
-msgid "size"
-msgstr "גודל"
-
-msgid "Expand/collapse option toolbar"
-msgstr "הרחב/צמצם סרגל האפשרויות"
-
-#. TRANS: save the heap to a file
-msgid "save heap"
-msgstr "שמור FILO"
-
-#. TRANS: dietary fiber
-msgid "fiber"
-msgstr "סיבים"
-
-msgid "Planet"
-msgstr "כוכב"
-
-#. TRANS: mathematical exponential base
-msgid "base"
-msgstr "בסיס"
-
-msgid "cookie"
-msgstr "עוגייה"
-
-#. TRANS: Musical score
-msgid "Save sheet music"
-msgstr ""
-
-msgid "maths"
-msgstr "מתמטיקה"
-
-msgid "sensors"
-msgstr "חיישנים"
-
-#. TRANS: retrieve the value at a specific entry (index) in the heap
-msgid "index heap"
-msgstr ""
-
-msgid "Delete"
-msgstr "מחיקה"
-
-msgid "digest meal"
-msgstr "לעכל"
-
-msgid "calories"
-msgstr "קלוריות"
-
-#. TRANS: swing beat in music
-msgid "swing"
-msgstr ""
-
-#. TRANS: volume of microphone audio
-msgid "loudness"
-msgstr "עוצמת קול"
-
-msgid "get protein"
-msgstr "קבל חלבון"
-
-msgid "cheese"
-msgstr "גבינה"
-
-msgid "number"
-msgstr "מספר"
-
-#. TRANS: as in blinking an eye.
-msgid "blink"
-msgstr ""
-
-#. TRANS: oscillator time
-msgid "osctime"
-msgstr ""
-
-msgid "Congratulations."
-msgstr "איחולנו"
-
-msgid "adjust transposition"
-msgstr ""
-
-msgid "rice and beans"
-msgstr "אורז ושעועית"
-
-msgid "city"
-msgstr "עיר"
-
-msgid "Click to run the project in fast mode."
-msgstr "לחצו כדי להריץ את הפרויקט במצב מהיר"
-
-msgid "unknown"
-msgstr "לא ידוע"
-
-#. TRANS: bitcoin currency (probably no need to translate)
-msgid "bitcoin"
-msgstr "ביטקוין"
-
-msgid "Run note by note"
-msgstr ""
-
-msgid "motion z"
-msgstr "z תנועת"
-
-msgid "motion x"
-msgstr "x תנועת"
-
-msgid "motion y"
-msgstr "y תנועת"
-
-msgid "Open a panel for configuring Music Blocks."
-msgstr "פתיחת פאנל להתאמת בלוקים"
-
-msgid "get name"
-msgstr "קבל שם"
-
-msgid "Return all blocks to the center of the screen."
-msgstr ""
-
-#. TRANS: mathematical ceiling function, e.g., ceiling(2.5) == 3
-msgid "ceiling"
-msgstr "תקרה"
-
-#. TRANS: a turtle shell
-msgid "shell"
-msgstr "שריון"
-
-msgid "that"
-msgstr "זה"
-
-#. TRANS: as in broadcast a signal
-msgid "broadcast"
-msgstr ""
-
-msgid "beats per minute"
-msgstr ""
-
-#. TRANS: robot sensors.
-msgid "distance"
-msgstr ""
-
-#. TRANS: target language for translation
-msgid "target"
-msgstr "יעד"
-
-msgid "grey"
-msgstr "אפור"
-
-msgid "banana"
-msgstr "בננה"
-
-msgid "wheat bread"
-msgstr "לחם"
-
-#. TRANS: detect language
-msgid "detect lang"
-msgstr "זיהוי שפה"
-
-msgid "sweet potato"
-msgstr "בַּטָטָה"
-
-#. TRANS: logical "and" operator
-msgid "and"
-msgstr "וגם"
-
-msgid "add 1 to"
-msgstr "הוסף 1 ל"
-
-msgid "angle"
-msgstr "זווית"
-
-#. TRANS: minimum
-msgid "min"
-msgstr "מינימום"
-
-msgid "note"
-msgstr "הערה"
-
-msgid "Please close the current matrix before opening a new one."
-msgstr ""
-
-msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-msgstr "כפתור הדבק פעיל כאשר ישנם בלוקים שהועתקו אל הלוח"
-
-msgid "Worldwide"
-msgstr "בעולם כולו"
-
-#. TRANS: as in play a musical note.
-msgid "play"
-msgstr ""
-
-msgid "denominator"
-msgstr ""
-
+#: js/activity.js:1251
+#: js/block.js:619
+#: js/block.js:1705
+#: js/analytics.js:104
+#: js/blocks.js:1603
+#: js/blocks.js:1605
+#: js/blocks.js:1789
+#: js/blocks.js:1932
+#: js/blocks.js:2038
+#: js/blocks.js:2464
+#: js/blocks.js:3100
+#: js/blocks.js:3175
+#: js/palette.js:471
+#: js/palette.js:480
+#: js/palette.js:489
+#: js/palette.js:498
+#: js/palette.js:1620
+#: js/palette.js:1631
+#: js/palette.js:1642
+#: js/palette.js:1653
+#: js/basicblocks.js:1003
+#: js/basicblocks.js:1032
+#: js/basicblocks.js:1039
+#: js/basicblocks.js:1067
+#: js/basicblocks.js:1077
+#: js/basicblocks.js:1106
+#: js/basicblocks.js:1138
+#: js/basicblocks.js:1142
+#: js/basicblocks.js:1148
+msgid "action"
+msgstr "פעולה"
+
+#: js/activity.js:1934
+#: js/turtledefs.js:78
 msgid "Run fast"
 msgstr "הרצה מהירה"
 
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
+#: js/activity.js:1935
+#: js/turtledefs.js:79
+msgid "Run slow"
+msgstr "הרצה איטית"
+
+#: js/activity.js:1936
+#: js/turtledefs.js:81
+msgid "Run step by step"
+msgstr "הרצה צעד אחרי צעד"
+
+#: js/activity.js:1937
+#: js/turtledefs.js:80
+msgid "Run music slow"
 msgstr ""
 
-msgid "forever"
-msgstr "תמיד"
-
-#. TRANS: save the program heap to an application
-msgid "save heap to App"
+#: js/activity.js:1938
+#: js/turtledefs.js:82
+msgid "Run note by note"
 msgstr ""
 
-#. TRANS: musical note to frequency
-msgid "note to frequency"
-msgstr ""
-
-#. TRANS: clear the screen of any graphics drawn by the turtle
-msgid "clear"
-msgstr "נקה"
-
-msgid "flow"
-msgstr "זרם"
-
-#. TRANS: Lilypond is engraving software
-msgid "Save your project to as a Lilypond file."
-msgstr ""
-
-msgid "beat factor"
-msgstr ""
-
-#. TRANS: convert number to octave
-msgid "number to octave"
-msgstr ""
-
-msgid "dot"
-msgstr ""
-
-msgid "show"
-msgstr "הצג"
-
-msgid "text"
-msgstr "טקסט"
-
-msgid "random"
-msgstr "מספר אקראי"
-
-msgid "Show or hide a Cartesian-coordinate grid."
-msgstr "הצג או הסתר רשת של קואורדינטות קרטזיות"
-
-#. TRANS: Do not translate
-msgid "mashape"
-msgstr ""
-
-msgid "chicken"
-msgstr "עוף"
-
-#. TRANS: name of project
-msgid "title"
-msgstr "כותרת"
-
-msgid "Undo"
-msgstr "לבטל"
-
-#. TRANS: ms is micro seconds
-msgid "duration (ms)"
-msgstr ""
-
-msgid "set pen size"
-msgstr "קבע עובי עט"
-
-msgid "mouse x"
-msgstr "עכבר x"
-
-msgid "mouse y"
-msgstr "עכבר y"
-
-msgid "free time"
-msgstr ""
-
-#. TRANS: do this action
-msgid "do"
-msgstr "בצע"
-
-msgid "triangle"
-msgstr ""
-
-msgid "stop turtle"
-msgstr "עצור צב"
-
-msgid "stop"
+#: js/activity.js:1939
+#: js/turtledefs.js:83
+msgid "Stop"
 msgstr "עצור"
 
+#: js/activity.js:1940
+#: js/turtledefs.js:84
+msgid "Clean"
+msgstr "נקה"
+
+#: js/activity.js:1941
+#: js/turtledefs.js:85
+msgid "Show/hide palettes"
+msgstr "הצג/הראה "
+
+#: js/activity.js:1942
+#: js/turtledefs.js:86
+msgid "Show/hide blocks"
+msgstr "הצג או הסתר את הבלוקים"
+
+#: js/activity.js:1943
+#: js/turtledefs.js:87
+msgid "Expand/collapse collapsable blocks"
+msgstr "צמצם/הרחב את הבלוקים הניתנים לצמצום"
+
+#: js/activity.js:1944
+#: js/activity.js:1985
+#: js/turtledefs.js:88
+msgid "Home"
+msgstr ""
+
+#: js/activity.js:1945
+#: js/turtledefs.js:89
 msgid "Help"
 msgstr "עזרה"
 
-msgid "transposition"
-msgstr ""
-
-msgid "Expand/collapse toolbar"
-msgstr "הרחב/כווץ את סרגל הכלים"
-
-msgid "Note value must be greater than 0"
-msgstr ""
-
-msgid "x"
-msgstr "x"
-
+#: js/activity.js:2012
+#: js/turtledefs.js:91
 msgid "Load samples from server"
 msgstr "העלאת דוגמאות מן השרת"
 
-#. TRANS: musical pitch
-msgid "pitch"
+#: js/activity.js:2013
+#: js/turtledefs.js:92
+msgid "Load project from files"
 msgstr ""
 
-msgid "Publish"
-msgstr "פרסום"
+#: js/activity.js:2014
+#: js/turtledefs.js:93
+msgid "Save project"
+msgstr "שמור פרויקט"
 
-msgid "arc"
-msgstr "קשת"
-
-msgid "radius"
-msgstr "רדיוס"
-
-#. TRANS: shade refers to value (dark to light)
-msgid "set shade"
-msgstr "קבע גוון"
-
-msgid "This button opens and closes the primary toolbar."
-msgstr "כפתור זה פותח וסוגר את סרגל הכלים הראשי"
-
-msgid "Show these messages."
-msgstr "הצג את הודעות אלה"
-
-#. TRANS: show the contents of the heap.
-msgid "show heap"
-msgstr "הצג מחסנית FILO"
-
-#. TRANS: matrix (grid) of pitch vs. time
-msgid "pitch-time matrix"
+#: js/activity.js:2015
+#: js/turtledefs.js:94
+msgid "Save sheet music"
 msgstr ""
 
-#. TRANS: weather forecast
-msgid "forecast"
-msgstr "תחזית מזג אוויר"
+#: js/activity.js:2016
+#: js/turtledefs.js:96
+msgid "Paste"
+msgstr "הדבק"
 
-msgid "city latitude"
-msgstr "קו רוחב של עיר"
+#: js/activity.js:2017
+#: js/turtledefs.js:98
+msgid "Cartesian"
+msgstr "קוארדינטות קרטזיות"
 
-msgid "Display statistics about your Music project."
-msgstr "הצג סטטיסטיקות אודות פרויקט הצב שלך"
+#: js/activity.js:2018
+#: js/turtledefs.js:99
+msgid "Polar"
+msgstr "קוארדינטות פולריות"
 
-msgid "You can load new blocks from the file system."
-msgstr "ניתן להעלות בלוקים חדשים מתוך מערכת הקבצים"
-
+#: js/activity.js:2019
+#: js/turtledefs.js:100
 msgid "Settings"
 msgstr "הגדרות"
 
-msgid "to radians"
-msgstr "לרדיאנים"
+#: js/activity.js:2020
+#: js/turtledefs.js:106
+msgid "Delete all"
+msgstr "מחק הכל"
 
-msgid "1/64 note"
+#: js/activity.js:2021
+#: js/turtledefs.js:107
+msgid "Undo"
+msgstr "לבטל"
+
+#: js/clearbox.js:46
+msgid "confirm"
+msgstr "אישור"
+
+#: js/block.js:553
+#: js/logo.js:1916
+#: js/logo.js:1969
+#: js/logo.js:4089
+#: js/matrix.js:312
+#: js/musicutils.js:21
+msgid "rest"
 msgstr ""
 
+#: js/block.js:622
+#: js/logo.js:4494
+#: js/logo.js:4543
+#: js/logo.js:4563
+#: js/turtle.js:361
+#: js/turtle.js:362
+#: js/basicblocks.js:1130
+msgid "start"
+msgstr "התחל"
+
+#: js/block.js:625
+#: js/turtledefs.js:21
+msgid "matrix"
+msgstr ""
+
+#: js/block.js:628
+#: js/turtle.js:219
+msgid "drum"
+msgstr ""
+
+#: js/logo.js:24
+msgid "mouse"
+msgstr ""
+
+#: js/logo.js:24
+msgid "brown rat"
+msgstr ""
+
+#: js/logo.js:24
+msgid "mole"
+msgstr ""
+
+#: js/logo.js:24
+msgid "chipmunk"
+msgstr ""
+
+#: js/logo.js:24
+msgid "red squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "guinea pig"
+msgstr ""
+
+#: js/logo.js:24
+msgid "capybara"
+msgstr ""
+
+#: js/logo.js:24
+msgid "coypu"
+msgstr ""
+
+#: js/logo.js:24
+msgid "black rat"
+msgstr ""
+
+#: js/logo.js:24
+msgid "grey squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "flying squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "bat"
+msgstr ""
+
+#: js/logo.js:26
+#.TRANS: Abbreviations for names used in Lilypind output, e.g., m for mouse
+msgid "m"
+msgstr ""
+
+#: js/logo.js:26
+msgid "br"
+msgstr ""
+
+#: js/logo.js:26
+msgid "ml"
+msgstr ""
+
+#: js/logo.js:26
+msgid "ch"
+msgstr ""
+
+#: js/logo.js:26
+msgid "rs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "gp"
+msgstr ""
+
+#: js/logo.js:26
+msgid "cb"
+msgstr ""
+
+#: js/logo.js:26
+msgid "cp"
+msgstr ""
+
+#: js/logo.js:26
+msgid "bk"
+msgstr ""
+
+#: js/logo.js:26
+msgid "gs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "fs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "bt"
+msgstr ""
+
+#: js/logo.js:352
+msgid "true"
+msgstr ""
+
+#: js/logo.js:354
+msgid "false"
+msgstr ""
+
+#: js/logo.js:1407
+#: js/logo.js:1731
+msgid "You must select a file."
+msgstr ""
+
+#: js/logo.js:1740
+#: plugins/heap.rtp:96
+msgid "The file you selected does not contain a valid heap."
+msgstr ""
+
+#: js/logo.js:1744
+#: plugins/heap.rtp:102
+msgid "The loadHeap block needs a loadFile block."
+msgstr ""
+
+#: js/logo.js:1760
+msgid "Error parsing JSON data:"
+msgstr ""
+
+#: js/logo.js:1765
+msgid "404: Page not found"
+msgstr ""
+
+#: js/logo.js:1789
+msgid "turtleHeaps does not contain a valid heap for"
+msgstr ""
+
+#: js/logo.js:1799
+msgid "Index must be > 0."
+msgstr ""
+
+#: js/logo.js:1818
+msgid "Beats per minute must be > 30."
+msgstr ""
+
+#: js/logo.js:1821
+msgid "Maximum beats per minute is 1000."
+msgstr ""
+
+#: js/logo.js:1867
+msgid "You must have at least one pitch block and one rhythm block in the matrix."
+msgstr ""
+
+#: js/logo.js:1869
+msgid "Please close the current matrix before opening a new one."
+msgstr ""
+
+#: js/logo.js:2064
+msgid "Pitch Block: Did you mean to use a Note block?"
+msgstr ""
+
+#: js/logo.js:2080
+msgid "Rhythm Block: Did you mean to use a Matrix block?"
+msgstr ""
+
+#: js/logo.js:2137
+msgid "Note value must be greater than 0"
+msgstr ""
+
+#: js/logo.js:2606
+msgid "Tuplet Block: Did you mean to use a Matrix block?"
+msgstr ""
+
+#: js/logo.js:2796
+msgid "My Project"
+msgstr ""
+
+#: js/logo.js:3151
+msgid "synth cannot play chords."
+msgstr ""
+
+#: js/logo.js:3736
+#: js/basicblocks.js:1213
+#: plugins/heap.rtp:42
+#: plugins/heap.rtp:142
+msgid "empty heap"
+msgstr "רוקן מחסנית FILO"
+
+#: js/logo.js:4494
+#: js/logo.js:4543
+#: js/logo.js:4563
+#: js/turtle.js:218
+#: js/turtle.js:357
+#: js/turtle.js:358
+#: js/basicblocks.js:1122
+msgid "start drum"
+msgstr ""
+
+#: js/matrix.js:209
+msgid "Solfa"
+msgstr ""
+
+#: plugins/rodi.rtp:181
+msgid "play"
+msgstr ""
+
+#: js/matrix.js:240
+#: js/matrix.js:240
+msgid "save"
+msgstr ""
+
+#: js/matrix.js:257
+#: js/matrix.js:257
+#: js/basicblocks.js:610
+msgid "clear"
+msgstr "נקה"
+
+#: js/matrix.js:274
+#: js/matrix.js:274
+msgid "export"
+msgstr ""
+
+#: js/matrix.js:291
+#: js/matrix.js:291
+msgid "close"
+msgstr ""
+
+#: js/matrix.js:336
+#: js/matrix.js:539
+#: js/basicblocks.js:267
+#: js/basicblocks.js:277
+msgid "note value"
+msgstr ""
+
+#: js/matrix.js:487
+msgid "tuplet value"
+msgstr ""
+
+#: js/utilitybox.js:36
+#: js/turtledefs.js:101
+msgid "Decrease block size"
+msgstr "הקטן גודל בלוק"
+
+#: js/utilitybox.js:44
+#: js/turtledefs.js:102
+msgid "Increase block size"
+msgstr "הגדל את גודל הבלוק"
+
+#: js/utilitybox.js:52
+#: js/turtledefs.js:103
+msgid "Display statistics"
+msgstr "הצג סטטיסטיקות"
+
+#: js/utilitybox.js:60
+#: js/turtledefs.js:104
+msgid "Load plugin from file"
+msgstr "העלאת פלאגין מקובץ"
+
+#: js/utilitybox.js:68
+#: js/turtledefs.js:105
+msgid "Enable scrolling"
+msgstr ""
+
+#: js/utilitybox.js:77
+msgid "Disable scrolling"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:277
+msgid "rhythm"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:204
+msgid "pitch"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:1299
+msgid "tone"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "flow"
+msgstr "זרם"
+
+#: js/turtledefs.js:21
+msgid "actions"
+msgstr ""
+
+#: js/turtledefs.js:21
+msgid "boxes"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "turtle"
+msgstr "צב"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "pen"
+msgstr "עט"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "number"
+msgstr "מספר"
+
+#: js/turtledefs.js:21
+msgid "boolean"
+msgstr "בוליאני"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "media"
+msgstr "מדיה"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "sensors"
+msgstr "חיישנים"
+
+#: js/turtledefs.js:21
+msgid "heap"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "extras"
+msgstr "אקסטרה"
+
+#: js/turtledefs.js:75
+msgid "Welcome to Music Blocks"
+msgstr ""
+
+#: js/turtledefs.js:75
+msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgstr ""
+
+#: js/turtledefs.js:76
+msgid "Meet Mr. Mouse!"
+msgstr ""
+
+#: js/turtledefs.js:76
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
+msgstr ""
+
+#: js/turtledefs.js:77
+msgid "Palette buttons"
+msgstr "סרגל כלים"
+
+#: js/turtledefs.js:77
+msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+#: js/turtledefs.js:78
+msgid "Click to run the project in fast mode."
+msgstr "לחצו כדי להריץ את הפרויקט במצב מהיר"
+
+#: js/turtledefs.js:79
+msgid "Click to run the project in slow mode."
+msgstr "לחצו כדי להריץ את הפרויקט במצב איטי"
+
+#: js/turtledefs.js:80
+msgid "Click to run just the music in slow mode."
+msgstr ""
+
+#: js/turtledefs.js:81
+msgid "Click to run the project step by step."
+msgstr "לחצו כדי להריץ את הפרויקט צעד אחרי צעד"
+
+#: js/turtledefs.js:82
+msgid "Click to run the music note by note."
+msgstr ""
+
+#: js/turtledefs.js:83
+msgid "Stop the music (and the turtles)."
+msgstr ""
+
+#: js/turtledefs.js:84
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr "נקה את המסך והחזר את הצבים למיקום הראשוני"
+
+#: js/turtledefs.js:85
+msgid "Hide or show the block palettes."
+msgstr "הצג או הסתר את סרגלי הכלים"
+
+#: js/turtledefs.js:86
+msgid "Hide or show the blocks and the palettes."
+msgstr "הצג או הסתר את הבלוקים ואת הכלים"
+
+#: js/turtledefs.js:87
+msgid "Expand or collapse start and action stacks."
+msgstr "הרחב או צמצם קבוצת בלוקים כמו קבוצת התחל או פעולה"
+
+#: js/turtledefs.js:88
+msgid "Return all blocks to the center of the screen."
+msgstr ""
+
+#: js/turtledefs.js:89
+msgid "Show these messages."
+msgstr "הצג את הודעות אלה"
+
+#: js/turtledefs.js:90
+msgid "Expand/collapse option toolbar"
+msgstr "הרחב/צמצם סרגל האפשרויות"
+
+#: js/turtledefs.js:90
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr "לחצו על כפתור זה כדי להרחיב או לצמצם את סרגל כלי העזר"
+
+#: js/turtledefs.js:91
+msgid "This button opens a viewer for loading example projects."
+msgstr "כפתור זה פותח מציג להעלאת פרויקטים"
+
+#: js/turtledefs.js:92
+msgid "You can also load projects from the file system."
+msgstr "ניתן להעלות פרויקטים מתוך מערכת הקבצים"
+
+#: js/turtledefs.js:93
+msgid "Save your project to a file."
+msgstr ""
+
+#: js/turtledefs.js:94
+msgid "Save your project to as a Lilypond file."
+msgstr ""
+
+#: js/turtledefs.js:95
+msgid "Copy"
+msgstr "העתק"
+
+#: js/turtledefs.js:95
+msgid "To copy a stack to the clipboard, do a \"long press\" on the stack. The Paste Button will highlight."
+msgstr ""
+
+#: js/turtledefs.js:96
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr "כפתור הדבק פעיל כאשר ישנם בלוקים שהועתקו אל הלוח"
+
+#: js/turtledefs.js:97
+#: js/blocks.js:200
+msgid "Save stack"
+msgstr "שמור את הקבוצה"
+
+#: js/turtledefs.js:97
+msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+msgstr ""
+
+#: js/turtledefs.js:98
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr "הצג או הסתר רשת של קואורדינטות קרטזיות"
+
+#: js/turtledefs.js:99
 msgid "Show or hide a polar-coordinate grid."
 msgstr "הצג או הסתר רשת קוארדינטות פולריות"
 
-#. TRANS: musical key, e.g., C Major
+#: js/turtledefs.js:100
+msgid "Open a panel for configuring Music Blocks."
+msgstr "פתיחת פאנל להתאמת בלוקים"
+
+#: js/turtledefs.js:101
+msgid "Decrease the size of the blocks."
+msgstr "הקטן את גודל הבלוקים"
+
+#: js/turtledefs.js:102
+msgid "Increase the size of the blocks."
+msgstr "הגדל את גודל הבלוקים"
+
+#: js/turtledefs.js:103
+msgid "Display statistics about your Music project."
+msgstr "הצג סטטיסטיקות אודות פרויקט הצב שלך"
+
+#: js/turtledefs.js:104
+msgid "You can load new blocks from the file system."
+msgstr "ניתן להעלות בלוקים חדשים מתוך מערכת הקבצים"
+
+#: js/turtledefs.js:105
+msgid "You can scroll the blocks on the canvas."
+msgstr ""
+
+#: js/turtledefs.js:106
+msgid "Remove all content on the canvas, including the blocks."
+msgstr "הסר את כל תוכן הקנבס, כולל הבלוקים"
+
+#: js/turtledefs.js:107
+msgid "Restore blocks from the trash."
+msgstr "שחזור בלוקים מסל המחזור"
+
+#: js/turtledefs.js:108
+msgid "Congratulations."
+msgstr "איחולנו"
+
+#: js/turtledefs.js:108
+msgid "You have finished the tour. Please enjoy Music Blocks!"
+msgstr ""
+
+#: js/samplesviewer.js:26
+#: js/samplesviewer.js:26
+msgid "Open"
+msgstr "פתיחה"
+
+#: js/samplesviewer.js:27
+#: js/samplesviewer.js:27
+msgid "Delete"
+msgstr "מחיקה"
+
+#: js/samplesviewer.js:28
+#: js/samplesviewer.js:28
+msgid "Publish"
+msgstr "פרסום"
+
+#: js/samplesviewer.js:29
+#: js/samplesviewer.js:29
+#: js/samplesviewer.js:38
+#: js/samplesviewer.js:38
+msgid "Download"
+msgstr "הורדה"
+
+#: js/samplesviewer.js:419
+msgid "Planet"
+msgstr "כוכב"
+
+#: js/samplesviewer.js:420
+msgid "On my device"
+msgstr "במכשיר שלי"
+
+#: js/samplesviewer.js:421
+msgid "Worldwide"
+msgstr "בעולם כולו"
+
+#: js/blocks.js:1144
+#: js/palette.js:543
+msgid "open file"
+msgstr "פתיחת קובץ"
+
+#: js/blocks.js:1478
+#: js/palette.js:515
+#: js/basicblocks.js:1335
+msgid "text"
+msgstr "טקסט"
+
+#: js/blocks.js:1488
+#: js/palette.js:518
+#: js/palette.js:1698
+#: js/palette.js:1705
+msgid "sol"
+msgstr ""
+
+#: js/blocks.js:1861
+#: js/palette.js:453
+#: js/palette.js:1598
+#: js/basicblocks.js:965
+#: js/basicblocks.js:969
+#: js/basicblocks.js:981
+#: js/basicblocks.js:989
+msgid "box"
+msgstr "תיבה"
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:978
+msgid "store in"
+msgstr "שמור ב"
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:204
+#: js/basicblocks.js:978
+msgid "name"
+msgstr "שם"
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:956
+#: js/basicblocks.js:978
+#: js/basicblocks.js:1180
+#: plugins/bitcoin.rtp:27
+msgid "value"
+msgstr "ערך"
+
+#: js/palette.js:639
+#: js/basicblocks.js:661
+msgid "back"
+msgstr "אחורה"
+
+#: js/palette.js:647
+#: js/palette.js:648
+msgid "hide"
+msgstr ""
+
+#: js/palette.js:650
+#: js/palette.js:651
+#: js/basicblocks.js:1331
+msgid "show"
+msgstr "הצג"
+
+#: js/palette.js:653
+#: js/palette.js:654
+msgid "popout"
+msgstr ""
+
+#: js/palette.js:1685
+msgid "la"
+msgstr ""
+
+#: js/palette.js:1705
+msgid "mi"
+msgstr ""
+
+#: js/palette.js:1705
+msgid "re"
+msgstr ""
+
+#: js/basicblocks.js:74
+msgid "current pitch name"
+msgstr ""
+
+#: js/basicblocks.js:83
+msgid "current pitch octave"
+msgstr ""
+
+#: js/basicblocks.js:92
+msgid "square"
+msgstr ""
+
+#: js/basicblocks.js:100
+msgid "triangle"
+msgstr ""
+
+#: js/basicblocks.js:108
+msgid "sine"
+msgstr ""
+
+#: js/basicblocks.js:116
+msgid "sawtooth"
+msgstr ""
+
+#: js/basicblocks.js:125
+msgid "transposition"
+msgstr ""
+
+#: js/basicblocks.js:132
+msgid "turtle pitch number"
+msgstr ""
+
+#: js/basicblocks.js:140
+msgid "number to pitch"
+msgstr ""
+
+#: js/basicblocks.js:148
+msgid "number to octave"
+msgstr ""
+
+#: js/basicblocks.js:170
+msgid "invert"
+msgstr ""
+
+#: js/basicblocks.js:170
+#: js/basicblocks.js:424
+#: js/basicblocks.js:1309
+#: plugins/rodi.rtp:170
+msgid "note"
+msgstr "הערה"
+
+#: js/basicblocks.js:170
+#: js/basicblocks.js:204
+#: js/basicblocks.js:1309
+msgid "octave"
+msgstr ""
+
+#: js/basicblocks.js:182
+msgid "adjust transposition"
+msgstr ""
+
+#: js/basicblocks.js:190
+msgid "flat"
+msgstr ""
+
+#: js/basicblocks.js:197
+msgid "sharp"
+msgstr ""
+
+#: js/basicblocks.js:217
+msgid "1/64 note"
+msgstr ""
+
+#: js/basicblocks.js:224
+msgid "1/32 note"
+msgstr ""
+
+#: js/basicblocks.js:231
+msgid "1/16 note"
+msgstr ""
+
+#: js/basicblocks.js:238
+msgid "eighth note"
+msgstr ""
+
+#: js/basicblocks.js:245
+msgid "quarter note"
+msgstr ""
+
+#: js/basicblocks.js:252
+msgid "half note"
+msgstr ""
+
+#: js/basicblocks.js:259
+msgid "whole note"
+msgstr ""
+
+#: js/basicblocks.js:267
+msgid "tuplet"
+msgstr ""
+
+#: js/basicblocks.js:267
+#: js/basicblocks.js:277
+msgid "number of notes"
+msgstr ""
+
+#: js/basicblocks.js:289
+msgid "pitch-time matrix"
+msgstr ""
+
+#: js/basicblocks.js:298
+msgid "turtle note"
+msgstr ""
+
+#: js/basicblocks.js:306
+msgid "duplicate factor"
+msgstr ""
+
+#: js/basicblocks.js:313
+msgid "skip factor"
+msgstr ""
+
+#: js/basicblocks.js:320
+msgid "beat factor"
+msgstr ""
+
+#: js/basicblocks.js:327
+#: js/basicblocks.js:349
+msgid "beats per minute"
+msgstr ""
+
+#: js/basicblocks.js:334
+msgid "free time"
+msgstr ""
+
+#: js/basicblocks.js:341
+msgid "osctime"
+msgstr ""
+
+#: js/basicblocks.js:357
+msgid "skip notes"
+msgstr ""
+
+#: js/basicblocks.js:365
+msgid "duplicate notes"
+msgstr ""
+
+#: js/basicblocks.js:373
+msgid "multiply beat"
+msgstr ""
+
+#: js/basicblocks.js:381
+msgid "divide beat"
+msgstr ""
+
+#: js/basicblocks.js:389
+msgid "tie"
+msgstr ""
+
+#: js/basicblocks.js:396
+msgid "dot"
+msgstr ""
+
+#: js/basicblocks.js:403
+msgid "silence"
+msgstr ""
+
+#: js/basicblocks.js:436
+#: js/basicblocks.js:519
+msgid "set volume"
+msgstr ""
+
+#: js/basicblocks.js:444
+msgid "staccato factor"
+msgstr ""
+
+#: js/basicblocks.js:451
+msgid "slur factor"
+msgstr ""
+
+#: js/basicblocks.js:458
+msgid "note volume"
+msgstr ""
+
+#: js/basicblocks.js:467
+msgid "play forward"
+msgstr ""
+
+#: js/basicblocks.js:476
+msgid "play backward"
+msgstr ""
+
+#: js/basicblocks.js:483
 msgid "key"
+msgstr ""
+
+#: js/basicblocks.js:490
+msgid "set key"
+msgstr ""
+
+#: js/basicblocks.js:500
+msgid "meter"
+msgstr ""
+
+#: js/basicblocks.js:500
+msgid "numerator"
+msgstr ""
+
+#: js/basicblocks.js:500
+msgid "denominator"
+msgstr ""
+
+#: js/basicblocks.js:511
+msgid "articulation"
+msgstr ""
+
+#: js/basicblocks.js:527
+msgid "crescendo"
+msgstr ""
+
+#: js/basicblocks.js:535
+msgid "thirds"
+msgstr ""
+
+#: js/basicblocks.js:542
+msgid "fourths"
+msgstr ""
+
+#: js/basicblocks.js:549
+msgid "tritone"
+msgstr ""
+
+#: js/basicblocks.js:556
+msgid "fifths"
+msgstr ""
+
+#: js/basicblocks.js:563
+msgid "swing"
+msgstr ""
+
+#: js/basicblocks.js:571
+msgid "slur"
+msgstr ""
+
+#: js/basicblocks.js:579
+msgid "staccato"
+msgstr ""
+
+#: js/basicblocks.js:589
+msgid "heading"
+msgstr "כיוון (אזימוט)"
+
+#: js/basicblocks.js:596
+#: js/basicblocks.js:635
+msgid "x"
+msgstr "x"
+
+#: js/basicblocks.js:603
+#: js/basicblocks.js:635
+msgid "y"
+msgstr "y"
+
+#: js/basicblocks.js:617
+msgid "arc"
+msgstr "קשת"
+
+#: js/basicblocks.js:617
+msgid "angle"
+msgstr "זווית"
+
+#: js/basicblocks.js:617
+msgid "radius"
+msgstr "רדיוס"
+
+#: js/basicblocks.js:627
+msgid "set heading"
+msgstr "קבע אזימוט (כיוון)"
+
+#: js/basicblocks.js:635
+msgid "set xy"
+msgstr "XY קבע ערך"
+
+#: js/basicblocks.js:645
+#: plugins/rodi.rtp:59
+msgid "right"
+msgstr "ימינה"
+
+#: js/basicblocks.js:653
+#: plugins/rodi.rtp:58
+msgid "left"
+msgstr "שמאלה"
+
+#: js/basicblocks.js:669
+msgid "forward"
+msgstr "קדימה"
+
+#: js/basicblocks.js:680
+#: js/basicblocks.js:724
+msgid "background"
+msgstr "מלא מסך"
+
+#: js/basicblocks.js:687
+msgid "color"
+msgstr "צבע"
+
+#: js/basicblocks.js:694
+msgid "shade"
+msgstr "גוון"
+
+#: js/basicblocks.js:701
+msgid "grey"
+msgstr "אפור"
+
+#: js/basicblocks.js:708
+msgid "pen size"
+msgstr "עובי עט"
+
+#: js/basicblocks.js:715
+msgid "set font"
+msgstr ""
+
+#: js/basicblocks.js:731
+msgid "hollow line"
+msgstr ""
+
+#: js/basicblocks.js:738
+msgid "fill"
+msgstr ""
+
+#: js/basicblocks.js:745
+msgid "pen up"
+msgstr "הרם עט"
+
+#: js/basicblocks.js:752
+msgid "pen down"
+msgstr "הורד עט"
+
+#: js/basicblocks.js:759
+msgid "set pen size"
+msgstr "קבע עובי עט"
+
+#: js/basicblocks.js:767
+msgid "set translucency"
+msgstr ""
+
+#: js/basicblocks.js:775
+msgid "set hue"
+msgstr "קבע צבע"
+
+#: js/basicblocks.js:783
+msgid "set shade"
+msgstr "קבע גוון"
+
+#: js/basicblocks.js:791
+msgid "set grey"
+msgstr "קבע אפור"
+
+#: js/basicblocks.js:799
+msgid "set color"
+msgstr "קבע צבע"
+
+#: js/basicblocks.js:809
+msgid "int"
+msgstr ""
+
+#: js/basicblocks.js:845
+msgid "and"
+msgstr "וגם"
+
+#: js/basicblocks.js:852
+msgid "or"
+msgstr "או"
+
+#: js/basicblocks.js:859
+msgid "not"
+msgstr "לא"
+
+#: js/basicblocks.js:865
+msgid "mod"
+msgstr "mod"
+
+#: js/basicblocks.js:873
+msgid "sqrt"
+msgstr "שורש ריבועי"
+
+#: js/basicblocks.js:923
+msgid "one of"
+msgstr "אחד מ"
+
+#: js/basicblocks.js:923
+msgid "this"
+msgstr "זה"
+
+#: js/basicblocks.js:923
+msgid "that"
+msgstr "זה"
+
+#: js/basicblocks.js:934
+msgid "random"
+msgstr "מספר אקראי"
+
+#: js/basicblocks.js:934
+msgid "min"
+msgstr "מינימום"
+
+#: js/basicblocks.js:934
+msgid "max"
+msgstr "מקסימום"
+
+#: js/basicblocks.js:949
+msgid "add 1 to"
+msgstr "הוסף 1 ל"
+
+#: js/basicblocks.js:956
+msgid "add"
+msgstr "הוסף"
+
+#: js/basicblocks.js:956
+#: plugins/finance.rtp:28
+msgid "to"
+msgstr "אל"
+
+#: js/basicblocks.js:1000
+#: js/basicblocks.js:1047
+#: js/basicblocks.js:1064
+#: js/basicblocks.js:1102
+#: js/basicblocks.js:1383
+#: js/basicblocks.js:1390
+msgid "do"
+msgstr "בצע"
+
+#: js/basicblocks.js:1009
+msgid "return"
+msgstr ""
+
+#: js/basicblocks.js:1019
+msgid "return to URL"
+msgstr ""
+
+#: js/basicblocks.js:1023
+msgid "100"
+msgstr ""
+
+#: js/basicblocks.js:1029
+#: js/basicblocks.js:1055
+#: js/basicblocks.js:1074
+msgid "calculate"
+msgstr ""
+
+#: js/basicblocks.js:1102
+msgid "on"
+msgstr ""
+
+#: js/basicblocks.js:1102
+#: js/basicblocks.js:1105
+#: js/basicblocks.js:1116
+msgid "event"
+msgstr ""
+
+#: js/basicblocks.js:1113
+msgid "broadcast"
+msgstr ""
+
+#: js/basicblocks.js:1158
+msgid "load heap from App"
+msgstr ""
+
+#: js/basicblocks.js:1169
+msgid "save heap to App"
+msgstr ""
+
+#: js/basicblocks.js:1180
+msgid "set heap"
+msgstr ""
+
+#: js/basicblocks.js:1180
+msgid "index"
+msgstr ""
+
+#: js/basicblocks.js:1191
+#: plugins/heap.rtp:126
+msgid "show heap"
+msgstr "הצג מחסנית FILO"
+
+#: js/basicblocks.js:1198
+msgid "heap length"
+msgstr ""
+
+#: js/basicblocks.js:1206
+#: plugins/heap.rtp:134
+msgid "heap empty?"
+msgstr ""
+
+#: js/basicblocks.js:1220
+#: plugins/heap.rtp:150
+msgid "save heap"
+msgstr "שמור FILO"
+
+#: js/basicblocks.js:1229
+#: plugins/heap.rtp:160
+msgid "load heap"
+msgstr "פתח FILO"
+
+#: js/basicblocks.js:1238
+msgid "index heap"
+msgstr ""
+
+#: js/basicblocks.js:1247
+#: plugins/heap.rtp:109
+msgid "push"
+msgstr "דחוף\\שמור ערך"
+
+#: js/basicblocks.js:1255
+#: plugins/heap.rtp:118
+msgid "pop"
+msgstr "שלוף\\טען ערך"
+
+#: js/basicblocks.js:1264
+msgid "speak"
+msgstr "דבר"
+
+#: js/basicblocks.js:1292
+msgid "stop media"
+msgstr "הפסק מדיה"
+
+#: js/basicblocks.js:1299
+msgid "frequency"
+msgstr ""
+
+#: js/basicblocks.js:1299
+msgid "duration (ms)"
+msgstr ""
+
+#: js/basicblocks.js:1309
+msgid "note to frequency"
+msgstr ""
+
+#: js/basicblocks.js:1320
+msgid "shell"
+msgstr "שריון"
+
+#: js/basicblocks.js:1320
+#: js/basicblocks.js:1331
+msgid "size"
+msgstr "גודל"
+
+#: js/basicblocks.js:1320
+msgid "image"
+msgstr "תמונה"
+
+#: js/basicblocks.js:1331
+msgid "obj"
+msgstr "אובייקט"
+
+#: js/basicblocks.js:1369
+msgid "stop"
+msgstr "עצור"
+
+#: js/basicblocks.js:1376
+msgid "wait for"
+msgstr "לחכות ל"
+
+#: js/basicblocks.js:1383
+msgid "until"
+msgstr "עד_ש"
+
+#: js/basicblocks.js:1390
+msgid "while"
+msgstr "כל-עוד"
+
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1404
+msgid "if"
+msgstr "אם"
+
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1404
+msgid "then"
+msgstr "אז"
+
+#: js/basicblocks.js:1397
+msgid "else"
+msgstr "ואם לא"
+
+#: js/basicblocks.js:1411
+msgid "forever"
+msgstr "תמיד"
+
+#: js/basicblocks.js:1418
+msgid "repeat"
+msgstr "חזור"
+
+#: js/basicblocks.js:1430
+#: js/basicblocks.js:1441
+#: js/basicblocks.js:1450
+#: js/basicblocks.js:1460
+#: js/basicblocks.js:1468
+#: js/basicblocks.js:1477
+#: js/basicblocks.js:1487
+msgid "unknown"
+msgstr "לא ידוע"
+
+#: js/basicblocks.js:1498
+msgid "play back"
+msgstr "נגן"
+
+#: js/basicblocks.js:1506
+msgid "stop play"
+msgstr "הפסקת נגן"
+
+#: js/basicblocks.js:1513
+msgid "loudness"
+msgstr "עוצמת קול"
+
+#: js/basicblocks.js:1520
+msgid "save as lilypond"
+msgstr ""
+
+#: js/basicblocks.js:1523
+#: js/basicblocks.js:1532
+msgid "title"
+msgstr "כותרת"
+
+#: js/basicblocks.js:1529
+msgid "save svg"
+msgstr "שמור SVG"
+
+#: js/basicblocks.js:1538
+#: plugins/turtle.rtp:42
+msgid "turtle x"
+msgstr "צב x"
+
+#: js/basicblocks.js:1547
+#: plugins/turtle.rtp:52
+msgid "turtle y"
+msgstr "y צב"
+
+#: js/basicblocks.js:1556
+#: plugins/turtle.rtp:62
+msgid "start turtle"
+msgstr "התחל צב"
+
+#: js/basicblocks.js:1565
+#: plugins/turtle.rtp:72
+msgid "stop turtle"
+msgstr "עצור צב"
+
+#: js/basicblocks.js:1574
+msgid "no background"
+msgstr "ללא רקע"
+
+#: js/basicblocks.js:1581
+msgid "show blocks"
+msgstr "הראה בלוקים"
+
+#: js/basicblocks.js:1588
+msgid "hide blocks"
+msgstr "הסתר בלוקים"
+
+#: js/basicblocks.js:1595
+msgid "open project"
+msgstr ""
+
+#: js/basicblocks.js:1619
+msgid "wait"
+msgstr "המתן"
+
+#: js/basicblocks.js:1627
+msgid "print"
+msgstr "הודעה"
+
+#: js/basicblocks.js:1635
+#: js/basicblocks.js:1643
+#: plugins/turtle.rtp:82
+msgid "turtle name"
+msgstr "שם צב"
+
+#: js/basicblocks.js:1644
+#: plugins/translate.rtp:95
+#: plugins/turtle.rtp:83
+msgid "source"
+msgstr "מקור"
+
+#: js/basicblocks.js:1645
+#: plugins/translate.rtp:95
+#: plugins/turtle.rtp:84
+msgid "target"
+msgstr "יעד"
+
+#: js/basicblocks.js:1659
+msgid "click"
+msgstr ""
+
+#: js/basicblocks.js:1667
+msgid "pixel color"
+msgstr "צבע פיקסל"
+
+#: js/basicblocks.js:1674
+msgid "time"
+msgstr "זמן"
+
+#: js/basicblocks.js:1681
+msgid "mouse x"
+msgstr "עכבר x"
+
+#: js/basicblocks.js:1689
+msgid "mouse y"
+msgstr "עכבר y"
+
+#: js/basicblocks.js:1697
+msgid "mouse button"
+msgstr "כפתור לחוץ"
+
+#: js/basicblocks.js:1704
+msgid "keyboard"
+msgstr "קלט מקלדת"
+
+#: js/basicblocks.js:1713
+msgid "eval"
+msgstr ""
+
+#: plugins/gmap.rtp:30
+msgid "city latitude"
+msgstr "קו רוחב של עיר"
+
+#: plugins/gmap.rtp:40
+msgid "city longitude"
+msgstr "קו אורך של עיר"
+
+#: plugins/gmap.rtp:71
+#: plugins/gmap.rtp:74
+#: plugins/gmap.rtp:104
+#: plugins/gmap.rtp:107
+msgid "Coordinate data not available."
+msgstr "נתוני הקואורדינטות אינם זמינים"
+
+#: plugins/gmap.rtp:116
+msgid "Google map"
+msgstr "גוגל מפות"
+
+#: plugins/gmap.rtp:116
+#: plugins/gmap.rtp:160
+msgid "coordinates"
+msgstr "קואורדינטות"
+
+#: plugins/gmap.rtp:116
+msgid "zoom factor"
+msgstr "גורם זום"
+
+#: plugins/gmap.rtp:144
+msgid "zoom"
+msgstr "זום"
+
+#: plugins/gmap.rtp:160
+msgid "latitude"
+msgstr "קו רוחב"
+
+#: plugins/gmap.rtp:160
+msgid "longitude"
+msgstr "קו אורך"
+
+#: plugins/dictionary.rtp:25
+msgid "define"
+msgstr "הגדר"
+
+#: plugins/bitcoin.rtp:27
+msgid "bitcoin"
+msgstr "ביטקוין"
+
+#: plugins/bitcoin.rtp:27
+#: plugins/finance.rtp:28
+msgid "from"
+msgstr "מ"
+
+#: plugins/maths.rtp:47
+msgid "power"
+msgstr "כוח"
+
+#: plugins/maths.rtp:47
+msgid "base"
+msgstr "בסיס"
+
+#: plugins/maths.rtp:47
+msgid "exp"
+msgstr "ביטוי"
+
+#: plugins/maths.rtp:69
+msgid "floor"
+msgstr "רצפה"
+
+#: plugins/maths.rtp:71
+msgid "ceiling"
+msgstr "תקרה"
+
+#: plugins/maths.rtp:74
+msgid "degrees"
+msgstr "מעלות"
+
+#: plugins/maths.rtp:74
+msgid "to degrees"
+msgstr "למעלות"
+
+#: plugins/maths.rtp:76
+msgid "radians"
+msgstr "רדיאנים"
+
+#: plugins/maths.rtp:76
+msgid "to radians"
+msgstr "לרדיאנים"
+
+#: plugins/heap.rtp:81
+#: plugins/heap.rtp:85
+msgid "You need to select a file."
+msgstr ""
+
+#: plugins/translate.rtp:73
+msgid "translate"
+msgstr "תרגם"
+
+#: plugins/translate.rtp:78
+#: plugins/translate.rtp:89
+msgid "hello"
+msgstr "שלום"
+
+#: plugins/translate.rtp:84
+msgid "detect lang"
+msgstr "זיהוי שפה"
+
+#: plugins/translate.rtp:95
+msgid "set lang"
+msgstr "קבע שפה"
+
+#: plugins/rodi.rtp:30
+msgid "blink (ms)"
+msgstr ""
+
+#: plugins/rodi.rtp:129
+msgid "move"
+msgstr "זוז"
+
+#: plugins/rodi.rtp:91
+msgid "sense left"
+msgstr ""
+
+#: plugins/rodi.rtp:130
+msgid "sense right"
+msgstr ""
+
+#: plugins/rodi.rtp:169
+msgid "sing"
+msgstr "לשיר"
+
+#: plugins/rodi.rtp:183
+msgid "duration"
+msgstr "משך זמן"
+
+#: plugins/rodi.rtp:203
+msgid "see distance"
+msgstr ""
+
+#: plugins/finance.rtp:28
+msgid "currency"
+msgstr "מטבע"
+
+#: plugins/finance.rtp:69
+msgid "stock price"
+msgstr "מחיר מניה"
+
+#: plugins/facebook.rtp:27
+msgid "publish"
+msgstr "פרסום"
+
+#: plugins/facebook.rtp:30
+msgid "comment"
+msgstr "הערה"
+
+#: plugins/weather.rtp:62
+#: plugins/weather.rtp:86
+msgid "Days ahead must be in the range of -1 to 5."
+msgstr ""
+
+#: plugins/weather.rtp:107
+msgid "forecast"
+msgstr "תחזית מזג אוויר"
+
+#: plugins/weather.rtp:108
+#: plugins/weather.rtp:122
+#: plugins/weather.rtp:135
+msgid "city"
+msgstr "עיר"
+
+#: plugins/weather.rtp:109
+#: plugins/weather.rtp:123
+#: plugins/weather.rtp:136
+msgid "day"
+msgstr "יום"
+
+#: plugins/weather.rtp:121
+msgid "high"
+msgstr "גבוה"
+
+#: plugins/weather.rtp:134
+msgid "low"
+msgstr "נמוך"
+
+#: plugins/nutrition.rtp:104
+msgid "get calories"
+msgstr "קבל קלוריות"
+
+#: plugins/nutrition.rtp:107
+msgid "get protein"
+msgstr "קבל חלבון"
+
+#: plugins/nutrition.rtp:110
+msgid "get carbs"
+msgstr "קבל קלפים"
+
+#: plugins/nutrition.rtp:113
+msgid "get fiber"
+msgstr "קבל סיבים"
+
+#: plugins/nutrition.rtp:116
+msgid "get fat"
+msgstr "קבל שומן"
+
+#: plugins/nutrition.rtp:119
+msgid "get name"
+msgstr "קבל שם"
+
+#: plugins/nutrition.rtp:122
+msgid "calories"
+msgstr "קלוריות"
+
+#: plugins/nutrition.rtp:128
+msgid "protein"
+msgstr "חלבון"
+
+#: plugins/nutrition.rtp:134
+msgid "carbs"
+msgstr "קלפים"
+
+#: plugins/nutrition.rtp:140
+msgid "fiber"
+msgstr "סיבים"
+
+#: plugins/nutrition.rtp:146
+msgid "fat"
+msgstr "שומן"
+
+#: plugins/nutrition.rtp:152
+msgid "eat"
+msgstr "לאכול"
+
+#: plugins/nutrition.rtp:155
+msgid "digest meal"
+msgstr "לעכל"
+
+#: plugins/nutrition.rtp:158
+msgid "apple"
+msgstr "תפוח"
+
+#: plugins/nutrition.rtp:161
+msgid "banana"
+msgstr "בננה"
+
+#: plugins/nutrition.rtp:164
+msgid "orange"
+msgstr "תפוז"
+
+#: plugins/nutrition.rtp:167
+msgid "wheat bread"
+msgstr "לחם"
+
+#: plugins/nutrition.rtp:170
+msgid "corn"
+msgstr "תירס"
+
+#: plugins/nutrition.rtp:173
+msgid "potato"
+msgstr "תַפּוּד"
+
+#: plugins/nutrition.rtp:176
+msgid "sweet potato"
+msgstr "בַּטָטָה"
+
+#: plugins/nutrition.rtp:179
+msgid "tomato"
+msgstr "עגבניות"
+
+#: plugins/nutrition.rtp:182
+msgid "broccoli"
+msgstr "ברוקולי"
+
+#: plugins/nutrition.rtp:185
+msgid "rice and beans"
+msgstr "אורז ושעועית"
+
+#: plugins/nutrition.rtp:188
+msgid "tamale"
+msgstr ""
+
+#: plugins/nutrition.rtp:191
+msgid "cheese"
+msgstr "גבינה"
+
+#: plugins/nutrition.rtp:194
+msgid "chicken"
+msgstr "עוף"
+
+#: plugins/nutrition.rtp:197
+msgid "fish"
+msgstr "דג"
+
+#: plugins/nutrition.rtp:200
+msgid "beef"
+msgstr "בשר בקר"
+
+#: plugins/nutrition.rtp:203
+msgid "cake"
+msgstr "עוגה"
+
+#: plugins/nutrition.rtp:206
+msgid "cookie"
+msgstr "עוגייה"
+
+#: plugins/nutrition.rtp:209
+msgid "water"
+msgstr "מים"
+
+#: plugins/accelerometer.rtp:48
+msgid "motion x"
+msgstr "x תנועת"
+
+#: plugins/accelerometer.rtp:56
+msgid "motion y"
+msgstr "y תנועת"
+
+#: plugins/accelerometer.rtp:64
+msgid "motion z"
+msgstr "z תנועת"
+
+#: plugins/gmap.rtp:30
+msgid "city latitude"
+msgstr "קו רוחב של עיר"
+
+#: plugins/gmap.rtp:40
+msgid "city longitude"
+msgstr "קו אורך של עיר"
+
+#: plugins/gmap.rtp:71
+#: plugins/gmap.rtp:74
+#: plugins/gmap.rtp:104
+#: plugins/gmap.rtp:107
+msgid "Coordinate data not available."
+msgstr "נתוני הקואורדינטות אינם זמינים"
+
+#: plugins/gmap.rtp:116
+msgid "Google map"
+msgstr "גוגל מפות"
+
+#: plugins/gmap.rtp:116
+#: plugins/gmap.rtp:160
+msgid "coordinates"
+msgstr "קואורדינטות"
+
+#: plugins/gmap.rtp:116
+msgid "zoom factor"
+msgstr "גורם זום"
+
+#: plugins/gmap.rtp:144
+msgid "zoom"
+msgstr "זום"
+
+#: plugins/gmap.rtp:160
+msgid "latitude"
+msgstr "קו רוחב"
+
+#: plugins/gmap.rtp:160
+msgid "longitude"
+msgstr "קו אורך"
+
+#: plugins/dictionary.rtp:25
+msgid "define"
+msgstr "הגדר"
+
+#: plugins/bitcoin.rtp:27
+msgid "bitcoin"
+msgstr "ביטקוין"
+
+#: plugins/bitcoin.rtp:27
+#: plugins/finance.rtp:28
+msgid "from"
+msgstr "מ"
+
+#: plugins/maths.rtp:47
+msgid "power"
+msgstr "כוח"
+
+#: plugins/maths.rtp:47
+msgid "base"
+msgstr "בסיס"
+
+#: plugins/maths.rtp:47
+msgid "exp"
+msgstr "ביטוי"
+
+#: plugins/maths.rtp:69
+msgid "floor"
+msgstr "רצפה"
+
+#: plugins/maths.rtp:71
+msgid "ceiling"
+msgstr "תקרה"
+
+#: plugins/maths.rtp:74
+msgid "degrees"
+msgstr "מעלות"
+
+#: plugins/maths.rtp:74
+msgid "to degrees"
+msgstr "למעלות"
+
+#: plugins/maths.rtp:76
+msgid "radians"
+msgstr "רדיאנים"
+
+#: plugins/maths.rtp:76
+msgid "to radians"
+msgstr "לרדיאנים"
+
+#: plugins/heap.rtp:81
+#: plugins/heap.rtp:85
+msgid "You need to select a file."
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "fetch"
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "UID"
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "field"
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "hours ago"
+msgstr ""
+
+#: plugins/impact.rtp:63
+#: plugins/impact.rtp:127
+msgid "Impact data not available."
+msgstr ""
+
+#: plugins/impact.rtp:69
+msgid "Cannot parse Impact data."
+msgstr ""
+
+#: plugins/impact.rtp:100
+#: plugins/impact.rtp:114
+msgid "Impact field not found."
+msgstr ""
+
+#: plugins/impact.rtp:122
+msgid "Impact UID not found."
+msgstr ""
+
+#: plugins/impact.rtp:124
+msgid "Impact Time not found."
+msgstr ""
+
+#: plugins/translate.rtp:73
+msgid "translate"
+msgstr "תרגם"
+
+#: plugins/translate.rtp:78
+#: plugins/translate.rtp:89
+msgid "hello"
+msgstr "שלום"
+
+#: plugins/translate.rtp:84
+msgid "detect lang"
+msgstr "זיהוי שפה"
+
+#: plugins/translate.rtp:95
+msgid "set lang"
+msgstr "קבע שפה"
+
+#: plugins/rodi.rtp:110
+msgid "blink"
+msgstr ""
+
+#: plugins/rodi.rtp:129
+msgid "move"
+msgstr "זוז"
+
+#: plugins/rodi.rtp:153
+msgid "infrared light (left)"
+msgstr ""
+
+#: plugins/rodi.rtp:167
+msgid "infrared light (right)"
+msgstr ""
+
+#: plugins/rodi.rtp:181
+msgid "play"
+msgstr ""
+
+#: plugins/rodi.rtp:183
+msgid "duration"
+msgstr "משך זמן"
+
+#: plugins/rodi.rtp:206
+msgid "distance"
+msgstr ""
+
+#: plugins/rodi.rtp:292
+msgid "red"
+msgstr ""
+
+#: plugins/rodi.rtp:293
+msgid "green"
+msgstr ""
+
+#: plugins/rodi.rtp:294
+msgid "blue"
+msgstr ""
+
+#: plugins/rodi.rtp:321
+msgid "light intensity"
+msgstr ""
+
+#: plugins/rodi.rtp:338
+msgid "led"
+msgstr ""
+
+#: plugins/finance.rtp:28
+msgid "currency"
+msgstr "מטבע"
+
+#: plugins/finance.rtp:69
+msgid "stock price"
+msgstr "מחיר מניה"
+
+#: plugins/facebook.rtp:27
+msgid "publish"
+msgstr "פרסום"
+
+#: plugins/facebook.rtp:30
+msgid "comment"
+msgstr "הערה"
+
+#: plugins/weather.rtp:62
+#: plugins/weather.rtp:86
+msgid "Days ahead must be in the range of -1 to 5."
+msgstr ""
+
+#: plugins/weather.rtp:107
+msgid "forecast"
+msgstr "תחזית מזג אוויר"
+
+#: plugins/weather.rtp:108
+#: plugins/weather.rtp:122
+#: plugins/weather.rtp:135
+msgid "city"
+msgstr "עיר"
+
+#: plugins/weather.rtp:109
+#: plugins/weather.rtp:123
+#: plugins/weather.rtp:136
+msgid "day"
+msgstr "יום"
+
+#: plugins/weather.rtp:121
+msgid "high"
+msgstr "גבוה"
+
+#: plugins/weather.rtp:134
+msgid "low"
+msgstr "נמוך"
+
+#: plugins/nutrition.rtp:104
+msgid "get calories"
+msgstr "קבל קלוריות"
+
+#: plugins/nutrition.rtp:107
+msgid "get protein"
+msgstr "קבל חלבון"
+
+#: plugins/nutrition.rtp:110
+msgid "get carbs"
+msgstr "קבל קלפים"
+
+#: plugins/nutrition.rtp:113
+msgid "get fiber"
+msgstr "קבל סיבים"
+
+#: plugins/nutrition.rtp:116
+msgid "get fat"
+msgstr "קבל שומן"
+
+#: plugins/nutrition.rtp:119
+msgid "get name"
+msgstr "קבל שם"
+
+#: plugins/nutrition.rtp:122
+msgid "calories"
+msgstr "קלוריות"
+
+#: plugins/nutrition.rtp:128
+msgid "protein"
+msgstr "חלבון"
+
+#: plugins/nutrition.rtp:134
+msgid "carbs"
+msgstr "קלפים"
+
+#: plugins/nutrition.rtp:140
+msgid "fiber"
+msgstr "סיבים"
+
+#: plugins/nutrition.rtp:146
+msgid "fat"
+msgstr "שומן"
+
+#: plugins/nutrition.rtp:152
+msgid "eat"
+msgstr "לאכול"
+
+#: plugins/nutrition.rtp:155
+msgid "digest meal"
+msgstr "לעכל"
+
+#: plugins/nutrition.rtp:158
+msgid "apple"
+msgstr "תפוח"
+
+#: plugins/nutrition.rtp:161
+msgid "banana"
+msgstr "בננה"
+
+#: plugins/nutrition.rtp:164
+msgid "orange"
+msgstr "תפוז"
+
+#: plugins/nutrition.rtp:167
+msgid "wheat bread"
+msgstr "לחם"
+
+#: plugins/nutrition.rtp:170
+msgid "corn"
+msgstr "תירס"
+
+#: plugins/nutrition.rtp:173
+msgid "potato"
+msgstr "תַפּוּד"
+
+#: plugins/nutrition.rtp:176
+msgid "sweet potato"
+msgstr "בַּטָטָה"
+
+#: plugins/nutrition.rtp:179
+msgid "tomato"
+msgstr "עגבניות"
+
+#: plugins/nutrition.rtp:182
+msgid "broccoli"
+msgstr "ברוקולי"
+
+#: plugins/nutrition.rtp:185
+msgid "rice and beans"
+msgstr "אורז ושעועית"
+
+#: plugins/nutrition.rtp:188
+msgid "tamale"
+msgstr ""
+
+#: plugins/nutrition.rtp:191
+msgid "cheese"
+msgstr "גבינה"
+
+#: plugins/nutrition.rtp:194
+msgid "chicken"
+msgstr "עוף"
+
+#: plugins/nutrition.rtp:197
+msgid "fish"
+msgstr "דג"
+
+#: plugins/nutrition.rtp:200
+msgid "beef"
+msgstr "בשר בקר"
+
+#: plugins/nutrition.rtp:203
+msgid "cake"
+msgstr "עוגה"
+
+#: plugins/nutrition.rtp:206
+msgid "cookie"
+msgstr "עוגייה"
+
+#: plugins/nutrition.rtp:209
+msgid "water"
+msgstr "מים"
+
+#: plugins/accelerometer.rtp:48
+msgid "motion x"
+msgstr "x תנועת"
+
+#: plugins/accelerometer.rtp:56
+msgid "motion y"
+msgstr "y תנועת"
+
+#: plugins/accelerometer.rtp:64
+msgid "motion z"
+msgstr "z תנועת"
+
+#. TRANS: mashape webservices (probably no need to translate)
+msgid "mashape"
 msgstr ""
 
 msgid "logic"
 msgstr "לוגיקה"
 
-msgid "1/16 note"
-msgstr ""
+msgid "maths"
+msgstr "מתמטיקה"
 
-msgid "comment"
-msgstr "הערה"
+msgid "food"
+msgstr "מזון"
 
-#. TRANS: audio (as in musical note)
-msgid "tone"
-msgstr ""
+msgid "eatme"
+msgstr "לאכול"
 
-#. TRANS: robot sensors.
-msgid "infrared light (left)"
-msgstr ""
-
-msgid "Click to run the music note by note."
-msgstr ""
-
-#. TRANS: pop a value off of the heap.
-msgid "pop"
-msgstr "שלוף\\טען ערך"
-
-msgid "pen size"
-msgstr "עובי עט"
-
-msgid "Clear the screen and return the turtles to their initial positions."
-msgstr "נקה את המסך והחזר את הצבים למיקום הראשוני"
-
-msgid "speak"
-msgstr "דבר"
-
-msgid "sine"
-msgstr ""
-
-msgid "beef"
-msgstr "בשר בקר"
-
-#. TRANS: source language for translation
-msgid "source"
-msgstr "מקור"
-
-msgid "invert"
-msgstr ""
-
-msgid "end hollow line"
-msgstr "סיים קו"
-
-msgid "define"
-msgstr "הגדר"
-
-#. TRANS: sawtooth wave
-msgid "sawtooth"
-msgstr ""
-
-#. TRANS: slurring of notes in music
-msgid "skip factor"
-msgstr ""
-
-msgid "turtle name"
-msgstr "שם צב"
-
-msgid "else"
-msgstr "ואם לא"
-
-msgid "orange"
-msgstr "תפוז"
-
-msgid "begin hollow line"
-msgstr "התחל קו"
-
-msgid "Rhythm Block: Did you mean to use a Note block?"
-msgstr ""
-
-#. TRANS: longitude and latitude coordinate data
-msgid "Coordinate data not available."
-msgstr "נתוני הקואורדינטות אינם זמינים"
-
-msgid "Click to run the project step by step."
-msgstr "לחצו כדי להריץ את הפרויקט צעד אחרי צעד"
-
-#. TRANS: the value of a variable (stored in a box)
-msgid "value"
-msgstr "ערך"
-
-#. TRANS: vertical space
-msgid "vspace"
-msgstr ""
-
-msgid "open file"
-msgstr "פתיחת קובץ"
-
-msgid "Open"
-msgstr "פתיחה"
-
-#. TRANS: grey refers to chroma (grey to vivid)
-msgid "set grey"
-msgstr "קבע אפור"
-
-msgid "Run step by step"
-msgstr "הרצה צעד אחרי צעד"
-
-msgid "protein"
-msgstr "חלבון"
-
-msgid "if"
-msgstr "אם"
-
-msgid "get fat"
-msgstr "קבל שומן"
-
-msgid "media"
-msgstr "מדיה"
-
-msgid "Stop"
-msgstr "עצור"
-
-#. TRANS: square root
-msgid "sqrt"
-msgstr "שורש ריבועי"
-
-msgid "skip notes"
-msgstr ""
-
-msgid "Palette buttons"
-msgstr "סרגל כלים"
-
-msgid "end fill"
-msgstr "סיים מילוי"
-
-msgid "Copy"
-msgstr "העתק"
-
-msgid "Paste"
-msgstr "הדבק"
-
-msgid "Remove all content on the canvas, including the blocks."
-msgstr "הסר את כל תוכן הקנבס, כולל הבלוקים"
-
-msgid "Polar"
-msgstr "קוארדינטות פולריות"
-
-#. TRANS: empty the heap
-msgid "empty heap"
-msgstr "רוקן מחסנית FILO"
-
-#. TRANS: robot sensors.
-msgid "infrared light (right)"
-msgstr ""
-
-msgid "On my device"
-msgstr "במכשיר שלי"
-
-#. TRANS: the name of a stack of blocks
-msgid "action"
-msgstr "פעולה"
-
-msgid "note value"
-msgstr ""
-
-msgid "Clean"
-msgstr "נקה"
-
-msgid "note volume"
-msgstr ""
-
-msgid "broccoli"
-msgstr "ברוקולי"
-
-#. TRANS: stop playing current media file (movie or audio)
-msgid "stop media"
-msgstr "הפסק מדיה"
-
-msgid "Load project from file"
-msgstr "העלאת פרויקטים מקובץ"
-
-msgid "y"
-msgstr "y"
-
-msgid "set beats per minute"
-msgstr ""
-
-msgid "left"
-msgstr "שמאלה"
-
-msgid "Delete all"
-msgstr "מחק הכל"
-
-msgid "rest"
-msgstr ""
-
-msgid "This button opens a viewer for loading example projects."
-msgstr "כפתור זה פותח מציג להעלאת פרויקטים"
-
-msgid "You can also load projects from the file system."
-msgstr "ניתן להעלות פרויקטים מתוך מערכת הקבצים"
-
-msgid "Run music slow"
-msgstr ""
-
-#. TRANS: unique ID
-msgid "UID"
-msgstr ""
-
-msgid "color"
-msgstr "צבע"
-
-msgid "add"
-msgstr "הוסף"
-
-#. TRANS: music term for dividing the beat into a different number of equal subdivisions
-msgid "tuplet"
-msgstr ""
-
-msgid "Meet Mr. Mouse!"
-msgstr ""
-
-msgid "set font"
-msgstr ""
-
-#. TRANS: a container for a variable
-msgid "boxes"
-msgstr ""
-
-msgid "background"
-msgstr "מלא מסך"
-
-#. TRANS: mathematical modular (remainder) function.
-msgid "mod"
-msgstr "mod"
-
-msgid "zoom"
-msgstr "זום"
-
-msgid "Hide or show the blocks and the palettes."
-msgstr "הצג או הסתר את הבלוקים ואת הכלים"
-
-msgid "show blocks"
-msgstr "הראה בלוקים"
-
-msgid "crescendo"
-msgstr ""
-
-msgid "right"
-msgstr "ימינה"
-
-msgid "one of"
-msgstr "אחד מ"
-
-msgid "Enable scrolling"
-msgstr ""
-
-msgid "back"
-msgstr "אחורה"
-
-msgid "duration"
-msgstr "משך זמן"
-
-msgid "pixel color"
-msgstr "צבע פיקסל"
-
-msgid "get calories"
-msgstr "קבל קלוריות"
-
-msgid "confirm"
-msgstr "אישור"
-
-msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
-
-msgid "staccato"
-msgstr ""
-
-#. TRANS: how many entries are in the heap?
-msgid "heap length"
-msgstr ""
-
-msgid "Load plugin from file"
-msgstr "העלאת פלאגין מקובץ"
-
-#. TRANS: mathematical power, e.g., 2^4 == 16
-msgid "power"
-msgstr "כוח"
-
-#. TRANS: slurring of notes in music
-msgid "slur"
-msgstr ""
-
-msgid "Save stack"
-msgstr "שמור את הקבוצה"
-
-msgid "corn"
-msgstr "תירס"
-
-msgid "Display statistics"
-msgstr "הצג סטטיסטיקות"
-
-#. TRANS: as in "on event do"
-msgid "on"
-msgstr ""
-
-#. TRANS: object
-msgid "obj"
-msgstr "אובייקט"
-
-#. TRANS: store a value in a box
-msgid "store in"
-msgstr "שמור ב"
-
-msgid "numerator"
-msgstr ""
-
-msgid "multiply beat"
-msgstr ""
-
-#. TRANS: logical "or" operator
-msgid "or"
-msgstr "או"
-
-msgid "silence"
-msgstr ""
-
-#. TRANS: lilypond is a language used to generate musical scores.
-msgid "save as lilypond"
-msgstr ""
-
-msgid "image"
-msgstr "תמונה"
-
-msgid "Save project"
-msgstr "שמור פרויקט"
-
-#. TRANS: convert number to pitch
-msgid "number to pitch"
-msgstr ""
-
-msgid "mouse button"
-msgstr "כפתור לחוץ"
-
-#. TRANS: carbohydrates
-msgid "get carbs"
-msgstr "קבל קלפים"
-
-msgid "wait for"
-msgstr "לחכות ל"
-
-msgid "Decrease the size of the blocks."
-msgstr "הקטן את גודל הבלוקים"
-
-msgid "start"
-msgstr "התחל"
-
-msgid "stock price"
-msgstr "מחיר מניה"
-
-#. TRANS: low temperature
-msgid "low"
-msgstr "נמוך"
-
-msgid "forward"
-msgstr "קדימה"
+#: plugins/rodi.rtp:169
+msgid "sing"
+msgstr "לשיר"
 
 msgid "do re mi fa sol la ti"
 msgstr ""
 
-msgid "translate"
-msgstr "תרגם"
+#~msgid "crescendo factor"
+#~msgstr ""
 
-#. TRANS: load the heap from a file
-msgid "load heap"
-msgstr "פתח FILO"
+#~msgid "hspace"
+#~msgstr ""
 
-msgid "Welcome to Music Blocks"
-msgstr ""
+#~msgid "cloud"
+#~msgstr "ענן"
 
-#. TRANS: the heap is a first-in-last-out (FILO) stack
-msgid "heap"
-msgstr ""
+#~msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+#~msgstr ""
 
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
-msgid "begin fill"
-msgstr "התחל מילוי"
+#~msgid "rodi"
+#~msgstr "RoDi"
 
-msgid "eat"
-msgstr "לאכול"
+#~msgid "Save your project to a server."
+#~msgstr "שמור את הפרויקט שלך בשרת"
 
-msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr ""
+#~msgid "blocks"
+#~msgstr "בלוקים"
 
-msgid "city longitude"
-msgstr "קו אורך של עיר"
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "כפתור זה פותח וסוגר את סרגל הכלים הראשי"
 
-msgid "duplicate notes"
-msgstr ""
+#~msgid "Expand/collapse toolbar"
+#~msgstr "הרחב/כווץ את סרגל הכלים"
 
-#. TRANS: musical key, e.g., C Major
-msgid "set key"
-msgstr ""
+#~msgid "end hollow line"
+#~msgstr "סיים קו"
 
-msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr ""
+#~msgid "begin hollow line"
+#~msgstr "התחל קו"
 
-msgid "slur factor"
-msgstr ""
+#~msgid "Rhythm Block: Did you mean to use a Note block?"
+#~msgstr ""
 
-msgid "cake"
-msgstr "עוגה"
+#~msgid "vspace"
+#~msgstr ""
 
-msgid "start drum"
-msgstr ""
+#~msgid "end fill"
+#~msgstr "סיים מילוי"
 
-msgid "Disable scrolling"
-msgstr ""
+#~msgid "Load project from file"
+#~msgstr "העלאת פרויקטים מקובץ"
 
-#. TRANS: set language
-msgid "set lang"
-msgstr "קבע שפה"
+#~msgid "set beats per minute"
+#~msgstr ""
 
-#. TRANS: play media (audio or video)
-msgid "play back"
-msgstr "נגן"
+#~msgid "begin fill"
+#~msgstr "התחל מילוי"
 
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
-msgid "fill"
-msgstr ""
-
-#. TRANS: save project as simple vector graphic (SVG)
-msgid "save svg"
-msgstr "שמור SVG"
-
-#. TRANS: number of notes
-msgid "number of notes"
-msgstr ""
-
-#. TRANS: mathematical floor function, e.g., floor(2.5) == 2
-msgid "floor"
-msgstr "רצפה"
-
-#. TRANS: field of interest in a database, e.g., temperature in a weather database
-msgid "field"
-msgstr ""
-
-msgid "zoom factor"
-msgstr "גורם זום"
-
-msgid "set xy"
-msgstr "XY קבע ערך"
-
-#. TRANS: tying together of notes in music
-msgid "tie"
-msgstr ""
-
-msgid "divide beat"
-msgstr ""
-
-#. TRANS: Mexican tamale
-msgid "tamale"
-msgstr ""
-
-msgid "repeat"
-msgstr "חזור"
-
-#. TRANS: mathematical exponent
-msgid "exp"
-msgstr "ביטוי"
-
-msgid "current pitch octave"
-msgstr ""
-
-msgid "current pitch name"
-msgstr ""
-
-#. TRANS: evaluate Javascript code
-msgid "eval"
-msgstr ""
-
-#. TRANS: carbohydrates
-msgid "carbs"
-msgstr "קלפים"
-
-msgid "potato"
-msgstr "תַפּוּד"
-
-msgid "Stop the music (and the turtles)."
-msgstr ""
-
-msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "לחצו על כפתור זה כדי להרחיב או לצמצם את סרגל כלי העזר"
-
-msgid "extras"
-msgstr "אקסטרה"
-
-msgid "time"
-msgstr "זמן"
-
-#. TRANS: push a value on to the heap.
-msgid "push"
-msgstr "דחוף\\שמור ערך"
-
-msgid "hello"
-msgstr "שלום"
