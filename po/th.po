@@ -2,7 +2,6 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-msgid ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-17 00:31-0400\n"
@@ -15,8 +14,6 @@ msgid ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.5\n"
-
-msgid ""
 
 #: js/activity.js:443
 msgid "Close"
@@ -542,16 +539,33 @@ msgid "Meet Mr. Mouse!"
 msgstr "พบกับคุณหนู"
 
 #: js/turtledefs.js:76
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-msgstr "คุณหนูคือวาทยากรของพวกเรา คุณหนูสนับสนุนให้คุณลองสำรวจ Music Block, The Matrix และการแสดง/สัญกรณ์ ความเป็นไปได้ของ Music Blocks เริ่มทัวร์กันได้เลย"
+msgid "Meet Mr. Mouse!"
+msgstr ""
+
+#: js/turtledefs.js:76
+msgid "Mr. Mouse is our Music Blocks conductor."
+msgstr "คุณหนูคือวาทยากรของพวกเรา"
+
+#: js/turtledefs.js:76
+msgid Mr. Mouse encourages you to explore Music Blocks.
+msgstr "คุณหนูสนับสนุนให้คุณลองสำรวจ Music Block"
+
+#: js/turtledefs.js:76
+msgid "Let us start our tour!"
+msgstr "Music Blocks เริ่มทัวร์กันได้เลย"
 
 #: js/turtledefs.js:77
 msgid "Palette buttons"
 msgstr "ปุ่มเมนูสี"
 
 #: js/turtledefs.js:77
-msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
+#.TRANS Matrix, Notes, Tone, Turtle, and more
+msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
+msgstr "กล่องเครื่องมีนี้มีปุ่มพิกัด โน้ต โทนเต่า และอีกมากมาย"
+
+#: js/turtledefs.js:77
+msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr "คลิ๊กเพื่อแสดงแถบสีของบล๊อกและลากบล๊อกจากแถบสีไปยังแสดงแสดงผล"
 
 #: js/turtledefs.js:78
 msgid "Click to run the project in fast mode."
@@ -630,7 +644,11 @@ msgid "Copy"
 msgstr "คัดลอก"
 
 #: js/turtledefs.js:95
-msgid "To copy a stack to the clipboard, do a \"long press\" on the stack. The Paste Button will highlight."
+msgid "To copy a stack to the clipboard, do a long press on the stack."
+msgstr ""
+
+#: js/turtledefs.js:95
+msgid "The Paste Button will highlight."
 msgstr ""
 
 #: js/turtledefs.js:96
@@ -643,7 +661,12 @@ msgid "Save stack"
 msgstr "บันทึก"
 
 #: js/turtledefs.js:97
-msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+msgid "The save-stack button saves a stack onto a custom palette."
+msgstr ""
+
+#: js/turtledefs.js:97
+#.TRANS: "It" is the stack on the custom palette
+msgid "It appears after a long press on a stack."
 msgstr ""
 
 #: js/turtledefs.js:98

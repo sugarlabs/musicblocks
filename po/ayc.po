@@ -15,8 +15,6 @@
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: ini-to-pot script\n"
 
-msgid ""
-
 #: js/activity.js:443
 msgid "Close"
 msgstr ""
@@ -598,9 +596,19 @@ msgid "Meet Mr. Mouse!"
 msgstr "Tata Achakuru uñt'tati!"
 
 #: js/turtledefs.js:76
-#.TRANS: Sr. Ratón es nuestro conductor de bloques de música. Sr. Ratón le anima a explorar los Bloques Musicales.
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-msgstr "Achaku tatawa siqi warurt'äwinaka qhanayirixa. Achaku tata siqi warurt'äwi warurt'ayma. Ukhamaxa warurt'awimpi muyt'pxañäni!"
+#.TRANS: Sr. Ratón es nuestro conductor de bloques de música.
+msgid "Mr. Mouse is our Music Blocks conductor."
+msgstr "Achaku tatawa siqi warurt'äwinaka qhanayirixa."
+
+#: js/turtledefs.js:76
+#.TRANS: Sr. Ratón le anima a explorar los Bloques Musicales.
+msgid Mr. Mouse encourages you to explore Music Blocks.
+msgstr "Achaku tata siqi warurt'äwi warurt'ayma. "
+
+#: js/turtledefs.js:76
+#.TRANS: Vamos a empezar nuestro recorrido!
+msgid Let us start our tour!"
+msgstr "Ukhamaxa warurt'awimpi muyt'pxañäni!""
 
 #: js/turtledefs.js:77
 #.TRANS: Botones de paleta
@@ -608,9 +616,15 @@ msgid "Palette buttons"
 msgstr "wakichatanaka apanaqaña limt’añanaka"
 
 #: js/turtledefs.js:77
-#.TRANS: Esta barra de herramientas contiene los botones de la paleta de Matrix, Notas, Tono, Tortuga, y más. Haga clic para mostrar las paletas de bloques y bloques de arrastre de las gamas de colores en el lienzo para usarlos.
-msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
+#.TRANS Matrix, Notes, Tone, Turtle, and more
+#.TRANS: Esta barra de herramientas contiene los botones de la paleta de Matrix, Notas, Tono, Tortuga, y más.
+msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
+msgstr "Aka wakichatanaka qhantayaña limt'añanakaxa Matrix, Chunk, ejecutar, Tono, tortuga, ukata juk'ampi wakichatanaka qhantayañatakiwa."
+
+#: js/turtledefs.js:77
+#.TRANS: Haga clic para mostrar las paletas de bloques y bloques de arrastre de las gamas de colores en el lienzo para usarlos.
+msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr "Limt'ma uka wakichatanaka apanaqañaru ukata samichaña wakichatanaka wayt'añataki samichañaru limt'ma."
 
 #: js/turtledefs.js:78
 #.TRANS: Haga clic para ejecutar el proyecto en modo rápido.
@@ -708,8 +722,21 @@ msgid "Copy"
 msgstr "Apaqata"
 
 #: js/turtledefs.js:95
-#.TRANS: Para copiar una pila en el portapapeles, hacer un \"pulsación larga \" en la pila. El botón de pegar destacará.
-msgid "To copy a stack to the clipboard, do a \"long press\" on the stack. The Paste Button will highlight."
+msgid "To copy a stack to the clipboard, do a long press on the stack."
+msgstr ""
+
+#: js/turtledefs.js:95
+msgid "The Paste Button will highlight."
+msgstr ""
+
+#: js/turtledefs.js:95
+#.TRANS: Para copiar una pila en el portapapeles, hacer un pulsación larga en la pila.
+msgid "To copy a stack to the clipboard, do a long press on the stack."
+msgstr ""
+
+#: js/turtledefs.js:95
+#.TRANS: El botón de pegar destacará
+msgid "The Paste Button will highlight."
 msgstr ""
 
 #: js/turtledefs.js:96
@@ -724,7 +751,14 @@ msgid "Save stack"
 msgstr "siqi imaña"
 
 #: js/turtledefs.js:97
-msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+#.TRANS: El botón de guardar-pila guarda una pila sobre una paleta personalizada.
+msgid "The save-stack button saves a stack onto a custom palette."
+msgstr ""
+
+#: js/turtledefs.js:97
+#.TRANS: "It" is the stack on the custom palette
+#.TRANS: Aparece despuás de una pulsación larga en una pila
+msgid "It appears after a long press on a stack."
 msgstr ""
 
 #: js/turtledefs.js:98
