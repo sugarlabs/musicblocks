@@ -1,4 +1,3 @@
-msgid ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
@@ -9,12 +8,6 @@ msgid ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
-
-
-msgid ""
-
-
-msgid ""
 
 #: js/activity.js:443
 msgid "Close"
@@ -106,7 +99,7 @@ msgstr "Expandir o colapsar los bloques colapsables\t"
 #: js/activity.js:1985
 #: js/turtledefs.js:88
 msgid "Home"
-msgstr ""
+msgstr "Casa"
 
 #: js/activity.js:1945
 #: js/turtledefs.js:89
@@ -540,16 +533,29 @@ msgid "Meet Mr. Mouse!"
 msgstr "Conoce Sr. Rat贸n"
 
 #: js/turtledefs.js:76
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-msgstr "Sr. Rat贸n es nuestro conductor de bloques de m煤sica. Sr. Rat贸n le anima a explorar los Bloques Musicales."
+msgid "Mr. Mouse is our Music Blocks conductor."
+msgstr "Sr. Rat贸n es nuestro conductor de bloques de m煤sica."
+
+#: js/turtledefs.js:76
+msgid Mr. Mouse encourages you to explore Music Blocks.
+msgstr "Sr. Rat贸n le anima a explorar los Bloques Musicales."
+
+#: js/turtledefs.js:76
+msgid Let us start our tour!"
+msgstr "Vamos a empezar nuestro recorrido!"
 
 #: js/turtledefs.js:77
 msgid "Palette buttons"
 msgstr "Botones de paleta"
 
 #: js/turtledefs.js:77
-msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr "Esta barra de herramientas contiene los botones de la paleta de Matrix, Notas, Tono, Tortuga, y m谩s. Haga clic para mostrar las paletas de bloques y bloques de arrastre de las gamas de colores en el lienzo para usarlos."
+#.TRANS Matrix, Notes, Tone, Turtle, and more
+msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
+msgstr "Esta barra de herramientas contiene los botones de la paleta de Matrix, Notas, Tono, Tortuga, y m谩s."
+
+#: js/turtledefs.js:77
+msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr "Haga clic para mostrar las paletas de bloques y bloques de arrastre de las gamas de colores en el lienzo para usarlos."
 
 #: js/turtledefs.js:78
 msgid "Click to run the project in fast mode."
@@ -593,7 +599,7 @@ msgstr "Expandir o colapsar los bloques colapsables, c贸mo por ejemplo los bloqu
 
 #: js/turtledefs.js:88
 msgid "Return all blocks to the center of the screen."
-msgstr ""
+msgstr "Devolver todos los bloques para el centro de la pantalla."
 
 #: js/turtledefs.js:89
 msgid "Show these messages."
@@ -628,8 +634,12 @@ msgid "Copy"
 msgstr "Copiar"
 
 #: js/turtledefs.js:95
-msgid "To copy a stack to the clipboard, do a \"long press\" on the stack. The Paste Button will highlight."
-msgstr "Para copiar una pila en el portapapeles, hacer un \"pulsaci贸n larga \" en la pila. El bot贸n de pegar destacar谩."
+msgid "To copy a stack to the clipboard, do a long press on the stack."
+msgstr "Para copiar una pila en el portapapeles, hacer un \"pulsaci贸n larga \" en la pila."
+
+#: js/turtledefs.js:95
+msgid "The Paste Button will highlight."
+msgstr "El bot贸n de pegar destacar谩."
 
 #: js/turtledefs.js:96
 msgid "The paste button is enabled when there are blocks copied onto the clipboard."
@@ -641,8 +651,13 @@ msgid "Save stack"
 msgstr "Guardar pila"
 
 #: js/turtledefs.js:97
-msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
-msgstr ""
+msgid "The save-stack button saves a stack onto a custom palette."
+msgstr "El bot髇 de guardar-pila guarda una pila sobre una paleta personalizada."
+
+#: js/turtledefs.js:97
+#.TRANS: "It" is the stack on the custom palette
+msgid "It appears after a long press on a stack."
+msgstr "Aparece despu閟 de una pulsaci髇 larga en una pila."
 
 #: js/turtledefs.js:98
 msgid "Show or hide a Cartesian-coordinate grid."
