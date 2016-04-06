@@ -73,8 +73,9 @@ function createDefaultStack() {
 function createHelpContent() {
     HELPCONTENT = [
         [_('Welcome to Music Blocks'), _('Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way.'), 'activity/activity-icon-mouse-color.svg'],
-        [_('Meet Mr. Mouse!'), _('Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!'), 'activity/activity-icon-mouse-color.svg'],
-        [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
+        [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'activity/activity-icon-mouse-color.svg'],
+        //.TRANS: Please add commas to list: Matrix, Notes, Tone, Turtle, and more.
+        [_('Palette buttons'), _('This toolbar contains the palette buttons Matrix Notes Tone Turtle and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'images/icons.svg'],
         [_('Run fast'), _('Click to run the project in fast mode.'), 'header-icons/fast-button.svg'],
         [_('Run slow'), _('Click to run the project in slow mode.'), 'header-icons/slow-button.svg'],
         [_('Run music slow'), _('Click to run just the music in slow mode.'), 'header-icons/slow-music-button.svg'],
@@ -92,9 +93,9 @@ function createHelpContent() {
         [_('Load project from files'), _('You can also load projects from the file system.'), 'header-icons/open-button.svg'],
         [_('Save project'), _('Save your project to a file.'), 'header-icons/save-button.svg'],
         [_('Save sheet music'), _('Save your project to as a Lilypond file.'), 'header-icons/lilypond-button.svg'],
-        [_('Copy'), _('To copy a stack to the clipboard, do a "long press" on the stack. The Paste Button will highlight.'), 'header-icons/paste-button.svg'],
+        [_('Copy'), _('To copy a stack to the clipboard, do a long press on the stack.') + ' ' + _('The Paste Button will highlight.'), 'header-icons/paste-button.svg'],
         [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'header-icons/paste-disabled-button.svg'],
-        [_('Save stack'), _('The save-stack button saves a stack onto a custom palette. It appears after a "long press" on a stack.'), 'header-icons/save-blocks-button.svg'],
+        [_('Save stack'), _('The save-stack button saves a stack onto a custom palette.') + ' ' + _('It appears after a long press on a stack.'), 'header-icons/save-blocks-button.svg'],
         [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'header-icons/Cartesian-button.svg'],
         [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
         [_('Settings'), _('Open a panel for configuring Music Blocks.'), 'header-icons/utility-button.svg'],
