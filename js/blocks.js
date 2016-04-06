@@ -647,28 +647,30 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
 
     this.addDefaultBlock = function(parentblk) {
-        // Add silence block when user pulls out all the blocks from note block
+        // Add a Silence block whenever the user removes all the
+        // blocks from a Note block.
         if (parentblk == null) {
             return;
         }
 
         var parentName = this.blockList[parentblk].name;
-        if (parentName == "note") {
+        if (parentName === 'note') {
             if (this.blockList[parentblk].connections[2] == null) {
-                var blkname = "rest2";
+                var blkname = 'rest2';
                 var newblock = this.makeBlock(blkname, '__NOARG__');
                 this.blockList[parentblk].connections[2] = newblock;
-                this.blockList[newblock].connections[1] = null;
                 this.blockList[newblock].connections[0] = parentblk;
+                this.blockList[newblock].connections[1] = null;
             }
         }
     };
 
     this.deleteNextDefault= function(thisBlock) {
-        //Remove silence block from note block if any other block is inserted just above silence block
+        // Remove the Silence block from a Note block if another block
+        // is inserted above the silence block.
         var thisBlockobj = this.blockList[thisBlock];
-        for( var i = 1; i < thisBlockobj.connections.length; i++) {
-            if(thisBlockobj.connections[i] && this.blockList[thisBlockobj.connections[i]].name == "rest2") {
+        for (var i = 1; i < thisBlockobj.connections.length; i++) {
+            if (thisBlockobj.connections[i] && this.blockList[thisBlockobj.connections[i]].name === 'rest2') {
                 var silenceBlock = thisBlockobj.connections[i];
                 var silenceBlockobj = this.blockList[silenceBlock];
                 silenceBlockobj.hide();
@@ -680,21 +682,25 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
 
     this.deletePreviousDefault = function(thisBlock) {
-        //Remove silence block from note block if any other block is inserted just after silence block
+        // Remove the Silence block from a Note block if another block
+        // is inserted just after the Silence block.
         var thisBlockobj = this.blockList[thisBlock];
-        if(thisBlockobj && this.blockList[thisBlockobj.connections[0]] && this.blockList[thisBlockobj.connections[0]].name == "rest2") {
+        if (thisBlockobj && this.blockList[thisBlockobj.connections[0]] && this.blockList[thisBlockobj.connections[0]].name === 'rest2') {
             var silenceBlock = thisBlockobj.connections[0];
             var silenceBlockobj = this.blockList[silenceBlock];
             silenceBlockobj.hide();
             silenceBlockobj.trash = true;
-            for ( var i = 0; i < this.blockList[silenceBlockobj.connections[0]].connections.length; i++) {
-                if(this.blockList[silenceBlockobj.connections[0]].connections[i] == silenceBlock) {
+
+            for (var i = 0; i < this.blockList[silenceBlockobj.connections[0]].connections.length; i++) {
+                if (this.blockList[silenceBlockobj.connections[0]].connections[i] === silenceBlock) {
                     this.blockList[silenceBlockobj.connections[0]].connections[i] = thisBlock;
                     break;
                 }
             }
+
         thisBlockobj.connections[0] = silenceBlockobj.connections[0];
         }
+
         return thisBlockobj.connections[0];
     };
 
@@ -948,15 +954,18 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             }
 
             this.blockList[newBlock].connections[newConnection] = thisBlock;
-            // Removing silence block (if exists) after adding block inside note block
-            if (this.blockList[this._insideExpandableBlock(thisBlock)].name == "note") {
+
+            // Remove the silence block (if it is present) after
+            // adding a new block inside of a note block.
+            if (this.blockList[this._insideExpandableBlock(thisBlock)].name === 'note') {
                 //If blocks are inserted above the silence block.
-                if(insertAfterDefault == false) {
-                    this.deleteNextDefault(bottom);
-                } else {
+                if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
+                } else {
+                    this.deleteNextDefault(bottom);
                 }
             }
+
             // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
