@@ -646,6 +646,58 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
 
+    this.addDefaultBlock = function(parentblk) {
+        // Add silence block when user pulls out all the blocks from note block
+        if (parentblk == null) {
+            return;
+        }
+
+        var parentName = this.blockList[parentblk].name;
+        if (parentName == "note") {
+            if (this.blockList[parentblk].connections[2] == null) {
+                var blkname = "rest2";
+                var newblock = this.makeBlock(blkname, '__NOARG__');
+                this.blockList[parentblk].connections[2] = newblock;
+                this.blockList[newblock].connections[1] = null;
+                this.blockList[newblock].connections[0] = parentblk;
+            }
+        }
+    };
+
+    this.deleteNextDefault= function(thisBlock) {
+        //Remove silence block from note block if any other block is inserted just above silence block
+        var thisBlockobj = this.blockList[thisBlock];
+        for( var i = 1; i < thisBlockobj.connections.length; i++) {
+            if(thisBlockobj.connections[i] && this.blockList[thisBlockobj.connections[i]].name == "rest2") {
+                var silenceBlock = thisBlockobj.connections[i];
+                var silenceBlockobj = this.blockList[silenceBlock];
+                silenceBlockobj.hide();
+                silenceBlockobj.trash = true;
+                this.blockList[thisBlock].connections[i] = silenceBlockobj.connections[1];
+                break;
+            }
+        }
+    };
+
+    this.deletePreviousDefault = function(thisBlock) {
+        //Remove silence block from note block if any other block is inserted just after silence block
+        var thisBlockobj = this.blockList[thisBlock];
+        if(thisBlockobj && this.blockList[thisBlockobj.connections[0]] && this.blockList[thisBlockobj.connections[0]].name == "rest2") {
+            var silenceBlock = thisBlockobj.connections[0];
+            var silenceBlockobj = this.blockList[silenceBlock];
+            silenceBlockobj.hide();
+            silenceBlockobj.trash = true;
+            for ( var i = 0; i < this.blockList[silenceBlockobj.connections[0]].connections.length; i++) {
+                if(this.blockList[silenceBlockobj.connections[0]].connections[i] == silenceBlock) {
+                    this.blockList[silenceBlockobj.connections[0]].connections[i] = thisBlock;
+                    break;
+                }
+            }
+        thisBlockobj.connections[0] = silenceBlockobj.connections[0];
+        }
+        return thisBlockobj.connections[0];
+    };
+
     this.blockMoved = function (thisBlock) {
         // When a block is moved, we have lots of things to check:
         // (0) Is it inside of a expandable block?
@@ -665,6 +717,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
         var blk = this._insideExpandableBlock(thisBlock);
         var expandableLoopCounter = 0;
+        var parentblk;
+        if(blk!=null) {
+            parentblk = blk;
+        }
+
         while (blk != null) {
             expandableLoopCounter += 1;
             if (expandableLoopCounter > 2 * this.blockList.length) {
@@ -725,7 +782,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         var newConnection = null;
         // TODO: Make minimum distance relative to scale.
         var min = MINIMUMDOCKDISTANCE;
-        var blkType = myBlock.docks[0][2]
+        var blkType = myBlock.docks[0][2];
+        //Is the added block above the silence block or below ?
+        var insertAfterDefault  = true;
         for (var b = 0; b < this.blockList.length; b++) {
             // Don't connect to yourself.
             if (b === thisBlock) {
@@ -809,6 +868,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 // (1) if it is an argClamp, add a new slot below the current block;
                 // (2) if it is an arg block, replace it; and
                 // (3) if it is a flow block, insert it into the flow.
+                insertAfterDefault = false;
                 if (this.blockList[newBlock].isArgClamp()) {
                     if ((this.blockList[newBlock].name === 'doArg' || this.blockList[newBlock].name === 'calcArg') && newConnection === 1) {
                         // If it is the action name then treat it like
@@ -888,6 +948,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             }
 
             this.blockList[newBlock].connections[newConnection] = thisBlock;
+            // Removing silence block (if exists) after adding block inside note block
+            if (this.blockList[this._insideExpandableBlock(thisBlock)].name == "note") {
+                //If blocks are inserted above the silence block.
+                if(insertAfterDefault == false) {
+                    this.deleteNextDefault(bottom);
+                } else {
+                    newBlock = this.deletePreviousDefault(thisBlock);
+                }
+            }
             // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
@@ -922,6 +991,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             }
         }
 
+        this.addDefaultBlock(parentblk);
         // Put block adjustments inside a slight delay to make the
         // addition/substraction of vspace and changes of block shape
         // appear less abrupt (and it can be a little racy).
@@ -3244,6 +3314,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
             myBlock.connections[0] = null;
+            // Add default block if user deletes all blocks from inside the note block
+            this.addDefaultBlock(parentBlock);
         }
 
         if (myBlock.name === 'start' || myBlock.name === 'drum') {
