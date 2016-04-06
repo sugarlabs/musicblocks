@@ -995,7 +995,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     // ACTIONS PALETTE
     
     var doBlock = new ProtoBlock('do');
-    doBlock.palette = palettes.dict['actions'];
+    doBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['do'] = doBlock;
     doBlock.staticLabels.push(_('do'));
     doBlock.adjustWidthToLabel();
@@ -1004,7 +1004,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     doBlock.dockTypes[1] = 'anyin';
 
     var returnBlock = new ProtoBlock('return');
-    returnBlock.palette = palettes.dict['actions'];
+    returnBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['return'] = returnBlock;
     returnBlock.staticLabels.push(_('return'));
     returnBlock.extraWidth = 10;
@@ -1014,7 +1014,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     returnBlock.dockTypes[1] = 'anyin';
 
     var returnToUrlBlock = new ProtoBlock('returnToUrl');
-    returnToUrlBlock.palette = palettes.dict['actions'];
+    returnToUrlBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['returnToUrl'] = returnToUrlBlock;
     returnToUrlBlock.staticLabels.push(_('return to URL'));
     returnToUrlBlock.extraWidth = 10;
@@ -1024,7 +1024,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     returnToUrlBlock.dockTypes[1] = 'anyin';
 
     var calcBlock = new ProtoBlock('calc');
-    calcBlock.palette = palettes.dict['actions'];
+    calcBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['calc'] = calcBlock;
     calcBlock.staticLabels.push(_('calculate'));
     calcBlock.adjustWidthToLabel();
@@ -1034,7 +1034,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     calcBlock.dockTypes[1] = 'anyin';
 
     var namedCalcBlock = new ProtoBlock('namedcalc');
-    namedCalcBlock.palette = palettes.dict['actions'];
+    namedCalcBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedcalc'] = namedCalcBlock;
     namedCalcBlock.staticLabels.push(_('action'));
     namedCalcBlock.extraWidth = 10;
@@ -1042,7 +1042,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     namedCalcBlock.parameterBlock();
 
     var namedDoArgBlock = new ProtoBlock('nameddoArg');
-    namedDoArgBlock.palette = palettes.dict['actions'];
+    namedDoArgBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['nameddoArg'] = namedDoArgBlock;
     namedDoArgBlock.staticLabels.push(_('do'));
     namedDoArgBlock.adjustWidthToLabel();
@@ -1050,7 +1050,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     namedDoArgBlock.dockTypes[1] = 'anyin';
 
     var namedCalcArgBlock = new ProtoBlock('namedcalcArg');
-    namedCalcArgBlock.palette = palettes.dict['actions'];
+    namedCalcArgBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedcalcArg'] = namedCalcArgBlock;
     namedCalcArgBlock.staticLabels.push(_('calculate'));
     namedCalcArgBlock.adjustWidthToLabel();
@@ -1059,7 +1059,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     namedCalcArgBlock.dockTypes[1] = 'anyin';
 
     var doArgBlock = new ProtoBlock('doArg');
-    doArgBlock.palette = palettes.dict['actions'];
+    doArgBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['doArg'] = doArgBlock;
     doArgBlock.staticLabels.push(_('do'));
     doArgBlock.adjustWidthToLabel();
@@ -1069,7 +1069,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     doArgBlock.dockTypes[2] = 'anyin';
 
     var calcArgBlock = new ProtoBlock('calcArg');
-    calcArgBlock.palette = palettes.dict['actions'];
+    calcArgBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['calcArg'] = calcArgBlock;
     calcArgBlock.staticLabels.push(_('calculate'));
     calcArgBlock.adjustWidthToLabel();
@@ -1080,7 +1080,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     calcArgBlock.dockTypes[2] = 'anyin';
 
     var argBlock = new ProtoBlock('arg');
-    argBlock.palette = palettes.dict['actions'];
+    argBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['arg'] = argBlock;
     argBlock.staticLabels.push('arg');
     argBlock.adjustWidthToLabel();
@@ -1090,14 +1090,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     argBlock.dockTypes[1] = 'numberin';
 
     var namedArgBlock = new ProtoBlock('namedarg');
-    namedArgBlock.palette = palettes.dict['actions'];
+    namedArgBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['namedarg'] = namedArgBlock;
     namedArgBlock.staticLabels.push('arg ' + 1);
     namedArgBlock.adjustWidthToLabel();
     namedArgBlock.parameterBlock();
 
     var listenBlock = new ProtoBlock('listen');
-    listenBlock.palette = palettes.dict['actions'];
+    listenBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['listen'] = listenBlock;
     listenBlock.staticLabels.push(_('on'), _('event'), _('do'));
     listenBlock.adjustWidthToLabel();
@@ -1108,7 +1108,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     listenBlock.dockTypes[2] = 'textin';
 
     var dispatchBlock = new ProtoBlock('dispatch');
-    dispatchBlock.palette = palettes.dict['actions'];
+    dispatchBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['dispatch'] = dispatchBlock;
     dispatchBlock.staticLabels.push(_('broadcast'));
     dispatchBlock.adjustWidthToLabel();
@@ -1117,7 +1117,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     dispatchBlock.dockTypes[1] = 'textin';
 
     var drumBlock = new ProtoBlock('drum');
-    drumBlock.palette = palettes.dict['actions'];
+    drumBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['drum'] = drumBlock;
     drumBlock.staticLabels.push(_('start drum'));
     drumBlock.extraWidth = 10;
@@ -1125,7 +1125,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     drumBlock.stackClampZeroArgBlock();
 
     var startBlock = new ProtoBlock('start');
-    startBlock.palette = palettes.dict['actions'];
+    startBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['start'] = startBlock;
     startBlock.staticLabels.push(_('start'));
     startBlock.extraWidth = 10;
@@ -1133,7 +1133,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     startBlock.stackClampZeroArgBlock();
 
     var actionBlock = new ProtoBlock('action');
-    actionBlock.palette = palettes.dict['actions'];
+    actionBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['action'] = actionBlock;
     actionBlock.staticLabels.push(_('action'));
     actionBlock.extraWidth = 25;
@@ -1142,7 +1142,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     actionBlock.defaults.push(_('action'));
 
     var namedDoBlock = new ProtoBlock('nameddo');
-    namedDoBlock.palette = palettes.dict['actions'];
+    namedDoBlock.palette = palettes.dict['action'];
     blocks.protoBlockDict['nameddo'] = namedDoBlock;
     namedDoBlock.hidden = true;
     namedDoBlock.staticLabels.push(_('action'));
