@@ -1592,7 +1592,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var openProjectBlock = new ProtoBlock('openProject');
     openProjectBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['openProject'] = openProjectBlock;
-    openProjectBlock.staticLabels.push(_('openProject'));
+    openProjectBlock.staticLabels.push(_('open project'));
     openProjectBlock.adjustWidthToLabel();
     openProjectBlock.oneArgBlock();
     openProjectBlock.defaults.push('url');
