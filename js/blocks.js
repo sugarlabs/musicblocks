@@ -958,7 +958,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             // Remove the silence block (if it is present) after
             // adding a new block inside of a note block.
             if (this.blockList[this._insideExpandableBlock(thisBlock)].name === 'note') {
-                //If blocks are inserted above the silence block.
+                // If blocks are inserted above the silence block.
                 if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
                 } else {
