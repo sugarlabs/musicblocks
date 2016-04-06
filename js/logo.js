@@ -696,6 +696,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
         } else {
             console.log('nothing to run');
+            if (this.lilypondSaveOnly) {
+                this.errorMsg(NOACTIONERRORMSG, null, _('start'));
+		this.lilypondSaveOnly = false;
+                this.checkingLilypond = false;
+                // Reset cursor.
+                document.body.style.cursor = 'default';
+	    }
         }
         this.refreshCanvas();
     };
@@ -2796,7 +2803,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo._saveLilypondOutput(_('My Project') + '.ly');
                     logo.lilypondSaveOnly = false;
                     logo.checkingLilypond = false;
-                    // Show busy cursor.
+                    // Reset cursor.
                     document.body.style.cursor = 'default';
                 } else if (logo.lilypondSaveOnly) {
                     setTimeout(function() {
