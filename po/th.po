@@ -17,1205 +17,2284 @@ msgid ""
 "X-Generator: Pootle 2.0.5\n"
 
 msgid ""
+
+#: js/activity.js:443
+msgid "Close"
 msgstr ""
 
+#: js/activity.js:1251
+#: js/block.js:619
+#: js/block.js:1705
+#: js/analytics.js:104
+#: js/blocks.js:1603
+#: js/blocks.js:1605
+#: js/blocks.js:1789
+#: js/blocks.js:1932
+#: js/blocks.js:2038
+#: js/blocks.js:2464
+#: js/blocks.js:3100
+#: js/blocks.js:3175
+#: js/palette.js:471
+#: js/palette.js:480
+#: js/palette.js:489
+#: js/palette.js:498
+#: js/palette.js:1620
+#: js/palette.js:1631
+#: js/palette.js:1642
+#: js/palette.js:1653
+#: js/basicblocks.js:1003
+#: js/basicblocks.js:1032
+#: js/basicblocks.js:1039
+#: js/basicblocks.js:1067
+#: js/basicblocks.js:1077
+#: js/basicblocks.js:1106
+#: js/basicblocks.js:1138
+#: js/basicblocks.js:1142
+#: js/basicblocks.js:1148
+msgid "action"
+msgstr "การกระทำ"
+
+#: js/activity.js:1934
+#: js/turtledefs.js:78
+msgid "Run fast"
+msgstr "วิ่งเร็ว"
+
+#: js/activity.js:1935
+#: js/turtledefs.js:79
+msgid "Run slow"
+msgstr "วิ่งช้า"
+
+#: js/activity.js:1936
+#: js/turtledefs.js:81
+msgid "Run step by step"
+msgstr "เล่นที่ละขั้นตอน"
+
+#: js/activity.js:1937
+#: js/turtledefs.js:80
+msgid "Run music slow"
+msgstr "เล่นเสียงดนตรี (ช้า)"
+
+#: js/activity.js:1938
+#: js/turtledefs.js:82
+msgid "Run note by note"
+msgstr "เล่นโน้ตต่อโน้ต"
+
+#: js/activity.js:1939
+#: js/turtledefs.js:83
+msgid "Stop"
+msgstr "หยุด"
+
+#: js/activity.js:1940
+#: js/turtledefs.js:84
+msgid "Clean"
+msgstr "ล้าง"
+
+#: js/activity.js:1941
+#: js/turtledefs.js:85
+msgid "Show/hide palettes"
+msgstr "แสดง/ซ่อนเมนูสี"
+
+#: js/activity.js:1942
+#: js/turtledefs.js:86
+msgid "Show/hide blocks"
+msgstr "แสดง/ซ่อน บล๊อก"
+
+#: js/activity.js:1943
+#: js/turtledefs.js:87
+msgid "Expand/collapse collapsable blocks"
+msgstr "เพิ่ม/พัง บล๊อกที่สามารถพังได้"
+
+#: js/activity.js:1944
+#: js/activity.js:1985
+#: js/turtledefs.js:88
+msgid "Home"
+msgstr ""
+
+#: js/activity.js:1945
+#: js/turtledefs.js:89
+msgid "Help"
+msgstr "ช่วยเหลือ"
+
+#: js/activity.js:2012
+#: js/turtledefs.js:91
+msgid "Load samples from server"
+msgstr "โหลดตัวอย่างจากเซอเว่อร์"
+
+#: js/activity.js:2013
+#: js/turtledefs.js:92
+msgid "Load project from files"
+msgstr ""
+
+#: js/activity.js:2014
+#: js/turtledefs.js:93
+msgid "Save project"
+msgstr "บันทึกงาน"
+
+#: js/activity.js:2015
+#: js/turtledefs.js:94
+msgid "Save sheet music"
+msgstr "บันทึกโน้ตเพลง"
+
+#: js/activity.js:2016
+#: js/turtledefs.js:96
+msgid "Paste"
+msgstr "วาง"
+
+#: js/activity.js:2017
+#: js/turtledefs.js:98
+msgid "Cartesian"
+msgstr "คาร์ทีเซียน"
+
+#: js/activity.js:2018
+#: js/turtledefs.js:99
+msgid "Polar"
+msgstr "ขั้ว"
+
+#: js/activity.js:2019
+#: js/turtledefs.js:100
+msgid "Settings"
+msgstr "ตั้งค่า"
+
+#: js/activity.js:2020
+#: js/turtledefs.js:106
 msgid "Delete all"
 msgstr "ลบทั้งหมด"
 
-msgid "rice and beans"
-msgstr "ข้าวและถั่ว"
+#: js/activity.js:2021
+#: js/turtledefs.js:107
+msgid "Undo"
+msgstr "ยกเลิกคำสั่งเก่า"
 
-msgid "show"
-msgstr "แสดง"
-
-msgid "text"
-msgstr "ถ้ดไป"
-
-msgid "random"
-msgstr "สุ่ม"
-
+#: js/clearbox.js:46
 msgid "confirm"
 msgstr "ยืนยัน"
 
-#. TRANS: musical meter
+#: js/block.js:553
+#: js/logo.js:1916
+#: js/logo.js:1969
+#: js/logo.js:4089
+#: js/matrix.js:312
+#: js/musicutils.js:21
+msgid "rest"
+msgstr "พัก"
+
+#: js/block.js:622
+#: js/logo.js:4494
+#: js/logo.js:4543
+#: js/logo.js:4563
+#: js/turtle.js:361
+#: js/turtle.js:362
+#: js/basicblocks.js:1130
+msgid "start"
+msgstr "เริ่ม"
+
+#: js/block.js:625
+#: js/turtledefs.js:21
+msgid "matrix"
+msgstr ""
+
+#: js/block.js:628
+#: js/turtle.js:219
+msgid "drum"
+msgstr ""
+
+#: js/logo.js:24
+msgid "mouse"
+msgstr ""
+
+#: js/logo.js:24
+msgid "brown rat"
+msgstr ""
+
+#: js/logo.js:24
+msgid "mole"
+msgstr ""
+
+#: js/logo.js:24
+msgid "chipmunk"
+msgstr ""
+
+#: js/logo.js:24
+msgid "red squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "guinea pig"
+msgstr ""
+
+#: js/logo.js:24
+msgid "capybara"
+msgstr ""
+
+#: js/logo.js:24
+msgid "coypu"
+msgstr ""
+
+#: js/logo.js:24
+msgid "black rat"
+msgstr ""
+
+#: js/logo.js:24
+msgid "grey squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "flying squirrel"
+msgstr ""
+
+#: js/logo.js:24
+msgid "bat"
+msgstr ""
+
+#: js/logo.js:26
+#.TRANS: Abbreviations for names used in Lilypind output, e.g., m for mouse
+msgid "m"
+msgstr ""
+
+#: js/logo.js:26
+msgid "br"
+msgstr ""
+
+#: js/logo.js:26
+msgid "ml"
+msgstr ""
+
+#: js/logo.js:26
+msgid "ch"
+msgstr ""
+
+#: js/logo.js:26
+msgid "rs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "gp"
+msgstr ""
+
+#: js/logo.js:26
+msgid "cb"
+msgstr ""
+
+#: js/logo.js:26
+msgid "cp"
+msgstr ""
+
+#: js/logo.js:26
+msgid "bk"
+msgstr ""
+
+#: js/logo.js:26
+msgid "gs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "fs"
+msgstr ""
+
+#: js/logo.js:26
+msgid "bt"
+msgstr ""
+
+#: js/logo.js:352
+msgid "true"
+msgstr ""
+
+#: js/logo.js:354
+msgid "false"
+msgstr ""
+
+#: js/logo.js:1407
+#: js/logo.js:1731
+msgid "You must select a file."
+msgstr ""
+
+#: js/logo.js:1740
+#: plugins/heap.rtp:96
+msgid "The file you selected does not contain a valid heap."
+msgstr ""
+
+#: js/logo.js:1744
+#: plugins/heap.rtp:102
+msgid "The loadHeap block needs a loadFile block."
+msgstr ""
+
+#: js/logo.js:1760
+msgid "Error parsing JSON data:"
+msgstr ""
+
+#: js/logo.js:1765
+msgid "404: Page not found"
+msgstr ""
+
+#: js/logo.js:1789
+msgid "turtleHeaps does not contain a valid heap for"
+msgstr ""
+
+#: js/logo.js:1799
+msgid "Index must be > 0."
+msgstr ""
+
+#: js/logo.js:1818
+msgid "Beats per minute must be > 30."
+msgstr ""
+
+#: js/logo.js:1821
+msgid "Maximum beats per minute is 1000."
+msgstr ""
+
+#: js/logo.js:1867
+msgid "You must have at least one pitch block and one rhythm block in the matrix."
+msgstr "คุณควรมีอย่างน้อยหนึ่งบล๊อกระดับเสียง และหนึ่งบล๊อกจังหวะในเมทริกซ์"
+
+#: js/logo.js:1869
+msgid "Please close the current matrix before opening a new one."
+msgstr "กรุณาปิดเมทริกซ์ปัจจุบันก่อนที่จะเปิดอันใหม่"
+
+#: js/logo.js:2064
+msgid "Pitch Block: Did you mean to use a Note block?"
+msgstr ""
+
+#: js/logo.js:2080
+msgid "Rhythm Block: Did you mean to use a Matrix block?"
+msgstr ""
+
+#: js/logo.js:2137
+msgid "Note value must be greater than 0"
+msgstr "ค่าโน้ตต้องมากกว่า0"
+
+#: js/logo.js:2606
+msgid "Tuplet Block: Did you mean to use a Matrix block?"
+msgstr ""
+
+#: js/logo.js:2796
+msgid "My Project"
+msgstr ""
+
+#: js/logo.js:3151
+msgid "synth cannot play chords."
+msgstr ""
+
+#: js/logo.js:3736
+#: js/basicblocks.js:1213
+#: plugins/heap.rtp:42
+#: plugins/heap.rtp:142
+msgid "empty heap"
+msgstr "heap ว่าง"
+
+#: js/logo.js:4494
+#: js/logo.js:4543
+#: js/logo.js:4563
+#: js/turtle.js:218
+#: js/turtle.js:357
+#: js/turtle.js:358
+#: js/basicblocks.js:1122
+msgid "start drum"
+msgstr "เริ่มเสียงกลอง"
+
+#: js/matrix.js:209
+msgid "Solfa"
+msgstr ""
+
+#: plugins/rodi.rtp:181
+msgid "play"
+msgstr "เล่น"
+
+#: js/matrix.js:240
+#: js/matrix.js:240
+msgid "save"
+msgstr ""
+
+#: js/matrix.js:257
+#: js/matrix.js:257
+#: js/basicblocks.js:610
+msgid "clear"
+msgstr "ล้าง"
+
+#: js/matrix.js:274
+#: js/matrix.js:274
+msgid "export"
+msgstr ""
+
+#: js/matrix.js:291
+#: js/matrix.js:291
+msgid "close"
+msgstr ""
+
+#: js/matrix.js:336
+#: js/matrix.js:539
+#: js/basicblocks.js:267
+#: js/basicblocks.js:277
+msgid "note value"
+msgstr "ค่าของโน้ต"
+
+#: js/matrix.js:487
+msgid "tuplet value"
+msgstr "ค่าทูเปรท"
+
+#: js/utilitybox.js:36
+#: js/turtledefs.js:101
+msgid "Decrease block size"
+msgstr "ลดขนาดของบล๊อก"
+
+#: js/utilitybox.js:44
+#: js/turtledefs.js:102
+msgid "Increase block size"
+msgstr "ลดขนาดบล๊อก"
+
+#: js/utilitybox.js:52
+#: js/turtledefs.js:103
+msgid "Display statistics"
+msgstr "แสดงสถิติ"
+
+#: js/utilitybox.js:60
+#: js/turtledefs.js:104
+msgid "Load plugin from file"
+msgstr "โหลดปลั๊กอินจากไฟล์"
+
+#: js/utilitybox.js:68
+#: js/turtledefs.js:105
+msgid "Enable scrolling"
+msgstr "ทำให้เลื่อนได้"
+
+#: js/utilitybox.js:77
+msgid "Disable scrolling"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:277
+msgid "rhythm"
+msgstr "จังหวะ"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:204
+msgid "pitch"
+msgstr "ระดับเสียง"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+#: js/basicblocks.js:1299
+msgid "tone"
+msgstr "โทน"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "flow"
+msgstr "ความคล่องตัว"
+
+#: js/turtledefs.js:21
+msgid "actions"
+msgstr ""
+
+#: js/turtledefs.js:21
+msgid "boxes"
+msgstr "กล่อง"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "turtle"
+msgstr "เต่า"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "pen"
+msgstr "ปากกา"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "number"
+msgstr "ตัวเลข"
+
+#: js/turtledefs.js:21
+msgid "boolean"
+msgstr "บูลีน"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "media"
+msgstr "สื่อ"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "sensors"
+msgstr "เซนเซอร์"
+
+#: js/turtledefs.js:21
+msgid "heap"
+msgstr "ฮีป"
+
+#: js/turtledefs.js:21
+#: js/analytics.js:104
+msgid "extras"
+msgstr "เพิ่มเติม"
+
+#: js/turtledefs.js:75
+msgid "Welcome to Music Blocks"
+msgstr "ยินดีต้อนรับสู่Music Blocks"
+
+#: js/turtledefs.js:75
+msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
+msgstr "Music Blocksคือศูนย์ร่วมอุปกรณ์ต่างๆเพื่อสำรวจแนวคิดเรื่องดนตรีด้วยวิธีที่สนุกและครบถ้วน"
+
+#: js/turtledefs.js:76
+msgid "Meet Mr. Mouse!"
+msgstr "พบกับคุณหนู"
+
+#: js/turtledefs.js:76
+msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
+msgstr "คุณหนูคือวาทยากรของพวกเรา คุณหนูสนับสนุนให้คุณลองสำรวจ Music Block, The Matrix และการแสดง/สัญกรณ์ ความเป็นไปได้ของ Music Blocks เริ่มทัวร์กันได้เลย"
+
+#: js/turtledefs.js:77
+msgid "Palette buttons"
+msgstr "ปุ่มเมนูสี"
+
+#: js/turtledefs.js:77
+msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr ""
+
+#: js/turtledefs.js:78
+msgid "Click to run the project in fast mode."
+msgstr "คลิ๊กเพื่อเล่นโปรเจคในโหมดเร็ว"
+
+#: js/turtledefs.js:79
+msgid "Click to run the project in slow mode."
+msgstr "คลิ๊กเพื่อเล่นโปรเจคอย่างช้า"
+
+#: js/turtledefs.js:80
+msgid "Click to run just the music in slow mode."
+msgstr "คลิ๊กเพื่อเล่นดนตรีในโหมดช้า"
+
+#: js/turtledefs.js:81
+msgid "Click to run the project step by step."
+msgstr "คลิ๊กเพื่อให้โปรเจคเล่นทีละขั้นตอน"
+
+#: js/turtledefs.js:82
+msgid "Click to run the music note by note."
+msgstr "คลิ๊กที่นี่เพื่อเล่นดนตรีโน้ตต่อโน้ต"
+
+#: js/turtledefs.js:83
+msgid "Stop the music (and the turtles)."
+msgstr "หยุดเพลง (และเต่า)"
+
+#: js/turtledefs.js:84
+msgid "Clear the screen and return the turtles to their initial positions."
+msgstr "ลบจอทั้งหมด และให้เต่าไปอยู่ที่จุดตั้งต้น"
+
+#: js/turtledefs.js:85
+msgid "Hide or show the block palettes."
+msgstr "ซ้อนหรือแสดงบล๊อก"
+
+#: js/turtledefs.js:86
+msgid "Hide or show the blocks and the palettes."
+msgstr "ซ่อนหรือแสดงบล๊อกและเมนูสี"
+
+#: js/turtledefs.js:87
+msgid "Expand or collapse start and action stacks."
+msgstr "ขยายหรือล้ม เริ่มและเรียงทับกัน"
+
+#: js/turtledefs.js:88
+msgid "Return all blocks to the center of the screen."
+msgstr ""
+
+#: js/turtledefs.js:89
+msgid "Show these messages."
+msgstr "แสดงข้อความ"
+
+#: js/turtledefs.js:90
+msgid "Expand/collapse option toolbar"
+msgstr "เพิ่ม/ลด แถบเครื่องมือตัวเลือก"
+
+#: js/turtledefs.js:90
+msgid "Click this button to expand or collapse the auxillary toolbar."
+msgstr "กดปุ่มนี้เพื่อขยายหรือลดกล่องเครื่องมือเพิ่มเติม"
+
+#: js/turtledefs.js:91
+msgid "This button opens a viewer for loading example projects."
+msgstr "ปุ่มนี้เปิดหน้าต่างเพื่อโหลดโปรเจคตัวอย่าง"
+
+#: js/turtledefs.js:92
+msgid "You can also load projects from the file system."
+msgstr "คุณสามารถโหลดโปรเจคได้จากไฟล์ในโปรแกรม"
+
+#: js/turtledefs.js:93
+msgid "Save your project to a file."
+msgstr "บันทึกโปรเจคของคุณเป็นไฟล์"
+
+#: js/turtledefs.js:94
+msgid "Save your project to as a Lilypond file."
+msgstr "บันทึกไฟล์เป็นไฟล์Lilypond"
+
+#: js/turtledefs.js:95
+msgid "Copy"
+msgstr "คัดลอก"
+
+#: js/turtledefs.js:95
+msgid "To copy a stack to the clipboard, do a \"long press\" on the stack. The Paste Button will highlight."
+msgstr ""
+
+#: js/turtledefs.js:96
+msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+msgstr "จะใช้ปุ่มวางได้ต่อเมื่อ คุณคัดลอกบล๊อกไว้บนคลิปบอร์ด"
+
+#: js/turtledefs.js:97
+#: js/blocks.js:200
+msgid "Save stack"
+msgstr "บันทึก"
+
+#: js/turtledefs.js:97
+msgid "The save-stack button saves a stack onto a custom palette. It appears after a \"long press\" on a stack."
+msgstr ""
+
+#: js/turtledefs.js:98
+msgid "Show or hide a Cartesian-coordinate grid."
+msgstr "แสดงหรือซ้อนกราฟพิกัดคาร์ทีเซียน"
+
+#: js/turtledefs.js:99
+msgid "Show or hide a polar-coordinate grid."
+msgstr "แสดง หรือซ่อนกราฟ พิกัดเชิงขั้ว"
+
+#: js/turtledefs.js:100
+msgid "Open a panel for configuring Music Blocks."
+msgstr "เปิดแผงสำหรับปรับแต่ง Music Blocks"
+
+#: js/turtledefs.js:101
+msgid "Decrease the size of the blocks."
+msgstr "ลดขนาดของบล๊อก"
+
+#: js/turtledefs.js:102
+msgid "Increase the size of the blocks."
+msgstr "เพิ่มขนาดของบล๊อก"
+
+#: js/turtledefs.js:103
+msgid "Display statistics about your Music project."
+msgstr "แสดงสถิตของโปรเจคคุณ"
+
+#: js/turtledefs.js:104
+msgid "You can load new blocks from the file system."
+msgstr "คุณสามารถโหลดบล๊อกใหม่จากไฟล์ในเครือข่าย"
+
+#: js/turtledefs.js:105
+msgid "You can scroll the blocks on the canvas."
+msgstr "คุณสามารถเลื่อนบล๊อกสู่แคนวาส"
+
+#: js/turtledefs.js:106
+msgid "Remove all content on the canvas, including the blocks."
+msgstr "ลบทุกอย่าง รวมทั้งบล๊อก"
+
+#: js/turtledefs.js:107
+msgid "Restore blocks from the trash."
+msgstr "กู้บล๊อกจากถังขยะ"
+
+#: js/turtledefs.js:108
+msgid "Congratulations."
+msgstr "ยินดีด้วย"
+
+#: js/turtledefs.js:108
+msgid "You have finished the tour. Please enjoy Music Blocks!"
+msgstr "ทัวร์จบแล้ว เริ่มเล่น Music Blockกัน"
+
+#: js/samplesviewer.js:26
+#: js/samplesviewer.js:26
+msgid "Open"
+msgstr "เปิด"
+
+#: js/samplesviewer.js:27
+#: js/samplesviewer.js:27
+msgid "Delete"
+msgstr "ลบ"
+
+#: js/samplesviewer.js:28
+#: js/samplesviewer.js:28
+msgid "Publish"
+msgstr "โพสสู่สาธารณะ"
+
+#: js/samplesviewer.js:29
+#: js/samplesviewer.js:29
+#: js/samplesviewer.js:38
+#: js/samplesviewer.js:38
+msgid "Download"
+msgstr "ดาวน์โหลด"
+
+#: js/samplesviewer.js:419
+msgid "Planet"
+msgstr "ดาวเคราะห์"
+
+#: js/samplesviewer.js:420
+msgid "On my device"
+msgstr "บนเครื่องของฉัน"
+
+#: js/samplesviewer.js:421
+msgid "Worldwide"
+msgstr "ทั่วโลก"
+
+#: js/blocks.js:1144
+#: js/palette.js:543
+msgid "open file"
+msgstr "เปิดไฟล์"
+
+#: js/blocks.js:1478
+#: js/palette.js:515
+#: js/basicblocks.js:1335
+msgid "text"
+msgstr "ถ้ดไป"
+
+#: js/blocks.js:1488
+#: js/palette.js:518
+#: js/palette.js:1698
+#: js/palette.js:1705
+msgid "sol"
+msgstr ""
+
+#: js/blocks.js:1861
+#: js/palette.js:453
+#: js/palette.js:1598
+#: js/basicblocks.js:965
+#: js/basicblocks.js:969
+#: js/basicblocks.js:981
+#: js/basicblocks.js:989
+msgid "box"
+msgstr "กล่อง"
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:978
+msgid "store in"
+msgstr "นำไปเก็บไว้"
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:204
+#: js/basicblocks.js:978
+msgid "name"
+msgstr "ชื่อ"
+
+#: js/blocks.js:1956
+#: js/basicblocks.js:956
+#: js/basicblocks.js:978
+#: js/basicblocks.js:1180
+#: plugins/bitcoin.rtp:27
+msgid "value"
+msgstr "ค่า"
+
+#: js/palette.js:639
+#: js/basicblocks.js:661
+msgid "back"
+msgstr "กลับ"
+
+#: js/palette.js:647
+#: js/palette.js:648
+msgid "hide"
+msgstr "ซ่อน"
+
+#: js/palette.js:650
+#: js/palette.js:651
+#: js/basicblocks.js:1331
+msgid "show"
+msgstr "แสดง"
+
+#: js/palette.js:653
+#: js/palette.js:654
+msgid "popout"
+msgstr "หน้าต่างแจ้งเตือน"
+
+#: js/palette.js:1685
+msgid "la"
+msgstr ""
+
+#: js/palette.js:1705
+msgid "mi"
+msgstr ""
+
+#: js/palette.js:1705
+msgid "re"
+msgstr ""
+
+#: js/basicblocks.js:74
+msgid "current pitch name"
+msgstr "ชื่อระดับเสียงปัจจุบัน"
+
+#: js/basicblocks.js:83
+msgid "current pitch octave"
+msgstr "เสียงโน้ตคู่แปด"
+
+#: js/basicblocks.js:92
+msgid "square"
+msgstr "สี่เหลี่ยม"
+
+#: js/basicblocks.js:100
+msgid "triangle"
+msgstr "สามเหลี่ยม"
+
+#: js/basicblocks.js:108
+msgid "sine"
+msgstr "ซายน์"
+
+#: js/basicblocks.js:116
+msgid "sawtooth"
+msgstr "ฟันเลื้อย"
+
+#: js/basicblocks.js:125
+msgid "transposition"
+msgstr "การเปลี่ยนตำแหน่ง"
+
+#: js/basicblocks.js:132
+msgid "turtle pitch number"
+msgstr "จำนวนเต่าระดับเสียง"
+
+#: js/basicblocks.js:140
+msgid "number to pitch"
+msgstr "จำนวนจนถึงระดับเสียง"
+
+#: js/basicblocks.js:148
+msgid "number to octave"
+msgstr "จำนวนจนถึงโน้ตคู่แปด"
+
+#: js/basicblocks.js:170
+msgid "invert"
+msgstr "สับเปลี่ยนที่กัน"
+
+#: js/basicblocks.js:170
+#: js/basicblocks.js:424
+#: js/basicblocks.js:1309
+#: plugins/rodi.rtp:170
+msgid "note"
+msgstr "โน้ต"
+
+#: js/basicblocks.js:170
+#: js/basicblocks.js:204
+#: js/basicblocks.js:1309
+msgid "octave"
+msgstr "เสียงแปดคู่"
+
+#: js/basicblocks.js:182
+msgid "adjust transposition"
+msgstr "ปรับการคมนาคม"
+
+#: js/basicblocks.js:190
+msgid "flat"
+msgstr "ราบ"
+
+#: js/basicblocks.js:197
+msgid "sharp"
+msgstr "เสียงแหลม"
+
+#: js/basicblocks.js:217
+msgid "1/64 note"
+msgstr "โน้ต 1/64"
+
+#: js/basicblocks.js:224
+msgid "1/32 note"
+msgstr "โน๊ต 1/32"
+
+#: js/basicblocks.js:231
+msgid "1/16 note"
+msgstr "โน้ต 1/16"
+
+#: js/basicblocks.js:238
+msgid "eighth note"
+msgstr "โน้ตแปด"
+
+#: js/basicblocks.js:245
+msgid "quarter note"
+msgstr "โน้ต 1/4"
+
+#: js/basicblocks.js:252
+msgid "half note"
+msgstr "โน๊ตครึ่ง"
+
+#: js/basicblocks.js:259
+msgid "whole note"
+msgstr "โน้ตเต็ม"
+
+#: js/basicblocks.js:267
+msgid "tuplet"
+msgstr "ทูเปรท"
+
+#: js/basicblocks.js:267
+#: js/basicblocks.js:277
+msgid "number of notes"
+msgstr "จำนวนของโน้ต"
+
+#: js/basicblocks.js:289
+msgid "pitch-time matrix"
+msgstr "คำอธิบายเมตริกซ์ภาพ"
+
+#: js/basicblocks.js:298
+msgid "turtle note"
+msgstr "เต่าโน๊ต"
+
+#: js/basicblocks.js:306
+msgid "duplicate factor"
+msgstr "ปัจจัยคักลอก"
+
+#: js/basicblocks.js:313
+msgid "skip factor"
+msgstr "ปัจจัยข้าม"
+
+#: js/basicblocks.js:320
+msgid "beat factor"
+msgstr "ปัจจัยให้เกิดจังหวะ"
+
+#: js/basicblocks.js:327
+#: js/basicblocks.js:349
+msgid "beats per minute"
+msgstr "บีทต่อนาที"
+
+#: js/basicblocks.js:334
+msgid "free time"
+msgstr ""
+
+#: js/basicblocks.js:341
+msgid "osctime"
+msgstr "เวลาจากเครื่องกำเนิดสัญญาณ"
+
+#: js/basicblocks.js:357
+msgid "skip notes"
+msgstr "ข้านโน้ต"
+
+#: js/basicblocks.js:365
+msgid "duplicate notes"
+msgstr "คัดลอกโน้ต"
+
+#: js/basicblocks.js:373
+msgid "multiply beat"
+msgstr "หลายจังหวะ"
+
+#: js/basicblocks.js:381
+msgid "divide beat"
+msgstr "แยกบีท"
+
+#: js/basicblocks.js:389
+msgid "tie"
+msgstr "รวม"
+
+#: js/basicblocks.js:396
+msgid "dot"
+msgstr "จุด"
+
+#: js/basicblocks.js:403
+msgid "silence"
+msgstr "พัก"
+
+#: js/basicblocks.js:436
+#: js/basicblocks.js:519
+msgid "set volume"
+msgstr "ปรับเสียง"
+
+#: js/basicblocks.js:444
+msgid "staccato factor"
+msgstr "ปัจจัยstaccato"
+
+#: js/basicblocks.js:451
+msgid "slur factor"
+msgstr "ปัจจัยslur"
+
+#: js/basicblocks.js:458
+msgid "note volume"
+msgstr "เสียงของโน๊ต"
+
+#: js/basicblocks.js:467
+msgid "play forward"
+msgstr ""
+
+#: js/basicblocks.js:476
+msgid "play backward"
+msgstr "เล่นย้อนหลัง"
+
+#: js/basicblocks.js:483
+msgid "key"
+msgstr "คีย์"
+
+#: js/basicblocks.js:490
+msgid "set key"
+msgstr "ตั้งคีย์"
+
+#: js/basicblocks.js:500
 msgid "meter"
 msgstr "อัตราจังหวะ"
 
-msgid "Save your project to a file."
-msgstr "บันทึกโปรเจคของคุณเป็นไฟล์"
+#: js/basicblocks.js:500
+msgid "numerator"
+msgstr "เศษ"
+
+#: js/basicblocks.js:500
+msgid "denominator"
+msgstr "ส่วน"
+
+#: js/basicblocks.js:511
+msgid "articulation"
+msgstr ""
+
+#: js/basicblocks.js:527
+msgid "crescendo"
+msgstr ""
+
+#: js/basicblocks.js:535
+msgid "thirds"
+msgstr ""
+
+#: js/basicblocks.js:542
+msgid "fourths"
+msgstr ""
+
+#: js/basicblocks.js:549
+msgid "tritone"
+msgstr ""
+
+#: js/basicblocks.js:556
+msgid "fifths"
+msgstr ""
+
+#: js/basicblocks.js:563
+msgid "swing"
+msgstr "แกว่ง"
+
+#: js/basicblocks.js:571
+msgid "slur"
+msgstr ""
+
+#: js/basicblocks.js:579
+msgid "staccato"
+msgstr ""
+
+#: js/basicblocks.js:589
+msgid "heading"
+msgstr "ทิศทางปัจจุบัน"
+
+#: js/basicblocks.js:596
+#: js/basicblocks.js:635
+msgid "x"
+msgstr "แกน x"
+
+#: js/basicblocks.js:603
+#: js/basicblocks.js:635
+msgid "y"
+msgstr "แกน y"
+
+#: js/basicblocks.js:617
+msgid "arc"
+msgstr "เส้นโค้ง"
+
+#: js/basicblocks.js:617
+msgid "angle"
+msgstr "มุม"
+
+#: js/basicblocks.js:617
+msgid "radius"
+msgstr "รัศมี"
+
+#: js/basicblocks.js:627
+msgid "set heading"
+msgstr "กำหนดทิศทาง"
+
+#: js/basicblocks.js:635
+msgid "set xy"
+msgstr "ตั้งค่าแกน xy"
+
+#: js/basicblocks.js:645
+#: plugins/rodi.rtp:59
+msgid "right"
+msgstr "ขวา"
+
+#: js/basicblocks.js:653
+#: plugins/rodi.rtp:58
+msgid "left"
+msgstr "ซ้าย"
+
+#: js/basicblocks.js:669
+msgid "forward"
+msgstr "เดินหน้า"
+
+#: js/basicblocks.js:680
+#: js/basicblocks.js:724
+msgid "background"
+msgstr "พื้นหลัง"
+
+#: js/basicblocks.js:687
+msgid "color"
+msgstr "สี"
+
+#: js/basicblocks.js:694
+msgid "shade"
+msgstr "เฉดสี"
+
+#: js/basicblocks.js:701
+msgid "grey"
+msgstr "เทา"
+
+#: js/basicblocks.js:708
+msgid "pen size"
+msgstr "ขนาดปากกา"
+
+#: js/basicblocks.js:715
+msgid "set font"
+msgstr ""
+
+#: js/basicblocks.js:731
+msgid "hollow line"
+msgstr "เส้นช่องโพรง"
+
+#: js/basicblocks.js:738
+msgid "fill"
+msgstr "เติม"
+
+#: js/basicblocks.js:745
+msgid "pen up"
+msgstr "ยกปากกาขึ้น"
+
+#: js/basicblocks.js:752
+msgid "pen down"
+msgstr "จรดปากกา"
+
+#: js/basicblocks.js:759
+msgid "set pen size"
+msgstr "ตั้งค่าขนาดปากกา"
+
+#: js/basicblocks.js:767
+msgid "set translucency"
+msgstr ""
+
+#: js/basicblocks.js:775
+msgid "set hue"
+msgstr "ตั้งค่า ความมืดหรือความสว่างของสี "
+
+#: js/basicblocks.js:783
+msgid "set shade"
+msgstr "ตั้งค่าเฉดสี"
+
+#: js/basicblocks.js:791
+msgid "set grey"
+msgstr "ตั้งเป็นสีเทา"
+
+#: js/basicblocks.js:799
+msgid "set color"
+msgstr "ตั้งค่าสี"
+
+#: js/basicblocks.js:809
+msgid "int"
+msgstr ""
+
+#: js/basicblocks.js:845
+msgid "and"
+msgstr "บวก"
+
+#: js/basicblocks.js:852
+msgid "or"
+msgstr "หรือ"
+
+#: js/basicblocks.js:859
+msgid "not"
+msgstr "ไม่"
+
+#: js/basicblocks.js:865
+msgid "mod"
+msgstr "หารเอาเศษ"
+
+#: js/basicblocks.js:873
+msgid "sqrt"
+msgstr "จำนวนรากกำลังสอง"
+
+#: js/basicblocks.js:923
+msgid "one of"
+msgstr "หนึ่งใน"
+
+#: js/basicblocks.js:923
+msgid "this"
+msgstr "นี้"
+
+#: js/basicblocks.js:923
+msgid "that"
+msgstr "ซึ่ง"
+
+#: js/basicblocks.js:934
+msgid "random"
+msgstr "สุ่ม"
+
+#: js/basicblocks.js:934
+msgid "min"
+msgstr "นาที"
+
+#: js/basicblocks.js:934
+msgid "max"
+msgstr "ใหญ่สุด"
+
+#: js/basicblocks.js:949
+msgid "add 1 to"
+msgstr "เพิ่ม1ที่"
+
+#: js/basicblocks.js:956
+msgid "add"
+msgstr "เพิ่ม"
+
+#: js/basicblocks.js:956
+#: plugins/finance.rtp:28
+msgid "to"
+msgstr "เพิ่ม1"
+
+#: js/basicblocks.js:1000
+#: js/basicblocks.js:1047
+#: js/basicblocks.js:1064
+#: js/basicblocks.js:1102
+#: js/basicblocks.js:1383
+#: js/basicblocks.js:1390
+msgid "do"
+msgstr "ทำ"
+
+#: js/basicblocks.js:1009
+msgid "return"
+msgstr ""
+
+#: js/basicblocks.js:1019
+msgid "return to URL"
+msgstr ""
+
+#: js/basicblocks.js:1023
+msgid "100"
+msgstr ""
+
+#: js/basicblocks.js:1029
+#: js/basicblocks.js:1055
+#: js/basicblocks.js:1074
+msgid "calculate"
+msgstr ""
+
+#: js/basicblocks.js:1102
+msgid "on"
+msgstr "ตรง"
+
+#: js/basicblocks.js:1102
+#: js/basicblocks.js:1105
+#: js/basicblocks.js:1116
+msgid "event"
+msgstr "งาน"
+
+#: js/basicblocks.js:1113
+msgid "broadcast"
+msgstr "ถ่ายทอด"
+
+#: js/basicblocks.js:1158
+msgid "load heap from App"
+msgstr ""
+
+#: js/basicblocks.js:1169
+msgid "save heap to App"
+msgstr ""
+
+#: js/basicblocks.js:1180
+msgid "set heap"
+msgstr "ตั้งค่าฮีป"
+
+#: js/basicblocks.js:1180
+msgid "index"
+msgstr "ดัชนี"
+
+#: js/basicblocks.js:1191
+#: plugins/heap.rtp:126
+msgid "show heap"
+msgstr "แสดง heap"
+
+#: js/basicblocks.js:1198
+msgid "heap length"
+msgstr "ความยาวของฮีป"
+
+#: js/basicblocks.js:1206
+#: plugins/heap.rtp:134
+msgid "heap empty?"
+msgstr "ลบฮีป?"
+
+#: js/basicblocks.js:1220
+#: plugins/heap.rtp:150
+msgid "save heap"
+msgstr "บันทึกฮีป"
+
+#: js/basicblocks.js:1229
+#: plugins/heap.rtp:160
+msgid "load heap"
+msgstr "โหลดฮีป"
+
+#: js/basicblocks.js:1238
+msgid "index heap"
+msgstr "ดัชนีฮีป"
+
+#: js/basicblocks.js:1247
+#: plugins/heap.rtp:109
+msgid "push"
+msgstr "ใส่เข้าไป"
+
+#: js/basicblocks.js:1255
+#: plugins/heap.rtp:118
+msgid "pop"
+msgstr "ป๊อบ"
+
+#: js/basicblocks.js:1264
+msgid "speak"
+msgstr "พูด"
+
+#: js/basicblocks.js:1292
+msgid "stop media"
+msgstr "หยุดสื่อ"
+
+#: js/basicblocks.js:1299
+msgid "frequency"
+msgstr "ความถี่"
+
+#: js/basicblocks.js:1299
+msgid "duration (ms)"
+msgstr "ระยะเวลาต่อ จุลวินาที"
+
+#: js/basicblocks.js:1309
+msgid "note to frequency"
+msgstr "โน้ตความถี่"
+
+#: js/basicblocks.js:1320
+msgid "shell"
+msgstr "กระดอง"
+
+#: js/basicblocks.js:1320
+#: js/basicblocks.js:1331
+msgid "size"
+msgstr "ขนาด"
+
+#: js/basicblocks.js:1320
+msgid "image"
+msgstr "รูปภาพ"
+
+#: js/basicblocks.js:1331
+msgid "obj"
+msgstr "สิ่งของ"
+
+#: js/basicblocks.js:1369
+msgid "stop"
+msgstr "หยุด"
+
+#: js/basicblocks.js:1376
+msgid "wait for"
+msgstr "รอ"
+
+#: js/basicblocks.js:1383
+msgid "until"
+msgstr "จนกว่า"
+
+#: js/basicblocks.js:1390
+msgid "while"
+msgstr "สีขาว"
+
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1404
+msgid "if"
+msgstr "ถ้า"
+
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1404
+msgid "then"
+msgstr "แล้ว"
+
+#: js/basicblocks.js:1397
+msgid "else"
+msgstr "ไม่งั้นให้ทำ"
+
+#: js/basicblocks.js:1411
+msgid "forever"
+msgstr "ตลอดไป"
+
+#: js/basicblocks.js:1418
+msgid "repeat"
+msgstr "ซ้ำ"
+
+#: js/basicblocks.js:1430
+#: js/basicblocks.js:1441
+#: js/basicblocks.js:1450
+#: js/basicblocks.js:1460
+#: js/basicblocks.js:1468
+#: js/basicblocks.js:1477
+#: js/basicblocks.js:1487
+msgid "unknown"
+msgstr "ไม่รู้"
+
+#: js/basicblocks.js:1498
+msgid "play back"
+msgstr "เล่นย้อนหลัง"
+
+#: js/basicblocks.js:1506
+msgid "stop play"
+msgstr "หยุดเล่น"
+
+#: js/basicblocks.js:1513
+msgid "loudness"
+msgstr "ระดับความดัง"
+
+#: js/basicblocks.js:1520
+msgid "save as lilypond"
+msgstr "จัดเก็บเป็น lilypond"
+
+#: js/basicblocks.js:1523
+#: js/basicblocks.js:1532
+msgid "title"
+msgstr "หัวข้อ"
+
+#: js/basicblocks.js:1529
+msgid "save svg"
+msgstr "บันทึกโปรเจคเป็นSVG"
+
+#: js/basicblocks.js:1538
+#: plugins/turtle.rtp:42
+msgid "turtle x"
+msgstr "เต่า x"
+
+#: js/basicblocks.js:1547
+#: plugins/turtle.rtp:52
+msgid "turtle y"
+msgstr "เต่า y"
+
+#: js/basicblocks.js:1556
+#: plugins/turtle.rtp:62
+msgid "start turtle"
+msgstr "เริ่มเต่า"
+
+#: js/basicblocks.js:1565
+#: plugins/turtle.rtp:72
+msgid "stop turtle"
+msgstr "หยุดเต่า"
+
+#: js/basicblocks.js:1574
+msgid "no background"
+msgstr "ไม่มีพื้นหลัง"
+
+#: js/basicblocks.js:1581
+msgid "show blocks"
+msgstr "แสดง blocks"
+
+#: js/basicblocks.js:1588
+msgid "hide blocks"
+msgstr "ซ่อน blocks"
+
+#: js/basicblocks.js:1595
+msgid "open project"
+msgstr ""
+
+#: js/basicblocks.js:1619
+msgid "wait"
+msgstr "รอ"
+
+#: js/basicblocks.js:1627
+msgid "print"
+msgstr "งานพิมพ์"
+
+#: js/basicblocks.js:1635
+#: js/basicblocks.js:1643
+#: plugins/turtle.rtp:82
+msgid "turtle name"
+msgstr "ชื่อของเต่า"
+
+#: js/basicblocks.js:1644
+#: plugins/translate.rtp:95
+#: plugins/turtle.rtp:83
+msgid "source"
+msgstr "แหล่ง"
+
+#: js/basicblocks.js:1645
+#: plugins/translate.rtp:95
+#: plugins/turtle.rtp:84
+msgid "target"
+msgstr "เป้าหมาย"
+
+#: js/basicblocks.js:1659
+msgid "click"
+msgstr "คลิ๊ก"
+
+#: js/basicblocks.js:1667
+msgid "pixel color"
+msgstr "พิเซลของสี"
+
+#: js/basicblocks.js:1674
+msgid "time"
+msgstr "เวลา"
+
+#: js/basicblocks.js:1681
+msgid "mouse x"
+msgstr "หนูx"
+
+#: js/basicblocks.js:1689
+msgid "mouse y"
+msgstr "หนูy"
+
+#: js/basicblocks.js:1697
+msgid "mouse button"
+msgstr "ปุ่มหนู"
+
+#: js/basicblocks.js:1704
+msgid "keyboard"
+msgstr "แป้นพิมพ์"
+
+#: js/basicblocks.js:1713
+msgid "eval"
+msgstr "ประเมิน"
+
+#: plugins/gmap.rtp:30
+msgid "city latitude"
+msgstr "เส้นรุ้งของเมือง"
+
+#: plugins/gmap.rtp:40
+msgid "city longitude"
+msgstr "เส้นแวงของเมือง"
+
+#: plugins/gmap.rtp:71
+#: plugins/gmap.rtp:74
+#: plugins/gmap.rtp:104
+#: plugins/gmap.rtp:107
+msgid "Coordinate data not available."
+msgstr "ไม่มีพิกัดข้อมูล"
+
+#: plugins/gmap.rtp:116
+msgid "Google map"
+msgstr "แผนที่"
+
+#: plugins/gmap.rtp:116
+#: plugins/gmap.rtp:160
+msgid "coordinates"
+msgstr "พิกัด"
+
+#: plugins/gmap.rtp:116
+msgid "zoom factor"
+msgstr "ปัจจัยที่น่าสนใจ"
+
+#: plugins/gmap.rtp:144
+msgid "zoom"
+msgstr "ขยาย"
+
+#: plugins/gmap.rtp:160
+msgid "latitude"
+msgstr "เส้นรุ่ง"
+
+#: plugins/gmap.rtp:160
+msgid "longitude"
+msgstr "เส้นแวง"
+
+#: plugins/dictionary.rtp:25
+msgid "define"
+msgstr "ความหมาย"
+
+#: plugins/bitcoin.rtp:27
+msgid "bitcoin"
+msgstr "บิตคอย์น"
+
+#: plugins/bitcoin.rtp:27
+#: plugins/finance.rtp:28
+msgid "from"
+msgstr "จาก"
+
+#: plugins/maths.rtp:47
+msgid "power"
+msgstr "ยกกำลัง"
+
+#: plugins/maths.rtp:47
+msgid "base"
+msgstr "ฐาน"
+
+#: plugins/maths.rtp:47
+msgid "exp"
+msgstr "เลขยกกำลังในคณิตศาสตร์"
+
+#: plugins/maths.rtp:69
+msgid "floor"
+msgstr "พื้น"
+
+#: plugins/maths.rtp:71
+msgid "ceiling"
+msgstr "เพดาน"
+
+#: plugins/maths.rtp:74
+msgid "degrees"
+msgstr "ดีกรี"
+
+#: plugins/maths.rtp:74
+msgid "to degrees"
+msgstr "ถึงดีกรีที่"
+
+#: plugins/maths.rtp:76
+msgid "radians"
+msgstr "รัศมีเส้นโค้ง"
+
+#: plugins/maths.rtp:76
+msgid "to radians"
+msgstr "รัศมี"
+
+#: plugins/heap.rtp:81
+#: plugins/heap.rtp:85
+msgid "You need to select a file."
+msgstr ""
+
+#: plugins/translate.rtp:73
+msgid "translate"
+msgstr "แปล"
+
+#: plugins/translate.rtp:78
+#: plugins/translate.rtp:89
+msgid "hello"
+msgstr "สวัสดี"
+
+#: plugins/translate.rtp:84
+msgid "detect lang"
+msgstr "จับภาษา"
+
+#: plugins/translate.rtp:95
+msgid "set lang"
+msgstr "ตั้งค่าภาษา"
+
+#: plugins/rodi.rtp:30
+msgid "blink (ms)"
+msgstr ""
+
+#: plugins/rodi.rtp:129
+msgid "move"
+msgstr "ย้าย"
+
+#: plugins/rodi.rtp:91
+msgid "sense left"
+msgstr ""
+
+#: plugins/rodi.rtp:130
+msgid "sense right"
+msgstr ""
+
+#: plugins/rodi.rtp:169
+msgid "sing"
+msgstr "ร้อง"
+
+#: plugins/rodi.rtp:183
+msgid "duration"
+msgstr "ช่วงเวลา"
+
+#: plugins/rodi.rtp:203
+msgid "see distance"
+msgstr ""
+
+#: plugins/finance.rtp:28
+msgid "currency"
+msgstr "เงินตรา"
+
+#: plugins/finance.rtp:69
+msgid "stock price"
+msgstr "ราคาหุ้น"
+
+#: plugins/facebook.rtp:27
+msgid "publish"
+msgstr "โพสสู่สาธารณะ"
+
+#: plugins/facebook.rtp:30
+msgid "comment"
+msgstr "หมายเหตุ"
+
+#: plugins/weather.rtp:62
+#: plugins/weather.rtp:86
+msgid "Days ahead must be in the range of -1 to 5."
+msgstr ""
+
+#: plugins/weather.rtp:107
+msgid "forecast"
+msgstr "พยากรณ์"
+
+#: plugins/weather.rtp:108
+#: plugins/weather.rtp:122
+#: plugins/weather.rtp:135
+msgid "city"
+msgstr "เมือง"
+
+#: plugins/weather.rtp:109
+#: plugins/weather.rtp:123
+#: plugins/weather.rtp:136
+msgid "day"
+msgstr "วัน"
+
+#: plugins/weather.rtp:121
+msgid "high"
+msgstr "สูง"
+
+#: plugins/weather.rtp:134
+msgid "low"
+msgstr "ต่ำ"
+
+#: plugins/nutrition.rtp:104
+msgid "get calories"
+msgstr "รับแคลลอรี่"
+
+#: plugins/nutrition.rtp:107
+msgid "get protein"
+msgstr "รับโปรตีน"
+
+#: plugins/nutrition.rtp:110
+msgid "get carbs"
+msgstr "รับ คาร์โบไฮเดรต"
+
+#: plugins/nutrition.rtp:113
+msgid "get fiber"
+msgstr "รับกาก"
+
+#: plugins/nutrition.rtp:116
+msgid "get fat"
+msgstr "ทำให้อ้วน"
+
+#: plugins/nutrition.rtp:119
+msgid "get name"
+msgstr "รับค่าชื่อ"
+
+#: plugins/nutrition.rtp:122
+msgid "calories"
+msgstr "แคลลอรี่"
+
+#: plugins/nutrition.rtp:128
+msgid "protein"
+msgstr "โปรตีน"
+
+#: plugins/nutrition.rtp:134
+msgid "carbs"
+msgstr "คาร์โบไฮเดรต"
+
+#: plugins/nutrition.rtp:140
+msgid "fiber"
+msgstr "กาก"
+
+#: plugins/nutrition.rtp:146
+msgid "fat"
+msgstr "อ้วน"
+
+#: plugins/nutrition.rtp:152
+msgid "eat"
+msgstr "กิน"
+
+#: plugins/nutrition.rtp:155
+msgid "digest meal"
+msgstr "ย่อยอาหาร"
+
+#: plugins/nutrition.rtp:158
+msgid "apple"
+msgstr "แอปเปิ้ล"
+
+#: plugins/nutrition.rtp:161
+msgid "banana"
+msgstr "กล้วย"
+
+#: plugins/nutrition.rtp:164
+msgid "orange"
+msgstr "สีส้ม"
+
+#: plugins/nutrition.rtp:167
+msgid "wheat bread"
+msgstr "ขนมปังข้าวสาลี"
+
+#: plugins/nutrition.rtp:170
+msgid "corn"
+msgstr "ข้าวโพด"
+
+#: plugins/nutrition.rtp:173
+msgid "potato"
+msgstr "มันฝรั้ง"
+
+#: plugins/nutrition.rtp:176
+msgid "sweet potato"
+msgstr "มันหวาน"
+
+#: plugins/nutrition.rtp:179
+msgid "tomato"
+msgstr "มะเขือเทศ"
+
+#: plugins/nutrition.rtp:182
+msgid "broccoli"
+msgstr "บล๊อกโคลี่"
+
+#: plugins/nutrition.rtp:185
+msgid "rice and beans"
+msgstr "ข้าวและถั่ว"
+
+#: plugins/nutrition.rtp:188
+msgid "tamale"
+msgstr "เทมาเล่"
+
+#: plugins/nutrition.rtp:191
+msgid "cheese"
+msgstr "ชีส"
+
+#: plugins/nutrition.rtp:194
+msgid "chicken"
+msgstr "ไก่"
+
+#: plugins/nutrition.rtp:197
+msgid "fish"
+msgstr "ปลา"
+
+#: plugins/nutrition.rtp:200
+msgid "beef"
+msgstr "เนื้อ"
+
+#: plugins/nutrition.rtp:203
+msgid "cake"
+msgstr "เค้ก"
+
+#: plugins/nutrition.rtp:206
+msgid "cookie"
+msgstr "คุกกี้"
+
+#: plugins/nutrition.rtp:209
+msgid "water"
+msgstr "น้ำ"
+
+#: plugins/accelerometer.rtp:48
+msgid "motion x"
+msgstr "การเคลื่อนไหวx"
+
+#: plugins/accelerometer.rtp:56
+msgid "motion y"
+msgstr "การเคลื่อนไหวy"
+
+#: plugins/accelerometer.rtp:64
+msgid "motion z"
+msgstr "การเคลื่อนไหวz"
+
+#: plugins/gmap.rtp:30
+msgid "city latitude"
+msgstr "เส้นรุ้งของเมือง"
+
+#: plugins/gmap.rtp:40
+msgid "city longitude"
+msgstr "เส้นแวงของเมือง"
+
+#: plugins/gmap.rtp:71
+#: plugins/gmap.rtp:74
+#: plugins/gmap.rtp:104
+#: plugins/gmap.rtp:107
+msgid "Coordinate data not available."
+msgstr "ไม่มีพิกัดข้อมูล"
+
+#: plugins/gmap.rtp:116
+msgid "Google map"
+msgstr "แผนที่"
+
+#: plugins/gmap.rtp:116
+#: plugins/gmap.rtp:160
+msgid "coordinates"
+msgstr "พิกัด"
+
+#: plugins/gmap.rtp:116
+msgid "zoom factor"
+msgstr "ปัจจัยที่น่าสนใจ"
+
+#: plugins/gmap.rtp:144
+msgid "zoom"
+msgstr "ขยาย"
+
+#: plugins/gmap.rtp:160
+msgid "latitude"
+msgstr "เส้นรุ่ง"
+
+#: plugins/gmap.rtp:160
+msgid "longitude"
+msgstr "เส้นแวง"
+
+#: plugins/dictionary.rtp:25
+msgid "define"
+msgstr "ความหมาย"
+
+#: plugins/bitcoin.rtp:27
+msgid "bitcoin"
+msgstr "บิตคอย์น"
+
+#: plugins/bitcoin.rtp:27
+#: plugins/finance.rtp:28
+msgid "from"
+msgstr "จาก"
+
+#: plugins/maths.rtp:47
+msgid "power"
+msgstr "ยกกำลัง"
+
+#: plugins/maths.rtp:47
+msgid "base"
+msgstr "ฐาน"
+
+#: plugins/maths.rtp:47
+msgid "exp"
+msgstr "เลขยกกำลังในคณิตศาสตร์"
+
+#: plugins/maths.rtp:69
+msgid "floor"
+msgstr "พื้น"
+
+#: plugins/maths.rtp:71
+msgid "ceiling"
+msgstr "เพดาน"
+
+#: plugins/maths.rtp:74
+msgid "degrees"
+msgstr "ดีกรี"
+
+#: plugins/maths.rtp:74
+msgid "to degrees"
+msgstr "ถึงดีกรีที่"
+
+#: plugins/maths.rtp:76
+msgid "radians"
+msgstr "รัศมีเส้นโค้ง"
+
+#: plugins/maths.rtp:76
+msgid "to radians"
+msgstr "รัศมี"
+
+#: plugins/heap.rtp:81
+#: plugins/heap.rtp:85
+msgid "You need to select a file."
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "fetch"
+msgstr "จับ"
+
+#: plugins/impact.rtp:32
+msgid "UID"
+msgstr ""
+
+#: plugins/impact.rtp:32
+msgid "field"
+msgstr "เขตข้อมูล"
+
+#: plugins/impact.rtp:32
+msgid "hours ago"
+msgstr "หนึ่งชั่วโมงที่แล้ว"
+
+#: plugins/impact.rtp:63
+#: plugins/impact.rtp:127
+msgid "Impact data not available."
+msgstr ""
+
+#: plugins/impact.rtp:69
+msgid "Cannot parse Impact data."
+msgstr ""
+
+#: plugins/impact.rtp:100
+#: plugins/impact.rtp:114
+msgid "Impact field not found."
+msgstr ""
+
+#: plugins/impact.rtp:122
+msgid "Impact UID not found."
+msgstr ""
+
+#: plugins/impact.rtp:124
+msgid "Impact Time not found."
+msgstr ""
+
+#: plugins/translate.rtp:73
+msgid "translate"
+msgstr "แปล"
+
+#: plugins/translate.rtp:78
+#: plugins/translate.rtp:89
+msgid "hello"
+msgstr "สวัสดี"
+
+#: plugins/translate.rtp:84
+msgid "detect lang"
+msgstr "จับภาษา"
+
+#: plugins/translate.rtp:95
+msgid "set lang"
+msgstr "ตั้งค่าภาษา"
+
+#: plugins/rodi.rtp:110
+msgid "blink"
+msgstr "กระพริบตา"
+
+#: plugins/rodi.rtp:129
+msgid "move"
+msgstr "ย้าย"
+
+#: plugins/rodi.rtp:153
+msgid "infrared light (left)"
+msgstr "แสงอินฟราเรท"
+
+#: plugins/rodi.rtp:167
+msgid "infrared light (right)"
+msgstr "แสงอินฟราเรท(ขวา)"
+
+#: plugins/rodi.rtp:181
+msgid "play"
+msgstr "เล่น"
+
+#: plugins/rodi.rtp:183
+msgid "duration"
+msgstr "ช่วงเวลา"
+
+#: plugins/rodi.rtp:206
+msgid "distance"
+msgstr "ระยะ"
+
+#: plugins/rodi.rtp:292
+msgid "red"
+msgstr ""
+
+#: plugins/rodi.rtp:293
+msgid "green"
+msgstr ""
+
+#: plugins/rodi.rtp:294
+msgid "blue"
+msgstr ""
+
+#: plugins/rodi.rtp:321
+msgid "light intensity"
+msgstr ""
+
+#: plugins/rodi.rtp:338
+msgid "led"
+msgstr ""
+
+#: plugins/finance.rtp:28
+msgid "currency"
+msgstr "เงินตรา"
+
+#: plugins/finance.rtp:69
+msgid "stock price"
+msgstr "ราคาหุ้น"
+
+#: plugins/facebook.rtp:27
+msgid "publish"
+msgstr "โพสสู่สาธารณะ"
+
+#: plugins/facebook.rtp:30
+msgid "comment"
+msgstr "หมายเหตุ"
+
+#: plugins/weather.rtp:62
+#: plugins/weather.rtp:86
+msgid "Days ahead must be in the range of -1 to 5."
+msgstr ""
+
+#: plugins/weather.rtp:107
+msgid "forecast"
+msgstr "พยากรณ์"
+
+#: plugins/weather.rtp:108
+#: plugins/weather.rtp:122
+#: plugins/weather.rtp:135
+msgid "city"
+msgstr "เมือง"
+
+#: plugins/weather.rtp:109
+#: plugins/weather.rtp:123
+#: plugins/weather.rtp:136
+msgid "day"
+msgstr "วัน"
+
+#: plugins/weather.rtp:121
+msgid "high"
+msgstr "สูง"
+
+#: plugins/weather.rtp:134
+msgid "low"
+msgstr "ต่ำ"
+
+#: plugins/nutrition.rtp:104
+msgid "get calories"
+msgstr "รับแคลลอรี่"
+
+#: plugins/nutrition.rtp:107
+msgid "get protein"
+msgstr "รับโปรตีน"
+
+#: plugins/nutrition.rtp:110
+msgid "get carbs"
+msgstr "รับ คาร์โบไฮเดรต"
+
+#: plugins/nutrition.rtp:113
+msgid "get fiber"
+msgstr "รับกาก"
+
+#: plugins/nutrition.rtp:116
+msgid "get fat"
+msgstr "ทำให้อ้วน"
+
+#: plugins/nutrition.rtp:119
+msgid "get name"
+msgstr "รับค่าชื่อ"
+
+#: plugins/nutrition.rtp:122
+msgid "calories"
+msgstr "แคลลอรี่"
+
+#: plugins/nutrition.rtp:128
+msgid "protein"
+msgstr "โปรตีน"
+
+#: plugins/nutrition.rtp:134
+msgid "carbs"
+msgstr "คาร์โบไฮเดรต"
+
+#: plugins/nutrition.rtp:140
+msgid "fiber"
+msgstr "กาก"
+
+#: plugins/nutrition.rtp:146
+msgid "fat"
+msgstr "อ้วน"
+
+#: plugins/nutrition.rtp:152
+msgid "eat"
+msgstr "กิน"
+
+#: plugins/nutrition.rtp:155
+msgid "digest meal"
+msgstr "ย่อยอาหาร"
+
+#: plugins/nutrition.rtp:158
+msgid "apple"
+msgstr "แอปเปิ้ล"
+
+#: plugins/nutrition.rtp:161
+msgid "banana"
+msgstr "กล้วย"
+
+#: plugins/nutrition.rtp:164
+msgid "orange"
+msgstr "สีส้ม"
+
+#: plugins/nutrition.rtp:167
+msgid "wheat bread"
+msgstr "ขนมปังข้าวสาลี"
+
+#: plugins/nutrition.rtp:170
+msgid "corn"
+msgstr "ข้าวโพด"
+
+#: plugins/nutrition.rtp:173
+msgid "potato"
+msgstr "มันฝรั้ง"
+
+#: plugins/nutrition.rtp:176
+msgid "sweet potato"
+msgstr "มันหวาน"
+
+#: plugins/nutrition.rtp:179
+msgid "tomato"
+msgstr "มะเขือเทศ"
+
+#: plugins/nutrition.rtp:182
+msgid "broccoli"
+msgstr "บล๊อกโคลี่"
+
+#: plugins/nutrition.rtp:185
+msgid "rice and beans"
+msgstr "ข้าวและถั่ว"
+
+#: plugins/nutrition.rtp:188
+msgid "tamale"
+msgstr "เทมาเล่"
+
+#: plugins/nutrition.rtp:191
+msgid "cheese"
+msgstr "ชีส"
+
+#: plugins/nutrition.rtp:194
+msgid "chicken"
+msgstr "ไก่"
+
+#: plugins/nutrition.rtp:197
+msgid "fish"
+msgstr "ปลา"
+
+#: plugins/nutrition.rtp:200
+msgid "beef"
+msgstr "เนื้อ"
+
+#: plugins/nutrition.rtp:203
+msgid "cake"
+msgstr "เค้ก"
+
+#: plugins/nutrition.rtp:206
+msgid "cookie"
+msgstr "คุกกี้"
+
+#: plugins/nutrition.rtp:209
+msgid "water"
+msgstr "น้ำ"
+
+#: plugins/accelerometer.rtp:48
+msgid "motion x"
+msgstr "การเคลื่อนไหวx"
+
+#: plugins/accelerometer.rtp:56
+msgid "motion y"
+msgstr "การเคลื่อนไหวy"
+
+#: plugins/accelerometer.rtp:64
+msgid "motion z"
+msgstr "การเคลื่อนไหวz"
 
 #. TRANS: mashape webservices (probably no need to translate)
 msgid "mashape"
 msgstr ""
 
-#. TRANS: target language for translation
-msgid "target"
-msgstr "เป้าหมาย"
-
-#. TRANS: horizontal space
-msgid "hspace"
-msgstr "ช่องว่างแนวนอน"
-
-msgid "keyboard"
-msgstr "แป้นพิมพ์"
-
-msgid "You can also load projects from the file system."
-msgstr "คุณสามารถโหลดโปรเจคได้จากไฟล์ในโปรแกรม"
-
-#. TRANS: as in "on event do"
-msgid "on"
-msgstr "ตรง"
-
-msgid "chicken"
-msgstr "ไก่"
-
-msgid "Run music slow"
-msgstr "เล่นเสียงดนตรี (ช้า)"
-
-msgid "apple"
-msgstr "แอปเปิ้ล"
-
-msgid "pitch-time matrix"
-msgstr "ระดับเสียง-เวลา เมทริกซ์"
-
-msgis "graphical-notation matrix"
-msgstr "คำอธิบายเมตริกซ์ภาพ"
-
-msgid "number"
-msgstr "ตัวเลข"
-
-#. TRANS: unique ID
-msgid "UID"
-msgstr ""
-
-#. TRANS: name of project
-msgid "title"
-msgstr "หัวข้อ"
-
-msgid "radians"
-msgstr "รัศมีเส้นโค้ง"
-
-msgid "staccato"
-msgstr ""
-
-msgid "Undo"
-msgstr "ยกเลิกคำสั่งเก่า"
-
-#. TRANS: ms is micro seconds
-msgid "duration (ms)"
-msgstr "ระยะเวลาต่อ จุลวินาที"
-
-#. TRANS: as in "add 1 to"
-msgid "to"
-msgstr "เพิ่ม1"
-
-msgid "add"
-msgstr "เพิ่ม"
-
-msgid "set pen size"
-msgstr "ตั้งค่าขนาดปากกา"
-
-msgid "rhythm"
-msgstr "จังหวะ"
-
-msgid "latitude"
-msgstr "เส้นรุ่ง"
-
-msgid "1/32 note"
-msgstr "โน๊ต 1/32"
-
-msgid "mouse x"
-msgstr "หนูx"
-
-msgid "mouse y"
-msgstr "หนูy"
-
-msgid "Show/hide blocks"
-msgstr "แสดง/ซ่อน บล๊อก"
-
-#. TRANS: do this action
-msgid "do"
-msgstr "ทำ"
-
-msgid "move"
-msgstr "ย้าย"
-
-msgid "triangle"
-msgstr "สามเหลี่ยม"
-
-msgid "stop turtle"
-msgstr "หยุดเต่า"
-
-msgid "current pitch octave"
-msgstr "เสียงโน้ตคู่แปด"
-
-#. TRANS: robot sensors.
-msgid "distance"
-msgstr "ระยะ"
-
-msgid "food"
-msgstr "อาหาร"
-
-msgid "Click to run the project in slow mode."
-msgstr "คลิ๊กเพื่อเล่นโปรเจคอย่างช้า"
-
-msgid "stop"
-msgstr "หยุด"
-
-#. TRANS: vertical space
-msgid "vspace"
-msgstr "พื้นที่แนวตั้ง"
-
-msgid "fat"
-msgstr "อ้วน"
-
-msgid "Expand or collapse start and action stacks."
-msgstr "ขยายหรือล้ม เริ่มและเรียงทับกัน"
-
-#. TRANS: a container for a variable
-msgid "boxes"
-msgstr "กล่อง"
-
-msgid "get fiber"
-msgstr "รับกาก"
-
-msgid "background"
-msgstr "พื้นหลัง"
-
-#. TRANS: logical "not" operator
-msgid "not"
-msgstr "ไม่"
-
-msgid "Google map"
-msgstr "แผนที่"
-
-#. TRANS: as in blinking an eye.
-msgid "blink"
-msgstr "กระพริบตา"
-
-msgid "day"
-msgstr "วัน"
-
-#. TRANS: mathematical modular (remainder) function.
-msgid "mod"
-msgstr "หารเอาเศษ"
-
-msgid "beat factor"
-msgstr "ปัจจัยให้เกิดจังหวะ"
-
-msgid "Save project"
-msgstr "บันทึกงาน"
-
-msgid "Copy"
-msgstr "คัดลอก"
-
-#. TRANS: the name of a variable (stored in a box)
-msgid "name"
-msgstr "ชื่อ"
-
-msgid "turtle x"
-msgstr "เต่า x"
-
-msgid "turtle y"
-msgstr "เต่า y"
-
-msgid "Download"
-msgstr "ดาวน์โหลด"
-
-msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-msgstr "จะใช้ปุ่มวางได้ต่อเมื่อ คุณคัดลอกบล๊อกไว้บนคลิปบอร์ด"
-
-msgid "transposition"
-msgstr "การเปลี่ยนตำแหน่ง"
-
-msgid "Expand/collapse toolbar"
-msgstr "เพิ่ม/พัง กล่องเครื่องมือ"
-
-msgid "zoom"
-msgstr "ขยาย"
-
-msgid "Hide or show the blocks and the palettes."
-msgstr "ซ่อนหรือแสดงบล๊อกและเมนูสี"
-
-msgid "to degrees"
-msgstr "ถึงดีกรีที่"
-
-msgid "Restore blocks from the trash."
-msgstr "กู้บล๊อกจากถังขยะ"
-
-msgid "get calories"
-msgstr "รับแคลลอรี่"
-
-msgid "Load plugin from file"
-msgstr "โหลดปลั๊กอินจากไฟล์"
-
-#. TRANS: dietary fiber
-msgid "fiber"
-msgstr "กาก"
-
-msgid "You can scroll the blocks on the canvas."
-msgstr "คุณสามารถเลื่อนบล๊อกสู่แคนวาส"
-
-msgid "x"
-msgstr "แกน x"
-
-msgid "show blocks"
-msgstr "แสดง blocks"
-
-msgid "heading"
-msgstr "ทิศทางปัจจุบัน"
-
-msgid "Help"
-msgstr "ช่วยเหลือ"
-
-msgid "turtle"
-msgstr "เต่า"
-
-msgid "crescendo"
-msgstr ""
-
-#. TRANS: sawtooth wave
-msgid "sawtooth"
-msgstr "ฟันเลื้อย"
-
-msgid "right"
-msgstr "ขวา"
-
-msgid "Load samples from server"
-msgstr "โหลดตัวอย่างจากเซอเว่อร์"
-
-msgid "hide blocks"
-msgstr "ซ่อน blocks"
-
-msgid "Hide or show the block palettes."
-msgstr "ซ้อนหรือแสดงบล๊อก"
-
-msgid "This button opens a viewer for loading example projects."
-msgstr "ปุ่มนี้เปิดหน้าต่างเพื่อโหลดโปรเจคตัวอย่าง"
-
-msgid "Enable scrolling"
-msgstr "ทำให้เลื่อนได้"
-
-msgid "Disable scrolling"
-msgstr ""
-
-msgid "back"
-msgstr "กลับ"
-
-msgid "Publish"
-msgstr "โพสสู่สาธารณะ"
-
-msgid "Click to run the project step by step."
-msgstr "คลิ๊กเพื่อให้โปรเจคเล่นทีละขั้นตอน"
-
-#. TRANS: hollow line refers to drawing an outline around a line
-msgid "hollow line"
-msgstr "เส้นช่องโพรง"
-
-msgid "arc"
-msgstr "เส้นโค้ง"
-
-msgid "radius"
-msgstr "รัศมี"
-
-msgid "longitude"
-msgstr "เส้นแวง"
-
-msgid "duration"
-msgstr "ช่วงเวลา"
-
-#. TRANS: shade refers to value (dark to light)
-msgid "set shade"
-msgstr "ตั้งค่าเฉดสี"
-
-msgid "duplicate notes"
-msgstr "คัดลอกโน้ต"
-
-#. TRANS: in mathematical sense (inverse of period)
-msgid "frequency"
-msgstr "ความถี่"
-
-#. TRANS: as in the event that a signal arrives
-msgid "event"
-msgstr "งาน"
-
-msgid "pixel color"
-msgstr "พิเซลของสี"
-
-msgid "eatme"
-msgstr "กินฉัน"
-
-msgid "This button opens and closes the primary toolbar."
-msgstr "ปุ่มนี้เปิดและปิดแถบเครื่องมือหลัก"
-
-#. TRANS: index specifies a position into an array (heap)
-msgid "index"
-msgstr "ดัชนี"
-
-msgid "note volume"
-msgstr "เสียงของโน๊ต"
-
-msgid "hide"
-msgstr "ซ่อน"
-
-#. TRANS: show the contents of the heap.
-msgid "show heap"
-msgstr "แสดง heap"
-
-msgid "Stop the music (and the turtles)."
-msgstr "หยุดเพลง (และเต่า)"
-
-msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr "ทัวร์จบแล้ว เริ่มเล่น Music Blockกัน"
-
-msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-msgstr "คุณหนูคือวาทยากรของพวกเรา คุณหนูสนับสนุนให้คุณลองสำรวจ Music Block, The Matrix และการแสดง/สัญกรณ์ ความเป็นไปได้ของ Music Blocks เริ่มทัวร์กันได้เลย"
-
-#. TRANS: publish project to Facebook
-msgid "publish"
-msgstr "โพสสู่สาธารณะ"
-
-#. TRANS: weather forecast
-msgid "forecast"
-msgstr "พยากรณ์"
-
-#. TRANS: hours ago that the data was updated.
-msgid "hours ago"
-msgstr "หนึ่งชั่วโมงที่แล้ว"
-
-#. TRANS: slurring of notes in music
-msgid "slur"
-msgstr ""
-
-msgid "pen"
-msgstr "ปากกา"
-
-msgid "fish"
-msgstr "ปลา"
-
-msgid "print"
-msgstr "งานพิมพ์"
-
-#. TRANS: how many entries are in the heap?
-msgid "heap length"
-msgstr "ความยาวของฮีป"
-
-msgid "speak"
-msgstr "พูด"
-
-msgid "Expand/collapse option toolbar"
-msgstr "เพิ่ม/ลด แถบเครื่องมือตัวเลือก"
-
-msgid "end hollow line"
-msgstr "จบเส้นช่องโพรง"
-
-msgid "city latitude"
-msgstr "เส้นรุ้งของเมือง"
-
-msgid "Display statistics about your Music project."
-msgstr "แสดงสถิตของโปรเจคคุณ"
-
-msgid "You can load new blocks from the file system."
-msgstr "คุณสามารถโหลดบล๊อกใหม่จากไฟล์ในเครือข่าย"
-
-#. TRANS: mathematical power, e.g., 2^4 == 16
-msgid "power"
-msgstr "ยกกำลัง"
-
-msgid "Settings"
-msgstr "ตั้งค่า"
-
-msgid "one of"
-msgstr "หนึ่งใน"
-
-msgid "Save stack"
-msgstr "บันทึก"
-
-msgid "corn"
-msgstr "ข้าวโพด"
-
-msgid "Display statistics"
-msgstr "แสดงสถิติ"
-
-msgid "Remove all content on the canvas, including the blocks."
-msgstr "ลบทุกอย่าง รวมทั้งบล๊อก"
-
-msgid "to radians"
-msgstr "รัศมี"
-
-msgid "water"
-msgstr "น้ำ"
-
-#. TRANS: robot sensors.
-msgid "infrared light (left)"
-msgstr "แสงอินฟราเรท"
-
-#. TRANS: mathematical exponential base
-msgid "base"
-msgstr "ฐาน"
-
-msgid "cookie"
-msgstr "คุกกี้"
-
-msgid "Show or hide a polar-coordinate grid."
-msgstr "แสดง หรือซ่อนกราฟ พิกัดเชิงขั้ว"
-
-msgid "octave"
-msgstr "เสียงแปดคู่"
-
-#. TRANS: Musical score
-msgid "Save sheet music"
-msgstr "บันทึกโน้ตเพลง"
-
-#. TRANS: save the heap to a file
-msgid "save heap"
-msgstr "บันทึกฮีป"
-
-msgid "from"
-msgstr "จาก"
-
-msgid "sensors"
-msgstr "เซนเซอร์"
-
-msgid "pen down"
-msgstr "จรดปากกา"
-
-#. TRANS: retrieve the value at a specific entry (index) in the heap
-msgid "index heap"
-msgstr "ดัชนีฮีป"
-
-msgid "get name"
-msgstr "รับค่าชื่อ"
-
-msgid "wait"
-msgstr "รอ"
-
-#. TRANS: a container for a variable
-msgid "box"
-msgstr "กล่อง"
-
-msgid "Planet"
-msgstr "ดาวเคราะห์"
-
-msgid "Show these messages."
-msgstr "แสดงข้อความ"
-
-#. TRANS: object
-msgid "obj"
-msgstr "สิ่งของ"
-
-msgid "numerator"
-msgstr "เศษ"
-
-#. TRANS: swing beat in music
-msgid "swing"
-msgstr "แกว่ง"
-
-#. TRANS: store a value in a box
-msgid "store in"
-msgstr "นำไปเก็บไว้"
-
-msgid "digest meal"
-msgstr "ย่อยอาหาร"
+msgid "logic"
+msgstr "ตรรกะ"
 
 msgid "maths"
 msgstr "คณิตศาสตร์"
 
-msgid "denominator"
-msgstr "ส่วน"
+msgid "food"
+msgstr "อาหาร"
 
-msgid "eighth note"
-msgstr "โน้ตแปด"
+msgid "eatme"
+msgstr "กินฉัน"
 
-msgid "whole note"
-msgstr "โน้ตเต็ม"
-
-#. TRANS: popout window
-msgid "popout"
-msgstr "หน้าต่างแจ้งเตือน"
-
-msgid "zoom factor"
-msgstr "ปัจจัยที่น่าสนใจ"
-
-#. TRANS: the name of a stack of blocks
-msgid "action"
-msgstr "การกระทำ"
-
-#. TRANS: volume of microphone audio
-msgid "loudness"
-msgstr "ระดับความดัง"
-
-msgid "Increase the size of the blocks."
-msgstr "เพิ่มขนาดของบล๊อก"
-
-msgid "set volume"
-msgstr "ปรับเสียง"
-
-#. TRANS: logical "or" operator
-msgid "or"
-msgstr "หรือ"
-
-msgid "note value"
-msgstr "ค่าของโน้ต"
-
-msgid "comment"
-msgstr "หมายเหตุ"
-
-msgid "cheese"
-msgstr "ชีส"
-
-#. TRANS: lilypond is a language used to generate musical scores.
-msgid "save as lilypond"
-msgstr "จัดเก็บเป็น lilypond"
-
-msgid "Cartesian"
-msgstr "คาร์ทีเซียน"
-
-#. TRANS: audio (as in musical note)
-msgid "tone"
-msgstr "โทน"
-
-#. TRANS: evaluate Javascript code
-msgid "eval"
-msgstr "ประเมิน"
-
-msgid "color"
-msgstr "สี"
-
-msgid "image"
-msgstr "รูปภาพ"
-
-msgid "Click to run the music note by note."
-msgstr "คลิ๊กที่นี่เพื่อเล่นดนตรีโน้ตต่อโน้ต"
-
-#. TRANS: pop a value off of the heap.
-msgid "pop"
-msgstr "ป๊อบ"
-
-#. TRANS: bitcoin currency (probably no need to translate)
-msgid "bitcoin"
-msgstr "บิตคอย์น"
-
-msgid "pen size"
-msgstr "ขนาดปากกา"
-
-msgid "Clear the screen and return the turtles to their initial positions."
-msgstr "ลบจอทั้งหมด และให้เต่าไปอยู่ที่จุดตั้งต้น"
-
-#. TRANS: Boolean logic
-msgid "boolean"
-msgstr "บูลีน"
-
-msgid "coordinates"
-msgstr "พิกัด"
-
+#: plugins/rodi.rtp:169
 msgid "sing"
 msgstr "ร้อง"
-
-msgid "play backward"
-msgstr "เล่นย้อนหลัง"
-
-msgid "Congratulations."
-msgstr "ยินดีด้วย"
-
-msgid "Run slow"
-msgstr "วิ่งช้า"
-
-msgid "mouse button"
-msgstr "ปุ่มหนู"
-
-#. TRANS: music term for dividing the beat into a different number of equal subdivisions
-msgid "tuplet"
-msgstr "ทูเปรท"
-
-msgid "tuplet value"
-msgstr "ค่าทูเปรท"
-
-#. TRANS: cloud as in cloud server
-msgid "cloud"
-msgstr "เครา"
-
-msgid "size"
-msgstr "ขนาด"
-
-msgid "city"
-msgstr "เมือง"
-
-#. TRANS: carbohydrates
-msgid "get carbs"
-msgstr "รับ คาร์โบไฮเดรต"
-
-msgid "sine"
-msgstr "ซายน์"
-
-msgid "Click to run the project in fast mode."
-msgstr "คลิ๊กเพื่อเล่นโปรเจคในโหมดเร็ว"
-
-msgid "beef"
-msgstr "เนื้อ"
-
-#. TRANS: source language for translation
-msgid "source"
-msgstr "แหล่ง"
-
-msgid "unknown"
-msgstr "ไม่รู้"
-
-msgid "wait for"
-msgstr "รอ"
-
-msgid "pen up"
-msgstr "ยกปากกาขึ้น"
-
-msgid "Decrease the size of the blocks."
-msgstr "ลดขนาดของบล๊อก"
-
-msgid "Run note by note"
-msgstr "เล่นโน้ตต่อโน้ต"
-
-msgid "start"
-msgstr "เริ่ม"
-
-msgid "stock price"
-msgstr "ราคาหุ้น"
-
-#. TRANS: is the heap empty?
-msgid "heap empty?"
-msgstr "ลบฮีป?"
-
-msgid "motion z"
-msgstr "การเคลื่อนไหวz"
-
-#. TRANS: low temperature
-msgid "low"
-msgstr "ต่ำ"
-
-msgid "motion x"
-msgstr "การเคลื่อนไหวx"
-
-msgid "motion y"
-msgstr "การเคลื่อนไหวy"
-
-msgid "forward"
-msgstr "เดินหน้า"
-
-#. TRANS: 360 degrees in a circle
-msgid "degrees"
-msgstr "ดีกรี"
-
-msgid "translate"
-msgstr "แปล"
-
-msgid "Open a panel for configuring Music Blocks."
-msgstr "เปิดแผงสำหรับปรับแต่ง Music Blocks"
-
-msgid "until"
-msgstr "จนกว่า"
-
-msgid "define"
-msgstr "ความหมาย"
-
-#. TRANS: save project as simple vector graphic (SVG)
-msgid "save svg"
-msgstr "บันทึกโปรเจคเป็นSVG"
-
-#. TRANS: mathematical ceiling function, e.g., ceiling(2.5) == 3
-msgid "ceiling"
-msgstr "เพดาน"
-
-#. TRANS: a turtle shell
-msgid "shell"
-msgstr "กระดอง"
-
-msgid "start turtle"
-msgstr "เริ่มเต่า"
-
-msgid "Welcome to Music Blocks"
-msgstr "ยินดีต้อนรับสู่Music Blocks"
-
-#. TRANS: set language
-msgid "set lang"
-msgstr "ตั้งค่าภาษา"
-
-msgid "turtle name"
-msgstr "ชื่อของเต่า"
-
-#. TRANS: carbohydrates
-msgid "carbs"
-msgstr "คาร์โบไฮเดรต"
-
-msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr "กล่องเครื่องมีนี้มีปุ่มพิกัด โน้ต โทนเต่า และอีกมากมาย คลิ๊กเพื่อแสดงแถบสีของบล๊อกและลากบล๊อกจากแถบสีไปยังแสดงแสดงผล"
-
-msgid "else"
-msgstr "ไม่งั้นให้ทำ"
-
-#. TRANS: as in broadcast a signal
-msgid "broadcast"
-msgstr "ถ่ายทอด"
-
-msgid "orange"
-msgstr "สีส้ม"
-
-msgid "begin hollow line"
-msgstr "เริ่มเส้นช่องโพรง"
-
-msgid "flat"
-msgstr "ราบ"
-
-#. TRANS: the heap is a first-in-last-out (FILO) stack
-msgid "heap"
-msgstr "ฮีป"
-
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
-msgid "begin fill"
-msgstr "เริ่มเติ่ม"
-
-msgid "beats per minute"
-msgstr "บีทต่อนาที"
-
-msgid "eat"
-msgstr "กิน"
-
-msgid "Expand/collapse collapsable blocks"
-msgstr "เพิ่ม/พัง บล๊อกที่สามารถพังได้"
-
-#. TRANS: high temperature
-msgid "high"
-msgstr "สูง"
-
-msgid "1/16 note"
-msgstr "โน้ต 1/16"
-
-msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-msgstr "Music Blocksคือศูนย์ร่วมอุปกรณ์ต่างๆเพื่อสำรวจแนวคิดเรื่องดนตรีด้วยวิธีที่สนุกและครบถ้วน"
-
-#. TRANS: longitude and latitude coordinate data
-msgid "Coordinate data not available."
-msgstr "ไม่มีพิกัดข้อมูล"
-
-#. TRANS: hue refers to spectral hue (red, yellow, green, blue...)
-msgid "set hue"
-msgstr "ตั้งค่า ความมืดหรือความสว่างของสี "
-
-msgid "currency"
-msgstr "เงินตรา"
-
-msgid "this"
-msgstr "นี้"
-
-msgid "Palette buttons"
-msgstr "ปุ่มเมนูสี"
-
-msgid "potato"
-msgstr "มันฝรั้ง"
-
-msgid "city longitude"
-msgstr "เส้นแวงของเมือง"
-
-msgid "grey"
-msgstr "เทา"
-
-#. TRANS: the value of a variable (stored in a box)
-msgid "value"
-msgstr "ค่า"
-
-msgid "banana"
-msgstr "กล้วย"
-
-msgid "wheat bread"
-msgstr "ขนมปังข้าวสาลี"
-
-msgid "while"
-msgstr "สีขาว"
-
-msgid "open file"
-msgstr "เปิดไฟล์"
-
-#. TRANS: detect language
-msgid "detect lang"
-msgstr "จับภาษา"
-
-msgid "cake"
-msgstr "เค้ก"
-
-msgid "sweet potato"
-msgstr "มันหวาน"
-
-#. TRANS: load the heap from a file
-msgid "load heap"
-msgstr "โหลดฮีป"
-
-msgid "Open"
-msgstr "เปิด"
-
-#. TRANS: database fetch
-msgid "fetch"
-msgstr "จับ"
-
-#. TRANS: logical "and" operator
-msgid "and"
-msgstr "บวก"
-
-#. TRANS: grey refers to chroma (grey to vivid)
-msgid "set grey"
-msgstr "ตั้งเป็นสีเทา"
-
-msgid "then"
-msgstr "แล้ว"
-
-msgid "calories"
-msgstr "แคลลอรี่"
-
-msgid "Run step by step"
-msgstr "เล่นที่ละขั้นตอน"
-
-#. TRANS: musical pitch
-msgid "pitch"
-msgstr "ระดับเสียง"
-
-msgid "Show/hide palettes"
-msgstr "แสดง/ซ่อนเมนูสี"
-
-msgid "set heading"
-msgstr "กำหนดทิศทาง"
-
-msgid "add 1 to"
-msgstr "เพิ่ม1ที่"
-
-#. TRANS: stop playing current media file (movie or audio)
-msgid "stop play"
-msgstr "หยุดเล่น"
-
-msgid "sharp"
-msgstr "เสียงแหลม"
-
-msgid "protein"
-msgstr "โปรตีน"
-
-msgid "1/64 note"
-msgstr "โน้ต 1/64"
-
-#. TRANS: oscillator time
-msgid "osctime"
-msgstr "เวลาจากเครื่องกำเนิดสัญญาณ"
-
-#. TRANS: play media (audio or video)
-msgid "play back"
-msgstr "เล่นย้อนหลัง"
-
-#. TRANS: fill refers to filling a shape with a color (e.g., paint bucket).
-msgid "fill"
-msgstr "เติม"
-
-msgid "Save your project to a server."
-msgstr "บึนทึกงานของคุณที่เซอเวอร์"
-
-msgid "Decrease block size"
-msgstr "ลดขนาดของบล๊อก"
-
-#. TRANS: number of notes
-msgid "number of notes"
-msgstr "จำนวนของโน้ต"
-
-msgid "angle"
-msgstr "มุม"
-
-msgid "get fat"
-msgstr "ทำให้อ้วน"
-
-#. TRANS: minimum
-msgid "min"
-msgstr "นาที"
-
-msgid "media"
-msgstr "สื่อ"
-
-msgid "that"
-msgstr "ซึ่ง"
-
-msgid "Stop"
-msgstr "หยุด"
-
-#. TRANS: square root
-msgid "sqrt"
-msgstr "จำนวนรากกำลังสอง"
-
-#. TRANS: as in button click
-msgid "click"
-msgstr "คลิ๊ก"
-
-msgid "note"
-msgstr "โน้ต"
-
-#. TRANS: field of interest in a database, e.g., temperature in a weather database
-msgid "field"
-msgstr "เขตข้อมูล"
-
-msgid "invert"
-msgstr "สับเปลี่ยนที่กัน"
-
-msgid "square"
-msgstr "สี่เหลี่ยม"
-
-msgid "Meet Mr. Mouse!"
-msgstr "พบกับคุณหนู"
-
-msgid "set xy"
-msgstr "ตั้งค่าแกน xy"
-
-msgid "end fill"
-msgstr "จบการเทสี"
-
-msgid "if"
-msgstr "ถ้า"
-
-msgid "Paste"
-msgstr "วาง"
-
-#. TRANS: musical key, e.g., C Major
-msgid "set key"
-msgstr "ตั้งคีย์"
-
-msgid "Delete"
-msgstr "ลบ"
-
-#. TRANS: Mexican tamale
-msgid "tamale"
-msgstr "เทมาเล่"
-
-msgid "Worldwide"
-msgstr "ทั่วโลก"
-
-#. TRANS: as in play a musical note.
-msgid "play"
-msgstr "เล่น"
-
-msgid "repeat"
-msgstr "ซ้ำ"
-
-msgid "blocks"
-msgstr "บล๊อก"
-
-#. TRANS: mathematical exponent
-msgid "exp"
-msgstr "เลขยกกำลังในคณิตศาสตร์"
-
-msgid "Polar"
-msgstr "ขั้ว"
-
-#. TRANS: maximum
-msgid "max"
-msgstr "ใหญ่สุด"
-
-msgid "logic"
-msgstr "ตรรกะ"
-
-msgid "current pitch name"
-msgstr "ชื่อระดับเสียงปัจจุบัน"
-
-#. TRANS: empty the heap
-msgid "empty heap"
-msgstr "heap ว่าง"
-
-#. TRANS: robot sensors.
-msgid "infrared light (right)"
-msgstr "แสงอินฟราเรท(ขวา)"
-
-msgid "On my device"
-msgstr "บนเครื่องของฉัน"
-
-#. TRANS: musical key, e.g., C Major
-msgid "key"
-msgstr "คีย์"
-
-#. TRANS: push a value on to the heap.
-msgid "push"
-msgstr "ใส่เข้าไป"
-
-#. TRANS: the name of a robot built in Paraguay (probably no need to translate)
-msgid "rodi"
-msgstr ""
-
-msgid "Increase block size"
-msgstr "ลดขนาดบล๊อก"
-
-#. TRANS: mathematical floor function, e.g., floor(2.5) == 2
-msgid "floor"
-msgstr "พื้น"
-
-msgid "Clean"
-msgstr "ล้าง"
-
-msgid "quarter note"
-msgstr "โน้ต 1/4"
-
-msgid "Note value must be greater than 0"
-msgstr "ค่าโน้ตต้องมากกว่า0"
-
-#. TRANS: color refers to a hue, value, chroma triplet
-msgid "set color"
-msgstr "ตั้งค่าสี"
-
-msgid "Click to run just the music in slow mode."
-msgstr "คลิ๊กเพื่อเล่นดนตรีในโหมดช้า"
-
-msgid "Run fast"
-msgstr "วิ่งเร็ว"
-
-msgid "broccoli"
-msgstr "บล๊อกโคลี่"
-
-#. TRANS: stop playing current media file (movie or audio)
-msgid "stop media"
-msgstr "หยุดสื่อ"
-
-msgid "tomato"
-msgstr "มะเขือเทศ"
-
-msgid "forever"
-msgstr "ตลอดไป"
-
-#. TRANS: musical note to frequency
-msgid "note to frequency"
-msgstr "โน้ตความถี่"
-
-msgid "no background"
-msgstr "ไม่มีพื้นหลัง"
-
-msgid "Load project from file"
-msgstr "โหลดโปรเจคจากไฟล์"
-
-msgid "get protein"
-msgstr "รับโปรตีน"
-
-#. TRANS: clear the screen of any graphics drawn by the turtle
-msgid "clear"
-msgstr "ล้าง"
-
-msgid "Show or hide a Cartesian-coordinate grid."
-msgstr "แสดงหรือซ้อนกราฟพิกัดคาร์ทีเซียน"
-
-msgid "flow"
-msgstr "ความคล่องตัว"
-
-msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "กดปุ่มนี้เพื่อขยายหรือลดกล่องเครื่องมือเพิ่มเติม"
-
-msgid "half note"
-msgstr "โน๊ตครึ่ง"
-
-#. TRANS: Lilypond is engraving software
-msgid "Save your project to as a Lilypond file."
-msgstr "บันทึกไฟล์เป็นไฟล์Lilypond"
-
-msgid "extras"
-msgstr "เพิ่มเติม"
-
-msgid "set beats per minute"
-msgstr "ตั้งจังหวะต่อนาที"
-
-msgid "shade"
-msgstr "เฉดสี"
-
-msgid "time"
-msgstr "เวลา"
-
-msgid "y"
-msgstr "แกน y"
-
-#. TRANS: set the value at a specific entry (index) in the heap
-msgid "set heap"
-msgstr "ตั้งค่าฮีป"
-
-msgid "multiply beat"
-msgstr "หลายจังหวะ"
-
-msgid "hello"
-msgstr "สวัสดี"
-
-msgid "dot"
-msgstr "จุด"
-
-msgid "left"
-msgstr "ซ้าย"
-
-#. TRANS: tying together of notes in music
-msgid "tie"
-msgstr "รวม"
-
-msgid "divide beat"
-msgstr "แยกบีท"
-
-msgid "skip notes"
-msgstr "ข้านโน้ต"
-
-msgid "duplicate factor"
-msgstr "ปัจจัยคักลอก"
-
-#. TRANS: slurring of notes in music
-msgid "skip factor"
-msgstr "ปัจจัยข้าม"
-
-msgid "adjust transposition"
-msgstr "ปรับการคมนาคม"
-
-msgid "silence"
-msgstr "พัก"
-
-msgid "rest"
-msgstr "พัก"
-
-msgid "staccato factor"
-msgstr "ปัจจัยstaccato"
-
-msgid "slur factor"
-msgstr "ปัจจัยslur"
-
-msgid "crescendo factor"
-msgstr "ปัจจัยcrescendo"
-
-msgid "start drum"
-msgstr "เริ่มเสียงกลอง"
-
-msgid "turtle note"
-msgstr "เต่าโน๊ต"
-
-msgid "turtle pitch number"
-msgstr "จำนวนเต่าระดับเสียง"
-
-msgid "number to pitch"
-msgstr "จำนวนจนถึงระดับเสียง"
-
-msgid "number to octave"
-msgstr "จำนวนจนถึงโน้ตคู่แปด"
-
-msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr "คุณควรมีอย่างน้อยหนึ่งบล๊อกระดับเสียง และหนึ่งบล๊อกจังหวะในเมทริกซ์"
-
-msgid "Please close the current matrix before opening a new one."
-msgstr "กรุณาปิดเมทริกซ์ปัจจุบันก่อนที่จะเปิดอันใหม่"
-
-msgid "set font"
-msgstr ""
-
-msgid "free time"
-msgstr ""
 
 msgid "do re mi fa sol la ti"
 msgstr ""
 
-msgid "Home"
-msgstr ""
+#~msgid "crescendo factor"
+#~msgstr "ปัจจัยcrescendo"
 
-msgid "Return all blocks to the center of the screen."
-msgstr ""
+#~msgid "hspace"
+#~msgstr "ช่องว่างแนวนอน"
 
-msgid "Rhythm Block: Did you mean to use a Note block?"
-msgstr ""
+#~msgid "cloud"
+#~msgstr "เครา"
 
-msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr ""
+#~msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+#~msgstr "กล่องเครื่องมีนี้มีปุ่มพิกัด โน้ต โทนเต่า และอีกมากมาย คลิ๊กเพื่อแสดงแถบสีของบล๊อกและลากบล๊อกจากแถบสีไปยังแสดงแสดงผล"
 
-msgid "articulation"
-msgstr ""
+#~msgid "rodi"
+#~msgstr ""
+
+#~msgid "Save your project to a server."
+#~msgstr "บึนทึกงานของคุณที่เซอเวอร์"
+
+#~msgid "blocks"
+#~msgstr "บล๊อก"
+
+#~msgid "Expand/collapse toolbar"
+#~msgstr "เพิ่ม/พัง กล่องเครื่องมือ"
+
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "ปุ่มนี้เปิดและปิดแถบเครื่องมือหลัก"
+
+#~msgid "end hollow line"
+#~msgstr "จบเส้นช่องโพรง"
+
+#~msgid "begin hollow line"
+#~msgstr "เริ่มเส้นช่องโพรง"
+
+#~msgid "vspace"
+#~msgstr "พื้นที่แนวตั้ง"
+
+#~msgid "end fill"
+#~msgstr "จบการเทสี"
+
+#~msgid "Load project from file"
+#~msgstr "โหลดโปรเจคจากไฟล์"
+
+#~msgid "set beats per minute"
+#~msgstr "ตั้งจังหวะต่อนาที"
+
+#~msgid "begin fill"
+#~msgstr "เริ่มเติ่ม"
+

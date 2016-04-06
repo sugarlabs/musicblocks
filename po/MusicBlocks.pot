@@ -1462,7 +1462,7 @@ msgid "hide blocks"
 msgstr ""
 
 #: js/basicblocks.js:1595
-msgid "openProject"
+msgid "open project"
 msgstr ""
 
 #: js/basicblocks.js:1619
