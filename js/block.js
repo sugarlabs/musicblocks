@@ -1707,7 +1707,7 @@ function Block(protoblock, blocks, overrideName) {
 		    this.blocks.setActionProtoVisiblity(false);
                 }
                 this.blocks.renameNameddos(oldValue, newValue);
-                this.blocks.palettes.updatePalettes('actions');
+                this.blocks.palettes.updatePalettes('action');
                 break;
             case 'storein':
                 // If the label was the name of a storein, update the
