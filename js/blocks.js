@@ -957,7 +957,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
             // Remove the silence block (if it is present) after
             // adding a new block inside of a note block.
-            if (this.blockList[this._insideExpandableBlock(thisBlock)].name === 'note') {
+            if (this._insideExpandableBlock(thisBlock) != null && this.blockList[this._insideExpandableBlock(thisBlock)].name === 'note') {
                 // If blocks are inserted above the silence block.
                 if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
@@ -965,7 +965,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     this.deleteNextDefault(bottom);
                 }
             }
-
+	    
             // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
