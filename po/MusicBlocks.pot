@@ -540,11 +540,11 @@ msgid "Mr. Mouse is our Music Blocks conductor."
 msgstr ""
 
 #: js/turtledefs.js:76
-msgid Mr. Mouse encourages you to explore Music Blocks.
+msgid "Mr. Mouse encourages you to explore Music Blocks.
 msgstr ""
 
 #: js/turtledefs.js:76
-msgid Let us start our tour!"
+msgid "Let us start our tour!"
 msgstr ""
 
 #: js/turtledefs.js:77
