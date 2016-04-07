@@ -111,7 +111,7 @@ function SVG() {
         var n = this._clampSlots.length;
         if (n < number) {
             for (var i = 0; i < number - n; i++) {
-            this._clampSlots.push(1);
+                this._clampSlots.push(1);
             }
         }
     };
@@ -874,10 +874,12 @@ function SVG() {
         } else {
             var y = this._strokeWidth / 2.0 + this._radius;
         }
+
         this.margins[0] = (x + this._strokeWidth + 0.5) * this._scale;
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
+
         var svg = this._newPath(x, y);
         svg += this._corner(1, -1 , 90, 0, 1, true, true, false);
         svg += this._doSlot();
@@ -885,6 +887,7 @@ function SVG() {
             this._slot = true;
             this._cap = false;
         }
+
         svg += this._rLineTo(this._radius + this._strokeWidth, 0);
         var xx = this._x;
         svg += this._rLineTo(this._expandX, 0);

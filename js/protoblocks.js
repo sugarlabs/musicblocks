@@ -740,21 +740,25 @@ function ProtoBlock(name) {
         svg.setTab(true);
         svg.setSlot(true);
         svg.setBoolean(true);
-        svg.setClampCount(this.scale);
+        svg.setClampCount(2);
+
         if (topSlots) {
             svg.setClampSlots(0, topSlots);
         } else {
             svg.setClampSlots(0, 1);
         }
+
         if (bottomSlots) {
             svg.setClampSlots(1, bottomSlots);
         } else {
             svg.setClampSlots(1, 1);
         }
+
         svg.setExpand(this.extraWidth, 0, 0, 0);
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
+
         var artwork = svg.basicClamp();
         return [artwork, svg.docks];
     };
