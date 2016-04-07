@@ -653,8 +653,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return;
         }
 
-        var parentName = this.blockList[parentblk].name;
-        if (parentName === 'note') {
+        if (this.blockList[parentblk].name === 'note') {
             if (this.blockList[parentblk].connections[2] == null) {
                 var blkname = 'rest2';
                 var newblock = this.makeBlock(blkname, '__NOARG__');
@@ -721,10 +720,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             console.log('block moved called with null block.');
             return;
         }
+
         var blk = this._insideExpandableBlock(thisBlock);
         var expandableLoopCounter = 0;
-        var parentblk;
-        if(blk!=null) {
+
+        var parentblk = null;
+        if (blk != null) {
             parentblk = blk;
         }
 
@@ -734,6 +735,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 console.log('Inifinite loop encountered checking for expandables?');
                 break;
             }
+
             this._clampBlocksToCheck.push([blk, 0]);
             blk = this._insideExpandableBlock(blk);
         }
@@ -782,13 +784,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // Look for a new connection.
         var x1 = myBlock.container.x + myBlock.docks[0][0];
         var y1 = myBlock.container.y + myBlock.docks[0][1];
+
         // Find the nearest dock; if it is close
         // enough, connect;
         var newBlock = null;
         var newConnection = null;
+
         // TODO: Make minimum distance relative to scale.
         var min = MINIMUMDOCKDISTANCE;
         var blkType = myBlock.docks[0][2];
+
         //Is the added block above the silence block or below ?
         var insertAfterDefault  = true;
         for (var b = 0; b < this.blockList.length; b++) {
@@ -1001,6 +1006,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
 
         this.addDefaultBlock(parentblk);
+
         // Put block adjustments inside a slight delay to make the
         // addition/substraction of vspace and changes of block shape
         // appear less abrupt (and it can be a little racy).
@@ -3323,6 +3329,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
             myBlock.connections[0] = null;
+
             // Add default block if user deletes all blocks from inside the note block
             this.addDefaultBlock(parentBlock);
         }
