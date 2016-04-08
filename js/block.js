@@ -1702,10 +1702,21 @@ function Block(protoblock, blocks, overrideName) {
                 // associated run this.blocks and the palette buttons
                 // Rename both do <- name and nameddo blocks.
                 this.blocks.renameDos(oldValue, newValue);
-                if (oldValue === _('action')) {
-                    this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
-		    this.blocks.setActionProtoVisiblity(false);
-                }
+                this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+                var blockPalette = blocks.palettes.dict['action'];
+                for (var blk = 0; blk < blockPalette.protoList.length; blk++) {
+                    var block = blockPalette.protoList[blk];
+                    if(oldValue === _('action')) {
+                        if (block.name === 'nameddo' && block.defaults.length === 0) {
+                            block.hidden = true;
+                        }
+                    }
+                    else {
+                        if (block.name === 'nameddo' && block.defaults[0] === oldValue) {
+                            blockPalette.remove(block,oldValue);
+                        }
+                    }
+                }   
                 this.blocks.renameNameddos(oldValue, newValue);
                 this.blocks.palettes.updatePalettes('action');
                 break;
