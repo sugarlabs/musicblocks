@@ -16,30 +16,6 @@ msgid ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: ini-to-pot script\n"
 
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
 #: js/activity.js:443
 msgid "Close"
 msgstr ""
@@ -572,7 +548,12 @@ msgid "Palette buttons"
 msgstr ""
 
 #: js/turtledefs.js:77
-msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+#.TRANS Matrix, Notes, Tone, Turtle, and more
+msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
+msgstr "This toolbar contains the palette buttons, Matrix, Notes, Tone, Turtle, and more."
+
+#: js/turtledefs.js:77
+msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 msgstr ""
 
 #: js/turtledefs.js:78
