@@ -227,7 +227,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         var notesFinish = {};
         var thisNote = {};
         var logo = this;
-        stepNote();
+        __stepNote();
 
         function __stepNote() {
             for (var turtle in logo.stepQueue) {
