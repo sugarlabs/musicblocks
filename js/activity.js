@@ -377,7 +377,7 @@ define(function (require) {
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
-                logo.stepNotes();
+                logo.stepNote();
             }
         };
 
