@@ -302,6 +302,11 @@ specified rhymic value of the notes.
 Slur will run a note past its noted duration, blending it into the
 next note.
 
+Other Tone Palette blocks include Articulation, which changes the
+volume of a group of notes, and a set of interval blocks, Fifths,
+Tritone, Fourths, and Thirds, which calculate and add pitches at
+common intervals.
+
 3. Voices
 ---------
 
