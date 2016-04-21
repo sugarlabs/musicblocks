@@ -184,6 +184,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     transpositionBlock.defaults.push('1');
     transpositionBlock.flowClampOneArgBlock();
 
+    var octaveBlock = new ProtoBlock('octave');
+    octaveBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['octave'] = octaveBlock;
+    octaveBlock.staticLabels.push(_('octave'));
+    octaveBlock.adjustWidthToLabel();
+    octaveBlock.zeroArgBlock();
+
     var flatBlock = new ProtoBlock('flat');
     flatBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['flat'] = flatBlock;
