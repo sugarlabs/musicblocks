@@ -302,7 +302,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var turtleNoteBlock = new ProtoBlock('turtlenote');
     turtleNoteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['turtlenote'] = turtleNoteBlock;
-    turtleNoteBlock.staticLabels.push(_('turtle note'));
+    turtleNoteBlock.staticLabels.push(_('turtle note value'));
     turtleNoteBlock.oneArgMathBlock();
     turtleNoteBlock.adjustWidthToLabel();
     turtleNoteBlock.dockTypes[1] = 'anyin';
