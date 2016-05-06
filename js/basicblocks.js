@@ -281,11 +281,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     var rhythm = new ProtoBlock('rhythm');
     rhythm.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythm'] = rhythm;
-    rhythm.staticLabels.push(_('rhythm'), _('number of notes'), _('denominator'));
+    rhythm.staticLabels.push(_('rhythm'), _('number of notes'), _('note value'));
     rhythm.extraWidth = 10;
     rhythm.adjustWidthToLabel();
     rhythm.defaults.push(3);
-    rhythm.defaults.push(1);
+    rhythm.defaults.push(4);
     rhythm.twoArgBlock();
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
