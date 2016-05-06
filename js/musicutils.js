@@ -32,6 +32,58 @@ const TWELTHROOT2 = 1.05946309435929;
 const A0 = 27.5;
 const C8 = 4186.01;
 
+
+function getScaleAndHalfSteps(keySignature) {
+    // Determine scale and half-step pattern from key signature
+    if (keySignature.substr(-1) === 'm' || keySignature.slice(1).toLowerCase() === 'minor') {
+        var thisScale = NOTESFLAT;
+        var halfSteps = MINORHALFSTEPS;  // 0 2 3 5 7 8 10
+        var keySignature = keySignature.substr(0, keySignature.length - 1);
+        var major = false;
+    } else {
+        var thisScale = NOTESSHARP;
+        var halfSteps = MAJORHALFSTEPS;  // 0 2 4 5 7 9 11
+        var keySignature = keySignature;
+        var major = true;
+    }
+
+    if (keySignature in EXTRATRANSPOSITIONS) {
+        keySignature = EXTRATRANSPOSITIONS[keySignature][0];
+    }
+
+    return [thisScale, halfSteps, keySignature, major];
+};
+
+
+function getInterval (interval, keySignature) {
+    // Calculate the interval in terms of halfsteps.
+    var obj = getScaleAndHalfSteps(keySignature);
+    // var thisScale = obj[0];
+    var halfSteps = obj[1];
+    // var keySignature = obj[2];
+    // var major = obj[3];
+
+    // FIXME: Assumes 8 tones per octave.
+    var o = Math.floor(interval / 8);
+    var i = interval % 8;
+    if (i === 0) {
+        return o * 12;
+    } else {
+        var c = 0;
+        for (j = 0; j < halfSteps.length; j++) {
+            if (halfSteps[j] !== '') {
+                c++;
+                if (c === i) {
+                    return j + o * 12;
+                }
+            }
+        }
+    }
+
+    return o * 12;
+};
+
+
 function durationToNoteValue(duration) {
     // returns [note value, no. of dots, tuplet factor]
     var dotCount = 0;
