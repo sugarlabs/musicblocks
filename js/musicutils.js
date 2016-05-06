@@ -65,7 +65,8 @@ function getInterval (interval, keySignature) {
 
     // FIXME: Assumes 8 tones per octave.
     var o = Math.floor(interval / 8);
-    var i = interval % 8;
+    var i = Math.floor(interval) % 8;
+
     if (i === 0) {
         return o * 12;
     } else {
