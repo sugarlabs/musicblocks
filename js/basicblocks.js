@@ -564,6 +564,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     fifthsBlock.adjustWidthToLabel();
     fifthsBlock.flowClampZeroArgBlock();
 
+    var intervalBlock = new ProtoBlock('interval');
+    intervalBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['interval'] = intervalBlock;
+    intervalBlock.staticLabels.push(_('interval'));
+    intervalBlock.adjustWidthToLabel();
+    intervalBlock.flowClampOneArgBlock();
+    intervalBlock.defaults.push(5);
+
     var swingBlock = new ProtoBlock('swing');
     swingBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['swing'] = swingBlock;

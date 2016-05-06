@@ -144,6 +144,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.crescendoDelta = {};
     this.crescendoVolume = {};
     this.crescendoInitialVolume = {};
+    this.intervals = {};
     this.fifths = {};
     this.tritones = {};
     this.fourths = {};
@@ -561,6 +562,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
+            this.intervals[turtle] = [];
             this.fifths[turtle] = [];
             this.tritones[turtle] = [];
             this.fourths[turtle] = [];
@@ -2034,6 +2036,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 addPitch(note, octave);
 
+                if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, last(logo.intervals[turtle]), logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1]);
+                }
+
                 if (turtle in logo.fifths && logo.fifths[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 7, logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1]);
@@ -2208,6 +2215,31 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 logo._setListener(turtle, listenerName, __listener);
             }
+            break;
+        case 'interval':
+            if (typeof(args[0]) !== 'number') {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            var i = getInterval(args[0], logo.keySignature[turtle]);
+
+            if (i > 0) {
+                logo.intervals[turtle].push(i);
+
+                var listenerName = '_interval_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    logo.intervals[turtle].pop();
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            }
+
+            childFlow = args[1];
+            childFlowCount = 1;
             break;
         case 'fifths':
             logo.fifths[turtle].push(true);
@@ -4031,6 +4063,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         if (solfege in BTOFLAT) {
             solfege = BTOFLAT[solfege];
         }
+
         if (solfege in EXTRATRANSPOSITIONS) {
             octave += EXTRATRANSPOSITIONS[solfege][1];
             note = EXTRATRANSPOSITIONS[solfege][0];
@@ -4057,21 +4090,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 keySignature = 'C';
             }
 
-            if (keySignature.substr(-1) === 'm' || keySignature.slice(1).toLowerCase() === 'minor') {
-                var thisScale = NOTESFLAT;
-                var halfSteps = MINORHALFSTEPS;  // 0 2 3 5 7 8 10
-                var keySignature = keySignature.substr(0, keySignature.length - 1);
-                var major = false;
-            } else {
-                var thisScale = NOTESSHARP;
-                var halfSteps = MAJORHALFSTEPS;  // 0 2 4 5 7 9 11
-                var keySignature = keySignature;
-                var major = true;
-            }
-
-            if (keySignature in EXTRATRANSPOSITIONS) {
-                keySignature = EXTRATRANSPOSITIONS[keySignature][0];
-            }
+            var obj = getScaleAndHalfSteps(keySignature);
+            var thisScale = obj[0];
+            var halfSteps = obj[1];
+            var keySignature = obj[2];
+            var major = obj[3];
 
             // Ensure it is a valid key signature.
             offset = thisScale.indexOf(keySignature);
