@@ -129,6 +129,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.arcListener = {};
 
     // status of note being played
+    // Deprecated (ref lastNotePlayed)
     this.currentNotes = {};
     this.currentOctaves = {};
 
@@ -449,9 +450,20 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 // FIX ME: bias and scaling
                 value = last(this.polyVolume[turtle]);
                 break;
+            case 'turtlepitch':
+                if (this.lastNotePlayed[turtle] !== null) {
+                    var len = this.lastNotePlayed[turtle][0].length;
+		    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)));
+                } else {
+                    console.log('Could not find a note for turtle ' + turtle);
+                    value = pitchToNumber('A', 4);
+                }
+                break;
+                // Deprecated
             case 'currentnote':
                 value = this.currentNotes[turtle];
                 break;
+                // Deprecated
             case 'currentoctave':
                 value = this.currentoctave[turtle];
                 break;
@@ -703,11 +715,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             console.log('nothing to run');
             if (this.lilypondSaveOnly) {
                 this.errorMsg(NOACTIONERRORMSG, null, _('start'));
-		this.lilypondSaveOnly = false;
+                this.lilypondSaveOnly = false;
                 this.checkingLilypond = false;
                 // Reset cursor.
                 document.body.style.cursor = 'default';
-	    }
+            }
         }
         this.refreshCanvas();
     };
@@ -817,6 +829,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 this.skipFactor[turtleId][len - 1] = value;
             }
             break;
+        case 'turtlepitch':
+            var obj = numberToPitch(value);
+            this.lastNotePlayed[turtleId] = [obj[0]+obj[1], this.lastNotePlayed[turtleId][1]];
+            break;
+        // Deprecated
         case 'currentnote':
             // A bit ugly because the setter call added the value
             // to the current note.
@@ -826,6 +843,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.currentNotes[turtleId] = newNoteObj[0];
             this.currentOctaves[turtleId] = newNoteObj[1];
             break;
+        // Deprecated
         case 'currentoctave':
             this.currentOctaves[turtleId] = Math.round(value);
             if (this.currentOctaves[turtleId] < 1) {
@@ -2053,17 +2071,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     var noteObj = logo.getNote(note, octave, 6, logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1]);
                 }
-		
+                
                 if (turtle in logo.fourths && logo.fourths[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 5, logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1]);
                 }
-		
+                
                 if (turtle in logo.thirds && logo.thirds[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 4, logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1]);
                 }
-		
+
                 if (turtle in logo.transposition) {
                     logo.noteTranspositions[turtle].push(logo.transposition[turtle] + 2 * delta);
                 } else {
@@ -3173,8 +3191,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                         if (notes.length > 0) {
                             var len = notes[0].length;
+
+                            // Deprecated
                             logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
                             logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
+
                             if (logo.turtles.turtleList[turtle].drum) {
                                 for (var i = 0; i < notes.length; i++) {
                                     // Remove pitch
@@ -3694,9 +3715,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.blocks.blockList[blk].value = -1;
                 }
                 break;
+            // Deprecated
             case 'currentnote':
                 logo.blocks.blockList[blk].value = logo.currentNotes[turtle];
                 break;
+            // Deprecated
             case 'currentoctave':
                 logo.blocks.blockList[blk].value = logo.currentOctaves[turtle];
                 break;
