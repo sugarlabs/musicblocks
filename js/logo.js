@@ -747,30 +747,30 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         }
     };
 
-    this._blockSetter = function(blk, value, turtleId) {
-        var turtle = this.turtles.turtleList[turtleId];
+    this._blockSetter = function(blk, value, turtle) {
+        var turtleObj = this.turtles.turtleList[turtle];
 
         switch (this.blocks.blockList[blk].name) {
         case 'x':
-            turtle.doSetXY(value, turtle.x);
+            turtleObj.doSetXY(value, turtleObj.x);
             break;
         case 'y':
-            turtle.doSetXY(turtle.y, value);
+            turtleObj.doSetXY(turtleObj.y, value);
             break;
         case 'heading':
-            turtle.doSetHeading(value);
+            turtleObj.doSetHeading(value);
             break;
         case 'color':
-            turtle.doSetColor(value);
+            turtleObj.doSetColor(value);
             break;
         case 'shade':
-            turtle.doSetValue(value);
+            turtleObj.doSetValue(value);
             break;
         case 'grey':
-            turtle.doSetChroma(value);
+            turtleObj.doSetChroma(value);
             break;
         case 'pensize':
-            turtle.doSetPensize(value);
+            turtleObj.doSetPensize(value);
             break;
         case 'namedbox':
             var name = this.blocks.blockList[blk].privateData;
@@ -790,70 +790,70 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
             break;
         case 'bpmfactor':
-            var len = this.bpm[turtleId].length;
+            var len = this.bpm[turtle].length;
             if (len > 0) {
-                this.bpm[turtleId][len - 1] = value;
+                this.bpm[turtle][len - 1] = value;
             }
             break;
         case 'transpositionfactor':
-            var len = this.transposition[turtleId].length;
+            var len = this.transposition[turtle].length;
             if (len > 0) {
-                this.transposition[turtleId][len - 1] = value;
+                this.transposition[turtle][len - 1] = value;
             }
             break;
         case 'staccatofactor':
-            var len = this.staccato[turtleId].length;
+            var len = this.staccato[turtle].length;
             if (len > 0) {
-                this.staccato[turtleId][len - 1] = value;
+                this.staccato[turtle][len - 1] = value;
             }
             break;
         case 'slurfactor':
             // Slur is stored as a negative staccato.
-            var len = this.staccato[turtleId].length;
+            var len = this.staccato[turtle].length;
             if (len > 0) {
-                this.staccato[turtleId][len - 1] = -value;
+                this.staccato[turtle][len - 1] = -value;
             }
             break;
         case 'beatfactor':
-            this.beatFactor[turtleId] = value;
+            this.beatFactor[turtle] = value;
             break;
         case 'duplicatefactor':
-            var len = this.duplicateFactor[turtleId].length;
+            var len = this.duplicateFactor[turtle].length;
             if (len > 0) {
-                this.duplicateFactor[turtleId][len - 1] = value;
+                this.duplicateFactor[turtle][len - 1] = value;
             }
             break;
         case 'skipfactor':
-            var len = this.skipFactor[turtleId].length;
+            var len = this.skipFactor[turtle].length;
             if (len > 0) {
-                this.skipFactor[turtleId][len - 1] = value;
+                this.skipFactor[turtle][len - 1] = value;
             }
             break;
         case 'turtlepitch':
             var obj = numberToPitch(value);
-            this.lastNotePlayed[turtleId] = [obj[0]+obj[1], this.lastNotePlayed[turtleId][1]];
+            this.lastNotePlayed[turtle] = [obj[0]+obj[1], this.lastNotePlayed[turtle][1]];
             break;
         // Deprecated
         case 'currentnote':
             // A bit ugly because the setter call added the value
             // to the current note.
-            var len = this.currentNotes[turtleId].length;
+            var len = this.currentNotes[turtle].length;
             value = parseInt(value.slice(len));
-            var newNoteObj = getNote(this.currentNotes[turtleId], this.currentOctaves[turtleId], value, this.keySignature[turtleId]);
-            this.currentNotes[turtleId] = newNoteObj[0];
-            this.currentOctaves[turtleId] = newNoteObj[1];
+            var newNoteObj = getNote(this.currentNotes[turtle], this.currentOctaves[turtle], value, this.keySignature[turtle]);
+            this.currentNotes[turtle] = newNoteObj[0];
+            this.currentOctaves[turtle] = newNoteObj[1];
             break;
         // Deprecated
         case 'currentoctave':
-            this.currentOctaves[turtleId] = Math.round(value);
-            if (this.currentOctaves[turtleId] < 1) {
-                this.currentOctaves[turtleId] = 1;
+            this.currentOctaves[turtle] = Math.round(value);
+            if (this.currentOctaves[turtle] < 1) {
+                this.currentOctaves[turtle] = 1;
             }
             break;
         case 'notevolumefactor':
-            var len = this.transposition[turtleId].length;
-            this.polyVolume[turtleId][len - 1] = value;
-            this._setSynthVolume(value, turtleId);
+            var len = this.transposition[turtle].length;
+            this.polyVolume[turtle][len - 1] = value;
+            this._setSynthVolume(value, turtle);
             break;
         default:
             if (this.blocks.blockList[blk].name in this.evalSetterDict) {
