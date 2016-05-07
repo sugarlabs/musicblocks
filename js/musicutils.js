@@ -216,6 +216,10 @@ function pitchToFrequency(pitch, octave) {
 function pitchToNumber(pitch, octave) {
     // Calculate the pitch index based on pitch and octave.
 
+    if (pitch in BTOFLAT) {
+        pitch = BTOFLAT[pitch];
+    }
+
     var pitchNumber = 0;
     if (PITCHES.indexOf(pitch) !== -1) {
         pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
@@ -227,6 +231,9 @@ function pitchToNumber(pitch, octave) {
         pitchNumber = PITCHES3.indexOf(pitch.toUpperCase());
     } else if (SOLFAGE.indexOf(pitch.toUpperCase()) !== -1) {
         pitchNumber = SOLFAGE.indexOf(pitch.toUpperCase());
+    } else {
+        console.log('pitch ' + pitch + ' not found');
+        pitchNumber = 0;
     }
 
     // We start at A0.
