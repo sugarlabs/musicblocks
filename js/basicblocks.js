@@ -126,12 +126,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     transposition.adjustWidthToLabel();
     transposition.parameterBlock();
 
-    var consonantStepSizeBlock = new ProtoBlock('consonantstepsize');
-    consonantStepSizeBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['consonantstepsize'] = consonantStepSizeBlock;
-    consonantStepSizeBlock.staticLabels.push(_('consonant step size'));
-    consonantStepSizeBlock.adjustWidthToLabel();
-    consonantStepSizeBlock.parameterBlock();
+    var consonantStepDownBlock = new ProtoBlock('consonantstepsizedown');
+    consonantStepDownBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['consonantstepsizedown'] = consonantStepDownBlock;
+    consonantStepDownBlock.staticLabels.push(_('consonant step down'));
+    consonantStepDownBlock.adjustWidthToLabel();
+    consonantStepDownBlock.parameterBlock();
+
+    var consonantStepUpBlock = new ProtoBlock('consonantstepsize');
+    consonantStepUpBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['consonantstepsize'] = consonantStepUpBlock;
+    consonantStepUpBlock.staticLabels.push(_('consonant step up'));
+    consonantStepUpBlock.adjustWidthToLabel();
+    consonantStepUpBlock.parameterBlock();
 
     var turtlePitchBlock = new ProtoBlock('turtlepitch');
     turtlePitchBlock.palette = palettes.dict['pitch'];

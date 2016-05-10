@@ -35,28 +35,28 @@ const A0 = 27.5;
 const C8 = 4186.01;
 
 const MAJORKEYSIGNATURES = {
-    'C': 'C', 'CMAJOR': 'C', 'c': 'C',
-    'G': 'G', 'GMAJOR': 'G', 'g': 'G',
-    'D': 'D', 'DMAJOR': 'D', 'd': 'D',
-    'A': 'A', 'AMAJOR': 'A', 'a': 'A',
-    'E': 'E', 'EMAJOR': 'E', 'e': 'E',
-    'B': 'B', 'BMAJOR': 'B', 'b': 'B',
-    'F#': 'F♯', 'FSHARP': 'F♯', 'F#': 'F♯',
-    'C#': 'C♯', 'CSHARP': 'C♯', 'C#': 'C♯',
+    'C': 'C', 'CMAJOR': 'C', 'c': 'C', 'C MAJOR': 'C',
+    'G': 'G', 'GMAJOR': 'G', 'g': 'G', 'G MAJOR': 'G',
+    'D': 'D', 'DMAJOR': 'D', 'd': 'D', 'D MAJOR': 'D',
+    'A': 'A', 'AMAJOR': 'A', 'a': 'A', 'A MAJOR': 'A',
+    'E': 'E', 'EMAJOR': 'E', 'e': 'E', 'E MAJOR': 'E',
+    'B': 'B', 'BMAJOR': 'B', 'b': 'B', 'B MAJOR': 'B',
+    'F#': 'F♯', 'F#MAJOR': 'F♯', 'F#': 'F♯', 'F# MAJOR': 'F♯',
+    'C#': 'C♯', 'C#MAJOR': 'C♯', 'C#': 'C♯', 'C# MAJOR': 'C♯',
 };
 
 const MINORKEYSIGNATURES = {
-    'F': 'F', 'FMINOR': 'F', 'f': 'F', 'Fm': 'F', 'fm': 'F',
-    'B♭': 'B♭', 'BFLAT': 'B♭', 'Bb': 'B♭', 'Bm': 'B♭', 'bm': 'B♭', 'BMINOR': 'B♭',
-    'E♭': 'E♭', 'EFLAT': 'E♭', 'Eb': 'E♭', 'Em': 'E♭', 'em': 'E♭', 'EMINOR': 'E♭',
-    'A♭': 'A♭', 'AFLAT': 'A♭', 'Ab': 'A♭', 'Am': 'A♭', 'am': 'A♭', 'AMINOR': 'A♭',
-    'D♭': 'D♭', 'DFLAT': 'D♭', 'Db': 'D♭', 'Dm': 'D♭', 'dm': 'D♭', 'DMINOR': 'D♭',
-    'G♭': 'G♭', 'GFLAT': 'G♭', 'Gb': 'G♭', 'Gm': 'G♭', 'gm': 'G♭', 'GMINOR': 'G♭',
-    'C♭': 'C♭', 'CFLAT': 'C♭', 'Cb': 'C♭', 'Cm': 'C♭', 'cm': 'C♭', 'CMINOR': 'C♭',
+    'F': 'F', 'f': 'F', 'Fm': 'F', 'fm': 'F', 'F MINOR': 'F',
+    'B♭': 'B♭', 'Bb': 'B♭', 'Bm': 'B♭', 'bm': 'B♭', 'BMINOR': 'B♭','B MINOR': 'B♭',
+    'E♭': 'E♭', 'Eb': 'E♭', 'Em': 'E♭', 'em': 'E♭', 'EMINOR': 'E♭','E MINOR': 'E♭',
+    'A♭': 'A♭', 'Ab': 'A♭', 'Am': 'A♭', 'am': 'A♭', 'AMINOR': 'A♭','A MINOR': 'A♭',
+    'D♭': 'D♭', 'Db': 'D♭', 'Dm': 'D♭', 'dm': 'D♭', 'DMINOR': 'D♭','D MINOR': 'D♭',
+    'G♭': 'G♭', 'Gb': 'G♭', 'Gm': 'G♭', 'gm': 'G♭', 'GMINOR': 'G♭','G MINOR': 'G♭',
+    'C♭': 'C♭', 'Cb': 'C♭', 'Cm': 'C♭', 'cm': 'C♭', 'CMINOR': 'C♭', 'C MINOR': 'C♭',
 };
 
 
-function getStepSize(keySignature, pitch) {
+function getStepSizeUp(keySignature, pitch) {
     // Returns how many half-steps to the next note in this key.
     if (keySignature in MINORKEYSIGNATURES || keySignature.toUpperCase() in MINORKEYSIGNATURES) {
         var myKeySignature = MINORKEYSIGNATURES[keySignature];
@@ -91,10 +91,8 @@ function getStepSize(keySignature, pitch) {
         if (thisScale[j] === pitch) {
             var ii = (i + 1) % halfSteps.length;
             if (ii === 0) {
-                var foo = thisScale.length - halfSteps[i];
                 return thisScale.length - halfSteps[i];
             } else {
-                var foo = halfSteps[ii] - halfSteps[i];
                 return halfSteps[ii] - halfSteps[i];
             }
         }
@@ -109,10 +107,72 @@ function getStepSize(keySignature, pitch) {
         if (thisScale[j] === pitch) {
             var ii = (i + 1) % halfSteps.length;
             if (ii === 0) {
-                var foo = thisScale.length - halfSteps[i];
                 return thisScale.length - halfSteps[i];
             } else {
-                var foo = halfSteps[ii] - halfSteps[i];
+                return halfSteps[ii] - halfSteps[i];
+            }
+        }
+    }
+
+    // current Note not in the consonant scale if this key.
+    console.log(pitch + ' not found in key of ' + myKeySignature);
+    return 1;
+}
+
+
+function getStepSizeDown(keySignature, pitch) {
+    // Returns how many half-steps to the next note in this key.
+    if (keySignature in MINORKEYSIGNATURES || keySignature.toUpperCase() in MINORKEYSIGNATURES) {
+        var myKeySignature = MINORKEYSIGNATURES[keySignature];
+        var thisScale = NOTESFLAT;
+        var halfSteps = [0, 2, 3, 5, 7, 8, 10];
+    } else if (keySignature in MAJORKEYSIGNATURES || keySignature.toUpperCase() in MAJORKEYSIGNATURES) {
+        var myKeySignature = MAJORKEYSIGNATURES[keySignature];
+        var thisScale = NOTESSHARP;
+        var halfSteps = [0, 2, 4, 5, 7, 9, 11];
+    } else {
+        console.log('key signature ' + keySignature + ' not found');
+        myKeySignature = 'C';
+        var thisScale = NOTESSHARP;
+        var halfSteps = [0, 2, 4, 5, 7, 9, 11];
+    }
+
+    var idx = thisScale.indexOf(myKeySignature);
+
+    if (idx === -1) {
+        idx = 0;
+    }
+
+    
+    if (pitch in BTOFLAT) {
+        pitch = BTOFLAT[pitch];
+    } else if (pitch in STOSHARP) {
+        pitch = STOSHARP[pitch];
+    }
+
+    for (var i = 0; i < halfSteps.length; i++) {
+        var j = (halfSteps[i] + idx) % thisScale.length;
+        if (thisScale[j] === pitch) {
+            var ii = i - 1;
+            if (ii < 0) {
+                return last(halfSteps) - thisScale.length;
+            } else {
+                return halfSteps[ii] - halfSteps[i];
+            }
+        }
+    }
+
+    if (pitch in EQUIVALENTNOTES) {
+        pitch = EQUIVALENTNOTES[pitch];
+    }
+
+    for (var i = 0; i < halfSteps.length; i++) {
+        var j = (halfSteps[i] + idx) % thisScale.length;
+        if (thisScale[j] === pitch) {
+            var ii = i - 1;
+            if (ii < 0) {
+                return last(halfSteps) - thisScale.length;
+            } else {
                 return halfSteps[ii] - halfSteps[i];
             }
         }

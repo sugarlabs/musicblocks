@@ -431,9 +431,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'consonantstepsize':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-                    value = getStepSize(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    value = getStepSizeUp(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    value = getStepSize(this.keySignature[turtle], 'A');
+                    value = getStepSizeUp(this.keySignature[turtle], 'A');
+                }
+                break;
+            case 'consonantstepsizedown':
+                if (this.lastNotePlayed[turtle] !== null) {
+                    var len = this.lastNotePlayed[turtle][0].length;
+                    value = getStepSizeDown(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
+                } else {
+                    value = getStepSizeDown(this.keySignature[turtle], 'A');
                 }
                 break;
             case 'transpositionfactor':
@@ -3644,9 +3652,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'consonantstepsize':
                 if (logo.lastNotePlayed[turtle] !== null) {
                     var len = logo.lastNotePlayed[turtle][0].length;
-                    logo.blocks.blockList[blk].value = getStepSize(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    logo.blocks.blockList[blk].value = getStepSizeUp(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
                 } else {
-                    logo.blocks.blockList[blk].value = getStepSize(logo.keySignature[turtle], 'A');
+                    logo.blocks.blockList[blk].value = getStepSizeUp(logo.keySignature[turtle], 'A');
+                }
+                break;
+            case 'consonantstepsizedown':
+                if (logo.lastNotePlayed[turtle] !== null) {
+                    var len = logo.lastNotePlayed[turtle][0].length;
+                    logo.blocks.blockList[blk].value = getStepSizeDown(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                } else {
+                    logo.blocks.blockList[blk].value = getStepSizeDown(logo.keySignature[turtle], 'A');
                 }
                 break;
             case 'transpositionfactor':
