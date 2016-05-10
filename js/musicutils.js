@@ -33,6 +33,41 @@ const A0 = 27.5;
 const C8 = 4186.01;
 
 
+function getStepSize(keySignature, currentNote) {
+    // Returns how many half-steps to the next note in this key.
+    if (keySignature.substr(-1) === 'm' || keySignature.slice(1).toLowerCase() === 'minor') {
+        var thisScale = NOTESFLAT;
+        var halfSteps = [0, 2, 3, 5, 7, 8, 10];
+    } else {
+        var thisScale = NOTESSHARP;
+        var halfSteps = [0, 2, 4, 5, 7, 9, 11];
+    }
+
+    var idx = thisScale.indexOf(keySignature[0]);
+
+    if (idx === -1) {
+        idx = 0;
+    }
+
+    for (var i = 0; i < halfSteps.length; i++) {
+        var j = (halfSteps[i] + idx) % thisScale.length;
+        if (thisScale[j] === currentNote) {
+            var ii = (i + 1) % halfSteps.length;
+            if (ii === 0) {
+                var foo = thisScale.length - halfSteps[i];
+                return thisScale.length - halfSteps[i];
+            } else {
+                var foo = halfSteps[ii] - halfSteps[i];
+                return halfSteps[ii] - halfSteps[i];
+            }
+        }
+    }
+
+    // current Note not in the consonant scale if this key.
+    return 1;
+}
+
+
 function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
     if (keySignature.substr(-1) === 'm' || keySignature.slice(1).toLowerCase() === 'minor') {
