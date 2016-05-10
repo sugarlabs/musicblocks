@@ -11,10 +11,12 @@
 
 const SHARP = '♯';
 const FLAT = '♭';
-const BTOFLAT = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'C♭', 'Fb': 'F♭', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'C♭', 'fb': 'F♭'};
+const BTOFLAT = {'Eb': 'E♭', 'Gb': 'G♭', 'Ab': 'A♭', 'Bb': 'B♭', 'Db': 'D♭', 'Cb': 'B', 'Fb': 'E', 'eb': 'E♭', 'gb': 'G♭', 'ab': 'A♭', 'bb': 'B♭', 'db': 'D♭', 'cb': 'B', 'fb': 'E'};
+const STOSHARP = {'E#': 'F', 'G#': 'G♯', 'A#': 'A♯', 'B#': 'C', 'D#': 'D♯', 'C#': 'C♯', 'F#': 'F♯', 'e#': 'F', 'g#': 'G♯', 'a#': 'A♯', 'b#': 'C', 'd#': 'D♯', 'c#': 'C♯', 'f#': 'F♯'};
 const NOTESSHARP = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const NOTESFLAT = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
 const NOTESFLAT2 = ['c', 'd♭', 'd', 'e♭', 'e', 'f', 'g♭', 'g', 'a♭', 'a', 'b♭', 'b'];
+const EQUIVALENTNOTES = {'C♯': 'D♭', 'D♯': 'E♭', 'F♯': 'G♭', 'G♯': 'A♭', 'A♯': 'B♭', 'D♭': 'C♯', 'E♭': 'D♯', 'G♭': 'F♯', 'A♭': 'G♯', 'B♭': 'A♯'};
 const EXTRATRANSPOSITIONS = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
 const MAJORHALFSTEPS = ['do', '', 're', '', 'mi', 'fa', '', 'sol', '', 'la', '', 'ti'];
 const MINORHALFSTEPS = ['do', '', 're', 'mi', '', 'fa', '', 'sol', 'la', '', 'ti', ''];
@@ -32,26 +34,79 @@ const TWELTHROOT2 = 1.05946309435929;
 const A0 = 27.5;
 const C8 = 4186.01;
 
+const MAJORKEYSIGNATURES = {
+    'C': 'C', 'CMAJOR': 'C', 'c': 'C',
+    'G': 'G', 'GMAJOR': 'G', 'g': 'G',
+    'D': 'D', 'DMAJOR': 'D', 'd': 'D',
+    'A': 'A', 'AMAJOR': 'A', 'a': 'A',
+    'E': 'E', 'EMAJOR': 'E', 'e': 'E',
+    'B': 'B', 'BMAJOR': 'B', 'b': 'B',
+    'F#': 'F♯', 'FSHARP': 'F♯', 'F#': 'F♯',
+    'C#': 'C♯', 'CSHARP': 'C♯', 'C#': 'C♯',
+};
 
-function getStepSize(keySignature, currentNote) {
+const MINORKEYSIGNATURES = {
+    'F': 'F', 'FMINOR': 'F', 'f': 'F', 'Fm': 'F', 'fm': 'F',
+    'B♭': 'B♭', 'BFLAT': 'B♭', 'Bb': 'B♭', 'Bm': 'B♭', 'bm': 'B♭', 'BMINOR': 'B♭',
+    'E♭': 'E♭', 'EFLAT': 'E♭', 'Eb': 'E♭', 'Em': 'E♭', 'em': 'E♭', 'EMINOR': 'E♭',
+    'A♭': 'A♭', 'AFLAT': 'A♭', 'Ab': 'A♭', 'Am': 'A♭', 'am': 'A♭', 'AMINOR': 'A♭',
+    'D♭': 'D♭', 'DFLAT': 'D♭', 'Db': 'D♭', 'Dm': 'D♭', 'dm': 'D♭', 'DMINOR': 'D♭',
+    'G♭': 'G♭', 'GFLAT': 'G♭', 'Gb': 'G♭', 'Gm': 'G♭', 'gm': 'G♭', 'GMINOR': 'G♭',
+    'C♭': 'C♭', 'CFLAT': 'C♭', 'Cb': 'C♭', 'Cm': 'C♭', 'cm': 'C♭', 'CMINOR': 'C♭',
+};
+
+
+function getStepSize(keySignature, pitch) {
     // Returns how many half-steps to the next note in this key.
-    if (keySignature.substr(-1) === 'm' || keySignature.slice(1).toLowerCase() === 'minor') {
+    if (keySignature in MINORKEYSIGNATURES || keySignature.toUpperCase() in MINORKEYSIGNATURES) {
+        var myKeySignature = MINORKEYSIGNATURES[keySignature];
         var thisScale = NOTESFLAT;
         var halfSteps = [0, 2, 3, 5, 7, 8, 10];
+    } else if (keySignature in MAJORKEYSIGNATURES || keySignature.toUpperCase() in MAJORKEYSIGNATURES) {
+        var myKeySignature = MAJORKEYSIGNATURES[keySignature];
+        var thisScale = NOTESSHARP;
+        var halfSteps = [0, 2, 4, 5, 7, 9, 11];
     } else {
+        console.log('key signature ' + keySignature + ' not found');
+        myKeySignature = 'C';
         var thisScale = NOTESSHARP;
         var halfSteps = [0, 2, 4, 5, 7, 9, 11];
     }
 
-    var idx = thisScale.indexOf(keySignature[0]);
+    var idx = thisScale.indexOf(myKeySignature);
 
     if (idx === -1) {
         idx = 0;
     }
 
+    
+    if (pitch in BTOFLAT) {
+        pitch = BTOFLAT[pitch];
+    } else if (pitch in STOSHARP) {
+        pitch = STOSHARP[pitch];
+    }
+
     for (var i = 0; i < halfSteps.length; i++) {
         var j = (halfSteps[i] + idx) % thisScale.length;
-        if (thisScale[j] === currentNote) {
+        if (thisScale[j] === pitch) {
+            var ii = (i + 1) % halfSteps.length;
+            if (ii === 0) {
+                var foo = thisScale.length - halfSteps[i];
+                return thisScale.length - halfSteps[i];
+            } else {
+                var foo = halfSteps[ii] - halfSteps[i];
+                return halfSteps[ii] - halfSteps[i];
+            }
+        }
+    }
+
+    if (pitch in EQUIVALENTNOTES) {
+        pitch = EQUIVALENTNOTES[pitch];
+    }
+
+    for (var i = 0; i < halfSteps.length; i++) {
+        var j = (halfSteps[i] + idx) % thisScale.length;
+        if (thisScale[j] === pitch) {
             var ii = (i + 1) % halfSteps.length;
             if (ii === 0) {
                 var foo = thisScale.length - halfSteps[i];
@@ -64,18 +119,26 @@ function getStepSize(keySignature, currentNote) {
     }
 
     // current Note not in the consonant scale if this key.
+    console.log(pitch + ' not found in key of ' + myKeySignature);
     return 1;
 }
 
 
 function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
-    if (keySignature.substr(-1) === 'm' || keySignature.slice(1).toLowerCase() === 'minor') {
+    if (keySignature in MINORKEYSIGNATURES || keySignature.toUpperCase() in MINORKEYSIGNATURES) {
         var thisScale = NOTESFLAT;
         var halfSteps = MINORHALFSTEPS;  // 0 2 3 5 7 8 10
-        var keySignature = keySignature.substr(0, keySignature.length - 1);
+        var keySignature = MINORKEYSIGNATURES[keySignature];
         var major = false;
+    } else if (keySignature in MAJORKEYSIGNATURES || keySignature.toUpperCase() in MAJORKEYSIGNATURES) {
+        var thisScale = NOTESSHARP;
+        var halfSteps = MAJORHALFSTEPS;  // 0 2 4 5 7 9 11
+        var keySignature = MAJORKEYSIGNATURES[keySignature];
+        var major = true;
     } else {
+        console.log('key signature ' + keySignature + ' not found');
+        keySignature = 'C';
         var thisScale = NOTESSHARP;
         var halfSteps = MAJORHALFSTEPS;  // 0 2 4 5 7 9 11
         var keySignature = keySignature;
@@ -253,6 +316,8 @@ function pitchToNumber(pitch, octave) {
 
     if (pitch in BTOFLAT) {
         pitch = BTOFLAT[pitch];
+    } else if (pitch in STOSHARP) {
+        pitch = STOSHARP[pitch];
     }
 
     var pitchNumber = 0;
