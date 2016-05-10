@@ -428,6 +428,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     value = Math.round(logo.mic.getLevel() * 1000);
                 }
                 break;
+            case 'consonantstepsize':
+                if (this.lastNotePlayed[turtle] !== null) {
+                    var len = this.lastNotePlayed[turtle][0].length;
+                    value = getStepSize(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
+                } else {
+                    value = getStepSize(this.keySignature[turtle], 'A');
+                }
+                break;
             case 'transpositionfactor':
                 value = this.transposition[turtle];
                 break;
@@ -453,7 +461,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'turtlepitch':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-		    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)));
+                    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)));
                 } else {
                     console.log('Could not find a note for turtle ' + turtle);
                     value = pitchToNumber('A', 4);
@@ -3633,6 +3641,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'key':
                 logo.blocks.blockList[blk].value = logo.keySignature[turtle];
                 break;
+            case 'consonantstepsize':
+                if (logo.lastNotePlayed[turtle] !== null) {
+                    var len = logo.lastNotePlayed[turtle][0].length;
+                    logo.blocks.blockList[blk].value = getStepSize(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                } else {
+                    logo.blocks.blockList[blk].value = getStepSize(logo.keySignature[turtle], 'A');
+                }
+                break;
             case 'transpositionfactor':
                 logo.blocks.blockList[blk].value = logo.transposition[turtle];
                 break;
@@ -3779,7 +3795,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var x = logo.turtles.turtleList[turtle].container.x;
                 var y = logo.turtles.turtleList[turtle].container.y;
                 logo.refreshCanvas();
-                var ctx = this.canvas.getContext('2d');
+                var ctx = logo.canvas.getContext('2d');
                 var imgData = ctx.getImageData(x, y, 1, 1).data;
                 var color = searchColors(imgData[0], imgData[1], imgData[2]);
                 if (imgData[3] === 0) {
