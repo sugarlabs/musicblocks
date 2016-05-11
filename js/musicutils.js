@@ -123,7 +123,10 @@ function keySignatureToMode(keySignature) {
     }
 
     if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
-        console.log('invalid key name: ' + key + ' reverting to C');
+        console.log('invalid key or missing name; reverting to C.');
+        // Is is possible that the key was left out?
+        var keySignature = 'C ' + keySignature;
+        var parts = keySignature.split(' ');
         key = 'C';
     }
 
