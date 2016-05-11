@@ -466,13 +466,13 @@ function pitchToNumber(pitch, octave, keySignature) {
         pitchNumber = PITCHES3.indexOf(pitch.toUpperCase());
     } else {
         // obj[1] is the solfege mapping for the current key/mode
-	var obj = getScaleAndHalfSteps(keySignature)
-	if (obj[1].indexOf(pitch.tolowerCase()) !== -1) {
+        var obj = getScaleAndHalfSteps(keySignature)
+        if (obj[1].indexOf(pitch.tolowerCase()) !== -1) {
             pitchNumber = obj[1].indexOf(pitch.tolowerCase());
-	} else {
+        } else {
             console.log('pitch ' + pitch + ' not found');
             pitchNumber = 0;
-	}
+        }
     }
 
     // We start at A0.
