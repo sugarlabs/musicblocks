@@ -428,7 +428,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     value = Math.round(logo.mic.getLevel() * 1000);
                 }
                 break;
-            case 'consonantstepsize':
+            case 'consonantstepsizeup':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
                     value = getStepSizeUp(this.keySignature[turtle], this.lastNotePlayed[turtle][0].slice(0, len - 1));
@@ -1963,6 +1963,73 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.noteOctaves[turtle].push(4);
             logo.noteBeatValues[turtle].push(1);
             logo.pushedNote[turtle] = true;
+            break;
+        case 'steppitch':
+            // FIXME: Only for inside a note block.
+            // FIXME: Add transforms
+
+            if (typeof(args[0]) !== 'number') {
+                logo.errorMsg(NANERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            if (logo.lastNotePlayed[turtle] == null) {
+                logo.errorMsg(INVALIDPITCH, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            var len = logo.lastNotePlayed[turtle][0].length;
+            if (args[0] >= 1) {
+                var n = Math.floor(args[0]);
+                if (logo.lastNotePlayed[turtle] !== null) {
+                    var value = getStepSizeUp(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), value, logo.keySignature[turtle]);
+                    for (var i = 1; i < n; i++) {
+                        var value = getStepSizeUp(logo.keySignature[turtle], noteObj[0]);
+                        noteObj = logo.getNote(noteObj[0], noteObj[1], value, logo.keySignature[turtle]);
+                    }
+
+                    logo.notePitches[turtle].push(noteObj[0]);
+                    logo.noteOctaves[turtle].push(noteObj[1]);
+                    logo.pushedNote[turtle] = true;
+                    if (turtle in logo.beatFactor) {
+                        logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+                    } else {
+                        logo.noteBeatValues[turtle].push(1);
+                    }
+                }
+            } else if (args[0] <= -1) {
+                var n = -Math.ceil(args[0]);
+                if (logo.lastNotePlayed[turtle] !== null) {
+                    value = getStepSizeDown(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                    var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), value, logo.keySignature[turtle]);
+                    for (var i = 1; i < n; i++) {
+                        var value = getStepSizeDown(logo.keySignature[turtle], noteObj[0]);
+                        noteObj = logo.getNote(noteObj[0], noteObj[1], value, logo.keySignature[turtle]);
+                    }
+
+                    logo.notePitches[turtle].push(noteObj[0]);
+                    logo.noteOctaves[turtle].push(noteObj[1]);
+                    logo.pushedNote[turtle] = true;
+                    if (turtle in logo.beatFactor) {
+                        logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+                    } else {
+                        logo.noteBeatValues[turtle].push(1);
+                    }
+                }
+            } else {  // Repeat last pitch played.
+                var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), 0, logo.keySignature[turtle]);
+                logo.notePitches[turtle].push(noteObj[0]);
+                logo.noteOctaves[turtle].push(noteObj[1]);
+                logo.pushedNote[turtle] = true;
+                if (turtle in logo.beatFactor) {
+                    logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+                } else {
+                    logo.noteBeatValues[turtle].push(1);
+                }
+            }
             break;
         case 'pitch':
             if (args.length !== 2 || args[0] == null || args[1] == null) {
@@ -3649,7 +3716,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'key':
                 logo.blocks.blockList[blk].value = logo.keySignature[turtle];
                 break;
-            case 'consonantstepsize':
+            case 'consonantstepsizeup':
                 if (logo.lastNotePlayed[turtle] !== null) {
                     var len = logo.lastNotePlayed[turtle][0].length;
                     logo.blocks.blockList[blk].value = getStepSizeUp(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
@@ -4129,6 +4196,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         // Already a note? No need to convert from solfege.
         if (solfege in BTOFLAT) {
             solfege = BTOFLAT[solfege];
+        } else if (solfege in STOSHARP) {
+            solfege = STOSHARP[solfege];
         }
 
         if (solfege in EXTRATRANSPOSITIONS) {
@@ -4200,7 +4269,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
                 note = thisScale[index];
             } else {
-                console.log('WARNING: Note ' + solfege + ' not found. Returning C');
+                console.log('WARNING: Note ' + solfege + ' not found in ' + halfSteps + '. Returning C');
                 this.validNote = false;
                 return ['C', octave];
             }

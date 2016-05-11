@@ -133,9 +133,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     consonantStepDownBlock.adjustWidthToLabel();
     consonantStepDownBlock.parameterBlock();
 
-    var consonantStepUpBlock = new ProtoBlock('consonantstepsize');
+    var consonantStepUpBlock = new ProtoBlock('consonantstepsizeup');
     consonantStepUpBlock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['consonantstepsize'] = consonantStepUpBlock;
+    blocks.protoBlockDict['consonantstepsizeup'] = consonantStepUpBlock;
     consonantStepUpBlock.staticLabels.push(_('consonant step up'));
     consonantStepUpBlock.adjustWidthToLabel();
     consonantStepUpBlock.parameterBlock();
@@ -219,6 +219,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     sharpBlock.adjustWidthToLabel();
     sharpBlock.flowClampZeroArgBlock();
     
+    var pitchStepBlock = new ProtoBlock('steppitch');
+    pitchStepBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['steppitch'] = pitchStepBlock;
+    pitchStepBlock.staticLabels.push(_('step pitch'));
+    pitchStepBlock.oneArgBlock();
+    pitchStepBlock.adjustWidthToLabel();
+    pitchStepBlock.dockTypes[1] = 'anyin';
+    pitchStepBlock.defaults.push(1);
+
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['pitch'] = pitch;
