@@ -469,10 +469,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             case 'turtlepitch':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-                    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)));
+                    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)), this.keySignature[turtle]);
                 } else {
                     console.log('Could not find a note for turtle ' + turtle);
-                    value = pitchToNumber('A', 4);
+                    value = pitchToNumber('A', 4, this.keySignature[turtle]);
                 }
                 break;
                 // Deprecated
@@ -3715,7 +3715,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             console.log('Could not find a note for turtle ' + turtle);
                             var obj = ['C', 0];
                         }
-                        value = pitchToNumber(obj[0], obj[1]);
+                        value = pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]);
                         logo.blocks.blockList[blk].value = value;
                     }
                 }
@@ -3832,7 +3832,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
                 var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
                 var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
-                block.value = Math.round(pitchToFrequency(a, b));
+                block.value = Math.round(pitchToFrequency(a, b, logo.keySignature[turtle]));
                 break;
             case 'pop':
                 var block = logo.blocks.blockList[blk];
@@ -4160,13 +4160,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             var obj = getScaleAndHalfSteps(keySignature);
             var thisScale = obj[0];
             var halfSteps = obj[1];
-            var keySignature = obj[2];
+            var myKeySignature = obj[2];
             var major = obj[3];
 
             // Ensure it is a valid key signature.
-            offset = thisScale.indexOf(keySignature);
+            offset = thisScale.indexOf(myKeySignature);
             if (offset === -1) {
-                console.log('WARNING: Key ' + keySignature + ' not found in ' + thisScale + '. Using default of C');
+                console.log('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
                 var offset = 0;
                 var thisScale = NOTESSHARP;
             }
