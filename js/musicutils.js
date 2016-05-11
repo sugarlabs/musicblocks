@@ -38,6 +38,9 @@ const C8 = 4186.01;
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org
 const MUSICALMODES = {
+     // 12 notes in an octave
+    'CHROMATIC': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+
      // 8 notes in an octave
     'ALGERIAN': [2, 1, 2, 1, 1, 1, 3, 1],
     'DIMINISHED': [2, 1, 2, 1, 2, 1, 2, 1],
