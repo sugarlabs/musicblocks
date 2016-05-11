@@ -29,19 +29,21 @@ const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 const SEMITONES = 12;
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
-const TWELTHROOT2 = 1.05946309435929;
+const TWELTHROOT2 = 1.0594630943592953;
+const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
 const A0 = 27.5;
 const C8 = 4186.01;
 
+// The table contains the intervals that define the modes.
+// All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org
-// The table contains the intervals that define the modes
 const MUSICALMODES = {
-     // 9 notes
+     // 8 notes in an octave
     'ALGERIAN': [2, 1, 2, 1, 1, 1, 3, 1],
     'DIMINISHED': [2, 1, 2, 1, 2, 1, 2, 1],
     'SPANISH': [1, 2, 1, 1, 1, 2, 2, 2],
 
-     // 8 notes
+     // 7 notes in an octave
     'MAJOR': [2, 2, 1, 2, 2, 2, 1],
     'IONIAN': [2, 2, 1, 2, 2, 2, 1],
     'DORIAN': [2, 1, 2, 2, 2, 1, 2],
@@ -67,12 +69,12 @@ const MUSICALMODES = {
     'GYPSY': [1, 3, 1, 2, 1, 2, 2],
     'MAQAM': [1, 3, 1, 2, 1, 3, 1],
 
-    // 7 notes
+    // 6 notes in an octave
     'BLUES': [3, 2, 1, 1, 3, 2],
     'PENTATONIC BLUES': [3, 2, 1, 1, 3, 2],
     'PENTATONIC MAJOR BLUES': [2, 1, 1, 3, 2, 2],
 
-    // 6 notes
+    // 5 notes in an octave
     'PENTATONIC': [3, 2, 2, 3, 2],
     'CHINESE': [4, 2, 1, 4, 1],
     'EGYPTIAN': [2, 3, 2, 3, 2],
