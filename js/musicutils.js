@@ -80,7 +80,7 @@ const MUSICALMODES = {
     'BLUES': [3, 2, 1, 1, 3, 2],
     'PENTATONIC BLUES': [3, 2, 1, 1, 3, 2],
     'PENTATONIC MAJOR BLUES': [2, 1, 1, 3, 2, 2],
-    'WHOLE TONE': [2, 2, 2, ,2, 2, 2]
+    'WHOLE TONE': [2, 2, 2, ,2, 2, 2],
 
     // 5 notes in an octave
     'PENTATONIC': [3, 2, 2, 3, 2],
