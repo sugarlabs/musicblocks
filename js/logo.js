@@ -2010,6 +2010,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), 0, logo.keySignature[turtle]);
             }
 
+            var delta = 0;
             if (!(logo.invertList[turtle].length === 0)) {
                 var len = logo.invertList[turtle].length;
                 var note1 = logo.getNote(noteObj[0], noteObj[1], 0, logo.keySignature[turtle]);
