@@ -53,8 +53,9 @@ const MUSICALMODES = {
     'MINOR': [2, 1, 2, 2, 1, 2, 2],
     'AEOLIAN': [2, 1, 2, 2, 1, 2, 2],
     'LOCRIAN': [1, 2, 2, 1, 2, 2, 2],
+
     'JAZZ': [2, 1, 2, 2, 2, 2, 1],
-    'AEOLIAN': [2, 2, 1, 2, 1, 2, 2],
+    'JAZZ MINOR': [2, 1, 2, 2, 2, 2, 1],
 
     'ARABIC': [2, 2, 1, 1, 2, 2, 2],
     'BYZANTINE': [1, 3, 1, 2, 1, 3, 1],
@@ -293,29 +294,32 @@ function getScaleAndHalfSteps(keySignature) {
         var thisScale = NOTESSHARP;
     }
 
-    var major = obj[1] === 'MAJOR' || obj[1] === 'IONIAN';
-
     if (myKeySignature in EXTRATRANSPOSITIONS) {
         myKeySignature = EXTRATRANSPOSITIONS[myKeySignature][0];
     }
 
-    return [thisScale, solfege, myKeySignature, major];
+    return [thisScale, solfege, myKeySignature, obj[1]];
 };
 
 
 function getInterval (interval, keySignature) {
+    // FIX ME: should this be half-steps or some step size based on
+    // the mode and position in the scale?
+    return interval;
+
     // Calculate the interval in terms of halfsteps for current mode.
     var obj = getScaleAndHalfSteps(keySignature);
-    var halfSteps = obj[1];
-
-    var myOctave = Math.floor(interval / halfSteps.length);
-    var myInterval = Math.floor(interval) % halfSteps.length;
+    console.log(interval);
+    console.log(MUSICALMODES[obj[3]]);
+    var myOctave = Math.floor(interval / SEMITONES);
+    var myInterval = Math.floor(interval) % SEMITONES;
+    console.log(myOctave + ' ' + myInterval);
 
     var ii = 0;
     for (var i = 0; i < myInterval; i++) {
-        ii += halfSteps[i];
+        ii += MUSICALMODES[obj[3]][i];
     }
-
+    console.log(ii);
     return ii + myOctave * SEMITONES;
 };
 
@@ -409,10 +413,25 @@ function frequencyToPitch(hz) {
         return ['C', 8];
     }
 
+    // Calculate cents to keep track of drift
+    var cents = 0;
+    for (var i = 0; i < 8800; i++) {
+        var f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
+        if (hz < f * 1.0003 && hz > f * 0.9997) {
+            console.log('cents: ' + i);
+            var cents = i % 100;
+            if (cents > 50) {
+                cents = 100 - cents;
+            }
+            break;
+        }
+    }
+
     for (var i = 0; i < 88; i++) {
         var f = A0 * Math.pow(TWELTHROOT2, i);
         if (hz < f * 1.03 && hz > f * 0.97) {
-            return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
+            console.log('pitch: ' + i);
+            return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12), cents];
         }
     }
     console.log('could not find note/octave for ' + hz);
@@ -436,15 +455,19 @@ function noteToFrequency(note, keySignature) {
     var len = note.length;
     var octave = last(note);
     var pitch = note.substring(0, len - 1);
-    return pitchToFrequency(pitch, Number(octave), keySignature);
+    return pitchToFrequency(pitch, Number(octave), 0, keySignature);
 };
 
 
-function pitchToFrequency(pitch, octave, keySignature) {
+function pitchToFrequency(pitch, octave, cents, keySignature) {
     // Calculate the frequency based on pitch and octave.
     var pitchNumber = pitchToNumber(pitch, octave, keySignature);
 
-    return A0 * Math.pow(TWELTHROOT2, pitchNumber);
+    if (cents === 0) {
+	return A0 * Math.pow(TWELTHROOT2, pitchNumber);
+    } else {
+	return A0 * Math.pow(TWELVEHUNDRETHROOT2, pitchNumber * 100 + cents);
+    }
 };
 
 
