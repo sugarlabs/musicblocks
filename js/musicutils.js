@@ -59,6 +59,7 @@ const MUSICALMODES = {
 
     'JAZZ': [2, 1, 2, 2, 2, 2, 1],
     'JAZZ MINOR': [2, 1, 2, 2, 2, 2, 1],
+    'BEBOP': [1, 1, 1, 2, 2, 1, 2],
 
     'ARABIC': [2, 2, 1, 1, 2, 2, 2],
     'BYZANTINE': [1, 3, 1, 2, 1, 3, 1],
