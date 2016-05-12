@@ -118,6 +118,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.noteFrequencies = {};
     this.notePitches = {};
     this.noteOctaves = {};
+    this.noteCents = {};
     this.noteTranspositions = {};
     this.noteBeatValues = {};
 
@@ -569,6 +570,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.transposition[turtle] = 0;
             this.noteBeat[turtle] = [];
             this.noteFrequencies[turtle] = [];
+            this.noteCents[turtle] = [];
             this.lastNotePlayed[turtle] = null;
             this.notePitches[turtle] = [];
             this.noteOctaves[turtle] = [];
@@ -2137,9 +2139,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             } else if (logo.inNoteBlock[turtle] > 0) {
 
-                function addPitch(note, octave) {
+                function addPitch(note, octave, cents) {
                     logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
+                    logo.noteCents[turtle].push(cents);
                 }
 
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -2155,35 +2158,35 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
                 }
 
-                addPitch(note, octave);
+                addPitch(note, octave, cents);
 
                 if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, last(logo.intervals[turtle]), logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1]);
+                    addPitch(noteObj[0], noteObj[1], cents);
                 }
 
                 // deprecated
                 if (turtle in logo.fifths && logo.fifths[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 7, logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1]);
+                    addPitch(noteObj[0], noteObj[1], cents);
                 }
 
                 // deprecated
                 if (turtle in logo.tritones && logo.tritones[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 6, logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1]);
+                    addPitch(noteObj[0], noteObj[1], cents);
                 }
                 
                 // deprecated
                 if (turtle in logo.fourths && logo.fourths[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 5, logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1]);
+                    addPitch(noteObj[0], noteObj[1], cents);
                 }
                 
                 // deprecated
                 if (turtle in logo.thirds && logo.thirds[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 4, logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1]);
+                    addPitch(noteObj[0], noteObj[1], cents);
                 }
 
                 if (turtle in logo.transposition) {
@@ -2268,6 +2271,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.noteBeat[turtle] = [];
             logo.notePitches[turtle] = [];
             logo.noteOctaves[turtle] = [];
+            logo.noteCents[turtle] = [];
             logo.noteTranspositions[turtle] = [];
             logo.noteBeatValues[turtle] = [];
 
@@ -2745,6 +2749,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 } else {
                     // TODO: add transpositions to frequency?
                     logo.noteFrequencies[turtle].push(args[0]);
+                    logo.noteCents[turtle].push(obj[3]);
                     // We keep track of pitch and octave for notation purposes.
                     logo.notePitches[turtle].push(obj[0]);
                     logo.noteOctaves[turtle].push(obj[1]);
@@ -3116,15 +3121,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         // Save the current note.
                         var saveNote = [];
                         for (var i = 0; i < this.notePitches[turtle].length; i++) {
-                            saveNote.push([this.notePitches[turtle][i], this.noteOctaves[turtle][i]]);
+                            saveNote.push([this.notePitches[turtle][i], this.noteOctaves[turtle][i], this.noteCents[turtle][i]]);
                         }
 
                         // Swap in the previous note.
                         this.notePitches[turtle] = [];
                         this.noteOctaves[turtle] = [];
+                        this.noteCents[turtle] = [];
                         for (var i = 0; i < this.tieNote[turtle].length; i++) {
                             this.notePitches[turtle].push(this.tieNote[turtle][i][0]);
                             this.noteOctaves[turtle].push(this.tieNote[turtle][i][1]);
+                            this.noteCents[turtle].push(this.tieNote[turtle][i][2]);
                         }
                         this.tieNote[turtle] = [];
                         // Remove the note from the Lilypond list.
@@ -3138,9 +3145,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         this.tie[turtle] = true;
                         this.notePitches[turtle] = [];
                         this.noteOctaves[turtle] = [];
+                        this.noteCents[turtle] = [];
                         for (var i = 0; i < saveNote.length; i++) {
                             this.notePitches[turtle].push(saveNote[i][0]);
                             this.noteOctaves[turtle].push(saveNote[i][1]);
+                            this.noteCents[turtle].push(saveNote[i][2]);
                         }
                     }
                 }
@@ -3149,7 +3158,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     this.tieNote[turtle] = [];
                     this.tieCarryOver[turtle] = noteBeatValue;
                     for (var i = 0; i < this.notePitches[turtle].length; i++) {
-                        this.tieNote[turtle].push([this.notePitches[turtle][i], this.noteOctaves[turtle][i]]);
+                        this.tieNote[turtle].push([this.notePitches[turtle][i], this.noteOctaves[turtle][i], this.noteCents[turtle][i]]);
                     }
                     noteBeatValue = 0;
                 } else {
@@ -3271,10 +3280,20 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                         for (var i = 0; i < logo.notePitches[turtle].length; i++) {
                             var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
-                            var note = noteObj[0] + noteObj[1];
+
+                            // If the cents for this note != 0, then
+                            // we need to convert to frequency and add
+                            // in the cents.
+                            if (logo.noteCents[turtle][i] !== 0) {                            
+				var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
+			    } else {
+				var note = noteObj[0] + noteObj[1];
+                            }
+
                             if (note !== 'R') {
                                 notes.push(note);
                             }
+
                             if (duration > 0) {
                                 if (carry > 0) {
                                     if (i === 0) {
@@ -3298,8 +3317,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             var len = notes[0].length;
 
                             // Deprecated
-                            logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
-                            logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
+                            if (typeof(notes[i]) === 'string') {
+				logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
+				logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
+                            }
 
                             if (logo.turtles.turtleList[turtle].drum) {
                                 for (var i = 0; i < notes.length; i++) {
@@ -3308,18 +3329,21 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 }
                             } else {
                                 for (var i = 0; i < notes.length; i++) {
-                                    notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
+                                    if (typeof(notes[i]) === 'string') {
+                                        notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#');
+                                    }
                                 }
                             }
 
                             if (!logo.lilypondSaveOnly && duration > 0) {
                                 if (logo.oscList[turtle].length > 0) {
-                                    console.log(last(logo.noteFrequencies[turtle]));
+                                    // console.log(last(logo.noteFrequencies[turtle]));
                                     if (notes.length > 1) {  // (insideChord > 0) {
                                         logo.errorMsg(last(logo.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
                                     logo.synth.trigger([last(logo.noteFrequencies[turtle])], beatValue, last(logo.oscList[turtle]));
                                     logo.noteFrequencies[turtle].pop();
+                                    logo.noteCents[turtle].pop();
                                     logo.oscList[turtle].pop();
                                 } else if (logo.turtles.turtleList[turtle].drum) {
                                     logo.synth.trigger(notes, beatValue, 'drum');
@@ -4374,7 +4398,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             // , and ' for shifts in octave.
             // Also, notes must be lowercase.
             // And the octave bounday is at C, not A.
-            return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
+
+            // Convert frequencies here.
+            if (typeof(note) === 'number') {
+                var pitchObj = frequencyToPitch(note);
+                note = pitchObj[0] + pitchObj[1];
+	    }
+
+	    return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
         };
 
         var counter = 0;
@@ -4650,7 +4681,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         if (obj[0].length < 2) {
                             // Test for rests
                         } else {
-                            octaveTotal += Number(obj[0].substr(-1));
+                            if (typeof(obj[0]) === 'string') {
+                                octaveTotal += Number(obj[0].substr(-1));
+                            } else {
+                                var pitchObj = frequencyToPitch(obj[0]);
+                                octaveTotal += pitchObj[1];
+			    }
                             noteCount += 1;
                         }
                     }

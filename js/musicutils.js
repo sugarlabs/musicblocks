@@ -418,7 +418,6 @@ function frequencyToPitch(hz) {
     for (var i = 0; i < 8800; i++) {
         var f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
-            console.log('cents: ' + i);
             var cents = i % 100;
             if (cents > 50) {
                 cents = 100 - cents;
@@ -430,7 +429,6 @@ function frequencyToPitch(hz) {
     for (var i = 0; i < 88; i++) {
         var f = A0 * Math.pow(TWELTHROOT2, i);
         if (hz < f * 1.03 && hz > f * 0.97) {
-            console.log('pitch: ' + i);
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12), cents];
         }
     }
