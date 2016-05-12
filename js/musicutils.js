@@ -38,9 +38,13 @@ const C8 = 4186.01;
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org
 const MUSICALMODES = {
+     // 12 notes in an octave
+    'CHROMATIC': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+
      // 8 notes in an octave
     'ALGERIAN': [2, 1, 2, 1, 1, 1, 3, 1],
-    'DIMINISHED': [2, 1, 2, 1, 2, 1, 2, 1],
+    'DIMINISHED-WHOLE': [2, 1, 2, 1, 2, 1, 2, 1],
+    'DIMINISHED-HALF': [1, 2, 1, 2, 1, 2, 1, 2],
     'SPANISH': [1, 2, 1, 1, 1, 2, 2, 2],
 
      // 7 notes in an octave
@@ -54,7 +58,10 @@ const MUSICALMODES = {
     'AEOLIAN': [2, 1, 2, 2, 1, 2, 2],
     'LOCRIAN': [1, 2, 2, 1, 2, 2, 2],
     'JAZZ': [2, 1, 2, 2, 2, 2, 1],
-    'AEOLIAN': [2, 2, 1, 2, 1, 2, 2],
+    'AEOLIAN': [2, 2, 1, 2, 1, 2, 2], //Is it just me, or are there two "Aeolian scales here"?
+    'HARMONIC-MINOR':[2, 1, 2, 2, 1, 3, 1],
+    'MELODIC-MINOR-UP':[2, 1, 2, 2, 2, 2, 1], //Going up the melodic minor scale.
+    'MELODIC-MINOR-DOWN':[2, 1, 2, 2, 1, 2, 2], //When you go down the Melodic Minor scale, the notes are different than when you go up.
 
     'ARABIC': [2, 2, 1, 1, 2, 2, 2],
     'BYZANTINE': [1, 3, 1, 2, 1, 3, 1],
@@ -73,6 +80,7 @@ const MUSICALMODES = {
     'BLUES': [3, 2, 1, 1, 3, 2],
     'PENTATONIC BLUES': [3, 2, 1, 1, 3, 2],
     'PENTATONIC MAJOR BLUES': [2, 1, 1, 3, 2, 2],
+    'WHOLE TONE': [2, 2, 2, ,2, 2, 2],
 
     // 5 notes in an octave
     'PENTATONIC': [3, 2, 2, 3, 2],
