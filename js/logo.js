@@ -876,7 +876,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 eval(this.evalSetterDict[this.blocks.blockList[blk].name]);
                 break;
             }
-            this.errorMsg('Block does not support incrementing', blk);
+            this.errorMsg(_('Block does not support incrementing.'), blk);
         }
     };
 
@@ -1965,8 +1965,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.pushedNote[turtle] = true;
             break;
         case 'steppitch':
-            // FIXME: Only for inside a note block.
-            // FIXME: Add transforms
+            // Similar to pitch but calculated from previous note played.
+            if (logo.inNoteBlock[turtle] === 0) {
+                logo.errorMsg(_('The Step Pitch Block must be used insdie of a Note Block.'), blk);
+                logo.stopTurtle = true;
+                break;
+            }
 
             if (typeof(args[0]) !== 'number') {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -1980,56 +1984,65 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             }
 
+            function addPitch(note, octave) {
+                logo.notePitches[turtle].push(note);
+                logo.noteOctaves[turtle].push(octave);
+            }
+
             var len = logo.lastNotePlayed[turtle][0].length;
             if (args[0] >= 1) {
                 var n = Math.floor(args[0]);
-                if (logo.lastNotePlayed[turtle] !== null) {
-                    var value = getStepSizeUp(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
-                    var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), value, logo.keySignature[turtle]);
-                    for (var i = 1; i < n; i++) {
-                        var value = getStepSizeUp(logo.keySignature[turtle], noteObj[0]);
-                        noteObj = logo.getNote(noteObj[0], noteObj[1], value, logo.keySignature[turtle]);
-                    }
-
-                    logo.notePitches[turtle].push(noteObj[0]);
-                    logo.noteOctaves[turtle].push(noteObj[1]);
-                    logo.pushedNote[turtle] = true;
-                    if (turtle in logo.beatFactor) {
-                        logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
-                    } else {
-                        logo.noteBeatValues[turtle].push(1);
-                    }
+                var value = getStepSizeUp(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), value, logo.keySignature[turtle]);
+                for (var i = 1; i < n; i++) {
+                    var value = getStepSizeUp(logo.keySignature[turtle], noteObj[0]);
+                    noteObj = logo.getNote(noteObj[0], noteObj[1], value, logo.keySignature[turtle]);
                 }
             } else if (args[0] <= -1) {
                 var n = -Math.ceil(args[0]);
-                if (logo.lastNotePlayed[turtle] !== null) {
-                    value = getStepSizeDown(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
-                    var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), value, logo.keySignature[turtle]);
-                    for (var i = 1; i < n; i++) {
-                        var value = getStepSizeDown(logo.keySignature[turtle], noteObj[0]);
-                        noteObj = logo.getNote(noteObj[0], noteObj[1], value, logo.keySignature[turtle]);
-                    }
-
-                    logo.notePitches[turtle].push(noteObj[0]);
-                    logo.noteOctaves[turtle].push(noteObj[1]);
-                    logo.pushedNote[turtle] = true;
-                    if (turtle in logo.beatFactor) {
-                        logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
-                    } else {
-                        logo.noteBeatValues[turtle].push(1);
-                    }
+                value = getStepSizeDown(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), value, logo.keySignature[turtle]);
+                for (var i = 1; i < n; i++) {
+                    var value = getStepSizeDown(logo.keySignature[turtle], noteObj[0]);
+                    noteObj = logo.getNote(noteObj[0], noteObj[1], value, logo.keySignature[turtle]);
                 }
             } else {  // Repeat last pitch played.
                 var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), 0, logo.keySignature[turtle]);
-                logo.notePitches[turtle].push(noteObj[0]);
-                logo.noteOctaves[turtle].push(noteObj[1]);
-                logo.pushedNote[turtle] = true;
-                if (turtle in logo.beatFactor) {
-                    logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
-                } else {
-                    logo.noteBeatValues[turtle].push(1);
+            }
+
+            if (!(logo.invertList[turtle].length === 0)) {
+                var len = logo.invertList[turtle].length;
+                var note1 = logo.getNote(noteObj[0], noteObj[1], 0, logo.keySignature[turtle]);
+                var num1 = getNumber(note1[0], note1[1]);
+                for (var i = len - 1; i > -1; i--) {
+                    var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
+                    var num2 = getNumber(note2[0], note2[1]);
+                    var a = getNumNote(num1, 0);
+                    delta += num2 - num1;
+                    num1 += 2 * delta;
                 }
             }
+
+            addPitch(noteObj[0], noteObj[1]);
+
+            if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], last(logo.intervals[turtle]), logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1]);
+            }
+
+            if (turtle in logo.transposition) {
+                logo.noteTranspositions[turtle].push(logo.transposition[turtle] + 2 * delta);
+            } else {
+                logo.noteTranspositions[turtle].push(2 * delta);
+            }
+
+            if (turtle in logo.beatFactor) {
+                logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+            } else {
+                logo.noteBeatValues[turtle].push(1);
+            }
+
+            logo.pushedNote[turtle] = true;
             break;
         case 'pitch':
             if (args.length !== 2 || args[0] == null || args[1] == null) {
@@ -2049,12 +2062,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var obj = frequencyToPitch(args[0]);
                 var note = obj[0];
                 var octave = obj[1];
+                var cents = obj[2];
                 if (note === '?') {
                     logo.errorMsg(INVALIDPITCH, blk);
                     logo.stopTurtle = true;
                     break;
                 }
             } else {
+                var cents = 0;
                 var note = args[0];
                 if (args[1] < 1) {
                     console.log('minimum allowable octave is 1');
@@ -2120,6 +2135,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     matrix.solfegeOctaves.push(octave);
                 }
             } else if (logo.inNoteBlock[turtle] > 0) {
+
                 function addPitch(note, octave) {
                     logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
@@ -2145,21 +2161,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     addPitch(noteObj[0], noteObj[1]);
                 }
 
+                // deprecated
                 if (turtle in logo.fifths && logo.fifths[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 7, logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1]);
                 }
 
+                // deprecated
                 if (turtle in logo.tritones && logo.tritones[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 6, logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1]);
                 }
                 
+                // deprecated
                 if (turtle in logo.fourths && logo.fourths[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 5, logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1]);
                 }
                 
+                // deprecated
                 if (turtle in logo.thirds && logo.thirds[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, 4, logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1]);
@@ -2712,6 +2732,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'sawtooth':
             if (args.length === 1) {
                 var obj = frequencyToPitch(args[0]);
+                // obj[2] is cents
                 if (logo.inMatrix) {
                     matrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
@@ -3899,7 +3920,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
                 var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
                 var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
-                block.value = Math.round(pitchToFrequency(a, b, logo.keySignature[turtle]));
+                block.value = Math.round(pitchToFrequency(a, b, 0, logo.keySignature[turtle]));
                 break;
             case 'pop':
                 var block = logo.blocks.blockList[blk];
@@ -4230,7 +4251,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             var thisScale = obj[0];
             var halfSteps = obj[1];
             var myKeySignature = obj[2];
-            var major = obj[3];
+            var mode = obj[3];
 
             // Ensure it is a valid key signature.
             offset = thisScale.indexOf(myKeySignature);
