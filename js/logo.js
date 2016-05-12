@@ -115,7 +115,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.dotCount = {};
     this.noteBeat = {};
     this.oscList = {};
-    this.noteFrequencies = {};
     this.notePitches = {};
     this.noteOctaves = {};
     this.noteCents = {};
@@ -569,7 +568,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.inNoteBlock[turtle] = 0;
             this.transposition[turtle] = 0;
             this.noteBeat[turtle] = [];
-            this.noteFrequencies[turtle] = [];
             this.noteCents[turtle] = [];
             this.lastNotePlayed[turtle] = null;
             this.notePitches[turtle] = [];
@@ -2747,14 +2745,25 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     matrix.solfegeNotes.push(getSolfege(obj[0]));
                     matrix.solfegeOctaves.push(obj[1]);
                 } else {
-                    // TODO: add transpositions to frequency?
-                    logo.noteFrequencies[turtle].push(args[0]);
-                    logo.noteCents[turtle].push(obj[3]);
+                    logo.oscList[turtle].push(blocks.blockList[blk].name);
+
                     // We keep track of pitch and octave for notation purposes.
                     logo.notePitches[turtle].push(obj[0]);
                     logo.noteOctaves[turtle].push(obj[1]);
-                    logo.noteBeatValues[turtle].push(1);
-                    logo.oscList[turtle].push(blocks.blockList[blk].name);
+                    logo.noteCents[turtle].push(obj[2]);
+
+                    if (turtle in logo.transposition) {
+                        logo.noteTranspositions[turtle].push(logo.transposition[turtle]);
+                    } else {
+                        logo.noteTranspositions[turtle].push(0);
+                    }
+
+                    if (turtle in logo.beatFactor) {
+                        logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+                    } else {
+                        logo.noteBeatValues[turtle].push(1);
+                    }
+
                     logo.pushedNote[turtle] = true;
                 }
             }
@@ -3285,9 +3294,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             // we need to convert to frequency and add
                             // in the cents.
                             if (logo.noteCents[turtle][i] !== 0) {                            
-				var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
-			    } else {
-				var note = noteObj[0] + noteObj[1];
+                                var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
+                            } else {
+                                var note = noteObj[0] + noteObj[1];
                             }
 
                             if (note !== 'R') {
@@ -3318,8 +3327,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                             // Deprecated
                             if (typeof(notes[i]) === 'string') {
-				logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
-				logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
+                                logo.currentNotes[turtle] = notes[0].slice(0, len - 1);
+                                logo.currentOctaves[turtle] = parseInt(notes[0].slice(len - 1));
                             }
 
                             if (logo.turtles.turtleList[turtle].drum) {
@@ -3337,14 +3346,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                             if (!logo.lilypondSaveOnly && duration > 0) {
                                 if (logo.oscList[turtle].length > 0) {
-                                    // console.log(last(logo.noteFrequencies[turtle]));
-                                    if (notes.length > 1) {  // (insideChord > 0) {
+                                    if (notes.length > 1) {
                                         logo.errorMsg(last(logo.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
-                                    logo.synth.trigger([last(logo.noteFrequencies[turtle])], beatValue, last(logo.oscList[turtle]));
-                                    logo.noteFrequencies[turtle].pop();
-                                    logo.noteCents[turtle].pop();
-                                    logo.oscList[turtle].pop();
+
+                                    logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
                                 } else if (logo.turtles.turtleList[turtle].drum) {
                                     logo.synth.trigger(notes, beatValue, 'drum');
                                 } else {
@@ -4403,9 +4409,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             if (typeof(note) === 'number') {
                 var pitchObj = frequencyToPitch(note);
                 note = pitchObj[0] + pitchObj[1];
-	    }
+            }
 
-	    return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
+            return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
         };
 
         var counter = 0;
@@ -4686,7 +4692,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             } else {
                                 var pitchObj = frequencyToPitch(obj[0]);
                                 octaveTotal += pitchObj[1];
-			    }
+                            }
                             noteCount += 1;
                         }
                     }
