@@ -1984,9 +1984,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             }
 
-            function addPitch(note, octave) {
+            function addPitch(note, octave, cents) {
                 logo.notePitches[turtle].push(note);
                 logo.noteOctaves[turtle].push(octave);
+                logo.noteCents[turtle].push(cents);
             }
 
             var len = logo.lastNotePlayed[turtle][0].length;
@@ -2024,11 +2025,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
 
-            addPitch(noteObj[0], noteObj[1]);
+            addPitch(noteObj[0], noteObj[1], 0);
 
             if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
                 var noteObj2 = logo.getNote(noteObj[0], noteObj[1], last(logo.intervals[turtle]), logo.keySignature[turtle]);
-                addPitch(noteObj2[0], noteObj2[1]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             if (turtle in logo.transposition) {
@@ -3293,7 +3294,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             // If the cents for this note != 0, then
                             // we need to convert to frequency and add
                             // in the cents.
-                            if (logo.noteCents[turtle][i] !== 0) {                            
+                            if (logo.noteCents[turtle][i] !== 0) {
                                 var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
                             } else {
                                 var note = noteObj[0] + noteObj[1];
