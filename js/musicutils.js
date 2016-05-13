@@ -57,7 +57,6 @@ const MUSICALMODES = {
     'AEOLIAN': [2, 1, 2, 2, 1, 2, 2],
     'LOCRIAN': [1, 2, 2, 1, 2, 2, 2],
 
-    'JAZZ': [2, 1, 2, 2, 2, 2, 1],
     'JAZZ MINOR': [2, 1, 2, 2, 2, 2, 1],
     'BEBOP': [1, 1, 1, 2, 2, 1, 2],
 
@@ -68,16 +67,13 @@ const MUSICALMODES = {
     'GEEZ': [2, 1, 2, 2, 1, 2, 2],
     'HINDU': [2, 2, 1, 2, 1, 2, 2],
     'HUNGARIAN': [2, 1, 3, 1, 1, 3, 1],
-    'ROMANIAN': [2, 1, 3, 1, 2, 1, 2],
     'ROMANIAN MINOR': [2, 1, 3, 1, 2, 1, 2],
     'SPANISH GYPSY': [1, 3, 1, 2, 1, 2, 2],
-    'GYPSY': [1, 3, 1, 2, 1, 2, 2],
     'MAQAM': [1, 3, 1, 2, 1, 3, 1],
 
     // 6 notes in an octave
     'BLUES': [3, 2, 1, 1, 3, 2],
-    'PENTATONIC BLUES': [3, 2, 1, 1, 3, 2],
-    'PENTATONIC MAJOR BLUES': [2, 1, 1, 3, 2, 2],
+    'MAJOR BLUES': [2, 1, 1, 3, 2, 2],
 
     // 5 notes in an octave
     'PENTATONIC': [3, 2, 2, 3, 2],
@@ -99,12 +95,46 @@ const MAQAMTABLE = {
     'AJAM MAQAM': 'Bb MAQAM',
 };
 
+const MODENAMES = [
+    [_('Chromatic'), 'CHROMATIC'],
+    [_('Algerian'), 'ALGERIAN'],
+    [_('Diminished'), 'DIMINISHED'],
+    [_('Spanish'), 'SPANISH'],
+    [_('Major'), 'MAJOR'],
+    [_('Ionian'), 'IONIAN'],
+    [_('Dorian'), 'DORIAN'],
+    [_('Phrygian'), 'PHRYGIAN'],
+    [_('Lydian'), 'LYDIAN'],
+    [_('Mixolydian'), 'MIXOLYDIAN'],
+    [_('Minor'), 'MINOR'],
+    [_('Aeolian'), 'AEOLIAN'],
+    [_('Locrian'), 'LOCRIAN'],
+    [_('Jazz Minor'), 'JAZZ MINOR'],
+    [_('Bebop'), 'BEBOP'],
+    [_('Arabic'), 'ARABIC'],
+    [_('Byzantine'), 'BYZANTINE'],
+    [_('Enigmatic'), 'ENIGMATIC'],
+    [_('Ethiopian'), 'ETHIOPIAN'],
+    [_('Geez'), 'GEEZ'],
+    [_('Hindu'), 'HINDU'],
+    [_('Hungarian'), 'HUNGARIAN'],
+    [_('Romanian Minor'), 'ROMANIAN MINOR'],
+    [_('Spanish Gypsy'), 'SPANISH GYPSY'],
+    [_('Maqam'), 'MAQAM'],
+    [_('Blues'), 'BLUES'],
+    [_('Major Blues'), 'MAJOR BLUES'],
+    [_('Pentatonic'), 'PENTATONIC'],
+    [_('Chinese'), 'CHINESE'],
+    [_('Egyptian'), 'EGYPTIAN'],
+    [_('Hirajoshi'), 'HIRAJOSHI'],
+    [_('Japanese'), 'JAPANESE'],
+];
 
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
     if (keySignature === '') {
         console.log('no key signature provided; reverting to C MAJOR');
-        return ['C', 'MAJOR'];
+       return ['C', 'MAJOR'];
     }
 
     // Maqams have special names for certain keys.

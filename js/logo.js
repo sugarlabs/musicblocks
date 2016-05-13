@@ -1885,10 +1885,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo._setListener(turtle, listenerName, __listener);
             }
             break;
+        // Deprecated
         case 'setkey':
             if (args.length === 1) {
-                // TODO: test arg type/validity
                 logo.keySignature[turtle] = args[0];
+            }
+            break;
+        case 'setkey2':
+            if (args.length === 2) {
+                var modename = 'MAJOR';
+                for (var i = 0; i < MODENAMES.length; i++) {
+                    if (MODENAMES[i][0] === args[1]) {
+                        modename = MODENAMES[i][1];
+                        break;
+                    }
+                }
+                logo.keySignature[turtle] = args[0] + ' ' + modename;
             }
             break;
         case 'matrix':
