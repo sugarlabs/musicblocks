@@ -542,20 +542,29 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Value blocks get a modifiable text label
-        if (['text', 'number', 'solfege', 'notename', 'rest'].indexOf(this.name) !== -1) {
+        if (['text', 'number', 'solfege', 'notename', 'modename', 'rest'].indexOf(this.name) !== -1) {
             if (this.value === null) {
-                if (this.name === 'text') {
+		switch(this.name) {
+		case 'text':
                     this.value = '---';
-                } else if (this.name === 'solfege') {
+                    break;
+		case 'solfege':
                     this.value = 'sol';
-                } else if (this.name === 'notename') {
+                    break;
+		case 'notename':
                     this.value = 'G';
-                } else if (this.name === 'rest') {
+                    break;
+		case 'rest':
                     this.value = _('rest');
-                } else {
+                    break;
+		case 'number':
                     this.value = NUMBERBLOCKDEFAULT;
-                }
-            }
+                    break;
+		case 'modename':
+                    this.value = 'MAJOR';
+                    break;
+		}
+	    }
 
             var label = this.value.toString();
             if (label.length > 8) {
@@ -928,7 +937,7 @@ function Block(protoblock, blocks, overrideName) {
         this.text.y = TEXTY * blockScale / 2.;
 
         // Some special cases
-        if (['text', 'number', 'solfege', 'notename'].indexOf(this.name) !== -1) {
+        if (['text', 'number', 'solfege', 'notename', 'modename'].indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
             this.text.x = VALUETEXTX * blockScale / 2.;
         } else if (this.protoblock.args === 0) {
@@ -1202,7 +1211,7 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock._doOpenMedia(thisBlock);
                 } else if (myBlock.name === 'loadFile') {
                     myBlock._doOpenMedia(thisBlock);
-                } else if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) !== -1) {
+                } else if (['text', 'number', 'solfege', 'notename', 'modename'].indexOf(myBlock.name) !== -1) {
                     if(!myBlock.trash)
                     {
                         myBlock._changeLabel();
@@ -1381,7 +1390,7 @@ function Block(protoblock, blocks, overrideName) {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
             }
-        } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
+        } else if (['text', 'solfege', 'notename', 'modename', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
             if (!haveClick) {
                 // Simulate click on Android.
                 var d = new Date();
@@ -1556,6 +1565,26 @@ function Block(protoblock, blocks, overrideName) {
             labelElem.innerHTML = labelHTML;
             this.label = docById('notenameLabel');
             this.labelattr = docById('noteattrLabel');
+        } else if (this.name === 'modename') {
+            var type = 'modename';
+            if (this.value != null) {
+                var selectedmode = this.value[0];
+            } else {
+                var selectednote = 'MAJOR';
+            }
+
+            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            for (var modename in MUSICALMODES) {
+                if (selectednote === modename) {
+                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectednote + '</option>';
+                } else {
+                    labelHTML += '<option value="' + modename + '">' + modename + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('modenameLabel');
         } else {
             var type = 'number';
             labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';

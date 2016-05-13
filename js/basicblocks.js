@@ -165,6 +165,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     numberToOctaveBlock.defaults.push(48);
 
     // Value blocks
+    var modenameBlock = new ProtoBlock('modename');
+    modenameBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['modename'] = modenameBlock;
+    modenameBlock.valueBlock();
+    modenameBlock.dockTypes[0] = 'textout';
+
     var notenameBlock = new ProtoBlock('notename');
     notenameBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['notename'] = notenameBlock;
