@@ -96,57 +96,57 @@ const MAQAMTABLE = {
 };
 
 const MODENAMES = [
-    // TRANS: twelve semi-tone scale for music
+    //.TRANS: twelve semi-tone scale for music
     [_('Chromatic'), 'CHROMATIC'],
     [_('Algerian'), 'ALGERIAN'],
-    // TRANS: modal scale for music
+    //.TRANS: modal scale for music
     [_('Diminished'), 'DIMINISHED'],
     [_('Spanish'), 'SPANISH'],
-    // TRANS: major scales in music
+    //.TRANS: major scales in music
     [_('Major'), 'MAJOR'],
-    // TRANS: modal scale for music
+    //.TRANS: modal scale for music
     [_('Ionian'), 'IONIAN'],
-    // TRANS: modal scale for music
+    //.TRANS: modal scale for music
     [_('Dorian'), 'DORIAN'],
-    // TRANS: modal scale for music
+    //.TRANS: modal scale for music
     [_('Phrygian'), 'PHRYGIAN'],
-    // TRANS: modal scale for music
+    //.TRANS: modal scale for music
     [_('Lydian'), 'LYDIAN'],
-    // TRANS: modal scale for music
+    //.TRANS: modal scale for music
     [_('Mixolydian'), 'MIXOLYDIAN'],
-    // TRANS: natural minor scales in music
+    //.TRANS: natural minor scales in music
     [_('Minor'), 'MINOR'],
-    // TRANS: modal scale for music
+    //.TRANS: modal scale for music
     [_('Aeolian'), 'AEOLIAN'],
-    // TRANS: modal scale for music
+    //.TRANS: modal scale for music
     [_('Locrian'), 'LOCRIAN'],
-    // TRANS: minor jazz scale for music
+    //.TRANS: minor jazz scale for music
     [_('Jazz Minor'), 'JAZZ MINOR'],
-    // TRANS: bebop scale for music
+    //.TRANS: bebop scale for music
     [_('Bebop'), 'BEBOP'],
     [_('Arabic'), 'ARABIC'],
     [_('Byzantine'), 'BYZANTINE'],
-    // TRANS: musical scale for music by Verdi
+    //.TRANS: musical scale for music by Verdi
     [_('Enigmatic'), 'ENIGMATIC'],
     [_('Ethiopian'), 'ETHIOPIAN'],
-    // TRANS: Ethiopic scale for music
+    //.TRANS: Ethiopic scale for music
     [_('Geez'), 'GEEZ'],
     [_('Hindu'), 'HINDU'],
     [_('Hungarian'), 'HUNGARIAN'],
-    // TRANS: minor Romanian scale for music
+    //.TRANS: minor Romanian scale for music
     [_('Romanian Minor'), 'ROMANIAN MINOR'],
     [_('Spanish Gypsy'), 'SPANISH GYPSY'],
-    // TRANS: musical scale for Mid-Eastern music
+    //.TRANS: musical scale for Mid-Eastern music
     [_('Maqam'), 'MAQAM'],
-    // TRANS: minor blues scale for music
+    //.TRANS: minor blues scale for music
     [_('Blues'), 'BLUES'],
-    // TRANS: major blues scale for music
+    //.TRANS: major blues scale for music
     [_('Major Blues'), 'MAJOR BLUES'],
-    // TRANS: pentatonic scale in music
+    //.TRANS: pentatonic scale in music
     [_('Pentatonic'), 'PENTATONIC'],
     [_('Chinese'), 'CHINESE'],
     [_('Egyptian'), 'EGYPTIAN'],
-    // TRANS: Japanese pentatonic scale for music
+    //.TRANS: Japanese pentatonic scale for music
     [_('Hirajoshi'), 'HIRAJOSHI'],
     [_('Japanese'), 'JAPANESE'],
 ];
