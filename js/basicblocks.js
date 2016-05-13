@@ -520,7 +520,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     keyBlock.adjustWidthToLabel();
     keyBlock.parameterBlock();
 
+    // Deprecated
     var setkeyBlock = new ProtoBlock('setkey');
+    setkeyBlock.hidden = true;
     setkeyBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setkey'] = setkeyBlock;
     setkeyBlock.staticLabels.push(_('set key'));
@@ -528,6 +530,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     setkeyBlock.oneArgBlock();
     setkeyBlock.dockTypes[1] = 'textin';
     setkeyBlock.defaults.push('C');
+
+    var setkey2Block = new ProtoBlock('setkey2');
+    setkey2Block.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setkey2'] = setkey2Block;
+    setkey2Block.staticLabels.push(_('set key'), _('key'), _('mode'));
+    setkey2Block.adjustWidthToLabel();
+    setkey2Block.twoArgBlock();
+    setkey2Block.dockTypes[1] = 'anyin';
+    setkey2Block.dockTypes[2] = 'textin';
 
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['tone'];
