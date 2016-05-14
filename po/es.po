@@ -12,7 +12,7 @@
 #: js/activity.js:443
 #: js/activity.js:443
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #: js/activity.js:1251
 #: js/block.js:629
@@ -116,7 +116,7 @@ msgstr "Cargar ejemplos desde el servidor"
 #: js/activity.js:2013
 #: js/turtledefs.js:93
 msgid "Load project from files"
-msgstr ""
+msgstr "Cargar proyecto de archivos"
 
 #: js/activity.js:2014
 #: js/turtledefs.js:94
@@ -299,46 +299,46 @@ msgstr ""
 
 #: js/logo.js:879
 msgid "Block does not support incrementing."
-msgstr ""
+msgstr "Bloque no soporta incremento."
 
 #: js/logo.js:1453
 #: js/logo.js:1777
 msgid "You must select a file."
-msgstr ""
+msgstr "Debe seleccionar un archivo."
 
 #: js/logo.js:1786
 #: plugins/heap.rtp:96
 msgid "The file you selected does not contain a valid heap."
-msgstr ""
+msgstr "El archivo seleccionado no contiene un pila válida."
 
 #: js/logo.js:1790
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
-msgstr ""
+msgstr "El bloque del pila de carga necesita un bloque de archivo de carga."
 
 #: js/logo.js:1806
 msgid "Error parsing JSON data:"
-msgstr ""
+msgstr "Error de análisis de datos JSON."
 
 #: js/logo.js:1811
 msgid "404: Page not found"
-msgstr ""
+msgstr "404: Página no encontrada."
 
 #: js/logo.js:1835
 msgid "turtleHeaps does not contain a valid heap for"
-msgstr ""
+msgstr "Pilas tortuga no contiene un montón válida para"
 
 #: js/logo.js:1845
 msgid "Index must be > 0."
-msgstr ""
+msgstr "El índice debe ser > 0."
 
 #: js/logo.js:1864
 msgid "Beats per minute must be > 30."
-msgstr ""
+msgstr "Latidos por minuto debe ser> 30."
 
 #: js/logo.js:1867
 msgid "Maximum beats per minute is 1000."
-msgstr ""
+msgstr "Los latidos por minuto como máximo es de 1000."
 
 #: js/logo.js:1925
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
@@ -349,8 +349,8 @@ msgid "Please close the current matrix before opening a new one."
 msgstr "Por favor, cierre la matriz actual antes de abrir una nueva."
 
 #: js/logo.js:1982
-msgid "The Step Pitch Block must be used insdie of a Note Block."
-msgstr ""
+msgid "The Step Pitch Block must be used inside of a Note Block."
+msgstr "El paso de tono del bloque debe ser utilizado dentro de un bloque de nota."
 
 #: js/logo.js:2217
 msgid "Pitch Block: Did you mean to use a Note block?"
@@ -358,7 +358,7 @@ msgstr "Bloque de tono: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/logo.js:2233
 msgid "Rhythm Block: Did you mean to use a Matrix block?"
-msgstr ""
+msgstr "Bloque de ritmo: Quizás quiso decir utilizar un bloque de matrix?"
 
 #: js/logo.js:2291
 msgid "Note value must be greater than 0"
@@ -366,15 +366,15 @@ msgstr "Valor de la nota debe ser mayor que 0"
 
 #: js/logo.js:2798
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
-msgstr ""
+msgstr "Bloque de tuplet: Quizás quiso decir utilizar un bloque de matrix?"
 
 #: js/logo.js:2988
 msgid "My Project"
-msgstr ""
+msgstr "Mi proyecto"
 
 #: js/logo.js:3363
 msgid "synth cannot play chords."
-msgstr ""
+msgstr "Synth no puede tocar acordes."
 
 #: js/logo.js:3974
 #: js/basicblocks.js:1268
@@ -405,7 +405,7 @@ msgstr "tocar"
 #: js/matrix.js:240
 #: js/matrix.js:240
 msgid "save"
-msgstr ""
+msgstr "guardar"
 
 #: js/matrix.js:257
 #: js/matrix.js:257
@@ -416,12 +416,12 @@ msgstr "limpiar"
 #: js/matrix.js:274
 #: js/matrix.js:274
 msgid "export"
-msgstr ""
+msgstr "exportar"
 
 #: js/matrix.js:291
 #: js/matrix.js:291
 msgid "close"
-msgstr ""
+msgstr "cerrar"
 
 #: js/matrix.js:337
 #: js/matrix.js:543
@@ -542,15 +542,15 @@ msgstr "Conoce Sr. Ratón"
 
 #: js/turtledefs.js:76
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr ""
+msgstr "Sr. Ratón es nuestro conductor de bloques de música."
 
 #: js/turtledefs.js:76
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr ""
+msgstr "Sr. Ratón le anima a explorar los Bloques Musicales."
 
 #: js/turtledefs.js:76
 msgid "Let us start our tour!"
-msgstr ""
+msgstr "Vamos a empezar nuestro recorrido."
 
 #: js/turtledefs.js:78
 #.TRANS: : Please add commas to list: Matrix, Notes, Tone, Turtle, and more.
@@ -858,11 +858,11 @@ msgstr "transposición"
 
 #: js/basicblocks.js:132
 msgid "consonant step down"
-msgstr ""
+msgstr "consonante paso hacia abajo"
 
 #: js/basicblocks.js:139
 msgid "consonant step up"
-msgstr ""
+msgstr "consonante paso adelante"
 
 #: js/basicblocks.js:146
 msgid "turtle pitch number"
@@ -908,7 +908,7 @@ msgstr "agudas"
 
 #: js/basicblocks.js:231
 msgid "step pitch"
-msgstr ""
+msgstr "paso el tono"
 
 #: js/basicblocks.js:253
 msgid "1/64 note"
@@ -916,7 +916,7 @@ msgstr "1/64 nota"
 
 #: js/basicblocks.js:260
 msgid "1/32 note"
-msgstr ""
+msgstr "1/32 nota"
 
 #: js/basicblocks.js:267
 msgid "1/16 note"
@@ -953,7 +953,7 @@ msgstr "matriz de tono en tiempo"
 
 #: js/basicblocks.js:334
 msgid "turtle note value"
-msgstr ""
+msgstr "valor de la nota de la tortuga"
 
 #: js/basicblocks.js:342
 msgid "duplicate factor"
@@ -1027,7 +1027,7 @@ msgstr "volumen nota"
 
 #: js/basicblocks.js:503
 msgid "play forward"
-msgstr ""
+msgstr "jugar hacia adelante"
 
 #: js/basicblocks.js:512
 msgid "play backward"
@@ -1045,7 +1045,7 @@ msgstr "fijar clave"
 
 #: js/basicblocks.js:537
 msgid "mode"
-msgstr ""
+msgstr "modo"
 
 #: js/basicblocks.js:547
 msgid "meter"
@@ -1069,23 +1069,23 @@ msgstr "crescendo"
 
 #: js/basicblocks.js:582
 msgid "thirds"
-msgstr ""
+msgstr "tercios"
 
 #: js/basicblocks.js:589
 msgid "fourths"
-msgstr ""
+msgstr "cuartas"
 
 #: js/basicblocks.js:596
 msgid "tritone"
-msgstr ""
+msgstr "tritono"
 
 #: js/basicblocks.js:603
 msgid "fifths"
-msgstr ""
+msgstr "quintos"
 
 #: js/basicblocks.js:610
 msgid "interval"
-msgstr ""
+msgstr "intervalo"
 
 #: js/basicblocks.js:618
 msgid "swing"
@@ -1194,7 +1194,7 @@ msgstr "fijar pluma"
 
 #: js/basicblocks.js:822
 msgid "set translucency"
-msgstr ""
+msgstr "fijar translucidez"
 
 #: js/basicblocks.js:830
 msgid "set hue"
@@ -1284,11 +1284,11 @@ msgstr "hacer"
 
 #: js/basicblocks.js:1064
 msgid "return"
-msgstr ""
+msgstr "retorno"
 
 #: js/basicblocks.js:1074
 msgid "return to URL"
-msgstr ""
+msgstr "retorno a URL"
 
 #: js/basicblocks.js:1078
 msgid "100"
@@ -1298,7 +1298,7 @@ msgstr ""
 #: js/basicblocks.js:1110
 #: js/basicblocks.js:1129
 msgid "calculate"
-msgstr ""
+msgstr "calcular"
 
 #: js/basicblocks.js:1157
 msgid "on"
@@ -1512,7 +1512,7 @@ msgstr "ocultar bloques"
 
 #: js/basicblocks.js:1650
 msgid "open project"
-msgstr ""
+msgstr "abierto proyecto"
 
 #: js/basicblocks.js:1674
 msgid "wait"
@@ -1575,25 +1575,25 @@ msgstr "evaluar"
 #: js/musicutils.js:100
 #.TRANS: : twelve semi-tone scale for music
 msgid "Chromatic"
-msgstr ""
+msgstr "Cromático"
 
 #: js/musicutils.js:101
 msgid "Algerian"
-msgstr ""
+msgstr "Argelino"
 
 #: js/musicutils.js:103
 #.TRANS: : modal scale for music
 msgid "Diminished"
-msgstr ""
+msgstr "Disminuido"
 
 #: js/musicutils.js:104
 msgid "Spanish"
-msgstr ""
+msgstr "Español"
 
 #: js/musicutils.js:106
 #.TRANS: : major scales in music
 msgid "Major"
-msgstr ""
+msgstr "Mayor"
 
 #: js/musicutils.js:108
 #.TRANS: : modal scale for music
@@ -1623,7 +1623,7 @@ msgstr ""
 #: js/musicutils.js:118
 #.TRANS: : natural minor scales in music
 msgid "Minor"
-msgstr ""
+msgstr "Menor"
 
 #: js/musicutils.js:120
 #.TRANS: : modal scale for music
@@ -1638,7 +1638,7 @@ msgstr ""
 #: js/musicutils.js:124
 #.TRANS: : minor jazz scale for music
 msgid "Jazz Minor"
-msgstr ""
+msgstr "Jazz Menor"
 
 #: js/musicutils.js:126
 #.TRANS: : bebop scale for music
@@ -1647,20 +1647,20 @@ msgstr ""
 
 #: js/musicutils.js:127
 msgid "Arabic"
-msgstr ""
+msgstr "Arábica"
 
 #: js/musicutils.js:128
 msgid "Byzantine"
-msgstr ""
+msgstr "Bizantino"
 
 #: js/musicutils.js:130
 #.TRANS: : musical scale for music by Verdi
 msgid "Enigmatic"
-msgstr ""
+msgstr "Enigmático"
 
 #: js/musicutils.js:131
 msgid "Ethiopian"
-msgstr ""
+msgstr "Etíope"
 
 #: js/musicutils.js:133
 #.TRANS: : Ethiopic scale for music
@@ -1669,20 +1669,20 @@ msgstr ""
 
 #: js/musicutils.js:134
 msgid "Hindu"
-msgstr ""
+msgstr "Hindú"
 
 #: js/musicutils.js:135
 msgid "Hungarian"
-msgstr ""
+msgstr "Húngaro"
 
 #: js/musicutils.js:137
 #.TRANS: : minor Romanian scale for music
 msgid "Romanian Minor"
-msgstr ""
+msgstr "Romano Menor"
 
 #: js/musicutils.js:138
 msgid "Spanish Gypsy"
-msgstr ""
+msgstr "Gitana española"
 
 #: js/musicutils.js:140
 #.TRANS: : musical scale for Mid-Eastern music
@@ -1697,20 +1697,20 @@ msgstr ""
 #: js/musicutils.js:144
 #.TRANS: : major blues scale for music
 msgid "Major Blues"
-msgstr ""
+msgstr "Blues mayor"
 
 #: js/musicutils.js:146
 #.TRANS: : pentatonic scale in music
 msgid "Pentatonic"
-msgstr ""
+msgstr "Pentatónica"
 
 #: js/musicutils.js:147
 msgid "Chinese"
-msgstr ""
+msgstr "Chino"
 
 #: js/musicutils.js:148
 msgid "Egyptian"
-msgstr ""
+msgstr "Egipcio"
 
 #: js/musicutils.js:150
 #.TRANS: : Japanese pentatonic scale for music
@@ -1719,7 +1719,7 @@ msgstr ""
 
 #: js/musicutils.js:151
 msgid "Japanese"
-msgstr ""
+msgstr "Japonés"
 
 #: plugins/gmap.rtp:30
 msgid "city latitude"
@@ -1813,7 +1813,7 @@ msgstr "a radianes"
 #: plugins/heap.rtp:81
 #: plugins/heap.rtp:85
 msgid "You need to select a file."
-msgstr ""
+msgstr "Debe seleccionar un archivo."
 
 #: plugins/translate.rtp:73
 msgid "translate"
