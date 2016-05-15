@@ -350,7 +350,7 @@ msgid "Please close the current matrix before opening a new one."
 msgstr ""
 
 #: js/logo.js:1982
-msgid "The Step Pitch Block must be used insdie of a Note Block."
+msgid "The Step Pitch Block must be used inside of a Note Block."
 msgstr ""
 
 #: js/logo.js:2217
