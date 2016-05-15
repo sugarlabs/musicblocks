@@ -1979,7 +1979,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'steppitch':
             // Similar to pitch but calculated from previous note played.
             if (logo.inNoteBlock[turtle] === 0) {
-                logo.errorMsg(_('The Step Pitch Block must be used insdie of a Note Block.'), blk);
+                logo.errorMsg(_('The Step Pitch Block must be used inside of a Note Block.'), blk);
                 logo.stopTurtle = true;
                 break;
             }
