@@ -220,6 +220,16 @@ function keySignatureToMode(keySignature) {
 
 
 function getStepSizeUp(keySignature, pitch) {
+    return _getStepSize(keySignature, pitch, 'up');
+};
+
+
+function getStepSizeDown(keySignature, pitch) {
+    return _getStepSize(keySignature, pitch, 'down');
+};
+
+
+function _getStepSize(keySignature, pitch, direction) {
     // Returns how many half-steps to the next note in this key.
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
@@ -252,7 +262,15 @@ function getStepSizeUp(keySignature, pitch) {
 
     ii = scale.indexOf(pitch);
     if (ii !== -1) {
-        return halfSteps[ii];
+	if (direction === 'up') {
+            return halfSteps[ii];
+	} else {
+            if (ii > 0) {
+		return -halfSteps[ii - 1];
+            } else {
+		return -last(halfSteps);
+            }
+	}
     }
 
     if (pitch in EQUIVALENTNOTES) {
@@ -261,71 +279,20 @@ function getStepSizeUp(keySignature, pitch) {
 
     ii = scale.indexOf(pitch);
     if (ii !== -1) {
-        return halfSteps[ii];
+	if (direction === 'up') {
+            return halfSteps[ii];
+	} else {
+            if (ii > 0) {
+		return -halfSteps[ii - 1];
+            } else {
+		return -last(halfSteps);
+            }
+	}
     }
 
     // current Note not in the consonant scale if this key.
     console.log(pitch + ' not found in key of ' + myKeySignature);
     return 1;
-};
-
-
-function getStepSizeDown(keySignature, pitch) {
-    // Returns next note down in current scale.
-    var obj = keySignatureToMode(keySignature);
-    var myKeySignature = obj[0];
-    var halfSteps = MUSICALMODES[obj[1]];
-
-    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        var thisScale = NOTESFLAT;
-    } else {
-        var thisScale = NOTESSHARP;
-    }
-
-    var idx = thisScale.indexOf(myKeySignature);
-
-    if (idx === -1) {
-        idx = 0;
-    }
-
-    if (pitch in BTOFLAT) {
-        pitch = BTOFLAT[pitch];
-    } else if (pitch in STOSHARP) {
-        pitch = STOSHARP[pitch];
-    }
-
-    var scale = [myKeySignature];
-    var ii = idx;
-    for (var i = 0; i < halfSteps.length; i++) {
-        ii += halfSteps[i];
-        scale.push(thisScale[ii % SEMITONES]);
-    }
-
-    ii = scale.indexOf(pitch);
-    if (ii !== -1) {
-        if (ii > 0) {
-            return -halfSteps[ii - 1];
-        } else {
-            return -last(halfSteps);
-        }
-    }
-
-    if (pitch in EQUIVALENTNOTES) {
-        pitch = EQUIVALENTNOTES[pitch];
-    }
-
-    ii = scale.indexOf(pitch);
-    if (ii !== -1) {
-        if (ii > 0) {
-            return -halfSteps[ii - 1];
-        } else {
-            return -last(halfSteps);
-        }
-    }
-
-    // current Note not in the consonant scale if this key.
-    console.log(pitch + ' not found in key of ' + myKeySignature);
-    return -1;
 };
 
 
