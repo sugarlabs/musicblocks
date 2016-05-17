@@ -2082,8 +2082,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             addPitch(noteObj[0], noteObj[1], 0);
 
             if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
-                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], last(logo.intervals[turtle]), logo.keySignature[turtle]);
-                addPitch(noteObj2[0], noteObj2[1], 0);
+                for (var i = 0; i < logo.intervals[turtle].length; i++) {
+                    var ii = getInterval(logo.intervals[turtle][i], logo.keySignature[turtle], noteObj[0]);
+                    var noteObj2 = logo.getNote(noteObj[0], noteObj[1], ii, logo.keySignature[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], 0);
+                }
             }
 
             if (turtle in logo.transposition) {
@@ -2214,8 +2217,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 addPitch(note, octave, cents);
 
                 if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
-                    var noteObj = logo.getNote(note, octave, last(logo.intervals[turtle]), logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    for (var i = 0; i < logo.intervals[turtle].length; i++) {
+			var ii = getInterval(logo.intervals[turtle][i], logo.keySignature[turtle], note);
+			var noteObj = logo.getNote(note, octave, ii, logo.keySignature[turtle]);
+                        addPitch(noteObj[0], noteObj[1], cents);
+                    }
                 }
 
                 // deprecated
@@ -2405,9 +2411,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             }
 
-            var i = getInterval(args[0], logo.keySignature[turtle]);
+	    if (args[0] > 0) {
+                var i = Math.floor(args[0]);
+            } else {
+                var i = Math.ceil(args[0]);
+	    }
 
-            if (i > 0) {
+            if (i !== 0) {
                 logo.intervals[turtle].push(i);
 
                 var listenerName = '_interval_' + turtle;

@@ -590,7 +590,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     fourthsBlock.adjustWidthToLabel();
     fourthsBlock.flowClampZeroArgBlock();
 
+    // deprecated
     var tritoneBlock = new ProtoBlock('tritone');
+    tritoneBlock.hidden = true;
     tritoneBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['tritone'] = tritoneBlock;
     tritoneBlock.staticLabels.push(_('tritone'));
