@@ -666,6 +666,39 @@ function initBasicProtoBlocks(palettes, blocks) {
     clearBlock.adjustWidthToLabel();
     clearBlock.zeroArgBlock();
 
+    var controlPoint2Block = new ProtoBlock('controlpoint2');
+    controlPoint2Block.palette = palettes.dict['turtle'];
+    blocks.protoBlockDict['controlpoint2'] = controlPoint2Block;
+    controlPoint2Block.staticLabels.push(_('control point 2'), _('x'), _('y'));
+    controlPoint2Block.adjustWidthToLabel();
+    controlPoint2Block.twoArgBlock();
+    controlPoint2Block.defaults.push(100);
+    controlPoint2Block.defaults.push(25);
+    controlPoint2Block.dockTypes[1] = 'numberin';
+    controlPoint2Block.dockTypes[2] = 'numberin';
+
+    var controlPoint1Block = new ProtoBlock('controlpoint1');
+    controlPoint1Block.palette = palettes.dict['turtle'];
+    blocks.protoBlockDict['controlpoint1'] = controlPoint1Block;
+    controlPoint1Block.staticLabels.push(_('control point 1'), _('x'), _('y'));
+    controlPoint1Block.adjustWidthToLabel();
+    controlPoint1Block.twoArgBlock();
+    controlPoint1Block.defaults.push(100);
+    controlPoint1Block.defaults.push(75);
+    controlPoint1Block.dockTypes[1] = 'numberin';
+    controlPoint1Block.dockTypes[2] = 'numberin';
+
+    var bezierBlock = new ProtoBlock('bezier');
+    bezierBlock.palette = palettes.dict['turtle'];
+    blocks.protoBlockDict['bezier'] = bezierBlock;
+    bezierBlock.staticLabels.push(_('bezier'), _('x'), _('y'));
+    bezierBlock.adjustWidthToLabel();
+    bezierBlock.twoArgBlock();
+    bezierBlock.defaults.push(0);
+    bezierBlock.defaults.push(100);
+    bezierBlock.dockTypes[1] = 'numberin';
+    bezierBlock.dockTypes[2] = 'numberin';
+
     var arcBlock = new ProtoBlock('arc');
     arcBlock.palette = palettes.dict['turtle'];
     blocks.protoBlockDict['arc'] = arcBlock;
