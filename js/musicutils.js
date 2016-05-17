@@ -262,15 +262,15 @@ function _getStepSize(keySignature, pitch, direction) {
 
     ii = scale.indexOf(pitch);
     if (ii !== -1) {
-	if (direction === 'up') {
+        if (direction === 'up') {
             return halfSteps[ii];
-	} else {
+        } else {
             if (ii > 0) {
-		return -halfSteps[ii - 1];
+                return -halfSteps[ii - 1];
             } else {
-		return -last(halfSteps);
+                return -last(halfSteps);
             }
-	}
+        }
     }
 
     if (pitch in EQUIVALENTNOTES) {
@@ -279,15 +279,15 @@ function _getStepSize(keySignature, pitch, direction) {
 
     ii = scale.indexOf(pitch);
     if (ii !== -1) {
-	if (direction === 'up') {
+        if (direction === 'up') {
             return halfSteps[ii];
-	} else {
+        } else {
             if (ii > 0) {
-		return -halfSteps[ii - 1];
+                return -halfSteps[ii - 1];
             } else {
-		return -last(halfSteps);
+                return -last(halfSteps);
             }
-	}
+        }
     }
 
     // current Note not in the consonant scale if this key.
@@ -324,25 +324,73 @@ function getScaleAndHalfSteps(keySignature) {
 };
 
 
-function getInterval (interval, keySignature) {
-    // FIX ME: should this be half-steps or some step size based on
-    // the mode and position in the scale?
-    return interval;
+function getInterval (interval, keySignature, pitch) {
+    // Step size interval based on the position (pitch) in the scale
+    var obj = keySignatureToMode(keySignature);
+    var myKeySignature = obj[0];
+    var halfSteps = MUSICALMODES[obj[1]];
 
-    // Calculate the interval in terms of halfsteps for current mode.
-    var obj = getScaleAndHalfSteps(keySignature);
-    console.log(interval);
-    console.log(MUSICALMODES[obj[3]]);
-    var myOctave = Math.floor(interval / SEMITONES);
-    var myInterval = Math.floor(interval) % SEMITONES;
-    console.log(myOctave + ' ' + myInterval);
-
-    var ii = 0;
-    for (var i = 0; i < myInterval; i++) {
-        ii += MUSICALMODES[obj[3]][i];
+    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
+        var thisScale = NOTESFLAT;
+    } else {
+        var thisScale = NOTESSHARP;
     }
-    console.log(ii);
-    return ii + myOctave * SEMITONES;
+
+    var idx = thisScale.indexOf(myKeySignature);
+
+    if (idx === -1) {
+        idx = 0;
+    }
+
+    var scale = [myKeySignature];
+    var ii = idx;
+    for (var i = 0; i < halfSteps.length; i++) {
+        ii += halfSteps[i];
+        scale.push(thisScale[ii % SEMITONES]);
+    }
+ 
+    if (pitch in BTOFLAT) {
+        pitch = BTOFLAT[pitch];
+        ii = scale.indexOf(pitch);
+    } else if (pitch in STOSHARP) {
+        pitch = STOSHARP[pitch];
+        ii = scale.indexOf(pitch);
+    } else if (scale.indexOf(pitch) !== -1) {
+        ii = scale.indexOf(pitch);
+    } else if (pitch in EQUIVALENTNOTES) {
+        pitch = EQUIVALENTNOTES[pitch];
+        if (scale.indexOf(pitch) !== -1) {
+            ii = scale.indexOf(pitch);
+        } else {
+            console.log('Note ' + pitch + ' not in scale ' + keySignature);
+            ii = 0;
+        }
+    } else {
+        // In case pitch is solfege, convert it.
+        var ii = SOLFEGENAMES.indexOf(pitch);
+    }
+
+    if (interval > 0) {
+        var myOctave = Math.floor(interval / SEMITONES);
+        var myInterval = Math.floor(interval) % SEMITONES;
+        var j = 0;
+        for (var i = 0; i < (myInterval - 1); i++) {
+            j += halfSteps[(ii + i) % halfSteps.length];
+        }
+        return j + myOctave * SEMITONES;
+    } else {
+        var myOctave = Math.ceil(interval / SEMITONES);
+        var myInterval = Math.ceil(interval) % SEMITONES;
+        var j = 0;
+        for (var i = 0; i > myInterval + 1; i--) {
+            var z = (ii + i - 1) % halfSteps.length;
+            while (z < 0) {
+                z += halfSteps.length;
+            }
+            j -= halfSteps[z];
+        }
+        return j + myOctave * SEMITONES;
+    }
 };
 
 
@@ -484,9 +532,9 @@ function pitchToFrequency(pitch, octave, cents, keySignature) {
     var pitchNumber = pitchToNumber(pitch, octave, keySignature);
 
     if (cents === 0) {
-	return A0 * Math.pow(TWELTHROOT2, pitchNumber);
+        return A0 * Math.pow(TWELTHROOT2, pitchNumber);
     } else {
-	return A0 * Math.pow(TWELVEHUNDRETHROOT2, pitchNumber * 100 + cents);
+        return A0 * Math.pow(TWELVEHUNDRETHROOT2, pitchNumber * 100 + cents);
     }
 };
 
