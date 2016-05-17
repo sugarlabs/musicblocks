@@ -183,6 +183,12 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.stepQueue = {};
     this.unhighlightStepQueue = {};
 
+    // Control points for bezier curves
+    this.cp1x = {};
+    this.cp1y = {};
+    this.cp2x = {};
+    this.cp2y = {};
+
     this.svgOutput = '';
     this.svgBackground = true;
 
@@ -565,6 +571,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.turtleTime[turtle] = 0;
             this.waitTimes[turtle] = 0;
             this.endOfClampSignals[turtle] = {};
+            this.cp1x[turtle] = 0;
+            this.cp1y[turtle] = 100;
+            this.cp2x[turtle] = 100;
+            this.cp2y[turtle] = 100;
             this.inNoteBlock[turtle] = 0;
             this.transposition[turtle] = 0;
             this.noteBeat[turtle] = [];
@@ -1273,6 +1283,38 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
+                }
+            }
+            break;
+        case 'bezier':
+            if (args.length === 2) {
+                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
+                    logo.errorMsg(NANERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    logo.turtles.turtleList[turtle].doBezier(logo.cp1x[turtle], logo.cp1y[turtle], logo.cp2x[turtle], logo.cp2y[turtle], args[0], args[1]);
+                }
+            }
+            break;
+        case 'controlpoint1':
+            if (args.length === 2) {
+                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
+                    logo.errorMsg(NANERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    logo.cp1x[turtle] = args[0];
+                    logo.cp1y[turtle] = args[1];
+                }
+            }
+            break;
+        case 'controlpoint2':
+            if (args.length === 2) {
+                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
+                    logo.errorMsg(NANERRORMSG, blk);
+                    logo.stopTurtle = true;
+                } else {
+                    logo.cp2x[turtle] = args[0];
+                    logo.cp2y[turtle] = args[1];
                 }
             }
             break;
