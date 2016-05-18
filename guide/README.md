@@ -209,20 +209,26 @@ chunks you create and/or modify by hand).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg'</img>
 
-Every time you create a new stack, Music Blocks creates a new block
-specific to that stack. (The new block is found at the bottom of the
-*Block* palette, found on the left edge of the screen.) Clicking on
-this block is the same as clicking on your stack. In the example
-above, the chunk block is inside of a *Start* block, which ties it
-to the Run button in the upper-left corner of the screen (the
-rabbit). Try clicking on the *Run* button. Also try the *Run Slow*
-button (the turtle).
+Every time you create a new *Action* stack, Music Blocks creates a new
+block specific to that stack. (The new block is found at the top of
+the *Block* palette, found on the left edge of the screen.) Clicking
+on this block is the same as clicking on your stack. By default, the
+new blocks are named `chunk`, `chunk1`, `chunk2`... but you can rename
+them by editing the labels on the *Action* blocks.
+
+In the example above, the *Chunk* block is inside of a *Start* block,
+which ties it to the *Run* button in the upper-left corner of the
+screen (the "rabbit"). Try clicking on the *Run* button. Also try the
+*Run Slow* button (the "turtle") and the *Step* button (the "snail"),
+which steps through the program one block per button press. There are
+also buttons for playing the music back slowly and for stepping one
+note per button press.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg'</img>
 
-You can repeat chunks either by using multiple chunk blocks or using a
+You can repeat chunks either by using multiple *Chunk* blocks or using a
 *Repeat* block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg'</img>
@@ -275,8 +281,8 @@ raise it by one octave.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg'</img>
 
 You can "dot" notes using the *Dot* block. A dotted note extends by
-50%. E.g., a dotted quarter note will play for 3/8 of a beat. A dotted
-eighth note will play for 3/16 of a beat.
+50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a
+beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg'</img>
 
@@ -333,8 +339,8 @@ and a number of more exotic modes, such as Bebop, Geez, Maqam, et al.
 3. Voices
 ---------
 
-Each *Start* block runs as a separate voice in Music blocks. (When
-you click on the Run button, all of the Start blocks are run
+Each *Start* block runs as a separate voice in Music Blocks. (When
+you click on the Run button, all of the *Start* blocks are run
 concurrently.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg'</img>
@@ -354,13 +360,6 @@ It gets more interesting if we shift up and down octaves.
 And even more interesting if we bring the various voices offset in time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg'</img>
-
-We can also launch the phrases (chunks) interactively. In this case,
-when the mouse is in the lower-left quadrant, `chunk` is played;
-lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
-upper-right quadrant, `chunk3`.
 
 4. Adding graphics
 ------------------
@@ -392,12 +391,18 @@ the master clock.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
 
-5. Another interaction example
-------------------------------
+5. Interaction
+--------------
 
 There are many ways to interactive with Music Blocks, including
-tracking the mouse position to impact some aspect of the music (as per
-the example at the end of the Voices section of this guide).
+tracking the mouse position to impact some aspect of the music.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg'</img>
+
+FOr example, we can launch the phrases (chunks) interactively. When
+the mouse is in the lower-left quadrant, `chunk` is played;
+lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
+upper-right quadrant, `chunk3`.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'</img>
 
