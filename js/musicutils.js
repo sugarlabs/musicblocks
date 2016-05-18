@@ -541,6 +541,9 @@ function pitchToFrequency(pitch, octave, cents, keySignature) {
 
 function pitchToNumber(pitch, octave, keySignature) {
     // Calculate the pitch index based on pitch and octave.
+    if (pitch.toUpperCase() === 'R') {
+        return 0;
+    }
 
     if (pitch in BTOFLAT) {
         pitch = BTOFLAT[pitch];
@@ -560,8 +563,8 @@ function pitchToNumber(pitch, octave, keySignature) {
     } else {
         // obj[1] is the solfege mapping for the current key/mode
         var obj = getScaleAndHalfSteps(keySignature)
-        if (obj[1].indexOf(pitch.tolowerCase()) !== -1) {
-            pitchNumber = obj[1].indexOf(pitch.tolowerCase());
+        if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
+            pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
             console.log('pitch ' + pitch + ' not found');
             pitchNumber = 0;

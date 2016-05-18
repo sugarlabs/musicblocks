@@ -3356,16 +3356,20 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
 
                         for (var i = 0; i < logo.notePitches[turtle].length; i++) {
-                            var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
-
-                            // If the cents for this note != 0, then
-                            // we need to convert to frequency and add
-                            // in the cents.
-                            if (logo.noteCents[turtle][i] !== 0) {
-                                var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
+                            if (logo.notePitches[turtle][i] === 'rest') {
+                                note = 'R';
                             } else {
-                                var note = noteObj[0] + noteObj[1];
-                            }
+				var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+
+				// If the cents for this note != 0, then
+				// we need to convert to frequency and add
+				// in the cents.
+				if (logo.noteCents[turtle][i] !== 0) {
+                                    var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
+				} else {
+                                    var note = noteObj[0] + noteObj[1];
+				}
+			    }
 
                             if (note !== 'R') {
                                 notes.push(note);
