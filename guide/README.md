@@ -400,6 +400,8 @@ In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
 make an 8-key piano?
 
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb&run=true)
+
 6. Beyond Music Blocks
 ----------------------
 
