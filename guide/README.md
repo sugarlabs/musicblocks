@@ -249,6 +249,8 @@ The Step Pitch block will move up or down notes in a scale from the
 current note. In the example above, Step Pitch blocks are used inside
 of Repeat blocks to play up and down a scale.
 
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb&run=true)
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
 
 The Sharp and Flat blocks can be wrapped around Pitch blocks, Note
