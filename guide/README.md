@@ -227,13 +227,15 @@ Repeat block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
 
-You can also mix and match chunks. Here we play chunk, followed by chunk1 twice, and then chunk again.
+You can also mix and match chunks. Here we play chunk, followed by
+chunk1 twice, and then chunk again.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg'</img>
 
-A few more chunks and we can make a song. (Can you read the block notation in order to guess what song we've programmed?)
+A few more chunks and we can make a song. (Can you read the block
+notation in order to guess what song we've programmed?)
 
 2. Transformations
 ------------------
@@ -243,7 +245,9 @@ the sound.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg'</img>
 
-The Step Pitch block will move up or down notes in a scale from the current note. In the example above, Step Pitch blocks are used inside of Repeat blocks to play up and down a scale.
+The Step Pitch block will move up or down notes in a scale from the
+current note. In the example above, Step Pitch blocks are used inside
+of Repeat blocks to play up and down a scale.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
 
@@ -261,7 +265,8 @@ an octave down.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg'</img>
 
-In the example above, we take the song we programmed previously and raise it by one octave.
+In the example above, we take the song we programmed previously and
+raise it by one octave.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg'</img>
 
@@ -308,9 +313,18 @@ next note.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'</img>
 
-Interval calculates an interval, e.g., a fifth, and adds the additional pitches to a note. In the figure, we add sol to do and do to fa.
+Interval calculates an interval, e.g., a fifth, and adds the
+additional pitches to a note. In the figure, we add sol to do and do
+to fa.
 
 Articulation changes the volume of a group of notes.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg'</img>
+
+The Set Key block will change the key and mode of the mapping between
+solfege, e.g., do, re, mi, to note names, e.g., C, D, E. Modes include
+Major and Minor, Chromatic, and a number of more exotic modes, such as
+Bebop, Geez, Maqam, et al.
 
 3. Voices
 ---------
@@ -350,10 +364,12 @@ upper-right quadrant, `chunk3`.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
 
 Turtle graphics can be combined with the music blocks. By placing
-graphics blocks, e.g., Forward and Right, inside of Note blocks, the graphics
-stay in sync with the music. In this example, the turtle moves forward each time a quarter note is played. It turns right during the eighth note. The pitch is
-raised by one half step, the pen size decreases, and the pen color
-increases at each step in the inner repeat loop.
+graphics blocks, e.g., Forward and Right, inside of Note blocks, the
+graphics stay in sync with the music. In this example, the turtle
+moves forward each time a quarter note is played. It turns right
+during the eighth note. The pitch is raised by one half step, the pen
+size decreases, and the pen color increases at each step in the inner
+repeat loop.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg'</img>
 
