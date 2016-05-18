@@ -241,6 +241,10 @@ A few more chunks and we can make a song. (Can you read the block notation in or
 There are many ways to transform pitch, rhythm, and other qualities of
 the sound.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg'</img>
+
+The Step Pitch block will move up or down notes in a scale from the current note. In the example above, Step Pitch blocks are used inside of Repeat blocks to play up and down a scale.
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
 
 The Sharp and Flat blocks can be wrapped around Pitch blocks, Note
