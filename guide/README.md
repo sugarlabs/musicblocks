@@ -388,8 +388,24 @@ the master clock.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
 
-5. Extras
----------
+5. Interaction
+--------------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'</img>
+
+There are many ways to interactive with Music Blocks, including
+tracking the mouse position to impact some aspect of the music.
+
+In the example above, a simple two-key piano is created by associating
+*click* events on two different turtles with individual notes. Can you
+make an 8-key piano?
+
+6. Beyond Music Blocks
+----------------------
+
+Music Blocks is a waypoint, not a destination. One of the goals is to
+point the learning towards other powerful tools. One such tool is
+[Lilypond](http://lilypond.org), a music engraving program.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg'</img>
 
