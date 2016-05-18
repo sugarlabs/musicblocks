@@ -302,10 +302,11 @@ specified rhymic value of the notes.
 Slur will run a note past its noted duration, blending it into the
 next note.
 
-Other Tone Palette blocks include Articulation, which changes the
-volume of a group of notes, and a set of interval blocks, Fifths,
-Tritone, Fourths, and Thirds, which calculate and add pitches at
-common intervals.
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'</img>
+
+Interval calculates an interval, e.g., a fifth, and adds the additional pitches to a note. In the figure, we add sol to do and do to fa.
+
+Articulation changes the volume of a group of notes.
 
 3. Voices
 ---------
