@@ -412,6 +412,10 @@ make an 8-key piano?
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb&run=true)
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg'</img>
+
+You can also add a bit of randomness to your music. In the top example above, the *One-of* block is used to randomly assign either `Do` or `Re` each time the *Note* block is played. In the bottom example above, the *One-of* block is used to randomly select between `chunk1` and `chunk2`.
+
 6. Beyond Music Blocks
 ----------------------
 
