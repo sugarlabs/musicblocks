@@ -380,6 +380,8 @@ the inner repeat loop.
 In this example, the graphics are synchronized to the music by placing
 the graphics commands inside of *Note* blocks.
 
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb&run=true)
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg'</img>
 
 In this example, because the computation and graphics are more
