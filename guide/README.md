@@ -353,6 +353,8 @@ It gets more interesting if we shift up and down octaves.
 
 And even more interesting if we bring the various voices offset in time.
 
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg'</img>
 
 We can also launch the phrases (chunks) interactively. In this case,
