@@ -46,18 +46,17 @@ organized vertically by pitch and horizontally by rhythm.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg'</img>
 
-The default matrix has five pitch blocks, hence, you will see five rows,
-one for each pitch. (A sixth row at the bottom is used for specifying
-the rhythms associated with each note.)
-
-Also by default, there are two *Rhythm* blocks, which specifies six
-quarter notes followed by one half note. Since the *Rhythm* blocks are
-inside of a *Repeat* block, there are fourteen (2 x 7) columns for
-selecting notes.
-
-Note that the matrix in the figure above has three *Pitch* blocks and
-one *Rhythm* block, which is used to create a 3 x 3 grid of pitch and
+The matrix in the figure above has three *Pitch* blocks and one
+*Rhythm* block, which is used to create a 3 x 3 grid of pitch and
 time.
+
+Note that the default matrix has five *Pitch* blocks, hence, you will
+see five rows, one for each pitch. (A sixth row at the bottom is used
+for specifying the rhythms associated with each note.) Also by
+default, there are two *Rhythm* blocks, which specifies six quarter
+notes followed by one half note. Since the *Rhythm* blocks are inside
+of a *Repeat* block, there are fourteen (2 x 7) columns for selecting
+notes.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg'</img>
 
@@ -258,7 +257,7 @@ on the right, both pitch blocks are raised by one half step.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg'</img>
 
-The *Transposition* block can be used to make larger shifts in
+The *Adjust-transposition* block can be used to make larger shifts in
 pitch. To shift an entire octave, transpose by 12 half-steps up. -12
 will shift an octave down.
 
