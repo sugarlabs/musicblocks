@@ -3425,8 +3425,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                     logo.synth.trigger(notes, beatValue, 'default');
                                 }
                                 logo.synth.start();
-                                logo.lastNotePlayed[turtle] = [notes[0], noteBeatValue];
                             }
+                            logo.lastNotePlayed[turtle] = [notes[0], noteBeatValue];
                         }
                     }
 
