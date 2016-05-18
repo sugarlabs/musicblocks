@@ -392,13 +392,14 @@ the master clock.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
 
-5. Interaction
---------------
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'</img>
+5. Another interaction example
+------------------------------
 
 There are many ways to interactive with Music Blocks, including
-tracking the mouse position to impact some aspect of the music.
+tracking the mouse position to impact some aspect of the music (as per
+the example at the end of the Voices section of this guide).
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'</img>
 
 In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
