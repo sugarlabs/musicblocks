@@ -1426,9 +1426,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     };
 
                     if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
-                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
                     } else {
-                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
                     }
 
                     logo.stage.addEventListener(listenerName, __listener, false);
@@ -1451,9 +1451,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     };
 
                     if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
-                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(listener);
+                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
                     } else {
-                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [listener];
+                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
                     }
 
                     logo.stage.addEventListener(listenerName, __listener, false);
