@@ -63,34 +63,40 @@ notes.
 By clicking on individual cells in the grid, you should hear
 individual notes (or chords if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
-cells). First `Re 4` (`D4`), followed by `Mi 4` (`E4`), followed by
-`Sol 4` (`G4`).
+cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg'
-height="36"</img> If you click on the *Play* button (found in the top
-row of the grid), you will hear a sequence of notes played (from left
-to right): `D4 E4 G4`.
+height="36"</img>
+
+If you click on the *Play* button (found in the top row of the grid),
+you will hear a sequence of notes played (from left to right): `Re 4`,
+`Mi 4`, `Sol 4`.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg'
-height="36"</img> Once you have a group of notes (a "chunk") that you
-like, click on the *Save* button (just to the right of the *Play*
-button). This will create a stack of blocks that can used to play
-these same notes programmatically. (More on that below.)
+height="36"</img>
+
+Once you have a group of notes (a "chunk") that you like, click on the
+*Save* button (just to the right of the *Play* button). This will
+create a stack of blocks that can used to play these same notes
+programmatically. (More on that below.)
 
 You can rearrange the selected notes in the grid and safe other chunks
 as well.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg'
-height="36"</img> Or hide the matrix by clicking on the *Close* button
-(the right-most button in the top row of the grid.)
+height="36"</img>
+
+Or hide the matrix by clicking on the *Close* button (the right-most
+button in the top row of the grid.)
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg'
-height="36"</img> There is also an Erase button that will clear the
-grid.
+height="36"</img>
+
+There is also an Erase button that will clear the grid.
 
 Don't worry. You can reopen the matrix at anytime (it will remember
 its previous state) and since you can define as many chunks as you
