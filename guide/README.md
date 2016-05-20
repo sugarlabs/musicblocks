@@ -399,10 +399,12 @@ tracking the mouse position to impact some aspect of the music.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg'</img>
 
-FOr example, we can launch the phrases (chunks) interactively. When
+For example, we can launch the phrases (chunks) interactively. When
 the mouse is in the lower-left quadrant, `chunk` is played;
 lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
 upper-right quadrant, `chunk3`.
+
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactive-frere-jacques.tb&run=true)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'</img>
 
