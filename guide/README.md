@@ -404,7 +404,7 @@ the mouse is in the lower-left quadrant, `chunk` is played;
 lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
 upper-right quadrant, `chunk3`.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactive-frere-jacques.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb&run=true)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'</img>
 
