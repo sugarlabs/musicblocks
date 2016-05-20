@@ -429,6 +429,8 @@ The *Save as Lilypond* block will transcribe your composition. The
 output of the program above is saved to `Downloads/hotdog.ly`. There is
 also a *Save as Lilypond* button on the secondary toolbar.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond2.svg'</img>
+
 ```
 \version "2.18.2"
 
