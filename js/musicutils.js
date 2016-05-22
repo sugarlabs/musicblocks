@@ -672,7 +672,7 @@ function Synth () {
     this.snaredrum = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1snare.wav'}).toMaster();
     this.hihat = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1hihat.wav'}).toMaster();
     this.kickdrum = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1kick.wav'}).toMaster();
-    this.tomdrum = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1tom.wav'}).toMaster();
+    this.tom = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1tom.wav'}).toMaster();
 
     var synthOptions = {
         oscillator: {
@@ -735,16 +735,16 @@ function Synth () {
         case 'pluck':
             this.pluck.toMaster();
             break;
-        case 'drum':
         case 'snare':
             this.snaredrum.toMaster();
             break;
         case 'hihat':
-            this.hihatdrum.toMaster();
+            this.hihat.toMaster();
             break;
         case 'tom':
-            this.tomdrum.toMaster();
+            this.tom.toMaster();
             break;
+        case 'drum':
         case 'kick':
             this.kickdrum.toMaster();
             break;
@@ -768,17 +768,17 @@ function Synth () {
 
     this.trigger = function(notes, beatValue, name) {
         switch (name) {
-        case 'drum':
         case 'snare':
             // this.drum.triggerAttackRelease(notes[0], beatValue);
             this.snaredrum.triggerAttack('C2', beatValue, 1);
             break;
         case 'hihat':
-            this.hihatdrum.triggerAttack('C2', beatValue, 1);
+            this.hihat.triggerAttack('C2', beatValue, 1);
             break;
         case 'tom':
-            this.tomdrum.triggerAttack('C2', beatValue, 1);
+            this.tom.triggerAttack('C2', beatValue, 1);
             break;
+        case 'drum':
         case 'kick':
             this.kickdrum.triggerAttack('C2', beatValue, 1);
             break;
@@ -805,9 +805,8 @@ function Synth () {
 
     this.stopSound = function(name) {
         switch (name) {
-        case 'drum':
         case 'snare':
-            this.snare.triggerRelease();
+            this.snaredrum.triggerRelease();
             break;
         case 'hihat':
             this.hihat.triggerRelease();
@@ -815,8 +814,9 @@ function Synth () {
         case 'tom':
             this.tom.triggerRelease();
             break;
+        case 'drum':
         case 'kick':
-            this.kick.triggerRelease();
+            this.kickdrum.triggerRelease();
             break;
         case 'pluck':
             this.pluck.triggerRelease();

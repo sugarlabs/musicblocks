@@ -208,7 +208,7 @@ function Block(protoblock, blocks, overrideName) {
 
             // If it is in the trash, make sure it remains hidden.
             if (myBlock.trash) {
-		myBlock.hide();
+                myBlock.hide();
             }
         };
 
@@ -284,6 +284,11 @@ function Block(protoblock, blocks, overrideName) {
         case 'osctime':
         case 'setbpm':
         case 'setnotevolume2':
+        case 'snare':
+        case 'hihat':
+        case 'tom':
+        case 'kick':
+        case 'pluck':
         case 'repeat':
         case 'fill':
         case 'hollowline':
@@ -544,27 +549,27 @@ function Block(protoblock, blocks, overrideName) {
         // Value blocks get a modifiable text label
         if (['text', 'number', 'solfege', 'notename', 'modename', 'rest'].indexOf(this.name) !== -1) {
             if (this.value === null) {
-		switch(this.name) {
-		case 'text':
+                switch(this.name) {
+                case 'text':
                     this.value = '---';
                     break;
-		case 'solfege':
+                case 'solfege':
                     this.value = 'sol';
                     break;
-		case 'notename':
+                case 'notename':
                     this.value = 'G';
                     break;
-		case 'rest':
+                case 'rest':
                     this.value = _('rest');
                     break;
-		case 'number':
+                case 'number':
                     this.value = NUMBERBLOCKDEFAULT;
                     break;
-		case 'modename':
+                case 'modename':
                     this.value = 'MAJOR';
                     break;
-		}
-	    }
+                     }
+            }
 
             var label = this.value.toString();
             if (label.length > 8) {
@@ -1734,7 +1739,7 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.renameDos(oldValue, newValue);
                 if (oldValue === _('action')) {
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
-		    this.blocks.setActionProtoVisiblity(false);
+                    this.blocks.setActionProtoVisiblity(false);
                 }
                 this.blocks.renameNameddos(oldValue, newValue);
                 this.blocks.palettes.updatePalettes('action');
