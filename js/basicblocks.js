@@ -639,19 +639,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     staccatoBlock.defaults.push(32);
 
     // DRUM PALETTE
-    var pluckBlock = new ProtoBlock('pluck');
-    pluckBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['pluck'] = pluckBlock;
-    pluckBlock.staticLabels.push(_('pluck'));
-    pluckBlock.adjustWidthToLabel();
-    pluckBlock.flowClampZeroArgBlock();
+    var drumnameBlock = new ProtoBlock('drumname');
+    drumnameBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['drumname'] = drumnameBlock;
+    drumnameBlock.valueBlock();
+    drumnameBlock.dockTypes[0] = 'textout';
 
-    var bubblesBlock = new ProtoBlock('bubbles');
-    bubblesBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['bubbles'] = bubblesBlock;
-    bubblesBlock.staticLabels.push(_('bubbles'));
-    bubblesBlock.adjustWidthToLabel();
-    bubblesBlock.flowClampZeroArgBlock();
+    var duckBlock = new ProtoBlock('duck');
+    duckBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['duck'] = duckBlock;
+    duckBlock.staticLabels.push(_('duck'));
+    duckBlock.adjustWidthToLabel();
+    duckBlock.flowClampZeroArgBlock();
 
     var catBlock = new ProtoBlock('cat');
     catBlock.palette = palettes.dict['drum'];
@@ -659,13 +658,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     catBlock.staticLabels.push(_('cat'));
     catBlock.adjustWidthToLabel();
     catBlock.flowClampZeroArgBlock();
-
-    var clapBlock = new ProtoBlock('clap');
-    clapBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['clap'] = clapBlock;
-    clapBlock.staticLabels.push(_('clap'));
-    clapBlock.adjustWidthToLabel();
-    clapBlock.flowClampZeroArgBlock();
 
     var cricketBlock = new ProtoBlock('cricket');
     cricketBlock.palette = palettes.dict['drum'];
@@ -681,15 +673,26 @@ function initBasicProtoBlocks(palettes, blocks) {
     dogBlock.adjustWidthToLabel();
     dogBlock.flowClampZeroArgBlock();
 
-    /*
-    // Frogs sample is weird.
-    var frogsBlock = new ProtoBlock('frogs');
-    frogsBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['frogs'] = frogsBlock;
-    frogsBlock.staticLabels.push(_('frogs'));
-    frogsBlock.adjustWidthToLabel();
-    frogsBlock.flowClampZeroArgBlock();
-    */
+    var pluckBlock = new ProtoBlock('pluck');
+    pluckBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['pluck'] = pluckBlock;
+    pluckBlock.staticLabels.push(_('pluck'));
+    pluckBlock.adjustWidthToLabel();
+    pluckBlock.flowClampZeroArgBlock();
+
+    var bottleBlock = new ProtoBlock('bottle');
+    bottleBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['bottle'] = bottleBlock;
+    bottleBlock.staticLabels.push(_('bottle'));
+    bottleBlock.adjustWidthToLabel();
+    bottleBlock.flowClampZeroArgBlock();
+
+    var bubblesBlock = new ProtoBlock('bubbles');
+    bubblesBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['bubbles'] = bubblesBlock;
+    bubblesBlock.staticLabels.push(_('bubbles'));
+    bubblesBlock.adjustWidthToLabel();
+    bubblesBlock.flowClampZeroArgBlock();
 
     var chineBlock = new ProtoBlock('chine');
     chineBlock.palette = palettes.dict['drum'];
@@ -698,26 +701,33 @@ function initBasicProtoBlocks(palettes, blocks) {
     chineBlock.adjustWidthToLabel();
     chineBlock.flowClampZeroArgBlock();
 
+    var clangBlock = new ProtoBlock('clang');
+    clangBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['clang'] = clangBlock;
+    clangBlock.staticLabels.push(_('clang'));
+    clangBlock.adjustWidthToLabel();
+    clangBlock.flowClampZeroArgBlock();
+
+    var clapBlock = new ProtoBlock('clap');
+    clapBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['clap'] = clapBlock;
+    clapBlock.staticLabels.push(_('clap'));
+    clapBlock.adjustWidthToLabel();
+    clapBlock.flowClampZeroArgBlock();
+
+    var slapBlock = new ProtoBlock('slap');
+    slapBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['slap'] = slapBlock;
+    slapBlock.staticLabels.push(_('slap'));
+    slapBlock.adjustWidthToLabel();
+    slapBlock.flowClampZeroArgBlock();
+
     var crashBlock = new ProtoBlock('crash');
     crashBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['crash'] = crashBlock;
     crashBlock.staticLabels.push(_('crash'));
     crashBlock.adjustWidthToLabel();
     crashBlock.flowClampZeroArgBlock();
-
-    var floortomBlock = new ProtoBlock('floortom');
-    floortomBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['floortom'] = floortomBlock;
-    floortomBlock.staticLabels.push(_('floortom'));
-    floortomBlock.adjustWidthToLabel();
-    floortomBlock.flowClampZeroArgBlock();
-
-    var ridebellBlock = new ProtoBlock('ridebell');
-    ridebellBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['ridebell'] = ridebellBlock;
-    ridebellBlock.staticLabels.push(_('ridebell'));
-    ridebellBlock.adjustWidthToLabel();
-    ridebellBlock.flowClampZeroArgBlock();
 
     var splashBlock = new ProtoBlock('tom');
     splashBlock.palette = palettes.dict['drum'];
@@ -729,16 +739,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     var cowbellBlock = new ProtoBlock('cowbell');
     cowbellBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['cowbell'] = cowbellBlock;
-    cowbellBlock.staticLabels.push(_('cowbell'));
+    cowbellBlock.staticLabels.push(_('cow bell'));
     cowbellBlock.adjustWidthToLabel();
     cowbellBlock.flowClampZeroArgBlock();
 
-    var cupBlock = new ProtoBlock('cup');
-    cupBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['cup'] = cupBlock;
-    cupBlock.staticLabels.push(_('cup'));
-    cupBlock.adjustWidthToLabel();
-    cupBlock.flowClampZeroArgBlock();
+    var ridebellBlock = new ProtoBlock('ridebell');
+    ridebellBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['ridebell'] = ridebellBlock;
+    ridebellBlock.staticLabels.push(_('ride bell'));
+    ridebellBlock.adjustWidthToLabel();
+    ridebellBlock.flowClampZeroArgBlock();
 
     var fingercymbalsBlock = new ProtoBlock('fingercymbals');
     fingercymbalsBlock.palette = palettes.dict['drum'];
@@ -747,48 +757,70 @@ function initBasicProtoBlocks(palettes, blocks) {
     fingercymbalsBlock.adjustWidthToLabel();
     fingercymbalsBlock.flowClampZeroArgBlock();
 
-    var slapBlock = new ProtoBlock('slap');
-    slapBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['slap'] = slapBlock;
-    slapBlock.staticLabels.push(_('slap'));
-    slapBlock.adjustWidthToLabel();
-    slapBlock.flowClampZeroArgBlock();
-
-    var triangle1Block = new ProtoBlock('triangle1');
-    triangle1Block.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['triangle1'] = triangle1Block;
-    triangle1Block.staticLabels.push(_('triangle'));
-    triangle1Block.adjustWidthToLabel();
-    triangle1Block.flowClampZeroArgBlock();
-
-    var tomBlock = new ProtoBlock('tom');
-    tomBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['tom'] = tomBlock;
-    tomBlock.staticLabels.push(_('tom'));
-    tomBlock.adjustWidthToLabel();
-    tomBlock.flowClampZeroArgBlock();
+    var trianglebellBlock = new ProtoBlock('trianglebell');
+    trianglebellBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['trianglebell'] = trianglebellBlock;
+    trianglebellBlock.staticLabels.push(_('triangle bell'));
+    trianglebellBlock.adjustWidthToLabel();
+    trianglebellBlock.flowClampZeroArgBlock();
 
     var hihatBlock = new ProtoBlock('hihat');
     hihatBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['hihat'] = hihatBlock;
-    hihatBlock.staticLabels.push(_('hihat'));
+    hihatBlock.staticLabels.push(_('hi hat'));
     hihatBlock.adjustWidthToLabel();
     hihatBlock.flowClampZeroArgBlock();
+
+    var darbukaBlock = new ProtoBlock('darbuka');
+    darbukaBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['darbuka'] = darbukaBlock;
+    darbukaBlock.staticLabels.push(_('darbuka drum'));
+    darbukaBlock.adjustWidthToLabel();
+    darbukaBlock.flowClampZeroArgBlock();
+
+    var cupBlock = new ProtoBlock('cup');
+    cupBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['cup'] = cupBlock;
+    cupBlock.staticLabels.push(_('cup drum'));
+    cupBlock.adjustWidthToLabel();
+    cupBlock.flowClampZeroArgBlock();
+
+    var floortomBlock = new ProtoBlock('floortom');
+    floortomBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['floortom'] = floortomBlock;
+    floortomBlock.staticLabels.push(_('floor tom tom'));
+    floortomBlock.adjustWidthToLabel();
+    floortomBlock.flowClampZeroArgBlock();
+
+    var tomBlock = new ProtoBlock('tom');
+    tomBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['tom'] = tomBlock;
+    tomBlock.staticLabels.push(_('tom tom'));
+    tomBlock.adjustWidthToLabel();
+    tomBlock.flowClampZeroArgBlock();
 
     var kickBlock = new ProtoBlock('kick');
     kickBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['kick'] = kickBlock;
-    kickBlock.staticLabels.push(_('kick'));
+    kickBlock.staticLabels.push(_('kick drum'));
     kickBlock.adjustWidthToLabel();
     kickBlock.flowClampZeroArgBlock();
 
     var snareBlock = new ProtoBlock('snare');
     snareBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['snare'] = snareBlock;
-    snareBlock.staticLabels.push(_('snare'));
+    snareBlock.staticLabels.push(_('snare drum'));
     snareBlock.adjustWidthToLabel();
     snareBlock.flowClampZeroArgBlock();
 
+    var setdrumBlock = new ProtoBlock('setdrum');
+    setdrumBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['setdrum'] = setdrumBlock;
+    setdrumBlock.staticLabels.push(_('set drum'));
+    setdrumBlock.adjustWidthToLabel();
+    setdrumBlock.flowClampOneArgBlock();
+    setdrumBlock.dockTypes[1] = 'anyin';
+    
     // TURTLE PALETTE
 
     var headingBlock = new ProtoBlock('heading');

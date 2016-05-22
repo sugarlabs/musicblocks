@@ -284,6 +284,10 @@ function Block(protoblock, blocks, overrideName) {
         case 'osctime':
         case 'setbpm':
         case 'setnotevolume2':
+        case 'darbuka':
+        case 'clang':
+        case 'bottle':
+        case 'duck':
         case 'snare':
         case 'hihat':
         case 'tom':
@@ -291,7 +295,6 @@ function Block(protoblock, blocks, overrideName) {
         case 'pluck':
         case 'triangle1':
         case 'slap':
-        case 'frogs':
         case 'fingercymbals':
         case 'cup':
         case 'cowbell':
@@ -305,6 +308,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'clap':
         case 'bubbles':
         case 'cricket':
+        case 'setdrum':
         case 'repeat':
         case 'fill':
         case 'hollowline':
@@ -563,8 +567,8 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Value blocks get a modifiable text label
-        if (['text', 'number', 'solfege', 'notename', 'modename', 'rest'].indexOf(this.name) !== -1) {
-            if (this.value === null) {
+        if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname', 'rest'].indexOf(this.name) !== -1) {
+            if (this.value == null) {
                 switch(this.name) {
                 case 'text':
                     this.value = '---';
@@ -582,9 +586,12 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = NUMBERBLOCKDEFAULT;
                     break;
                 case 'modename':
-                    this.value = 'MAJOR';
+                    this.value = MAJOR;
                     break;
-                     }
+                case 'drumname':
+                    this.value = _('kick drum');
+                    break;
+                }
             }
 
             var label = this.value.toString();
@@ -958,7 +965,7 @@ function Block(protoblock, blocks, overrideName) {
         this.text.y = TEXTY * blockScale / 2.;
 
         // Some special cases
-        if (['text', 'number', 'solfege', 'notename', 'modename'].indexOf(this.name) !== -1) {
+        if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname'].indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
             this.text.x = VALUETEXTX * blockScale / 2.;
         } else if (this.protoblock.args === 0) {
@@ -1232,7 +1239,7 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock._doOpenMedia(thisBlock);
                 } else if (myBlock.name === 'loadFile') {
                     myBlock._doOpenMedia(thisBlock);
-                } else if (['text', 'number', 'solfege', 'notename', 'modename'].indexOf(myBlock.name) !== -1) {
+                } else if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname'].indexOf(myBlock.name) !== -1) {
                     if(!myBlock.trash)
                     {
                         myBlock._changeLabel();
@@ -1411,7 +1418,7 @@ function Block(protoblock, blocks, overrideName) {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
             }
-        } else if (['text', 'solfege', 'notename', 'modename', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
+        } else if (['text', 'solfege', 'notename', 'modename', 'drumname', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
             if (!haveClick) {
                 // Simulate click on Android.
                 var d = new Date();
@@ -1591,13 +1598,13 @@ function Block(protoblock, blocks, overrideName) {
             if (this.value != null) {
                 var selectedmode = this.value[0];
             } else {
-                var selectednote = 'MAJOR';
+                var selectedmode = 'MAJOR';
             }
 
             var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
             for (var i = 0; i < MODENAMES.length; i++) {
                 if (selectednote === MODENAMES[i][0]) {
-                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectednote + '</option>';
+                    labelHTML += '<option value="' + selectedmode + '" selected>' + '</option>';
                 } else {
                     labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
                 }
@@ -1606,6 +1613,28 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('modenameLabel');
+        } else if (this.name === 'drumname') {
+            var type = 'drumname';
+            if (this.value != null) {
+                var selecteddrum = this.value[0];
+            } else {
+                var selecteddrum = _('kick drum');
+            }
+
+            var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            for (var i = 0; i < DRUMNAMES.length; i++) {
+                if (selecteddrum === DRUMNAMES[i][0]) {
+                    labelHTML += '<option value="' + selecteddrum + '" selected>' + '</option>';
+                } else if (selecteddrum === DRUMNAMES[i][1]) {
+                    labelHTML += '<option value="' + selecteddrum + '" selected>' + '</option>';
+                } else {
+                    labelHTML += '<option value="' + DRUMNAMES[i][0] + '">' + DRUMNAMES[i][0] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('drumnameLabel');
         } else {
             var type = 'number';
             labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
