@@ -2409,6 +2409,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo._setListener(turtle, listenerName, __listener);
             }
             break;
+        case 'darbuka':
+        case 'clang':
+        case 'bottle':
+        case 'duck':
         case 'snare':
         case 'hihat':
         case 'tom':
@@ -2432,6 +2436,29 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'cricket':
             logo.drumStyle[turtle].push(blocks.blockList[blk].name);
             childFlow = args[0];
+            childFlowCount = 1;
+
+            var listenerName = '_drum_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.drumStyle[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'setdrum':
+            var drumname = 'kick';
+            for (drum in DRUMNAMES) { 
+                if (DRUMNAMES[drum][0] === args[0]) {
+                    drumname = DRUMNAMES[drum][1];
+                } else if (DRUMNAMES[drum][1] === args[0]) {
+                    drumname = args[0];
+                }
+            }
+
+            logo.drumStyle[turtle].push(drumname);
+            childFlow = args[1];
             childFlowCount = 1;
 
             var listenerName = '_drum_' + turtle;
@@ -3384,10 +3411,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         if (!logo.lilypondSaveOnly && duration > 0) {
                             if (logo.oscList[turtle].length > 0) {
                                 logo.synth.init(last(logo.oscList[turtle]));
-                            } else if (logo.turtles.turtleList[turtle].drum) {
-                                logo.synth.init('drum');
                             } else if (logo.drumStyle[turtle].length > 0) {
                                 logo.synth.init(last(logo.drumStyle[turtle]));
+                            } else if (logo.turtles.turtleList[turtle].drum) {
+                                logo.synth.init('drum');
                             } else {
                                 logo.synth.init('default');
                             }
@@ -3461,10 +3488,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                     }
 
                                     logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
-                                } else if (logo.turtles.turtleList[turtle].drum) {
-                                    logo.synth.trigger(notes, beatValue, 'drum');
                                 } else if (logo.drumStyle[turtle].length > 0) {
                                     logo.synth.trigger(notes, beatValue, last(logo.drumStyle[turtle]));
+                                } else if (logo.turtles.turtleList[turtle].drum) {
+                                    logo.synth.trigger(notes, beatValue, 'drum');
                                 } else {
                                     logo.synth.trigger(notes, beatValue, 'default');
                                 }

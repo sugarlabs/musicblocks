@@ -151,6 +151,56 @@ const MODENAMES = [
     [_('Japanese'), 'JAPANESE'],
 ];
 
+const DRUMNAMES = [
+    //.TRANS: musical instrument
+    [_('snare drum'), 'snaredrum'],
+    //.TRANS: musical instrument
+    [_('kick drum'), 'kick'],
+    //.TRANS: musical instrument
+    [_('tom tom'), 'tom'],
+    //.TRANS: musical instrument
+    [_('floor tom tom'), 'floortom'],
+    //.TRANS: musical instrument
+    [_('cup drum'), 'cup'],
+    //.TRANS: musical instrument
+    [_('darbuka drum'), 'darbuka'],
+    //.TRANS: musical instrument
+    [_('hi hat'), 'hihat'],
+    //.TRANS: musical instrument
+    [_('ride bell'), 'ridebell'],
+    //.TRANS: musical instrument
+    [_('cow bell'), 'cowbell'],
+    //.TRANS: musical instrument
+    [_('triangle bell'), 'trianglebell'],
+    //.TRANS: musical instrument
+    [_('finger cymbals'), 'fingercymbals'],
+    //.TRANS: sound effect
+    [_('chine'), 'chine'],
+    //.TRANS: sound effect
+    [_('bottle'), 'bottle'],
+    //.TRANS: sound effect
+    [_('clang'), 'clang'],
+    //.TRANS: sound effect
+    [_('crash'), 'crash'],
+    //.TRANS: sound effect
+    [_('clap'), 'clap'],
+    //.TRANS: sound effect
+    [_('slap'), 'slap'],
+    //.TRANS: sound effect
+    [_('splash'), 'splash'],
+    //.TRANS: sound effect
+    [_('bubbles'), 'bubbles'],
+    //.TRANS: animal sound effect
+    [_('cat'), 'cat'],
+    //.TRANS: animal sound effect
+    [_('cricket'), 'cricket'],
+    //.TRANS: animal sound effect
+    [_('dog'), 'dog'],
+    //.TRANS: animal sound effect
+    [_('duck'), 'duck'],
+];
+
+
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
     if (keySignature === '') {
@@ -687,9 +737,12 @@ function Synth () {
         'cowbell': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum3cowbell.wav', null],
         'cup': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum3cup.wav', null],
         'fingercymbals': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/fingercymbals.wav', null],
-        'frogs': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/frogs.wav', null],
         'slap': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/slap.wav', null],
-        'triangle1': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/triangle.wav', null],
+        'trianglebell': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/triangle.wav', null],
+        'darbuka': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum2darbukaslap.wav', null],
+        'duck': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/duck.wav', null],
+        'clang': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/clang.wav', null],
+        'bottle': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/bottle.wav', null],
     };
 
     Tone.Buffer.onload = function(){
