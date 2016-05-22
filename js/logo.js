@@ -2414,6 +2414,22 @@ function Logo(matrix, canvas, blocks, turtles, stage,
         case 'tom':
         case 'kick':
         case 'pluck':
+        case 'triangle1':
+        case 'slap':
+        case 'frogs':
+        case 'fingercymbals':
+        case 'cup':
+        case 'cowbell':
+        case 'splash':
+        case 'ridebell':
+        case 'floortom':
+        case 'crash':
+        case 'chine':
+        case 'dog':
+        case 'cat':
+        case 'clap':
+        case 'bubbles':
+        case 'cricket':
             logo.drumStyle[turtle].push(blocks.blockList[blk].name);
             childFlow = args[0];
             childFlowCount = 1;

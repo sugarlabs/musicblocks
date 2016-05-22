@@ -1568,7 +1568,7 @@ function Palette(palettes, name) {
     };
 
     this._makeBlockFromPalette = function(protoblk, blkname, callback) {
-        const BUILTINMACROS= ['note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm', 'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2', 'articulation', 'matrix', 'turtlepitch', 'turtlenote', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote', 'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline', 'note2', 'note3', 'octave', 'fifths', 'tritone', 'fourths', 'thirds', 'steppitch', 'sine', 'triangle', 'square', 'sawtooth', 'setkey2', 'snare', 'hihat', 'kick', 'tom', 'pluck'];
+        const BUILTINMACROS= ['note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm', 'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2', 'articulation', 'matrix', 'turtlepitch', 'turtlenote', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote', 'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline', 'note2', 'note3', 'octave', 'fifths', 'tritone', 'fourths', 'thirds', 'steppitch', 'sine', 'triangle', 'square', 'sawtooth', 'setkey2', 'snare', 'hihat', 'kick', 'tom', 'pluck', 'triangle1', 'slap', 'frogs', 'fingercymbals', 'cup', 'cowbell', 'splash', 'ridebell', 'floortom', 'crash', 'chine', 'dog', 'cat', 'clap', 'bubbles', 'cricket'];
 
         switch (protoblk.name) {
         case 'do':
@@ -1733,6 +1733,22 @@ function Palette(palettes, name) {
         const HIHATOBJ = [[0, 'hihat', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
         const TOMOBJ = [[0, 'tom', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
         const PLUCKOBJ = [[0, 'pluck', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const TRIANGLE1OBJ = [[0, 'triangle1', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const SLAPOBJ = [[0, 'slap', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const FROGSOBJ = [[0, 'frogs', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const FINGERCYMBALSOBJ = [[0, 'fingercymbals', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const CUPOBJ = [[0, 'cup', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const COWBELLOBJ = [[0, 'cowbell', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const SPLASHOBJ = [[0, 'splash', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const RIDEBELLOBJ = [[0, 'ridebell', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const FLOORTOMOBJ = [[0, 'floortom', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const CRASHOBJ = [[0, 'crash', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const CHINEOBJ = [[0, 'chine', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const DOGOBJ = [[0, 'dog', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const CATOBJ = [[0, 'cat', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const CLAPOBJ = [[0, 'clap', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const BUBBLESOBJ = [[0, 'bubbles', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const CRICKETOBJ = [[0, 'cricket', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
 
         const BUILTINMACROS = {'note': NOTEOBJ,
                                'rhythmicdot': DOTOBJ,
@@ -1788,6 +1804,22 @@ function Palette(palettes, name) {
                                'kick': KICKOBJ,
                                'tom': TOMOBJ,
                                'pluck': PLUCKOBJ,
+                               'triangle1': TRIANGLE1OBJ,
+                               'slap': SLAPOBJ,
+                               'frogs': FROGSOBJ,
+                               'fingercymbals': FINGERCYMBALSOBJ,
+                               'cup': CUPOBJ,
+                               'cowbell': COWBELLOBJ,
+                               'splash': SPLASHOBJ,
+                               'ridebell': RIDEBELLOBJ,
+                               'floortom': FLOORTOMOBJ,
+                               'crash': CRASHOBJ,
+                               'chine': CHINEOBJ,
+                               'dog': DOGOBJ,
+                               'cat': CATOBJ,
+                               'clap': CLAPOBJ,
+                               'bubbles': BUBBLESOBJ,
+                               'cricket': CRICKETOBJ,
                               };
 
         function __myCallback (newBlock) {

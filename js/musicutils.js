@@ -657,22 +657,48 @@ function Synth () {
             release: 1.4,
             attackCurve:'exponential'
         }
-    }
+    };
 
     this.pluck = new Tone.PluckSynth().toMaster();
 
+    // The drum samples are from the TamTam
+    // collection (See https://wiki.sugarlabs.org/go/Activities/TamTam).
+
     // this.drum = new Tone.DrumSynth().toMaster();
+
+    // TODO: load on demand
+    // TODO: load from inline data
+
+    this.drumset = {
+        'snaredrum': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1snare.wav', null],
+        'hihat': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1hihat.wav', null],
+        'kick': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1kick.wav', null],
+        'tom': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1tom.wav', null],
+        'bubbles': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/bubbles.wav', null],
+        'cat': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/cat.wav', null],
+        'clap': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/clap.wav', null],
+        'cricket': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/cricket.wav', null],
+        'dog': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/dog.wav', null],
+        'chine': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1chine.wav', null],
+        'crash': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1crash.wav', null],
+        'floortom': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1floortom.wav', null],
+        'ridebell': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1ridebell.wav', null],
+        'splash': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1splash.wav', null],
+        'cowbell': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum3cowbell.wav', null],
+        'cup': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum3cup.wav', null],
+        'fingercymbals': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/fingercymbals.wav', null],
+        'frogs': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/frogs.wav', null],
+        'slap': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/slap.wav', null],
+        'triangle1': ['http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/triangle.wav', null],
+    };
 
     Tone.Buffer.onload = function(){
         console.log('drum loaded');
     };
 
-    // drum1snare, drum1tom, drum1kick, and drum1hihat are from TamTam
-    // collection (See https://wiki.sugarlabs.org/go/Activities/TamTam).
-    this.snaredrum = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1snare.wav'}).toMaster();
-    this.hihat = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1hihat.wav'}).toMaster();
-    this.kickdrum = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1kick.wav'}).toMaster();
-    this.tom = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1tom.wav'}).toMaster();
+    for (var drum in this.drumset) {
+        this.drumset[drum][1] = new Tone.Sampler({'C2' : this.drumset[drum][0]}).toMaster();
+    }
 
     var synthOptions = {
         oscillator: {
@@ -735,19 +761,6 @@ function Synth () {
         case 'pluck':
             this.pluck.toMaster();
             break;
-        case 'snare':
-            this.snaredrum.toMaster();
-            break;
-        case 'hihat':
-            this.hihat.toMaster();
-            break;
-        case 'tom':
-            this.tom.toMaster();
-            break;
-        case 'drum':
-        case 'kick':
-            this.kickdrum.toMaster();
-            break;
         case 'triangle':
             this.triangle.toMaster();
             break;
@@ -761,27 +774,20 @@ function Synth () {
             this.sine.toMaster();
             break;
         default:
-            this.poly.toMaster();
+            if (name in this.drumset) {
+                this.drumset[name][1].toMaster();
+            } else if (name === 'drum') {
+                this.drumset['kick'][1].toMaster();
+            } else {
+                this.poly.toMaster();
+            }
             break;
         }
     };
 
     this.trigger = function(notes, beatValue, name) {
+        console.log(name);
         switch (name) {
-        case 'snare':
-            // this.drum.triggerAttackRelease(notes[0], beatValue);
-            this.snaredrum.triggerAttack('C2', beatValue, 1);
-            break;
-        case 'hihat':
-            this.hihat.triggerAttack('C2', beatValue, 1);
-            break;
-        case 'tom':
-            this.tom.triggerAttack('C2', beatValue, 1);
-            break;
-        case 'drum':
-        case 'kick':
-            this.kickdrum.triggerAttack('C2', beatValue, 1);
-            break;
         case 'pluck':
             this.pluck.triggerAttackRelease(notes[0], beatValue);
             break;
@@ -798,7 +804,13 @@ function Synth () {
             this.sine.triggerAttackRelease(notes[0], beatValue);
             break;
         default:
-            this.poly.triggerAttackRelease(notes, beatValue);
+            if (name in this.drumset) {
+                this.drumset[name][1].triggerAttack('C2', beatValue, 1);
+            } else if (name === 'drum') {
+                this.drumset['kick'][1].triggerAttack('C2', beatValue, 1);
+            } else {
+                this.poly.triggerAttackRelease(notes, beatValue);
+            }
             break;
         }
     };
@@ -834,7 +846,13 @@ function Synth () {
             this.sine.triggerRelease();
             break;
         default:
-            this.poly.triggerRelease();
+            if (name in this.drumset) {
+                this.drumset[name][1].triggerRelease();
+            } else if (name === 'drum') {
+                this.drumset['kick'][1].triggerRelease();
+            } else {
+                this.poly.triggerRelease();
+            }
             break;
         }
     };
