@@ -138,6 +138,7 @@ const PALETTECOLORS0 = {
     'pitch': [37.5, 70, 50],
     'rhythm' : [12.5, 60, 80],
     'tone' : [57.5, 50, 28],
+    'drum' : [57.5, 50, 28],
     'turtle': [37.5, 70, 50],
     'pen': [57.5, 50, 28],
     'boxes': [12.5, 60, 80],
@@ -157,6 +158,7 @@ const PALETTECOLORS = {
     'pitch': [37.5, 70, 42],
     'rhythm' : [12.5, 60, 49],
     'tone' : [57.5, 50, 21],
+    'drum' : [57.5, 50, 21],
     'turtle': [37.5, 70, 35],
     'pen': [57.5, 50, 21],
     'boxes': [12.5, 60, 49],
@@ -226,11 +228,14 @@ const PITCHPALETTEICON = '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" 
 
 const TONEPALETTEICON = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="55" height="55" viewBox="0 0 55 55" id="Layer_1" xml:space="preserve"><g transform="matrix(0.83337674,0,0,0.83337674,4.4102265,2.7730896)" id="preferences-system" style="fill:#ffffff;fill-opacity:1;display:block"><path d="m 51.103,50.895 c -2.343,2.343 -6.143,2.343 -8.485,0 L 19.813,28.091 c -2.343,-2.343 -2.343,-6.143 0,-8.485 l 0,0 c 2.343,-2.343 6.143,-2.343 8.485,0 L 51.102,42.41 c 2.343,2.342 2.343,6.142 0.001,8.485 l 0,0 z" id="path4" style="fill:#ffffff;fill-opacity:1" /><g id="g6" style="fill:#ffffff;fill-opacity:1"><g id="g8" style="fill:#ffffff;fill-opacity:1"><path d="m 17.813,2.254 c -0.804,0 -1.587,0.081 -2.358,0.2 L 26.012,13.012 13.22,25.804 2.662,15.246 c -0.119,0.771 -0.2,1.555 -0.2,2.36 0,8.479 6.873,15.352 15.351,15.352 8.478,0 15.351,-6.873 15.351,-15.352 0,-8.479 -6.873,-15.352 -15.351,-15.352 z" id="path10" style="fill:#ffffff;fill-opacity:1" /></g></g></g><text x="25.423845" y="55.311741" transform="scale(1.1549947,0.86580484)" id="text2995" xml:space="preserve" style="font-size:13.85287762px;font-style:normal;font-weight:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-opacity:1;font-family:Sans"><tspan x="25.423845" y="55.311741" id="tspan2997" style="font-size:24.24253464px;font-weight:bold;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-opacity:1;-inkscape-font-specification:Sans Bold">♫</tspan></text></svg>';
 
+const DRUMPALETTEICON = '<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1" width="55" height="55" viewBox="0 0 55 55" id="svg2" xml:space="preserve"><path d="m 9.653,18.199 h 35.54 c 0.772,0 1.4,0.628 1.4,1.403 v 2.362 c 0,0.771 -0.628,1.401 -1.4,1.401 H 9.653 c -0.775,0 -1.403,-0.628 -1.403,-1.401 v -2.361 c 0,-0.777 0.627,-1.404 1.403,-1.404 z" id="path8" style="fill:#ffffff;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;display:inline" /><rect width="33.139" height="22.128" x="10.852" y="23.365" id="rect10" style="fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;display:inline" /><path d="m 9.653,45.493 h 35.54 c 0.772,0 1.4,0.627 1.4,1.401 v 2.362 c 0,0.775 -0.628,1.405 -1.4,1.405 H 9.653 c -0.775,0 -1.403,-0.629 -1.403,-1.405 v -2.362 c 0,-0.77 0.627,-1.401 1.403,-1.401 z" id="path17" style="fill:#ffffff;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;display:inline" /><path d="M 10.851,45.491 19.395,23.365 27.291,45.49 35.217,23.364" id="path19" style="fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;display:inline" /><path d="M 43.987,45.491 35.217,23.365" id="path21" style="fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;display:inline" /><line style="fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;display:inline" y2="5.948" y1="13.149" x2="48.335999" x1="33.689999" id="line27" display="inline" /><line style="fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;display:inline" y2="9.4799995" y1="2.2130001" x2="20.658001" x1="6.0419998" id="line29" display="inline" /><path d="m 25.721,9.802 c 0.55,1.451 -0.171,3.066 -1.608,3.612 -1.437,0.545 -3.049,-0.188 -3.599,-1.639 -0.547,-1.45 0.174,-3.067 1.609,-3.613 1.438,-0.542 3.049,0.19 3.598,1.64 z" id="path23" style="fill:none;stroke:#ffffff;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round;display:inline" /><path d="m 33.338,16.442 c -1.04,1.125 -2.798,1.189 -3.928,0.144 -1.128,-1.044 -1.197,-2.801 -0.155,-3.927 1.041,-1.125 2.8,-1.19 3.926,-0.146 1.129,1.045 1.2,2.803 0.157,3.929 z" id="path25" style="fill:none;stroke:#ffffff;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round;display:inline" /></svg>';
+
 const PALETTEICONS = {
     'matrix' : MATRIXPALETTEICON,
     'rhythm' : NOTESPALETTEICON,
     'pitch' : PITCHPALETTEICON,
     'tone' : TONEPALETTEICON,
+    'drum': DRUMPALETTEICON,
     'turtle': TURTLEPALETTEICON,
     'pen': PENPALETTEICON,
     'number': NUMBERPALETTEICON,
