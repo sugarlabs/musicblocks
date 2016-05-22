@@ -646,6 +646,7 @@ function Synth () {
     this.poly = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
 
     var synthOptions = {
+        pitchDecay: 0.05,
         oscillator: {
             type: 'sine'
         },
@@ -658,8 +659,20 @@ function Synth () {
         }
     }
 
-    // this.drum = new Tone.SimpleSynth(synthOptions);
-    this.drum = new Tone.DrumSynth().toMaster();
+    this.pluck = new Tone.PluckSynth().toMaster();
+
+    // this.drum = new Tone.DrumSynth().toMaster();
+
+    Tone.Buffer.onload = function(){
+        console.log('drum loaded');
+    };
+
+    // drum1snare, drum1tom, drum1kick, and drum1hihat are from TamTam
+    // collection (See https://wiki.sugarlabs.org/go/Activities/TamTam).
+    this.snaredrum = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1snare.wav'}).toMaster();
+    this.hihat = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1hihat.wav'}).toMaster();
+    this.kickdrum = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1kick.wav'}).toMaster();
+    this.tomdrum = new Tone.Sampler({'C2' : 'http://raw.githubusercontent.com/walterbender/musicblocks/master/samples/drum1tom.wav'}).toMaster();
 
     var synthOptions = {
         oscillator: {
@@ -719,8 +732,21 @@ function Synth () {
 
     this.init = function(name) {
         switch (name) {
+        case 'pluck':
+            this.pluck.toMaster();
+            break;
         case 'drum':
-            this.drum.toMaster();
+        case 'snare':
+            this.snaredrum.toMaster();
+            break;
+        case 'hihat':
+            this.hihatdrum.toMaster();
+            break;
+        case 'tom':
+            this.tomdrum.toMaster();
+            break;
+        case 'kick':
+            this.kickdrum.toMaster();
             break;
         case 'triangle':
             this.triangle.toMaster();
@@ -743,7 +769,21 @@ function Synth () {
     this.trigger = function(notes, beatValue, name) {
         switch (name) {
         case 'drum':
-            this.drum.triggerAttackRelease(notes[0], beatValue);
+        case 'snare':
+            // this.drum.triggerAttackRelease(notes[0], beatValue);
+            this.snaredrum.triggerAttack('C2', beatValue, 1);
+            break;
+        case 'hihat':
+            this.hihatdrum.triggerAttack('C2', beatValue, 1);
+            break;
+        case 'tom':
+            this.tomdrum.triggerAttack('C2', beatValue, 1);
+            break;
+        case 'kick':
+            this.kickdrum.triggerAttack('C2', beatValue, 1);
+            break;
+        case 'pluck':
+            this.pluck.triggerAttackRelease(notes[0], beatValue);
             break;
         case 'triangle':
             this.triangle.triggerAttackRelease(notes[0], beatValue);
@@ -766,7 +806,20 @@ function Synth () {
     this.stopSound = function(name) {
         switch (name) {
         case 'drum':
-            this.drum.triggerRelease();
+        case 'snare':
+            this.snare.triggerRelease();
+            break;
+        case 'hihat':
+            this.hihat.triggerRelease();
+            break;
+        case 'tom':
+            this.tom.triggerRelease();
+            break;
+        case 'kick':
+            this.kick.triggerRelease();
+            break;
+        case 'pluck':
+            this.pluck.triggerRelease();
             break;
         case 'triangle':
             this.triangle.triggerRelease();
