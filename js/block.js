@@ -289,6 +289,22 @@ function Block(protoblock, blocks, overrideName) {
         case 'tom':
         case 'kick':
         case 'pluck':
+        case 'triangle1':
+        case 'slap':
+        case 'frogs':
+        case 'fingercymbals':
+        case 'cup':
+        case 'cowbell':
+        case 'splash':
+        case 'ridebell':
+        case 'floortom':
+        case 'crash':
+        case 'chine':
+        case 'dog':
+        case 'cat':
+        case 'clap':
+        case 'bubbles':
+        case 'cricket':
         case 'repeat':
         case 'fill':
         case 'hollowline':
