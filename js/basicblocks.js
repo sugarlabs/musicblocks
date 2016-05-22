@@ -552,6 +552,41 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
 
+    var pluckBlock = new ProtoBlock('pluck');
+    pluckBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['pluck'] = pluckBlock;
+    pluckBlock.staticLabels.push(_('pluck'));
+    pluckBlock.adjustWidthToLabel();
+    pluckBlock.flowClampZeroArgBlock();
+
+    var tomBlock = new ProtoBlock('tom');
+    tomBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['tom'] = tomBlock;
+    tomBlock.staticLabels.push(_('tom'));
+    tomBlock.adjustWidthToLabel();
+    tomBlock.flowClampZeroArgBlock();
+
+    var hihatBlock = new ProtoBlock('hihat');
+    hihatBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['hihat'] = hihatBlock;
+    hihatBlock.staticLabels.push(_('hihat'));
+    hihatBlock.adjustWidthToLabel();
+    hihatBlock.flowClampZeroArgBlock();
+
+    var kickBlock = new ProtoBlock('kick');
+    kickBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['kick'] = kickBlock;
+    kickBlock.staticLabels.push(_('kick'));
+    kickBlock.adjustWidthToLabel();
+    kickBlock.flowClampZeroArgBlock();
+
+    var snareBlock = new ProtoBlock('snare');
+    snareBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['snare'] = snareBlock;
+    snareBlock.staticLabels.push(_('snare'));
+    snareBlock.adjustWidthToLabel();
+    snareBlock.flowClampZeroArgBlock();
+
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['articulation'] = articulationBlock;

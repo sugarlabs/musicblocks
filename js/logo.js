@@ -165,6 +165,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.polyVolume = {};
     this.validNote = true;
     this.drift = {};
+    this.drumStyle = {};
 
     // tuplet
     this.tuplet = false;
@@ -619,6 +620,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.tieNote[turtle] = [];
             this.tieCarryOver[turtle] = 0;
             this.drift[turtle] = 0;
+            this.drumStyle[turtle] = [];
         }
 
         if (!this.lilypondSaveOnly) {
@@ -2221,8 +2223,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
                     for (var i = 0; i < logo.intervals[turtle].length; i++) {
-			var ii = getInterval(logo.intervals[turtle][i], logo.keySignature[turtle], note);
-			var noteObj = logo.getNote(note, octave, ii, logo.keySignature[turtle]);
+                        var ii = getInterval(logo.intervals[turtle][i], logo.keySignature[turtle], note);
+                        var noteObj = logo.getNote(note, octave, ii, logo.keySignature[turtle]);
                         addPitch(noteObj[0], noteObj[1], cents);
                     }
                 }
@@ -2407,6 +2409,24 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo._setListener(turtle, listenerName, __listener);
             }
             break;
+        case 'snare':
+        case 'hihat':
+        case 'tom':
+        case 'kick':
+        case 'pluck':
+            logo.drumStyle[turtle].push(blocks.blockList[blk].name);
+            childFlow = args[0];
+            childFlowCount = 1;
+
+            var listenerName = '_drum_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.drumStyle[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -2414,11 +2434,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 break;
             }
 
-	    if (args[0] > 0) {
+            if (args[0] > 0) {
                 var i = Math.floor(args[0]);
             } else {
                 var i = Math.ceil(args[0]);
-	    }
+            }
 
             if (i !== 0) {
                 logo.intervals[turtle].push(i);
@@ -3350,6 +3370,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 logo.synth.init(last(logo.oscList[turtle]));
                             } else if (logo.turtles.turtleList[turtle].drum) {
                                 logo.synth.init('drum');
+                            } else if (logo.drumStyle[turtle].length > 0) {
+                                logo.synth.init(last(logo.drumStyle[turtle]));
                             } else {
                                 logo.synth.init('default');
                             }
@@ -3359,17 +3381,17 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                             if (logo.notePitches[turtle][i] === 'rest') {
                                 note = 'R';
                             } else {
-				var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
+                                var noteObj = logo.getNote(logo.notePitches[turtle][i], logo.noteOctaves[turtle][i], logo.noteTranspositions[turtle][i], logo.keySignature[turtle]);
 
-				// If the cents for this note != 0, then
-				// we need to convert to frequency and add
-				// in the cents.
-				if (logo.noteCents[turtle][i] !== 0) {
+                                // If the cents for this note != 0, then
+                                // we need to convert to frequency and add
+                                // in the cents.
+                                if (logo.noteCents[turtle][i] !== 0) {
                                     var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
-				} else {
+                                } else {
                                     var note = noteObj[0] + noteObj[1];
-				}
-			    }
+                                }
+                            }
 
                             if (note !== 'R') {
                                 notes.push(note);
@@ -3425,6 +3447,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                     logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
                                 } else if (logo.turtles.turtleList[turtle].drum) {
                                     logo.synth.trigger(notes, beatValue, 'drum');
+                                } else if (logo.drumStyle[turtle].length > 0) {
+                                    logo.synth.trigger(notes, beatValue, last(logo.drumStyle[turtle]));
                                 } else {
                                     logo.synth.trigger(notes, beatValue, 'default');
                                 }
