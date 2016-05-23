@@ -200,6 +200,28 @@ const DRUMNAMES = [
     [_('duck'), 'duck'],
 ];
 
+const DEFAULTDRUM = 'kick';
+
+
+function getDrumName(name) {
+    for (var i = 0; i < DRUMNAMES.length; i++) {
+        if (DRUMNAMES[i].indexOf(name) !== -1) {
+            return DRUMNAMES[i][0];
+        }
+    }
+    return null
+};
+
+
+function getDrumSynth(name) {
+    for (var i = 0; i < DRUMNAMES.length; i++) {
+        if (DRUMNAMES[i].indexOf(name) !== -1) {
+            return DRUMNAMES[i][1];
+        }
+    }
+    return null
+};
+
 
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
@@ -827,10 +849,11 @@ function Synth () {
             this.sine.toMaster();
             break;
         default:
-            if (name in this.drumset) {
-                this.drumset[name][1].toMaster();
+            var drumName = getDrumSynth(name);
+            if (drumName != null) {
+                this.drumset[drumName][1].toMaster();
             } else if (name === 'drum') {
-                this.drumset['kick'][1].toMaster();
+                this.drumset[DEFAULTDRUM][1].toMaster();
             } else {
                 this.poly.toMaster();
             }
@@ -839,7 +862,6 @@ function Synth () {
     };
 
     this.trigger = function(notes, beatValue, name) {
-        // console.log(name);
         switch (name) {
         case 'pluck':
             this.pluck.triggerAttackRelease(notes[0], beatValue);
@@ -857,11 +879,11 @@ function Synth () {
             this.sine.triggerAttackRelease(notes[0], beatValue);
             break;
         default:
-            if (name in this.drumset) {
-                // console.log(this.drumset[name][1]);
-                this.drumset[name][1].triggerAttack('C2', beatValue, 1);
+            var drumName = getDrumSynth(name);
+            if (drumName != null) {
+                this.drumset[drumName][1].triggerAttack('C2', beatValue, 1);
             } else if (name === 'drum') {
-                this.drumset['kick'][1].triggerAttack('C2', beatValue, 1);
+                this.drumset[DEFAULTDRUM][1].triggerAttack('C2', beatValue, 1);
             } else {
                 this.poly.triggerAttackRelease(notes, beatValue);
             }
@@ -881,7 +903,7 @@ function Synth () {
             this.tom.triggerRelease();
             break;
         case 'drum':
-        case 'kick':
+        case DEFAULTDRUM:
             this.kickdrum.triggerRelease();
             break;
         case 'pluck':
@@ -900,10 +922,11 @@ function Synth () {
             this.sine.triggerRelease();
             break;
         default:
-            if (name in this.drumset) {
-                this.drumset[name][1].triggerRelease();
+            var drumName = getDrumSynth(name);
+            if (drumName != null) {
+                this.drumset[drumName][1].triggerRelease();
             } else if (name === 'drum') {
-                this.drumset['kick'][1].triggerRelease();
+                this.drumset[DEFAULTDRUM][1].triggerRelease();
             } else {
                 this.poly.triggerRelease();
             }
