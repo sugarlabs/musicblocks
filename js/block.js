@@ -586,7 +586,7 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = NUMBERBLOCKDEFAULT;
                     break;
                 case 'modename':
-                    this.value = MAJOR;
+                    this.value = 'Major';
                     break;
                 case 'drumname':
                     this.value = _('kick drum');
@@ -1598,7 +1598,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.value != null) {
                 var selectedmode = this.value[0];
             } else {
-                var selectedmode = 'MAJOR';
+                var selectedmode = 'Major';
             }
 
             var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'

@@ -1581,6 +1581,26 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             };
 
             postProcessArg = [thisBlock, 'G'];
+        } else if (name === 'drumname') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                me.blockList[thisBlock].value = value;
+                me.blockList[thisBlock].text.text = value;
+                me.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'kick'];
+        } else if (name === 'modename') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                me.blockList[thisBlock].value = value;
+                me.blockList[thisBlock].text.text = value;
+                me.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'Major'];
         } else if (name === 'number') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2913,6 +2933,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'notename':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                };
+            case 'modename':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                };
+            case 'drumname':
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
