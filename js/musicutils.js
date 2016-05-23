@@ -839,7 +839,7 @@ function Synth () {
     };
 
     this.trigger = function(notes, beatValue, name) {
-        console.log(name);
+        // console.log(name);
         switch (name) {
         case 'pluck':
             this.pluck.triggerAttackRelease(notes[0], beatValue);
@@ -858,6 +858,7 @@ function Synth () {
             break;
         default:
             if (name in this.drumset) {
+                // console.log(this.drumset[name][1]);
                 this.drumset[name][1].triggerAttack('C2', beatValue, 1);
             } else if (name === 'drum') {
                 this.drumset['kick'][1].triggerAttack('C2', beatValue, 1);
