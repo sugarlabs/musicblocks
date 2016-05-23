@@ -3558,7 +3558,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                         if (!logo.lilypondSaveOnly && duration > 0) {
                             for (var i = 0; i < drums.length; i++) {
-                                logo.synth.trigger(['C2'], beatValue, drums[i]);
+                                if (logo.drumStyle[turtle].length > 0) {
+                                    logo.synth.trigger(['C2'], beatValue, last(logo.drumStyle[turtle]));
+                                } else {
+                                    logo.synth.trigger(['C2'], beatValue, drums[i]);
+                                }
                             }
                         }
                     }
