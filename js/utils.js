@@ -631,6 +631,16 @@ function hideDOMLabel() {
     if (noteattrLabel !== null) {
         noteattrLabel.style.display = 'none';
     }
+
+    var drumnameLabel = docById('drumnameLabel');
+    if (drumnameLabel !== null) {
+        drumnameLabel.style.display = 'none';
+    }
+
+    var modenameLabel = docById('modenameLabel');
+    if (modenameLabel !== null) {
+        modenameLabel.style.display = 'none';
+    }
 };
 
 
