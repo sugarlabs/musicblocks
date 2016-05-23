@@ -196,6 +196,15 @@ input.text {
   border: 0 !important;
   width: 100px; }
 
+input.drum {
+  background-color: #00a09a !important; /* */
+  text-align: center;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100px; }
+
 input.number {
   background-color: #ffb2bc !important; /* 0RP 8/10 */
   text-align: center;
