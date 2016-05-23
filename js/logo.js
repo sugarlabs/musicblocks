@@ -2142,6 +2142,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             if (logo.inMatrix) {
                 matrix.solfegeNotes.push(drumname);
                 matrix.solfegeOctaves.push(-1);
+
+                matrix.addRowBlock(blk);
+                if (logo.drumBlocks.indexOf(blk) === -1) {
+                    logo.drumBlocks.push(blk);
+                }
             } else if (logo.inNoteBlock[turtle] > 0) {
                 logo.noteDrums[turtle].push(drumname);
             } else {
@@ -2417,6 +2422,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo._processNote(noteBeatValue, blk, turtle);
                 logo.inNoteBlock[turtle] -= 1;
                 logo.pitchBlocks = [];
+                logo.drumBlocks = [];
             };
 
             logo._setListener(turtle, listenerName, __listener);
@@ -3252,6 +3258,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 matrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
                     matrix.addNode(this.pitchBlocks[i], blk, 0);
+                }
+                for (var i = 0; i < this.drumBlocks.length; i++) {
+                    matrix.addNode(this.drumBlocks[i], blk, 0);
                 }
             }
             noteBeatValue *= this.beatFactor[turtle];
