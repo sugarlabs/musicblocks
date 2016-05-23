@@ -106,6 +106,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.keySignature = {};
     this.tupletRhythms = [];
     this.addingNotesToTuplet = false;
+    this.drumBlocks = [];
     this.pitchBlocks = [];
     this.inNoteBlock = [];
     this.whichNoteBlock = [];
@@ -118,6 +119,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.dotCount = {};
     this.noteBeat = {};
     this.oscList = {};
+    this.noteDrums = {};
     this.notePitches = {};
     this.noteOctaves = {};
     this.noteCents = {};
@@ -584,6 +586,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.noteBeat[turtle] = [];
             this.noteCents[turtle] = [];
             this.lastNotePlayed[turtle] = null;
+            this.noteDrums[turtle] = [];
             this.notePitches[turtle] = [];
             this.noteOctaves[turtle] = [];
             this.currentNotes[turtle] = 'G';
@@ -629,6 +632,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
         this.inMatrix = false;
         this.pitchBlocks = [];
+        this.drumBlocks = [];
         this.tuplet = false;
 
         // Remove any listeners that might be still active
@@ -2108,6 +2112,46 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             logo.pushedNote[turtle] = true;
             break;
+        case 'playdrum':
+            if (args.length !== 1 || args[0] == null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            if (typeof(args[0]) !== 'string') {
+                logo.errorMsg(NANERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            var drumname = 'kick';
+            for (drum in DRUMNAMES) { 
+                if (DRUMNAMES[drum][0] === args[0]) {
+                    drumname = DRUMNAMES[drum][1];
+                } else if (DRUMNAMES[drum][1] === args[0]) {
+                    drumname = args[0];
+                }
+            }
+
+            if (logo.inMatrix) {
+                // TODO: Add drums to matrix.
+            } else if (logo.inNoteBlock[turtle] > 0) {
+                logo.noteDrums[turtle].push(drumname);
+            } else {
+                logo.errorMsg(_('Drum Block: Did you mean to use a Note block?'), blk);
+                console.log('play drum block found outside of note block');
+                break;
+            }
+
+            if (turtle in logo.beatFactor) {
+                logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+            } else {
+                logo.noteBeatValues[turtle].push(1);
+            }
+
+            logo.pushedNote[turtle] = true;
+            break;
         case 'pitch':
             if (args.length !== 2 || args[0] == null || args[1] == null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -3377,6 +3421,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 __playnote = function(logo) {
                     var notes = [];
+                    var drums = [];
                     var insideChord = -1;
                     if ((logo.notePitches[turtle].length + logo.oscList[turtle].length) > 1) {
                         if (turtle in logo.lilypondStaging) {
@@ -3407,6 +3452,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     logo._dispatchTurtleSignals(turtle, beatValue, blk);
 
+                    // Process pitches
                     if (logo.notePitches[turtle].length > 0) {
                         if (!logo.lilypondSaveOnly && duration > 0) {
                             if (logo.oscList[turtle].length > 0) {
@@ -3501,8 +3547,20 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                         }
                     }
 
-                    if (insideChord > 0) {
-                        insideChord = -1;
+                    // Process drums
+                    if (logo.noteDrums[turtle].length > 0) {
+                        for (var i = 0; i < logo.noteDrums[turtle].length; i++) {
+                            logo.synth.init(logo.noteDrums[turtle][i]);
+                            drums.push(logo.noteDrums[turtle][i]);
+                        }
+
+                        console.log("drums to play " + drums + ' ' + noteBeatValue);
+
+                        if (!logo.lilypondSaveOnly && duration > 0) {
+                            for (var i = 0; i < drums.length; i++) {
+                                logo.synth.trigger(['C2'], beatValue, drums[i]);
+                            }
+                        }
                     }
                 };
 

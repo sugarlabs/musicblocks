@@ -1621,7 +1621,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selecteddrum = _('kick drum');
             }
 
-            var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (selecteddrum === DRUMNAMES[i][0]) {
                     labelHTML += '<option value="' + selecteddrum + '" selected>' + '</option>';

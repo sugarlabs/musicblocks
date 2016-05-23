@@ -821,6 +821,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     setdrumBlock.flowClampOneArgBlock();
     setdrumBlock.dockTypes[1] = 'anyin';
     
+    var playdrumBlock = new ProtoBlock('playdrum');
+    playdrumBlock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['playdrum'] = playdrumBlock;
+    playdrumBlock.staticLabels.push(_('drum'));
+    playdrumBlock.adjustWidthToLabel();
+    playdrumBlock.oneArgBlock();
+    playdrumBlock.dockTypes[1] = 'anyin';
+
     // TURTLE PALETTE
 
     var headingBlock = new ProtoBlock('heading');
