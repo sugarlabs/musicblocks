@@ -2134,6 +2134,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
             }
 
+            // If we are in a setdrum clamp, override the drum name.
+            if (logo.drumStyle[turtle].length > 0) {
+                drumname = last(logo.drumStyle[turtle]);
+            }
+
             if (logo.inMatrix) {
                 matrix.solfegeNotes.push(drumname);
                 matrix.solfegeOctaves.push(-1);
@@ -2240,8 +2245,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
 
                     note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
-                    matrix.solfegeNotes.push(getSolfege(note));
-                    matrix.solfegeOctaves.push(octave);
+		    // If we are in a setdrum clamp, override the pitch.
+		    if (logo.drumStyle[turtle].length > 0) {
+                        matrix.solfegeNotes.push(last(logo.drumStyle[turtle]));
+                        matrix.solfegeOctaves.push(-1);
+		    } else {
+                        matrix.solfegeNotes.push(getSolfege(note));
+                        matrix.solfegeOctaves.push(octave);
+                    }
                 }
             } else if (logo.inNoteBlock[turtle] > 0) {
 
