@@ -2135,7 +2135,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
 
             if (logo.inMatrix) {
-                // TODO: Add drums to matrix.
+                matrix.solfegeNotes.push(drumname);
+                matrix.solfegeOctaves.push(-1);
             } else if (logo.inNoteBlock[turtle] > 0) {
                 logo.noteDrums[turtle].push(drumname);
             } else {
@@ -2382,6 +2383,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             logo.noteCents[turtle] = [];
             logo.noteTranspositions[turtle] = [];
             logo.noteBeatValues[turtle] = [];
+            logo.noteDrums[turtle] = [];
 
             // Ensure that note duration is positive.
             if (args[0] < 0) {
