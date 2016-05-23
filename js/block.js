@@ -1604,7 +1604,7 @@ function Block(protoblock, blocks, overrideName) {
             var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
             for (var i = 0; i < MODENAMES.length; i++) {
                 if (selectednote === MODENAMES[i][0]) {
-                    labelHTML += '<option value="' + selectedmode + '" selected>' + '</option>';
+                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
                 } else {
                     labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
                 }
@@ -1616,17 +1616,17 @@ function Block(protoblock, blocks, overrideName) {
         } else if (this.name === 'drumname') {
             var type = 'drumname';
             if (this.value != null) {
-                var selecteddrum = this.value[0];
+                var selecteddrum = getDrumName(this.value);
             } else {
-                var selecteddrum = _('kick drum');
+                var selecteddrum = getDrumName(DEFAULTDRUM);
             }
 
             var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (selecteddrum === DRUMNAMES[i][0]) {
-                    labelHTML += '<option value="' + selecteddrum + '" selected>' + '</option>';
+                    labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
                 } else if (selecteddrum === DRUMNAMES[i][1]) {
-                    labelHTML += '<option value="' + selecteddrum + '" selected>' + '</option>';
+                    labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
                 } else {
                     labelHTML += '<option value="' + DRUMNAMES[i][0] + '">' + DRUMNAMES[i][0] + '</option>';
                 }
