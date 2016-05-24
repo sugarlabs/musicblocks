@@ -213,7 +213,7 @@ function getDrumName(name) {
 };
 
 
-function getDrumSynth(name) {
+function getDrumSynthName(name) {
     for (var i = 0; i < DRUMNAMES.length; i++) {
         if (DRUMNAMES[i].indexOf(name) !== -1) {
             return DRUMNAMES[i][1];
@@ -714,32 +714,20 @@ function getNumNote(value, delta) {
 
 function Synth () {
     // Isolate synth functions here.
+
+    // Using Tone.js
     this.tone = new Tone();
-    this.poly = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
 
-    var synthOptions = {
-        pitchDecay: 0.05,
-        oscillator: {
-            type: 'sine'
-        },
-        envelope: {
-            attack: 0.001,
-            decay: 0.4,
-            sustain: 0.01,
-            release: 1.4,
-            attackCurve:'exponential'
-        }
-    };
+    this.synthset = {
+        // builtin synths
+	'poly': [null, null],
+	'sine': [null, null],
+	'triangle': [null, null],
+	'sawtooth': [null, null],
+	'square': [null, null],
+	'pluck': [null, null],
 
-    this.pluck = new Tone.PluckSynth().toMaster();
-
-    // The drum samples are from the TamTam
-    // collection (See https://wiki.sugarlabs.org/go/Activities/TamTam).
-
-    // this.drum = new Tone.DrumSynth().toMaster();
-
-    // TODO: load on demand
-    this.drumset = {
+        // drum samples
 	'bottle': [BOTTLESOUNDSAMPLE, null],
 	'clap': [CLAPSOUNDSAMPLE, null],
 	'darbuka': [DARBUKASOUNDSAMPLE, null],
@@ -769,167 +757,106 @@ function Synth () {
         console.log('drum loaded');
     };
 
-    for (var drum in this.drumset) {
-        this.drumset[drum][1] = new Tone.Sampler({'C2' : this.drumset[drum][0]}).toMaster();
-    }
-
-    var synthOptions = {
-        oscillator: {
-            type: 'triangle'
-        },
-        envelope: {
-            attack: 0.03,
-            decay: 0,
-            sustain: 1,
-            release: 0.03
-        },
-    };
-
-    this.triangle = new Tone.SimpleSynth(synthOptions);
-
-    var synthOptions = {
-        oscillator: {
-            type: 'square'
-        },
-        envelope: {
-            attack: 0.03,
-            decay: 0,
-            sustain: 1,
-            release: 0.03
-        },
-    };
-
-    this.square = new Tone.SimpleSynth(synthOptions);
-
-    var synthOptions = {
-        oscillator: {
-            type: 'sawtooth'
-        },
-        envelope: {
-            attack: 0.03,
-            decay: 0,
-            sustain: 1,
-            release: 0.03
-        },
-    };
-
-    this.sawtooth = new Tone.SimpleSynth(synthOptions);
-
-    var synthOptions = {
-        oscillator: {
-            type: 'sine'
-        },
-        envelope: {
-            attack: 0.03,
-            decay: 0,
-            sustain: 1,
-            release: 0.03
-        },
-    };
-
-    this.sine = new Tone.SimpleSynth(synthOptions);
-
-    this.init = function(name) {
-        switch (name) {
+    this.getSynthByName = function(name) {
+        switch (name) {    
         case 'pluck':
-            this.pluck.toMaster();
-            break;
         case 'triangle':
-            this.triangle.toMaster();
-            break;
         case 'square':
-            this.square.toMaster();
-            break;
         case 'sawtooth':
-            this.sawtooth.toMaster();
-            break;
         case 'sine':
-            this.sine.toMaster();
+            return this.synthset[name][1];
+            break;
+        case 'poly':
+        case 'default':
+            return this.synthset['poly'][1];
             break;
         default:
-            var drumName = getDrumSynth(name);
+            var drumName = getDrumSynthName(name);
             if (drumName != null) {
-                this.drumset[drumName][1].toMaster();
+                return this.synthset[drumName][1];
             } else if (name === 'drum') {
-                this.drumset[DEFAULTDRUM][1].toMaster();
-            } else {
-                this.poly.toMaster();
+                return this.synthset[DEFAULTDRUM][1];
             }
             break;
+	}
+
+        // Use polysynth if all else fails.
+        return this.synthset['poly'][1];
+    };
+
+    this.loadSynth = function(name) {
+        var thisSynth = this.getSynthByName(name);
+        if (this.synthset[name][1] == null) {
+            console.log(name);
+            switch (name) {
+            case 'pluck':
+		this.synthset['pluck'][1] = new Tone.PluckSynth();
+                break;
+            case 'triangle':
+            case 'square':
+            case 'sawtooth':
+            case 'sine':
+		var synthOptions = {
+		    oscillator: {
+			type: name
+		    },
+		    envelope: {
+			attack: 0.03,
+			decay: 0,
+			sustain: 1,
+			release: 0.03
+		    },
+		};
+		this.synthset[name][1] = new Tone.SimpleSynth(synthOptions);
+                break;
+            case 'poly':
+            case 'default':
+		this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
+                break;
+            default:
+		this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]}).toMaster();
+                break;
+	    }
         }
+    };
+
+    // TODO: Load on demand.
+    for (var synth in this.synthset) {
+        this.loadSynth(synth);
+    }
+
+    this.init = function(name) {
+        this.getSynthByName(name).toMaster();
     };
 
     this.trigger = function(notes, beatValue, name) {
         switch (name) {
         case 'pluck':
-            this.pluck.triggerAttackRelease(notes[0], beatValue);
-            break;
         case 'triangle':
-            this.triangle.triggerAttackRelease(notes[0], beatValue);
-            break;
         case 'square':
-            this.square.triggerAttackRelease(notes[0], beatValue);
-            break;
         case 'sawtooth':
-            this.sawtooth.triggerAttackRelease(notes[0], beatValue);
-            break;
         case 'sine':
-            this.sine.triggerAttackRelease(notes[0], beatValue);
+            this.synthset[name][1].triggerAttackRelease(notes[0], beatValue);
+            break;
+        case 'poly':
+        case 'default':
+            this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
             break;
         default:
-            var drumName = getDrumSynth(name);
+            var drumName = getDrumSynthName(name);
             if (drumName != null) {
-                this.drumset[drumName][1].triggerAttack('C2', beatValue, 1);
+                this.synthset[drumName][1].triggerAttack('C2', beatValue, 1);
             } else if (name === 'drum') {
-                this.drumset[DEFAULTDRUM][1].triggerAttack('C2', beatValue, 1);
+                this.synthset[DEFAULTDRUM][1].triggerAttack('C2', beatValue, 1);
             } else {
-                this.poly.triggerAttackRelease(notes, beatValue);
+                this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
             }
             break;
         }
     };
 
     this.stopSound = function(name) {
-        switch (name) {
-        case 'snare':
-            this.snaredrum.triggerRelease();
-            break;
-        case 'hihat':
-            this.hihat.triggerRelease();
-            break;
-        case 'tom':
-            this.tom.triggerRelease();
-            break;
-        case 'drum':
-        case DEFAULTDRUM:
-            this.kickdrum.triggerRelease();
-            break;
-        case 'pluck':
-            this.pluck.triggerRelease();
-            break;
-        case 'triangle':
-            this.triangle.triggerRelease();
-            break;
-        case 'square':
-            this.square.triggerRelease();
-            break;
-        case 'sawtooth':
-            this.sawtooth.triggerRelease();
-            break;
-        case 'sine':
-            this.sine.triggerRelease();
-            break;
-        default:
-            var drumName = getDrumSynth(name);
-            if (drumName != null) {
-                this.drumset[drumName][1].triggerRelease();
-            } else if (name === 'drum') {
-                this.drumset[DEFAULTDRUM][1].triggerRelease();
-            } else {
-                this.poly.triggerRelease();
-            }
-            break;
-        }
+        this.getSynthByName(name).triggerRelease();
     };
 
     this.start = function() {
