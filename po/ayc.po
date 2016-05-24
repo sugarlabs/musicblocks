@@ -1195,12 +1195,12 @@ msgstr "warurt'äwi chimpu payachäwi"
 
 #: js/basicblocks.js:409
 #.TRANS: ritmo multiplican
-msgid "multiply beat"
+msgid "multiply beat value"
 msgstr "putuqi jakhu p'asi"
 
 #: js/basicblocks.js:417
 #.TRANS: dividir tiempo
-msgid "divide beat"
+msgid "divide beat value"
 msgstr "putuqi chimpu"
 
 #: js/basicblocks.js:425
