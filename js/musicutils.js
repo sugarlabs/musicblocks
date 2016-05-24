@@ -786,7 +786,7 @@ function Synth () {
 
     this.loadSynth = function(name) {
         var thisSynth = this.getSynthByName(name);
-        if (this.synthset[name][1] == null) {
+        if (thisSynth == null) {
             console.log('loading synth for ' + name);
             switch (name) {
             case 'pluck':

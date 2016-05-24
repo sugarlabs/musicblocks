@@ -1623,7 +1623,10 @@ function Block(protoblock, blocks, overrideName) {
 
             var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
             for (var i = 0; i < DRUMNAMES.length; i++) {
-                if (selecteddrum === DRUMNAMES[i][0]) {
+                if (DRUMNAMES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + DRUMNAMES[i][1] + '">' + DRUMNAMES[i][1] + '</option>';
+                } else if (selecteddrum === DRUMNAMES[i][0]) {
                     labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
                 } else if (selecteddrum === DRUMNAMES[i][1]) {
                     labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
