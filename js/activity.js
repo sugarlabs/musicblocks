@@ -77,6 +77,7 @@ define(function (require) {
     require('activity/utilitybox');
     require('activity/samplesviewer');
     require('activity/blockfactory');
+    require('activity/soundsamples');
 
     // Music Block-specific modules
     require('activity/turtledefs');
