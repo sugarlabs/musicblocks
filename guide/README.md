@@ -198,7 +198,7 @@ create "rests".
 Using drums
 -----------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drums1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg'</img>
 
 Anywhere you can use a *Pitch* block--e.g., inside of the matrix or a
 *Note* block--you can also specify a drum sample. Currently there
@@ -346,7 +346,7 @@ between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
 and a number of more exotic modes, such as Bebop, Geez, Maqam, et al.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drums2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
 
 The *Set Drum* block is used to convert the enclosed notes into drum
 sounds. Drum sounds are played in a monopitch using the specified drum
@@ -378,7 +378,7 @@ And even more interesting if we bring the various voices offset in time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drums3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg'</img>
 
 A special "drum" version of the *Start* block is available for laying
 down a drum track. Any pitch blocks encounted while starting from a
