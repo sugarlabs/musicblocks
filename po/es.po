@@ -1159,11 +1159,11 @@ msgid "duplicate notes"
 msgstr "notas duplicadas"
 
 #: js/basicblocks.js:409
-msgid "multiply beat"
+msgid "multiply beat value"
 msgstr "ritmo multiplican"
 
 #: js/basicblocks.js:417
-msgid "divide beat"
+msgid "divide beat value"
 msgstr "dividir tiempo"
 
 #: js/basicblocks.js:425

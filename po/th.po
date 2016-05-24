@@ -995,11 +995,11 @@ msgid "duplicate notes"
 msgstr "คัดลอกโน้ต"
 
 #: js/basicblocks.js:409
-msgid "multiply beat"
+msgid "multiply beat value"
 msgstr "หลายจังหวะ"
 
 #: js/basicblocks.js:417
-msgid "divide beat"
+msgid "divide beat value"
 msgstr "แยกบีท"
 
 #: js/basicblocks.js:425

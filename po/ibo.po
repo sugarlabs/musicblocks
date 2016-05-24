@@ -993,11 +993,11 @@ msgid "duplicate notes"
 msgstr "oyiri ndetu"
 
 #: js/basicblocks.js:409
-msgid "multiply beat"
+msgid "multiply beat value"
 msgstr "ọtụtụ ụda"
 
 #: js/basicblocks.js:417
-msgid "divide beat"
+msgid "divide beat value"
 msgstr ""
 
 #: js/basicblocks.js:425
