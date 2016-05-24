@@ -353,6 +353,12 @@ sounds. Drum sounds are played in a monopitch using the specified drum
 sample. In the example above, two quaternotes of a kick drum will be
 played.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg'</img>
+
+In the above example, the sequence of drum beats is increased over time.
+
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
+
 3. Voices
 ---------
 
