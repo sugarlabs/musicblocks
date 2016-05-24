@@ -195,6 +195,16 @@ will expand into *Rhythm* blocks with corresponding values.
 A *Silence* block can be used in combination with the *Note* block to
 create "rests".
 
+Using drums
+-----------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drums1.svg'</img>
+
+Anywhere you can use a *Pitch* block--e.g., inside of the matrix or a
+*Note* block--you can also specify a drum sample. Currently there
+about one dozen different samples from which to choose. The default
+drum is a kick drum.
+
 PROGRAMMING WITH MUSIC
 ----------------------
 
@@ -336,6 +346,13 @@ between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
 and a number of more exotic modes, such as Bebop, Geez, Maqam, et al.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drums2.svg'</img>
+
+The *Set Drum* block is used to convert the enclosed notes into drum
+sounds. Drum sounds are played in a monopitch using the specified drum
+sample. In the example above, two quaternotes of a kick drum will be
+played.
+
 3. Voices
 ---------
 
@@ -360,6 +377,14 @@ It gets more interesting if we shift up and down octaves.
 And even more interesting if we bring the various voices offset in time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drums3.svg'</img>
+
+A special "drum" version of the *Start* block is available for laying
+down a drum track. Any pitch blocks encounted while starting from a
+drum will be played as `C2` with the default drum sample. In the
+example above, all of the notes in `chunk` will be played with a kick
+drum.
 
 4. Adding graphics
 ------------------

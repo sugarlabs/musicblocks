@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="svg5587"
+   viewBox="0 0 235.99999 45.999999"
+   height="12.982222mm"
+   width="66.604439mm">
+  <defs
+     id="defs5589" />
+  <metadata
+     id="metadata5592">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-13.999984,0)"
+     id="g5801">
+    <path
+       style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path21-6-1-0-1-8-3-2"
+       d="m 128.99997,1 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+    <text
+       y="2.9530745"
+       x="120.5228"
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+       id="text23-9-82-5-8-1-1-2">
+      <tspan
+         id="tspan25-8-5-1-3-7-2-3"
+         y="28.953075"
+         x="140.5228">kick drum</tspan>
+    </text>
+  </g>
+  <g
+     transform="translate(197.33133,-236.90688)"
+     id="g5796">
+    <path
+       d="m -196.33134,253.90688 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-8 z"
+       id="path3051"
+       style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+    <text
+       id="text3053"
+       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+       x="-197.33134"
+       y="236.90688">
+      <tspan
+         x="-103.33134"
+         y="264.90689"
+         id="tspan3055">drum</tspan>
+    </text>
+  </g>
+  <text
+     y="-141.09311"
+     x="-197.33133"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3057">
+    <tspan
+       id="tspan3059"
+       y="-118.59309"
+       x="-103.33131" />
+  </text>
+</svg>
