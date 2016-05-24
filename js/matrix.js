@@ -941,7 +941,7 @@ function Matrix() {
     this.setNoteCell = function(j, colIndex, cell, playNote) {
         var table = docById('myTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
-        var drumName = getDrumSynth(solfegeHTML);
+        var drumName = getDrumSynthName(solfegeHTML);
         if (drumName != null) {
             // If it is a drum, just save the name.
             var note = drumName;
