@@ -1805,6 +1805,11 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
+
+        // Load the synth for the selected drum.
+        if (this.name === 'drumname') {
+            this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
+        }
     };
 
 };

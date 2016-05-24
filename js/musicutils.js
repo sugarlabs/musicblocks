@@ -787,7 +787,7 @@ function Synth () {
     this.loadSynth = function(name) {
         var thisSynth = this.getSynthByName(name);
         if (this.synthset[name][1] == null) {
-            console.log(name);
+            console.log('loading synth for ' + name);
             switch (name) {
             case 'pluck':
 		this.synthset['pluck'][1] = new Tone.PluckSynth();
@@ -821,9 +821,9 @@ function Synth () {
     };
 
     // TODO: Load on demand.
-    for (var synth in this.synthset) {
-        this.loadSynth(synth);
-    }
+    // for (var synth in this.synthset) {
+    //     this.loadSynth(synth);
+    // }
 
     this.init = function(name) {
         this.getSynthByName(name).toMaster();

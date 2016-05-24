@@ -1490,11 +1490,18 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             console.log('makeNewBlock: no prototype for ' + name);
             return null;
         }
+
         if (this.protoBlockDict[name] == null) {
             // Should never happen
             console.log('makeNewBlock: no prototype for ' + name);
             return null;
         }
+
+        // If we drag in a synth block, we need to load the synth.
+        if (['sine', 'sawtooth', 'triangle', 'square'].indexOf(name) !== -1) {
+	    this.logo.synth.loadSynth(name);
+        }
+
         if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(name) !== -1) {
             this.blockList.push(new Block(this.protoBlockDict[name], this, postProcessArg[1]));
         } else if (name === 'namedarg') {
@@ -1502,6 +1509,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         } else {
             this.blockList.push(new Block(this.protoBlockDict[name], this));
         }
+
         if (last(this.blockList) == null) {
             // Should never happen
             console.log('failed to make protoblock for ' + name);
@@ -2955,6 +2963,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+
+                // Load the synth for this drum
+                this.logo.synth.loadSynth(getDrumSynthName(value));
                 break;
             case 'media':
                 // Load a thumbnail into a media blocks.
