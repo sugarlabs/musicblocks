@@ -144,6 +144,9 @@
 	    <p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg'</img></p>
 		    <p>A <em>Silence</em> block can be used in combination with the <em>Note</em> block to
 		      create "rests".</p>
+	    <h2 id="using-drums">Using drums</h2>
+	    <p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg'</img></p>
+            <p>Anywhere you can use a <em>Pitch</em> block&mdash;e.g., inside of the matrix or a <em>Note</em> block&mdash;you can also specify a drum sample. Currently there about one dozen different samples from which to choose. The default drum is a kick drum.</p>
 		    <h2 id="programming-with-music">PROGRAMMING WITH MUSIC</h2>
 	    <p>The remainder of this guide discusses how to use the chunks created by
 	      the <em>Pitch-time Matrix</em> when programming (You can also program with
@@ -235,6 +238,8 @@
 		      between solfege, e.g., <code>Do</code>, <code>Re</code>, <code>Mi</code>, to note names, e.g., <code>C</code>,
 		      <code>D</code>, <code>E</code>, when in C Major. Modes include Major and Minor, Chromatic,
 		      and a number of more exotic modes, such as Bebop, Geez, Maqam, et al.</p>
+	    <p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img></p>
+		    <p>The <em>Set Drum</em> block is used to convert the enclosed notes into drum sounds. Drum sounds are played in a monopitch using the specified drum sample. In the example above, two quaternotes of a kick drum will be played.</p>
 		    <h2 id="voices">3. Voices</h2>
 	    <p>Each <em>Start</em> block runs as a separate voice in Music Blocks. (When
 	      you click on the Run button, all of the <em>Start</em> blocks are run
@@ -248,6 +253,8 @@
 	    <p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg'</img></p>
 		    <p>And even more interesting if we bring the various voices offset in time.</p>
 	    <p><a href="http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&amp;run=true">RUN LIVE</a></p>
+	    <p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg'</img></p>
+		    <p>A special "drum" version of the <em>Start</em> block is available for laying down a drum track. Any pitch blocks encounted while starting from a drum will be played as <code>C2</code> with the default drum sample. In the example above, all of the notes in `chunk` will be played with a kick drum.</p>
 	    <h2 id="adding-graphics">4. Adding graphics</h2>
 	    <p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'</img></p>
 		    <p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img></p>
