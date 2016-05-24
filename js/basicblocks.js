@@ -406,7 +406,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var beatFactorBlock = new ProtoBlock('multiplybeatfactor');
     beatFactorBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['multiplybeatfactor'] = beatFactorBlock;
-    beatFactorBlock.staticLabels.push(_('multiply beat'));
+    beatFactorBlock.staticLabels.push(_('multiply beat value'));
     beatFactorBlock.adjustWidthToLabel();
     beatFactorBlock.flowClampOneArgBlock();
     beatFactorBlock.defaults.push(2);
@@ -414,7 +414,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var beatFactorBlock2 = new ProtoBlock('dividebeatfactor');
     beatFactorBlock2.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['dividebeatfactor'] = beatFactorBlock2;
-    beatFactorBlock2.staticLabels.push(_('divide beat'));
+    beatFactorBlock2.staticLabels.push(_('divide beat value'));
     beatFactorBlock2.adjustWidthToLabel();
     beatFactorBlock2.flowClampOneArgBlock();
     beatFactorBlock2.defaults.push(2);
@@ -457,7 +457,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note'] = noteBlock;
-    noteBlock.staticLabels.push(_('note'));
+    noteBlock.staticLabels.push(_('note value'));
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(8);
