@@ -39,23 +39,23 @@
        id="tspan3198">pitch</tspan>
   </text>
   <text
-     y="85.999947"
+     y="87.999947"
      x="328"
      id="text3200"
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
        x="422"
-       y="108.49995"
+       y="110.49995"
        id="tspan3202">note</tspan>
   </text>
   <text
-     y="85.999947"
+     y="89.999947"
      x="328"
      id="text3204"
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
        x="422"
-       y="150.49995"
+       y="154.49995"
        id="tspan3206">octave</tspan>
   </text>
   <path
@@ -87,30 +87,30 @@
        id="tspan25-8">5</tspan>
   </text>
   <path
-     d="m 311,60.99997 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.47715 -10,9.99999 l 0,8 0,132.00002 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.4183 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.5817 -8,-8 l 0,-8 z"
+     d="m 311,60.99997 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.713639 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.47715 -10,9.99999 l 0,8 0,132.00002 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.4183 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.5817 -8,-8 l 0,-8 z"
      id="path3035"
      style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      id="text3037"
      style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-     y="44.000015"
-     x="310">
+     y="42.000015"
+     x="308">
     <tspan
-       x="318"
-       y="74.499954"
-       id="tspan3039">note</tspan>
+       x="316"
+       y="72.499954"
+       id="tspan3039">note value</tspan>
   </text>
   <path
-     d="m 423,44.99997 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     d="m 443,44.99997 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
      id="path21-6-1"
      style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      id="text23-9-82"
      style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-     x="458"
+     x="478"
      y="44.000015">
     <tspan
-       x="478"
+       x="498"
        y="70.000015"
        id="tspan25-8-5">8</tspan>
   </text>
@@ -171,57 +171,59 @@
        id="tspan3198-0-8">pitch</tspan>
   </text>
   <text
-     y="169.99997"
+     y="171.99997"
      x="328"
      id="text3200-6-6"
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
        x="422"
-       y="192.49997"
+       y="194.49997"
        id="tspan3202-5-8">note</tspan>
   </text>
   <text
-     y="169.99997"
+     y="173.99997"
      x="328"
      id="text3204-9-2"
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
        x="422"
-       y="234.49997"
+       y="238.49997"
        id="tspan3206-0-2">octave</tspan>
   </text>
-  <g
-     id="g3423-8"
-     transform="translate(36,85.99994)">
-    <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-       id="path3194-9"
-       d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z" />
-    <text
-       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
-       id="text3196-9">
-      <tspan
-         id="tspan3198-7"
-         y="49"
-         x="94">pitch</tspan>
-    </text>
-    <text
-       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
-       id="text3200-4">
-      <tspan
-         id="tspan3202-4"
-         y="22.5"
-         x="94">note</tspan>
-    </text>
-    <text
-       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
-       id="text3204-9">
-      <tspan
-         id="tspan3206-0"
-         y="64.5"
-         x="94">octave</tspan>
-    </text>
-  </g>
+  <path
+     d="m 37,102.99994 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194-9"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="85.999939"
+     x="36"
+     id="text3196-9"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="134.99994"
+       id="tspan3198-7">pitch</tspan>
+  </text>
+  <text
+     y="87.999939"
+     x="36"
+     id="text3200-4"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="110.49994"
+       id="tspan3202-4">note</tspan>
+  </text>
+  <text
+     y="89.999939"
+     x="36"
+     id="text3204-9"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="154.49994"
+       id="tspan3206-0">octave</tspan>
+  </text>
   <path
      style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-7"
@@ -255,30 +257,30 @@
     </text>
   </g>
   <path
-     d="m 19,60.99996 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.47715 -10,9.99999 l 0,8 0,50.00002 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.4183 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.5817 -8,-8 l 0,-8 z"
+     d="m 19,60.99996 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.713639 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.47715 -10,9.99999 l 0,8 0,50.00002 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.4183 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.5817 -8,-8 l 0,-8 z"
      id="path3035-3"
      style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      id="text3037-2"
      style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-     y="44.000004"
-     x="18">
+     y="42.000004"
+     x="16">
     <tspan
-       x="26"
-       y="74.499939"
-       id="tspan3039-3">note</tspan>
+       x="24"
+       y="72.499939"
+       id="tspan3039-3">note value</tspan>
   </text>
   <path
-     d="m 131,44.99996 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     d="m 151,44.99996 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
      id="path21-6-1-4"
      style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      id="text23-9-82-0"
      style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-     x="166"
+     x="186"
      y="44.000004">
     <tspan
-       x="186"
+       x="206"
        y="70"
        id="tspan25-8-5-0">8</tspan>
   </text>
