@@ -440,6 +440,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     rest2Block.adjustWidthToLabel();
     rest2Block.zeroArgBlock();
 
+    var note4Block = new ProtoBlock('note4');
+    note4Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['note4'] = note4Block;
+    note4Block.staticLabels.push(_('drum'));
+    note4Block.adjustWidthToLabel();
+    note4Block.zeroArgBlock();
+
     var note3Block = new ProtoBlock('note3');
     note3Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note3'] = note3Block;
