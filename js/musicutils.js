@@ -814,18 +814,10 @@ function Synth () {
 		this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
             default:
-		this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]}).toMaster();
+		this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]});
                 break;
 	    }
         }
-    };
-
-    // TODO: Load on demand.
-    // for (var synth in this.synthset) {
-    //     this.loadSynth(synth);
-    // }
-
-    this.init = function(name) {
         this.getSynthByName(name).toMaster();
     };
 
