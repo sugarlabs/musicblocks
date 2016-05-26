@@ -741,7 +741,6 @@ function Matrix() {
 
     this.playAll = function() {
         // Play all of the notes in the matrix.
-        this.logo.synth.init('poly');
         this.logo.synth.stop();
 
         var notes = [];
@@ -812,8 +811,6 @@ function Matrix() {
     };
 
     this.playNote = function(time, noteCounter) {
-        this.logo.synth.init('poly');
-
         noteValue = this.notesToPlayDirected[noteCounter][1];
         time = 1 / noteValue;
         var that = this;
@@ -932,7 +929,6 @@ function Matrix() {
     };
 
     this.setNoteCell = function(j, colIndex, cell, playNote) {
-        this.logo.synth.init('poly');
         var table = docById('myTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
         var drumName = getDrumSynthName(solfegeHTML);

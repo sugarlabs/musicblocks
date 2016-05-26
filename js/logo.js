@@ -3479,18 +3479,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                     // Process pitches
                     if (logo.notePitches[turtle].length > 0) {
-                        if (!logo.lilypondSaveOnly && duration > 0) {
-                            if (logo.oscList[turtle].length > 0) {
-                                logo.synth.init(last(logo.oscList[turtle]));
-                            } else if (logo.drumStyle[turtle].length > 0) {
-                                logo.synth.init(last(logo.drumStyle[turtle]));
-                            } else if (logo.turtles.turtleList[turtle].drum) {
-                                logo.synth.init('drum');
-                            } else {
-                                logo.synth.init('default');
-                            }
-                        }
-
                         for (var i = 0; i < logo.notePitches[turtle].length; i++) {
                             if (logo.notePitches[turtle][i] === 'rest') {
                                 note = 'R';
@@ -3575,7 +3563,6 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     // Process drums
                     if (logo.noteDrums[turtle].length > 0) {
                         for (var i = 0; i < logo.noteDrums[turtle].length; i++) {
-                            logo.synth.init(logo.noteDrums[turtle][i]);
                             drums.push(logo.noteDrums[turtle][i]);
                         }
 
