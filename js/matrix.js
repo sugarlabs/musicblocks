@@ -146,6 +146,7 @@ function Matrix() {
         // and them make another one in DOM (document object model)
         this.rests = 0;
         this.logo = logo;
+
         docById('matrix').style.display = 'inline';
         docById('matrix').style.visibility = 'visible';
         docById('matrix').style.border = 2;
@@ -396,7 +397,6 @@ function Matrix() {
                 var exportCell = exportRow.insertCell(j);
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.innerHTML = col.innerHTML;
-                console.log(col.innerHTML);
                 exportCell.width = col.width;
                 if(exportCell.width == ""){
                     exportCell.width = col.style.width;
@@ -413,7 +413,6 @@ function Matrix() {
         var uriData = saveDocument.documentElement.outerHTML;
         exportDocument.body.innerHTML+='<br><a id="downloadb1" style="background:#C374E9;' + 'border-radius:5%;' + 'padding:0.3em;' + 'text-decoration:none;' + 'margin:0.5em;' + 'color:white;" ' + 'download>Download Matrix</a>';
         exportDocument.getElementById("downloadb1").download = "MusicMatrix";
-        console.log(saveDocument.documentElement.outerHTML);
         exportDocument.getElementById("downloadb1").href = this.generateDataURI(uriData);
         exportDocument.close();
     };
@@ -426,7 +425,6 @@ function Matrix() {
             var octave = note[2];
             var newNote = SOLFEGECONVERSIONTABLE[note.substr(0,2)];
         }
-        console.log(index + ': ' + newNote + '/' + octave);
         this.solfegeNotes[index] = newNote;
         this.solfegeOctaves[index] = octave;
     };
@@ -435,7 +433,6 @@ function Matrix() {
         // The first two parameters are the interval for the tuplet,
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
-        console.log('addTuplet ' + JSON.stringify(param));
 
         var table = docById('myTable');
         var tupletTimeFactor = param[0][0] / param[0][1];
@@ -616,7 +613,6 @@ function Matrix() {
     };
 
     this.addNotes = function(numBeats, noteValue) {
-        console.log('addNotes ' + numBeats + ' ' + noteValue);
         var table = docById('myTable');
 
         var noteValueToDisplay = this.calcNoteValueToDisplay(noteValue, 1);
@@ -702,9 +698,7 @@ function Matrix() {
                 cell.onclick = function() {
                     if (this.style.backgroundColor === 'black') {
                         this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        console.log(this.id + ': ' + that.notesToPlay[this.id - 1][0]);
                         that.notesToPlay[this.id - 1][0] = ['R'];
-                        console.log(this.id + ': ' + that.notesToPlay[this.id - 1][0]);
                         that.setNotes(this.id, this.parentNode.rowIndex, false);
                     } else {
                         this.style.backgroundColor = 'black';
@@ -747,6 +741,7 @@ function Matrix() {
 
     this.playAll = function() {
         // Play all of the notes in the matrix.
+        this.logo.synth.init('poly');
         this.logo.synth.stop();
 
         var notes = [];
@@ -804,7 +799,7 @@ function Matrix() {
 
         if (note[0] !== 'R' && pitchNotes.length > 0) {
             console.log(pitchNotes);
-            this.logo.synth.trigger(pitchNotes, this.logo.defaultBPMFactor / noteValue, 'default');
+            this.logo.synth.trigger(pitchNotes, this.logo.defaultBPMFactor / noteValue, 'poly');
         }
 
         for (i = 0; i < drumNotes.length; i++) {
@@ -817,6 +812,8 @@ function Matrix() {
     };
 
     this.playNote = function(time, noteCounter) {
+        this.logo.synth.init('poly');
+
         noteValue = this.notesToPlayDirected[noteCounter][1];
         time = 1 / noteValue;
         var that = this;
@@ -840,7 +837,6 @@ function Matrix() {
                     }
                 }
             } else {
-                console.log(that.colIndex);
                 var cell = table.rows[that.rowIndex].cells[that.colIndex];
 
                 if (cell != undefined) {
@@ -857,7 +853,6 @@ function Matrix() {
                 }
 
                 note = that.notesToPlayDirected[that.notesCounter][0];
-                console.log(note);
                 noteValue = that.notesToPlayDirected[that.notesCounter][1];
                 that.notesCounter += 1;
 
@@ -874,13 +869,11 @@ function Matrix() {
                     }
                 }
 
-                console.log(pitchNotes + ' ' + drumNotes);
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    that.logo.synth.trigger(pitchNotes, that.logo.defaultBPMFactor / noteValue, 'default');
+                    that.logo.synth.trigger(pitchNotes, that.logo.defaultBPMFactor / noteValue, 'poly');
                 }
 
                 for (j = 0; j < drumNotes.length; j++) {
-                    console.log(drumNotes[j]);
                     that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drumNotes[j]);
                 }
 
@@ -939,6 +932,7 @@ function Matrix() {
     };
 
     this.setNoteCell = function(j, colIndex, cell, playNote) {
+        this.logo.synth.init('poly');
         var table = docById('myTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
         var drumName = getDrumSynthName(solfegeHTML);
@@ -957,14 +951,13 @@ function Matrix() {
         noteValue = Number(noteParts[0])/Number(noteParts[2]);
         noteValue = noteValue.toString();
 
-        console.log('pushing ' + note + ' to notesToPlay');
         this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
         if (playNote) {
             if (drumName != null) {
                 this.logo.synth.trigger('C2', noteValue, drumName);
             } else {
-                this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default');
+                this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
             }
         }
     };
