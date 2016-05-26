@@ -182,10 +182,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.numerator = 3;
     this.denominator = 4;
 
-    // Load the default synthesizers
+    // Load the default synthesizer
     this.synth = new Synth();
     this.synth.loadSynth('poly');
-    this.synth.loadSynth(DEFAULTDRUM);
+    // this.synth.loadSynth(DEFAULTDRUM);
 
     // When running in step-by-step mode, the next command to run is
     // queued here.
