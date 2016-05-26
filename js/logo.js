@@ -173,6 +173,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
     this.tuplet = false;
     this.tupletParams = [];
 
+    // pitch to drum mapping
+    this.pitchDrumTable = {};
+
     // parameters used by notations
     this.checkingLilypond = false;
     this.lilypondSaveOnly = false;
@@ -627,6 +630,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this.tieCarryOver[turtle] = 0;
             this.drift[turtle] = 0;
             this.drumStyle[turtle] = [];
+            this.pitchDrumTable[turtle] = {};
         }
 
         if (!this.lilypondSaveOnly) {
@@ -2051,6 +2055,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
 
             function addPitch(note, octave, cents) {
+		if (logo.drumStyle[turtle].length > 0) {
+		    var drumname = last(logo.drumStyle[turtle]);
+                    var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                    logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
+                }
                 logo.notePitches[turtle].push(note);
                 logo.noteOctaves[turtle].push(octave);
                 logo.noteCents[turtle].push(cents);
@@ -2265,6 +2274,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             } else if (logo.inNoteBlock[turtle] > 0) {
 
                 function addPitch(note, octave, cents) {
+		    if (logo.drumStyle[turtle].length > 0) {
+			var drumname = last(logo.drumStyle[turtle]);
+                        var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                        logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
+                    }
                     logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
                     logo.noteCents[turtle].push(cents);
@@ -2330,6 +2344,10 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 }
 
                 logo.pushedNote[turtle] = true;
+            } else if (logo.drumStyle[turtle].length > 0) {
+		var drumname = last(logo.drumStyle[turtle]);
+                var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
             } else {
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
                 console.log('pitch block found outside of note block');
@@ -3552,7 +3570,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 } else if (logo.turtles.turtleList[turtle].drum) {
                                     logo.synth.trigger(notes, beatValue, 'drum');
                                 } else {
-                                    logo.synth.trigger(notes, beatValue, 'default');
+                                    console.log(logo.pitchDrumTable[turtle]);
+                                    // FIXME: Only if we are in a Drum clamp
+                                    // FIXME: chords?
+                                    if (notes[0] in logo.pitchDrumTable[turtle]) {
+                                        logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[0]]);
+				    } else {
+                                        logo.synth.trigger(notes, beatValue, 'default');
+                                    }
                                 }
                                 logo.synth.start();
                             }
