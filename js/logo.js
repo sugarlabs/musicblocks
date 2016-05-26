@@ -2055,8 +2055,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             }
 
             function addPitch(note, octave, cents) {
-		if (logo.drumStyle[turtle].length > 0) {
-		    var drumname = last(logo.drumStyle[turtle]);
+                if (logo.drumStyle[turtle].length > 0) {
+                    var drumname = last(logo.drumStyle[turtle]);
                     var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                     logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
                 }
@@ -2262,11 +2262,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                     }
 
                     note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
-		    // If we are in a setdrum clamp, override the pitch.
-		    if (logo.drumStyle[turtle].length > 0) {
+                    // If we are in a setdrum clamp, override the pitch.
+                    if (logo.drumStyle[turtle].length > 0) {
                         matrix.solfegeNotes.push(last(logo.drumStyle[turtle]));
                         matrix.solfegeOctaves.push(-1);
-		    } else {
+                    } else {
                         matrix.solfegeNotes.push(getSolfege(note));
                         matrix.solfegeOctaves.push(octave);
                     }
@@ -2274,8 +2274,8 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             } else if (logo.inNoteBlock[turtle] > 0) {
 
                 function addPitch(note, octave, cents) {
-		    if (logo.drumStyle[turtle].length > 0) {
-			var drumname = last(logo.drumStyle[turtle]);
+                    if (logo.drumStyle[turtle].length > 0) {
+                        var drumname = last(logo.drumStyle[turtle]);
                         var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                         logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
                     }
@@ -2345,7 +2345,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
                 logo.pushedNote[turtle] = true;
             } else if (logo.drumStyle[turtle].length > 0) {
-		var drumname = last(logo.drumStyle[turtle]);
+                var drumname = last(logo.drumStyle[turtle]);
                 var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                 logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
             } else {
@@ -3570,13 +3570,14 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                                 } else if (logo.turtles.turtleList[turtle].drum) {
                                     logo.synth.trigger(notes, beatValue, 'drum');
                                 } else {
-                                    console.log(logo.pitchDrumTable[turtle]);
-                                    // FIXME: Only if we are in a Drum clamp
-                                    // FIXME: chords?
-                                    if (notes[0] in logo.pitchDrumTable[turtle]) {
-                                        logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[0]]);
-				    } else {
-                                        logo.synth.trigger(notes, beatValue, 'default');
+                                    // FIXME: Only if we are in a Drum clamp???
+                                    // Look for any notes in the chord that might be in the pitchDrumTable.
+                                    for (j = 0; j < notes.length; j++) {
+                                        if (notes[j] in logo.pitchDrumTable[turtle]) {
+                                            logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[j]]);
+                                        } else {
+                                            logo.synth.trigger(notes[j], beatValue, 'default');
+                                        }
                                     }
                                 }
                                 logo.synth.start();
