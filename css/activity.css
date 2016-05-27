@@ -226,6 +226,17 @@ table {
 #canvas {
   overflow-y: visible; }
 
+#pitchdrummatrix {
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  border-style: solid;
+  border: 0 !important;
+  background: rgba(255, 225, 255, 0.85);
+  -webkit-user-select: none;
+  overflow-x: scroll !important;
+}
+
 #matrix {
   position: absolute;
   top: 20%;
@@ -234,7 +245,6 @@ table {
   border: 0 !important;
   background: rgba(255, 225, 255, 0.85);
   -webkit-user-select: none;
-}
   overflow-x: scroll !important;
 }
 

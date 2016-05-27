@@ -62,7 +62,6 @@ var NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighth
 
 
 function Matrix() {
-    this.arr = [];
     this.secondsPerBeat = 1;
     this.notesToPlay = [];
     this.notesToPlayDirected = [];
@@ -95,7 +94,6 @@ function Matrix() {
     // We populate the blockMap whenever a note is selected and
     // restore any notes that might be present.
 
-    // FIXME: Doesn't properly account for Tuplets
     this.blockMap = [];
 
     this.clearBlocks = function() {
@@ -169,13 +167,13 @@ function Matrix() {
         }
 
         NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-            for (var i = 0, len = this.length; i < len; i++)
-            {
+            for (var i = 0, len = this.length; i < len; i++) {
                 if (this[i] && this[i].parentElement) {
                     this[i].parentElement.removeChild(this[i]);
                 }
             }
-        }
+        };
+
         var table = docById('myTable');
 
         if (table !== null) {

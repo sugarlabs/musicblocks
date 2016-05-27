@@ -247,6 +247,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'drum':
         case 'action':
         case 'matrix':
+        case 'pitchdrummatrix':
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
