@@ -85,7 +85,7 @@ define(function (require) {
     require('activity/analytics');
     require('activity/soundsamples');
     require('activity/musicutils');
-    require('activity/matrix');
+    require('activity/pitchtimematrix');
     require('activity/pitchdrummatrix');
 
     // Manipulate the DOM only when it is ready.
