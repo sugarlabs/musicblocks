@@ -28,7 +28,7 @@ save() : Saves the Drum Matrix in an array of blocks: Set
 Drum and Pitch blocks.
 */
 
-const DRUMNAMEWIDTH = 24;
+const DRUMNAMEWIDTH = 50;
 
 
 function PitchDrumMatrix() {
