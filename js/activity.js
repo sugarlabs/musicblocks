@@ -1372,12 +1372,20 @@ define(function (require) {
         };
 
         function _doOpenSamples() {
-            if(document.getElementById('matrix').style.visibility !== 'hidden') {
+            if (document.getElementById('matrix').style.visibility !== 'hidden') {
                 console.log('hide matrix');
                 document.getElementById('matrix').style.visibility = 'hidden';
                 document.getElementById('matrix').style.border = 0;
             }
-            localStorage.setItem("isMatrixHidden",document.getElementById('matrix').style.visibility);
+
+            if (document.getElementById('pitchdrummatrix').style.visibility !== 'hidden') {
+                console.log('hide pitch-drum matrix');
+                document.getElementById('pitchdrummatrix').style.visibility = 'hidden';
+                document.getElementById('pitchdrummatrix').style.border = 0;
+            }
+
+            localStorage.setItem('isMatrixHidden', document.getElementById('matrix').style.visibility);
+            localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
             console.log('save locally');
             saveLocally();
             thumbnails.show()
@@ -1815,6 +1823,10 @@ define(function (require) {
                         'collapsed': myBlock.collapsed
                     }
                 } else if(myBlock.name === 'matrix') {
+                    var args = {
+                        'collapsed' : myBlock.collapsed
+                    }
+                } else if(myBlock.name === 'pitchdrummatrix') {
                     var args = {
                         'collapsed' : myBlock.collapsed
                     }
