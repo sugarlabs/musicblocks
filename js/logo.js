@@ -2627,7 +2627,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             childFlow = args[1];
             childFlowCount = 1;
 
-            var listenerName = '_drum_' + turtle;
+            var listenerName = '_setdrum_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
