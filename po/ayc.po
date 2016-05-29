@@ -17,23 +17,24 @@
 
 #: js/activity.js:443
 #: js/activity.js:443
-#.TRANS: 
+#: js/activity.js:445
+#.TRANS: Cerrar
 msgid "Close"
 msgstr ""
 
-#: js/activity.js:1251
-#: js/block.js:629
-#: js/block.js:1735
+#: js/activity.js:1254
+#: js/block.js:658
+#: js/block.js:1792
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-#: js/blocks.js:1688
-#: js/blocks.js:1690
-#: js/blocks.js:1874
-#: js/blocks.js:2017
-#: js/blocks.js:2123
-#: js/blocks.js:2549
-#: js/blocks.js:3185
-#: js/blocks.js:3260
+#: js/blocks.js:1716
+#: js/blocks.js:1718
+#: js/blocks.js:1902
+#: js/blocks.js:2045
+#: js/blocks.js:2151
+#: js/blocks.js:2578
+#: js/blocks.js:3232
+#: js/blocks.js:3307
 #: js/palette.js:471
 #: js/palette.js:480
 #: js/palette.js:489
@@ -42,147 +43,147 @@ msgstr ""
 #: js/palette.js:1628
 #: js/palette.js:1639
 #: js/palette.js:1650
-#: js/basicblocks.js:1058
-#: js/basicblocks.js:1087
-#: js/basicblocks.js:1094
-#: js/basicblocks.js:1122
-#: js/basicblocks.js:1132
-#: js/basicblocks.js:1161
-#: js/basicblocks.js:1193
-#: js/basicblocks.js:1197
-#: js/basicblocks.js:1203
+#: js/basicblocks.js:1298
+#: js/basicblocks.js:1327
+#: js/basicblocks.js:1334
+#: js/basicblocks.js:1362
+#: js/basicblocks.js:1372
+#: js/basicblocks.js:1401
+#: js/basicblocks.js:1433
+#: js/basicblocks.js:1437
+#: js/basicblocks.js:1443
 #.TRANS: acción
 msgid "action"
 msgstr "luräwi"
 
-#: js/activity.js:1934
+#: js/activity.js:1950
 #: js/turtledefs.js:79
 #.TRANS: Ejecutar rápidamente
 msgid "Run fast"
 msgstr "k’ataki qhantayaña"
 
-#: js/activity.js:1935
+#: js/activity.js:1951
 #: js/turtledefs.js:80
 #.TRANS: Ejecutar lentamente
 msgid "Run slow"
 msgstr "K’achata qhantayaña"
 
-#: js/activity.js:1936
+#: js/activity.js:1952
 #: js/turtledefs.js:82
 #.TRANS: Ejecutar paso a paso
 msgid "Run step by step"
 msgstr "mayata mayata qhantayaña"
 
-#: js/activity.js:1937
+#: js/activity.js:1953
 #: js/turtledefs.js:81
 #.TRANS: Música ejecute lentamente
 msgid "Run music slow"
 msgstr "K'achata t'ijuña warurt'äwi"
 
-#: js/activity.js:1938
+#: js/activity.js:1954
 #: js/turtledefs.js:83
 #.TRANS: Reproducir nota a nota
 msgid "Run note by note"
 msgstr "Run sapa chimputa chimpuru"
 
-#: js/activity.js:1939
+#: js/activity.js:1955
 #: js/turtledefs.js:84
 #.TRANS: Detener
 msgid "Stop"
 msgstr "Sayt’ayaña"
 
-#: js/activity.js:1940
+#: js/activity.js:1956
 #: js/turtledefs.js:85
 #.TRANS: Limpiar
 msgid "Clean"
 msgstr "Mayampi qalltañataki wakichaña"
 
-#: js/activity.js:1941
+#: js/activity.js:1957
 #: js/turtledefs.js:86
 #.TRANS: Mostrar u ocultar las paletas
 msgid "Show/hide palettes"
 msgstr "wakichaña apanaqañanaka uñachayaña jani ukaxa chhaqtayaña"
 
-#: js/activity.js:1942
+#: js/activity.js:1958
 #: js/turtledefs.js:87
 #.TRANS: Mostrar u ocultar los bloques.
 msgid "Show/hide blocks"
 msgstr "wakichata siqinaka uñstayaña imantaña"
 
-#: js/activity.js:1943
+#: js/activity.js:1959
 #: js/turtledefs.js:88
 #.TRANS: Expandir o colapsar los bloques colapsables\t
 msgid "Expand/collapse collapsable blocks"
 msgstr "japhalla wakichata siqinaka jach’aptayaña jani uka chhaqtayaña"
 
-#: js/activity.js:1944
-#: js/activity.js:1985
+#: js/activity.js:1960
+#: js/activity.js:2001
 #: js/turtledefs.js:89
 #.TRANS: Casa
 msgid "Home"
 msgstr "Uta"
 
-#: js/activity.js:1945
+#: js/activity.js:1961
 #: js/turtledefs.js:90
 #.TRANS: Ayuda
 msgid "Help"
 msgstr "Yanapa"
 
-#: js/activity.js:2012
+#: js/activity.js:2028
 #: js/turtledefs.js:92
 #.TRANS: Cargar ejemplos desde el servidor
 msgid "Load samples from server"
 msgstr "wakichata apanaqañata yant'äwinaka qhantayaña"
 
-#: js/activity.js:2013
+#: js/activity.js:2029
 #: js/turtledefs.js:93
-#.TRANS: 
+#.TRANS: Cargar proyecto de archivos
 msgid "Load project from files"
 msgstr ""
 
-#: js/activity.js:2014
+#: js/activity.js:2030
 #: js/turtledefs.js:94
 #.TRANS: Guardar proyecto
 msgid "Save project"
 msgstr "Wakichata imaña"
 
-#: js/activity.js:2015
+#: js/activity.js:2031
 #: js/turtledefs.js:95
 #.TRANS: Ahorre partituras
 msgid "Save sheet music"
 msgstr "Warurt'äwi qillqatanaka imaña"
 
-#: js/activity.js:2016
+#: js/activity.js:2032
 #: js/turtledefs.js:97
 #.TRANS: Pegar
 msgid "Paste"
 msgstr "Apxataña"
 
-#: js/activity.js:2017
+#: js/activity.js:2033
 #: js/turtledefs.js:99
 #.TRANS: Cartesiano
 msgid "Cartesian"
 msgstr "Cartesiano wakichata"
 
-#: js/activity.js:2018
+#: js/activity.js:2034
 #: js/turtledefs.js:100
 #.TRANS: Polar
 msgid "Polar"
 msgstr "Polar wakichata"
 
-#: js/activity.js:2019
+#: js/activity.js:2035
 #: js/turtledefs.js:101
 #.TRANS: Configuración
 msgid "Settings"
 msgstr "Chiqachatanaka"
 
-#: js/activity.js:2020
+#: js/activity.js:2036
 #: js/turtledefs.js:107
 #.TRANS: Borrar todo
 msgid "Delete all"
 msgstr "Qawayata apsuña"
 
-#: js/activity.js:2021
+#: js/activity.js:2037
 #: js/turtledefs.js:108
 #.TRANS: Deshacer
 msgid "Undo"
@@ -193,334 +194,374 @@ msgstr "Kutjayaña"
 msgid "confirm"
 msgstr "yatiyaña"
 
-#: js/block.js:558
-#: js/logo.js:1974
-#: js/logo.js:2111
-#: js/logo.js:4320
-#: js/matrix.js:312
+#: js/pitchdrummatrix.js:146
+#: js/pitchtimematrix.js:207
+#.TRANS: 
+msgid "Solfa"
+msgstr ""
+
+#: js/pitchdrummatrix.js:159
+#: js/pitchdrummatrix.js:159
+#: js/pitchtimematrix.js:220
+#: js/pitchtimematrix.js:220
+#.TRANS: tocar
+msgid "play"
+msgstr "qhantayaña"
+
+#: js/pitchdrummatrix.js:177
+#: js/pitchdrummatrix.js:177
+#: js/pitchtimematrix.js:238
+#: js/pitchtimematrix.js:238
+#.TRANS: guardar
+msgid "save"
+msgstr ""
+
+#: js/pitchdrummatrix.js:194
+#: js/pitchdrummatrix.js:194
+#: js/pitchtimematrix.js:255
+#: js/pitchtimematrix.js:255
+#: js/basicblocks.js:872
+#.TRANS: limpiar
+msgid "clear"
+msgstr "mayampi qalltañataki wakichaña"
+
+#: js/pitchdrummatrix.js:211
+#: js/pitchdrummatrix.js:211
+#: js/pitchtimematrix.js:289
+#: js/pitchtimematrix.js:289
+#.TRANS: cerrar
+msgid "close"
+msgstr ""
+
+#: js/pitchdrummatrix.js:231
+#: js/pitchtimematrix.js:309
+#: js/block.js:584
+#: js/logo.js:2063
+#: js/logo.js:2265
+#: js/logo.js:2310
+#: js/logo.js:4630
 #: js/musicutils.js:22
 #.TRANS: descanso
 msgid "rest"
 msgstr "samart'a"
 
-#: js/block.js:632
-#: js/logo.js:733
-#: js/logo.js:4737
-#: js/logo.js:4786
-#: js/logo.js:4806
-#: js/turtle.js:361
-#: js/turtle.js:362
-#: js/basicblocks.js:1185
+#: js/pitchdrummatrix.js:266
+#: js/block.js:670
+#: js/turtledefs.js:21
+#: js/turtle.js:380
+#: js/basicblocks.js:446
+#: js/basicblocks.js:841
+#.TRANS: tambor
+msgid "drum"
+msgstr ""
+
+#: js/pitchtimematrix.js:272
+#: js/pitchtimematrix.js:272
+#.TRANS: exportar
+msgid "export"
+msgstr ""
+
+#: js/pitchtimematrix.js:342
+#: js/pitchtimematrix.js:544
+#: js/basicblocks.js:303
+#: js/basicblocks.js:313
+#: js/basicblocks.js:467
+#.TRANS: valor de la nota
+msgid "note value"
+msgstr "warurt'äwi chimpu chani"
+
+#: js/pitchtimematrix.js:491
+#.TRANS: valor del tuplet
+msgid "tuplet value"
+msgstr "tupla chimpu chani"
+
+#: js/block.js:593
+#: js/palette.js:1703
+#: js/palette.js:1721
+#: js/palette.js:1734
+#: js/basicblocks.js:812
+#: js/musicutils.js:158
+#.TRANS: : musical instrument
+#.TRANS: bombo
+msgid "kick drum"
+msgstr ""
+
+#: js/block.js:661
+#: js/logo.js:763
+#: js/logo.js:5047
+#: js/logo.js:5096
+#: js/logo.js:5116
+#: js/turtle.js:522
+#: js/turtle.js:523
+#: js/basicblocks.js:1425
 #.TRANS: iniciar
 msgid "start"
 msgstr "qalltaña"
 
-#: js/block.js:635
+#: js/block.js:664
+#: js/block.js:667
 #: js/turtledefs.js:21
 #.TRANS: 
 msgid "matrix"
 msgstr ""
 
-#: js/block.js:638
-#: js/turtle.js:219
-#.TRANS: 
-msgid "drum"
-msgstr ""
-
-#: js/logo.js:24
+#: js/logo.js:26
+#.TRANS:  Animal names used in Lilypond output
 #.TRANS: 
 msgid "mouse"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "brown rat"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "mole"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "chipmunk"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "red squirrel"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "guinea pig"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "capybara"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "coypu"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "black rat"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "grey squirrel"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "flying squirrel"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 #.TRANS: 
 msgid "bat"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS:  Abbreviations for names used in Lilypind output, e.g., m for mouse
 #.TRANS: 
 msgid "m"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "br"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "ml"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "ch"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "rs"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "gp"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "cb"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "cp"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "bk"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "gs"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "fs"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS: 
 msgid "bt"
 msgstr ""
 
-#: js/logo.js:356
+#: js/logo.js:377
 #.TRANS: 
 msgid "true"
 msgstr ""
 
-#: js/logo.js:358
+#: js/logo.js:379
 #.TRANS: 
 msgid "false"
 msgstr ""
 
-#: js/logo.js:879
+#: js/logo.js:909
+#.TRANS: Bloque no soporta incremento.
 msgid "Block does not support incrementing."
 msgstr ""
 
-#: js/logo.js:1453
-#: js/logo.js:1777
-#.TRANS: 
+#: js/logo.js:1515
+#: js/logo.js:1839
+#.TRANS: Debe seleccionar un archivo.
 msgid "You must select a file."
 msgstr ""
 
-#: js/logo.js:1786
+#: js/logo.js:1848
 #: plugins/heap.rtp:96
-#.TRANS: 
+#.TRANS: El archivo seleccionado no contiene un pila válida.
 msgid "The file you selected does not contain a valid heap."
 msgstr ""
 
-#: js/logo.js:1790
+#: js/logo.js:1852
 #: plugins/heap.rtp:102
-#.TRANS: 
+#.TRANS: El bloque del pila de carga necesita un bloque de archivo de carga.
 msgid "The loadHeap block needs a loadFile block."
 msgstr ""
 
-#: js/logo.js:1806
-#.TRANS: 
+#: js/logo.js:1868
+#.TRANS: Error de análisis de datos JSON.
 msgid "Error parsing JSON data:"
 msgstr ""
 
-#: js/logo.js:1811
-#.TRANS: 
+#: js/logo.js:1873
+#.TRANS: 404: Página no encontrada.
 msgid "404: Page not found"
 msgstr ""
 
-#: js/logo.js:1835
-#.TRANS: 
+#: js/logo.js:1897
+#.TRANS: Pilas tortuga no contiene un montón válida para
 msgid "turtleHeaps does not contain a valid heap for"
 msgstr ""
 
-#: js/logo.js:1845
-#.TRANS: 
+#: js/logo.js:1907
+#.TRANS: El índice debe ser > 0.
 msgid "Index must be > 0."
 msgstr ""
 
-#: js/logo.js:1864
-#.TRANS: 
+#: js/logo.js:1926
+#.TRANS: Latidos por minuto debe ser> 30.
 msgid "Beats per minute must be > 30."
 msgstr ""
 
-#: js/logo.js:1867
-#.TRANS: 
+#: js/logo.js:1929
+#.TRANS: Los latidos por minuto como máximo es de 1000.
 msgid "Maximum beats per minute is 1000."
 msgstr ""
 
-#: js/logo.js:1925
+#: js/logo.js:1985
+msgid "You must have at least one pitch block and one drum block in the matrix."
+msgstr ""
+
+#: js/logo.js:2014
 #.TRANS: Debe tener al menos un bloque de tono y un bloque de ritmo en la matriz.
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
 msgstr "Maya siqi warurt'a arka ukata maya siqi warurt'a arka utjañapapuniwa"
 
-#: js/logo.js:1927
+#: js/logo.js:2016
 #.TRANS: Por favor, cierre la matriz actual antes de abrir una nueva.
 msgid "Please close the current matrix before opening a new one."
 msgstr "jichha wakichata jist'antma yaqha qalltañataki"
 
-#: js/logo.js:1982
-msgid "The Step Pitch Block must be used insdie of a Note Block."
+#: js/logo.js:2071
+#.TRANS: El paso de tono del bloque debe ser utilizado dentro de un bloque de nota.
+msgid "The Step Pitch Block must be used inside of a Note Block."
 msgstr ""
 
-#: js/logo.js:2217
+#: js/logo.js:2202
+#.TRANS: Bloque de tambor: Quizás quiso decir utilizar un bloque de nota?
+msgid "Drum Block: Did you mean to use a Note block?"
+msgstr ""
+
+#: js/logo.js:2434
 #.TRANS: Bloque de tono: Quizás quiso decir utilizar un bloque de nota?
 msgid "Pitch Block: Did you mean to use a Note block?"
 msgstr "Pitch larama wakichata: Maya siqi warurt'a chimpcha?"
 
-#: js/logo.js:2233
-#.TRANS: 
+#: js/logo.js:2450
+#.TRANS: Bloque de ritmo: Quizás quiso decir utilizar un bloque de matrix?
 msgid "Rhythm Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:2291
+#: js/logo.js:2509
 #.TRANS: Valor de la nota debe ser mayor que 0
 msgid "Note value must be greater than 0"
 msgstr "Warurt'äwi jakhu chimpuxa 0 jilañapawa"
 
-#: js/logo.js:2798
-#.TRANS: 
+#: js/logo.js:3082
+#.TRANS: Bloque de tuplet: Quizás quiso decir utilizar un bloque de matrix?
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:2988
-#.TRANS: 
+#: js/logo.js:3272
+#.TRANS: Mi proyecto
 msgid "My Project"
 msgstr ""
 
-#: js/logo.js:3363
-#.TRANS: 
+#: js/logo.js:3648
+#.TRANS: Synth no puede tocar acordes.
 msgid "synth cannot play chords."
 msgstr ""
 
-#: js/logo.js:3974
-#: js/basicblocks.js:1268
+#: js/logo.js:4284
+#: js/basicblocks.js:1508
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 #.TRANS: vaciar pila
 msgid "empty heap"
 msgstr "siqi wakichata ch'ussuña"
 
-#: js/logo.js:4737
-#: js/logo.js:4786
-#: js/logo.js:4806
-#: js/turtle.js:218
-#: js/turtle.js:357
-#: js/turtle.js:358
-#: js/basicblocks.js:1177
+#: js/logo.js:5047
+#: js/logo.js:5096
+#: js/logo.js:5116
+#: js/turtle.js:379
+#: js/turtle.js:518
+#: js/turtle.js:519
+#: js/basicblocks.js:1417
 #.TRANS: iniciar tambor
 msgid "start drum"
 msgstr "tarula qhantayaña"
-
-#: js/matrix.js:209
-#.TRANS: 
-msgid "Solfa"
-msgstr ""
-
-#: js/matrix.js:222
-#: js/matrix.js:222
-#.TRANS: tocar
-msgid "play"
-msgstr "qhantayaña"
-
-#: js/matrix.js:240
-#: js/matrix.js:240
-#.TRANS: 
-msgid "save"
-msgstr ""
-
-#: js/matrix.js:257
-#: js/matrix.js:257
-#: js/basicblocks.js:665
-#.TRANS: limpiar
-msgid "clear"
-msgstr "mayampi qalltañataki wakichaña"
-
-#: js/matrix.js:274
-#: js/matrix.js:274
-#.TRANS: 
-msgid "export"
-msgstr ""
-
-#: js/matrix.js:291
-#: js/matrix.js:291
-#.TRANS: 
-msgid "close"
-msgstr ""
-
-#: js/matrix.js:337
-#: js/matrix.js:543
-#: js/basicblocks.js:303
-#: js/basicblocks.js:313
-#.TRANS: valor de la nota
-msgid "note value"
-msgstr "warurt'äwi chimpu chani"
-
-#: js/matrix.js:490
-#.TRANS: valor del tuplet
-msgid "tuplet value"
-msgstr "tupla chimpu chani"
 
 #: js/utilitybox.js:36
 #: js/turtledefs.js:102
@@ -573,7 +614,7 @@ msgstr "ira"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-#: js/basicblocks.js:1354
+#: js/basicblocks.js:1594
 #.TRANS: tono
 msgid "tone"
 msgstr "ist’äwi"
@@ -651,14 +692,17 @@ msgid "Meet Mr. Mouse!"
 msgstr "Tata Achakuru uñt'tati!"
 
 #: js/turtledefs.js:76
+#.TRANS: Sr. Ratón es nuestro conductor de bloques de música.
 msgid "Mr Mouse is our Music Blocks conductor."
 msgstr ""
 
 #: js/turtledefs.js:76
+#.TRANS: Sr. Ratón le anima a explorar los Bloques Musicales.
 msgid "Mr Mouse encourages you to explore Music Blocks."
 msgstr ""
 
 #: js/turtledefs.js:76
+#.TRANS: Vamos a empezar nuestro recorrido.
 msgid "Let us start our tour!"
 msgstr ""
 
@@ -890,17 +934,17 @@ msgstr "wakichata uñachayaña"
 msgid "Download"
 msgstr "Apaqaña"
 
-#: js/samplesviewer.js:419
+#: js/samplesviewer.js:420
 #.TRANS: Planeta
 msgid "Planet"
 msgstr "Uraqi"
 
-#: js/samplesviewer.js:420
+#: js/samplesviewer.js:421
 #.TRANS: En mi dispositivo
 msgid "On my device"
 msgstr "wakichatanaka machaqa imaña"
 
-#: js/samplesviewer.js:421
+#: js/samplesviewer.js:422
 #.TRANS: En todo el mundo
 msgid "Worldwide"
 msgstr "Aka pachana"
@@ -911,56 +955,57 @@ msgstr "Aka pachana"
 msgid "open file"
 msgstr "imata wakichata qhantayaña"
 
-#: js/blocks.js:1563
+#: js/blocks.js:1571
 #: js/palette.js:515
-#: js/basicblocks.js:1390
+#: js/basicblocks.js:1630
 #.TRANS: texto
 msgid "text"
 msgstr "qillqata"
 
-#: js/blocks.js:1573
+#: js/blocks.js:1581
 #: js/palette.js:518
 #: js/palette.js:1695
 #: js/palette.js:1702
+#: js/palette.js:1703
 #.TRANS: 
 msgid "sol"
 msgstr ""
 
-#: js/blocks.js:1946
+#: js/blocks.js:1974
 #: js/palette.js:453
 #: js/palette.js:1595
-#: js/basicblocks.js:1020
-#: js/basicblocks.js:1024
-#: js/basicblocks.js:1036
-#: js/basicblocks.js:1044
+#: js/basicblocks.js:1260
+#: js/basicblocks.js:1264
+#: js/basicblocks.js:1276
+#: js/basicblocks.js:1284
 #.TRANS: caja
 msgid "box"
 msgstr "kajuna wakichata"
 
-#: js/blocks.js:2041
-#: js/basicblocks.js:1033
+#: js/blocks.js:2069
+#: js/basicblocks.js:1273
 #.TRANS: guardar en
 msgid "store in"
 msgstr "imaña"
 
-#: js/blocks.js:2041
+#: js/blocks.js:2069
 #: js/basicblocks.js:240
-#: js/basicblocks.js:1033
+#: js/basicblocks.js:1273
 #.TRANS: nombre
 msgid "name"
 msgstr "suti"
 
-#: js/blocks.js:2041
-#: js/basicblocks.js:1011
-#: js/basicblocks.js:1033
-#: js/basicblocks.js:1235
+#: js/blocks.js:2069
+#: js/basicblocks.js:1251
+#: js/basicblocks.js:1273
+#: js/basicblocks.js:1475
 #: plugins/bitcoin.rtp:27
 #.TRANS: valor
 msgid "value"
 msgstr "chani"
 
 #: js/palette.js:639
-#: js/basicblocks.js:716
+#: js/basicblocks.js:956
 #.TRANS: atrás
 msgid "back"
 msgstr "qhipäxa"
@@ -973,7 +1018,7 @@ msgstr "wakichata"
 
 #: js/palette.js:650
 #: js/palette.js:651
-#: js/basicblocks.js:1386
+#: js/basicblocks.js:1626
 #.TRANS: mostrar
 msgid "show"
 msgstr "Jañurt’äwi"
@@ -990,13 +1035,191 @@ msgid "la"
 msgstr ""
 
 #: js/palette.js:1702
+#: js/palette.js:1703
 #.TRANS: 
 msgid "mi"
 msgstr ""
 
 #: js/palette.js:1702
+#: js/palette.js:1703
 #.TRANS: 
 msgid "re"
+msgstr ""
+
+#: js/palette.js:1733
+#: js/basicblocks.js:819
+#: js/musicutils.js:156
+#.TRANS: : musical instrument
+#.TRANS: tambor militar pequeño
+msgid "snare drum"
+msgstr ""
+
+#: js/palette.js:1735
+#: js/basicblocks.js:777
+#: js/musicutils.js:168
+#.TRANS: : musical instrument
+#.TRANS: 
+msgid "hi hat"
+msgstr ""
+
+#: js/palette.js:1736
+#: js/basicblocks.js:805
+#: js/musicutils.js:160
+#.TRANS: : musical instrument
+#.TRANS: 
+msgid "tom tom"
+msgstr ""
+
+#: js/palette.js:1737
+#: js/basicblocks.js:770
+#: js/musicutils.js:174
+#.TRANS: : musical instrument
+#.TRANS: campana triángulo
+msgid "triangle bell"
+msgstr ""
+
+#: js/palette.js:1738
+#: js/basicblocks.js:728
+#: js/musicutils.js:188
+#.TRANS: : sound effect
+#.TRANS: bofetada
+msgid "slap"
+msgstr ""
+
+#: js/palette.js:1739
+#: js/basicblocks.js:658
+#: js/musicutils.js:200
+#.TRANS: : animal sound effect
+#.TRANS: pato
+msgid "duck"
+msgstr ""
+
+#: js/palette.js:1740
+#: js/basicblocks.js:784
+#: js/musicutils.js:166
+#.TRANS: : musical instrument
+#.TRANS: darbuka
+msgid "darbuka drum"
+msgstr ""
+
+#: js/palette.js:1741
+#: js/basicblocks.js:693
+#: js/musicutils.js:180
+#.TRANS: : sound effect
+#.TRANS: botella
+msgid "bottle"
+msgstr ""
+
+#: js/palette.js:1742
+#: js/basicblocks.js:714
+#: js/musicutils.js:182
+#.TRANS: : sound effect
+#.TRANS: estruendo
+msgid "clang"
+msgstr ""
+
+#: js/palette.js:1743
+#: js/basicblocks.js:763
+#: js/musicutils.js:176
+#.TRANS: : musical instrument
+#.TRANS: castañuelas
+msgid "finger cymbals"
+msgstr ""
+
+#: js/palette.js:1744
+#: js/basicblocks.js:791
+#: js/musicutils.js:164
+#.TRANS: : musical instrument
+#.TRANS: tambor taza
+msgid "cup drum"
+msgstr ""
+
+#: js/palette.js:1745
+#: js/basicblocks.js:749
+#: js/musicutils.js:172
+#.TRANS: : musical instrument
+#.TRANS: cencerro
+msgid "cow bell"
+msgstr ""
+
+#: js/palette.js:1746
+#: js/basicblocks.js:742
+#: js/musicutils.js:190
+#.TRANS: : sound effect
+#.TRANS: salpicadura
+msgid "splash"
+msgstr ""
+
+#: js/palette.js:1747
+#: js/basicblocks.js:756
+#: js/musicutils.js:170
+#.TRANS: : musical instrument
+#.TRANS: 
+msgid "ride bell"
+msgstr ""
+
+#: js/palette.js:1748
+#: js/basicblocks.js:798
+#: js/musicutils.js:162
+#.TRANS: : musical instrument
+#.TRANS: tom tom de piso
+msgid "floor tom tom"
+msgstr ""
+
+#: js/palette.js:1749
+#: js/basicblocks.js:735
+#: js/musicutils.js:184
+#.TRANS: : sound effect
+#.TRANS: choque
+msgid "crash"
+msgstr ""
+
+#: js/palette.js:1750
+#: js/basicblocks.js:707
+#: js/musicutils.js:178
+#.TRANS: : sound effect
+#.TRANS: 
+msgid "chine"
+msgstr ""
+
+#: js/palette.js:1751
+#: js/basicblocks.js:679
+#: js/musicutils.js:198
+#.TRANS: : animal sound effect
+#.TRANS: perro
+msgid "dog"
+msgstr ""
+
+#: js/palette.js:1752
+#: js/basicblocks.js:665
+#: js/musicutils.js:194
+#.TRANS: : animal sound effect
+#.TRANS: gato
+msgid "cat"
+msgstr ""
+
+#: js/palette.js:1753
+#: js/basicblocks.js:721
+#: js/musicutils.js:186
+#.TRANS: : sound effect
+#.TRANS: palmada
+msgid "clap"
+msgstr ""
+
+#: js/palette.js:1754
+#: js/basicblocks.js:700
+#: js/musicutils.js:192
+#.TRANS: : sound effect
+#.TRANS: burbujas
+msgid "bubbles"
+msgstr ""
+
+#: js/palette.js:1755
+#: js/basicblocks.js:672
+#: js/musicutils.js:196
+#.TRANS: : animal sound effect
+#.TRANS: grillo
+msgid "cricket"
 msgstr ""
 
 #: js/basicblocks.js:74
@@ -1035,10 +1258,12 @@ msgid "transposition"
 msgstr "jarantäwi"
 
 #: js/basicblocks.js:132
+#.TRANS: consonante paso hacia abajo
 msgid "consonant step down"
 msgstr ""
 
 #: js/basicblocks.js:139
+#.TRANS: consonante paso adelante
 msgid "consonant step up"
 msgstr ""
 
@@ -1063,8 +1288,7 @@ msgid "invert"
 msgstr "kutjtayaña"
 
 #: js/basicblocks.js:190
-#: js/basicblocks.js:460
-#: js/basicblocks.js:1364
+#: js/basicblocks.js:1604
 #: plugins/rodi.rtp:170
 #.TRANS: nota
 msgid "note"
@@ -1073,7 +1297,7 @@ msgstr "qhananchäwi"
 #: js/basicblocks.js:190
 #: js/basicblocks.js:210
 #: js/basicblocks.js:240
-#: js/basicblocks.js:1364
+#: js/basicblocks.js:1604
 #.TRANS: octava
 msgid "octave"
 msgstr "kimsaqallaqu chimpu"
@@ -1094,6 +1318,7 @@ msgid "sharp"
 msgstr "ch'iriqi"
 
 #: js/basicblocks.js:231
+#.TRANS: paso el tono
 msgid "step pitch"
 msgstr ""
 
@@ -1103,7 +1328,7 @@ msgid "1/64 note"
 msgstr "1/64 warurt'a chimpu"
 
 #: js/basicblocks.js:260
-#.TRANS: 
+#.TRANS: 1/32 nota
 msgid "1/32 note"
 msgstr ""
 
@@ -1149,6 +1374,7 @@ msgid "pitch-time matrix"
 msgstr ""
 
 #: js/basicblocks.js:334
+#.TRANS: valor de la nota de la tortuga
 msgid "turtle note value"
 msgstr ""
 
@@ -1218,844 +1444,913 @@ msgstr "tukuya chimpu"
 msgid "silence"
 msgstr "ch'ujtata"
 
-#: js/basicblocks.js:472
-#: js/basicblocks.js:566
+#: js/basicblocks.js:479
+#: js/basicblocks.js:573
 #.TRANS: fijar volumen
 msgid "set volume"
 msgstr "siqinaka jach'ata warurt'ayaña"
 
-#: js/basicblocks.js:480
+#: js/basicblocks.js:487
 #.TRANS: factor de staccato
 msgid "staccato factor"
 msgstr "staccato wakichata chimpu"
 
-#: js/basicblocks.js:487
+#: js/basicblocks.js:494
 #.TRANS: 
 msgid "slur factor"
 msgstr "jist'thapiña wakichata chimpu"
 
-#: js/basicblocks.js:494
+#: js/basicblocks.js:501
 #.TRANS: volumen nota
 msgid "note volume"
 msgstr "warurt'äwi jach'ata qhantayaña"
 
-#: js/basicblocks.js:503
-#.TRANS: 
+#: js/basicblocks.js:510
+#.TRANS: jugar hacia adelante
 msgid "play forward"
 msgstr ""
 
-#: js/basicblocks.js:512
+#: js/basicblocks.js:519
 #.TRANS: jugar hacia atrás
 msgid "play backward"
 msgstr "warurt'äwi qhiparu jit'tayma"
 
-#: js/basicblocks.js:519
-#: js/basicblocks.js:537
+#: js/basicblocks.js:526
+#: js/basicblocks.js:544
 #.TRANS: clave
 msgid "key"
 msgstr "qallu llawi"
 
-#: js/basicblocks.js:528
-#: js/basicblocks.js:537
+#: js/basicblocks.js:535
+#: js/basicblocks.js:544
 #.TRANS: fijar clave
 msgid "set key"
 msgstr "imañanaka wakichata limt'aña"
 
-#: js/basicblocks.js:537
+#: js/basicblocks.js:544
+#.TRANS: modo
 msgid "mode"
 msgstr ""
 
-#: js/basicblocks.js:547
+#: js/basicblocks.js:554
 #.TRANS: metro
 msgid "meter"
 msgstr "warurt'äwi qhatu"
 
-#: js/basicblocks.js:547
+#: js/basicblocks.js:554
 #.TRANS: numerador
 msgid "numerator"
 msgstr "Jakhuriri"
 
-#: js/basicblocks.js:547
+#: js/basicblocks.js:554
 #.TRANS: denominador
 msgid "denominator"
 msgstr "sutichriri"
 
-#: js/basicblocks.js:558
+#: js/basicblocks.js:565
 #.TRANS: articulación
 msgid "articulation"
 msgstr "chikanchäwi"
 
-#: js/basicblocks.js:574
+#: js/basicblocks.js:581
 #.TRANS: crescendo
 msgid "crescendo"
 msgstr "crescendo wakichata"
 
-#: js/basicblocks.js:582
-#.TRANS: 
+#: js/basicblocks.js:589
+#.TRANS: tercios
 msgid "thirds"
 msgstr ""
 
-#: js/basicblocks.js:589
-#.TRANS: 
+#: js/basicblocks.js:596
+#.TRANS: cuartas
 msgid "fourths"
 msgstr ""
 
-#: js/basicblocks.js:596
-#.TRANS: 
+#: js/basicblocks.js:605
+#.TRANS: tritono
 msgid "tritone"
 msgstr ""
 
-#: js/basicblocks.js:603
-#.TRANS: 
+#: js/basicblocks.js:612
+#.TRANS: quintos
 msgid "fifths"
 msgstr ""
 
-#: js/basicblocks.js:610
+#: js/basicblocks.js:619
+#.TRANS: intervalo
 msgid "interval"
 msgstr ""
 
-#: js/basicblocks.js:618
+#: js/basicblocks.js:627
 #.TRANS: swing
 msgid "swing"
 msgstr "jiwalachi"
 
-#: js/basicblocks.js:626
+#: js/basicblocks.js:635
 #.TRANS: 
 msgid "slur"
 msgstr "Jaquntäwi"
 
-#: js/basicblocks.js:634
+#: js/basicblocks.js:643
 #.TRANS: staccato
 msgid "staccato"
 msgstr "staccato wakichata"
 
-#: js/basicblocks.js:644
+#: js/basicblocks.js:686
+#.TRANS: 
+msgid "pluck"
+msgstr ""
+
+#: js/basicblocks.js:826
+msgid "pitch-drum matrix"
+msgstr ""
+
+#: js/basicblocks.js:833
+#.TRANS: fijar tambor
+msgid "set drum"
+msgstr ""
+
+#: js/basicblocks.js:851
 #.TRANS: rumbo
 msgid "heading"
 msgstr "saraña chimpu"
 
-#: js/basicblocks.js:651
-#: js/basicblocks.js:690
+#: js/basicblocks.js:858
+#: js/basicblocks.js:879
+#: js/basicblocks.js:890
+#: js/basicblocks.js:901
+#: js/basicblocks.js:930
 #.TRANS: x
 msgid "x"
 msgstr "X wakichata"
 
-#: js/basicblocks.js:658
-#: js/basicblocks.js:690
+#: js/basicblocks.js:865
+#: js/basicblocks.js:879
+#: js/basicblocks.js:890
+#: js/basicblocks.js:901
+#: js/basicblocks.js:930
 #.TRANS: y
 msgid "y"
 msgstr "y wakichata"
 
-#: js/basicblocks.js:672
+#: js/basicblocks.js:879
+#.TRANS: punto de control 2
+msgid "control point 2"
+msgstr ""
+
+#: js/basicblocks.js:890
+#.TRANS: punto de control 1
+msgid "control point 1"
+msgstr ""
+
+#: js/basicblocks.js:901
+#.TRANS: 
+msgid "bezier"
+msgstr ""
+
+#: js/basicblocks.js:912
 #.TRANS: arco
 msgid "arc"
 msgstr "sawana"
 
-#: js/basicblocks.js:672
+#: js/basicblocks.js:912
 #.TRANS: ángulo
 msgid "angle"
 msgstr "k'uchu"
 
-#: js/basicblocks.js:672
+#: js/basicblocks.js:912
 #.TRANS: radio
 msgid "radius"
 msgstr "muruq'u taypi muyuri"
 
-#: js/basicblocks.js:682
+#: js/basicblocks.js:922
 #.TRANS: fijar rumbo
 msgid "set heading"
 msgstr "sarayaña chimpuña"
 
-#: js/basicblocks.js:690
+#: js/basicblocks.js:930
 #.TRANS: fijar xy
 msgid "set xy"
 msgstr "xy wakichata chimpuña"
 
-#: js/basicblocks.js:700
+#: js/basicblocks.js:940
 #: plugins/rodi.rtp:59
 #.TRANS: derecha
 msgid "right"
 msgstr "kupi"
 
-#: js/basicblocks.js:708
+#: js/basicblocks.js:948
 #: plugins/rodi.rtp:58
 #.TRANS: izquierda
 msgid "left"
 msgstr "ch'iqa"
 
-#: js/basicblocks.js:724
+#: js/basicblocks.js:964
 #.TRANS: adelante
 msgid "forward"
 msgstr "qalltma"
 
-#: js/basicblocks.js:735
-#: js/basicblocks.js:779
+#: js/basicblocks.js:975
+#: js/basicblocks.js:1019
 #.TRANS: rellenar pantalla
 msgid "background"
 msgstr "maypacha uñtaña phuqachma"
 
-#: js/basicblocks.js:742
+#: js/basicblocks.js:982
 #.TRANS: color
 msgid "color"
 msgstr "sami"
 
-#: js/basicblocks.js:749
+#: js/basicblocks.js:989
 #.TRANS: sombra
 msgid "shade"
 msgstr "ist'añataki wakichata"
 
-#: js/basicblocks.js:756
+#: js/basicblocks.js:996
 #.TRANS: gris
 msgid "grey"
 msgstr "uqiru samiri"
 
-#: js/basicblocks.js:763
+#: js/basicblocks.js:1003
 #.TRANS: tamaño de la pluma
 msgid "pen size"
 msgstr "taña wakichata"
 
-#: js/basicblocks.js:770
+#: js/basicblocks.js:1010
 #.TRANS: fijar font
 msgid "set font"
 msgstr "qillqañanaka tama"
 
-#: js/basicblocks.js:786
+#: js/basicblocks.js:1026
 #.TRANS: linea sin relleno
 msgid "hollow line"
 msgstr "ch'usa qhanayäwi"
 
-#: js/basicblocks.js:793
+#: js/basicblocks.js:1033
 #.TRANS: relleno
 msgid "fill"
 msgstr "phuqantaña"
 
-#: js/basicblocks.js:800
+#: js/basicblocks.js:1040
 #.TRANS: subir pluma
 msgid "pen up"
 msgstr "samichaña phuyu jithsuyaña"
 
-#: js/basicblocks.js:807
+#: js/basicblocks.js:1047
 #.TRANS: bajar pluma
 msgid "pen down"
 msgstr "samichaña phuyu jithiqayaña"
 
-#: js/basicblocks.js:814
+#: js/basicblocks.js:1054
 #.TRANS: fijar pluma
 msgid "set pen size"
 msgstr "taña chanichaña"
 
-#: js/basicblocks.js:822
-#.TRANS: 
+#: js/basicblocks.js:1062
+#.TRANS: fijar translucidez
 msgid "set translucency"
 msgstr ""
 
-#: js/basicblocks.js:830
+#: js/basicblocks.js:1070
 #.TRANS: fijar matiz
 msgid "set hue"
 msgstr "sami wakichaña"
 
-#: js/basicblocks.js:838
+#: js/basicblocks.js:1078
 #.TRANS: fijar sombra
 msgid "set shade"
 msgstr "ist'añataki wakichata wakichaña"
 
-#: js/basicblocks.js:846
+#: js/basicblocks.js:1086
 #.TRANS: fijar gris
 msgid "set grey"
 msgstr "uqiru samiri wakichaña"
 
-#: js/basicblocks.js:854
+#: js/basicblocks.js:1094
 #.TRANS: fijar color
 msgid "set color"
 msgstr "sami wakichaña"
 
-#: js/basicblocks.js:864
+#: js/basicblocks.js:1104
 #.TRANS: 
 msgid "int"
 msgstr ""
 
-#: js/basicblocks.js:900
+#: js/basicblocks.js:1140
 #.TRANS: y
 msgid "and"
 msgstr "ukata"
 
-#: js/basicblocks.js:907
+#: js/basicblocks.js:1147
 #.TRANS: o
 msgid "or"
 msgstr "o wakichata"
 
-#: js/basicblocks.js:914
+#: js/basicblocks.js:1154
 #.TRANS: no
 msgid "not"
 msgstr "janiwa"
 
-#: js/basicblocks.js:920
+#: js/basicblocks.js:1160
 #.TRANS: módulo
 msgid "mod"
 msgstr "uñanaqa"
 
-#: js/basicblocks.js:928
+#: js/basicblocks.js:1168
 #.TRANS: raíz
 msgid "sqrt"
 msgstr "raíz cuadrada wakichata"
 
-#: js/basicblocks.js:978
+#: js/basicblocks.js:1218
 #.TRANS: uno de estos
 msgid "one of"
 msgstr "Maynïripa"
 
-#: js/basicblocks.js:978
+#: js/basicblocks.js:1218
 #.TRANS: éste
 msgid "this"
 msgstr "akïri"
 
-#: js/basicblocks.js:978
+#: js/basicblocks.js:1218
 #.TRANS: ése
 msgid "that"
 msgstr "kuna"
 
-#: js/basicblocks.js:989
+#: js/basicblocks.js:1229
 #.TRANS: aleatorio
 msgid "random"
 msgstr "maski kawkïrsa"
 
-#: js/basicblocks.js:989
+#: js/basicblocks.js:1229
 #.TRANS: min
 msgid "min"
 msgstr "juk'ata sipana"
 
-#: js/basicblocks.js:989
+#: js/basicblocks.js:1229
 #.TRANS: max
 msgid "max"
 msgstr "jilata sipana"
 
-#: js/basicblocks.js:1004
+#: js/basicblocks.js:1244
 #.TRANS: sumar 1 a
 msgid "add 1 to"
 msgstr "1 jakhuta jakhuña"
 
-#: js/basicblocks.js:1011
+#: js/basicblocks.js:1251
 #.TRANS: sumar
 msgid "add"
 msgstr "jakhuxataña"
 
-#: js/basicblocks.js:1011
+#: js/basicblocks.js:1251
 #: plugins/finance.rtp:28
 #.TRANS: para
 msgid "to"
 msgstr "ukataki"
 
-#: js/basicblocks.js:1055
-#: js/basicblocks.js:1102
-#: js/basicblocks.js:1119
-#: js/basicblocks.js:1157
-#: js/basicblocks.js:1438
-#: js/basicblocks.js:1445
+#: js/basicblocks.js:1295
+#: js/basicblocks.js:1342
+#: js/basicblocks.js:1359
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1678
+#: js/basicblocks.js:1685
 #.TRANS: hacer
 msgid "do"
 msgstr "luraña"
 
-#: js/basicblocks.js:1064
-#.TRANS: 
+#: js/basicblocks.js:1304
+#.TRANS: retorno
 msgid "return"
 msgstr ""
 
-#: js/basicblocks.js:1074
-#.TRANS: 
+#: js/basicblocks.js:1314
+#.TRANS: retorno a URL
 msgid "return to URL"
 msgstr ""
 
-#: js/basicblocks.js:1078
+#: js/basicblocks.js:1318
 #.TRANS: 
 msgid "100"
 msgstr ""
 
-#: js/basicblocks.js:1084
-#: js/basicblocks.js:1110
-#: js/basicblocks.js:1129
-#.TRANS: 
+#: js/basicblocks.js:1324
+#: js/basicblocks.js:1350
+#: js/basicblocks.js:1369
+#.TRANS: calcular
 msgid "calculate"
 msgstr ""
 
-#: js/basicblocks.js:1157
+#: js/basicblocks.js:1397
 #.TRANS: cuando
 msgid "on"
 msgstr "on qhantayaña"
 
-#: js/basicblocks.js:1157
-#: js/basicblocks.js:1160
-#: js/basicblocks.js:1171
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1400
+#: js/basicblocks.js:1411
 #.TRANS: señal
 msgid "event"
 msgstr "luräwi"
 
-#: js/basicblocks.js:1168
+#: js/basicblocks.js:1408
 #.TRANS: emitir
 msgid "broadcast"
 msgstr "luqtaña"
 
-#: js/basicblocks.js:1213
+#: js/basicblocks.js:1453
 #.TRANS: cargar pila desde aplicación
 msgid "load heap from App"
 msgstr "App taypita kunaymana wakichaña"
 
-#: js/basicblocks.js:1224
+#: js/basicblocks.js:1464
 #.TRANS: guardar pila a aplicación
 msgid "save heap to App"
 msgstr "App kunaymana wakichatanaka imaña chimpu"
 
-#: js/basicblocks.js:1235
+#: js/basicblocks.js:1475
 #.TRANS: modificar valor en pila
 msgid "set heap"
 msgstr "qutunaka tama"
 
-#: js/basicblocks.js:1235
+#: js/basicblocks.js:1475
 #.TRANS: posición en la pila
 msgid "index"
 msgstr "wakichatanaka"
 
-#: js/basicblocks.js:1246
+#: js/basicblocks.js:1486
 #: plugins/heap.rtp:126
 #.TRANS: mostrar pila
 msgid "show heap"
 msgstr "siqi wakichata uñachayma"
 
-#: js/basicblocks.js:1253
+#: js/basicblocks.js:1493
 #.TRANS: tamaño de la pila
 msgid "heap length"
 msgstr "phina taña"
 
-#: js/basicblocks.js:1261
+#: js/basicblocks.js:1501
 #: plugins/heap.rtp:134
 #.TRANS: ¿pila vacía?
 msgid "heap empty?"
 msgstr "ch'usa siqi?"
 
-#: js/basicblocks.js:1275
+#: js/basicblocks.js:1515
 #: plugins/heap.rtp:150
 #.TRANS: guardar pila
 msgid "save heap"
 msgstr "wakichata siqi imaña"
 
-#: js/basicblocks.js:1284
+#: js/basicblocks.js:1524
 #: plugins/heap.rtp:160
 #.TRANS: cargar pila
 msgid "load heap"
 msgstr "imata wakichata siqi apxataña"
 
-#: js/basicblocks.js:1293
+#: js/basicblocks.js:1533
 #.TRANS: valor en la pila
 msgid "index heap"
 msgstr "nayrïri qutu"
 
-#: js/basicblocks.js:1302
+#: js/basicblocks.js:1542
 #: plugins/heap.rtp:109
 #.TRANS: apilar
 msgid "push"
 msgstr "nukht'aña"
 
-#: js/basicblocks.js:1310
+#: js/basicblocks.js:1550
 #: plugins/heap.rtp:118
 #.TRANS: sacar
 msgid "pop"
 msgstr "apsuña"
 
-#: js/basicblocks.js:1319
+#: js/basicblocks.js:1559
 #.TRANS: hablar
 msgid "speak"
 msgstr "arsuña"
 
-#: js/basicblocks.js:1347
+#: js/basicblocks.js:1587
 #.TRANS: detener medios
 msgid "stop media"
 msgstr "wakisirinaka sayt'ayaña"
 
-#: js/basicblocks.js:1354
+#: js/basicblocks.js:1594
 #.TRANS: frecuencia
 msgid "frequency"
 msgstr "Sapa kuti qhantayäwi"
 
-#: js/basicblocks.js:1354
+#: js/basicblocks.js:1594
 #.TRANS: duración (ms)
 msgid "duration (ms)"
 msgstr "sara pacha"
 
-#: js/basicblocks.js:1364
+#: js/basicblocks.js:1604
 #.TRANS: nota a frecuencia
 msgid "note to frequency"
 msgstr "maya maya mantäwi jakhuña"
 
-#: js/basicblocks.js:1375
+#: js/basicblocks.js:1615
 #.TRANS: caparazón
 msgid "shell"
 msgstr "tortuga uywana lip'ichipa"
 
-#: js/basicblocks.js:1375
-#: js/basicblocks.js:1386
+#: js/basicblocks.js:1615
+#: js/basicblocks.js:1626
 #.TRANS: tamaño
 msgid "size"
 msgstr "taña"
 
-#: js/basicblocks.js:1375
+#: js/basicblocks.js:1615
 #.TRANS: imagen
 msgid "image"
 msgstr "rixita"
 
-#: js/basicblocks.js:1386
+#: js/basicblocks.js:1626
 #.TRANS: objeto
 msgid "obj"
 msgstr "apanaqaña"
 
-#: js/basicblocks.js:1424
+#: js/basicblocks.js:1664
 #.TRANS: detener
 msgid "stop"
 msgstr "sayt'ayaña"
 
-#: js/basicblocks.js:1431
+#: js/basicblocks.js:1671
 #.TRANS: esperar hasta
 msgid "wait for"
 msgstr "ukakama suyt’aña"
 
-#: js/basicblocks.js:1438
+#: js/basicblocks.js:1678
 #.TRANS: hasta
 msgid "until"
 msgstr "akakama"
 
-#: js/basicblocks.js:1445
+#: js/basicblocks.js:1685
 #.TRANS: mientras
 msgid "while"
 msgstr "ukchiñkama"
 
-#: js/basicblocks.js:1452
-#: js/basicblocks.js:1459
+#: js/basicblocks.js:1692
+#: js/basicblocks.js:1699
 #.TRANS: si
 msgid "if"
 msgstr "jïsa"
 
-#: js/basicblocks.js:1452
-#: js/basicblocks.js:1459
+#: js/basicblocks.js:1692
+#: js/basicblocks.js:1699
 #.TRANS: entonces
 msgid "then"
 msgstr "ukhamaxa"
 
-#: js/basicblocks.js:1452
+#: js/basicblocks.js:1692
 #.TRANS: sino
 msgid "else"
 msgstr "jani ukaxa"
 
-#: js/basicblocks.js:1466
+#: js/basicblocks.js:1706
 #.TRANS: por siempre
 msgid "forever"
 msgstr "wiñayataki"
 
-#: js/basicblocks.js:1473
+#: js/basicblocks.js:1713
 #.TRANS: repetir
 msgid "repeat"
 msgstr "kutxataña"
 
-#: js/basicblocks.js:1485
-#: js/basicblocks.js:1496
-#: js/basicblocks.js:1505
-#: js/basicblocks.js:1515
-#: js/basicblocks.js:1523
-#: js/basicblocks.js:1532
-#: js/basicblocks.js:1542
+#: js/basicblocks.js:1725
+#: js/basicblocks.js:1736
+#: js/basicblocks.js:1745
+#: js/basicblocks.js:1755
+#: js/basicblocks.js:1763
+#: js/basicblocks.js:1772
+#: js/basicblocks.js:1782
 #.TRANS: desconocido
 msgid "unknown"
 msgstr "jani uñt’ata"
 
-#: js/basicblocks.js:1553
+#: js/basicblocks.js:1793
 #.TRANS: reproducir
 msgid "play back"
 msgstr "qhantayaña"
 
-#: js/basicblocks.js:1561
+#: js/basicblocks.js:1801
 #.TRANS: detener
 msgid "stop play"
 msgstr "sayt’ayaña"
 
-#: js/basicblocks.js:1568
+#: js/basicblocks.js:1808
 #.TRANS: volumen
 msgid "loudness"
 msgstr "ist'asiñapa jithxatayaña"
 
-#: js/basicblocks.js:1575
+#: js/basicblocks.js:1815
 #.TRANS: guardar como lilypond
 msgid "save as lilypond"
 msgstr "Ukawa warurt'awi chimpu..."
 
-#: js/basicblocks.js:1578
-#: js/basicblocks.js:1587
+#: js/basicblocks.js:1818
+#: js/basicblocks.js:1827
 #.TRANS: título
 msgid "title"
 msgstr "p'iqinchiri suti"
 
-#: js/basicblocks.js:1584
+#: js/basicblocks.js:1824
 #.TRANS: guardar como SVG
 msgid "save svg"
 msgstr " SVG Sutini imaña"
 
-#: js/basicblocks.js:1593
+#: js/basicblocks.js:1833
 #: plugins/turtle.rtp:42
 #.TRANS: tortuga x
 msgid "turtle x"
 msgstr "tortuga X wakichata"
 
-#: js/basicblocks.js:1602
+#: js/basicblocks.js:1842
 #: plugins/turtle.rtp:52
 #.TRANS: tortuga y
 msgid "turtle y"
 msgstr "tortuga Y wakichata"
 
-#: js/basicblocks.js:1611
+#: js/basicblocks.js:1851
 #: plugins/turtle.rtp:62
 #.TRANS: iniciar tortuga
 msgid "start turtle"
 msgstr "tortuga wakichata qalltaña"
 
-#: js/basicblocks.js:1620
+#: js/basicblocks.js:1860
 #: plugins/turtle.rtp:72
 #.TRANS: detener tortuga
 msgid "stop turtle"
 msgstr "tortuga wakichata sayt'ayaña"
 
-#: js/basicblocks.js:1629
+#: js/basicblocks.js:1869
 #.TRANS: sin fondo
 msgid "no background"
 msgstr "jani manqha wakichatani"
 
-#: js/basicblocks.js:1636
+#: js/basicblocks.js:1876
 #.TRANS: mostrar bloques
 msgid "show blocks"
 msgstr "siqichata wakichatana uñachayaña"
 
-#: js/basicblocks.js:1643
+#: js/basicblocks.js:1883
 #.TRANS: ocultar bloques
 msgid "hide blocks"
 msgstr "siqichata wakichatanaka imantaña"
 
-#: js/basicblocks.js:1650
-#.TRANS: 
+#: js/basicblocks.js:1890
+#.TRANS: abierto proyecto
 msgid "open project"
 msgstr ""
 
-#: js/basicblocks.js:1674
+#: js/basicblocks.js:1914
 #.TRANS: esperar
 msgid "wait"
 msgstr "suyt'aña"
 
-#: js/basicblocks.js:1682
+#: js/basicblocks.js:1922
 #.TRANS: imprimir
 msgid "print"
 msgstr "wakichata laphiru apsuña"
 
-#: js/basicblocks.js:1690
-#: js/basicblocks.js:1698
+#: js/basicblocks.js:1930
+#: js/basicblocks.js:1938
 #: plugins/turtle.rtp:82
 #.TRANS: renombrar tortuga
 msgid "turtle name"
 msgstr "Tortuga wakichatampi mayachasiña"
 
-#: js/basicblocks.js:1699
+#: js/basicblocks.js:1939
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:83
 #.TRANS: origen
 msgid "source"
 msgstr "qallta"
 
-#: js/basicblocks.js:1700
+#: js/basicblocks.js:1940
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:84
 #.TRANS: destino
 msgid "target"
 msgstr "purïwi"
 
-#: js/basicblocks.js:1714
+#: js/basicblocks.js:1954
 #.TRANS: click
 msgid "click"
 msgstr "click limt’aña"
 
-#: js/basicblocks.js:1722
+#: js/basicblocks.js:1962
 #.TRANS: color del pixel
 msgid "pixel color"
 msgstr "pixel wakichata ullaña"
 
-#: js/basicblocks.js:1729
+#: js/basicblocks.js:1969
 #.TRANS: tiempo
 msgid "time"
 msgstr "pacha"
 
-#: js/basicblocks.js:1736
+#: js/basicblocks.js:1976
 #.TRANS: cursor x
 msgid "mouse x"
 msgstr "x chimpuni thaqnaqiri lliphi qhana"
 
-#: js/basicblocks.js:1744
+#: js/basicblocks.js:1984
 #.TRANS: cursor y
 msgid "mouse y"
 msgstr "y chimpuni thaqnaqiri lliphi qhana"
 
-#: js/basicblocks.js:1752
+#: js/basicblocks.js:1992
 #.TRANS: botón del ratón
 msgid "mouse button"
 msgstr "limt'aña limxatata"
 
-#: js/basicblocks.js:1759
+#: js/basicblocks.js:1999
 #.TRANS: teclado
 msgid "keyboard"
 msgstr "qillqañana thaqaña"
 
-#: js/basicblocks.js:1768
+#: js/basicblocks.js:2008
 #.TRANS: evaluar
 msgid "eval"
 msgstr "eval wakichata"
 
 #: js/musicutils.js:100
 #.TRANS: : twelve semi-tone scale for music
+#.TRANS: Cromático
 msgid "Chromatic"
 msgstr ""
 
 #: js/musicutils.js:101
+#.TRANS: Argelino
 msgid "Algerian"
 msgstr ""
 
 #: js/musicutils.js:103
 #.TRANS: : modal scale for music
+#.TRANS: Disminuido
 msgid "Diminished"
 msgstr ""
 
 #: js/musicutils.js:104
+#.TRANS: Español
 msgid "Spanish"
 msgstr ""
 
 #: js/musicutils.js:106
 #.TRANS: : major scales in music
+#.TRANS: Mayor
 msgid "Major"
 msgstr ""
 
 #: js/musicutils.js:108
 #.TRANS: : modal scale for music
+#.TRANS: 
 msgid "Ionian"
 msgstr ""
 
 #: js/musicutils.js:110
 #.TRANS: : modal scale for music
+#.TRANS: 
 msgid "Dorian"
 msgstr ""
 
 #: js/musicutils.js:112
 #.TRANS: : modal scale for music
+#.TRANS: 
 msgid "Phrygian"
 msgstr ""
 
 #: js/musicutils.js:114
 #.TRANS: : modal scale for music
+#.TRANS: 
 msgid "Lydian"
 msgstr ""
 
 #: js/musicutils.js:116
 #.TRANS: : modal scale for music
+#.TRANS: 
 msgid "Mixolydian"
 msgstr ""
 
 #: js/musicutils.js:118
 #.TRANS: : natural minor scales in music
+#.TRANS: Menor
 msgid "Minor"
 msgstr ""
 
 #: js/musicutils.js:120
 #.TRANS: : modal scale for music
+#.TRANS: 
 msgid "Aeolian"
 msgstr ""
 
 #: js/musicutils.js:122
 #.TRANS: : modal scale for music
+#.TRANS: 
 msgid "Locrian"
 msgstr ""
 
 #: js/musicutils.js:124
 #.TRANS: : minor jazz scale for music
+#.TRANS: Jazz Menor
 msgid "Jazz Minor"
 msgstr ""
 
 #: js/musicutils.js:126
 #.TRANS: : bebop scale for music
+#.TRANS: 
 msgid "Bebop"
 msgstr ""
 
 #: js/musicutils.js:127
+#.TRANS: Arábica
 msgid "Arabic"
 msgstr ""
 
 #: js/musicutils.js:128
+#.TRANS: Bizantino
 msgid "Byzantine"
 msgstr ""
 
 #: js/musicutils.js:130
 #.TRANS: : musical scale for music by Verdi
+#.TRANS: Enigmático
 msgid "Enigmatic"
 msgstr ""
 
 #: js/musicutils.js:131
+#.TRANS: Etíope
 msgid "Ethiopian"
 msgstr ""
 
 #: js/musicutils.js:133
 #.TRANS: : Ethiopic scale for music
+#.TRANS: 
 msgid "Geez"
 msgstr ""
 
 #: js/musicutils.js:134
+#.TRANS: Hindú
 msgid "Hindu"
 msgstr ""
 
 #: js/musicutils.js:135
+#.TRANS: Húngaro
 msgid "Hungarian"
 msgstr ""
 
 #: js/musicutils.js:137
 #.TRANS: : minor Romanian scale for music
+#.TRANS: Romano Menor
 msgid "Romanian Minor"
 msgstr ""
 
 #: js/musicutils.js:138
+#.TRANS: Gitana española
 msgid "Spanish Gypsy"
 msgstr ""
 
 #: js/musicutils.js:140
 #.TRANS: : musical scale for Mid-Eastern music
+#.TRANS: 
 msgid "Maqam"
 msgstr ""
 
 #: js/musicutils.js:142
 #.TRANS: : minor blues scale for music
+#.TRANS: 
 msgid "Blues"
 msgstr ""
 
 #: js/musicutils.js:144
 #.TRANS: : major blues scale for music
+#.TRANS: Blues mayor
 msgid "Major Blues"
 msgstr ""
 
 #: js/musicutils.js:146
 #.TRANS: : pentatonic scale in music
+#.TRANS: Pentatónica
 msgid "Pentatonic"
 msgstr ""
 
 #: js/musicutils.js:147
+#.TRANS: Chino
 msgid "Chinese"
 msgstr ""
 
 #: js/musicutils.js:148
+#.TRANS: Egipcio
 msgid "Egyptian"
 msgstr ""
 
 #: js/musicutils.js:150
 #.TRANS: : Japanese pentatonic scale for music
+#.TRANS: 
 msgid "Hirajoshi"
 msgstr ""
 
 #: js/musicutils.js:151
+#.TRANS: Japonés
 msgid "Japanese"
 msgstr ""
 
@@ -2171,7 +2466,7 @@ msgstr "radianes wakichataru"
 
 #: plugins/heap.rtp:81
 #: plugins/heap.rtp:85
-#.TRANS: 
+#.TRANS: Debe seleccionar un archivo.
 msgid "You need to select a file."
 msgstr ""
 
@@ -2458,7 +2753,6 @@ msgstr "Z unxtäwi"
 
 #: js/turtledefs.js:76
 
-#.TRANS: Vamos a empezar nuestro recorrido!
 #~msgid "et us start our tour!"
 #~msgstr "Ukhamaxa warurt'awimpi muyt'pxañäni!""
 
@@ -2469,19 +2763,16 @@ msgstr "Z unxtäwi"
 
 #: plugins/impact.rtp:114
 
-#.TRANS: 
 #~msgid "Impact field not found."
 #~msgstr ""
 
 #: js/turtledefs.js:76
 
-#.TRANS: Sr. Ratón le anima a explorar los Bloques Musicales.
 #~msgid "r. Mouse encourages you to explore Music Blocks"
 #~msgstr "Achaku tata siqi warurt'äwi warurt'ayma. "
 
 #: js/basicblocks.js:298
 
-#.TRANS: nota de tortugas
 #~msgid "turtle note"
 #~msgstr "khirkhinchu warurt'a chimpu"
 
@@ -2490,7 +2781,6 @@ msgstr "Z unxtäwi"
 
 #: plugins/rodi.rtp:292
 
-#.TRANS: 
 #~msgid "red"
 #~msgstr ""
 
@@ -2499,13 +2789,11 @@ msgstr "Z unxtäwi"
 
 #: plugins/rodi.rtp:294
 
-#.TRANS: 
 #~msgid "blue"
 #~msgstr ""
 
 #: js/turtledefs.js:76
 
-#.TRANS: Sr. Ratón es nuestro conductor de bloques de música.
 #~msgid "Mr. Mouse is our Music Blocks conductor."
 #~msgstr "Achaku tatawa siqi warurt'äwinaka qhanayirixa."
 
@@ -2514,7 +2802,6 @@ msgstr "Z unxtäwi"
 
 #: plugins/rodi.rtp:338
 
-#.TRANS: 
 #~msgid "led"
 #~msgstr ""
 
@@ -2523,19 +2810,16 @@ msgstr "Z unxtäwi"
 
 #: plugins/impact.rtp:32
 
-#.TRANS: hace *X* hora(s)
 #~msgid "hours ago"
 #~msgstr "nikht’a pacha"
 
 #: plugins/impact.rtp:122
 
-#.TRANS: 
 #~msgid "Impact UID not found."
 #~msgstr ""
 
 #: plugins/impact.rtp:32
 
-#.TRANS: comprobar
 #~msgid "fetch"
 #~msgstr "apaniña"
 
@@ -2548,39 +2832,32 @@ msgstr "Z unxtäwi"
 #~msgid "blocks"
 #~msgstr "t'aqanaka"
 
-#.TRANS: cómeme
 #~msgid "eatme"
 #~msgstr "manq´antati"
 
 #: plugins/rodi.rtp:293
 
-#.TRANS: 
 #~msgid "green"
 #~msgstr ""
 
 #: plugins/impact.rtp:69
 
-#.TRANS: 
 #~msgid "Cannot parse Impact data."
 #~msgstr ""
 
-#.TRANS: alimentos
 #~msgid "food"
 #~msgstr "juyranaka"
 
-#.TRANS: matemáticas
 #~msgid "maths"
 #~msgstr "jakhunaka tuqita"
 
 #: plugins/rodi.rtp:110
 
-#.TRANS: parpadear
 #~msgid "blink"
 #~msgstr "lliphiqi"
 
 #: plugins/rodi.rtp:206
 
-#.TRANS: distancia
 #~msgid "distance"
 #~msgstr "jaya"
 
@@ -2592,7 +2869,6 @@ msgstr "Z unxtäwi"
 
 #: plugins/rodi.rtp:153
 
-#.TRANS: luz infrarroja (izquierda)
 #~msgid "infrared light (left)"
 #~msgstr "Surump'iyasiri qhana (ch'iqäxa)"
 
@@ -2600,11 +2876,9 @@ msgstr "Z unxtäwi"
 
 #: plugins/impact.rtp:127
 
-#.TRANS: 
 #~msgid "Impact data not available."
 #~msgstr ""
 
-#.TRANS: mashape
 #~msgid "mashape"
 #~msgstr "mashape wakichata"
 
@@ -2613,7 +2887,6 @@ msgstr "Z unxtäwi"
 
 #: js/turtledefs.js:21
 
-#.TRANS: 
 #~msgid "actions"
 #~msgstr ""
 
@@ -2622,11 +2895,9 @@ msgstr "Z unxtäwi"
 
 #: plugins/impact.rtp:32
 
-#.TRANS: id único
 #~msgid "UID"
 #~msgstr "UID wakichata"
 
-#.TRANS: lógica
 #~msgid "logic"
 #~msgstr "Sara"
 
@@ -2641,8 +2912,12 @@ msgstr "Z unxtäwi"
 
 #: plugins/rodi.rtp:321
 
-#.TRANS: 
 #~msgid "light intensity"
+#~msgstr ""
+
+#: js/logo.js:1982
+
+#~msgid "The Step Pitch Block must be used insdie of a Note Block."
 #~msgstr ""
 
 #~msgid "end fill"
@@ -2650,7 +2925,6 @@ msgstr "Z unxtäwi"
 
 #: plugins/rodi.rtp:167
 
-#.TRANS: luz infrarroja (derecha)
 #~msgid "infrared light (right)"
 #~msgstr "Surump'iyasiri qhana (Kupïxa)"
 
@@ -2660,13 +2934,11 @@ msgstr "Z unxtäwi"
 #~msgid "set beats per minute"
 #~msgstr "t'ijtäwi pacha chani putuqi"
 
-#.TRANS: do re mi fa sol la si
 #~msgid "do re mi fa sol la ti"
 #~msgstr "do re mi fa sol la ti"
 
 #: plugins/impact.rtp:124
 
-#.TRANS: 
 #~msgid "Impact Time not found."
 #~msgstr ""
 
@@ -2675,7 +2947,6 @@ msgstr "Z unxtäwi"
 
 #: plugins/impact.rtp:32
 
-#.TRANS: campo
 #~msgid "field"
 #~msgstr "apanaqäwi"
 
