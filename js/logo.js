@@ -47,7 +47,7 @@ const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(matrix, canvas, blocks, turtles, stage,
+function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -100,8 +100,11 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
     // Music-related attributes
 
-    // matrix
-    this.showMatrix = false;
+    // pitch-drum matrix
+    this.showPitchDrumMatrix = false;
+    this.inPitchDrumMatrix = false;
+
+    // pitch-rhythm matrix
     this.inMatrix = false;
     this.keySignature = {};
     this.tupletRhythms = [];
@@ -637,6 +640,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this._setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
         }
 
+        this.inPitchDrumMatrix = false;
         this.inMatrix = false;
         this.pitchBlocks = [];
         this.drumBlocks = [];
@@ -1961,6 +1965,33 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 logo.keySignature[turtle] = args[0] + ' ' + modename;
             }
             break;
+        case 'pitchdrummatrix':
+            console.log('running pitchdrummatrix');
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+            logo.inPitchDrumMatrix = true;
+            pitchdrummatrix.solfegeNotes = [];
+            pitchdrummatrix.solfegeOctaves = [];
+            pitchdrummatrix.drums = [];
+            pitchdrummatrix.clearBlocks();
+
+            var listenerName = '_pitchdrummatrix_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                if (pitchdrummatrix.drums.length === 0 || pitchdrummatrix.solfegeNotes.length === 0) {
+                    logo.errorMsg(_('You must have at least one pitch block and one drum block in the matrix.'), blk);
+                } else {
+                    // Process queued up rhythms.
+                    pitchdrummatrix.init(logo);
+                    pitchdrummatrix.makeClickable();
+                }
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         case 'matrix':
             if (args.length === 1) {
                 childFlow = args[0];
@@ -2151,7 +2182,13 @@ function Logo(matrix, canvas, blocks, turtles, stage,
                 drumname = last(logo.drumStyle[turtle]);
             }
 
-            if (logo.inMatrix) {
+            if (logo.inPitchDrumMatrix) {
+                pitchdrummatrix.drums.push(drumname);
+                pitchdrummatrix.addColBlock(blk);
+                if (logo.drumBlocks.indexOf(blk) === -1) {
+                    logo.drumBlocks.push(blk);
+                }
+            } else if (logo.inMatrix) {
                 matrix.solfegeNotes.push(drumname);
                 matrix.solfegeOctaves.push(-1);
 
@@ -2224,7 +2261,52 @@ function Logo(matrix, canvas, blocks, turtles, stage,
 
             var delta = 0;
 
-            if (logo.inMatrix) {
+            if (logo.inPitchDrumMatrix) {
+                if (note.toLowerCase() !== _('rest')) {
+                    pitchdrummatrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                }
+                if (!(logo.invertList[turtle].length === 0)) {
+                    var delta = 0;
+                    var len = logo.invertList[turtle].length;
+                    // Get an anchor note and its corresponding
+                    // number, which is used to calculate delta.
+                    var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
+                    var num1 = logo.getNumber(note1[0], note1[1]);
+                    for (var i = len - 1; i > -1; i--) {
+                        // Note from which delta is calculated.
+                        var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
+                        var num2 = getNumber(note2[0], note2[1]);
+                        var a = getNumNote(num1, 0);
+                        delta += num2 - num1;
+                        num1 += 2 * delta;
+                    }
+                }
+
+                if (logo.duplicateFactor[turtle].length > 0) {
+                    var duplicateFactor = logo.duplicateFactor[turtle];
+                } else {
+                    var duplicateFactor = 1;
+                }
+                for (var i = 0; i < duplicateFactor; i++) {
+                    // Apply transpositions
+                    var transposition = 2 * delta;
+                    if (turtle in logo.transposition) {
+                        transposition += logo.transposition[turtle];
+                    }
+
+                    note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                    // If we are in a setdrum clamp, override the pitch.
+                    if (logo.drumStyle[turtle].length > 0) {
+                        pitchdrummatrix.drums.push(last(logo.drumStyle[turtle]));
+                    } else {
+                        pitchdrummatrix.solfegeNotes.push(getSolfege(note));
+                        pitchdrummatrix.solfegeOctaves.push(octave);
+                    }
+                }
+            } else if (logo.inMatrix) {
                 if (note.toLowerCase() !== _('rest')) {
                     matrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
@@ -2545,7 +2627,7 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             childFlow = args[1];
             childFlowCount = 1;
 
-            var listenerName = '_drum_' + turtle;
+            var listenerName = '_setdrum_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
@@ -3274,7 +3356,9 @@ function Logo(matrix, canvas, blocks, turtles, stage,
             this._setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
 
-        if (this.inMatrix) {
+        if (this.inPitchDrumMatrix) {
+            // FIME
+        } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
                 matrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {

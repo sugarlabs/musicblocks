@@ -77,15 +77,16 @@ define(function (require) {
     require('activity/utilitybox');
     require('activity/samplesviewer');
     require('activity/blockfactory');
-    require('activity/soundsamples');
 
     // Music Block-specific modules
     require('activity/turtledefs');
     require('activity/logo');
     require('activity/basicblocks');
     require('activity/analytics');
+    require('activity/soundsamples');
     require('activity/musicutils');
-    require('activity/matrix');
+    require('activity/pitchtimematrix');
+    require('activity/pitchdrummatrix');
 
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {
@@ -584,6 +585,7 @@ define(function (require) {
             palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
 
             matrix = new Matrix();
+            pitchdrummatrix = new PitchDrumMatrix();
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
@@ -592,7 +594,7 @@ define(function (require) {
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(matrix, canvas,
+            logo = new Logo(matrix, pitchdrummatrix, canvas,
                 blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
                 onRunTurtle, getStageX, getStageY,
@@ -1370,12 +1372,21 @@ define(function (require) {
         };
 
         function _doOpenSamples() {
-            if(document.getElementById('matrix').style.visibility !== 'hidden') {
+            localStorage.setItem('isMatrixHidden', document.getElementById('matrix').style.visibility);
+            localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
+
+            if (document.getElementById('matrix').style.visibility !== 'hidden') {
                 console.log('hide matrix');
                 document.getElementById('matrix').style.visibility = 'hidden';
                 document.getElementById('matrix').style.border = 0;
             }
-            localStorage.setItem("isMatrixHidden",document.getElementById('matrix').style.visibility);
+
+            if (document.getElementById('pitchdrummatrix').style.visibility !== 'hidden') {
+                console.log('hide pitch-drum matrix');
+                document.getElementById('pitchdrummatrix').style.visibility = 'hidden';
+                document.getElementById('pitchdrummatrix').style.border = 0;
+            }
+
             console.log('save locally');
             saveLocally();
             thumbnails.show()
@@ -1813,6 +1824,10 @@ define(function (require) {
                         'collapsed': myBlock.collapsed
                     }
                 } else if(myBlock.name === 'matrix') {
+                    var args = {
+                        'collapsed' : myBlock.collapsed
+                    }
+                } else if(myBlock.name === 'pitchdrummatrix') {
                     var args = {
                         'collapsed' : myBlock.collapsed
                     }
