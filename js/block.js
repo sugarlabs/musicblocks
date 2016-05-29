@@ -309,6 +309,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'bubbles':
         case 'cricket':
         case 'setdrum':
+        case 'rhythmruler':
         case 'repeat':
         case 'fill':
         case 'hollowline':
