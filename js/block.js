@@ -12,7 +12,7 @@
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix','rhythmruler'];
 const NOHIT = ['hidden'];
 
 
@@ -248,6 +248,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'action':
         case 'matrix':
         case 'pitchdrummatrix':
+        case 'rhythmruler':
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
@@ -666,6 +667,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'pitchdrummatrix':
                     myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'rhythmruler':
+                    myBlock.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'drum':
                     myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
