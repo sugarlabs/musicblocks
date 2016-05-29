@@ -298,7 +298,13 @@ function PitchDrumMatrix() {
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
                 cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
                 cell.style.lineHeight = 100 + '%';
-                cell.innerHTML = getDrumName(drumname);
+                // Work around i8n bug in Firefox.
+                var name = getDrumName(drumname);
+                if (name === '') {
+                    cell.innerHTML = drumname;
+                } else {
+                    cell.innerHTML = name;
+                }
                 cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
             } else {
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -391,12 +397,12 @@ function PitchDrumMatrix() {
             for (var j = 1; j < table.rows[i].cells.length; j++) {
                 var cell = table.rows[i].cells[j];
                 if (cell.style.backgroundColor === 'black') {
-		    pairs.push([i, j]);
+                    pairs.push([i, j]);
                     break;
                 }
             }
             if (j === table.rows[i].cells.length) {
-		pairs.push([i, -1]);
+                pairs.push([i, -1]);
             }
         }
 
@@ -428,8 +434,8 @@ function PitchDrumMatrix() {
                     var pitchCell = table.rows[i].cells[0];
                     pitchCell.style.backgroundColor = MATRIXLABELCOLOR;
                 }
-	    }, 1000);
-	}
+            }, 1000);
+        }
     }
 
     this._setCellPitchDrum = function(colIndex, rowIndex, playNote) {
@@ -535,19 +541,19 @@ function PitchDrumMatrix() {
             for (var j = 1; j < table.rows[i].cells.length; j++) {
                 var cell = table.rows[i].cells[j];
                 if (cell.style.backgroundColor === 'black') {
-		    pairs.push([i, j]);
+                    pairs.push([i, j]);
                     continue;
                 }
             }
         }
 
         if (pairs.length === 0) {
-	    return;
-	}
+            return;
+        }
 
         var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'drums'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
-	var previousBlock = 0;
+        var previousBlock = 0;
 
         for (var i = 0; i < pairs.length; i++)
         {
@@ -560,7 +566,7 @@ function PitchDrumMatrix() {
             // Both solfege and octave are extracted from HTML by getNote.
             var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
             var pitch = noteObj[0];
-	    var octave = noteObj[1];
+            var octave = noteObj[1];
 
             // Add the set drum block and its value
             var setdrumidx = newStack.length;
@@ -577,12 +583,12 @@ function PitchDrumMatrix() {
             newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchidx]]);
 
             if (i === pairs.length - 1) {
-		newStack.push([hiddenidx, 'hidden', 0, 0, [setdrumidx, null]]);
+                newStack.push([hiddenidx, 'hidden', 0, 0, [setdrumidx, null]]);
             } else {
-		newStack.push([hiddenidx, 'hidden', 0, 0, [setdrumidx, hiddenidx + 1]]);
-	    }
+                newStack.push([hiddenidx, 'hidden', 0, 0, [setdrumidx, hiddenidx + 1]]);
+            }
 
-	    var previousBlock = hiddenidx;
+            var previousBlock = hiddenidx;
         }
 
         // Create a new stack for the chunk.
