@@ -1829,7 +1829,7 @@ function Palette(palettes, name) {
                                'bubbles': BUBBLESOBJ,
                                'cricket': CRICKETOBJ,
                                'darbuka': DARBUKAOBJ,
-			       'clang': CLANGOBJ,
+                               'clang': CLANGOBJ,
                                'duck': DUCKOBJ,
                                'bottle': BOTTLEOBJ,
                                'setdrum': SETDRUMOBJ,

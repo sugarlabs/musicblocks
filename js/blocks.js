@@ -970,7 +970,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     this.deleteNextDefault(bottom);
                 }
             }
-	    
+            
             // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
@@ -1499,7 +1499,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
         // If we drag in a synth block, we need to load the synth.
         if (['sine', 'sawtooth', 'triangle', 'square'].indexOf(name) !== -1) {
-	    this.logo.synth.loadSynth(name);
+            this.logo.synth.loadSynth(name);
         }
 
         if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(name) !== -1) {
