@@ -2089,7 +2089,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 if (logo.drumStyle[turtle].length > 0) {
                     var drumname = last(logo.drumStyle[turtle]);
                     var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
-                    logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
+                    logo.pitchDrumTable[turtle][note2[0] + note2[1]] = drumname;
                 }
                 logo.notePitches[turtle].push(note);
                 logo.noteOctaves[turtle].push(octave);
