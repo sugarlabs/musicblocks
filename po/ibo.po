@@ -15,22 +15,23 @@
 
 #: js/activity.js:443
 #: js/activity.js:443
+#: js/activity.js:445
 msgid "Close"
 msgstr ""
 
-#: js/activity.js:1251
-#: js/block.js:629
-#: js/block.js:1735
+#: js/activity.js:1254
+#: js/block.js:658
+#: js/block.js:1792
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-#: js/blocks.js:1688
-#: js/blocks.js:1690
-#: js/blocks.js:1874
-#: js/blocks.js:2017
-#: js/blocks.js:2123
-#: js/blocks.js:2549
-#: js/blocks.js:3185
-#: js/blocks.js:3260
+#: js/blocks.js:1716
+#: js/blocks.js:1718
+#: js/blocks.js:1902
+#: js/blocks.js:2045
+#: js/blocks.js:2151
+#: js/blocks.js:2578
+#: js/blocks.js:3232
+#: js/blocks.js:3307
 #: js/palette.js:471
 #: js/palette.js:480
 #: js/palette.js:489
@@ -39,125 +40,125 @@ msgstr ""
 #: js/palette.js:1628
 #: js/palette.js:1639
 #: js/palette.js:1650
-#: js/basicblocks.js:1058
-#: js/basicblocks.js:1087
-#: js/basicblocks.js:1094
-#: js/basicblocks.js:1122
-#: js/basicblocks.js:1132
-#: js/basicblocks.js:1161
-#: js/basicblocks.js:1193
-#: js/basicblocks.js:1197
-#: js/basicblocks.js:1203
+#: js/basicblocks.js:1298
+#: js/basicblocks.js:1327
+#: js/basicblocks.js:1334
+#: js/basicblocks.js:1362
+#: js/basicblocks.js:1372
+#: js/basicblocks.js:1401
+#: js/basicblocks.js:1433
+#: js/basicblocks.js:1437
+#: js/basicblocks.js:1443
 msgid "action"
 msgstr "edinam"
 
-#: js/activity.js:1934
+#: js/activity.js:1950
 #: js/turtledefs.js:79
 msgid "Run fast"
 msgstr "Gbaa ngwa ngwa"
 
-#: js/activity.js:1935
+#: js/activity.js:1951
 #: js/turtledefs.js:80
 msgid "Run slow"
 msgstr "Gbaa Obere Obere"
 
-#: js/activity.js:1936
+#: js/activity.js:1952
 #: js/turtledefs.js:82
 msgid "Run step by step"
 msgstr "Gbaa nzọụkwụ site nzọụkwụ"
 
-#: js/activity.js:1937
+#: js/activity.js:1953
 #: js/turtledefs.js:81
 msgid "Run music slow"
 msgstr "Agba ọsọ egwu ngwa ngwa"
 
-#: js/activity.js:1938
+#: js/activity.js:1954
 #: js/turtledefs.js:83
 msgid "Run note by note"
 msgstr "Agba ọsọ dee site na ndetu"
 
-#: js/activity.js:1939
+#: js/activity.js:1955
 #: js/turtledefs.js:84
 msgid "Stop"
 msgstr "kwụsị"
 
-#: js/activity.js:1940
+#: js/activity.js:1956
 #: js/turtledefs.js:85
 msgid "Clean"
 msgstr "ọcha"
 
-#: js/activity.js:1941
+#: js/activity.js:1957
 #: js/turtledefs.js:86
 msgid "Show/hide palettes"
 msgstr "Gosi / hide palettes"
 
-#: js/activity.js:1942
+#: js/activity.js:1958
 #: js/turtledefs.js:87
 msgid "Show/hide blocks"
 msgstr "Gosi / hide blocks"
 
-#: js/activity.js:1943
+#: js/activity.js:1959
 #: js/turtledefs.js:88
 msgid "Expand/collapse collapsable blocks"
 msgstr "Ịmụbawanye / daa collapsable blocks"
 
-#: js/activity.js:1944
-#: js/activity.js:1985
+#: js/activity.js:1960
+#: js/activity.js:2001
 #: js/turtledefs.js:89
 msgid "Home"
 msgstr ""
 
-#: js/activity.js:1945
+#: js/activity.js:1961
 #: js/turtledefs.js:90
 msgid "Help"
 msgstr "Help"
 
-#: js/activity.js:2012
+#: js/activity.js:2028
 #: js/turtledefs.js:92
 msgid "Load samples from server"
 msgstr "Ibu Ibu n'omume site na ihe nkesa"
 
-#: js/activity.js:2013
+#: js/activity.js:2029
 #: js/turtledefs.js:93
 msgid "Load project from files"
 msgstr ""
 
-#: js/activity.js:2014
+#: js/activity.js:2030
 #: js/turtledefs.js:94
 msgid "Save project"
 msgstr "zoputa oru ngo"
 
-#: js/activity.js:2015
+#: js/activity.js:2031
 #: js/turtledefs.js:95
 msgid "Save sheet music"
 msgstr "Zọpụta mpempe akwụkwọ egwu"
 
-#: js/activity.js:2016
+#: js/activity.js:2032
 #: js/turtledefs.js:97
 msgid "Paste"
 msgstr "tapawa"
 
-#: js/activity.js:2017
+#: js/activity.js:2033
 #: js/turtledefs.js:99
 msgid "Cartesian"
 msgstr "Cartesian"
 
-#: js/activity.js:2018
+#: js/activity.js:2034
 #: js/turtledefs.js:100
 msgid "Polar"
 msgstr "pola"
 
-#: js/activity.js:2019
+#: js/activity.js:2035
 #: js/turtledefs.js:101
 msgid "Settings"
 msgstr "Ntọala"
 
-#: js/activity.js:2020
+#: js/activity.js:2036
 #: js/turtledefs.js:107
 msgid "Delete all"
 msgstr "hichapụ niile"
 
-#: js/activity.js:2021
+#: js/activity.js:2037
 #: js/turtledefs.js:108
 msgid "Undo"
 msgstr "Wepu"
@@ -166,276 +167,312 @@ msgstr "Wepu"
 msgid "confirm"
 msgstr "gosi"
 
-#: js/block.js:558
-#: js/logo.js:1974
-#: js/logo.js:2111
-#: js/logo.js:4320
-#: js/matrix.js:312
+#: js/pitchdrummatrix.js:146
+#: js/pitchtimematrix.js:207
+msgid "Solfa"
+msgstr ""
+
+#: js/pitchdrummatrix.js:159
+#: js/pitchdrummatrix.js:159
+#: js/pitchtimematrix.js:220
+#: js/pitchtimematrix.js:220
+msgid "play"
+msgstr "igwu egwu"
+
+#: js/pitchdrummatrix.js:177
+#: js/pitchdrummatrix.js:177
+#: js/pitchtimematrix.js:238
+#: js/pitchtimematrix.js:238
+msgid "save"
+msgstr ""
+
+#: js/pitchdrummatrix.js:194
+#: js/pitchdrummatrix.js:194
+#: js/pitchtimematrix.js:255
+#: js/pitchtimematrix.js:255
+#: js/basicblocks.js:872
+msgid "clear"
+msgstr "doro anya"
+
+#: js/pitchdrummatrix.js:211
+#: js/pitchdrummatrix.js:211
+#: js/pitchtimematrix.js:289
+#: js/pitchtimematrix.js:289
+msgid "close"
+msgstr ""
+
+#: js/pitchdrummatrix.js:231
+#: js/pitchtimematrix.js:309
+#: js/block.js:584
+#: js/logo.js:2063
+#: js/logo.js:2265
+#: js/logo.js:2310
+#: js/logo.js:4630
 #: js/musicutils.js:22
 msgid "rest"
 msgstr ""
 
-#: js/block.js:632
-#: js/logo.js:733
-#: js/logo.js:4737
-#: js/logo.js:4786
-#: js/logo.js:4806
-#: js/turtle.js:361
-#: js/turtle.js:362
-#: js/basicblocks.js:1185
+#: js/pitchdrummatrix.js:266
+#: js/block.js:670
+#: js/turtledefs.js:21
+#: js/turtle.js:380
+#: js/basicblocks.js:446
+#: js/basicblocks.js:841
+msgid "drum"
+msgstr ""
+
+#: js/pitchtimematrix.js:272
+#: js/pitchtimematrix.js:272
+msgid "export"
+msgstr ""
+
+#: js/pitchtimematrix.js:342
+#: js/pitchtimematrix.js:544
+#: js/basicblocks.js:303
+#: js/basicblocks.js:313
+#: js/basicblocks.js:467
+msgid "note value"
+msgstr "dee uru"
+
+#: js/pitchtimematrix.js:491
+msgid "tuplet value"
+msgstr ""
+
+#: js/block.js:593
+#: js/palette.js:1703
+#: js/palette.js:1721
+#: js/palette.js:1734
+#: js/basicblocks.js:812
+#: js/musicutils.js:158
+#.TRANS: : musical instrument
+msgid "kick drum"
+msgstr ""
+
+#: js/block.js:661
+#: js/logo.js:763
+#: js/logo.js:5047
+#: js/logo.js:5096
+#: js/logo.js:5116
+#: js/turtle.js:522
+#: js/turtle.js:523
+#: js/basicblocks.js:1425
 msgid "start"
 msgstr "bido"
 
-#: js/block.js:635
+#: js/block.js:664
+#: js/block.js:667
 #: js/turtledefs.js:21
 msgid "matrix"
 msgstr ""
 
-#: js/block.js:638
-#: js/turtle.js:219
-msgid "drum"
-msgstr ""
-
-#: js/logo.js:24
+#: js/logo.js:26
+#.TRANS:  Animal names used in Lilypond output
 msgid "mouse"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "brown rat"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "mole"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "chipmunk"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "red squirrel"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "guinea pig"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "capybara"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "coypu"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "black rat"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "grey squirrel"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "flying squirrel"
 msgstr ""
 
-#: js/logo.js:24
+#: js/logo.js:26
 msgid "bat"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 #.TRANS:  Abbreviations for names used in Lilypind output, e.g., m for mouse
 msgid "m"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "br"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "ml"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "ch"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "rs"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "gp"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "cb"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "cp"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "bk"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "gs"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "fs"
 msgstr ""
 
-#: js/logo.js:26
+#: js/logo.js:29
 msgid "bt"
 msgstr ""
 
-#: js/logo.js:356
+#: js/logo.js:377
 msgid "true"
 msgstr ""
 
-#: js/logo.js:358
+#: js/logo.js:379
 msgid "false"
 msgstr ""
 
-#: js/logo.js:879
+#: js/logo.js:909
 msgid "Block does not support incrementing."
 msgstr ""
 
-#: js/logo.js:1453
-#: js/logo.js:1777
+#: js/logo.js:1515
+#: js/logo.js:1839
 msgid "You must select a file."
 msgstr ""
 
-#: js/logo.js:1786
+#: js/logo.js:1848
 #: plugins/heap.rtp:96
 msgid "The file you selected does not contain a valid heap."
 msgstr ""
 
-#: js/logo.js:1790
+#: js/logo.js:1852
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
 msgstr ""
 
-#: js/logo.js:1806
+#: js/logo.js:1868
 msgid "Error parsing JSON data:"
 msgstr ""
 
-#: js/logo.js:1811
+#: js/logo.js:1873
 msgid "404: Page not found"
 msgstr ""
 
-#: js/logo.js:1835
+#: js/logo.js:1897
 msgid "turtleHeaps does not contain a valid heap for"
 msgstr ""
 
-#: js/logo.js:1845
+#: js/logo.js:1907
 msgid "Index must be > 0."
 msgstr ""
 
-#: js/logo.js:1864
+#: js/logo.js:1926
 msgid "Beats per minute must be > 30."
 msgstr ""
 
-#: js/logo.js:1867
+#: js/logo.js:1929
 msgid "Maximum beats per minute is 1000."
 msgstr ""
 
-#: js/logo.js:1925
+#: js/logo.js:1985
+msgid "You must have at least one pitch block and one drum block in the matrix."
+msgstr ""
+
+#: js/logo.js:2014
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
 msgstr ""
 
-#: js/logo.js:1927
+#: js/logo.js:2016
 msgid "Please close the current matrix before opening a new one."
 msgstr ""
 
-#: js/logo.js:1982
-msgid "The Step Pitch Block must be used insdie of a Note Block."
+#: js/logo.js:2071
+msgid "The Step Pitch Block must be used inside of a Note Block."
 msgstr ""
 
-#: js/logo.js:2217
+#: js/logo.js:2202
+msgid "Drum Block: Did you mean to use a Note block?"
+msgstr ""
+
+#: js/logo.js:2434
 msgid "Pitch Block: Did you mean to use a Note block?"
 msgstr ""
 
-#: js/logo.js:2233
+#: js/logo.js:2450
 msgid "Rhythm Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:2291
+#: js/logo.js:2509
 msgid "Note value must be greater than 0"
 msgstr "Cheta uru ga-adị ukwuu karịa 0"
 
-#: js/logo.js:2798
+#: js/logo.js:3082
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:2988
+#: js/logo.js:3272
 msgid "My Project"
 msgstr ""
 
-#: js/logo.js:3363
+#: js/logo.js:3648
 msgid "synth cannot play chords."
 msgstr ""
 
-#: js/logo.js:3974
-#: js/basicblocks.js:1268
+#: js/logo.js:4284
+#: js/basicblocks.js:1508
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 msgid "empty heap"
 msgstr "efu kpokọtara"
 
-#: js/logo.js:4737
-#: js/logo.js:4786
-#: js/logo.js:4806
-#: js/turtle.js:218
-#: js/turtle.js:357
-#: js/turtle.js:358
-#: js/basicblocks.js:1177
+#: js/logo.js:5047
+#: js/logo.js:5096
+#: js/logo.js:5116
+#: js/turtle.js:379
+#: js/turtle.js:518
+#: js/turtle.js:519
+#: js/basicblocks.js:1417
 msgid "start drum"
-msgstr ""
-
-#: js/matrix.js:209
-msgid "Solfa"
-msgstr ""
-
-#: js/matrix.js:222
-#: js/matrix.js:222
-msgid "play"
-msgstr "igwu egwu"
-
-#: js/matrix.js:240
-#: js/matrix.js:240
-msgid "save"
-msgstr ""
-
-#: js/matrix.js:257
-#: js/matrix.js:257
-#: js/basicblocks.js:665
-msgid "clear"
-msgstr "doro anya"
-
-#: js/matrix.js:274
-#: js/matrix.js:274
-msgid "export"
-msgstr ""
-
-#: js/matrix.js:291
-#: js/matrix.js:291
-msgid "close"
-msgstr ""
-
-#: js/matrix.js:337
-#: js/matrix.js:543
-#: js/basicblocks.js:303
-#: js/basicblocks.js:313
-msgid "note value"
-msgstr "dee uru"
-
-#: js/matrix.js:490
-msgid "tuplet value"
 msgstr ""
 
 #: js/utilitybox.js:36
@@ -481,7 +518,7 @@ msgstr "pitch"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-#: js/basicblocks.js:1354
+#: js/basicblocks.js:1594
 msgid "tone"
 msgstr "ụda"
 
@@ -740,15 +777,15 @@ msgstr "asuanetop"
 msgid "Download"
 msgstr "ala-ibu"
 
-#: js/samplesviewer.js:419
+#: js/samplesviewer.js:420
 msgid "Planet"
 msgstr "Planet"
 
-#: js/samplesviewer.js:420
+#: js/samplesviewer.js:421
 msgid "On my device"
 msgstr "On m ngwaọrụ"
 
-#: js/samplesviewer.js:421
+#: js/samplesviewer.js:422
 msgid "Worldwide"
 msgstr "Uwa-obosara"
 
@@ -757,50 +794,51 @@ msgstr "Uwa-obosara"
 msgid "open file"
 msgstr "emeghe faịlụ"
 
-#: js/blocks.js:1563
+#: js/blocks.js:1571
 #: js/palette.js:515
-#: js/basicblocks.js:1390
+#: js/basicblocks.js:1630
 msgid "text"
 msgstr "ederede"
 
-#: js/blocks.js:1573
+#: js/blocks.js:1581
 #: js/palette.js:518
 #: js/palette.js:1695
 #: js/palette.js:1702
+#: js/palette.js:1703
 msgid "sol"
 msgstr ""
 
-#: js/blocks.js:1946
+#: js/blocks.js:1974
 #: js/palette.js:453
 #: js/palette.js:1595
-#: js/basicblocks.js:1020
-#: js/basicblocks.js:1024
-#: js/basicblocks.js:1036
-#: js/basicblocks.js:1044
+#: js/basicblocks.js:1260
+#: js/basicblocks.js:1264
+#: js/basicblocks.js:1276
+#: js/basicblocks.js:1284
 msgid "box"
 msgstr "igbe"
 
-#: js/blocks.js:2041
-#: js/basicblocks.js:1033
+#: js/blocks.js:2069
+#: js/basicblocks.js:1273
 msgid "store in"
 msgstr "echekwa na"
 
-#: js/blocks.js:2041
+#: js/blocks.js:2069
 #: js/basicblocks.js:240
-#: js/basicblocks.js:1033
+#: js/basicblocks.js:1273
 msgid "name"
 msgstr "aha"
 
-#: js/blocks.js:2041
-#: js/basicblocks.js:1011
-#: js/basicblocks.js:1033
-#: js/basicblocks.js:1235
+#: js/blocks.js:2069
+#: js/basicblocks.js:1251
+#: js/basicblocks.js:1273
+#: js/basicblocks.js:1475
 #: plugins/bitcoin.rtp:27
 msgid "value"
 msgstr "uru"
 
 #: js/palette.js:639
-#: js/basicblocks.js:716
+#: js/basicblocks.js:956
 msgid "back"
 msgstr "azụ"
 
@@ -811,7 +849,7 @@ msgstr "zie"
 
 #: js/palette.js:650
 #: js/palette.js:651
-#: js/basicblocks.js:1386
+#: js/basicblocks.js:1626
 msgid "show"
 msgstr "zie"
 
@@ -825,11 +863,167 @@ msgid "la"
 msgstr ""
 
 #: js/palette.js:1702
+#: js/palette.js:1703
 msgid "mi"
 msgstr ""
 
 #: js/palette.js:1702
+#: js/palette.js:1703
 msgid "re"
+msgstr ""
+
+#: js/palette.js:1733
+#: js/basicblocks.js:819
+#: js/musicutils.js:156
+#.TRANS: : musical instrument
+msgid "snare drum"
+msgstr ""
+
+#: js/palette.js:1735
+#: js/basicblocks.js:777
+#: js/musicutils.js:168
+#.TRANS: : musical instrument
+msgid "hi hat"
+msgstr ""
+
+#: js/palette.js:1736
+#: js/basicblocks.js:805
+#: js/musicutils.js:160
+#.TRANS: : musical instrument
+msgid "tom tom"
+msgstr ""
+
+#: js/palette.js:1737
+#: js/basicblocks.js:770
+#: js/musicutils.js:174
+#.TRANS: : musical instrument
+msgid "triangle bell"
+msgstr ""
+
+#: js/palette.js:1738
+#: js/basicblocks.js:728
+#: js/musicutils.js:188
+#.TRANS: : sound effect
+msgid "slap"
+msgstr ""
+
+#: js/palette.js:1739
+#: js/basicblocks.js:658
+#: js/musicutils.js:200
+#.TRANS: : animal sound effect
+msgid "duck"
+msgstr ""
+
+#: js/palette.js:1740
+#: js/basicblocks.js:784
+#: js/musicutils.js:166
+#.TRANS: : musical instrument
+msgid "darbuka drum"
+msgstr ""
+
+#: js/palette.js:1741
+#: js/basicblocks.js:693
+#: js/musicutils.js:180
+#.TRANS: : sound effect
+msgid "bottle"
+msgstr ""
+
+#: js/palette.js:1742
+#: js/basicblocks.js:714
+#: js/musicutils.js:182
+#.TRANS: : sound effect
+msgid "clang"
+msgstr ""
+
+#: js/palette.js:1743
+#: js/basicblocks.js:763
+#: js/musicutils.js:176
+#.TRANS: : musical instrument
+msgid "finger cymbals"
+msgstr ""
+
+#: js/palette.js:1744
+#: js/basicblocks.js:791
+#: js/musicutils.js:164
+#.TRANS: : musical instrument
+msgid "cup drum"
+msgstr ""
+
+#: js/palette.js:1745
+#: js/basicblocks.js:749
+#: js/musicutils.js:172
+#.TRANS: : musical instrument
+msgid "cow bell"
+msgstr ""
+
+#: js/palette.js:1746
+#: js/basicblocks.js:742
+#: js/musicutils.js:190
+#.TRANS: : sound effect
+msgid "splash"
+msgstr ""
+
+#: js/palette.js:1747
+#: js/basicblocks.js:756
+#: js/musicutils.js:170
+#.TRANS: : musical instrument
+msgid "ride bell"
+msgstr ""
+
+#: js/palette.js:1748
+#: js/basicblocks.js:798
+#: js/musicutils.js:162
+#.TRANS: : musical instrument
+msgid "floor tom tom"
+msgstr ""
+
+#: js/palette.js:1749
+#: js/basicblocks.js:735
+#: js/musicutils.js:184
+#.TRANS: : sound effect
+msgid "crash"
+msgstr ""
+
+#: js/palette.js:1750
+#: js/basicblocks.js:707
+#: js/musicutils.js:178
+#.TRANS: : sound effect
+msgid "chine"
+msgstr ""
+
+#: js/palette.js:1751
+#: js/basicblocks.js:679
+#: js/musicutils.js:198
+#.TRANS: : animal sound effect
+msgid "dog"
+msgstr ""
+
+#: js/palette.js:1752
+#: js/basicblocks.js:665
+#: js/musicutils.js:194
+#.TRANS: : animal sound effect
+msgid "cat"
+msgstr ""
+
+#: js/palette.js:1753
+#: js/basicblocks.js:721
+#: js/musicutils.js:186
+#.TRANS: : sound effect
+msgid "clap"
+msgstr ""
+
+#: js/palette.js:1754
+#: js/basicblocks.js:700
+#: js/musicutils.js:192
+#.TRANS: : sound effect
+msgid "bubbles"
+msgstr ""
+
+#: js/palette.js:1755
+#: js/basicblocks.js:672
+#: js/musicutils.js:196
+#.TRANS: : animal sound effect
+msgid "cricket"
 msgstr ""
 
 #: js/basicblocks.js:74
@@ -885,8 +1079,7 @@ msgid "invert"
 msgstr "invert"
 
 #: js/basicblocks.js:190
-#: js/basicblocks.js:460
-#: js/basicblocks.js:1364
+#: js/basicblocks.js:1604
 #: plugins/rodi.rtp:170
 msgid "note"
 msgstr "dee"
@@ -894,7 +1087,7 @@ msgstr "dee"
 #: js/basicblocks.js:190
 #: js/basicblocks.js:210
 #: js/basicblocks.js:240
-#: js/basicblocks.js:1364
+#: js/basicblocks.js:1604
 msgid "octave"
 msgstr "octave"
 
@@ -1012,567 +1205,597 @@ msgstr "ntụpọ"
 msgid "silence"
 msgstr ""
 
-#: js/basicblocks.js:472
-#: js/basicblocks.js:566
+#: js/basicblocks.js:479
+#: js/basicblocks.js:573
 msgid "set volume"
 msgstr "setịpụrụ uda"
 
-#: js/basicblocks.js:480
+#: js/basicblocks.js:487
 msgid "staccato factor"
 msgstr ""
 
-#: js/basicblocks.js:487
+#: js/basicblocks.js:494
 msgid "slur factor"
 msgstr ""
 
-#: js/basicblocks.js:494
+#: js/basicblocks.js:501
 msgid "note volume"
 msgstr "dee olu"
 
-#: js/basicblocks.js:503
+#: js/basicblocks.js:510
 msgid "play forward"
 msgstr ""
 
-#: js/basicblocks.js:512
+#: js/basicblocks.js:519
 msgid "play backward"
 msgstr "egwu backward"
 
-#: js/basicblocks.js:519
-#: js/basicblocks.js:537
+#: js/basicblocks.js:526
+#: js/basicblocks.js:544
 msgid "key"
 msgstr "ntughe"
 
-#: js/basicblocks.js:528
-#: js/basicblocks.js:537
+#: js/basicblocks.js:535
+#: js/basicblocks.js:544
 msgid "set key"
 msgstr "setịpụụrụ ntughe "
 
-#: js/basicblocks.js:537
+#: js/basicblocks.js:544
 msgid "mode"
 msgstr ""
 
-#: js/basicblocks.js:547
+#: js/basicblocks.js:554
 msgid "meter"
 msgstr "mita"
 
-#: js/basicblocks.js:547
+#: js/basicblocks.js:554
 msgid "numerator"
 msgstr "numerator"
 
-#: js/basicblocks.js:547
+#: js/basicblocks.js:554
 msgid "denominator"
 msgstr "denominator"
 
-#: js/basicblocks.js:558
+#: js/basicblocks.js:565
 msgid "articulation"
 msgstr ""
 
-#: js/basicblocks.js:574
+#: js/basicblocks.js:581
 msgid "crescendo"
 msgstr "crescendo"
 
-#: js/basicblocks.js:582
+#: js/basicblocks.js:589
 msgid "thirds"
 msgstr ""
 
-#: js/basicblocks.js:589
+#: js/basicblocks.js:596
 msgid "fourths"
 msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:605
 msgid "tritone"
 msgstr ""
 
-#: js/basicblocks.js:603
+#: js/basicblocks.js:612
 msgid "fifths"
 msgstr ""
 
-#: js/basicblocks.js:610
+#: js/basicblocks.js:619
 msgid "interval"
 msgstr ""
 
-#: js/basicblocks.js:618
+#: js/basicblocks.js:627
 msgid "swing"
 msgstr "siwing"
 
-#: js/basicblocks.js:626
+#: js/basicblocks.js:635
 msgid "slur"
 msgstr "slur"
 
-#: js/basicblocks.js:634
+#: js/basicblocks.js:643
 msgid "staccato"
 msgstr "staccato"
 
-#: js/basicblocks.js:644
+#: js/basicblocks.js:686
+msgid "pluck"
+msgstr ""
+
+#: js/basicblocks.js:826
+msgid "pitch-drum matrix"
+msgstr ""
+
+#: js/basicblocks.js:833
+msgid "set drum"
+msgstr ""
+
+#: js/basicblocks.js:851
 msgid "heading"
 msgstr "isiokwu"
 
-#: js/basicblocks.js:651
-#: js/basicblocks.js:690
+#: js/basicblocks.js:858
+#: js/basicblocks.js:879
+#: js/basicblocks.js:890
+#: js/basicblocks.js:901
+#: js/basicblocks.js:930
 msgid "x"
 msgstr "x"
 
-#: js/basicblocks.js:658
-#: js/basicblocks.js:690
+#: js/basicblocks.js:865
+#: js/basicblocks.js:879
+#: js/basicblocks.js:890
+#: js/basicblocks.js:901
+#: js/basicblocks.js:930
 msgid "y"
 msgstr "y"
 
-#: js/basicblocks.js:672
+#: js/basicblocks.js:879
+msgid "control point 2"
+msgstr ""
+
+#: js/basicblocks.js:890
+msgid "control point 1"
+msgstr ""
+
+#: js/basicblocks.js:901
+msgid "bezier"
+msgstr ""
+
+#: js/basicblocks.js:912
 msgid "arc"
 msgstr "aak"
 
-#: js/basicblocks.js:672
+#: js/basicblocks.js:912
 msgid "angle"
 msgstr "n'akuku"
 
-#: js/basicblocks.js:672
+#: js/basicblocks.js:912
 msgid "radius"
 msgstr "okirikiri"
 
-#: js/basicblocks.js:682
+#: js/basicblocks.js:922
 msgid "set heading"
 msgstr "set isiokwu"
 
-#: js/basicblocks.js:690
+#: js/basicblocks.js:930
 msgid "set xy"
 msgstr "set xy"
 
-#: js/basicblocks.js:700
+#: js/basicblocks.js:940
 #: plugins/rodi.rtp:59
 msgid "right"
 msgstr "nri"
 
-#: js/basicblocks.js:708
+#: js/basicblocks.js:948
 #: plugins/rodi.rtp:58
 msgid "left"
 msgstr "ekpe"
 
-#: js/basicblocks.js:724
+#: js/basicblocks.js:964
 msgid "forward"
 msgstr "na-atụ"
 
-#: js/basicblocks.js:735
-#: js/basicblocks.js:779
+#: js/basicblocks.js:975
+#: js/basicblocks.js:1019
 msgid "background"
 msgstr "ndabere"
 
-#: js/basicblocks.js:742
+#: js/basicblocks.js:982
 msgid "color"
 msgstr "agba"
 
-#: js/basicblocks.js:749
+#: js/basicblocks.js:989
 msgid "shade"
 msgstr "ndo"
 
-#: js/basicblocks.js:756
+#: js/basicblocks.js:996
 msgid "grey"
 msgstr "isi awọ"
 
-#: js/basicblocks.js:763
+#: js/basicblocks.js:1003
 msgid "pen size"
 msgstr "pen size"
 
-#: js/basicblocks.js:770
+#: js/basicblocks.js:1010
 msgid "set font"
 msgstr ""
 
-#: js/basicblocks.js:786
+#: js/basicblocks.js:1026
 msgid "hollow line"
 msgstr "oghere ogbara"
 
-#: js/basicblocks.js:793
+#: js/basicblocks.js:1033
 msgid "fill"
 msgstr "imeju "
 
-#: js/basicblocks.js:800
+#: js/basicblocks.js:1040
 msgid "pen up"
 msgstr "pen elu"
 
-#: js/basicblocks.js:807
+#: js/basicblocks.js:1047
 msgid "pen down"
 msgstr "pen ala"
 
-#: js/basicblocks.js:814
+#: js/basicblocks.js:1054
 msgid "set pen size"
 msgstr "set pen size"
 
-#: js/basicblocks.js:822
+#: js/basicblocks.js:1062
 msgid "set translucency"
 msgstr ""
 
-#: js/basicblocks.js:830
+#: js/basicblocks.js:1070
 msgid "set hue"
 msgstr "set agba"
 
-#: js/basicblocks.js:838
+#: js/basicblocks.js:1078
 msgid "set shade"
 msgstr "set ndo"
 
-#: js/basicblocks.js:846
+#: js/basicblocks.js:1086
 msgid "set grey"
 msgstr "set isi awọ"
 
-#: js/basicblocks.js:854
+#: js/basicblocks.js:1094
 msgid "set color"
 msgstr "set agba"
 
-#: js/basicblocks.js:864
+#: js/basicblocks.js:1104
 msgid "int"
 msgstr ""
 
-#: js/basicblocks.js:900
+#: js/basicblocks.js:1140
 msgid "and"
 msgstr "na"
 
-#: js/basicblocks.js:907
+#: js/basicblocks.js:1147
 msgid "or"
 msgstr "ma ọ bụ"
 
-#: js/basicblocks.js:914
+#: js/basicblocks.js:1154
 msgid "not"
 msgstr "bụghị"
 
-#: js/basicblocks.js:920
+#: js/basicblocks.js:1160
 msgid "mod"
 msgstr "mod"
 
-#: js/basicblocks.js:928
+#: js/basicblocks.js:1168
 msgid "sqrt"
 msgstr "sqrt"
 
-#: js/basicblocks.js:978
+#: js/basicblocks.js:1218
 msgid "one of"
 msgstr "otu n'ime"
 
-#: js/basicblocks.js:978
+#: js/basicblocks.js:1218
 msgid "this"
 msgstr "this"
 
-#: js/basicblocks.js:978
+#: js/basicblocks.js:1218
 msgid "that"
 msgstr "that"
 
-#: js/basicblocks.js:989
+#: js/basicblocks.js:1229
 msgid "random"
 msgstr "random"
 
-#: js/basicblocks.js:989
+#: js/basicblocks.js:1229
 msgid "min"
 msgstr "kacha nta"
 
-#: js/basicblocks.js:989
+#: js/basicblocks.js:1229
 msgid "max"
 msgstr "kacha"
 
-#: js/basicblocks.js:1004
+#: js/basicblocks.js:1244
 msgid "add 1 to"
 msgstr "tinye 1"
 
-#: js/basicblocks.js:1011
+#: js/basicblocks.js:1251
 msgid "add"
 msgstr "tinye"
 
-#: js/basicblocks.js:1011
+#: js/basicblocks.js:1251
 #: plugins/finance.rtp:28
 msgid "to"
 msgstr "ka"
 
-#: js/basicblocks.js:1055
-#: js/basicblocks.js:1102
-#: js/basicblocks.js:1119
-#: js/basicblocks.js:1157
-#: js/basicblocks.js:1438
-#: js/basicblocks.js:1445
+#: js/basicblocks.js:1295
+#: js/basicblocks.js:1342
+#: js/basicblocks.js:1359
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1678
+#: js/basicblocks.js:1685
 msgid "do"
 msgstr "eme"
 
-#: js/basicblocks.js:1064
+#: js/basicblocks.js:1304
 msgid "return"
 msgstr ""
 
-#: js/basicblocks.js:1074
+#: js/basicblocks.js:1314
 msgid "return to URL"
 msgstr ""
 
-#: js/basicblocks.js:1078
+#: js/basicblocks.js:1318
 msgid "100"
 msgstr ""
 
-#: js/basicblocks.js:1084
-#: js/basicblocks.js:1110
-#: js/basicblocks.js:1129
+#: js/basicblocks.js:1324
+#: js/basicblocks.js:1350
+#: js/basicblocks.js:1369
 msgid "calculate"
 msgstr ""
 
-#: js/basicblocks.js:1157
+#: js/basicblocks.js:1397
 msgid "on"
 msgstr "inwu"
 
-#: js/basicblocks.js:1157
-#: js/basicblocks.js:1160
-#: js/basicblocks.js:1171
+#: js/basicblocks.js:1397
+#: js/basicblocks.js:1400
+#: js/basicblocks.js:1411
 msgid "event"
 msgstr "omume"
 
-#: js/basicblocks.js:1168
+#: js/basicblocks.js:1408
 msgid "broadcast"
 msgstr "agbasa ozi n'ikuku`"
 
-#: js/basicblocks.js:1213
+#: js/basicblocks.js:1453
 msgid "load heap from App"
 msgstr ""
 
-#: js/basicblocks.js:1224
+#: js/basicblocks.js:1464
 msgid "save heap to App"
 msgstr ""
 
-#: js/basicblocks.js:1235
+#: js/basicblocks.js:1475
 msgid "set heap"
 msgstr "setịpụụrụ obo"
 
-#: js/basicblocks.js:1235
+#: js/basicblocks.js:1475
 msgid "index"
 msgstr "ndeksi"
 
-#: js/basicblocks.js:1246
+#: js/basicblocks.js:1486
 #: plugins/heap.rtp:126
 msgid "show heap"
 msgstr "show kpokọtara"
 
-#: js/basicblocks.js:1253
+#: js/basicblocks.js:1493
 msgid "heap length"
 msgstr "obo ogologo"
 
-#: js/basicblocks.js:1261
+#: js/basicblocks.js:1501
 #: plugins/heap.rtp:134
 msgid "heap empty?"
 msgstr "ekpokwasị efu?"
 
-#: js/basicblocks.js:1275
+#: js/basicblocks.js:1515
 #: plugins/heap.rtp:150
 msgid "save heap"
 msgstr "ịzọpụta kpokọtara"
 
-#: js/basicblocks.js:1284
+#: js/basicblocks.js:1524
 #: plugins/heap.rtp:160
 msgid "load heap"
 msgstr "ibu kpokọtara"
 
-#: js/basicblocks.js:1293
+#: js/basicblocks.js:1533
 msgid "index heap"
 msgstr "ndeksi obo"
 
-#: js/basicblocks.js:1302
+#: js/basicblocks.js:1542
 #: plugins/heap.rtp:109
 msgid "push"
 msgstr "kwaa"
 
-#: js/basicblocks.js:1310
+#: js/basicblocks.js:1550
 #: plugins/heap.rtp:118
 msgid "pop"
 msgstr "pop"
 
-#: js/basicblocks.js:1319
+#: js/basicblocks.js:1559
 msgid "speak"
 msgstr "kwo"
 
-#: js/basicblocks.js:1347
+#: js/basicblocks.js:1587
 msgid "stop media"
 msgstr "kwụsị egwu"
 
-#: js/basicblocks.js:1354
+#: js/basicblocks.js:1594
 msgid "frequency"
 msgstr "ugboro ole"
 
-#: js/basicblocks.js:1354
+#: js/basicblocks.js:1594
 msgid "duration (ms)"
 msgstr "Na oge (ms)"
 
-#: js/basicblocks.js:1364
+#: js/basicblocks.js:1604
 msgid "note to frequency"
 msgstr "mara na ugboro ole"
 
-#: js/basicblocks.js:1375
+#: js/basicblocks.js:1615
 msgid "shell"
 msgstr "shei"
 
-#: js/basicblocks.js:1375
-#: js/basicblocks.js:1386
+#: js/basicblocks.js:1615
+#: js/basicblocks.js:1626
 msgid "size"
 msgstr "size"
 
-#: js/basicblocks.js:1375
+#: js/basicblocks.js:1615
 msgid "image"
 msgstr "oyiyi"
 
-#: js/basicblocks.js:1386
+#: js/basicblocks.js:1626
 msgid "obj"
 msgstr "obj"
 
-#: js/basicblocks.js:1424
+#: js/basicblocks.js:1664
 msgid "stop"
 msgstr "kwụsị"
 
-#: js/basicblocks.js:1431
+#: js/basicblocks.js:1671
 msgid "wait for"
 msgstr "na-eche maka"
 
-#: js/basicblocks.js:1438
+#: js/basicblocks.js:1678
 msgid "until"
 msgstr "ruo mgbe"
 
-#: js/basicblocks.js:1445
+#: js/basicblocks.js:1685
 msgid "while"
 msgstr "mgbe"
 
-#: js/basicblocks.js:1452
-#: js/basicblocks.js:1459
+#: js/basicblocks.js:1692
+#: js/basicblocks.js:1699
 msgid "if"
 msgstr "o buru na"
 
-#: js/basicblocks.js:1452
-#: js/basicblocks.js:1459
+#: js/basicblocks.js:1692
+#: js/basicblocks.js:1699
 msgid "then"
 msgstr "mgbe ahụ"
 
-#: js/basicblocks.js:1452
+#: js/basicblocks.js:1692
 msgid "else"
 msgstr "ọzọ"
 
-#: js/basicblocks.js:1466
+#: js/basicblocks.js:1706
 msgid "forever"
 msgstr "ruo mgbe ebighị ebi"
 
-#: js/basicblocks.js:1473
+#: js/basicblocks.js:1713
 msgid "repeat"
 msgstr "imekwa"
 
-#: js/basicblocks.js:1485
-#: js/basicblocks.js:1496
-#: js/basicblocks.js:1505
-#: js/basicblocks.js:1515
-#: js/basicblocks.js:1523
-#: js/basicblocks.js:1532
-#: js/basicblocks.js:1542
+#: js/basicblocks.js:1725
+#: js/basicblocks.js:1736
+#: js/basicblocks.js:1745
+#: js/basicblocks.js:1755
+#: js/basicblocks.js:1763
+#: js/basicblocks.js:1772
+#: js/basicblocks.js:1782
 msgid "unknown"
 msgstr "amaghị"
 
-#: js/basicblocks.js:1553
+#: js/basicblocks.js:1793
 msgid "play back"
 msgstr "egwu azụ"
 
-#: js/basicblocks.js:1561
+#: js/basicblocks.js:1801
 msgid "stop play"
 msgstr "kwụsị play"
 
-#: js/basicblocks.js:1568
+#: js/basicblocks.js:1808
 msgid "loudness"
 msgstr "keuzu"
 
-#: js/basicblocks.js:1575
+#: js/basicblocks.js:1815
 msgid "save as lilypond"
 msgstr "azọpụta dị ka lilypond"
 
-#: js/basicblocks.js:1578
-#: js/basicblocks.js:1587
+#: js/basicblocks.js:1818
+#: js/basicblocks.js:1827
 msgid "title"
 msgstr "aha"
 
-#: js/basicblocks.js:1584
+#: js/basicblocks.js:1824
 msgid "save svg"
 msgstr "save svg"
 
-#: js/basicblocks.js:1593
+#: js/basicblocks.js:1833
 #: plugins/turtle.rtp:42
 msgid "turtle x"
 msgstr "mbe x"
 
-#: js/basicblocks.js:1602
+#: js/basicblocks.js:1842
 #: plugins/turtle.rtp:52
 msgid "turtle y"
 msgstr "mbe y"
 
-#: js/basicblocks.js:1611
+#: js/basicblocks.js:1851
 #: plugins/turtle.rtp:62
 msgid "start turtle"
 msgstr "mbe bido"
 
-#: js/basicblocks.js:1620
+#: js/basicblocks.js:1860
 #: plugins/turtle.rtp:72
 msgid "stop turtle"
 msgstr "kwusi mbe "
 
-#: js/basicblocks.js:1629
+#: js/basicblocks.js:1869
 msgid "no background"
 msgstr "ọ dịghị ndabere"
 
-#: js/basicblocks.js:1636
+#: js/basicblocks.js:1876
 msgid "show blocks"
 msgstr "show blocks"
 
-#: js/basicblocks.js:1643
+#: js/basicblocks.js:1883
 msgid "hide blocks"
 msgstr "hide blocks"
 
-#: js/basicblocks.js:1650
+#: js/basicblocks.js:1890
 msgid "open project"
 msgstr ""
 
-#: js/basicblocks.js:1674
+#: js/basicblocks.js:1914
 msgid "wait"
 msgstr "na-eche"
 
-#: js/basicblocks.js:1682
+#: js/basicblocks.js:1922
 msgid "print"
 msgstr "ebipụta"
 
-#: js/basicblocks.js:1690
-#: js/basicblocks.js:1698
+#: js/basicblocks.js:1930
+#: js/basicblocks.js:1938
 #: plugins/turtle.rtp:82
 msgid "turtle name"
 msgstr "mbe aha "
 
-#: js/basicblocks.js:1699
+#: js/basicblocks.js:1939
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:83
 msgid "source"
 msgstr "isi iyi"
 
-#: js/basicblocks.js:1700
+#: js/basicblocks.js:1940
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:84
 msgid "target"
 msgstr "lekwasịrị"
 
-#: js/basicblocks.js:1714
+#: js/basicblocks.js:1954
 msgid "click"
 msgstr "click"
 
-#: js/basicblocks.js:1722
+#: js/basicblocks.js:1962
 msgid "pixel color"
 msgstr "pixel agba"
 
-#: js/basicblocks.js:1729
+#: js/basicblocks.js:1969
 msgid "time"
 msgstr "oge"
 
-#: js/basicblocks.js:1736
+#: js/basicblocks.js:1976
 msgid "mouse x"
 msgstr "oke x"
 
-#: js/basicblocks.js:1744
+#: js/basicblocks.js:1984
 msgid "mouse y"
 msgstr "oke y"
 
-#: js/basicblocks.js:1752
+#: js/basicblocks.js:1992
 msgid "mouse button"
 msgstr "òké bọtịnụ"
 
-#: js/basicblocks.js:1759
+#: js/basicblocks.js:1999
 msgid "keyboard"
 msgstr "kiiboodu"
 
-#: js/basicblocks.js:1768
+#: js/basicblocks.js:2008
 msgid "eval"
 msgstr "eval"
 
@@ -2096,9 +2319,6 @@ msgstr "ngagharị z"
 #~msgid "Impact UID not found."
 #~msgstr ""
 
-#~msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr "Nke a ogwè e dere ihe palette buttons matriks, Note, ụda, Turtle, na ndị ọzọ. Pịa egosi na palettes nke blocks na ikpuru blocks si palettes na na kwaaji na-eji ha."
-
 #: plugins/impact.rtp:32
 
 #~msgid "fetch"
@@ -2201,6 +2421,11 @@ msgstr "ngagharị z"
 #~msgid "Mr. Mouse encourages you to explore Music Blocks"
 #~msgstr "Mr. Òké na i kwesịrị inyocha Egwú nkanka."
 
+#: js/logo.js:1982
+
+#~msgid "The Step Pitch Block must be used insdie of a Note Block."
+#~msgstr ""
+
 #~msgid "end fill"
 #~msgstr "ọgwụgwụ erijueala"
 
@@ -2214,6 +2439,9 @@ msgstr "ngagharị z"
 
 #~msgid "set beats per minute"
 #~msgstr "setịpụụrụ gafere kwa nkeji"
+
+#~msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+#~msgstr "Nke a ogwè e dere ihe palette buttons matriks, Note, ụda, Turtle, na ndị ọzọ. Pịa egosi na palettes nke blocks na ikpuru blocks si palettes na na kwaaji na-eji ha."
 
 #~msgid "do re mi fa sol la ti"
 #~msgstr ""
