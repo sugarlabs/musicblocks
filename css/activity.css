@@ -278,6 +278,7 @@ table {
   top: 200px; 
   border-bottom: 1px solid;
   z-index: 9;
+  background: blue;
 }
 .vRule {
   position: absolute;
@@ -403,10 +404,11 @@ table {
   top: -50%;
   padding: 0 2px;
 }
-#rhythmruler {
+#rulerbody {
     position:relative;
     width:600px;
     height:70px;
-    top:175px;
-    left: 100px;    
+    top: 200px;
+    left: 100px; 
+    overflow: auto;
 }
