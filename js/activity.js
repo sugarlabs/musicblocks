@@ -62,6 +62,8 @@ define(function (require) {
     require('howler');
     require('mespeak');
     require('Chart');
+    require('jquery.ruler');
+    require('modernizr-2.6.2.min');
 
     require('activity/utils');
     require('activity/artwork');
@@ -87,6 +89,7 @@ define(function (require) {
     require('activity/musicutils');
     require('activity/pitchtimematrix');
     require('activity/pitchdrummatrix');
+    require('activity/rhythmruler');
 
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {
@@ -586,15 +589,16 @@ define(function (require) {
 
             matrix = new Matrix();
             pitchdrummatrix = new PitchDrumMatrix();
+            rhythmruler = new RhythmRuler();
 
             palettes.setBlocks(blocks);
-            turtles.setBlocks(blocks);
+            turtles.setBlocks(blocks);  
             blocks.setTurtles(turtles);
             blocks.setErrorMsg(errorMsg);
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(matrix, pitchdrummatrix, canvas,
+            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, canvas,
                 blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
                 onRunTurtle, getStageX, getStageY,
