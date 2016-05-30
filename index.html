@@ -13,11 +13,14 @@
     <script src="lib/jquery-ui.js"></script>
     <script src="lib/webL10n.js"></script>
     <script src="lib/tone.min.js"></script>
+    <script src="lib/jquery.ruler.js"></script>
+    <script src="lib/modernizr-2.6.2.min.js"></script>
 
     <script type="text/javascript"></script>
 
     <script src="//code.jquery.com/jquery-2.1.4.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
     <script data-main="js/loader" src="lib/require.js">
@@ -59,7 +62,7 @@
             $("#matrix").draggable();
         });
 
-	$(function() {
+	    $(function() {
             $("#pitchdrummatrix").draggable();
         });
 
@@ -107,6 +110,7 @@
             });
         });
 
+       
         function moveMatrix(event) {
             var matrixDiv = document.getElementById('matrix');
             matrixDivPosition = matrixDiv.getBoundingClientRect();
@@ -198,7 +202,18 @@
     <canvas hidden id="music" width="700"></canvas>
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
+    <div id="rhythmruler"></div>
     <div id="helpElem"></div>
+    <script>
+        function loadRuler() {
+            $("#rhythmruler").ruler ({
+                vRuleSize: 0,
+                hRuleSize: 18,
+                showCrosshair : false,
+                showMousePos: true
+            }); 
+        }
+    </script>
 
 </body>
 
