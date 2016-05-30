@@ -413,7 +413,7 @@ msgstr "Los latidos por minuto como máximo es de 1000."
 
 #: js/logo.js:1985
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr ""
+msgstr "Debe tener al menos un bloque de tono y un bloque de tambor en la matriz."
 
 #: js/logo.js:2014
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
