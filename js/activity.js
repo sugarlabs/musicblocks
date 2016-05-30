@@ -592,7 +592,7 @@ define(function (require) {
             rhythmruler = new RhythmRuler();
 
             palettes.setBlocks(blocks);
-            turtles.setBlocks(blocks);  
+            turtles.setBlocks(blocks);
             blocks.setTurtles(turtles);
             blocks.setErrorMsg(errorMsg);
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);

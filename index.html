@@ -57,8 +57,8 @@
             }(document, 'script', 'facebook-jssdk'));
         } catch (e) {}
           -->
-
-        $(function() {
+    
+       $(function() {
             $("#matrix").draggable();
         });
 
@@ -109,8 +109,7 @@
                 }, 2000);
             });
         });
-
-       
+      
         function moveMatrix(event) {
             var matrixDiv = document.getElementById('matrix');
             matrixDivPosition = matrixDiv.getBoundingClientRect();
