@@ -203,6 +203,7 @@ function _(text) {
         };
         return translation;
     } catch (e) {
+        console.log('i18n error: ' + text);
         return text;
     }
 };
