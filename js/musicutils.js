@@ -205,6 +205,7 @@ const DEFAULTDRUM = 'kick';
 
 function getDrumName(name) {
     if (name === '') {
+        console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     }
 
@@ -219,6 +220,7 @@ function getDrumName(name) {
 
 function getDrumIcon(name) {
     if (name === '') {
+        console.log('getDrumIcon passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     }
 
@@ -233,6 +235,7 @@ function getDrumIcon(name) {
 
 function getDrumSynthName(name) {
     if (name === '') {
+        console.log('getDrumSynthName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     }
 
@@ -860,10 +863,17 @@ function Synth () {
             var drumName = getDrumSynthName(name);
             if (drumName != null) {
                 // Work around i8n bug in Firefox.
-                if (drumName === '') {
+                if (drumName === '' && name in this.synthset) {
                     this.synthset[name][1].triggerAttack('C2', beatValue, 1);
+                } else if (drumName in this.synthset) {
+                    if (this.synthset[drumName][1] == null) {
+                        console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
+                    } else {
+                        this.synthset[drumName][1].triggerAttack('C2', beatValue, 1);
+                    }
                 } else {
-                    this.synthset[drumName][1].triggerAttack('C2', beatValue, 1);               }
+                    console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
+                }
             } else if (name === 'drum') {
                 this.synthset[DEFAULTDRUM][1].triggerAttack('C2', beatValue, 1);
             } else {
