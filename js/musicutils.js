@@ -153,51 +153,51 @@ const MODENAMES = [
 
 const DRUMNAMES = [
     //.TRANS: musical instrument
-    [_('snare drum'), 'snaredrum'],
+    [_('snare drum'), 'snaredrum', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('kick drum'), 'kick'],
+    [_('kick drum'), 'kick', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('tom tom'), 'tom'],
+    [_('tom tom'), 'tom', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('floor tom tom'), 'floortom'],
+    [_('floor tom tom'), 'floortom', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('cup drum'), 'cup'],
+    [_('cup drum'), 'cup', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('darbuka drum'), 'darbuka'],
+    [_('darbuka drum'), 'darbuka', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('hi hat'), 'hihat'],
+    [_('hi hat'), 'hihat', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('ride bell'), 'ridebell'],
+    [_('ride bell'), 'ridebell', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('cow bell'), 'cowbell'],
+    [_('cow bell'), 'cowbell', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('triangle bell'), 'trianglebell'],
+    [_('triangle bell'), 'trianglebell', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('finger cymbals'), 'fingercymbals'],
+    [_('finger cymbals'), 'fingercymbals', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('chine'), 'chine'],
+    [_('chine'), 'chine', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('bottle'), 'bottle'],
+    [_('bottle'), 'bottle', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('clang'), 'clang'],
+    [_('clang'), 'clang', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('crash'), 'crash'],
+    [_('crash'), 'crash', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('clap'), 'clap'],
+    [_('clap'), 'clap', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('slap'), 'slap'],
+    [_('slap'), 'slap', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('splash'), 'splash'],
+    [_('splash'), 'splash', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('bubbles'), 'bubbles'],
+    [_('bubbles'), 'bubbles', 'images/drum.svg'],
     //.TRANS: animal sound effect
-    [_('cat'), 'cat'],
+    [_('cat'), 'cat', 'images/drum.svg'],
     //.TRANS: animal sound effect
-    [_('cricket'), 'cricket'],
+    [_('cricket'), 'cricket', 'images/drum.svg'],
     //.TRANS: animal sound effect
-    [_('dog'), 'dog'],
+    [_('dog'), 'dog', 'images/drum.svg'],
     //.TRANS: animal sound effect
-    [_('duck'), 'duck'],
+    [_('duck'), 'duck', 'images/drum.svg'],
 ];
 
 const DEFAULTDRUM = 'kick';
@@ -214,6 +214,20 @@ function getDrumName(name) {
         }
     }
     return null;
+};
+
+
+function getDrumIcon(name) {
+    if (name === '') {
+        name = DEFAULTDRUM;
+    }
+
+    for (var i = 0; i < DRUMNAMES.length; i++) {
+        if (DRUMNAMES[i].indexOf(name) !== -1) {
+            return DRUMNAMES[i][2];
+        }
+    }
+    return 'images/drum.svg';
 };
 
 
