@@ -177,11 +177,11 @@ const DRUMNAMES = [
     //.TRANS: sound effect
     [_('chine'), 'chine', 'images/bell.svg'],
     //.TRANS: sound effect
+    [_('clang'), 'clang', 'images/bell.svg'],
+    //.TRANS: sound effect
+    [_('crash'), 'crash', 'images/bell.svg'],
+    //.TRANS: sound effect
     [_('bottle'), 'bottle', 'images/drum.svg'],
-    //.TRANS: sound effect
-    [_('clang'), 'clang', 'images/drum.svg'],
-    //.TRANS: sound effect
-    [_('crash'), 'crash', 'images/drum.svg'],
     //.TRANS: sound effect
     [_('clap'), 'clap', 'images/drum.svg'],
     //.TRANS: sound effect
@@ -191,11 +191,11 @@ const DRUMNAMES = [
     //.TRANS: sound effect
     [_('bubbles'), 'bubbles', 'images/drum.svg'],
     //.TRANS: animal sound effect
-    [_('cat'), 'cat', 'images/drum.svg'],
+    [_('cat'), 'cat', 'images/cat.svg'],
     //.TRANS: animal sound effect
     [_('cricket'), 'cricket', 'images/drum.svg'],
     //.TRANS: animal sound effect
-    [_('dog'), 'dog', 'images/drum.svg'],
+    [_('dog'), 'dog', 'images/dog.svg'],
     //.TRANS: animal sound effect
     [_('duck'), 'duck', 'images/drum.svg'],
 ];
