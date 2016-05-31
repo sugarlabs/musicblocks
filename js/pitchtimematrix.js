@@ -571,7 +571,7 @@ function Matrix() {
                 cell.style.lineHeight = 60 + '%';
                 cell.style.fontSize = this.cellScale * 75 + '%';
                 var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
-                if (obj[1] in NOTESYMBOLS) {
+                if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
                        cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '>';
                 } else {
                        cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
@@ -589,7 +589,7 @@ function Matrix() {
     this.calcNoteValueToDisplay = function (a, b) {
         var noteValue = a / b;
         var noteValueToDisplay = null;
-        if (noteValue in NOTESYMBOLS) {
+        if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
             noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '>';
         } else {
             noteValueToDisplay = reducedFraction(b, a);
@@ -597,11 +597,11 @@ function Matrix() {
 
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
-            if (noteValueToDisplay in NOTESYMBOLS) {
+            if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
                 noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '> .';
             } else {
                 noteValueToDisplay = parseInt((noteValue * 1.75))
-                if (noteValueToDisplay in NOTESYMBOLS) {
+                if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
                     noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '> ..';
                 } else {
                     noteValueToDisplay = reducedFraction(b, a);
@@ -1123,7 +1123,7 @@ function reducedFraction(a, b) {
     }
 
     var gcm = greatestCommonMultiple(a, b);
-    if (b / gcm in [1, 2, 4, 8, 16, 32, 64]) {
+    if (NOTESYMBOLS != undefined && b / gcm in [1, 2, 4, 8, 16, 32, 64]) {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
     } else {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
