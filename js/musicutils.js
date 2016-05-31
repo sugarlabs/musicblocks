@@ -153,73 +153,106 @@ const MODENAMES = [
 
 const DRUMNAMES = [
     //.TRANS: musical instrument
-    [_('snare drum'), 'snaredrum'],
+    [_('snare drum'), 'snaredrum', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('kick drum'), 'kick'],
+    [_('kick drum'), 'kick', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('tom tom'), 'tom'],
+    [_('tom tom'), 'tom', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('floor tom tom'), 'floortom'],
+    [_('floor tom tom'), 'floortom', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('cup drum'), 'cup'],
+    [_('cup drum'), 'cup', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('darbuka drum'), 'darbuka'],
+    [_('darbuka drum'), 'darbuka', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('hi hat'), 'hihat'],
+    [_('hi hat'), 'hihat', 'images/bell.svg'],
     //.TRANS: musical instrument
-    [_('ride bell'), 'ridebell'],
+    [_('ride bell'), 'ridebell', 'images/bell.svg'],
     //.TRANS: musical instrument
-    [_('cow bell'), 'cowbell'],
+    [_('cow bell'), 'cowbell', 'images/bell.svg'],
     //.TRANS: musical instrument
-    [_('triangle bell'), 'trianglebell'],
+    [_('triangle bell'), 'trianglebell', 'images/triangle.svg'],
     //.TRANS: musical instrument
-    [_('finger cymbals'), 'fingercymbals'],
+    [_('finger cymbals'), 'fingercymbals', 'images/bell.svg'],
     //.TRANS: sound effect
-    [_('chine'), 'chine'],
+    [_('chine'), 'chine', 'images/bell.svg'],
     //.TRANS: sound effect
-    [_('bottle'), 'bottle'],
+    [_('clang'), 'clang', 'images/bell.svg'],
     //.TRANS: sound effect
-    [_('clang'), 'clang'],
+    [_('crash'), 'crash', 'images/bell.svg'],
     //.TRANS: sound effect
-    [_('crash'), 'crash'],
+    [_('bottle'), 'bottle', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('clap'), 'clap'],
+    [_('clap'), 'clap', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('slap'), 'slap'],
+    [_('slap'), 'slap', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('splash'), 'splash'],
+    [_('splash'), 'splash', 'images/drum.svg'],
     //.TRANS: sound effect
-    [_('bubbles'), 'bubbles'],
+    [_('bubbles'), 'bubbles', 'images/drum.svg'],
     //.TRANS: animal sound effect
-    [_('cat'), 'cat'],
+    [_('cat'), 'cat', 'images/cat.svg'],
     //.TRANS: animal sound effect
-    [_('cricket'), 'cricket'],
+    [_('cricket'), 'cricket', 'images/drum.svg'],
     //.TRANS: animal sound effect
-    [_('dog'), 'dog'],
+    [_('dog'), 'dog', 'images/dog.svg'],
     //.TRANS: animal sound effect
-    [_('duck'), 'duck'],
+    [_('duck'), 'duck', 'images/drum.svg'],
 ];
 
 const DEFAULTDRUM = 'kick';
 
 
 function getDrumName(name) {
+    if (name === '') {
+        console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
+        name = DEFAULTDRUM;
+    }
+
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i].indexOf(name) !== -1) {
-            return DRUMNAMES[i][0];
+        // if (DRUMNAMES[i].indexOf(name) !== -1) {
+	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+            if (DRUMNAMES[i][0] != '') {
+		return DRUMNAMES[i][0];
+            } else {
+		console.log('i18n is misbehaving?');
+		return DRUMNAMES[i][1];
+            }
         }
     }
-    return null
+    return null;
+};
+
+
+function getDrumIcon(name) {
+    if (name === '') {
+        console.log('getDrumIcon passed blank name. Returning ' + DEFAULTDRUM);
+        name = DEFAULTDRUM;
+    }
+
+    for (var i = 0; i < DRUMNAMES.length; i++) {
+        // if (DRUMNAMES[i].indexOf(name) !== -1) {
+	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+            return DRUMNAMES[i][2];
+        }
+    }
+    return 'images/drum.svg';
 };
 
 
 function getDrumSynthName(name) {
+    if (name === '') {
+        console.log('getDrumSynthName passed blank name. Returning ' + DEFAULTDRUM);
+        name = DEFAULTDRUM;
+    }
+
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i].indexOf(name) !== -1) {
+        // if (DRUMNAMES[i].indexOf(name) !== -1) {
+	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
             return DRUMNAMES[i][1];
         }
     }
-    return null
+    return null;
 };
 
 
@@ -720,37 +753,37 @@ function Synth () {
 
     this.synthset = {
         // builtin synths
-	'poly': [null, null],
-	'sine': [null, null],
-	'triangle': [null, null],
-	'sawtooth': [null, null],
-	'square': [null, null],
-	'pluck': [null, null],
+        'poly': [null, null],
+        'sine': [null, null],
+        'triangle': [null, null],
+        'sawtooth': [null, null],
+        'square': [null, null],
+        'pluck': [null, null],
 
         // drum samples
-	'bottle': [BOTTLESOUNDSAMPLE, null],
-	'clap': [CLAPSOUNDSAMPLE, null],
-	'darbuka': [DARBUKASOUNDSAMPLE, null],
+        'bottle': [BOTTLESOUNDSAMPLE, null],
+        'clap': [CLAPSOUNDSAMPLE, null],
+        'darbuka': [DARBUKASOUNDSAMPLE, null],
         'hihat': [HIHATSOUNDSAMPLE, null],
-	'splash': [SPLASHSOUNDSAMPLE, null],
-	'bubbles': [BUBBLESSOUNDSAMPLE, null],
-	'cowbell': [COWBELLSOUNDSAMPLE, null],
-	'dog': [DOGSOUNDSAMPLE, null],
+        'splash': [SPLASHSOUNDSAMPLE, null],
+        'bubbles': [BUBBLESSOUNDSAMPLE, null],
+        'cowbell': [COWBELLSOUNDSAMPLE, null],
+        'dog': [DOGSOUNDSAMPLE, null],
         'kick': [KICKSOUNDSAMPLE, null],
-	'tom': [TOMSOUNDSAMPLE, null],
-	'cat': [CATSOUNDSAMPLE, null],
-	'crash': [CRASHSOUNDSAMPLE, null],
-	'duck': [DUCKSOUNDSAMPLE, null],
+        'tom': [TOMSOUNDSAMPLE, null],
+        'cat': [CATSOUNDSAMPLE, null],
+        'crash': [CRASHSOUNDSAMPLE, null],
+        'duck': [DUCKSOUNDSAMPLE, null],
         'ridebell': [RIDEBELLSOUNDSAMPLE, null],
-	'trianglebell': [TRIANGLESOUNDSAMPLE, null],
-	'chine': [CHINESOUNDSAMPLE, null],
-	'cricket': [CRICKETSOUNDSAMPLE, null],
-	'fingercymbals': [FINGERCYMBALSSOUNDSAMPLE, null],
-	'slap': [SLAPSOUNDSAMPLE, null],
-	'clang': [CLANGSOUNDSAMPLE, null],
-	'cup': [CUPSOUNDSAMPLE, null],
-	'floortom': [FLOORTOMSOUNDSAMPLE, null],
-	'snaredrum': [SNARESOUNDSAMPLE, null],
+        'trianglebell': [TRIANGLESOUNDSAMPLE, null],
+        'chine': [CHINESOUNDSAMPLE, null],
+        'cricket': [CRICKETSOUNDSAMPLE, null],
+        'fingercymbals': [FINGERCYMBALSSOUNDSAMPLE, null],
+        'slap': [SLAPSOUNDSAMPLE, null],
+        'clang': [CLANGSOUNDSAMPLE, null],
+        'cup': [CUPSOUNDSAMPLE, null],
+        'floortom': [FLOORTOMSOUNDSAMPLE, null],
+        'snaredrum': [SNARESOUNDSAMPLE, null],
     };
 
     Tone.Buffer.onload = function(){
@@ -778,7 +811,7 @@ function Synth () {
                 return this.synthset[DEFAULTDRUM][1];
             }
             break;
-	}
+        }
 
         // Use polysynth if all else fails.
         return this.synthset['poly'][1];
@@ -790,33 +823,33 @@ function Synth () {
             console.log('loading synth for ' + name);
             switch (name) {
             case 'pluck':
-		this.synthset['pluck'][1] = new Tone.PluckSynth();
+                this.synthset['pluck'][1] = new Tone.PluckSynth();
                 break;
             case 'triangle':
             case 'square':
             case 'sawtooth':
             case 'sine':
-		var synthOptions = {
-		    oscillator: {
-			type: name
-		    },
-		    envelope: {
-			attack: 0.03,
-			decay: 0,
-			sustain: 1,
-			release: 0.03
-		    },
-		};
-		this.synthset[name][1] = new Tone.SimpleSynth(synthOptions);
+                var synthOptions = {
+                    oscillator: {
+                        type: name
+                    },
+                    envelope: {
+                        attack: 0.03,
+                        decay: 0,
+                        sustain: 1,
+                        release: 0.03
+                    },
+                };
+                this.synthset[name][1] = new Tone.SimpleSynth(synthOptions);
                 break;
             case 'poly':
             case 'default':
-		this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
+                this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
             default:
-		this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]});
+                this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]});
                 break;
-	    }
+            }
         }
         this.getSynthByName(name).toMaster();
     };
@@ -837,7 +870,18 @@ function Synth () {
         default:
             var drumName = getDrumSynthName(name);
             if (drumName != null) {
-                this.synthset[drumName][1].triggerAttack('C2', beatValue, 1);
+                // Work around i8n bug in Firefox.
+                if (drumName === '' && name in this.synthset) {
+                    this.synthset[name][1].triggerAttack('C2', beatValue, 1);
+                } else if (drumName in this.synthset) {
+                    if (this.synthset[drumName][1] == null) {
+                        console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
+                    } else {
+                        this.synthset[drumName][1].triggerAttack('C2', beatValue, 1);
+                    }
+                } else {
+                    console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
+                }
             } else if (name === 'drum') {
                 this.synthset[DEFAULTDRUM][1].triggerAttack('C2', beatValue, 1);
             } else {

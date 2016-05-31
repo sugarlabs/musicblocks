@@ -319,7 +319,8 @@ function Matrix() {
 
             var drumName = getDrumName(this.solfegeNotes[i]);
             if (drumName != null) {
-                cell.innerHTML = drumName;
+                console.log('drumName is: ' + drumName + ' (' + this.solfegeNotes[i] + ')');
+		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             }
@@ -569,7 +570,7 @@ function Matrix() {
                 cell.style.lineHeight = 60 + '%';
                 cell.style.fontSize = this.cellScale * 75 + '%';
                 var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
-                if (obj[1] in NOTESYMBOLS) {
+                if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
                        cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '>';
                 } else {
                        cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
@@ -587,7 +588,7 @@ function Matrix() {
     this.calcNoteValueToDisplay = function (a, b) {
         var noteValue = a / b;
         var noteValueToDisplay = null;
-        if (noteValue in NOTESYMBOLS) {
+        if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
             noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '>';
         } else {
             noteValueToDisplay = reducedFraction(b, a);
@@ -595,11 +596,11 @@ function Matrix() {
 
         if (parseInt(noteValue) < noteValue) {
             noteValueToDisplay = parseInt((noteValue * 1.5))
-            if (noteValueToDisplay in NOTESYMBOLS) {
+            if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
                 noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '> .';
             } else {
                 noteValueToDisplay = parseInt((noteValue * 1.75))
-                if (noteValueToDisplay in NOTESYMBOLS) {
+                if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
                     noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '> ..';
                 } else {
                     noteValueToDisplay = reducedFraction(b, a);
@@ -766,6 +767,7 @@ function Matrix() {
         for (var i = 0; i < note.length; i++) {
             var drumName = getDrumName(note[i]);
             if (drumName != null) {
+                console.log('drumName is ' + drumName);
                 drumNotes.push(drumName);
             } else {
                 pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
@@ -858,6 +860,7 @@ function Matrix() {
                 for (var j = 0; j < note.length; j++) {
                     var drumName = getDrumName(note[j]);
                     if (drumName != null) {
+                        console.log('drumName is ' + drumName);
                         drumNotes.push(drumName);
                     } else {
                         pitchNotes.push(note[j].replace(/♭/g, 'b').replace(/♯/g, '#'));
@@ -929,10 +932,17 @@ function Matrix() {
     this.setNoteCell = function(j, colIndex, cell, playNote) {
         var table = docById('myTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
-        var drumName = getDrumSynthName(solfegeHTML);
-        if (drumName != null) {
-            // If it is a drum, just save the name.
-            var note = drumName;
+        var drumHTML = solfegeHTML.split('"');
+        if (drumHTML.length > 3) {
+            var drumName = getDrumSynthName(drumHTML[3]);
+            if (drumName != null) {
+		// If it is a drum, just save the name.
+                console.log('drumName is ' + drumName);
+		var note = drumName;
+            } else {
+                console.log('something is wrong (drumSynthName is ' + drumName + ')');
+		var note = DEFAULTDRUM;
+            }
         } else {
             // Both solfege and octave are extracted from HTML by getNote.
             var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
@@ -949,6 +959,7 @@ function Matrix() {
 
         if (playNote) {
             if (drumName != null) {
+                console.log('drumName is ' + drumName);
                 this.logo.synth.trigger('C2', noteValue, drumName);
             } else {
                 this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
@@ -1067,7 +1078,7 @@ function Matrix() {
                     var drumName = getDrumName(note[0][j]);
                     if (drumName != null) {
                         // add a playdrum block
-
+                        console.log('drumName is ' + drumName);
 			// The last connection in last pitch block is null.
 			if (note[0].length === 1 || j === note[0].length - 1) {
                             var lastConnection = null;
@@ -1116,7 +1127,7 @@ function reducedFraction(a, b) {
     }
 
     var gcm = greatestCommonMultiple(a, b);
-    if (b / gcm in [1, 2, 4, 8, 16, 32, 64]) {
+    if (NOTESYMBOLS != undefined && b / gcm in [1, 2, 4, 8, 16, 32, 64]) {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
     } else {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
