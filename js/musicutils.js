@@ -204,22 +204,30 @@ const DEFAULTDRUM = 'kick';
 
 
 function getDrumName(name) {
+    if (name === '') {
+        name = DEFAULTDRUM;
+    }
+
     for (var i = 0; i < DRUMNAMES.length; i++) {
         if (DRUMNAMES[i].indexOf(name) !== -1) {
             return DRUMNAMES[i][0];
         }
     }
-    return getDrumName(DEFAULTDRUM);
+    return null;
 };
 
 
 function getDrumSynthName(name) {
+    if (name === '') {
+        name = DEFAULTDRUM;
+    }
+
     for (var i = 0; i < DRUMNAMES.length; i++) {
         if (DRUMNAMES[i].indexOf(name) !== -1) {
             return DRUMNAMES[i][1];
         }
     }
-    return getDrumSynthName(DEFAULTDRUM);
+    return null;
 };
 
 
@@ -720,37 +728,37 @@ function Synth () {
 
     this.synthset = {
         // builtin synths
-	'poly': [null, null],
-	'sine': [null, null],
-	'triangle': [null, null],
-	'sawtooth': [null, null],
-	'square': [null, null],
-	'pluck': [null, null],
+        'poly': [null, null],
+        'sine': [null, null],
+        'triangle': [null, null],
+        'sawtooth': [null, null],
+        'square': [null, null],
+        'pluck': [null, null],
 
         // drum samples
-	'bottle': [BOTTLESOUNDSAMPLE, null],
-	'clap': [CLAPSOUNDSAMPLE, null],
-	'darbuka': [DARBUKASOUNDSAMPLE, null],
+        'bottle': [BOTTLESOUNDSAMPLE, null],
+        'clap': [CLAPSOUNDSAMPLE, null],
+        'darbuka': [DARBUKASOUNDSAMPLE, null],
         'hihat': [HIHATSOUNDSAMPLE, null],
-	'splash': [SPLASHSOUNDSAMPLE, null],
-	'bubbles': [BUBBLESSOUNDSAMPLE, null],
-	'cowbell': [COWBELLSOUNDSAMPLE, null],
-	'dog': [DOGSOUNDSAMPLE, null],
+        'splash': [SPLASHSOUNDSAMPLE, null],
+        'bubbles': [BUBBLESSOUNDSAMPLE, null],
+        'cowbell': [COWBELLSOUNDSAMPLE, null],
+        'dog': [DOGSOUNDSAMPLE, null],
         'kick': [KICKSOUNDSAMPLE, null],
-	'tom': [TOMSOUNDSAMPLE, null],
-	'cat': [CATSOUNDSAMPLE, null],
-	'crash': [CRASHSOUNDSAMPLE, null],
-	'duck': [DUCKSOUNDSAMPLE, null],
+        'tom': [TOMSOUNDSAMPLE, null],
+        'cat': [CATSOUNDSAMPLE, null],
+        'crash': [CRASHSOUNDSAMPLE, null],
+        'duck': [DUCKSOUNDSAMPLE, null],
         'ridebell': [RIDEBELLSOUNDSAMPLE, null],
-	'trianglebell': [TRIANGLESOUNDSAMPLE, null],
-	'chine': [CHINESOUNDSAMPLE, null],
-	'cricket': [CRICKETSOUNDSAMPLE, null],
-	'fingercymbals': [FINGERCYMBALSSOUNDSAMPLE, null],
-	'slap': [SLAPSOUNDSAMPLE, null],
-	'clang': [CLANGSOUNDSAMPLE, null],
-	'cup': [CUPSOUNDSAMPLE, null],
-	'floortom': [FLOORTOMSOUNDSAMPLE, null],
-	'snaredrum': [SNARESOUNDSAMPLE, null],
+        'trianglebell': [TRIANGLESOUNDSAMPLE, null],
+        'chine': [CHINESOUNDSAMPLE, null],
+        'cricket': [CRICKETSOUNDSAMPLE, null],
+        'fingercymbals': [FINGERCYMBALSSOUNDSAMPLE, null],
+        'slap': [SLAPSOUNDSAMPLE, null],
+        'clang': [CLANGSOUNDSAMPLE, null],
+        'cup': [CUPSOUNDSAMPLE, null],
+        'floortom': [FLOORTOMSOUNDSAMPLE, null],
+        'snaredrum': [SNARESOUNDSAMPLE, null],
     };
 
     Tone.Buffer.onload = function(){
@@ -778,7 +786,7 @@ function Synth () {
                 return this.synthset[DEFAULTDRUM][1];
             }
             break;
-	}
+        }
 
         // Use polysynth if all else fails.
         return this.synthset['poly'][1];
@@ -790,33 +798,33 @@ function Synth () {
             console.log('loading synth for ' + name);
             switch (name) {
             case 'pluck':
-		this.synthset['pluck'][1] = new Tone.PluckSynth();
+                this.synthset['pluck'][1] = new Tone.PluckSynth();
                 break;
             case 'triangle':
             case 'square':
             case 'sawtooth':
             case 'sine':
-		var synthOptions = {
-		    oscillator: {
-			type: name
-		    },
-		    envelope: {
-			attack: 0.03,
-			decay: 0,
-			sustain: 1,
-			release: 0.03
-		    },
-		};
-		this.synthset[name][1] = new Tone.SimpleSynth(synthOptions);
+                var synthOptions = {
+                    oscillator: {
+                        type: name
+                    },
+                    envelope: {
+                        attack: 0.03,
+                        decay: 0,
+                        sustain: 1,
+                        release: 0.03
+                    },
+                };
+                this.synthset[name][1] = new Tone.SimpleSynth(synthOptions);
                 break;
             case 'poly':
             case 'default':
-		this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
+                this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
             default:
-		this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]});
+                this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]});
                 break;
-	    }
+            }
         }
         this.getSynthByName(name).toMaster();
     };
