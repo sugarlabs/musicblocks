@@ -1378,6 +1378,7 @@ define(function (require) {
         function _doOpenSamples() {
             localStorage.setItem('isMatrixHidden', document.getElementById('matrix').style.visibility);
             localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
+            localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerbody').style.visibility);
 
             if (document.getElementById('matrix').style.visibility !== 'hidden') {
                 console.log('hide matrix');
@@ -1389,6 +1390,14 @@ define(function (require) {
                 console.log('hide pitch-drum matrix');
                 document.getElementById('pitchdrummatrix').style.visibility = 'hidden';
                 document.getElementById('pitchdrummatrix').style.border = 0;
+            }
+
+            if(document.getElementById('rulerbody').style.visibility !== 'hidden') {
+                console.log('hide RhythmRuler');
+                document.getElementById('rulerbody').style.visibility = 'hidden';
+                document.getElementById('rulerbody').style.border = 0;
+                document.getElementsByClassName('hRule')[0].style.visibility = 'hidden';
+                document.getElementsByClassName('mousePosBox')[0].style.visibility = 'hidden';                
             }
 
             console.log('save locally');
