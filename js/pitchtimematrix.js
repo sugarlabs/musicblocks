@@ -319,7 +319,9 @@ function Matrix() {
 
             var drumName = getDrumName(this.solfegeNotes[i]);
             if (drumName != null) {
-                cell.innerHTML = drumName;
+		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.solfegeNotes[i]) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+
+                // cell.innerHTML = drumName;
             } else {
                 cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             }
@@ -929,10 +931,15 @@ function Matrix() {
     this.setNoteCell = function(j, colIndex, cell, playNote) {
         var table = docById('myTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
-        var drumName = getDrumSynthName(solfegeHTML);
-        if (drumName != null) {
-            // If it is a drum, just save the name.
-            var note = drumName;
+        var drumHTML = solfegeHTML.split('"');
+        if (drumHTML.length > 3) {
+            var drumName = getDrumSynthName(drumHTML[3]);
+            if (drumName != null) {
+		// If it is a drum, just save the name.
+		var note = drumName;
+            } else {
+		var note = DEFAULTDRUM;
+            }
         } else {
             // Both solfege and octave are extracted from HTML by getNote.
             var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);

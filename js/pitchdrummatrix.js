@@ -284,6 +284,7 @@ function PitchDrumMatrix() {
         var table = docById('myTable');
 
         var rowCount = this.solfegeNotes.length + 1 - this.rests;
+        var iconSize = Math.floor(this.cellScale * 24);
 
         for (var i = 1; i <= rowCount; i++) {
             var row = table.rows[i];
@@ -301,10 +302,10 @@ function PitchDrumMatrix() {
                 // Work around i8n bug in Firefox.
                 var name = getDrumName(drumname);
                 if (name === '') {
-                    cell.innerHTML = drumname;
-                } else {
-                    cell.innerHTML = name;
+                    name = drumname;
                 }
+		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(name) + '" title="' + name + '" alt="' + name + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                // cell.innerHTML = name;
                 cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
             } else {
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -484,9 +485,8 @@ function PitchDrumMatrix() {
     this._setPairCell = function(j, colIndex, cell, playNote) {
         var table = docById('myTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
-        var drumHTML = table.rows[table.rows.length - 1].cells[colIndex].innerHTML;
-
-        var drumName = getDrumSynthName(drumHTML);
+        var drumHTML = table.rows[table.rows.length - 1].cells[colIndex].innerHTML.split('"');
+        var drumName = getDrumSynthName(drumHTML[3]);
         // Both solfege and octave are extracted from HTML by getNote.
         var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
         var note = noteObj[0] + noteObj[1];
@@ -560,9 +560,8 @@ function PitchDrumMatrix() {
             var row = pairs[i][0];
             var col = pairs[i][1];
             var solfegeHTML = table.rows[row].cells[0].innerHTML;
-            var drumHTML = table.rows[table.rows.length - 1].cells[col].innerHTML;
-
-            var drumName = getDrumSynthName(drumHTML);
+            var drumHTML = table.rows[table.rows.length - 1].cells[col].innerHTML.split('"');
+            var drumName = getDrumSynthName(drumHTML[3]);
             // Both solfege and octave are extracted from HTML by getNote.
             var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
             var pitch = noteObj[0];
