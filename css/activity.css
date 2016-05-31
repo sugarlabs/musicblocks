@@ -271,14 +271,14 @@ table {
   background: #444;
 }
 .hRule {
-  position: fixed;
+  position: absolute;
   width: 600px;
   height: 18px;
-  left: 100px;
-  top: 200px; 
+  left: 300 + 'px';
+  top: 530 + 'px'; 
   border-bottom: 1px solid;
   z-index: 9;
-  background: blue;
+  background-color: rgb(195, 116, 233);
 }
 .vRule {
   position: absolute;
@@ -405,10 +405,13 @@ table {
   padding: 0 2px;
 }
 #rulerbody {
-    position:relative;
+    position:absolute;
+    visibility: hidden;
     width:600px;
-    height:70px;
-    top: 200px;
-    left: 100px; 
+    height:150px;
+    left: 300 + 'px';
+    top: 500 + 'px'; 
     overflow: auto;
+    background-color: rgb(177, 219, 0);
 }
+
