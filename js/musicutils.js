@@ -210,8 +210,14 @@ function getDrumName(name) {
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i].indexOf(name) !== -1) {
-            return DRUMNAMES[i][0];
+        // if (DRUMNAMES[i].indexOf(name) !== -1) {
+	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+            if (DRUMNAMES[i][0] != '') {
+		return DRUMNAMES[i][0];
+            } else {
+		console.log('i18n is misbehaving?');
+		return DRUMNAMES[i][1];
+            }
         }
     }
     return null;
@@ -225,7 +231,8 @@ function getDrumIcon(name) {
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i].indexOf(name) !== -1) {
+        // if (DRUMNAMES[i].indexOf(name) !== -1) {
+	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
             return DRUMNAMES[i][2];
         }
     }
@@ -240,7 +247,8 @@ function getDrumSynthName(name) {
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i].indexOf(name) !== -1) {
+        // if (DRUMNAMES[i].indexOf(name) !== -1) {
+	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
             return DRUMNAMES[i][1];
         }
     }
