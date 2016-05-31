@@ -31,6 +31,52 @@ ABOUT THIS GUIDE
 Many of the examples given in the guide have links to code you can
 run. Look for RUN LIVE links.
 
+NOTES
+-----
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
+
+At the heart of Music Blocks is the *Note value* block. The *Note
+value* block is a container for a pitch that specifies the duration
+(note value) of the pitch.
+
+At the top of the example above, a single *Note value* block is
+shown. The `4` is the note value, in this case, a quarter note. The
+pitch, specified by the *Pitch* block, contains a pitch, `Re` at
+`Octave 4`. At the bottom, two consecutive notes are shown.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg'</img>
+
+In this example, different note values are shown. From top to bottom,
+`8` for an eighth note, `16` for a sixteenth note, and `2` for a half
+note.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
+
+In this example, different ways to specify the pitch are shown. From
+top to bottom, `Sol` in `Octave 6`, `B flat` in `Octave 4`, and `440`
+hertz (the octave is ignored when the frequency is assigned).
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg'</img>
+
+A chord (multiple, simultaneous pitches) can be specified by add
+multiple *Pitch* blocks to a *Note value* container.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg'</img>
+
+A rest of duration note value can be constructed using a *Silence* block.
+
+Using drums
+-----------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg'</img>
+
+Anywhere you can use a *Pitch* block--e.g., inside of the matrix or a
+*Note value* block--you can also specify a drum sample. Currently there
+about two dozen different samples from which to choose. The default
+drum is a kick drum.
+
+
 THE PITCH-TIME MATRIX
 ---------------------
 
@@ -123,15 +169,14 @@ names and the pitch octaves.)
 To play the chuck, simply click on the action block (on the word
 action). You should hear the notes play, ordered from top to bottom.
 
-About the Pitch Block
----------------------
+More regarding the Pitch Block
+------------------------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5.svg'</img>
 
-As we have seen, *Pitch* blocks are used inside the *Pitch-time
-Matrix* block to indicate pitches you may want to select. They are also
-used inside of *Note value* blocks to specify the pitch(s) to be played when
-the *Note value* block is run.
+As we have seen, *Pitch* blocks are used inside the *Note value*
+blocks and the *Pitch-time Matrix* block to indicate pitches you may
+want to select or play.
 
 You can plug different values into the *Pitch* block name and octave
 slots. Some examples are shown above. Starting from the top, the pitch
@@ -176,7 +221,7 @@ Creating Tuplets
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
 are not based on a power of 2. In the example above, three quarter
-notes -- defined in the *Rhythm* block -- are played in the time of a
+notes--defined in the *Rhythm* block--are played in the time of a
 single quarter note. The result is three twelfth notes.
 
 You can mix and match *Rhythm* blocks and *Tuplet* blocks when
@@ -189,21 +234,6 @@ Using individual notes in the matrix
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with corresponding values.
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg'</img>
-
-A *Silence* block can be used in combination with the *Note value* block to
-create "rests".
-
-Using drums
------------
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg'</img>
-
-Anywhere you can use a *Pitch* block--e.g., inside of the matrix or a
-*Note value* block--you can also specify a drum sample. Currently there
-about one dozen different samples from which to choose. The default
-drum is a kick drum.
 
 PROGRAMMING WITH MUSIC
 ----------------------
@@ -447,7 +477,11 @@ make an 8-key piano?
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg'</img>
 
-You can also add a bit of randomness to your music. In the top example above, the *One-of* block is used to randomly assign either `Do` or `Re` each time the *Note value* block is played. In the bottom example above, the *One-of* block is used to randomly select between `chunk1` and `chunk2`.
+You can also add a bit of randomness to your music. In the top example
+above, the *One-of* block is used to randomly assign either `Do` or
+`Re` each time the *Note value* block is played. In the bottom example
+above, the *One-of* block is used to randomly select between `chunk1`
+and `chunk2`.
 
 6. Beyond Music Blocks
 ----------------------
