@@ -34,11 +34,15 @@ run. Look for RUN LIVE links.
 NOTES
 -----
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
+Music Blocks exposed the common elements of music: pitch, rhythm, and
+sonic quality, e.g., loudness and softness, and to some degree, timbre
+and texture.
 
 At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a pitch that specifies the duration
-(note value) of the pitch.
+(note value) of the pitch. (The *Pitch* block is detailed below.)
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
 
 At the top of the example above, a single *Note value* block is
 shown. The `4` is the note value, in this case, a quarter note. The
@@ -54,20 +58,21 @@ note.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
 
 As we have seen, *Pitch* blocks are used inside the *Note value*
-blocks.
+blocks. The *Pitch* block specifies a pitch name and pitch octave that
+in combination determine the frequency at which a note is played.
 
 You can plug different values into the *Pitch* block name and octave
 slots. Some examples are shown above. Starting from the top, the pitch
 name block is specified using a *Solfege* block (`Sol` in `Octave 6`);
-the pitch name is specified using a *Pitch-name* block (`B flat` in
+the pitch name is specified using a *Ppppppitch-name* block (`B flat` in
 `Octave 4`); the pitch name is specified using a *Number* block (`440`
-Hertz). The octave is ignored when the frequency is assigned.
-
-Note that the pitch name can also be specified using a *Text* block.
+Hertz).
 
 The octave is specified using a number block and is restricted to
 whole numbers. In the case where the pitch name is specified by
 frequency, the octave is ignored.
+
+Note that the pitch name can also be specified using a *Text* block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg'</img>
 
