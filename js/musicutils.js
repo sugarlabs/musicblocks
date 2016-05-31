@@ -165,17 +165,17 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_('darbuka drum'), 'darbuka', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('hi hat'), 'hihat', 'images/drum.svg'],
+    [_('hi hat'), 'hihat', 'images/bell.svg'],
     //.TRANS: musical instrument
-    [_('ride bell'), 'ridebell', 'images/drum.svg'],
+    [_('ride bell'), 'ridebell', 'images/bell.svg'],
     //.TRANS: musical instrument
-    [_('cow bell'), 'cowbell', 'images/drum.svg'],
+    [_('cow bell'), 'cowbell', 'images/bell.svg'],
     //.TRANS: musical instrument
-    [_('triangle bell'), 'trianglebell', 'images/drum.svg'],
+    [_('triangle bell'), 'trianglebell', 'images/bell.svg'],
     //.TRANS: musical instrument
-    [_('finger cymbals'), 'fingercymbals', 'images/drum.svg'],
+    [_('finger cymbals'), 'fingercymbals', 'images/bell.svg'],
     //.TRANS: sound effect
-    [_('chine'), 'chine', 'images/drum.svg'],
+    [_('chine'), 'chine', 'images/bell.svg'],
     //.TRANS: sound effect
     [_('bottle'), 'bottle', 'images/drum.svg'],
     //.TRANS: sound effect
