@@ -93,6 +93,11 @@ Anywhere you can use a *Pitch* block--e.g., inside of the matrix or a
 about two dozen different samples from which to choose. The default
 drum is a kick drum.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg'</img>
+
+Just as in the chord example above, you can use multiple *Drum* blocks
+within a single *Note value* block and combine them with *Pitch*
+blocks.
 
 THE PITCH-TIME MATRIX
 ---------------------
