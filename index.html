@@ -66,6 +66,14 @@
             $("#pitchdrummatrix").draggable();
         });
 
+        $(function() {
+            $("#rulerbody").draggable();
+        });
+
+        $(function() {
+            $(".hRule").draggable();
+        });
+
         (function($) {
             $.fn.fixMe = function() {
                 return this.each(function() {
@@ -145,6 +153,21 @@
                 marginFromTop += parseInt(cell.style.height);
             }
         }
+
+        function moveRhythmRuler(event) {
+            var rulerbodyDiv = document.getElementById('rulerbody');
+            var rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
+
+            var rulerDiv = document.getElementsByClassName('hRule');
+            for (var i = 0; i < rulerDiv.length; i++) {
+                rulerDiv[i].style.left = rulerbodyDivPosition.left + 'px';
+                rulerDiv[i].style.top = rulerbodyDivPosition.top + 30 + 'px';
+                console.log(rulerDiv[i].style.left);
+                console.log(rulerbodyDivPosition.left);
+                console.log(rulerDiv[i].style.top);
+                console.log(rulerbodyDivPosition.top);
+            }
+        }
     </script>
 
     <!-- see activity/activity-icon-color-loading.svg for info -->
@@ -202,7 +225,8 @@
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
     <div id="ruler"></div>
-    <div id="rulerbody"></div>
+    <div id="rulerbody" ondrag="moveRhythmRuler(event)"></div>
+
     <div id="helpElem"></div>
     <script>
         function loadRuler() {
@@ -214,7 +238,14 @@
                 showMousePos: true
                 }); 
             })(jQuery);
-            document.getElementById("rulerbody").style.backgroundColor = "green";
+        var rulerbodyDiv = document.getElementById('rulerbody');
+       // document.getElementById('rulerbody').style.visibility = 'visible';
+        var rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
+        var rulerDiv = document.getElementsByClassName('hRule');
+        for (var i = 0; i < rulerDiv.length; i++) {
+                rulerDiv[i].style.left = rulerbodyDivPosition.left + 'px';
+                rulerDiv[i].style.top = rulerbodyDivPosition.top + 30 + 'px';
+            }
         }
     </script>
 

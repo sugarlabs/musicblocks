@@ -378,6 +378,8 @@ function PlanetView(model, controller) {
         return function () {
             document.getElementById('matrix').style.visibility = localStorage.getItem("isMatrixHidden");
             document.getElementById('pitchdrummatrix').style.visibility = localStorage.getItem("isPitchDrumMatrixHidden");
+            document.getElementById('rulerbody').style.visibility = localStorage.getItem("isRhythmRulerHidden"); 
+            console.log(document.getElementById('rulerbody').style.visibility);           
             if (ele.attributes.current.value === 'true') {
                 planet.controller.hide();
                 return;
