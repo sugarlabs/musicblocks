@@ -209,7 +209,7 @@ function getDrumName(name) {
             return DRUMNAMES[i][0];
         }
     }
-    return null
+    return getDrumName(DEFAULTDRUM);
 };
 
 
@@ -219,7 +219,7 @@ function getDrumSynthName(name) {
             return DRUMNAMES[i][1];
         }
     }
-    return null
+    return getDrumSynthName(DEFAULTDRUM);
 };
 
 
@@ -837,7 +837,11 @@ function Synth () {
         default:
             var drumName = getDrumSynthName(name);
             if (drumName != null) {
-                this.synthset[drumName][1].triggerAttack('C2', beatValue, 1);
+                // Work around i8n bug in Firefox.
+                if (drumName === '') {
+                    this.synthset[name][1].triggerAttack('C2', beatValue, 1);
+                } else {
+                    this.synthset[drumName][1].triggerAttack('C2', beatValue, 1);               }
             } else if (name === 'drum') {
                 this.synthset[DEFAULTDRUM][1].triggerAttack('C2', beatValue, 1);
             } else {
