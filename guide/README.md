@@ -53,9 +53,21 @@ note.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
 
-In this example, different ways to specify the pitch are shown. From
-top to bottom, `Sol` in `Octave 6`, `B flat` in `Octave 4`, and `440`
-hertz (the octave is ignored when the frequency is assigned).
+As we have seen, *Pitch* blocks are used inside the *Note value*
+blocks.
+
+You can plug different values into the *Pitch* block name and octave
+slots. Some examples are shown above. Starting from the top, the pitch
+name block is specified using a *Solfege* block (`Sol` in `Octave 6`);
+the pitch name is specified using a *Pitch-name* block (`B flat` in
+`Octave 4`); the pitch name is specified using a *Number* block (`440`
+Hertz). The octave is ignored when the frequency is assigned.
+
+Note that the pitch name can also be specified using a *Text* block.
+
+The octave is specified using a number block and is restricted to
+whole numbers. In the case where the pitch name is specified by
+frequency, the octave is ignored.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg'</img>
 
@@ -168,26 +180,6 @@ names and the pitch octaves.)
 
 To play the chuck, simply click on the action block (on the word
 action). You should hear the notes play, ordered from top to bottom.
-
-More regarding the Pitch Block
-------------------------------
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5.svg'</img>
-
-As we have seen, *Pitch* blocks are used inside the *Note value*
-blocks and the *Pitch-time Matrix* block to indicate pitches you may
-want to select or play.
-
-You can plug different values into the *Pitch* block name and octave
-slots. Some examples are shown above. Starting from the top, the pitch
-name block is specified using a *Solfege* block; the pitch name is
-specified using a *Pitch-name* block; the pitch name is specified using
-a *Number* block (frequency in Hertz); the pitch name is specified using
-a *Text* block.
-
-The octave is specified using a number block and is restricted to
-whole numbers. In the case where the pitch name is specified by
-frequency, the octave is ignored.
 
 About the Rhythm Block
 ----------------------
