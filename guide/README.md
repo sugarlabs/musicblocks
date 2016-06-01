@@ -378,18 +378,34 @@ between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
 and a number of more exotic modes, such as Bebop, Geez, Maqam, et al.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
-
-The *Set Drum* block is used to convert the enclosed notes into drum
-sounds. Drum sounds are played in a monopitch using the specified drum
-sample. In the example above, two quaternotes of a kick drum will be
-played.
-
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg'</img>
 
 In the above example, the sequence of drum beats is increased over time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
+
+The Pitch Drum Matrix
+---------------------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
+
+The *Set Drum* block is used to map the enclosed pitches into drum
+sounds. Drum sounds are played in a monopitch using the specified drum
+sample. In the example above, a `kick drum` will be substitued for
+each occurance of a `Re` `4`.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum6.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg'</img>
+
+As an expedience for creating mapping with the *Set Drum* block, we
+provide the *Drum-Pitch* Matrix. You use it to map between pitches and
+drums. The output is a stack of *Set Dum* blocks.
+
 
 3. Voices
 ---------
