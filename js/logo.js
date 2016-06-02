@@ -1970,7 +1970,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             var listenerName = '_rhythmruler_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
-                loadRuler();
+              //  loadRuler();
                 rhythmruler.init(logo);
             };
 

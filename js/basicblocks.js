@@ -850,7 +850,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['rhythmruler'] = rhythmrulerBlock;
     rhythmrulerBlock.staticLabels.push(_('rhythmruler'));
     rhythmrulerBlock.adjustWidthToLabel();
-    rhythmrulerBlock.stackClampZeroArgBlock();
+    rhythmrulerBlock.stackClampOneArgBlock();
+    rhythmrulerBlock.defaults.push(_('32'));
+
     
     // TURTLE PALETTE
 
