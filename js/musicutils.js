@@ -193,11 +193,11 @@ const DRUMNAMES = [
     //.TRANS: animal sound effect
     [_('cat'), 'cat', 'images/cat.svg'],
     //.TRANS: animal sound effect
-    [_('cricket'), 'cricket', 'images/drum.svg'],
+    [_('cricket'), 'cricket', 'images/cricket.svg'],
     //.TRANS: animal sound effect
     [_('dog'), 'dog', 'images/dog.svg'],
     //.TRANS: animal sound effect
-    [_('duck'), 'duck', 'images/drum.svg'],
+    [_('duck'), 'duck', 'images/duck.svg'],
 ];
 
 const DEFAULTDRUM = 'kick';
