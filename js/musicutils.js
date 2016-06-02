@@ -157,23 +157,23 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_('kick drum'), 'kick', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('tom tom'), 'tom', 'images/drum.svg'],
+    [_('tom tom'), 'tom', 'images/tomtom.svg'],
     //.TRANS: musical instrument
-    [_('floor tom tom'), 'floortom', 'images/drum.svg'],
+    [_('floor tom tom'), 'floortom', 'images/floortom.svg'],
     //.TRANS: musical instrument
     [_('cup drum'), 'cup', 'images/drum.svg'],
     //.TRANS: musical instrument
-    [_('darbuka drum'), 'darbuka', 'images/drum.svg'],
+    [_('darbuka drum'), 'darbuka', 'images/darbuka.svg'],
     //.TRANS: musical instrument
-    [_('hi hat'), 'hihat', 'images/bell.svg'],
+    [_('hi hat'), 'hihat', 'images/hihat.svg'],
     //.TRANS: musical instrument
-    [_('ride bell'), 'ridebell', 'images/bell.svg'],
+    [_('ride bell'), 'ridebell', 'images/ridebell.svg'],
     //.TRANS: musical instrument
     [_('cow bell'), 'cowbell', 'images/bell.svg'],
     //.TRANS: musical instrument
     [_('triangle bell'), 'trianglebell', 'images/triangle.svg'],
     //.TRANS: musical instrument
-    [_('finger cymbals'), 'fingercymbals', 'images/bell.svg'],
+    [_('finger cymbals'), 'fingercymbals', 'images/fingercymbals.svg'],
     //.TRANS: sound effect
     [_('chine'), 'chine', 'images/bell.svg'],
     //.TRANS: sound effect

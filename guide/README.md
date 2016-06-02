@@ -34,11 +34,15 @@ run. Look for RUN LIVE links.
 NOTES
 -----
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
+Music Blocks exposed the common elements of music: pitch, rhythm, and
+sonic quality, e.g., loudness and softness, and to some degree, timbre
+and texture.
 
 At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a pitch that specifies the duration
-(note value) of the pitch.
+(note value) of the pitch. (The *Pitch* block is detailed below.)
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
 
 At the top of the example above, a single *Note value* block is
 shown. The `4` is the note value, in this case, a quarter note. The
@@ -53,9 +57,22 @@ note.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
 
-In this example, different ways to specify the pitch are shown. From
-top to bottom, `Sol` in `Octave 6`, `B flat` in `Octave 4`, and `440`
-hertz (the octave is ignored when the frequency is assigned).
+As we have seen, *Pitch* blocks are used inside the *Note value*
+blocks. The *Pitch* block specifies a pitch name and pitch octave that
+in combination determine the frequency at which a note is played.
+
+You can plug different values into the *Pitch* block name and octave
+slots. Some examples are shown above. Starting from the top, the pitch
+name block is specified using a *Solfege* block (`Sol` in `Octave 6`);
+the pitch name is specified using a *Ppppppitch-name* block (`B flat` in
+`Octave 4`); the pitch name is specified using a *Number* block (`440`
+Hertz).
+
+The octave is specified using a number block and is restricted to
+whole numbers. In the case where the pitch name is specified by
+frequency, the octave is ignored.
+
+Note that the pitch name can also be specified using a *Text* block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg'</img>
 
@@ -76,6 +93,11 @@ Anywhere you can use a *Pitch* block--e.g., inside of the matrix or a
 about two dozen different samples from which to choose. The default
 drum is a kick drum.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg'</img>
+
+Just as in the chord example above, you can use multiple *Drum* blocks
+within a single *Note value* block and combine them with *Pitch*
+blocks.
 
 THE PITCH-TIME MATRIX
 ---------------------
@@ -168,26 +190,6 @@ names and the pitch octaves.)
 
 To play the chuck, simply click on the action block (on the word
 action). You should hear the notes play, ordered from top to bottom.
-
-More regarding the Pitch Block
-------------------------------
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix5.svg'</img>
-
-As we have seen, *Pitch* blocks are used inside the *Note value*
-blocks and the *Pitch-time Matrix* block to indicate pitches you may
-want to select or play.
-
-You can plug different values into the *Pitch* block name and octave
-slots. Some examples are shown above. Starting from the top, the pitch
-name block is specified using a *Solfege* block; the pitch name is
-specified using a *Pitch-name* block; the pitch name is specified using
-a *Number* block (frequency in Hertz); the pitch name is specified using
-a *Text* block.
-
-The octave is specified using a number block and is restricted to
-whole numbers. In the case where the pitch name is specified by
-frequency, the octave is ignored.
 
 About the Rhythm Block
 ----------------------
@@ -376,18 +378,34 @@ between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
 and a number of more exotic modes, such as Bebop, Geez, Maqam, et al.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
-
-The *Set Drum* block is used to convert the enclosed notes into drum
-sounds. Drum sounds are played in a monopitch using the specified drum
-sample. In the example above, two quaternotes of a kick drum will be
-played.
-
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg'</img>
 
 In the above example, the sequence of drum beats is increased over time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
+
+The Pitch Drum Matrix
+---------------------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
+
+The *Set Drum* block is used to map the enclosed pitches into drum
+sounds. Drum sounds are played in a monopitch using the specified drum
+sample. In the example above, a `kick drum` will be substitued for
+each occurance of a `Re` `4`.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum6.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg'</img>
+
+As an expedience for creating mapping with the *Set Drum* block, we
+provide the *Drum-Pitch* Matrix. You use it to map between pitches and
+drums. The output is a stack of *Set Dum* blocks.
+
 
 3. Voices
 ---------
