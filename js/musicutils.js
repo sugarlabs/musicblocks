@@ -167,7 +167,7 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_('hi hat'), 'hihat', 'images/hihat.svg'],
     //.TRANS: musical instrument
-    [_('ride bell'), 'ridebell', 'images/bell.svg'],
+    [_('ride bell'), 'ridebell', 'images/ridebell.svg'],
     //.TRANS: musical instrument
     [_('cow bell'), 'cowbell', 'images/bell.svg'],
     //.TRANS: musical instrument
