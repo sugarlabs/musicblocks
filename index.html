@@ -70,10 +70,6 @@
             $("#rulerbody").draggable();
         });
 
-        $(function() {
-            $(".hRule").draggable();
-        });
-
         (function($) {
             $.fn.fixMe = function() {
                 return this.each(function() {
@@ -158,15 +154,19 @@
             var rulerbodyDiv = document.getElementById('rulerbody');
             var rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
 
-            var rulerDiv = document.getElementsByClassName('hRule');
-            for (var i = 0; i < rulerDiv.length; i++) {
-                rulerDiv[i].style.left = rulerbodyDivPosition.left + 'px';
-                rulerDiv[i].style.top = rulerbodyDivPosition.top + 30 + 'px';
-                console.log(rulerDiv[i].style.left);
-                console.log(rulerbodyDivPosition.left);
-                console.log(rulerDiv[i].style.top);
-                console.log(rulerbodyDivPosition.top);
+            var table = document.getElementById('myTable');
+            var row = table.rows.item(0);
+            row.style.left = rulerbodyDivPosition.left + 'px';
+            row.style.top = rulerbodyDivPosition.top + 'px';
+            
+            var marginFromTop = 2 + 'px'
+            for (i = 1, row; row = table.rows[i]; i++) {
+                cell = row.cells[0];
+                cell.style.left = rulerbodyDivPosition.left + 2 + 'px';
+                cell.style.top = marginFromTop + 'px';
+                marginFromTop += parseInt(cell.style.height);
             }
+
         }
     </script>
 
@@ -224,29 +224,30 @@
     <canvas hidden id="music" width="700"></canvas>
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
-    <div id="ruler"></div>
-    <div id="rulerbody" ondrag="moveRhythmRuler(event)"></div>
-
+    <div id="rulerbody" overflow-x="auto" ondrag="moveRhythmRuler(event)"></div>
     <div id="helpElem"></div>
     <script>
-        function loadRuler() {
-            (function($) {
-                $("#ruler").ruler ({
-                vRuleSize: 0,
-                hRuleSize: 18,
-                showCrosshair : false,
-                showMousePos: true
-                }); 
-            })(jQuery);
-        var rulerbodyDiv = document.getElementById('rulerbody');
-       // document.getElementById('rulerbody').style.visibility = 'visible';
-        var rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
-        var rulerDiv = document.getElementsByClassName('hRule');
-        for (var i = 0; i < rulerDiv.length; i++) {
-                rulerDiv[i].style.left = rulerbodyDivPosition.left + 'px';
-                rulerDiv[i].style.top = rulerbodyDivPosition.top + 30 + 'px';
-            }
+    function dissectRuler (event) {
+        var inputNum = prompt("Divide By:");
+        var cell = event.target;
+        var newCellIndex = cell.cellIndex;
+        var newCellWidth = Math.floor(parseFloat(cell.style.width)/inputNum) + 'px';
+        var ruler = document.getElementById('ruler');
+        ruler.deleteCell(newCellIndex);
+        var newCellHeight = cell.style.height;
+
+        for ( var i = 0; i < inputNum; i++) {
+            var newCell = ruler.insertCell(newCellIndex+i);
+            newCell.style.width = newCellWidth;
+            newCell.style.height = newCellHeight;
+            newCell.style.minWidth = newCell.style.width;
+            newCell.style.maxWidth = newCell.style.width;
+            newCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            newCell.setAttribute('onclick', 'dissectRuler(event)');
         }
+
+    }
+
     </script>
 
 </body>
