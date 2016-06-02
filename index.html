@@ -162,9 +162,11 @@
             var marginFromTop = 2 + 'px'
             for (i = 1, row; row = table.rows[i]; i++) {
                 cell = row.cells[0];
+                if(cell !== null) {
                 cell.style.left = rulerbodyDivPosition.left + 2 + 'px';
                 cell.style.top = marginFromTop + 'px';
                 marginFromTop += parseInt(cell.style.height);
+                }
             }
 
         }
