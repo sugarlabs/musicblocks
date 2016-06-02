@@ -19,7 +19,7 @@ function RhythmRuler () {
             newCell.style.height = newCellHeight;
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
-            newCell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            newCell.style.backgroundColor = MATRIXBUTTONCOLOR;            
             
             newCell.addEventListener("click", function(event) {
               dissectRuler(event);
