@@ -2,12 +2,21 @@ const RHYTHMRULERHEIGHT = 100;
 
 function RhythmRuler () {
 
+    function isInt(value) {
+         return !isNaN(value) && 
+         parseInt(Number(value)) == value && 
+         !isNaN(parseInt(value, 10));
+    }
 
-
-  function dissectRuler (event) {
-        var inputNum = prompt("Divide By:" , 2  );
-        if(inputNum == null) {
+    function dissectRuler (event) {
+        var inputNum = prompt("Divide By:", 2);
+        if(inputNum === null) {
             return ;
+        }
+
+        if(!isInt(inputNum)) {
+            alert("Please Input a Integer");
+            inputNum = prompt("Divide By:", 2);
         }
         var cell = event.target;
         var newCellIndex = cell.cellIndex;
