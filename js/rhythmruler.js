@@ -2,6 +2,7 @@ const RHYTHMRULERHEIGHT = 100;
 
 function RhythmRuler () {
 
+    var divisionHistory = new Array();
     function isInt(value) {
          return !isNaN(value) && 
          parseInt(Number(value)) == value && 
@@ -10,21 +11,22 @@ function RhythmRuler () {
 
     function dissectRuler (event) {
         var inputNum = prompt("Divide By:", 2);
-        if(inputNum === null) {
-            return ;
-        }
-
+        
         if(!isInt(inputNum)) {
             alert("Please Input a Integer");
             inputNum = prompt("Divide By:", 2);
         }
+        if(inputNum === null) {
+            return ;
+        }
+
         var cell = event.target;
         var newCellIndex = cell.cellIndex;
+        divisionHistory.push([newCellIndex,inputNum]);
         var newCellWidth = Math.floor(parseFloat(cell.style.width)/inputNum) + 'px';
         var ruler = document.getElementById('ruler');
         ruler.deleteCell(newCellIndex);
         var newCellHeight = cell.style.height;
-
         for ( var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
             newCell.style.width = newCellWidth;
@@ -45,7 +47,44 @@ function RhythmRuler () {
               this.style.backgroundColor = MATRIXNOTECELLCOLOR;
             }  
         }
-  }
+    }
+
+    this.undo = function() {
+        if(divisionHistory.length === 0) {
+            return ;
+        }
+        var ruler = docById('ruler');
+        var inputNum = divisionHistory[divisionHistory.length-1][1];
+        var newCellIndex = divisionHistory[divisionHistory.length-1][0];
+        var cellWidth = ruler.cells[newCellIndex].style.width;
+        var newCellHeight = ruler.cells[newCellIndex].style.height;
+        var newCellWidth = Math.floor(parseFloat(cellWidth)*inputNum) + 'px';
+                
+        var newCell = ruler.insertCell(newCellIndex);
+        newCell.style.width = newCellWidth;
+        newCell.style.height = newCellHeight;
+        newCell.style.minWidth = newCell.style.width;
+        newCell.style.maxWidth = newCell.style.width;
+        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR; 
+
+        newCell.addEventListener("click", function(event) {
+              dissectRuler(event);
+        });
+            
+        newCell.onmouseover=function() {
+          this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+        }    
+            
+        newCell.onmouseout=function() {
+          this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+        }  
+
+        for ( var i = 0; i < inputNum; i++) {
+                ruler.deleteCell(newCellIndex+1);
+        }
+        divisionHistory.pop();
+        console.log(divisionHistory); 
+    }
 	this.init = function(logo) {
 		console.log("init RhythmRuler");
 		this.logo = logo;
@@ -59,6 +98,7 @@ function RhythmRuler () {
         docById('rulerbody').style.width = Math.floor(w / 2) + 'px';
         docById('rulerbody').style.overflowX = 'auto';
 
+        var thisMatrix = this;
         var table = docById('buttonTable');
 
         var rulertable = docById('rulerTable');
@@ -88,6 +128,7 @@ function RhythmRuler () {
         row.style.top = Math.floor(rulerbodyDivPosition.top) + 'px';
 
         var iconSize = Math.floor(this.cellScale * 24);
+        console.log(divisionHistory);
 
         var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -125,6 +166,24 @@ function RhythmRuler () {
         }
 
         var cell = row.insertCell(2);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/restore-trash-button.svg" title="' + _('undo') + '" alt="' + _('undo') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onclick=function() {
+            thisMatrix.undo();
+        }
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        var cell = row.insertCell(3);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
