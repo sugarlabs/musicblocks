@@ -3,6 +3,8 @@ const RHYTHMRULERHEIGHT = 100;
 function RhythmRuler () {
 
     var divisionHistory = new Array();
+    var noteValues = new Array();
+    this.notesCounter = 0;
     function isInt(value) {
          return !isNaN(value) && 
          parseInt(Number(value)) == value && 
@@ -26,9 +28,13 @@ function RhythmRuler () {
         var newCellWidth = Math.floor(parseFloat(cell.style.width)/inputNum) + 'px';
         var ruler = document.getElementById('ruler');
         ruler.deleteCell(newCellIndex);
+        var noteValue = noteValues[newCellIndex];
+        var newNoteValue = inputNum * noteValue;
+        noteValues.splice(newCellIndex, 1);
         var newCellHeight = cell.style.height;
         for ( var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
+            noteValues.splice(newCellIndex+i, 0, newNoteValue);
             newCell.style.width = newCellWidth;
             newCell.style.height = newCellHeight;
             newCell.style.minWidth = newCell.style.width;
@@ -85,6 +91,39 @@ function RhythmRuler () {
         divisionHistory.pop();
         console.log(divisionHistory); 
     }
+
+    this.playAll = function() {
+        this.logo.synth.stop();
+        this.notesCounter = 0;
+        var noteValue = noteValues[this.notesCounter];
+        var ruler = docById('ruler');
+        this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, 'kick');
+        this.playNote(0, 0);       
+    }
+    
+    this.playNote = function(time, notesCounter) {
+        var that = this;
+        noteValue = noteValues[that.notesCounter];
+        time = 1/noteValue;
+        setTimeout(function() {
+            var ruler = docById('ruler');
+
+            if (that.notesCounter >= noteValues.length) {
+                    that.notesCounter = 1;
+                    that.logo.synth.stop()
+            }
+            noteValue = noteValues[that.notesCounter];
+            that.notesCounter += 1;
+
+            that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, 'kick');
+
+            if(that.notesCounter < noteValues.length) {
+                that.playNote(time, that.notesCounter);
+            }
+
+        }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
+    }
+   
 	this.init = function(logo) {
 		console.log("init RhythmRuler");
 		this.logo = logo;
@@ -220,6 +259,8 @@ function RhythmRuler () {
         rulercell.maxWidth = rulercell.style.width;
         rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
         rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+
+        noteValues.push(1);
 
         rulercell.addEventListener("click", function(event) {
           dissectRuler(event);
