@@ -124,6 +124,48 @@ function RhythmRuler () {
         }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
     }
    
+    this.save = function() {
+
+        for (var name in this.logo.blocks.palettes.dict) {
+            this.logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+        this.logo.refreshCanvas();
+
+        var ruler = docById('ruler');
+
+        
+        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'ruler'}], 0, 0, [0]]];
+        var endOfStackIdx = 0;
+        var previousBlock = 0;
+
+
+        for (var i = 0; i < ruler.cells.length; i++) {
+            var setnotevalueidx = newStack.length;
+            var notevalueidx = setnotevalueidx + 1;
+            var setdrumnameidx = setnotevalueidx + 2;
+            var drumnameidx = setnotevalueidx + 3;
+            var hiddenidx = setnotevalueidx + 4;
+            var noteValue = noteValues[i];
+
+            newStack.push([setnotevalueidx, 'note', 0, 0, [previousBlock, notevalueidx, setdrumnameidx, hiddenidx]]);
+            newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [setnotevalueidx]]);
+            newStack.push([setdrumnameidx, 'playdrum', 0, 0, [setnotevalueidx, drumnameidx,null]]);
+            newStack.push([drumnameidx, ['drumname', {'value': 'kick'}], 0, 0, [setdrumnameidx]]);
+
+            if(i == ruler.cells.length-1) {
+                newStack.push([hiddenidx, 'hidden', 0, 0, [setnotevalueidx, null]]);
+            }
+            else {
+                newStack.push([hiddenidx, 'hidden', 0, 0, [setnotevalueidx, hiddenidx + 1]]);
+            }
+
+            var previousBlock = hiddenidx;
+
+        }
+        console.log(newStack);
+        this.logo.blocks.loadNewBlocks(newStack);
+    };
+
 	this.init = function(logo) {
 		console.log("init RhythmRuler");
 		this.logo = logo;
@@ -195,7 +237,7 @@ function RhythmRuler () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
-            
+            thisMatrix.save();            
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
