@@ -1898,7 +1898,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     }
 
     this._findUniqueActionName = function (name) {
-        // If we have a stack named 'action', make te protoblock visible.
+        // If we have a stack named 'action', make the protoblock visible.
         if (name === _('action')) {
             this.setActionProtoVisiblity(true);
         }
@@ -1921,6 +1921,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             i += 1;
         }
         return value;
+    };
+
+    this._findDrumURLs = function() {
+        // Make sure we initialize any drum with a URL name.
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') {
+                var c = this.blockList[blk].connections[0];
+                if (c != null && ['playdrum', 'setdrum'].indexOf(this.blockList[c].name) !== -1) {
+                    if (this.blockList[blk].value.slice(0, 4) === 'http') {
+                        this.logo.synth.loadSynth(this.blockList[blk].value);
+                    }
+                }
+            }
+        }
     };
 
     this.renameBoxes = function (oldName, newName) {
@@ -3168,6 +3182,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (this._loadCounter > 0) {
             return;
         }
+
+	this._findDrumURLs();
 
         this.updateBlockPositions();
 
