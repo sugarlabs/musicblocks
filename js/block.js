@@ -1808,6 +1808,12 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.renameNamedboxes(oldValue, newValue);
                 this.blocks.palettes.updatePalettes('boxes');
                 break;
+            case 'setdrum':
+            case 'playdrum':
+                if (newValue.slice(0, 4) === 'http') {
+                    this.blocks.logo.synth.loadSynth(newValue);
+                }
+                break;
             default:
                 break;
             }
