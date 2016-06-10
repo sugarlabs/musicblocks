@@ -1713,7 +1713,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
-                value = this._findUniqueActionName(_('action'));
+                value = this.findUniqueActionName(_('action'));
                 // console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
                     // console.log('calling newNameddoBlock with value ' + value);
@@ -1897,7 +1897,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     }
 
-    this._findUniqueActionName = function (name) {
+    this.findUniqueActionName = function (name) {
         // If we have a stack named 'action', make the protoblock visible.
         if (name === _('action')) {
             this.setActionProtoVisiblity(true);
