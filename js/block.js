@@ -1728,12 +1728,15 @@ function Block(protoblock, blocks, overrideName) {
         // Update the block values as they change in the DOM label.
         if (this == null) {
             console.log('cannot find block associated with label change');
+            // console.log('unlock');
+            this._label_lock = false;
             return;
         }
 
         if (this._label_lock) {
             console.log('changing label lock already set');
-	} else {
+        } else {
+            // console.log('lock');
             this._label_lock = true;
         }
 
@@ -1758,10 +1761,38 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
+
         if (oldValue === newValue) {
             // Nothing to do in this case.
+            // console.log('unlock');
+            this._label_lock = false;
             return;
         }
+
+        var c = this.connections[0];
+        if (this.name === 'text' && c != null) {
+            var cblock = this.blocks.blockList[c];
+            switch (cblock.name) {
+            case 'action':
+                // Ensure new name is unique.
+                var uniqueValue = this.blocks.findUniqueActionName(newValue);
+                if (uniqueValue !== newValue) {
+                    console.log('old name: ' + oldValue + ' new name: ' + newValue + ' unique name: ' + uniqueValue);
+                    newValue = uniqueValue;
+                    this.value = newValue;
+                    var label = this.value.toString();
+                    if (label.length > 8) {
+                        label = label.substr(0, 7) + '...';
+                    }
+                    this.text.text = label;
+                    this.label.value = newValue;
+                    this.updateCache();
+		}
+		break;
+	    default:
+		break;
+	    }
+	}
 
         // Update the block value and block text.
         if (this.name === 'number') {
@@ -1795,22 +1826,6 @@ function Block(protoblock, blocks, overrideName) {
             var cblock = this.blocks.blockList[c];
             switch (cblock.name) {
             case 'action':
-                // If the new label is already being used in a different
-                // aciton, we need to come up with a unique name.
-                var uniqueValue = this.blocks.findUniqueActionName(newValue);
-                if (uniqueValue !== newValue) {
-                    console.log('old name: ' + oldValue + ' new name: ' + newValue + ' unique name: ' + uniqueValue);
-                    newValue = uniqueValue;
-                    this.value = newValue;
-                    var label = this.value.toString();
-                    if (label.length > 8) {
-                        label = label.substr(0, 7) + '...';
-                    }
-                    this.text.text = label;
-		    this.label.value = newValue;
-                    this.updateCache();
-                }
-
                 // If the label was the name of an action, update the
                 // associated run this.blocks and the palette buttons
                 // Rename both do <- name and nameddo blocks.
@@ -1820,7 +1835,9 @@ function Block(protoblock, blocks, overrideName) {
                     this.blocks.setActionProtoVisiblity(false);
                 }
                 this.blocks.renameNameddos(oldValue, newValue);
+                this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('action');
+                this.blocks.palettes.show();
                 break;
             case 'storein':
                 // If the label was the name of a storein, update the
@@ -1832,7 +1849,9 @@ function Block(protoblock, blocks, overrideName) {
                 // Rename both box <- name and namedbox blocks.
                 this.blocks.renameBoxes(oldValue, newValue);
                 this.blocks.renameNamedboxes(oldValue, newValue);
+                this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('boxes');
+                this.blocks.palettes.show();
                 break;
             case 'setdrum':
             case 'playdrum':
@@ -1846,6 +1865,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // We are done changing the label, so unlock.
+        // console.log('unlock');
         this._label_lock = false;
 
         // Load the synth for the selected drum.
