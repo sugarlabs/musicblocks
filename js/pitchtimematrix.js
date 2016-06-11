@@ -321,6 +321,8 @@ function Matrix() {
             if (drumName != null) {
                 console.log('drumName is: ' + drumName + ' (' + this.solfegeNotes[i] + ')');
 		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else if (this.solfegeNotes[i].slice(0, 4) === 'http') {
+		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.solfegeNotes[i]) + '" title="' + this.solfegeNotes[i] + '" alt="' + this.solfegeNotes[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             }
@@ -769,6 +771,8 @@ function Matrix() {
             if (drumName != null) {
                 console.log('drumName is ' + drumName);
                 drumNotes.push(drumName);
+            } else if (note[i].slice(0, 4) === 'http') {
+                drumNotes.push(note[i]);
             } else {
                 pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
             }
@@ -862,6 +866,8 @@ function Matrix() {
                     if (drumName != null) {
                         console.log('drumName is ' + drumName);
                         drumNotes.push(drumName);
+                    } else if (note[j].slice(0, 4) === 'http') {
+                        drumNotes.push(note[j]);
                     } else {
                         pitchNotes.push(note[j].replace(/♭/g, 'b').replace(/♯/g, '#'));
                     }
@@ -1088,6 +1094,20 @@ function Matrix() {
 
 			newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
                         newStack.push([thisBlock + 1, ['drumname', {'value': drumName}], 0, 0, [thisBlock]]);
+                        thisBlock += 2;
+                        previousBlock = thisBlock - 2;
+                    } else if (note[0][j].slice(0, 4) === 'http') {
+                        // add a playdrum block with URL
+                        console.log('drumName is ' + note[0][j]);
+			// The last connection in last pitch block is null.
+			if (note[0].length === 1 || j === note[0].length - 1) {
+                            var lastConnection = null;
+			} else {
+                            var lastConnection = thisBlock + 2;
+			}
+
+			newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
+                        newStack.push([thisBlock + 1, ['text', {'value': note[0][j]}], 0, 0, [thisBlock]]);
                         thisBlock += 2;
                         previousBlock = thisBlock - 2;
 		    } else {
