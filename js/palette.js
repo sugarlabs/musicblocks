@@ -260,8 +260,10 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.dict[name].hideMenu(true);
         }
 
-        this.upIndicator.visible = false;
-        this.downIndicator.visible = false;
+        if (this.upIndicator != null) {
+            this.upIndicator.visible = false;
+            this.downIndicator.visible = false;
+        }
 
         this.refreshCanvas();
     };

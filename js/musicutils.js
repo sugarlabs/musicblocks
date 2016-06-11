@@ -193,11 +193,11 @@ const DRUMNAMES = [
     //.TRANS: animal sound effect
     [_('cat'), 'cat', 'images/cat.svg'],
     //.TRANS: animal sound effect
-    [_('cricket'), 'cricket', 'images/drum.svg'],
+    [_('cricket'), 'cricket', 'images/cricket.svg'],
     //.TRANS: animal sound effect
     [_('dog'), 'dog', 'images/dog.svg'],
     //.TRANS: animal sound effect
-    [_('duck'), 'duck', 'images/drum.svg'],
+    [_('duck'), 'duck', 'images/duck.svg'],
 ];
 
 const DEFAULTDRUM = 'kick';
@@ -207,16 +207,19 @@ function getDrumName(name) {
     if (name === '') {
         console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
+    } else if (name.slice(0, 4) == 'http') {
+        // console.log('drum name is URL');
+        return null;
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
-	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
             if (DRUMNAMES[i][0] != '') {
-		return DRUMNAMES[i][0];
+                return DRUMNAMES[i][0];
             } else {
-		console.log('i18n is misbehaving?');
-		return DRUMNAMES[i][1];
+                console.log('i18n is misbehaving?');
+                return DRUMNAMES[i][1];
             }
         }
     }
@@ -228,11 +231,14 @@ function getDrumIcon(name) {
     if (name === '') {
         console.log('getDrumIcon passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
+    } else if (name.slice(0, 4) == 'http') {
+        // console.log('drum name is URL');
+        return 'images/drum.svg';
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
-	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
             return DRUMNAMES[i][2];
         }
     }
@@ -244,11 +250,14 @@ function getDrumSynthName(name) {
     if (name === '') {
         console.log('getDrumSynthName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
+    } else if (name.slice(0, 4) == 'http') {
+        // console.log('drum name is URL');
+        return name;
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
-	if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
             return DRUMNAMES[i][1];
         }
     }
@@ -805,7 +814,16 @@ function Synth () {
             break;
         default:
             var drumName = getDrumSynthName(name);
-            if (drumName != null) {
+            if (name.slice(0, 4) == 'http') {
+                // console.log('drum name is URL');
+                if (name in this.synthset) {
+                    // console.log('returning URL synth');
+                    return this.synthset[name][1];
+                } else {
+                    console.log('no synth by that name');
+                    return null;
+                }
+            } else if (drumName != null) {
                 return this.synthset[drumName][1];
             } else if (name === 'drum') {
                 return this.synthset[DEFAULTDRUM][1];
@@ -847,7 +865,14 @@ function Synth () {
                 this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
             default:
-                this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]});
+                if (name.slice(0, 4) == 'http') {
+                    // console.log('drum name is URL');
+                    // console.log('initializing drum at ' + name);
+                    this.synthset[name] = [name, new Tone.Sampler({'C2' : name})];
+                    // console.log(this.synthset[name][1]);
+                } else {
+                    this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]});
+                }
                 break;
             }
         }
@@ -884,6 +909,9 @@ function Synth () {
                 }
             } else if (name === 'drum') {
                 this.synthset[DEFAULTDRUM][1].triggerAttack('C2', beatValue, 1);
+            } else if (name.slice(0, 4) == 'http') {
+                console.log('drum name is URL');
+                this.synthset[name][1].triggerAttack('C2', beatValue, 1);
             } else {
                 this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
             }
