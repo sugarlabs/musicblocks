@@ -2180,11 +2180,18 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             }
 
             var drumname = 'kick';
-            for (drum in DRUMNAMES) { 
-                if (DRUMNAMES[drum][0] === args[0]) {
-                    drumname = DRUMNAMES[drum][1];
-                } else if (DRUMNAMES[drum][1] === args[0]) {
-                    drumname = args[0];
+            if (args[0].slice(0, 4) === 'http') {
+                console.log('drum is URL');
+                drumname = args[0];
+            } else {
+                for (drum in DRUMNAMES) { 
+                    if (DRUMNAMES[drum][0] === args[0]) {
+                        drumname = DRUMNAMES[drum][1];
+                        break;
+                    } else if (DRUMNAMES[drum][1] === args[0]) {
+                        drumname = args[0];
+                        break;
+                    }
                 }
             }
 
