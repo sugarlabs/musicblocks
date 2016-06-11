@@ -65,13 +65,17 @@ function RhythmRuler () {
         var cellWidth = ruler.cells[newCellIndex].style.width;
         var newCellHeight = ruler.cells[newCellIndex].style.height;
         var newCellWidth = Math.floor(parseFloat(cellWidth)*inputNum) + 'px';
+        var oldCellNoteValue = noteValues[newCellIndex]
                 
         var newCell = ruler.insertCell(newCellIndex);
         newCell.style.width = newCellWidth;
         newCell.style.height = newCellHeight;
         newCell.style.minWidth = newCell.style.width;
         newCell.style.maxWidth = newCell.style.width;
-        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR; 
+        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+       
+        noteValues[newCellIndex] = oldCellNoteValue/inputNum; 
+        noteValues.splice(newCellIndex+1,inputNum-1);
 
         newCell.addEventListener("click", function(event) {
               dissectRuler(event);
@@ -140,23 +144,21 @@ function RhythmRuler () {
 
 
         for (var i = 0; i < ruler.cells.length; i++) {
-            var setnotevalueidx = newStack.length;
-            var notevalueidx = setnotevalueidx + 1;
-            var setdrumnameidx = setnotevalueidx + 2;
-            var drumnameidx = setnotevalueidx + 3;
-            var hiddenidx = setnotevalueidx + 4;
+            var rhythmblockidx = newStack.length;
+            var noofnotes = rhythmblockidx + 1;
+            var notevalueidx = rhythmblockidx + 2;
+            var hiddenidx = rhythmblockidx + 3;
             var noteValue = noteValues[i];
 
-            newStack.push([setnotevalueidx, 'note', 0, 0, [previousBlock, notevalueidx, setdrumnameidx, hiddenidx]]);
-            newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [setnotevalueidx]]);
-            newStack.push([setdrumnameidx, 'playdrum', 0, 0, [setnotevalueidx, drumnameidx,null]]);
-            newStack.push([drumnameidx, ['drumname', {'value': 'kick'}], 0, 0, [setdrumnameidx]]);
+            newStack.push([rhythmblockidx, 'rhythm', 0, 0, [previousBlock, noofnotes, notevalueidx, hiddenidx]]);
+            newStack.push([noofnotes, ['number', {'value': 1}], 0, 0, [rhythmblockidx]]);
+            newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [rhythmblockidx]]);
 
             if(i == ruler.cells.length-1) {
-                newStack.push([hiddenidx, 'hidden', 0, 0, [setnotevalueidx, null]]);
+                newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, null]]);
             }
             else {
-                newStack.push([hiddenidx, 'hidden', 0, 0, [setnotevalueidx, hiddenidx + 1]]);
+                newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, hiddenidx + 1]]);
             }
 
             var previousBlock = hiddenidx;
@@ -169,6 +171,10 @@ function RhythmRuler () {
 	this.init = function(logo) {
 		console.log("init RhythmRuler");
 		this.logo = logo;
+
+        noteValues = [];
+        divisionHistory = [];
+        
         docById('rulerbody').style.display = 'inline';
         console.log('setting RhythmRuler visible');
         docById('rulerbody').style.visibility = 'visible';
