@@ -1970,19 +1970,18 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             break;
         case 'rhythmruler':
             console.log("running rhythmruler");
-            if (args.length === 1) {
-                childFlow = args[0];
-                childFlowCount = 1;
-            }
+
+            childFlow = args[1];
+            childFlowCount = 1;
+            rhythmruler.Rulers = [];
+            rhythmruler.Drums = [];
             logo.inRhythmRuler = true;
+            
             var listenerName = '_rhythmruler_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
-              //  loadRuler();
                 rhythmruler.init(logo);
             };
-            rhythmruler.Rulers = [[[],[]]];
-            console.log(rhythmruler.Rulers);
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'pitchdrummatrix':
@@ -2473,6 +2472,8 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                 for (var i = 0; i < args[0]; i++) {
                     logo._processNote(args[1], blk, turtle);
                 }
+            } else if (logo.inRhythmRuler) {
+
             } else {
                 logo.errorMsg(_('Rhythm Block: Did you mean to use a Matrix block?'), blk);
             }
@@ -2662,6 +2663,10 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             };
 
             logo._setListener(turtle, listenerName, __listener);
+            if (logo.inRhythmRuler) {
+                rhythmruler.Drums.push(args[0]);
+                rhythmruler.Rulers.push([[],[]]);
+            }
             break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
