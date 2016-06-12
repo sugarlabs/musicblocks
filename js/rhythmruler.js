@@ -3,6 +3,7 @@ const RHYTHMRULERHEIGHT = 100;
 function RhythmRuler () {
 
     this.Rulers = [];
+    this.Drums = [];
     this.RulerSelected = 0;
     this.notesCounter = 0;
 
@@ -24,10 +25,9 @@ function RhythmRuler () {
         if(inputNum === null) {
             return ;
         }
-        console.log(this.Rulers);
 
         var cell = event.target;
-        this.RulerSelected = cell.parentNode.rowIndex;
+        this.RulerSelected = cell.parentNode.id[5];
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this.RulerSelected][0];
         var divisionHistory = this.Rulers[this.RulerSelected][1];
@@ -191,9 +191,6 @@ function RhythmRuler () {
 		console.log("init RhythmRuler");
 		this.logo = logo;
 
-
-        //this.noteValues = [];
-       // this.divisionHistory = [];
         
         docById('rulerbody').style.display = 'inline';
         console.log('setting RhythmRuler visible');
