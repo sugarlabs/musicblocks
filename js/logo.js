@@ -104,6 +104,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
     this.showPitchDrumMatrix = false;
     this.inPitchDrumMatrix = false;
 
+    //rhythm-ruler
+    this.inRhythmRuler = false;
+
     // pitch-rhythm matrix
     this.inMatrix = false;
     this.keySignature = {};
@@ -1967,13 +1970,19 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             break;
         case 'rhythmruler':
             console.log("running rhythmruler");
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+            logo.inRhythmRuler = true;
             var listenerName = '_rhythmruler_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
               //  loadRuler();
                 rhythmruler.init(logo);
             };
-
+            rhythmruler.Rulers = [[[],[]]];
+            console.log(rhythmruler.Rulers);
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'pitchdrummatrix':
