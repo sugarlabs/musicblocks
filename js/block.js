@@ -1774,6 +1774,10 @@ function Block(protoblock, blocks, overrideName) {
             var cblock = this.blocks.blockList[c];
             switch (cblock.name) {
             case 'action':
+                var that = this;
+		setTimeout(function () {
+                    that.blocks.palettes.removeActionPrototype(oldValue);
+		}, 1000);
                 // Ensure new name is unique.
                 var uniqueValue = this.blocks.findUniqueActionName(newValue);
                 if (uniqueValue !== newValue) {
@@ -1831,6 +1835,7 @@ function Block(protoblock, blocks, overrideName) {
                 // Rename both do <- name and nameddo blocks.
                 this.blocks.renameDos(oldValue, newValue);
                 if (oldValue === _('action')) {
+                    console.log('newNameddoBlock: ' + newValue);
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
                 }

@@ -2035,6 +2035,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
 
     this.renameNameddos = function (oldName, newName) {
+        console.log(oldName + ' ' + newName);
         if (oldName === newName) {
             return;
         }
@@ -2050,20 +2051,19 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     }
 
                     this.blockList[blk].overrideName = label;
-                    // console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
+                    console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
                     this.blockList[blk].regenerateArtwork();
                 }
             }
         }
 
         // Update the palette
-        // console.log('updating the palette in renameNameddos');
         var actionsPalette = this.palettes.dict['action'];
         var nameChanged = false;
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
             if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] !== _('action') && block.defaults[0] === oldName) {
-                // console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
+                console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
             }

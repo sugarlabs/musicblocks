@@ -417,13 +417,12 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
     this.removeActionPrototype = function(actionName) {
         var blockRemoved = false;
-
-        console.log('removing ' + actionName);
         for (var blk = 0; blk < this.dict['action'].protoList.length; blk++) {
             var block = this.dict['action'].protoList[blk];
-            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] === actionName) {
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && (block.defaults[0] === actionName || blocks.defaults == undefined)) {
                 // Remove the palette protoList entry for this block.
                 this.dict['action'].remove(block, actionName);
+                console.log('deleting protoblocks for ' + actionName);
 
                 // And remove it from the protoBlock dictionary.
                 if (paletteBlocks.protoBlockDict['myDo_' + actionName]) {
@@ -957,6 +956,7 @@ function Palette(palettes, name) {
     this._resetLayout = function() {
         // Account for menu toolbar
         if (this.menuContainer == null) {
+            console.log('menuContainer is null');
             return;
         }
 
@@ -988,7 +988,6 @@ function Palette(palettes, name) {
     };
 
     this._updateMenu = function(hide) {
-
         var palette = this;
 
         function __calculateBounds(palette, blk, modname) {
@@ -1477,9 +1476,11 @@ function Palette(palettes, name) {
             var startX = event.stageX;
             var startY = event.stageY;
             var lastY = event.stageY;
+
             if (palette.draggingProtoBlock) {
                 return;
             }
+
             var mode = window.hasMouse ? MODEDRAG : MODEUNSURE;
 
             palette.protoContainers[blkname].on('pressmove', function(event) {
@@ -1541,7 +1542,7 @@ function Palette(palettes, name) {
         // Return protoblock we've been dragging back to the palette.
         this.protoContainers[name].x = x;
         this.protoContainers[name].y = y;
-
+        console.log('restore ' + name);
         this._resetLayout();
     };
 

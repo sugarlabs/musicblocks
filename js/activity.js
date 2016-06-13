@@ -1284,8 +1284,6 @@ define(function (require) {
                             if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(me.name) !== -1 && me.privateData === oldName) {
                                 console.log('reassigning nameddo to ' + uniqueName);
                                 me.privateData = uniqueName;
-                                me.overrideName = uniqueName;
-
                                 me.value = uniqueName;
 
                                 var label = me.value.toString();
@@ -1293,6 +1291,7 @@ define(function (require) {
                                     label = label.substr(0, 7) + '...';
                                 }
                                 me.text.text = label;
+                                me.overrideName = label;
 				me.regenerateArtwork();
                                 me.container.updateCache();
                             }
