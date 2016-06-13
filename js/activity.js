@@ -1275,7 +1275,7 @@ define(function (require) {
                             actionArg.label.value = uniqueName;
                         }
 
-                        actionArg.updateCache();
+                        actionArg.container.updateCache();
 
                         // Check the drag group to ensure any do
                         // blocks are updated (in case of recursion).
@@ -1293,9 +1293,8 @@ define(function (require) {
                                     label = label.substr(0, 7) + '...';
                                 }
                                 me.text.text = label;
-                                // FIXME: For some reasone, the text
-                                // is not updated on the screen.
-                                me.updateCache();
+				me.regenerateArtwork();
+                                me.container.updateCache();
                             }
                         }
                     }
