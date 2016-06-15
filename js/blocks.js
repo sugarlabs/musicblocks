@@ -1714,7 +1714,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
                 value = this.findUniqueActionName(_('action'));
-                // console.log('renaming action block to ' + value);
+               //  console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
                     // console.log('calling newNameddoBlock with value ' + value);
                     // TODO: are there return or arg blocks?
@@ -2453,6 +2453,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         var currentStoreinNames = [];
         for (var b = 0; b < this.blockList.length; b++) {
             if (this.blockList[b].name === 'action') {
+                console.log(this.blockList[this.blockList[b].connections[1]].value);
                 if (this.blockList[b].connections[1] != null) {
                     currentActionNames.push(this.blockList[this.blockList[b].connections[1]].value);
                 }
@@ -2603,7 +2604,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (name === _('action')) {
                 this.setActionProtoVisiblity(true);
             }
-
+            console.log(name);
             var oldName = name;
             var i = 1;
             while (currentActionNames.indexOf(name) !== -1) {
