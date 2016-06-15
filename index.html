@@ -153,35 +153,21 @@
         function moveRhythmRuler(event) {
             var rulerbodyDiv = document.getElementById('rulerbody');
             var rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
-
-            var buttontable = document.getElementById('buttonTable');
-            var rulertable = document.getElementById('rulerTable');
-            var row1 = buttontable.rows.item(0);
-            var row2 = rulertable.rows.item(0);
-            row1.style.left = rulerbodyDivPosition.left + 'px';
-            row1.style.top = rulerbodyDivPosition.top + 'px';
-            row2.style.left = rulerbodyDivPosition.left + 'px';
-            row2.style.top = rulerbodyDivPosition.top + 'px';
-            
-            var marginFromTop = 2 + 'px'
-            for (i = 1, row1; row1 = buttontable.rows[i]; i++) {
-                cell = row1.cells[0];
-                if(cell !== null) {
-                cell.style.left = rulerbodyDivPosition.left + 2 + 'px';
-                cell.style.top = marginFromTop + 'px';
-                marginFromTop += parseInt(cell.style.height);
+            for (var j = 0; j < rulerbodyDiv.childNodes.length; j++) {
+                var table = rulerbodyDiv.childNodes[j];
+                var row = table.rows.item(0);
+                row.style.left = rulerbodyDivPosition.left + 'px';
+                row.style.top = rulerbodyDivPosition.top + 'px';                
+                var marginFromTop = 2 + 'px'
+                for (i = 1, row; row = table.rows[i]; i++) {
+                    cell = row1.cells[0];
+                    if(cell !== null) {
+                    cell.style.left = rulerbodyDivPosition.left + 2 + 'px';
+                    cell.style.top = marginFromTop + 'px';
+                    marginFromTop += parseInt(cell.style.height);
+                    }
                 }
             }
-
-            for (i = 1, row2; row2 = rulertable.rows[i]; i++) {
-                cell = row2.cells[0];
-                if(cell !== null) {
-                cell.style.left = rulerbodyDivPosition.left + 2 + 'px';
-                cell.style.top = marginFromTop + 'px';
-                marginFromTop += parseInt(cell.style.height);
-                }   
-            }
-
         }
     </script>
 
