@@ -148,43 +148,46 @@ function RhythmRuler () {
    
     this.save = function() {
 
+        var that = this;
         for (var name in this.logo.blocks.palettes.dict) {
             this.logo.blocks.palettes.dict[name].hideMenu(true);
         }
         this.logo.refreshCanvas();
-        for (var j = 0; j < this.Rulers.length; j++) {
-            var ruler = docById('ruler' + j);
-            var noteValues = this.Rulers[j][0];
+        var j = this.RulerSelected;
+       // for (var j = 0; j < this.Rulers.length; j++) {
+                var ruler = docById('ruler' + j);
+                var noteValues = this.Rulers[j][0];
 
-            
-            var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'ruler'}], 0, 0, [0]]];
-            var endOfStackIdx = 0;
-            var previousBlock = 0;
+                
+                var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'ruler'}], 0, 0, [0]]];
+                var endOfStackIdx = 0;
+                var previousBlock = 0;
 
 
-            for (var i = 0; i < ruler.cells.length; i++) {
-                var rhythmblockidx = newStack.length;
-                var noofnotes = rhythmblockidx + 1;
-                var notevalueidx = rhythmblockidx + 2;
-                var hiddenidx = rhythmblockidx + 3;
-                var noteValue = noteValues[i];
+                for (var i = 0; i < ruler.cells.length; i++) {
+                    var rhythmblockidx = newStack.length;
+                    var noofnotes = rhythmblockidx + 1;
+                    var notevalueidx = rhythmblockidx + 2;
+                    var hiddenidx = rhythmblockidx + 3;
+                    var noteValue = noteValues[i];
 
-                newStack.push([rhythmblockidx, 'rhythm', 0, 0, [previousBlock, noofnotes, notevalueidx, hiddenidx]]);
-                newStack.push([noofnotes, ['number', {'value': 1}], 0, 0, [rhythmblockidx]]);
-                newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [rhythmblockidx]]);
+                    newStack.push([rhythmblockidx, 'rhythm', 0, 0, [previousBlock, noofnotes, notevalueidx, hiddenidx]]);
+                    newStack.push([noofnotes, ['number', {'value': 1}], 0, 0, [rhythmblockidx]]);
+                    newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [rhythmblockidx]]);
 
-                if(i == ruler.cells.length-1) {
-                    newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, null]]);
+                    if(i == ruler.cells.length-1) {
+                        newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, null]]);
+                    }
+                    else {
+                        newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, hiddenidx + 1]]);
+                    }
+
+                    var previousBlock = hiddenidx;
+
                 }
-                else {
-                    newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, hiddenidx + 1]]);
-                }
 
-                var previousBlock = hiddenidx;
-
-            }
-            this.logo.blocks.loadNewBlocks(newStack);
-        }
+                that.logo.blocks.loadNewBlocks(newStack);
+      //  }
     };
 
 	this.init = function(logo) {
@@ -263,7 +266,10 @@ function RhythmRuler () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
-            thisRuler.save();            
+            for (var j = 0; j < thisRuler.Rulers.length; j++) {
+                thisRuler.RulerSelected = j;
+                setTimeout(thisRuler.save(), 600);           
+            }
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
