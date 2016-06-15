@@ -12,7 +12,7 @@
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix','rhythmruler'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler'];
 const NOHIT = ['hidden'];
 
 
@@ -1188,7 +1188,7 @@ function Block(protoblock, blocks, overrideName) {
         var hitArea = new createjs.Shape();
         var bounds = this.container.getBounds()
 
-        if (bounds == null) {
+        if (bounds === null) {
             this._createCache();
             bounds = this.bounds;
         }
