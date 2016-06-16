@@ -1775,9 +1775,9 @@ function Block(protoblock, blocks, overrideName) {
             switch (cblock.name) {
             case 'action':
                 var that = this;
-		setTimeout(function () {
+                setTimeout(function () {
                     that.blocks.palettes.removeActionPrototype(oldValue);
-		}, 1000);
+                }, 1000);
                 // Ensure new name is unique.
                 var uniqueValue = this.blocks.findUniqueActionName(newValue);
                 if (uniqueValue !== newValue) {
@@ -1791,12 +1791,12 @@ function Block(protoblock, blocks, overrideName) {
                     this.text.text = label;
                     this.label.value = newValue;
                     this.updateCache();
-		}
-		break;
-	    default:
-		break;
-	    }
-	}
+                }
+                break;
+            default:
+                break;
+            }
+        }
 
         // Update the block value and block text.
         if (this.name === 'number') {
