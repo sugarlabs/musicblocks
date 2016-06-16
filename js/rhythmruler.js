@@ -146,48 +146,49 @@ function RhythmRuler () {
         }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
     }
    
-    this.save = function() {
+    this.save = function(selectedruler) {
 
         var that = this;
         for (var name in this.logo.blocks.palettes.dict) {
             this.logo.blocks.palettes.dict[name].hideMenu(true);
         }
         this.logo.refreshCanvas();
-        var j = this.RulerSelected;
-       // for (var j = 0; j < this.Rulers.length; j++) {
-                var ruler = docById('ruler' + j);
-                var noteValues = this.Rulers[j][0];
+        setTimeout(function() {
+            var ruler = docById('ruler' + selectedruler);
+            var noteValues = that.Rulers[selectedruler][0];
+    
+            var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'ruler'}], 0, 0, [0]]];
+            var endOfStackIdx = 0;
+            var previousBlock = 0;
 
-                
-                var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'ruler'}], 0, 0, [0]]];
-                var endOfStackIdx = 0;
-                var previousBlock = 0;
+            for (var i = 0; i < ruler.cells.length; i++) {
+                var rhythmblockidx = newStack.length;
+                var noofnotes = rhythmblockidx + 1;
+                var notevalueidx = rhythmblockidx + 2;
+                var hiddenidx = rhythmblockidx + 3;
+                var noteValue = noteValues[i];
 
+                newStack.push([rhythmblockidx, 'rhythm', 0, 0, [previousBlock, noofnotes, notevalueidx, hiddenidx]]);
+                newStack.push([noofnotes, ['number', {'value': 1}], 0, 0, [rhythmblockidx]]);
+                newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [rhythmblockidx]]);
 
-                for (var i = 0; i < ruler.cells.length; i++) {
-                    var rhythmblockidx = newStack.length;
-                    var noofnotes = rhythmblockidx + 1;
-                    var notevalueidx = rhythmblockidx + 2;
-                    var hiddenidx = rhythmblockidx + 3;
-                    var noteValue = noteValues[i];
-
-                    newStack.push([rhythmblockidx, 'rhythm', 0, 0, [previousBlock, noofnotes, notevalueidx, hiddenidx]]);
-                    newStack.push([noofnotes, ['number', {'value': 1}], 0, 0, [rhythmblockidx]]);
-                    newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [rhythmblockidx]]);
-
-                    if(i == ruler.cells.length-1) {
-                        newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, null]]);
-                    }
-                    else {
-                        newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, hiddenidx + 1]]);
-                    }
-
-                    var previousBlock = hiddenidx;
-
+                if(i == ruler.cells.length-1) {
+                    newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, null]]);
+                }
+                else {
+                    newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, hiddenidx + 1]]);
                 }
 
-                that.logo.blocks.loadNewBlocks(newStack);
-      //  }
+                var previousBlock = hiddenidx;
+            }
+
+            that.logo.blocks.loadNewBlocks(newStack);
+            if(selectedruler > that.Rulers.length-2) {
+                return ;
+            } else {
+                that.save(selectedruler+1);
+            }
+        }, 500);
     };
 
 	this.init = function(logo) {
@@ -266,10 +267,7 @@ function RhythmRuler () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
-            for (var j = 0; j < thisRuler.Rulers.length; j++) {
-                thisRuler.RulerSelected = j;
-                setTimeout(thisRuler.save(), 600);           
-            }
+                thisRuler.save(0);                      
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
