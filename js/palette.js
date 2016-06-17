@@ -574,7 +574,11 @@ function PaletteModel(palette, palettes, name) {
             default:
                 if (blkname != modname) {
                     // Override label for do, storein, and box
-                    label = block.defaults[0];
+                    if (blkname === 'storein' && block.defaults[0] === _('box')) {
+			label = _('store in');
+                    } else {
+			label = block.defaults[0];
+                    }
                 } else if (protoBlock.staticLabels.length > 0) {
                     label = protoBlock.staticLabels[0];
                     if (label === '') {
