@@ -4335,7 +4335,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                 if (!(turtle in logo.turtleHeaps)) {
                     logo.turtleHeaps[turtle] = [];
                 }
-                console.log(logo.turtleHeaps[turtle].length);
+                // console.log(logo.turtleHeaps[turtle].length);
                 block.value = logo.turtleHeaps[turtle].length;
                 break;
             case 'heapEmpty':

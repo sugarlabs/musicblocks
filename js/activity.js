@@ -104,7 +104,7 @@ define(function (require) {
 
     function domReady(doc) {
         createDefaultStack();
-	createHelpContent();
+        createHelpContent();
         // facebookInit();
         window.scroll(0, 0);
 
@@ -301,6 +301,7 @@ define(function (require) {
             logo.setBackgroundColor(-1);
             logo.lilypondOutput = LILYPONDHEADER;
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                logo.turtleHeaps[turtle] = [];
                 logo.lilypondStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear();
             }
@@ -1252,8 +1253,56 @@ define(function (require) {
                 turtles.turtleList[turtle].container.visible = true;
             } else if (blocks.blockList[thisBlock].name === 'action') {
                 // We need to add a palette entry for this action.
+                // But first we need to ensure we have a unqiue name,
+                // as the name could have been taken in the interim.
                 var actionArg = blocks.blockList[blocks.blockList[thisBlock].connections[1]];
-                if (actionArg) {
+                if (actionArg != null) {
+                    var oldName = actionArg.value;
+                    // Mark the action block as still being in the
+                    // trash so that its name won't be considered when
+                    // looking for a unique name.
+                    blocks.blockList[thisBlock].trash = true;
+                    var uniqueName = blocks.findUniqueActionName(oldName);
+                    blocks.blockList[thisBlock].trash = false;
+
+                    if (uniqueName !== actionArg) {
+                        console.log('renaming action when restoring from trash. old name: ' + oldName + ' unique name: ' + uniqueName);
+
+                        actionArg.value = uniqueName;
+
+                        var label = actionArg.value.toString();
+                        if (label.length > 8) {
+                            label = label.substr(0, 7) + '...';
+                        }
+                        actionArg.text.text = label;
+
+                        if (actionArg.label != null) {
+                            actionArg.label.value = uniqueName;
+                        }
+
+                        actionArg.container.updateCache();
+
+                        // Check the drag group to ensure any do
+                        // blocks are updated (in case of recursion).
+                        for (var b = 0; b < blocks.dragGroup.length; b++) {
+                            var me = blocks.blockList[blocks.dragGroup[b]];
+                            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(me.name) !== -1 && me.privateData === oldName) {
+                                console.log('reassigning nameddo to ' + uniqueName);
+                                me.privateData = uniqueName;
+                                me.value = uniqueName;
+
+                                var label = me.value.toString();
+                                if (label.length > 8) {
+                                    label = label.substr(0, 7) + '...';
+                                }
+                                me.text.text = label;
+                                me.overrideName = label;
+				me.regenerateArtwork();
+                                me.container.updateCache();
+                            }
+                        }
+                    }
+
                     var actionName = actionArg.value;
                     if (actionName !== _('action')) {
                         blocks.checkPaletteEntries('action');
@@ -2062,8 +2111,8 @@ define(function (require) {
             var dx = 0;
             var dy = btnSize;
 
-            container = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
-            _loadButtonDragHandler(container, x, y, _doMenuButton);
+            menuContainer = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
+            _loadButtonDragHandler(menuContainer, x, y, _doMenuButton);
 
             for (var i = 0; i < menuNames.length; i++) {
                 if (!getAuxToolbarButtonNames(menuNames[i][0])) {
