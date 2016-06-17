@@ -2975,6 +2975,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
                 };
+                break;
             case 'modename':
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -2982,6 +2983,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
                 };
+                break;
             case 'drumname':
                 postProcess = function (args) {
                     var thisBlock = args[0];
