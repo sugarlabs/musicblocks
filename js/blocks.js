@@ -1244,7 +1244,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (myBlock.loadComplete) {
             myBlock.container.updateCache();
         } else {
-            console.log('load not yet complete for ' + blk);
+            console.log('load not yet complete for (' + blk + ') ' + myBlock.name);
         }
     };
 
@@ -2975,6 +2975,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
                 };
+		this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'modename':
                 postProcess = function (args) {
@@ -2983,6 +2984,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
                 };
+		this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'drumname':
                 postProcess = function (args) {
