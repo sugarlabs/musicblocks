@@ -415,6 +415,43 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         });
     };
 
+    this.removeActionPrototype = function(actionName) {
+        var blockRemoved = false;
+        for (var blk = 0; blk < this.dict['action'].protoList.length; blk++) {
+            var block = this.dict['action'].protoList[blk];
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && (block.defaults[0] === actionName || blocks.defaults == undefined)) {
+                // Remove the palette protoList entry for this block.
+                this.dict['action'].remove(block, actionName);
+                console.log('deleting protoblocks for ' + actionName);
+
+                // And remove it from the protoBlock dictionary.
+                if (paletteBlocks.protoBlockDict['myDo_' + actionName]) {
+                    // console.log('deleting protoblocks for action ' + actionName);
+                    delete paletteBlocks.protoBlockDict['myDo_' + actionName];
+                } else if (paletteBlocks.protoBlockDict['myCalc_' + actionName]) {
+                    // console.log('deleting protoblocks for action ' + actionName);
+                    delete paletteBlocks.protoBlockDict['myCalc_' + actionName];
+                } else if (paletteBlocks.protoBlockDict['myDoArg_' + actionName]) {
+                    // console.log('deleting protoblocks for action ' + actionName);
+                    delete paletteBlocks.protoBlockDict['myDoArg_' + actionName];
+                } else if (paletteBlocks.protoBlockDict['myCalcArg_' + actionName]) {
+                    // console.log('deleting protoblocks for action ' + actionName);
+                    delete paletteBlocks.protoBlockDict['myCalcArg_' + actionName];
+                }
+                this.dict['action'].y = 0;
+                blockRemoved = true;
+                break;
+            }
+        }
+
+        // Force an update if a block was removed.
+        if (blockRemoved) {
+            this.hide();
+            this.updatePalettes('action');
+            this.show();
+        }
+    };
+
     return this;
 }
 
@@ -537,7 +574,11 @@ function PaletteModel(palette, palettes, name) {
             default:
                 if (blkname != modname) {
                     // Override label for do, storein, and box
-                    label = block.defaults[0];
+                    if (blkname === 'storein' && block.defaults[0] === _('box')) {
+			label = _('store in');
+                    } else {
+			label = block.defaults[0];
+                    }
                 } else if (protoBlock.staticLabels.length > 0) {
                     label = protoBlock.staticLabels[0];
                     if (label === '') {
@@ -919,6 +960,7 @@ function Palette(palettes, name) {
     this._resetLayout = function() {
         // Account for menu toolbar
         if (this.menuContainer == null) {
+            console.log('menuContainer is null');
             return;
         }
 
@@ -950,7 +992,6 @@ function Palette(palettes, name) {
     };
 
     this._updateMenu = function(hide) {
-
         var palette = this;
 
         function __calculateBounds(palette, blk, modname) {
@@ -1439,9 +1480,11 @@ function Palette(palettes, name) {
             var startX = event.stageX;
             var startY = event.stageY;
             var lastY = event.stageY;
+
             if (palette.draggingProtoBlock) {
                 return;
             }
+
             var mode = window.hasMouse ? MODEDRAG : MODEUNSURE;
 
             palette.protoContainers[blkname].on('pressmove', function(event) {
@@ -1503,7 +1546,7 @@ function Palette(palettes, name) {
         // Return protoblock we've been dragging back to the palette.
         this.protoContainers[name].x = x;
         this.protoContainers[name].y = y;
-
+        // console.log('restore ' + name);
         this._resetLayout();
     };
 
@@ -1732,7 +1775,7 @@ function Palette(palettes, name) {
         const TRIANGLEOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'triangle', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
         const SQUAREOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'square', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
         const SAWTOOTHOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'sawtooth', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
-        const SETKEYOBJ = [[0, 'setkey2', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]], [1, ['notename', {'value': 'C'}], 0, 0, [0]], [2, ['modename', {'value': 'Major'}], 0, 0, [0]]];
+        const SETKEYOBJ = [[0, 'setkey2', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]],  [1, ['notename', {'value': 'C'}], 0, 0, [0]], [2, ['modename', {'value': 'Major'}], 0, 0, [0]]];
         const SNAREOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('snare drum')}], 0, 0, [0]]];
         const KICKOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('kick drum')}], 0, 0, [0]]];
         const HIHATOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('hi hat')}], 0, 0, [0]]];

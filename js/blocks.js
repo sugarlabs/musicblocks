@@ -1244,7 +1244,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (myBlock.loadComplete) {
             myBlock.container.updateCache();
         } else {
-            console.log('load not yet complete for ' + blk);
+            console.log('load not yet complete for (' + blk + ') ' + myBlock.name);
         }
     };
 
@@ -1910,9 +1910,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // Make sure we don't make two actions with the same name.
         var actionNames = [];
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') {
+            if ((this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') && !this.blockList[blk].trash) {
                 var c = this.blockList[blk].connections[0];
-                if (c != null && this.blockList[c].name === 'action') {
+                if (c != null && this.blockList[c].name === 'action' && !this.blockList[c].trash) {
                     actionNames.push(this.blockList[blk].value);
                 }
             }
@@ -2035,6 +2035,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
 
     this.renameNameddos = function (oldName, newName) {
+        console.log(oldName + ' ' + newName);
         if (oldName === newName) {
             return;
         }
@@ -2050,20 +2051,19 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     }
 
                     this.blockList[blk].overrideName = label;
-                    // console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
+                    console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
                     this.blockList[blk].regenerateArtwork();
                 }
             }
         }
 
         // Update the palette
-        // console.log('updating the palette in renameNameddos');
         var actionsPalette = this.palettes.dict['action'];
         var nameChanged = false;
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
             if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] !== _('action') && block.defaults[0] === oldName) {
-                // console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
+                console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
             }
@@ -2976,6 +2976,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
                 };
+		this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
             case 'modename':
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -2983,6 +2985,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
                 };
+		this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
             case 'drumname':
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -3347,42 +3351,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
 
-            var blockPalette = this.palettes.dict['action'];
-            var blockRemoved = false;
-
-            console.log('removing ' + actionName);
-            for (var blk = 0; blk < blockPalette.protoList.length; blk++) {
-                var block = blockPalette.protoList[blk];
-                if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] === actionName) {
-                    // Remove the palette protoList entry for this block.
-                    blockPalette.remove(block, actionName);
-
-                    // And remove it from the protoBlock dictionary.
-                    if (this.protoBlockDict['myDo_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        delete this.protoBlockDict['myDo_' + actionName];
-                    } else if (this.protoBlockDict['myCalc_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        delete this.protoBlockDict['myCalc_' + actionName];
-                    } else if (this.protoBlockDict['myDoArg_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        delete this.protoBlockDict['myDoArg_' + actionName];
-                    } else if (this.protoBlockDict['myCalcArg_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        delete this.protoBlockDict['myCalcArg_' + actionName];
-                    }
-                    blockPalette.y = 0;
-                    blockRemoved = true;
-                    break;
-                }
-            }
-
-            // Force an update if a block was removed.
-            if (blockRemoved) {
-                this.palettes.hide();
-                this.palettes.updatePalettes('action');
-                this.palettes.show();
-            }
+            this.palettes.removeActionPrototype(actionName);
         }
     };
 

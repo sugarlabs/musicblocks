@@ -247,7 +247,10 @@ function getDrumIcon(name) {
 
 
 function getDrumSynthName(name) {
-    if (name === '') {
+    if (name == null || name == undefined) {
+        console.log('getDrumSynthName passed null name. Returning null');
+        return null;
+    } else if (name === '') {
         console.log('getDrumSynthName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) == 'http') {
@@ -800,6 +803,10 @@ function Synth () {
     };
 
     this.getSynthByName = function(name) {
+        if (name == null || name == undefined) {
+            return this.synthset['poly'][1];
+        }
+
         switch (name) {    
         case 'pluck':
         case 'triangle':

@@ -1564,6 +1564,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'notename') {
+            console.log('notename');
             var type = 'notename';
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
             const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
@@ -1779,6 +1780,10 @@ function Block(protoblock, blocks, overrideName) {
             var cblock = this.blocks.blockList[c];
             switch (cblock.name) {
             case 'action':
+                var that = this;
+                setTimeout(function () {
+                    that.blocks.palettes.removeActionPrototype(oldValue);
+                }, 1000);
                 // Ensure new name is unique.
                 var uniqueValue = this.blocks.findUniqueActionName(newValue);
                 if (uniqueValue !== newValue) {
@@ -1792,12 +1797,12 @@ function Block(protoblock, blocks, overrideName) {
                     this.text.text = label;
                     this.label.value = newValue;
                     this.updateCache();
-		}
-		break;
-	    default:
-		break;
-	    }
-	}
+                }
+                break;
+            default:
+                break;
+            }
+        }
 
         // Update the block value and block text.
         if (this.name === 'number') {
@@ -1836,6 +1841,7 @@ function Block(protoblock, blocks, overrideName) {
                 // Rename both do <- name and nameddo blocks.
                 this.blocks.renameDos(oldValue, newValue);
                 if (oldValue === _('action')) {
+                    console.log('newNameddoBlock: ' + newValue);
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
                 }
