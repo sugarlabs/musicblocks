@@ -70,6 +70,10 @@
             $("#rulerbody").draggable();
         });
 
+        $(function() {
+            $("#drumDiv").draggable();
+        });
+    
         (function($) {
             $.fn.fixMe = function() {
                 return this.each(function() {
@@ -153,14 +157,19 @@
         function moveRhythmRuler(event) {
             var rulerbodyDiv = document.getElementById('rulerbody');
             var rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
-            for (var j = 0; j < rulerbodyDiv.childNodes.length; j++) {
-                var table = rulerbodyDiv.childNodes[j];
+            var drumDiv = document.getElementById('drumDiv')
+            var drumDivPosition = drumDiv.getBoundingClientRect();
+            drumDivPosition.left = rulerbodyDivPosition.left + 'px';
+            drumDivPosition.top = rulerbodyDivPosition.top + 'px';
+            for (var j = 0; j < drumDiv.childNodes.length; j++) {
+                var table = drumDiv.childNodes[j];
                 var row = table.rows.item(0);
                 row.style.left = rulerbodyDivPosition.left + 'px';
                 row.style.top = rulerbodyDivPosition.top + 'px';                
                 var marginFromTop = 2 + 'px'
+               // console.log(table.rows[1]);
                 for (i = 1, row; row = table.rows[i]; i++) {
-                    cell = row1.cells[0];
+                    cell = row.cells[0];
                     if(cell !== null) {
                     cell.style.left = rulerbodyDivPosition.left + 2 + 'px';
                     cell.style.top = marginFromTop + 'px';
@@ -226,6 +235,7 @@
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
     <div id="rulerbody" overflow-x="auto" ondrag="moveRhythmRuler(event)"></div>
+    <div id="drumDiv"></div>
     <div id="helpElem"></div>
 
 </body>
