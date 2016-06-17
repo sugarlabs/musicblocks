@@ -1542,7 +1542,7 @@ function Palette(palettes, name) {
         // Return protoblock we've been dragging back to the palette.
         this.protoContainers[name].x = x;
         this.protoContainers[name].y = y;
-        console.log('restore ' + name);
+        // console.log('restore ' + name);
         this._resetLayout();
     };
 
