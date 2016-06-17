@@ -1559,6 +1559,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'notename') {
+            console.log('notename');
             var type = 'notename';
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
             const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];

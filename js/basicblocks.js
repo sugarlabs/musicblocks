@@ -545,7 +545,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setkey2Block.adjustWidthToLabel();
     setkey2Block.twoArgBlock();
     setkey2Block.dockTypes[1] = 'anyin';
-    setkey2Block.dockTypes[2] = 'textin';
+    setkey2Block.dockTypes[2] = 'anyin';
 
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['tone'];
