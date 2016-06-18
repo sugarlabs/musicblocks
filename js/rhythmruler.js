@@ -115,35 +115,39 @@ function RhythmRuler () {
 
     this.playAll = function() {
         this.logo.synth.stop();
-        this.notesCounter = 0;
-        var noteValues = this.Rulers[this.RulerSelected][0];
-        var noteValue = noteValues[this.notesCounter];
-        var ruler = docById('ruler' + this.RulerSelected);
-        this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, 'kick');
-        this.playNote(0, 0);       
+
+        for(var i = 0; i < this.Rulers.length; i++) {
+            var noteValues = this.Rulers[i][0];
+            var noteValue = noteValues[i];
+            var drum = this.Drums[i]
+            this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
+            this.playNote(0, 0, i);
+        }       
     }
     
-    this.playNote = function(time, notesCounter) {
+    this.playNote = function(time, notesCounter, rulerno) {
         var that = this;
-        var noteValues = this.Rulers[this.RulerSelected][0];
-        noteValue = noteValues[that.notesCounter];
+        var noteValues = that.Rulers[rulerno][0];
+        noteValue = noteValues[notesCounter];
         time = 1/noteValue;
+        var drum = this.Drums[rulerno];
         setTimeout(function() {
-            var ruler = docById('ruler' + this.RulerSelected);
+                
 
-            if (that.notesCounter >= noteValues.length) {
-                    that.notesCounter = 1;
-                    that.logo.synth.stop()
-            }
-            noteValue = noteValues[that.notesCounter];
-            that.notesCounter += 1;
+                var ruler = docById('ruler' + rulerno);
 
-            that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, 'kick');
+                if (notesCounter >= noteValues.length) {
+                        notesCounter = 1;
+                        that.logo.synth.stop()
+                }
+                noteValue = noteValues[that.notesCounter];
+                notesCounter += 1;
 
-            if(that.notesCounter < noteValues.length) {
-                that.playNote(time, that.notesCounter);
-            }
+                that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drum);
 
+                if(notesCounter < noteValues.length) {
+                    that.playNote(time, notesCounter, rulerno);
+                }
         }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
     }
    
