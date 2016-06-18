@@ -306,7 +306,7 @@ function Matrix() {
         var j = 0;
         var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
         for (var i = 0; i < this.solfegeNotes.length; i++) {
-            if (this.solfegeNotes[i].toLowerCase() === _('rest')) {
+            if (this.solfegeNotes[i].toLowerCase() === 'rest') {
                 this.rests += 1;
                 continue;
             }
