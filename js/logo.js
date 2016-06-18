@@ -2060,7 +2060,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'rest2':
-            logo.notePitches[turtle].push(_('rest'));
+            logo.notePitches[turtle].push('rest');
             logo.noteOctaves[turtle].push(4);
             logo.noteBeatValues[turtle].push(1);
             logo.pushedNote[turtle] = true;
@@ -2269,7 +2269,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             var delta = 0;
 
             if (logo.inPitchDrumMatrix) {
-                if (note.toLowerCase() !== _('rest')) {
+                if (note.toLowerCase() !== 'rest') {
                     pitchdrummatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
@@ -2314,7 +2314,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                     }
                 }
             } else if (logo.inMatrix) {
-                if (note.toLowerCase() !== _('rest')) {
+                if (note.toLowerCase() !== 'rest') {
                     matrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
@@ -4634,7 +4634,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 }
             }
 
-            if (solfege.toLowerCase().substr(0, 4) === _('rest')) {
+            if (solfege.toLowerCase().substr(0, 4) === 'rest') {
                 return ['R', ''];
             } else if (halfSteps.indexOf(solfege.substr(0, 2).toLowerCase()) !== -1) {
                 var index = halfSteps.indexOf(solfege.substr(0, 2).toLowerCase()) + offset;
