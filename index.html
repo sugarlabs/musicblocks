@@ -59,6 +59,7 @@
           -->
     
        $(function() {
+            console.log("hellllllo");
             $("#matrix").draggable();
         });
 
@@ -67,12 +68,22 @@
         });
 
         $(function() {
-            $("#rulerbody").draggable();
-        });
+             $("#drumDiv").draggable();
+         });
 
-        $(function() {
-            $("#drumDiv").draggable();
-        });
+    
+        (function($) {
+            $('#rulerbody').draggable({
+                drag: function() {
+                    $("#drumDiv").css('left',$(this).position().left); 
+                },
+                axis: 'x',
+                containment: '#container1',
+                stop: function(){
+                    $("#drumDiv").css('left',$(this).position().left);  
+                }
+            });
+        })(jQuery);
     
         (function($) {
             $.fn.fixMe = function() {
@@ -234,8 +245,12 @@
     <canvas hidden id="music" width="700"></canvas>
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
+    <div id="container1">
     <div id="rulerbody" overflow-x="auto" ondrag="moveRhythmRuler(event)"></div>
+    </div>
+    <div id="container2">
     <div id="drumDiv"></div>
+    </div>
     <div id="helpElem"></div>
 
 </body>
