@@ -32,16 +32,12 @@ function RhythmRuler () {
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this.RulerSelected][0];
         var divisionHistory = this.Rulers[this.RulerSelected][1];
-       // this.divisionHistory.push([newCellIndex,inputNum]);
         divisionHistory.push([newCellIndex,inputNum]);
         var newCellWidth = Math.floor(parseFloat(cell.style.width)/inputNum) + 'px';
-       // var rulertable = document.getElementById('rulerTable');
         var ruler = docById('ruler' + this.RulerSelected);
         ruler.deleteCell(newCellIndex);
-      //  var noteValue = this.noteValues[newCellIndex];
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
-       // this.noteValues.splice(newCellIndex, 1);
         noteValues.splice(newCellIndex, 1);
         var newCellHeight = cell.style.height;
         for ( var i = 0; i < inputNum; i++) {
@@ -122,7 +118,7 @@ function RhythmRuler () {
             var drum = this.Drums[i]
             this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
             this.playNote(0, 0, i);
-        }       
+        }
     }
     
     this.playNote = function(time, notesCounter, rulerno) {
@@ -235,12 +231,22 @@ function RhythmRuler () {
         	table.remove();
         }
 
+        var table = docById('drum');
+
+        if (table !== null) {
+            table.remove();
+        }
+
         for (var i = 0; i < this.Rulers.length; i++) {
             var rulertable = docById('rulerTable' + i);
+            var rulerdrum = docById('rulerdrum' + i);
             this.Rulers[i][0] = [];
             this.Rulers[i][1] = [];
-            if(rulertable !== null) {
+            if (rulertable !== null) {
                 rulertable.remove();
+            }
+            if (rulerdrum !== null) {
+                rulerdrum.remove();
             }
         }
 
@@ -353,7 +359,9 @@ function RhythmRuler () {
 
         cell.onclick=function() {
             docById('rulerbody').style.visibility = 'hidden';
+            docById('drumDiv').style.visibility = 'hidden';
             docById('rulerbody').style.border = 0;
+            docById('drumDiv').style.border = 0;
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
@@ -416,7 +424,6 @@ function RhythmRuler () {
             rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
             rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
-          //  this.noteValues.push(1);
             this.Rulers[i][0].push(1);
             rulercell.addEventListener("click", function(event) {
               thisRuler.dissectRuler(event);
