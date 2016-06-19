@@ -121,7 +121,9 @@ function RhythmRuler () {
     this.playOne = function() {
         this.logo.synth.stop();
         var noteValues = this.Rulers[this.RulerSelected][0];
-        var noteValue = noteValues[this.RulerSelected];
+        var noteValue = noteValues[0];
+        console.log(noteValues);
+        console.log(noteValue);
         var drum = this.Drums[this.RulerSelected];
         this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
         this.playNote(0, 0, this.RulerSelected)
