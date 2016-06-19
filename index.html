@@ -66,24 +66,34 @@
 	    $(function() {
             $("#pitchdrummatrix").draggable();
         });
-
+        
         $(function() {
-             $("#drumDiv").draggable();
-         });
-
-    
-        (function($) {
-            $('#rulerbody').draggable({
+            $('#drumDiv').draggable({
                 drag: function() {
-                    $("#drumDiv").css('left',$(this).position().left); 
+                    jQuery('#rulerbody').css('top',jQuery(this).position().top);
+                    jQuery('#rulerbody').css('left',jQuery(this).position().left + 30 + 'px');
+
                 },
-                axis: 'x',
-                containment: '#container1',
                 stop: function(){
-                    $("#drumDiv").css('left',$(this).position().left);  
+                    jQuery('#rulerbody').css('top',jQuery(this).position().top);                     
+                    jQuery('#rulerbody').css('left',jQuery(this).position().left + 30 + 'px');                                        
                 }
             });
-        })(jQuery);
+        });
+        
+        $(function() {
+            $('#rulerbody').draggable({
+                drag: function() {
+                    jQuery('#drumDiv').css('top',jQuery(this).position().top);
+                    jQuery('#drumDiv').css('left',jQuery(this).position().left - 30 + 'px');
+
+                },
+                stop: function(){
+                    jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
+                    jQuery('#drumDiv').css('left',jQuery(this).position().left - 30 + 'px');                                        
+                }
+            });
+        });
     
         (function($) {
             $.fn.fixMe = function() {
@@ -245,12 +255,8 @@
     <canvas hidden id="music" width="700"></canvas>
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
-    <div id="container1">
-    <div id="rulerbody" overflow-x="auto" ondrag="moveRhythmRuler(event)"></div>
-    </div>
-    <div id="container2">
+    <div id="rulerbody" overflow-x="auto"></div>
     <div id="drumDiv"></div>
-    </div>
     <div id="helpElem"></div>
 
 </body>
