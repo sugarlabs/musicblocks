@@ -6,6 +6,10 @@ function RhythmRuler () {
     this.Drums = [];
     this.RulerSelected = 0;
     this.notesCounter = 0;
+    this.Completed = 0;
+    this.Playing = 0;
+    this.PlayingOne = 0;
+    this.PlayingAll = 0;
 
     function isInt(value) {
          return !isNaN(value) && 
@@ -115,8 +119,10 @@ function RhythmRuler () {
             var noteValue = noteValues[i];
             var drum = this.Drums[i]
             this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
-            this.playNote(0, 0, i);
-        }
+            if(this.PlayingAll) {
+                this.playNote(0, 0, i);
+            }
+        }   
     }
     this.playOne = function() {
         this.logo.synth.stop();
@@ -126,7 +132,9 @@ function RhythmRuler () {
         console.log(noteValue);
         var drum = this.Drums[this.RulerSelected];
         this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
-        this.playNote(0, 0, this.RulerSelected)
+        if(this.PlayingOne) {
+            this.playNote(0, 0, this.RulerSelected)
+        }
     }
     
     this.playNote = function(time, notesCounter, rulerno) {
@@ -150,9 +158,29 @@ function RhythmRuler () {
                 that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drum);
 
                 if(notesCounter < noteValues.length) {
-                    that.playNote(time, notesCounter, rulerno);
+                    if(that.Playing) {
+                        that.playNote(time, notesCounter, rulerno);
+                    }
                 }
-        }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
+                else {
+                    that.Completed += 1;
+                }
+                if(that.PlayingAll) {
+                    if(that.Completed === that.Rulers.length) {
+                        console.log("playing again");
+                        that.Completed = 0;
+                        that.logo.setTurtleDelay(0);
+                        that.playAll();
+                    }    
+                }
+                if(that.PlayingOne) {
+                    if(that.Completed === 1) {
+                        that.Completed = 0;
+                        that.logo.setTurtleDelay(0);
+                        that.playOne();
+                    }
+                }            
+        }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);   
     }
    
     this.save = function(selectedruler) {
@@ -312,8 +340,24 @@ function RhythmRuler () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
-            thisRuler.logo.setTurtleDelay(0);
-            thisRuler.playAll();
+            if(thisRuler.PlayingAll === 0) {
+                console.log("hellooo");
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/stop-turtle-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                thisRuler.logo.setTurtleDelay(0);
+                thisRuler.Completed =0;
+                thisRuler.PlayingAll = 1;
+                thisRuler.Playing = 1;
+                thisRuler.PlayingOne = 0;
+                thisRuler.playAll();
+            }
+            else {
+                console.log("helllllllllllllll");
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';                
+                thisRuler.Playing = 0;
+                thisRuler.PlayingAll = 0;
+                thisRuler.PlayingOne = 0;
+                thisRuler.Completed = 0;
+            }   
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
@@ -402,9 +446,23 @@ function RhythmRuler () {
             drumcell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
             drumcell.onclick=function() {
-                thisRuler.RulerSelected = this.parentNode.id[4];
-                thisRuler.logo.setTurtleDelay(0);
-                thisRuler.playOne();
+                if(thisRuler.PlayingOne ===0) {
+                    thisRuler.RulerSelected = this.parentNode.id[4];
+                    thisRuler.logo.setTurtleDelay(0);
+                    thisRuler.Playing = 1;
+                    thisRuler.PlayingOne = 1;
+                    thisRuler.PlayingAll = 0;
+                    thisRuler.Completed = 0;
+                    this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/stop-turtle-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                    thisRuler.playOne();
+                }
+                else {
+                    this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                    thisRuler.Playing = 0;
+                    thisRuler.PlayingOne = 0;
+                    thisRuler.PlayingAll = 0;
+                    thisRuler.Completed = 0;
+                }
             }
             drumcell.onmouseover=function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
