@@ -116,11 +116,15 @@ function RhythmRuler () {
 
         for(var i = 0; i < this.Rulers.length; i++) {
             var noteValues = this.Rulers[i][0];
-            var noteValue = noteValues[i];
+            var noteValue = noteValues[0];
             var drum = this.Drums[i]
+            var ruler = docById('ruler' + i);
+            var cell = ruler.cells[0];
+            console.log(cell);
+            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
             this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
             if(this.PlayingAll) {
-                this.playNote(0, 0, i);
+                this.playNote(0, 0, i, 0);
             }
         }   
     }
@@ -128,16 +132,17 @@ function RhythmRuler () {
         this.logo.synth.stop();
         var noteValues = this.Rulers[this.RulerSelected][0];
         var noteValue = noteValues[0];
-        console.log(noteValues);
-        console.log(noteValue);
+        var ruler = docById('ruler' + this.RulerSelected);
+        var cell = ruler.cells[0];
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         var drum = this.Drums[this.RulerSelected];
         this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
         if(this.PlayingOne) {
-            this.playNote(0, 0, this.RulerSelected)
+            this.playNote(0, 0, this.RulerSelected, 1)
         }
     }
     
-    this.playNote = function(time, notesCounter, rulerno) {
+    this.playNote = function(time, notesCounter, rulerno, colIndex) {
         var that = this;
         var noteValues = that.Rulers[rulerno][0];
         noteValue = noteValues[notesCounter];
@@ -148,18 +153,33 @@ function RhythmRuler () {
 
                 var ruler = docById('ruler' + rulerno);
 
+                if (notesCounter === noteValues.length-1) {
+                    for (var i = 0; i < ruler.cells.length; i++) {
+                        var cell = ruler.cells[i];
+                        cell.style.backgroundColor =  MATRIXNOTECELLCOLOR;
+                    }
+
+                } else {
+                    console.log(ruler);
+                    console.log(colIndex);
+                    var cell = ruler.cells[colIndex];
+                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+                }
+
                 if (notesCounter >= noteValues.length) {
                         notesCounter = 1;
                         that.logo.synth.stop()
-                }
+                }                
                 noteValue = noteValues[that.notesCounter];
                 notesCounter += 1;
+                colIndex += 1;
 
                 that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drum);
 
                 if(notesCounter < noteValues.length) {
                     if(that.Playing) {
-                        that.playNote(time, notesCounter, rulerno);
+                        that.playNote(time, notesCounter, rulerno, colIndex);
                     }
                 }
                 else {
@@ -169,6 +189,8 @@ function RhythmRuler () {
                     if(that.Completed === that.Rulers.length) {
                         console.log("playing again");
                         that.Completed = 0;
+                        var cell = ruler.cells[0];
+                        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                         that.logo.setTurtleDelay(0);
                         that.playAll();
                     }    
@@ -176,6 +198,8 @@ function RhythmRuler () {
                 if(that.PlayingOne) {
                     if(that.Completed === 1) {
                         that.Completed = 0;
+                        var cell = ruler.cells[0];
+                        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                         that.logo.setTurtleDelay(0);
                         that.playOne();
                     }
@@ -351,7 +375,6 @@ function RhythmRuler () {
                 thisRuler.playAll();
             }
             else {
-                console.log("helllllllllllllll");
                 this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';                
                 thisRuler.Playing = 0;
                 thisRuler.PlayingAll = 0;
