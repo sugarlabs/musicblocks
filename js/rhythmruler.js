@@ -16,6 +16,45 @@ function RhythmRuler () {
          !isNaN(parseInt(value, 10));
     }
 
+    function reducedFraction(a, b) {
+        greatestCommonMultiple = function(a, b) {
+            return b === 0 ? a : greatestCommonMultiple(b, a % b);
+        }
+
+        var gcm = greatestCommonMultiple(a, b);
+        if (NOTESYMBOLS != undefined && b / gcm in [1, 2, 4, 8, 16, 32, 64]) {
+            return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
+        } else {
+            return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
+        }
+    };
+
+    this.calcNoteValueToDisplay = function (a, b) {
+        var noteValue = a / b;
+        var noteValueToDisplay = null;
+        if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
+            noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '>';
+        } else {
+            noteValueToDisplay = reducedFraction(b, a);
+        }
+
+        if (parseInt(noteValue) < noteValue) {
+            noteValueToDisplay = parseInt((noteValue * 1.5))
+            if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
+                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '> .';
+            } else {
+                noteValueToDisplay = parseInt((noteValue * 1.75))
+                if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
+                    noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '> ..';
+                } else {
+                    noteValueToDisplay = reducedFraction(b, a);
+                }
+            }
+        }
+
+        return noteValueToDisplay;
+    };
+
     this.dissectRuler = function (event) {
 
         var that = this;
@@ -46,7 +85,9 @@ function RhythmRuler () {
         for ( var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
             noteValues.splice(newCellIndex+i, 0, newNoteValue);
+            newCell.innerHTML = that.calcNoteValueToDisplay(newNoteValue, 1);
             newCell.style.width = newCellWidth;
+            newCell.style.lineHeight = 60 + '%';
             newCell.style.height = newCellHeight;
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
@@ -503,9 +544,11 @@ function RhythmRuler () {
 
 
             var rulercell = row.insertCell(-1);
+            rulercell.innerHTML = this.calcNoteValueToDisplay(1, 1);
             rulercell.style.width = Math.floor(rulerbodyDivPosition.width) + 'px';
             rulercell.minWidth = rulercell.style.width;
             rulercell.maxWidth = rulercell.style.width;
+            rulercell.style.lineHeight = 60 + '%';
             rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
             rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 

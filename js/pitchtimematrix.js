@@ -615,7 +615,7 @@ function Matrix() {
 
     this.addNotes = function(numBeats, noteValue) {
         var table = docById('myTable');
-
+        console.log(noteValue);
         var noteValueToDisplay = this.calcNoteValueToDisplay(noteValue, 1);
 
         if (this.noteValue > noteValue) {
