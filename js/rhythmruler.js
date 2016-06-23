@@ -55,6 +55,32 @@ function RhythmRuler () {
         return noteValueToDisplay;
     };
 
+    this.calculateZebraStripes = function(rulerno) {
+        var ruler = docById('ruler' + rulerno);
+        if(this.RulerSelected%2 === 0) {
+            var evenColor = MATRIXNOTECELLCOLOR;
+        } else {
+            var evenColor = MATRIXNOTECELLCOLORHOVER;
+        }
+        for(var i = 0; i < ruler.cells.length; i++) {
+            var newCell = ruler.cells[i];
+            if(evenColor === MATRIXNOTECELLCOLOR) {
+                if((i)%2 === 0) {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                } else {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                }
+            } 
+            if(evenColor === MATRIXNOTECELLCOLORHOVER) {
+                if((i)%2 === 0) {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                } else {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                }
+            }              
+        }
+    }
+
     this.dissectRuler = function (event) {
 
         var that = this;
@@ -70,11 +96,6 @@ function RhythmRuler () {
         var cell = event.target;
         this.RulerSelected = cell.parentNode.id[5];
         var ruler = docById('ruler' + this.RulerSelected);
-        if(this.RulerSelected%2 === 0) {
-            var evenColor = MATRIXNOTECELLCOLOR;
-        } else {
-            var evenColor = MATRIXNOTECELLCOLORHOVER;
-        }
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this.RulerSelected][0];
         var divisionHistory = this.Rulers[this.RulerSelected][1];
@@ -94,45 +115,12 @@ function RhythmRuler () {
             newCell.style.lineHeight = 60 + '%';
             newCell.style.height = newCellHeight;
             newCell.style.minWidth = newCell.style.width;
-            newCell.style.maxWidth = newCell.style.width;
-            if(evenColor === MATRIXNOTECELLCOLOR) {
-                if((newCellIndex+i)%2 === 0) {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                } else {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-                }
-            } 
-            if(evenColor === MATRIXNOTECELLCOLORHOVER) {
-                if((newCellIndex+i)%2 === 0) {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-                } else {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                }
-            }              
+            newCell.style.maxWidth = newCell.style.width;   
             newCell.addEventListener("click", function(event) {
               that.dissectRuler(event);
             });
         }
-        if(inputNum%2 === 0) {
-            for (var j = newCellIndex + parseInt(inputNum); j < ruler.cells.length; j++) {
-                console.log(j);
-                var newCell = ruler.cells[j];
-                if(evenColor === MATRIXNOTECELLCOLOR) {
-                    if(j%2 === 0) {
-                        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    } else {
-                        newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-                    }
-                } 
-                if(evenColor === MATRIXNOTECELLCOLORHOVER) {
-                    if(j%2 === 0) {
-                        newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-                    } else {
-                        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    }
-                }          
-            }
-        }
+        this.calculateZebraStripes(that.RulerSelected);        
     }
 
     this.undo = function() {
@@ -154,9 +142,11 @@ function RhythmRuler () {
         var newCell = ruler.insertCell(newCellIndex);
         newCell.style.width = newCellWidth;
         newCell.style.height = newCellHeight;
+        newCell.style.lineHeight = 60 + '%';
         newCell.style.minWidth = newCell.style.width;
         newCell.style.maxWidth = newCell.style.width;
         newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+        newCell.innerHTML = that.calcNoteValueToDisplay(oldCellNoteValue/inputNum, 1);
        
         noteValues[newCellIndex] = oldCellNoteValue/inputNum; 
         noteValues.splice(newCellIndex+1,inputNum-1);
@@ -177,6 +167,7 @@ function RhythmRuler () {
                 ruler.deleteCell(newCellIndex+1);
         }
         divisionHistory.pop();
+        this.calculateZebraStripes(this.RulerSelected);
     }
 
     this.playAll = function() {
