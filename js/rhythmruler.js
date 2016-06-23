@@ -36,7 +36,7 @@ function RhythmRuler () {
         var noteValues = this.Rulers[this.RulerSelected][0];
         var divisionHistory = this.Rulers[this.RulerSelected][1];
         divisionHistory.push([newCellIndex,inputNum]);
-        var newCellWidth = Math.floor(parseFloat(cell.style.width)/inputNum) + 'px';
+        var newCellWidth = parseFloat(cell.style.width).toPrecision(21)/inputNum + 'px';
         var ruler = docById('ruler' + this.RulerSelected);
         ruler.deleteCell(newCellIndex);
         var noteValue = noteValues[newCellIndex];
@@ -50,19 +50,14 @@ function RhythmRuler () {
             newCell.style.height = newCellHeight;
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
-            newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;            
-            
+            if((newCellIndex+i)%2 === 0) {
+                newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;            
+            } else {
+                newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;            
+            } 
             newCell.addEventListener("click", function(event) {
               that.dissectRuler(event);
             });
-            
-            newCell.onmouseover=function() {
-              this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-            }    
-            
-            newCell.onmouseout=function() {
-              this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            }  
         }
     }
 
@@ -314,6 +309,8 @@ function RhythmRuler () {
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'drum');
         x.style.textAlign = 'center';
+        x.style.borderCollapse = 'collapse';
+        x.cellSpacing = 0;
 
         var drumDiv = docById('drumDiv');
         drumDiv.style.paddingTop = 0 + 'px';
@@ -326,33 +323,6 @@ function RhythmRuler () {
         var row = header.insertRow(0);
         row.style.left = Math.floor(drumDivPosition.left) + 'px';
         row.style.top = Math.floor(drumDivPosition.top) + 'px';
-
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img  " height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'buttonTable');
-        x.style.textAlign = 'center';
-
-        
-
-        var rulerbodyDiv = docById('rulerbody');
-        rulerbodyDiv.style.paddingTop = 0 + 'px';
-        rulerbodyDiv.style.paddingLeft = 0 + 'px';
-        rulerbodyDiv.appendChild(x);
-        rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
-
-        var table = docById('buttonTable');
-        var header = table.createTHead();
-        var row = header.insertRow(0);
-        row.style.left = Math.floor(rulerbodyDivPosition.left) + 'px';
-        row.style.top = Math.floor(rulerbodyDivPosition.top) + 'px';
-
 
         var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -386,7 +356,28 @@ function RhythmRuler () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
-        var cell = row.insertCell(1);
+        var x = document.createElement('TABLE');
+        x.setAttribute('id', 'buttonTable');
+        x.style.textAlign = 'center';
+        x.style.borderCollapse = 'collapse';
+        x.cellSpacing = 0;
+
+        
+
+        var rulerbodyDiv = docById('rulerbody');
+        rulerbodyDiv.style.paddingTop = 0 + 'px';
+        rulerbodyDiv.style.paddingLeft = 0 + 'px';
+        rulerbodyDiv.appendChild(x);
+        rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
+
+        var table = docById('buttonTable');
+        var header = table.createTHead();
+        var row = header.insertRow(0);
+        row.style.left = Math.floor(rulerbodyDivPosition.left) + 'px';
+        row.style.top = Math.floor(rulerbodyDivPosition.top) + 'px';
+
+        
+        var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
@@ -403,7 +394,7 @@ function RhythmRuler () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
-        var cell = row.insertCell(2);
+        var cell = row.insertCell(1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/restore-trash-button.svg" title="' + _('undo') + '" alt="' + _('undo') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
@@ -421,7 +412,7 @@ function RhythmRuler () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
-        var cell = row.insertCell(3);
+        var cell = row.insertCell(2);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
@@ -450,6 +441,8 @@ function RhythmRuler () {
             var rulerdrumTable = document.createElement('TABLE');
             rulerdrumTable.setAttribute('id', 'rulerdrum' + i);
             rulerdrumTable.style.textAlign = 'center';
+            rulerdrumTable.style.borderCollapse = 'collapse';
+            rulerdrumTable.cellSpacing = 0;
             drumDiv.appendChild(rulerdrumTable);
             var header = rulerdrumTable.createTHead();
             var row = header.insertRow(-1);
@@ -495,6 +488,12 @@ function RhythmRuler () {
             var RulerTable = document.createElement('TABLE');
             RulerTable.setAttribute('id', 'rulerTable' + i);
             RulerTable.style.textAlign = 'center';
+           // RulerTable.style.border = 'soid';
+            RulerTable.style.borderCollapse = 'collapse';
+          //  RulerTable.style.borderTopWidth = '2px';
+            RulerTable.cellSpacing = 0;
+           // RulerTable.cellPadding = 0;
+          //  RulerTable.borderSpacing = '10px';
             rulerbodyDiv.appendChild(RulerTable);
             var header = RulerTable.createTHead();
             var row = header.insertRow(-1);
@@ -514,13 +513,6 @@ function RhythmRuler () {
             rulercell.addEventListener("click", function(event) {
               thisRuler.dissectRuler(event);
             });
-            rulercell.onmouseover=function() {
-              this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-            }    
-            rulercell.onmouseout=function() {
-              this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            }
-
         }
 
 	}
