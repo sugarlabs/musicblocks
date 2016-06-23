@@ -67,20 +67,24 @@ function RhythmRuler () {
         if(inputNum === null) {
             return ;
         }
-
-        console.log(this.RulerSelected);
         var cell = event.target;
         this.RulerSelected = cell.parentNode.id[5];
+        var ruler = docById('ruler' + this.RulerSelected);
+        if(this.RulerSelected%2 === 0) {
+            var evenColor = MATRIXNOTECELLCOLOR;
+        } else {
+            var evenColor = MATRIXNOTECELLCOLORHOVER;
+        }
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this.RulerSelected][0];
         var divisionHistory = this.Rulers[this.RulerSelected][1];
         divisionHistory.push([newCellIndex,inputNum]);
         var newCellWidth = parseFloat(cell.style.width).toPrecision(21)/inputNum + 'px';
-        var ruler = docById('ruler' + this.RulerSelected);
         ruler.deleteCell(newCellIndex);
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
         noteValues.splice(newCellIndex, 1);
+        
         var newCellHeight = cell.style.height;
         for ( var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
@@ -91,23 +95,43 @@ function RhythmRuler () {
             newCell.style.height = newCellHeight;
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
-            if(this.RulerSelected%2 === 0) {
+            if(evenColor === MATRIXNOTECELLCOLOR) {
                 if((newCellIndex+i)%2 === 0) {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;            
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 } else {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;            
-                }     
-            } else {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                }
+            } 
+            if(evenColor === MATRIXNOTECELLCOLORHOVER) {
                 if((newCellIndex+i)%2 === 0) {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;            
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                 } else {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;            
-                }    
-            }
-            
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                }
+            }              
             newCell.addEventListener("click", function(event) {
               that.dissectRuler(event);
             });
+        }
+        if(inputNum%2 === 0) {
+            for (var j = newCellIndex + parseInt(inputNum); j < ruler.cells.length; j++) {
+                console.log(j);
+                var newCell = ruler.cells[j];
+                if(evenColor === MATRIXNOTECELLCOLOR) {
+                    if(j%2 === 0) {
+                        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    } else {
+                        newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    }
+                } 
+                if(evenColor === MATRIXNOTECELLCOLORHOVER) {
+                    if(j%2 === 0) {
+                        newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    } else {
+                        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    }
+                }          
+            }
         }
     }
 
