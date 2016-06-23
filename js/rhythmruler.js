@@ -22,7 +22,7 @@ function RhythmRuler () {
         }
 
         var gcm = greatestCommonMultiple(a, b);
-        if (NOTESYMBOLS != undefined && b / gcm in [1, 2, 4, 8, 16, 32, 64]) {
+        if (NOTESYMBOLS != undefined && [1, 2, 4, 8, 16, 32, 64].indexOf(b/gcm) !== -1) {
             return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
         } else {
             return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
@@ -154,15 +154,6 @@ function RhythmRuler () {
         newCell.addEventListener("click", function(event) {
               that.dissectRuler(event);
         });
-            
-        newCell.onmouseover=function() {
-          this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-        }    
-            
-        newCell.onmouseout=function() {
-          this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        }  
-
         for ( var i = 0; i < inputNum; i++) {
                 ruler.deleteCell(newCellIndex+1);
         }
