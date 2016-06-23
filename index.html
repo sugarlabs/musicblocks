@@ -174,31 +174,6 @@
                 marginFromTop += parseInt(cell.style.height);
             }
         }
-
-        function moveRhythmRuler(event) {
-            var rulerbodyDiv = document.getElementById('rulerbody');
-            var rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
-            var drumDiv = document.getElementById('drumDiv')
-            var drumDivPosition = drumDiv.getBoundingClientRect();
-            drumDivPosition.left = rulerbodyDivPosition.left + 'px';
-            drumDivPosition.top = rulerbodyDivPosition.top + 'px';
-            for (var j = 0; j < drumDiv.childNodes.length; j++) {
-                var table = drumDiv.childNodes[j];
-                var row = table.rows.item(0);
-                row.style.left = rulerbodyDivPosition.left + 'px';
-                row.style.top = rulerbodyDivPosition.top + 'px';                
-                var marginFromTop = 2 + 'px'
-               // console.log(table.rows[1]);
-                for (i = 1, row; row = table.rows[i]; i++) {
-                    cell = row.cells[0];
-                    if(cell !== null) {
-                    cell.style.left = rulerbodyDivPosition.left + 2 + 'px';
-                    cell.style.top = marginFromTop + 'px';
-                    marginFromTop += parseInt(cell.style.height);
-                    }
-                }
-            }
-        }
     </script>
 
     <!-- see activity/activity-icon-color-loading.svg for info -->
