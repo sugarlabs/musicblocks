@@ -91,11 +91,20 @@ function RhythmRuler () {
             newCell.style.height = newCellHeight;
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
-            if((newCellIndex+i)%2 === 0) {
-                newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;            
+            if(this.RulerSelected%2 === 0) {
+                if((newCellIndex+i)%2 === 0) {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;            
+                } else {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;            
+                }     
             } else {
-                newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;            
-            } 
+                if((newCellIndex+i)%2 === 0) {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;            
+                } else {
+                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;            
+                }    
+            }
+            
             newCell.addEventListener("click", function(event) {
               that.dissectRuler(event);
             });
@@ -550,8 +559,11 @@ function RhythmRuler () {
             rulercell.maxWidth = rulercell.style.width;
             rulercell.style.lineHeight = 60 + '%';
             rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
-            rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-
+            if(i%2 === 0) {
+                rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            } else {
+                rulercell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+            }
             this.Rulers[i][0].push(1);
             rulercell.addEventListener("click", function(event) {
               thisRuler.dissectRuler(event);
