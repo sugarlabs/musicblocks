@@ -846,7 +846,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     //RHYTHMRULER PALETTE
 
     var rhythmrulerBlock = new ProtoBlock('rhythmruler');
-    rhythmrulerBlock.palette = palettes.dict['rhythmruler'];
+    rhythmrulerBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythmruler'] = rhythmrulerBlock;
     rhythmrulerBlock.staticLabels.push(_('rhythmruler'));
     rhythmrulerBlock.adjustWidthToLabel();
