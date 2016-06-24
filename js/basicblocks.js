@@ -1827,23 +1827,23 @@ function initBasicProtoBlocks(palettes, blocks) {
     svgBlock.defaults.push(_('title') + '.svg');
     svgBlock.dockTypes[1] = 'textin';
 
-    var getxTurtleBlock = new ProtoBlock('xturtle');
-    getxTurtleBlock.palette = palettes.dict['extras'];
-    blocks.protoBlockDict['xturtle'] = getxTurtleBlock;
-    getxTurtleBlock.staticLabels.push(_('turtle x'));
-    getxTurtleBlock.adjustWidthToLabel();
-    getxTurtleBlock.oneArgBlock();
-    getxTurtleBlock.dockTypes[1] = 'anyin';
-    getxTurtleBlock.defaults.push('0');
-
     var getyTurtleBlock = new ProtoBlock('yturtle');
     getyTurtleBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['yturtle'] = getyTurtleBlock;
     getyTurtleBlock.staticLabels.push(_('turtle y'));
     getyTurtleBlock.adjustWidthToLabel();
-    getyTurtleBlock.oneArgBlock();
+    getyTurtleBlock.oneArgMathBlock();
     getyTurtleBlock.dockTypes[1] = 'anyin';
     getyTurtleBlock.defaults.push('0');
+
+    var getxTurtleBlock = new ProtoBlock('xturtle');
+    getxTurtleBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['xturtle'] = getxTurtleBlock;
+    getxTurtleBlock.staticLabels.push(_('turtle x'));
+    getxTurtleBlock.adjustWidthToLabel();
+    getxTurtleBlock.oneArgMathBlock();
+    getxTurtleBlock.dockTypes[1] = 'anyin';
+    getxTurtleBlock.defaults.push('0');
 
     var startTurtleBlock = new ProtoBlock('startTurtle');
     startTurtleBlock.palette = palettes.dict['extras'];
