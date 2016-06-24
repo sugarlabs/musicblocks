@@ -4044,7 +4044,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 break;
             case 'toascii':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
                 logo.blocks.blockList[blk].value = String.fromCharCode(a);
                 break;
             case 'myclick':
