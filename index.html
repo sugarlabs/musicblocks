@@ -71,12 +71,12 @@
             $('#drumDiv').draggable({
                 drag: function() {
                     jQuery('#rulerbody').css('top',jQuery(this).position().top);
-                    jQuery('#rulerbody').css('left',jQuery(this).position().left + this.cellScale/2 + 'px');
+                    jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);
 
                 },
                 stop: function(){
                     jQuery('#rulerbody').css('top',jQuery(this).position().top);                     
-                    jQuery('#rulerbody').css('left',jQuery(this).position().left + this.cellScale/2 + 'px');                                        
+                    jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
                 }
             });
         });
@@ -85,12 +85,12 @@
             $('#rulerbody').draggable({
                 drag: function() {
                     jQuery('#drumDiv').css('top',jQuery(this).position().top);
-                    jQuery('#drumDiv').css('left',jQuery(this).position().left - this.cellScale/2 + 'px');
+                    jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/30);
 
                 },
                 stop: function(){
                     jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
-                    jQuery('#drumDiv').css('left',jQuery(this).position().left - this.cellScale/2 + 'px');                                        
+                    jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/30);                                        
                 }
             });
         });
@@ -147,6 +147,7 @@
             var row = table.rows.item(0);
             row.style.left = matrixDivPosition.left + 'px';
             row.style.top = matrixDivPosition.top + 'px';
+            console.log(this.cellScale);
 
             var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
             for (i = 1, row; row = table.rows[i]; i++) {

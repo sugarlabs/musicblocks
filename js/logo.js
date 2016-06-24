@@ -2473,7 +2473,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                     logo._processNote(args[1], blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
-
+                console.log(blk);
+                console.log(args[0]);
+                console.log(args[1]);
             } else {
                 logo.errorMsg(_('Rhythm Block: Did you mean to use a Matrix block?'), blk);
             }
