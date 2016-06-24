@@ -2004,6 +2004,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     mousebuttonBlock.adjustWidthToLabel();
     mousebuttonBlock.booleanZeroArgBlock();
 
+    var toASCIIBlock = new ProtoBlock('toascii');
+    toASCIIBlock.palette = palettes.dict['sensors'];
+    blocks.protoBlockDict['toascii'] = toASCIIBlock;
+    toASCIIBlock.staticLabels.push(_('to ASCII'));
+    toASCIIBlock.defaults.push(65);
+    toASCIIBlock.oneArgMathBlock();
+
     var keyboardBlock = new ProtoBlock('keyboard');
     keyboardBlock.palette = palettes.dict['sensors'];
     blocks.protoBlockDict['keyboard'] = keyboardBlock;
