@@ -2473,9 +2473,15 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                     logo._processNote(args[1], blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
-                console.log(blk);
-                console.log(args[0]);
-                console.log(args[1]);
+                console.log(drumblockno);
+                var indexofdrum = rhythmruler.Drums.indexOf(drumblockno);
+                console.log(indexofdrum);
+                if(indexofdrum !== -1) {
+                    for (var i = 0; i < args[0]; i++) {
+                        rhythmruler.Rulers[indexofdrum][0].push(args[1]);
+                    }
+                }
+                console.log(rhythmruler.Rulers[indexofdrum]);    
             } else {
                 logo.errorMsg(_('Rhythm Block: Did you mean to use a Matrix block?'), blk);
             }
@@ -2666,7 +2672,8 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
 
             logo._setListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
-                rhythmruler.Drums.push(args[0]);
+                drumblockno = blk;
+                rhythmruler.Drums.push(blk);
                 rhythmruler.Rulers.push([[],[]]);
             }
             break;
