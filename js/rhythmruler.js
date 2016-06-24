@@ -29,6 +29,11 @@ function RhythmRuler () {
         }
     };
 
+    this.noteWidth = function (noteValue) {
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
+    };
+
+
     this.calcNoteValueToDisplay = function (a, b) {
         var noteValue = a / b;
         var noteValueToDisplay = null;
@@ -100,10 +105,10 @@ function RhythmRuler () {
         var noteValues = this.Rulers[this.RulerSelected][0];
         var divisionHistory = this.Rulers[this.RulerSelected][1];
         divisionHistory.push([newCellIndex,inputNum]);
-        var newCellWidth = parseFloat(cell.style.width).toPrecision(21)/inputNum + 'px';
         ruler.deleteCell(newCellIndex);
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
+        var newCellWidth = this.noteWidth(newNoteValue);
         noteValues.splice(newCellIndex, 1);
         
         var newCellHeight = cell.style.height;
@@ -138,9 +143,10 @@ function RhythmRuler () {
         var newCellHeight = ruler.cells[newCellIndex].style.height;
         var newCellWidth = Math.floor(parseFloat(cellWidth)*inputNum) + 'px';
         var oldCellNoteValue = noteValues[newCellIndex];
+        var newNoteValue = oldCellNoteValue/inputNum;
                 
         var newCell = ruler.insertCell(newCellIndex);
-        newCell.style.width = newCellWidth;
+        newCell.style.width = this.noteWidth(newNoteValue);
         newCell.style.height = newCellHeight;
         newCell.style.lineHeight = 60 + '%';
         newCell.style.minWidth = newCell.style.width;
@@ -167,7 +173,10 @@ function RhythmRuler () {
         for(var i = 0; i < this.Rulers.length; i++) {
             var noteValues = this.Rulers[i][0];
             var noteValue = noteValues[0];
-            var drum = this.Drums[i]
+            var drumblockno = blocks.blockList[this.Drums[i]].connections[1];
+            var drum = blocks.blockList[drumblockno].value;
+            console.log(drumblockno);
+            console.log(drum);
             var ruler = docById('ruler' + i);
             var cell = ruler.cells[0];
             console.log(cell);
@@ -185,7 +194,9 @@ function RhythmRuler () {
         var ruler = docById('ruler' + this.RulerSelected);
         var cell = ruler.cells[0];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        var drum = this.Drums[this.RulerSelected];
+        var drumblockno = blocks.blockList[this.Drums[this.RulerSelected]].connections[1];
+        var drum = blocks.blockList[drumblockno].value;
+        console.log(drum);
         this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
         if(this.PlayingOne) {
             this.playNote(0, 0, this.RulerSelected, 1)
@@ -197,7 +208,9 @@ function RhythmRuler () {
         var noteValues = that.Rulers[rulerno][0];
         var noteValue = noteValues[notesCounter];
         time = 1/noteValue;
-        var drum = this.Drums[rulerno];
+        var drumblockno = blocks.blockList[this.Drums[rulerno]].connections[1];
+        var drum = blocks.blockList[drumblockno].value;
+        console.log(drum);
         setTimeout(function() {
                 
 
@@ -313,6 +326,7 @@ function RhythmRuler () {
 		console.log("init RhythmRuler");
 		this.logo = logo;
 
+        console.log(this.Rulers);
         
         docById('rulerbody').style.display = 'inline';
         console.log('setting RhythmRuler visible');
@@ -349,8 +363,6 @@ function RhythmRuler () {
         for (var i = 0; i < this.Rulers.length; i++) {
             var rulertable = docById('rulerTable' + i);
             var rulerdrum = docById('rulerdrum' + i);
-            this.Rulers[i][0] = [];
-            this.Rulers[i][1] = [];
             if (rulertable !== null) {
                 rulertable.remove();
             }
@@ -556,24 +568,36 @@ function RhythmRuler () {
             row.style.left = Math.floor(rulerbodyDivPosition.left) + 'px';
             row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
             row.setAttribute('id', 'ruler' + i);
-
-
-            var rulercell = row.insertCell(-1);
-            rulercell.innerHTML = this.calcNoteValueToDisplay(1, 1);
-            rulercell.style.width = Math.floor(rulerbodyDivPosition.width) + 'px';
-            rulercell.minWidth = rulercell.style.width;
-            rulercell.maxWidth = rulercell.style.width;
-            rulercell.style.lineHeight = 60 + '%';
-            rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
-            if(i%2 === 0) {
-                rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            } else {
-                rulercell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+            console.log("<<<<.>>>>>>");
+            console.log(i);
+            for (var j = 0; j < thisRuler.Rulers[i][0].length; j++) {
+                var noteValue = thisRuler.Rulers[i][0][j];
+                var rulercell = row.insertCell(j);
+                rulercell.innerHTML = this.calcNoteValueToDisplay(noteValue, 1);
+                console.log(noteValue);
+                rulercell.style.width = thisRuler.noteWidth(noteValue);
+               // rulercell.style.width = Math.floor(parseFloat(rulerbodyDivPosition.width)/noteValue) + 'px';
+                rulercell.minWidth = rulercell.style.width;
+                rulercell.maxWidth = rulercell.style.width;
+                rulercell.style.lineHeight = 60 + '%';
+                rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+                if(i%2 === 0) {
+                    if(j%2 === 0) {
+                        rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    } else {
+                        rulercell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    }
+                } else {
+                    if(j%2 === 0) {
+                        rulercell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    } else {
+                        rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    }
+                }
+                rulercell.addEventListener("click", function(event) {
+                  thisRuler.dissectRuler(event);
+                });
             }
-            this.Rulers[i][0].push(1);
-            rulercell.addEventListener("click", function(event) {
-              thisRuler.dissectRuler(event);
-            });
         }
 
 	}
