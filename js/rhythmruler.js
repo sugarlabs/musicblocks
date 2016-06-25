@@ -226,7 +226,9 @@ function RhythmRuler () {
                     console.log(ruler);
                     console.log(colIndex);
                     var cell = ruler.cells[colIndex];
-                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    if(that.Playing) {
+                       cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    }
 
                 }
 
@@ -236,9 +238,8 @@ function RhythmRuler () {
                 }                
                 notesCounter += 1;
                 colIndex += 1;
-
                 that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drum);
-
+                
                 if(notesCounter < noteValues.length) {
                     if(that.Playing) {
                         that.playNote(time, notesCounter, rulerno, colIndex);
@@ -415,6 +416,9 @@ function RhythmRuler () {
                 thisRuler.PlayingAll = 0;
                 thisRuler.PlayingOne = 0;
                 thisRuler.Completed = 0;
+                for (var i = 0; i < thisRuler.Rulers.length; i++) {
+                    thisRuler.calculateZebraStripes(i);
+                }
             }   
         }
         cell.onmouseover=function() {
@@ -543,6 +547,7 @@ function RhythmRuler () {
                     thisRuler.PlayingOne = 0;
                     thisRuler.PlayingAll = 0;
                     thisRuler.Completed = 0;
+                    setTimeout(thisRuler.calculateZebraStripes(this.parentNode.id[4]),1000);
                 }
             }
             drumcell.onmouseover=function() {
