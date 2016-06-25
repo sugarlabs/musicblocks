@@ -31,7 +31,7 @@ function RhythmRuler () {
     };
 
     this.noteWidth = function (noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
+        return EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale + 'px';
     };
 
 
@@ -109,7 +109,14 @@ function RhythmRuler () {
         ruler.deleteCell(newCellIndex);
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
-        var newCellWidth = this.noteWidth(newNoteValue);
+        var tempwidth = this.noteWidth(newNoteValue);
+        var tempwidthPixels = parseInt(inputNum) * parseInt(tempwidth) + 'px'
+        var difference = parseInt(this.noteWidth(noteValue)) - parseInt(inputNum) * parseInt(tempwidth);
+        var newCellWidth = parseInt(this.noteWidth(newNoteValue)) - parseFloat(difference)/inputNum + 'px';
+        newCellWidth = parseFloat(23.015) + 'px';
+        newCellWidth = this.noteWidth(newNoteValue);
+        console.log(newCellWidth);
+
         noteValues.splice(newCellIndex, 1);
         
         var newCellHeight = cell.style.height;
@@ -142,7 +149,7 @@ function RhythmRuler () {
         var newCellIndex = divisionHistory[divisionHistory.length-1][0];
         var cellWidth = ruler.cells[newCellIndex].style.width;
         var newCellHeight = ruler.cells[newCellIndex].style.height;
-        var newCellWidth = Math.floor(parseFloat(cellWidth)*inputNum) + 'px';
+        var newCellWidth = parseFloat(cellWidth)*inputNum;
         var oldCellNoteValue = noteValues[newCellIndex];
         var newNoteValue = oldCellNoteValue/inputNum;
                 
@@ -593,6 +600,7 @@ function RhythmRuler () {
                 var rulercell = row.insertCell(j);
                 rulercell.innerHTML = this.calcNoteValueToDisplay(noteValue, 1);
                 rulercell.style.width = thisRuler.noteWidth(noteValue);
+                console.log(rulercell.style.width);
                // rulercell.style.width = Math.floor(parseFloat(rulerbodyDivPosition.width)/noteValue) + 'px';
                 rulercell.minWidth = rulercell.style.width;
                 rulercell.maxWidth = rulercell.style.width;
