@@ -1,4 +1,3 @@
-const RHYTHMRULERHEIGHT = 100;
 
 function RhythmRuler () {
 
@@ -11,55 +10,13 @@ function RhythmRuler () {
     this.PlayingAll = 0;
     this.RulernoPlaying = -1;
 
-    function isInt(value) {
-         return !isNaN(value) && 
-         parseInt(Number(value)) == value && 
-         !isNaN(parseInt(value, 10));
-    }
-
-    function reducedFraction(a, b) {
-        greatestCommonMultiple = function(a, b) {
-            return b === 0 ? a : greatestCommonMultiple(b, a % b);
-        }
-
-        var gcm = greatestCommonMultiple(a, b);
-        if (NOTESYMBOLS != undefined && [1, 2, 4, 8, 16, 32, 64].indexOf(b/gcm) !== -1) {
-            return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
-        } else {
-            return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
-        }
-    };
 
     this.noteWidth = function (noteValue) {
         return EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale + 'px';
     };
 
 
-    this.calcNoteValueToDisplay = function (a, b) {
-        var noteValue = a / b;
-        var noteValueToDisplay = null;
-        if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
-            noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '>';
-        } else {
-            noteValueToDisplay = reducedFraction(b, a);
-        }
-
-        if (parseInt(noteValue) < noteValue) {
-            noteValueToDisplay = parseInt((noteValue * 1.5))
-            if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '> .';
-            } else {
-                noteValueToDisplay = parseInt((noteValue * 1.75))
-                if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-                    noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '> ..';
-                } else {
-                    noteValueToDisplay = reducedFraction(b, a);
-                }
-            }
-        }
-
-        return noteValueToDisplay;
-    };
+    
 
     this.calculateZebraStripes = function(rulerno) {
         var ruler = docById('ruler' + rulerno);
@@ -123,7 +80,7 @@ function RhythmRuler () {
         for ( var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
             noteValues.splice(newCellIndex+i, 0, newNoteValue);
-            newCell.innerHTML = that.calcNoteValueToDisplay(newNoteValue, 1);
+            newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
             newCell.style.width = newCellWidth;
             newCell.style.lineHeight = 60 + '%';
             newCell.style.height = newCellHeight;
@@ -160,7 +117,7 @@ function RhythmRuler () {
         newCell.style.minWidth = newCell.style.width;
         newCell.style.maxWidth = newCell.style.width;
         newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        newCell.innerHTML = that.calcNoteValueToDisplay(oldCellNoteValue/inputNum, 1);
+        newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue/inputNum, 1);
        
         noteValues[newCellIndex] = oldCellNoteValue/inputNum; 
         noteValues.splice(newCellIndex+1,inputNum-1);
@@ -598,7 +555,7 @@ function RhythmRuler () {
             for (var j = 0; j < thisRuler.Rulers[i][0].length; j++) {
                 var noteValue = thisRuler.Rulers[i][0][j];
                 var rulercell = row.insertCell(j);
-                rulercell.innerHTML = this.calcNoteValueToDisplay(noteValue, 1);
+                rulercell.innerHTML = calcNoteValueToDisplay(noteValue, 1);
                 rulercell.style.width = thisRuler.noteWidth(noteValue);
                 console.log(rulercell.style.width);
                // rulercell.style.width = Math.floor(parseFloat(rulerbodyDivPosition.width)/noteValue) + 'px';

@@ -35,31 +35,6 @@ savematrix() : Saves the Matrix notes in an array. Part of that array
 (between 2 'end') constitutes notes for any chunk.
 */
 
-const MATRIXBUTTONCOLOR = '#c374e9';
-const MATRIXLABELCOLOR = '#90c100';
-const MATRIXNOTECELLCOLOR = '#b1db00';
-const MATRIXTUPLETCELLCOLOR = '#57e751';
-const MATRIXRHYTHMCELLCOLOR = '#c8c8c8';
-
-const MATRIXBUTTONCOLORHOVER = '#c894e0';
-const MATRIXNOTECELLCOLORHOVER = '#c2e820';
-
-const MATRIXSOLFEWIDTH = 52;
-const EIGHTHNOTEWIDTH = 24;
-const MATRIXBUTTONHEIGHT = 40;
-const MATRIXBUTTONHEIGHT2 = 66;
-const MATRIXSOLFEHEIGHT = 30;
-
-const wholeNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(WHOLENOTE)));
-const halfNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HALFNOTE)));
-const quarterNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(QUARTERNOTE)));
-const eighthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EIGHTHNOTE)));
-const sixteenthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SIXTEENTHNOTE)));
-const thirtysecondNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(THIRTYSECONDNOTE)));
-const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SIXTYFOURTHNOTE)));
-
-const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
-
 
 function Matrix() {
     this.secondsPerBeat = 1;
@@ -502,7 +477,7 @@ function Matrix() {
         cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
 
         var noteValue = param[0][1] / param[0][0];
-        var noteValueToDisplay = this.calcNoteValueToDisplay(param[0][1], param[0][0]);
+        var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0]);
 
         cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
@@ -587,36 +562,10 @@ function Matrix() {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
     };
 
-    this.calcNoteValueToDisplay = function (a, b) {
-        var noteValue = a / b;
-        var noteValueToDisplay = null;
-        if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
-            noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '>';
-        } else {
-            noteValueToDisplay = reducedFraction(b, a);
-        }
-
-        if (parseInt(noteValue) < noteValue) {
-            noteValueToDisplay = parseInt((noteValue * 1.5))
-            if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-                noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '> .';
-            } else {
-                noteValueToDisplay = parseInt((noteValue * 1.75))
-                if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-                    noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '> ..';
-                } else {
-                    noteValueToDisplay = reducedFraction(b, a);
-                }
-            }
-        }
-
-        return noteValueToDisplay;
-    };
-
     this.addNotes = function(numBeats, noteValue) {
         var table = docById('myTable');
         console.log(noteValue);
-        var noteValueToDisplay = this.calcNoteValueToDisplay(noteValue, 1);
+        var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
         if (this.noteValue > noteValue) {
             this.noteValue = noteValue;
@@ -1141,15 +1090,3 @@ function Matrix() {
     };
 };
 
-function reducedFraction(a, b) {
-    greatestCommonMultiple = function(a, b) {
-        return b === 0 ? a : greatestCommonMultiple(b, a % b);
-    }
-
-    var gcm = greatestCommonMultiple(a, b);
-    if (NOTESYMBOLS != undefined && [1, 2, 4, 8, 16, 32, 64].indexOf(b/gcm) !== -1) {
-        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
-    } else {
-        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
-    }
-};
