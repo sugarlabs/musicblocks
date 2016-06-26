@@ -2474,7 +2474,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                 }
             } else if (logo.inRhythmRuler) {
                 var indexofdrum = rhythmruler.Drums.indexOf(drumblockno);
-                if(indexofdrum !== -1) {
+                    if(indexofdrum !== -1) {
                     for (var i = 0; i < args[0]; i++) {
                         rhythmruler.Rulers[indexofdrum][0].push(args[1]);
                     }
