@@ -12,7 +12,7 @@ function RhythmRuler () {
 
 
     this.noteWidth = function (noteValue) {
-        return EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale + 'px';
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
     };
 
 
@@ -67,11 +67,12 @@ function RhythmRuler () {
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
         var tempwidth = this.noteWidth(newNoteValue);
-        var tempwidthPixels = parseInt(inputNum) * parseInt(tempwidth) + 'px'
-        var difference = parseInt(this.noteWidth(noteValue)) - parseInt(inputNum) * parseInt(tempwidth);
-        var newCellWidth = parseInt(this.noteWidth(newNoteValue)) - parseFloat(difference)/inputNum + 'px';
-        newCellWidth = parseFloat(23.015) + 'px';
-        newCellWidth = this.noteWidth(newNoteValue);
+        var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px'
+        var difference = parseFloat(this.noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
+        
+        var newCellWidth = parseFloat(this.noteWidth(newNoteValue)) + parseFloat(difference)/inputNum + 'px';
+       // newCellWidth = parseFloat(23.015) + 'px';
+     //   newCellWidth = this.noteWidth(newNoteValue);
         console.log(newCellWidth);
 
         noteValues.splice(newCellIndex, 1);
@@ -214,6 +215,9 @@ function RhythmRuler () {
                         var cell = ruler.cells[0];
                         cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                         that.logo.setTurtleDelay(0);
+                        for(var i = 0; i < that.Rulers.length; i++) {
+                            that.calculateZebraStripes(i);
+                        }
                         that.playAll();
                     }    
                 }
@@ -224,6 +228,7 @@ function RhythmRuler () {
                         var cell = ruler.cells[0];
                         cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                         that.logo.setTurtleDelay(0);
+                        that.calculateZebraStripes(that.RulernoPlaying);
                         that.playOne();
                     }
                 }            
@@ -337,8 +342,10 @@ function RhythmRuler () {
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'drum');
         x.style.textAlign = 'center';
-        x.style.borderCollapse = 'collapse';
+      //  x.style.borderCollapse = 'collapse';
         x.cellSpacing = 0;
+        x.cellPadding = 0;
+
 
         var drumDiv = docById('drumDiv');
         drumDiv.style.paddingTop = 0 + 'px';
@@ -398,8 +405,9 @@ function RhythmRuler () {
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'buttonTable');
         x.style.textAlign = 'center';
-        x.style.borderCollapse = 'collapse';
+      //  x.style.borderCollapse = 'collapse';
         x.cellSpacing = 0;
+        x.cellPadding = 0;
 
         
 
@@ -483,8 +491,9 @@ function RhythmRuler () {
             var rulerdrumTable = document.createElement('TABLE');
             rulerdrumTable.setAttribute('id', 'rulerdrum' + i);
             rulerdrumTable.style.textAlign = 'center';
-            rulerdrumTable.style.borderCollapse = 'collapse';
+          //  rulerdrumTable.style.borderCollapse = 'collapse';
             rulerdrumTable.cellSpacing = 0;
+            rulerdrumTable.cellPadding = 0;
             drumDiv.appendChild(rulerdrumTable);
             var header = rulerdrumTable.createTHead();
             var row = header.insertRow(-1);
@@ -541,10 +550,10 @@ function RhythmRuler () {
             RulerTable.setAttribute('id', 'rulerTable' + i);
             RulerTable.style.textAlign = 'center';
            // RulerTable.style.border = 'soid';
-            RulerTable.style.borderCollapse = 'collapse';
+         //   RulerTable.style.borderCollapse = 'collapse';
           //  RulerTable.style.borderTopWidth = '2px';
             RulerTable.cellSpacing = 0;
-           // RulerTable.cellPadding = 0;
+            RulerTable.cellPadding = 0;
           //  RulerTable.borderSpacing = '10px';
             rulerbodyDiv.appendChild(RulerTable);
             var header = RulerTable.createTHead();
