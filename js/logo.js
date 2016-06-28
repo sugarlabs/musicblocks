@@ -945,7 +945,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                     var nextFlow = last(logo.blocks.blockList[blk].connections);
                 } else {
                     var nextFlow = logo.blocks.blockList[blk].connections[0];
-                    if (logo.blocks.blockList[nextFlow].name === 'action') {
+                    if (logo.blocks.blockList[nextFlow].name === 'action' || logo.blocks.blockList[nextFlow].name === 'backward') {
                         nextFlow = null;
 		    } else {
 			if (!logo.blocks.sameGeneration(logo.blocks.blockList[last(logo.backward[turtle])].connections[c], nextFlow)) {
@@ -1036,7 +1036,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                     var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
 		    logo.backward[turtle].push(actionBlk);
 
-		    var listenerName = '_backward_action_' + turtle;
+		    var listenerName = '_backward_action_' + turtle + '_' + blk;
 
 		    var nextBlock = this.blocks.blockList[actionBlk].connections[2];
 		    if (nextBlock == null) {
@@ -2112,7 +2112,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             childFlow = logo.blocks.findBottomBlock(args[0]);
             childFlowCount = 1;
 
-            var listenerName = '_backward_' + turtle;
+            var listenerName = '_backward_' + turtle + '_' + blk;
 
             var nextBlock = this.blocks.blockList[blk].connections[1];
             if (nextBlock == null) {
@@ -2125,7 +2125,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 		logo.backward[turtle].pop();
                 // Since a backward block was requeued each
                 // time, we need to flush it from the queue.
-                logo.turtles.turtleList[turtle].queue.pop();
+                // logo.turtles.turtleList[turtle].queue.pop();
             };
 
             logo._setListener(turtle, listenerName, __listener);
@@ -3380,11 +3380,12 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 
         }
 
-        clearTimeout(this.saveTimeout);
+	clearTimeout(this.saveTimeout);
 
         var me = this;
         this.saveTimeout = setTimeout(function () {
             // Save at the end to save an image
+            console.log('in saveTimeout');
             me.saveLocally();
         }, DEFAULTDELAY * 1.5);
     };
