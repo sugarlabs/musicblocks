@@ -171,6 +171,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
     this.validNote = true;
     this.drift = {};
     this.drumStyle = {};
+    this.backward = {};
 
     // tuplet
     this.tuplet = false;
@@ -634,6 +635,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             this.drift[turtle] = 0;
             this.drumStyle[turtle] = [];
             this.pitchDrumTable[turtle] = {};
+            this.backward[turtle] = [];
         }
 
         if (!this.lilypondSaveOnly) {
@@ -691,7 +693,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             } else if (this.blocks.blockList[this.blocks.stackList[blk]].name === 'action') {
                 // Does the action stack have a name?
                 var c = this.blocks.blockList[this.blocks.stackList[blk]].connections[1];
-               var b = this.blocks.blockList[this.blocks.stackList[blk]].connections[2];
+                var b = this.blocks.blockList[this.blocks.stackList[blk]].connections[2];
                 if (c != null && b != null) {
                     // Don't use an action block in the trash.
                     if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
@@ -723,7 +725,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
         // (2) Execute the stack.
         // A bit complicated because we have lots of corner cases:
         if (startHere != null) {
-            console.log('startHere is ' + this.blocks.blockList[startHere].name);
+            // console.log('startHere is ' + this.blocks.blockList[startHere].name);
 
             // If a block to start from was passed, find its
             // associated turtle, i.e., which turtle should we use?
@@ -733,9 +735,9 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
             if (this.blocks.blockList[startHere].name === 'start' || this.blocks.blockList[startHere].name === 'drum') {
                 var turtle = this.blocks.blockList[startHere].value;
-                console.log('starting on start with turtle ' + turtle);
-            } else {
-                console.log('starting on ' + this.blocks.blockList[startHere].name + ' with turtle ' + turtle);
+                // console.log('starting on start with turtle ' + turtle);
+            // } else {
+                // console.log('starting on ' + this.blocks.blockList[startHere].name + ' with turtle ' + turtle);
             }
 
             this.turtles.turtleList[turtle].queue = [];
@@ -758,7 +760,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 }
             }
         } else {
-            console.log('nothing to run');
+            // console.log('nothing to run');
             if (this.lilypondSaveOnly) {
                 this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.lilypondSaveOnly = false;
@@ -932,12 +934,37 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
         } else {
             // All flow blocks have a nextFlow, but it can be null
             // (i.e., end of a flow).
-            var nextFlow = last(logo.blocks.blockList[blk].connections);
+            if (logo.backward[turtle].length > 0) {
+                // We only run backwards in the "first generation" children.
+                if (logo.blocks.blockList[last(logo.backward[turtle])].name === 'backward') {
+                    var c = 1;
+                } else {
+                    var c = 2;
+		}
+                if (!logo.blocks.sameGeneration(logo.blocks.blockList[last(logo.backward[turtle])].connections[c], blk)) {
+                    var nextFlow = last(logo.blocks.blockList[blk].connections);
+                } else {
+                    var nextFlow = logo.blocks.blockList[blk].connections[0];
+                    if (logo.blocks.blockList[nextFlow].name === 'action') {
+                        nextFlow = null;
+		    } else {
+			if (!logo.blocks.sameGeneration(logo.blocks.blockList[last(logo.backward[turtle])].connections[c], nextFlow)) {
+                            var nextFlow = last(logo.blocks.blockList[blk].connections);
+			} else {
+                            var nextFlow = logo.blocks.blockList[blk].connections[0];
+			}
+		    }
+                }
+            } else {
+                var nextFlow = last(logo.blocks.blockList[blk].connections);
+            }
+
             if (nextFlow === -1) {
                 nextFlow = null;
             }
+
             var queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
-            if (nextFlow != null) {  // Not sure why this check is needed.
+            if (nextFlow != null) {  // This could be the last block
                 logo.turtles.turtleList[turtle].queue.push(queueBlock);
             }
         }
@@ -950,6 +977,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
         if (logo.turtleDelay !== 0) {
             logo.blocks.highlight(blk, false);
         }
+
         switch (logo.blocks.blockList[blk].name) {
         case 'dispatch':
             // Dispatch an event.
@@ -978,10 +1006,8 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                             // running, we need to run the stack
                             // from here.
                             if (isflow) {
-                                console.log('calling runFromBlockNow with ' + logo.actions[args[1]]);
                                 logo._runFromBlockNow(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
                             } else {
-                                console.log('calling runFromBlock with ' + logo.actions[args[1]]);
                                 logo._runFromBlock(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
                             }
                         }
@@ -1001,10 +1027,32 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
             break;
         case 'nameddo':
+            // FIXME: Add backward support to other instances fo 'do'
             var name = logo.blocks.blockList[blk].privateData;
             if (name in logo.actions) {
                 logo._lilypondLineBreak(turtle);
-                childFlow = logo.actions[name];
+                if (logo.backward[turtle].length > 0) {
+		    childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
+                    var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+		    logo.backward[turtle].push(actionBlk);
+
+		    var listenerName = '_backward_action_' + turtle;
+
+		    var nextBlock = this.blocks.blockList[actionBlk].connections[2];
+		    if (nextBlock == null) {
+			logo.backward[turtle].pop();
+		    } else {
+			logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+		    }
+
+		    var __listener = function(event) {
+			logo.backward[turtle].pop();
+		    };
+
+		    logo._setListener(turtle, listenerName, __listener);
+		} else {
+                    childFlow = logo.actions[name];
+		}
                 childFlowCount = 1;
             } else {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
@@ -1033,7 +1081,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                    var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i+1], blk, receivedArg));
+                    var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
                     actionArgs.push(t);
                 }
             }
@@ -1052,7 +1100,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                    var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i+2], blk, receivedArg));
+                    var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
                     actionArgs.push(t);
                 }
             }
@@ -1567,7 +1615,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                     }
                 }
                 if (foundStartBlock) {
-                    console.log('calling runFromBlock with ' + i);
                     logo._runFromBlock(logo, targetTurtle, i, isflow, receivedArg);
                 } else {
                     logo.errorMsg('Cannot find start block for turtle: ' + args[0], blk)
@@ -1966,7 +2013,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
             break;
         case 'pitchdrummatrix':
-            console.log('running pitchdrummatrix');
             if (args.length === 1) {
                 childFlow = args[0];
                 childFlowCount = 1;
@@ -2055,6 +2101,31 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 
             var __listener = function(event) {
                 logo.invertList[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'backward':
+            logo.backward[turtle].push(blk);
+            // Set child to bottom block inside clamp
+            // FIXME: We need to do the same inside any contained stack.
+            childFlow = logo.blocks.findBottomBlock(args[0]);
+            childFlowCount = 1;
+
+            var listenerName = '_backward_' + turtle;
+
+            var nextBlock = this.blocks.blockList[blk].connections[1];
+            if (nextBlock == null) {
+                logo.backward[turtle].pop();
+            } else {
+                logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+            }
+
+            var __listener = function(event) {
+		logo.backward[turtle].pop();
+                // Since a backward block was requeued each
+                // time, we need to flush it from the queue.
+                logo.turtles.turtleList[turtle].queue.pop();
             };
 
             logo._setListener(turtle, listenerName, __listener);
@@ -2170,7 +2241,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 
             var drumname = 'kick';
             if (args[0].slice(0, 4) === 'http') {
-                console.log('drum is URL');
                 drumname = args[0];
             } else {
                 for (drum in DRUMNAMES) { 
@@ -2207,7 +2277,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 logo.noteDrums[turtle].push(drumname);
             } else {
                 logo.errorMsg(_('Drum Block: Did you mean to use a Note block?'), blk);
-                console.log('play drum block found outside of note block');
                 break;
             }
 
@@ -2439,7 +2508,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
             } else {
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
-                console.log('pitch block found outside of note block');
             }
             break;
         case 'rhythm':
@@ -3109,7 +3177,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
             } else {
                 // Could be an arg block, so we need to print its value.
-                console.log('running an arg block?');
                 if (logo.blocks.blockList[blk].isArgBlock()) {
                     args.push(logo._parseArg(logo, turtle, blk));
                     console.log('block: ' + blk + ' turtle: ' + turtle);
@@ -3133,10 +3200,8 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
         // Is the block in a queued clamp?
         if (blk in logo.endOfClampSignals[turtle]) {
             for (var i = logo.endOfClampSignals[turtle][blk].length - 1; i >= 0; i--) {
-                // console.log(blk + ': ' + logo.blocks.blockList[blk].name + ' turtle: ' + turtle);
                 var signal = logo.endOfClampSignals[turtle][blk][i];
                 if (signal != null) {
-                    // console.log(logo.blocks.blockList[blk].name + ' dispatching ' + logo.endOfClampSignals[turtle][blk][i]);
                     logo.stage.dispatchEvent(logo.endOfClampSignals[turtle][blk][i]);
                     // Mark issued signals as null
                     logo.endOfClampSignals[turtle][blk][i] = null;
@@ -3153,8 +3218,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 
         // If there is a child flow, queue it.
         if (childFlow != null) {
-            // console.log('child flow is ' + childFlow + ' '  + logo.blocks.blockList[childFlow].name);
-
             if (logo.blocks.blockList[blk].name==='doArg' || logo.blocks.blockList[blk].name==='nameddoArg') {
                 var queueBlock = new Queue(childFlow, childFlowCount, blk, actionArgs);
             } else {
@@ -3197,11 +3260,10 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 }
             }
 
-            if (last(logo.blocks.blockList[blk].connections) == null) {
+            if ((logo.backward[turtle].length > 0 && logo.blocks.blockList[blk].connections[0] == null) || (logo.backward[turtle].length === 0 && last(logo.blocks.blockList[blk].connections) == null)) {
                 // If we are at the end of the child flow, queue the
                 // unhighlighting of the parent block to the flow.
                 if (logo.parentFlowQueue[turtle].length > 0 && logo.turtles.turtleList[turtle].queue.length > 0 && last(logo.turtles.turtleList[turtle].queue).parentBlk !== last(logo.parentFlowQueue[turtle])) {
-                    // console.log('popping parent flow queue for ' + logo.blocks.blockList[blk].name);
                     logo.unhightlightQueue[turtle].push(last(logo.parentFlowQueue[turtle]));
 
                     // logo.unhightlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
@@ -3209,7 +3271,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                     // The child flow is finally complete, so unhighlight.
                     if (logo.turtleDelay !== 0) {
                         setTimeout(function() {
-                            console.log('popping parent flow queue for ' + logo.blocks.blockList[blk].name);
                             logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
                         }, logo.turtleDelay);
                     }
@@ -3232,7 +3293,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 for (var i = 0; i < logo.endOfClampSignals[turtle][b].length; i++) {
                     if (logo.endOfClampSignals[turtle][b][i] != null) {
                         logo.stage.dispatchEvent(logo.endOfClampSignals[turtle][b][i]);
-                        // console.log('dispatching ' + logo.endOfClampSignals[turtle][b][i]);
                     }
                 }
             }
@@ -3771,12 +3831,26 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
     };
 
     this._setDispatchBlock = function(blk, turtle, listenerName) {
-        var nextBlock = last(this.blocks.blockList[blk].connections);
+	if (this.backward[turtle].length > 0) {
+            if (this.blocks.blockList[last(this.backward[turtle])].name === 'backward') {
+		var c = 1;
+            } else {
+		var c = 2;
+	    }
+            if (this.blocks.sameGeneration(this.blocks.blockList[last(this.backward[turtle])].connections[c], blk)) {
+		var nextBlock = this.blocks.blockList[blk].connections[0];
+		this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+	    } else {
+		var nextBlock = null;
+	    }
+        } else {
+            var nextBlock = last(this.blocks.blockList[blk].connections);
+        }
+
         if (nextBlock == null) {
-            // console.log('next block not found when setting dispatcher');
             return;
         }
-        // console.log('setting dispatch block for ' + blk + ' to ' + nextBlock);
+
         this.endOfClampSignals[turtle][nextBlock] = [listenerName];
     };
 

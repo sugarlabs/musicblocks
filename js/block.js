@@ -282,6 +282,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'slur':
         case 'crescendo':
         case 'articulation':
+        case 'backward':
         case 'settransposition':
         case 'tuplet':
         case 'tuplet2':

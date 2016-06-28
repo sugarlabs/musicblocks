@@ -502,6 +502,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     notevolumeFactor.adjustWidthToLabel();
     notevolumeFactor.parameterBlock();
 
+    /*
     var playfwdBlock = new ProtoBlock('playfwd');
     playfwdBlock.hidden = true;
     playfwdBlock.palette = palettes.dict['tone'];
@@ -519,7 +520,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.staticLabels.push(_('play backward'));
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
-
+    */
+    
     var keyBlock = new ProtoBlock('key');
     keyBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['key'] = keyBlock;
@@ -558,6 +560,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.twoArgMathBlock();
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
+
+    var backwardBlock = new ProtoBlock('backward');
+    backwardBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['backward'] = backwardBlock;
+    backwardBlock.staticLabels.push(_('backward'));
+    backwardBlock.adjustWidthToLabel();
+    backwardBlock.flowClampZeroArgBlock();
 
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];
