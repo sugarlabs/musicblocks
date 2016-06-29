@@ -2091,8 +2091,13 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 
             logo._setListener(turtle, listenerName, __listener);
             break;
+        case 'invert2':
         case 'invert':
-            logo.invertList[turtle].push([args[0], args[1]]);
+            if (logo.blocks.blockList[blk].name === 'invert') {
+                logo.invertList[turtle].push([args[0], args[1], 'even']);
+            } else {
+                logo.invertList[turtle].push([args[0], args[1], 'odd']);
+            }
             childFlow = args[2];
             childFlowCount = 1;
 
@@ -2197,7 +2202,11 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                     var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                     var num2 = getNumber(note2[0], note2[1]);
                     var a = getNumNote(num1, 0);
-                    delta += num2 - num1;
+                    if (logo.invertList[turtle][i][2] === 'even') {
+                        delta += num2 - num1;
+                    } else {  // odd
+                        delta += num2 - num1 + 0.5;
+                    }
                     num1 += 2 * delta;
                 }
             }
@@ -2356,7 +2365,11 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
                         var a = getNumNote(num1, 0);
-                        delta += num2 - num1;
+                        if (logo.invertList[turtle][i][2] === 'even') {
+                            delta += num2 - num1;
+                        } else {  // odd
+                            delta += num2 - num1 + 0.5;
+                        }
                         num1 += 2 * delta;
                     }
                 }
@@ -2402,7 +2415,11 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
                         var a = getNumNote(num1, 0);
-                        delta += num2 - num1;
+                        if (logo.invertList[turtle][i][2] === 'even') {
+                            delta += num2 - num1;
+                        } else {  // odd
+                            delta += num2 - num1 + 0.5;
+                        }
                         num1 += 2 * delta;
                     }
                 }
@@ -2450,7 +2467,11 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
                         var a = getNumNote(num1, 0);
-                        delta += num2 - num1;
+                        if (logo.invertList[turtle][i][2] === 'even') {
+                            delta += num2 - num1;
+                        } else {  // odd
+                            delta += num2 - num1 + 0.5;
+                        }
                         num1 += 2 * delta;
                     }
                 }

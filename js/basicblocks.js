@@ -184,17 +184,29 @@ function initBasicProtoBlocks(palettes, blocks) {
     solfegeBlock.dockTypes[0] = 'solfegeout';
 
     // Transposition blocks
-    var invertblock = new ProtoBlock('invert');
-    invertblock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['invert'] = invertblock;
-    invertblock.staticLabels.push(_('invert'), _('note'), _('octave'));
-    invertblock.adjustWidthToLabel();
-    invertblock.flowClampTwoArgBlock();
-    invertblock.adjustWidthToLabel();
-    invertblock.defaults.push('sol');
-    invertblock.defaults.push(4);
-    invertblock.dockTypes[1] = 'solfegein';
-    invertblock.dockTypes[2] = 'anyin';
+    var invertBlock2 = new ProtoBlock('invert2');
+    invertBlock2.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['invert2'] = invertBlock2;
+    invertBlock2.staticLabels.push(_('invert (odd)'), _('note'), _('octave'));
+    invertBlock2.adjustWidthToLabel();
+    invertBlock2.flowClampTwoArgBlock();
+    invertBlock2.adjustWidthToLabel();
+    invertBlock2.defaults.push('sol');
+    invertBlock2.defaults.push(4);
+    invertBlock2.dockTypes[1] = 'solfegein';
+    invertBlock2.dockTypes[2] = 'anyin';
+
+    var invertBlock = new ProtoBlock('invert');
+    invertBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['invert'] = invertBlock;
+    invertBlock.staticLabels.push(_('invert (even)'), _('note'), _('octave'));
+    invertBlock.adjustWidthToLabel();
+    invertBlock.flowClampTwoArgBlock();
+    invertBlock.adjustWidthToLabel();
+    invertBlock.defaults.push('sol');
+    invertBlock.defaults.push(4);
+    invertBlock.dockTypes[1] = 'solfegein';
+    invertBlock.dockTypes[2] = 'anyin';
 
     var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['pitch'];

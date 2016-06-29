@@ -262,6 +262,7 @@ function Block(protoblock, blocks, overrideName) {
             break;
         case 'note':
         case 'invert':
+        case 'invert2':
         case 'notation':
         case 'flat':
         case 'sharp':
