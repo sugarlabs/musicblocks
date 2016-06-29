@@ -81,6 +81,7 @@ const MUSICALMODES = {
     'EGYPTIAN': [2, 3, 2, 3, 2],
     'HIRAJOSHI': [1, 4, 1, 4, 2],
     'JAPANESE': [1, 4, 2, 3, 2],
+    'FIBONACCI': [1, 1, 2, 3, 5],
 };
 
 const MAQAMTABLE = {
@@ -149,6 +150,7 @@ const MODENAMES = [
     //.TRANS: Japanese pentatonic scale for music
     [_('Hirajoshi'), 'HIRAJOSHI'],
     [_('Japanese'), 'JAPANESE'],
+    [_('Fibonacci'), 'FIBONACCI'],
 ];
 
 const DRUMNAMES = [
