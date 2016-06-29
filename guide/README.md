@@ -373,9 +373,10 @@ The *Articulation* block changes the volume of a group of notes.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
 
-The *Backward* block will play the contained notes in reverse
-order. In the example above, the notes in *Chunk* are played as `Sol`,
-`Ti`, `La`, `Sol`, e.g., from the bottom to the top of the stack.
+The *Backward* block will play the contained notes in reverse order
+(retrograde). In the example above, the notes in *Chunk* are played as
+`Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
+stack.
 
 [RUN
 LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
