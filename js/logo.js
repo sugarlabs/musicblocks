@@ -940,20 +940,20 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                     var c = 1;
                 } else {
                     var c = 2;
-		}
+                }
                 if (!logo.blocks.sameGeneration(logo.blocks.blockList[last(logo.backward[turtle])].connections[c], blk)) {
                     var nextFlow = last(logo.blocks.blockList[blk].connections);
                 } else {
                     var nextFlow = logo.blocks.blockList[blk].connections[0];
                     if (logo.blocks.blockList[nextFlow].name === 'action' || logo.blocks.blockList[nextFlow].name === 'backward') {
                         nextFlow = null;
-		    } else {
-			if (!logo.blocks.sameGeneration(logo.blocks.blockList[last(logo.backward[turtle])].connections[c], nextFlow)) {
+                    } else {
+                        if (!logo.blocks.sameGeneration(logo.blocks.blockList[last(logo.backward[turtle])].connections[c], nextFlow)) {
                             var nextFlow = last(logo.blocks.blockList[blk].connections);
-			} else {
+                        } else {
                             var nextFlow = logo.blocks.blockList[blk].connections[0];
-			}
-		    }
+                        }
+                    }
                 }
             } else {
                 var nextFlow = last(logo.blocks.blockList[blk].connections);
@@ -1032,27 +1032,27 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             if (name in logo.actions) {
                 logo._lilypondLineBreak(turtle);
                 if (logo.backward[turtle].length > 0) {
-		    childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
+                    childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
                     var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
-		    logo.backward[turtle].push(actionBlk);
+                    logo.backward[turtle].push(actionBlk);
 
-		    var listenerName = '_backward_action_' + turtle + '_' + blk;
+                    var listenerName = '_backward_action_' + turtle + '_' + blk;
 
-		    var nextBlock = this.blocks.blockList[actionBlk].connections[2];
-		    if (nextBlock == null) {
-			logo.backward[turtle].pop();
-		    } else {
-			logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
-		    }
+                    var nextBlock = this.blocks.blockList[actionBlk].connections[2];
+                    if (nextBlock == null) {
+                        logo.backward[turtle].pop();
+                    } else {
+                        logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    }
 
-		    var __listener = function(event) {
-			logo.backward[turtle].pop();
-		    };
+                    var __listener = function(event) {
+                        logo.backward[turtle].pop();
+                    };
 
-		    logo._setListener(turtle, listenerName, __listener);
-		} else {
+                    logo._setListener(turtle, listenerName, __listener);
+                } else {
                     childFlow = logo.actions[name];
-		}
+                }
                 childFlowCount = 1;
             } else {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
@@ -2122,7 +2122,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
 
             var __listener = function(event) {
-		logo.backward[turtle].pop();
+                logo.backward[turtle].pop();
                 // Since a backward block was requeued each
                 // time, we need to flush it from the queue.
                 // logo.turtles.turtleList[turtle].queue.pop();
@@ -3380,7 +3380,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 
         }
 
-	clearTimeout(this.saveTimeout);
+        clearTimeout(this.saveTimeout);
 
         var me = this;
         this.saveTimeout = setTimeout(function () {
@@ -3682,11 +3682,11 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                             } else if (logo.tieCarryOver[turtle] > 0) {
                                 logo._updateNotation(note, logo.tieCarryOver[turtle], turtle, insideChord);
                             } else {
-                                console.log('durarion == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
+                                // console.log('durarion == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
                             }
                         }
 
-                        console.log("notes to play " + notes + ' ' + noteBeatValue);
+                        // console.log("notes to play " + notes + ' ' + noteBeatValue);
 
                         if (notes.length > 0) {
                             var len = notes[0].length;
@@ -3744,7 +3744,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                             drums.push(logo.noteDrums[turtle][i]);
                         }
 
-                        console.log("drums to play " + drums + ' ' + noteBeatValue);
+                        // console.log("drums to play " + drums + ' ' + noteBeatValue);
 
                         if (!logo.lilypondSaveOnly && duration > 0) {
                             for (var i = 0; i < drums.length; i++) {
@@ -3832,18 +3832,18 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
     };
 
     this._setDispatchBlock = function(blk, turtle, listenerName) {
-	if (this.backward[turtle].length > 0) {
+        if (this.backward[turtle].length > 0) {
             if (this.blocks.blockList[last(this.backward[turtle])].name === 'backward') {
-		var c = 1;
+                var c = 1;
             } else {
-		var c = 2;
-	    }
+                var c = 2;
+            }
             if (this.blocks.sameGeneration(this.blocks.blockList[last(this.backward[turtle])].connections[c], blk)) {
-		var nextBlock = this.blocks.blockList[blk].connections[0];
-		this.endOfClampSignals[turtle][nextBlock] = [listenerName];
-	    } else {
-		var nextBlock = null;
-	    }
+                var nextBlock = this.blocks.blockList[blk].connections[0];
+                this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+            } else {
+                var nextBlock = null;
+            }
         } else {
             var nextBlock = last(this.blocks.blockList[blk].connections);
         }
