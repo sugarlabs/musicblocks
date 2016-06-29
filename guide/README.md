@@ -378,7 +378,7 @@ order. In the example above, the notes in *Chunk* are played as `Sol`,
 `Ti`, `La`, `Sol`, e.g., from the bottom to the top of the stack.
 
 [RUN
-LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crabcanon.tb&run=true)
+LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
 
 Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
