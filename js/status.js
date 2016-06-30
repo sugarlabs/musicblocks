@@ -96,7 +96,10 @@ function StatusMatrix() {
 
         console.log('voices ' + this.logo.turtles.turtleList.length);
 
-	// One row per voice (turtle)
+        // One row per voice (turtle)
+        // FIXME: One column per field with header
+        console.log(this.logo.statusFields);
+
         var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
         for (var i = 0; i < this.logo.turtles.turtleList.length; i++) {
             if (this.logo.turtles.turtleList[i].trash) {
@@ -119,12 +122,7 @@ function StatusMatrix() {
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             cell.style.fontSize = this.cellScale * 100 + '%';
 
-            if (this.logo.bpm[i].length > 0) {
-                var bpm = last(this.logo.bpm[i]);
-            } else {
-                var bpm = TARGETBPM;
-            }
-            cell.innerHTML = this.logo.keySignature[i] + ' ' + bpm + ' bpm ' + this.logo.polyVolume[i] + ' ' + _('volume');
+            cell.innerHTML = '';
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
             // cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
@@ -132,6 +130,7 @@ function StatusMatrix() {
             // cell.style.maxWidth = cell.style.minWidth;
             marginFromTop += parseInt(cell.style.height.replace('px', ''));
         }
+
     };
 
     this.updateAll = function() {
@@ -142,10 +141,33 @@ function StatusMatrix() {
                 continue;
             }
 
-            if (this.logo.bpm[i].length > 0) {
-                var bpm = last(this.logo.bpm[i]);
-            } else {
-                var bpm = TARGETBPM;
+            var innerHTML = '';
+
+            for (j = 0; j < this.logo.statusFields.length; j++) {
+                switch(this.logo.statusFields[j]) {
+                case 'bpm':
+                    if (this.logo.bpm[i].length > 0) {
+                        var bpm = last(this.logo.bpm[i]);
+                    } else {
+                        var bpm = TARGETBPM;
+                    }
+                    innerHTML += ' ' + _('bpm') + ': ' + bpm;
+                    break;
+                case 'volume':
+                    innerHTML += ' ' + _('volume') + ': ' + this.logo.polyVolume[i];
+                    break;
+                case 'key':
+                    innerHTML += ' ' + this.logo.keySignature[i];
+                    break;
+                case 'duplicate':
+                case 'transposition':
+                case 'skip':
+                case 'staccato':
+                case 'slur':
+                default:
+                    console.log('??? ' + this.logo.statusFields[j]);
+                    break;
+                }
             }
 
             if (this.logo.lastNotePlayed[i] != null) {
@@ -157,7 +179,7 @@ function StatusMatrix() {
             }
 
             var cell = table.rows[i + 1].cells[1];
-            cell.innerHTML = this.logo.keySignature[i] + ' ' + bpm + ' bpm ' + this.logo.polyVolume[i] + ' ' + _('volume') + ' ' +  note + ' ' + value;
+            cell.innerHTML = innerHTML + ' ' + note + ' ' + value;
         }
     };
 

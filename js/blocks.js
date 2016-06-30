@@ -824,7 +824,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     // Don't break the connection between a block and
                     // a hidden block below it.
                     continue;
-                } else if ((this.blockList[b].name === 'backward') && (i === 1) && (this.blockList[b].connections[1] != null) && (this.blockList[this.blockList[b].connections[1]].isNoHitBlock())) {
+                } else if ((['backward', 'status'].indexOf(this.blockList[b].name) !== -1) && (i === 1) && (this.blockList[b].connections[1] != null) && (this.blockList[this.blockList[b].connections[1]].isNoHitBlock())) {
                     // Don't break the connection betweem a backward
                     // block and a hidden block attached to its clamp.
                     continue;

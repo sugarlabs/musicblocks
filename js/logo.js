@@ -196,6 +196,8 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 
     // Status matrix
     this.statusMatrix = new StatusMatrix();
+    this.inStatusMatrix = false;
+    this.statusFields = [];
 
     // When running in step-by-step mode, the next command to run is
     // queued here.
@@ -640,7 +642,6 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             this.pitchDrumTable[turtle] = {};
             this.backward[turtle] = [];
         }
-        this.statusMatrix.init(this);
 
         if (!this.lilypondSaveOnly) {
             this._setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
@@ -648,6 +649,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
 
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
+        this.inStatusMatrix = false;
         this.pitchBlocks = [];
         this.drumBlocks = [];
         this.tuplet = false;
@@ -677,6 +679,11 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             this.turtles.turtleList[turtle].container.x = this.turtles.turtleX2screenX(this.turtles.turtleList[turtle].x);
             this.turtles.turtleList[turtle].container.y = this.turtles.turtleY2screenY(this.turtles.turtleList[turtle].y);
+        }
+
+        // Set up status block
+        if (docById('statusmatrix').style.visibility === 'visible') {
+            this.statusMatrix.init(this);
         }
 
         // Execute turtle code here...  Find the start block (or the
@@ -1151,8 +1158,10 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
             break;
         case 'print':
-            if (args.length === 1) {
-                logo.textMsg(args[0].toString());
+            if (!logo.inStatusMatrix) {
+                if (args.length === 1) {
+                    logo.textMsg(args[0].toString());
+                }
             }
             break;
         case 'speak':
@@ -2041,6 +2050,16 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             };
 
             logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'status':
+            logo.statusMatrix.init(logo);
+            logo.statusFields = [];
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+
+            logo.inStatusMatrix = true;
             break;
         case 'matrix':
             if (args.length === 1) {
@@ -3243,7 +3262,9 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             logo.endOfClampSignals[turtle][blk] = cleanSignals;
         }
 
-        this.statusMatrix.updateAll();
+        if (docById('statusmatrix').style.visibility === 'visible') {
+            logo.statusMatrix.updateAll();
+        }
 
         // If there is a child flow, queue it.
         if (childFlow != null) {
@@ -4184,28 +4205,38 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'bpmfactor':
-                if (logo.bpm[turtle].length > 0) {
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('bpm');
+                } else if (logo.bpm[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = last(logo.bpm[turtle]);
                 } else {
                     logo.blocks.blockList[blk].value = TARGETBPM;
                 }
                 break;
             case 'staccatofactor':
-                if (logo.staccato[turtle].length > 0) {
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('staccato');
+                } else if (logo.staccato[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = last(logo.staccato[turtle]);
                 } else {
                     logo.blocks.blockList[blk].value = 0;
                 }
                 break;
             case 'slurfactor':
-                if (logo.staccato[turtle].length > 0) {
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('slur');
+                } else if (logo.staccato[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = -last(logo.staccato[turtle]);
                 } else {
                     logo.blocks.blockList[blk].value = 0;
                 }
                 break;
             case 'key':
-                logo.blocks.blockList[blk].value = logo.keySignature[turtle];
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('key');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.keySignature[turtle];
+                }
                 break;
             case 'consonantstepsizeup':
                 if (logo.lastNotePlayed[turtle] !== null) {
@@ -4224,16 +4255,32 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 }
                 break;
             case 'transpositionfactor':
-                logo.blocks.blockList[blk].value = logo.transposition[turtle];
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('transposition');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.transposition[turtle];
+                }
                 break;
             case 'duplicatefactor':
-                logo.blocks.blockList[blk].value = logo.duplicateFactor[turtle];
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('duplicate');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.duplicateFactor[turtle];
+                }
                 break;
             case 'skipfactor':
-                logo.blocks.blockList[blk].value = logo.skipFactor[turtle];
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('skip');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.skipFactor[turtle];
+                }
                 break;
             case 'notevolumefactor':
-                logo.blocks.blockList[blk].value = last(logo.polyVolume[turtle]);
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('volume');
+                } else {
+                    logo.blocks.blockList[blk].value = last(logo.polyVolume[turtle]);
+                }
                 break;
             case 'beatfactor':
                 logo.blocks.blockList[blk].value = logo.beatFactor[turtle];

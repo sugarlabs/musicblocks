@@ -260,6 +260,7 @@ function Block(protoblock, blocks, overrideName) {
 
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
+        case 'status':
         case 'note':
         case 'invert':
         case 'invert2':
