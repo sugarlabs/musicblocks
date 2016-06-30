@@ -75,7 +75,7 @@ function StatusMatrix() {
         var iconSize = Math.floor(this.cellScale * 24);
 
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + ' display="block" margin="auto">&nbsp;&nbsp;';
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -96,14 +96,18 @@ function StatusMatrix() {
         // One column per field
         for (i = 0; i < this.logo.statusFields.length; i++) {
             var cell = row.insertCell(i + 1);
+            cell.style.fontSize = Math.floor(this.cellScale * 100) + '%';
             cell.innerHTML = '&nbsp;<b>' + _(this.logo.statusFields[i]) + '</b>&nbsp;'
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
             cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
+
         var cell = row.insertCell(i + 1);
+        cell.style.fontSize = Math.floor(this.cellScale * 100) + '%';
         cell.innerHTML = '&nbsp;<b>' + _('note') + '</b>&nbsp;'
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
         for (var i = 0; i < this.logo.turtles.turtleList.length; i++) {
             if (this.logo.turtles.turtleList[i].trash) {
                 continue;
@@ -111,9 +115,8 @@ function StatusMatrix() {
             var row = header.insertRow(i + 1);
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
-            cell.style.fontSize = this.cellScale * 100 + '%';
 
-            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this.logo.turtles.turtleList[i].name + '" alt="' + this.logo.turtles.turtleList[i].name + '" height="' + iconSize + '" width="' + iconSize + ' display="block" margin="auto">&nbsp;&nbsp;'; // + '" vertical-align="middle">&nbsp;&nbsp;';
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this.logo.turtles.turtleList[i].name + '" alt="' + this.logo.turtles.turtleList[i].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
 
@@ -121,10 +124,8 @@ function StatusMatrix() {
             for (j = 0; j < this.logo.statusFields.length + 1; j++) {
                 var cell = row.insertCell(-1);
                 cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-                cell.style.fontSize = this.cellScale * 100 + '%';
-
+                cell.style.fontSize = Math.floor(this.cellScale * 100) + '%';
                 cell.innerHTML = '';
-
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
             }
         }
