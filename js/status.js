@@ -21,14 +21,12 @@ function StatusMatrix() {
     docById('statusmatrix').style.visibility = 'hidden';
 
     this.init = function(logo) {
-        console.log('init status');
         // Initializes the status matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
         this.logo = logo;
 
         docById('statusmatrix').style.display = 'inline';
-        console.log('setting statusmatrix visible');
         docById('statusmatrix').style.visibility = 'visible';
         docById('statusmatrix').style.border = 2;
 
@@ -77,7 +75,7 @@ function StatusMatrix() {
         var iconSize = Math.floor(this.cellScale * 24);
 
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + ' display="block" margin="auto">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -94,43 +92,42 @@ function StatusMatrix() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
-        console.log('voices ' + this.logo.turtles.turtleList.length);
-
         // One row per voice (turtle)
-        // FIXME: One column per field with header
-        console.log(this.logo.statusFields);
-
-        var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
+        // One column per field
+        for (i = 0; i < this.logo.statusFields.length; i++) {
+            var cell = row.insertCell(i + 1);
+            cell.innerHTML = '&nbsp;<b>' + _(this.logo.statusFields[i]) + '</b>&nbsp;'
+            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+        var cell = row.insertCell(i + 1);
+        cell.innerHTML = '&nbsp;<b>' + _('note') + '</b>&nbsp;'
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         for (var i = 0; i < this.logo.turtles.turtleList.length; i++) {
             if (this.logo.turtles.turtleList[i].trash) {
                 continue;
             }
-            console.log('adding row for turtle ' + i);
             var row = header.insertRow(i + 1);
-            console.log('adding cell 0');
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             cell.style.fontSize = this.cellScale * 100 + '%';
 
-            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this.logo.turtles.turtleList[i].name + '" alt="' + this.logo.turtles.turtleList[i].name + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this.logo.turtles.turtleList[i].name + '" alt="' + this.logo.turtles.turtleList[i].name + '" height="' + iconSize + '" width="' + iconSize + ' display="block" margin="auto">&nbsp;&nbsp;'; // + '" vertical-align="middle">&nbsp;&nbsp;';
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-            marginFromTop += parseInt(cell.style.height.replace('px', ''));
 
-            console.log('adding cell 1');
-            var cell = row.insertCell(-1);
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
-            cell.style.fontSize = this.cellScale * 100 + '%';
+            // + 1 is for the note column
+            for (j = 0; j < this.logo.statusFields.length + 1; j++) {
+                var cell = row.insertCell(-1);
+                cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+                cell.style.fontSize = this.cellScale * 100 + '%';
 
-            cell.innerHTML = '';
+                cell.innerHTML = '';
 
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-            // cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            // cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            // cell.style.maxWidth = cell.style.minWidth;
-            marginFromTop += parseInt(cell.style.height.replace('px', ''));
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            }
         }
-
     };
 
     this.updateAll = function() {
@@ -141,9 +138,8 @@ function StatusMatrix() {
                 continue;
             }
 
-            var innerHTML = '';
-
             for (j = 0; j < this.logo.statusFields.length; j++) {
+                var innerHTML = '';
                 switch(this.logo.statusFields[j]) {
                 case 'bpm':
                     if (this.logo.bpm[i].length > 0) {
@@ -151,22 +147,36 @@ function StatusMatrix() {
                     } else {
                         var bpm = TARGETBPM;
                     }
-                    innerHTML += ' ' + _('bpm') + ': ' + bpm;
+                    innerHTML = bpm;
                     break;
                 case 'volume':
-                    innerHTML += ' ' + _('volume') + ': ' + this.logo.polyVolume[i];
+                    innerHTML = this.logo.polyVolume[i];
                     break;
                 case 'key':
-                    innerHTML += ' ' + this.logo.keySignature[i];
+                    innerHTML = this.logo.keySignature[i].replace(/ /g, '&nbsp;');
                     break;
                 case 'duplicate':
+                    innerHTML = this.logo.duplicateFactor[i];
+                    break;
                 case 'transposition':
+                    innerHTML = this.logo.transposition[i];
+                    break;
                 case 'skip':
+                    innerHTML = this.logo.skipFactor[i];
+                    break;
                 case 'staccato':
+                    innerHTML =  last(this.logo.staccato[i]);
+                    break;
                 case 'slur':
+                    innerHTML =  -last(this.logo.staccato[i]);
+                    break;
                 default:
                     console.log('??? ' + this.logo.statusFields[j]);
                     break;
+                }
+                var cell = table.rows[i + 1].cells[j + 1];
+                if (cell != null) {
+                    cell.innerHTML = innerHTML;
                 }
             }
 
@@ -177,9 +187,10 @@ function StatusMatrix() {
                 var note = '';
                 var value = '';
             }
-
-            var cell = table.rows[i + 1].cells[1];
-            cell.innerHTML = innerHTML + ' ' + note + ' ' + value;
+            var cell = table.rows[i + 1].cells[j + 1];
+            if (cell != null) {
+                cell.innerHTML = note + ' ' + value;
+            }
         }
     };
 
