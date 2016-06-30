@@ -166,10 +166,18 @@ function StatusMatrix() {
                     innerHTML = this.logo.skipFactor[i];
                     break;
                 case 'staccato':
-                    innerHTML =  last(this.logo.staccato[i]);
+                    if (this.logo.staccato[i].length > 0) {
+                        innerHTML =  last(this.logo.staccato[i]);
+                    } else {
+                        innerHTML = 0;
+                    }
                     break;
                 case 'slur':
-                    innerHTML =  -last(this.logo.staccato[i]);
+                    if (this.logo.staccato[i].length > 0) {
+                        innerHTML =  -last(this.logo.staccato[i]);
+                    } else {
+                        innerHTML = 0;
+                    }
                     break;
                 default:
                     console.log('??? ' + this.logo.statusFields[j]);
