@@ -1803,7 +1803,7 @@ function Palette(palettes, name) {
         const SETDRUMOBJ = [[0, 'setdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['drumname', {'value': getDrumName(DEFAULTDRUM)}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         const PLAYDRUMOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': getDrumName(DEFAULTDRUM)}], 0, 0, [0]]];
         const BACKWARDOBJ = [[0, 'backward', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'hidden', 0, 0, [0, null]]];
-	const STATUSOBJ = [[0, 'status', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'hidden', 0, 0, [0, 2]], [2, ["print", {}], 0, 0, [1, 3, 4]], [3, ["key", {}], 0, 0, [2]], [4, ["print", {}], 0, 0, [2, 5, 6]], [5, ["bpmfactor", {}], 0, 0, [4]], [6, ["print", {}], 0, 0, [4, 7, null]], [7, ["notevolumefactor", {}], 0, 0, [6]]];
+	const STATUSOBJ = [[0, 'status', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 8]], [1, 'hidden', 0, 0, [0, 2]], [2, ["print", {}], 0, 0, [1, 3, 4]], [3, ["key", {}], 0, 0, [2]], [4, ["print", {}], 0, 0, [2, 5, 6]], [5, ["bpmfactor", {}], 0, 0, [4]], [6, ["print", {}], 0, 0, [4, 7, null]], [7, ["notevolumefactor", {}], 0, 0, [6]], [8, 'hidden', 0, 0, [0, null]]];
 
         const BUILTINMACROS = {'note': NOTEOBJ,
                                'rhythmicdot': DOTOBJ,
