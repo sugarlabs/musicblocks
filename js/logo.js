@@ -10,6 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+const DEFAULTVOLUME = 50;
 const TONEBPM = 240;  // Seems to be the default.
 const TARGETBPM = 90;  // What we'd like to use for beats per minute
 const DEFAULTDELAY = 500; // milleseconds
@@ -619,7 +620,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             this.skipIndex[turtle] = 0;
             this.keySignature[turtle] = 'C ' + _('Major');
             this.pushedNote[turtle] = false;
-            this.polyVolume[turtle] = [50];
+            this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
             this.crescendoDelta[turtle] = [];
@@ -644,7 +645,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
         }
 
         if (!this.lilypondSaveOnly) {
-            this._setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
+            this._setSynthVolume(DEFAULTVOLUME, Math.max(this.turtles.turtleList.length - 1), 0);
         }
 
         this.inPitchDrumMatrix = false;
@@ -2688,6 +2689,8 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 logo.crescendoDelta[turtle].push(args[0]);
                 logo.crescendoVolume[turtle].push(last(logo.polyVolume[turtle]));
                 logo.crescendoInitialVolume[turtle].push(last(logo.polyVolume[turtle]));
+                logo.polyVolume[turtle].push(last(logo.crescendoVolume[turtle]));
+
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -2697,6 +2700,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 var __listener = function (event) {
                     logo.crescendoDelta[turtle].pop();
                     logo.crescendoVolume[turtle].pop();
+		    logo.polyVolume[turtle].pop();
                     logo.crescendoInitialVolume[turtle].pop();
                     logo._lilypondEndCrescendo(turtle);
                 };
@@ -3834,6 +3838,9 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                     var len = this.crescendoVolume[turtle].length
                     this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
                     this._setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
+                    // FIXME: Do we need to track crescendoVolume separately?
+                    var len2 = this.polyVolume[turtle].length;
+                    this.polyVolume[turtle][len2 - 1] = this.crescendoVolume[turtle][len - 1];
                 }
             }
             this.pushedNote[turtle] = false;
