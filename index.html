@@ -63,6 +63,10 @@
             $("#pitchdrummatrix").draggable();
         });
 
+	$(function() {
+            $("#statusmatrix").draggable();
+        });
+
         (function($) {
             $.fn.fixMe = function() {
                 return this.each(function() {
@@ -129,7 +133,25 @@
             var matrixDiv = document.getElementById('pitchdrummatrix');
             matrixDivPosition = matrixDiv.getBoundingClientRect();
 
-            var table = document.getElementById('myTable');
+            var table = document.getElementById('drumTable');
+            var row = table.rows.item(0);
+            row.style.left = matrixDivPosition.left + 'px';
+            row.style.top = matrixDivPosition.top + 'px';
+
+            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
+            for (i = 1, row; row = table.rows[i]; i++) {
+                cell = row.cells[0];
+                cell.style.left = matrixDivPosition.left + 2 + 'px';
+                cell.style.top = marginFromTop + 'px';
+                marginFromTop += parseInt(cell.style.height);
+            }
+        }
+
+        function moveStatusMatrix(event) {
+            var matrixDiv = document.getElementById('statusmatrix');
+            matrixDivPosition = matrixDiv.getBoundingClientRect();
+
+            var table = document.getElementById('statusTable');
             var row = table.rows.item(0);
             row.style.left = matrixDivPosition.left + 'px';
             row.style.top = matrixDivPosition.top + 'px';
@@ -198,6 +220,7 @@
     <canvas hidden id="music" width="700"></canvas>
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
+    <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    
     <div id="helpElem"></div>
 
 </body>

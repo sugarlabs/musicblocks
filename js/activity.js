@@ -80,6 +80,7 @@ define(function (require) {
 
     // Music Block-specific modules
     require('activity/turtledefs');
+    require('activity/status');
     require('activity/logo');
     require('activity/basicblocks');
     require('activity/analytics');

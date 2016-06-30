@@ -119,14 +119,14 @@ function PitchDrumMatrix() {
             }
         };
 
-        var table = docById('myTable');
+        var table = docById('drumTable');
 
         if (table !== null) {
             table.remove();
         }
 
         var x = document.createElement('TABLE');
-        x.setAttribute('id', 'myTable');
+        x.setAttribute('id', 'drumTable');
         x.style.textAlign = 'center';
 
         var matrixDiv = docById('pitchdrummatrix');
@@ -135,7 +135,7 @@ function PitchDrumMatrix() {
         matrixDiv.appendChild(x);
         matrixDivPosition = matrixDiv.getBoundingClientRect();
 
-        var table = docById('myTable');
+        var table = docById('drumTable');
         var header = table.createTHead();
         var row = header.insertRow(0);
         row.style.left = Math.floor(matrixDivPosition.left) + 'px';
@@ -281,7 +281,7 @@ function PitchDrumMatrix() {
     };
 
     this._addDrum = function(drumname) {
-        var table = docById('myTable');
+        var table = docById('drumTable');
 
         var rowCount = this.solfegeNotes.length + 1 - this.rests;
         var iconSize = Math.floor(this.cellScale * 24);
@@ -328,7 +328,7 @@ function PitchDrumMatrix() {
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
-        var table = docById('myTable');
+        var table = docById('drumTable');
 
         for (var i = 1; i < table.rows[1].cells.length; i++) {
             for (var j = 1; j < table.rows.length - 1; j++) {
@@ -391,7 +391,7 @@ function PitchDrumMatrix() {
         this.logo.synth.stop();
 
         var pairs = [];
-        var table = docById('myTable');
+        var table = docById('drumTable');
 
         // For each row (pitch), look for a drum.
         for (var i = 1; i < table.rows.length - 1; i++) {
@@ -414,7 +414,7 @@ function PitchDrumMatrix() {
     };
 
     this._playPitchDrum = function(i, pairs) {
-        var table = docById('myTable');
+        var table = docById('drumTable');
         var cell = table.rows[i + 1].cells[i];
         var pitchCell = table.rows[i + 1].cells[0];
         pitchCell.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -437,12 +437,12 @@ function PitchDrumMatrix() {
                 }
             }, 1000);
         }
-    }
+    };
 
     this._setCellPitchDrum = function(colIndex, rowIndex, playNote) {
         // Sets corresponding pitch/drum when user clicks on any cell and
         // plays them.
-        var table = docById('myTable');
+        var table = docById('drumTable');
 
         var coli = Number(colIndex);
         // For the moment, we can only have one drum per pitch, so
@@ -483,7 +483,7 @@ function PitchDrumMatrix() {
     };
 
     this._setPairCell = function(j, colIndex, cell, playNote) {
-        var table = docById('myTable');
+        var table = docById('drumTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
         var drumHTML = table.rows[table.rows.length - 1].cells[colIndex].innerHTML.split('"');
         var drumName = getDrumSynthName(drumHTML[3]);
@@ -503,7 +503,7 @@ function PitchDrumMatrix() {
 
     this._clear = function() {
         // "Unclick" every entry in the matrix.
-        var table = docById('myTable');
+        var table = docById('drumTable');
 
         var leaveRowsFromBottom = 1;
 
@@ -534,7 +534,7 @@ function PitchDrumMatrix() {
         this.logo.refreshCanvas();
 
         var pairs = [];
-        var table = docById('myTable');
+        var table = docById('drumTable');
 
         // For each row (pitch), look for a drum.
         for (var i = 1; i < table.rows.length - 1; i++) {

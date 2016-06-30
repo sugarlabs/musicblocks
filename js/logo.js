@@ -194,6 +194,9 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
     this.synth.loadSynth('poly');
     // this.synth.loadSynth(DEFAULTDRUM);
 
+    // Status matrix
+    this.statusMatrix = new StatusMatrix();
+
     // When running in step-by-step mode, the next command to run is
     // queued here.
     this.stepQueue = {};
@@ -612,7 +615,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             this.duplicateFactor[turtle] = 1;
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
-            this.keySignature[turtle] = 'C';
+            this.keySignature[turtle] = 'C ' + _('Major');
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = [50];
             this.oscList[turtle] = [];
@@ -637,6 +640,7 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             this.pitchDrumTable[turtle] = {};
             this.backward[turtle] = [];
         }
+        this.statusMatrix.init(this);
 
         if (!this.lilypondSaveOnly) {
             this._setSynthVolume(50, Math.max(this.turtles.turtleList.length - 1), 0);
@@ -3161,10 +3165,12 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
                 }
             }
             break;
+            // Deprecated
         case 'playfwd':
             matrix.playDirection = 1;
             logo._runFromBlock(logo, turtle, args[0]);
             break;
+            // Deprecated
         case 'playbwd':
             matrix.playDirection = -1;
             logo._runFromBlock(logo, turtle, args[0]);
@@ -3236,6 +3242,8 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
             logo.endOfClampSignals[turtle][blk] = cleanSignals;
         }
+
+        this.statusMatrix.updateAll();
 
         // If there is a child flow, queue it.
         if (childFlow != null) {
