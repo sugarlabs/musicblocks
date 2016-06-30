@@ -2060,6 +2060,16 @@ function Logo(matrix, pitchdrummatrix, canvas, blocks, turtles, stage,
             }
 
             logo.inStatusMatrix = true;
+
+            var listenerName = '_status_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+		logo.statusMatrix.init(logo);
+		logo.inStatusMatrix = false;
+	    }
+
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'matrix':
             if (args.length === 1) {
