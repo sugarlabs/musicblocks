@@ -150,7 +150,7 @@ function StatusMatrix() {
                     innerHTML = bpm;
                     break;
                 case 'volume':
-                    innerHTML = this.logo.polyVolume[i];
+                    innerHTML = last(this.logo.polyVolume[i]);
                     break;
                 case 'key':
                     innerHTML = this.logo.keySignature[i].replace(/ /g, '&nbsp;');
