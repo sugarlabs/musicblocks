@@ -338,6 +338,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
 
+    var statusBlock = new ProtoBlock('status');
+    statusBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['status'] = statusBlock;
+    statusBlock.staticLabels.push(_('status'));
+    statusBlock.adjustWidthToLabel();
+    statusBlock.stackClampZeroArgBlock();
+
     // RHYTHM PALETTE
 
     var turtleNoteBlock = new ProtoBlock('turtlenote');
