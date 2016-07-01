@@ -1448,7 +1448,8 @@ define(function (require) {
                 document.getElementById('rulerbody').style.visibility = 'hidden';
                 document.getElementById('rulerbody').style.border = 0;
                 document.getElementsByClassName('hRule')[0].style.visibility = 'hidden';
-                document.getElementsByClassName('mousePosBox')[0].style.visibility = 'hidden';                
+                document.getElementsByClassName('mousePosBox')[0].style.visibility = 'hidden';  
+            }              
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
                 console.log('hide status');
                 document.getElementById('statusmatrix').style.visibility = 'hidden';
