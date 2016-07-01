@@ -81,11 +81,14 @@ function RhythmRuler () {
 
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
+	var tempwidth = this.noteWidth(newNoteValue);
+        var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
+        var difference = parseFloat(this.noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
         var newCellWidth = parseFloat(this.noteWidth(newNoteValue)) + parseFloat(difference) / inputNum + 'px';
         var newCellHeight = cell.style.height;
         noteValues.splice(newCellIndex, 1);
 
-        for ( var i = 0; i < inputNum; i++) {
+        for (var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
             noteValues.splice(newCellIndex + i, 0, newNoteValue);
             newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
@@ -104,7 +107,7 @@ function RhythmRuler () {
     this.undo = function() {
         var that = this;
         var divisionHistory = this.Rulers[this.RulerSelected][1];
-        if(divisionHistory.length === 0) {
+        if (divisionHistory.length === 0) {
             return;
         }
         var ruler = docById('ruler' + this.RulerSelected);
@@ -133,7 +136,7 @@ function RhythmRuler () {
             that.dissectRuler(event);
         });
 
-        for ( var i = 0; i < inputNum; i++) {
+        for (var i = 0; i < inputNum; i++) {
             ruler.deleteCell(newCellIndex+1);
         }
 
@@ -154,7 +157,7 @@ function RhythmRuler () {
             cell.style.backgroundColor = MATRIXBUTTONCOLOR;
             this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
 
-            if(this.PlayingAll) {
+            if (this.PlayingAll) {
                 this.playNote(0, 0, i, 1);
             }
         }
@@ -171,7 +174,7 @@ function RhythmRuler () {
         var drum = blocks.blockList[drumblockno].value;
         this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
 
-        if(this.PlayingOne) {
+        if (this.PlayingOne) {
             this.playNote(0, 0, this.RulerSelected, 1)
         }
     };
@@ -193,7 +196,7 @@ function RhythmRuler () {
                 }
             } else {
                 var cell = ruler.cells[colIndex];
-                if(that.Playing) {
+                if (that.Playing) {
                     cell.style.backgroundColor = MATRIXBUTTONCOLOR;
                 }
             }
@@ -205,19 +208,19 @@ function RhythmRuler () {
 
             notesCounter += 1;
             colIndex += 1;
-            if(that.Playing) {
+            if (that.Playing) {
                 that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drum);
             }
 
-            if(notesCounter < noteValues.length) {
-                if(that.Playing) {
+            if (notesCounter < noteValues.length) {
+                if (that.Playing) {
                     that.playNote(time, notesCounter, rulerno, colIndex);
                 }
             } else {
                 that.Completed += 1;
             }
-            if(that.PlayingAll) {
-                if(that.Completed === that.Rulers.length) {
+            if (that.PlayingAll) {
+                if (that.Completed === that.Rulers.length) {
                     console.log('playing again all rulers');
                     that.Completed = 0;
                     var cell = ruler.cells[0];
@@ -231,8 +234,8 @@ function RhythmRuler () {
                     that.playAll();
                 }
             }
-            if(that.PlayingOne) {
-                if(that.Completed === 1) {
+            if (that.PlayingOne) {
+                if (that.Completed === 1) {
                     console.log('playing again ruler' + that.RulernoPlaying);
                     that.Completed = 0;
                     var cell = ruler.cells[0];
@@ -263,7 +266,7 @@ function RhythmRuler () {
             var samenotevalue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
 
-                if(noteValues[i] === noteValues[i+1] && i < ruler.cells.length - 1) {
+                if (noteValues[i] === noteValues[i+1] && i < ruler.cells.length - 1) {
                     samenotevalue += 1;
                     continue;
                 } else {
@@ -277,7 +280,7 @@ function RhythmRuler () {
                     newStack.push([noofnotes, ['number', {'value': samenotevalue}], 0, 0, [rhythmblockidx]]);
                     newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [rhythmblockidx]]);
 
-                    if(i == ruler.cells.length - 1) {
+                    if (i == ruler.cells.length - 1) {
                         newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, null]]);
                     }
                     else {
@@ -290,7 +293,7 @@ function RhythmRuler () {
             }
 
             that.logo.blocks.loadNewBlocks(newStack);
-            if(selectedruler > that.Rulers.length - 2) {
+            if (selectedruler > that.Rulers.length - 2) {
                 return;
             } else {
                 that.save(selectedruler+1);
@@ -373,8 +376,8 @@ function RhythmRuler () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         cell.onclick=function() {
-            if(thisRuler.Playing === 0) {
-                if(thisRuler.PlayingAll === 0) {
+            if (thisRuler.Playing === 0) {
+                if (thisRuler.PlayingAll === 0) {
                     console.log("playing all rulers");
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                     thisRuler.logo.setTurtleDelay(0);
@@ -387,7 +390,7 @@ function RhythmRuler () {
                 }
             }
             else {
-                if(thisRuler.PlayingAll) {
+                if (thisRuler.PlayingAll) {
                     console.log('stopping playing all rulers');
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                     thisRuler.Playing = 0;
@@ -518,8 +521,8 @@ function RhythmRuler () {
             drumcell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
             drumcell.onclick=function() {
-                if(thisRuler.Playing === 0) {
-                    if(thisRuler.PlayingOne ===0) {
+                if (thisRuler.Playing === 0) {
+                    if (thisRuler.PlayingOne ===0) {
                         console.log("playing ruler" + this.parentNode.id[4]);
                         thisRuler.RulerSelected = this.parentNode.id[4];
                         thisRuler.logo.setTurtleDelay(0);
@@ -533,7 +536,7 @@ function RhythmRuler () {
                     }
                 }
                 else {
-                    if(this.parentNode.id[4] === thisRuler.RulernoPlaying) {
+                    if (this.parentNode.id[4] === thisRuler.RulernoPlaying) {
                         console.log("stopping ruler" + this.parentNode.id[4]);
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         thisRuler.Playing = 0;
@@ -576,14 +579,14 @@ function RhythmRuler () {
                 rulercell.maxWidth = rulercell.style.width;
                 rulercell.style.lineHeight = 60 + '%';
                 rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
-                if(i % 2 === 0) {
-                    if(j % 2 === 0) {
+                if (i % 2 === 0) {
+                    if (j % 2 === 0) {
                         rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     } else {
                         rulercell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                     }
                 } else {
-                    if(j % 2 === 0) {
+                    if (j % 2 === 0) {
                         rulercell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                     } else {
                         rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
