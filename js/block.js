@@ -12,7 +12,7 @@
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status'];
 const NOHIT = ['hidden'];
 
 
@@ -258,11 +258,20 @@ function Block(protoblock, blocks, overrideName) {
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
-
+            var obj = this.protoblock.generator(this.clampCount[0]);
+            break;
+        case 'status':
+            var proto = new ProtoBlock('collapse');
+            proto.scale = this.protoblock.scale;
+            // proto.extraWidth = 10;
+            proto.basicBlockCollapsed();
+            var obj = proto.generator();
+            this.collapseArtwork = obj[0];
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
         case 'note':
         case 'invert':
+        case 'invert2':
         case 'notation':
         case 'flat':
         case 'sharp':
@@ -283,6 +292,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'slur':
         case 'crescendo':
         case 'articulation':
+        case 'backward':
         case 'settransposition':
         case 'tuplet':
         case 'tuplet2':
@@ -668,8 +678,11 @@ function Block(protoblock, blocks, overrideName) {
                 case 'matrix':
                     myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
                     break;
+                case 'status':
+                    myBlock.collapseText = new createjs.Text(_('status'), fontSize + 'px Sans', '#000000');
+                    break;
                 case 'pitchdrummatrix':
-                    myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                    myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'rhythmruler':
                     myBlock.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
@@ -1862,6 +1875,11 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 }   
+                if (oldValue === _('action')) {
+                    console.log('newNameddoBlock: ' + newValue);
+                    this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+                    this.blocks.setActionProtoVisiblity(false);
+                }
                 this.blocks.renameNameddos(oldValue, newValue);
                 this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('action');

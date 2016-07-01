@@ -73,6 +73,7 @@ const MUSICALMODES = {
     'ALGERIAN': [2, 1, 2, 1, 1, 1, 3, 1],
     'DIMINISHED': [2, 1, 2, 1, 2, 1, 2, 1],
     'SPANISH': [1, 2, 1, 1, 1, 2, 2, 2],
+    'OCATONIC': [1, 2, 1, 2, 1, 2, 1, 2],
 
      // 7 notes in an octave
     'MAJOR': [2, 2, 1, 2, 2, 2, 1],
@@ -102,6 +103,7 @@ const MUSICALMODES = {
     // 6 notes in an octave
     'BLUES': [3, 2, 1, 1, 3, 2],
     'MAJOR BLUES': [2, 1, 1, 3, 2, 2],
+    'WHOLE TONE': [2, 2, 2, 2, 2, 2],
 
     // 5 notes in an octave
     'PENTATONIC': [3, 2, 2, 3, 2],
@@ -109,6 +111,7 @@ const MUSICALMODES = {
     'EGYPTIAN': [2, 3, 2, 3, 2],
     'HIRAJOSHI': [1, 4, 1, 4, 2],
     'JAPANESE': [1, 4, 2, 3, 2],
+    'FIBONACCI': [1, 1, 2, 3, 5],
 };
 
 const MAQAMTABLE = {
@@ -130,6 +133,8 @@ const MODENAMES = [
     //.TRANS: modal scale for music
     [_('Diminished'), 'DIMINISHED'],
     [_('Spanish'), 'SPANISH'],
+    //.TRANS: modal scale for music
+    [_('Octatonic'), 'OCTATONIC'],
     //.TRANS: major scales in music
     [_('Major'), 'MAJOR'],
     //.TRANS: modal scale for music
@@ -170,6 +175,7 @@ const MODENAMES = [
     [_('Blues'), 'BLUES'],
     //.TRANS: major blues scale for music
     [_('Major Blues'), 'MAJOR BLUES'],
+    [_('Whole Tone'), 'WHOLE TONE'],
     //.TRANS: pentatonic scale in music
     [_('Pentatonic'), 'PENTATONIC'],
     [_('Chinese'), 'CHINESE'],
@@ -177,6 +183,8 @@ const MODENAMES = [
     //.TRANS: Japanese pentatonic scale for music
     [_('Hirajoshi'), 'HIRAJOSHI'],
     [_('Japanese'), 'JAPANESE'],
+    //.TRANS: Italian mathematician
+    [_('Fibonacci'), 'FIBONACCI'],
 ];
 
 const DRUMNAMES = [

@@ -184,17 +184,29 @@ function initBasicProtoBlocks(palettes, blocks) {
     solfegeBlock.dockTypes[0] = 'solfegeout';
 
     // Transposition blocks
-    var invertblock = new ProtoBlock('invert');
-    invertblock.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['invert'] = invertblock;
-    invertblock.staticLabels.push(_('invert'), _('note'), _('octave'));
-    invertblock.adjustWidthToLabel();
-    invertblock.flowClampTwoArgBlock();
-    invertblock.adjustWidthToLabel();
-    invertblock.defaults.push('sol');
-    invertblock.defaults.push(4);
-    invertblock.dockTypes[1] = 'solfegein';
-    invertblock.dockTypes[2] = 'anyin';
+    var invertBlock2 = new ProtoBlock('invert2');
+    invertBlock2.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['invert2'] = invertBlock2;
+    invertBlock2.staticLabels.push(_('invert (odd)'), _('note'), _('octave'));
+    invertBlock2.adjustWidthToLabel();
+    invertBlock2.flowClampTwoArgBlock();
+    invertBlock2.adjustWidthToLabel();
+    invertBlock2.defaults.push('sol');
+    invertBlock2.defaults.push(4);
+    invertBlock2.dockTypes[1] = 'solfegein';
+    invertBlock2.dockTypes[2] = 'anyin';
+
+    var invertBlock = new ProtoBlock('invert');
+    invertBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['invert'] = invertBlock;
+    invertBlock.staticLabels.push(_('invert (even)'), _('note'), _('octave'));
+    invertBlock.adjustWidthToLabel();
+    invertBlock.flowClampTwoArgBlock();
+    invertBlock.adjustWidthToLabel();
+    invertBlock.defaults.push('sol');
+    invertBlock.defaults.push(4);
+    invertBlock.dockTypes[1] = 'solfegein';
+    invertBlock.dockTypes[2] = 'anyin';
 
     var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['pitch'];
@@ -325,6 +337,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     matrixBlock.staticLabels.push(_('pitch-time matrix'));
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
+
+    var statusBlock = new ProtoBlock('status');
+    statusBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['status'] = statusBlock;
+    statusBlock.staticLabels.push(_('status'));
+    statusBlock.adjustWidthToLabel();
+    statusBlock.stackClampZeroArgBlock();
 
     // RHYTHM PALETTE
 
@@ -502,6 +521,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     notevolumeFactor.adjustWidthToLabel();
     notevolumeFactor.parameterBlock();
 
+    /*
     var playfwdBlock = new ProtoBlock('playfwd');
     playfwdBlock.hidden = true;
     playfwdBlock.palette = palettes.dict['tone'];
@@ -519,7 +539,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     playbwdBlock.staticLabels.push(_('play backward'));
     playbwdBlock.adjustWidthToLabel();
     playbwdBlock.flowClampZeroArgBlock();
-
+    */
+    
     var keyBlock = new ProtoBlock('key');
     keyBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['key'] = keyBlock;
@@ -558,6 +579,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.twoArgMathBlock();
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
+
+    var backwardBlock = new ProtoBlock('backward');
+    backwardBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['backward'] = backwardBlock;
+    backwardBlock.staticLabels.push(_('backward'));
+    backwardBlock.adjustWidthToLabel();
+    backwardBlock.flowClampZeroArgBlock();
 
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];

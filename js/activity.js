@@ -82,6 +82,7 @@ define(function (require) {
 
     // Music Block-specific modules
     require('activity/turtledefs');
+    require('activity/status');
     require('activity/logo');
     require('activity/basicblocks');
     require('activity/analytics');
@@ -1428,6 +1429,7 @@ define(function (require) {
             localStorage.setItem('isMatrixHidden', document.getElementById('matrix').style.visibility);
             localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
             localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerbody').style.visibility);
+            localStorage.setItem('isStatusHidden', document.getElementById('statusmatrix').style.visibility);
 
             if (document.getElementById('matrix').style.visibility !== 'hidden') {
                 console.log('hide matrix');
@@ -1447,6 +1449,10 @@ define(function (require) {
                 document.getElementById('rulerbody').style.border = 0;
                 document.getElementsByClassName('hRule')[0].style.visibility = 'hidden';
                 document.getElementsByClassName('mousePosBox')[0].style.visibility = 'hidden';                
+            if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
+                console.log('hide status');
+                document.getElementById('statusmatrix').style.visibility = 'hidden';
+                document.getElementById('statusmatrix').style.border = 0;
             }
 
             console.log('save locally');
@@ -1890,6 +1896,10 @@ define(function (require) {
                         'collapsed' : myBlock.collapsed
                     }
                 } else if(myBlock.name === 'pitchdrummatrix') {
+                    var args = {
+                        'collapsed' : myBlock.collapsed
+                    }
+                } else if(myBlock.name === 'status') {
                     var args = {
                         'collapsed' : myBlock.collapsed
                     }

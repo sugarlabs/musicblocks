@@ -371,6 +371,20 @@ the additional pitches to a note. In the figure, we add `Sol` to `Do` and
 
 The *Articulation* block changes the volume of a group of notes.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
+
+The *Backward* block will play the contained notes in reverse order
+(retrograde). In the example above, the notes in *Chunk* are played as
+`Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
+stack.
+
+[RUN
+LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
+
+Note that all of the blocks inside a *Backward* block are reverse, so
+use this feature with caution if you include logic intermixed with
+notes.
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg'</img>
 
 The *Set Key* block will change the key and mode of the mapping
