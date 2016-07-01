@@ -12,11 +12,8 @@ function RhythmRuler () {
 
 
     this.noteWidth = function (noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
-    };
-
-
-    
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale * 3) + 'px';
+    };  
 
     this.calculateZebraStripes = function(rulerno) {
         var ruler = docById('ruler' + rulerno);
@@ -71,8 +68,6 @@ function RhythmRuler () {
         var difference = parseFloat(this.noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
         
         var newCellWidth = parseFloat(this.noteWidth(newNoteValue)) + parseFloat(difference)/inputNum + 'px';
-       // newCellWidth = parseFloat(23.015) + 'px';
-     //   newCellWidth = this.noteWidth(newNoteValue);
         console.log(newCellWidth);
 
         noteValues.splice(newCellIndex, 1);
@@ -342,7 +337,7 @@ function RhythmRuler () {
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'drum');
         x.style.textAlign = 'center';
-      //  x.style.borderCollapse = 'collapse';
+        x.style.borderCollapse = 'collapse';
         x.cellSpacing = 0;
         x.cellPadding = 0;
 
@@ -405,7 +400,7 @@ function RhythmRuler () {
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'buttonTable');
         x.style.textAlign = 'center';
-      //  x.style.borderCollapse = 'collapse';
+        x.style.borderCollapse = 'collapse';
         x.cellSpacing = 0;
         x.cellPadding = 0;
 
@@ -491,7 +486,7 @@ function RhythmRuler () {
             var rulerdrumTable = document.createElement('TABLE');
             rulerdrumTable.setAttribute('id', 'rulerdrum' + i);
             rulerdrumTable.style.textAlign = 'center';
-          //  rulerdrumTable.style.borderCollapse = 'collapse';
+            rulerdrumTable.style.borderCollapse = 'collapse';
             rulerdrumTable.cellSpacing = 0;
             rulerdrumTable.cellPadding = 0;
             drumDiv.appendChild(rulerdrumTable);
@@ -549,12 +544,9 @@ function RhythmRuler () {
             var RulerTable = document.createElement('TABLE');
             RulerTable.setAttribute('id', 'rulerTable' + i);
             RulerTable.style.textAlign = 'center';
-           // RulerTable.style.border = 'soid';
-         //   RulerTable.style.borderCollapse = 'collapse';
-          //  RulerTable.style.borderTopWidth = '2px';
+            RulerTable.style.borderCollapse = 'collapse';
             RulerTable.cellSpacing = 0;
             RulerTable.cellPadding = 0;
-          //  RulerTable.borderSpacing = '10px';
             rulerbodyDiv.appendChild(RulerTable);
             var header = RulerTable.createTHead();
             var row = header.insertRow(-1);
@@ -566,8 +558,6 @@ function RhythmRuler () {
                 var rulercell = row.insertCell(j);
                 rulercell.innerHTML = calcNoteValueToDisplay(noteValue, 1);
                 rulercell.style.width = thisRuler.noteWidth(noteValue);
-                console.log(rulercell.style.width);
-               // rulercell.style.width = Math.floor(parseFloat(rulerbodyDivPosition.width)/noteValue) + 'px';
                 rulercell.minWidth = rulercell.style.width;
                 rulercell.maxWidth = rulercell.style.width;
                 rulercell.style.lineHeight = 60 + '%';
