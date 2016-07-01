@@ -12,7 +12,7 @@
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'status'];
 const NOHIT = ['hidden'];
 
 
@@ -67,6 +67,9 @@ function Block(protoblock, blocks, overrideName) {
     // Some blocks have some post process after they are first loaded.
     this.postProcess = null;
     this.postProcessArg = null;
+
+    // Lock on label change
+    this._label_lock = false;
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
@@ -208,7 +211,7 @@ function Block(protoblock, blocks, overrideName) {
 
             // If it is in the trash, make sure it remains hidden.
             if (myBlock.trash) {
-		myBlock.hide();
+                myBlock.hide();
             }
         };
 
@@ -247,17 +250,27 @@ function Block(protoblock, blocks, overrideName) {
         case 'drum':
         case 'action':
         case 'matrix':
+        case 'pitchdrummatrix':
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
-
+            var obj = this.protoblock.generator(this.clampCount[0]);
+            break;
+        case 'status':
+            var proto = new ProtoBlock('collapse');
+            proto.scale = this.protoblock.scale;
+            // proto.extraWidth = 10;
+            proto.basicBlockCollapsed();
+            var obj = proto.generator();
+            this.collapseArtwork = obj[0];
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
         case 'note':
         case 'invert':
+        case 'invert2':
         case 'notation':
         case 'flat':
         case 'sharp':
@@ -269,6 +282,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'tie':
         case 'swing':
         case 'drift':
+        case 'interval':
         case 'fifths':
         case 'tritone':
         case 'fourths':
@@ -277,12 +291,38 @@ function Block(protoblock, blocks, overrideName) {
         case 'slur':
         case 'crescendo':
         case 'articulation':
+        case 'backward':
         case 'settransposition':
         case 'tuplet':
         case 'tuplet2':
         case 'osctime':
         case 'setbpm':
         case 'setnotevolume2':
+        case 'darbuka':
+        case 'clang':
+        case 'bottle':
+        case 'duck':
+        case 'snare':
+        case 'hihat':
+        case 'tom':
+        case 'kick':
+        case 'pluck':
+        case 'triangle1':
+        case 'slap':
+        case 'fingercymbals':
+        case 'cup':
+        case 'cowbell':
+        case 'splash':
+        case 'ridebell':
+        case 'floortom':
+        case 'crash':
+        case 'chine':
+        case 'dog':
+        case 'cat':
+        case 'clap':
+        case 'bubbles':
+        case 'cricket':
+        case 'setdrum':
         case 'repeat':
         case 'fill':
         case 'hollowline':
@@ -541,18 +581,30 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Value blocks get a modifiable text label
-        if (['text', 'number', 'solfege', 'notename', 'rest'].indexOf(this.name) !== -1) {
-            if (this.value === null) {
-                if (this.name === 'text') {
+        if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname', 'rest'].indexOf(this.name) !== -1) {
+            if (this.value == null) {
+                switch(this.name) {
+                case 'text':
                     this.value = '---';
-                } else if (this.name === 'solfege') {
+                    break;
+                case 'solfege':
                     this.value = 'sol';
-                } else if (this.name === 'notename') {
+                    break;
+                case 'notename':
                     this.value = 'G';
-                } else if (this.name === 'rest') {
+                    break;
+                case 'rest':
                     this.value = _('rest');
-                } else {
+                    break;
+                case 'number':
                     this.value = NUMBERBLOCKDEFAULT;
+                    break;
+                case 'modename':
+                    this.value = 'Major';
+                    break;
+                case 'drumname':
+                    this.value = _('kick drum');
+                    break;
                 }
             }
 
@@ -623,6 +675,12 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'matrix':
                     myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'status':
+                    myBlock.collapseText = new createjs.Text(_('status'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'pitchdrummatrix':
+                    myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'drum':
                     myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
@@ -927,7 +985,7 @@ function Block(protoblock, blocks, overrideName) {
         this.text.y = TEXTY * blockScale / 2.;
 
         // Some special cases
-        if (['text', 'number', 'solfege', 'notename'].indexOf(this.name) !== -1) {
+        if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname'].indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
             this.text.x = VALUETEXTX * blockScale / 2.;
         } else if (this.protoblock.args === 0) {
@@ -1201,7 +1259,7 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock._doOpenMedia(thisBlock);
                 } else if (myBlock.name === 'loadFile') {
                     myBlock._doOpenMedia(thisBlock);
-                } else if (['text', 'number', 'solfege', 'notename'].indexOf(myBlock.name) !== -1) {
+                } else if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname'].indexOf(myBlock.name) !== -1) {
                     if(!myBlock.trash)
                     {
                         myBlock._changeLabel();
@@ -1380,7 +1438,7 @@ function Block(protoblock, blocks, overrideName) {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
             }
-        } else if (['text', 'solfege', 'notename', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
+        } else if (['text', 'solfege', 'notename', 'modename', 'drumname', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
             if (!haveClick) {
                 // Simulate click on Android.
                 var d = new Date();
@@ -1514,6 +1572,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'notename') {
+            console.log('notename');
             var type = 'notename';
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
             const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
@@ -1555,6 +1614,51 @@ function Block(protoblock, blocks, overrideName) {
             labelElem.innerHTML = labelHTML;
             this.label = docById('notenameLabel');
             this.labelattr = docById('noteattrLabel');
+        } else if (this.name === 'modename') {
+            var type = 'modename';
+            if (this.value != null) {
+                var selectedmode = this.value[0];
+            } else {
+                var selectedmode = 'Major';
+            }
+
+            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            for (var i = 0; i < MODENAMES.length; i++) {
+                if (selectednote === MODENAMES[i][0]) {
+                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
+                } else {
+                    labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('modenameLabel');
+        } else if (this.name === 'drumname') {
+            var type = 'drumname';
+            if (this.value != null) {
+                var selecteddrum = getDrumName(this.value);
+            } else {
+                var selecteddrum = getDrumName(DEFAULTDRUM);
+            }
+
+            var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            for (var i = 0; i < DRUMNAMES.length; i++) {
+                if (DRUMNAMES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + DRUMNAMES[i][1] + '">' + DRUMNAMES[i][1] + '</option>';
+                } else if (selecteddrum === DRUMNAMES[i][0]) {
+                    labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
+                } else if (selecteddrum === DRUMNAMES[i][1]) {
+                    labelHTML += '<option value="' + selecteddrum + '" selected>' + selecteddrum + '</option>';
+                } else {
+                    labelHTML += '<option value="' + DRUMNAMES[i][0] + '">' + DRUMNAMES[i][0] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('drumnameLabel');
         } else {
             var type = 'number';
             labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
@@ -1637,7 +1741,17 @@ function Block(protoblock, blocks, overrideName) {
     this._labelChanged = function() {
         // Update the block values as they change in the DOM label.
         if (this == null) {
+            console.log('cannot find block associated with label change');
+            // console.log('unlock');
+            this._label_lock = false;
             return;
+        }
+
+        if (this._label_lock) {
+            console.log('changing label lock already set');
+        } else {
+            // console.log('lock');
+            this._label_lock = true;
         }
 
         this.label.style.display = 'none';
@@ -1661,9 +1775,41 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
+
         if (oldValue === newValue) {
             // Nothing to do in this case.
+            // console.log('unlock');
+            this._label_lock = false;
             return;
+        }
+
+        var c = this.connections[0];
+        if (this.name === 'text' && c != null) {
+            var cblock = this.blocks.blockList[c];
+            switch (cblock.name) {
+            case 'action':
+                var that = this;
+                setTimeout(function () {
+                    that.blocks.palettes.removeActionPrototype(oldValue);
+                }, 1000);
+                // Ensure new name is unique.
+                var uniqueValue = this.blocks.findUniqueActionName(newValue);
+                if (uniqueValue !== newValue) {
+                    console.log('old name: ' + oldValue + ' new name: ' + newValue + ' unique name: ' + uniqueValue);
+                    newValue = uniqueValue;
+                    this.value = newValue;
+                    var label = this.value.toString();
+                    if (label.length > 8) {
+                        label = label.substr(0, 7) + '...';
+                    }
+                    this.text.text = label;
+                    this.label.value = newValue;
+                    this.updateCache();
+                }
+                break;
+            default:
+                break;
+            }
         }
 
         // Update the block value and block text.
@@ -1717,8 +1863,15 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 }   
+                if (oldValue === _('action')) {
+                    console.log('newNameddoBlock: ' + newValue);
+                    this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+                    this.blocks.setActionProtoVisiblity(false);
+                }
                 this.blocks.renameNameddos(oldValue, newValue);
+                this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('action');
+                this.blocks.palettes.show();
                 break;
             case 'storein':
                 // If the label was the name of a storein, update the
@@ -1730,11 +1883,28 @@ function Block(protoblock, blocks, overrideName) {
                 // Rename both box <- name and namedbox blocks.
                 this.blocks.renameBoxes(oldValue, newValue);
                 this.blocks.renameNamedboxes(oldValue, newValue);
+                this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('boxes');
+                this.blocks.palettes.show();
+                break;
+            case 'setdrum':
+            case 'playdrum':
+                if (newValue.slice(0, 4) === 'http') {
+                    this.blocks.logo.synth.loadSynth(newValue);
+                }
                 break;
             default:
                 break;
             }
+        }
+
+        // We are done changing the label, so unlock.
+        // console.log('unlock');
+        this._label_lock = false;
+
+        // Load the synth for the selected drum.
+        if (this.name === 'drumname') {
+            this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
         }
     };
 

@@ -177,7 +177,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+            if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                 myBlock.collapseToggle();
             }
         }
@@ -824,6 +824,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     // Don't break the connection between a block and
                     // a hidden block below it.
                     continue;
+                } else if ((['backward', 'status'].indexOf(this.blockList[b].name) !== -1) && (i === 1) && (this.blockList[b].connections[1] != null) && (this.blockList[this.blockList[b].connections[1]].isNoHitBlock())) {
+                    // Don't break the connection betweem a backward
+                    // block and a hidden block attached to its clamp.
+                    continue;
                 }
 
                 // Look for available connections.
@@ -892,7 +896,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     } else if (['doArg', 'nameddoArg'].indexOf(this.blockList[newBlock].name) !== -1 && newConnection === this.blockList[newBlock].connections.length - 1) {
                         // If it is the bottom of the flow, insert as
                         // usual.
-                        var bottom = this._findBottomBlock(thisBlock);
+                        var bottom = this.findBottomBlock(thisBlock);
                         this.blockList[connection].connections[0] = bottom;
                         this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
                     } else {
@@ -952,7 +956,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         this.moveBlockRelative(this.dragGroup[c], 40, 40);
                     }
                 } else {
-                    var bottom = this._findBottomBlock(thisBlock);
+                    var bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
                     this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
                 }
@@ -970,7 +974,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     this.deleteNextDefault(bottom);
                 }
             }
-	    
+            
             // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
@@ -1244,7 +1248,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (myBlock.loadComplete) {
             myBlock.container.updateCache();
         } else {
-            console.log('load not yet complete for ' + blk);
+            console.log('load not yet complete for (' + blk + ') ' + myBlock.name);
         }
     };
 
@@ -1286,16 +1290,52 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         return blk;
     };
 
-    this._findBottomBlock = function (blk) {
+    this.sameGeneration = function(firstBlk, childBlk) {
+        if (firstBlk == null || childBlk == null) {
+            return false;
+        }
+
+        if (firstBlk === childBlk) {
+            return true;
+	}
+
+	var myBlock = this.blockList[firstBlk];
+        if (myBlock.connections == null) {
+            return false;
+        }
+
+        if (myBlock.connections.length === 0) {
+            return false;
+        }
+
+        var bottomBlockLoop = 0;
+        while (last(myBlock.connections) != null) {
+            bottomBlockLoop += 1;
+            if (bottomBlockLoop > 2 * this.blockList.length) {
+                // Could happen if the block data is malformed.
+                console.log('infinite loop finding bottomBlock?');
+                break;
+            }
+            blk = last(myBlock.connections);
+            myBlock = this.blockList[blk];
+            if (blk === childBlk) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    this.findBottomBlock = function (blk) {
         // Find the bottom block in a stack.
         if (blk == null) {
             return null;
         }
 
-        var myBlock = this.blockList[blk];
+	var myBlock = this.blockList[blk];
         if (myBlock.connections == null) {
             return blk;
         }
+
         if (myBlock.connections.length === 0) {
             return blk;
         }
@@ -1490,11 +1530,18 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             console.log('makeNewBlock: no prototype for ' + name);
             return null;
         }
+
         if (this.protoBlockDict[name] == null) {
             // Should never happen
             console.log('makeNewBlock: no prototype for ' + name);
             return null;
         }
+
+        // If we drag in a synth block, we need to load the synth.
+        if (['sine', 'sawtooth', 'triangle', 'square'].indexOf(name) !== -1) {
+            this.logo.synth.loadSynth(name);
+        }
+
         if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(name) !== -1) {
             this.blockList.push(new Block(this.protoBlockDict[name], this, postProcessArg[1]));
         } else if (name === 'namedarg') {
@@ -1502,6 +1549,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         } else {
             this.blockList.push(new Block(this.protoBlockDict[name], this));
         }
+
         if (last(this.blockList) == null) {
             // Should never happen
             console.log('failed to make protoblock for ' + name);
@@ -1581,6 +1629,26 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             };
 
             postProcessArg = [thisBlock, 'G'];
+        } else if (name === 'drumname') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                me.blockList[thisBlock].value = value;
+                me.blockList[thisBlock].text.text = value;
+                me.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'kick'];
+        } else if (name === 'modename') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                me.blockList[thisBlock].value = value;
+                me.blockList[thisBlock].text.text = value;
+                me.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'Major'];
         } else if (name === 'number') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1685,13 +1753,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
-                value = this._findUniqueActionName(_('action'));
+                value = this.findUniqueActionName(_('action'));
                 // console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
                     // console.log('calling newNameddoBlock with value ' + value);
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
+                    this.palettes.hide();
                     this.palettes.updatePalettes('action');
+                    this.palettes.show();
                 }
             }
 
@@ -1865,12 +1935,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
         // Force an update if the name has changed.
         if (stateChanged) {
+            this.palettes.hide();
             this.palettes.updatePalettes('action');
+            this.palettes.show();
         }
     }
 
-    this._findUniqueActionName = function (name) {
-        // If we have a stack named 'action', make te protoblock visible.
+    this.findUniqueActionName = function (name) {
+        // If we have a stack named 'action', make the protoblock visible.
         if (name === _('action')) {
             this.setActionProtoVisiblity(true);
         }
@@ -1878,9 +1950,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // Make sure we don't make two actions with the same name.
         var actionNames = [];
         for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') {
+            if ((this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') && !this.blockList[blk].trash) {
                 var c = this.blockList[blk].connections[0];
-                if (c != null && this.blockList[c].name === 'action') {
+                if (c != null && this.blockList[c].name === 'action' && !this.blockList[c].trash) {
                     actionNames.push(this.blockList[blk].value);
                 }
             }
@@ -1893,6 +1965,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             i += 1;
         }
         return value;
+    };
+
+    this._findDrumURLs = function() {
+        // Make sure we initialize any drum with a URL name.
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') {
+                var c = this.blockList[blk].connections[0];
+                if (c != null && ['playdrum', 'setdrum'].indexOf(this.blockList[c].name) !== -1) {
+                    if (this.blockList[blk].value.slice(0, 4) === 'http') {
+                        this.logo.synth.loadSynth(this.blockList[blk].value);
+                    }
+                }
+            }
+        }
     };
 
     this.renameBoxes = function (oldName, newName) {
@@ -1952,7 +2038,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
         // Force an update if the name has changed.
         if (nameChanged) {
+            this.palettes.hide();
             this.palettes.updatePalettes('boxes');
+            this.palettes.show();
         }
     };
 
@@ -1987,6 +2075,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
 
     this.renameNameddos = function (oldName, newName) {
+        console.log(oldName + ' ' + newName);
         if (oldName === newName) {
             return;
         }
@@ -2002,20 +2091,19 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     }
 
                     this.blockList[blk].overrideName = label;
-                    // console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
+                    console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
                     this.blockList[blk].regenerateArtwork();
                 }
             }
         }
 
         // Update the palette
-        // console.log('updating the palette in renameNameddos');
         var actionsPalette = this.palettes.dict['action'];
         var nameChanged = false;
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
             if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] !== _('action') && block.defaults[0] === oldName) {
-                // console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
+                console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
             }
@@ -2023,7 +2111,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
         // Force an update if the name has changed.
         if (nameChanged) {
+            this.palettes.hide();
             this.palettes.updatePalettes('action');
+            this.palettes.show();
         }
     };
 
@@ -2089,7 +2179,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
         myNamedArgBlock.palette.add(myNamedArgBlock);
         // Force regeneration of palette after adding new block.
+        this.palettes.hide();
         this.palettes.updatePalettes('action');
+        this.palettes.show();
     };
 
     this._removeNamedoEntries = function (name) {
@@ -2502,8 +2594,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
             switch (name) {
             case 'action':
+            case 'pitchdrummatrix':
             case 'matrix':
             case 'drum':
+	    case 'status':
             case 'start':
                 if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
                     if (blkData[1][1]['collapsed']) {
@@ -2599,7 +2693,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
 
         if (updatePalettes) {
+            this.palettes.hide();
             this.palettes.updatePalettes('action');
+            this.palettes.show();
         }
 
         // Append to the current set of blocks.
@@ -2620,7 +2716,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     blkInfo = [blkData[1][0], {'value': null}];
                 } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) !== -1) {
                     blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1][0]) !== -1) {
+                    if (COLLAPSABLES.indexOf(blkData[1][0]) !== -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -2628,7 +2724,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             } else {
                 blkInfo = [blkData[1], {'value': null}];
-                if (['start', 'drum', 'action', 'matrix', 'hat'].indexOf(blkData[1]) !== -1) {
+                if (COLLAPSABLES.indexOf(blkData[1]) !== -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -2636,7 +2732,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (['start', 'drum', 'matrix', 'action'].indexOf(name) !== -1) {
+            if (COLLAPSABLES.indexOf(name) !== -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
@@ -2673,7 +2769,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'swing':
             case 'crescendo':
             case 'setnotevolume2':
+            case 'pitchdrummatrix':
             case 'matrix':
+            case 'status':
             case 'tuplet2':
             case 'fill':
             case 'hollowline':
@@ -2919,8 +3017,29 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
                 };
+		this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'modename':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                };
+		this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+            case 'drumname':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+
+                // Load the synth for this drum
+                this.logo.synth.loadSynth(getDrumSynthName(value));
                 break;
             case 'media':
                 // Load a thumbnail into a media blocks.
@@ -3122,6 +3241,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return;
         }
 
+        this._findDrumURLs();
+
         this.updateBlockPositions();
 
         this._cleanupStacks();
@@ -3191,11 +3312,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
         if (updatePalettes) {
             // console.log('in checkPaletteEntries');
+            this.palettes.hide();
             if (name === 'storein') {
                 this.palettes.updatePalettes('boxes');
             } else {
                 this.palettes.updatePalettes('action');
             }
+            this.palettes.show();
         }
     };
 
@@ -3269,40 +3392,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
 
-            var blockPalette = this.palettes.dict['action'];
-            var blockRemoved = false;
-
-            console.log('removing ' + actionName);
-            for (var blk = 0; blk < blockPalette.protoList.length; blk++) {
-                var block = blockPalette.protoList[blk];
-                if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] === actionName) {
-                    // Remove the palette protoList entry for this block.
-                    blockPalette.remove(block, actionName);
-
-                    // And remove it from the protoBlock dictionary.
-                    if (this.protoBlockDict['myDo_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        delete this.protoBlockDict['myDo_' + actionName];
-                    } else if (this.protoBlockDict['myCalc_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        delete this.protoBlockDict['myCalc_' + actionName];
-                    } else if (this.protoBlockDict['myDoArg_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        delete this.protoBlockDict['myDoArg_' + actionName];
-                    } else if (this.protoBlockDict['myCalcArg_' + actionName]) {
-                        // console.log('deleting protoblocks for action ' + actionName);
-                        delete this.protoBlockDict['myCalcArg_' + actionName];
-                    }
-                    blockPalette.y = 0;
-                    blockRemoved = true;
-                    break;
-                }
-            }
-
-            // Force an update if a block was removed.
-            if (blockRemoved) {
-                this.palettes.updatePalettes('action');
-            }
+            this.palettes.removeActionPrototype(actionName);
         }
     };
 

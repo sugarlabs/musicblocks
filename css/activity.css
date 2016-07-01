@@ -196,6 +196,15 @@ input.text {
   border: 0 !important;
   width: 100px; }
 
+input.drum {
+  background-color: #00a09a !important; /* */
+  text-align: center;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100px; }
+
 input.number {
   background-color: #ffb2bc !important; /* 0RP 8/10 */
   text-align: center;
@@ -217,6 +226,28 @@ table {
 #canvas {
   overflow-y: visible; }
 
+#pitchdrummatrix {
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  border-style: solid;
+  border: 0 !important;
+  background: rgba(255, 225, 255, 0.85);
+  -webkit-user-select: none;
+  overflow-x: scroll !important;
+}
+
+#statusmatrix {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  border-style: solid;
+  border: 0 !important;
+  background: rgba(255, 225, 255, 0.85);
+  -webkit-user-select: none;
+  overflow-x: scroll !important;
+}
+
 #matrix {
   position: absolute;
   top: 20%;
@@ -225,7 +256,6 @@ table {
   border: 0 !important;
   background: rgba(255, 225, 255, 0.85);
   -webkit-user-select: none;
-}
   overflow-x: scroll !important;
 }
 

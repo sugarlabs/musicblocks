@@ -23,910 +23,690 @@
   </metadata>
   <defs
      id="defs3668" />
-  <g
-     transform="translate(2.3148641,1.9935181e-5)"
-     id="g3869">
-    <g
-       transform="translate(336,95.124065)"
-       id="g3423-1">
-      <path
-         d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
-         id="path3194-9"
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text3196-5"
-         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="49"
-           id="tspan3198-01">pitch</tspan>
-      </text>
-      <text
-         id="text3200-4"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="22.5"
-           id="tspan3202-55">note</tspan>
-      </text>
-      <text
-         id="text3204-8"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="64.5"
-           id="tspan3206-1">octave</tspan>
-      </text>
-    </g>
-    <g
-       id="g4-4"
-       transform="matrix(2,0,0,2,434,95.124065)">
-      <filter
-         style="color-interpolation-filters:sRGB"
-         id="dropshadow-3"
-         height="1.3">
-        <feGaussianBlur
-           id="feGaussianBlur7-0"
-           stdDeviation="3"
-           in="SourceAlpha" />
-        <feOffset
-           id="feOffset9-3"
-           result="offsetblur"
-           dy="2"
-           dx="2" />
-        <feComponentTransfer
-           id="feComponentTransfer11-1">
-          <feFuncA
-             id="feFuncA13-6"
-             slope="0.2"
-             type="linear" />
-        </feComponentTransfer>
-        <feMerge
-           id="feMerge15-6">
-          <feMergeNode
-             id="feMergeNode17-6" />
-          <feMergeNode
-             id="feMergeNode19-01"
-             in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <path
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path21-38"
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
-      <text
-         x="25"
-         style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
-         id="text23-65">
-        <tspan
-           id="tspan25-85"
-           y="13"
-           x="35">ti</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(152.16364,191.9483)"
-       id="g3710-7">
-      <path
-         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-6-0"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-3"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="333.83636"
-         y="-54.824242">
-        <tspan
-           x="353.83636"
-           y="-28.824242"
-           id="tspan25-8-27">4</tspan>
-      </text>
-    </g>
-    <g
-       id="g4-9-5"
-       transform="matrix(2,0,0,2,434,263.12407)">
-      <filter
-         style="color-interpolation-filters:sRGB"
-         id="dropshadow-7-1"
-         height="1.3">
-        <feGaussianBlur
-           id="feGaussianBlur7-08-2"
-           stdDeviation="3"
-           in="SourceAlpha" />
-        <feOffset
-           id="feOffset9-1-5"
-           result="offsetblur"
-           dy="2"
-           dx="2" />
-        <feComponentTransfer
-           id="feComponentTransfer11-5-5">
-          <feFuncA
-             id="feFuncA13-3-6"
-             slope="0.2"
-             type="linear" />
-        </feComponentTransfer>
-        <feMerge
-           id="feMerge15-1-2">
-          <feMergeNode
-             id="feMergeNode17-3-2" />
-          <feMergeNode
-             id="feMergeNode19-0-7"
-             in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <path
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path21-2-3"
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
-      <text
-         x="25"
-         style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
-         id="text23-0-6">
-        <tspan
-           id="tspan25-7-2"
-           y="13"
-           x="35">do</tspan>
-      </text>
-    </g>
-    <g
-       id="g4-2-3"
-       transform="matrix(2,0,0,2,434,431.12406)">
-      <filter
-         style="color-interpolation-filters:sRGB"
-         id="dropshadow-6-9"
-         height="1.3">
-        <feGaussianBlur
-           id="feGaussianBlur7-6-3"
-           stdDeviation="3"
-           in="SourceAlpha" />
-        <feOffset
-           id="feOffset9-0-2"
-           result="offsetblur"
-           dy="2"
-           dx="2" />
-        <feComponentTransfer
-           id="feComponentTransfer11-7-8">
-          <feFuncA
-             id="feFuncA13-7-2"
-             slope="0.2"
-             type="linear" />
-        </feComponentTransfer>
-        <feMerge
-           id="feMerge15-19-4">
-          <feMergeNode
-             id="feMergeNode17-1-9" />
-          <feMergeNode
-             id="feMergeNode19-3-7"
-             in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <path
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path21-3-2"
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
-      <text
-         x="25"
-         style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
-         id="text23-6-7">
-        <tspan
-           id="tspan25-9-2"
-           y="13"
-           x="35">re</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(152.16364,359.94831)"
-       id="g3710-4-2">
-      <path
-         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-6-7-2"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-8-9"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="333.83636"
-         y="-54.824242">
-        <tspan
-           x="353.83636"
-           y="-28.824242"
-           id="tspan25-8-2-4">5</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(152.16364,527.94831)"
-       id="g3710-3-6">
-      <path
-         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-6-72-1"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-5-2"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="333.83636"
-         y="-54.824242">
-        <tspan
-           x="353.83636"
-           y="-28.824242"
-           id="tspan25-8-7-3">5</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(336,431.12406)"
-       id="g3423-9-4">
-      <path
-         d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
-         id="path3194-6-6"
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text3196-0-8"
-         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="49"
-           id="tspan3198-1-9">pitch</tspan>
-      </text>
-      <text
-         id="text3200-46-5"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="22.5"
-           id="tspan3202-3-0">note</tspan>
-      </text>
-      <text
-         id="text3204-4-2"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="64.5"
-           id="tspan3206-6-2">octave</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(336,263.12407)"
-       id="g3423-5-5">
-      <path
-         d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
-         id="path3194-3-8"
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text3196-7-6"
-         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="49"
-           id="tspan3198-0-1">pitch</tspan>
-      </text>
-      <text
-         id="text3200-6-0"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="22.5"
-           id="tspan3202-5-0">note</tspan>
-      </text>
-      <text
-         id="text3204-9-5"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="64.5"
-           id="tspan3206-0-8">octave</tspan>
-      </text>
-    </g>
-    <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-       id="path3035-4"
-       d="m 319,70.124085 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.47715 -10,9.999985 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12.00001 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
-    <text
-       x="318"
-       y="53.124088"
-       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text3037-9">
-      <tspan
-         id="tspan3039-9"
-         y="83.624092"
-         x="326">note</tspan>
-    </text>
-    <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-       id="path21-6-1-1"
-       d="m 431,54.124085 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
-    <text
-       y="53.124088"
-       x="466"
-       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text23-9-82-4">
-      <tspan
-         id="tspan25-8-5-6"
-         y="79.124092"
-         x="486">4</tspan>
-    </text>
-    <g
-       transform="translate(318,117.99996)"
-       id="g3689-3">
-      <path
-         d="m 1,288.12411 0,-8 c 0,-4.41827 3.58173,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40,0 8,0 c 4.41828,0 8.00001,3.58173 8.00001,8 l 0,8 -8.00001,0 0,-6 -8,0 0,20 8,0 0,-6 8.00001,0 0,8 c 0,4.41828 -3.58173,8 -8.00001,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.47716 -10,10 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64206,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41827,0 -8,-3.58172 -8,-8 l 0,-8 z"
-         id="path3035-3-6"
-         style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text3037-5-0"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         y="271.12411"
-         x="0">
-        <tspan
-           x="8"
-           y="301.62411"
-           id="tspan3039-8-4">note</tspan>
-      </text>
-      <path
-         d="m 113.00001,272.12412 119.99999,0 0,40 -119.99999,0 0,-16 0,-2 -12.00001,0 0,6 -4,0 0,-16 4,0 0,6 12.00001,0 0,-2 z"
-         id="path21-6-1-2-1"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-82-1-8"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="148"
-         y="271.12411">
-        <tspan
-           x="168"
-           y="297.12411"
-           id="tspan25-8-5-3-5">2</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(318,41.999965)"
-       id="g3680-5">
-      <g
-         id="g3674-1"
-         transform="translate(0,148)">
-        <path
-           style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-           id="path3035-8-1"
-           d="m 1,48.124115 0,-8 c 0,-4.418278 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40.000002,0 7.999998,0 c 4.41828,0 8,3.581722 8,8 l 0,8 -8,0 0,-6 -7.999998,0 0,20 7.999998,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -7.999998,0 -40.000002,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.477153 -10,10 l 0,8 0,50.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
-        <text
-           x="3.7304687e-06"
-           y="31.124115"
-           style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-           id="text3037-0-1">
-          <tspan
-             id="tspan3039-6-1"
-             y="61.624119"
-             x="8.0000038">note</tspan>
-        </text>
-        <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-           id="path21-6-1-0-1"
-           d="m 113,32.124118 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -3.999998,0 0,-16 3.999998,0 0,6 12,0 0,-2 z" />
-      </g>
-      <text
-         id="text23-9-82-5-8"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="148"
-         y="181.12411">
-        <tspan
-           x="168"
-           y="207.12411"
-           id="tspan25-8-5-1-3">4</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(318,-166.00004)"
-       id="g4012-3">
-      <path
-         d="m -17,195.56207 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 10,-12 10,12 18,0 70,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -70,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.07773 -7.07107,2.92893 C 0.07773,224.3422 -1,226.94407 -1,229.56207 l 0,8 0,468 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.5312466,2.29397 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18878 -3.93628,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81122 -8,-8 l 0,-8 z"
-         id="path3027-4-2"
-         style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         x="-18.055397"
-         y="164.27332"
-         id="text3029-4-9"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
-        <tspan
-           x="-10.055397"
-           y="207.27332"
-           id="tspan3031-5-3">action</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(318,-166.00004)"
-       id="g4017-9">
-      <path
-         d="m 125,179.56207 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-2-0-2"
-         style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         x="131.21786"
-         y="178.01807"
-         id="text23-2-3"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
-        <tspan
-           x="151.21786"
-           y="204.01805"
-           id="tspan25-1-1">chunk1</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     id="g3972">
-    <g
-       transform="translate(36,95.12408)"
-       id="g3423">
-      <path
-         d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
-         id="path3194"
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text3196"
-         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="49"
-           id="tspan3198">pitch</tspan>
-      </text>
-      <text
-         id="text3200"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="22.5"
-           id="tspan3202">note</tspan>
-      </text>
-      <text
-         id="text3204"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="64.5"
-           id="tspan3206">octave</tspan>
-      </text>
-    </g>
-    <g
-       id="g4"
-       transform="matrix(2,0,0,2,134,95.12408)">
-      <filter
-         style="color-interpolation-filters:sRGB"
-         id="dropshadow"
-         height="1.3">
-        <feGaussianBlur
-           id="feGaussianBlur7"
-           stdDeviation="3"
-           in="SourceAlpha" />
-        <feOffset
-           id="feOffset9"
-           result="offsetblur"
-           dy="2"
-           dx="2" />
-        <feComponentTransfer
-           id="feComponentTransfer11">
-          <feFuncA
-             id="feFuncA13"
-             slope="0.2"
-             type="linear" />
-        </feComponentTransfer>
-        <feMerge
-           id="feMerge15">
-          <feMergeNode
-             id="feMergeNode17" />
-          <feMergeNode
-             id="feMergeNode19"
-             in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <path
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path21"
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
-      <text
-         x="25"
-         style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
-         id="text23">
-        <tspan
-           id="tspan25"
-           y="13"
-           x="35">sol</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(-147.83636,191.94832)"
-       id="g3710">
-      <path
-         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-6"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="333.83636"
-         y="-54.824242">
-        <tspan
-           x="353.83636"
-           y="-28.824242"
-           id="tspan25-8">4</tspan>
-      </text>
-    </g>
-    <g
-       id="g4-9"
-       transform="matrix(2,0,0,2,134,263.12408)">
-      <filter
-         style="color-interpolation-filters:sRGB"
-         id="dropshadow-7"
-         height="1.3">
-        <feGaussianBlur
-           id="feGaussianBlur7-08"
-           stdDeviation="3"
-           in="SourceAlpha" />
-        <feOffset
-           id="feOffset9-1"
-           result="offsetblur"
-           dy="2"
-           dx="2" />
-        <feComponentTransfer
-           id="feComponentTransfer11-5">
-          <feFuncA
-             id="feFuncA13-3"
-             slope="0.2"
-             type="linear" />
-        </feComponentTransfer>
-        <feMerge
-           id="feMerge15-1">
-          <feMergeNode
-             id="feMergeNode17-3" />
-          <feMergeNode
-             id="feMergeNode19-0"
-             in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <path
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path21-2"
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
-      <text
-         x="25"
-         style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
-         id="text23-0">
-        <tspan
-           id="tspan25-7"
-           y="13"
-           x="35">la</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(-147.83636,359.94832)"
-       id="g3710-4">
-      <path
-         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-6-7"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-8"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="333.83636"
-         y="-54.824242">
-        <tspan
-           x="353.83636"
-           y="-28.824242"
-           id="tspan25-8-2">4</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(36,263.12408)"
-       id="g3423-5">
-      <path
-         d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
-         id="path3194-3"
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text3196-7"
-         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="49"
-           id="tspan3198-0">pitch</tspan>
-      </text>
-      <text
-         id="text3200-6"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="22.5"
-           id="tspan3202-5">note</tspan>
-      </text>
-      <text
-         id="text3204-9"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="94"
-           y="64.5"
-           id="tspan3206-0">octave</tspan>
-      </text>
-    </g>
-    <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-       id="path3035"
-       d="m 19,70.124095 0,-8 c 0,-4.418278 3.581722,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40,0 8,0 c 4.41828,0 8,3.581722 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.522847,0 -10,4.477153 -10,9.999995 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.642051,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.713641,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.418278,0 -8,-3.58172 -8,-8 l 0,-8 z" />
-    <text
-       x="18"
-       y="53.124096"
-       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text3037">
-      <tspan
-         id="tspan3039"
-         y="83.624092"
-         x="26">note</tspan>
-    </text>
-    <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-       id="path21-6-1"
-       d="m 131,54.124098 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
-    <text
-       y="53.1241"
-       x="166"
-       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text23-9-82">
-      <tspan
-         id="tspan25-8-5"
-         y="79.1241"
-         x="186">4</tspan>
-    </text>
-    <g
-       id="g3776">
-      <path
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-         id="path21-3"
-         d="m 151,432.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
-      <text
-         y="431.12408"
-         x="184"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         id="text23-6">
-        <tspan
-           id="tspan25-9"
-           y="457.12408"
-           x="204">ti</tspan>
-      </text>
-      <path
-         d="m 151,474.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-6-72"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-5"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="186"
-         y="473.12408">
-        <tspan
-           x="206"
-           y="499.12408"
-           id="tspan25-8-7">4</tspan>
-      </text>
-      <path
-         d="m 37,448.12408 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
-         id="path3194-6"
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         y="431.12408"
-         x="36"
-         id="text3196-0"
-         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="130"
-           y="480.12408"
-           id="tspan3198-1">pitch</tspan>
-      </text>
-      <text
-         y="431.12408"
-         x="36"
-         id="text3200-46"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="130"
-           y="453.62408"
-           id="tspan3202-3">note</tspan>
-      </text>
-      <text
-         y="431.12408"
-         x="36"
-         id="text3204-4"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="130"
-           y="495.62408"
-           id="tspan3206-6">octave</tspan>
-      </text>
-      <path
-         d="m 19,406.12409 0,-8 c 0,-4.41827 3.58173,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40,0 8,0 c 4.41828,0 8.00001,3.58173 8.00001,8 l 0,8 -8.00001,0 0,-6 -8,0 0,20 8,0 0,-6 8.00001,0 0,8 c 0,4.41828 -3.58173,8 -8.00001,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.47716 -10,10 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64206,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41827,0 -8,-3.58172 -8,-8 l 0,-8 z"
-         id="path3035-3"
-         style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text3037-5"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         y="389.12408"
-         x="18">
-        <tspan
-           x="26"
-           y="419.62408"
-           id="tspan3039-8">note</tspan>
-      </text>
-      <path
-         d="m 131.00001,390.1241 119.99999,0 0,40 -119.99999,0 0,-16 0,-2 -12.00001,0 0,6 -4,0 0,-16 4,0 0,6 12.00001,0 0,-2 z"
-         id="path21-6-1-2"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-82-1"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="166"
-         y="389.12408">
-        <tspan
-           x="186"
-           y="415.12408"
-           id="tspan25-8-5-3">4</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(18,41.99998)"
-       id="g3680">
-      <g
-         id="g3674"
-         transform="translate(0,148)">
-        <path
-           style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-           id="path3035-8"
-           d="m 1,48.124115 0,-8 c 0,-4.418278 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40.000002,0 7.999998,0 c 4.41828,0 8,3.581722 8,8 l 0,8 -8,0 0,-6 -7.999998,0 0,20 7.999998,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -7.999998,0 -40.000002,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.477153 -10,10 l 0,8 0,50.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
-        <text
-           x="3.7304687e-06"
-           y="31.124115"
-           style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-           id="text3037-0">
-          <tspan
-             id="tspan3039-6"
-             y="61.624119"
-             x="8.0000038">note</tspan>
-        </text>
-        <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-           id="path21-6-1-0"
-           d="m 113,32.124118 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -3.999998,0 0,-16 3.999998,0 0,6 12,0 0,-2 z" />
-      </g>
-      <text
-         id="text23-9-82-5"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="148"
-         y="181.12411">
-        <tspan
-           x="168"
-           y="207.12411"
-           id="tspan25-8-5-1">4</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(18,-166.00002)"
-       id="g4012">
-      <path
-         d="m -17,195.56207 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 10,-12 10,12 18,0 70,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -70,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.07773 -7.07107,2.92893 C 0.07773,224.3422 -1,226.94407 -1,229.56207 l 0,8 0,634 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.5312466,2.29397 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18878 -3.93628,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81122 -8,-8 l 0,-8 z"
-         id="path3027-4"
-         style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         x="-18.055397"
-         y="164.27332"
-         id="text3029-4"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
-        <tspan
-           x="-10.055397"
-           y="207.27332"
-           id="tspan3031-5">action</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(18,-166.00002)"
-       id="g4017">
-      <path
-         d="m 125,179.56207 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-2-0"
-         style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         x="131.21786"
-         y="178.01807"
-         id="text23-2"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
-        <tspan
-           x="151.21786"
-           y="204.01805"
-           id="tspan25-1">chunk</tspan>
-      </text>
-    </g>
-    <g
-       transform="translate(0,167.99999)"
-       id="g3776-7">
-      <path
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
-         id="path21-3-3"
-         d="m 151,432.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
-      <text
-         y="431.12408"
-         x="184"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         id="text23-6-5">
-        <tspan
-           id="tspan25-9-8"
-           y="457.12408"
-           x="204">sol</tspan>
-      </text>
-      <path
-         d="m 151,474.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
-         id="path21-6-72-4"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-5-6"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="186"
-         y="473.12408">
-        <tspan
-           x="206"
-           y="499.12408"
-           id="tspan25-8-7-2">4</tspan>
-      </text>
-      <path
-         d="m 37,448.12408 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
-         id="path3194-6-2"
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         y="431.12408"
-         x="36"
-         id="text3196-0-1"
-         style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="130"
-           y="480.12408"
-           id="tspan3198-1-1">pitch</tspan>
-      </text>
-      <text
-         y="431.12408"
-         x="36"
-         id="text3200-46-55"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="130"
-           y="453.62408"
-           id="tspan3202-3-2">note</tspan>
-      </text>
-      <text
-         y="431.12408"
-         x="36"
-         id="text3204-4-3"
-         style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-        <tspan
-           x="130"
-           y="495.62408"
-           id="tspan3206-6-29">octave</tspan>
-      </text>
-      <path
-         d="m 19,406.12409 0,-8 c 0,-4.41827 3.58173,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 40,0 8,0 c 4.41828,0 8.00001,3.58173 8.00001,8 l 0,8 -8.00001,0 0,-6 -8,0 0,20 8,0 0,-6 8.00001,0 0,8 c 0,4.41828 -3.58173,8 -8.00001,8 l -8,0 -40,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.47716 -10,10 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64206,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41827,0 -8,-3.58172 -8,-8 l 0,-8 z"
-         id="path3035-3-7"
-         style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text3037-5-3"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         y="389.12408"
-         x="18">
-        <tspan
-           x="26"
-           y="419.62408"
-           id="tspan3039-8-2">note</tspan>
-      </text>
-      <path
-         d="m 131.00001,390.1241 119.99999,0 0,40 -119.99999,0 0,-16 0,-2 -12.00001,0 0,6 -4,0 0,-16 4,0 0,6 12.00001,0 0,-2 z"
-         id="path21-6-1-2-8"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
-      <text
-         id="text23-9-82-1-4"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-         x="166"
-         y="389.12408">
-        <tspan
-           x="186"
-           y="415.12408"
-           id="tspan25-8-5-3-1">4</tspan>
-      </text>
-    </g>
-  </g>
+  <path
+     d="m 339.31486,112.12408 0,-8 a 8,8 0 0 1 8,-7.999995 l 8,0 0,3.999995 20,0 0,-3.999995 60,0 8,0 a 8,8 0 0 1 8,7.999995 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194-9"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3196-5"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="95.124084">
+    <tspan
+       x="432.31485"
+       y="144.12408"
+       id="tspan3198-01">pitch</tspan>
+  </text>
+  <text
+     id="text3200-4"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="97.124084">
+    <tspan
+       x="432.31485"
+       y="119.62408"
+       id="tspan3202-55">note</tspan>
+  </text>
+  <text
+     id="text3204-8"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="99.124084">
+    <tspan
+       x="432.31485"
+       y="163.62408"
+       id="tspan3206-1">octave</tspan>
+  </text>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-38"
+     d="m 453.31486,96.124085 120,0 0,39.999995 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     x="486.31485"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-65"
+     y="95.124084">
+    <tspan
+       id="tspan25-85"
+       y="121.12408"
+       x="506.31485">ti</tspan>
+  </text>
+  <path
+     d="m 453.31486,138.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-0"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-3"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="488.31485"
+     y="137.12408">
+    <tspan
+       x="508.31485"
+       y="163.12408"
+       id="tspan25-8-27">4</tspan>
+  </text>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-2-3"
+     d="m 453.31486,264.12409 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     x="486.31485"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-0-6"
+     y="263.12408">
+    <tspan
+       id="tspan25-7-2"
+       y="289.12408"
+       x="506.31485">do</tspan>
+  </text>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-3-2"
+     d="m 453.31486,432.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     x="486.31485"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-6-7"
+     y="431.12408">
+    <tspan
+       id="tspan25-9-2"
+       y="457.12408"
+       x="506.31485">re</tspan>
+  </text>
+  <path
+     d="m 453.31486,306.12409 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-7-2"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-8-9"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="488.31485"
+     y="305.12408">
+    <tspan
+       x="508.31485"
+       y="331.12408"
+       id="tspan25-8-2-4">5</tspan>
+  </text>
+  <path
+     d="m 453.31486,474.12409 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-72-1"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-5-2"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="488.31485"
+     y="473.12408">
+    <tspan
+       x="508.31485"
+       y="499.12408"
+       id="tspan25-8-7-3">5</tspan>
+  </text>
+  <path
+     d="m 339.31486,448.12408 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194-6-6"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3196-0-8"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="431.12408">
+    <tspan
+       x="432.31485"
+       y="480.12408"
+       id="tspan3198-1-9">pitch</tspan>
+  </text>
+  <text
+     id="text3200-46-5"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="433.12408">
+    <tspan
+       x="432.31485"
+       y="455.62408"
+       id="tspan3202-3-0">note</tspan>
+  </text>
+  <text
+     id="text3204-4-2"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="435.12408">
+    <tspan
+       x="432.31485"
+       y="499.62408"
+       id="tspan3206-6-2">octave</tspan>
+  </text>
+  <path
+     d="m 339.31486,280.12409 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194-3-8"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3196-7-6"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="263.12408">
+    <tspan
+       x="432.31485"
+       y="312.12408"
+       id="tspan3198-0-1">pitch</tspan>
+  </text>
+  <text
+     id="text3200-6-0"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="265.12408">
+    <tspan
+       x="432.31485"
+       y="287.62408"
+       id="tspan3202-5-0">note</tspan>
+  </text>
+  <text
+     id="text3204-9-5"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="338.31485"
+     y="267.12408">
+    <tspan
+       x="432.31485"
+       y="331.62408"
+       id="tspan3206-0-8">octave</tspan>
+  </text>
+  <path
+     d="m 321.31486,70.124105 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 6.92841,3.713639 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.47715 -10,9.999985 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12.00001 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z"
+     id="path3035-4"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3037-9"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     y="51.124107"
+     x="318.31485">
+    <tspan
+       x="326.31485"
+       y="81.624115"
+       id="tspan3039-9">note value</tspan>
+  </text>
+  <path
+     d="m 453.31486,54.124105 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-1-1"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-82-4"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="488.31485"
+     y="53.124107">
+    <tspan
+       x="508.31485"
+       y="79.124115"
+       id="tspan25-8-5-6">4</tspan>
+  </text>
+  <path
+     d="m 321.31486,406.12409 0,-8 c 0,-4.41827 3.58173,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 8.00001,3.58173 8.00001,8 l 0,8 -8.00001,0 0,-6 -8,0 0,20 8,0 0,-6 8.00001,0 0,8 c 0,4.41828 -3.58173,8 -8.00001,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.47716 -10,10 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64206,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41827,0 -8,-3.58172 -8,-8 l 0,-8 z"
+     id="path3035-3-6"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3037-5-0"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     y="387.12408"
+     x="318.31485">
+    <tspan
+       x="326.31485"
+       y="417.62408"
+       id="tspan3039-8-4">note value</tspan>
+  </text>
+  <path
+     d="m 453.31487,390.1241 119.99999,0 0,40 -119.99999,0 0,-16 0,-2 -12.00001,0 0,6 -4,0 0,-16 4,0 0,6 12.00001,0 0,-2 z"
+     id="path21-6-1-2-1"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-82-1-8"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="488.31485"
+     y="389.12408">
+    <tspan
+       x="508.31485"
+       y="415.12408"
+       id="tspan25-8-5-3-5">2</tspan>
+  </text>
+  <path
+     d="m 321.31486,238.1241 0,-8 c 0,-4.41827 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 8,3.58173 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.47716 -10,10 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z"
+     id="path3035-8-1"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3037-0-1"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     y="219.1241"
+     x="318.31485">
+    <tspan
+       x="326.31485"
+       y="249.62411"
+       id="tspan3039-6-1">note value</tspan>
+  </text>
+  <path
+     d="m 453.31486,222.12411 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-1-0-1"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-82-5-8"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="488.31485"
+     y="223.1241">
+    <tspan
+       x="508.31485"
+       y="249.1241"
+       id="tspan25-8-5-1-3">4</tspan>
+  </text>
+  <path
+     d="m 303.31486,29.56205 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 10,-12 10,12 18,0 70,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -70,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.07773 -7.07107,2.92893 -1.8512,1.8512 -2.92893,4.45307 -2.92893,7.07107 l 0,8 0,468 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.53125,2.29397 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18878 -3.93628,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81122 -8,-8 l 0,-8 z"
+     id="path3027-4-2"
+     style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     x="302.25946"
+     y="-1.7267046"
+     id="text3029-4-9"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+    <tspan
+       x="310.25946"
+       y="41.273296"
+       id="tspan3031-5-3">action</tspan>
+  </text>
+  <path
+     d="m 445.31486,13.56205 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-2-0-2"
+     style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     x="451.53271"
+     y="12.018046"
+     id="text23-2-3"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+    <tspan
+       x="471.53271"
+       y="38.018032"
+       id="tspan25-1-1">chunk1</tspan>
+  </text>
+  <path
+     d="m 37,112.12408 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="95.124077"
+     x="36"
+     id="text3196"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="144.12408"
+       id="tspan3198">pitch</tspan>
+  </text>
+  <text
+     y="97.124077"
+     x="36"
+     id="text3200"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="119.62408"
+       id="tspan3202">note</tspan>
+  </text>
+  <text
+     y="99.124077"
+     x="36"
+     id="text3204"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="163.62408"
+       id="tspan3206">octave</tspan>
+  </text>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21"
+     d="m 151,96.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     y="95.124077"
+     x="184"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23">
+    <tspan
+       id="tspan25"
+       y="121.12408"
+       x="204">sol</tspan>
+  </text>
+  <path
+     d="m 151,138.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="186"
+     y="137.12408">
+    <tspan
+       x="206"
+       y="163.12408"
+       id="tspan25-8">4</tspan>
+  </text>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-2"
+     d="m 151,264.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     y="263.12408"
+     x="184"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-0">
+    <tspan
+       id="tspan25-7"
+       y="289.12408"
+       x="204">la</tspan>
+  </text>
+  <path
+     d="m 151,306.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-7"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-8"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="186"
+     y="305.12408">
+    <tspan
+       x="206"
+       y="331.12408"
+       id="tspan25-8-2">4</tspan>
+  </text>
+  <path
+     d="m 37,280.12408 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194-3"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="263.12408"
+     x="36"
+     id="text3196-7"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="312.12408"
+       id="tspan3198-0">pitch</tspan>
+  </text>
+  <text
+     y="265.12408"
+     x="36"
+     id="text3200-6"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="287.62408"
+       id="tspan3202-5">note</tspan>
+  </text>
+  <text
+     y="267.12408"
+     x="36"
+     id="text3204-9"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="331.62408"
+       id="tspan3206-0">octave</tspan>
+  </text>
+  <path
+     d="m 19,70.124095 0,-8 c 0,-4.418278 3.581722,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.713641 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.522847,0 -10,4.477153 -10,9.999995 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.642051,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.713641,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.418278,0 -8,-3.58172 -8,-8 l 0,-8 z"
+     id="path3035"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3037"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     y="51.124096"
+     x="16">
+    <tspan
+       x="24"
+       y="81.624092"
+       id="tspan3039">note value</tspan>
+  </text>
+  <path
+     d="m 151,54.124098 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-1"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-82"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="186"
+     y="53.1241">
+    <tspan
+       x="206"
+       y="79.1241"
+       id="tspan25-8-5">4</tspan>
+  </text>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-3"
+     d="m 151,432.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     y="431.12408"
+     x="184"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-6">
+    <tspan
+       id="tspan25-9"
+       y="457.12408"
+       x="204">ti</tspan>
+  </text>
+  <path
+     d="m 151,474.12408 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-72"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-5"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="186"
+     y="473.12408">
+    <tspan
+       x="206"
+       y="499.12408"
+       id="tspan25-8-7">4</tspan>
+  </text>
+  <path
+     d="m 37,448.12408 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194-6"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="431.12408"
+     x="36"
+     id="text3196-0"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="480.12408"
+       id="tspan3198-1">pitch</tspan>
+  </text>
+  <text
+     y="433.12408"
+     x="36"
+     id="text3200-46"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="455.62408"
+       id="tspan3202-3">note</tspan>
+  </text>
+  <text
+     y="435.12408"
+     x="36"
+     id="text3204-4"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="499.62408"
+       id="tspan3206-6">octave</tspan>
+  </text>
+  <path
+     d="m 19,406.12409 0,-8 c 0,-4.41827 3.58173,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.0716,3.71365 8.00001,8 l 0,8 -8.00001,0 0,-6 -8,0 0,20 8,0 0,-6 8.00001,0 0,8 c 0,4.41828 -3.58173,8 -8.00001,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.47716 -10,10 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64206,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41827,0 -8,-3.58172 -8,-8 l 0,-8 z"
+     id="path3035-3"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3037-5"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     y="387.12408"
+     x="16">
+    <tspan
+       x="24"
+       y="417.62408"
+       id="tspan3039-8">note value</tspan>
+  </text>
+  <path
+     d="m 151.00001,390.1241 119.99999,0 0,40 -119.99999,0 0,-16 0,-2 -12.00001,0 0,6 -4,0 0,-16 4,0 0,6 12.00001,0 0,-2 z"
+     id="path21-6-1-2"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-82-1"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="186"
+     y="389.12408">
+    <tspan
+       x="206"
+       y="415.12408"
+       id="tspan25-8-5-3">4</tspan>
+  </text>
+  <path
+     d="m 19,238.1241 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41827 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.47715 -10,10 l 0,8 0,50 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z"
+     id="path3035-8"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3037-0"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     y="219.1241"
+     x="16.000004">
+    <tspan
+       x="24.000004"
+       y="249.6241"
+       id="tspan3039-6">note value</tspan>
+  </text>
+  <path
+     d="m 151,222.1241 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-1-0"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-82-5"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="186"
+     y="223.1241">
+    <tspan
+       x="206"
+       y="249.1241"
+       id="tspan25-8-5-1">4</tspan>
+  </text>
+  <path
+     d="m 1,29.56205 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 10,-12 10,12 18,0 70,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -70,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.07773 -7.07107,2.92893 C 18.07773,58.34218 17,60.94405 17,63.56205 l 0,8 0,634 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.531247,2.29397 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18878 -3.93628,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81122 -8,-8 l 0,-8 z"
+     id="path3027-4"
+     style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     x="-0.055397034"
+     y="-1.7267046"
+     id="text3029-4"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+    <tspan
+       x="7.944603"
+       y="41.273296"
+       id="tspan3031-5">action</tspan>
+  </text>
+  <path
+     d="m 143,13.56205 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-2-0"
+     style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     x="149.21786"
+     y="12.018046"
+     id="text23-2"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+    <tspan
+       x="169.21786"
+       y="38.018032"
+       id="tspan25-1">chunk</tspan>
+  </text>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-3-3"
+     d="m 151,600.12407 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     y="599.12408"
+     x="184"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-6-5">
+    <tspan
+       id="tspan25-9-8"
+       y="625.12408"
+       x="204">sol</tspan>
+  </text>
+  <path
+     d="m 151,642.12407 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-72-4"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-5-6"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="186"
+     y="641.12408">
+    <tspan
+       x="206"
+       y="667.12408"
+       id="tspan25-8-7-2">4</tspan>
+  </text>
+  <path
+     d="m 37,616.12407 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194-6-2"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="599.12408"
+     x="36"
+     id="text3196-0-1"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="648.12408"
+       id="tspan3198-1-1">pitch</tspan>
+  </text>
+  <text
+     y="601.12408"
+     x="36"
+     id="text3200-46-55"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="623.62408"
+       id="tspan3202-3-2">note</tspan>
+  </text>
+  <text
+     y="603.12408"
+     x="36"
+     id="text3204-4-3"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="130"
+       y="667.62408"
+       id="tspan3206-6-29">octave</tspan>
+  </text>
+  <path
+     d="m 19,574.12408 0,-8 c 0,-4.41827 3.58173,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.0716,3.71365 8.00001,8 l 0,8 -8.00001,0 0,-6 -8,0 0,20 8,0 0,-6 8.00001,0 0,8 c 0,4.41828 -3.58173,8 -8.00001,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52284,0 -10,4.47716 -10,10 l 0,8 0,50.00001 0,7.99999 c 0,5.52285 4.64206,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41827,0 -8,-3.58172 -8,-8 l 0,-8 z"
+     id="path3035-3-7"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3037-5-3"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     y="555.12408"
+     x="16">
+    <tspan
+       x="24"
+       y="585.62408"
+       id="tspan3039-8-2">note value</tspan>
+  </text>
+  <path
+     d="m 151.00001,558.12409 119.99999,0 0,40 -119.99999,0 0,-16 0,-2 -12.00001,0 0,6 -4,0 0,-16 4,0 0,6 12.00001,0 0,-2 z"
+     id="path21-6-1-2-8"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-82-1-4"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="186"
+     y="557.12408">
+    <tspan
+       x="206"
+       y="583.12408"
+       id="tspan25-8-5-3-1">4</tspan>
+  </text>
 </svg>
