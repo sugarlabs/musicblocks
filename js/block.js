@@ -12,7 +12,7 @@
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'status'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status'];
 const NOHIT = ['hidden'];
 
 
@@ -251,6 +251,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'action':
         case 'matrix':
         case 'pitchdrummatrix':
+        case 'rhythmruler':
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
@@ -323,6 +324,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'bubbles':
         case 'cricket':
         case 'setdrum':
+        case 'rhythmruler':
         case 'repeat':
         case 'fill':
         case 'hollowline':
@@ -681,6 +683,9 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'pitchdrummatrix':
                     myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'rhythmruler':
+                    myBlock.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'drum':
                     myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
@@ -1196,7 +1201,7 @@ function Block(protoblock, blocks, overrideName) {
         var hitArea = new createjs.Shape();
         var bounds = this.container.getBounds()
 
-        if (bounds == null) {
+        if (bounds === null) {
             this._createCache();
             bounds = this.bounds;
         }
@@ -1848,6 +1853,28 @@ function Block(protoblock, blocks, overrideName) {
                 // associated run this.blocks and the palette buttons
                 // Rename both do <- name and nameddo blocks.
                 this.blocks.renameDos(oldValue, newValue);
+
+                if (oldValue === _('action')) {
+                    console.log('newNameddoBlock: ' + newValue);
+                    this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+                    this.blocks.setActionProtoVisiblity(false);
+                }
+                
+                this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+                var blockPalette = blocks.palettes.dict['action'];
+                for (var blk = 0; blk < blockPalette.protoList.length; blk++) {
+                    var block = blockPalette.protoList[blk];
+                    if(oldValue === _('action')) {
+                        if (block.name === 'nameddo' && block.defaults.length === 0) {
+                            block.hidden = true;
+                        }
+                    }
+                    else {
+                        if (block.name === 'nameddo' && block.defaults[0] === oldValue) {
+                            blockPalette.remove(block,oldValue);
+                        }
+                    }
+                }   
                 if (oldValue === _('action')) {
                     console.log('newNameddoBlock: ' + newValue);
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));

@@ -62,6 +62,8 @@ define(function (require) {
     require('howler');
     require('mespeak');
     require('Chart');
+    require('jquery.ruler');
+    require('modernizr-2.6.2.min');
 
     require('activity/utils');
     require('activity/artwork');
@@ -88,6 +90,7 @@ define(function (require) {
     require('activity/musicutils');
     require('activity/pitchtimematrix');
     require('activity/pitchdrummatrix');
+    require('activity/rhythmruler');
 
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {
@@ -588,6 +591,7 @@ define(function (require) {
 
             matrix = new Matrix();
             pitchdrummatrix = new PitchDrumMatrix();
+            rhythmruler = new RhythmRuler();
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
@@ -596,7 +600,7 @@ define(function (require) {
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(matrix, pitchdrummatrix, canvas,
+            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, canvas,
                 blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
                 onRunTurtle, getStageX, getStageY,
@@ -1424,6 +1428,7 @@ define(function (require) {
         function _doOpenSamples() {
             localStorage.setItem('isMatrixHidden', document.getElementById('matrix').style.visibility);
             localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
+            localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerbody').style.visibility);
             localStorage.setItem('isStatusHidden', document.getElementById('statusmatrix').style.visibility);
 
             if (document.getElementById('matrix').style.visibility !== 'hidden') {
@@ -1438,6 +1443,13 @@ define(function (require) {
                 document.getElementById('pitchdrummatrix').style.border = 0;
             }
 
+            if(document.getElementById('rulerbody').style.visibility !== 'hidden') {
+                console.log('hide RhythmRuler');
+                document.getElementById('rulerbody').style.visibility = 'hidden';
+                document.getElementById('rulerbody').style.border = 0;
+                document.getElementsByClassName('hRule')[0].style.visibility = 'hidden';
+                document.getElementsByClassName('mousePosBox')[0].style.visibility = 'hidden';  
+            }              
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
                 console.log('hide status');
                 document.getElementById('statusmatrix').style.visibility = 'hidden';
