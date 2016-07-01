@@ -177,7 +177,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (['start', 'action', 'drum', 'matrix', 'pitchdrummatrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+            if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                 myBlock.collapseToggle();
             }
         }
@@ -2597,6 +2597,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'pitchdrummatrix':
             case 'matrix':
             case 'drum':
+	    case 'status':
             case 'start':
                 if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
                     if (blkData[1][1]['collapsed']) {
@@ -2715,7 +2716,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     blkInfo = [blkData[1][0], {'value': null}];
                 } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) !== -1) {
                     blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (['start', 'drum', 'action', 'matrix', 'pitchdrummatrix', 'hat'].indexOf(blkData[1][0]) !== -1) {
+                    if (COLLAPSABLES.indexOf(blkData[1][0]) !== -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -2723,7 +2724,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             } else {
                 blkInfo = [blkData[1], {'value': null}];
-                if (['start', 'drum', 'action', 'matrix', 'pitchdrummatrix', 'hat'].indexOf(blkData[1]) !== -1) {
+                if (COLLAPSABLES.indexOf(blkData[1]) !== -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -2731,7 +2732,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (['start', 'drum', 'matrix', 'pitchdrummatrix', 'action'].indexOf(name) !== -1) {
+            if (COLLAPSABLES.indexOf(name) !== -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
@@ -2770,6 +2771,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'setnotevolume2':
             case 'pitchdrummatrix':
             case 'matrix':
+            case 'status':
             case 'tuplet2':
             case 'fill':
             case 'hollowline':
