@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   version="1.1"
-   width="114"
-   height="46"
-   id="svg2">
+   id="svg2"
+   height="88"
+   width="113.99999"
+   version="1.1">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -25,24 +23,102 @@
   </metadata>
   <defs
      id="defs33" />
-  <path
-     d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,33 l 0,-8 0,-8 z"
-     id="path21"
-     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
-     id="text23"
-     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans">
+     y="238.57959"
+     x="32.187191"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text27">
     <tspan
-       x="94"
-       y="28"
-       id="tspan25">set key</tspan>
+       id="tspan29"
+       y="261.07959"
+       x="126.18719" />
+  </text>
+  <g
+     transform="translate(-173.81281,238.57959)"
+     id="g7114">
+    <path
+       d="m 174.81281,-221.57959 0,-8 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 59.99999,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -59.99999,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+       id="path3194-3-8-43"
+       style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+    <text
+       id="text3196-7-6-6"
+       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+       x="174.70929"
+       y="-238.86279">
+      <tspan
+         x="268.70929"
+         y="-189.86279"
+         id="tspan3198-0-1-1">set key</tspan>
+    </text>
+    <text
+       id="text3200-6-0-8"
+       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+       x="175.22198"
+       y="-236.86279">
+      <tspan
+         x="269.22198"
+         y="-214.36279"
+         id="tspan3202-5-0-1">key</tspan>
+    </text>
+    <text
+       id="text3204-9-5-7"
+       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+       x="174.70929"
+       y="-234.86279">
+      <tspan
+         x="268.70929"
+         y="-170.36278"
+         id="tspan3206-0-8-6">mode</tspan>
+    </text>
+  </g>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3095"
+     x="224.00009"
+     y="504.43808">
+    <tspan
+       id="tspan3097"
+       y="526.93811"
+       x="334.00009" />
   </text>
   <text
-     id="text27"
-     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans">
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3107"
+     x="224.00009"
+     y="294.43808">
     <tspan
-       x="94"
-       y="22.5"
-       id="tspan29" />
+       id="tspan3109"
+       y="316.93808"
+       x="318.00009" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3033"
+     x="224.00009"
+     y="252.43805">
+    <tspan
+       id="tspan3035"
+       y="274.93805"
+       x="326.00009" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3317"
+     x="206.00009"
+     y="84.438049">
+    <tspan
+       id="tspan3319"
+       y="106.93805"
+       x="348.00009" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3095-2"
+     x="224.00009"
+     y="462.43808">
+    <tspan
+       id="tspan3097-4"
+       y="484.93808"
+       x="334.00009" />
   </text>
 </svg>

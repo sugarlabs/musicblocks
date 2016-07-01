@@ -800,7 +800,7 @@ function ProtoBlock(name) {
         this.style = 'clamp';
         this.expandable = true;
         this.size = 3;
-        this.args = 1;
+        this.args = 2;
         this.dockTypes.push('unavailable');
         this.dockTypes.push('anyin');
         this.dockTypes.push('in');

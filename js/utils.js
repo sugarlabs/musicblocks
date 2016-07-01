@@ -203,6 +203,7 @@ function _(text) {
         };
         return translation;
     } catch (e) {
+        console.log('i18n error: ' + text);
         return text;
     }
 };
@@ -630,6 +631,16 @@ function hideDOMLabel() {
     var noteattrLabel = docById('noteattrLabel');
     if (noteattrLabel !== null) {
         noteattrLabel.style.display = 'none';
+    }
+
+    var drumnameLabel = docById('drumnameLabel');
+    if (drumnameLabel !== null) {
+        drumnameLabel.style.display = 'none';
+    }
+
+    var modenameLabel = docById('modenameLabel');
+    if (modenameLabel !== null) {
+        modenameLabel.style.display = 'none';
     }
 };
 

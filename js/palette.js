@@ -260,8 +260,10 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.dict[name].hideMenu(true);
         }
 
-        this.upIndicator.visible = false;
-        this.downIndicator.visible = false;
+        if (this.upIndicator != null) {
+            this.upIndicator.visible = false;
+            this.downIndicator.visible = false;
+        }
 
         this.refreshCanvas();
     };
@@ -413,6 +415,43 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         });
     };
 
+    this.removeActionPrototype = function(actionName) {
+        var blockRemoved = false;
+        for (var blk = 0; blk < this.dict['action'].protoList.length; blk++) {
+            var block = this.dict['action'].protoList[blk];
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && (block.defaults[0] === actionName || blocks.defaults == undefined)) {
+                // Remove the palette protoList entry for this block.
+                this.dict['action'].remove(block, actionName);
+                console.log('deleting protoblocks for ' + actionName);
+
+                // And remove it from the protoBlock dictionary.
+                if (paletteBlocks.protoBlockDict['myDo_' + actionName]) {
+                    // console.log('deleting protoblocks for action ' + actionName);
+                    delete paletteBlocks.protoBlockDict['myDo_' + actionName];
+                } else if (paletteBlocks.protoBlockDict['myCalc_' + actionName]) {
+                    // console.log('deleting protoblocks for action ' + actionName);
+                    delete paletteBlocks.protoBlockDict['myCalc_' + actionName];
+                } else if (paletteBlocks.protoBlockDict['myDoArg_' + actionName]) {
+                    // console.log('deleting protoblocks for action ' + actionName);
+                    delete paletteBlocks.protoBlockDict['myDoArg_' + actionName];
+                } else if (paletteBlocks.protoBlockDict['myCalcArg_' + actionName]) {
+                    // console.log('deleting protoblocks for action ' + actionName);
+                    delete paletteBlocks.protoBlockDict['myCalcArg_' + actionName];
+                }
+                this.dict['action'].y = 0;
+                blockRemoved = true;
+                break;
+            }
+        }
+
+        // Force an update if a block was removed.
+        if (blockRemoved) {
+            this.hide();
+            this.updatePalettes('action');
+            this.show();
+        }
+    };
+
     return this;
 }
 
@@ -535,7 +574,11 @@ function PaletteModel(palette, palettes, name) {
             default:
                 if (blkname != modname) {
                     // Override label for do, storein, and box
-                    label = block.defaults[0];
+                    if (blkname === 'storein' && block.defaults[0] === _('box')) {
+			label = _('store in');
+                    } else {
+			label = block.defaults[0];
+                    }
                 } else if (protoBlock.staticLabels.length > 0) {
                     label = protoBlock.staticLabels[0];
                     if (label === '') {
@@ -917,6 +960,7 @@ function Palette(palettes, name) {
     this._resetLayout = function() {
         // Account for menu toolbar
         if (this.menuContainer == null) {
+            console.log('menuContainer is null');
             return;
         }
 
@@ -948,7 +992,6 @@ function Palette(palettes, name) {
     };
 
     this._updateMenu = function(hide) {
-
         var palette = this;
 
         function __calculateBounds(palette, blk, modname) {
@@ -1437,9 +1480,11 @@ function Palette(palettes, name) {
             var startX = event.stageX;
             var startY = event.stageY;
             var lastY = event.stageY;
+
             if (palette.draggingProtoBlock) {
                 return;
             }
+
             var mode = window.hasMouse ? MODEDRAG : MODEUNSURE;
 
             palette.protoContainers[blkname].on('pressmove', function(event) {
@@ -1501,7 +1546,7 @@ function Palette(palettes, name) {
         // Return protoblock we've been dragging back to the palette.
         this.protoContainers[name].x = x;
         this.protoContainers[name].y = y;
-
+        // console.log('restore ' + name);
         this._resetLayout();
     };
 
@@ -1568,10 +1613,7 @@ function Palette(palettes, name) {
     };
 
     this._makeBlockFromPalette = function(protoblk, blkname, callback) {
-        const BUILTINMACROS= ['note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm',
-                              'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2',
-                              'matrix', 'turtlepitch', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote',
-                              'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline', 'note2', 'note3'];
+        const BUILTINMACROS= ['note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm', 'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'invert2', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2', 'articulation', 'matrix', 'pitchdrummatrix', 'turtlepitch', 'turtlenote', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote', 'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline', 'note2', 'note3', 'note4', 'octave', 'fifths', 'tritone', 'fourths', 'thirds', 'steppitch', 'sine', 'triangle', 'square', 'sawtooth', 'setkey2', 'snare', 'hihat', 'kick', 'tom', 'pluck', 'triangle1', 'slap', 'fingercymbals', 'cup', 'cowbell', 'splash', 'ridebell', 'floortom', 'crash', 'chine', 'dog', 'cat', 'clap', 'bubbles', 'cricket', 'duck', 'bottle', 'clang', 'darbuka', 'setdrum', 'playdrum', 'backward', 'status'];
 
         switch (protoblk.name) {
         case 'do':
@@ -1696,14 +1738,17 @@ function Palette(palettes, name) {
         const FLATOBJ = [[0, 'flat', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
         const TRANSPOBJ = [[0, 'settransposition', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         const INVERTOBJ = [[0, 'invert', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null, 3]], [1, ['solfege', {'value': _('sol')}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+        const INVERT2OBJ = [[0, 'invert2', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null, 3]], [1, ['solfege', {'value': _('sol')}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
         const STACCATOOBJ = [[0, 'staccato', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 32}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         const SLUROBJ = [[0, 'slur', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 32}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         const SWINGOBJ = [[0, 'swing', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 32}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         const CRESCENDOOBJ = [[0, 'crescendo', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         const VOLOBJ = [[0, 'setnotevolume2', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 50}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-        const ARTICULATIONOOBJ = [[0, 'articulation', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 25}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+        const ARTICULATIONOBJ = [[0, 'articulation', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['number', {'value': 25}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         const MATRIXOBJ = [[0, 'matrix', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 13]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': _('sol')}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': _('mi')}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': _('re')}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'rhythm', 0, 0, [7, 11, 12, null]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]], [13, 'hidden', 0, 0, [0, null]]];
-        const TURTLEPITCHOBJ = [[0, 'turtlepitch', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'turtlename', 0, 0, [0]]]
+        const PITCHDRUMMATRIXOBJ = [[0, 'pitchdrummatrix', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 12]], [1, 'pitch', 0, 0, [0, 2, 3, 4]], [2, ['solfege', {'value': _('sol')}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'pitch', 0, 0, [1, 5, 6, 7]], [5, ['solfege', {'value': _('mi')}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'pitch', 0, 0, [4, 8, 9, 10]], [8, ['solfege', {'value': _('re')}], 0, 0, [7]], [9, ['number', {'value': 4}], 0, 0, [7]], [10, 'playdrum', 0, 0, [7, 11, null]], [11, ['drumname', {'value': _('kick drum')}], 0, 0, [10]], [12, 'hidden', 0, 0, [0, null]]];
+        const TURTLEPITCHOBJ = [[0, 'turtlepitch', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'turtlename', 0, 0, [0]]];
+        const TURTLENOTEOBJ = [[0, 'turtlenote', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'turtlename', 0, 0, [0]]];
         const SETTURTLENAMEOBJ = [[0, 'setturtlename', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]], [1, 'turtlename', 0, 0, [0]], [2, ['text', {'value': 'Yertle'}], 0, 0, [0]]];
         const WHOLEOBJ = [[0, 'rhythm', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 1}], 0, 0, [0]]];
         const HALFOBJ = [[0, 'rhythm', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 2}], 0, 0, [0]]];
@@ -1714,11 +1759,51 @@ function Palette(palettes, name) {
         const SIXTYFOURTHOBJ = [[0, 'rhythm', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 64}], 0, 0, [0]]];
         const TONEOBJ = [[0, 'drift', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'triangle', 0, 0, [2, 7, null]], [7, ['number', {'value': 440}], 0, 0, [6]]];
         const RESTOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'rest2', 0, 0, [0, null]]];
-        const TUPLETOBJ = [[0, 'tuplet2', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 3, 6]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]], [3, 'rhythm', 0, 0, [0, 4, 5, null]], [4, ['number', {'value': 3}], 0, 0, [3]], [5, ['number', {'value': 4}], 0, 0, [3]], [6, 'hidden', 0, 0, [0, null]]];
+        const TUPLETOBJ = [[0, 'tuplet2', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 3, 6]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]], [3, 'rhythm', 0, 0, [0, 4, 5, null]], [4, ['number', {'value': 3}], 0, 0, [3]], [5, ['number', {'value': 1}], 0, 0, [3]], [6, 'hidden', 0, 0, [0, null]]];
         const FILLOBJ = [[0, 'fill', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
         const HOLLOWOBJ = [[0, 'hollowline', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
         const NOTE2OBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 5]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'pitch', 0, 0, [0, 3, 4, null]], [3, ['notename', {'value': 'A'}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]], [5, 'hidden', 0, 0, [0, null]]];
         const NOTE3OBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'sine', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
+        const NOTE4OBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'playdrum', 0, 0, [0, 3, null]], [3, ['drumname', {'value': _('kick drum')}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
+        const OCTAVEOBJ = [[0, 'settransposition', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, null]], [1, ['number', {'value': 12}], 0, 0, [0]]];
+        const FIFTHSOBJ = [[0, 'interval', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, null]], [1, ['number', {'value': 5}], 0, 0, [0]]];
+        const TRITONEOBJ = [[0, 'interval', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, null]], [1, ['number', {'value': 6}], 0, 0, [0]]];
+        const FOURTHSOBJ = [[0, 'interval', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, null]], [1, ['number', {'value': 4}], 0, 0, [0]]];
+        const THIRDSOBJ = [[0, 'interval', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, null]], [1, ['number', {'value': 3}], 0, 0, [0]]];
+        const STEPPITCHOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'steppitch', 0, 0, [0, 3, null]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
+        const SINEOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'sine', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
+        const TRIANGLEOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'triangle', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
+        const SQUAREOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'square', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
+        const SAWTOOTHOBJ = [[0, 'note', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'sawtooth', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
+        const SETKEYOBJ = [[0, 'setkey2', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 2, null]],  [1, ['notename', {'value': 'C'}], 0, 0, [0]], [2, ['modename', {'value': 'Major'}], 0, 0, [0]]];
+        const SNAREOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('snare drum')}], 0, 0, [0]]];
+        const KICKOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('kick drum')}], 0, 0, [0]]];
+        const HIHATOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('hi hat')}], 0, 0, [0]]];
+        const TOMOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('tom tom')}], 0, 0, [0]]];
+        const TRIANGLE1OBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('triangle bell')}], 0, 0, [0]]];
+        const SLAPOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('slap')}], 0, 0, [0]]];
+        const DUCKOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('duck')}], 0, 0, [0]]];
+        const DARBUKAOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('darbuka drum')}], 0, 0, [0]]];
+        const BOTTLEOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('bottle')}], 0, 0, [0]]];
+        const CLANGOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('clang')}], 0, 0, [0]]];
+        const FINGERCYMBALSOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('finger cymbals')}], 0, 0, [0]]];
+        const CUPOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('cup drum')}], 0, 0, [0]]];
+        const COWBELLOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('cow bell')}], 0, 0, [0]]];
+        const SPLASHOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('splash')}], 0, 0, [0]]];
+        const RIDEBELLOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('ride bell')}], 0, 0, [0]]];
+        const FLOORTOMOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('floor tom tom')}], 0, 0, [0]]];
+        const CRASHOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('crash')}], 0, 0, [0]]];
+        const CHINEOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('chine')}], 0, 0, [0]]];
+        const DOGOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('dog')}], 0, 0, [0]]];
+        const CATOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('cat')}], 0, 0, [0]]];
+        const CLAPOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('clap')}], 0, 0, [0]]];
+        const BUBBLESOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('bubbles')}], 0, 0, [0]]];
+        const CRICKETOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': _('cricket')}], 0, 0, [0]]];
+        const PLUCKOBJ = [[0, 'pluck', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
+        const SETDRUMOBJ = [[0, 'setdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null, 2]], [1, ['drumname', {'value': getDrumName(DEFAULTDRUM)}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+        const PLAYDRUMOBJ = [[0, 'playdrum', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, ['drumname', {'value': getDrumName(DEFAULTDRUM)}], 0, 0, [0]]];
+        const BACKWARDOBJ = [[0, 'backward', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, null]], [1, 'hidden', 0, 0, [0, null]]];
+	const STATUSOBJ = [[0, 'status', this.protoContainers[blkname].x - paletteBlocks.stage.x, this.protoContainers[blkname].y - paletteBlocks.stage.y, [null, 1, 8]], [1, 'hidden', 0, 0, [0, 2]], [2, ["print", {}], 0, 0, [1, 3, 4]], [3, ["key", {}], 0, 0, [2]], [4, ["print", {}], 0, 0, [2, 5, 6]], [5, ["bpmfactor", {}], 0, 0, [4]], [6, ["print", {}], 0, 0, [4, 7, null]], [7, ["notevolumefactor", {}], 0, 0, [6]], [8, 'hidden', 0, 0, [0, null]]];
 
         const BUILTINMACROS = {'note': NOTEOBJ,
                                'rhythmicdot': DOTOBJ,
@@ -1734,14 +1819,17 @@ function Palette(palettes, name) {
                                'flat': FLATOBJ,
                                'settransposition': TRANSPOBJ,
                                'invert': INVERTOBJ,
+                               'invert2': INVERT2OBJ,
                                'staccato': STACCATOOBJ,
                                'slur': SLUROBJ,
                                'swing': SWINGOBJ,
                                'crescendo': CRESCENDOOBJ,
                                'setnotevolume2': VOLOBJ,
-                               'articulation': ARTICULATIONOOBJ,
+                               'articulation': ARTICULATIONOBJ,
                                'matrix': MATRIXOBJ,
+                               'pitchdrummatrix': PITCHDRUMMATRIXOBJ,
                                'turtlepitch': TURTLEPITCHOBJ,
+                               'turtlenote': TURTLENOTEOBJ,
                                'setturtlename': SETTURTLENAMEOBJ,
                                'wholeNote': WHOLEOBJ,
                                'halfNote': HALFOBJ,
@@ -1757,6 +1845,46 @@ function Palette(palettes, name) {
                                'hollowline': HOLLOWOBJ,
                                'note2': NOTE2OBJ,
                                'note3': NOTE3OBJ,
+                               'note4': NOTE4OBJ,
+                               'octave': OCTAVEOBJ,
+                               'fifths': FIFTHSOBJ,
+                               'tritone': TRITONEOBJ,
+                               'fourths': FOURTHSOBJ,
+                               'thirds': THIRDSOBJ,
+                               'steppitch': STEPPITCHOBJ,
+                               'sine': SINEOBJ,
+                               'triangle': TRIANGLEOBJ,
+                               'square': SQUAREOBJ,
+                               'sawtooth': SAWTOOTHOBJ,
+                               'setkey2': SETKEYOBJ,
+                               'snare': SNAREOBJ,
+                               'hihat': HIHATOBJ,
+                               'kick': KICKOBJ,
+                               'tom': TOMOBJ,
+                               'pluck': PLUCKOBJ,
+                               'triangle1': TRIANGLE1OBJ,
+                               'slap': SLAPOBJ,
+                               'fingercymbals': FINGERCYMBALSOBJ,
+                               'cup': CUPOBJ,
+                               'cowbell': COWBELLOBJ,
+                               'splash': SPLASHOBJ,
+                               'ridebell': RIDEBELLOBJ,
+                               'floortom': FLOORTOMOBJ,
+                               'crash': CRASHOBJ,
+                               'chine': CHINEOBJ,
+                               'dog': DOGOBJ,
+                               'cat': CATOBJ,
+                               'clap': CLAPOBJ,
+                               'bubbles': BUBBLESOBJ,
+                               'cricket': CRICKETOBJ,
+                               'darbuka': DARBUKAOBJ,
+                               'clang': CLANGOBJ,
+                               'duck': DUCKOBJ,
+                               'bottle': BOTTLEOBJ,
+                               'setdrum': SETDRUMOBJ,
+                               'playdrum': PLAYDRUMOBJ,
+                               'backward': BACKWARDOBJ,
+                               'status': STATUSOBJ,
                               };
 
         function __myCallback (newBlock) {

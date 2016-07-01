@@ -16,9 +16,9 @@ const DEFAULTPALETTE = 'rhythm';
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-BUILTINPALETTES = ['rhythm', 'pitch', 'tone', 'flow', 'action', 'boxes', 'matrix', 'turtle', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'extras'];
+BUILTINPALETTES = ['rhythm', 'pitch', 'tone', 'drum', 'flow', 'action', 'boxes', 'matrix', 'turtle', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'extras'];
 
-const BUILTINPALETTESFORL23N = [_('rhythm'), _('pitch'), _('tone'), _('flow'), _('action'), _('boxes'), _('matrix'), _('turtle'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('extras')];
+const BUILTINPALETTESFORL23N = [_('rhythm'), _('pitch'), _('tone'), _('drum'), _('flow'), _('action'), _('boxes'), _('matrix'), _('turtle'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('extras')];
 
 function getMainToolbarButtonNames(name) {
     return (['fast', 'slow', 'slow-music', 'step', 'step-music', 'stop-turtle', 'clear', 'palette', 'hide-blocks', 'collapse-blocks', 'go-home', 'help'].indexOf(name) > -1);
