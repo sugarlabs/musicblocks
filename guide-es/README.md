@@ -29,7 +29,7 @@ ABOUT THIS GUIDE
 ----------------
 
 Many of the examples given in the guide have links to code you can
-run. Look for RUN LIVE links.
+run. Look for EJECUTAR EN VIVO links.
 
 NOTES
 -----
@@ -306,7 +306,7 @@ en una escala a partir de la nota actual En el ejemplo, bloques *Paso
 el Tono* se usan dentro de bloques *Repetir* para tocar una escala
 hacia arriba y hacia abajo.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb&run=true)
+[EJECUTAR EN VIVO](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb&run=true)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/transform1.svg'</img>
 
@@ -382,6 +382,19 @@ Do y Do a Fa.
 
 El bloque *Articulación* cambia el volumen de un grupo de notas.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/transform11.svg'</img>
+
+El bloque *Hacia atrás* juega las notas contenidas en reversa
+orden. En el ejemplo anterior, las notas en la colección se reproducen
+como `Sol`, `Ti`,` La`, `Sol`, es decir, desde el fondo hasta la parte
+superior de la pila.
+
+[EJECUTAR EN VIVO](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
+
+Note that all of the blocks inside a *Backward* block are reverse, so
+use this feature with caution if you include logic intermixed with
+notes.
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/transform10.svg'</img>
 
 El bloque *Fijar Clave* cambia la clave y el modo de relación entre
@@ -393,7 +406,7 @@ exóticos como Bebop, Geez y Maqam.
 
 En este ejemplo, la secuencia de pulsos de tambor aumenta en el tiempo.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
+[EJECUTAR EN VIVO](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
 
 The Pitch Drum Matrix
 ---------------------
@@ -441,7 +454,7 @@ Se pone más interesante si la desplazamos octavas arriba y abajo.
 
 And even more interesting if we bring the various voices offset in time.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
+[EJECUTAR EN VIVO](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/drum3.svg'</img>
 
@@ -472,7 +485,7 @@ disminuye y el color aumenta.
 In this example, the graphics are synchronized to the music by placing
 the graphics commands inside of *Note value* blocks.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb&run=true)
+[EJECUTAR EN VIVO](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb&run=true)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/fibonacci3.svg'</img>
 
@@ -495,7 +508,7 @@ the mouse is in the lower-left quadrant, `chunk` is played;
 lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
 upper-right quadrant, `chunk3`.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb&run=true)
+[EJECUTAR EN VIVO](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb&run=true)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/interactive2.svg'</img>
 
@@ -503,7 +516,7 @@ In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
 make an 8-key piano?
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb&run=true)
+[EJECUTAR EN VIVO](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb&run=true)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/interactive3.svg'</img>
 
@@ -550,4 +563,4 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/hotdog.png'</img>
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_hotdog.tb&run=true)
+[EJECUTAR EN VIVO](http://walterbender.github.io/musicblocks/?file=MusicBlocks_hotdog.tb&run=true)

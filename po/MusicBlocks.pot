@@ -1256,6 +1256,10 @@ msgstr ""
 msgid "articulation"
 msgstr ""
 
+#: js/basicblocks.js:565
+msgid "backward"
+msgstr ""
+
 #: js/basicblocks.js:581
 msgid "crescendo"
 msgstr ""

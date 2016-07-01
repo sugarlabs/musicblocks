@@ -1257,6 +1257,10 @@ msgstr "denominador"
 msgid "articulation"
 msgstr "articulación"
 
+#: js/basicblocks.js:565
+msgid "backward"
+msgstr "hacia atrás"
+
 #: js/basicblocks.js:581
 msgid "crescendo"
 msgstr "crescendo"

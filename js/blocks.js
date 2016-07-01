@@ -177,7 +177,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this.toggleCollapsibles = function () {
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
-            if (['start', 'action', 'drum', 'matrix', 'pitchdrummatrix', 'rhythmruler'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+            if (COLLAPSABLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
                 myBlock.collapseToggle();
             }
         }
@@ -824,6 +824,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     // Don't break the connection between a block and
                     // a hidden block below it.
                     continue;
+                } else if ((['backward', 'status'].indexOf(this.blockList[b].name) !== -1) && (i === 1) && (this.blockList[b].connections[1] != null) && (this.blockList[this.blockList[b].connections[1]].isNoHitBlock())) {
+                    // Don't break the connection betweem a backward
+                    // block and a hidden block attached to its clamp.
+                    continue;
                 }
 
                 // Look for available connections.
@@ -892,7 +896,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     } else if (['doArg', 'nameddoArg'].indexOf(this.blockList[newBlock].name) !== -1 && newConnection === this.blockList[newBlock].connections.length - 1) {
                         // If it is the bottom of the flow, insert as
                         // usual.
-                        var bottom = this._findBottomBlock(thisBlock);
+                        var bottom = this.findBottomBlock(thisBlock);
                         this.blockList[connection].connections[0] = bottom;
                         this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
                     } else {
@@ -952,7 +956,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         this.moveBlockRelative(this.dragGroup[c], 40, 40);
                     }
                 } else {
-                    var bottom = this._findBottomBlock(thisBlock);
+                    var bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
                     this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
                 }
@@ -1286,16 +1290,52 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         return blk;
     };
 
-    this._findBottomBlock = function (blk) {
+    this.sameGeneration = function(firstBlk, childBlk) {
+        if (firstBlk == null || childBlk == null) {
+            return false;
+        }
+
+        if (firstBlk === childBlk) {
+            return true;
+	}
+
+	var myBlock = this.blockList[firstBlk];
+        if (myBlock.connections == null) {
+            return false;
+        }
+
+        if (myBlock.connections.length === 0) {
+            return false;
+        }
+
+        var bottomBlockLoop = 0;
+        while (last(myBlock.connections) != null) {
+            bottomBlockLoop += 1;
+            if (bottomBlockLoop > 2 * this.blockList.length) {
+                // Could happen if the block data is malformed.
+                console.log('infinite loop finding bottomBlock?');
+                break;
+            }
+            blk = last(myBlock.connections);
+            myBlock = this.blockList[blk];
+            if (blk === childBlk) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    this.findBottomBlock = function (blk) {
         // Find the bottom block in a stack.
         if (blk == null) {
             return null;
         }
 
-        var myBlock = this.blockList[blk];
+	var myBlock = this.blockList[blk];
         if (myBlock.connections == null) {
             return blk;
         }
+
         if (myBlock.connections.length === 0) {
             return blk;
         }
@@ -2558,6 +2598,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'rhythmruler':
             case 'matrix':
             case 'drum':
+	    case 'status':
             case 'start':
                 if (typeof(blkData[1]) === 'object' && blkData[1].length > 1 && typeof(blkData[1][1]) === 'object' && 'collapsed' in blkData[1][1]) {
                     if (blkData[1][1]['collapsed']) {
@@ -2675,7 +2716,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     blkInfo = [blkData[1][0], {'value': null}];
                 } else if (['number', 'string'].indexOf(typeof(blkData[1][1])) !== -1) {
                     blkInfo = [blkData[1][0], {'value': blkData[1][1]}];
-                    if (['start', 'drum', 'action', 'matrix', 'pitchdrummatrix', 'hat', 'rhythmruler'].indexOf(blkData[1][0]) !== -1) {
+                    if (COLLAPSABLES.indexOf(blkData[1][0]) !== -1) {
                         blkInfo[1]['collapsed'] = false;
                     }
                 } else {
@@ -2683,7 +2724,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             } else {
                 blkInfo = [blkData[1], {'value': null}];
-                if (['start', 'drum', 'action', 'matrix', 'pitchdrummatrix', 'hat', 'rhythmruler'].indexOf(blkData[1]) !== -1) {
+                if (COLLAPSABLES.indexOf(blkData[1]) !== -1) {
                     blkInfo[1]['collapsed'] = false;
                 }
             }
@@ -2691,7 +2732,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var name = blkInfo[0];
 
             var collapsed = false;
-            if (['start', 'drum', 'matrix', 'pitchdrummatrix', 'action', 'rhythmruler'].indexOf(name) !== -1) {
+            if (COLLAPSABLES.indexOf(name) !== -1) {
                 collapsed = blkInfo[1]['collapsed'];
             }
 
@@ -2731,6 +2772,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'pitchdrummatrix':
             case 'rhythmruler':
             case 'matrix':
+            case 'status':
             case 'tuplet2':
             case 'fill':
             case 'hollowline':
