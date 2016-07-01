@@ -1,3 +1,16 @@
+// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016 Hemant Kasat
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+// This widget enable us to create a certain rhythm which plays with the drum we decide.
+
 
 function RhythmRuler () {
 
@@ -39,7 +52,7 @@ function RhythmRuler () {
                 }
             }              
         }
-    }
+    };
 
     this.dissectRuler = function (event) {
 
@@ -59,20 +72,16 @@ function RhythmRuler () {
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this.RulerSelected][0];
         var divisionHistory = this.Rulers[this.RulerSelected][1];
+    
         divisionHistory.push([newCellIndex,inputNum]);
         ruler.deleteCell(newCellIndex);
+    
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
-        var tempwidth = this.noteWidth(newNoteValue);
-        var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px'
-        var difference = parseFloat(this.noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
-        
         var newCellWidth = parseFloat(this.noteWidth(newNoteValue)) + parseFloat(difference)/inputNum + 'px';
-        console.log(newCellWidth);
-
-        noteValues.splice(newCellIndex, 1);
-        
         var newCellHeight = cell.style.height;
+        noteValues.splice(newCellIndex, 1);
+
         for ( var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
             noteValues.splice(newCellIndex+i, 0, newNoteValue);
@@ -87,7 +96,7 @@ function RhythmRuler () {
             });
         }
         this.calculateZebraStripes(that.RulerSelected);        
-    }
+    };
 
     this.undo = function() {
 
@@ -126,7 +135,7 @@ function RhythmRuler () {
         }
         divisionHistory.pop();
         this.calculateZebraStripes(this.RulerSelected);
-    }
+    };
 
     this.playAll = function() {
         this.logo.synth.stop();
@@ -144,7 +153,8 @@ function RhythmRuler () {
                 this.playNote(0, 0, i, 1);
             }
         }   
-    }
+    };
+
     this.playOne = function() {
         this.logo.synth.stop();
         var noteValues = this.Rulers[this.RulerSelected][0];
@@ -158,7 +168,7 @@ function RhythmRuler () {
         if(this.PlayingOne) {
             this.playNote(0, 0, this.RulerSelected, 1)
         }
-    }
+    };
     
     this.playNote = function(time, notesCounter, rulerno, colIndex) {
         var that = this;
@@ -168,67 +178,63 @@ function RhythmRuler () {
         var drumblockno = blocks.blockList[this.Drums[rulerno]].connections[1];
         var drum = blocks.blockList[drumblockno].value;
         setTimeout(function() {
-                
 
-                var ruler = docById('ruler' + rulerno);
+            var ruler = docById('ruler' + rulerno);
 
-                if (notesCounter === noteValues.length-1) {
-                    for (var i = 0; i < ruler.cells.length; i++) {
-                        var cell = ruler.cells[i];
-                        cell.style.backgroundColor =  MATRIXNOTECELLCOLOR;
-                    }
-
-                } else {
-                    var cell = ruler.cells[colIndex];
-                    if(that.Playing) {
-                       cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-                    }
-
+            if (notesCounter === noteValues.length-1) {
+                for (var i = 0; i < ruler.cells.length; i++) {
+                    var cell = ruler.cells[i];
+                    cell.style.backgroundColor =  MATRIXNOTECELLCOLOR;
                 }
-
-                if (notesCounter >= noteValues.length) {
-                        notesCounter = 1;
-                        that.logo.synth.stop()
-                }                
-                notesCounter += 1;
-                colIndex += 1;
+            } else {
+                var cell = ruler.cells[colIndex];
                 if(that.Playing) {
-                    that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drum);
+                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
                 }
-                if(notesCounter < noteValues.length) {
-                    if(that.Playing) {
-                        that.playNote(time, notesCounter, rulerno, colIndex);
+            }
+
+            if (notesCounter >= noteValues.length) {
+                notesCounter = 1;
+                that.logo.synth.stop()
+            }                
+            notesCounter += 1;
+            colIndex += 1;
+            if(that.Playing) {
+                that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drum);
+            }
+            if(notesCounter < noteValues.length) {
+                if(that.Playing) {
+                    that.playNote(time, notesCounter, rulerno, colIndex);
+                }
+            } else {
+                that.Completed += 1;
+            }
+            if(that.PlayingAll) {
+                if(that.Completed === that.Rulers.length) {
+                    console.log("playing again all rulers");
+                    that.Completed = 0;
+                    var cell = ruler.cells[0];
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    that.logo.setTurtleDelay(0);
+                    for(var i = 0; i < that.Rulers.length; i++) {
+                        that.calculateZebraStripes(i);
                     }
+                    that.playAll();
+                }    
+            }
+            if(that.PlayingOne) {
+                if(that.Completed === 1) {
+                    console.log("playing again ruler" + that.RulernoPlaying);
+                    that.Completed = 0;
+                    var cell = ruler.cells[0];
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    that.logo.setTurtleDelay(0);
+                    that.calculateZebraStripes(that.RulernoPlaying);
+                    that.playOne();
                 }
-                else {
-                    that.Completed += 1;
-                }
-                if(that.PlayingAll) {
-                    if(that.Completed === that.Rulers.length) {
-                        console.log("playing again all rulers");
-                        that.Completed = 0;
-                        var cell = ruler.cells[0];
-                        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        that.logo.setTurtleDelay(0);
-                        for(var i = 0; i < that.Rulers.length; i++) {
-                            that.calculateZebraStripes(i);
-                        }
-                        that.playAll();
-                    }    
-                }
-                if(that.PlayingOne) {
-                    if(that.Completed === 1) {
-                        console.log("playing again ruler" + that.RulernoPlaying);
-                        that.Completed = 0;
-                        var cell = ruler.cells[0];
-                        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        that.logo.setTurtleDelay(0);
-                        that.calculateZebraStripes(that.RulernoPlaying);
-                        that.playOne();
-                    }
-                }            
+            }            
         }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);   
-    }
+    };
    
     this.save = function(selectedruler) {
 
@@ -250,8 +256,7 @@ function RhythmRuler () {
                 if(noteValues[i] === noteValues[i+1] && i < ruler.cells.length-1) {
                     samenotevalue += 1;
                     continue;
-                }
-                else {
+                } else {
                     var rhythmblockidx = newStack.length;
                     var noofnotes = rhythmblockidx + 1;
                     var notevalueidx = rhythmblockidx + 2;
@@ -582,5 +587,4 @@ function RhythmRuler () {
         }
 
 	}
-
-}
+};
