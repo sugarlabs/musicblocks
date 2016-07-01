@@ -13,11 +13,14 @@
     <script src="lib/jquery-ui.js"></script>
     <script src="lib/webL10n.js"></script>
     <script src="lib/tone.min.js"></script>
+    <script src="lib/jquery.ruler.js"></script>
+    <script src="lib/modernizr-2.6.2.min.js"></script>
 
     <script type="text/javascript"></script>
 
     <script src="//code.jquery.com/jquery-2.1.4.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
     <script data-main="js/loader" src="lib/require.js">
@@ -54,14 +57,43 @@
             }(document, 'script', 'facebook-jssdk'));
         } catch (e) {}
           -->
-
-        $(function() {
+    
+       $(function() {
             $("#matrix").draggable();
         });
 
-	$(function() {
+	    $(function() {
             $("#pitchdrummatrix").draggable();
         });
+        
+        $(function() {
+            $('#drumDiv').draggable({
+                drag: function() {
+                    jQuery('#rulerbody').css('top',jQuery(this).position().top);
+                    jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);
+
+                },
+                stop: function(){
+                    jQuery('#rulerbody').css('top',jQuery(this).position().top);                     
+                    jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
+                }
+            });
+        });
+        
+        $(function() {
+            $('#rulerbody').draggable({
+                drag: function() {
+                    jQuery('#drumDiv').css('top',jQuery(this).position().top);
+                    jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/30);
+
+                },
+                stop: function(){
+                    jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
+                    jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/30);                                        
+                }
+            });
+        });
+    
 
 	$(function() {
             $("#statusmatrix").draggable();
@@ -110,7 +142,7 @@
                 }, 2000);
             });
         });
-
+      
         function moveMatrix(event) {
             var matrixDiv = document.getElementById('matrix');
             matrixDivPosition = matrixDiv.getBoundingClientRect();
@@ -119,6 +151,7 @@
             var row = table.rows.item(0);
             row.style.left = matrixDivPosition.left + 'px';
             row.style.top = matrixDivPosition.top + 'px';
+            console.log(this.cellScale);
 
             var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
             for (i = 1, row; row = table.rows[i]; i++) {
@@ -220,6 +253,8 @@
     <canvas hidden id="music" width="700"></canvas>
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
+    <div id="rulerbody" overflow-x="auto"></div>
+    <div id="drumDiv"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    
     <div id="helpElem"></div>
 

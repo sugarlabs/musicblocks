@@ -34,6 +34,34 @@ const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
 const A0 = 27.5;
 const C8 = 4186.01;
 
+const RHYTHMRULERHEIGHT = 100;
+
+
+const MATRIXBUTTONCOLOR = '#c374e9';
+const MATRIXLABELCOLOR = '#90c100';
+const MATRIXNOTECELLCOLOR = '#b1db00';
+const MATRIXTUPLETCELLCOLOR = '#57e751';
+const MATRIXRHYTHMCELLCOLOR = '#c8c8c8';
+
+const MATRIXBUTTONCOLORHOVER = '#c894e0';
+const MATRIXNOTECELLCOLORHOVER = '#c2e820';
+
+const MATRIXSOLFEWIDTH = 52;
+const EIGHTHNOTEWIDTH = 24;
+const MATRIXBUTTONHEIGHT = 40;
+const MATRIXBUTTONHEIGHT2 = 66;
+const MATRIXSOLFEHEIGHT = 30;
+
+const wholeNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(WHOLENOTE)));
+const halfNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HALFNOTE)));
+const quarterNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(QUARTERNOTE)));
+const eighthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(EIGHTHNOTE)));
+const sixteenthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SIXTEENTHNOTE)));
+const thirtysecondNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(THIRTYSECONDNOTE)));
+const sixtyfourthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SIXTYFOURTHNOTE)));
+
+const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eighthNoteImg, 16: sixteenthNoteImg, 32: thirtysecondNoteImg, 64: sixtyfourthNoteImg};
+
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org
@@ -518,6 +546,30 @@ function getInterval (interval, keySignature, pitch) {
     }
 };
 
+function calcNoteValueToDisplay(a, b) {
+    var noteValue = a / b;
+    var noteValueToDisplay = null;
+    if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
+        noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '>';
+    } else {
+        noteValueToDisplay = reducedFraction(b, a);
+    }
+    if (parseInt(noteValue) < noteValue) {
+        noteValueToDisplay = parseInt((noteValue * 1.5))
+        if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
+            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '> .';
+        } else {
+            noteValueToDisplay = parseInt((noteValue * 1.75))
+            if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
+                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '> ..';
+            } else {
+                noteValueToDisplay = reducedFraction(b, a);
+            }
+        }
+    }
+    return noteValueToDisplay;
+};
+
 
 function durationToNoteValue(duration) {
     // returns [note value, no. of dots, tuplet factor]
@@ -764,6 +816,24 @@ function getNumNote(value, delta) {
     return [note, octave + 1];
 };
 
+function isInt(value) {
+    return !isNaN(value) && 
+    parseInt(Number(value)) == value && 
+    !isNaN(parseInt(value, 10));
+}
+
+function reducedFraction(a, b) {
+    greatestCommonMultiple = function(a, b) {
+        return b === 0 ? a : greatestCommonMultiple(b, a % b);
+    }
+
+    var gcm = greatestCommonMultiple(a, b);
+    if (NOTESYMBOLS != undefined && [1, 2, 4, 8, 16, 32, 64].indexOf(b/gcm) !== -1) {
+        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
+    } else {
+        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
+    }
+};
 
 function Synth () {
     // Isolate synth functions here.
