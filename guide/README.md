@@ -515,7 +515,45 @@ above, the *One-of* block is used to randomly assign either `Do` or
 above, the *One-of* block is used to randomly select between `chunk1`
 and `chunk2`.
 
-6. Beyond Music Blocks
+6. Generating Rhythms
+---------------------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'</img>
+
+The *Rhythm Ruler* block is used to launch a widget similar to the
+*Matrix*, which can be used to generate rhythmic patterns.
+
+The argument to the *Rhythm Ruler* block specifies the duration that
+will be subdivided to generate a rhythmic pattern. By default, it is 1
+/ 1, e.g., a whole note.
+
+The *Set Drum* blocks contained in the clamp of the *Rhythm Ruler*
+block define the number of rhythms to be defined simultaneously. By
+default, two rhythms are defined. The embedded *Rhythm* blocks define
+the initial subdivision of the of each rhythm ruler.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg'</img>
+
+When the *Rhythm Ruler* block is clicked, the Rhythm Ruler widget is
+opened. It contains a row for each rhythm ruler. Clicking in a ruler
+will open a prompt for how many subdivisions to make within a cell.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm3.svg'</img>
+
+As shown in the above figure, the top rhythm ruler has been divided
+into two half-notes and the bottom rhythm ruler has been divided into
+three third-notes. Clicking on the *Play* button to the left of each row
+will playback the rhythm using a drum for each beat. The *Play-all*
+button on the upper-left of the widget will play back all rhythms
+simultaneously. The *Save stack* button will export rhythm stacks as
+shown below.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg'</img>
+
+The output of the *Rhythm Ruler* widget are stacks of rhythms that can
+be used to define rhythmic patterns in the *Matrix*.
+
+7. Beyond Music Blocks
 ----------------------
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
