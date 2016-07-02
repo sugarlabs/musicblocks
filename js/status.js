@@ -179,6 +179,27 @@ function StatusMatrix() {
                         innerHTML = 0;
                     }
                     break;
+                case 'x':
+                    innerHTML = Math.floor(this.logo.turtles.turtleList[i].x);
+                    break;
+                case 'y':
+                    innerHTML = Math.floor(this.logo.turtles.turtleList[i].y);
+                    break;
+                case 'heading':
+                    innerHTML = Math.floor(this.logo.turtles.turtleList[i].orientation);
+                    break;
+                case 'color':
+                    innerHTML = this.logo.turtles.turtleList[i].color;
+                    break;
+                case 'shade':
+                    innerHTML = this.logo.turtles.turtleList[i].value;
+                    break;
+                case 'grey':
+                    innerHTML = this.logo.turtles.turtleList[i].chroma;
+                    break;
+                case 'pensize':
+                    innerHTML = this.logo.turtles.turtleList[i].stroke;
+                    break;
                 default:
                     console.log('??? ' + this.logo.statusFields[j]);
                     break;
