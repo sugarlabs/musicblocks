@@ -2085,9 +2085,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-		logo.statusMatrix.init(logo);
-		logo.inStatusMatrix = false;
-	    }
+                logo.statusMatrix.init(logo);
+                logo.inStatusMatrix = false;
+            }
 
             logo._setListener(turtle, listenerName, __listener);
             break;
@@ -2726,7 +2726,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                 var __listener = function (event) {
                     logo.crescendoDelta[turtle].pop();
                     logo.crescendoVolume[turtle].pop();
-		    logo.polyVolume[turtle].pop();
+                    logo.polyVolume[turtle].pop();
                     logo.crescendoInitialVolume[turtle].pop();
                     logo._lilypondEndCrescendo(turtle);
                 };
@@ -4224,13 +4224,25 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                 logo.blocks.blockList[blk].value = 'click' + logo.turtles.turtleList[turtle].name;
                 break;
             case 'heading':
-                logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].orientation;
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('heading');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].orientation;
+                }
                 break;
             case 'x':
-                logo.blocks.blockList[blk].value = logo.turtles.screenX2turtleX(logo.turtles.turtleList[turtle].container.x);
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('x');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.turtles.screenX2turtleX(logo.turtles.turtleList[turtle].container.x);
+                }
                 break;
             case 'y':
-                logo.blocks.blockList[blk].value = logo.turtles.screenY2turtleY(logo.turtles.turtleList[turtle].container.y);
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('y');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.turtles.screenY2turtleY(logo.turtles.turtleList[turtle].container.y);
+                }
                 break;
             case 'xturtle':
             case 'yturtle':
@@ -4410,16 +4422,32 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                 break;
             case 'color':
             case 'hue':
-                logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].color;
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('color');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].color;
+                }
                 break;
             case 'shade':
-                logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].value;
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('shade');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].value;
+                }
                 break;
             case 'grey':
-                logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].chroma;
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('grey');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].chroma;
+                }
                 break;
             case 'pensize':
-                logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].stroke;
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push('pensize');
+                } else {
+                    logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].stroke;
+                }
                 break;
             case 'and':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
