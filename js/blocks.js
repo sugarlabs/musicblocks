@@ -2596,6 +2596,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'action':
             case 'pitchdrummatrix':
             case 'rhythmruler':
+            case 'pitchstaircase':
             case 'matrix':
             case 'drum':
 	    case 'status':
@@ -2771,6 +2772,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'setnotevolume2':
             case 'pitchdrummatrix':
             case 'rhythmruler':
+            case 'pitchstaircase':
             case 'matrix':
             case 'status':
             case 'tuplet2':
