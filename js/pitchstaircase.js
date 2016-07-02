@@ -38,6 +38,14 @@ function PitchStairCase() {
         StairDiv.appendChild(x);
         StairDivPosition = StairDiv.getBoundingClientRect();
 
+        var x = document.createElement('TABLE');
+        x.setAttribute('id', 'stair');
+        x.style.textAlign = 'center';
+        x.style.borderCollapse = 'collapse';
+        x.cellSpacing = 0;
+        x.cellPadding = 0;
+        StairDiv.appendChild(x);
+
         var table = docById('buttonTable');
         var header = table.createTHead();
         var row = header.insertRow(0);
@@ -52,6 +60,7 @@ function PitchStairCase() {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
+
         cell.onclick=function() {
             docById('pitchstaircase').style.visibility = 'hidden';
         };
@@ -64,6 +73,18 @@ function PitchStairCase() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
+        var table = docById('stair');
+        var header = table.createTHead();
+        var row = header.insertRow(0);
+        row.style.left = Math.floor(StairDivPosition.left) + 'px';
+        row.style.top = Math.floor(StairDivPosition.top) + 'px';
+
+        var cell = row.insertCell(-1);
+        cell.style.width = StairDivPosition.width + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 	};
 
 };
