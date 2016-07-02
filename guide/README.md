@@ -554,8 +554,12 @@ clicking on one of the half-notes.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg'</img>
 
- The *Save stack* button will export rhythm stacks. These stacks of
-rhythms can be used to define rhythmic patterns in the *Matrix*.
+The *Save stack* button will export rhythm stacks.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg'</img>
+
+These stacks of rhythms can be used to define rhythmic patterns in the
+*Matrix*.
 
 7. Beyond Music Blocks
 ----------------------
