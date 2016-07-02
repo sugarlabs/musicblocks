@@ -48,7 +48,7 @@ const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, stage,
+function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -107,6 +107,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
 
     //rhythm-ruler
     this.inRhythmRuler = false;
+    this.inPitchStairCase = false;
 
     // pitch-rhythm matrix
     this.inMatrix = false;
@@ -2042,6 +2043,20 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
                 rhythmruler.init(logo);
+            };
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'pitchstaircase':
+            console.log("running pitchstaircase");
+
+          //  childFlow = args[0];
+          //  childFlowCount = 1;
+            logo.inPitchStairCase = true;
+
+            var listenerName = '_pitchstaircase_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+            var __listener = function (event) {
+                pitchstaircase.init(logo);
             };
             logo._setListener(turtle, listenerName, __listener);
             break;
