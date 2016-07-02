@@ -517,10 +517,10 @@ and `chunk2`.
 6. Generating Rhythms
 ---------------------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'</img>
-
 The *Rhythm Ruler* block is used to launch a widget similar to the
 *Matrix*, which can be used to generate rhythmic patterns.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'</img>
 
 The argument to the *Rhythm Ruler* block specifies the duration that
 will be subdivided to generate a rhythmic pattern. By default, it is 1
