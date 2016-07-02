@@ -507,7 +507,57 @@ above, the <em>One-of</em> block is used to randomly assign either <code>Do</cod
 above, the <em>One-of</em> block is used to randomly select between <code>chunk1</code>
 and <code>chunk2</code>.</p>
 
-<h2>6. Beyond Music Blocks</h2>
+<h2>6. Generating Rhythms</h2>
+
+<p>The <em>Rhythm Ruler</em> block is used to launch a widget similar to the
+<em>Matrix</em>, which can be used to generate rhythmic patterns.</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'</img></p>
+
+<p>The argument to the <em>Rhythm Ruler</em> block specifies the
+duration that will be subdivided to generate a rhythmic pattern. By
+default, it is 1 / 1, e.g., a whole note.</p>
+
+<p>The <em>Set Drum</em> blocks contained in the clamp of
+the <em>Rhythm Ruler</em> block define the number of rhythms to be
+defined simultaneously. By default, two rhythms are defined. The
+embedded <em>Rhythm</em> blocks define the initial subdivision of the
+of each rhythm ruler.</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg'</img></p>
+
+<p>When the <em>Rhythm Ruler</em> block is clicked, the Rhythm Ruler widget is
+opened. It contains a row for each rhythm ruler. Clicking in a ruler
+will open a prompt for how many subdivisions to make within a cell.
+</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm3.svg'</img></p>
+
+<p>As shown in the above figure, the top rhythm ruler has been divided
+into two half-notes and the bottom rhythm ruler has been divided into
+three third-notes. Clicking on the <em>Play</em> button to the left of
+each row will playback the rhythm using a drum for each
+beat. The <em>Play-all</em> button on the upper-left of the widget
+will play back all rhythms simultaneously.
+</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg'</img></p>
+
+<p>The rhythm can be further subdivided by clicking in individual
+cells. In the example above, two quarter-notes have been created by
+clicking on one of the half-notes.
+</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg'</img></p>
+
+<p>The <em>Save stack</em> button will export rhythm stacks.</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg'</img></p>
+
+<p>These stacks of rhythms can be used to define rhythmic patterns in
+the <em>Matrix</em>.</p>
+
+<h2>7. Beyond Music Blocks</h2>
 
 <p>Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools. One such tool is
