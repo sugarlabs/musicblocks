@@ -2049,8 +2049,10 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, bloc
         case 'pitchstaircase':
             console.log("running pitchstaircase");
 
-          //  childFlow = args[0];
-          //  childFlowCount = 1;
+            pitchstaircase.Stairs = [];
+
+            childFlow = args[0];
+            childFlowCount = 1;
             logo.inPitchStairCase = true;
 
             var listenerName = '_pitchstaircase_' + turtle;
@@ -2595,7 +2597,12 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, bloc
                 var drumname = last(logo.drumStyle[turtle]);
                 var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                 logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
-            } else {
+            } else if (logo.inPitchStairCase) {
+                pitchstaircase.Stairs.push(blk);
+                var temp = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
+                console.log(temp);
+            } 
+            else {
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
             }
             break;
@@ -2653,6 +2660,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, bloc
             break;
         case 'osctime':
         case 'note':
+            console.log("in note");
             // We queue up the child flow of the note clamp and
             // once all of the children are run, we trigger a
             // _playnote_ event, then wait for the note to play.
@@ -2674,6 +2682,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, bloc
             logo.noteTranspositions[turtle] = [];
             logo.noteBeatValues[turtle] = [];
             logo.noteDrums[turtle] = [];
+
 
             // Ensure that note duration is positive.
             if (args[0] < 0) {
