@@ -90,7 +90,8 @@ function PitchStairCase() {
     this.PlayOne = function(stairno) {
         var pitchnotes = [];
         console.log(this.Stairs[stairno]);
-        pitchnotes.push(this.Stairs[stairno][0] + this.Stairs[stairno][1]);
+        var note = this.Stairs[stairno][0] + this.Stairs[stairno][1];
+        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         console.log(pitchnotes);
         this.logo.synth.trigger(pitchnotes, 0.125, 'poly');
     }
@@ -118,29 +119,16 @@ function PitchStairCase() {
 		
 		var thisStair = this;
 
-		var table = docById('buttonTable');
+        var tables = document.getElementsByTagName('TABLE');
 
-		if (table !== null) {
-            table.remove();
+      //  console.log(tables);
+
+        var noofTables = tables.length
+
+        for (var i = 0; i < noofTables; i++) {
+                tables[0].parentNode.removeChild(tables[0]);
         }
 
-        var table = docById('playAllStairTable');
-
-        if (table !== null) {
-            table.remove();
-        }
-        
-        for (var i = 0; i < this.Stairs.length; i++) {
-            var table = docById('stairTable' + i);
-            var table1 = docById('playStairTable' + i);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-            if (table !== null) {
-                table.remove();
-            }
-
-            if (table1 !== null) {
-                table1.remove();
-            }
-        }
         var iconSize = Math.floor(this.cellScale * 24);
 
         var x = document.createElement('TABLE');
