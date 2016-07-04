@@ -81,7 +81,7 @@ function RhythmRuler () {
 
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
-	var tempwidth = this.noteWidth(newNoteValue);
+	    var tempwidth = this.noteWidth(newNoteValue);
         var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
         var difference = parseFloat(this.noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
         var newCellWidth = parseFloat(this.noteWidth(newNoteValue)) + parseFloat(difference) / inputNum + 'px';
