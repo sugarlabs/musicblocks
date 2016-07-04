@@ -93,6 +93,34 @@
                 }
             });
         });
+
+        $(function() {
+            $('#pitchstaircase').draggable({
+                drag: function() {
+                    jQuery('#playPitch').css('top',jQuery(this).position().top);
+                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/30);
+
+                },
+                stop: function(){
+                    jQuery('#playPitch').css('top',jQuery(this).position().top);                     
+                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/30);                                        
+                }
+            });
+        });
+        
+        $(function() {
+            $('#playPitch').draggable({
+                drag: function() {
+                    jQuery('#pitchstaircase').css('top',jQuery(this).position().top);
+                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/30);
+
+                },
+                stop: function(){
+                    jQuery('#pitchstaircase').css('top',jQuery(this).position().top);                     
+                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
+                }
+            });
+        });
     
 
 	$(function() {
