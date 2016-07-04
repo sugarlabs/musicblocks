@@ -47,6 +47,11 @@ function PitchStairCase() {
         cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
+        cell.onclick = function() {
+            console.log(cell.parentNode.id);
+            that.PlayOne(cell.parentNode.id[9]);
+        };
+
         var StairTable = document.createElement('TABLE');
         StairTable.setAttribute('id',"stairTable" + this.Stairs.length);
         StairTable.style.textAlign = 'center';
@@ -81,6 +86,14 @@ function PitchStairCase() {
         that.Stairs.push([obj[0], obj[1], parseFloat(frequency)/inputNum]);
 
     };
+
+    this.PlayOne = function(stairno) {
+        var pitchnotes = [];
+        console.log(this.Stairs[stairno]);
+        pitchnotes.push(this.Stairs[stairno][0] + this.Stairs[stairno][1]);
+        console.log(pitchnotes);
+        this.logo.synth.trigger(pitchnotes, 0.125, 'poly');
+    }
 
 	this.init = function(logo) {
 
@@ -212,18 +225,23 @@ function PitchStairCase() {
             playPitchDiv.appendChild(playTable);
 
             var header = playTable.createTHead();
-            var row = header.insertRow(-1);
-            row.style.left = Math.floor(playPitchDivPosition.left) + 'px';
-            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-            row.setAttribute('id', "playStair" + i);
+            var playrow = header.insertRow(-1);
+            playrow.style.left = Math.floor(playPitchDivPosition.left) + 'px';
+            playrow.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            playrow.setAttribute('id', "playStair" + i);
 
-            var cell = row.insertCell(-1);
-            cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-            cell.style.minWidth = cell.style.width;
-            cell.style.maxWidth = cell.style.width;
-            cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            var playcell = playrow.insertCell(-1);
+            playcell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            playcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            playcell.style.minWidth = playcell.style.width;
+            playcell.style.maxWidth = playcell.style.width;
+            playcell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+            playcell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+            playcell.onclick = function() {
+                console.log(playcell.parentNode.id);
+                thisStair.PlayOne(playcell.parentNode.id[9]);
+            };
 
 
             var StairTable = document.createElement('TABLE');
@@ -258,10 +276,6 @@ function PitchStairCase() {
             cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
             cell.style.lineHeight = 60 + '%';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            var pitchnotes = [];
-            pitchnotes.push(thisStair.Stairs[i][0] + thisStair.Stairs[i][1]);
-            console.log(pitchnotes);
-            thisStair.logo.synth.trigger(pitchnotes, 0.125, 'poly');
 
             cell.addEventListener('click', function(event) {
                 thisStair.dissectStair(event, logo);
