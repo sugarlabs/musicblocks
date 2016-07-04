@@ -2,10 +2,63 @@ function PitchStairCase() {
 
     this.Stairs = [];
 
+    this.dissectStair = function(event, logo) {
+        var that = this;
+
+        var inputNum = prompt(_('Divide By:'), 2);
+
+        if(!isInt(inputNum)) {
+            alert(_('Please Input a Integer'));
+            inputNum = prompt(_('Divide By:'), 2);
+        }
+
+        if(inputNum === null) {
+            return ;
+        }
+        var cell = event.target;
+        var StairDiv = docById('pitchstaircase');
+        var StairDivPosition = StairDiv.getBoundingClientRect();
+
+        var StairTable = document.createElement('TABLE');
+        StairTable.setAttribute('id',"stairTable" + this.Stairs.length);
+        StairTable.style.textAlign = 'center';
+        StairTable.style.borderCollapse = 'collapse';
+        StairTable.cellSpacing = 0;
+        StairTable.cellPadding = 0;
+        StairDiv.appendChild(StairTable);
+
+        var header = StairTable.createTHead();
+        var newRow = header.insertRow(-1);
+        newRow.style.left = Math.floor(StairDivPosition.left) + 'px';
+        newRow.style.top = Math.floor(StairDivPosition.top) + 'px';
+        newRow.setAttribute('id','stair' + this.Stairs.length);
+
+        var newCell = newRow.insertCell(-1);
+        newCell.style.width = parseFloat(cell.style.width)/inputNum + 'px';
+        console.log(cell.style.width);
+        console.log(newCell.style.width);
+        newCell.style.minWidth = newCell.style.width;
+        newCell.style.maxWidth = newCell.style.width;
+        newCell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+
+        newCell.addEventListener('click', function(event) {
+            that.dissectStair(event);
+        });
+        var frequency = that.Stairs[that.Stairs.length-1][2];
+        var obj = frequencyToPitch(parseFloat(frequency)/inputNum);
+
+        newCell.innerHTML = obj[0] + obj[1] + " " + Math.floor(parseFloat(frequency)/inputNum);
+
+        that.Stairs.push([obj[0], obj[1], parseFloat(frequency)/inputNum]);
+
+
+
+    };
+
 	this.init = function(logo) {
 
         console.log(this.Stairs);
-        console.log(blocks.blockList[this.Stairs[0]].connections);  
 
 		console.log("init PitchStairCase");
 		this.logo = logo;
@@ -28,12 +81,13 @@ function PitchStairCase() {
             table.remove();
         }
 
-        var table  = docById('stair');
-
-        if (table !== null) {
-            table.remove();
+        
+        for (var i = 0; i < this.Stairs.length; i++) {
+            var table = docById('stairTable' + i);
+            if (table !== null) {
+                table.remove();
+            }
         }
-
         var iconSize = Math.floor(this.cellScale * 24);
 
         var x = document.createElement('TABLE');
@@ -48,14 +102,6 @@ function PitchStairCase() {
         StairDiv.style.paddingLeft = 0 + 'px';
         StairDiv.appendChild(x);
         StairDivPosition = StairDiv.getBoundingClientRect();
-
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'stair');
-        x.style.textAlign = 'center';
-        x.style.borderCollapse = 'collapse';
-        x.cellSpacing = 0;
-        x.cellPadding = 0;
-        StairDiv.appendChild(x);
 
         var table = docById('buttonTable');
         var header = table.createTHead();
@@ -84,34 +130,45 @@ function PitchStairCase() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        var table = docById('stair');
-        var header = table.createTHead();
-        var row = header.insertRow(0);
-        row.style.left = Math.floor(StairDivPosition.left) + 'px';
-        row.style.top = Math.floor(StairDivPosition.top) + 'px';
-
 
         for (var i = 0; i < thisStair.Stairs.length; i++) {
 
-            var cell = row.insertCell(i);
+            var StairTable = document.createElement('TABLE');
+            StairTable.setAttribute('id', 'stairTable' + i);
+            StairTable.style.textAlign = 'center';
+            StairTable.style.borderCollapse = 'collapse';
+            StairTable.cellSpacing = 0;
+            StairTable.cellPadding = 0;
+            StairDiv.appendChild(StairTable);
 
-            var args0 = blocks.blockList[thisStair.Stairs[i]].connections[1];
-            var args1 = blocks.blockList[thisStair.Stairs[i]].connections[2];
+            var header = StairTable.createTHead();          
+            var row = header.insertRow(-1);
+            row.style.left = Math.floor(StairDivPosition.left) + 'px';
+            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            row.setAttribute('id','stair' + i)
+            
 
-            var solfege = blocks.blockList[args0].value;
-            var octave = blocks.blockList[args1].value;
+
+            var solfege = this.Stairs[i][0];
+            var octave = this.Stairs[i][1];
             console.log(solfege);
             console.log(octave);
 
             var solfegetonote = this.logo.getNote(solfege, octave, 0, this.logo.keySignature[this.logoturtle])[0];
             console.log(solfegetonote);
 
+            var cell = row.insertCell(-1);
             cell.style.width = StairDivPosition.width + 'px';
-            cell.innerHTML = this.logo.getNote(solfege, octave, 0, this.logo.keySignature[this.logoturtle]) + " "  + Math.floor(pitchToFrequency(solfegetonote, octave, 0, this.logo.keySignature[this.logo.turtle]));
+            cell.innerHTML = thisStair.Stairs[i][0] + thisStair.Stairs[i][1] + " "  + Math.floor(thisStair.Stairs[i][2]);
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+
+            cell.addEventListener('click', function(event) {
+                thisStair.dissectStair(event, logo);
+            });
+            
         }
 	};
 

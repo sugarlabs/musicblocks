@@ -2598,9 +2598,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, bloc
                 var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                 logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
             } else if (logo.inPitchStairCase) {
-                pitchstaircase.Stairs.push(blk);
-                var temp = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
-                console.log(temp);
+                var frequency = pitchToFrequency(args[0], args[1], 0 ,logo.keySignature[turtle]);
+                var note = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
+                pitchstaircase.Stairs.push([note[0], note[1], frequency]);
             } 
             else {
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
