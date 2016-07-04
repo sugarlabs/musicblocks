@@ -151,7 +151,6 @@
             var row = table.rows.item(0);
             row.style.left = matrixDivPosition.left + 'px';
             row.style.top = matrixDivPosition.top + 'px';
-            console.log(this.cellScale);
 
             var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
             for (i = 1, row; row = table.rows[i]; i++) {
@@ -256,6 +255,7 @@
     <div id="rulerbody" overflow-x="auto"></div>
     <div id="drumDiv"></div>
     <div id="pitchstaircase"></div>
+    <div id="playPitch"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    
     <div id="helpElem"></div>
 

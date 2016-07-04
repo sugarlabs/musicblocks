@@ -15,9 +15,37 @@ function PitchStairCase() {
         if(inputNum === null) {
             return ;
         }
-        var cell = event.target;
+
+        var iconSize = Math.floor(this.cellScale * 24);
+
+        var oldcell = event.target;
         var StairDiv = docById('pitchstaircase');
         var StairDivPosition = StairDiv.getBoundingClientRect();
+
+        var playPitchDiv = docById('playPitch');
+        var playPitchDivPosition = playPitchDiv.getBoundingClientRect();
+
+        var playTable = document.createElement('TABLE');
+        playTable.setAttribute('id', 'playStairTable' + this.Stairs.length);
+        playTable.style.textAlign = 'center';
+        playTable.style.borderCollapse = 'collapse';
+        playTable.cellSpacing = 0;
+        playTable.cellPadding = 0;
+        playPitchDiv.appendChild(playTable);
+
+        var header = playTable.createTHead();
+        var row = header.insertRow(-1);
+        row.style.left = Math.floor(playPitchDivPosition.left) + 'px';
+        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        row.setAttribute('id', "playStair" + this.Stairs.length);
+
+        var cell = row.insertCell(-1);
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         var StairTable = document.createElement('TABLE');
         StairTable.setAttribute('id',"stairTable" + this.Stairs.length);
@@ -34,7 +62,7 @@ function PitchStairCase() {
         newRow.setAttribute('id','stair' + this.Stairs.length);
 
         var newCell = newRow.insertCell(-1);
-        newCell.style.width = parseFloat(cell.style.width)/inputNum + 'px';
+        newCell.style.width = parseFloat(oldcell.style.width)/inputNum + 'px';
         console.log(cell.style.width);
         console.log(newCell.style.width);
         newCell.style.minWidth = newCell.style.width;
@@ -45,14 +73,12 @@ function PitchStairCase() {
         newCell.addEventListener('click', function(event) {
             that.dissectStair(event);
         });
-        var frequency = that.Stairs[that.Stairs.length-1][2];
+        var frequency = that.Stairs[oldcell.parentNode.id[5]][2];
         var obj = frequencyToPitch(parseFloat(frequency)/inputNum);
 
         newCell.innerHTML = obj[0] + obj[1] + " " + Math.floor(parseFloat(frequency)/inputNum);
 
         that.Stairs.push([obj[0], obj[1], parseFloat(frequency)/inputNum]);
-
-
 
     };
 
@@ -68,6 +94,10 @@ function PitchStairCase() {
         docById('pitchstaircase').style.visibility = 'visible';
         docById('pitchstaircase').style.border = 2;
 
+        docById('playPitch').style.display = 'inline';
+        docById('playPitch').style.visibility = 'visible';
+        docById('playPitch').style.border = 2;
+
         var w = window.innerWidth;
         this.cellScale = w / 1200;
         docById('pitchstaircase').style.width = Math.floor(w / 2) + 'px';
@@ -81,11 +111,21 @@ function PitchStairCase() {
             table.remove();
         }
 
+        var table = docById('playAllStairTable');
+
+        if (table !== null) {
+            table.remove();
+        }
         
         for (var i = 0; i < this.Stairs.length; i++) {
             var table = docById('stairTable' + i);
+            var table1 = docById('playStairTable' + i);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
             if (table !== null) {
                 table.remove();
+            }
+
+            if (table1 !== null) {
+                table1.remove();
             }
         }
         var iconSize = Math.floor(this.cellScale * 24);
@@ -102,6 +142,35 @@ function PitchStairCase() {
         StairDiv.style.paddingLeft = 0 + 'px';
         StairDiv.appendChild(x);
         StairDivPosition = StairDiv.getBoundingClientRect();
+
+        var x = document.createElement('TABLE');
+        x.setAttribute('id', 'playAllStairTable');
+        x.style.textAlign = 'center';
+        x.style.borderCollapse = 'collapse';
+        x.cellSpacing = 0;
+        x.cellPadding = 0;
+
+        var playPitchDiv = docById('playPitch');
+        playPitchDiv.style.paddingTop = 0 + 'px';
+        playPitchDiv.style.paddingLeft = 0 + 'px';
+        playPitchDiv.appendChild(x);
+        playPitchDivPosition = playPitchDiv.getBoundingClientRect();
+
+        var table = docById('playAllStairTable');
+        var header = table.createTHead();
+        var row = header.insertRow(-1);
+        row.style.left = Math.floor(playPitchDivPosition.left) + 'px';
+        row.style.top = Math.floor(playPitchDivPosition.top) + 'px';
+        row.setAttribute('id', 'playAllStair');
+
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
 
         var table = docById('buttonTable');
         var header = table.createTHead();
@@ -120,6 +189,7 @@ function PitchStairCase() {
 
         cell.onclick=function() {
             docById('pitchstaircase').style.visibility = 'hidden';
+            docById('playPitch').style.visibility = 'hidden';
         };
 
         cell.onmouseover=function() {
@@ -132,6 +202,29 @@ function PitchStairCase() {
 
 
         for (var i = 0; i < thisStair.Stairs.length; i++) {
+
+            var playTable = document.createElement('TABLE');
+            playTable.setAttribute('id', 'playStairTable' + i);
+            playTable.style.textAlign = 'center';
+            playTable.style.borderCollapse = 'collapse';
+            playTable.cellSpacing = 0;
+            playTable.cellPadding = 0;
+            playPitchDiv.appendChild(playTable);
+
+            var header = playTable.createTHead();
+            var row = header.insertRow(-1);
+            row.style.left = Math.floor(playPitchDivPosition.left) + 'px';
+            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            row.setAttribute('id', "playStair" + i);
+
+            var cell = row.insertCell(-1);
+            cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            cell.style.minWidth = cell.style.width;
+            cell.style.maxWidth = cell.style.width;
+            cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
 
             var StairTable = document.createElement('TABLE');
             StairTable.setAttribute('id', 'stairTable' + i);
@@ -163,7 +256,12 @@ function PitchStairCase() {
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+            cell.style.lineHeight = 60 + '%';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            var pitchnotes = [];
+            pitchnotes.push(thisStair.Stairs[i][0] + thisStair.Stairs[i][1]);
+            console.log(pitchnotes);
+            thisStair.logo.synth.trigger(pitchnotes, 0.125, 'poly');
 
             cell.addEventListener('click', function(event) {
                 thisStair.dissectStair(event, logo);
