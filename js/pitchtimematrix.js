@@ -149,14 +149,14 @@ function Matrix() {
             }
         };
 
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
 
         if (table !== null) {
             table.remove();
         }
 
         var x = document.createElement('TABLE');
-        x.setAttribute('id', 'myTable');
+        x.setAttribute('id', 'pitchTimeTable');
         x.style.textAlign = 'center';
 
         var matrixDiv = docById('matrix');
@@ -165,7 +165,7 @@ function Matrix() {
         matrixDiv.appendChild(x);
         matrixDivPosition = matrixDiv.getBoundingClientRect();
 
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
         // FIXME: Why is not 'fixed' honored?
         // table.style.tableLayout = 'fixed';
         // table.style.maxWidth = 'none';
@@ -344,7 +344,7 @@ function Matrix() {
     };
 
     this.exportMatrix = function() {
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
 
         var exportWindow = window.open("");
         var exportDocument = exportWindow.document;
@@ -410,7 +410,7 @@ function Matrix() {
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
 
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
         var tupletTimeFactor = param[0][0] / param[0][1];
         var numberOfNotes = param[1].length;
         var totalNoteInterval = 0;
@@ -563,7 +563,7 @@ function Matrix() {
     };
 
     this.addNotes = function(numBeats, noteValue) {
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
         console.log(noteValue);
         var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
@@ -623,7 +623,7 @@ function Matrix() {
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
         if (this.matrixHasTuplets) {
             var leaveRowsFromBottom = 3;
         } else {
@@ -708,7 +708,7 @@ function Matrix() {
 
         this.playDirection = 1;
         this.notesCounter = 0;
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
 
         // We have an array of pitches and note values.
         var note = this.notesToPlayDirected[this.notesCounter][0];
@@ -773,7 +773,7 @@ function Matrix() {
         // cell of the tuplet spams multiple columns, the highlight
         // gets ahead of itself.
         setTimeout(function() {
-            var table = docById('myTable');
+            var table = docById('pitchTimeTable');
             // Did we just play the last note?
             if (noteCounter === that.notesToPlayDirected.length - 1) {
                 for (var j = 1; j < table.rows[that.rowIndex].cells.length; j++) {
@@ -871,11 +871,11 @@ function Matrix() {
             var leaveRowsFromBottom = 1;
         }
 
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
         this.notesToPlay[colIndex - 1][0] = [];
         if (table !== null) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
-                var table = docById('myTable');
+                var table = docById('pitchTimeTable');
                 cell = table.rows[j].cells[colIndex];
                 if (cell.style.backgroundColor === 'black') {
                     this.setNoteCell(j, colIndex, cell, playNote);
@@ -885,7 +885,7 @@ function Matrix() {
     };
 
     this.setNoteCell = function(j, colIndex, cell, playNote) {
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
         var drumHTML = solfegeHTML.split('"');
         if (drumHTML.length > 3) {
@@ -924,7 +924,7 @@ function Matrix() {
 
     this.clearMatrix = function() {
         // "Unclick" every entry in the matrix.
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
 
         if (this.matrixHasTuplets) {
             var leaveRowsFromBottom = 3;

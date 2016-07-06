@@ -112,6 +112,9 @@ const MUSICALMODES = {
     'HIRAJOSHI': [1, 4, 1, 4, 2],
     'JAPANESE': [1, 4, 2, 3, 2],
     'FIBONACCI': [1, 1, 2, 3, 5],
+
+    // User definition overrides this constant
+    'CUSTOM': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 };
 
 const MAQAMTABLE = {
@@ -185,6 +188,7 @@ const MODENAMES = [
     [_('Japanese'), 'JAPANESE'],
     //.TRANS: Italian mathematician
     [_('Fibonacci'), 'FIBONACCI'],
+    [_('Custom'), 'CUSTOM'],
 ];
 
 const DRUMNAMES = [
@@ -238,6 +242,7 @@ const DRUMNAMES = [
 
 const DEFAULTDRUM = 'kick';
 
+var customMode = MUSICALMODES[CUSTOM];
 
 function getDrumName(name) {
     if (name === '') {

@@ -345,6 +345,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     statusBlock.adjustWidthToLabel();
     statusBlock.stackClampZeroArgBlock();
 
+    var modewidgetBlock = new ProtoBlock('modewidget');
+    modewidgetBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['modewidget'] = modewidgetBlock;
+    modewidgetBlock.staticLabels.push(_('custom mode'));
+    modewidgetBlock.adjustWidthToLabel();
+    modewidgetBlock.basicBlockCollapsed();
+
     // RHYTHM PALETTE
 
     var turtleNoteBlock = new ProtoBlock('turtlenote');
