@@ -634,6 +634,13 @@ define(function (require) {
                 updatePluginObj(obj);
             }
 
+            // Load custom mode saved in local storage.
+	    var custommodeData = storage.custommode;
+            if (custommodeData != undefined) {
+		customMode = JSON.parse(custommodeData);
+                console.log('restoring custom mode: ' + customMode);
+	    }
+
             fileChooser.addEventListener('click', function (event) {
                 this.value = null;
             });
