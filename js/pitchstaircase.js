@@ -1,4 +1,4 @@
-function PitchStairCase() {
+    function PitchStairCase() {
 
     this.Stairs = [];
 
@@ -96,6 +96,29 @@ function PitchStairCase() {
         this.logo.synth.trigger(pitchnotes, 0.125, 'poly');
     }
 
+    this.playAll = function() {
+        var pitchnotes = [];
+        var note = this.Stairs[0][0] + this.Stairs[0][1];
+        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
+        console.log("Playing Stair0")
+        this.logo.synth.trigger(pitchnotes, 1, 'poly');
+        this.playAllStairs(1);
+    }
+
+    this.playAllStairs = function(stairno) {
+        var that = this;
+        setTimeout(function () {
+            if(stairno < that.Stairs.length) {
+                var pitchnotes = [];
+                console.log("Playing stair" + stairno);
+                var note = that.Stairs[stairno][0] + that.Stairs[stairno][1];
+                pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
+                that.logo.synth.trigger(pitchnotes, 1, 'poly');
+                that.playAllStairs(stairno+1);
+            }
+        }, 1000 + that.logo.turtleDelay);
+    }
+
 	this.init = function(logo) {
 
         console.log(this.Stairs);
@@ -171,6 +194,9 @@ function PitchStairCase() {
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.onclick = function() {
+            thisStair.playAll();
+        }
 
 
         var table = docById('buttonTable');
