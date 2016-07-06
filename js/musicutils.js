@@ -391,7 +391,11 @@ function _getStepSize(keySignature, pitch, direction) {
     // Returns how many half-steps to the next note in this key.
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
-    var halfSteps = MUSICALMODES[obj[1]];
+    if (obj[1] === 'CUSTOM') {
+	var halfSteps = customMode;
+    } else {
+	var halfSteps = MUSICALMODES[obj[1]];
+    }
 
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
         var thisScale = NOTESFLAT;
@@ -458,7 +462,11 @@ function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
-    var halfSteps = MUSICALMODES[obj[1]];
+    if (obj[1] === 'CUSTOM') {
+	var halfSteps = customMode;
+    } else {
+	var halfSteps = MUSICALMODES[obj[1]];
+    }
 
     var solfege = [];
     for (var i = 0; i < halfSteps.length; i++) {
@@ -486,7 +494,11 @@ function getInterval (interval, keySignature, pitch) {
     // Step size interval based on the position (pitch) in the scale
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
-    var halfSteps = MUSICALMODES[obj[1]];
+    if (obj[1] === 'CUSTOM') {
+	var halfSteps = customMode;
+    } else {
+	var halfSteps = MUSICALMODES[obj[1]];
+    }
 
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
         var thisScale = NOTESFLAT;
