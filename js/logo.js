@@ -198,6 +198,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
     this.synth.loadSynth('poly');
     // this.synth.loadSynth(DEFAULTDRUM);
 
+    // Mide widget
+    this.modeWidget = new ModeWidget();
+
     // Status matrix
     this.statusMatrix = new StatusMatrix();
     this.inStatusMatrix = false;
@@ -2070,6 +2073,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             };
 
             logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'modewidget':
+            logo.modeWidget.init(logo);
             break;
         case 'status':
             logo.statusMatrix.init(logo);
