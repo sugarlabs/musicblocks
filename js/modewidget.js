@@ -291,7 +291,7 @@ function ModeWidget() {
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
 		cell.style.fontSize = this.cellScale * 100 + '%';
-                var halfStep = (j % 12) + 1;
+                var halfStep = j % 12;
 		cell.innerHTML = '<font color="white">' + halfStep + '</font>';
 
                 cell.onmouseover=function() {
