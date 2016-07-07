@@ -66,14 +66,14 @@ function ModeWidget() {
         row.style.left = Math.floor(matrixDivPosition.left) + 'px';
         row.style.top = Math.floor(matrixDivPosition.top) + 'px';
 
-        var solfaCell = row.insertCell(-1);
-        solfaCell.style.fontSize = this.cellScale * 100 + '%';
-        solfaCell.innerHTML = '<b>' + _('mode') + '</b>';
-        solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        solfaCell.style.minWidth = solfaCell.style.width;
-        solfaCell.style.maxWidth = solfaCell.style.width;
-        solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        solfaCell.style.backgroundColor = MATRIXLABELCOLOR;
+        var labelCell = row.insertCell(-1);
+        labelCell.style.fontSize = this.cellScale * 100 + '%';
+        labelCell.innerHTML = '<b>' + _('mode') + '</b>';
+        labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        labelCell.style.minWidth = labelCell.style.width;
+        labelCell.style.maxWidth = labelCell.style.width;
+        labelCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        labelCell.style.backgroundColor = MATRIXLABELCOLOR;
 
         var iconSize = Math.floor(this.cellScale * 24);
 
@@ -218,6 +218,10 @@ function ModeWidget() {
         this.addNotes(13, 4);
 
         this.makeClickable();
+
+        // Recalculate widget width (including intercell padding)
+        var w = 13 * Math.floor(EIGHTHNOTEWIDTH * 2 * this.cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 15 * 3;
+        docById('modewidget').style.width = w + 'px';
     };
 
     this.rotateLeft = function() {
@@ -261,11 +265,11 @@ function ModeWidget() {
         }
     };
 
-    this.noteWidth = function (noteValue) {
+    this.cellWidth = function (noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
     };
 
-    this.addNotes = function(numBeats, noteValue) {
+    this.addNotes = function(numHalfSteps, noteValue) {
         var table = docById('modeTable');
         var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
@@ -275,16 +279,20 @@ function ModeWidget() {
 
         var rowCount = 1;
 
-        for (var j = 0; j < numBeats; j++) {
+        for (var j = 0; j < numHalfSteps; j++) {
             for (var i = 1; i <= rowCount; i++) {
                 var row = table.rows[i];
                 var cell = row.insertCell(-1);
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-                cell.width = this.noteWidth(noteValue);
+                cell.width = this.cellWidth(noteValue);
                 cell.style.width = cell.width;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+
+		cell.style.fontSize = this.cellScale * 100 + '%';
+                var halfStep = (j % 12) + 1;
+		cell.innerHTML = '<font color="white">' + halfStep + '</font>';
 
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
