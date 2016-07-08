@@ -1,4 +1,4 @@
-// Copyright (c) 2015,16 Walter Bender
+// Copyright (c) 2016 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -12,7 +12,6 @@
 
 function ModeWidget() {
     this.cellWidth = 0;
-    this.noteValue = 4;
 
     this.init = function(logo) {
         // Initializes the mode widget. First removes the previous widget
@@ -214,8 +213,14 @@ function ModeWidget() {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
-        // 13 because we include the first note of the next octave
-        this.addNotes(13, 4);
+        this.addNotes();
+
+        var row = header.insertRow(2);
+        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale + MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+        var cell = row.insertCell(0);
+        cell.colSpan = 14;
+        cell.innerHTML = '&nbsp;';
+        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
         this.makeClickable();
 
@@ -224,89 +229,36 @@ function ModeWidget() {
         docById('modewidget').style.width = w + 'px';
     };
 
-    this.rotateLeft = function() {
-        var table = docById('modeTable');
-        var firstCell = table.rows[1].cells[1].style.backgroundColor;
-
-        for (var i = 2; i < 13; i++) {
-            var prev = table.rows[1].cells[i - 1];
-            var cell = table.rows[1].cells[i];
-            prev.style.backgroundColor = cell.style.backgroundColor;
-        }
-
-        var cell = table.rows[1].cells[12];
-        cell.style.backgroundColor = firstCell;
-
-        // Keep rotating until first cell is set.
-        var cell = table.rows[1].cells[1];
-        if (cell.style.backgroundColor !== 'black') {
-            this.rotateLeft();
-        }
-    };
-
-    this.rotateRight = function() {
+    this.addNotes = function() {
         var table = docById('modeTable');
 
-        var lastCell = table.rows[1].cells[12].style.backgroundColor;
+        // 13 because we include the first note of the next octave
+        for (var i = 0; i < 13; i++) {
+            var row = table.rows[1];
+            var cell = row.insertCell(i + 1);
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            cell.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            cell.style.width = cell.width;
+            cell.style.minWidth = cell.style.width;
+            cell.style.maxWidth = cell.style.width;
+            cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
-        for (var i = 12; i > 1; i--) {
-            var prev = table.rows[1].cells[i];
-            var cell = table.rows[1].cells[i - 1];
-            prev.style.backgroundColor = cell.style.backgroundColor;
-        }
+	    cell.style.fontSize = this.cellScale * 100 + '%';
+            var halfStep = i % 12;
+	    cell.innerHTML = '<font color="white">' + halfStep + '</font>';
 
-        var cell = table.rows[1].cells[1];
-        cell.style.backgroundColor = lastCell;
-
-        // Keep rotating until first cell is set.
-        var cell = table.rows[1].cells[1];
-        if (cell.style.backgroundColor !== 'black') {
-            this.rotateRight();
-        }
-    };
-
-    this.cellWidth = function (noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
-    };
-
-    this.addNotes = function(numHalfSteps, noteValue) {
-        var table = docById('modeTable');
-        var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
-
-        if (this.noteValue > noteValue) {
-            this.noteValue = noteValue;
-        }
-
-        var rowCount = 1;
-
-        for (var j = 0; j < numHalfSteps; j++) {
-            for (var i = 1; i <= rowCount; i++) {
-                var row = table.rows[i];
-                var cell = row.insertCell(-1);
-                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-                cell.width = this.cellWidth(noteValue);
-                cell.style.width = cell.width;
-                cell.style.minWidth = cell.style.width;
-                cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-
-		cell.style.fontSize = this.cellScale * 100 + '%';
-                var halfStep = j % 12;
-		cell.innerHTML = '<font color="white">' + halfStep + '</font>';
-
-                cell.onmouseover=function() {
-                    if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-                    }
-                }
-
-                cell.onmouseout=function() {
-                    if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    }
+            cell.onmouseover=function() {
+                if (this.style.backgroundColor !== 'black'){
+                    this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                 }
             }
-            cell.setAttribute('id', table.rows[1].cells.length - 1);
+
+            cell.onmouseout=function() {
+                if (this.style.backgroundColor !== 'black'){
+                    this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                }
+            }
+            cell.setAttribute('id', i);
         }
     };
 
@@ -356,12 +308,57 @@ function ModeWidget() {
                 if (this.style.backgroundColor === 'black') {
                     this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     that._playNote(this.id, false);
+		    that._getModeName()
                 } else {
                     this.style.backgroundColor = 'black';
                     that._playNote(this.id, true);
+		    that._getModeName()
                 }
             }
         }
+    };
+
+    this.rotateLeft = function() {
+        var table = docById('modeTable');
+        var firstCell = table.rows[1].cells[1].style.backgroundColor;
+
+        for (var i = 2; i < 13; i++) {
+            var prev = table.rows[1].cells[i - 1];
+            var cell = table.rows[1].cells[i];
+            prev.style.backgroundColor = cell.style.backgroundColor;
+        }
+
+        var cell = table.rows[1].cells[12];
+        cell.style.backgroundColor = firstCell;
+
+        // Keep rotating until first cell is set.
+        var cell = table.rows[1].cells[1];
+        if (cell.style.backgroundColor !== 'black') {
+            this.rotateLeft();
+        }
+	this._getModeName()
+    };
+
+    this.rotateRight = function() {
+        var table = docById('modeTable');
+
+        var lastCell = table.rows[1].cells[12].style.backgroundColor;
+
+        for (var i = 12; i > 1; i--) {
+            var prev = table.rows[1].cells[i];
+            var cell = table.rows[1].cells[i - 1];
+            prev.style.backgroundColor = cell.style.backgroundColor;
+        }
+
+        var cell = table.rows[1].cells[1];
+        cell.style.backgroundColor = lastCell;
+
+        // Keep rotating until first cell is set.
+        var cell = table.rows[1].cells[1];
+        if (cell.style.backgroundColor !== 'black') {
+            this.rotateRight();
+        }
+	this._getModeName()
     };
 
     this.playAll = function() {
@@ -467,20 +464,36 @@ function ModeWidget() {
         }
     };
 
-    this.save = function() {
-        customMode = [];
+    this._calculateMode = function() {
+        var currentMode = [];
         var table = docById('modeTable');
         var j = 1;
         for (var i = 2; i < 13; i++) {
             var cell = table.rows[1].cells[i];
             if (cell.style.backgroundColor === 'black') {
-                customMode.push(j);
+                currentMode.push(j);
                 j = 1;
             } else {
                 j += 1;
             }
         }
-        customMode.push(j);
+        currentMode.push(j);
+	return currentMode;
+    };
+
+    this._getModeName = function() {
+        var currentMode = JSON.stringify(this._calculateMode());
+        for (var mode in MUSICALMODES) {
+            if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
+		var table = docById('modeTable');
+                table.rows[2].cells[0].innerHTML = mode;
+		break;
+	    }
+	}
+    };
+
+    this.save = function() {
+        customMode = this._calculateMode();
         console.log('custom mode: ' + customMode);
         storage.custommode = JSON.stringify(customMode);
     };
