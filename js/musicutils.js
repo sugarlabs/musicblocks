@@ -242,7 +242,7 @@ const DRUMNAMES = [
 
 const DEFAULTDRUM = 'kick';
 
-var customMode = MUSICALMODES[CUSTOM];
+var customMode = MUSICALMODES['CUSTOM'];
 
 function getDrumName(name) {
     if (name === '') {
