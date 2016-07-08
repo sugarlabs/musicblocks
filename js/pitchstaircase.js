@@ -94,12 +94,18 @@ function PitchStairCase() {
     this.dissectStair = function(event) {
         var that = this;
 
-        var inputNum = prompt(_('Divide By:'), 2);
+        var inputNum = prompt(_('Divide By:'), "2:3");
 
-        if(!isInt(inputNum)) {
-            alert(_('Please Input a Integer'));
-            inputNum = prompt(_('Divide By:'), 2);
-        }
+      //  if(!isInt(inputNum)) {
+     //       alert(_('Please Input a Integer'));
+     //       inputNum = prompt(_('Divide By:'), 2);
+     //   }
+
+        var arr = inputNum.split(":");
+        console.log(arr);
+
+        inputNum = parseFloat(arr[0]/arr[1]);
+
 
         if(inputNum === null) {
             return ;
@@ -113,7 +119,6 @@ function PitchStairCase() {
         for (var i=0 ; i < this.Stairs.length; i++) {
 
             if (this.Stairs[i][2] < parseFloat(frequency)/inputNum) {
-                console.log(i);
                 this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency)/inputNum]);
                 flag = 1;
                 break;
@@ -136,23 +141,37 @@ function PitchStairCase() {
 
     this.playAll = function() {
         var pitchnotes = [];
-        var note = this.Stairs[0][0] + this.Stairs[0][1];
+        var note = this.Stairs[this.Stairs.length-1][0] + this.Stairs[this.Stairs.length-1][1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
-        console.log("Playing Stair0")
+        var laststair = this.Stairs.length - 1;
+        console.log("Playing stair " + laststair);     
+        var row = docById('stair' + laststair);
+        console.log(row.cells[0]);
+        row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
+        console.log(row.cells[0]);
         this.logo.synth.trigger(pitchnotes, 1, 'poly');
-        this.playAllStairs(1);
+        this.playAllStairs(this.Stairs.length-2);
     }
 
     this.playAllStairs = function(stairno) {
         var that = this;
         setTimeout(function () {
-            if(stairno < that.Stairs.length) {
+            if(stairno > -1) {
                 var pitchnotes = [];
-                console.log("Playing stair" + stairno);
+                console.log("Playing stair " + stairno);
                 var note = that.Stairs[stairno][0] + that.Stairs[stairno][1];
                 pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
+                var row = docById('stair' + stairno);
+                console.log(row.cells[0]);
+                row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
+                console.log(row.cells[0]);
                 that.logo.synth.trigger(pitchnotes, 1, 'poly');
-                that.playAllStairs(stairno+1);
+                that.playAllStairs(stairno-1);
+            } else {
+                for(var i = 0; i < that.Stairs.length; i++) {
+                    var row = docById('stair' + i);
+                    row.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                }
             }
         }, 1000 + that.logo.turtleDelay);
     }
@@ -178,7 +197,7 @@ function PitchStairCase() {
         docById('pitchstaircase').style.width = Math.floor(w / 2) + 'px';
         docById('pitchstaircase').style.overflowX = 'auto';
 		
-		var thisStair = this;
+    		var thisStair = this;
 
         var tables = document.getElementsByTagName('TABLE');
 
