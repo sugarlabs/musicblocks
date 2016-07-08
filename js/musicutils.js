@@ -244,6 +244,19 @@ const DEFAULTDRUM = 'kick';
 
 var customMode = MUSICALMODES['CUSTOM'];
 
+
+function getModeName(name) {
+    for (var mode in MODENAMES) {
+        // console.log(MODENAMES[mode]);
+        if (MODENAMES[mode][1] === name) {
+            return MODENAMES[mode][0];
+        }
+    }
+    console.log(name + ' not found in MODENAMES');
+    return name;
+};
+
+
 function getDrumName(name) {
     if (name === '') {
         console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
@@ -392,9 +405,9 @@ function _getStepSize(keySignature, pitch, direction) {
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
     if (obj[1] === 'CUSTOM') {
-	var halfSteps = customMode;
+        var halfSteps = customMode;
     } else {
-	var halfSteps = MUSICALMODES[obj[1]];
+        var halfSteps = MUSICALMODES[obj[1]];
     }
 
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
@@ -463,9 +476,9 @@ function getScaleAndHalfSteps(keySignature) {
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
     if (obj[1] === 'CUSTOM') {
-	var halfSteps = customMode;
+        var halfSteps = customMode;
     } else {
-	var halfSteps = MUSICALMODES[obj[1]];
+        var halfSteps = MUSICALMODES[obj[1]];
     }
 
     var solfege = [];
@@ -495,9 +508,9 @@ function getInterval (interval, keySignature, pitch) {
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
     if (obj[1] === 'CUSTOM') {
-	var halfSteps = customMode;
+        var halfSteps = customMode;
     } else {
-	var halfSteps = MUSICALMODES[obj[1]];
+        var halfSteps = MUSICALMODES[obj[1]];
     }
 
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
