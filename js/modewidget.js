@@ -243,9 +243,9 @@ function ModeWidget() {
             cell.style.maxWidth = cell.style.width;
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
-	    cell.style.fontSize = this.cellScale * 100 + '%';
+            cell.style.fontSize = this.cellScale * 100 + '%';
             var halfStep = i % 12;
-	    cell.innerHTML = '<font color="white">' + halfStep + '</font>';
+            cell.innerHTML = '<font color="white">' + halfStep + '</font>';
 
             cell.onmouseover=function() {
                 if (this.style.backgroundColor !== 'black'){
@@ -270,6 +270,9 @@ function ModeWidget() {
         // Read in the current mode to start.
         var currentModeName = keySignatureToMode(this.logo.keySignature[0]);
         var currentMode = MUSICALMODES[currentModeName[1]];
+
+        var table = docById('modeTable');
+        table.rows[2].cells[0].innerHTML = getModeName(currentModeName[1]);
 
         k = 0;
         j = 1;
@@ -308,11 +311,11 @@ function ModeWidget() {
                 if (this.style.backgroundColor === 'black') {
                     this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     that._playNote(this.id, false);
-		    that._getModeName()
+                    that._setModeName()
                 } else {
                     this.style.backgroundColor = 'black';
                     that._playNote(this.id, true);
-		    that._getModeName()
+                    that._setModeName()
                 }
             }
         }
@@ -336,7 +339,7 @@ function ModeWidget() {
         if (cell.style.backgroundColor !== 'black') {
             this.rotateLeft();
         }
-	this._getModeName()
+        this._setModeName()
     };
 
     this.rotateRight = function() {
@@ -358,7 +361,7 @@ function ModeWidget() {
         if (cell.style.backgroundColor !== 'black') {
             this.rotateRight();
         }
-	this._getModeName()
+        this._setModeName()
     };
 
     this.playAll = function() {
@@ -478,18 +481,18 @@ function ModeWidget() {
             }
         }
         currentMode.push(j);
-	return currentMode;
+        return currentMode;
     };
 
-    this._getModeName = function() {
+    this._setModeName = function() {
         var currentMode = JSON.stringify(this._calculateMode());
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
-		var table = docById('modeTable');
-                table.rows[2].cells[0].innerHTML = mode;
-		break;
-	    }
-	}
+                var table = docById('modeTable');
+                table.rows[2].cells[0].innerHTML = getModeName(mode);
+                break;
+            }
+        }
     };
 
     this.save = function() {
