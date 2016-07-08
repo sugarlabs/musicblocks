@@ -225,7 +225,7 @@ function ModeWidget() {
         this.makeClickable();
 
         // Recalculate widget width (including intercell padding)
-        var w = 13 * Math.floor(EIGHTHNOTEWIDTH * 2 * this.cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 15 * 3;
+        var w = 13 * Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 15 * 4;
         docById('modewidget').style.width = w + 'px';
     };
 
