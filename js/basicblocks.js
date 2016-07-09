@@ -350,7 +350,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['modewidget'] = modewidgetBlock;
     modewidgetBlock.staticLabels.push(_('custom mode'));
     modewidgetBlock.adjustWidthToLabel();
-    modewidgetBlock.basicBlockCollapsed();
+    modewidgetBlock.stackClampZeroArgBlock();
 
     // RHYTHM PALETTE
 
