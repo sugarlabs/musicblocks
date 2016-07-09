@@ -490,9 +490,11 @@ function ModeWidget() {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 var table = docById('modeTable');
                 table.rows[2].cells[0].innerHTML = getModeName(mode);
-                break;
+		return;
             }
         }
+        var table = docById('modeTable');
+        table.rows[2].cells[0].innerHTML = '';
     };
 
     this.save = function() {
