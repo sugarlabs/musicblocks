@@ -325,6 +325,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'cricket':
         case 'setdrum':
         case 'rhythmruler':
+        case 'modewidget':
         case 'repeat':
         case 'fill':
         case 'hollowline':

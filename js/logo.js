@@ -2075,7 +2075,19 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'modewidget':
-            logo.modeWidget.init(logo);
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+
+            var listenerName = '_modewidget_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+		logo.modeWidget.init(logo);
+            }
+
+            logo._setListener(turtle, listenerName, __listener);
             break;
         case 'status':
             logo.statusMatrix.init(logo);
