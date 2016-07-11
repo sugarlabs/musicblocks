@@ -427,7 +427,6 @@ drums. The output is a stack of *Set Dum* blocks.
 Each *Start* block runs as a separate voice in Music Blocks. (When
 you click on the Run button, all of the *Start* blocks are run
 concurrently.)
-
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg'</img>
 
 If we put our song into an action...
@@ -518,10 +517,10 @@ and `chunk2`.
 6. Generating Rhythms
 ---------------------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'</img>
-
 The *Rhythm Ruler* block is used to launch a widget similar to the
 *Matrix*, which can be used to generate rhythmic patterns.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'</img>
 
 The argument to the *Rhythm Ruler* block specifies the duration that
 will be subdivided to generate a rhythmic pattern. By default, it is 1
@@ -545,13 +544,22 @@ into two half-notes and the bottom rhythm ruler has been divided into
 three third-notes. Clicking on the *Play* button to the left of each row
 will playback the rhythm using a drum for each beat. The *Play-all*
 button on the upper-left of the widget will play back all rhythms
-simultaneously. The *Save stack* button will export rhythm stacks as
-shown below.
+simultaneously.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg'</img>
 
-The output of the *Rhythm Ruler* widget are stacks of rhythms that can
-be used to define rhythmic patterns in the *Matrix*.
+The rhythm can be further subdivided by clicking in individual
+cells. In the example above, two quarter-notes have been created by
+clicking on one of the half-notes.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg'</img>
+
+The *Save stack* button will export rhythm stacks.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg'</img>
+
+These stacks of rhythms can be used to define rhythmic patterns in the
+*Matrix*.
 
 7. Beyond Music Blocks
 ----------------------
