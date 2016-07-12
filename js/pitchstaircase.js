@@ -77,7 +77,7 @@ function PitchStairCase() {
             var solfegetonote = this.logo.getNote(solfege, octave, 0, this.logo.keySignature[this.logoturtle])[0];
 
             var cell = row.insertCell(-1);
-            cell.style.width = (StairDivPosition.width)* parseFloat(this.Stairs[i][2]/this.Stairs[0][2]) + 'px';
+            cell.style.width = (StairDivPosition.width)* parseFloat(this.Stairs[0][2]/this.Stairs[i][2]) * this.cellScale/2 + 'px';
             cell.innerHTML = thisStair.Stairs[i][0] + thisStair.Stairs[i][1] + " "  + Math.floor(thisStair.Stairs[i][2]);
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
@@ -94,17 +94,17 @@ function PitchStairCase() {
     this.dissectStair = function(event) {
         var that = this;
 
-        var inputNum = prompt(_('Divide By:'), "2:3");
+        var inputNum = prompt(_('Divide By:'), "3 2");
 
       //  if(!isInt(inputNum)) {
      //       alert(_('Please Input a Integer'));
      //       inputNum = prompt(_('Divide By:'), 2);
      //   }
 
-        var arr = inputNum.split(":");
+        var arr = inputNum.split(" ");
         console.log(arr);
 
-        inputNum = parseFloat(arr[0]/arr[1]);
+        inputNum = parseFloat(arr[1]/arr[0]);
 
 
         if(inputNum === null) {
