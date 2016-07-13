@@ -2084,7 +2084,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-		logo.modeWidget.init(logo);
+                logo.modeWidget.init(logo);
             }
 
             logo._setListener(turtle, listenerName, __listener);
