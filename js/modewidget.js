@@ -20,6 +20,8 @@ function ModeWidget() {
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
 
+        this._undoStack = [];
+
         docById('modewidget').style.display = 'inline';
         docById('modewidget').style.visibility = 'visible';
         docById('modewidget').style.border = 2;
@@ -79,127 +81,48 @@ function ModeWidget() {
 
         var that = this;
 
-        // Add the buttons to the top row.
-        var cell = row.insertCell(1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        // Add the buttons to the top row for play all, save, clear,
+        // rotate (left and right, invert, and close.
 
+        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play all'));
         cell.onclick=function() {
-            that._logo.setTurtleDelay(0);
             that._playAll();
         }
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        }
-
-        var cell = row.insertCell(2);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        var cell = this._addButton(row, 2, 'export-chunk.svg', iconSize, _('save'));
         cell.onclick=function() {
             that._save();
         }
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        }
-
-        var cell = row.insertCell(3);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/erase-button.svg" title="' + _('clear') + '" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        var cell = this._addButton(row, 3, 'erase-button.svg', iconSize, _('clear'));
         cell.onclick=function() {
             that._clear();
         }
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        }
-
-        var cell = row.insertCell(4);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/rotate-left.svg" title="' + _('rotate left') + ' HTML" alt="' + _('rotate left') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        var cell = this._addButton(row, 4, 'rotate-left.svg', iconSize, _('rotate left'));
         cell.onclick=function() {
             that._rotateLeft();
         }
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        }
-
-        var cell = row.insertCell(5);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/rotate-right.svg" title="' + _('rotate right') + ' HTML" alt="' + _('rotate right') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        var cell = this._addButton(row, 5, 'rotate-right.svg', iconSize, _('rotate right'));
         cell.onclick=function() {
             that._rotateRight();
         }
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        var cell = this._addButton(row, 6, 'invert.svg', iconSize, _('invert'));
+        cell.onclick=function() {
+            that._invert();
         }
 
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 7, 'restore-button.svg', iconSize, _('undo'));
+        cell.onclick=function() {
+            that._undo();
         }
 
-        var cell = row.insertCell(6);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        var cell = this._addButton(row, 8, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             docById('modewidget').style.visibility = 'hidden';
             docById('modewidget').style.border = 0;
-        }
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
         var marginFromTop = Math.floor(matrixDivPosition.top + this._cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
@@ -228,6 +151,26 @@ function ModeWidget() {
         // Recalculate widget width (including intercell padding)
         var w = 13 * Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 15 * 4;
         docById('modewidget').style.width = w + 'px';
+    };
+
+    this._addButton = function(row, colIndex, icon, iconSize, label) {
+        var cell = row.insertCell(colIndex);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        return cell;
     };
 
     this._addNotes = function() {
@@ -299,6 +242,7 @@ function ModeWidget() {
             that._playNote(this.id, true);
         }
 
+        // The first note of the next octave is always selected.
         var cell = table.rows[1].cells[13];
         cell.onclick = function() {
             that._playNote(this.id, true);
@@ -309,6 +253,8 @@ function ModeWidget() {
             var cell = table.rows[1].cells[i];
 
             cell.onclick = function() {
+                that._saveState();
+
                 if (this.style.backgroundColor === 'black') {
                     this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     that._setModeName()
@@ -321,8 +267,33 @@ function ModeWidget() {
         }
     };
 
+    this._invert = function() {
+        var table = docById('modeTable');
+        if (table == null) {
+            return;
+        }
+
+        this._saveState();
+
+        for (var i = 2; i < 7; i++) {
+            var thisCell = table.rows[1].cells[i];
+            var thatCell = table.rows[1].cells[14 - i];
+            var tmp = thisCell.style.backgroundColor;
+            thisCell.style.backgroundColor = thatCell.style.backgroundColor;
+            thatCell.style.backgroundColor = tmp;
+        }
+
+        this._setModeName()
+    };
+
     this._rotateLeft = function() {
         var table = docById('modeTable');
+        if (table == null) {
+            return;
+        }
+
+        this._saveState();
+
         var firstCell = table.rows[1].cells[1].style.backgroundColor;
 
         for (var i = 2; i < 13; i++) {
@@ -339,11 +310,17 @@ function ModeWidget() {
         if (cell.style.backgroundColor !== 'black') {
             this._rotateLeft();
         }
+
         this._setModeName()
     };
 
     this._rotateRight = function() {
         var table = docById('modeTable');
+        if (table == null) {
+            return;
+        }
+
+        this._saveState();
 
         var lastCell = table.rows[1].cells[12].style.backgroundColor;
 
@@ -361,11 +338,17 @@ function ModeWidget() {
         if (cell.style.backgroundColor !== 'black') {
             this._rotateRight();
         }
+
         this._setModeName()
     };
 
     this._playAll = function() {
         // Play all of the notes in the matrix.
+        var table = docById('modeTable');
+        if (table == null) {
+            return;
+        }
+
         if (this._playing) {
             return;
         }
@@ -377,21 +360,18 @@ function ModeWidget() {
         this.cells = [];
         var firstNote = '';
 
-        var table = docById('modeTable');
-        if (table !== null) {
-            for (var i = 1; i < 13; i++) {
-                cell = table.rows[1].cells[i];
-                if (cell.style.backgroundColor === 'black') {
-                    this.cells.push(i);
-                    if (this.cells.length === 1) {
-                        firstNote = true;
-                    }
+        for (var i = 1; i < 13; i++) {
+            cell = table.rows[1].cells[i];
+            if (cell.style.backgroundColor === 'black') {
+                this.cells.push(i);
+                if (this.cells.length === 1) {
+                    firstNote = true;
                 }
             }
+        }
 
-            if (firstNote !== '') {
-                this.cells.push(13);
-            }
+        if (firstNote !== '') {
+            this.cells.push(13);
         }
 
         this.notesCounter = 1;
@@ -434,12 +414,40 @@ function ModeWidget() {
 
     this._playNote = function(colIndex, playNote) {
         var table = docById('modeTable');
-        if (table !== null) {
-            cell = table.rows[1].cells[colIndex];
+        if (table == null) {
+            return;
+        }
 
-            if (cell.style.backgroundColor === 'black') {
-                var noteToPlay = this._logo.getNote(this._pitch, 4, colIndex - 1);
-                this._logo.synth.trigger(noteToPlay[0] + noteToPlay[1], this._noteValue, 'poly');
+        var cell = table.rows[1].cells[colIndex];
+        if (cell.style.backgroundColor === 'black') {
+            var noteToPlay = this._logo.getNote(this._pitch, 4, colIndex - 1);
+            this._logo.synth.trigger(noteToPlay[0] + noteToPlay[1], this._noteValue, 'poly');
+        }
+    };
+
+    this._saveState = function() {
+        var table = docById('modeTable');
+        if (table == null) {
+            return;
+        }
+
+        var thisState = [];
+        for (var i = 2; i < 13; i++) {
+            var cell = table.rows[1].cells[i];
+            thisState.push(cell.style.backgroundColor);
+        }
+
+        this._undoStack.push(thisState);
+    };
+
+    this._undo = function() {
+        var table = docById('modeTable');
+
+        if (this._undoStack.length > 0) {
+            var prevState = this._undoStack.pop();
+            for (var i = 2; i < 13; i++) {
+                var cell = table.rows[1].cells[i];
+                cell.style.backgroundColor = prevState[i - 2];
             }
         }
     };
@@ -447,20 +455,23 @@ function ModeWidget() {
     this._clear = function() {
         // "Unclick" every entry in the matrix.
         var table = docById('modeTable');
+        if (table == null) {
+            return;
+        }
 
-        if (table !== null) {
-            // Always set the first cell
-            var cell = table.rows[1].cells[1];
-            cell.style.backgroundColor = 'black';
+        this._saveState();
 
-            var cell = table.rows[1].cells[13];
-            cell.style.backgroundColor = 'black';
+        // Always set the first cell
+        var cell = table.rows[1].cells[1];
+        cell.style.backgroundColor = 'black';
 
-            for (var i = 2; i < 13; i++) {
-                var cell = table.rows[1].cells[i];
-                if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                }
+        var cell = table.rows[1].cells[13];
+        cell.style.backgroundColor = 'black';
+
+        for (var i = 2; i < 13; i++) {
+            var cell = table.rows[1].cells[i];
+            if (cell.style.backgroundColor === 'black') {
+                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
         }
     };
