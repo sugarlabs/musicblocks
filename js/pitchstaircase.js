@@ -176,36 +176,40 @@ function PitchStairCase() {
 
         this.logo.refreshCanvas();
 
-        setTimeout(function() {
        //     var stair = docById('stair' + stairno);
-            var noteobj = frequencyToPitch(that.Stairs[stairno][2]);
-            console.log(noteobj);
-            var note  = that.Stairs[stairno][0];
-            var octave = that.Stairs[stairno][1];
+            
 
             var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'stair'}], 0, 0, [0]]];
             var endOfStackIdx = 0;
             var previousBlock = 0;
 
-            var pitchblockidx = newStack.length;
-            var noteidx = pitchblockidx + 1;
-            var octaveidx = pitchblockidx + 2;
-            var hiddenidx = pitchblockidx + 3;
+            for (var i = 0; i < that.Stairs.length; i++) {
+                var noteobj = frequencyToPitch(that.Stairs[i][2]);
+                console.log(noteobj);
+                var note  = that.Stairs[i][0];
+                var octave = that.Stairs[i][1];
+                console.log(note);
+                var pitchblockidx = newStack.length;
+                var noteidx = pitchblockidx + 1;
+                var octaveidx = pitchblockidx + 2;
+                var hiddenidx = pitchblockidx + 3;
 
-            newStack.push([pitchblockidx, 'pitch', 0, 0, [previousBlock, noteidx, octaveidx, hiddenidx]]);
-            newStack.push([noteidx, ['text', {'value': note}], 0, 0, [pitchblockidx]]);
-            newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
-            newStack.push([hiddenidx, 'hidden', 0, 0, [pitchblockidx, null]]);
+                newStack.push([pitchblockidx, 'pitch', 0, 0, [previousBlock, noteidx, octaveidx, hiddenidx]]);
+                newStack.push([noteidx, ['text', {'value': note}], 0, 0, [pitchblockidx]]);
+                newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
 
-            var previousBlock = hiddenidx;
+                if (i === that.Stairs.length - 1) {
+                    newStack.push([hiddenidx, 'hidden', 0, 0, [pitchblockidx, null]]);
+                }
+                else {
+                    newStack.push([hiddenidx, 'hidden', 0, 0, [pitchblockidx, hiddenidx + 1]]);
+                }
 
-            that.logo.blocks.loadNewBlocks(newStack);
-            if (stairno > that.Stairs.length - 2) {
-                return;
-            } else {
-                that.save(stairno+1);
+                previousBlock = hiddenidx;
+
             }
-        }, 500);
+            console.log(newStack);
+            that.logo.blocks.loadNewBlocks(newStack);
     }
 
 	this.init = function(logo) {
