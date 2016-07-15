@@ -12,8 +12,8 @@ function PitchStairCase() {
             for (var j = start; j < this.Stairs.length-1; j++) {
                 console.log(j);
                 console.log(docById("playStairTable" + j));
-                 docById("playStairTable" + j).remove();
-                docById("stairTable"+ j).remove();  
+                docById("playStairTable" + j).remove();
+                docById("stairTable"+ j).remove();
             }
         }
         var thisStair = this;
@@ -51,7 +51,7 @@ function PitchStairCase() {
 
             playcell.onclick = function() {
                 console.log(playcell.parentNode.id);
-                thisStair.PlayOne(playcell.parentNode.id[9]);
+                thisStair.PlayOne(event);
             };
 
 
@@ -130,50 +130,42 @@ function PitchStairCase() {
         this.makeStairs(i);
     };
 
-    this.PlayOne = function(stairno) {
+    this.PlayOne = function(event) {
+        var that = this;
+        var cell = event.target;
+        var stairno = cell.parentNode.id[9];
         var pitchnotes = [];
         console.log(this.Stairs[stairno]);
         var note = this.Stairs[stairno][0] + this.Stairs[stairno][1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         console.log(pitchnotes);
-        this.logo.synth.trigger(pitchnotes, 0.125, 'poly');
+        console.log(stairno);
+        var stair = docById('stair' + stairno);
+        stair.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
+        this.logo.synth.trigger(pitchnotes, 1, 'poly');
+        setTimeout(function () {
+                stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+        }, 1000)
     }
 
     this.playAll = function() {
-        var pitchnotes = [];
-        var note = this.Stairs[this.Stairs.length-1][0] + this.Stairs[this.Stairs.length-1][1];
-        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
-        var laststair = this.Stairs.length - 1;
-        console.log("Playing stair " + laststair);     
-        var row = docById('stair' + laststair);
-        console.log(row.cells[0]);
-        row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
-        console.log(row.cells[0]);
-        this.logo.synth.trigger(pitchnotes, 1, 'poly');
-        this.playAllStairs(this.Stairs.length-2);
-    }
-
-    this.playAllStairs = function(stairno) {
         var that = this;
+        var pitchnotes = [];
+        for (var i=0; i < this.Stairs.length; i++) {
+            var note = this.Stairs[i][0] + this.Stairs[i][1];
+            pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
+
+            var row = docById('stair' + i);
+            row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
+            this.logo.synth.trigger(pitchnotes, 1, 'poly');
+        }
         setTimeout(function () {
-            if(stairno > -1) {
-                var pitchnotes = [];
-                console.log("Playing stair " + stairno);
-                var note = that.Stairs[stairno][0] + that.Stairs[stairno][1];
-                pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
-                var row = docById('stair' + stairno);
-                console.log(row.cells[0]);
-                row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
-                console.log(row.cells[0]);
-                that.logo.synth.trigger(pitchnotes, 1, 'poly');
-                that.playAllStairs(stairno-1);
-            } else {
-                for(var i = 0; i < that.Stairs.length; i++) {
-                    var row = docById('stair' + i);
-                    row.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
-                }
+            for (var i = 0; i < that.Stairs.length; i++) {
+                var stair = docById('stair' + i);
+                stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
-        }, 1000 + that.logo.turtleDelay);
+        }, 1000)
+
     }
 
     this.save = function (stairno) {
