@@ -176,6 +176,46 @@ function PitchStairCase() {
         }, 1000 + that.logo.turtleDelay);
     }
 
+    this.save = function (stairno) {
+        var that = this;
+        for (var name in this.logo.blocks.palettes.dict) {
+            this.logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+
+        this.logo.refreshCanvas();
+
+        setTimeout(function() {
+       //     var stair = docById('stair' + stairno);
+            var noteobj = frequencyToPitch(that.Stairs[stairno][2]);
+            console.log(noteobj);
+            var note  = that.Stairs[stairno][0];
+            var octave = that.Stairs[stairno][1];
+
+            var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'stair'}], 0, 0, [0]]];
+            var endOfStackIdx = 0;
+            var previousBlock = 0;
+
+            var pitchblockidx = newStack.length;
+            var noteidx = pitchblockidx + 1;
+            var octaveidx = pitchblockidx + 2;
+            var hiddenidx = pitchblockidx + 3;
+
+            newStack.push([pitchblockidx, 'pitch', 0, 0, [previousBlock, noteidx, octaveidx, hiddenidx]]);
+            newStack.push([noteidx, ['text', {'value': note}], 0, 0, [pitchblockidx]]);
+            newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
+            newStack.push([hiddenidx, 'hidden', 0, 0, [pitchblockidx, null]]);
+
+            var previousBlock = hiddenidx;
+
+            that.logo.blocks.loadNewBlocks(newStack);
+            if (stairno > that.Stairs.length - 2) {
+                return;
+            } else {
+                that.save(stairno+1);
+            }
+        }, 500);
+    }
+
 	this.init = function(logo) {
 
         console.log(this.Stairs);
@@ -263,6 +303,26 @@ function PitchStairCase() {
         row.style.top = Math.floor(StairDivPosition.top) + 'px';
 
         var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onclick=function() {
+            thisStair.save(0);
+        };
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        };
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        };
+
+        var cell = row.insertCell(1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
