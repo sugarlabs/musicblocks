@@ -9,7 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// const MODEMAP = [[2, 7], [3, 9], [5, 11], [7, 12], [9, 11], [11, 9], [12, 7], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
+// Row and column of each halfstep: Note that span cells are counted
+// only once.
 const MODEMAP = [[2, 7], [3, 6], [5, 10], [7, 11], [9, 10], [11, 8], [12, 5], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
 
 function ModeWidget() {
@@ -29,12 +30,10 @@ function ModeWidget() {
         docById('modewidget').style.border = 2;
 
         // FIXME: make this number based on canvas size.
-        var w = window.innerWidth;
-        this._cellScale = w / 1200;
-        docById('modewidget').style.width = 17.5 * Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        this._cellScale = window.innerWidth / 1200;
         docById('modewidget').style.overflowX = 'auto';
 
-        // Used to remove the matrix table
+        // Used to remove the mode widget table
         Element.prototype.remove = function() {
             this.parentElement.removeChild(this);
         }
@@ -57,28 +56,27 @@ function ModeWidget() {
         x.setAttribute('id', 'modeTable');
         x.style.textAlign = 'center';
 
-        var matrixDiv = docById('modewidget');
-        matrixDiv.style.paddingTop = 0 + 'px';
-        matrixDiv.style.paddingLeft = 0 + 'px';
-        matrixDiv.appendChild(x);
-        matrixDivPosition = matrixDiv.getBoundingClientRect();
+        var modeDiv = docById('modewidget');
+        modeDiv.style.paddingTop = 0 + 'px';
+        modeDiv.style.paddingLeft = 0 + 'px';
+        modeDiv.appendChild(x);
+        var modeDivPosition = modeDiv.getBoundingClientRect();
 
         var table = docById('modeTable');
-
         var header = table.createTHead();
         var row = header.insertRow(0);
+        row.style.left = Math.floor(modeDivPosition.left) + 'px';
+        row.style.top = Math.floor(modeDivPosition.top) + 'px';
 
         // Create blank rows.
-        for (var r = 0; r < 15; r++) {
-            table.insertRow(r);
+        for (var i = 0; i < 15; i++) {
+            table.insertRow(i);
         }
         
-        // var labelCell = row.insertCell(-1);
-        // var labelCell = table.rows[0].cells[0];
+        // Add a label to the widget in the upper-left cell.
         var labelCell = table.rows[0].insertCell();
         labelCell.rowSpan = 2;
         labelCell.colSpan = 2;
-
         labelCell.style.fontSize = this._cellScale * 100 + '%';
         labelCell.innerHTML = '<b>' + _('mode') + '</b>';
         labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -87,12 +85,10 @@ function ModeWidget() {
         labelCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         labelCell.style.backgroundColor = MATRIXLABELCOLOR;
 
-        var iconSize = Math.floor(this._cellScale * 24);
-
-        var that = this;
-
         // Add the buttons to the top row for play all, save, clear,
         // rotate (left and right, invert, and close.
+        var iconSize = Math.floor(this._cellScale * 24);
+        var that = this;
 
         var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play all'));
         cell.onclick=function() {
@@ -139,23 +135,21 @@ function ModeWidget() {
 
         // A row for the current mode label
         var row = header.insertRow(14);
-        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        // row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         var cell = row.insertCell(0);
-        cell.colSpan = 14;
+        cell.colSpan = 18;
         cell.innerHTML = '&nbsp;';
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
         this._makeClickable();
 
         // Recalculate widget width (including intercell padding)
-        var w = 9 * Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 10 * 4;  // + borders
+        var w = 9 * Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 10 * 2;  // + borders
         docById('modewidget').style.width = w + 'px';
     };
 
     this._addButton = function(row, colIndex, icon, iconSize, label) {
-        // var cell = row.insertCell(colIndex);
         var table = docById('modeTable');
-        // var cell = table.rows[0].cells[colIndex * 2];
         var cell = table.rows[0].insertCell();
         cell.rowSpan = 2;
         cell.colSpan = 2;
@@ -362,7 +356,7 @@ function ModeWidget() {
         }
     };
 
-    this.__addNoteCell = function(table, row, i) {
+    this.__addNoteCell = function(table, row, halfstep) {
         var cell = table.rows[row].insertCell();
         cell.rowSpan = 2;
         cell.colSpan = 2;
@@ -375,28 +369,12 @@ function ModeWidget() {
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-
         cell.style.fontSize = this._cellScale * 100 + '%';
-        var halfStep = i % 12;
-        cell.innerHTML = '<font color="white">' + halfStep + '</font>';
-
-        cell.onmouseover=function() {
-            if (this.style.backgroundColor !== 'black'){
-                this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-            }
-        }
-
-        cell.onmouseout=function() {
-            if (this.style.backgroundColor !== 'black'){
-                this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            }
-        }
-        cell.setAttribute('id', i);
+        cell.innerHTML = '<font color="white">' + halfstep + '</font>';
+        cell.setAttribute('id', halfstep);
     };
 
     this._makeClickable = function() {
-        // Once the entire matrix is generated, this function makes it
-        // clickable.
         var table = docById('modeTable');
 
         // Read in the current mode to start.
@@ -410,7 +388,7 @@ function ModeWidget() {
         var k = 0;
         var j = 0;
         for (var i = 0; i < 12; i++) {
-            cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
 
             if (i === j) {
                 cell.style.backgroundColor = 'black';
@@ -517,7 +495,7 @@ function ModeWidget() {
     };
 
     this._playAll = function() {
-        // Play all of the notes in the matrix.
+        // Play all of the notes in the widget.
         var table = docById('modeTable');
         if (table == null) {
             return;
@@ -535,7 +513,7 @@ function ModeWidget() {
         var firstNote = '';
 
         for (var i = 0; i < 12; i++) {
-            cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             if (cell.style.backgroundColor === 'black') {
                 this.cells.push(i);
                 if (this.cells.length === 1) {
@@ -631,7 +609,7 @@ function ModeWidget() {
     };
 
     this._clear = function() {
-        // "Unclick" every entry in the matrix.
+        // "Unclick" every entry in the widget.
         var table = docById('modeTable');
         if (table == null) {
             return;

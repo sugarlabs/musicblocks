@@ -120,15 +120,15 @@ function Matrix() {
         this.rests = 0;
         this.logo = logo;
 
-        docById('matrix').style.display = 'inline';
-        docById('matrix').style.visibility = 'visible';
-        docById('matrix').style.border = 2;
+        docById('pitchtimematrix').style.display = 'inline';
+        docById('pitchtimematrix').style.visibility = 'visible';
+        docById('pitchtimematrix').style.border = 2;
 
         // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
         this.cellScale = w / 1200;
-        docById('matrix').style.width = Math.floor(w / 2) + 'px';
-        docById('matrix').style.overflowX = 'auto';
+        docById('pitchtimematrix').style.width = Math.floor(w / 2) + 'px';
+        docById('pitchtimematrix').style.overflowX = 'auto';
 
         console.log('notes ' + this.solfegeNotes + ' octave ' + this.solfegeOctaves);
 
@@ -159,11 +159,11 @@ function Matrix() {
         x.setAttribute('id', 'pitchTimeTable');
         x.style.textAlign = 'center';
 
-        var matrixDiv = docById('matrix');
+        var matrixDiv = docById('pitchtimematrix');
         matrixDiv.style.paddingTop = 0 + 'px';
         matrixDiv.style.paddingLeft = 0 + 'px';
         matrixDiv.appendChild(x);
-        matrixDivPosition = matrixDiv.getBoundingClientRect();
+        var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
         var table = docById('pitchTimeTable');
         // FIXME: Why is not 'fixed' honored?
@@ -268,8 +268,8 @@ function Matrix() {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         cell.onclick=function() {
-            docById('matrix').style.visibility = 'hidden';
-            docById('matrix').style.border = 0;
+            docById('pitchtimematrix').style.visibility = 'hidden';
+            docById('pitchtimematrix').style.border = 0;
         }
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
