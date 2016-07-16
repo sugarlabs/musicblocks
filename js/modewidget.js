@@ -134,18 +134,13 @@ function ModeWidget() {
         this._addNotes();
 
         // A row for the current mode label
-        var row = header.insertRow(14);
-        // row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        var row = table.insertRow(14);
         var cell = row.insertCell(0);
         cell.colSpan = 18;
         cell.innerHTML = '&nbsp;';
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
         this._makeClickable();
-
-        // Recalculate widget width (including intercell padding)
-        var w = 9 * Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 10 * 2;  // + borders
-        docById('modewidget').style.width = w + 'px';
     };
 
     this._addButton = function(row, colIndex, icon, iconSize, label) {

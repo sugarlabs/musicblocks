@@ -148,57 +148,42 @@
         });
       
         function moveMatrix(event) {
-            var matrixDiv = document.getElementById('pitchtimematrix');
-            var matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var myDiv = document.getElementById('pitchtimematrix');
+            var myDivPosition = myDiv.getBoundingClientRect();
 
             var table = document.getElementById('pitchTimeTable');
             var row = table.rows.item(0);
-            row.style.left = matrixDivPosition.left + 'px';
-            row.style.top = matrixDivPosition.top + 'px';
+            row.style.left = myDivPosition.left + 'px';
+            row.style.top = myDivPosition.top + 'px';
 
-            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
+            // What does this do?
+            var marginFromTop = Math.floor(myDivPosition.top + this.cellScale * 2 + parseInt(myDiv.style.paddingTop));
             for (var i = 1, row; row = table.rows[i]; i++) {
                 cell = row.cells[0];
-                cell.style.left = matrixDivPosition.left + 2 + 'px';
+                cell.style.left = myDivPosition.left + 2 + 'px';
                 cell.style.top = marginFromTop + 'px';
                 marginFromTop += parseInt(cell.style.height);
             }
         }
 
         function movePitchDrumMatrix(event) {
-            var matrixDiv = document.getElementById('pitchdrummatrix');
-            var matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var myDiv = document.getElementById('pitchdrummatrix');
+            var myDivPosition = myDiv.getBoundingClientRect();
 
             var table = document.getElementById('drumTable');
             var row = table.rows.item(0);
-            row.style.left = matrixDivPosition.left + 'px';
-            row.style.top = matrixDivPosition.top + 'px';
-
-            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (var i = 1, row; row = table.rows[i]; i++) {
-                cell = row.cells[0];
-                cell.style.left = matrixDivPosition.left + 2 + 'px';
-                cell.style.top = marginFromTop + 'px';
-                marginFromTop += parseInt(cell.style.height);
-            }
+            row.style.left = myDivPosition.left + 'px';
+            row.style.top = myDivPosition.top + 'px';
         }
 
         function moveStatusMatrix(event) {
-            var matrixDiv = document.getElementById('statusmatrix');
-            var matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var myDiv = document.getElementById('statusmatrix');
+            var myDivPosition = myDiv.getBoundingClientRect();
 
             var table = document.getElementById('statusTable');
             var row = table.rows.item(0);
-            row.style.left = matrixDivPosition.left + 'px';
-            row.style.top = matrixDivPosition.top + 'px';
-
-            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (var i = 1, row; row = table.rows[i]; i++) {
-                cell = row.cells[0];
-                cell.style.left = matrixDivPosition.left + 2 + 'px';
-                cell.style.top = marginFromTop + 'px';
-                marginFromTop += parseInt(cell.style.height);
-            }
+            row.style.left = myDivPosition.left + 'px';
+            row.style.top = myDivPosition.top + 'px';
         }
 
         function moveModeWidget(event) {
