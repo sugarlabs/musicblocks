@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+// const MODEMAP = [[2, 7], [3, 9], [5, 11], [7, 12], [9, 11], [11, 9], [12, 7], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
+const MODEMAP = [[2, 7], [3, 6], [5, 10], [7, 11], [9, 10], [11, 8], [12, 5], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
 
 function ModeWidget() {
 
@@ -65,10 +67,18 @@ function ModeWidget() {
 
         var header = table.createTHead();
         var row = header.insertRow(0);
-        row.style.left = Math.floor(matrixDivPosition.left) + 'px';
-        row.style.top = Math.floor(matrixDivPosition.top) + 'px';
 
-        var labelCell = row.insertCell(-1);
+        // Create blank rows.
+        for (var r = 0; r < 15; r++) {
+            table.insertRow(r);
+        }
+        
+        // var labelCell = row.insertCell(-1);
+        // var labelCell = table.rows[0].cells[0];
+        var labelCell = table.rows[0].insertCell();
+        labelCell.rowSpan = 2;
+        labelCell.colSpan = 2;
+
         labelCell.style.fontSize = this._cellScale * 100 + '%';
         labelCell.innerHTML = '<b>' + _('mode') + '</b>';
         labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -125,21 +135,10 @@ function ModeWidget() {
             docById('modewidget').style.border = 0;
         }
 
-        var marginFromTop = Math.floor(matrixDivPosition.top + this._cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
-        var row = header.insertRow(1);
-        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-
-        var cell = row.insertCell(0);
-        cell.innerHTML = '&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-
         this._addNotes();
 
-        var row = header.insertRow(2);
+        // A row for the current mode label
+        var row = header.insertRow(14);
         row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         var cell = row.insertCell(0);
         cell.colSpan = 14;
@@ -149,12 +148,17 @@ function ModeWidget() {
         this._makeClickable();
 
         // Recalculate widget width (including intercell padding)
-        var w = 13 * Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 15 * 4;
+        var w = 9 * Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + parseInt(labelCell.style.width.replace('px', '')) + 10 * 4;  // + borders
         docById('modewidget').style.width = w + 'px';
     };
 
     this._addButton = function(row, colIndex, icon, iconSize, label) {
-        var cell = row.insertCell(colIndex);
+        // var cell = row.insertCell(colIndex);
+        var table = docById('modeTable');
+        // var cell = table.rows[0].cells[colIndex * 2];
+        var cell = table.rows[0].insertCell();
+        cell.rowSpan = 2;
+        cell.colSpan = 2;
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
@@ -174,36 +178,220 @@ function ModeWidget() {
     };
 
     this._addNotes = function() {
+        // This is a brute-force way of adding notes in a circular
+        // pattern within an HTML table.
+        // Fix me: Some of this could be done with CSS.
+
         var table = docById('modeTable');
 
-        // 13 because we include the first note of the next octave
-        for (var i = 0; i < 13; i++) {
-            var row = table.rows[1];
-            var cell = row.insertCell(i + 1);
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            cell.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            cell.style.width = cell.width;
-            cell.style.minWidth = cell.style.width;
-            cell.style.maxWidth = cell.style.width;
-            cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-
-            cell.style.fontSize = this._cellScale * 100 + '%';
-            var halfStep = i % 12;
-            cell.innerHTML = '<font color="white">' + halfStep + '</font>';
-
-            cell.onmouseover=function() {
-                if (this.style.backgroundColor !== 'black'){
-                    this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-                }
-            }
-
-            cell.onmouseout=function() {
-                if (this.style.backgroundColor !== 'black'){
-                    this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                }
-            }
-            cell.setAttribute('id', i);
+        for (var i = 0; i < 7; i++) {
+            table.rows[2].insertCell();
+            last(table.rows[2].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[2].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
         }
+
+        this.__addNoteCell(table, 2, 0);
+
+        for (var i = 0; i < 7; i++) {
+            table.rows[2].insertCell();
+            last(table.rows[2].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[2].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        for (var i = 0; i < 5; i++) {
+            table.rows[3].insertCell();
+            last(table.rows[3].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[3].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[4].insertCell();
+            last(table.rows[4].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[4].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 3, 11);
+
+        for (var i = 0; i < 2; i++) {
+            table.rows[4].insertCell();
+            last(table.rows[4].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[4].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 3, 1);
+
+        for (var i = 0; i < 5; i++) {
+            table.rows[3].insertCell();
+            last(table.rows[3].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[3].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[4].insertCell();
+            last(table.rows[4].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[4].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        for (var i = 0; i < 3; i++) {
+            table.rows[5].insertCell();
+            last(table.rows[5].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[5].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[6].insertCell();
+            last(table.rows[6].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[6].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 5, 10);
+
+        for (var i = 0; i < 6; i++) {
+            table.rows[5].insertCell();
+            last(table.rows[5].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[5].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[6].insertCell();
+            last(table.rows[6].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[6].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 5, 2);
+
+        for (var i = 0; i < 3; i++) {
+            table.rows[5].insertCell();
+            last(table.rows[5].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[5].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[6].insertCell();
+            last(table.rows[6].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[6].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        for (var i = 0; i < 2; i++) {
+            table.rows[7].insertCell();
+            last(table.rows[7].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[7].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[8].insertCell();
+            last(table.rows[8].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[8].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 7, 9);
+
+        for (var i = 0; i < 8; i++) {
+            table.rows[7].insertCell();
+            last(table.rows[7].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[7].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[8].insertCell();
+            last(table.rows[8].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[8].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 7, 3);
+
+        for (var i = 0; i < 2; i++) {
+            table.rows[7].insertCell();
+            last(table.rows[7].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[7].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[8].insertCell();
+            last(table.rows[8].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[8].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        for (var i = 0; i < 3; i++) {
+            table.rows[9].insertCell();
+            last(table.rows[9].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[9].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[10].insertCell();
+            last(table.rows[10].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[10].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 9, 8);
+
+        for (var i = 0; i < 6; i++) {
+            table.rows[9].insertCell();
+            last(table.rows[9].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[9].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[10].insertCell();
+            last(table.rows[10].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[10].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 9, 4);
+
+        for (var i = 0; i < 3; i++) {
+            table.rows[9].insertCell();
+            last(table.rows[9].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[9].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[10].insertCell();
+            last(table.rows[10].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[10].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        for (var i = 0; i < 5; i++) {
+            table.rows[11].insertCell();
+            last(table.rows[11].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[11].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[12].insertCell();
+            last(table.rows[12].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[12].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        for (var i = 0; i < 7; i++) {
+            table.rows[13].insertCell();
+            last(table.rows[13].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[13].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 11, 7);
+
+        for (var i = 0; i < 2; i++) {
+            table.rows[11].insertCell();
+            last(table.rows[11].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[11].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        this.__addNoteCell(table, 12, 6);
+
+        this.__addNoteCell(table, 11, 5);
+
+        for (var i = 0; i < 5; i++) {
+            table.rows[11].insertCell();
+            last(table.rows[11].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[11].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            table.rows[12].insertCell();
+            last(table.rows[12].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[12].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+
+        for (var i = 0; i < 7; i++) {
+            table.rows[13].insertCell();
+            last(table.rows[13].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+            last(table.rows[13].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
+        }
+    };
+
+    this.__addNoteCell = function(table, row, i) {
+        var cell = table.rows[row].insertCell();
+        cell.rowSpan = 2;
+        cell.colSpan = 2;
+        cell.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.height = cell.height;
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.width = cell.width;
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+
+        cell.style.fontSize = this._cellScale * 100 + '%';
+        var halfStep = i % 12;
+        cell.innerHTML = '<font color="white">' + halfStep + '</font>';
+
+        cell.onmouseover=function() {
+            if (this.style.backgroundColor !== 'black'){
+                this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+            }
+        }
+
+        cell.onmouseout=function() {
+            if (this.style.backgroundColor !== 'black'){
+                this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            }
+        }
+        cell.setAttribute('id', i);
     };
 
     this._makeClickable = function() {
@@ -216,12 +404,14 @@ function ModeWidget() {
         var currentMode = MUSICALMODES[currentModeName[1]];
 
         var table = docById('modeTable');
-        table.rows[2].cells[0].innerHTML = getModeName(currentModeName[1]);
+        table.rows[14].cells[0].innerHTML = getModeName(currentModeName[1]);
 
-        k = 0;
-        j = 1;
-        for (var i = 1; i < 13; i++) {
-            cell = table.rows[1].cells[i];
+        var that = this;
+        var k = 0;
+        var j = 0;
+        for (var i = 0; i < 12; i++) {
+            cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+
             if (i === j) {
                 cell.style.backgroundColor = 'black';
                 j += currentMode[k];
@@ -229,39 +419,24 @@ function ModeWidget() {
             } else {
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
-        }
-        // The first note of the next octave.
-        cell = table.rows[1].cells[13];
-        cell.style.backgroundColor = 'black';
 
-        var that = this;
+            if (i === 0) {
+                // The first note of the octave is always selected.
+                cell.onclick = function() {
+                    that._playNote(this.id);
+                }
+            } else {
+                cell.onclick = function() {
+                    that._saveState();
 
-        // The first note of the octave is always selected.
-        var cell = table.rows[1].cells[1];
-        cell.onclick = function() {
-            that._playNote(this.id, true);
-        }
-
-        // The first note of the next octave is always selected.
-        var cell = table.rows[1].cells[13];
-        cell.onclick = function() {
-            that._playNote(this.id, true);
-        }
-
-        // All the other notes are optional.
-        for (var i = 2; i < 13; i++) {
-            var cell = table.rows[1].cells[i];
-
-            cell.onclick = function() {
-                that._saveState();
-
-                if (this.style.backgroundColor === 'black') {
-                    this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    that._setModeName()
-                } else {
-                    this.style.backgroundColor = 'black';
-                    that._playNote(this.id, true);
-                    that._setModeName()
+                    if (this.style.backgroundColor === 'black') {
+                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        that._setModeName()
+                    } else {
+                        this.style.backgroundColor = 'black';
+                        that._playNote(this.id);
+                        that._setModeName()
+                    }
                 }
             }
         }
@@ -275,9 +450,9 @@ function ModeWidget() {
 
         this._saveState();
 
-        for (var i = 2; i < 7; i++) {
-            var thisCell = table.rows[1].cells[i];
-            var thatCell = table.rows[1].cells[14 - i];
+        for (var i = 1; i < 6; i++) {
+            var thisCell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+            var thatCell = table.rows[MODEMAP[12 - i][0]].cells[MODEMAP[12 - i][1]];
             var tmp = thisCell.style.backgroundColor;
             thisCell.style.backgroundColor = thatCell.style.backgroundColor;
             thatCell.style.backgroundColor = tmp;
@@ -294,19 +469,19 @@ function ModeWidget() {
 
         this._saveState();
 
-        var firstCell = table.rows[1].cells[1].style.backgroundColor;
+        var firstCell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]].style.backgroundColor;
 
-        for (var i = 2; i < 13; i++) {
-            var prev = table.rows[1].cells[i - 1];
-            var cell = table.rows[1].cells[i];
+        for (var i = 1; i < 12; i++) {
+            var prev = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
+            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             prev.style.backgroundColor = cell.style.backgroundColor;
         }
 
-        var cell = table.rows[1].cells[12];
+        var cell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]];
         cell.style.backgroundColor = firstCell;
 
         // Keep rotating until first cell is set.
-        var cell = table.rows[1].cells[1];
+        var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
         if (cell.style.backgroundColor !== 'black') {
             this._rotateLeft();
         }
@@ -322,19 +497,18 @@ function ModeWidget() {
 
         this._saveState();
 
-        var lastCell = table.rows[1].cells[12].style.backgroundColor;
+        var lastCell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]].style.backgroundColor;
 
-        for (var i = 12; i > 1; i--) {
-            var prev = table.rows[1].cells[i];
-            var cell = table.rows[1].cells[i - 1];
+        for (var i = 11; i > 0; i--) {
+            var prev = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+            var cell = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
             prev.style.backgroundColor = cell.style.backgroundColor;
         }
 
-        var cell = table.rows[1].cells[1];
+        var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
         cell.style.backgroundColor = lastCell;
 
         // Keep rotating until first cell is set.
-        var cell = table.rows[1].cells[1];
         if (cell.style.backgroundColor !== 'black') {
             this._rotateRight();
         }
@@ -360,8 +534,8 @@ function ModeWidget() {
         this.cells = [];
         var firstNote = '';
 
-        for (var i = 1; i < 13; i++) {
-            cell = table.rows[1].cells[i];
+        for (var i = 0; i < 12; i++) {
+            cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             if (cell.style.backgroundColor === 'black') {
                 this.cells.push(i);
                 if (this.cells.length === 1) {
@@ -371,7 +545,7 @@ function ModeWidget() {
         }
 
         if (firstNote !== '') {
-            this.cells.push(13);
+            this.cells.push(12);
         }
 
         this.notesCounter = 1;
@@ -397,31 +571,33 @@ function ModeWidget() {
                 var i = noteCounter;
             }
 
-            if (i < that.cells.length) {// - 1) {
-                var cell = table.rows[1].cells[that.cells[i]];
-                if (i === noteCounter) {
-                    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-                } else {
-                    cell.style.backgroundColor = 'black';
+            if (i < that.cells.length) {
+                var cell = table.rows[MODEMAP[that.cells[i] % 12][0]].cells[MODEMAP[that.cells[i] % 12][1]];
+                if (i < that.cells.length - 1) {
+                    if (i === noteCounter) {
+                        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    } else {
+                        cell.style.backgroundColor = 'black';
+                    }
                 }
             }
 
-            var noteToPlay = that._logo.getNote(that._pitch, 4, that.cells[i] - 1);
+            var noteToPlay = that._logo.getNote(that._pitch, 4, that.cells[i]);
             that._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, 'poly');
             that.__playNote(time, noteCounter + 1);
         }, 1000 * time);
     };
 
-    this._playNote = function(colIndex, playNote) {
+    this._playNote = function(idx) {
         var table = docById('modeTable');
         if (table == null) {
             return;
         }
 
-        var cell = table.rows[1].cells[colIndex];
+        var cell = table.rows[MODEMAP[idx][0]].cells[MODEMAP[idx][1]];
         if (cell.style.backgroundColor === 'black') {
-            var noteToPlay = this._logo.getNote(this._pitch, 4, colIndex - 1);
-            this._logo.synth.trigger(noteToPlay[0] + noteToPlay[1], this._noteValue, 'poly');
+            var noteToPlay = this._logo.getNote(this._pitch, 4, idx);
+            this._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, 'poly');
         }
     };
 
@@ -432,8 +608,8 @@ function ModeWidget() {
         }
 
         var thisState = [];
-        for (var i = 2; i < 13; i++) {
-            var cell = table.rows[1].cells[i];
+        for (var i = 0; i < 12; i++) {
+            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             thisState.push(cell.style.backgroundColor);
         }
 
@@ -445,10 +621,12 @@ function ModeWidget() {
 
         if (this._undoStack.length > 0) {
             var prevState = this._undoStack.pop();
-            for (var i = 2; i < 13; i++) {
-                var cell = table.rows[1].cells[i];
-                cell.style.backgroundColor = prevState[i - 2];
+            for (var i = 0; i < 12; i++) {
+                var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+                cell.style.backgroundColor = prevState[i];
             }
+
+            this._setModeName()
         }
     };
 
@@ -462,14 +640,11 @@ function ModeWidget() {
         this._saveState();
 
         // Always set the first cell
-        var cell = table.rows[1].cells[1];
+        var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
         cell.style.backgroundColor = 'black';
 
-        var cell = table.rows[1].cells[13];
-        cell.style.backgroundColor = 'black';
-
-        for (var i = 2; i < 13; i++) {
-            var cell = table.rows[1].cells[i];
+        for (var i = 1; i < 12; i++) {
+            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             if (cell.style.backgroundColor === 'black') {
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
@@ -480,8 +655,8 @@ function ModeWidget() {
         var currentMode = [];
         var table = docById('modeTable');
         var j = 1;
-        for (var i = 2; i < 13; i++) {
-            var cell = table.rows[1].cells[i];
+        for (var i = 1; i < 12; i++) {
+            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
             if (cell.style.backgroundColor === 'black') {
                 currentMode.push(j);
                 j = 1;
@@ -489,6 +664,7 @@ function ModeWidget() {
                 j += 1;
             }
         }
+
         currentMode.push(j);
         return currentMode;
     };
@@ -498,12 +674,12 @@ function ModeWidget() {
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 var table = docById('modeTable');
-                table.rows[2].cells[0].innerHTML = getModeName(mode);
+                table.rows[14].cells[0].innerHTML = getModeName(mode);
                 return;
             }
         }
         var table = docById('modeTable');
-        table.rows[2].cells[0].innerHTML = '';
+        table.rows[14].cells[0].innerHTML = '';
     };
 
     this._save = function() {
