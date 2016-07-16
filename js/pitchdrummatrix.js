@@ -133,7 +133,7 @@ function PitchDrumMatrix() {
         matrixDiv.style.paddingTop = 0 + 'px';
         matrixDiv.style.paddingLeft = 0 + 'px';
         matrixDiv.appendChild(x);
-        matrixDivPosition = matrixDiv.getBoundingClientRect();
+        var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
         var table = docById('drumTable');
         var header = table.createTHead();

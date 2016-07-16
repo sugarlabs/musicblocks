@@ -258,7 +258,7 @@ table {
   -webkit-user-select: none;
 }
 
-#matrix {
+#pitchtimematrix {
   position: absolute;
   top: 20%;
   left: 30%;

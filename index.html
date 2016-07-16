@@ -59,7 +59,7 @@
           -->
     
        $(function() {
-            $("#matrix").draggable();
+            $("#pitchtimematrix").draggable();
         });
 
 	    $(function() {
@@ -148,17 +148,16 @@
         });
       
         function moveMatrix(event) {
-            var matrixDiv = document.getElementById('matrix');
-            matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var matrixDiv = document.getElementById('pitchtimematrix');
+            var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
             var table = document.getElementById('pitchTimeTable');
             var row = table.rows.item(0);
             row.style.left = matrixDivPosition.left + 'px';
             row.style.top = matrixDivPosition.top + 'px';
-            console.log(this.cellScale);
 
             var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (i = 1, row; row = table.rows[i]; i++) {
+            for (var i = 1, row; row = table.rows[i]; i++) {
                 cell = row.cells[0];
                 cell.style.left = matrixDivPosition.left + 2 + 'px';
                 cell.style.top = marginFromTop + 'px';
@@ -168,7 +167,7 @@
 
         function movePitchDrumMatrix(event) {
             var matrixDiv = document.getElementById('pitchdrummatrix');
-            matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
             var table = document.getElementById('drumTable');
             var row = table.rows.item(0);
@@ -176,7 +175,7 @@
             row.style.top = matrixDivPosition.top + 'px';
 
             var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (i = 1, row; row = table.rows[i]; i++) {
+            for (var i = 1, row; row = table.rows[i]; i++) {
                 cell = row.cells[0];
                 cell.style.left = matrixDivPosition.left + 2 + 'px';
                 cell.style.top = marginFromTop + 'px';
@@ -186,7 +185,7 @@
 
         function moveStatusMatrix(event) {
             var matrixDiv = document.getElementById('statusmatrix');
-            matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
             var table = document.getElementById('statusTable');
             var row = table.rows.item(0);
@@ -194,7 +193,7 @@
             row.style.top = matrixDivPosition.top + 'px';
 
             var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (i = 1, row; row = table.rows[i]; i++) {
+            for (var i = 1, row; row = table.rows[i]; i++) {
                 cell = row.cells[0];
                 cell.style.left = matrixDivPosition.left + 2 + 'px';
                 cell.style.top = marginFromTop + 'px';
@@ -203,21 +202,13 @@
         }
 
         function moveModeWidget(event) {
-            var matrixDiv = document.getElementById('statusmatrix');
-            matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var modeDiv = document.getElementById('modewidget');
+            var modeDivPosition = modeDiv.getBoundingClientRect();
 
             var table = document.getElementById('modeTable');
             var row = table.rows.item(0);
-            row.style.left = matrixDivPosition.left + 'px';
-            row.style.top = matrixDivPosition.top + 'px';
-
-            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (i = 1, row; row = table.rows[i]; i++) {
-                cell = row.cells[0];
-                cell.style.left = matrixDivPosition.left + 2 + 'px';
-                cell.style.top = marginFromTop + 'px';
-                marginFromTop += parseInt(cell.style.height);
-            }
+            row.style.left = modeDivPosition.left + 'px';
+            row.style.top = modeDivPosition.top + 'px';
         }
     </script>
 
@@ -273,7 +264,7 @@
     </div>
     <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
     <canvas hidden id="music" width="700"></canvas>
-    <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
+    <div id="pitchtimematrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
     <div id="rulerbody" overflow-x="auto"></div>
     <div id="drumDiv"></div>
