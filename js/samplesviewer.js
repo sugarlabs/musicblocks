@@ -232,14 +232,14 @@ function PlanetModel(controller) {
         model.controller.sendAllToTrash(false, false);
 
         jQuery.ajax({
-            url: SERVER + name + ".tb",
+            url: SERVER + name + '.tb',
             headers: {
                 'x-api-key' : '3tgTzMXbbw6xEKX7'
             },
             dataType: 'text',
             error: function(XMLHttpRequest, textStatus, errorThrown){
             	jQuery.ajax({
-		            url: SERVER + "MusicBlocks_" + name + ".tb",
+		            url: SERVER + 'MusicBlocks_' + name + '.tb',
 		            headers: {
 		                'x-api-key' : '3tgTzMXbbw6xEKX7'
 		            },
@@ -376,11 +376,12 @@ function PlanetView(model, controller) {
 
     this.open = function (ele) {
         return function () {
-            document.getElementById('matrix').style.visibility = localStorage.getItem("isMatrixHidden");
-            document.getElementById('status').style.visibility = localStorage.getItem("isStatusHidden");
-            document.getElementById('pitchdrummatrix').style.visibility = localStorage.getItem("isPitchDrumMatrixHidden");
-            document.getElementById('rulerbody').style.visibility = localStorage.getItem("isRhythmRulerHidden"); 
-            console.log(document.getElementById('rulerbody').style.visibility);           
+            document.getElementById('pitchtimematrix').style.visibility = localStorage.getItem('isMatrixHidden');
+            document.getElementById('statusmatrix').style.visibility = localStorage.getItem('isStatusHidden');
+            document.getElementById('pitchdrummatrix').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
+            document.getElementById('rulerbody').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+            document.getElementById('modewidget').style.visibility = localStorage.getItem('isModeWidgetHidden');
+
             if (ele.attributes.current.value === 'true') {
                 planet.controller.hide();
                 return;
@@ -420,9 +421,9 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
     var samples = this;  // for future reference
 
     // i18n for section titles
-    document.querySelector("#planetTitle").innerHTML = _("Planet");
-    document.querySelector("#planetMyDevice").innerHTML = _("On my device");
-    document.querySelector("#planetWorldwide").innerHTML = _("Worldwide");
+    document.querySelector('#planetTitle').innerHTML = _('Planet');
+    document.querySelector('#planetMyDevice').innerHTML = _('On my device');
+    document.querySelector('#planetWorldwide').innerHTML = _('Worldwide');
 
     this.model = new PlanetModel(this);
     this.view = new PlanetView(this.model, this);
@@ -465,7 +466,7 @@ function validateImageData(d) {
     if(d.indexOf('data:image') !== 0){
         return false;
     } else {
-        var data = d.split(",");
+        var data = d.split(',');
         if(data[1].length == 0){
             return false;
         }
