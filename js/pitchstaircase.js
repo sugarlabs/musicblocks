@@ -75,10 +75,11 @@ function PitchStairCase() {
             var octave = this.Stairs[i][1];
 
             var solfegetonote = this.logo.getNote(solfege, octave, 0, this.logo.keySignature[this.logoturtle])[0];
-
+            var frequency = this.Stairs[i][2];
+            
             var cell = row.insertCell(-1);
             cell.style.width = (StairDivPosition.width)* parseFloat(this.Stairs[0][2]/this.Stairs[i][2]) * this.cellScale/2 + 'px';
-            cell.innerHTML = thisStair.Stairs[i][0] + thisStair.Stairs[i][1] + " "  + Math.floor(thisStair.Stairs[i][2]);
+            cell.innerHTML = thisStair.Stairs[i][0] + thisStair.Stairs[i][1] + " "  + frequency.toFixed(2);
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
@@ -188,21 +189,22 @@ function PitchStairCase() {
                 console.log(noteobj);
                 var note  = that.Stairs[i][0];
                 var octave = that.Stairs[i][1];
+                var frequency = that.Stairs[i][2];
                 console.log(note);
-                var pitchblockidx = newStack.length;
-                var noteidx = pitchblockidx + 1;
-                var octaveidx = pitchblockidx + 2;
-                var hiddenidx = pitchblockidx + 3;
+                var sineblockidx = newStack.length;
+                var frequencyidx = sineblockidx + 1;
+              //  var octaveidx = pitchblockidx + 2;
+                var hiddenidx = sineblockidx + 2;
 
-                newStack.push([pitchblockidx, 'pitch', 0, 0, [previousBlock, noteidx, octaveidx, hiddenidx]]);
-                newStack.push([noteidx, ['text', {'value': note}], 0, 0, [pitchblockidx]]);
-                newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
+                newStack.push([sineblockidx, 'sine', 0, 0, [previousBlock, frequencyidx, hiddenidx]]);
+                newStack.push([frequencyidx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [sineblockidx]]);
+            //    newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
 
                 if (i === that.Stairs.length - 1) {
-                    newStack.push([hiddenidx, 'hidden', 0, 0, [pitchblockidx, null]]);
+                    newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, null]]);
                 }
                 else {
-                    newStack.push([hiddenidx, 'hidden', 0, 0, [pitchblockidx, hiddenidx + 1]]);
+                    newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, hiddenidx + 1]]);
                 }
 
                 previousBlock = hiddenidx;

@@ -2708,6 +2708,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
         var hiddenBlocks = [];
         console.log(this._loadCounter + ' blocks to load');
+        console.log(blockObjs);
         for (var b = 0; b < this._loadCounter; b++) {
             var thisBlock = blockOffset + b;
             var blkData = blockObjs[b];
