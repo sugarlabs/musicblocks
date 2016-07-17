@@ -555,11 +555,11 @@ function ModeWidget() {
                 } else {
                     // FIXME: better way to do  comparision?
                     if (cell.style.backgroundColor === "rgb(195, 116, 233)") { // MATRIXBUTTONCOLOR) {
-			cell.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-		    } else {
-			cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-		    }
-		}
+                        cell.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+                    } else {
+                        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+                    }
+                }
             }
 
             var noteToPlay = that._logo.getNote(that._pitch, 4, that.cells[i]);
