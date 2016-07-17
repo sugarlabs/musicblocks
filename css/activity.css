@@ -297,6 +297,7 @@ input.number {
 input.dissectNumber {
     background-color: #c374e9 !important;
     text-align: center;
+    font-size: 24px;
     font-weight: bold !important;
     resize: none !important;
     padding: 0 !important;
