@@ -106,12 +106,12 @@ function ModeWidget() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 4, 'rotate-left.svg', iconSize, _('rotate left'));
+        var cell = this._addButton(row, 4, 'rotate-left.svg', iconSize, _('rotate counter clockwise'));
         cell.onclick=function() {
             that._rotateLeft();
         }
 
-        var cell = this._addButton(row, 5, 'rotate-right.svg', iconSize, _('rotate right'));
+        var cell = this._addButton(row, 5, 'rotate-right.svg', iconSize, _('rotate clockwise'));
         cell.onclick=function() {
             that._rotateRight();
         }
