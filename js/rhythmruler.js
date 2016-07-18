@@ -58,9 +58,19 @@ function RhythmRuler () {
 
     this.dissectRuler = function (event) {
 	var that = this;
+
 	var inputNum = docById('dissectNumber').value;
+        if (isNaN(inputNum)) {
+            inputNum = 2;
+	} else {
+            inputNum = Math.abs(Math.floor(inputNum));
+	}
+
+	docById('dissectNumber').value = inputNum;
+
         var cell = event.target;
         this.RulerSelected = cell.parentNode.id[5];
+
         var ruler = docById('ruler' + this.RulerSelected);
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this.RulerSelected][0];
