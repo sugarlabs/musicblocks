@@ -492,7 +492,10 @@ function ModeWidget() {
                 var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
                 if (cell.style.backgroundColor !== 'black') {
                     that._rotateRight();
+                    // We don't want to 'undo' to a broken mode.
+		    that._undoStack.pop();
                 }
+
                 that._setModeName()
             }, 250);
         } else {
@@ -538,6 +541,8 @@ function ModeWidget() {
                 // Keep rotating until last cell is set.
                 if (cell.style.backgroundColor !== 'black') {
                     that._rotateLeft();
+                    // We don't want to 'undo' to a broken mode.
+		    that._undoStack.pop();
                 }
 
                 that._setModeName()
