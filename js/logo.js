@@ -200,6 +200,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
 
     // Mide widget
     this.modeWidget = new ModeWidget();
+    this._modeBlock = null;
 
     // Status matrix
     this.statusMatrix = new StatusMatrix();
@@ -660,6 +661,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
         this.pitchBlocks = [];
         this.drumBlocks = [];
         this.tuplet = false;
+        this._modeBlock = null;
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -2026,6 +2028,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                 for (var i = 0; i < MODENAMES.length; i++) {
                     if (MODENAMES[i][0] === args[1]) {
                         modename = MODENAMES[i][1];
+			logo._modeBlock = logo.blocks.blockList[blk].connections[2];
                         break;
                     }
                 }
@@ -2084,7 +2087,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                logo.modeWidget.init(logo);
+                logo.modeWidget.init(logo, logo._modeBlock);
             }
 
             logo._setListener(turtle, listenerName, __listener);

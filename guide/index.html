@@ -558,7 +558,84 @@ clicking on one of the half-notes.
 <p>These stacks of rhythms can be used to define rhythmic patterns in
 the <em>Matrix</em>.</p>
 
-<h2>7. Beyond Music Blocks</h2>
+
+<h2>7. Musical Modes</h2>
+
+<p>Musical modes are used to specify the relationship between intervals
+(or steps) in a scale. Since Western music is based on 12 half-steps
+per octave, modes speficy how many half steps there are between each
+note in a scale.</p>
+
+<p>By default, Music Blocks uses the <em>Major</em> mode, which, in the Key of
+C, maps to the white keys on a piano. The intervals in the <em>Major</em>
+mode are <code>2, 2, 1, 2, 2, 2, 1</code>. Many other common modes are
+built into Music Blocks, including, of course, <em>Minor</em> mode, which
+uses <code>2, 1, 2, 2, 1, 2, 2</code> as its intervals.</p>
+
+<p>Note that not every mode uses 7 intervals per octave. For example, the
+<em>Chromatic</em> mode uses 11 intervals: <code>1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1</code>. The <em>Japanese</em> mode uses only 5 intervals: <code>1, 4,
+2, 3, 2],</code>. What is important is that the sum of the intervals
+in an octave is 12 half-steps.</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg'</img></p>
+
+<p>The <em>Mode</em> widget lets you explore modes and generate custom
+modes. You invoke the widget with the <em>Custom mode</em> block. The mode
+specified in the <em>Set key</em> block will be the default mode when the
+widget launches.</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode2.svg'</img></p>
+
+<p>In the above example, the widget has been launched with <em>Major</em> mode
+(the default). Note that the notes included the mode are indicated by
+the black boxes, which are arrayed in a circular pattern of tweleve
+half-steps to complete the octave.</p>
+
+<p>Since the intervals in the <em>Major</em> mode are <code>2, 2, 1, 2, 2, 2,
+1</code>, the notes are <code>0, 2, 4, 5, 7, 9, </code> and
+<code>11</code>.</p>
+
+<p>The widget controls run along the toolbar at the top. From left to
+right are:</p>
+
+<p><em>Play all</em>, which will play a scale using the current mode;</p>
+
+<p><em>Save</em>, which will save the current mode as the <em>Custom</em> mode;</p>
+
+<p><em>Rotate counter-clockwise</em>, which will rotate the mode
+ counter-clockwise (See the example below);</p>
+
+<p><em>Rotate clockwise</em>, which will rotate the mode clockwise (See the
+ example below);</p>
+
+<p><em>Invert</em>, which will invert the mode (See the example below);</p>
+
+<p><em>Undo</em>, which will restore the mode to the previous version; and</p>
+
+<p><em>Close</em>, which will close the widget.</p>
+
+<p>Note that the mode inside the <em>Custom mode</em> block is updated whenever
+the mode is changed inside the widget.</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode3.svg'</img></p>
+
+<p>In the above example, the <em>Major</em> mode has been rotated clockwise,
+transforming it into <em>Dorian</em>.</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode4.svg'</img></p>
+
+<p>In the above example, the <em>Major</em> mode has been rotated
+counter-clockwise, transforming it into <em>Locrian</em>.</p>
+
+<p><img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode5.svg'</img></p>
+
+<p>In the above example, the <em>Major</em> mode has been inverted, transforming
+it into <em>Phrygian</em>.</p>
+
+<p>Note: The build-in modes in Music Blocks can be found in <a href="https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68">musicutils.js</a>.</p>
+
+<h2>8. Beyond Music Blocks</h2>
 
 <p>Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools. One such tool is
