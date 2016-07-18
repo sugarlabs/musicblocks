@@ -20,7 +20,7 @@ function ModeWidget() {
         // and them make another one in DOM (document object model)
         this._logo = logo;
         this._modeBlock = modeBlock;
-        this._playing = false;
+        this._locked = false;
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
 
@@ -417,6 +417,12 @@ function ModeWidget() {
     };
 
     this._invert = function() {
+        if (this._locked) {
+            return;
+        }
+
+        this._locked = true;
+
         var table = docById('modeTable');
         if (table == null) {
             return;
@@ -424,18 +430,37 @@ function ModeWidget() {
 
         this._saveState();
 
-        for (var i = 1; i < 6; i++) {
-            var thisCell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            var thatCell = table.rows[MODEMAP[12 - i][0]].cells[MODEMAP[12 - i][1]];
-            var tmp = thisCell.style.backgroundColor;
-            thisCell.style.backgroundColor = thatCell.style.backgroundColor;
-            thatCell.style.backgroundColor = tmp;
+        this.__invertOnePair(1);
+    };
+
+    this.__invertOnePair = function(i) {
+        var table = docById('modeTable');
+        var that = this;
+
+        var thisCell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+        var thatCell = table.rows[MODEMAP[12 - i][0]].cells[MODEMAP[12 - i][1]];
+        var tmp = thisCell.style.backgroundColor;
+        thisCell.style.backgroundColor = thatCell.style.backgroundColor;
+        thatCell.style.backgroundColor = tmp;
+
+        if (i === 5) {
+            that._locked = false;
+            that._setModeName()
+        } else {
+            setTimeout(function() {
+                that.__invertOnePair(i + 1);
+            }, 250);
         }
 
-        this._setModeName()
     };
 
     this._rotateLeft = function() {
+        if (this._locked) {
+            return;
+        }
+
+        this._locked = true;
+
         var table = docById('modeTable');
         if (table == null) {
             return;
@@ -444,26 +469,46 @@ function ModeWidget() {
         this._saveState();
 
         var firstCell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]].style.backgroundColor;
+        this.__rotateLeftOneCell(1, firstCell);
 
-        for (var i = 1; i < 12; i++) {
-            var prev = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
-            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            prev.style.backgroundColor = cell.style.backgroundColor;
+    };
+
+    this.__rotateLeftOneCell = function(i, firstCell) {
+        var table = docById('modeTable');
+
+        var prev = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
+        var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+        prev.style.backgroundColor = cell.style.backgroundColor;
+
+        var that = this;
+
+        if (i === 11) {
+            setTimeout(function() {
+                var cell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]];
+                cell.style.backgroundColor = firstCell;
+                that._locked = false;
+
+                // Keep rotating until first cell is set.
+                var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
+                if (cell.style.backgroundColor !== 'black') {
+                    that._rotateLeft();
+                }
+                that._setModeName()
+            }, 250);
+        } else {
+            setTimeout(function() {
+                that.__rotateLeftOneCell(i + 1, firstCell);
+            }, 250);
         }
-
-        var cell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]];
-        cell.style.backgroundColor = firstCell;
-
-        // Keep rotating until first cell is set.
-        var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
-        if (cell.style.backgroundColor !== 'black') {
-            this._rotateLeft();
-        }
-
-        this._setModeName()
     };
 
     this._rotateRight = function() {
+        if (this._locked) {
+            return;
+        }
+
+        this._locked = true;
+
         var table = docById('modeTable');
         if (table == null) {
             return;
@@ -472,22 +517,36 @@ function ModeWidget() {
         this._saveState();
 
         var lastCell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]].style.backgroundColor;
+        this.__rotateRightOneCell(11, lastCell);
+    };
 
-        for (var i = 11; i > 0; i--) {
-            var prev = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            var cell = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
-            prev.style.backgroundColor = cell.style.backgroundColor;
+    this.__rotateRightOneCell = function(i, lastCell) {
+        var table = docById('modeTable');
+
+        var prev = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
+        var cell = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
+        prev.style.backgroundColor = cell.style.backgroundColor;
+
+        var that = this;
+
+        if (i === 1) {
+            setTimeout(function() {
+                var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
+                cell.style.backgroundColor = lastCell;
+                that._locked = false;
+
+                // Keep rotating until last cell is set.
+                if (cell.style.backgroundColor !== 'black') {
+                    that._rotateRight();
+                }
+
+                that._setModeName()
+            }, 250);
+        } else {
+            setTimeout(function() {
+                that.__rotateRightOneCell(i - 1, lastCell);
+            }, 250);
         }
-
-        var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
-        cell.style.backgroundColor = lastCell;
-
-        // Keep rotating until first cell is set.
-        if (cell.style.backgroundColor !== 'black') {
-            this._rotateRight();
-        }
-
-        this._setModeName()
     };
 
     this._playAll = function() {
@@ -497,12 +556,12 @@ function ModeWidget() {
             return;
         }
 
-        if (this._playing) {
+        if (this._locked) {
             return;
         }
 
         this._logo.synth.stop();
-        this._playing = true;
+        this._locked = true;
 
         // this.notes = [];
         this.cells = [];
@@ -536,7 +595,7 @@ function ModeWidget() {
                 that._lastNotePlayed.style.backgroundColor = 'black';
             }, 1000 * time);
 
-            this._playing = false;
+            this._locked = false;
             return;
         }
 
