@@ -521,19 +521,23 @@ function ModeWidget() {
             this.cells.push(12);
         }
 
-        this.notesCounter = 1;
+        this._lastNotePlayed = null;
         this.__playNote(0, 0);
     };
 
     this.__playNote = function(time, noteCounter) {
+        var that = this;
+        time = this._noteValue + 0.125;
+
         // Did we just play the last note?
         if (noteCounter === 2 * this.cells.length) {
-            this._playing = false;
+            setTimeout(function() {
+		that._lastNotePlayed.style.backgroundColor = 'black';
+	    }, 1000 * time);
+
+	    this._playing = false;
             return;
         }
-
-        time = this._noteValue + 0.125;
-        var that = this;
 
         setTimeout(function() {
             var table = docById('modeTable');
@@ -544,23 +548,13 @@ function ModeWidget() {
                 var i = noteCounter;
             }
 
-            if (i < that.cells.length) {
-                var cell = table.rows[MODEMAP[that.cells[i] % 12][0]].cells[MODEMAP[that.cells[i] % 12][1]];
-                if (i < that.cells.length - 1) {
-                    if (i === noteCounter) {
-                        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-                    } else {
-                        cell.style.backgroundColor = 'black';
-                    }
-                } else {
-                    // FIXME: better way to do  comparision?
-                    if (cell.style.backgroundColor === "rgb(195, 116, 233)") { // MATRIXBUTTONCOLOR) {
-                        cell.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-                    } else {
-                        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-                    }
-                }
-            }
+            var cell = table.rows[MODEMAP[that.cells[i] % 12][0]].cells[MODEMAP[that.cells[i] % 12][1]];
+            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+            if (that._lastNotePlayed != null) {
+		that._lastNotePlayed.style.backgroundColor = 'black';
+	    }
+            that._lastNotePlayed = cell;
 
             var noteToPlay = that._logo.getNote(that._pitch, 4, that.cells[i]);
             that._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, 'poly');
