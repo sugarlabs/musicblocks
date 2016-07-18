@@ -533,9 +533,11 @@ the initial subdivision of the of each rhythm ruler.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg'</img>
 
-When the *Rhythm Ruler* block is clicked, the Rhythm Ruler widget is
-opened. It contains a row for each rhythm ruler. Clicking in a ruler
-will open a prompt for how many subdivisions to make within a cell.
+When the *Rhythm Ruler* block is clicked, the *Rhythm Ruler* widget is
+opened. It contains a row for each rhythm ruler. An input in the top
+row of the widget is used to specify how many subdivisions will be
+created within a cell when it is clicked. By default, 2 subdivisions
+are created.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm3.svg'</img>
 
