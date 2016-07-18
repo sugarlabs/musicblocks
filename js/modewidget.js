@@ -15,10 +15,11 @@ const MODEMAP = [[2, 7], [3, 6], [5, 10], [7, 11], [9, 10], [11, 8], [12, 5], [1
 
 function ModeWidget() {
 
-    this.init = function(logo) {
+    this.init = function(logo, modeBlock) {
         // Initializes the mode widget. First removes the previous widget
         // and them make another one in DOM (document object model)
         this._logo = logo;
+        this._modeBlock = modeBlock;
         this._playing = false;
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
@@ -532,10 +533,10 @@ function ModeWidget() {
         // Did we just play the last note?
         if (noteCounter === 2 * this.cells.length) {
             setTimeout(function() {
-		that._lastNotePlayed.style.backgroundColor = 'black';
-	    }, 1000 * time);
+                that._lastNotePlayed.style.backgroundColor = 'black';
+            }, 1000 * time);
 
-	    this._playing = false;
+            this._playing = false;
             return;
         }
 
@@ -552,8 +553,8 @@ function ModeWidget() {
             cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
             if (that._lastNotePlayed != null) {
-		that._lastNotePlayed.style.backgroundColor = 'black';
-	    }
+                that._lastNotePlayed.style.backgroundColor = 'black';
+            }
             that._lastNotePlayed = cell;
 
             var noteToPlay = that._logo.getNote(that._pitch, 4, that.cells[i]);
@@ -649,6 +650,15 @@ function ModeWidget() {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 var table = docById('modeTable');
                 table.rows[14].cells[0].innerHTML = getModeName(mode);
+                // Update the value of the modename block inside of
+                // the mode widget block.
+                if (this._modeBlock != null) {
+                    this._logo.blocks.blockList[this._modeBlock].value = getModeName(mode);
+                    this._logo.blocks.blockList[this._modeBlock].text.text = getModeName(mode);
+                    this._logo.blocks.blockList[this._modeBlock].updateCache();
+;
+                    this._logo.refreshCanvas();
+                }
                 return;
             }
         }
