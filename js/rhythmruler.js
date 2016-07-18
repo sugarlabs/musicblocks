@@ -17,37 +17,37 @@
 function RhythmRuler () {
     this.Rulers = [];
     this.Drums = [];
-    this.RulerSelected = 0;
-    this.Completed = 0;
-    this.Playing = 0;
-    this.PlayingOne = 0;
-    this.PlayingAll = 0;
-    this.RulernoPlaying = -1;
+    this._rulerSelected = 0;
+    this._completed = 0;
+    this._playing = 0;
+    this._playingOne = 0;
+    this._playingAll = 0;
+    this._rulerPlaying = -1;
     
-    this.noteWidth = function (noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale * 3) + 'px';
+    this._noteWidth = function (noteValue) {
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale * 3) + 'px';
     };
     
-    this.calculateZebraStripes = function(rulerno) {
+    this._calculateZebraStripes = function(rulerno) {
         var ruler = docById('ruler' + rulerno);
-        if(this.RulerSelected%2 === 0) {
+        if (this._rulerSelected % 2 === 0) {
             var evenColor = MATRIXNOTECELLCOLOR;
         } else {
             var evenColor = MATRIXNOTECELLCOLORHOVER;
         }
 
-        for(var i = 0; i < ruler.cells.length; i++) {
+        for (var i = 0; i < ruler.cells.length; i++) {
             var newCell = ruler.cells[i];
-            if(evenColor === MATRIXNOTECELLCOLOR) {
-                if((i)%2 === 0) {
+            if (evenColor === MATRIXNOTECELLCOLOR) {
+                if (i % 2 === 0) {
                     newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 } else {
                     newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                 }
             }
 
-            if(evenColor === MATRIXNOTECELLCOLORHOVER) {
-                if((i)%2 === 0) {
+            if (evenColor === MATRIXNOTECELLCOLORHOVER) {
+                if (i % 2 === 0) {
                     newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                 } else {
                     newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -56,7 +56,7 @@ function RhythmRuler () {
         }
     };
 
-    this.dissectRuler = function (event) {
+    this._dissectRuler = function (event) {
 	var that = this;
 
 	var inputNum = docById('dissectNumber').value;
@@ -69,22 +69,22 @@ function RhythmRuler () {
 	docById('dissectNumber').value = inputNum;
 
         var cell = event.target;
-        this.RulerSelected = cell.parentNode.id[5];
+        this._rulerSelected = cell.parentNode.id[5];
 
-        var ruler = docById('ruler' + this.RulerSelected);
+        var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
-        var noteValues = this.Rulers[this.RulerSelected][0];
-        var divisionHistory = this.Rulers[this.RulerSelected][1];
+        var noteValues = this.Rulers[this._rulerSelected][0];
+        var divisionHistory = this.Rulers[this._rulerSelected][1];
 	
         divisionHistory.push([newCellIndex,inputNum]);
         ruler.deleteCell(newCellIndex);
 	
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
-	var tempwidth = this.noteWidth(newNoteValue);
+	var tempwidth = this._noteWidth(newNoteValue);
         var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
-        var difference = parseFloat(this.noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
-        var newCellWidth = parseFloat(this.noteWidth(newNoteValue)) + parseFloat(difference) / inputNum + 'px';
+        var difference = parseFloat(this._noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
+        var newCellWidth = parseFloat(this._noteWidth(newNoteValue)) + parseFloat(difference) / inputNum + 'px';
         var newCellHeight = cell.style.height;
         noteValues.splice(newCellIndex, 1);
 	
@@ -93,25 +93,25 @@ function RhythmRuler () {
             noteValues.splice(newCellIndex + i, 0, newNoteValue);
             newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
             newCell.style.width = newCellWidth;
-            newCell.style.lineHeight = 60 + '%';
+            newCell.style.lineHeight = 60 + ' % ';
             newCell.style.height = newCellHeight;
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
             newCell.addEventListener('click', function(event) {
-                that.dissectRuler(event);
+                that._dissectRuler(event);
             });
         }
-        this.calculateZebraStripes(that.RulerSelected);
+        this._calculateZebraStripes(that._rulerSelected);
     };
     
-    this.undo = function() {
+    this._undo = function() {
         var that = this;
-        var divisionHistory = this.Rulers[this.RulerSelected][1];
+        var divisionHistory = this.Rulers[this._rulerSelected][1];
         if (divisionHistory.length === 0) {
             return;
         }
-        var ruler = docById('ruler' + this.RulerSelected);
-        var noteValues = this.Rulers[this.RulerSelected][0];
+        var ruler = docById('ruler' + this._rulerSelected);
+        var noteValues = this.Rulers[this._rulerSelected][0];
         var inputNum = divisionHistory[divisionHistory.length - 1][1];
         var newCellIndex = divisionHistory[divisionHistory.length - 1][0];
         var cellWidth = ruler.cells[newCellIndex].style.width;
@@ -121,9 +121,9 @@ function RhythmRuler () {
         var newNoteValue = oldCellNoteValue/inputNum;
 	
         var newCell = ruler.insertCell(newCellIndex);
-        newCell.style.width = this.noteWidth(newNoteValue);
+        newCell.style.width = this._noteWidth(newNoteValue);
         newCell.style.height = newCellHeight;
-        newCell.style.lineHeight = 60 + '%';
+        newCell.style.lineHeight = 60 + ' % ';
         newCell.style.minWidth = newCell.style.width;
         newCell.style.maxWidth = newCell.style.width;
         newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -134,7 +134,7 @@ function RhythmRuler () {
 	
         newCell.addEventListener('click', function(event) {
 	    console.log('adding DISSECT event too');
-            that.dissectRuler(event);
+            that._dissectRuler(event);
         });
 	
         for (var i = 0; i < inputNum; i++) {
@@ -142,13 +142,13 @@ function RhythmRuler () {
         }
 	
         divisionHistory.pop();
-        this.calculateZebraStripes(this.RulerSelected);
+        this._calculateZebraStripes(this._rulerSelected);
     };
     
-    this.playAll = function() {
-        this.logo.synth.stop();
+    this._playAll = function() {
+        this._logo.synth.stop();
 	
-        for(var i = 0; i < this.Rulers.length; i++) {
+        for (var i = 0; i < this.Rulers.length; i++) {
             var noteValues = this.Rulers[i][0];
             var noteValue = noteValues[0];
             var drumblockno = blocks.blockList[this.Drums[i]].connections[1];
@@ -156,31 +156,31 @@ function RhythmRuler () {
             var ruler = docById('ruler' + i);
             var cell = ruler.cells[0];
             cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-            this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
+            this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drum);
 	    
-            if (this.PlayingAll) {
-                this.playNote(0, 0, i, 1);
+            if (this._playingAll) {
+                this._playNote(0, 0, i, 1);
             }
         }
     };
     
-    this.playOne = function() {
-        this.logo.synth.stop();
-        var noteValues = this.Rulers[this.RulerSelected][0];
+    this._playOne = function() {
+        this._logo.synth.stop();
+        var noteValues = this.Rulers[this._rulerSelected][0];
         var noteValue = noteValues[0];
-        var ruler = docById('ruler' + this.RulerSelected);
+        var ruler = docById('ruler' + this._rulerSelected);
         var cell = ruler.cells[0];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        var drumblockno = blocks.blockList[this.Drums[this.RulerSelected]].connections[1];
+        var drumblockno = blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
         var drum = blocks.blockList[drumblockno].value;
-        this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drum);
+        this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drum);
 	
-        if (this.PlayingOne) {
-            this.playNote(0, 0, this.RulerSelected, 1)
+        if (this._playingOne) {
+            this._playNote(0, 0, this._rulerSelected, 1)
         }
     };
     
-    this.playNote = function(time, notesCounter, rulerno, colIndex) {
+    this._playNote = function(time, notesCounter, rulerno, colIndex) {
         var that = this;
         var noteValues = that.Rulers[rulerno][0];
         var noteValue = noteValues[notesCounter];
@@ -197,65 +197,65 @@ function RhythmRuler () {
                 }
             } else {
                 var cell = ruler.cells[colIndex];
-                if (that.Playing) {
+                if (that._playing) {
                     cell.style.backgroundColor = MATRIXBUTTONCOLOR;
                 }
             }
 	    
             if (notesCounter >= noteValues.length) {
                 notesCounter = 1;
-                that.logo.synth.stop()
+                that._logo.synth.stop()
             }
 	    
             notesCounter += 1;
             colIndex += 1;
-            if (that.Playing) {
-                that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drum);
+            if (that._playing) {
+                that._logo.synth.trigger(['C2'], that._logo.defaultBPMFactor / noteValue, drum);
             }
 	    
             if (notesCounter < noteValues.length) {
-                if (that.Playing) {
-                    that.playNote(time, notesCounter, rulerno, colIndex);
+                if (that._playing) {
+                    that._playNote(time, notesCounter, rulerno, colIndex);
                 }
             } else {
-                that.Completed += 1;
+                that._completed += 1;
             }
-            if (that.PlayingAll) {
-                if (that.Completed === that.Rulers.length) {
+            if (that._playingAll) {
+                if (that._completed === that.Rulers.length) {
                     console.log('playing again all rulers');
-                    that.Completed = 0;
+                    that._completed = 0;
                     var cell = ruler.cells[0];
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    that.logo.setTurtleDelay(0);
+                    that._logo.setTurtleDelay(0);
 		    
-                    for(var i = 0; i < that.Rulers.length; i++) {
-                        that.calculateZebraStripes(i);
+                    for (var i = 0; i < that.Rulers.length; i++) {
+                        that._calculateZebraStripes(i);
                     }
 		    
-                    that.playAll();
+                    that._playAll();
                 }
             }
-            if (that.PlayingOne) {
-                if (that.Completed === 1) {
-                    console.log('playing again ruler' + that.RulernoPlaying);
-                    that.Completed = 0;
+            if (that._playingOne) {
+                if (that._completed === 1) {
+                    console.log('playing again ruler' + that._rulerPlaying);
+                    that._completed = 0;
                     var cell = ruler.cells[0];
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    that.logo.setTurtleDelay(0);
-                    that.calculateZebraStripes(that.RulernoPlaying);
-                    that.playOne();
+                    that._logo.setTurtleDelay(0);
+                    that._calculateZebraStripes(that._rulerPlaying);
+                    that._playOne();
                 }
             }
-        }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
+        }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
     };
     
-    this.save = function(selectedruler) {
+    this._save = function(selectedruler) {
         var that = this;
-        for (var name in this.logo.blocks.palettes.dict) {
-            this.logo.blocks.palettes.dict[name].hideMenu(true);
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
 	
-        this.logo.refreshCanvas();
+        this._logo.refreshCanvas();
 	
         setTimeout(function() {
             var ruler = docById('ruler' + selectedruler);
@@ -293,18 +293,18 @@ function RhythmRuler () {
                 }
             }
 	    
-            that.logo.blocks.loadNewBlocks(newStack);
+            that._logo.blocks.loadNewBlocks(newStack);
             if (selectedruler > that.Rulers.length - 2) {
                 return;
             } else {
-                that.save(selectedruler+1);
+                that._save(selectedruler+1);
             }
         }, 500);
     };
     
     this.init = function(logo) {
         console.log('init RhythmRuler');
-        this.logo = logo;
+        this._logo = logo;
 	
         docById('rulerbody').style.display = 'inline';
         console.log('setting RhythmRuler visible');
@@ -316,7 +316,7 @@ function RhythmRuler () {
         docById('drumDiv').style.border = 2;
 	
         var w = window.innerWidth;
-        this.cellScale = w / 1200;
+        this._cellScale = w / 1200;
         docById('rulerbody').style.width = Math.floor(w / 2) + 'px';
         docById('rulerbody').style.overflowX = 'auto';
 	
@@ -347,7 +347,7 @@ function RhythmRuler () {
             }
         }
 	
-        var iconSize = Math.floor(this.cellScale * 24);
+        var iconSize = Math.floor(this._cellScale * 24);
 	
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'drum');
@@ -370,37 +370,37 @@ function RhythmRuler () {
 	
         var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 	
         cell.onclick=function() {
-            if (thisRuler.Playing === 0) {
-                if (thisRuler.PlayingAll === 0) {
+            if (thisRuler._playing === 0) {
+                if (thisRuler._playingAll === 0) {
                     console.log("playing all rulers");
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                    thisRuler.logo.setTurtleDelay(0);
-                    thisRuler.Completed =0;
-                    thisRuler.PlayingAll = 1;
-                    thisRuler.Playing = 1;
-                    thisRuler.PlayingOne = 0;
-                    thisRuler.RulernoPlaying = -1;
-                    thisRuler.playAll();
+                    thisRuler._logo.setTurtleDelay(0);
+                    thisRuler._completed =0;
+                    thisRuler._playingAll = 1;
+                    thisRuler._playing = 1;
+                    thisRuler._playingOne = 0;
+                    thisRuler._rulerPlaying = -1;
+                    thisRuler._playAll();
                 }
             }
             else {
-                if (thisRuler.PlayingAll) {
+                if (thisRuler._playingAll) {
                     console.log('stopping playing all rulers');
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                    thisRuler.Playing = 0;
-                    thisRuler.PlayingAll = 0;
-                    thisRuler.PlayingOne = 0;
-                    thisRuler.Completed = 0;
-                    thisRuler.RulernoPlaying = -1;
+                    thisRuler._playing = 0;
+                    thisRuler._playingAll = 0;
+                    thisRuler._playingOne = 0;
+                    thisRuler._completed = 0;
+                    thisRuler._rulerPlaying = -1;
                     for (var i = 0; i < thisRuler.Rulers.length; i++) {
-                        thisRuler.calculateZebraStripes(i);
+                        thisRuler._calculateZebraStripes(i);
                     }
                 }
             }
@@ -435,14 +435,14 @@ function RhythmRuler () {
 	
         var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 	
         cell.onclick=function() {
-            thisRuler.save(0);
+            thisRuler._save(0);
         };
 	
         cell.onmouseover=function() {
@@ -455,14 +455,14 @@ function RhythmRuler () {
 	
         var cell = row.insertCell(1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/restore-button.svg" title="' + _('undo') + '" alt="' + _('undo') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 	
         cell.onclick=function() {
-            thisRuler.undo();
+            thisRuler._undo();
         };
 	
         cell.onmouseover=function() {
@@ -477,18 +477,18 @@ function RhythmRuler () {
         cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dussectNumber" value="' + 2 + '" />';
         cell.style.top = 0;
         cell.style.left = 0;
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 	
         var cell = row.insertCell(3);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 	
         cell.onclick=function() {
@@ -496,9 +496,9 @@ function RhythmRuler () {
             docById('drumDiv').style.visibility = 'hidden';
             docById('rulerbody').style.border = 0;
             docById('drumDiv').style.border = 0;
-            thisRuler.Playing = 0;
-            thisRuler.PlayingOne = 0;
-            thisRuler.PlayingAll = 0;
+            thisRuler._playing = 0;
+            thisRuler._playingOne = 0;
+            thisRuler._playingAll = 0;
         };
 	
         cell.onmouseover=function() {
@@ -520,42 +520,42 @@ function RhythmRuler () {
             var header = rulerdrumTable.createTHead();
             var row = header.insertRow(-1);
             row.style.left = Math.floor(drumDivPosition.left) + 'px';
-            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             row.setAttribute('id', 'drum' + i);
 	    
             var drumcell = row.insertCell(-1);
             drumcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-            drumcell.style.width = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+            drumcell.style.width = Math.floor(RHYTHMRULERHEIGHT * this._cellScale) + 'px';
             drumcell.style.minWidth = cell.style.width;
             drumcell.style.maxWidth = cell.style.width;
-            drumcell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+            drumcell.style.height = Math.floor(RHYTHMRULERHEIGHT * this._cellScale) + 'px';
             drumcell.style.backgroundColor = MATRIXBUTTONCOLOR;
 	    
             drumcell.onclick=function() {
-                if (thisRuler.Playing === 0) {
-                    if (thisRuler.PlayingOne ===0) {
+                if (thisRuler._playing === 0) {
+                    if (thisRuler._playingOne ===0) {
                         console.log("playing ruler" + this.parentNode.id[4]);
-                        thisRuler.RulerSelected = this.parentNode.id[4];
-                        thisRuler.logo.setTurtleDelay(0);
-                        thisRuler.Playing = 1;
-                        thisRuler.PlayingOne = 1;
-                        thisRuler.PlayingAll = 0;
-                        thisRuler.Completed = 0;
-                        thisRuler.RulernoPlaying = this.parentNode.id[4];
+                        thisRuler._rulerSelected = this.parentNode.id[4];
+                        thisRuler._logo.setTurtleDelay(0);
+                        thisRuler._playing = 1;
+                        thisRuler._playingOne = 1;
+                        thisRuler._playingAll = 0;
+                        thisRuler._completed = 0;
+                        thisRuler._rulerPlaying = this.parentNode.id[4];
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                        thisRuler.playOne();
+                        thisRuler._playOne();
                     }
                 }
                 else {
-                    if (this.parentNode.id[4] === thisRuler.RulernoPlaying) {
+                    if (this.parentNode.id[4] === thisRuler._rulerPlaying) {
                         console.log("stopping ruler" + this.parentNode.id[4]);
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                        thisRuler.Playing = 0;
-                        thisRuler.PlayingOne = 0;
-                        thisRuler.PlayingAll = 0;
-                        thisRuler.Completed = 0;
-                        thisRuler.RulernoPlaying = -1;
-                        setTimeout(thisRuler.calculateZebraStripes(this.parentNode.id[4]),1000);
+                        thisRuler._playing = 0;
+                        thisRuler._playingOne = 0;
+                        thisRuler._playingAll = 0;
+                        thisRuler._completed = 0;
+                        thisRuler._rulerPlaying = -1;
+                        setTimeout(thisRuler._calculateZebraStripes(this.parentNode.id[4]),1000);
                     }
                 }
             };
@@ -578,18 +578,18 @@ function RhythmRuler () {
             var header = RulerTable.createTHead();
             var row = header.insertRow(-1);
             row.style.left = Math.floor(rulerbodyDivPosition.left) + 'px';
-            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             row.setAttribute('id', 'ruler' + i);
 	    
             for (var j = 0; j < thisRuler.Rulers[i][0].length; j++) {
                 var noteValue = thisRuler.Rulers[i][0][j];
                 var rulercell = row.insertCell(j);
                 rulercell.innerHTML = calcNoteValueToDisplay(noteValue, 1);
-                rulercell.style.width = thisRuler.noteWidth(noteValue);
+                rulercell.style.width = thisRuler._noteWidth(noteValue);
                 rulercell.minWidth = rulercell.style.width;
                 rulercell.maxWidth = rulercell.style.width;
-                rulercell.style.lineHeight = 60 + '%';
-                rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+                rulercell.style.lineHeight = 60 + ' % ';
+                rulercell.style.height = Math.floor(RHYTHMRULERHEIGHT * this._cellScale) + 'px';
                 if (i % 2 === 0) {
                     if (j % 2 === 0) {
                         rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -605,7 +605,7 @@ function RhythmRuler () {
                 }
 		
                 rulercell.addEventListener('click', function(event) {
-                    thisRuler.dissectRuler(event);
+                    thisRuler._dissectRuler(event);
                 });
             }
         }
