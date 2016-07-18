@@ -573,14 +573,14 @@ note in a scale.
 
 By default, Music Blocks uses the *Major* mode, which, in the Key of
 C, maps to the white keys on a piano. The intervals in the *Major*
-mode are <code>2, 2, 1, 2, 2, 2, 1</code>. Many other common modes are
+mode are `2, 2, 1, 2, 2, 2, 1`. Many other common modes are
 built into Music Blocks, including, of course, *Minor* mode, which
-uses <code>2, 1, 2, 2, 1, 2, 2</code> as its intervals.
+uses `2, 1, 2, 2, 1, 2, 2` as its intervals.
 
 Note that not every mode uses 7 intervals per octave. For example, the
-*Chromatic* mode uses 11 intervals: <code>1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1</code>. The *Japanese* mode uses only 5 intervals: <code>1, 4,
-2, 3, 2],</code>. What is important is that the sum of the intervals
+*Chromatic* mode uses 11 intervals: `1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1`. The *Japanese* mode uses only 5 intervals: `1, 4,
+2, 3, 2],`. What is important is that the sum of the intervals
 in an octave is 12 half-steps.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg'</img>
@@ -597,9 +597,9 @@ In the above example, the widget has been launched with *Major* mode
 the black boxes, which are arrayed in a circular pattern of tweleve
 half-steps to complete the octave.
 
-Since the intervals in the *Major* mode are <code>2, 2, 1, 2, 2, 2,
-1</code>, the notes are <code>0, 2, 4, 5, 7, 9, </code> and
-<code>11</code>.
+Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
+notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
+above `0`).
 
 The widget controls run along the toolbar at the top. From left to
 right are:
@@ -619,6 +619,8 @@ right are:
 *Undo*, which will restore the mode to the previous version; and
 
 *Close*, which will close the widget.
+
+You can also click on individual notes to activate or deactivate them.
 
 Note that the mode inside the *Custom mode* block is updated whenever
 the mode is changed inside the widget.
