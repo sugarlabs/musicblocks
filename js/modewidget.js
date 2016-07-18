@@ -454,7 +454,7 @@ function ModeWidget() {
 
     };
 
-    this._rotateLeft = function() {
+    this._rotateRight = function() {
         if (this._locked) {
             return;
         }
@@ -469,11 +469,11 @@ function ModeWidget() {
         this._saveState();
 
         var firstCell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]].style.backgroundColor;
-        this.__rotateLeftOneCell(1, firstCell);
+        this.__rotateRightOneCell(1, firstCell);
 
     };
 
-    this.__rotateLeftOneCell = function(i, firstCell) {
+    this.__rotateRightOneCell = function(i, firstCell) {
         var table = docById('modeTable');
 
         var prev = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
@@ -491,18 +491,18 @@ function ModeWidget() {
                 // Keep rotating until first cell is set.
                 var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
                 if (cell.style.backgroundColor !== 'black') {
-                    that._rotateLeft();
+                    that._rotateRight();
                 }
                 that._setModeName()
             }, 250);
         } else {
             setTimeout(function() {
-                that.__rotateLeftOneCell(i + 1, firstCell);
+                that.__rotateRightOneCell(i + 1, firstCell);
             }, 250);
         }
     };
 
-    this._rotateRight = function() {
+    this._rotateLeft = function() {
         if (this._locked) {
             return;
         }
@@ -517,10 +517,10 @@ function ModeWidget() {
         this._saveState();
 
         var lastCell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]].style.backgroundColor;
-        this.__rotateRightOneCell(11, lastCell);
+        this.__rotateLeftOneCell(11, lastCell);
     };
 
-    this.__rotateRightOneCell = function(i, lastCell) {
+    this.__rotateLeftOneCell = function(i, lastCell) {
         var table = docById('modeTable');
 
         var prev = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
@@ -537,14 +537,14 @@ function ModeWidget() {
 
                 // Keep rotating until last cell is set.
                 if (cell.style.backgroundColor !== 'black') {
-                    that._rotateRight();
+                    that._rotateLeft();
                 }
 
                 that._setModeName()
             }, 250);
         } else {
             setTimeout(function() {
-                that.__rotateRightOneCell(i - 1, lastCell);
+                that.__rotateLeftOneCell(i - 1, lastCell);
             }, 250);
         }
     };
