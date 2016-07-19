@@ -301,9 +301,12 @@ function RhythmRuler () {
             }
         }, 500);
     };
-    
+
     this.init = function(logo) {
-        console.log('init RhythmRuler');
+        // FIXME: should be contained in click event
+        docById('dissectNumber').classList.add('hasKeyboard');
+
+	console.log('init RhythmRuler');
         this._logo = logo;
 	
         docById('rulerbody').style.display = 'inline';
@@ -499,6 +502,8 @@ function RhythmRuler () {
             thisRuler._playing = 0;
             thisRuler._playingOne = 0;
             thisRuler._playingAll = 0;
+            // FIXME: should be contained in click event
+            docById('dissectNumber').classList.remove('hasKeyboard');
         };
 	
         cell.onmouseover=function() {
