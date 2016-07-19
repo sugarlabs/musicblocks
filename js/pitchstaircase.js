@@ -191,14 +191,26 @@ function PitchStairCase() {
                 var octave = that.Stairs[i][1];
                 var frequency = that.Stairs[i][2];
                 console.log(note);
+                var pitch = frequencyToPitch(frequency);
+                console.log(pitch);
                 var sineblockidx = newStack.length;
                 var frequencyidx = sineblockidx + 1;
               //  var octaveidx = pitchblockidx + 2;
                 var hiddenidx = sineblockidx + 2;
+                if(pitch[2] === 0) {
 
-                newStack.push([sineblockidx, 'sine', 0, 0, [previousBlock, frequencyidx, hiddenidx]]);
-                newStack.push([frequencyidx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [sineblockidx]]);
-            //    newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
+                    var pitchblockidx = newStack.length;
+                    var noteidx = pitchblockidx + 1;
+                    var octaveidx = pitchblockidx + 2;
+                    var hiddenidx = pitchblockidx + 3;
+                    newStack.push([sineblockidx, 'pitch', 0, 0, [previousBlock, noteidx, octaveidx, hiddenidx]]);
+                    newStack.push([noteidx, ['text', {'value': pitch[0]}], 0, 0, [pitchblockidx]]);
+                    newStack.push([octaveidx, ['number', {'value': pitch[1]}], 0, 0, [pitchblockidx]])
+                } else {
+                    newStack.push([sineblockidx, 'sine', 0, 0, [previousBlock, frequencyidx, hiddenidx]]);
+                    newStack.push([frequencyidx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [sineblockidx]]);
+                } 
+              // newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
 
                 if (i === that.Stairs.length - 1) {
                     newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, null]]);
