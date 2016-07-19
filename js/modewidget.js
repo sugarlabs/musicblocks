@@ -12,6 +12,8 @@
 // Row and column of each halfstep: Note that span cells are counted
 // only once.
 const MODEMAP = [[2, 7], [3, 6], [5, 10], [7, 11], [9, 10], [11, 8], [12, 5], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
+const ROTATESPEED = 125;
+
 
 function ModeWidget() {
 
@@ -449,7 +451,7 @@ function ModeWidget() {
         } else {
             setTimeout(function() {
                 that.__invertOnePair(i + 1);
-            }, 250);
+            }, ROTATESPEED);
         }
 
     };
@@ -497,11 +499,11 @@ function ModeWidget() {
                 }
 
                 that._setModeName()
-            }, 250);
+            }, ROTATESPEED);
         } else {
             setTimeout(function() {
                 that.__rotateRightOneCell(i + 1, firstCell);
-            }, 250);
+            }, ROTATESPEED);
         }
     };
 
@@ -546,11 +548,11 @@ function ModeWidget() {
                 }
 
                 that._setModeName()
-            }, 250);
+            }, ROTATESPEED);
         } else {
             setTimeout(function() {
                 that.__rotateLeftOneCell(i - 1, lastCell);
-            }, 250);
+            }, ROTATESPEED);
         }
     };
 
