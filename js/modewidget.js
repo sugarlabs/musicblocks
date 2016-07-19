@@ -13,7 +13,7 @@
 // only once.
 const MODEMAP = [[2, 7], [3, 6], [5, 10], [7, 11], [9, 10], [11, 8], [12, 5], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
 const ROTATESPEED = 125;
-
+const ORANGE = '#e37a00'; // 5YR
 
 function ModeWidget() {
 
@@ -470,24 +470,28 @@ function ModeWidget() {
 
         this._saveState();
 
-        var firstCell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]].style.backgroundColor;
-        this.__rotateRightOneCell(1, firstCell);
+        var cellColors = [];
+        for (var i = 0; i < 12; i++) {
+            cellColors.push(table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]].style.backgroundColor);
+        }
+        this.__rotateRightOneCell(1, cellColors);
 
     };
 
-    this.__rotateRightOneCell = function(i, firstCell) {
+    this.__rotateRightOneCell = function(i, cellColors) {
         var table = docById('modeTable');
 
         var prev = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
         var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-        prev.style.backgroundColor = cell.style.backgroundColor;
+        prev.style.backgroundColor = cellColors[i];
+        cell.style.backgroundColor = ORANGE;
 
         var that = this;
 
         if (i === 11) {
             setTimeout(function() {
                 var cell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]];
-                cell.style.backgroundColor = firstCell;
+		cell.style.backgroundColor = cellColors[0];
                 that._locked = false;
 
                 // Keep rotating until first cell is set.
@@ -502,7 +506,7 @@ function ModeWidget() {
             }, ROTATESPEED);
         } else {
             setTimeout(function() {
-                that.__rotateRightOneCell(i + 1, firstCell);
+                that.__rotateRightOneCell(i + 1, cellColors);
             }, ROTATESPEED);
         }
     };
@@ -521,23 +525,27 @@ function ModeWidget() {
 
         this._saveState();
 
-        var lastCell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]].style.backgroundColor;
-        this.__rotateLeftOneCell(11, lastCell);
+        var cellColors = [];
+        for (var i = 0; i < 12; i++) {
+            cellColors.push(table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]].style.backgroundColor);
+        }
+        this.__rotateLeftOneCell(11, cellColors);
     };
 
-    this.__rotateLeftOneCell = function(i, lastCell) {
+    this.__rotateLeftOneCell = function(i, cellColors) {
         var table = docById('modeTable');
 
         var prev = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
         var cell = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
-        prev.style.backgroundColor = cell.style.backgroundColor;
+	prev.style.backgroundColor = cellColors[i - 1];
+        cell.style.backgroundColor = ORANGE;
 
         var that = this;
 
         if (i === 1) {
             setTimeout(function() {
                 var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
-                cell.style.backgroundColor = lastCell;
+                cell.style.backgroundColor = cellColors[11];
                 that._locked = false;
 
                 // Keep rotating until last cell is set.
@@ -551,7 +559,7 @@ function ModeWidget() {
             }, ROTATESPEED);
         } else {
             setTimeout(function() {
-                that.__rotateLeftOneCell(i - 1, lastCell);
+                that.__rotateLeftOneCell(i - 1, cellColors);
             }, ROTATESPEED);
         }
     };
