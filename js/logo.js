@@ -2275,7 +2275,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                 for (var i = len - 1; i > -1; i--) {
                     var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                     var num2 = getNumber(note2[0], note2[1]);
-                    var a = getNumNote(num1, 0);
+                    // var a = getNumNote(num1, 0);
                     if (logo.invertList[turtle][i][2] === 'even') {
                         delta += num2 - num1;
                     } else {  // odd
@@ -2438,7 +2438,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                         // Note from which delta is calculated.
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
-                        var a = getNumNote(num1, 0);
+                        // var a = getNumNote(num1, 0);
                         if (logo.invertList[turtle][i][2] === 'even') {
                             delta += num2 - num1;
                         } else {  // odd
@@ -2488,7 +2488,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                         // Note from which delta is calculated.
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
-                        var a = getNumNote(num1, 0);
+                        // var a = getNumNote(num1, 0);
                         if (logo.invertList[turtle][i][2] === 'even') {
                             delta += num2 - num1;
                         } else {  // odd
@@ -2540,7 +2540,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, canvas, blocks, turtles, sta
                     for (var i = len - 1; i > -1; i--) {
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
-                        var a = getNumNote(num1, 0);
+                        // var a = getNumNote(num1, 0);
                         if (logo.invertList[turtle][i][2] === 'even') {
                             delta += num2 - num1;
                         } else {  // odd

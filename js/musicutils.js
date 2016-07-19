@@ -794,8 +794,8 @@ function getSolfege(note) {
 };
 
 
-function getNumber(solfege, octave) {
-    // converts a note to a number
+function getNumber(notename, octave) {
+    // Converts a note, e.g., C, and octave to a number
 
     if (octave < 1) {
         var num = 0;
@@ -804,11 +804,12 @@ function getNumber(solfege, octave) {
     } else {
         var num = 12 * (octave - 1);
     }
-    solfege = String(solfege);
-    if (solfege.substring(0, 1) in NOTESTEP) {
-        num += NOTESTEP[solfege.substring(0, 1)];
-        if (solfege.length >= 1) {
-            var delta = solfege.substring(1);
+
+    notename = String(notename);
+    if (notename.substring(0, 1) in NOTESTEP) {
+        num += NOTESTEP[notename.substring(0, 1)];
+        if (notename.length >= 1) {
+            var delta = notename.substring(1);
             if (delta === 'bb' || delta === '♭♭') {
                 num -= 2;
             } else if (delta === '##' || delta === '♯♯') {
