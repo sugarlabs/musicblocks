@@ -606,7 +606,9 @@ right are:
 
 *Play all*, which will play a scale using the current mode;
 
-*Save*, which will save the current mode as the *Custom* mode;
+*Save*, which will save the current mode as the *Custom* mode and save
+ a stack of *Pitch* blocks that can be used with the *Pitch-time
+ Matrix* block;
 
 *Rotate counter-clockwise*, which will rotate the mode
  counter-clockwise (See the example below);
