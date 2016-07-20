@@ -741,8 +741,52 @@ function ModeWidget() {
     };
 
     this._save = function() {
-        customMode = this._calculateMode();
-        console.log('custom mode: ' + customMode);
-        storage.custommode = JSON.stringify(customMode);
+        var table = docById('modeTable');
+
+        // If the mode is not in the list, save it as the new custom mode.
+        if (table.rows[14].cells[0].innerHTML === '') {
+            customMode = this._calculateMode();
+            console.log('custom mode: ' + customMode);
+            storage.custommode = JSON.stringify(customMode);
+	}
+
+        // Save a stack of pitches to be used with the matrix.
+        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'pitches'}], 0, 0, [0]]];
+        var endOfStackIdx = 0;
+        var previousBlock = 0;
+
+        var modeLength = this._calculateMode().length;
+        var p = 0;
+
+        for (var i = 0; i < 12; i++) {
+            // Reverse the order so that Do is last.
+            var j = 11 - i;
+            var cell = table.rows[MODEMAP[j][0]].cells[MODEMAP[j][1]];
+            if (cell.style.backgroundColor !== 'black') {
+		continue;
+	    }
+
+            p += 1;
+            var pitch = NOTESTABLE[(j + 1) % 12];
+            var octave = 4;
+            console.log(pitch + ' ' + octave);
+
+            var pitchidx = newStack.length;
+            var notenameidx = pitchidx + 1;
+            var octaveidx = pitchidx + 2;
+
+            if (p === modeLength) {
+		newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, null]]);
+	    } else {
+		newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, pitchidx + 3]]);
+	    }
+            newStack.push([notenameidx, ['solfege', {'value': pitch}], 0, 0, [pitchidx]]);
+            newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchidx]]);
+            var previousBlock = pitchidx;
+        }
+
+        // Create a new stack for the chunk.
+        console.log(newStack);
+        this._logo.blocks.loadNewBlocks(newStack);
     };
 };
