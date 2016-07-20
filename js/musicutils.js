@@ -847,11 +847,13 @@ function getNumNote(value, delta) {
     return [note, octave + 1];
 };
 
+
 function isInt(value) {
     return !isNaN(value) && 
     parseInt(Number(value)) == value && 
     !isNaN(parseInt(value, 10));
 }
+
 
 function reducedFraction(a, b) {
     greatestCommonMultiple = function(a, b) {
@@ -865,6 +867,7 @@ function reducedFraction(a, b) {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
     }
 };
+
 
 function Synth () {
     // Isolate synth functions here.
