@@ -2,6 +2,83 @@
 <html>
 
 <head>
+<head>
+    <style>
+
+#tempo {
+  background-color: white;
+    margin-right: 300px;
+    margin-left: 300px;
+    
+}
+
+#TempoCanvas {
+  visibility: hidden;
+  margin-right: 300px;
+  margin-left: 300px;
+  
+}
+
+a {
+    color: black;
+}
+header{
+ 
+  text-align: center;
+  background-color: #00ff00;
+ margin-right: 300px;
+  margin-left: 300px;
+
+ }
+.black {
+   border: 4px solid #000000;
+   background: #000000;
+   background: -webkit-gradient(linear, left top, left bottom, from(#f0f0f0), to(#000000));
+   background: -webkit-linear-gradient(top, #f0f0f0, #000000);
+   background: -moz-linear-gradient(top, #f0f0f0, #000000);
+   background: -ms-linear-gradient(top, #f0f0f0, #000000);
+   background: -o-linear-gradient(top, #f0f0f0, #000000);
+   background-image: -ms-linear-gradient(top, #f0f0f0 0%, #000000 100%);
+   padding: 18px 36px;
+   -webkit-border-radius: 30px;
+   -moz-border-radius: 30px;
+   border-radius: 30px;
+   -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   text-shadow: #ffffff 0 1px 0;
+   color: #000000;
+   font-size: 20px;
+   font-family: helvetica, serif;
+   text-decoration: none;
+   vertical-align: middle;
+   }
+.black:hover {
+   border: 4px solid #000000;
+   text-shadow: #000508 0 1px 0;
+   background: #000000;
+   background: -webkit-gradient(linear, left top, left bottom, from(#000000), to(#000000));
+   background: -webkit-linear-gradient(top, #000000, #000000);
+   background: -moz-linear-gradient(top, #000000, #000000);
+   background: -ms-linear-gradient(top, #000000, #000000);
+   background: -o-linear-gradient(top, #000000, #000000);
+   background-image: -ms-linear-gradient(top, #000000 0%, #000000 100%);
+   color: #ffffff;
+   }
+.black:active {
+   text-shadow: #000000 0 1px 0;
+   border: 4px solid #000000;
+   background: #000000;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#000000));
+   background: -webkit-linear-gradient(top, #3e779d, #000000);
+   background: -moz-linear-gradient(top, #3e779d, #000000);
+   background: -ms-linear-gradient(top, #3e779d, #000000);
+   background: -o-linear-gradient(top, #3e779d, #000000);
+   background-image: -ms-linear-gradient(top, #3e779d 0%, #000000 100%);
+   color: #000000;
+   }
+ 
+</style>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Music Blocks</title>
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
@@ -33,6 +110,243 @@
 </head>
 
 <body data-title="index" id="body" style="background: #96D3F3;">
+        <script>
+            function visible() {
+              document.getElementById('tempo').style.visibility = 'visible';
+            }
+        </script>
+        <div id="tempo"> 
+<header id="myHeader"><font size="10">Music Blocks: Tempo System</font></header>
+
+                <canvas id="TempoCanvas"> 
+
+                      
+
+           Sorry, your browser doesn't support canvas technology 
+                </canvas>
+                <div  id="myDiv" class="center" style="color:#FFFFFF" align="center">
+                </br>
+                </br>
+                <button class = "black" onclick="speedUp()" id ="up">Speed Up</button>
+        
+                <button  class = "black"onclick="speedDown()" id ="down">Slow Down</button>
+                
+                
+                
+                
+                </br>
+                BPM: <input type="number" id="myNumber" value="10   ">
+
+                <button onclick="useBPM()" class="black">Change BPM</button>
+                </br>
+                
+                
+                
+                
+                <button  class = "black"onclick="stop()">Stop</button>
+                <button  class = "black"onclick="start()">Start</button>
+                </br>
+                <aside align = "center"><font size= "8" color ="black"><b> About Tempo</b></font></aside>
+                <p><font size = "4" color ="black">Tempo is the pace of a piece of music. A metronome is used to keep track of tempo. Music Blocks has a similar function to that of a metronome. Tempo is used all the time. It is used when you tap your foot to your favorite song. It is used when you sing a song. It is even used when you are running and you start to breathe in a pattern. Enjoy the learning environment and experience of Music Blocks </font><p>
+                <a href = "manyBeats.html" link="#000000" vlink="#000000" alink="#FFFFFF">Click here if you want to see multiple beats within multiple tempos</a>
+                </div>
+<audio id="myAudio">
+ <source src="tick.mp3" type="audio/mpeg"
+</audio>
+    
+        <script type="text/javascript"> 
+
+
+                        var canvas; 
+
+
+                        var ctx; 
+
+
+                        var x = 1287; 
+
+
+                        var y = 500; 
+
+
+                        var mx = 1; 
+
+
+                        var my = 4; 
+
+                        var tempmx = -1;
+                        var WIDTH = 1287; 
+
+
+                        var HEIGHT = 500; 
+var sound = document.getElementById("myAudio"); 
+
+  function stop(){
+  tempmx = mx;
+  mx=0;
+  
+  
+  }
+  
+  function start(){
+  if (tempmx<0)
+  mx=-1;
+  
+  else
+    mx=1;
+  }
+  
+  function useBPM(){
+    var input = document.getElementById("myNumber").value;
+    var temp;
+    
+    if(input<10)
+    alert("BPM must be between 10-240");
+    
+    if(input>240)
+    alert("BPM must be between 10-240");
+    
+    else
+    {
+    temp = input*1287;
+    
+    if(mx<0){
+    mx = (temp*5)/60000;
+    mx = -mx;
+    }
+    if(mx>0)
+    mx = (temp*5)/60000;
+  }
+  }
+  
+function speedUp(){
+if(mx > 26 || mx < -26){
+ alert("You can not speed up anymore");
+}
+else{
+if (mx < 0){
+
+mx--;
+
+}
+if (mx > 0){
+
+mx++;
+
+}
+
+}
+}
+function speedDown(){
+if(mx - 1 == 0 || mx + 1 == 0){
+ alert("You can not slow down anymore");
+}
+else{
+if (mx > 0){
+
+mx--;
+
+}
+if (mx < 0){
+
+mx++;
+
+}
+}
+}
+
+function circle(x,y,r) { 
+
+
+  ctx.beginPath(); 
+
+ctx.fillStyle = ""; 
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+
+
+  ctx.fill(); 
+
+
+} 
+
+
+  
+
+
+function clear() { 
+
+
+  ctx.clearRect(0, 0, WIDTH, HEIGHT); 
+
+
+} 
+
+
+function init() { 
+
+  canvas = document.getElementById("TempoCanvas"); 
+
+
+  ctx = canvas.getContext("2d"); 
+
+
+  return setInterval(draw, 5); 
+
+} 
+
+
+function draw() { 
+  clear(); 
+  circle(x,250, 30); 
+
+
+  if (x + mx > WIDTH || x + mx < 0) {
+    
+    if(x+mx>WIDTH)
+        tempmx=-1;
+            
+    else
+        tempmx=1;
+        
+    mx = -mx;
+sound.play(); 
+var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+
+
+}
+ctx.fillStyle = color; 
+document.getElementById("myHeader").style.background = color;
+
+var colorC = '#';
+    for (var i = 0; i < 6; i++ ) {
+        colorC += letters[Math.floor(Math.random() * 16)];
+
+}
+document.getElementById("TempoCanvas").style.background = colorC;
+
+document.getElementById("myDiv").style.background = colorC;
+
+}
+  if (y + my > HEIGHT || y + my < 0) 
+
+    my = -my; 
+
+  x += mx; 
+
+
+ // y += my; 
+
+} 
+
+
+
+
+init(); 
+                </script> 
+                </div>
 
     <script>
         window.fbAsyncInit = function() {
