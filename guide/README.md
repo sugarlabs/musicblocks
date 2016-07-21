@@ -644,6 +644,11 @@ it into *Phrygian*.
 
 Note: The build-in modes in Music Blocks can be found in (musicutils.js)[https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68].
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg'</img>
+
+The *Save* button exports a stack of blocks representing the mode that
+can be used inside the *Pitch-time Matrix* block.
+
 8. Beyond Music Blocks
 ----------------------
 
