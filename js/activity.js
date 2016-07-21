@@ -92,7 +92,7 @@ define(function (require) {
     require('activity/pitchdrummatrix');
     require('activity/rhythmruler');
     require('activity/pitchstaircase');
-
+    require('activity/tempo');
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {
         if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -125,6 +125,7 @@ define(function (require) {
         }
 
         var canvas = docById('myCanvas');
+        var canvas1 = docById('TempoCanvas')
 
         var queue = new createjs.LoadQueue(false);
 
@@ -594,6 +595,7 @@ define(function (require) {
             pitchdrummatrix = new PitchDrumMatrix();
             rhythmruler = new RhythmRuler();
             pitchstaircase = new PitchStairCase();
+            tempo = new Tempo();
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
@@ -602,7 +604,7 @@ define(function (require) {
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas,
+            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canvas,
                 blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
                 onRunTurtle, getStageX, getStageY,
@@ -1173,6 +1175,11 @@ define(function (require) {
 
             stage.scaleX = turlteBlocksScale;
             stage.scaleY = turlteBlocksScale;
+
+            var canvas1 = docById('TempoCanvas');
+            console.log(canvas1);
+            canvas1.width = w;
+            canvas1.height = h;   
 
             stage.canvas.width = w;
             stage.canvas.height = h;
