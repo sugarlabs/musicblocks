@@ -95,17 +95,26 @@ function PitchStairCase() {
     this.dissectStair = function(event) {
         var that = this;
 
-        var inputNum = prompt(_('Divide By:'), "3 2");
+        var inputNum1 = docById('musicratio1').value;
+        if (isNaN(inputNum1)) {
+            inputNum1 = 3;
+        } else {
+            inputNum1 = Math.abs(Math.floor(inputNum1));
+        }
 
-      //  if(!isInt(inputNum)) {
-     //       alert(_('Please Input a Integer'));
-     //       inputNum = prompt(_('Divide By:'), 2);
-     //   }
+        docById('musicratio1').value = inputNum1;
 
-        var arr = inputNum.split(" ");
-        console.log(arr);
+        var inputNum2 = docById('musicratio2').value;
+        if (isNaN(inputNum2)) {
+            inputNum2 = 3;
+        } else {
+            inputNum2 = Math.abs(Math.floor(inputNum2));
+        }
+       
+        docById('musicratio2').value = inputNum2;
 
-        inputNum = parseFloat(arr[1]/arr[0]);
+
+        inputNum = parseFloat(inputNum2/inputNum1);
 
 
         if(inputNum === null) {
@@ -333,6 +342,28 @@ function PitchStairCase() {
         };
 
         var cell = row.insertCell(1);
+        cell.innerHTML = '<input id="musicratio1" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio1" type="musicratio1" value="' + 3 + '" />';
+        cell.style.top = 0;
+        cell.style.left = 0;
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        docById('musicratio1').classList.add('hasKeyboard');
+
+        var cell = row.insertCell(2);
+        cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
+        cell.style.top = 0;
+        cell.style.left = 0;
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        docById('musicratio2').classList.add('hasKeyboard');
+        
+        var cell = row.insertCell(3);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
@@ -344,6 +375,8 @@ function PitchStairCase() {
         cell.onclick=function() {
             docById('pitchstaircase').style.visibility = 'hidden';
             docById('playPitch').style.visibility = 'hidden';
+            docById('musicratio1').classList.remove('hasKeyboard');
+            docById('musicratio2').classList.remove('hasKeyboard');
         };
 
         cell.onmouseover=function() {
