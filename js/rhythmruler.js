@@ -303,9 +303,6 @@ function RhythmRuler () {
     };
 
     this.init = function(logo) {
-        // FIXME: should be contained in click event
-        docById('dissectNumber').classList.add('hasKeyboard');
-
 	console.log('init RhythmRuler');
         this._logo = logo;
 	
@@ -485,6 +482,8 @@ function RhythmRuler () {
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        // FIXME: should be contained in click event
+        docById('dissectNumber').classList.add('hasKeyboard');
 	
         var cell = row.insertCell(3);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
