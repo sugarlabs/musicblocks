@@ -126,6 +126,17 @@
 	$(function() {
             $("#statusmatrix").draggable();
         });
+    $(function() {
+        $('#pitchstaircase').on('scroll', function () {
+            jQuery('#playPitch').scrollTop(jQuery(this).scrollTop());
+        });
+    });
+
+    $(function() {
+        $('#playPitch').on('scroll', function () {
+            jQuery('#pitchstaircase').scrollTop(jQuery(this).scrollTop());
+        });
+    });
 
         (function($) {
             $.fn.fixMe = function() {

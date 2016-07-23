@@ -254,9 +254,12 @@ function PitchStairCase() {
         var w = window.innerWidth;
         this.cellScale = w / 1200;
         docById('pitchstaircase').style.width = Math.floor(w / 2) + 'px';
-        docById('pitchstaircase').style.overflowX = 'auto';
-		
-    		var thisStair = this;
+        docById('pitchstaircase').style.height = Math.floor(w/4) + 'px';
+        docById('pitchstaircase').style.overflowY = 'auto';
+        docById('playPitch').style.height = Math.floor(w/4) + 'px';
+        docById('playPitch').style.overflowY = 'hidden';
+	
+            var thisStair = this;
 
         var tables = document.getElementsByTagName('TABLE');
 
