@@ -124,6 +124,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
 
     // parameters used by notes
     this._masterBPM = TARGETBPM;
+    this.defaultBPMFactor = TONEBPM / this._masterBPM;
 
     this.beatFactor = {};
     this.dotCount = {};
@@ -595,6 +596,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
                 }
             }
         }
+
+	this._masterBPM = TARGETBPM;
+	this.defaultBPMFactor = TONEBPM / this._masterBPM;
 
         // Each turtle needs to keep its own wait time and music
         // states.
@@ -2002,6 +2006,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
                 } else {
                     logo._masterBPM = args[0];
                 }
+		logo.defaultBPMFactor = TONEBPM / this._masterBPM;
             }
             break;
         case 'setbpm':
