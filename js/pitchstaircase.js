@@ -4,16 +4,29 @@ function PitchStairCase() {
 
     this.Stairs = [];
 
+    this._addButton = function(row, colIndex, icon, iconSize, label) {
+        var cell = row.insertCell();
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        return cell;
+    };
+
     this._makeStairs = function (start) {
 
-        if(start === -1) {
-            start = 0;
-        } else {
-            for (var j = start; j < this.Stairs.length-1; j++) {
-                docById("playStairTable" + j).remove();
-                docById("stairTable"+ j).remove();
-            }
-        }
+
         var thisStair = this;
         var iconSize = Math.floor(this._cellScale * 24);
         
@@ -22,30 +35,34 @@ function PitchStairCase() {
 
         var playPitchDiv = docById('playPitch');
         var playPitchDivPosition = playPitchDiv.getBoundingClientRect();
-
-        for (var i = start; i < thisStair.Stairs.length; i++) {
-
+        if(start === -1) {
+            start = 0;
             var playTable = document.createElement('TABLE');
-            playTable.setAttribute('id', 'playStairTable' + i);
+            playTable.setAttribute('id', 'playStairTable');
             playTable.style.textAlign = 'center';
             playTable.style.borderCollapse = 'collapse';
             playTable.cellSpacing = 0;
             playTable.cellPadding = 0;
             playPitchDiv.appendChild(playTable);
+        } else {
+            for (var j = start; j < this.Stairs.length-1; j++) {
+                docById("playStair" + j).remove();
+                docById("stairTable"+ j).remove();
+            }
+        }
+        
+        
+        var playTable = docById('playStairTable');
+
+        for (var i = start; i < thisStair.Stairs.length; i++) {
 
             var header = playTable.createTHead();
-            var playrow = header.insertRow(-1);
+            var playrow = header.insertRow(i);
             playrow.style.left = Math.floor(playPitchDivPosition.left) + 'px';
             playrow.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             playrow.setAttribute('id', "playStair" + i);
 
-            var playcell = playrow.insertCell(-1);
-            playcell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            playcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize * this._cellScale + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-            playcell.style.minWidth = playcell.style.width;
-            playcell.style.maxWidth = playcell.style.width;
-            playcell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            playcell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            var playcell = this._addButton(playrow, -1, 'play-button.svg', iconSize, _('play'));
 
             playcell.onclick = function() {
                 console.log(playcell.parentNode.id);
@@ -80,7 +97,7 @@ function PitchStairCase() {
             cell.innerHTML = thisStair.Stairs[i][0] + thisStair.Stairs[i][1] + " "  + frequency.toFixed(2);
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
-            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+            cell.style.height = playrow.offsetHeight + 'px';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
             cell.addEventListener('click', function(event) {
