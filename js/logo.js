@@ -123,6 +123,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
     this.transposition = {};
 
     // parameters used by notes
+    this._masterBPM = TARGETBPM;
+
     this.beatFactor = {};
     this.dotCount = {};
     this.noteBeat = {};
@@ -148,7 +150,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
 
     // parameters used by the note block
     this.bpm = {};
-    this.defaultBPMFactor = TONEBPM / TARGETBPM;
     this.turtleTime = [];
     this.noteDelay = 0;
     this.playedNote = {};
@@ -523,7 +524,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
                 if (this.bpm[turtle].length > 0) {
                     value = last(this.bpm[turtle]);
                 } else {
-                    value = TARGETBPM;
+                    value = this._masterBPM;
                 }
                 break;
             default:
@@ -1988,6 +1989,19 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
         case 'savelilypond':
             if (args.length === 1) {
                 logo._saveLilypondOutput(args[0]);
+            }
+            break;
+        case 'setmasterbpm':
+            if (args.length === 1 && typeof(args[0] === 'number')) {
+                if (args[0] < 30) {
+                    logo.errorMsg(_('Beats per minute must be > 30.'))
+                    logo._masterBPM = 30;
+                } else if (args[0] > 1000) {
+                    logo.errorMsg(_('Maximum beats per minute is 1000.'))
+                    logo._masterBPM = 1000;
+                } else {
+                    logo._masterBPM = args[0];
+                }
             }
             break;
         case 'setbpm':
@@ -3521,7 +3535,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
         if (this.bpm[turtle].length > 0) {
             var bpmFactor = TONEBPM / last(this.bpm[turtle]);
         } else {
-            var bpmFactor = TONEBPM / TARGETBPM;
+            var bpmFactor = TONEBPM / this._masterBPM;
         }
 
         if (this.blocks.blockList[blk].name === 'osctime') {
@@ -4292,7 +4306,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
                 } else if (logo.bpm[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = last(logo.bpm[turtle]);
                 } else {
-                    logo.blocks.blockList[blk].value = TARGETBPM;
+                    logo.blocks.blockList[blk].value = logo._masterBPM;
                 }
                 break;
             case 'staccatofactor':

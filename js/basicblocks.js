@@ -595,6 +595,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
 
+    var setMasterBPMBlock = new ProtoBlock('setmasterbpm');
+    setMasterBPMBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setmasterbpm'] = setMasterBPMBlock;
+    setMasterBPMBlock.staticLabels.push(_('master beats per minute'));
+    setMasterBPMBlock.adjustWidthToLabel();
+    setMasterBPMBlock.oneArgBlock();
+    setMasterBPMBlock.defaults.push(90);
+
     var backwardBlock = new ProtoBlock('backward');
     backwardBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['backward'] = backwardBlock;
