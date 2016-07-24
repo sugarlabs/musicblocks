@@ -41,10 +41,10 @@ function PitchStairCase() {
 
             var playcell = playrow.insertCell(-1);
             playcell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            playcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            playcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize * this._cellScale + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             playcell.style.minWidth = playcell.style.width;
             playcell.style.maxWidth = playcell.style.width;
-            playcell.style.height = Math.floor(RHYTHMRULERHEIGHT * this._cellScale) + 'px';
+            playcell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             playcell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
             playcell.onclick = function() {
@@ -80,7 +80,7 @@ function PitchStairCase() {
             cell.innerHTML = thisStair.Stairs[i][0] + thisStair.Stairs[i][1] + " "  + frequency.toFixed(2);
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
-            cell.style.height = Math.floor(RHYTHMRULERHEIGHT * this._cellScale) + 'px';
+            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
             cell.addEventListener('click', function(event) {
