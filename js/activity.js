@@ -1176,11 +1176,6 @@ define(function (require) {
             stage.scaleX = turlteBlocksScale;
             stage.scaleY = turlteBlocksScale;
 
-            var canvas1 = docById('TempoCanvas');
-            console.log(canvas1);
-            canvas1.width = w;
-            canvas1.height = h;   
-
             stage.canvas.width = w;
             stage.canvas.height = h;
 
