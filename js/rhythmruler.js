@@ -15,13 +15,19 @@
 
 
 function RhythmRuler () {
-    this.Rulers = [];
+    // There is one ruler per drum.
     this.Drums = [];
-    this._rulerSelected = 0;
-    this._completed = 0;
+    // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
+    this.Rulers = [];
+    // Save the history of divisions so as to be able to restore them.
+    this._dissectHistory = [];
+
     this._playing = false;
     this._playingOne = false;
     this._playingAll = false;
+    this._completed = 0;
+
+    this._rulerSelected = 0;
     this._rulerPlaying = -1;
     
     this._noteWidth = function (noteValue) {
@@ -57,8 +63,6 @@ function RhythmRuler () {
     };
 
     this._dissectRuler = function (event) {
-	var that = this;
-
 	var inputNum = docById('dissectNumber').value;
         if (isNaN(inputNum)) {
             inputNum = 2;
@@ -70,13 +74,18 @@ function RhythmRuler () {
 
         var cell = event.target;
         this._rulerSelected = cell.parentNode.id[5];
+        this.__dissect(cell, inputNum);
+    };
+
+    this.__dissect = function (cell, inputNum) {
+	var that = this;
 
         var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this._rulerSelected][0];
         var divisionHistory = this.Rulers[this._rulerSelected][1];
 	
-        divisionHistory.push([newCellIndex,inputNum]);
+        divisionHistory.push([newCellIndex, inputNum]);
         ruler.deleteCell(newCellIndex);
 	
         var noteValue = noteValues[newCellIndex];
@@ -261,7 +270,7 @@ function RhythmRuler () {
             var samenotevalue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
 		
-                if (noteValues[i] === noteValues[i+1] && i < ruler.cells.length - 1) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
                     samenotevalue += 1;
                     continue;
                 } else {
@@ -298,6 +307,7 @@ function RhythmRuler () {
 
     this.init = function(logo) {
 	console.log('init RhythmRuler');
+        console.log(this.Rulers);
         this._logo = logo;
 	
         docById('rulerbody').style.display = 'inline';
@@ -444,6 +454,15 @@ function RhythmRuler () {
 	
         var cell = this._addButton(row, 3, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
+            // Save dissect history
+            that._dissectHistory = [];
+            for (var i = 0; i < that.Rulers.length; i++) {
+                var history = [];
+                for (var j = 0; j < that.Rulers[i][1].length; j++) {
+                    history.push(that.Rulers[i][1][j]);
+		}
+                that._dissectHistory.push(history);
+            }
             docById('rulerbody').style.visibility = 'hidden';
             docById('drumDiv').style.visibility = 'hidden';
             docById('rulerbody').style.border = 0;
@@ -532,6 +551,17 @@ function RhythmRuler () {
             // Match the play button height to the ruler height.
             table.rows[i + 1].cells[0].style.height = row.offsetHeight + 'px';
         }
+
+        // Restore dissect history.
+	// FIXME: We should take into account any changes in the set drum and rhythm blocks.
+        for (var i = 0; i < this._dissectHistory.length; i++) {
+	    var rulerTable = docById('rulerTable' + i);
+            for (var j = 0; j < this._dissectHistory[i].length; j++) {
+		this._rulerSelected = i;
+		var cell = rulerTable.rows[i].cells[this._dissectHistory[i][j][0]]
+		this.__dissect(cell, this._dissectHistory[i][j][1]);
+	    }
+	}
     };
 
     this._addButton = function(row, colIndex, icon, iconSize, label) {
