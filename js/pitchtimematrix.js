@@ -1,4 +1,4 @@
-s// Copyright (c) 2015 Yash Khandelwal
+// Copyright (c) 2015 Yash Khandelwal
 // Copyright (c) 2015,16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -9,31 +9,6 @@ s// Copyright (c) 2015 Yash Khandelwal
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
-
-//All about Matrix
-
-/*
-init() : Initializes the matrix. Makes the pitches according to
-solfegeNotes (contains what is to be displayed in first column)
-solfegeOctaves (contains the octave for each pitch )
-
-addNotes() : Makes the matrix according to each rhythm block.
-
-addTuplet() : Called when tuplet block is attached to the matrix
-clamp. Adds the rows and columns required for adding tuplet
-functionality to matrix. "Code is little messy" *<==How so? How should
-it be improved in the future?*
-
-makeClickable() : Makes the matrix clickable.
-
-setNotes() : Set notes in this.notesToPlay when user clicks onto any
-clickable cell.
-
-playMatrix() : Plays the matrix by calling playAll();
-
-savematrix() : Saves the Matrix notes in an array. Part of that array
-(between 2 'end') constitutes notes for any chunk.
-*/
 
 
 function Matrix() {
