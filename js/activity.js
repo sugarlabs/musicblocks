@@ -1021,6 +1021,14 @@ define(function (require) {
                 return;
             }
 
+            if (docById('musicratio1').classList.contains('hasKeyboard')) {
+                return;
+            }
+
+            if (docById('musicratio2').classList.contains('hasKeyboard')) {
+                return;
+            }
+
             const BACKSPACE = 8;
             const TAB = 9;
             if (event.keyCode === TAB || event.keyCode === BACKSPACE) {
