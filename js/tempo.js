@@ -1,14 +1,14 @@
 function Tempo () {
 	var canvas; 
     var ctx; 
-    var x = 1287; 
-    var y = 500; 
+    var x; 
+    var y; 
     var mx = 1; 
     var my = 4; 
 	var tempmx = -1;
-    var WIDTH = 1287; 
-    var HEIGHT = 500; 
-	var sound = document.getElementById("myAudio"); 
+    var WIDTH; 
+    var HEIGHT; 
+//	var sound = document.getElementById("myAudio"); 
 
 	this.stop = function () {
   		tempmx = mx;
@@ -70,46 +70,21 @@ function Tempo () {
 			}
 		}
 	};
-
+ 
 	this.circle = function (x,y,r) { 
   		ctx.beginPath(); 
 		ctx.fillStyle = ""; 
-  		ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  		ctx.arc(x, y, r, 0, Math.PI*2); 
 		ctx.fill(); 
 	}; 
 
 	this.draw = function () { 
-  		ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  		this.circle(x,250, 30); 
-  		if (x + mx > WIDTH || x + mx < 0) {	
-			if(x+mx>WIDTH)
-				tempmx=-1;	
-			else
-				tempmx=1;
-	    	mx = -mx;
-			//sound.play(); 
-			var letters = '0123456789ABCDEF'.split('');
-    		var color = '#';
-    		for (var i = 0; i < 6; i++ ) {
-        		color += letters[Math.floor(Math.random() * 16)];
-			}
-
-			ctx.fillStyle = color; 
-			document.getElementById("TempoHeader").style.background = color;
-			var colorC = '#';
-    
-    		for (var i = 0; i < 6; i++ ) {
-        		colorC += letters[Math.floor(Math.random() * 16)];
-			}
-
-			document.getElementById("TempoCanvas").style.background = colorC;
-			document.getElementById("TempoDiv").style.background = colorC;
-		}
-
-  		if (y + my > HEIGHT || y + my < 0) 
-			my = -my; 
-  		
-  		x += mx; 
+		var that = this;
+		var canvasRect = canvas.getBoundingClientRect();
+  		ctx.clearRect(canvasRect.left,canvasRect.top, WIDTH, HEIGHT);
+  		console.log(x);
+  		this.circle(x+10,y+20,30); 
+  		x += 1;
 	};
 
 	this.init = function () {
@@ -121,19 +96,23 @@ function Tempo () {
         var w = window.innerWidth;
         docById('TempoDiv').style.width = Math.floor(w / 2) + 'px';
         docById('TempoCanvas').style.width = Math.floor(w / 2) + 'px';
-        docById('TempoCanvas').style.height = Math.floor(w/2) + 'px';
+        docById('TempoCanvas').style.height = Math.floor(w / 2) + 'px';
 
+        WIDTH = Math.floor(w / 2) + 'px';
+        HEIGHT = Math.floor(w / 2) + 'px';
+ 
         var TempoDiv = docById('TempoDiv');
 
-        var speedUpButton = document.createElement("input");
-        speedUpButton.type = "button";
-        speedUpButton.value = "SpeedUp";
-        TempoDiv.appendChild(speedUpButton);
-
-
 	    canvas = document.getElementById("TempoCanvas"); 
-		ctx = canvas.getContext("2d"); 
-  		return setInterval(thisTempo.draw(), 5);
+		ctx = canvas.getContext("2d");
+		console.log(ctx);
+		var canvasRect = canvas.getBoundingClientRect();
+
+		x = canvasRect.left;
+		y = canvasRect.top;
+		console.log(canvas.getBoundingClientRect());
+		thisTempo.draw();
+  		setInterval(thisTempo.draw(), 5);
 	};
 
 };
