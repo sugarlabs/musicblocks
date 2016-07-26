@@ -230,6 +230,7 @@
     <div class="canvasHolder">
         <canvas id="myCanvas" width="1200" height="900"></canvas>
         <canvas id="myChart" width="600" height="600"></canvas>
+        <canvas id="TempoCanvas" width="700" height="800" style="border: 1px solid black"></canvas>
         <video id="camVideo" style="visibility:hidden;"></video>
         <canvas hidden id="TempoCanvas" width="700" height="800" style="border: 1px solid black"></canvas>
         <canvas id="camCanvas" style="visibility:hidden;"></canvas>
@@ -278,7 +279,6 @@
         </div>
     </div>
     <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
-    <canvas hidden id="TempoCanvas" width="700" height="800" style="border: 1px solid black"></canvas>
     <canvas hidden id="music" width="700"></canvas>
     <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
@@ -288,7 +288,6 @@
     <div id="playPitch"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
     <div id="TempoDiv" class="center" style="color:#FFFFFF" align="center"></div>
-    <header id="TempoHeader"><font size="10">Music Blocks: Tempo System</font></header>    
     <div id="helpElem"></div>
 
 </body>

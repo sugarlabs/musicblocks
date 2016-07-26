@@ -310,13 +310,6 @@ table {
   -webkit-user-select: none;
 }
 
-#TempoHeader{
-  text-align: center;
-  background-color: #00ff00;
-  margin-right: 300px;
-  margin-left: 300px;
-}
-
 #TempoDiv {
   position: absolute;
   top: 20%;
@@ -328,8 +321,57 @@ table {
 }
 
 #TempoCanvas {
+  visibility: hidden;
   position: absolute;
-  top : 20%;
-  left : 30%;  
+  top : 5%;
+  left : 20%;  
+}
+
+.black {
+  border: 4px solid #000000;
+  background: #000000;
+  background: -webkit-gradient(linear, left top, left bottom, from(#f0f0f0), to(#000000));
+  background: -webkit-linear-gradient(top, #f0f0f0, #000000);
+  background: -moz-linear-gradient(top, #f0f0f0, #000000);
+  background: -ms-linear-gradient(top, #f0f0f0, #000000);
+  background: -o-linear-gradient(top, #f0f0f0, #000000);
+  background-image: -ms-linear-gradient(top, #f0f0f0 0%, #000000 100%);
+  padding: 18px 36px;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+  -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+  box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+  text-shadow: #ffffff 0 1px 0;
+  color: #000000;
+  font-size: 20px;
+  font-family: helvetica, serif;
+  text-decoration: none;
+  vertical-align: middle;
+}
+.black:hover {
+  border: 4px solid #000000;
+  text-shadow: #000508 0 1px 0;
+  background: #000000;
+  background: -webkit-gradient(linear, left top, left bottom, from(#000000), to(#000000));
+  background: -webkit-linear-gradient(top, #000000, #000000);
+  background: -moz-linear-gradient(top, #000000, #000000);
+  background: -ms-linear-gradient(top, #000000, #000000);
+  background: -o-linear-gradient(top, #000000, #000000);
+  background-image: -ms-linear-gradient(top, #000000 0%, #000000 100%);
+  color: #ffffff;
+}
+.black:active {
+  text-shadow: #000000 0 1px 0;
+  border: 4px solid #000000;
+  background: #000000;
+  background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#000000));
+  background: -webkit-linear-gradient(top, #3e779d, #000000);
+  background: -moz-linear-gradient(top, #3e779d, #000000);
+  background: -ms-linear-gradient(top, #3e779d, #000000);
+  background: -o-linear-gradient(top, #3e779d, #000000);
+  background-image: -ms-linear-gradient(top, #3e779d 0%, #000000 100%);
+  color: #000000;
 }
 
