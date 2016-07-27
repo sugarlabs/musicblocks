@@ -23,7 +23,7 @@ function Tempo () {
   	};
 
   	this.useBPM = function () {
-		var input = document.getElementById("myNumber").value;
+		var input = document.getElementById("bpmnumber").value;
 		var temp;
 	
 		if(input<10)
@@ -82,7 +82,6 @@ function Tempo () {
 		var that = this;
 		var canvasRect = canvas.getBoundingClientRect();
   		ctx.clearRect(0,0,canvas.width,canvas.height);
-  		console.log(x);
   	//	that.circle(x+10,y+20,30); 
   		ctx.beginPath(); 
 		ctx.fillStyle = ""; 
@@ -171,6 +170,32 @@ document.getElementById("TempoDiv").style.background = colorC;
 		SpeedDownButton.className = 'black';
 		TempoDiv.appendChild(SpeedDownButton);
 //		ctx.clearRect(0,0,canvas.width,canvas.height);
+
+		var BPMInput = document.createElement("input");
+		BPMInput.setAttribute('id','bpmnumber');
+		BPMInput.type = "number";
+		TempoDiv.appendChild(BPMInput);
+
+		var BPMButton = document.createElement("BUTTON");
+		BPMButton.setAttribute('id', 'bpmchange');
+		BPMButton.textContent = "Change BPM";
+		BPMButton.onclick = thisTempo.useBPM;
+		BPMButton.className = 'black';
+		TempoDiv.appendChild(BPMButton);
+
+		var StartButton = document.createElement("BUTTON");
+		StartButton.setAttribute('id', 'start');
+		StartButton.textContent = "Start";
+		StartButton.onclick = thisTempo.start;
+		StartButton.className = 'black';
+		TempoDiv.appendChild(StartButton);
+
+		var StopButton = document.createElement("BUTTON");
+		StopButton.setAttribute('id', 'stop');
+		StopButton.textContent = "Stop";
+		StopButton.onclick = thisTempo.stop;
+		StopButton.className = 'black';
+		TempoDiv.appendChild(StopButton);
 	};
 
 };
