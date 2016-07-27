@@ -312,8 +312,8 @@ table {
 
 #TempoDiv {
   position: absolute;
-  top: 20%;
-  left: 30%;
+  top: 40%;
+  left: 20%;
   border-style: solid;
   border: 0 !important;
   background: rgba(255, 225, 255, 0.85);
