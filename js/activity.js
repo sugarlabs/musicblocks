@@ -1023,6 +1023,10 @@ define(function (require) {
                 return;
             }
 
+            if (docById('bpmnumber').classList.contains('hasKeyboard')) {
+                return ;
+            }
+
             const BACKSPACE = 8;
             const TAB = 9;
             if (event.keyCode === TAB || event.keyCode === BACKSPACE) {
@@ -1451,7 +1455,6 @@ define(function (require) {
                 console.log('hide RhythmRuler');
                 document.getElementById('rulerbody').style.visibility = 'hidden';
                 document.getElementById('rulerbody').style.border = 0;
-                document.getElementsByClassName('hRule')[0].style.visibility = 'hidden';
                 document.getElementsByClassName('mousePosBox')[0].style.visibility = 'hidden';  
             }              
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
