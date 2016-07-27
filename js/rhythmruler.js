@@ -111,9 +111,9 @@ function RhythmRuler () {
     };
     
     this._undo = function() {
-        var that = this;
         var divisionHistory = this.Rulers[this._rulerSelected][1];
         if (divisionHistory.length === 0) {
+            // FIXME: Cycle through other rulers if necessary.
             return;
         }
         var ruler = docById('ruler' + this._rulerSelected);
@@ -135,6 +135,7 @@ function RhythmRuler () {
         noteValues[newCellIndex] = oldCellNoteValue/inputNum;
         noteValues.splice(newCellIndex + 1, inputNum - 1);
         
+        var that = this;
         newCell.addEventListener('click', function(event) {
             console.log('adding DISSECT event too');
             that._dissectRuler(event);
@@ -307,7 +308,6 @@ function RhythmRuler () {
 
     this.init = function(logo) {
         console.log('init RhythmRuler');
-        console.log(this.Rulers);
         this._logo = logo;
         
         docById('rulerbody').style.display = 'inline';
@@ -345,12 +345,6 @@ function RhythmRuler () {
         for (var i = 0; i < this.Rulers.length; i++) {
             var rulertable = docById('rulerTable' + i);
             var rulerdrum = docById('rulerdrum' + i);
-            if (rulertable !== null) {
-                rulertable.remove();
-            }
-            if (rulerdrum !== null) {
-                rulerdrum.remove();
-            }
         }
         
         // The play all button
@@ -454,15 +448,41 @@ function RhythmRuler () {
         
         var cell = this._addButton(row, 3, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
-            // Save dissect history
-            that._dissectHistory = [];
+            // Save the new dissect history
+            var dissectHistory = [];
+            var drums = [];
             for (var i = 0; i < that.Rulers.length; i++) {
                 var history = [];
                 for (var j = 0; j < that.Rulers[i][1].length; j++) {
                     history.push(that.Rulers[i][1][j]);
                 }
-                that._dissectHistory.push(history);
+
+                dissectHistory.push([history, that.Drums[i]]);
+                drums.push(that.Drums[i]);
             }
+
+            // Look for any old entries that we may have missed.
+            for (var i = 0; i < that._dissectHistory.length; i++) {
+                var drum = that._dissectHistory[i][1];
+                if (drums.indexOf(drum) === -1) {
+                    var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+		    dissectHistory.push([history, drum]);
+		}
+	    }
+
+            that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+
+            for (var i = 0; i < that.Rulers.length; i++) {
+		var rulertable = docById('rulerTable' + i);
+		var rulerdrum = docById('rulerdrum' + i);
+		if (rulertable !== null) {
+                    rulertable.remove();
+		}
+		if (rulerdrum !== null) {
+                    rulerdrum.remove();
+		}
+            }
+
             docById('rulerbody').style.visibility = 'hidden';
             docById('drumDiv').style.visibility = 'hidden';
             docById('rulerbody').style.border = 0;
@@ -553,16 +573,25 @@ function RhythmRuler () {
         }
 
         // Restore dissect history.
-        // FIXME: We should take into account any changes in the set drum and rhythm blocks.
-        for (var i = 0; i < this._dissectHistory.length; i++) {
-            var rulerTable = docById('rulerTable' + i);
-            for (var j = 0; j < this._dissectHistory[i].length; j++) {
-                this._rulerSelected = i;
-                var cell = rulerTable.rows[0].cells[this._dissectHistory[i][j][0]]
-                if (cell != undefined) {
-                    this.__dissect(cell, this._dissectHistory[i][j][1]);
-                } else {
-                    console.log('Could not find cell to divide. Did the order of the blocks change?');
+        for (var drum = 0; drum < this.Drums.length; drum++) {
+            for (var i = 0; i < this._dissectHistory.length; i++) {
+                if (this._dissectHistory[i][1] !== this.Drums[drum]) {
+                    continue;
+                }
+
+                var rulerTable = docById('rulerTable' + drum);
+                for (var j = 0; j < this._dissectHistory[i].length; j++) {
+                    this._rulerSelected = drum;
+                    if (this._dissectHistory[i][0][j] == undefined) {
+                        continue;
+                    }
+
+                    var cell = rulerTable.rows[0].cells[this._dissectHistory[i][0][j][0]];
+                    if (cell != undefined) {
+                        this.__dissect(cell, this._dissectHistory[i][0][j][1]);
+                    } else {
+                        console.log('Could not find cell to divide. Did the order of the rhythm blocks change?');
+                    }
                 }
             }
         }
