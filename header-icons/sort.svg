@@ -5,10 +5,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   version="1.1"
-   id="svg2"
+   width="55"
    height="55"
-   width="55">
+   id="svg2"
+   version="1.1">
   <metadata
      id="metadata20">
     <rdf:RDF>
@@ -24,51 +24,39 @@
   <defs
      id="defs18" />
   <line
-     style="fill:#000000;stroke:#000000;stroke-opacity:1"
-     id="line4"
-     stroke-width="3.5"
-     stroke="#FFFFFF"
-     y2="15"
-     x2="38"
-     y1="15"
-     x1="5" />
-  <line
-     style="fill:#000000;stroke:#000000;stroke-opacity:1"
-     id="line6"
-     stroke-width="3.5"
-     stroke="#FFFFFF"
-     y2="23"
-     x2="32.5"
-     y1="23"
-     x1="10.5" />
-  <line
-     style="fill:#000000;stroke:#000000;stroke-opacity:1"
-     id="line8"
-     stroke-width="3.5"
-     stroke="#FFFFFF"
-     y2="31"
-     x2="28"
-     y1="31"
-     x1="15" />
-  <line
-     style="fill:#000000;stroke:#000000;stroke-opacity:1"
-     id="line10"
-     stroke-width="3.5"
-     stroke="#FFFFFF"
-     y2="39"
-     x2="23.5"
+     x1="5"
      y1="39"
-     x1="19.5" />
+     x2="38"
+     y2="39"
+     id="line4"
+     style="fill:#000000;stroke:#000000;stroke-width:3.5;stroke-opacity:1" />
+  <line
+     x1="10.5"
+     y1="31"
+     x2="32.5"
+     y2="31"
+     id="line6"
+     style="fill:#000000;stroke:#000000;stroke-width:3.5;stroke-opacity:1" />
+  <line
+     x1="15"
+     y1="23"
+     x2="28"
+     y2="23"
+     id="line8"
+     style="fill:#000000;stroke:#000000;stroke-width:3.5;stroke-opacity:1" />
+  <line
+     x1="19.5"
+     y1="15"
+     x2="23.5"
+     y2="15"
+     id="line10"
+     style="fill:#000000;stroke:#000000;stroke-width:3.5;stroke-opacity:1" />
   <path
-     style="fill:#000000"
+     d="m 46,37 7,-7 -14,0 z"
      id="path12"
-     stroke="none"
-     fill="#FFFFFF"
-     d="M 46 17 l 7 7 l -14 0 z" />
+     style="fill:#000000;stroke:none" />
   <path
-     style="fill:#000000"
+     d="m 46,16 7,7 -14,0 z"
      id="path14"
-     stroke="none"
-     fill="#FFFFFF"
-     d="M 46 38 l 7 -7 l -14 0 z" />
+     style="fill:#000000;stroke:none" />
 </svg>
