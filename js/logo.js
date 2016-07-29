@@ -2161,7 +2161,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
                 } else {
                     // Process queued up rhythms.
                     pitchtimematrix.init(logo);
-                    var addedTuplet = false;
 
                     for (var i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
@@ -2170,7 +2169,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
                         // converted to notes.
                         switch (logo.tupletRhythms[i][0]) {
                         case 'notes':
-                            addedTuplet = true;
                             var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                             tupletParam.push([]);
                             for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
