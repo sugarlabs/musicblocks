@@ -2600,7 +2600,19 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, bloc
             } else if (logo.inPitchStairCase) {
                 var frequency = pitchToFrequency(args[0], args[1], 0 ,logo.keySignature[turtle]);
                 var note = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
-                pitchstaircase.Stairs.push([note[0], note[1], frequency]);
+                var flag = 0;
+
+                for (var i=0 ; i < pitchstaircase.Stairs.length; i++) {
+                    if (pitchstaircase.Stairs[i][2] < parseFloat(frequency)) {
+                        pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency)]);
+                        flag = 1;
+                        break;
+                    }
+                }
+
+                if (flag === 0) {
+                    pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
+                }
             } 
             else {
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
