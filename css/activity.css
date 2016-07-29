@@ -312,7 +312,7 @@ table {
 
 #TempoDiv {
   position: absolute;
-  top: 40%;
+  top: 30%;
   left: 20%;
   border-style: solid;
   border: 0 !important;
@@ -323,7 +323,7 @@ table {
 #TempoCanvas {
   visibility: hidden;
   position: absolute;
-  top : 5%;
+  top :17%;
   left : 20%;  
 }
 
