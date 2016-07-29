@@ -2608,6 +2608,11 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, bloc
                         flag = 1;
                         break;
                     }
+                    if (pitchstaircase.Stairs[i][2] === parseFloat(frequency)) {
+                        pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency)]);
+                        flag = 1;
+                        break;
+                    } 
                 }
 
                 if (flag === 0) {
