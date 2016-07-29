@@ -327,6 +327,18 @@ table {
   left : 20%;  
 }
 
+input.BPMNUMBER {
+    background-color: #c374e9 !important;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold !important;
+    resize: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .black {
   border: 4px solid #000000;
   background: #000000;

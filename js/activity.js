@@ -1023,9 +1023,11 @@ define(function (require) {
                 return;
             }
 
-            if (docById('bpmnumber').classList.contains('hasKeyboard')) {
+            if (docById('BPMNUMBER').classList.contains('hasKeyboard')) {
                 return ;
             }
+
+
 
             const BACKSPACE = 8;
             const TAB = 9;
