@@ -230,6 +230,8 @@ function PitchStairCase() {
 
         console.log(this.Stairs);
 
+        console.log(this.cellScale);
+
 		console.log("init PitchStairCase");
 		this.logo = logo;
 
