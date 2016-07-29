@@ -10,6 +10,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+const SOLFEGE2SORTABLE = {'do♭': 'a', 'do': 'b', 'do♯': 'c', 're♭': 'd', 're': 'e', 're♯': 'f', 'mi♭': 'g', 'mi': 'h', 'mi♯': 'i', 'fa♭': 'j', 'fa': 'k', 'fa♯': 'l', 'sol♭': 'm', 'sol': 'n', 'sol♯': 'o', 'la♭': 'p', 'la': 'q', 'la♯': 'r','ti♭': 's', 'ti': 't', 'ti♯': 'u'};
+const SORTABLE2SOLFEGE = {'a': 'do♭', 'b': 'do', 'c': 'do♯', 'd': 're♭', 'e': 're', 'f': 're♯', 'g': 'mi♭', 'h': 'mi', 'i': 'mi♯', 'j': 'fa♭', 'k': 'fa', 'l': 'fa♯', 'm': 'sol♭', 'n': 'sol', 'o': 'sol♯', 'p': 'la♭', 'q': 'la', 'r': 'la♯', 's': 'ti♭', 't': 'ti', 'u': 'ti♯'};
+
 
 function Matrix() {
     // Note: solfegeNotes can contain either a pitch or a drum
@@ -174,7 +177,12 @@ function Matrix() {
             that._export();
         }
 
-        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 5, 'sort.svg', iconSize, _('sort'));
+        cell.onclick=function() {
+            that._sort();
+        }
+
+        var cell = this._addButton(row, 6, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             docById('pitchtimematrix').style.visibility = 'hidden';
             docById('pitchtimematrix').style.border = 0;
@@ -197,9 +205,9 @@ function Matrix() {
             var drumName = getDrumName(this.solfegeNotes[i]);
             if (drumName != null) {
                 console.log('drumName is: ' + drumName + ' (' + this.solfegeNotes[i] + ')');
-		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (this.solfegeNotes[i].slice(0, 4) === 'http') {
-		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.solfegeNotes[i]) + '" title="' + this.solfegeNotes[i] + '" alt="' + this.solfegeNotes[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.solfegeNotes[i]) + '" title="' + this.solfegeNotes[i] + '" alt="' + this.solfegeNotes[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             }
@@ -264,6 +272,66 @@ function Matrix() {
         */
         var data = "data:text/html;charset=utf-8," + encodeURIComponent(file);
         return data;
+    };
+
+    this._sort = function() {
+        var sortableList = [];        
+        for (var i = 0; i < this.solfegeNotes.length; i++) {
+            if (this.solfegeNotes[i].toLowerCase() === 'rest') {
+                continue;
+            }
+
+            var drumName = getDrumName(this.solfegeNotes[i]);
+            if (drumName != null) {
+                continue;
+            }
+            // FIXME: some sortable code foe soflege
+            sortableList.push(this.solfegeOctaves[i] + ':' + SOLFEGE2SORTABLE[this.solfegeNotes[i]]);
+        }
+
+        var sortedList = sortableList.sort(); 
+        for (var i = 0; i < this.solfegeNotes.length; i++) {
+            if (this.solfegeNotes[i].toLowerCase() === 'rest') {
+                continue;
+            }
+
+            var drumName = getDrumName(this.solfegeNotes[i]);
+            if (drumName != null) {
+                sortedList.push('3:' + this.solfegeNotes[i]);
+            }
+        }
+
+        // Reverse since we start from the top of the table.
+        sortedList.reverse();
+
+        // TODO: remove dups; and remap blockMap
+        this.solfegeNotes = [];
+        this.solfegeOctaves = [];
+        for (var i = 0; i < sortedList.length; i++) {
+            var obj = sortedList[i].split(':');
+            this.solfegeOctaves.push(Number(obj[0]));
+            this.solfegeNotes.push(SORTABLE2SOLFEGE[obj[1]]);
+        }
+
+        this.init(this._logo);
+
+        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+            switch (this._logo.tupletRhythms[i][0]) {
+            case 'notes':
+                var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
+                tupletParam.push([]);
+                for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
+                    tupletParam[1].push(this._logo.tupletRhythms[i][j]);
+                }
+                this.addTuplet(tupletParam);
+                break;
+            default:
+                this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
+                break;
+            }
+        }
+
+        this.makeClickable();
     };
 
     this._export = function() {
@@ -758,21 +826,21 @@ function Matrix() {
 
             var cell = table.rows[that._rowIndex].cells[that._colIndex];
             if (cell != undefined) {
-		if (cell.colSpan > 1) {
+                if (cell.colSpan > 1) {
                     that._spanCounter += 1;
                     if (that._spanCounter === cell.colSpan) {
-			that._spanCounter = 0;
-			that._colIndex += 1;
+                        that._spanCounter = 0;
+                        that._colIndex += 1;
                     }
-		} else {
+                } else {
                     that._spanCounter = 0;
                     that._colIndex += 1;
-		}
+                }
 
-		noteCounter += 1;
-		if (noteCounter < that._notesToPlayDirected.length) {
+                noteCounter += 1;
+                if (noteCounter < that._notesToPlayDirected.length) {
                     that.__playNote(time, noteCounter);
-		}
+                }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
     };
@@ -815,12 +883,12 @@ function Matrix() {
         if (drumHTML.length > 3) {
             var drumName = getDrumSynthName(drumHTML[3]);
             if (drumName != null) {
-		// If it is a drum, just save the name.
+                // If it is a drum, just save the name.
                 console.log('drumName is ' + drumName);
-		var note = drumName;
+                var note = drumName;
             } else {
                 console.log('something is wrong (drumSynthName is ' + drumName + ')');
-		var note = DEFAULTDRUM;
+                var note = DEFAULTDRUM;
             }
         } else {
             // Both solfege and octave are extracted from HTML by getNote.
@@ -958,52 +1026,52 @@ function Matrix() {
                     if (drumName != null) {
                         // add a playdrum block
                         console.log('drumName is ' + drumName);
-			// The last connection in last pitch block is null.
-			if (note[0].length === 1 || j === note[0].length - 1) {
+                        // The last connection in last pitch block is null.
+                        if (note[0].length === 1 || j === note[0].length - 1) {
                             var lastConnection = null;
-			} else {
+                        } else {
                             var lastConnection = thisBlock + 2;
-			}
+                        }
 
-			newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
+                        newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
                         newStack.push([thisBlock + 1, ['drumname', {'value': drumName}], 0, 0, [thisBlock]]);
                         thisBlock += 2;
                         previousBlock = thisBlock - 2;
                     } else if (note[0][j].slice(0, 4) === 'http') {
                         // add a playdrum block with URL
                         console.log('drumName is ' + note[0][j]);
-			// The last connection in last pitch block is null.
-			if (note[0].length === 1 || j === note[0].length - 1) {
+                        // The last connection in last pitch block is null.
+                        if (note[0].length === 1 || j === note[0].length - 1) {
                             var lastConnection = null;
-			} else {
+                        } else {
                             var lastConnection = thisBlock + 2;
-			}
+                        }
 
-			newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
+                        newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
                         newStack.push([thisBlock + 1, ['text', {'value': note[0][j]}], 0, 0, [thisBlock]]);
                         thisBlock += 2;
                         previousBlock = thisBlock - 2;
-		    } else {
+                    } else {
                         // add a pitch block
 
-			// The last connection in last pitch block is null.
-			if (note[0].length === 1 || j === note[0].length - 1) {
+                        // The last connection in last pitch block is null.
+                        if (note[0].length === 1 || j === note[0].length - 1) {
                             var lastConnection = null;
-			} else {
+                        } else {
                             var lastConnection = thisBlock + 3;
-			}
+                        }
 
-			newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-			if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
+                        newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                        if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
                             newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                             newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
-			} else {
+                        } else {
                             newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
                             newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
-			}
+                        }
                         thisBlock += 3;
                         previousBlock = thisBlock - 3;
-		    }
+                    }
                 }
             }
         }
