@@ -121,6 +121,34 @@
                 }
             });
         });
+
+        $(function() {
+            $('#TempoCanvas').draggable({
+                drag: function() {
+                    jQuery('#TempoDiv').css('left',jQuery(this).position().left);
+                    jQuery('#TempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);
+
+                },
+                stop: function(){
+                    jQuery('#TempoDiv').css('left',jQuery(this).position().left);                     
+                    jQuery('#TempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);                                        
+                }
+            });
+        });
+        
+        $(function() {
+            $('#TempoDiv').draggable({
+                drag: function() {
+                    jQuery('#TempoCanvas').css('left',jQuery(this).position().left);
+                    jQuery('#TempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);
+
+                },
+                stop: function(){
+                    jQuery('#TempoCanvas').css('left',jQuery(this).position().left);                     
+                    jQuery('#TempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);                                        
+                }
+            });
+        });
     
 
 	$(function() {
@@ -287,7 +315,8 @@
     <div id="pitchstaircase"></div>
     <div id="playPitch"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
-    <div id="TempoDiv" class="center" style="color:#FFFFFF" align="center"></div>
+    <div id="TempoDiv"></div>
+    <div id="BPMNUMBER"></div>
     <div id="helpElem"></div>
 
 </body>
