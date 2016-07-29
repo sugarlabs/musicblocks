@@ -290,6 +290,9 @@ function Matrix() {
         }
 
         var sortedList = sortableList.sort(); 
+        // Reverse since we start from the top of the table.
+        sortedList = sortedList.reverse();
+
         for (var i = 0; i < this.solfegeNotes.length; i++) {
             if (this.solfegeNotes[i].toLowerCase() === 'rest') {
                 continue;
@@ -301,16 +304,21 @@ function Matrix() {
             }
         }
 
-        // Reverse since we start from the top of the table.
-        sortedList.reverse();
-
-        // TODO: remove dups; and remap blockMap
+        // TODO: remap blockMap
         this.solfegeNotes = [];
         this.solfegeOctaves = [];
         for (var i = 0; i < sortedList.length; i++) {
             var obj = sortedList[i].split(':');
-            this.solfegeOctaves.push(Number(obj[0]));
-            this.solfegeNotes.push(SORTABLE2SOLFEGE[obj[1]]);
+            var drumName = getDrumName(obj[1]);
+            if (drumName == null) {
+		obj[1] = SORTABLE2SOLFEGE[obj[1]];
+	    }
+            if (i > 0 && (Number(obj[0]) === last(this.solfegeOctaves) && obj[1] === last(this.solfegeNotes))) {
+                // skip duplicates
+                continue;
+	    }
+	    this.solfegeOctaves.push(Number(obj[0]));
+	    this.solfegeNotes.push(obj[1]);
         }
 
         this.init(this._logo);
