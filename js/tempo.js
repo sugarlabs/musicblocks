@@ -26,25 +26,36 @@ function Tempo () {
   	};
 
   	this.useBPM = function () {
-		var input = document.getElementById("BPMNUMBER").value;
-		var temp;
-	
-		if(input<10)
-			alert("BPM must be between 10-240");
-	
-		if(input>240) {
-			alert("BPM must be between 10-240");	
-		} else {
-			temp = input*1287;
-	
-			if(mx<0){
-				mx = (temp*5)/60000;
-				mx = -mx;
-			}
+    console.log("hello");
+    this.BPM = document.getElementById("BPMNUMBER").value
+    this.velocity = parseFloat(WIDTH)/60 * this.BPM;
+    mx = parseFloat(this.velocity)/200;
+    console.log(WIDTH);
+    console.log(this.velocity);
+    console.log(mx);
+   // this.stop();
+    //this.start();
 
-			if(mx>0)
-				mx = (temp*5)/60000;
-  		}
+
+		// var input = document.getElementById("BPMNUMBER").value;
+		// var temp;
+	
+		// if(input<10)
+		// 	alert("BPM must be between 10-240");
+	
+		// if(input>240) {
+		// 	alert("BPM must be between 10-240");	
+		// } else {
+		// 	temp = input*1287;
+	
+		// 	if(mx<0){
+		// 		mx = (temp*5)/60000;
+		// 		mx = -mx;
+		// 	}
+
+		// 	if(mx>0)
+		// 		mx = (temp*5)/60000;
+  // 		}
   	};
 
   	this.speedUp = function () {
@@ -91,8 +102,8 @@ function Tempo () {
   		ctx.arc(x, y, 30, 0, Math.PI*2); 
 		ctx.fill(); 
 		ctx.closePath();
-    console.log(mx);
-    console.log(canvas.width);
+    console.log(thisTempo.logo.turtleDelay);
+   // console.log(mx);
 		if (x + mx > canvas.width || x + mx < 0) {
 	
 	if(x+mx>canvas.width)
@@ -133,8 +144,9 @@ document.getElementById("TempoCanvas").style.background = colorC;
 
 	};
 
-	this.init = function () {
+	this.init = function (logo) {
 		var thisTempo = this;
+    thisTempo.logo = logo;
 		console.log("init tempo");
 	    docById('TempoDiv').style.visibility = 'visible';
 	    docById('TempoCanvas').style.visibility = 'visible';
@@ -326,57 +338,16 @@ document.getElementById("TempoCanvas").style.background = colorC;
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        this.velocity = parseFloat(canvas.width)/60 * this.BPM;
+        console.log(WIDTH);
+        this.velocity = parseFloat(WIDTH)/60 * this.BPM;
         console.log(this.velocity);
         mx = parseFloat(thisTempo.velocity)/200;
+        console.log(mx);
         setInterval(function() {
+          console.log(thisTempo.logo.turtleDelay);
           thisTempo.draw(thisTempo);
         },5);
 
-
-
-// 		var SpeedUpButton = document.createElement("BUTTON");
-// 		SpeedUpButton.setAttribute('id','up');
-// 		SpeedUpButton.textContent = "Speed Up";
-// 		SpeedUpButton.onclick = thisTempo.speedUp;
-// 		SpeedUpButton.className = 'black';	
-// 		TempoDiv.appendChild(SpeedUpButton); 
-
-// 		var SpeedDownButton = document.createElement("BUTTON");
-// 		SpeedDownButton.setAttribute('id', 'down');
-// 		SpeedDownButton.textContent = "Speed Down";
-// 		SpeedDownButton.onclick = thisTempo.speedDown;
-// 		SpeedDownButton.className = 'black';
-// 		TempoDiv.appendChild(SpeedDownButton);
-// //		ctx.clearRect(0,0,canvas.width,canvas.height);
-
-// 		var BPMInput = document.createElement("input");
-// 		BPMInput.setAttribute('id','bpmnumber');
-// 		BPMInput.type = "number";
-// 		TempoDiv.appendChild(BPMInput);
-//         docById('bpmnumber').classList.add('hasKeyboard');
-
-
-// 		var BPMButton = document.createElement("BUTTON");
-// 		BPMButton.setAttribute('id', 'bpmchange');
-// 		BPMButton.textContent = "Change BPM";
-// 		BPMButton.onclick = thisTempo.useBPM;
-// 		BPMButton.className = 'black';
-// 		TempoDiv.appendChild(BPMButton);
-
-// 		var StartButton = document.createElement("BUTTON");
-// 		StartButton.setAttribute('id', 'start');
-// 		StartButton.textContent = "Start";
-// 		StartButton.onclick = thisTempo.start;
-// 		StartButton.className = 'black';
-// 		TempoDiv.appendChild(StartButton);
-
-// 		var StopButton = document.createElement("BUTTON");
-// 		StopButton.setAttribute('id', 'stop');
-// 		StopButton.textContent = "Stop";
-// 		StopButton.onclick = thisTempo.stop;
-// 		StopButton.className = 'black';
-// 		TempoDiv.appendChild(StopButton);
 	};
 
 };
