@@ -11,6 +11,8 @@ function Tempo () {
     this.isMoving = 1; 
     this.Previousmx;
     this.Previoustempx;
+    this.velocity = 0;
+    this.BPM = 60;
 //	var sound = document.getElementById("myAudio"); 
 
 	this.stop = function () {
@@ -79,7 +81,7 @@ function Tempo () {
 		ctx.fill(); 
 	}; 
 
-	this.draw = function () { 
+	this.draw = function (thisTempo) { 
 		var that = this;
 		var canvasRect = canvas.getBoundingClientRect();
   		ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -89,6 +91,8 @@ function Tempo () {
   		ctx.arc(x, y, 30, 0, Math.PI*2); 
 		ctx.fill(); 
 		ctx.closePath();
+    console.log(mx);
+    console.log(canvas.width);
 		if (x + mx > canvas.width || x + mx < 0) {
 	
 	if(x+mx>canvas.width)
@@ -322,7 +326,12 @@ document.getElementById("TempoCanvas").style.background = colorC;
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        setInterval(thisTempo.draw,5);
+        this.velocity = parseFloat(canvas.width)/60 * this.BPM;
+        console.log(this.velocity);
+        mx = parseFloat(thisTempo.velocity)/200;
+        setInterval(function() {
+          thisTempo.draw(thisTempo);
+        },5);
 
 
 
