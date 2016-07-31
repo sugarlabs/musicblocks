@@ -154,6 +154,13 @@ You can rearrange the selected notes in the grid and safe other chunks
 as well.
 
 <img
+src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/sort.svg'
+height="36"</img>
+
+The *Sort* button will reorder the pitches in the matrix from highest
+to lowest and eliminate any duplicate *Pitch* blocks.
+
+<img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg'
 height="36"</img>
 
