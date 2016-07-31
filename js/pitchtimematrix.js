@@ -20,6 +20,7 @@ function Matrix() {
     this.solfegeOctaves = [];
     this.playDirection = 1;
 
+    this._sorted = false;
     this._notesToPlay = [];
     this._notesToPlayDirected = [];
     this._matrixHasTuplets = false;
@@ -37,6 +38,11 @@ function Matrix() {
     this._rowBlocks = [];  // pitch-block number
     this._colBlocks = [];  // [rhythm-block number, note number]
 
+    // This array keeps track of the position of the rows after sorting.
+    this._rowMap = [];
+    // And offsets due to deleting duplicates.
+    this._rowOffset = [];
+
     // This array is preserved between sessions.
     // We populate the blockMap whenever a note is selected and
     // restore any notes that might be present.
@@ -46,9 +52,13 @@ function Matrix() {
     this.clearBlocks = function() {
         this._rowBlocks = [];
         this._colBlocks = [];
+        this._rowMap = [];
+        this._rowOffset = [];
     };
 
     this.addRowBlock = function(pitchBlock) {
+        this._rowMap.push(this._rowBlocks.length);
+        this._rowOffset.push(0);
         this._rowBlocks.push(pitchBlock);
     };
 
@@ -89,6 +99,7 @@ function Matrix() {
     this.init = function(logo) {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
+        this._sorted = false;
         this._rests = 0;
         this._logo = logo;
 
@@ -186,6 +197,10 @@ function Matrix() {
         cell.onclick=function() {
             docById('pitchtimematrix').style.visibility = 'hidden';
             docById('pitchtimematrix').style.border = 0;
+            that._rowOffset = [];
+            for (var i = 0; i < that._rowMap.length; i++) {
+                that._rowMap[i] = i;
+            }
         }
 
         var j = 0;
@@ -275,6 +290,11 @@ function Matrix() {
     };
 
     this._sort = function() {
+        if (this._sorted) {
+            console.log('already sorted');
+            return;
+        }
+
         var sortableList = [];        
         for (var i = 0; i < this.solfegeNotes.length; i++) {
             if (this.solfegeNotes[i].toLowerCase() === 'rest') {
@@ -286,7 +306,7 @@ function Matrix() {
                 continue;
             }
             // FIXME: some sortable code foe soflege
-            sortableList.push(this.solfegeOctaves[i] + ':' + SOLFEGE2SORTABLE[this.solfegeNotes[i]]);
+            sortableList.push(this.solfegeOctaves[i] + ':' + SOLFEGE2SORTABLE[this.solfegeNotes[i]] + ';' + i);
         }
 
         var sortedList = sortableList.sort(); 
@@ -300,28 +320,37 @@ function Matrix() {
 
             var drumName = getDrumName(this.solfegeNotes[i]);
             if (drumName != null) {
-                sortedList.push('3:' + this.solfegeNotes[i]);
+                sortedList.push('-1:' + this.solfegeNotes[i] + ';' + i);
             }
         }
 
-        // TODO: remap blockMap
         this.solfegeNotes = [];
         this.solfegeOctaves = [];
         for (var i = 0; i < sortedList.length; i++) {
             var obj = sortedList[i].split(':');
-            var drumName = getDrumName(obj[1]);
+            var obj2 = obj[1].split(';');
+            var drumName = getDrumName(obj2[0]);
             if (drumName == null) {
-		obj[1] = SORTABLE2SOLFEGE[obj[1]];
-	    }
-            if (i > 0 && (Number(obj[0]) === last(this.solfegeOctaves) && obj[1] === last(this.solfegeNotes))) {
+                obj2[0] = SORTABLE2SOLFEGE[obj2[0]];
+            }
+
+            this._rowMap[Number(obj2[1])] = i;
+            if (i > 0 && (Number(obj[0]) === last(this.solfegeOctaves) && obj2[0] === last(this.solfegeNotes))) {
                 // skip duplicates
+                for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
+                    this._rowOffset[j] -= 1;
+                }
+
+                this._rowMap[i] = this._rowMap[i - 1];
                 continue;
-	    }
-	    this.solfegeOctaves.push(Number(obj[0]));
-	    this.solfegeNotes.push(obj[1]);
+            }
+
+            this.solfegeOctaves.push(Number(obj[0]));
+            this.solfegeNotes.push(obj2[0]);
         }
 
         this.init(this._logo);
+        this._sorted = true;
 
         for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
             switch (this._logo.tupletRhythms[i][0]) {
@@ -664,7 +693,7 @@ function Matrix() {
             var obj = this._blockMap[i];
             if (obj[0] !== -1) {
                 // Look for this note in the pitch and rhythm blocks.
-                var row = this._rowBlocks.indexOf(obj[0]);
+                var row = this._rowMap[this._rowBlocks.indexOf(obj[0])] + this._rowOffset[this._rowMap[this._rowBlocks.indexOf(obj[0])]];
                 var col = -1;
                 for (var j = 0; j < this._colBlocks.length; j++) {
                     if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === obj[1][1]) {
@@ -672,9 +701,11 @@ function Matrix() {
                         break;
                     }
                 }
+
                 if (col == -1) {
                     continue;
                 }
+
                 // If we found a match, mark this cell and add this
                 // note to the play list.
                 var cell = table.rows[row + 1].cells[col + 1];
@@ -856,7 +887,7 @@ function Matrix() {
     this._setNotes = function(colIndex, rowIndex, playNote) {
         // Sets corresponding note when user clicks on any cell and
         // plays that note
-        var pitchBlock = this._rowBlocks[rowIndex - 1];
+        var pitchBlock = this._rowBlocks[this._rowMap.indexOf(rowIndex - 1 - this._rowOffset[rowIndex - 1])];
         var rhythmBlockObj = this._colBlocks[colIndex - 1];
 
         if (playNote) {
