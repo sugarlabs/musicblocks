@@ -5,7 +5,7 @@ function Tempo () {
     var y; 
     var mx = 1; 
     var my = 4; 
-	var tempmx = -1;
+	  var tempmx = -1;
     var WIDTH; 
     var HEIGHT;
     this.isMoving = 1; 
@@ -13,7 +13,6 @@ function Tempo () {
     this.Previoustempx;
     this.velocity = 0;
     this.BPM = 60;
-//	var sound = document.getElementById("myAudio"); 
 
 	this.stop = function () {
   		tempmx = mx;
@@ -95,88 +94,67 @@ function Tempo () {
 	this.draw = function (thisTempo) { 
 		var that = this;
 		var canvasRect = canvas.getBoundingClientRect();
-  		ctx.clearRect(0,0,canvas.width,canvas.height);
-  	//	that.circle(x+10,y+20,30); 
-  		ctx.beginPath(); 
+  	ctx.clearRect(0,0,canvas.width,canvas.height);
+  	ctx.beginPath(); 
 		ctx.fillStyle = ""; 
-  		ctx.arc(x, y, 30, 0, Math.PI*2); 
+  	ctx.arc(x, y, 30, 0, Math.PI*2); 
 		ctx.fill(); 
 		ctx.closePath();
     console.log(thisTempo.logo.turtleDelay);
-   // console.log(mx);
 		if (x + mx > canvas.width || x + mx < 0) {
-	
-	if(x+mx>canvas.width)
-		tempmx=-1;
-			
-	else
-		tempmx=1;
-		
-    mx = -mx;
-//sound.play(); 
-var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
+	    if(x+mx>canvas.width) {
+		    tempmx=-1;
+      } else {
+		    tempmx=1;
+      }
+      mx = -mx;
+      var letters = '0123456789ABCDEF'.split('');
+      var color = '#';
+      for (var i = 0; i < 6; i++ ) {
         color += letters[Math.floor(Math.random() * 16)];
-
-
-}
-ctx.fillStyle = color; 
-var colorC = '#';
-    for (var i = 0; i < 6; i++ ) {
+      }
+      ctx.fillStyle = color; 
+      var colorC = '#';
+      for (var i = 0; i < 6; i++ ) {
         colorC += letters[Math.floor(Math.random() * 16)];
+      }
+      document.getElementById("TempoCanvas").style.background = colorC;
+    }
+    if (y+ my > canvas.height || y+ my < 0) {
+      my = -my; 
+    }
 
-}
-document.getElementById("TempoCanvas").style.background = colorC;
-//document.getElementById("TempoDiv").style.background = colorC;
-
-}
-  if (y+ my > canvas.height || y+ my < 0) 
-
-    my = -my; 
-
-  x += mx; 
-
-
- // y += my; 
-
-
-
+    x += mx; 
 	};
 
 	this.init = function (logo) {
 		var thisTempo = this;
     thisTempo.logo = logo;
 		console.log("init tempo");
-	    docById('TempoDiv').style.visibility = 'visible';
-	    docById('TempoCanvas').style.visibility = 'visible';
+	  docById('TempoDiv').style.visibility = 'visible';
+	  docById('TempoCanvas').style.visibility = 'visible';
 
-        var w = window.innerWidth;
-        docById('TempoDiv').style.width = Math.floor(w / 2) + 'px';
-        docById('TempoCanvas').style.width = Math.floor(w / 2) + 'px';
-        docById('TempoCanvas').style.height = Math.floor(w / 4) + 'px';
+    var w = window.innerWidth;
+    docById('TempoDiv').style.width = Math.floor(w / 2) + 'px';
+    docById('TempoCanvas').style.width = Math.floor(w / 2) + 'px';
+    docById('TempoCanvas').style.height = Math.floor(w / 4) + 'px';
 
-        WIDTH = Math.floor(w / 2) + 'px';
-        HEIGHT = Math.floor(w / 4) + 'px';
+    WIDTH = Math.floor(w / 2) + 'px';
+    HEIGHT = Math.floor(w / 4) + 'px';
 
-        this.cellScale = w/1200;
+    this.cellScale = w/1200;
  
-        var TempoDiv = docById('TempoDiv');
+    var TempoDiv = docById('TempoDiv');
 
-	    canvas = document.getElementById("TempoCanvas"); 
+	  canvas = document.getElementById("TempoCanvas"); 
 		ctx = canvas.getContext("2d");
 		console.log(ctx);
 		var canvasRect = canvas.getBoundingClientRect();
 
-        var iconSize = Math.floor(this.cellScale * 24);
-
-        console.log(iconSize);
+    var iconSize = Math.floor(this.cellScale * 24);
 
 		x = canvas.width;
 		y = 100;
-		console.log(x);
-		console.log(y);
-		console.log(canvas.getBoundingClientRect());
 
     var tables = document.getElementsByTagName('TABLE');
     var noofTables = tables.length;
@@ -187,167 +165,155 @@ document.getElementById("TempoCanvas").style.background = colorC;
 
 
 		var t = document.createElement('TABLE');
-        t.setAttribute('id', 'buttonDiv');
-        t.style.textAlign = 'center';
-        t.style.borderCollapse = 'collapse';
-        t.cellSpacing = 0;
-        t.cellPadding = 0;
+    t.setAttribute('id', 'buttonDiv');
+    t.style.textAlign = 'center';
+    t.style.borderCollapse = 'collapse';
+    t.cellSpacing = 0;
+    t.cellPadding = 0;
 
-        var TempoDiv = docById('TempoDiv');
-        TempoDiv.style.paddingTop = 0 + 'px';
-        TempoDiv.style.paddingLeft = 0 + 'px';
-        TempoDiv.appendChild(t);
-        TempoDivPosition = TempoDiv.getBoundingClientRect();
+    var TempoDiv = docById('TempoDiv');
+    TempoDiv.style.paddingTop = 0 + 'px';
+    TempoDiv.style.paddingLeft = 0 + 'px';
+    TempoDiv.appendChild(t);
+    TempoDivPosition = TempoDiv.getBoundingClientRect();
 
-        var table = docById('buttonDiv');
-        var header = table.createTHead();
-        var row = header.insertRow(-1);
-        row.style.left = Math.floor(TempoDivPosition.left) + 'px';
-        row.style.top = Math.floor(TempoDivPosition.top) + 'px';
-        row.setAttribute('id', 'buttons');
+    var table = docById('buttonDiv');
+    var header = table.createTHead();
+    var row = header.insertRow(-1);
+    row.style.left = Math.floor(TempoDivPosition.left) + 'px';
+    row.style.top = Math.floor(TempoDivPosition.top) + 'px';
+    row.setAttribute('id', 'buttons');
 
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-//        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/down.svg" title="' + _('Speed Up') + '" alt="' + _('Speed Up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-      	cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+    var cell = row.insertCell(-1);
+    cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+    cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.minWidth = cell.style.width;
+    cell.style.maxWidth = cell.style.width;
+    cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-      	cell.onclick=function() {
-            if(thisTempo.isMoving) {
-              thisTempo.Previoustempx = tempmx;
-              thisTempo.Previousmx = mx;
-              thisTempo.stop();
-              this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-              thisTempo.isMoving = 0;
-            } else {
+    cell.onclick=function() {
+      if(thisTempo.isMoving) {
+        thisTempo.Previoustempx = tempmx;
+        thisTempo.Previousmx = mx;
+        thisTempo.stop();
+        this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        thisTempo.isMoving = 0;
+      } else {
+        thisTempo.start();
+        this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        thisTempo.isMoving = 1;
+      }
+    };
 
-              thisTempo.start();
-              this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-              thisTempo.isMoving = 1;
-            }
-        };
+    cell.onmouseover=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+    };
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        };
+    cell.onmouseout=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLOR;
+    };    
 
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        };    
+    var cell = row.insertCell(1);
+    cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('Speed Up') + '" alt="' + _('Speed Up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+    cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.minWidth = cell.style.width;
+    cell.style.maxWidth = cell.style.width;
+    cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        var cell = row.insertCell(1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('Speed Up') + '" alt="' + _('Speed Up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-      	cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+    cell.onclick=function() {
+      thisTempo.speedUp();
+    };
 
-      	cell.onclick=function() {
-            thisTempo.speedUp();
-        };
+    cell.onmouseover=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+    };
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        };
+    cell.onmouseout=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLOR;
+    };
 
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        };
+		var cell = row.insertCell(2);
+    cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/down.svg" title="' + _('Speed Up') + '" alt="' + _('Speed Up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+    cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.minWidth = cell.style.width;
+    cell.style.maxWidth = cell.style.width;
+    cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.backgroundColor = MATRIXBUTTONCOLOR;      
 
-		    var cell = row.insertCell(2);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/down.svg" title="' + _('Speed Up') + '" alt="' + _('Speed Up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-      	cell.style.backgroundColor = MATRIXBUTTONCOLOR;      
+    cell.onclick=function() {
+      thisTempo.speedDown();
+    };
 
-      	cell.onclick=function() {
-            thisTempo.speedDown();
-        };
+    cell.onmouseover=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+    };
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        };
+    cell.onmouseout=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLOR;
+    };
 
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        };
+    var cell = row.insertCell(3);
+    cell.style.top = 0;
+    cell.style.left = 0;
+    cell.innerHTML = '<input id="BPMNUMBER" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="BPMNUMBER" type="BPMNUMBER" value="' + 2 + '" />';
+    cell.style.width = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+    cell.style.minWidth = cell.style.width;
+    cell.style.maxWidth = cell.style.width;
+    cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.backgroundColor = MATRIXBUTTONCOLOR;  
+    docById('BPMNUMBER').classList.add('hasKeyboard');
 
-        
+    var cell = row.insertCell(4);
+    cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/apply.svg" title="' + _('Apply BPM') + '" alt="' + _('Apply BPM') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+    cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.minWidth = cell.style.width;
+    cell.style.maxWidth = cell.style.width;
+    cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-      	// row = header.insertRow(1);
-      	// row.style.left = Math.floor(TempoDivPosition.left) + 'px';
-      	// row.style.top = Math.floor(TempoDivPosition.top) + 'px';
-      	// row.setAttribute('id', 'row2');
+    cell.onclick=function() {
+      thisTempo.useBPM();
+    };
 
-      	var cell = row.insertCell(3);
-      	cell.style.top = 0;
-        cell.style.left = 0;
-        cell.innerHTML = '<input id="BPMNUMBER" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="BPMNUMBER" type="BPMNUMBER" value="' + 2 + '" />';
-//        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('Speed Up') + '" alt="' + _('Speed Up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-      	cell.style.backgroundColor = MATRIXBUTTONCOLOR;  
-        docById('BPMNUMBER').classList.add('hasKeyboard');
+    cell.onmouseover=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+    };
 
-        var cell = row.insertCell(4);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/apply.svg" title="' + _('Apply BPM') + '" alt="' + _('Apply BPM') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-      	cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+    cell.onmouseout=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLOR;
+    };    
 
-      	cell.onclick=function() {
-            thisTempo.useBPM();
-        };
+    var cell = row.insertCell(5);
+    cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('Speed Up') + '" alt="' + _('Speed Up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+    cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.minWidth = cell.style.width;
+    cell.style.maxWidth = cell.style.width;
+    cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+    cell.style.backgroundColor = MATRIXBUTTONCOLOR;      
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        };
+    cell.onclick=function() {
+      docById('TempoDiv').style.visibility = 'hidden';
+		  docById('TempoCanvas').style.visibility = 'hidden';	
+    };
 
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        };    
+    cell.onmouseover=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+    };
 
-        var cell = row.insertCell(5);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('Speed Up') + '" alt="' + _('Speed Up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-      	cell.style.backgroundColor = MATRIXBUTTONCOLOR;      
+    cell.onmouseout=function() {
+      this.style.backgroundColor = MATRIXBUTTONCOLOR;
+    };
 
-      	cell.onclick=function() {
-      		docById('TempoDiv').style.visibility = 'hidden';
-		    docById('TempoCanvas').style.visibility = 'hidden';	
-        };
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        };
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        };
-
-        console.log(WIDTH);
-        this.velocity = parseFloat(WIDTH)/60 * this.BPM;
-        console.log(this.velocity);
-        mx = parseFloat(thisTempo.velocity)/200;
-        console.log(mx);
-        setInterval(function() {
-          console.log(thisTempo.logo.turtleDelay);
-          thisTempo.draw(thisTempo);
-        },5);
-
-	};
-
+    this.velocity = parseFloat(WIDTH)/60 * this.BPM;
+    mx = parseFloat(thisTempo.velocity)/200;
+    
+    setInterval(function() {
+      console.log(thisTempo.logo.turtleDelay);
+      thisTempo.draw(thisTempo);
+    },5);
+	
+  };
+  
 };
