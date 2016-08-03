@@ -251,6 +251,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'action':
         case 'matrix':
         case 'pitchdrummatrix':
+        case 'modewidget':
         case 'rhythmruler':
         case 'pitchstaircase':
         case 'tempo':

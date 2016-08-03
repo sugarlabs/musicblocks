@@ -83,6 +83,7 @@ define(function (require) {
     // Music Block-specific modules
     require('activity/turtledefs');
     require('activity/status');
+    require('activity/modewidget');
     require('activity/logo');
     require('activity/basicblocks');
     require('activity/analytics');
@@ -337,7 +338,7 @@ define(function (require) {
 
         function _doFastButton(env) {
             logo.setTurtleDelay(0);
-            if (docById('matrix').style.visibility === 'visible') {
+            if (docById('pitchtimematrix').style.visibility === 'visible') {
                 matrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands(null, env);
@@ -348,7 +349,7 @@ define(function (require) {
 
         function _doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
-            if (docById('matrix').style.visibility === 'visible') {
+            if (docById('pitchtimematrix').style.visibility === 'visible') {
                 matrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
@@ -381,7 +382,7 @@ define(function (require) {
         function _doSlowMusicButton() {
             logo.setNoteDelay(DEFAULTDELAY);
 
-            if (docById('matrix').style.visibility === 'visible') {
+            if (docById('pitchtimematrix').style.visibility === 'visible') {
                 matrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
@@ -636,6 +637,13 @@ define(function (require) {
                 var obj = processPluginData(pluginData, palettes, blocks, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList);
                 updatePluginObj(obj);
             }
+
+            // Load custom mode saved in local storage.
+	    var custommodeData = storage.custommode;
+            if (custommodeData != undefined) {
+		customMode = JSON.parse(custommodeData);
+                console.log('restoring custom mode: ' + customMode);
+	    }
 
             fileChooser.addEventListener('click', function (event) {
                 this.value = null;
@@ -1027,7 +1035,9 @@ define(function (require) {
                 return ;
             }
 
-
+            if (docById('dissectNumber').classList.contains('hasKeyboard')) {
+                return;
+            }
 
             const BACKSPACE = 8;
             const TAB = 9;
@@ -1436,33 +1446,35 @@ define(function (require) {
         };
 
         function _doOpenSamples() {
-            localStorage.setItem('isMatrixHidden', document.getElementById('matrix').style.visibility);
+            localStorage.setItem('isMatrixHidden', document.getElementById('pitchtimematrix').style.visibility);
             localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
             localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerbody').style.visibility);
             localStorage.setItem('isStatusHidden', document.getElementById('statusmatrix').style.visibility);
+            localStorage.setItem('isModeWidgetHidden', document.getElementById('modewidget').style.visibility);
 
-            if (document.getElementById('matrix').style.visibility !== 'hidden') {
-                console.log('hide matrix');
-                document.getElementById('matrix').style.visibility = 'hidden';
-                document.getElementById('matrix').style.border = 0;
+            if (document.getElementById('pitchtimematrix').style.visibility !== 'hidden') {
+                document.getElementById('pitchtimematrix').style.visibility = 'hidden';
+                document.getElementById('pitchtimematrix').style.border = 0;
             }
 
             if (document.getElementById('pitchdrummatrix').style.visibility !== 'hidden') {
-                console.log('hide pitch-drum matrix');
                 document.getElementById('pitchdrummatrix').style.visibility = 'hidden';
                 document.getElementById('pitchdrummatrix').style.border = 0;
             }
 
             if(document.getElementById('rulerbody').style.visibility !== 'hidden') {
-                console.log('hide RhythmRuler');
                 document.getElementById('rulerbody').style.visibility = 'hidden';
                 document.getElementById('rulerbody').style.border = 0;
-                document.getElementsByClassName('mousePosBox')[0].style.visibility = 'hidden';  
             }              
+
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
-                console.log('hide status');
                 document.getElementById('statusmatrix').style.visibility = 'hidden';
                 document.getElementById('statusmatrix').style.border = 0;
+            }
+
+            if (document.getElementById('modewidget').style.visibility !== 'hidden') {
+                document.getElementById('modewidget').style.visibility = 'hidden';
+                document.getElementById('modewidget').style.border = 0;
             }
 
             console.log('save locally');

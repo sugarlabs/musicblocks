@@ -59,7 +59,7 @@
           -->
     
        $(function() {
-            $("#matrix").draggable();
+            $("#pitchtimematrix").draggable();
         });
 
 	    $(function() {
@@ -155,6 +155,10 @@
             $("#statusmatrix").draggable();
         });
 
+	$(function() {
+            $("#modewidget").draggable();
+        });
+
         (function($) {
             $.fn.fixMe = function() {
                 return this.each(function() {
@@ -200,57 +204,52 @@
         });
       
         function moveMatrix(event) {
-            var matrixDiv = document.getElementById('matrix');
-            matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var myDiv = document.getElementById('pitchtimematrix');
+            var myDivPosition = myDiv.getBoundingClientRect();
 
-            var table = document.getElementById('myTable');
+            var table = document.getElementById('pitchTimeTable');
             var row = table.rows.item(0);
-            row.style.left = matrixDivPosition.left + 'px';
-            row.style.top = matrixDivPosition.top + 'px';
+            row.style.left = myDivPosition.left + 'px';
+            row.style.top = myDivPosition.top + 'px';
 
-            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (i = 1, row; row = table.rows[i]; i++) {
+            // What does this do?
+            var marginFromTop = Math.floor(myDivPosition.top + this.cellScale * 2 + parseInt(myDiv.style.paddingTop));
+            for (var i = 1, row; row = table.rows[i]; i++) {
                 cell = row.cells[0];
-                cell.style.left = matrixDivPosition.left + 2 + 'px';
+                cell.style.left = myDivPosition.left + 2 + 'px';
                 cell.style.top = marginFromTop + 'px';
                 marginFromTop += parseInt(cell.style.height);
             }
         }
 
         function movePitchDrumMatrix(event) {
-            var matrixDiv = document.getElementById('pitchdrummatrix');
-            matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var myDiv = document.getElementById('pitchdrummatrix');
+            var myDivPosition = myDiv.getBoundingClientRect();
 
             var table = document.getElementById('drumTable');
             var row = table.rows.item(0);
-            row.style.left = matrixDivPosition.left + 'px';
-            row.style.top = matrixDivPosition.top + 'px';
-
-            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (i = 1, row; row = table.rows[i]; i++) {
-                cell = row.cells[0];
-                cell.style.left = matrixDivPosition.left + 2 + 'px';
-                cell.style.top = marginFromTop + 'px';
-                marginFromTop += parseInt(cell.style.height);
-            }
+            row.style.left = myDivPosition.left + 'px';
+            row.style.top = myDivPosition.top + 'px';
         }
 
         function moveStatusMatrix(event) {
-            var matrixDiv = document.getElementById('statusmatrix');
-            matrixDivPosition = matrixDiv.getBoundingClientRect();
+            var myDiv = document.getElementById('statusmatrix');
+            var myDivPosition = myDiv.getBoundingClientRect();
 
             var table = document.getElementById('statusTable');
             var row = table.rows.item(0);
-            row.style.left = matrixDivPosition.left + 'px';
-            row.style.top = matrixDivPosition.top + 'px';
+            row.style.left = myDivPosition.left + 'px';
+            row.style.top = myDivPosition.top + 'px';
+        }
 
-            var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop));
-            for (i = 1, row; row = table.rows[i]; i++) {
-                cell = row.cells[0];
-                cell.style.left = matrixDivPosition.left + 2 + 'px';
-                cell.style.top = marginFromTop + 'px';
-                marginFromTop += parseInt(cell.style.height);
-            }
+        function moveModeWidget(event) {
+            var modeDiv = document.getElementById('modewidget');
+            var modeDivPosition = modeDiv.getBoundingClientRect();
+
+            var table = document.getElementById('modeTable');
+            var row = table.rows.item(0);
+            row.style.left = modeDivPosition.left + 'px';
+            row.style.top = modeDivPosition.top + 'px';
         }
     </script>
 
@@ -263,6 +262,7 @@
         <canvas hidden id="TempoCanvas" width="700" height="800" style="border: 1px solid black"></canvas>
         <canvas id="camCanvas" style="visibility:hidden;"></canvas>
         <div id="labelDiv"></div>
+        <div id="dissectNumberDiv"></div>
         <div id="ioDiv">
             <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*" />
             <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb" />
@@ -306,20 +306,19 @@
             <ul class="content w"></ul>
         </div>
     </div>
-    <canvas hidden id="canvasToSave" width="700" height="800" style="border: 1px solid black"></canvas>
-    <canvas hidden id="music" width="700"></canvas>
-    <div id="matrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
+
+    <div id="pitchtimematrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
     <div id="rulerbody" overflow-x="auto"></div>
+    <div id="dissectNumber"></div>
     <div id="drumDiv"></div>
     <div id="pitchstaircase"></div>
     <div id="playPitch"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
     <div id="TempoDiv"></div>
     <div id="BPMNUMBER"></div>
-    <audio id="TempoAudio">
-    <source src="sounds/tick.mp3" type="audio/mpeg">
-    </audio>
+    <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    
+    <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>    
     <div id="helpElem"></div>
 
 </body>
