@@ -110,7 +110,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
 
     this.inPitchStairCase = false;
 
-    this.InTempo = false;
+    this.inTempo = false;
 
     this._currentDrumBlock = null;
 
@@ -2003,6 +2003,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             }
             break;
         case 'setmasterbpm':
+            console.log("hellodafjksdf");
             if (args.length === 1 && typeof(args[0] === 'number')) {
                 if (args[0] < 30) {
                     logo.errorMsg(_('Beats per minute must be > 30.'))
@@ -2015,8 +2016,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 }
                 logo.defaultBPMFactor = TONEBPM / this._masterBPM;
             }
-            if (this.InTempo) {
+            if (this.inTempo) {
                 tempo.BPMBlock = blk;
+                console.log(blk);
                 tempo.BPM = args[0];
             }
             break;
@@ -2101,9 +2103,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             break;
         case 'tempo':
             console.log("running Tempo");
-            childFlow = args[0];
+            childFlow = args[1];
             childFlowCount = 1;
-            logo.InTempo = true;
+            logo.inTempo = true;
 
             var listenerName = '_tempo_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
