@@ -143,7 +143,7 @@ function PitchStairCase () {
                 flag = 1;
                 break;
             }
-            if (this.Stairs[i][2] === parseFloat(frequency)/input) {
+            if (this.Stairs[i][2] === parseFloat(frequency)/inputNum) {
                 this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency)/input]);
                 flag = 1;
                 break;
