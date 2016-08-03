@@ -14,7 +14,6 @@ function Tempo () {
     this.Previoustempx;
     this.velocity = 0;
     this.BPM = 60;
-    var sound = document.getElementById("TempoAudio");
 
     this.stop = function () {
           tempmx = mx;
@@ -30,7 +29,7 @@ function Tempo () {
         console.log("hello");
         this.BPM = document.getElementById("BPMNUMBER").value
         this.velocity = parseFloat(WIDTH) / 60 * this.BPM;
-        mx = parseFloat(this.velocity) / 200;
+       // mx = parseFloat(this.velocity) / 200;
         console.log(WIDTH);
         console.log(this.velocity);
         console.log(mx);
@@ -71,7 +70,7 @@ function Tempo () {
         // }
         this.BPM += 5;
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
-        mx = parseFloat(this.velocity) / 200;
+       // mx = parseFloat(this.velocity) / 200;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
@@ -90,7 +89,7 @@ function Tempo () {
 
         this.BPM-= 5;
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
-        mx = parseFloat(this.velocity) / 200;
+    //    mx = parseFloat(this.velocity) / 200;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
@@ -107,7 +106,7 @@ function Tempo () {
           ctx.clearRect(0,0,canvas.width,canvas.height);
           ctx.beginPath(); 
         ctx.fillStyle = ""; 
-          ctx.arc(x, y, 30, 0, Math.PI * 2); 
+          ctx.arc(x, y, 25, 0, Math.PI * 2); 
         ctx.fill(); 
         ctx.closePath();
         // console.log(that.logo.turtleDelay);
@@ -118,7 +117,7 @@ function Tempo () {
                 tempmx = 1;
             }
             mx = -mx;
-            sound.play();
+            this.logo.synth.trigger('C4', 0.125, 'poly');
         }
         if (y + my > canvas.height || y + my < 0) {
             my = -my; 
@@ -158,16 +157,20 @@ function Tempo () {
         var w = window.innerWidth;
         docById('TempoDiv').style.width = Math.floor(w / 2) + 'px';
         docById('TempoCanvas').style.width = Math.floor(w / 2) + 'px';
-        docById('TempoCanvas').style.height = Math.floor(w / 4) + 'px';
+        docById('TempoCanvas').style.height = Math.floor(w / 12) + 'px';
 
         WIDTH = Math.floor(w / 2);
-        HEIGHT = Math.floor(w / 4);
+        HEIGHT = Math.floor(w / 12);
 
         this.cellScale = w / 1200;
 
         var TempoDiv = docById('TempoDiv');
 
         canvas = document.getElementById("TempoCanvas"); 
+
+        canvas.style.left = TempoDiv.style.left;
+        canvas.style.top =  TempoDiv.style.top;
+
         ctx = canvas.getContext("2d");
         console.log(ctx);
         var canvasRect = canvas.getBoundingClientRect();
@@ -175,7 +178,7 @@ function Tempo () {
         var iconSize = Math.floor(this.cellScale * 24);
 
         x = canvas.width;
-        y = 100;
+        y = 250;
 
         var tables = document.getElementsByTagName('TABLE');
         var noofTables = tables.length;
