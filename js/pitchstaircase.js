@@ -190,8 +190,56 @@ function PitchStairCase () {
                 var stair = docById('stair' + i);
                 stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
-        }, 1000)
+        }, 1000);
 
+    };
+
+    this._PlayUpandDown = function () {
+        var that = this;
+        var pitchnotes = [];
+        var note = this.Stairs[0][0] + this.Stairs[0][1];
+        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
+        var row = docById('stair' + 0);
+        row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
+        this.logo.synth.trigger(pitchnotes, 1, 'poly');
+        this._Playnext(1, 1);
+    };
+
+    this._Playnext = function (index, next) {
+        var that = this;
+        if(index === this.Stairs.length) {
+            setTimeout(function () {
+            for (var i = 0; i < that.Stairs.length; i++) {
+                var stair = docById('stair' + i);
+                stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            }
+        }, 1000);
+            setTimeout(function () {
+                that._Playnext(that.Stairs.length-1,-1);
+            },200);
+            return;
+        }
+        if(index === -1) {
+            setTimeout(function () {
+            for (var i = 0; i < that.Stairs.length; i++) {
+                var stair = docById('stair' + i);
+                stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            }
+        }, 1000);
+            return;
+        }
+        var pitchnotes = [];
+        var note = this.Stairs[index][0] + this.Stairs[index][1];
+        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
+        var row = docById('stair' + index);
+        setTimeout(function () {
+            console.log(index);
+            row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
+            that.logo.synth.trigger(pitchnotes, 1, 'poly');
+            if(index < that.Stairs.length || index > -1) {
+                that._Playnext(index+next,next);
+            }
+        }, 1000);
     };
 
     this._save = function (stairno) {
@@ -341,6 +389,26 @@ function PitchStairCase () {
         };
 
         var cell = row.insertCell(1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onclick=function() {
+            thisStair._PlayUpandDown();
+        };
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        };
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        };
+
+        var cell = row.insertCell(2);
         cell.innerHTML = '<input id="musicratio1" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio1" type="musicratio1" value="' + 3 + '" />';
         cell.style.top = 0;
         cell.style.left = 0;
@@ -351,7 +419,7 @@ function PitchStairCase () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         docById('musicratio1').classList.add('hasKeyboard');
 
-        var cell = row.insertCell(2);
+        var cell = row.insertCell(3);
         cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
         cell.style.top = 0;
         cell.style.left = 0;
@@ -362,7 +430,7 @@ function PitchStairCase () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         docById('musicratio2').classList.add('hasKeyboard');
         
-        var cell = row.insertCell(3);
+        var cell = row.insertCell(4);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
