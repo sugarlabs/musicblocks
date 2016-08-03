@@ -107,7 +107,12 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
 
     //rhythm-ruler
     this.inRhythmRuler = false;
+
     this.inPitchStairCase = false;
+
+    this.InTempo = false;
+
+    this._currentDrumBlock = null;
 
     // pitch-rhythm matrix
     this.inMatrix = false;
@@ -123,6 +128,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
     this.transposition = {};
 
     // parameters used by notes
+    this._masterBPM = TARGETBPM;
+    this.defaultBPMFactor = TONEBPM / this._masterBPM;
+
     this.beatFactor = {};
     this.dotCount = {};
     this.noteBeat = {};
@@ -148,7 +156,6 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
 
     // parameters used by the note block
     this.bpm = {};
-    this.defaultBPMFactor = TONEBPM / TARGETBPM;
     this.turtleTime = [];
     this.noteDelay = 0;
     this.playedNote = {};
@@ -198,6 +205,10 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
     this.synth = new Synth();
     this.synth.loadSynth('poly');
     // this.synth.loadSynth(DEFAULTDRUM);
+
+    // Mide widget
+    this.modeWidget = new ModeWidget();
+    this._modeBlock = null;
 
     // Status matrix
     this.statusMatrix = new StatusMatrix();
@@ -519,7 +530,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 if (this.bpm[turtle].length > 0) {
                     value = last(this.bpm[turtle]);
                 } else {
-                    value = TARGETBPM;
+                    value = this._masterBPM;
                 }
                 break;
             default:
@@ -591,6 +602,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             }
         }
 
+        this._masterBPM = TARGETBPM;
+        this.defaultBPMFactor = TONEBPM / this._masterBPM;
+
         // Each turtle needs to keep its own wait time and music
         // states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -654,10 +668,13 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
 
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
+        this.inRhythmRuler = false;
+        this._currentDrumBlock = null;
         this.inStatusMatrix = false;
         this.pitchBlocks = [];
         this.drumBlocks = [];
         this.tuplet = false;
+        this._modeBlock = null;
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -1985,6 +2002,24 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 logo._saveLilypondOutput(args[0]);
             }
             break;
+        case 'setmasterbpm':
+            if (args.length === 1 && typeof(args[0] === 'number')) {
+                if (args[0] < 30) {
+                    logo.errorMsg(_('Beats per minute must be > 30.'))
+                    logo._masterBPM = 30;
+                } else if (args[0] > 1000) {
+                    logo.errorMsg(_('Maximum beats per minute is 1000.'))
+                    logo._masterBPM = 1000;
+                } else {
+                    logo._masterBPM = args[0];
+                }
+                logo.defaultBPMFactor = TONEBPM / this._masterBPM;
+            }
+            if (this.InTempo) {
+                tempo.BPMBlock = blk;
+                tempo.BPM = args[0];
+            }
+            break;
         case 'setbpm':
             if (args.length === 2 && typeof(args[0] === 'number')) {
                 if (args[0] < 30) {
@@ -2024,6 +2059,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 for (var i = 0; i < MODENAMES.length; i++) {
                     if (MODENAMES[i][0] === args[1]) {
                         modename = MODENAMES[i][1];
+                        logo._modeBlock = logo.blocks.blockList[blk].connections[2];
                         break;
                     }
                 }
@@ -2035,6 +2071,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
 
             childFlow = args[1];
             childFlowCount = 1;
+            // To do: restore previous state
             rhythmruler.Rulers = [];
             rhythmruler.Drums = [];
             logo.inRhythmRuler = true;
@@ -2064,6 +2101,10 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             break;
         case 'tempo':
             console.log("running Tempo");
+            childFlow = args[0];
+            childFlowCount = 1;
+            logo.InTempo = true;
+
             var listenerName = '_tempo_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
@@ -2098,6 +2139,21 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
 
             logo._setListener(turtle, listenerName, __listener);
             break;
+        case 'modewidget':
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+
+            var listenerName = '_modewidget_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.modeWidget.init(logo, logo._modeBlock);
+            }
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         case 'status':
             logo.statusMatrix.init(logo);
             logo.statusFields = [];
@@ -2124,9 +2180,9 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 childFlowCount = 1;
             }
             logo.inMatrix = true;
-            matrix.solfegeNotes = [];
-            matrix.solfegeOctaves = [];
-            matrix.clearBlocks();
+            pitchtimematrix.solfegeNotes = [];
+            pitchtimematrix.solfegeOctaves = [];
+            pitchtimematrix.clearBlocks();
 
             logo.tupletRhythms = [];
             logo.tupletParams = [];
@@ -2136,14 +2192,13 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                if (logo.tupletRhythms.length === 0 || matrix.solfegeNotes.length === 0) {
+                if (logo.tupletRhythms.length === 0 || pitchtimematrix.solfegeNotes.length === 0) {
                     logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
                     // } else if(document.getElementById('matrix').style.visibility === 'visible') {
                     //    logo.errorMsg(_('Please close the current matrix before opening a new one.'), blk);
                 } else {
                     // Process queued up rhythms.
-                    matrix.initMatrix(logo);
-                    var addedTuplet = false;
+                    pitchtimematrix.init(logo);
 
                     for (var i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
@@ -2152,20 +2207,19 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                         // converted to notes.
                         switch (logo.tupletRhythms[i][0]) {
                         case 'notes':
-                            addedTuplet = true;
                             var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                             tupletParam.push([]);
                             for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
                                 tupletParam[1].push(logo.tupletRhythms[i][j]);
                             }
-                            matrix.addTuplet(tupletParam);
+                            pitchtimematrix.addTuplet(tupletParam);
                             break;
                         default:
-                            matrix.addNotes(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
+                            pitchtimematrix.addNotes(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
                             break;
                         }
                     }
-                    matrix.makeClickable();
+                    pitchtimematrix.makeClickable();
                 }
             };
 
@@ -2281,7 +2335,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 for (var i = len - 1; i > -1; i--) {
                     var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                     var num2 = getNumber(note2[0], note2[1]);
-                    var a = getNumNote(num1, 0);
+                    // var a = getNumNote(num1, 0);
                     if (logo.invertList[turtle][i][2] === 'even') {
                         delta += num2 - num1;
                     } else {  // odd
@@ -2355,10 +2409,10 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inMatrix) {
-                matrix.solfegeNotes.push(drumname);
-                matrix.solfegeOctaves.push(-1);
+                pitchtimematrix.solfegeNotes.push(drumname);
+                pitchtimematrix.solfegeOctaves.push(-1);
 
-                matrix.addRowBlock(blk);
+                pitchtimematrix.addRowBlock(blk);
                 if (logo.drumBlocks.indexOf(blk) === -1) {
                     logo.drumBlocks.push(blk);
                 }
@@ -2444,7 +2498,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                         // Note from which delta is calculated.
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
-                        var a = getNumNote(num1, 0);
+                        // var a = getNumNote(num1, 0);
                         if (logo.invertList[turtle][i][2] === 'even') {
                             delta += num2 - num1;
                         } else {  // odd
@@ -2477,7 +2531,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 }
             } else if (logo.inMatrix) {
                 if (note.toLowerCase() !== 'rest') {
-                    matrix.addRowBlock(blk);
+                    pitchtimematrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
@@ -2494,7 +2548,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                         // Note from which delta is calculated.
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
-                        var a = getNumNote(num1, 0);
+                        // var a = getNumNote(num1, 0);
                         if (logo.invertList[turtle][i][2] === 'even') {
                             delta += num2 - num1;
                         } else {  // odd
@@ -2519,11 +2573,11 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                     note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                     // If we are in a setdrum clamp, override the pitch.
                     if (logo.drumStyle[turtle].length > 0) {
-                        matrix.solfegeNotes.push(last(logo.drumStyle[turtle]));
-                        matrix.solfegeOctaves.push(-1);
+                        pitchtimematrix.solfegeNotes.push(last(logo.drumStyle[turtle]));
+                        pitchtimematrix.solfegeOctaves.push(-1);
                     } else {
-                        matrix.solfegeNotes.push(getSolfege(note));
-                        matrix.solfegeOctaves.push(octave);
+                        pitchtimematrix.solfegeNotes.push(getSolfege(note));
+                        pitchtimematrix.solfegeOctaves.push(octave);
                     }
                 }
             } else if (logo.inNoteBlock[turtle] > 0) {
@@ -2546,7 +2600,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                     for (var i = len - 1; i > -1; i--) {
                         var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
                         var num2 = getNumber(note2[0], note2[1]);
-                        var a = getNumNote(num1, 0);
+                        // var a = getNumNote(num1, 0);
                         if (logo.invertList[turtle][i][2] === 'even') {
                             delta += num2 - num1;
                         } else {  // odd
@@ -2622,16 +2676,17 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 logo.stopTurtle = true;
                 break;
             }
+
             if (logo.inMatrix) {
-                matrix.addColBlock(blk, args[0]);
+                pitchtimematrix.addColBlock(blk, args[0]);
                 for (var i = 0; i < args[0]; i++) {
                     logo._processNote(args[1], blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
-                var indexofdrum = rhythmruler.Drums.indexOf(drumblockno);
-                    if(indexofdrum !== -1) {
+                var drumIndex = rhythmruler.Drums.indexOf(logo._currentDrumBlock);
+                if (drumIndex !== -1) {
                     for (var i = 0; i < args[0]; i++) {
-                        rhythmruler.Rulers[indexofdrum][0].push(args[1]);
+                        rhythmruler.Rulers[drumIndex][0].push(args[1]);
                     }
                 }
             } else {
@@ -2829,7 +2884,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
 
             logo._setListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
-                drumblockno = blk;
+                logo._currentDrumBlock = blk;
                 rhythmruler.Drums.push(blk);
                 rhythmruler.Rulers.push([[],[]]);
             }
@@ -3232,13 +3287,13 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 var obj = frequencyToPitch(args[0]);
                 // obj[2] is cents
                 if (logo.inMatrix) {
-                    matrix.addRowBlock(blk);
+                    pitchtimematrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
                     // TODO: add frequency instead of approximate note to matrix
-                    matrix.solfegeNotes.push(getSolfege(obj[0]));
-                    matrix.solfegeOctaves.push(obj[1]);
+                    pitchtimematrix.solfegeNotes.push(getSolfege(obj[0]));
+                    pitchtimematrix.solfegeOctaves.push(obj[1]);
                 } else {
                     logo.oscList[turtle].push(blocks.blockList[blk].name);
 
@@ -3265,12 +3320,12 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             break;
             // Deprecated
         case 'playfwd':
-            matrix.playDirection = 1;
+            pitchtimematrix.playDirection = 1;
             logo._runFromBlock(logo, turtle, args[0]);
             break;
             // Deprecated
         case 'playbwd':
-            matrix.playDirection = -1;
+            pitchtimematrix.playDirection = -1;
             logo._runFromBlock(logo, turtle, args[0]);
             break;
         case 'tuplet2':
@@ -3533,7 +3588,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
         if (this.bpm[turtle].length > 0) {
             var bpmFactor = TONEBPM / last(this.bpm[turtle]);
         } else {
-            var bpmFactor = TONEBPM / TARGETBPM;
+            var bpmFactor = TONEBPM / this._masterBPM;
         }
 
         if (this.blocks.blockList[blk].name === 'osctime') {
@@ -3557,12 +3612,12 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             // FIME
         } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
-                matrix.addColBlock(blk, 1);
+                pitchtimematrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
-                    matrix.addNode(this.pitchBlocks[i], blk, 0);
+                    pitchtimematrix.addNode(this.pitchBlocks[i], blk, 0);
                 }
                 for (var i = 0; i < this.drumBlocks.length; i++) {
-                    matrix.addNode(this.drumBlocks[i], blk, 0);
+                    pitchtimematrix.addNode(this.drumBlocks[i], blk, 0);
                 }
             }
             noteBeatValue *= this.beatFactor[turtle];
@@ -4304,7 +4359,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                 } else if (logo.bpm[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = last(logo.bpm[turtle]);
                 } else {
-                    logo.blocks.blockList[blk].value = TARGETBPM;
+                    logo.blocks.blockList[blk].value = logo._masterBPM;
                 }
                 break;
             case 'staccatofactor':

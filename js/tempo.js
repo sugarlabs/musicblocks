@@ -13,7 +13,8 @@ function Tempo () {
     this.Previousmx;
     this.Previoustempx;
     this.velocity = 0;
-    this.BPM = 60;
+    this.BPM;
+    this.BPMBlock;
 
     this.stop = function () {
           tempmx = mx;
@@ -28,68 +29,28 @@ function Tempo () {
     this.useBPM = function () {
         console.log("hello");
         this.BPM = document.getElementById("BPMNUMBER").value
+        var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
+        blocks.blockList[bpmnumberblock].value = this.BPMB;
         this.velocity = parseFloat(WIDTH) / 60 * this.BPM;
-       // mx = parseFloat(this.velocity) / 200;
-        console.log(WIDTH);
-        console.log(this.velocity);
-        console.log(mx);
-        // this.stop();
-        //this.start();
-
-        // var input = document.getElementById("BPMNUMBER").value;
-        // var temp;
-
-        // if(input<10)
-        //         alert("BPM must be between 10-240");
-
-        // if(input>240) {
-        //         alert("BPM must be between 10-240");
-        // } else {
-        //         temp = input*1287;
-
-        //         if(mx<0){
-        //                 mx = (temp*5)/60000;
-        //                 mx = -mx;
-        //         }
-
-        //         if(mx>0)
-        //                 mx = (temp*5)/60000;
-        //                 }
+        mx = parseFloat(this.velocity) / 200;
     };
 
     this.speedUp = function () {
-        // if(mx > 26 || mx < -26)        {
-        //      alert("You can not speed up anymore");
-        // } else{
-        //     if (mx < 0) {
-        //         mx--;
-        //     }
-        //     if (mx > 0) {
-        //         mx++;
-        //     }
-        // }
-        this.BPM += 5;
+        this.BPM = this.BPM + 5;
+        var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
+        blocks.blockList[bpmnumberblock].value = this.BPMB;
+        
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
-       // mx = parseFloat(this.velocity) / 200;
+        mx = parseFloat(this.velocity) / 200;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
     this.slowDown = function () {
-        // if (mx - 1 == 0 || mx + 1 == 0)        {
-        //      alert("You can not slow down anymore");
-        // } else {
-        //     if (mx > 0) {
-        //         mx--;
-        //     }
-        
-        //     if (mx < 0) {
-        //         mx++;
-        //     }
-        // }
-
-        this.BPM-= 5;
+        this.BPM = this.BPM - 5;
+        var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
+        blocks.blockList[bpmnumberblock].value = this.BPMB;
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
-    //    mx = parseFloat(this.velocity) / 200;
+        mx = parseFloat(this.velocity) / 200;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
@@ -109,7 +70,6 @@ function Tempo () {
           ctx.arc(x, y, 25, 0, Math.PI * 2); 
         ctx.fill(); 
         ctx.closePath();
-        // console.log(that.logo.turtleDelay);
         if (x + mx > canvas.width || x + mx < 0) {
             if(x + mx > canvas.width) {
                 tempmx = -1;
@@ -153,6 +113,7 @@ function Tempo () {
         docById('TempoDiv').style.visibility = 'visible';
         docById('TempoCanvas').style.visibility = 'visible';
         docById('TempoCanvas').style.backgroundColor = 'white';
+        console.log(this.BPM);
 
         var w = window.innerWidth;
         docById('TempoDiv').style.width = Math.floor(w / 2) + 'px';
@@ -259,7 +220,7 @@ function Tempo () {
         var cell = row.insertCell(3);
         cell.style.top = 0;
         cell.style.left = 0;
-        cell.innerHTML = '<input id="BPMNUMBER" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="BPMNUMBER" type="BPMNUMBER" value="' + 60 + '" />';
+        cell.innerHTML = '<input id="BPMNUMBER" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="BPMNUMBER" type="BPMNUMBER" value="' + this.BPM + '" />';
         cell.style.width = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
