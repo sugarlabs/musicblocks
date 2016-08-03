@@ -9,10 +9,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// This widget enable us to create new pitches with help of a initial pitch value by 
-//applying music ratios.
+// This widget enable us to create new pitches with help of a initial
+// pitch value by applying music ratios.
 
 var DEFUALTFREQUENCY = 220.0;
+
+
 function PitchStairCase () {
 
     this.Stairs = [];
@@ -38,7 +40,7 @@ function PitchStairCase () {
     };
 
     this._makeStairs = function (start) {
-        var thisStair = this;
+        var that = this;
         var iconSize = Math.floor(this._cellScale * 24);     
         var StairDiv = docById('pitchstaircase');
         var StairDivPosition = StairDiv.getBoundingClientRect();
@@ -55,15 +57,15 @@ function PitchStairCase () {
             playTable.cellPadding = 0;
             playPitchDiv.appendChild(playTable);
         } else {
-            for (var j = start; j < this.Stairs.length-1; j++) {
+            for (var j = start; j < this.Stairs.length - 1; j++) {
                 docById("playStair" + j).remove();
-                docById("stairTable"+ j).remove();
+                docById("stairTable" + j).remove();
             }
         }
         
         var playTable = docById('playStairTable');
 
-        for (var i = start; i < thisStair.Stairs.length; i++) {
+        for (var i = start; i < that.Stairs.length; i++) {
             var header = playTable.createTHead();
             var playrow = header.insertRow(i);
             playrow.style.left = Math.floor(playPitchDivPosition.left) + 'px';
@@ -74,7 +76,7 @@ function PitchStairCase () {
 
             playcell.onclick=function() {
                 console.log(playcell.parentNode.id);
-                thisStair._PlayOne(event);
+                that._PlayOne(this);
             };
 
             var StairTable = document.createElement('TABLE');
@@ -97,15 +99,15 @@ function PitchStairCase () {
             var frequency = this.Stairs[i][2];
             
             var cell = row.insertCell(-1);
-            cell.style.width = (StairDivPosition.width)* parseFloat(DEFUALTFREQUENCY/this.Stairs[i][2]) * this._cellScale/3 + 'px';
-            cell.innerHTML = thisStair.Stairs[i][0] + thisStair.Stairs[i][1] + " "  + frequency.toFixed(2);
+            cell.style.width = (StairDivPosition.width)* parseFloat(DEFUALTFREQUENCY/this.Stairs[i][2]) * this._cellScale / 3 + 'px';
+            cell.innerHTML = that.Stairs[i][0] + that.Stairs[i][1] + " "  + frequency.toFixed(2);
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = playrow.offsetHeight + 'px';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
             cell.addEventListener('click', function (event) {
-                thisStair._dissectStair(event);
+                that._dissectStair(event);
             });
         }
     };
@@ -130,21 +132,20 @@ function PitchStairCase () {
         }
        
         docById('musicratio2').value = inputNum2;
-        inputNum = parseFloat(inputNum2/inputNum1);
+        inputNum = parseFloat(inputNum2 / inputNum1);
         var oldcell = event.target;
         var frequency = that.Stairs[oldcell.parentNode.id[5]][2];
-        var obj = frequencyToPitch(parseFloat(frequency)/inputNum);
+        var obj = frequencyToPitch(parseFloat(frequency) / inputNum);
         var flag = 0;
 
-        for (var i=0 ; i < this.Stairs.length; i++) {
-
-            if (this.Stairs[i][2] < parseFloat(frequency)/inputNum) {
-                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency)/inputNum]);
+        for (var i = 0; i < this.Stairs.length; i++) {
+            if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
+                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum]);
                 flag = 1;
                 break;
             }
-            if (this.Stairs[i][2] === parseFloat(frequency)/inputNum) {
-                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency)/inputNum]);
+            if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
+                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum]);
                 flag = 1;
                 break;
             }
@@ -157,9 +158,8 @@ function PitchStairCase () {
         this._makeStairs(i);
     };
 
-    this._PlayOne = function (event) {
+    this._PlayOne = function (cell) {
         var that = this;
-        var cell = event.target;
         var stairno = cell.parentNode.id[9];
         var pitchnotes = [];
         var note = this.Stairs[stairno][0] + this.Stairs[stairno][1];        
@@ -284,15 +284,15 @@ function PitchStairCase () {
                 }
 
                 previousBlock = hiddenidx;
-            }
-            that.logo.blocks.loadNewBlocks(newStack);
+        }
+        that.logo.blocks.loadNewBlocks(newStack);
     };
 
-	this.init = function (logo) {
+    this.init = function (logo) {
         this.logo = logo;
-        var thisStair = this;
-		console.log("init PitchStairCase");
-		docById('pitchstaircase').style.display = 'inline';
+        var that = this;
+        console.log("init PitchStairCase");
+        docById('pitchstaircase').style.display = 'inline';
         console.log('setting PitchStairCase visible');
         docById('pitchstaircase').style.visibility = 'visible';
         docById('pitchstaircase').style.border = 2;
@@ -304,16 +304,16 @@ function PitchStairCase () {
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         docById('pitchstaircase').style.width = Math.floor(w / 2) + 'px';
-        docById('pitchstaircase').style.height = Math.floor(w/4) + 'px';
+        docById('pitchstaircase').style.height = Math.floor(w / 4) + 'px';
         docById('pitchstaircase').style.overflowY = 'auto';
-        docById('playPitch').style.height = Math.floor(w/4) + 'px';
+        docById('playPitch').style.height = Math.floor(w / 4) + 'px';
         docById('playPitch').style.overflowY = 'hidden';
-	
+        
         var tables = document.getElementsByTagName('TABLE');
         var noofTables = tables.length
        
         for (var i = 0; i < noofTables; i++) {
-                tables[0].parentNode.removeChild(tables[0]);
+            tables[0].parentNode.removeChild(tables[0]);
         }
 
         var iconSize = Math.floor(this._cellScale * 24);
@@ -351,7 +351,7 @@ function PitchStairCase () {
         row.setAttribute('id', 'playAllStair');
 
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play chord') + '" alt="' + _('play chord') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -359,7 +359,7 @@ function PitchStairCase () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         
         cell.onclick=function() {
-            thisStair._playAll();
+            that._playAll();
         }
 
         var table = docById('buttonTable');
@@ -377,7 +377,7 @@ function PitchStairCase () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         cell.onclick=function() {
-            thisStair._save(0);
+            that._save(0);
         };
 
         cell.onmouseover=function() {
@@ -389,7 +389,7 @@ function PitchStairCase () {
         };
 
         var cell = row.insertCell(1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -397,7 +397,7 @@ function PitchStairCase () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         cell.onclick=function() {
-            thisStair._PlayUpandDown();
+            that._PlayUpandDown();
         };
 
         cell.onmouseover=function() {
@@ -454,6 +454,5 @@ function PitchStairCase () {
         };
 
         this._makeStairs(-1);
-	};
-
+        };
 };
