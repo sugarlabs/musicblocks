@@ -197,12 +197,13 @@ function PitchStairCase () {
     this._PlayUpandDown = function () {
         var that = this;
         var pitchnotes = [];
-        var note = this.Stairs[0][0] + this.Stairs[0][1];
+        var note = this.Stairs[this.Stairs.length-1][0] + this.Stairs[this.Stairs.length-1][1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
-        var row = docById('stair' + 0);
+        var last = this.Stairs.length-1;
+        var row = docById('stair' + last);
         row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
         this.logo.synth.trigger(pitchnotes, 1, 'poly');
-        this._Playnext(1, 1);
+        this._Playnext(this.Stairs.length-2, -1);
     };
 
     this._Playnext = function (index, next) {
@@ -214,9 +215,7 @@ function PitchStairCase () {
                 stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
         }, 1000);
-            setTimeout(function () {
-                that._Playnext(that.Stairs.length-1,-1);
-            },200);
+            
             return;
         }
         if(index === -1) {
@@ -226,14 +225,22 @@ function PitchStairCase () {
                 stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
         }, 1000);
+            setTimeout(function () {
+                that._Playnext(0,1);
+            },200);
             return;
         }
         var pitchnotes = [];
         var note = this.Stairs[index][0] + this.Stairs[index][1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var row = docById('stair' + index);
+        var previousrownumber = index-next;
+        var previousrow = docById('stair' + previousrownumber);
+        console.log(previousrow);
         setTimeout(function () {
-            console.log(index);
+            if(previousrow != null) {
+                previousrow.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            }
             row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
             that.logo.synth.trigger(pitchnotes, 1, 'poly');
             if(index < that.Stairs.length || index > -1) {
