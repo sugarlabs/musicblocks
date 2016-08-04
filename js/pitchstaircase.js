@@ -427,6 +427,10 @@ function PitchStairCase () {
         docById('musicratio1').classList.add('hasKeyboard');
 
         var cell = row.insertCell(3);
+        cell.innerHTML = ':';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        var cell = row.insertCell(4);
         cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
         cell.style.top = 0;
         cell.style.left = 0;
@@ -437,7 +441,7 @@ function PitchStairCase () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         docById('musicratio2').classList.add('hasKeyboard');
         
-        var cell = row.insertCell(4);
+        var cell = row.insertCell(5);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
