@@ -841,6 +841,7 @@ function Matrix() {
                 var pitchNotes = [];
                 var drumNotes = [];
                 // Note can be a chord, hence it is an array.
+                console.log(note);
                 for (var j = 0; j < note.length; j++) {
                     var drumName = getDrumName(note[j]);
                     if (drumName != null) {
@@ -849,6 +850,7 @@ function Matrix() {
                     } else if (note[j].slice(0, 4) === 'http') {
                         drumNotes.push(note[j]);
                     } else {
+                        console.log(note[j]);
                         pitchNotes.push(note[j].replace(/♭/g, 'b').replace(/♯/g, '#'));
                     }
                 }

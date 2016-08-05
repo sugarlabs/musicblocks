@@ -92,6 +92,7 @@ define(function (require) {
     require('activity/pitchtimematrix');
     require('activity/pitchdrummatrix');
     require('activity/rhythmruler');
+    require('activity/pitchstaircase');
 
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {
@@ -593,6 +594,7 @@ define(function (require) {
             matrix = new Matrix();
             pitchdrummatrix = new PitchDrumMatrix();
             rhythmruler = new RhythmRuler();
+            pitchstaircase = new PitchStairCase();
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
@@ -601,7 +603,7 @@ define(function (require) {
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, canvas,
+            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas,
                 blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
                 onRunTurtle, getStageX, getStageY,
@@ -1024,6 +1026,14 @@ define(function (require) {
 
         function __keyPressed(event) {
             if (docById('labelDiv').classList.contains('hasKeyboard')) {
+                return;
+            }
+
+            if (docById('musicratio1').classList.contains('hasKeyboard')) {
+                return;
+            }
+
+            if (docById('musicratio2').classList.contains('hasKeyboard')) {
                 return;
             }
 
