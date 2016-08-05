@@ -93,11 +93,50 @@
                 }
             });
         });
+
+        $(function() {
+            $('#pitchstaircase').draggable({
+                drag: function() {
+                    jQuery('#playPitch').css('top',jQuery(this).position().top);
+                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);
+
+                },
+                stop: function(){
+                    jQuery('#playPitch').css('top',jQuery(this).position().top);                     
+                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);                                        
+                }
+            });
+        });
+        
+        $(function() {
+            $('#playPitch').draggable({
+                drag: function() {
+                    jQuery('#pitchstaircase').css('top',jQuery(this).position().top);
+                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);
+
+                },
+                stop: function(){
+                    jQuery('#pitchstaircase').css('top',jQuery(this).position().top);                     
+                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);                                        
+                }
+            });
+        });
     
 
 	$(function() {
             $("#statusmatrix").draggable();
         });
+    $(function() {
+        $('#pitchstaircase').on('scroll', function () {
+            jQuery('#playPitch').scrollTop(jQuery(this).scrollTop());
+        });
+    });
+
+    $(function() {
+        $('#playPitch').on('scroll', function () {
+            jQuery('#pitchstaircase').scrollTop(jQuery(this).scrollTop());
+        });
+    });
 
 	$(function() {
             $("#modewidget").draggable();
@@ -253,6 +292,10 @@
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
     <div id="rulerbody" overflow-x="auto"></div>
     <div id="drumDiv"></div>
+    <div id="pitchstaircase"></div>
+    <div id="playPitch"></div>
+    <div id="musicratio1"></div>
+    <div id="musicratio2"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    
     <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>    
     <div id="helpElem"></div>

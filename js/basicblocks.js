@@ -893,6 +893,26 @@ function initBasicProtoBlocks(palettes, blocks) {
     playdrumBlock.adjustWidthToLabel();
     playdrumBlock.oneArgBlock();
     playdrumBlock.dockTypes[1] = 'anyin';
+
+    //RHYTHMRULER
+
+    var rhythmrulerBlock = new ProtoBlock('rhythmruler');
+    rhythmrulerBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['rhythmruler'] = rhythmrulerBlock;
+    rhythmrulerBlock.staticLabels.push(_('rhythm ruler'));
+    rhythmrulerBlock.adjustWidthToLabel();
+    rhythmrulerBlock.stackClampOneArgBlock();
+    rhythmrulerBlock.defaults.push(1);
+
+    // PITCHSTAIRCASE
+
+    var pitchstaircaseBlock = new ProtoBlock('pitchstaircase');
+    pitchstaircaseBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['pitchstaircase'] = pitchstaircaseBlock;
+    pitchstaircaseBlock.staticLabels.push(_('pitchstaircase'));
+    pitchstaircaseBlock.adjustWidthToLabel();
+    pitchstaircaseBlock.stackClampZeroArgBlock();
+
     
     // TURTLE PALETTE
 

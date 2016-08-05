@@ -2596,6 +2596,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'action':
             case 'pitchdrummatrix':
             case 'rhythmruler':
+            case 'pitchstaircase':
             case 'matrix':
             case 'drum':
 	    case 'status':
@@ -2707,6 +2708,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
         var hiddenBlocks = [];
         console.log(this._loadCounter + ' blocks to load');
+        console.log(blockObjs);
         for (var b = 0; b < this._loadCounter; b++) {
             var thisBlock = blockOffset + b;
             var blkData = blockObjs[b];
@@ -2771,6 +2773,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'setnotevolume2':
             case 'pitchdrummatrix':
             case 'rhythmruler':
+            case 'pitchstaircase':
             case 'matrix':
             case 'status':
             case 'tuplet2':

@@ -48,8 +48,7 @@ const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
-              blocks, turtles, stage,
+function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -108,6 +107,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
 
     //rhythm-ruler
     this.inRhythmRuler = false;
+
+    this.inPitchStairCase = false;
+
     this._currentDrumBlock = null;
 
     // pitch-rhythm matrix
@@ -2075,6 +2077,22 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
             };
             logo._setListener(turtle, listenerName, __listener);
             break;
+        case 'pitchstaircase':
+            console.log("running pitchstaircase");
+
+            pitchstaircase.Stairs = [];
+
+            childFlow = args[0];
+            childFlowCount = 1;
+            logo.inPitchStairCase = true;
+
+            var listenerName = '_pitchstaircase_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+            var __listener = function (event) {
+                pitchstaircase.init(logo);
+            };
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         case 'pitchdrummatrix':
             if (args.length === 1) {
                 childFlow = args[0];
@@ -2623,7 +2641,29 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
                 var drumname = last(logo.drumStyle[turtle]);
                 var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                 logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
-            } else {
+            } else if (logo.inPitchStairCase) {
+                var frequency = pitchToFrequency(args[0], args[1], 0 ,logo.keySignature[turtle]);
+                var note = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
+                var flag = 0;
+
+                for (var i=0 ; i < pitchstaircase.Stairs.length; i++) {
+                    if (pitchstaircase.Stairs[i][2] < parseFloat(frequency)) {
+                        pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency)]);
+                        flag = 1;
+                        break;
+                    }
+                    if (pitchstaircase.Stairs[i][2] === parseFloat(frequency)) {
+                        pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency)]);
+                        flag = 1;
+                        break;
+                    } 
+                }
+
+                if (flag === 0) {
+                    pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
+                }
+            } 
+            else {
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
             }
             break;
@@ -2682,6 +2722,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
             break;
         case 'osctime':
         case 'note':
+            console.log("in note");
             // We queue up the child flow of the note clamp and
             // once all of the children are run, we trigger a
             // _playnote_ event, then wait for the note to play.
@@ -2703,6 +2744,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, canvas,
             logo.noteTranspositions[turtle] = [];
             logo.noteBeatValues[turtle] = [];
             logo.noteDrums[turtle] = [];
+
 
             // Ensure that note duration is positive.
             if (args[0] < 0) {
