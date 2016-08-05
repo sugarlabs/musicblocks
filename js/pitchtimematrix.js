@@ -10,49 +10,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-//All about Matrix
-
-/*
-initMatrix() : Initializes the matrix. Makes the pitches according to
-solfegeNotes (contains what is to be displayed in first column)
-solfegeOctaves (contains the octave for each pitch )
-
-addNotes() : Makes the matrix according to each rhythm block.
-
-addTuplet() : Called when tuplet block is attached to the matrix
-clamp. Adds the rows and columns required for adding tuplet
-functionality to matrix. "Code is little messy" *<==How so? How should
-it be improved in the future?*
-
-makeClickable() : Makes the matrix clickable.
-
-setNotes() : Set notes in this.notesToPlay when user clicks onto any
-clickable cell.
-
-playMatrix() : Plays the matrix by calling playAll();
-
-savematrix() : Saves the Matrix notes in an array. Part of that array
-(between 2 'end') constitutes notes for any chunk.
-*/
+const SOLFEGE2SORTABLE = {'do♭': 'a', 'do': 'b', 'do♯': 'c', 're♭': 'd', 're': 'e', 're♯': 'f', 'mi♭': 'g', 'mi': 'h', 'mi♯': 'i', 'fa♭': 'j', 'fa': 'k', 'fa♯': 'l', 'sol♭': 'm', 'sol': 'n', 'sol♯': 'o', 'la♭': 'p', 'la': 'q', 'la♯': 'r','ti♭': 's', 'ti': 't', 'ti♯': 'u'};
+const SORTABLE2SOLFEGE = {'a': 'do♭', 'b': 'do', 'c': 'do♯', 'd': 're♭', 'e': 're', 'f': 're♯', 'g': 'mi♭', 'h': 'mi', 'i': 'mi♯', 'j': 'fa♭', 'k': 'fa', 'l': 'fa♯', 'm': 'sol♭', 'n': 'sol', 'o': 'sol♯', 'p': 'la♭', 'q': 'la', 'r': 'la♯', 's': 'ti♭', 't': 'ti', 'u': 'ti♯'};
 
 
 function Matrix() {
-    this.secondsPerBeat = 1;
-    this.notesToPlay = [];
-    this.notesToPlayDirected = [];
-    this.numberOfNotesToPlay = 0;
-    this.octave = 0;
-    this.matrixContainer = null;
-
-    this.matrixHasTuplets = false;
-
-    this.cellWidth = 0;
     // Note: solfegeNotes can contain either a pitch or a drum
     this.solfegeNotes = [];
     this.solfegeOctaves = [];
-    this.noteValue = 4;
-    this.notesCounter = 0;
     this.playDirection = 1;
+
+    this._sorted = false;
+    this._notesToPlay = [];
+    this._notesToPlayDirected = [];
+    this._matrixHasTuplets = false;
+    this._noteValue = 4;
+    this._notesCounter = 0;
 
     // The pitch-block number associated with a row; a rhythm block is
     // associated with a column. We need to keep track of which
@@ -62,79 +35,89 @@ function Matrix() {
     // columns).
 
     // These arrays get created each time the matrix is built.
-    this.rowBlocks = [];  // pitch-block number
-    this.colBlocks = [];  // [rhythm-block number, note number]
+    this._rowBlocks = [];  // pitch-block number
+    this._colBlocks = [];  // [rhythm-block number, note number]
+
+    // This array keeps track of the position of the rows after sorting.
+    this._rowMap = [];
+    // And offsets due to deleting duplicates.
+    this._rowOffset = [];
 
     // This array is preserved between sessions.
     // We populate the blockMap whenever a note is selected and
     // restore any notes that might be present.
 
-    this.blockMap = [];
+    this._blockMap = [];
 
     this.clearBlocks = function() {
-        this.rowBlocks = [];
-        this.colBlocks = [];
+        this._rowBlocks = [];
+        this._colBlocks = [];
+        this._rowMap = [];
+        this._rowOffset = [];
     };
 
     this.addRowBlock = function(pitchBlock) {
-        this.rowBlocks.push(pitchBlock);
+        this._rowMap.push(this._rowBlocks.length);
+        this._rowOffset.push(0);
+        this._rowBlocks.push(pitchBlock);
     };
 
     this.addColBlock = function(rhythmBlock, n) {
         // Search for previous instance of the same block (from a repeat)
         var startIdx = 0;
-        for (var i = 0; i < this.colBlocks.length; i++) {
-            var obj = this.colBlocks[i];
+        for (var i = 0; i < this._colBlocks.length; i++) {
+            var obj = this._colBlocks[i];
             if (obj[0] === rhythmBlock) {
                 startIdx += 1;
             }
         }
 
         for (var i = startIdx; i < n + startIdx; i++) {
-            this.colBlocks.push([rhythmBlock, i]);
+            this._colBlocks.push([rhythmBlock, i]);
         }
     };
 
     this.addNode = function(pitchBlock, rhythmBlock, n) {
-        for (var i = 0; i < this.blockMap.length; i++) {
-            var obj = this.blockMap[i];
+        for (var i = 0; i < this._blockMap.length; i++) {
+            var obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
                 return;  // node is already in the list
             }
         }
-        this.blockMap.push([pitchBlock, [rhythmBlock, n]]);
+        this._blockMap.push([pitchBlock, [rhythmBlock, n]]);
     };
 
     this.removeNode = function(pitchBlock, rhythmBlock, n) {
-        for (var i = 0; i < this.blockMap.length; i++) {
-            var obj = this.blockMap[i];
+        for (var i = 0; i < this._blockMap.length; i++) {
+            var obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                this.blockMap[i] = [-1, [-1, 1, 0]];  // Mark as removed
+                this._blockMap[i] = [-1, [-1, 1, 0]];  // Mark as removed
             }
         }
     };
 
-    this.initMatrix = function(logo) {
+    this.init = function(logo) {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
-        this.rests = 0;
-        this.logo = logo;
+        this._sorted = false;
+        this._rests = 0;
+        this._logo = logo;
 
-        docById('matrix').style.display = 'inline';
-        docById('matrix').style.visibility = 'visible';
-        docById('matrix').style.border = 2;
+        docById('pitchtimematrix').style.display = 'inline';
+        docById('pitchtimematrix').style.visibility = 'visible';
+        docById('pitchtimematrix').style.border = 2;
 
         // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
-        this.cellScale = w / 1200;
-        docById('matrix').style.width = Math.floor(w / 2) + 'px';
-        docById('matrix').style.overflowX = 'auto';
+        this._cellScale = w / 1200;
+        docById('pitchtimematrix').style.width = Math.floor(w / 2) + 'px';
+        docById('pitchtimematrix').style.overflowX = 'auto';
 
         console.log('notes ' + this.solfegeNotes + ' octave ' + this.solfegeOctaves);
 
-        this.notesToPlay = [];
-        this.notesToPlayDirected = [];
-        this.matrixHasTuplets = false;
+        this._notesToPlay = [];
+        this._notesToPlayDirected = [];
+        this._matrixHasTuplets = false;
 
         // Used to remove the matrix table
         Element.prototype.remove = function() {
@@ -149,186 +132,149 @@ function Matrix() {
             }
         };
 
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
 
         if (table !== null) {
             table.remove();
         }
 
         var x = document.createElement('TABLE');
-        x.setAttribute('id', 'myTable');
+        x.setAttribute('id', 'pitchTimeTable');
         x.style.textAlign = 'center';
 
-        var matrixDiv = docById('matrix');
+        var matrixDiv = docById('pitchtimematrix');
         matrixDiv.style.paddingTop = 0 + 'px';
         matrixDiv.style.paddingLeft = 0 + 'px';
         matrixDiv.appendChild(x);
-        matrixDivPosition = matrixDiv.getBoundingClientRect();
+        var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
-        var table = docById('myTable');
-        // FIXME: Why is not 'fixed' honored?
-        // table.style.tableLayout = 'fixed';
-        // table.style.maxWidth = 'none';
-        // table.style.width = 'auto';
-        // table.style.minWidth = 100 + '%';
-
+        var table = docById('pitchTimeTable');
         var header = table.createTHead();
         var row = header.insertRow(0);
         row.style.left = Math.floor(matrixDivPosition.left) + 'px';
         row.style.top = Math.floor(matrixDivPosition.top) + 'px';
 
         var solfaCell = row.insertCell(-1);
-        solfaCell.style.fontSize = this.cellScale * 100 + '%';
+        solfaCell.style.fontSize = this._cellScale * 100 + '%';
         solfaCell.innerHTML = '<b>' + _('Solfa') + '</b>';
-        solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         solfaCell.style.minWidth = solfaCell.style.width;
         solfaCell.style.maxWidth = solfaCell.style.width;
-        solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         solfaCell.style.backgroundColor = MATRIXLABELCOLOR;
 
-        var iconSize = Math.floor(this.cellScale * 24);
-
         // Add the buttons to the top row.
-        var thisMatrix = this;
+        var that = this;
+        var iconSize = Math.floor(this._cellScale * 24);
 
-        var cell = row.insertCell(1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play'));
         cell.onclick=function() {
-            thisMatrix.logo.setTurtleDelay(0);
-            thisMatrix.playAll();
-        }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            that._logo.setTurtleDelay(0);
+            that._playAll();
         }
 
-        var cell = row.insertCell(2);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 2, 'export-chunk.svg', iconSize, _('save'));
         cell.onclick=function() {
-            thisMatrix.saveMatrix();
-        }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            that._save();
         }
 
-        var cell = row.insertCell(3);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/erase-button.svg" title="' + _('clear') + '" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 3, 'erase-button.svg', iconSize, _('clear'));
         cell.onclick=function() {
-            thisMatrix.clearMatrix();
-        }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            that._clear();
         }
 
-        var cell = row.insertCell(4);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-button.svg" title="' + _('export') + ' HTML" alt="' + _('export') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 4, 'export-button.svg', iconSize, _('export'));
         cell.onclick=function() {
-            thisMatrix.exportMatrix();
-        }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            that._export();
         }
 
-        var cell = row.insertCell(5);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 5, 'sort.svg', iconSize, _('sort'));
         cell.onclick=function() {
-            docById('matrix').style.visibility = 'hidden';
-            docById('matrix').style.border = 0;
+            that._sort();
         }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        var cell = this._addButton(row, 6, 'close-button.svg', iconSize, _('close'));
+        cell.onclick=function() {
+            docById('pitchtimematrix').style.visibility = 'hidden';
+            docById('pitchtimematrix').style.border = 0;
+            that._rowOffset = [];
+            for (var i = 0; i < that._rowMap.length; i++) {
+                that._rowMap[i] = i;
+            }
         }
 
         var j = 0;
-        var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
+        var marginFromTop = Math.floor(matrixDivPosition.top + this._cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
         for (var i = 0; i < this.solfegeNotes.length; i++) {
             if (this.solfegeNotes[i].toLowerCase() === 'rest') {
-                this.rests += 1;
+                this._rests += 1;
                 continue;
             }
 
             var row = header.insertRow(i + 1);
-            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale + i * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
-            cell.style.fontSize = this.cellScale * 100 + '%';
+            cell.style.fontSize = this._cellScale * 100 + '%';
 
             var drumName = getDrumName(this.solfegeNotes[i]);
             if (drumName != null) {
                 console.log('drumName is: ' + drumName + ' (' + this.solfegeNotes[i] + ')');
-		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (this.solfegeNotes[i].slice(0, 4) === 'http') {
-		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.solfegeNotes[i]) + '" title="' + this.solfegeNotes[i] + '" alt="' + this.solfegeNotes[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.solfegeNotes[i]) + '" title="' + this.solfegeNotes[i] + '" alt="' + this.solfegeNotes[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             }
 
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.maxWidth = cell.style.minWidth;
             cell.style.position = 'fixed';
             cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
-            // cell.style.top = Math.floor(marginFromTop + (i * this.cellScale * 2)) + 'px';
+            // cell.style.top = Math.floor(marginFromTop + (i * this._cellScale * 2)) + 'px';
             marginFromTop += parseInt(cell.style.height.replace('px', ''));
             j += 1;
         }
 
-        var row = header.insertRow(this.solfegeNotes.length - this.rests + 1);
-        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale + i * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+        var row = header.insertRow(this.solfegeNotes.length - this._rests + 1);
+        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         var cell = row.insertCell(0);
-        cell.style.fontSize = this.cellScale * 75 + '%';
+        cell.style.fontSize = this._cellScale * 75 + '%';
         cell.innerHTML = _('note value');
         cell.style.position = 'fixed';
-        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
-        // cell.style.top = Math.floor(marginFromTop + (i * this.cellScale * 2)) + 'px';
+        // cell.style.top = Math.floor(marginFromTop + (i * this._cellScale * 2)) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
     };
 
-    this.generateDataURI = function(file) {
+    this._addButton = function(row, colIndex, icon, iconSize, label) {
+        var table = docById('drumTable');
+        var cell = row.insertCell();
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        return cell;
+    };
+
+    this._generateDataURI = function(file) {
         // Deprecated since we now use SVG for note artwork.
         /*
         file=file.replace(/𝅝/g,"&#x1D15D;");
@@ -343,10 +289,92 @@ function Matrix() {
         return data;
     };
 
-    this.exportMatrix = function() {
-        var table = docById('myTable');
+    this._sort = function() {
+        if (this._sorted) {
+            console.log('already sorted');
+            return;
+        }
 
-        var exportWindow = window.open("");
+        var sortableList = [];        
+        for (var i = 0; i < this.solfegeNotes.length; i++) {
+            if (this.solfegeNotes[i].toLowerCase() === 'rest') {
+                continue;
+            }
+
+            var drumName = getDrumName(this.solfegeNotes[i]);
+            if (drumName != null) {
+                continue;
+            }
+            // FIXME: some sortable code foe soflege
+            sortableList.push(this.solfegeOctaves[i] + ':' + SOLFEGE2SORTABLE[this.solfegeNotes[i]] + ';' + i);
+        }
+
+        var sortedList = sortableList.sort(); 
+        // Reverse since we start from the top of the table.
+        sortedList = sortedList.reverse();
+
+        for (var i = 0; i < this.solfegeNotes.length; i++) {
+            if (this.solfegeNotes[i].toLowerCase() === 'rest') {
+                continue;
+            }
+
+            var drumName = getDrumName(this.solfegeNotes[i]);
+            if (drumName != null) {
+                sortedList.push('-1:' + this.solfegeNotes[i] + ';' + i);
+            }
+        }
+
+        this.solfegeNotes = [];
+        this.solfegeOctaves = [];
+        for (var i = 0; i < sortedList.length; i++) {
+            var obj = sortedList[i].split(':');
+            var obj2 = obj[1].split(';');
+            var drumName = getDrumName(obj2[0]);
+            if (drumName == null) {
+                obj2[0] = SORTABLE2SOLFEGE[obj2[0]];
+            }
+
+            this._rowMap[Number(obj2[1])] = i;
+            if (i > 0 && (Number(obj[0]) === last(this.solfegeOctaves) && obj2[0] === last(this.solfegeNotes))) {
+                // skip duplicates
+                for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
+                    this._rowOffset[j] -= 1;
+                }
+
+                this._rowMap[i] = this._rowMap[i - 1];
+                continue;
+            }
+
+            this.solfegeOctaves.push(Number(obj[0]));
+            this.solfegeNotes.push(obj2[0]);
+        }
+
+        this.init(this._logo);
+        this._sorted = true;
+
+        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+            switch (this._logo.tupletRhythms[i][0]) {
+            case 'notes':
+                var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
+                tupletParam.push([]);
+                for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
+                    tupletParam[1].push(this._logo.tupletRhythms[i][j]);
+                }
+                this.addTuplet(tupletParam);
+                break;
+            default:
+                this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
+                break;
+            }
+        }
+
+        this.makeClickable();
+    };
+
+    this._export = function() {
+        var table = docById('pitchTimeTable');
+
+        var exportWindow = window.open('');
         var exportDocument = exportWindow.document;
         var title = exportDocument.createElement('title');
         title.innerHTML = 'Music Matrix';
@@ -385,14 +413,16 @@ function Matrix() {
                 exportCell.style.padding = 1 + 'px';
             }
         }
+
         var saveDocument = exportDocument;
         var uriData = saveDocument.documentElement.outerHTML;
         exportDocument.body.innerHTML+='<br><a id="downloadb1" style="background:#C374E9;' + 'border-radius:5%;' + 'padding:0.3em;' + 'text-decoration:none;' + 'margin:0.5em;' + 'color:white;" ' + 'download>Download Matrix</a>';
         exportDocument.getElementById("downloadb1").download = "MusicMatrix";
-        exportDocument.getElementById("downloadb1").href = this.generateDataURI(uriData);
+        exportDocument.getElementById("downloadb1").href = this._generateDataURI(uriData);
         exportDocument.close();
     };
 
+    // Deprecated
     this.note2Solfege = function(note, index) {
         if (['♭', '♯'].indexOf(note[1]) === -1) {
             var octave = note[1];
@@ -410,7 +440,7 @@ function Matrix() {
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
 
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
         var tupletTimeFactor = param[0][0] / param[0][1];
         var numberOfNotes = param[1].length;
         var totalNoteInterval = 0;
@@ -419,7 +449,7 @@ function Matrix() {
         }
 
         // Add the cells for each tuplet note
-        if (this.matrixHasTuplets) {
+        if (this._matrixHasTuplets) {
             // Extra rows for tuplets have already been added.
             var rowCount = table.rows.length - 3;
         } else {
@@ -431,7 +461,7 @@ function Matrix() {
             for (var j = 0; j < numberOfNotes; j++) {
                 cell = row.insertCell(-1);
                 cell.setAttribute('id', table.rows[i].cells.length - 1);
-                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
@@ -450,20 +480,20 @@ function Matrix() {
         for (var j = 0; j < numberOfNotes; j++) {
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
-            this.notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])]);
+            this._notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])]);
         }
 
-        if (this.matrixHasTuplets) {
+        if (this._matrixHasTuplets) {
             var row = table.rows[table.rows.length - 2];
         } else {
             var row = table.insertRow(table.rows.length - 1);
             var cell = row.insertCell(-1);
-            cell.style.fontSize = this.cellScale * 75 + '%';
+            cell.style.fontSize = this._cellScale * 75 + '%';
             cell.style.position = 'fixed';
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.minWidth;
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
             // cell.style.top = matrixDivPosition.top + (table.rows.length - 1) * cell.style.height + 'px';
             cell.innerHTML = _('tuplet value');
@@ -474,17 +504,17 @@ function Matrix() {
         w = (2 * w) / 5;
 
         cell = table.rows[table.rows.length - 1].insertCell(-1);
-        cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+        cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
 
         var noteValue = param[0][1] / param[0][0];
         var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0]);
 
         cell.colSpan = numberOfNotes;
-        cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
+        cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
         cell.style.lineHeight = 60 + '%';
-        cell.style.width = this.noteWidth(noteValue);
-        cell.style.minWidth = this.noteWidth(noteValue);
-        cell.style.maxWidth = this.noteWidth(noteValue);
+        cell.style.width = this._noteWidth(noteValue);
+        cell.style.minWidth = this._noteWidth(noteValue);
+        cell.style.maxWidth = this._noteWidth(noteValue);
         cell.innerHTML = noteValueToDisplay;
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
 
@@ -493,37 +523,37 @@ function Matrix() {
             // Add an entry for the tuplet value in any rhythm
             // columns. If we already have tuplets, just add a cell to
             // the new tuplet column.
-            if (!this.matrixHasTuplets || i === tupletCol) {
+            if (!this._matrixHasTuplets || i === tupletCol) {
                 cell = row.insertCell(i + 1);
                 cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 if (i === tupletCol) {
-                    cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
+                    cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
                     cell.innerHTML = numberOfNotes.toString();
                     cell.colSpan = numberOfNotes;
                 }
             }
         }
 
-        if (this.matrixHasTuplets) {
+        if (this._matrixHasTuplets) {
             var row = table.rows[table.rows.length - 3];
         } else {
             // Add row for tuplet note values
             var row = table.insertRow(table.rows.length - 2);
             var cell = row.insertCell(-1);
             cell.style.position = 'fixed';
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
-            cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             cell.style.left = matrixDivPosition.left + 2 + 'px';
             // cell.style.top = matrixDivPosition.top + (table.rows.length - 2) * cell.style.height + 'px';
-            cell.style.fontSize = this.cellScale * 75 + '%';
+            cell.style.fontSize = this._cellScale * 75 + '%';
             cell.innerHTML = _('note value');
             cell.style.backgroundColor = MATRIXLABELCOLOR;
         }
 
-        if (this.matrixHasTuplets) {
+        if (this._matrixHasTuplets) {
             // Just add the new tuplet note values
             var tupletCol = 0;
             var cellCount = param[1].length;
@@ -539,64 +569,64 @@ function Matrix() {
             // Add cell for tuplet note values
             cell = row.insertCell(-1);
             cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             // Add tuplet note values
             if (i >= tupletCol) {
                 var j = i - tupletCol;
                 var numerator = 32 / param[1][j];
                 cell.style.lineHeight = 60 + '%';
-                cell.style.fontSize = this.cellScale * 75 + '%';
+                cell.style.fontSize = this._cellScale * 75 + '%';
                 var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
                 if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
-                       cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this.cellScale + '>';
+                       cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this._cellScale + '>';
                 } else {
                        cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
                 }
             }
         }
 
-        this.matrixHasTuplets = true;
+        this._matrixHasTuplets = true;
     };
 
-    this.noteWidth = function (noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this.cellScale) + 'px';
+    this._noteWidth = function (noteValue) {
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale) + 'px';
     };
 
     this.addNotes = function(numBeats, noteValue) {
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
         var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
-        if (this.noteValue > noteValue) {
-            this.noteValue = noteValue;
+        if (this._noteValue > noteValue) {
+            this._noteValue = noteValue;
         }
 
         for (var i = 0; i < numBeats; i++) {
-            this.notesToPlay.push([['R'], noteValue]);
+            this._notesToPlay.push([['R'], noteValue]);
         }
 
-        if (this.matrixHasTuplets) {
-            var rowCount = this.solfegeNotes.length + 3 - this.rests;
+        if (this._matrixHasTuplets) {
+            var rowCount = this.solfegeNotes.length + 3 - this._rests;
         } else {
-            var rowCount = this.solfegeNotes.length + 1 - this.rests;
+            var rowCount = this.solfegeNotes.length + 1 - this._rests;
         }
 
         for (var j = 0; j < numBeats; j++) {
             for (var i = 1; i <= rowCount; i++) {
                 var row = table.rows[i];
                 var cell = row.insertCell(-1);
-                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-                cell.width = this.noteWidth(noteValue);
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                cell.width = this._noteWidth(noteValue);
                 cell.style.width = cell.width;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 if (i === rowCount) {
-                    cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-                    cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-                    cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
+                    cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                    cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                    cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
                     cell.style.lineHeight = 60 + '%';
                     cell.innerHTML = noteValueToDisplay;
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-                } else if (this.matrixHasTuplets && i > this.solfegeNotes.length - this.rests) {
+                } else if (this._matrixHasTuplets && i > this.solfegeNotes.length - this._rests) {
                     // We may need to insert some blank cells in the extra rows
                     // added by tuplets.
                     cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
@@ -622,8 +652,8 @@ function Matrix() {
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
-        var table = docById('myTable');
-        if (this.matrixHasTuplets) {
+        var table = docById('pitchTimeTable');
+        if (this._matrixHasTuplets) {
             var leaveRowsFromBottom = 3;
         } else {
             var leaveRowsFromBottom = 1;
@@ -635,7 +665,7 @@ function Matrix() {
                 if (cell.style.backgroundColor === 'black') {
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     cell.style.backgroundColor = 'black';
-                    this.setNotes(i, cell.parentNode.rowIndex, false);
+                    this._setNotes(i, cell.parentNode.rowIndex, false);
                 }
             }
         }
@@ -647,11 +677,11 @@ function Matrix() {
                 cell.onclick = function() {
                     if (this.style.backgroundColor === 'black') {
                         this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        that.notesToPlay[this.id - 1][0] = ['R'];
-                        that.setNotes(this.id, this.parentNode.rowIndex, false);
+                        that._notesToPlay[this.id - 1][0] = ['R'];
+                        that._setNotes(this.id, this.parentNode.rowIndex, false);
                     } else {
                         this.style.backgroundColor = 'black';
-                        that.setNotes(this.id, this.parentNode.rowIndex, true);
+                        that._setNotes(this.id, this.parentNode.rowIndex, true);
                     }
                 }
             }
@@ -659,58 +689,60 @@ function Matrix() {
 
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
-        for (var i = 0; i < this.blockMap.length; i++) {
-            var obj = this.blockMap[i];
+        for (var i = 0; i < this._blockMap.length; i++) {
+            var obj = this._blockMap[i];
             if (obj[0] !== -1) {
                 // Look for this note in the pitch and rhythm blocks.
-                var row = this.rowBlocks.indexOf(obj[0]);
+                var row = this._rowMap[this._rowBlocks.indexOf(obj[0])] + this._rowOffset[this._rowMap[this._rowBlocks.indexOf(obj[0])]];
                 var col = -1;
-                for (var j = 0; j < this.colBlocks.length; j++) {
-                    if (this.colBlocks[j][0] === obj[1][0] && this.colBlocks[j][1] === obj[1][1]) {
+                for (var j = 0; j < this._colBlocks.length; j++) {
+                    if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === obj[1][1]) {
                         col = j;
                         break;
                     }
                 }
+
                 if (col == -1) {
                     continue;
                 }
+
                 // If we found a match, mark this cell and add this
                 // note to the play list.
                 var cell = table.rows[row + 1].cells[col + 1];
                 if (cell != undefined) {
                     cell.style.backgroundColor = 'black';
-                    if (this.notesToPlay[col][0][0] === 'R') {
-                        this.notesToPlay[col][0] = [];
+                    if (this._notesToPlay[col][0][0] === 'R') {
+                        this._notesToPlay[col][0] = [];
                     }
-                    this.setNoteCell(row + 1, col + 1, cell, false, null);
+                    this._setNoteCell(row + 1, col + 1, cell, false, null);
                 }
             }
         }
     };
 
-    this.playAll = function() {
+    this._playAll = function() {
         // Play all of the notes in the matrix.
-        this.logo.synth.stop();
+        this._logo.synth.stop();
 
         var notes = [];
 
-        console.log(this.notesToPlay);
-        for (var i in this.notesToPlay) {
-            notes.push(this.notesToPlay[i]);
+        console.log(this._notesToPlay);
+        for (var i in this._notesToPlay) {
+            notes.push(this._notesToPlay[i]);
         }
 
         if (this.playDirection > 0) {
-            this.notesToPlayDirected = notes;
+            this._notesToPlayDirected = notes;
         } else {
-            this.notesToPlayDirected = notes.reverse();
+            this._notesToPlayDirected = notes.reverse();
         }
 
         this.playDirection = 1;
-        this.notesCounter = 0;
-        var table = docById('myTable');
+        this._notesCounter = 0;
+        var table = docById('pitchTimeTable');
 
         // We have an array of pitches and note values.
-        var note = this.notesToPlayDirected[this.notesCounter][0];
+        var note = this._notesToPlayDirected[this._notesCounter][0];
         var pitchNotes = [];
         var drumNotes = [];
         // Note can be a chord, hence it is an array.
@@ -725,45 +757,45 @@ function Matrix() {
                 pitchNotes.push(note[i].replace(/♭/g, 'b').replace(/♯/g, '#'));
             }
         }
-        var noteValue = this.notesToPlayDirected[this.notesCounter][1];
+        var noteValue = this._notesToPlayDirected[this._notesCounter][1];
 
-        this.notesCounter += 1;
+        this._notesCounter += 1;
 
         // Notes begin in Column 1.
-        this.colIndex = 1;
+        this._colIndex = 1;
         // We highlight the note-value cells (bottom row).
-        this.rowIndex = table.rows.length - 1;
+        this._rowIndex = table.rows.length - 1;
         // Highlight first note.
-        var cell = table.rows[this.rowIndex].cells[this.colIndex];
+        var cell = table.rows[this._rowIndex].cells[this._colIndex];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         // If we are in a tuplet, we don't update the column until
         // we've played all of the notes in the column span.
         if (cell.colSpan > 1) {
-            this.spanCounter = 1;
-            var tupletCell = table.rows[this.rowIndex - 2].cells[this.colIndex];
+            this._spanCounter = 1;
+            var tupletCell = table.rows[this._rowIndex - 2].cells[this._colIndex];
             tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
         } else {
-            this.spanCounter = 0;
-            this.colIndex += 1;
+            this._spanCounter = 0;
+            this._colIndex += 1;
         }
 
         if (note[0] !== 'R' && pitchNotes.length > 0) {
             console.log(pitchNotes);
-            this.logo.synth.trigger(pitchNotes, this.logo.defaultBPMFactor / noteValue, 'poly');
+            this._logo.synth.trigger(pitchNotes, this._logo.defaultBPMFactor / noteValue, 'poly');
         }
 
-        for (i = 0; i < drumNotes.length; i++) {
+        for (var i = 0; i < drumNotes.length; i++) {
             console.log(drumNotes[i]);
-            this.logo.synth.trigger('C2', this.logo.defaultBPMFactor / noteValue, drumNotes[i]);
+            this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i]);
         }
 
         console.log('calling playNote');
-        this.playNote(0, 0);
+        this.__playNote(0, 0);
     };
 
-    this.playNote = function(time, noteCounter) {
-        noteValue = this.notesToPlayDirected[noteCounter][1];
+    this.__playNote = function(time, noteCounter) {
+        noteValue = this._notesToPlayDirected[noteCounter][1];
         time = 1 / noteValue;
         var that = this;
 
@@ -772,38 +804,38 @@ function Matrix() {
         // cell of the tuplet spams multiple columns, the highlight
         // gets ahead of itself.
         setTimeout(function() {
-            var table = docById('myTable');
+            var table = docById('pitchTimeTable');
             // Did we just play the last note?
-            if (noteCounter === that.notesToPlayDirected.length - 1) {
-                for (var j = 1; j < table.rows[that.rowIndex].cells.length; j++) {
-                    var cell = table.rows[that.rowIndex].cells[j];
+            if (noteCounter === that._notesToPlayDirected.length - 1) {
+                for (var j = 1; j < table.rows[that._rowIndex].cells.length; j++) {
+                    var cell = table.rows[that._rowIndex].cells[j];
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                 }
-                if (that.matrixHasTuplets) {
-                    for (var j = 1; j < table.rows[that.rowIndex - 2].cells.length; j++) {
-                    var cell = table.rows[that.rowIndex - 2].cells[j];
+                if (that._matrixHasTuplets) {
+                    for (var j = 1; j < table.rows[that._rowIndex - 2].cells.length; j++) {
+                    var cell = table.rows[that._rowIndex - 2].cells[j];
                     cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                     }
                 }
             } else {
-                var cell = table.rows[that.rowIndex].cells[that.colIndex];
+                var cell = table.rows[that._rowIndex].cells[that._colIndex];
 
                 if (cell != undefined) {
                     cell.style.backgroundColor = MATRIXBUTTONCOLOR;
                     if (cell.colSpan > 1) {
-                        var tupletCell = table.rows[that.rowIndex - 2].cells[that.notesCounter + 1];
+                        var tupletCell = table.rows[that._rowIndex - 2].cells[that._notesCounter + 1];
                         tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
                     }
                 }
 
-                if (that.notesCounter >= that.notesToPlayDirected.length) {
-                    that.notesCounter = 1;
-                    that.logo.synth.stop()
+                if (that._notesCounter >= that._notesToPlayDirected.length) {
+                    that._notesCounter = 1;
+                    that._logo.synth.stop()
                 }
 
-                note = that.notesToPlayDirected[that.notesCounter][0];
-                noteValue = that.notesToPlayDirected[that.notesCounter][1];
-                that.notesCounter += 1;
+                note = that._notesToPlayDirected[that._notesCounter][0];
+                noteValue = that._notesToPlayDirected[that._notesCounter][1];
+                that._notesCounter += 1;
 
                 // Note can be a chord, hence it is an array.
                 var pitchNotes = [];
@@ -824,42 +856,41 @@ function Matrix() {
                 }
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    console.log(pitchNotes);
-                    that.logo.synth.trigger(pitchNotes, that.logo.defaultBPMFactor / noteValue, 'poly');
+                    that._logo.synth.trigger(pitchNotes, that._logo.defaultBPMFactor / noteValue, 'poly');
                 }
 
-                for (j = 0; j < drumNotes.length; j++) {
-                    that.logo.synth.trigger(['C2'], that.logo.defaultBPMFactor / noteValue, drumNotes[j]);
+                for (var j = 0; j < drumNotes.length; j++) {
+                    that._logo.synth.trigger(['C2'], that._logo.defaultBPMFactor / noteValue, drumNotes[j]);
                 }
 
             }
-            var cell = table.rows[that.rowIndex].cells[that.colIndex];
+
+            var cell = table.rows[that._rowIndex].cells[that._colIndex];
             if (cell != undefined) {
-            if (cell.colSpan > 1) {
-                that.spanCounter += 1;
-                if (that.spanCounter === cell.colSpan) {
-                    that.spanCounter = 0;
-                    that.colIndex += 1;
+                if (cell.colSpan > 1) {
+                    that._spanCounter += 1;
+                    if (that._spanCounter === cell.colSpan) {
+                        that._spanCounter = 0;
+                        that._colIndex += 1;
+                    }
+                } else {
+                    that._spanCounter = 0;
+                    that._colIndex += 1;
                 }
-            } else {
-                that.spanCounter = 0;
-                that.colIndex += 1;
+
+                noteCounter += 1;
+                if (noteCounter < that._notesToPlayDirected.length) {
+                    that.__playNote(time, noteCounter);
+                }
             }
-            noteCounter += 1;
-            if (noteCounter < that.notesToPlayDirected.length) {
-                that.playNote(time, noteCounter);
-            }
-            }
-        }, that.logo.defaultBPMFactor * 1000 * time + that.logo.turtleDelay);
+        }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
     };
 
-    this.setNotes = function(colIndex, rowIndex, playNote) {
+    this._setNotes = function(colIndex, rowIndex, playNote) {
         // Sets corresponding note when user clicks on any cell and
         // plays that note
-
-        // console.log('setNotes rhythm block: ' + colIndex + ' ' + this.colBlocks[colIndex - 1]);
-        var pitchBlock = this.rowBlocks[rowIndex - 1];
-        var rhythmBlockObj = this.colBlocks[colIndex - 1];
+        var pitchBlock = this._rowBlocks[this._rowMap.indexOf(rowIndex - 1 - this._rowOffset[rowIndex - 1])];
+        var rhythmBlockObj = this._colBlocks[colIndex - 1];
 
         if (playNote) {
             this.addNode(pitchBlock, rhythmBlockObj[0], rhythmBlockObj[1], rhythmBlockObj[2]);
@@ -867,42 +898,42 @@ function Matrix() {
             this.removeNode(pitchBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         }
 
-        if (this.matrixHasTuplets) {
+        if (this._matrixHasTuplets) {
             var leaveRowsFromBottom = 3;
         } else {
             var leaveRowsFromBottom = 1;
         }
 
-        var table = docById('myTable');
-        this.notesToPlay[colIndex - 1][0] = [];
+        var table = docById('pitchTimeTable');
+        this._notesToPlay[colIndex - 1][0] = [];
         if (table !== null) {
             for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
-                var table = docById('myTable');
+                var table = docById('pitchTimeTable');
                 cell = table.rows[j].cells[colIndex];
                 if (cell.style.backgroundColor === 'black') {
-                    this.setNoteCell(j, colIndex, cell, playNote);
+                    this._setNoteCell(j, colIndex, cell, playNote);
                 }
             }
         }
     };
 
-    this.setNoteCell = function(j, colIndex, cell, playNote) {
-        var table = docById('myTable');
+    this._setNoteCell = function(j, colIndex, cell, playNote) {
+        var table = docById('pitchTimeTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
         var drumHTML = solfegeHTML.split('"');
         if (drumHTML.length > 3) {
             var drumName = getDrumSynthName(drumHTML[3]);
             if (drumName != null) {
-		// If it is a drum, just save the name.
+                // If it is a drum, just save the name.
                 console.log('drumName is ' + drumName);
-		var note = drumName;
+                var note = drumName;
             } else {
                 console.log('something is wrong (drumSynthName is ' + drumName + ')');
-		var note = DEFAULTDRUM;
+                var note = DEFAULTDRUM;
             }
         } else {
             // Both solfege and octave are extracted from HTML by getNote.
-            var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
+            var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
             var note = noteObj[0] + noteObj[1];
         }
         var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
@@ -912,23 +943,23 @@ function Matrix() {
         noteValue = Number(noteParts[0])/Number(noteParts[2]);
         noteValue = noteValue.toString();
 
-        this.notesToPlay[parseInt(colIndex) - 1][0].push(note);
+        this._notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
         if (playNote) {
             if (drumName != null) {
                 console.log('drumName is ' + drumName);
-                this.logo.synth.trigger('C2', noteValue, drumName);
+                this._logo.synth.trigger('C2', noteValue, drumName);
             } else {
-                this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
+                this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
             }
         }
     };
 
-    this.clearMatrix = function() {
+    this._clear = function() {
         // "Unclick" every entry in the matrix.
-        var table = docById('myTable');
+        var table = docById('pitchTimeTable');
 
-        if (this.matrixHasTuplets) {
+        if (this._matrixHasTuplets) {
             var leaveRowsFromBottom = 3;
         } else {
             var leaveRowsFromBottom = 1;
@@ -940,32 +971,32 @@ function Matrix() {
                     var cell = table.rows[j].cells[i];
                     if (cell.style.backgroundColor === 'black') {
                         cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        this.notesToPlay[cell.id - 1][0] = ['R'];
-                        this.setNotes(cell.id, cell.parentNode.rowIndex, false);
+                        this._notesToPlay[cell.id - 1][0] = ['R'];
+                        this._setNotes(cell.id, cell.parentNode.rowIndex, false);
                     }
                 }
             }
         }
     };
 
-    this.saveMatrix = function() {
+    this._save = function() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
 
         // First, hide the palettes as they will need updating.
-        for (var name in this.logo.blocks.palettes.dict) {
-            this.logo.blocks.palettes.dict[name].hideMenu(true);
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
-        this.logo.refreshCanvas();
+        this._logo.refreshCanvas();
 
 
         var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': 'chunk'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 
-        for (var i = 0; i < this.notesToPlay.length; i++)
+        for (var i = 0; i < this._notesToPlay.length; i++)
         {
             // We want all of the notes in a column.
-            var note = this.notesToPlay[i].slice(0);
+            var note = this._notesToPlay[i].slice(0);
             if (note[0] === '') {
                 note[0] = 'R';
             }
@@ -1036,59 +1067,59 @@ function Matrix() {
                     if (drumName != null) {
                         // add a playdrum block
                         console.log('drumName is ' + drumName);
-			// The last connection in last pitch block is null.
-			if (note[0].length === 1 || j === note[0].length - 1) {
+                        // The last connection in last pitch block is null.
+                        if (note[0].length === 1 || j === note[0].length - 1) {
                             var lastConnection = null;
-			} else {
+                        } else {
                             var lastConnection = thisBlock + 2;
-			}
+                        }
 
-			newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
+                        newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
                         newStack.push([thisBlock + 1, ['drumname', {'value': drumName}], 0, 0, [thisBlock]]);
                         thisBlock += 2;
                         previousBlock = thisBlock - 2;
                     } else if (note[0][j].slice(0, 4) === 'http') {
                         // add a playdrum block with URL
                         console.log('drumName is ' + note[0][j]);
-			// The last connection in last pitch block is null.
-			if (note[0].length === 1 || j === note[0].length - 1) {
+                        // The last connection in last pitch block is null.
+                        if (note[0].length === 1 || j === note[0].length - 1) {
                             var lastConnection = null;
-			} else {
+                        } else {
                             var lastConnection = thisBlock + 2;
-			}
+                        }
 
-			newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
+                        newStack.push([thisBlock, 'playdrum', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
                         newStack.push([thisBlock + 1, ['text', {'value': note[0][j]}], 0, 0, [thisBlock]]);
                         thisBlock += 2;
                         previousBlock = thisBlock - 2;
-		    } else {
+                    } else {
                         // add a pitch block
 
-			// The last connection in last pitch block is null.
-			if (note[0].length === 1 || j === note[0].length - 1) {
+                        // The last connection in last pitch block is null.
+                        if (note[0].length === 1 || j === note[0].length - 1) {
                             var lastConnection = null;
-			} else {
+                        } else {
                             var lastConnection = thisBlock + 3;
-			}
+                        }
 
-			newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-			if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
+                        newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                        if(['♯', '♭'].indexOf(note[0][j][1]) !== -1) {
                             newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
                             newStack.push([thisBlock + 2, ['number', {'value': note[0][j][2]}], 0, 0, [thisBlock]]);
-			} else {
+                        } else {
                             newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
                             newStack.push([thisBlock + 2, ['number', {'value': note[0][j][1]}], 0, 0, [thisBlock]]);
-			}
+                        }
                         thisBlock += 3;
                         previousBlock = thisBlock - 3;
-		    }
+                    }
                 }
             }
         }
 
         // Create a new stack for the chunk.
         console.log(newStack);
-        this.logo.blocks.loadNewBlocks(newStack);
+        this._logo.blocks.loadNewBlocks(newStack);
     };
 };
 

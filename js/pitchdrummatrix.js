@@ -32,12 +32,10 @@ const DRUMNAMEWIDTH = 50;
 
 
 function PitchDrumMatrix() {
-    this.cellWidth = 0;
     this.solfegeNotes = [];
     this.solfegeOctaves = [];
-    this.rests = 0;
+    this._rests = 0;
     this.drums = [];
-    this.noteValue = 4;
 
     // The pitch-block number associated with a row; a drum block is
     // associated with a column. We need to keep track of which
@@ -46,42 +44,42 @@ function PitchDrumMatrix() {
     // drum blocks.
 
     // These arrays get created each time the matrix is built.
-    this.rowBlocks = [];  // pitch-block number
-    this.colBlocks = [];  // drum-block number
+    this._rowBlocks = [];  // pitch-block number
+    this._colBlocks = [];  // drum-block number
 
     // This array is preserved between sessions.
     // We populate the blockMap whenever a node is selected and
     // restore any nodes that might be present.
-    this.blockMap = [];
+    this._blockMap = [];
 
     this.clearBlocks = function() {
-        this.rowBlocks = [];
-        this.colBlocks = [];
+        this._rowBlocks = [];
+        this._colBlocks = [];
     };
 
     this.addRowBlock = function(pitchBlock) {
-        this.rowBlocks.push(pitchBlock);
+        this._rowBlocks.push(pitchBlock);
     };
 
     this.addColBlock = function(drumBlock) {
-        this.colBlocks.push(drumBlock);
+        this._colBlocks.push(drumBlock);
     };
 
     this.addNode = function(pitchBlock, drumBlock) {
-        for (var i = 0; i < this.blockMap.length; i++) {
-            var obj = this.blockMap[i];
+        for (var i = 0; i < this._blockMap.length; i++) {
+            var obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1] === drumBlock) {
                 return;  // node is already in the list
             }
         }
-        this.blockMap.push([pitchBlock, drumBlock]);
+        this._blockMap.push([pitchBlock, drumBlock]);
     };
 
     this.removeNode = function(pitchBlock, drumBlock) {
-        for (var i = 0; i < this.blockMap.length; i++) {
-            var obj = this.blockMap[i];
+        for (var i = 0; i < this._blockMap.length; i++) {
+            var obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1] === drumBlock) {
-                this.blockMap[i] = [-1, -1];  // Mark as removed
+                this._blockMap[i] = [-1, -1];  // Mark as removed
             }
         }
     };
@@ -91,7 +89,7 @@ function PitchDrumMatrix() {
         // Initializes the pitch/drum matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
-        this.logo = logo;
+        this._logo = logo;
 
         docById('pitchdrummatrix').style.display = 'inline';
         console.log('setting pitchdrummatrix visible');
@@ -100,7 +98,7 @@ function PitchDrumMatrix() {
 
         // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
-        this.cellScale = w / 1200;
+        this._cellScale = w / 1200;
         docById('pitchdrummatrix').style.width = Math.floor(w / 2) + 'px';
         docById('pitchdrummatrix').style.overflowX = 'auto';
 
@@ -133,7 +131,7 @@ function PitchDrumMatrix() {
         matrixDiv.style.paddingTop = 0 + 'px';
         matrixDiv.style.paddingLeft = 0 + 'px';
         matrixDiv.appendChild(x);
-        matrixDivPosition = matrixDiv.getBoundingClientRect();
+        var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
         var table = docById('drumTable');
         var header = table.createTHead();
@@ -142,103 +140,54 @@ function PitchDrumMatrix() {
         row.style.top = Math.floor(matrixDivPosition.top) + 'px';
 
         var solfaCell = row.insertCell(-1);
-        solfaCell.style.fontSize = this.cellScale * 100 + '%';
+        solfaCell.style.fontSize = this._cellScale * 100 + '%';
         solfaCell.innerHTML = '<b>' + _('Solfa') + '</b>';
-        solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         solfaCell.style.minWidth = solfaCell.style.width;
         solfaCell.style.maxWidth = solfaCell.style.width;
-        solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         solfaCell.style.backgroundColor = MATRIXLABELCOLOR;
 
-        var iconSize = Math.floor(this.cellScale * 24);
-
         // Add the buttons to the top row.
-        var thisMatrix = this;
+        var iconSize = Math.floor(this._cellScale * 24);
+        var that = this;
 
-        var cell = row.insertCell(1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play'));
         cell.onclick=function() {
-            thisMatrix.logo.setTurtleDelay(0);
-            thisMatrix._playAll();
-        }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            that._logo.setTurtleDelay(0);
+            that._playAll();
         }
 
-        var cell = row.insertCell(2);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 2, 'export-chunk.svg', iconSize, _('save'));
         cell.onclick=function() {
-            thisMatrix._save();
-        }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            that._save();
         }
 
-        var cell = row.insertCell(3);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/erase-button.svg" title="' + _('clear') + '" alt="' + _('clear') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 3, 'erase-button.svg', iconSize, _('clear'));
         cell.onclick=function() {
-            thisMatrix._clear();
-        }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            that._clear();
         }
 
-        var cell = row.insertCell(4);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        var cell = this._addButton(row, 4, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             docById('pitchdrummatrix').style.visibility = 'hidden';
             docById('pitchdrummatrix').style.border = 0;
         }
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        }
 
         var j = 0;
-        var marginFromTop = Math.floor(matrixDivPosition.top + this.cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
+        var marginFromTop = Math.floor(matrixDivPosition.top + this._cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
         for (var i = 0; i < this.solfegeNotes.length; i++) {
             if (this.solfegeNotes[i].toLowerCase() === _('rest')) {
                 // In case there are rest notes included.
-                this.rests += 1;
+                this._rests += 1;
                 continue;
             }
 
             var row = header.insertRow(i + 1);
-            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale + i * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
-            cell.style.fontSize = this.cellScale * 100 + '%';
+            cell.style.fontSize = this._cellScale * 100 + '%';
 
             var drumName = getDrumName(this.solfegeNotes[i]);
             if (drumName != null) {
@@ -249,9 +198,9 @@ function PitchDrumMatrix() {
                 cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
             }
 
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.maxWidth = cell.style.minWidth;
             cell.style.position = 'fixed';
             cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
@@ -259,16 +208,16 @@ function PitchDrumMatrix() {
             j += 1;
         }
 
-        var row = header.insertRow(this.solfegeNotes.length - this.rests + 1);
-        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale + i * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+        var row = header.insertRow(this.solfegeNotes.length - this._rests + 1);
+        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         var cell = row.insertCell(0);
-        cell.style.fontSize = this.cellScale * 75 + '%';
+        cell.style.fontSize = this._cellScale * 75 + '%';
         cell.innerHTML = ''; // '<b>' + _('drum') + '</b>';
         cell.style.position = 'fixed';
-        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
-        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this.cellScale) + 'px';
+        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
         cell.style.verticalAlign = "middle";
@@ -280,31 +229,53 @@ function PitchDrumMatrix() {
 
     };
 
+    this._addButton = function(row, colIndex, icon, iconSize, label) {
+        var table = docById('drumTable');
+        var cell = row.insertCell();
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        return cell;
+    };
+
     this._addDrum = function(drumname) {
         var table = docById('drumTable');
 
-        var rowCount = this.solfegeNotes.length + 1 - this.rests;
-        var iconSize = Math.floor(this.cellScale * 24);
+        var rowCount = this.solfegeNotes.length + 1 - this._rests;
+        var iconSize = Math.floor(this._cellScale * 24);
 
         for (var i = 1; i <= rowCount; i++) {
             var row = table.rows[i];
             var cell = row.insertCell(-1);
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             cell.width = DRUMNAMEWIDTH;
             cell.style.width = cell.width;
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             if (i === rowCount) {
-                cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-                cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this.cellScale) + 'px';
-                cell.style.fontSize = Math.floor(this.cellScale * 75) + '%';
+                cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
                 cell.style.lineHeight = 100 + '%';
+
                 // Work around i8n bug in Firefox.
                 var name = getDrumName(drumname);
                 if (name === '') {
                     name = drumname;
                 }
-		cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(name) + '" title="' + name + '" alt="' + name + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(name) + '" title="' + name + '" alt="' + name + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                 // cell.innerHTML = name;
                 cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
             } else {
@@ -359,18 +330,19 @@ function PitchDrumMatrix() {
 
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
-        for (var i = 0; i < this.blockMap.length; i++) {
-            var obj = this.blockMap[i];
+        for (var i = 0; i < this._blockMap.length; i++) {
+            var obj = this._blockMap[i];
             if (obj[0] !== -1) {
                 // Look for this note in the pitch and drum blocks.
-                var row = this.rowBlocks.indexOf(obj[0]);
+                var row = this._rowBlocks.indexOf(obj[0]);
                 var col = -1;
-                for (var j = 0; j < this.colBlocks.length; j++) {
-                    if (this.colBlocks[j] === obj[1]) {
+                for (var j = 0; j < this._colBlocks.length; j++) {
+                    if (this._colBlocks[j] === obj[1]) {
                         col = j;
                         break;
                     }
                 }
+
                 if (col == -1) {
                     continue;
                 }
@@ -388,7 +360,7 @@ function PitchDrumMatrix() {
 
     this._playAll = function() {
         // Play all of the pitch/drum combinations in the matrix.
-        this.logo.synth.stop();
+        this._logo.synth.stop();
 
         var pairs = [];
         var table = docById('drumTable');
@@ -402,6 +374,7 @@ function PitchDrumMatrix() {
                     break;
                 }
             }
+
             if (j === table.rows[i].cells.length) {
                 pairs.push([i, -1]);
             }
@@ -423,7 +396,7 @@ function PitchDrumMatrix() {
             this._setPairCell(pairs[i][0], pairs[i][1], cell, true);
         }
 
-        if (i < pairs.length - 1) { 
+        if (i < pairs.length - 1) {
             var that = this;
             setTimeout(function() {
                 var ii = i + 1;
@@ -452,10 +425,11 @@ function PitchDrumMatrix() {
                 if (i === coli) {
                     continue;
                 }
+
                 cell = table.rows[rowIndex].cells[i];
                 if (cell.style.backgroundColor === 'black') {
-                     var pitchBlock = this.rowBlocks[rowIndex - 1];
-                    var drumBlock = this.colBlocks[i - 1];
+                     var pitchBlock = this._rowBlocks[rowIndex - 1];
+                    var drumBlock = this._colBlocks[i - 1];
                     this.removeNode(pitchBlock, drumBlock);
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     this._setCellPitchDrum(cell.id, cell.parentNode.rowIndex, false);
@@ -463,8 +437,8 @@ function PitchDrumMatrix() {
             }
         }
 
-        var pitchBlock = this.rowBlocks[rowIndex - 1];
-        var drumBlock = this.colBlocks[colIndex - 1];
+        var pitchBlock = this._rowBlocks[rowIndex - 1];
+        var drumBlock = this._colBlocks[colIndex - 1];
 
         if (playNote) {
             this.addNode(pitchBlock, drumBlock);
@@ -488,15 +462,16 @@ function PitchDrumMatrix() {
         var drumHTML = table.rows[table.rows.length - 1].cells[colIndex].innerHTML.split('"');
         var drumName = getDrumSynthName(drumHTML[3]);
         // Both solfege and octave are extracted from HTML by getNote.
-        var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
+        var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
         var note = noteObj[0] + noteObj[1];
 
         if (playNote) {
-            var waitTime = this.logo.defaultBPMFactor * 1000 * 0.25;
-            this.logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), 0.125, 'poly');
+            var waitTime = this._logo.defaultBPMFactor * 1000 * 0.25;
+            this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), 0.125, 'poly');
+
             var that = this;
             setTimeout(function() {
-                that.logo.synth.trigger('C2', 0.125, drumName);
+                that._logo.synth.trigger('C2', 0.125, drumName);
             }, waitTime);
         }
     };
@@ -528,10 +503,10 @@ function PitchDrumMatrix() {
         // FIXME: Consolidate pitches into drum blocks.
 
         // First, hide the palettes as they will need updating.
-        for (var name in this.logo.blocks.palettes.dict) {
-            this.logo.blocks.palettes.dict[name].hideMenu(true);
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
-        this.logo.refreshCanvas();
+        this._logo.refreshCanvas();
 
         var pairs = [];
         var table = docById('drumTable');
@@ -563,7 +538,7 @@ function PitchDrumMatrix() {
             var drumHTML = table.rows[table.rows.length - 1].cells[col].innerHTML.split('"');
             var drumName = getDrumSynthName(drumHTML[3]);
             // Both solfege and octave are extracted from HTML by getNote.
-            var noteObj = this.logo.getNote(solfegeHTML, -1, 0, this.logo.keySignature[0]);
+            var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
             var pitch = noteObj[0];
             var octave = noteObj[1];
 
@@ -592,6 +567,6 @@ function PitchDrumMatrix() {
 
         // Create a new stack for the chunk.
         console.log(newStack);
-        this.logo.blocks.loadNewBlocks(newStack);
+        this._logo.blocks.loadNewBlocks(newStack);
     };
 };
