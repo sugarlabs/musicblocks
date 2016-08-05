@@ -75,7 +75,6 @@ function PitchStairCase () {
             var playcell = this._addButton(playrow, -1, 'play-button.svg', iconSize, _('play'));
 
             playcell.onclick=function() {
-                console.log(playcell.parentNode.id);
                 that._PlayOne(this);
             };
 
@@ -95,11 +94,11 @@ function PitchStairCase () {
             
             var solfege = this.Stairs[i][0];
             var octave = this.Stairs[i][1];
-            var solfegetonote = this.logo.getNote(solfege, octave, 0, this.logo.keySignature[this.logoturtle])[0];
+            var solfegetonote = this._logo.getNote(solfege, octave, 0, this._logo.keySignature[this.logoturtle])[0];
             var frequency = this.Stairs[i][2];
             
             var cell = row.insertCell(-1);
-            cell.style.width = (StairDivPosition.width)* parseFloat(DEFUALTFREQUENCY/this.Stairs[i][2]) * this._cellScale / 3 + 'px';
+            cell.style.width = (StairDivPosition.width)* parseFloat(DEFUALTFREQUENCY/frequency) * this._cellScale / 3 + 'px';
             cell.innerHTML = that.Stairs[i][0] + that.Stairs[i][1] + " "  + frequency.toFixed(2);
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
@@ -166,7 +165,7 @@ function PitchStairCase () {
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));        
         var stair = docById('stair' + stairno);
         stair.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;       
-        this.logo.synth.trigger(pitchnotes, 1, 'poly');
+        this._logo.synth.trigger(pitchnotes, 1, 'poly');
         
         setTimeout(function () {
                 stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -182,7 +181,7 @@ function PitchStairCase () {
             pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
             var row = docById('stair' + i);
             row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;        
-            this.logo.synth.trigger(pitchnotes, 1, 'poly');
+            this._logo.synth.trigger(pitchnotes, 1, 'poly');
         }
 
         setTimeout(function () {
@@ -202,7 +201,7 @@ function PitchStairCase () {
         var last = this.Stairs.length-1;
         var row = docById('stair' + last);
         row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
-        this.logo.synth.trigger(pitchnotes, 1, 'poly');
+        this._logo.synth.trigger(pitchnotes, 1, 'poly');
         this._Playnext(this.Stairs.length-2, -1);
     };
 
@@ -236,13 +235,12 @@ function PitchStairCase () {
         var row = docById('stair' + index);
         var previousrownumber = index-next;
         var previousrow = docById('stair' + previousrownumber);
-        console.log(previousrow);
         setTimeout(function () {
             if(previousrow != null) {
                 previousrow.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
             row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
-            that.logo.synth.trigger(pitchnotes, 1, 'poly');
+            that._logo.synth.trigger(pitchnotes, 1, 'poly');
             if(index < that.Stairs.length || index > -1) {
                 that._Playnext(index+next,next);
             }
@@ -251,11 +249,11 @@ function PitchStairCase () {
 
     this._save = function (stairno) {
         var that = this;
-        for (var name in this.logo.blocks.palettes.dict) {
-            this.logo.blocks.palettes.dict[name].hideMenu(true);
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
-        this.logo.refreshCanvas();
+        this._logo.refreshCanvas();
         var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'stair'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         var previousBlock = 0;
@@ -292,11 +290,11 @@ function PitchStairCase () {
 
                 previousBlock = hiddenidx;
         }
-        that.logo.blocks.loadNewBlocks(newStack);
+        that._logo.blocks.loadNewBlocks(newStack);
     };
 
     this.init = function (logo) {
-        this.logo = logo;
+        this._logo = logo;
         var that = this;
         console.log("init PitchStairCase");
         docById('pitchstaircase').style.display = 'inline';
@@ -357,14 +355,7 @@ function PitchStairCase () {
         row.style.top = Math.floor(playPitchDivPosition.top) + 'px';
         row.setAttribute('id', 'playAllStair');
 
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play chord') + '" alt="' + _('play chord') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        
+        var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play chord'));        
         cell.onclick=function() {
             that._playAll();
         }
@@ -375,14 +366,7 @@ function PitchStairCase () {
         row.style.left = Math.floor(StairDivPosition.left) + 'px';
         row.style.top = Math.floor(StairDivPosition.top) + 'px';
 
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/export-chunk.svg" title="' + _('save') + '" alt="' + _('save') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        var cell = this._addButton(row, -1, 'export-chunk.svg', iconSize, _('save'));        
         cell.onclick=function() {
             that._save(0);
         };
@@ -395,14 +379,7 @@ function PitchStairCase () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        var cell = row.insertCell(1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play UpDown'));        
         cell.onclick=function() {
             that._PlayUpandDown();
         };
@@ -441,14 +418,7 @@ function PitchStairCase () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         docById('musicratio2').classList.add('hasKeyboard');
         
-        var cell = row.insertCell(5);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/close-button.svg" title="' + _('close') + '" alt="' + _('close') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));        
         cell.onclick=function() {
             docById('pitchstaircase').style.visibility = 'hidden';
             docById('playPitch').style.visibility = 'hidden';
