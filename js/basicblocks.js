@@ -331,6 +331,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
 
+    var modewidgetBlock = new ProtoBlock('modewidget');
+    modewidgetBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['modewidget'] = modewidgetBlock;
+    modewidgetBlock.staticLabels.push(_('custom mode'));
+    modewidgetBlock.adjustWidthToLabel();
+    modewidgetBlock.stackClampZeroArgBlock();
+
+    var rhythmrulerBlock = new ProtoBlock('rhythmruler');
+    rhythmrulerBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['rhythmruler'] = rhythmrulerBlock;
+    rhythmrulerBlock.staticLabels.push(_('rhythm ruler'));
+    rhythmrulerBlock.adjustWidthToLabel();
+    rhythmrulerBlock.stackClampOneArgBlock();
+    rhythmrulerBlock.defaults.push(1);
+
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
@@ -579,6 +594,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     meter.twoArgMathBlock();
     meter.dockTypes[1] = 'number';
     meter.dockTypes[2] = 'number';
+
+    var setMasterBPMBlock = new ProtoBlock('setmasterbpm');
+    setMasterBPMBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setmasterbpm'] = setMasterBPMBlock;
+    setMasterBPMBlock.staticLabels.push(_('master beats per minute'));
+    setMasterBPMBlock.adjustWidthToLabel();
+    setMasterBPMBlock.oneArgBlock();
+    setMasterBPMBlock.defaults.push(90);
 
     var backwardBlock = new ProtoBlock('backward');
     backwardBlock.palette = palettes.dict['tone'];

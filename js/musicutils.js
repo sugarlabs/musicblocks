@@ -112,6 +112,9 @@ const MUSICALMODES = {
     'HIRAJOSHI': [1, 4, 1, 4, 2],
     'JAPANESE': [1, 4, 2, 3, 2],
     'FIBONACCI': [1, 1, 2, 3, 5],
+
+    // User definition overrides this constant
+    'CUSTOM': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 };
 
 const MAQAMTABLE = {
@@ -185,6 +188,7 @@ const MODENAMES = [
     [_('Japanese'), 'JAPANESE'],
     //.TRANS: Italian mathematician
     [_('Fibonacci'), 'FIBONACCI'],
+    [_('Custom'), 'CUSTOM'],
 ];
 
 const DRUMNAMES = [
@@ -237,6 +241,20 @@ const DRUMNAMES = [
 ];
 
 const DEFAULTDRUM = 'kick';
+
+var customMode = MUSICALMODES['CUSTOM'];
+
+
+function getModeName(name) {
+    for (var mode in MODENAMES) {
+        // console.log(MODENAMES[mode]);
+        if (MODENAMES[mode][1] === name) {
+            return MODENAMES[mode][0];
+        }
+    }
+    console.log(name + ' not found in MODENAMES');
+    return name;
+};
 
 
 function getDrumName(name) {
@@ -386,7 +404,11 @@ function _getStepSize(keySignature, pitch, direction) {
     // Returns how many half-steps to the next note in this key.
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
-    var halfSteps = MUSICALMODES[obj[1]];
+    if (obj[1] === 'CUSTOM') {
+        var halfSteps = customMode;
+    } else {
+        var halfSteps = MUSICALMODES[obj[1]];
+    }
 
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
         var thisScale = NOTESFLAT;
@@ -453,7 +475,11 @@ function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
-    var halfSteps = MUSICALMODES[obj[1]];
+    if (obj[1] === 'CUSTOM') {
+        var halfSteps = customMode;
+    } else {
+        var halfSteps = MUSICALMODES[obj[1]];
+    }
 
     var solfege = [];
     for (var i = 0; i < halfSteps.length; i++) {
@@ -481,7 +507,11 @@ function getInterval (interval, keySignature, pitch) {
     // Step size interval based on the position (pitch) in the scale
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
-    var halfSteps = MUSICALMODES[obj[1]];
+    if (obj[1] === 'CUSTOM') {
+        var halfSteps = customMode;
+    } else {
+        var halfSteps = MUSICALMODES[obj[1]];
+    }
 
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
         var thisScale = NOTESFLAT;
@@ -765,8 +795,8 @@ function getSolfege(note) {
 };
 
 
-function getNumber(solfege, octave) {
-    // converts a note to a number
+function getNumber(notename, octave) {
+    // Converts a note, e.g., C, and octave to a number
 
     if (octave < 1) {
         var num = 0;
@@ -775,11 +805,12 @@ function getNumber(solfege, octave) {
     } else {
         var num = 12 * (octave - 1);
     }
-    solfege = String(solfege);
-    if (solfege.substring(0, 1) in NOTESTEP) {
-        num += NOTESTEP[solfege.substring(0, 1)];
-        if (solfege.length >= 1) {
-            var delta = solfege.substring(1);
+
+    notename = String(notename);
+    if (notename.substring(0, 1) in NOTESTEP) {
+        num += NOTESTEP[notename.substring(0, 1)];
+        if (notename.length >= 1) {
+            var delta = notename.substring(1);
             if (delta === 'bb' || delta === '♭♭') {
                 num -= 2;
             } else if (delta === '##' || delta === '♯♯') {
@@ -817,11 +848,13 @@ function getNumNote(value, delta) {
     return [note, octave + 1];
 };
 
+
 function isInt(value) {
     return !isNaN(value) && 
     parseInt(Number(value)) == value && 
     !isNaN(parseInt(value, 10));
 }
+
 
 function reducedFraction(a, b) {
     greatestCommonMultiple = function(a, b) {
@@ -835,6 +868,7 @@ function reducedFraction(a, b) {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
     }
 };
+
 
 function Synth () {
     // Isolate synth functions here.
