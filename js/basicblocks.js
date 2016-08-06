@@ -338,6 +338,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     modewidgetBlock.adjustWidthToLabel();
     modewidgetBlock.stackClampZeroArgBlock();
 
+    var pitchstaircaseBlock = new ProtoBlock('pitchstaircase');
+    pitchstaircaseBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['pitchstaircase'] = pitchstaircaseBlock;
+    pitchstaircaseBlock.staticLabels.push(_('pitchstaircase'));
+    pitchstaircaseBlock.adjustWidthToLabel();
+    pitchstaircaseBlock.stackClampZeroArgBlock();
+
     var rhythmrulerBlock = new ProtoBlock('rhythmruler');
     rhythmrulerBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['rhythmruler'] = rhythmrulerBlock;
@@ -903,16 +910,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmrulerBlock.adjustWidthToLabel();
     rhythmrulerBlock.stackClampOneArgBlock();
     rhythmrulerBlock.defaults.push(1);
-
-    // PITCHSTAIRCASE
-
-    var pitchstaircaseBlock = new ProtoBlock('pitchstaircase');
-    pitchstaircaseBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['pitchstaircase'] = pitchstaircaseBlock;
-    pitchstaircaseBlock.staticLabels.push(_('pitchstaircase'));
-    pitchstaircaseBlock.adjustWidthToLabel();
-    pitchstaircaseBlock.stackClampZeroArgBlock();
-
     
     // TURTLE PALETTE
 
