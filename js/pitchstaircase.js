@@ -39,7 +39,7 @@ function PitchStairCase () {
         return cell;
     };
 
-    this._makeStairs = function (start, isStairDeleted) {
+    this._makeStairs = function (start, isStepDeleted) {
         var that = this;
         var iconSize = Math.floor(this._cellScale * 24);
         var stairDiv = docById('pitchstaircase');
@@ -47,7 +47,7 @@ function PitchStairCase () {
         var playPitchDiv = docById('playPitch');
         var playPitchDivPosition = playPitchDiv.getBoundingClientRect();
 
-        if (!isStairDeleted) {
+        if (!isStepDeleted) {
             var stairsLength = this.Stairs.length;
         } else {
             var stairsLength = this.Stairs.length-1;
@@ -141,27 +141,29 @@ function PitchStairCase () {
         var oldcell = event.target;
         var frequency = that.Stairs[oldcell.parentNode.id[5]][2];
         var obj = frequencyToPitch(parseFloat(frequency) / inputNum);
-        var flag = 0;
-        var isStairDeleted = 1;
+        var foundStep = false;
+        var isStepDeleted = true;
 
         for (var i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
                 this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum]);
-                flag = 1;
+                foundStep = true;
                 break;
             }
+
             if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
                 this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum]);
-                flag = 1;
-                isStairDeleted = 0;
+                foundStep = true;
+                isStepDeleted = false;
                 break;
             }
         }
-        if (flag === 0) {
+
+        if (!foundStep) {
             this.Stairs.push([obj[0], obj[1], parseFloat(frequency)/inputNum]);
         }
 
-        this._makeStairs(i, isStairDeleted);
+        this._makeStairs(i, isStepDeleted);
     };
 
     this._playOne = function (cell) {
@@ -413,7 +415,7 @@ function PitchStairCase () {
         docById('musicratio1').classList.add('hasKeyboard');
 
         var cell = row.insertCell(3);
-        cell.innerHTML = ':';
+        cell.innerHTML = '<h2>:</h2>';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         var cell = row.insertCell(4);

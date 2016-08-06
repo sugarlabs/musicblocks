@@ -2366,7 +2366,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
             if (args[0].slice(0, 4) === 'http') {
                 drumname = args[0];
             } else {
-                for (drum in DRUMNAMES) { 
+                for (var drum in DRUMNAMES) { 
                     if (DRUMNAMES[drum][0] === args[0]) {
                         drumname = DRUMNAMES[drum][1];
                         break;
@@ -2859,7 +2859,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
             break;
         case 'setdrum':
             var drumname = 'kick';
-            for (drum in DRUMNAMES) { 
+            for (var drum in DRUMNAMES) { 
                 if (DRUMNAMES[drum][0] === args[0]) {
                     drumname = DRUMNAMES[drum][1];
                 } else if (DRUMNAMES[drum][1] === args[0]) {
