@@ -1,4 +1,3 @@
-
 function Tempo () {
     var canvas; 
     var ctx; 
@@ -16,6 +15,14 @@ function Tempo () {
     this.BPM;
     this.BPMBlock;
 
+    this.updateBPM = function() {
+        var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
+        this.logo.blocks.blockList[bpmnumberblock].value = this.BPMB;
+        this.logo.blocks.blockList[bpmnumberblock].text.text = this.BPM;
+        this.logo.blocks.blockList[bpmnumberblock].updateCache();
+        this.logo.refreshCanvas();
+    };
+
     this.stop = function () {
           tempmx = mx;
           mx=0;
@@ -27,28 +34,23 @@ function Tempo () {
     };
 
     this.useBPM = function () {
-        console.log("hello");
         this.BPM = document.getElementById("BPMNUMBER").value
-        var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
-        blocks.blockList[bpmnumberblock].value = this.BPMB;
+        this.updateBPM();        
         this.velocity = parseFloat(WIDTH) / 60 * this.BPM;
         mx = parseFloat(this.velocity) / 200;
     };
 
     this.speedUp = function () {
-        this.BPM = this.BPM + 5;
-        var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
-        blocks.blockList[bpmnumberblock].value = this.BPMB;
-        
+        this.BPM = parseFloat(this.BPM) + 5;
+        this.updateBPM();
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
         mx = parseFloat(this.velocity) / 200;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
     this.slowDown = function () {
-        this.BPM = this.BPM - 5;
-        var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
-        blocks.blockList[bpmnumberblock].value = this.BPMB;
+        this.BPM = parseFloat(this.BPM) - 5;
+        this.updateBPM();
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
         mx = parseFloat(this.velocity) / 200;
         document.getElementById("BPMNUMBER").value = this.BPM;
