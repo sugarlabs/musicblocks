@@ -39,13 +39,19 @@ function PitchStairCase () {
         return cell;
     };
 
-    this._makeStairs = function (start) {
+    this._makeStairs = function (start, flag) {
         var that = this;
         var iconSize = Math.floor(this._cellScale * 24);
         var stairDiv = docById('pitchstaircase');
         var stairDivPosition = stairDiv.getBoundingClientRect();
         var playPitchDiv = docById('playPitch');
         var playPitchDivPosition = playPitchDiv.getBoundingClientRect();
+
+        if(flag === 2) {
+            var noofstairs = this.Stairs.length;
+        } else {
+            var noofstairs = this.Stairs.length-1;
+        }
 
         if (start === -1) {
             start = 0;
@@ -57,7 +63,7 @@ function PitchStairCase () {
             playTable.cellPadding = 0;
             playPitchDiv.appendChild(playTable);
         } else {
-            for (var j = start; j < this.Stairs.length - 1; j++) {
+            for (var j = start; j < noofstairs; j++) {
                 docById('playStair' + j).remove();
                 docById('stairTable' + j).remove();
             }
@@ -145,16 +151,15 @@ function PitchStairCase () {
             }
             if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
                 this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum]);
-                flag = 1;
+                flag = 2;
                 break;
             }
         }
-
         if (flag === 0) {
             this.Stairs.push([obj[0], obj[1], parseFloat(frequency)/inputNum]);
         }
 
-        this._makeStairs(i);
+        this._makeStairs(i, flag);
     };
 
     this._playOne = function (cell) {
@@ -436,6 +441,6 @@ function PitchStairCase () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        this._makeStairs(-1);
+        this._makeStairs(-1, 0);
         };
 };
