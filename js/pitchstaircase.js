@@ -39,7 +39,7 @@ function PitchStairCase () {
         return cell;
     };
 
-    this._makeStairs = function (start, flag) {
+    this._makeStairs = function (start, isStairDeleted) {
         var that = this;
         var iconSize = Math.floor(this._cellScale * 24);
         var stairDiv = docById('pitchstaircase');
@@ -47,10 +47,10 @@ function PitchStairCase () {
         var playPitchDiv = docById('playPitch');
         var playPitchDivPosition = playPitchDiv.getBoundingClientRect();
 
-        if(flag === 2) {
-            var noofstairs = this.Stairs.length;
+        if (!isStairDeleted) {
+            var stairsLength = this.Stairs.length;
         } else {
-            var noofstairs = this.Stairs.length-1;
+            var stairsLength = this.Stairs.length-1;
         }
 
         if (start === -1) {
@@ -63,7 +63,7 @@ function PitchStairCase () {
             playTable.cellPadding = 0;
             playPitchDiv.appendChild(playTable);
         } else {
-            for (var j = start; j < noofstairs; j++) {
+            for (var j = start; j < stairsLength; j++) {
                 docById('playStair' + j).remove();
                 docById('stairTable' + j).remove();
             }
@@ -142,6 +142,7 @@ function PitchStairCase () {
         var frequency = that.Stairs[oldcell.parentNode.id[5]][2];
         var obj = frequencyToPitch(parseFloat(frequency) / inputNum);
         var flag = 0;
+        var isStairDeleted = 1;
 
         for (var i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
@@ -151,7 +152,8 @@ function PitchStairCase () {
             }
             if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
                 this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum]);
-                flag = 2;
+                flag = 1;
+                isStairDeleted = 0;
                 break;
             }
         }
@@ -159,7 +161,7 @@ function PitchStairCase () {
             this.Stairs.push([obj[0], obj[1], parseFloat(frequency)/inputNum]);
         }
 
-        this._makeStairs(i, flag);
+        this._makeStairs(i, isStairDeleted);
     };
 
     this._playOne = function (cell) {
@@ -441,6 +443,6 @@ function PitchStairCase () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        this._makeStairs(-1, 0);
+        this._makeStairs(-1, 1);
         };
 };
