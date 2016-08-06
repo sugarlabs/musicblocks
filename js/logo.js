@@ -2722,7 +2722,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
             break;
         case 'osctime':
         case 'note':
-            console.log("in note");
             // We queue up the child flow of the note clamp and
             // once all of the children are run, we trigger a
             // _playnote_ event, then wait for the note to play.
@@ -3606,7 +3605,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
         }
 
         if (this.inPitchDrumMatrix) {
-            // FIME
+            // FIXME
         } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
                 pitchtimematrix.addColBlock(blk, 1);
@@ -3654,7 +3653,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
             // note, or we cache the duration and set the wait to
             // zero. FIXME: Will not work when using dup and skip.
             if (this.tie[turtle]) {
-
                 // We need to check to see if we are tying together
                 // similar notes.
                 if (this.tieCarryOver[turtle] > 0) {
@@ -3667,6 +3665,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
                                 match = false;
                                 break;
                             }
+
                             if (this.tieNote[turtle][i][1] != this.noteOctaves[turtle][i]) {
                                 match = false;
                                 break;
@@ -3766,6 +3765,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
             if (duration > 0) {
                 this.turtleTime[turtle] += ((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle];
             }
+
             if (!this.lilypondSaveOnly) {
                 if (duration > 0) {
                     this._doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle] - turtleLag, 0));
@@ -3905,11 +3905,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
                                 } else {
                                     // FIXME: Only if we are in a Drum clamp???
                                     // Look for any notes in the chord that might be in the pitchDrumTable.
-                                    for (j = 0; j < notes.length; j++) {
-                                        if (notes[j] in logo.pitchDrumTable[turtle]) {
-                                            logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[j]]);
+                                    for (var d = 0; d < notes.length; d++) {
+                                        if (notes[d] in logo.pitchDrumTable[turtle]) {
+                                            logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[d]]);
                                         } else {
-                                            logo.synth.trigger(notes[j], beatValue, 'default');
+                                            logo.synth.trigger(notes[d], beatValue, 'default');
                                         }
                                     }
                                 }
