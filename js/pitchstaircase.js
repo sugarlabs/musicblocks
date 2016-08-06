@@ -41,12 +41,12 @@ function PitchStairCase () {
 
     this._makeStairs = function (start) {
         var that = this;
-        var iconSize = Math.floor(this._cellScale * 24);     
-        var StairDiv = docById('pitchstaircase');
-        var StairDivPosition = StairDiv.getBoundingClientRect();
+        var iconSize = Math.floor(this._cellScale * 24);
+        var stairDiv = docById('pitchstaircase');
+        var stairDivPosition = stairDiv.getBoundingClientRect();
         var playPitchDiv = docById('playPitch');
         var playPitchDivPosition = playPitchDiv.getBoundingClientRect();
-        
+
         if (start === -1) {
             start = 0;
             var playTable = document.createElement('TABLE');
@@ -58,11 +58,11 @@ function PitchStairCase () {
             playPitchDiv.appendChild(playTable);
         } else {
             for (var j = start; j < this.Stairs.length - 1; j++) {
-                docById("playStair" + j).remove();
-                docById("stairTable" + j).remove();
+                docById('playStair' + j).remove();
+                docById('stairTable' + j).remove();
             }
         }
-        
+
         var playTable = docById('playStairTable');
 
         for (var i = start; i < that.Stairs.length; i++) {
@@ -70,12 +70,12 @@ function PitchStairCase () {
             var playrow = header.insertRow(i);
             playrow.style.left = Math.floor(playPitchDivPosition.left) + 'px';
             playrow.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            playrow.setAttribute('id', "playStair" + i);
+            playrow.setAttribute('id', 'playStair' + i);
 
             var playcell = this._addButton(playrow, -1, 'play-button.svg', iconSize, _('play'));
 
             playcell.onclick=function() {
-                that._PlayOne(this);
+                that._playOne(this);
             };
 
             var StairTable = document.createElement('TABLE');
@@ -84,22 +84,22 @@ function PitchStairCase () {
             StairTable.style.borderCollapse = 'collapse';
             StairTable.cellSpacing = 0;
             StairTable.cellPadding = 0;
-            StairDiv.appendChild(StairTable);
+            stairDiv.appendChild(StairTable);
 
-            var header = StairTable.createTHead();          
+            var header = StairTable.createTHead();
             var row = header.insertRow(-1);
-            row.style.left = Math.floor(StairDivPosition.left) + 'px';
+            row.style.left = Math.floor(stairDivPosition.left) + 'px';
             row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             row.setAttribute('id','stair' + i)
-            
+
             var solfege = this.Stairs[i][0];
             var octave = this.Stairs[i][1];
             var solfegetonote = this._logo.getNote(solfege, octave, 0, this._logo.keySignature[this.logoturtle])[0];
             var frequency = this.Stairs[i][2];
-            
+
             var cell = row.insertCell(-1);
-            cell.style.width = (StairDivPosition.width)* parseFloat(DEFUALTFREQUENCY/frequency) * this._cellScale / 3 + 'px';
-            cell.innerHTML = that.Stairs[i][0] + that.Stairs[i][1] + " "  + frequency.toFixed(2);
+            cell.style.width = (stairDivPosition.width) * parseFloat(DEFUALTFREQUENCY/frequency) * this._cellScale / 3 + 'px';
+            cell.innerHTML = that.Stairs[i][0] + that.Stairs[i][1] + ' ' + frequency.toFixed(2);
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = playrow.offsetHeight + 'px';
@@ -114,7 +114,7 @@ function PitchStairCase () {
     this._dissectStair = function (event) {
         var that = this;
         var inputNum1 = docById('musicratio1').value;
-        
+
         if (isNaN(inputNum1)) {
             inputNum1 = 3;
         } else {
@@ -123,13 +123,13 @@ function PitchStairCase () {
 
         docById('musicratio1').value = inputNum1;
         var inputNum2 = docById('musicratio2').value;
-        
+
         if (isNaN(inputNum2)) {
             inputNum2 = 2;
         } else {
             inputNum2 = Math.abs(Math.floor(inputNum2));
         }
-       
+
         docById('musicratio2').value = inputNum2;
         inputNum = parseFloat(inputNum2 / inputNum1);
         var oldcell = event.target;
@@ -157,30 +157,30 @@ function PitchStairCase () {
         this._makeStairs(i);
     };
 
-    this._PlayOne = function (cell) {
+    this._playOne = function (cell) {
         var that = this;
         var stairno = cell.parentNode.id[9];
         var pitchnotes = [];
-        var note = this.Stairs[stairno][0] + this.Stairs[stairno][1];        
-        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));        
+        var note = this.Stairs[stairno][0] + this.Stairs[stairno][1];
+        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var stair = docById('stair' + stairno);
-        stair.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;       
+        stair.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
         this._logo.synth.trigger(pitchnotes, 1, 'poly');
-        
+
         setTimeout(function () {
-                stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+            stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
         }, 1000)
     };
 
     this._playAll = function () {
         var that = this;
         var pitchnotes = [];
-        
-        for (var i=0; i < this.Stairs.length; i++) {
+
+        for (var i = 0; i < this.Stairs.length; i++) {
             var note = this.Stairs[i][0] + this.Stairs[i][1];
             pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
             var row = docById('stair' + i);
-            row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;        
+            row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
             this._logo.synth.trigger(pitchnotes, 1, 'poly');
         }
 
@@ -190,7 +190,6 @@ function PitchStairCase () {
                 stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
         }, 1000);
-
     };
 
     this._PlayUpandDown = function () {
@@ -207,28 +206,30 @@ function PitchStairCase () {
 
     this._Playnext = function (index, next) {
         var that = this;
-        if(index === this.Stairs.length) {
+        if (index === this.Stairs.length) {
             setTimeout(function () {
-            for (var i = 0; i < that.Stairs.length; i++) {
-                var stair = docById('stair' + i);
-                stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            }
-        }, 1000);
-            
+                for (var i = 0; i < that.Stairs.length; i++) {
+                    var stair = docById('stair' + i);
+                    stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                }
+            }, 1000);
             return;
         }
+
         if(index === -1) {
             setTimeout(function () {
-            for (var i = 0; i < that.Stairs.length; i++) {
-                var stair = docById('stair' + i);
-                stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
-            }
-        }, 1000);
+                for (var i = 0; i < that.Stairs.length; i++) {
+                    var stair = docById('stair' + i);
+                    stair.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+                }
+            }, 1000);
+
             setTimeout(function () {
                 that._Playnext(0,1);
-            },200);
+            }, 200);
             return;
         }
+
         var pitchnotes = [];
         var note = this.Stairs[index][0] + this.Stairs[index][1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
@@ -239,6 +240,7 @@ function PitchStairCase () {
             if(previousrow != null) {
                 previousrow.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
+
             row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
             that._logo.synth.trigger(pitchnotes, 1, 'poly');
             if(index < that.Stairs.length || index > -1) {
@@ -279,7 +281,7 @@ function PitchStairCase () {
                 } else {
                     newStack.push([sineblockidx, 'sine', 0, 0, [previousBlock, frequencyidx, hiddenidx]]);
                     newStack.push([frequencyidx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [sineblockidx]]);
-                } 
+                }
 
                 if (i === that.Stairs.length - 1) {
                     newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, null]]);
@@ -296,7 +298,7 @@ function PitchStairCase () {
     this.init = function (logo) {
         this._logo = logo;
         var that = this;
-        console.log("init PitchStairCase");
+        console.log('init PitchStairCase');
         docById('pitchstaircase').style.display = 'inline';
         console.log('setting PitchStairCase visible');
         docById('pitchstaircase').style.visibility = 'visible';
@@ -313,10 +315,10 @@ function PitchStairCase () {
         docById('pitchstaircase').style.overflowY = 'auto';
         docById('playPitch').style.height = Math.floor(w / 4) + 'px';
         docById('playPitch').style.overflowY = 'hidden';
-        
+
         var tables = document.getElementsByTagName('TABLE');
         var noofTables = tables.length
-       
+
         for (var i = 0; i < noofTables; i++) {
             tables[0].parentNode.removeChild(tables[0]);
         }
@@ -329,11 +331,11 @@ function PitchStairCase () {
         x.cellSpacing = 0;
         x.cellPadding = 0;
 
-        var StairDiv = docById('pitchstaircase');
-        StairDiv.style.paddingTop = 0 + 'px';
-        StairDiv.style.paddingLeft = 0 + 'px';
-        StairDiv.appendChild(x);
-        StairDivPosition = StairDiv.getBoundingClientRect();
+        var stairDiv = docById('pitchstaircase');
+        stairDiv.style.paddingTop = 0 + 'px';
+        stairDiv.style.paddingLeft = 0 + 'px';
+        stairDiv.appendChild(x);
+        stairDivPosition = stairDiv.getBoundingClientRect();
 
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'playAllStairTable');
@@ -355,7 +357,7 @@ function PitchStairCase () {
         row.style.top = Math.floor(playPitchDivPosition.top) + 'px';
         row.setAttribute('id', 'playAllStair');
 
-        var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play chord'));        
+        var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play chord'));
         cell.onclick=function() {
             that._playAll();
         }
@@ -363,10 +365,10 @@ function PitchStairCase () {
         var table = docById('buttonTable');
         var header = table.createTHead();
         var row = header.insertRow(0);
-        row.style.left = Math.floor(StairDivPosition.left) + 'px';
-        row.style.top = Math.floor(StairDivPosition.top) + 'px';
+        row.style.left = Math.floor(stairDivPosition.left) + 'px';
+        row.style.top = Math.floor(stairDivPosition.top) + 'px';
 
-        var cell = this._addButton(row, -1, 'export-chunk.svg', iconSize, _('save'));        
+        var cell = this._addButton(row, -1, 'export-chunk.svg', iconSize, _('save'));
         cell.onclick=function() {
             that._save(0);
         };
@@ -379,7 +381,7 @@ function PitchStairCase () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play UpDown'));        
+        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play UpDown'));
         cell.onclick=function() {
             that._PlayUpandDown();
         };
@@ -417,8 +419,8 @@ function PitchStairCase () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         docById('musicratio2').classList.add('hasKeyboard');
-        
-        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));        
+
+        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             docById('pitchstaircase').style.visibility = 'hidden';
             docById('playPitch').style.visibility = 'hidden';
