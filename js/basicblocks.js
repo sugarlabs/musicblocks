@@ -921,8 +921,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['tempo'] = tempoBlock;
     tempoBlock.staticLabels.push(_('tempo'));
     tempoBlock.adjustWidthToLabel();
-    tempoBlock.flowClampOneArgBlock();
-    tempoBlock.defaults.push(90);
+    tempoBlock.stackClampZeroArgBlock();
 
 
 

@@ -730,7 +730,7 @@ function ModeWidget() {
                     this._logo.blocks.blockList[this._modeBlock].value = getModeName(mode);
                     this._logo.blocks.blockList[this._modeBlock].text.text = getModeName(mode);
                     this._logo.blocks.blockList[this._modeBlock].updateCache();
-;
+
                     this._logo.refreshCanvas();
                 }
                 return;
