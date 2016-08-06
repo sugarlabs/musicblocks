@@ -17,10 +17,11 @@ function Tempo () {
 
     this.updateBPM = function() {
         var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
-        this.logo.blocks.blockList[bpmnumberblock].value = this.BPMB;
+        this.logo.blocks.blockList[bpmnumberblock].value = parseFloat(this.BPM);
         this.logo.blocks.blockList[bpmnumberblock].text.text = this.BPM;
         this.logo.blocks.blockList[bpmnumberblock].updateCache();
         this.logo.refreshCanvas();
+        saveLocally();
     };
 
     this.stop = function () {
