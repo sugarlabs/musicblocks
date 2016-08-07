@@ -38,14 +38,14 @@ function Tempo () {
         this.BPM = document.getElementById("BPMNUMBER").value
         this.updateBPM();        
         this.velocity = parseFloat(WIDTH) / 60 * this.BPM;
-        mx = parseFloat(this.velocity) / 200;
+        mx = parseFloat(this.velocity) / 150;
     };
 
     this.speedUp = function () {
         this.BPM = parseFloat(this.BPM) + 5;
         this.updateBPM();
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
-        mx = parseFloat(this.velocity) / 200;
+        mx = parseFloat(this.velocity) / 150;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
@@ -53,7 +53,7 @@ function Tempo () {
         this.BPM = parseFloat(this.BPM) - 5;
         this.updateBPM();
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
-        mx = parseFloat(this.velocity) / 200;
+        mx = parseFloat(this.velocity) / 150;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
@@ -260,7 +260,7 @@ function Tempo () {
         };
 
         this.velocity = parseFloat(WIDTH) / 60 * this.BPM;
-        mx = parseFloat(that.velocity) / 200;
+        mx = parseFloat(that.velocity) / 150;
 
         this._intervalID = setInterval(function() {
             that.draw();
