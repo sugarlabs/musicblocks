@@ -14,8 +14,10 @@ function Tempo () {
     this.velocity = 0;
     this.BPM;
     this.BPMBlock;
+    this.direction = 0;
 
-    this.updateBPM = function() {
+    this.updateBPM = function(event) {
+        console.log(event);
         var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
         this.logo.blocks.blockList[bpmnumberblock].value = parseFloat(this.BPM);
         this.logo.blocks.blockList[bpmnumberblock].text.text = this.BPM;
@@ -38,14 +40,14 @@ function Tempo () {
         this.BPM = document.getElementById("BPMNUMBER").value
         this.updateBPM();        
         this.velocity = parseFloat(WIDTH) / 60 * this.BPM;
-        mx = parseFloat(this.velocity) / 150;
+        mx = parseFloat(this.velocity) / 150 * this.direction;
     };
 
     this.speedUp = function () {
         this.BPM = parseFloat(this.BPM) + 5;
         this.updateBPM();
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
-        mx = parseFloat(this.velocity) / 150;
+        mx = parseFloat(this.velocity) / 150 * this.direction;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
@@ -53,7 +55,7 @@ function Tempo () {
         this.BPM = parseFloat(this.BPM) - 5;
         this.updateBPM();
         this.velocity = parseFloat(this.BPM) / 60 * WIDTH;
-        mx = parseFloat(this.velocity) / 150;
+        mx = parseFloat(this.velocity) / 150 * this.direction;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
 
@@ -73,20 +75,19 @@ function Tempo () {
           ctx.arc(x, y, 25, 0, Math.PI * 2); 
         ctx.fill(); 
         ctx.closePath();
-        if (x + mx > canvas.width || x + mx < 0) {
-            if(x + mx > canvas.width) {
-                tempmx = -1;
-            } else {
-                tempmx = 1;
-            }
+        x += mx; 
+        if (this.direction === 1 && x + mx > canvas.width) {
+            x = canvas.width;
+            this.direction = -1;
             mx = -mx;
             this.logo.synth.trigger('C4', 0.125, 'poly');
         }
-        if (y + my > canvas.height || y + my < 0) {
-            my = -my; 
+        if (this.direction === -1 && x + mx < 0) {
+            x = 0;
+            this.direction = 1; 
+            mx = -mx;
+            this.logo.synth.trigger('C4', 0.125, 'poly');
         }
-
-        x += mx; 
     };
 
     this._addButton = function(row, colIndex, icon, iconSize, label) {
@@ -133,7 +134,6 @@ function Tempo () {
         canvas = document.getElementById("TempoCanvas"); 
 
         canvas.style.left = TempoDiv.style.left;
-        canvas.style.top =  TempoDiv.style.top;
 
         ctx = canvas.getContext("2d");
         console.log(ctx);
@@ -141,8 +141,9 @@ function Tempo () {
 
         var iconSize = Math.floor(this.cellScale * 24);
 
+        console.log(canvas.style.top)   ;
         x = canvas.width;
-        y = 250;
+        y = this.cellScale * 200;
 
         var tables = document.getElementsByTagName('TABLE');
         var noofTables = tables.length;
@@ -230,21 +231,11 @@ function Tempo () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;  
         docById('BPMNUMBER').classList.add('hasKeyboard');
-
-        var cell = this._addButton(row, 4, 'apply.svg', iconSize, _('apply BPM'));
-        cell.onclick=function() {
+        docById('TempoCanvas').addEventListener('dblclick', function() {
             that.useBPM();
-        };
+        })
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        };
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        };
-
-        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 4, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             docById('TempoDiv').style.visibility = 'hidden';
             docById('TempoCanvas').style.visibility = 'hidden';
@@ -260,6 +251,7 @@ function Tempo () {
         };
 
         this.velocity = parseFloat(WIDTH) / 60 * this.BPM;
+        this.direction = 1;
         mx = parseFloat(that.velocity) / 150;
 
         this._intervalID = setInterval(function() {
