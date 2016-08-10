@@ -923,8 +923,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     tempoBlock.adjustWidthToLabel();
     tempoBlock.stackClampZeroArgBlock();
 
+    //PITCHSLIDER
 
-
+    var pitchsliderBlock = new ProtoBlock('pitchslider');
+    pitchsliderBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['pitchslider'] = pitchsliderBlock;
+    pitchsliderBlock.staticLabels.push(_('pitchslider'));
+    pitchsliderBlock.adjustWidthToLabel();
+    pitchsliderBlock.stackClampZeroArgBlock();
     
     // TURTLE PALETTE
 
