@@ -17,7 +17,6 @@ function Tempo () {
     this.direction = 0;
 
     this.updateBPM = function(event) {
-        console.log(event);
         var bpmnumberblock = blocks.blockList[this.BPMBlock].connections[1];
         this.logo.blocks.blockList[bpmnumberblock].value = parseFloat(this.BPM);
         this.logo.blocks.blockList[bpmnumberblock].text.text = this.BPM;
@@ -141,7 +140,6 @@ function Tempo () {
 
         var iconSize = Math.floor(this.cellScale * 24);
 
-        console.log(canvas.style.top)   ;
         x = canvas.width;
         y = this.cellScale * 200;
 
@@ -233,7 +231,13 @@ function Tempo () {
         docById('BPMNUMBER').classList.add('hasKeyboard');
         docById('TempoCanvas').addEventListener('dblclick', function() {
             that.useBPM();
-        })
+        });
+
+        docById('BPMNUMBER').addEventListener('keyup', function(e) {
+            if (e.keyCode === 13) {
+                that.useBPM();
+            }
+        });
 
         var cell = this._addButton(row, 4, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
