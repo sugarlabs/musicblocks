@@ -48,7 +48,7 @@ const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canvas, blocks, turtles, stage,
+function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitchslider, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -111,6 +111,8 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
     this.inPitchStairCase = false;
 
     this.inTempo = false;
+
+    this.inPitchSlider = false;
 
     this._currentDrumBlock = null;
 
@@ -2113,7 +2115,19 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             };
             logo._setListener(turtle, listenerName, __listener);
             break;
+        case 'pitchslider':
+            console.log("running PitchSlider");
+            childFlow = args[0];
+            childFlowCount = 1;
+            logo.inPitchSlider = true;
 
+            var listenerName = '_pitchslider_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+            var __listener = function (event) {
+                pitchslider.init(logo);
+            };
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         case 'pitchdrummatrix':
             if (args.length === 1) {
                 childFlow = args[0];
@@ -3295,6 +3309,8 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                     // TODO: add frequency instead of approximate note to matrix
                     pitchtimematrix.solfegeNotes.push(getSolfege(obj[0]));
                     pitchtimematrix.solfegeOctaves.push(obj[1]);
+                } else if (logo.inPitchSlider) {
+                    
                 } else {
                     logo.oscList[turtle].push(blocks.blockList[blk].name);
 
