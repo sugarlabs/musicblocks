@@ -1,5 +1,6 @@
 function PitchSlider () {
 
+    this.startFrequency;
 	this._addButton = function(row, colIndex, icon, iconSize, label) {
         var cell = row.insertCell();
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -18,6 +19,19 @@ function PitchSlider () {
         }
 
         return cell;
+    };
+
+    this._play = function () {
+        var obj = frequencyToPitch(this.startFrequency);
+        var pitchnotes = [];
+        var note = obj[0] + obj[1];
+        pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
+        var slider = docById('slider');
+        slider.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
+        this._logo.synth.trigger(pitchnotes, 1, 'poly');
+        setTimeout(function() {
+            slider.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
+        }, 1000);
     };
 
 	this.init = function (logo) {
@@ -62,7 +76,20 @@ function PitchSlider () {
         row.style.left = Math.floor(sliderDivPosition.left) + 'px';
         row.style.top = Math.floor(sliderDivPosition.top) + 'px';
 
-        var cell = this._addButton(row, -1, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play'));
+        cell.onclick=function() {
+            that._play();
+        };
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        };
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        };
+
+        var cell = this._addButton(row, 1, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             docById('pitchSliderDiv').style.visibility = 'hidden';
         };
@@ -75,5 +102,28 @@ function PitchSlider () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
+        var x = document.createElement('TABLE');
+        x.setAttribute('id', 'pitchslider');
+        x.style.textAlign = 'center';
+        x.style.borderCollapse = 'collapse';
+        x.cellSpacing = 0;
+        x.cellPadding = 0;
+        sliderDiv.appendChild(x);
+
+        var table = docById('pitchslider');
+        var row = table.insertRow(0);
+        row.style.left = Math.floor(sliderDivPosition.left) + 'px';
+        row.style.top = Math.floor(sliderDivPosition.top) + 'px';
+        row.setAttribute('id', 'slider');
+
+        var cell = row.insertCell(-1);
+        cell.style.width = sliderDivPosition.width + 'px';
+        cell.innerHTML = this.startFrequency + "-" + 2 * this.startFrequency;
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.lineHeight = 60 + '%';
+        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+        
 	};
 };
