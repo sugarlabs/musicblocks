@@ -2117,6 +2117,8 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitch
             break;
         case 'pitchslider':
             console.log("running PitchSlider");
+
+            pitchslider.Sliders = [];
             childFlow = args[0];
             childFlowCount = 1;
             logo.inPitchSlider = true;
@@ -3310,7 +3312,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitch
                     pitchtimematrix.solfegeNotes.push(getSolfege(obj[0]));
                     pitchtimematrix.solfegeOctaves.push(obj[1]);
                 } else if (logo.inPitchSlider) {
-                    pitchslider.startFrequency = args[0];      
+                    pitchslider.Sliders.push([args[0], args[0]]);
                 } else {
                     logo.oscList[turtle].push(blocks.blockList[blk].name);
 
