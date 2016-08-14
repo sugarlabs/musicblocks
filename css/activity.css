@@ -424,7 +424,7 @@ table {
 
 #moveSliderDiv {
   position: absolute;
-  top: 60%;
+  top: 67%;
   left: 30%;
   border-style: solid;
   border: 0 !important;
@@ -447,6 +447,10 @@ table {
   position: absolute;
   top : 23%;
   left : 20%;  
+}
+
+#sliderInCell {
+    position: absolute;
 }
 
 input.BPMNUMBER {
