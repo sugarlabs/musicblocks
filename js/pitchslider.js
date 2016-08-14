@@ -24,33 +24,70 @@ function PitchSlider () {
 
     this._play = function (cell) {
         var cellIndex = cell.cellIndex;
-        var obj = frequencyToPitch(this.Sliders[cellIndex][1]);
+        var frequency = this.Sliders[cellIndex][0] +  this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0])/12 + this.Sliders[cellIndex][2];
+        var obj = frequencyToPitch(frequency);
         var pitchnotes = [];
         var note = obj[0] + obj[1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var slider = docById('slider');
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        this._logo.synth.trigger(pitchnotes, 1, 'poly');
+        this._logo.synth.trigger(pitchnotes, 0.125, 'poly');
         setTimeout(function() {
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        }, 1000);
+        }, 125);
     };
 
     this._moveslider = function (cell) {
-        cellIndex = cell.cellIndex;
-        console.log(cell.cellIndex);
+        var cellIndex = cell.cellIndex;
         var sliderrow = docById('slider');
-        var nextoctavefrequency = 2 * this.Sliders[cellIndex][0];
-        var frequency = this.Sliders[cellIndex][1] + parseFloat(this.Sliders[cellIndex][0])/12;
-        console.log(frequency);
-        console.log(nextoctavefrequency);
-        if (frequency > nextoctavefrequency) {
-            console.log("hello");
-            this.Sliders[cellIndex][1] = this.Sliders[cellIndex][0];
-        } else {
-            this.Sliders[cellIndex][1] = frequency;
+        var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
+        var frequencyDiv = cellDiv.childNodes[0];
+        var sliderDiv = docById('pitchSliderDiv');
+        var w = window.innerWidth;
+        var moveValue = parseFloat(Math.floor(SLIDERWIDTH * this._cellScale))/3;
+        var nextoctavefrequency = 2 * this.Sliders[cellIndex][0];   
+
+        jQuery(cellDiv).css('top',jQuery(cellDiv).position().top - moveValue);
+        this.Sliders[cellIndex][2] = 0;
+        this.Sliders[cellIndex][1] += 1;    
+        var frequency = this.Sliders[cellIndex][0] +  this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0])/12 + this.Sliders[cellIndex][2]; 
+        if (frequency > nextoctavefrequency || frequency < this.Sliders[cellIndex][0]) {
+            this.Sliders[cellIndex][1] = 0;
+            var frequency = this.Sliders[cellIndex][0];
+            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
         }
-        sliderrow.cells[cellIndex].innerHTML = this.Sliders[cellIndex][1].toFixed(2);
+        frequencyDiv.innerHTML = frequency.toFixed(2);
+    };
+
+    this._mousemove = function (e,cell) {
+        var w = window.innerWidth;
+        var sliderDiv = docById('pitchSliderDiv');
+        var cellIndex = cell.cellIndex;
+        var cellDiv = cell.childNodes[0];
+        var frequencyDiv = cellDiv.childNodes[0];
+        var cellDivPosition = cellDiv.getBoundingClientRect();
+        var moveValue = parseFloat(Math.floor(SLIDERWIDTH * this._cellScale))/36;
+        var offset = parseFloat(this.Sliders[cellIndex][0]) / 144;
+        if(e.wheelDelta > 0) {
+            this.Sliders[cellIndex][2] += offset;
+            jQuery(cellDiv).css('top',jQuery(cellDiv).position().top - moveValue);
+        } else {
+            this.Sliders[cellIndex][2] -= offset;
+            jQuery(cellDiv).css('top',jQuery(cellDiv).position().top + moveValue);
+        }
+        if (this.Sliders[cellIndex][2] > parseFloat(this.Sliders[cellIndex][0]) / 12) {
+            this.Sliders[cellIndex][1] += 1;
+            this.Sliders[cellIndex][2] = 0;
+        }
+        var frequency = this.Sliders[cellIndex][0] + this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0]/12) + this.Sliders[cellIndex][2];
+        var nextoctavefrequency = 2 * this.Sliders[cellIndex][0];   
+        if (frequency > nextoctavefrequency || frequency < this.Sliders[cellIndex][0]) {
+            this.Sliders[cellIndex][1] = 0;
+            this.Sliders[cellIndex][2] = 0;
+            var frequency = this.Sliders[cellIndex][0];
+            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
+        }
+        frequencyDiv.innerHTML =  frequency.toFixed(2);
     };
 
 	this.init = function (logo) {
@@ -73,7 +110,7 @@ function PitchSlider () {
         
         docById('pitchSliderDiv').style.width = Math.floor(w / 2) + 'px';
         docById('pitchSliderDiv').style.overflowX = 'auto';
-        docById('pitchSliderDiv').style.height = Math.floor((SLIDERHEIGHT + MATRIXBUTTONHEIGHT) * this._cellScale) + 'px';
+        docById('pitchSliderDiv').style.height = Math.floor(w / 4) + 'px';
         docById('pitchSliderDiv').style.overflowY = 'auto';
 	
 		var tables = document.getElementsByTagName('TABLE');
@@ -106,6 +143,7 @@ function PitchSlider () {
         row.style.top = Math.floor(sliderDivPosition.top) + 'px';
 
         var cell = this._addButton(row, -1, 'close-button.svg', iconSize, _('close'));
+
         cell.onclick=function() {
             docById('pitchSliderDiv').style.visibility = 'hidden';
             docById('moveSliderDiv').style.visibility = 'hidden';
@@ -149,16 +187,31 @@ function PitchSlider () {
         for (var i = 0; i < this.Sliders.length; i++) {
             var cell = row.insertCell(i);
             cell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-            cell.innerHTML = this.Sliders[i][0];
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = Math.floor(SLIDERHEIGHT * this._cellScale) + 'px';
-            cell.style.lineHeight = 60 + '%';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
+            var cellDiv = document.createElement("div");
+            cellDiv.setAttribute('id', 'sliderInCell');
+            cellDiv.style.height = Math.floor(w / 200) + 'px';
+            cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
+            console.log(cellDiv.style.top);
+            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
+            console.log(cellDiv.style.top);
+            cellDiv.style.backgroundColor = MATRIXBUTTONCOLOR;
+            cell.appendChild(cellDiv);
+            var slider = document.createElement("P");
+            slider.innerHTML = this.Sliders[i][0];
+            cellDiv.appendChild(slider);
+            
             cell.onclick=function() {
-                that._play(this);
-            }
+                    that._play(this);
+            };
+
+            cell.addEventListener("wheel", function(e) {
+                that._mousemove(e, this);
+            });
 
             var movecell = moverow.insertCell(i);
             movecell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('move') + '" alt="' + _('move') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
