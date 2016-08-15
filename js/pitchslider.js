@@ -90,6 +90,49 @@ function PitchSlider () {
         frequencyDiv.innerHTML =  frequency.toFixed(2);
     };
 
+    this._save = function (cell) {
+        var that = this;
+        var cellIndex = cell.cellIndex;
+        var frequency = this.Sliders[cellIndex][0] + this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0]/12) + this.Sliders[cellIndex][2];
+        console.log(frequency.toFixed(2));
+
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+
+        this._logo.refreshCanvas();
+
+        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'slider'}], 0, 0, [0]]];
+        var endOfStackIdx = 0;
+        var previousBlock = 0;
+
+        var noteObj = frequencyToPitch(frequency);
+        var note = noteObj[0];
+        var octave = noteObj[1];
+
+        if(noteObj[2] === 0) {
+            var pitchblockidx = newStack.length;
+            var noteidx = pitchblockidx + 1;
+            var octaveidx = pitchblockidx + 2;
+            var hiddenidx = pitchblockidx + 3;
+            newStack.push([pitchblockidx, 'pitch', 0, 0, [previousBlock, noteidx, octaveidx, hiddenidx]]);
+            newStack.push([noteidx, ['text', {'value': note}], 0, 0, [pitchblockidx]]);
+            newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
+            newStack.push([hiddenidx, 'hidden', 0, 0, [pitchblockidx, null]]);
+        } else {
+            var sineblockidx = newStack.length;
+            var frequencyidx = sineblockidx + 1;
+            var hiddenidx = sineblockidx + 2;
+            newStack.push([sineblockidx, 'sine', 0, 0, [previousBlock, frequencyidx, hiddenidx]]);
+            newStack.push([frequencyidx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [sineblockidx]]);
+            newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, null]]);
+
+        } 
+
+
+        that._logo.blocks.loadNewBlocks(newStack);
+    }
+
 	this.init = function (logo) {
 		console.log('init PitchSlider');
 		this._logo = logo;
@@ -211,6 +254,10 @@ function PitchSlider () {
 
             cell.addEventListener("wheel", function(e) {
                 that._mousemove(e, this);
+            });
+
+            cell.addEventListener('dblclick', function() {
+                that._save(this);
             });
 
             var movecell = moverow.insertCell(i);
