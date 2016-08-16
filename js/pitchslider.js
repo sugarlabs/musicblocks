@@ -30,11 +30,11 @@ function PitchSlider () {
         var note = obj[0] + obj[1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var slider = docById('slider');
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+     //   cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         this._logo.synth.trigger(pitchnotes, 0.125, 'poly');
-        setTimeout(function() {
-            cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        }, 125);
+        // setTimeout(function() {
+        //     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+        // }, 1000);
     };
 
     this._moveslider = function (cell) {
@@ -57,6 +57,7 @@ function PitchSlider () {
             jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
         }
         frequencyDiv.innerHTML = frequency.toFixed(2);
+        this._play(sliderrow.cells[cellIndex]);
     };
 
     this._mousemove = function (e,cell) {
@@ -88,6 +89,8 @@ function PitchSlider () {
             jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
         }
         frequencyDiv.innerHTML =  frequency.toFixed(2);
+        this._play(cell);
+
     };
 
     this._save = function (cell) {
@@ -248,9 +251,13 @@ function PitchSlider () {
             slider.innerHTML = this.Sliders[i][0];
             cellDiv.appendChild(slider);
             
-            cell.onclick=function() {
-                    that._play(this);
+            cell.onmouseover=function() {
+                that._play(this);
             };
+
+            cell.onclick=function() {
+                that._play(this);
+            }
 
             cell.addEventListener("wheel", function(e) {
                 that._mousemove(e, this);
