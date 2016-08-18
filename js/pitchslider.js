@@ -30,11 +30,7 @@ function PitchSlider () {
         var note = obj[0] + obj[1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var slider = docById('slider');
-     //   cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        this._logo.synth.trigger(pitchnotes, 0.125, 'poly');
-        // setTimeout(function() {
-        //     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        // }, 1000);
+        this._logo.synth.trigger(pitchnotes, 1, 'poly');
     };
 
     this._moveslider = function (cell) {
@@ -57,6 +53,7 @@ function PitchSlider () {
             jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
         }
         frequencyDiv.innerHTML = frequency.toFixed(2);
+        this._logo.synth.stop();
         this._play(sliderrow.cells[cellIndex]);
     };
 
@@ -89,6 +86,7 @@ function PitchSlider () {
             jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
         }
         frequencyDiv.innerHTML =  frequency.toFixed(2);
+        this._logo.synth.stop();
         this._play(cell);
 
     };
@@ -131,7 +129,6 @@ function PitchSlider () {
             newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, null]]);
 
         } 
-
 
         that._logo.blocks.loadNewBlocks(newStack);
     }
@@ -217,7 +214,6 @@ function PitchSlider () {
         x.cellPadding = 0;
         movesliderDiv.appendChild(x);
 
-
         var table = docById('pitchslider');
         var row = table.insertRow(0);
         row.style.left = Math.floor(sliderDivPosition.left) + 'px';
@@ -240,6 +236,7 @@ function PitchSlider () {
 
             var cellDiv = document.createElement("div");
             cellDiv.setAttribute('id', 'sliderInCell');
+            cellDiv.setAttribute('position', 'absolute');
             cellDiv.style.height = Math.floor(w / 200) + 'px';
             cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
             console.log(cellDiv.style.top);
@@ -250,10 +247,36 @@ function PitchSlider () {
             var slider = document.createElement("P");
             slider.innerHTML = this.Sliders[i][0];
             cellDiv.appendChild(slider);
-            
-            cell.onmouseover=function() {
+
+            cell.onmousemove=function() {
+                var cellDiv = this.childNodes[0];
+                var moveValue = parseFloat(Math.floor(SLIDERWIDTH * that._cellScale))/3;
+
+                if (event.pageY - w / 10 <= jQuery(sliderDiv).position().top + w / 9 && event.pageY - w / 10 >= jQuery(sliderDiv).position().top + w / 9 - 12 * moveValue) {
+                    jQuery(cellDiv).css('top', event.pageY - w / 10);
+                } else {
+                    if (event.pageY - w / 10 > jQuery(sliderDiv).position().top + w / 9) {
+                        jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9);
+                    } else {
+                        jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9 - 12 * moveValue);   
+                    }
+                }
+                var cellIndex = this.cellIndex;
+                var slidingAreaHeight = jQuery(sliderDiv).position().top + w / 9 - jQuery(sliderDiv).position().top - w / 9 + 12 * moveValue;
+                console.log(slidingAreaHeight);
+                var distanceFromBottom =  jQuery(sliderDiv).position().top + w / 9 - jQuery(cellDiv).position().top;
+                console.log(distanceFromBottom);
+                var frequencyOffSet = parseFloat(that.Sliders[cellIndex][0]) / slidingAreaHeight * distanceFromBottom;
+
+                that.Sliders[cellIndex][1] = parseInt(frequencyOffSet / that.Sliders[cellIndex][0] * 12);
+                that.Sliders[cellIndex][2] = frequencyOffSet - that.Sliders[cellIndex][1] * parseFloat(that.Sliders[cellIndex][0]) / 12;
+
+                var frequencyDiv = cellDiv.childNodes[0];
+                var frequency = that.Sliders[cellIndex][0] + that.Sliders[cellIndex][1] * parseFloat(that.Sliders[cellIndex][0]/12) + that.Sliders[cellIndex][2];
+                frequencyDiv.innerHTML = frequency.toFixed(2);
                 that._play(this);
-            };
+
+            }
 
             cell.onclick=function() {
                 that._play(this);
