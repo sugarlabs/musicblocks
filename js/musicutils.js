@@ -487,7 +487,7 @@ function getScaleAndHalfSteps(keySignature) {
     var solfege = [];
     for (var i = 0; i < halfSteps.length; i++) {
         solfege.push(SOLFEGENAMES[i]);
-        for (j = 1; j < halfSteps[i]; j++) {
+        for (var j = 1; j < halfSteps[i]; j++) {
             solfege.push('');
         }
     }
@@ -607,10 +607,9 @@ function calcNoteValueToDisplay(a, b) {
 
 function durationToNoteValue(duration) {
     // returns [note value, no. of dots, tuplet factor]
-    var dotCount = 0;
 
     // Try to find a match or a dotted match.
-    for (dotCount = 0; dotCount < 3; dotCount++) {
+    for (var dotCount = 0; dotCount < 3; dotCount++) {
         var currentDotFactor = 2 - (1 / Math.pow(2, dotCount));
         var d = duration * currentDotFactor;
         if (POWER2.indexOf(d) !== -1) {
