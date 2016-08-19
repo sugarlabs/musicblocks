@@ -98,12 +98,12 @@
             $('#pitchstaircase').draggable({
                 drag: function() {
                     jQuery('#playPitch').css('top',jQuery(this).position().top);
-                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/30);
+                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);
 
                 },
                 stop: function(){
                     jQuery('#playPitch').css('top',jQuery(this).position().top);                     
-                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/30);                                        
+                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);                                        
                 }
             });
         });
@@ -112,40 +112,40 @@
             $('#playPitch').draggable({
                 drag: function() {
                     jQuery('#pitchstaircase').css('top',jQuery(this).position().top);
-                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/30);
+                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);
 
                 },
                 stop: function(){
                     jQuery('#pitchstaircase').css('top',jQuery(this).position().top);                     
-                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
+                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);                                        
                 }
             });
         });
 
         $(function() {
-            $('#TempoCanvas').draggable({
+            $('#tempoCanvas').draggable({
                 drag: function() {
-                    jQuery('#TempoDiv').css('left',jQuery(this).position().left);
-                    jQuery('#TempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);
+                    jQuery('#tempoDiv').css('left',jQuery(this).position().left);
+                    jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);
 
                 },
                 stop: function(){
-                    jQuery('#TempoDiv').css('left',jQuery(this).position().left);                     
-                    jQuery('#TempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);                                        
+                    jQuery('#tempoDiv').css('left',jQuery(this).position().left);                     
+                    jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);                                        
                 }
             });
         });
         
         $(function() {
-            $('#TempoDiv').draggable({
+            $('#tempoDiv').draggable({
                 drag: function() {
-                    jQuery('#TempoCanvas').css('left',jQuery(this).position().left);
-                    jQuery('#TempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);
+                    jQuery('#tempoCanvas').css('left',jQuery(this).position().left);
+                    jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);
 
                 },
                 stop: function(){
-                    jQuery('#TempoCanvas').css('left',jQuery(this).position().left);                     
-                    jQuery('#TempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);                                        
+                    jQuery('#tempoCanvas').css('left',jQuery(this).position().left);                     
+                    jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);                                        
                 }
             });
         });
@@ -154,6 +154,17 @@
 	$(function() {
             $("#statusmatrix").draggable();
         });
+    $(function() {
+        $('#pitchstaircase').on('scroll', function () {
+            jQuery('#playPitch').scrollTop(jQuery(this).scrollTop());
+        });
+    });
+
+    $(function() {
+        $('#playPitch').on('scroll', function () {
+            jQuery('#pitchstaircase').scrollTop(jQuery(this).scrollTop());
+        });
+    });
 
 	$(function() {
             $("#modewidget").draggable();
@@ -257,12 +268,11 @@
     <div class="canvasHolder">
         <canvas id="myCanvas" width="1200" height="900"></canvas>
         <canvas id="myChart" width="600" height="600"></canvas>
-        <canvas id="TempoCanvas" width="700" height="800" style="border: 1px solid black"></canvas>
         <video id="camVideo" style="visibility:hidden;"></video>
-        <canvas hidden id="TempoCanvas" width="700" height="800" style="border: 1px solid black"></canvas>
+        <canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;"></canvas>
         <canvas id="camCanvas" style="visibility:hidden;"></canvas>
         <div id="labelDiv"></div>
-        <div id="dissectNumberDiv"></div>
+        <div id="dissectNumber"></div>
         <div id="ioDiv">
             <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*" />
             <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb" />
@@ -315,11 +325,13 @@
     <div id="pitchstaircase"></div>
     <div id="playPitch"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
-    <div id="TempoDiv"></div>
-    <div id="BPMNUMBER"></div>
     <div id="pitchSliderDiv"></div>
     <div id="moveSliderDiv"></div>
     <div id="sliderInCell"></div>
+    <div id="tempoDiv"></div>
+    <div id="BPMInput"></div>
+    <div id="musicratio1"></div>
+    <div id="musicratio2"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    
     <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>    
     <div id="helpElem"></div>

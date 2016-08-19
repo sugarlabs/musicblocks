@@ -306,6 +306,20 @@ input.dissectNumber {
     height: 100% !important;
 }
 
+input.musicratio1, input.musicratio2   {
+  background-color: #c374e9 !important;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+
 table {
 }
 
@@ -398,17 +412,19 @@ table {
   border: 0 !important;
   background: rgba(255, 225, 255, 0.85);
   -webkit-user-select: none;
-  overflow-x: scroll !important;
+  overflow-y: scroll !important;
 }
 
 #playPitch {
   position: absolute;
+  direction: rtl;
   top: 20%;
-  left: 26%;
+  left: 25%;
   border-style: solid;
   border: 0 !important;
   background: rgba(255, 225, 255, 0.85);
   -webkit-user-select: none;
+  overflow-y: scroll !important;
 }
 
 #pitchSliderDiv {
@@ -432,7 +448,7 @@ table {
   -webkit-user-select: none;
 }
 
-#TempoDiv {
+#tempoDiv {
   position: absolute;
   top: 30%;
   left: 20%;
@@ -442,10 +458,10 @@ table {
   -webkit-user-select: none;
 }
 
-#TempoCanvas {
+#tempoCanvas {
   visibility: hidden;
   position: absolute;
-  top : 23%;
+  top : 30%;
   left : 20%;  
 }
 
@@ -453,7 +469,7 @@ table {
     position: absolute;
 }
 
-input.BPMNUMBER {
+input.BPMInput {
     background-color: #c374e9 !important;
     text-align: center;
     font-size: 24px;
@@ -464,4 +480,3 @@ input.BPMNUMBER {
     width: 100% !important;
     height: 100% !important;
 }
-
