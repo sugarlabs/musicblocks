@@ -1034,6 +1034,14 @@ define(function (require) {
             if (docById('BPMInput').classList.contains('hasKeyboard')) {
                 return ;
             }
+            
+            if (docById('musicratio1').classList.contains('hasKeyboard')) {
+                return;
+            }
+
+            if (docById('musicratio2').classList.contains('hasKeyboard')) {
+                return;
+            }
 
             if (docById('dissectNumber').classList.contains('hasKeyboard')) {
                 return;

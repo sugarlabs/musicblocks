@@ -48,7 +48,7 @@ const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canvas, blocks, turtles, stage,
+function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -2387,7 +2387,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             if (args[0].slice(0, 4) === 'http') {
                 drumname = args[0];
             } else {
-                for (drum in DRUMNAMES) { 
+                for (var drum in DRUMNAMES) { 
                     if (DRUMNAMES[drum][0] === args[0]) {
                         drumname = DRUMNAMES[drum][1];
                         break;
@@ -2665,7 +2665,24 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             } else if (logo.inPitchStairCase) {
                 var frequency = pitchToFrequency(args[0], args[1], 0 ,logo.keySignature[turtle]);
                 var note = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
-                pitchstaircase.Stairs.push([note[0], note[1], frequency]);
+                var flag = 0;
+
+                for (var i=0 ; i < pitchstaircase.Stairs.length; i++) {
+                    if (pitchstaircase.Stairs[i][2] < parseFloat(frequency)) {
+                        pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency)]);
+                        flag = 1;
+                        break;
+                    }
+                    if (pitchstaircase.Stairs[i][2] === parseFloat(frequency)) {
+                        pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency)]);
+                        flag = 1;
+                        break;
+                    } 
+                }
+
+                if (flag === 0) {
+                    pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
+                }
             } 
             else {
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
@@ -2726,7 +2743,6 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             break;
         case 'osctime':
         case 'note':
-            console.log("in note");
             // We queue up the child flow of the note clamp and
             // once all of the children are run, we trigger a
             // _playnote_ event, then wait for the note to play.
@@ -2864,7 +2880,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             break;
         case 'setdrum':
             var drumname = 'kick';
-            for (drum in DRUMNAMES) { 
+            for (var drum in DRUMNAMES) { 
                 if (DRUMNAMES[drum][0] === args[0]) {
                     drumname = DRUMNAMES[drum][1];
                 } else if (DRUMNAMES[drum][1] === args[0]) {
@@ -3610,7 +3626,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
         }
 
         if (this.inPitchDrumMatrix) {
-            // FIME
+            // FIXME
         } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
                 pitchtimematrix.addColBlock(blk, 1);
@@ -3658,7 +3674,6 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             // note, or we cache the duration and set the wait to
             // zero. FIXME: Will not work when using dup and skip.
             if (this.tie[turtle]) {
-
                 // We need to check to see if we are tying together
                 // similar notes.
                 if (this.tieCarryOver[turtle] > 0) {
@@ -3671,6 +3686,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                                 match = false;
                                 break;
                             }
+
                             if (this.tieNote[turtle][i][1] != this.noteOctaves[turtle][i]) {
                                 match = false;
                                 break;
@@ -3770,6 +3786,7 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
             if (duration > 0) {
                 this.turtleTime[turtle] += ((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle];
             }
+
             if (!this.lilypondSaveOnly) {
                 if (duration > 0) {
                     this._doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle] - turtleLag, 0));
@@ -3909,11 +3926,11 @@ function Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canva
                                 } else {
                                     // FIXME: Only if we are in a Drum clamp???
                                     // Look for any notes in the chord that might be in the pitchDrumTable.
-                                    for (j = 0; j < notes.length; j++) {
-                                        if (notes[j] in logo.pitchDrumTable[turtle]) {
-                                            logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[j]]);
+                                    for (var d = 0; d < notes.length; d++) {
+                                        if (notes[d] in logo.pitchDrumTable[turtle]) {
+                                            logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[d]]);
                                         } else {
-                                            logo.synth.trigger(notes[j], beatValue, 'default');
+                                            logo.synth.trigger(notes[d], beatValue, 'default');
                                         }
                                     }
                                 }
