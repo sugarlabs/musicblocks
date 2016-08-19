@@ -409,7 +409,7 @@ table {
   -webkit-user-select: none;
 }
 
-#TempoDiv {
+#tempoDiv {
   position: absolute;
   top: 30%;
   left: 20%;
@@ -419,14 +419,14 @@ table {
   -webkit-user-select: none;
 }
 
-#TempoCanvas {
+#tempoCanvas {
   visibility: hidden;
   position: absolute;
-  top : 23%;
+  top : 30%;
   left : 20%;  
 }
 
-input.BPMNUMBER {
+input.BPMInput {
     background-color: #c374e9 !important;
     text-align: center;
     font-size: 24px;
@@ -437,4 +437,3 @@ input.BPMNUMBER {
     width: 100% !important;
     height: 100% !important;
 }
-
