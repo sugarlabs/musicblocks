@@ -14,22 +14,18 @@
 
 
 function Tempo () {
-    var canvas; 
-    var ctx; 
-    var canvasHalfWidth; 
-    
-    // dot position
-    var x; 
-    var y; 
-    var dx = 1; 
-    
+    var canvas;
+    var ctx;
+    var canvasHalfWidth;
+
     this._isMoving = true;
-    this._previousDx;
-    this._direction = 0;
-    
+    this._direction = 1;
+    this._widgetFirstTime = null;
+    this._widgetNextTime = 0;
+
     this.BPM;
     this.BPMBlock = null;  // set-master-BPM block contained in Tempo clamp
-    
+
     this._updateBPM = function(event) {
         if (this.BPMBlock != null) {
             var blockNumber = blocks.blockList[this.BPMBlock].connections[1];
@@ -42,15 +38,26 @@ function Tempo () {
             }
         }
     };
-    
+
     this._stop = function () {
-        dx = 0;
+        clearInterval(this._intervalID);
     };
-    
+
     this._start = function () {
-        dx = this._previousDx;
+        // Reset widget time since we are restarting.
+        // We will no longer keep synch with the turtles.
+        var d = new Date();
+        this._widgetFirstTime = d.getTime();
+        this._widgetNextTime = this._widgetFirstTime + (60 / this.BPM) * 1000;
+        this._direction = 1;
+
+        // Restart the interval.
+        var that = this;
+        this._intervalID = setInterval(function() {
+            that._draw();
+        }, 5);
     };
-    
+
     this._useBPM = function () {
         this.BPM = document.getElementById("BPMNUMBER").value
         if (this.BPM > 1000) {
@@ -60,9 +67,8 @@ function Tempo () {
         }
 
         this._updateBPM();
-        dx = parseFloat(parseFloat(canvasHalfWidth) / 60 * this.BPM) / 150 * this._direction;
     };
-    
+
     this._speedUp = function () {
         this.BPM = parseFloat(this.BPM) + 5;
 
@@ -71,10 +77,9 @@ function Tempo () {
         }
 
         this._updateBPM();
-        dx = parseFloat(parseFloat(this.BPM) / 60 * canvasHalfWidth) / 150 * this._direction;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
-    
+
     this._slowDown = function () {
         this.BPM = parseFloat(this.BPM) - 5;
         if (this.BPM < 30) {
@@ -82,34 +87,56 @@ function Tempo () {
         }
 
         this._updateBPM();
-        dx = parseFloat(parseFloat(this.BPM) / 60 * canvasHalfWidth) / 150 * this._direction;
         document.getElementById("BPMNUMBER").value = this.BPM;
     };
-    
-    this._draw = function() { 
+
+    this._draw = function() {
+        // First thing to do is figure out where we are supposed to be
+        // based on the elapsed time.
+        var d = new Date();
+
+        // We start the music clock as the first note is being
+        // played.
+        if (this._widgetFirstTime == null) {
+            this._widgetFirstTime = d.getTime();
+            this._widgetNextTime = this._widgetFirstTime + (60 / this.BPM) * 1000;
+        }
+
+        // How much time has gone by?
+        var deltaTime = this._widgetNextTime - d.getTime();
+
+        // Are we done yet?
+        if (d.getTime() > this._widgetNextTime) {
+            // Play a tone.
+            this._logo.synth.trigger('C4', 0.125, 'poly');
+            this._widgetNextTime += (60 / this.BPM) * 1000;
+
+            // Ensure we are at the edge.
+            if (this._direction === -1) {
+                var x = 0;
+                this._direction = 1;
+            } else {
+                var x = canvas.width;
+                this._direction = -1;
+            }
+        } else {
+            // Determine new x position based on delta time.
+            var dx = canvas.width * (deltaTime / ((60 / this.BPM) * 1000));
+            if (this._direction === -1) {
+                var x = canvas.width - dx;
+            } else {
+                var x = dx;
+            }
+        }
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath(); 
-        ctx.fillStyle = ''; 
-        ctx.arc(x, y, 25, 0, Math.PI * 2); 
-        ctx.fill(); 
+        ctx.beginPath();
+        ctx.fillStyle = '';
+        ctx.arc(x, this.cellScale * 200, 25, 0, Math.PI * 2);
+        ctx.fill();
         ctx.closePath();
-
-        x += dx; 
-        if (this._direction === 1 && x + dx > canvas.width) {
-            x = canvas.width;
-            this._direction = -1;
-            dx = -dx;
-            this._logo.synth.trigger('C4', 0.125, 'poly');
-        }
-
-        if (this._direction === -1 && x + dx < 0) {
-            x = 0;
-            this._direction = 1; 
-            dx = -dx;
-            this._logo.synth.trigger('C4', 0.125, 'poly');
-        }
     };
-    
+
     this._addButton = function(row, colIndex, icon, iconSize, label) {
         var cell = row.insertCell();
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -129,7 +156,7 @@ function Tempo () {
 
         return cell;
     };
-    
+
     this.init = function (logo) {
         var that = this;
         this._logo = logo;
@@ -150,8 +177,8 @@ function Tempo () {
 
         var TempoDiv = docById('TempoDiv');
 
-        canvas = document.getElementById("TempoCanvas"); 
-
+        canvas = document.getElementById("TempoCanvas");
+        canvasHalfWidth = Math.floor(canvas.width / 2);
         canvas.style.left = TempoDiv.style.left;
 
         ctx = canvas.getContext("2d");
@@ -159,8 +186,7 @@ function Tempo () {
 
         var iconSize = Math.floor(this.cellScale * 24);
 
-        x = canvas.width;
-        y = this.cellScale * 200;
+        console.log(canvas.width + ' ' + window.innerWidth);
 
         var tables = document.getElementsByTagName('TABLE');
         var noofTables = tables.length;
@@ -192,7 +218,6 @@ function Tempo () {
         var cell = this._addButton(row, -1, 'pause-button.svg', iconSize, _('pause'));
         cell.onclick=function() {
             if (that._isMoving) {
-                that._previousDx = dx;
                 that._stop();
                 this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                 that._isMoving = false;
@@ -245,7 +270,7 @@ function Tempo () {
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;  
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         docById('BPMNUMBER').classList.add('hasKeyboard');
         docById('TempoCanvas').addEventListener('dblclick', function() {
             that._useBPM();
@@ -273,11 +298,14 @@ function Tempo () {
         };
 
         this._direction = 1;
-        dx = parseFloat(parseFloat(canvasHalfWidth) / 60 * this.BPM) / 150;
+
+        // When we start, we try to synch with the turtles.
+        this._widgetFirstTime = this._logo.firstNoteTime;
+        this._widgetNextTime = this._widgetFirstTime + (60 / this.BPM) * 1000;
 
         this._intervalID = setInterval(function() {
             that._draw();
         }, 5);
     };
-    
+
 };
