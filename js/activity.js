@@ -1031,7 +1031,7 @@ define(function (require) {
                 return;
             }
 
-            if (docById('BPMNUMBER').classList.contains('hasKeyboard')) {
+            if (docById('BPMInput').classList.contains('hasKeyboard')) {
                 return ;
             }
 
