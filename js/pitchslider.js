@@ -279,15 +279,11 @@ function PitchSlider () {
             }
 
             cell.onclick=function() {
-                that._play(this);
+                that._save(this);
             }
 
             cell.addEventListener("wheel", function(e) {
                 that._mousemove(e, this);
-            });
-
-            cell.addEventListener('dblclick', function() {
-                that._save(this);
             });
 
             var movecell = moverow.insertCell(i);
