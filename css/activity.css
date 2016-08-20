@@ -427,3 +427,31 @@ table {
   overflow-y: scroll !important;
 }
 
+#tempoDiv {
+  position: absolute;
+  top: 30%;
+  left: 20%;
+  border-style: solid;
+  border: 0 !important;
+  background: rgba(255, 225, 255, 0.85);
+  -webkit-user-select: none;
+}
+
+#tempoCanvas {
+  visibility: hidden;
+  position: absolute;
+  top : 30%;
+  left : 20%;  
+}
+
+input.BPMInput {
+    background-color: #c374e9 !important;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold !important;
+    resize: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}

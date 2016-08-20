@@ -93,7 +93,7 @@ define(function (require) {
     require('activity/pitchdrummatrix');
     require('activity/rhythmruler');
     require('activity/pitchstaircase');
-
+    require('activity/tempo');
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {
         if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -126,6 +126,7 @@ define(function (require) {
         }
 
         var canvas = docById('myCanvas');
+        var canvas1 = docById('TempoCanvas')
 
         var queue = new createjs.LoadQueue(false);
 
@@ -595,6 +596,7 @@ define(function (require) {
             pitchdrummatrix = new PitchDrumMatrix();
             rhythmruler = new RhythmRuler();
             pitchstaircase = new PitchStairCase();
+            tempo = new Tempo();
 
             palettes.setBlocks(blocks);
             turtles.setBlocks(blocks);
@@ -603,7 +605,7 @@ define(function (require) {
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
             // TODO: clean up this mess.
-            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas,
+            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canvas,
                 blocks, turtles, turtleContainer, refreshCanvas,
                 textMsg, errorMsg, hideMsgs, onStopTurtle,
                 onRunTurtle, getStageX, getStageY,
@@ -1029,6 +1031,10 @@ define(function (require) {
                 return;
             }
 
+            if (docById('BPMInput').classList.contains('hasKeyboard')) {
+                return ;
+            }
+            
             if (docById('musicratio1').classList.contains('hasKeyboard')) {
                 return;
             }
@@ -1467,8 +1473,6 @@ define(function (require) {
             if(document.getElementById('rulerbody').style.visibility !== 'hidden') {
                 document.getElementById('rulerbody').style.visibility = 'hidden';
                 document.getElementById('rulerbody').style.border = 0;
-                // document.getElementsByClassName('hRule')[0].style.visibility = 'hidden';
-                // document.getElementsByClassName('mousePosBox')[0].style.visibility = 'hidden';  
             }              
 
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {

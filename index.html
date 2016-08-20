@@ -121,6 +121,34 @@
                 }
             });
         });
+
+        $(function() {
+            $('#tempoCanvas').draggable({
+                drag: function() {
+                    jQuery('#tempoDiv').css('left',jQuery(this).position().left);
+                    jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);
+
+                },
+                stop: function(){
+                    jQuery('#tempoDiv').css('left',jQuery(this).position().left);                     
+                    jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);                                        
+                }
+            });
+        });
+        
+        $(function() {
+            $('#tempoDiv').draggable({
+                drag: function() {
+                    jQuery('#tempoCanvas').css('left',jQuery(this).position().left);
+                    jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);
+
+                },
+                stop: function(){
+                    jQuery('#tempoCanvas').css('left',jQuery(this).position().left);                     
+                    jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);                                        
+                }
+            });
+        });
     
 
 	$(function() {
@@ -241,6 +269,7 @@
         <canvas id="myCanvas" width="1200" height="900"></canvas>
         <canvas id="myChart" width="600" height="600"></canvas>
         <video id="camVideo" style="visibility:hidden;"></video>
+        <canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;"></canvas>
         <canvas id="camCanvas" style="visibility:hidden;"></canvas>
         <div id="labelDiv"></div>
         <div id="dissectNumber"></div>
@@ -291,9 +320,13 @@
     <div id="pitchtimematrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
     <div id="rulerbody" overflow-x="auto"></div>
+    <div id="dissectNumber"></div>
     <div id="drumDiv"></div>
     <div id="pitchstaircase"></div>
     <div id="playPitch"></div>
+    <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
+    <div id="tempoDiv"></div>
+    <div id="BPMInput"></div>
     <div id="musicratio1"></div>
     <div id="musicratio2"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    

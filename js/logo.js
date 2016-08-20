@@ -48,7 +48,7 @@ const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, canvas, blocks, turtles, stage,
+function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -109,6 +109,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
     this.inRhythmRuler = false;
 
     this.inPitchStairCase = false;
+
+    this.inTempo = false;
 
     this._currentDrumBlock = null;
 
@@ -2013,6 +2015,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
                 }
                 logo.defaultBPMFactor = TONEBPM / this._masterBPM;
             }
+            if (this.inTempo) {
+                tempo.BPMBlock = blk;
+                var bpmnumberblock = blocks.blockList[blk].connections[1]
+                tempo.BPM = blocks.blockList[bpmnumberblock].text.text;
+            }
             break;
         case 'setbpm':
             if (args.length === 2 && typeof(args[0] === 'number')) {
@@ -2093,6 +2100,20 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, can
             };
             logo._setListener(turtle, listenerName, __listener);
             break;
+        case 'tempo':
+            console.log("running Tempo");
+            childFlow = args[0];
+            childFlowCount = 1;
+            logo.inTempo = true;
+
+            var listenerName = '_tempo_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+            var __listener = function (event) {
+                tempo.init(logo);
+            };
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+
         case 'pitchdrummatrix':
             if (args.length === 1) {
                 childFlow = args[0];

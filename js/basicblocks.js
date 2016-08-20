@@ -910,7 +910,25 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmrulerBlock.adjustWidthToLabel();
     rhythmrulerBlock.stackClampOneArgBlock();
     rhythmrulerBlock.defaults.push(1);
-    
+
+    // PITCHSTAIRCASE
+
+    var pitchstaircaseBlock = new ProtoBlock('pitchstaircase');
+    pitchstaircaseBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['pitchstaircase'] = pitchstaircaseBlock;
+    pitchstaircaseBlock.staticLabels.push(_('pitchstaircase'));
+    pitchstaircaseBlock.adjustWidthToLabel();
+    pitchstaircaseBlock.stackClampZeroArgBlock();
+
+    //TEMPO
+
+    var tempoBlock = new ProtoBlock('tempo');
+    tempoBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['tempo'] = tempoBlock;
+    tempoBlock.staticLabels.push(_('tempo'));
+    tempoBlock.adjustWidthToLabel();
+    tempoBlock.stackClampZeroArgBlock();
+
     // TURTLE PALETTE
 
     var headingBlock = new ProtoBlock('heading');
