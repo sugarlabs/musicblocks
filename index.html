@@ -149,6 +149,34 @@
                 }
             });
         });
+
+        $(function() {
+            $('#pitchSliderDiv').draggable({
+                drag: function() {
+                    jQuery('#moveSliderDiv').css('left',jQuery(this).position().left);
+                    jQuery('#moveSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4);
+
+                },
+                stop: function(){
+                    jQuery('#moveSliderDiv').css('left',jQuery(this).position().left);                     
+                    jQuery('#moveSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4);                                        
+                }
+            });
+        });
+        
+        $(function() {
+            $('#moveSliderDiv').draggable({
+                drag: function() {
+                    jQuery('#pitchSliderDiv').css('left',jQuery(this).position().left);
+                    jQuery('#pitchSliderDiv').css('top',jQuery(this).position().top - $(window).innerWidth/4);
+
+                },
+                stop: function(){
+                    jQuery('#pitchSliderDiv').css('left',jQuery(this).position().left);                     
+                    jQuery('#pitchSliderDiv').css('top',jQuery(this).position().top - $(window).innerWidth/4);                                        
+                }
+            });
+        });
     
 
 	$(function() {

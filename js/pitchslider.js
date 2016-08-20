@@ -1,6 +1,7 @@
 function PitchSlider () {
 
     this.Sliders = [];
+    this._initialTop;
 
 	this._addButton = function(row, colIndex, icon, iconSize, label) {
         var cell = row.insertCell();
@@ -33,7 +34,7 @@ function PitchSlider () {
         this._logo.synth.trigger(pitchnotes, 1, 'poly');
     };
 
-    this._moveslider = function (cell) {
+    this._moveslider = function (cell, upordown) {
         var cellIndex = cell.cellIndex;
         var sliderrow = docById('slider');
         var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
@@ -41,17 +42,21 @@ function PitchSlider () {
         var sliderDiv = docById('pitchSliderDiv');
         var w = window.innerWidth;
         var moveValue = parseFloat(Math.floor(SLIDERWIDTH * this._cellScale))/3;
-        var nextoctavefrequency = 2 * this.Sliders[cellIndex][0];   
+        var nextoctavefrequency = 2 * this.Sliders[cellIndex][0];
+        var divMoved =  jQuery(sliderDiv).position().top - this._initialTop;
 
-        jQuery(cellDiv).css('top',jQuery(cellDiv).position().top - moveValue);
         this.Sliders[cellIndex][2] = 0;
         this.Sliders[cellIndex][1] += 1;    
-        var frequency = this.Sliders[cellIndex][0] +  this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0])/12 + this.Sliders[cellIndex][2]; 
+        console.log(this.Sliders[cellIndex][1]);
+        console.log(this.Sliders[cellIndex][2]);
+        jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved - this.Sliders[cellIndex][1] * moveValue);
+        var frequency = this.Sliders[cellIndex][0] +  this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0])/12; 
         if (frequency > nextoctavefrequency || frequency < this.Sliders[cellIndex][0]) {
             this.Sliders[cellIndex][1] = 0;
             var frequency = this.Sliders[cellIndex][0];
-            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
+            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved);
         }
+        console.log(frequency);
         frequencyDiv.innerHTML = frequency.toFixed(2);
         this._logo.synth.stop();
         this._play(sliderrow.cells[cellIndex]);
@@ -150,6 +155,7 @@ function PitchSlider () {
 		var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = Math.floor(this._cellScale * 24);
+        this._initialTop = jQuery('#pitchSliderDiv').position().top;
         
         docById('pitchSliderDiv').style.width = Math.floor(w / 2) + 'px';
         docById('pitchSliderDiv').style.overflowX = 'auto';
@@ -233,6 +239,7 @@ function PitchSlider () {
             cell.style.maxWidth = cell.style.width;
             cell.style.height = Math.floor(SLIDERHEIGHT * this._cellScale) + 'px';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            cell.setAttribute('tabIndex', 1);
 
             var cellDiv = document.createElement("div");
             cellDiv.setAttribute('id', 'sliderInCell');
@@ -248,24 +255,40 @@ function PitchSlider () {
             slider.innerHTML = this.Sliders[i][0];
             cellDiv.appendChild(slider);
 
+            cell.onmouseover=function() {
+                this.focus();
+                this.addEventListener("keydown", function(event) {
+                    if (event.keyCode === 38) {
+                        that._moveslider(this, 1);
+                    }
+
+                    if (event.keyCode === 40) {
+                        that._moveslider(this, -1);
+                    }
+                });
+            };
+
+            cell.onmouseout=function() {
+                this.blur();
+            }
+
             cell.onmousemove=function() {
                 var cellDiv = this.childNodes[0];
                 var moveValue = parseFloat(Math.floor(SLIDERWIDTH * that._cellScale))/3;
+                var divMoved = jQuery(sliderDiv).position().top - that._initialTop;
 
-                if (event.pageY - w / 10 <= jQuery(sliderDiv).position().top + w / 9 && event.pageY - w / 10 >= jQuery(sliderDiv).position().top + w / 9 - 12 * moveValue) {
-                    jQuery(cellDiv).css('top', event.pageY - w / 10);
+                if (event.pageY - w / 10 - divMoved <= jQuery(sliderDiv).position().top + w / 9 - divMoved && event.pageY - w / 10 - divMoved >= jQuery(sliderDiv).position().top + w / 9 - divMoved - 12 * moveValue) {
+                    jQuery(cellDiv).css('top', event.pageY - w / 10 - divMoved);
                 } else {
-                    if (event.pageY - w / 10 > jQuery(sliderDiv).position().top + w / 9) {
-                        jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9);
+                    if (event.pageY - w / 10 - divMoved > jQuery(sliderDiv).position().top + w / 9 - divMoved) {
+                        jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9 - divMoved);
                     } else {
-                        jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9 - 12 * moveValue);   
+                        jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9 - divMoved - 12 * moveValue);   
                     }
                 }
                 var cellIndex = this.cellIndex;
                 var slidingAreaHeight = jQuery(sliderDiv).position().top + w / 9 - jQuery(sliderDiv).position().top - w / 9 + 12 * moveValue;
-                console.log(slidingAreaHeight);
-                var distanceFromBottom =  jQuery(sliderDiv).position().top + w / 9 - jQuery(cellDiv).position().top;
-                console.log(distanceFromBottom);
+                var distanceFromBottom =  jQuery(sliderDiv).position().top + w / 9 - divMoved - jQuery(cellDiv).position().top;
                 var frequencyOffSet = parseFloat(that.Sliders[cellIndex][0]) / slidingAreaHeight * distanceFromBottom;
 
                 that.Sliders[cellIndex][1] = parseInt(frequencyOffSet / that.Sliders[cellIndex][0] * 12);
@@ -279,7 +302,7 @@ function PitchSlider () {
             }
 
             cell.onclick=function() {
-                that._save(this);
+                that._save(this);           
             }
 
             cell.addEventListener("wheel", function(e) {
@@ -298,7 +321,7 @@ function PitchSlider () {
             }
             movecell.onmouseover=function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-            }
+            }   
 
             movecell.onmouseout=function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLOR;
