@@ -1,3 +1,19 @@
+// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016 Hemant Kasat
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+// This widget enable us to create pitches of different frequency varying 
+// from given frequency to nextoctave frequency(two times the given frequency)
+// in continuous manner.
+
+
 function PitchSlider () {
     this.Sliders = [];
     this._initialTop;
@@ -36,7 +52,6 @@ function PitchSlider () {
     };
 
     this._moveslider = function (cell, upordown) {
-        console.log("called _mousemove");
         var cellIndex = cell.cellIndex;
         var sliderrow = docById('slider');
         var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
@@ -49,11 +64,8 @@ function PitchSlider () {
 
         this.Sliders[cellIndex][2] = 0;
         this.Sliders[cellIndex][1] += 1 * upordown;    
-        console.log(this.Sliders[cellIndex][1]);
-        console.log(this.Sliders[cellIndex][2]);
         jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved - this.Sliders[cellIndex][1] * moveValue);
         var frequency = this.Sliders[cellIndex][0] +  this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0])/12; 
-        console.log(frequency);
         if (frequency > nextoctavefrequency) {
             this.Sliders[cellIndex][1] = 0;
             var frequency = this.Sliders[cellIndex][0];
@@ -64,7 +76,6 @@ function PitchSlider () {
             var frequency = nextoctavefrequency;
             jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved - 12 * moveValue);
         }
-        console.log(frequency);
         frequencyDiv.innerHTML = frequency.toFixed(2);
         this._logo.synth.stop();
         this._play(sliderrow.cells[cellIndex]);
@@ -108,7 +119,6 @@ function PitchSlider () {
         var that = this;
         var cellIndex = cell.cellIndex;
         var frequency = this.Sliders[cellIndex][0] + this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0]/12) + this.Sliders[cellIndex][2];
-        console.log(frequency.toFixed(2));
 
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -201,7 +211,6 @@ function PitchSlider () {
     }
 
 	this.init = function (logo) {
-		console.log('init PitchSlider');
 		this._logo = logo;
 		var that = this;
 
@@ -336,9 +345,7 @@ function PitchSlider () {
             cellDiv.setAttribute('position', 'absolute');
             cellDiv.style.height = Math.floor(w / 200) + 'px';
             cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-            console.log(cellDiv.style.top);
             jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
-            console.log(cellDiv.style.top);
             cellDiv.style.backgroundColor = MATRIXBUTTONCOLOR;
             cell.appendChild(cellDiv);
             var slider = document.createElement("P");
@@ -379,14 +386,11 @@ function PitchSlider () {
                 var frequency = that.Sliders[cellIndex][0] + that.Sliders[cellIndex][1] * parseFloat(that.Sliders[cellIndex][0]/12) + that.Sliders[cellIndex][2];
                 frequencyDiv.innerHTML = frequency.toFixed(2);
                 that._play(this);
-
             }
 
             cell.onclick=function() {
                 that._save(this);           
             }
-
-           
 
             var moveupcell = moveuprow.insertCell(i);
             moveupcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('move up') + '" alt="' + _('move up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -422,8 +426,7 @@ function PitchSlider () {
 
             movedowncell.onmouseout=function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLOR;
-            }
-           
+            }           
         }        
 	};
 };
