@@ -35,6 +35,7 @@ function PitchSlider () {
     };
 
     this._moveslider = function (cell, upordown) {
+        console.log("called _mousemove");
         var cellIndex = cell.cellIndex;
         var sliderrow = docById('slider');
         var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
@@ -46,15 +47,21 @@ function PitchSlider () {
         var divMoved =  jQuery(sliderDiv).position().top - this._initialTop;
 
         this.Sliders[cellIndex][2] = 0;
-        this.Sliders[cellIndex][1] += 1;    
+        this.Sliders[cellIndex][1] += 1 * upordown;    
         console.log(this.Sliders[cellIndex][1]);
         console.log(this.Sliders[cellIndex][2]);
         jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved - this.Sliders[cellIndex][1] * moveValue);
         var frequency = this.Sliders[cellIndex][0] +  this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0])/12; 
-        if (frequency > nextoctavefrequency || frequency < this.Sliders[cellIndex][0]) {
+        console.log(frequency);
+        if (frequency > nextoctavefrequency) {
             this.Sliders[cellIndex][1] = 0;
             var frequency = this.Sliders[cellIndex][0];
             jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved);
+        }
+        if (frequency < this.Sliders[cellIndex][0]) {
+            this.Sliders[cellIndex][1] = 11;
+            var frequency = nextoctavefrequency;
+            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved - 12 * moveValue);
         }
         console.log(frequency);
         frequencyDiv.innerHTML = frequency.toFixed(2);
@@ -156,6 +163,7 @@ function PitchSlider () {
         this._cellScale = w / 1200;
         var iconSize = Math.floor(this._cellScale * 24);
         this._initialTop = jQuery('#pitchSliderDiv').position().top;
+        var isKeyPressed = 0;
         
         docById('pitchSliderDiv').style.width = Math.floor(w / 2) + 'px';
         docById('pitchSliderDiv').style.overflowX = 'auto';
@@ -256,14 +264,26 @@ function PitchSlider () {
             cellDiv.appendChild(slider);
 
             cell.onmouseover=function() {
+                console.log("hello");
                 this.focus();
                 this.addEventListener("keydown", function(event) {
-                    if (event.keyCode === 38) {
-                        that._moveslider(this, 1);
+                    isKeyPressed = 1;
+                    if (event.keyCode === 38 || event.keyCode === 40) {
+                        isKeyPressed = 1;
                     }
+                });
 
-                    if (event.keyCode === 40) {
-                        that._moveslider(this, -1);
+                this.addEventListener("keyup", function(event) {
+                    if (isKeyPressed === 1) {
+                        isKeyPressed =0;
+                        
+                        if (event.keyCode === 38) {
+                            that._moveslider(this, 1);
+                        }                        
+
+                        if (event.keyCode === 40) {
+                            that._moveslider(this, -1);
+                        }
                     }
                 });
             };
@@ -305,9 +325,7 @@ function PitchSlider () {
                 that._save(this);           
             }
 
-            cell.addEventListener("wheel", function(e) {
-                that._mousemove(e, this);
-            });
+           
 
             var movecell = moverow.insertCell(i);
             movecell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('move') + '" alt="' + _('move') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -317,7 +335,7 @@ function PitchSlider () {
             movecell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             movecell.style.backgroundColor = MATRIXBUTTONCOLOR; 
             movecell.onclick=function() {
-                that._moveslider(this);
+                that._moveslider(this, 1);
             }
             movecell.onmouseover=function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
