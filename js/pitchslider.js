@@ -2,7 +2,8 @@ function PitchSlider () {
 
     this.Sliders = [];
     this._initialTop;
-
+    this._focusedCellIndex = 0;
+    this._isKeyPressed = 0;
 	this._addButton = function(row, colIndex, icon, iconSize, label) {
         var cell = row.insertCell();
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -145,6 +146,60 @@ function PitchSlider () {
         that._logo.blocks.loadNewBlocks(newStack);
     }
 
+    this._addKeyboardInput = function (cell) {
+        var that = this;
+        cell.focus();
+
+        cell.addEventListener("keydown", function(event) {
+            that._isKeyPressed = 1;
+            if (event.keyCode >= 37 && event.keyCode <= 40) {
+                that._isKeyPressed = 1;
+            }
+        });
+
+        cell.addEventListener("keyup", function(event) {
+            if (that._isKeyPressed === 1) {
+                that._isKeyPressed = 0;
+                        
+                if (event.keyCode === 38) {
+                    that._moveslider(cell, 1);
+                }                        
+
+                if (event.keyCode === 40) {
+                    that._moveslider(cell, -1);
+                }
+
+                if (event.keyCode === 37) {
+                    that._focusCell(cell, -1);
+                }
+
+                if (event.keyCode === 39) {
+                    that._focusCell(cell, 1);
+                }
+            }
+        });
+
+    }
+
+    this._focusCell = function (cell, RightOrLeft) {
+        var that = this;
+        var cellIndex = cell.cellIndex;
+        var toBeFocused = cellIndex + RightOrLeft;
+
+        if (toBeFocused < 0) {
+            toBeFocused = this.Sliders.length - 1;
+        } 
+
+        if (toBeFocused > this.Sliders.length - 1) {
+            toBeFocused = 0;
+        }
+
+        cell.blur();
+        var sliderrow = docById('slider');
+        var newCell = sliderrow.cells[toBeFocused];
+        this._addKeyboardInput(newCell);
+    }
+
 	this.init = function (logo) {
 		console.log('init PitchSlider');
 		this._logo = logo;
@@ -155,19 +210,22 @@ function PitchSlider () {
         docById('pitchSliderDiv').style.visibility = 'visible';
         docById('pitchSliderDiv').style.border = 2;
 		
-        docById('moveSliderDiv').style.display = 'inline';
-        docById('moveSliderDiv').style.visibility = 'visible';
-        docById('moveSliderDiv').style.border = 2;
+        docById('moveUpSliderDiv').style.display = 'inline';
+        docById('moveUpSliderDiv').style.visibility = 'visible';
+        docById('moveUpSliderDiv').style.border = 2;
+
+        docById('moveDownSliderDiv').style.display = 'inline';
+        docById('moveDownSliderDiv').style.visibility = 'visible';
+        docById('moveDownSliderDiv').style.border = 2;
 
 		var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = Math.floor(this._cellScale * 24);
         this._initialTop = jQuery('#pitchSliderDiv').position().top;
-        var isKeyPressed = 0;
         
         docById('pitchSliderDiv').style.width = Math.floor(w / 2) + 'px';
         docById('pitchSliderDiv').style.overflowX = 'auto';
-        docById('pitchSliderDiv').style.height = Math.floor(w / 4) + 'px';
+        docById('pitchSliderDiv').style.height = Math.floor(parseFloat(w) / 3.2) + 'px';
         docById('pitchSliderDiv').style.overflowY = 'auto';
 	
 		var tables = document.getElementsByTagName('TABLE');
@@ -189,10 +247,16 @@ function PitchSlider () {
         sliderDiv.appendChild(x);
         sliderDivPosition = sliderDiv.getBoundingClientRect();
 
-        var movesliderDiv = docById('moveSliderDiv');
-        movesliderDiv.style.paddingTop = 0 + 'px';
-        movesliderDiv.style.paddingLeft = 0 + 'px';
-        movesliderDivPosition = movesliderDiv.getBoundingClientRect();        
+        var moveUpsliderDiv = docById('moveUpSliderDiv');
+        moveUpsliderDiv.style.paddingTop = 0 + 'px';
+        moveUpsliderDiv.style.paddingLeft = 0 + 'px';
+        moveUpsliderDivPosition = moveUpsliderDiv.getBoundingClientRect();
+
+        var moveDownsliderDiv = docById('moveDownSliderDiv');
+        moveDownsliderDiv.style.paddingTop = 0 + 'px';
+        moveDownsliderDiv.style.paddingLeft = 0 + 'px';
+        moveDownsliderDivPosition = moveDownsliderDiv.getBoundingClientRect();        
+        
 
         var table = docById('buttonTable');
         var row = table.insertRow(0);
@@ -203,7 +267,8 @@ function PitchSlider () {
 
         cell.onclick=function() {
             docById('pitchSliderDiv').style.visibility = 'hidden';
-            docById('moveSliderDiv').style.visibility = 'hidden';
+            docById('moveUpSliderDiv').style.visibility = 'hidden';
+            docById('moveDownSliderDiv').style.visibility = 'hidden';
         };
 
         cell.onmouseover=function() {
@@ -222,11 +287,18 @@ function PitchSlider () {
         sliderDiv.appendChild(x);
 
         var x = document.createElement('TABLE');
-        x.setAttribute('id', 'movepitch');
+        x.setAttribute('id', 'moveUppitch');
         x.style.textAlign = 'center';
         x.cellSpacing = this._cellScale * 5 + 'px';
         x.cellPadding = 0;
-        movesliderDiv.appendChild(x);
+        moveUpsliderDiv.appendChild(x);
+
+        var x = document.createElement('TABLE');
+        x.setAttribute('id', 'moveDownpitch');
+        x.style.textAlign = 'center';
+        x.cellSpacing = this._cellScale * 5 + 'px';
+        x.cellPadding = 0;
+        moveDownsliderDiv.appendChild(x);
 
         var table = docById('pitchslider');
         var row = table.insertRow(0);
@@ -234,11 +306,17 @@ function PitchSlider () {
         row.style.top = Math.floor(sliderDivPosition.top) + 'px';
         row.setAttribute('id', 'slider');
 
-        var table = docById('movepitch');
-        var moverow = table.insertRow(0);
-        moverow.style.left = Math.floor(movesliderDivPosition.left) + 'px';
-        moverow.style.top = Math.floor(movesliderDivPosition.top) + 'px';
-        moverow.setAttribute('id', 'moveslider');
+        var table = docById('moveUppitch');
+        var moveuprow = table.insertRow(0);
+        moveuprow.style.left = Math.floor(moveUpsliderDivPosition.left) + 'px';
+        moveuprow.style.top = Math.floor(moveUpsliderDivPosition.top) + 'px';
+        moveuprow.setAttribute('id', 'moveUpslider');
+
+        var table = docById('moveDownpitch');
+        var movedownrow = table.insertRow(0);
+        movedownrow.style.left = Math.floor(moveDownsliderDivPosition.left) + 'px';
+        movedownrow.style.top = Math.floor(moveDownsliderDivPosition.top) + 'px';
+        movedownrow.setAttribute('id', 'moveDownslider');
 
         for (var i = 0; i < this.Sliders.length; i++) {
             var cell = row.insertCell(i);
@@ -264,28 +342,7 @@ function PitchSlider () {
             cellDiv.appendChild(slider);
 
             cell.onmouseover=function() {
-                console.log("hello");
-                this.focus();
-                this.addEventListener("keydown", function(event) {
-                    isKeyPressed = 1;
-                    if (event.keyCode === 38 || event.keyCode === 40) {
-                        isKeyPressed = 1;
-                    }
-                });
-
-                this.addEventListener("keyup", function(event) {
-                    if (isKeyPressed === 1) {
-                        isKeyPressed =0;
-                        
-                        if (event.keyCode === 38) {
-                            that._moveslider(this, 1);
-                        }                        
-
-                        if (event.keyCode === 40) {
-                            that._moveslider(this, -1);
-                        }
-                    }
-                });
+                that._addKeyboardInput(this);
             };
 
             cell.onmouseout=function() {
@@ -327,21 +384,39 @@ function PitchSlider () {
 
            
 
-            var movecell = moverow.insertCell(i);
-            movecell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('move') + '" alt="' + _('move') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-            movecell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-            movecell.style.minWidth = movecell.style.width;
-            movecell.style.maxWidth = movecell.style.width;
-            movecell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            movecell.style.backgroundColor = MATRIXBUTTONCOLOR; 
-            movecell.onclick=function() {
+            var moveupcell = moveuprow.insertCell(i);
+            moveupcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('move up') + '" alt="' + _('move up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            moveupcell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
+            moveupcell.style.minWidth = moveupcell.style.width;
+            moveupcell.style.maxWidth = moveupcell.style.width;
+            moveupcell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+            moveupcell.style.backgroundColor = MATRIXBUTTONCOLOR; 
+            moveupcell.onclick=function() {
                 that._moveslider(this, 1);
             }
-            movecell.onmouseover=function() {
+            moveupcell.onmouseover=function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
             }   
 
-            movecell.onmouseout=function() {
+            moveupcell.onmouseout=function() {
+                this.style.backgroundColor = MATRIXBUTTONCOLOR;
+            }
+
+            var movedowncell = movedownrow.insertCell(i);
+            movedowncell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/down.svg" title="' + _('move down') + '" alt="' + _('move down') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            movedowncell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
+            movedowncell.style.minWidth = movedowncell.style.width;
+            movedowncell.style.maxWidth = movedowncell.style.width;
+            movedowncell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+            movedowncell.style.backgroundColor = MATRIXBUTTONCOLOR; 
+            movedowncell.onclick=function() {
+                that._moveslider(this, -1);
+            }
+            movedowncell.onmouseover=function() {
+                this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+            }   
+
+            movedowncell.onmouseout=function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLOR;
             }
            
