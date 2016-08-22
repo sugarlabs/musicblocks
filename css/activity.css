@@ -438,14 +438,24 @@ table {
   overflow-y: scroll !important;
 }
 
-#moveSliderDiv {
+#moveUpSliderDiv {
   position: absolute;
-  top: 69%;
+  top: 66%;
   left: 30%;
   border-style: solid;
   border: 0 !important;
   background: rgba(255, 225, 255, 0.85);
   -webkit-user-select: none;
+}
+
+#moveDownSliderDiv {
+    position: absolute;
+    top: 74%;
+    left: 30%;
+    border-style: solid;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-user-select: none;
 }
 
 #tempoDiv {
