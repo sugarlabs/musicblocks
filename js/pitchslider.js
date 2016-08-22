@@ -1,10 +1,10 @@
 function PitchSlider () {
-
     this.Sliders = [];
     this._initialTop;
     this._focusedCellIndex = 0;
     this._isKeyPressed = 0;
-	this._addButton = function(row, colIndex, icon, iconSize, label) {
+	
+    this._addButton = function(row, colIndex, icon, iconSize, label) {
         var cell = row.insertCell();
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
@@ -221,6 +221,10 @@ function PitchSlider () {
 		var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = Math.floor(this._cellScale * 24);
+
+        jQuery('#pitchSliderDiv').css('top', '20%');
+        jQuery('#moveUpSliderDiv').css('top', '66%');
+        jQuery('#moveDownSliderDiv').css('top', '74%');
         this._initialTop = jQuery('#pitchSliderDiv').position().top;
         
         docById('pitchSliderDiv').style.width = Math.floor(w / 2) + 'px';
