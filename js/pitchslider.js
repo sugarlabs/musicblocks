@@ -13,6 +13,7 @@
 // from given frequency to nextoctave frequency(two times the given frequency)
 // in continuous manner.
 
+const SEMITONE = Math.pow(2, 1/12);
 
 function PitchSlider () {
     this.Sliders = [];
@@ -42,7 +43,7 @@ function PitchSlider () {
 
     this._play = function (cell) {
         var cellIndex = cell.cellIndex;
-        var frequency = this.Sliders[cellIndex][0] +  this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0])/12 + this.Sliders[cellIndex][2];
+        var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]); 
         var obj = frequencyToPitch(frequency);
         var pitchnotes = [];
         var note = obj[0] + obj[1];
@@ -65,7 +66,7 @@ function PitchSlider () {
         this.Sliders[cellIndex][2] = 0;
         this.Sliders[cellIndex][1] += 1 * upordown;    
         jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved - this.Sliders[cellIndex][1] * moveValue);
-        var frequency = this.Sliders[cellIndex][0] +  this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0])/12; 
+        var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]); 
         if (frequency > nextoctavefrequency) {
             this.Sliders[cellIndex][1] = 0;
             var frequency = this.Sliders[cellIndex][0];
@@ -81,44 +82,10 @@ function PitchSlider () {
         this._play(sliderrow.cells[cellIndex]);
     };
 
-    this._mousemove = function (e,cell) {
-        var w = window.innerWidth;
-        var sliderDiv = docById('pitchSliderDiv');
-        var cellIndex = cell.cellIndex;
-        var cellDiv = cell.childNodes[0];
-        var frequencyDiv = cellDiv.childNodes[0];
-        var cellDivPosition = cellDiv.getBoundingClientRect();
-        var moveValue = parseFloat(Math.floor(SLIDERWIDTH * this._cellScale))/36;
-        var offset = parseFloat(this.Sliders[cellIndex][0]) / 144;
-        if(e.wheelDelta > 0) {
-            this.Sliders[cellIndex][2] += offset;
-            jQuery(cellDiv).css('top',jQuery(cellDiv).position().top - moveValue);
-        } else {
-            this.Sliders[cellIndex][2] -= offset;
-            jQuery(cellDiv).css('top',jQuery(cellDiv).position().top + moveValue);
-        }
-        if (this.Sliders[cellIndex][2] > parseFloat(this.Sliders[cellIndex][0]) / 12) {
-            this.Sliders[cellIndex][1] += 1;
-            this.Sliders[cellIndex][2] = 0;
-        }
-        var frequency = this.Sliders[cellIndex][0] + this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0]/12) + this.Sliders[cellIndex][2];
-        var nextoctavefrequency = 2 * this.Sliders[cellIndex][0];   
-        if (frequency > nextoctavefrequency || frequency < this.Sliders[cellIndex][0]) {
-            this.Sliders[cellIndex][1] = 0;
-            this.Sliders[cellIndex][2] = 0;
-            var frequency = this.Sliders[cellIndex][0];
-            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
-        }
-        frequencyDiv.innerHTML =  frequency.toFixed(2);
-        this._logo.synth.stop();
-        this._play(cell);
-
-    };
-
     this._save = function (cell) {
         var that = this;
         var cellIndex = cell.cellIndex;
-        var frequency = this.Sliders[cellIndex][0] + this.Sliders[cellIndex][1] * parseFloat(this.Sliders[cellIndex][0]/12) + this.Sliders[cellIndex][2];
+        var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]); 
 
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -130,28 +97,12 @@ function PitchSlider () {
         var endOfStackIdx = 0;
         var previousBlock = 0;
 
-        var noteObj = frequencyToPitch(frequency);
-        var note = noteObj[0];
-        var octave = noteObj[1];
-
-        if(noteObj[2] === 0) {
-            var pitchblockidx = newStack.length;
-            var noteidx = pitchblockidx + 1;
-            var octaveidx = pitchblockidx + 2;
-            var hiddenidx = pitchblockidx + 3;
-            newStack.push([pitchblockidx, 'pitch', 0, 0, [previousBlock, noteidx, octaveidx, hiddenidx]]);
-            newStack.push([noteidx, ['text', {'value': note}], 0, 0, [pitchblockidx]]);
-            newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchblockidx]]);
-            newStack.push([hiddenidx, 'hidden', 0, 0, [pitchblockidx, null]]);
-        } else {
-            var sineblockidx = newStack.length;
-            var frequencyidx = sineblockidx + 1;
-            var hiddenidx = sineblockidx + 2;
-            newStack.push([sineblockidx, 'sine', 0, 0, [previousBlock, frequencyidx, hiddenidx]]);
-            newStack.push([frequencyidx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [sineblockidx]]);
-            newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, null]]);
-
-        } 
+        var sineblockidx = newStack.length;
+        var frequencyidx = sineblockidx + 1;
+        var hiddenidx = sineblockidx + 2;
+        newStack.push([sineblockidx, 'sine', 0, 0, [previousBlock, frequencyidx, hiddenidx]]);
+        newStack.push([frequencyidx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [sineblockidx]]);
+        newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, null]]); 
 
         that._logo.blocks.loadNewBlocks(newStack);
     }
@@ -379,11 +330,11 @@ function PitchSlider () {
                 var distanceFromBottom =  jQuery(sliderDiv).position().top + w / 9 - divMoved - jQuery(cellDiv).position().top;
                 var frequencyOffSet = parseFloat(that.Sliders[cellIndex][0]) / slidingAreaHeight * distanceFromBottom;
 
-                that.Sliders[cellIndex][1] = parseInt(frequencyOffSet / that.Sliders[cellIndex][0] * 12);
-                that.Sliders[cellIndex][2] = frequencyOffSet - that.Sliders[cellIndex][1] * parseFloat(that.Sliders[cellIndex][0]) / 12;
+                that.Sliders[cellIndex][1] = parseInt(Math.log2(parseFloat(that.Sliders[cellIndex][0] + frequencyOffSet) / that.Sliders[cellIndex][0]) * 12);
+                that.Sliders[cellIndex][2] = frequencyOffSet - that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
 
                 var frequencyDiv = cellDiv.childNodes[0];
-                var frequency = that.Sliders[cellIndex][0] + that.Sliders[cellIndex][1] * parseFloat(that.Sliders[cellIndex][0]/12) + that.Sliders[cellIndex][2];
+                var frequency = that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]); 
                 frequencyDiv.innerHTML = frequency.toFixed(2);
                 that._play(this);
             }
