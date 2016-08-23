@@ -236,7 +236,7 @@ function PitchSlider () {
         jQuery('#moveDownSliderDiv').css('top', '74%');
         this._initialTop = jQuery('#pitchSliderDiv').position().top;
         
-        docById('pitchSliderDiv').style.width = Math.floor(w / 2) + 'px';
+        docById('pitchSliderDiv').style.width = Math.floor(SLIDERWIDTH * this._cellScale) * (this.Sliders.length + 1) + 'px';
         docById('pitchSliderDiv').style.overflowX = 'auto';
         docById('pitchSliderDiv').style.height = Math.floor(parseFloat(w) / 3.2) + 'px';
         docById('pitchSliderDiv').style.overflowY = 'auto';
