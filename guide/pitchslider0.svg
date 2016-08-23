@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg4075"
+   viewBox="0 0 265 198.55997"
+   height="198.56"
+   width="265"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="pitchmatrixpitchstaircase.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="744"
+     id="namedview74"
+     showgrid="false"
+     inkscape:zoom="0.49940526"
+     inkscape:cx="497.38042"
+     inkscape:cy="311.75783"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4075" />
+  <defs
+     id="defs4077">
+    <filter
+       id="dropshadow"
+       color-interpolation-filters="sRGB"
+       height="1.3">
+      <feGaussianBlur
+         id="feGaussianBlur3106"
+         stdDeviation="3"
+         in="SourceAlpha" />
+      <feOffset
+         id="feOffset3108"
+         result="offsetblur"
+         dy="2"
+         dx="2" />
+      <feComponentTransfer
+         id="feComponentTransfer3110">
+        <feFuncA
+           id="feFuncA3112"
+           slope="0.2"
+           type="linear" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3114">
+        <feMergeNode
+           id="feMergeNode3116" />
+        <feMergeNode
+           id="feMergeNode3118"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <g
+     transform="matrix(0.9990308,0,0,1.2764038,4.1764929,2.7107612)"
+     id="g4085">
+    <path
+       style="fill:#00b700;fill-opacity:1;stroke:#c48d00;stroke-width:1.77111387;stroke-linecap:round;stroke-opacity:1"
+       id="path3660"
+       d="m 1,29 0,-8 c 0,-4.18879 3.8112098,-8 8,-8 l 8,0 10,-12 10,12 18,0 60,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.617994,0 -5.219867,1.077731 -7.071068,2.928932 C 18.077731,57.780133 17,60.382006 17,63 l 0,8 0,8 0,8 c 0,2.61799 1.077731,5.21987 2.928932,7.07107 C 21.780133,95.92227 24.382004,97 27,97 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.936277,6.98407 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.1887902,0 -8,-3.81121 -8,-8 l 0,-8 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       id="text3662"
+       x="6.1353979"
+       y="-4.7390666">
+      <tspan
+         id="tspan3664"
+         y="38.260933"
+         x="14.135398">pitchslider</tspan>
+    </text>
+  </g>
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1.99999976;stroke-linecap:round;stroke-opacity:1"
+     id="path3101"
+     d="m 22.004043,93.037704 0,-10.791888 a 8.1856196,10.791925 0 0 1 8.18562,-10.791898 l 8.18561,0 0,5.39595 20.46406,0 0,-5.39595 61.392147,0 8.18562,0 a 8.1856196,10.791925 0 0 1 8.18562,10.791898 l 0,10.791888 -8.18562,0 0,-8.093912 -8.18562,0 0,26.979768 8.18562,0 0,-8.09394 8.18562,0 0,10.79192 a 8.1856196,10.791925 0 0 1 -8.18562,10.79192 l -8.18562,0 -61.392147,0 -2.0464,0 0,5.39598 -16.37124,0 0,-5.39598 -2.04642,0 -8.18561,0 a 8.1856196,10.791925 0 0 1 -8.18562,-10.79192 l 0,-10.79192 0,-10.791916 z" />
+  <text
+     style="font-size:23.49715614px;text-anchor:end;fill:#000000;font-family:Sans"
+     id="text3103"
+     y="61.055717"
+     x="24.090504"
+     transform="scale(0.87091627,1.148216)">
+    <tspan
+       id="tspan3105"
+       y="93.951805"
+       x="134.52695">sine</tspan>
+  </text>
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:1.99999976;stroke-linecap:round;stroke-opacity:1"
+     id="path21-7"
+     d="m 138.64913,71.453918 122.78429,0 0,53.959542 -122.78429,0 0,-21.58384 0,-2.69797 -12.27843,0 0,8.09394 -4.09281,0 0,-21.583834 4.09281,0 0,8.093924 12.27843,0 0,-2.697976 z" />
+  <text
+     style="font-size:23.49715614px;text-anchor:start;fill:#000000;font-family:Sans"
+     id="text23-1"
+     y="63.168827"
+     x="187.22025"
+     transform="scale(0.87091627,1.148216)">
+    <tspan
+       id="tspan25-0"
+       y="93.715103"
+       x="210.71729">220</tspan>
+  </text>
+  <metadata
+     id="metadata6332">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
