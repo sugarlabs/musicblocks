@@ -2,48 +2,45 @@
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Music Blocks</title>
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
-    <link rel="stylesheet" href="css/activity.css">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Music Blocks</title>
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+  <link rel="stylesheet" href="css/activity.css">
 
-    <script src="lib/mespeak.js"></script>
-    <script src="lib/reqwest.js"></script>
-    <script src="lib/jquery-2.1.4.js"></script>
-    <script src="lib/jquery-ui.js"></script>
-    <script src="lib/webL10n.js"></script>
-    <script src="lib/tone.min.js"></script>
-    <script src="lib/jquery.ruler.js"></script>
-    <script src="lib/modernizr-2.6.2.min.js"></script>
+  <script src="lib/mespeak.js"></script>
+  <script src="lib/reqwest.js"></script>
+  <script src="lib/jquery-2.1.4.js"></script>
+  <script src="lib/jquery-ui.js"></script>
+  <script src="lib/webL10n.js"></script>
+  <script src="lib/tone.min.js"></script>
+  <script src="lib/jquery.ruler.js"></script>
+  <script src="lib/modernizr-2.6.2.min.js"></script>
 
-    <script type="text/javascript"></script>
+  <script type="text/javascript"></script>
 
-    <script src="//code.jquery.com/jquery-2.1.4.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="//code.jquery.com/jquery-2.1.4.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
+  <link rel="prefetch" type="application/l10n" href="./localization.ini" />
+  <script data-main="js/loader" src="lib/require.js"></script>
 
-    <link rel="prefetch" type="application/l10n" href="./localization.ini" />
-    <script data-main="js/loader" src="lib/require.js">
-    </script>
-
-    <link rel="manifest" href="android_chrome_manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="activity/activity-icon-color-4-00.png">
-    <meta id="theme-color" name="theme-color" content="#2196F3">
+  <link rel="manifest" href="android_chrome_manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="192x192" href="activity/activity-icon-color-4-00.png">
+  <meta id="theme-color" name="theme-color" content="#2196F3">
 </head>
 
 <body data-title="index" id="body" style="background: #96D3F3;">
+  <script>
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId: '1496189893985945',
+            xfbml: true,
+            version: 'v2.1'
+        });
+    };
 
-    <script>
-        window.fbAsyncInit = function() {
-            FB.init({
-                appId: '1496189893985945',
-                xfbml: true,
-                version: 'v2.1'
-            });
-        };
-
-        <!--
+    <!--
         try {
             (function(d, s, id) {
                 var js, fjs = d.getElementsByTagName(s)[0];
@@ -56,120 +53,115 @@
                 fjs.parentNode.insertBefore(js, fjs);
             }(document, 'script', 'facebook-jssdk'));
         } catch (e) {}
-          -->
+    -->
     
-       $(function() {
-            $("#pitchtimematrix").draggable();
-        });
+    $(function() {
+        $("#pitchtimematrix").draggable();
+    });
 
-	    $(function() {
-            $("#pitchdrummatrix").draggable();
-        });
+    $(function() {
+        $("#pitchdrummatrix").draggable();
+    });
         
-        $(function() {
-            $('#drumDiv').draggable({
-                drag: function() {
-                    jQuery('#rulerbody').css('top',jQuery(this).position().top);
-                    jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);
-
-                },
-                stop: function(){
-                    jQuery('#rulerbody').css('top',jQuery(this).position().top);                     
-                    jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
-                }
-            });
+    $(function() {
+        $('#drumDiv').draggable({
+            drag: function() {
+                jQuery('#rulerbody').css('top',jQuery(this).position().top);
+                jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);
+            },
+            stop: function(){
+                jQuery('#rulerbody').css('top',jQuery(this).position().top);                     
+                jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
+            }
         });
+    });
         
-        $(function() {
-            $('#rulerbody').draggable({
-                drag: function() {
-                    jQuery('#drumDiv').css('top',jQuery(this).position().top);
-                    jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/30);
-
-                },
-                stop: function(){
-                    jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
-                    jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/30);                                        
-                }
-            });
+    $(function() {
+        $('#rulerBody').draggable({
+            drag: function() {
+                jQuery('#drumDiv').css('top',jQuery(this).position().top);
+                jQuery('#drumDiv').css('left',jQuery(this).position().left + $(window).innerWidth/30);
+            },
+            stop: function(){
+                jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
+                jQuery('#drumDiv').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
+            }
         });
-
-        $(function() {
-            $('#pitchstaircase').draggable({
-                drag: function() {
-                    jQuery('#playPitch').css('top',jQuery(this).position().top);
-                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);
-
-                },
-                stop: function(){
-                    jQuery('#playPitch').css('top',jQuery(this).position().top);                     
-                    jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);                                        
-                }
-            });
-        });
+    });
         
-        $(function() {
-            $('#playPitch').draggable({
-                drag: function() {
-                    jQuery('#pitchstaircase').css('top',jQuery(this).position().top);
-                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);
-
-                },
-                stop: function(){
-                    jQuery('#pitchstaircase').css('top',jQuery(this).position().top);                     
-                    jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);                                        
-                }
-            });
+    $(function() {
+        $('#pitchstaircase').draggable({
+            drag: function() {
+                jQuery('#playPitch').css('top',jQuery(this).position().top);
+                jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);
+            },
+            stop: function(){
+                jQuery('#playPitch').css('top',jQuery(this).position().top);                     
+                jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);                                        
+            }
         });
-
-        $(function() {
-            $('#tempoCanvas').draggable({
-                drag: function() {
-                    jQuery('#tempoDiv').css('left',jQuery(this).position().left);
-                    jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);
-
-                },
-                stop: function(){
-                    jQuery('#tempoDiv').css('left',jQuery(this).position().left);                     
-                    jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);                                        
-                }
-            });
-        });
+    });
         
-        $(function() {
-            $('#tempoDiv').draggable({
-                drag: function() {
-                    jQuery('#tempoCanvas').css('left',jQuery(this).position().left);
-                    jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);
-
-                },
-                stop: function(){
-                    jQuery('#tempoCanvas').css('left',jQuery(this).position().left);                     
-                    jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);                                        
-                }
-            });
+    $(function() {
+        $('#playPitch').draggable({
+            drag: function() {
+                jQuery('#pitchstaircase').css('top',jQuery(this).position().top);
+                jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);
+            },
+            stop: function(){
+                jQuery('#pitchstaircase').css('top',jQuery(this).position().top);                     
+                jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);                                        
+            }
         });
+    });
 
-        $(function() {
-            $('#pitchSliderDiv').draggable({
-                drag: function() {
-                    jQuery('#moveUpSliderDiv').css('left',jQuery(this).position().left);
-                    jQuery('#moveUpSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4.4);
-                    jQuery('#moveDownSliderDiv').css('left',jQuery(this).position().left);
-                    jQuery('#moveDownSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/3.8);
-                },
-                stop: function(){
-                    jQuery('#moveUpSliderDiv').css('left',jQuery(this).position().left);                     
-                    jQuery('#moveUpSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4.4);
-                    jQuery('#moveDownSliderDiv').css('left',jQuery(this).position().left);                     
-                    jQuery('#moveDownSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/3.8);
-                }
-            });
+    $(function() {
+        $('#tempoCanvas').draggable({
+            drag: function() {
+                jQuery('#tempoDiv').css('left',jQuery(this).position().left);
+                jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);
+            },
+            stop: function(){
+                jQuery('#tempoDiv').css('left',jQuery(this).position().left);                     
+                jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);                                        
+            }
         });
+    });
         
-	$(function() {
-            $("#statusmatrix").draggable();
+    $(function() {
+        $('#tempoDiv').draggable({
+            drag: function() {
+                jQuery('#tempoCanvas').css('left',jQuery(this).position().left);
+                jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);
+            },
+            stop: function(){
+                jQuery('#tempoCanvas').css('left',jQuery(this).position().left);                     
+                jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);                                        
+            }
         });
+    });
+
+    $(function() {
+        $('#pitchSliderDiv').draggable({
+            drag: function() {
+                jQuery('#moveUpSliderDiv').css('left',jQuery(this).position().left);
+                jQuery('#moveUpSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4.4);
+                jQuery('#moveDownSliderDiv').css('left',jQuery(this).position().left);
+                jQuery('#moveDownSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/3.8);
+            },
+            stop: function(){
+                jQuery('#moveUpSliderDiv').css('left',jQuery(this).position().left);                     
+                jQuery('#moveUpSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4.4);
+                jQuery('#moveDownSliderDiv').css('left',jQuery(this).position().left);                     
+                jQuery('#moveDownSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/3.8);
+            }
+        });
+    });
+        
+    $(function() {
+        $("#statusmatrix").draggable();
+    });
+
     $(function() {
         $('#pitchstaircase').on('scroll', function () {
             jQuery('#playPitch').scrollTop(jQuery(this).scrollTop());
@@ -182,177 +174,175 @@
         });
     });
 
-	$(function() {
-            $("#modewidget").draggable();
+    $(function() {
+        $("#modewidget").draggable();
+    });
+
+    (function($) {
+        $.fn.fixMe = function() {
+            return this.each(function() {
+                var $this = $(this), $t_fixed;
+
+                function init() {
+                    $this.wrap('<div class="container" />');
+                    $t_fixed = $this.clone();
+                    $t_fixed.find("tbody").remove().end().addClass("fixed").insertBefore($this);
+                    resizeFixed();
+                };
+
+                function resizeFixed() {
+                    $t_fixed.find("th").each(function(index) {
+                        $(this).css("width", $this.find("th").eq(index).outerWidth() + "px");
+                    });
+                };
+
+                function scrollFixed() {
+                    var offset = $(this).scrollTop(), tableOffsetTop = $this.offset().top, tableOffsetBottom = tableOffsetTop + $this.height() - $this.find("thead").height();
+
+                    if (offset < tableOffsetTop || offset > tableOffsetBottom) {
+                        $t_fixed.hide();
+                    } else if (offset >= tableOffsetTop && offset <= tableOffsetBottom && $t_fixed.is(":hidden")) {
+                        $t_fixed.show();
+                    }
+                };
+
+                $(window).resize(resizeFixed);
+                $(window).scroll(scrollFixed);
+                init();
+	    });
+        };
+    })(jQuery);
+
+    $(document).ready(function() {
+	$("solfa").fixMe();
+        $(".up").click(function() {
+            $('html, body').animate({
+                scrollTop: 0
+            }, 2000);
         });
-
-        (function($) {
-            $.fn.fixMe = function() {
-                return this.each(function() {
-                    var $this = $(this),
-                        $t_fixed;
-
-                    function init() {
-                        $this.wrap('<div class="container" />');
-                        $t_fixed = $this.clone();
-                        $t_fixed.find("tbody").remove().end().addClass("fixed").insertBefore($this);
-                        resizeFixed();
-                    }
-
-                    function resizeFixed() {
-                        $t_fixed.find("th").each(function(index) {
-                            $(this).css("width", $this.find("th").eq(index).outerWidth() + "px");
-                        });
-                    }
-
-                    function scrollFixed() {
-                        var offset = $(this).scrollTop(),
-                            tableOffsetTop = $this.offset().top,
-                            tableOffsetBottom = tableOffsetTop + $this.height() - $this.find("thead").height();
-                        if (offset < tableOffsetTop || offset > tableOffsetBottom)
-                            $t_fixed.hide();
-                        else if (offset >= tableOffsetTop && offset <= tableOffsetBottom && $t_fixed.is(":hidden"))
-                            $t_fixed.show();
-                    }
-                    $(window).resize(resizeFixed);
-                    $(window).scroll(scrollFixed);
-                    init();
-                });
-            };
-        })(jQuery);
-
-        $(document).ready(function() {
-            $("solfa").fixMe();
-            $(".up").click(function() {
-                $('html, body').animate({
-                    scrollTop: 0
-                }, 2000);
-            });
-        });
+    });
       
-        function moveMatrix(event) {
-            var myDiv = document.getElementById('pitchtimematrix');
-            var myDivPosition = myDiv.getBoundingClientRect();
+    function moveMatrix(event) {
+        var myDiv = document.getElementById('pitchtimematrix');
+        var myDivPosition = myDiv.getBoundingClientRect();
 
-            var table = document.getElementById('pitchTimeTable');
-            var row = table.rows.item(0);
-            row.style.left = myDivPosition.left + 'px';
-            row.style.top = myDivPosition.top + 'px';
+        var table = document.getElementById('pitchTimeTable');
+        var row = table.rows.item(0);
+        row.style.left = myDivPosition.left + 'px';
+        row.style.top = myDivPosition.top + 'px';
 
-            // What does this do?
-            var marginFromTop = Math.floor(myDivPosition.top + this.cellScale * 2 + parseInt(myDiv.style.paddingTop));
-            for (var i = 1, row; row = table.rows[i]; i++) {
-                cell = row.cells[0];
-                cell.style.left = myDivPosition.left + 2 + 'px';
-                cell.style.top = marginFromTop + 'px';
-                marginFromTop += parseInt(cell.style.height);
-            }
+        // What does this do?
+        var marginFromTop = Math.floor(myDivPosition.top + this.cellScale * 2 + parseInt(myDiv.style.paddingTop));
+        for (var i = 1, row; row = table.rows[i]; i++) {
+            cell = row.cells[0];
+            cell.style.left = myDivPosition.left + 2 + 'px';
+            cell.style.top = marginFromTop + 'px';
+            marginFromTop += parseInt(cell.style.height);
         }
+    };
 
-        function movePitchDrumMatrix(event) {
-            var myDiv = document.getElementById('pitchdrummatrix');
-            var myDivPosition = myDiv.getBoundingClientRect();
+    function movePitchDrumMatrix(event) {
+        var myDiv = document.getElementById('pitchdrummatrix');
+        var myDivPosition = myDiv.getBoundingClientRect();
 
-            var table = document.getElementById('drumTable');
-            var row = table.rows.item(0);
-            row.style.left = myDivPosition.left + 'px';
-            row.style.top = myDivPosition.top + 'px';
-        }
+        var table = document.getElementById('drumTable');
+        var row = table.rows.item(0);
+        row.style.left = myDivPosition.left + 'px';
+        row.style.top = myDivPosition.top + 'px';
+    };
 
-        function moveStatusMatrix(event) {
-            var myDiv = document.getElementById('statusmatrix');
-            var myDivPosition = myDiv.getBoundingClientRect();
+    function moveStatusMatrix(event) {
+        var myDiv = document.getElementById('statusmatrix');
+        var myDivPosition = myDiv.getBoundingClientRect();
 
-            var table = document.getElementById('statusTable');
-            var row = table.rows.item(0);
-            row.style.left = myDivPosition.left + 'px';
-            row.style.top = myDivPosition.top + 'px';
-        }
+        var table = document.getElementById('statusTable');
+        var row = table.rows.item(0);
+        row.style.left = myDivPosition.left + 'px';
+        row.style.top = myDivPosition.top + 'px';
+    };
 
-        function moveModeWidget(event) {
-            var modeDiv = document.getElementById('modewidget');
-            var modeDivPosition = modeDiv.getBoundingClientRect();
+    function moveModeWidget(event) {
+        var modeDiv = document.getElementById('modewidget');
+        var modeDivPosition = modeDiv.getBoundingClientRect();
 
-            var table = document.getElementById('modeTable');
-            var row = table.rows.item(0);
-            row.style.left = modeDivPosition.left + 'px';
-            row.style.top = modeDivPosition.top + 'px';
-        }
-    </script>
+        var table = document.getElementById('modeTable');
+        var row = table.rows.item(0);
+        row.style.left = modeDivPosition.left + 'px';
+        row.style.top = modeDivPosition.top + 'px';
+    };
+  </script>
 
-    <!-- see activity/activity-icon-color-loading.svg for info -->
-    <div class="canvasHolder">
-        <canvas id="myCanvas" width="1200" height="900"></canvas>
-        <canvas id="myChart" width="600" height="600"></canvas>
-        <video id="camVideo" style="visibility:hidden;"></video>
-        <canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;"></canvas>
-        <canvas id="camCanvas" style="visibility:hidden;"></canvas>
-        <div id="labelDiv"></div>
-        <div id="dissectNumber"></div>
-        <div id="ioDiv">
-            <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*" />
-            <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb" />
-            <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json" />
-            <input tabindex="-1" class="file" type="file" id="myOpenAll" />
-        </div>
-        <div id="audio"></div>
-        <div id="tourData"></div>
+  <!-- see activity/activity-icon-color-loading.svg for info -->
+  <div class="canvasHolder">
+    <canvas id="myCanvas" width="1200" height="900"></canvas>
+    <canvas id="myChart" width="600" height="600"></canvas>
+    <video id="camVideo" style="visibility:hidden;"></video>
+    <canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;"></canvas>
+    <canvas id="camCanvas" style="visibility:hidden;"></canvas>
+    <div id="labelDiv"></div>
+    <div id="ioDiv">
+      <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*" />
+      <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb" />
+      <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json" />
+      <input tabindex="-1" class="file" type="file" id="myOpenAll" />
     </div>
-    <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
-        <img src="./activity/mouse.svg" style="max-width:50%; width: 512px; margin: auto; display: block;" />
+    <div id="audio"></div>
+    <div id="tourData"></div>
+  </div>
+
+  <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
+    <img src="./activity/mouse.svg" style="max-width:50%; width: 512px; margin: auto; display: block;" />
+  </div>
+
+  <div id="popdown-palette"></div>
+
+  <div id="main-toolbar" class="toolbar"></div>
+
+  <div id="loader"></div>
+
+  <div id="header" class="EaselJS"></div>
+
+  <div class="planet" style="display: none;">
+    <nav>
+      <div class="nav-container">
+        <img src="header-icons/planet-button.svg" class="logo" />
+        <h1 id="planetTitle"></h1>
+        <ul>
+          <li class="back"><img src="header-icons/cancel-button.svg" /></li>
+          <li class="new"><img src="header-icons/add.svg" /></li>
+          <li class="open"><img src="header-icons/folder-open.svg" /></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="nav-spacer"></div>
+    <div class="planet-content">
+      <h2 id="planetMyDevice"></h2>
+      <ul class="content l"></ul>
+      <h2 id="planetWorldwide"></h2>
+      <ul class="content w"></ul>
     </div>
+  </div>
 
-    <div id="popdown-palette"></div>
-
-    <div id="main-toolbar" class="toolbar"></div>
-
-    <div id="loader"></div>
-
-    <div id="header" class="EaselJS"></div>
-
-    <div class="planet" style="display: none;">
-        <nav>
-            <div class="nav-container">
-                <img src="header-icons/planet-button.svg" class="logo" />
-                <h1 id="planetTitle"></h1>
-                <ul>
-                    <li class="back"><img src="header-icons/cancel-button.svg" /></li>
-                    <li class="new"><img src="header-icons/add.svg" /></li>
-                    <li class="open"><img src="header-icons/folder-open.svg" /></li>
-                </ul>
-            </div>
-        </nav>
-
-        <div class="nav-spacer"></div>
-        <div class="planet-content">
-            <h2 id="planetMyDevice"></h2>
-            <ul class="content l"></ul>
-
-            <h2 id="planetWorldwide"></h2>
-            <ul class="content w"></ul>
-        </div>
-    </div>
-
-    <div id="pitchtimematrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
-    <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
-    <div id="rulerbody" overflow-x="auto"></div>
-    <div id="dissectNumber"></div>
-    <div id="drumDiv"></div>
-    <div id="pitchstaircase"></div>
-    <div id="playPitch"></div>
-    <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
-    <div id="pitchSliderDiv"></div>
-    <div id="moveUpSliderDiv"></div>
-    <div id="moveDownSliderDiv"></div>
-    <div id="sliderInCell"></div>
-    <div id="tempoDiv"></div>
-    <div id="BPMInput"></div>
-    <div id="musicratio1"></div>
-    <div id="musicratio2"></div>
-    <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    
-    <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>    
-    <div id="helpElem"></div>
-
+  <div id="pitchtimematrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
+  <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
+  <div id="rulerbody" overflow-x="auto"></div>
+  <div id="dissectNumber"></div>
+  <div id="drumDiv"></div>
+  <div id="pitchstaircase"></div>
+  <div id="playPitch"></div>
+  <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
+  <div id="pitchSliderDiv"></div>
+  <div id="moveUpSliderDiv"></div>
+  <div id="moveDownSliderDiv"></div>
+  <div id="sliderInCell"></div>
+  <div id="tempoDiv"></div>
+  <div id="BPMInput"></div>
+  <div id="musicratio1"></div>
+  <div id="musicratio2"></div>
+  <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>    
+  <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>    
+  <div id="helpElem"></div>
 </body>
 
 </html>
