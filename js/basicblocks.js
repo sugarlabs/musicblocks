@@ -338,10 +338,31 @@ function initBasicProtoBlocks(palettes, blocks) {
     modewidgetBlock.adjustWidthToLabel();
     modewidgetBlock.stackClampZeroArgBlock();
 
+    var tempoBlock = new ProtoBlock('tempo');
+    tempoBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['tempo'] = tempoBlock;
+    tempoBlock.staticLabels.push(_('tempo'));
+    tempoBlock.adjustWidthToLabel();
+    tempoBlock.stackClampZeroArgBlock();
+
+    var pitchDrumMatrixBlock = new ProtoBlock('pitchdrummatrix');
+    pitchDrumMatrixBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['pitchdrummatrix'] = pitchDrumMatrixBlock;
+    pitchDrumMatrixBlock.staticLabels.push(_('pitch-drum matrix'));
+    pitchDrumMatrixBlock.adjustWidthToLabel();
+    pitchDrumMatrixBlock.stackClampZeroArgBlock();
+
+    var pitchsliderBlock = new ProtoBlock('pitchslider');
+    pitchsliderBlock.palette = palettes.dict['matrix'];
+    blocks.protoBlockDict['pitchslider'] = pitchsliderBlock;
+    pitchsliderBlock.staticLabels.push(_('pitchslider'));
+    pitchsliderBlock.adjustWidthToLabel();
+    pitchsliderBlock.stackClampZeroArgBlock();
+
     var pitchstaircaseBlock = new ProtoBlock('pitchstaircase');
     pitchstaircaseBlock.palette = palettes.dict['matrix'];
     blocks.protoBlockDict['pitchstaircase'] = pitchstaircaseBlock;
-    pitchstaircaseBlock.staticLabels.push(_('pitchstaircase'));
+    pitchstaircaseBlock.staticLabels.push(_('pitch staircase'));
     pitchstaircaseBlock.adjustWidthToLabel();
     pitchstaircaseBlock.stackClampZeroArgBlock();
 
@@ -543,26 +564,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     notevolumeFactor.adjustWidthToLabel();
     notevolumeFactor.parameterBlock();
 
-    /*
-    var playfwdBlock = new ProtoBlock('playfwd');
-    playfwdBlock.hidden = true;
-    playfwdBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['playfwd'] = playfwdBlock;
-    playfwdBlock.hidden = true;
-    playfwdBlock.staticLabels.push(_('play forward'));
-    playfwdBlock.adjustWidthToLabel();
-    playfwdBlock.flowClampZeroArgBlock();
-
-    var playbwdBlock = new ProtoBlock('playbwd');
-    playbwdBlock.hidden = true;
-    playbwdBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['playbwd'] = playbwdBlock;
-    playbwdBlock.hidden = true;
-    playbwdBlock.staticLabels.push(_('play backward'));
-    playbwdBlock.adjustWidthToLabel();
-    playbwdBlock.flowClampZeroArgBlock();
-    */
-    
     var keyBlock = new ProtoBlock('key');
     keyBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['key'] = keyBlock;
@@ -878,13 +879,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     snareBlock.adjustWidthToLabel();
     snareBlock.oneArgBlock();
 
-    var pitchDrumMatrixBlock = new ProtoBlock('pitchdrummatrix');
-    pitchDrumMatrixBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['pitchdrummatrix'] = pitchDrumMatrixBlock;
-    pitchDrumMatrixBlock.staticLabels.push(_('pitch-drum matrix'));
-    pitchDrumMatrixBlock.adjustWidthToLabel();
-    pitchDrumMatrixBlock.stackClampZeroArgBlock();
-
     var setdrumBlock = new ProtoBlock('setdrum');
     setdrumBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['setdrum'] = setdrumBlock;
@@ -901,43 +895,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     playdrumBlock.oneArgBlock();
     playdrumBlock.dockTypes[1] = 'anyin';
 
-    //RHYTHMRULER
-
-    var rhythmrulerBlock = new ProtoBlock('rhythmruler');
-    rhythmrulerBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['rhythmruler'] = rhythmrulerBlock;
-    rhythmrulerBlock.staticLabels.push(_('rhythm ruler'));
-    rhythmrulerBlock.adjustWidthToLabel();
-    rhythmrulerBlock.stackClampOneArgBlock();
-    rhythmrulerBlock.defaults.push(1);
-
-    // PITCHSTAIRCASE
-
-    var pitchstaircaseBlock = new ProtoBlock('pitchstaircase');
-    pitchstaircaseBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['pitchstaircase'] = pitchstaircaseBlock;
-    pitchstaircaseBlock.staticLabels.push(_('pitchstaircase'));
-    pitchstaircaseBlock.adjustWidthToLabel();
-    pitchstaircaseBlock.stackClampZeroArgBlock();
-
-    //TEMPO
-
-    var tempoBlock = new ProtoBlock('tempo');
-    tempoBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['tempo'] = tempoBlock;
-    tempoBlock.staticLabels.push(_('tempo'));
-    tempoBlock.adjustWidthToLabel();
-    tempoBlock.stackClampZeroArgBlock();
-
-    //PITCHSLIDER
-
-    var pitchsliderBlock = new ProtoBlock('pitchslider');
-    pitchsliderBlock.palette = palettes.dict['matrix'];
-    blocks.protoBlockDict['pitchslider'] = pitchsliderBlock;
-    pitchsliderBlock.staticLabels.push(_('pitchslider'));
-    pitchsliderBlock.adjustWidthToLabel();
-    pitchsliderBlock.stackClampZeroArgBlock();
-    
     // TURTLE PALETTE
 
     var headingBlock = new ProtoBlock('heading');
