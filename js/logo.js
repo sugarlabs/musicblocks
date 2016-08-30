@@ -48,7 +48,7 @@ const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, canvas, blocks, turtles, stage,
+function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitchslider, canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -111,6 +111,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     this.inPitchStairCase = false;
 
     this.inTempo = false;
+
+    this.inPitchSlider = false;
 
     this._currentDrumBlock = null;
 
@@ -2113,7 +2115,21 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             };
             logo._setListener(turtle, listenerName, __listener);
             break;
+        case 'pitchslider':
+            console.log("running PitchSlider");
 
+            pitchslider.Sliders = [];
+            childFlow = args[0];
+            childFlowCount = 1;
+            logo.inPitchSlider = true;
+
+            var listenerName = '_pitchslider_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+            var __listener = function (event) {
+                pitchslider.init(logo);
+            };
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         case 'pitchdrummatrix':
             if (args.length === 1) {
                 childFlow = args[0];
@@ -3311,6 +3327,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     // TODO: add frequency instead of approximate note to matrix
                     pitchtimematrix.solfegeNotes.push(getSolfege(obj[0]));
                     pitchtimematrix.solfegeOctaves.push(obj[1]);
+                } else if (logo.inPitchSlider) {
+                    pitchslider.Sliders.push([args[0], 0, 0]);
                 } else {
                     logo.oscList[turtle].push(blocks.blockList[blk].name);
 

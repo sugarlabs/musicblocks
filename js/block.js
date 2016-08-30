@@ -12,7 +12,7 @@
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'modewidget'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden'];
 
 
@@ -255,6 +255,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'rhythmruler':
         case 'pitchstaircase':
         case 'tempo':
+        case 'pitchslider':
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
@@ -330,6 +331,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'rhythmruler':
         case 'pitchstaircase':
         case 'tempo':
+        case 'pitchslider':
         case 'modewidget':
         case 'repeat':
         case 'fill':
@@ -700,6 +702,9 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', '#000000');
                 case 'modewidget':
                     myBlock.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', '#000000');
+                    break;
+                case 'pitchslider':
+                    myBlock.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'drum':
                     myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');

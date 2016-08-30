@@ -149,8 +149,24 @@
                 }
             });
         });
-    
 
+        $(function() {
+            $('#pitchSliderDiv').draggable({
+                drag: function() {
+                    jQuery('#moveUpSliderDiv').css('left',jQuery(this).position().left);
+                    jQuery('#moveUpSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4.4);
+                    jQuery('#moveDownSliderDiv').css('left',jQuery(this).position().left);
+                    jQuery('#moveDownSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/3.8);
+                },
+                stop: function(){
+                    jQuery('#moveUpSliderDiv').css('left',jQuery(this).position().left);                     
+                    jQuery('#moveUpSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4.4);
+                    jQuery('#moveDownSliderDiv').css('left',jQuery(this).position().left);                     
+                    jQuery('#moveDownSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/3.8);
+                }
+            });
+        });
+        
 	$(function() {
             $("#statusmatrix").draggable();
         });
@@ -325,6 +341,10 @@
     <div id="pitchstaircase"></div>
     <div id="playPitch"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
+    <div id="pitchSliderDiv"></div>
+    <div id="moveUpSliderDiv"></div>
+    <div id="moveDownSliderDiv"></div>
+    <div id="sliderInCell"></div>
     <div id="tempoDiv"></div>
     <div id="BPMInput"></div>
     <div id="musicratio1"></div>
