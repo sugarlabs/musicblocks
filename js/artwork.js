@@ -134,7 +134,7 @@ const BORDER = '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120"
 // Palettes have different colored blocks
 // hue, value, chroma
 const PALETTECOLORS0 = {
-    'matrix': [37.5, 70, 50],
+    'widgets': [37.5, 70, 50],
     'pitch': [37.5, 70, 50],
     'rhythm' : [12.5, 60, 80],
     'tone' : [57.5, 50, 28],
@@ -154,7 +154,7 @@ const PALETTECOLORS0 = {
 };
 
 const PALETTECOLORS = {
-    'matrix': [37.5, 70, 35],
+    'widgets': [37.5, 70, 35],
     'pitch': [37.5, 70, 42],
     'rhythm' : [12.5, 60, 49],
     'tone' : [57.5, 50, 21],
@@ -232,7 +232,7 @@ const DRUMPALETTEICON = '<svg xmlns="http://www.w3.org/2000/svg" xml:space="pres
 
 
 const PALETTEICONS = {
-    'matrix' : MATRIXPALETTEICON,
+    'widgets' : MATRIXPALETTEICON,
     'rhythm' : NOTESPALETTEICON,
     'pitch' : PITCHPALETTEICON,
     'tone' : TONEPALETTEICON,
