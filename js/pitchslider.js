@@ -96,7 +96,7 @@ function PitchSlider () {
 
         this._logo.refreshCanvas();
 
-        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'slider'}], 0, 0, [0]]];
+        var newStack = [[0, 'note', 100, 100, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         var previousBlock = 0;
 
