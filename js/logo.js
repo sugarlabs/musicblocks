@@ -2127,6 +2127,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
                 pitchslider.init(logo);
+		logo.inPitchSlider = false;
             };
             logo._setListener(turtle, listenerName, __listener);
             break;
@@ -3952,8 +3953,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                                         }
                                     }
                                 }
+
                                 logo.synth.start();
                             }
+
                             logo.lastNotePlayed[turtle] = [notes[0], noteBeatValue];
                         }
                     }

@@ -326,6 +326,7 @@ function PitchSlider () {
                         jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9 - divMoved - 12 * moveValue);
                     }
                 }
+
                 var cellIndex = this.cellIndex;
                 var slidingAreaHeight = jQuery(sliderDiv).position().top + w / 9 - jQuery(sliderDiv).position().top - w / 9 + 12 * moveValue;
                 var distanceFromBottom =  jQuery(sliderDiv).position().top + w / 9 - divMoved - jQuery(cellDiv).position().top;
