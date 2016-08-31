@@ -581,13 +581,14 @@ function getInterval (interval, keySignature, pitch) {
 
 function calcNoteValueToDisplay(a, b) {
     var noteValue = a / b;
-    console.log(noteValue);
     var noteValueToDisplay = null;
+
     if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
         noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '>';
     } else {
         noteValueToDisplay = reducedFraction(b, a);
     }
+
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt((noteValue * 1.5))
         if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
