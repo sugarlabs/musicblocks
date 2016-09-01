@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg4602"
+   viewBox="0 0 290.99999 279.00001"
+   height="279"
+   width="291"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="pitchstaircase4.svg">
+  <metadata
+     id="metadata47">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="744"
+     id="namedview33"
+     showgrid="false"
+     inkscape:zoom="0.81289436"
+     inkscape:cx="-90.289077"
+     inkscape:cy="185.07517"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4602" />
+  <defs
+     id="defs4604" />
+  <path
+     inkscape:connector-curvature="0"
+     d="m 168.17006,183.22441 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-7-2-79-55"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-8-9-32-4"
+     style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+     x="203.17006"
+     y="182.2244">
+    <tspan
+       x="223.17006"
+       y="208.22443"
+       id="tspan25-8-2-4-4-7">3</tspan>
+  </text>
+  <path
+     inkscape:connector-curvature="0"
+     d="m 22.170078,157.22441 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 92.000012,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -92.000012,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,-42 z"
+     id="path3194-3-8-8-6"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3196-7-6-0-5"
+     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans"
+     x="53.170025"
+     y="140.22443">
+    <tspan
+       x="147.17006"
+       y="189.2244"
+       id="tspan3198-0-1-1-6">pitch</tspan>
+  </text>
+  <text
+     id="text3200-6-0-5-9"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans"
+     x="53.170025"
+     y="142.22441">
+    <tspan
+       x="147.17006"
+       y="164.7244"
+       id="tspan3202-5-0-5-3">name</tspan>
+  </text>
+  <text
+     id="text3204-9-5-3-7"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans"
+     x="53.170025"
+     y="144.2244">
+    <tspan
+       x="147.17006"
+       y="208.72443"
+       id="tspan3206-0-8-3-4">octave</tspan>
+  </text>
+  <g
+     transform="matrix(2,0,0,2,150.82759,140.37563)"
+     id="g4-2">
+    <filter
+       height="1.3"
+       id="dropshadow-6"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="3"
+         id="feGaussianBlur7-6" />
+      <feOffset
+         dx="2"
+         dy="2"
+         result="offsetblur"
+         id="feOffset9-0" />
+      <feComponentTransfer
+         id="feComponentTransfer11-7">
+        <feFuncA
+           type="linear"
+           slope="0.2"
+           id="feFuncA13-7" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge15-19">
+        <feMergeNode
+           id="feMergeNode17-1" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode19-3" />
+      </feMerge>
+    </filter>
+    <path
+       d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
+       id="path21-3"
+       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       inkscape:connector-curvature="0" />
+    <text
+       id="text23-6"
+       style="font-size:10px;text-anchor:start;fill:#000000;font-family:Sans"
+       x="25">
+      <tspan
+         x="35"
+         y="13"
+         id="tspan25-9">A</tspan>
+    </text>
+  </g>
+  <g
+     id="g4012"
+     transform="translate(22.300188,-163.79629)">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path3027-4"
+       d="m -17,195.56207 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 10,-12 10,12 18,0 70,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -70,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.07773 -7.07107,2.92893 C 0.07773,224.3422 -1,226.94407 -1,229.56207 l 0,8 0,134 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.5312466,2.29397 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18878 -3.93628,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81122 -8,-8 l 0,-8 z" />
+    <text
+       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       id="text3029-4"
+       y="164.27332"
+       x="-18.055397">
+      <tspan
+         id="tspan3031-5"
+         y="207.27332"
+         x="-10.055397">action</tspan>
+    </text>
+  </g>
+  <g
+     id="g4017"
+     transform="translate(-560.80142,-494.71255)">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path21-2-0"
+       d="m 708.10161,510.47838 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+    <text
+       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       id="text23-2"
+       y="508.93439"
+       x="714.31952">
+      <tspan
+         id="tspan25-1"
+         y="534.93439"
+         x="734.31952">stair</tspan>
+    </text>
+  </g>
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3101"
+     d="m 22.738568,114.62216 0,-8 a 8,8 0 0 1 8,-8.000001 l 8,0 0,4.000001 20,0 0,-4.000001 60.000002,0 8,0 a 8,8 0 0 1 8,8.000001 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60.000002,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-8 z" />
+  <text
+     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans"
+     id="text3103"
+     y="97.622162"
+     x="21.738512">
+    <tspan
+       id="tspan3105"
+       y="125.62216"
+       x="115.73858">right</tspan>
+  </text>
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-7"
+     d="m 136.73857,98.622159 120.00001,0 0,40.000001 -120.00001,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+     id="text23-1"
+     y="99.420753"
+     x="160.58922">
+    <tspan
+       id="tspan25-0"
+       y="125.42075"
+       x="180.58922">330</tspan>
+  </text>
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3101-8"
+     d="m 23.341278,72.429983 0,-8 a 8.0000002,8.0000002 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60.000002,0 8,0 a 8.0000002,8.0000002 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,19.999996 8,0 0,-6 8,0 0,8 a 8.0000002,8.0000002 0 0 1 -8,8 l -8,0 -60.000002,0 -2,0 0,4.000001 -16,0 0,-4.000001 -2,0 -8,0 a 8.0000002,8.0000002 0 0 1 -8,-8 l 0,-8 0,-7.999996 z" />
+  <text
+     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans"
+     id="text3103-8"
+     y="55.429993"
+     x="22.341234">
+    <tspan
+       id="tspan3105-3"
+       y="83.429993"
+       x="116.3413">sine</tspan>
+  </text>
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-7-1"
+     d="m 137.34128,56.429983 120.00002,0 0,39.999996 -120.00002,0 0,-16 0,-1.999996 -12,0 0,5.999996 -4,0 0,-15.999996 4,0 0,6 12,0 0,-2 z" />
+  <text
+     style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+     id="text23-1-2"
+     y="57.228577"
+     x="161.19194">
+    <tspan
+       id="tspan25-0-7"
+       y="83.228577"
+       x="181.19194">495</tspan>
+  </text>
+</svg>

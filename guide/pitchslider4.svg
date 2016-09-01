@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg4075"
+   viewBox="0 0 273 151.99998"
+   height="152"
+   width="273"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="pitchslider3.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="744"
+     id="namedview74"
+     showgrid="false"
+     inkscape:zoom="0.49940526"
+     inkscape:cx="-643.67913"
+     inkscape:cy="531.75902"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4075" />
+  <defs
+     id="defs4077">
+    <filter
+       id="dropshadow"
+       color-interpolation-filters="sRGB"
+       height="1.3">
+      <feGaussianBlur
+         id="feGaussianBlur3106"
+         stdDeviation="3"
+         in="SourceAlpha" />
+      <feOffset
+         id="feOffset3108"
+         result="offsetblur"
+         dy="2"
+         dx="2" />
+      <feComponentTransfer
+         id="feComponentTransfer3110">
+        <feFuncA
+           id="feFuncA3112"
+           slope="0.2"
+           type="linear" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3114">
+        <feMergeNode
+           id="feMergeNode3116" />
+        <feMergeNode
+           id="feMergeNode3118"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style
+       id="style4474-1"
+       type="text/css" />
+    <style
+       type="text/css"
+       id="style4474" />
+    <filter
+       height="1.3"
+       color-interpolation-filters="sRGB"
+       id="dropshadow-2">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="3"
+         id="feGaussianBlur3106-5" />
+      <feOffset
+         dx="2"
+         dy="2"
+         result="offsetblur"
+         id="feOffset3108-8" />
+      <feComponentTransfer
+         id="feComponentTransfer3110-9">
+        <feFuncA
+           type="linear"
+           slope="0.2"
+           id="feFuncA3112-2" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3114-8">
+        <feMergeNode
+           id="feMergeNode3116-9" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode3118-4" />
+      </feMerge>
+    </filter>
+    <filter
+       id="dropshadow-5"
+       color-interpolation-filters="sRGB"
+       height="1.3">
+      <feGaussianBlur
+         id="feGaussianBlur3013"
+         stdDeviation="3"
+         in="SourceAlpha" />
+      <feOffset
+         id="feOffset3015"
+         result="offsetblur"
+         dy="2"
+         dx="2" />
+      <feComponentTransfer
+         id="feComponentTransfer3017">
+        <feFuncA
+           id="feFuncA3019"
+           slope="0.2"
+           type="linear" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3021">
+        <feMergeNode
+           id="feMergeNode3023" />
+        <feMergeNode
+           id="feMergeNode3025"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter
+       id="dropshadow-0"
+       color-interpolation-filters="sRGB"
+       height="1.3">
+      <feGaussianBlur
+         id="feGaussianBlur3044"
+         stdDeviation="3"
+         in="SourceAlpha" />
+      <feOffset
+         id="feOffset3046"
+         result="offsetblur"
+         dy="2"
+         dx="2" />
+      <feComponentTransfer
+         id="feComponentTransfer3048">
+        <feFuncA
+           id="feFuncA3050"
+           slope="0.2"
+           type="linear" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3052">
+        <feMergeNode
+           id="feMergeNode3054" />
+        <feMergeNode
+           id="feMergeNode3056"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter
+       id="dropshadow-8"
+       color-interpolation-filters="sRGB"
+       height="1.3">
+      <feGaussianBlur
+         id="feGaussianBlur3013-9"
+         stdDeviation="3"
+         in="SourceAlpha" />
+      <feOffset
+         id="feOffset3015-4"
+         result="offsetblur"
+         dy="2"
+         dx="2" />
+      <feComponentTransfer
+         id="feComponentTransfer3017-3">
+        <feFuncA
+           id="feFuncA3019-9"
+           slope="0.2"
+           type="linear" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3021-4">
+        <feMergeNode
+           id="feMergeNode3023-9" />
+        <feMergeNode
+           id="feMergeNode3025-0"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter
+       id="dropshadow-6"
+       color-interpolation-filters="sRGB"
+       height="1.3">
+      <feGaussianBlur
+         id="feGaussianBlur3087"
+         stdDeviation="3"
+         in="SourceAlpha" />
+      <feOffset
+         id="feOffset3089"
+         result="offsetblur"
+         dy="2"
+         dx="2" />
+      <feComponentTransfer
+         id="feComponentTransfer3091">
+        <feFuncA
+           id="feFuncA3093"
+           slope="0.2"
+           type="linear" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3095">
+        <feMergeNode
+           id="feMergeNode3097" />
+        <feMergeNode
+           id="feMergeNode3099"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <g
+     id="g4017-3-3"
+     transform="translate(-1432.5529,-996.0625)">
+    <path
+       style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path21-2-0-2-9"
+       d="m 125,179.56207 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       id="text23-2-0-2"
+       y="178.01807"
+       x="131.21786">
+      <tspan
+         id="tspan25-1-6-5"
+         y="204.01805"
+         x="151.21786">slider</tspan>
+    </text>
+  </g>
+  <path
+     inkscape:connector-curvature="0"
+     d="m -1309.5815,-774.55287 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-7-2-79-55-3"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-8-9-32-4-9"
+     style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+     x="-1296.6078"
+     y="-773.55048">
+    <tspan
+       x="-1276.6078"
+       y="-747.55048"
+       id="tspan25-8-2-4-4-7-8">373.74</tspan>
+  </text>
+  <g
+     id="g7364"
+     transform="translate(-1450.6411,-830.64149)">
+    <path
+       style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path3027"
+       d="m 1,29.5625 0,-8 a 8,8 0 0 1 8,-8 l 8,0 10,-12 10,12 18,0 70,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -70,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 10,10 0 0 0 -10,10 l 0,8 0,8 0,8 a 10,10 0 0 0 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 a 8,8 0 0 1 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       id="text3029"
+       y="0.5625">
+      <tspan
+         id="tspan3031"
+         y="43.5625"
+         x="8">action</tspan>
+    </text>
+  </g>
+  <g
+     id="g7424"
+     transform="translate(-1432.6315,-776.07662)">
+    <path
+       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path3027-2"
+       d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 68,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -68,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,33 l 0,-8 0,-8 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans"
+       id="text3029-0">
+      <tspan
+         id="tspan3031-3"
+         y="28"
+         x="102">sine</tspan>
+    </text>
+  </g>
+  <g
+     id="g4017-3-3-4"
+     transform="translate(24.208446,-163.07171)">
+    <path
+       style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path21-2-0-2-9-9"
+       d="m 125,179.56207 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       id="text23-2-0-2-1"
+       y="178.01807"
+       x="131.21786">
+      <tspan
+         id="tspan25-1-6-5-4"
+         y="204.01805"
+         x="151.21786">slider1</tspan>
+    </text>
+  </g>
+  <path
+     inkscape:connector-curvature="0"
+     d="m 147.17984,58.43796 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-7-2-79-55-3-5"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-8-9-32-4-9-6"
+     style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+     x="160.15355"
+     y="59.440338">
+    <tspan
+       x="180.15355"
+       y="85.440338"
+       id="tspan25-8-2-4-4-7-8-4">880.00</tspan>
+  </text>
+  <g
+     id="g7364-6"
+     transform="translate(6.1202459,2.34934)">
+    <path
+       style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path3027-3"
+       d="m 1,29.5625 0,-8 a 8,8 0 0 1 8,-8 l 8,0 10,-12 10,12 18,0 70,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -70,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 10,10 0 0 0 -10,10 l 0,8 0,8 0,8 a 10,10 0 0 0 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 a 8,8 0 0 1 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       id="text3029-7"
+       y="0.5625">
+      <tspan
+         id="tspan3031-1"
+         y="43.5625"
+         x="8">action</tspan>
+    </text>
+  </g>
+  <g
+     id="g7424-1"
+     transform="translate(24.129846,56.91421)">
+    <path
+       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path3027-2-4"
+       d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 68,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -68,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,33 l 0,-8 0,-8 z"
+       inkscape:connector-curvature="0" />
+    <text
+       style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans"
+       id="text3029-0-1">
+      <tspan
+         id="tspan3031-3-9"
+         y="28"
+         x="102">sine</tspan>
+    </text>
+    <text
+       style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans"
+       id="text3033-5-3">
+      <tspan
+         id="tspan3035-9-5"
+         y="22.5"
+         x="102" />
+    </text>
+  </g>
+  <metadata
+     id="metadata7577">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

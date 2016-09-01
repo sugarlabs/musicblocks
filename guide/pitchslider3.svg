@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg4075"
+   viewBox="0 0 232 586.99992"
+   height="587"
+   width="232"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="pitchslider2.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="744"
+     id="namedview74"
+     showgrid="false"
+     inkscape:zoom="0.49940526"
+     inkscape:cx="-643.67913"
+     inkscape:cy="371.56848"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4075" />
+  <defs
+     id="defs4077">
+    <filter
+       id="dropshadow"
+       color-interpolation-filters="sRGB"
+       height="1.3">
+      <feGaussianBlur
+         id="feGaussianBlur3106"
+         stdDeviation="3"
+         in="SourceAlpha" />
+      <feOffset
+         id="feOffset3108"
+         result="offsetblur"
+         dy="2"
+         dx="2" />
+      <feComponentTransfer
+         id="feComponentTransfer3110">
+        <feFuncA
+           id="feFuncA3112"
+           slope="0.2"
+           type="linear" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3114">
+        <feMergeNode
+           id="feMergeNode3116" />
+        <feMergeNode
+           id="feMergeNode3118"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style
+       id="style4474-1"
+       type="text/css" />
+    <style
+       type="text/css"
+       id="style4474" />
+    <style
+       id="style4474-6"
+       type="text/css" />
+    <style
+       type="text/css"
+       id="style4474-1-4" />
+    <filter
+       height="1.3"
+       color-interpolation-filters="sRGB"
+       id="dropshadow-6">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="3"
+         id="feGaussianBlur3106-2" />
+      <feOffset
+         dx="2"
+         dy="2"
+         result="offsetblur"
+         id="feOffset3108-7" />
+      <feComponentTransfer
+         id="feComponentTransfer3110-4">
+        <feFuncA
+           type="linear"
+           slope="0.2"
+           id="feFuncA3112-3" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3114-8">
+        <feMergeNode
+           id="feMergeNode3116-9" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode3118-9" />
+      </feMerge>
+    </filter>
+    <style
+       id="style4474-4"
+       type="text/css" />
+    <style
+       type="text/css"
+       id="style4474-1-5" />
+    <filter
+       height="1.3"
+       color-interpolation-filters="sRGB"
+       id="dropshadow-8">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="3"
+         id="feGaussianBlur3106-5" />
+      <feOffset
+         dx="2"
+         dy="2"
+         result="offsetblur"
+         id="feOffset3108-5" />
+      <feComponentTransfer
+         id="feComponentTransfer3110-7">
+        <feFuncA
+           type="linear"
+           slope="0.2"
+           id="feFuncA3112-0" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3114-5">
+        <feMergeNode
+           id="feMergeNode3116-0" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode3118-2" />
+      </feMerge>
+    </filter>
+  </defs>
+  <metadata
+     id="metadata6610">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title></dc:title>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     style="display:block"
+     transform="matrix(0,0.60721608,1.1140359,0,26.976432,541.72884)"
+     id="go-next-5-3"
+     display="block">
+    <g
+       id="g5-2-1">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         id="path7-71-0"
+         d="M 22.561,50 C 34.954,50 45,39.924 45,27.498 45,15.076 34.954,5 22.561,5 H 0 v 45 h 22.561 z" />
+      <g
+         id="g9-7-2">
+        <polygon
+           style="fill:#4c4d4f"
+           id="polygon11-4-3-8"
+           points="15.707,16.706 30.772,27.133 15.707,37.555 " />
+      </g>
+    </g>
+  </g>
+  <rect
+     y="-583.91901"
+     x="9.7002335"
+     height="61.919025"
+     width="104.74711"
+     id="rect3453-63-4-7-5-22-8"
+     style="fill:#c374e9;fill-opacity:1;fill-rule:nonzero;stroke:none"
+     transform="scale(1,-1)" />
+  <g
+     style="display:block"
+     transform="matrix(0,0.6612551,1.1140359,0,26.976432,536.86532)"
+     id="go-next-7-0-2"
+     display="block">
+    <g
+       id="g5-5-0-0">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         id="path7-7-48-9"
+         d="M 22.561,50 C 34.954,50 45,39.924 45,27.498 45,15.076 34.954,5 22.561,5 H 0 v 45 h 22.561 z" />
+      <g
+         id="g9-5-4-7">
+        <polygon
+           style="fill:#4c4d4f"
+           id="polygon11-7-9-4"
+           points="15.707,37.555 15.707,16.706 30.772,27.133 " />
+      </g>
+    </g>
+  </g>
+  <g
+     style="display:block"
+     transform="matrix(0,0.60721608,1.1140359,0,141.11221,541.72884)"
+     id="go-next-5-3-8"
+     display="block">
+    <g
+       id="g5-2-1-2">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         id="path7-71-0-5"
+         d="M 22.561,50 C 34.954,50 45,39.924 45,27.498 45,15.076 34.954,5 22.561,5 H 0 v 45 h 22.561 z" />
+      <g
+         id="g9-7-2-5">
+        <polygon
+           style="fill:#4c4d4f"
+           id="polygon11-4-3-8-6"
+           points="15.707,16.706 30.772,27.133 15.707,37.555 " />
+      </g>
+    </g>
+  </g>
+  <rect
+     y="-583.91901"
+     x="123.83604"
+     height="61.919025"
+     width="104.74711"
+     id="rect3453-63-4-7-5-22-8-4"
+     style="fill:#c374e9;fill-opacity:1;fill-rule:nonzero;stroke:none"
+     transform="scale(1,-1)" />
+  <g
+     style="display:block"
+     transform="matrix(0,0.6612551,1.1140359,0,141.11221,536.86532)"
+     id="go-next-7-0-2-6"
+     display="block">
+    <g
+       id="g5-5-0-0-6">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         id="path7-7-48-9-0"
+         d="M 22.561,50 C 34.954,50 45,39.924 45,27.498 45,15.076 34.954,5 22.561,5 H 0 v 45 h 22.561 z" />
+      <g
+         id="g9-5-4-7-0">
+        <polygon
+           style="fill:#4c4d4f"
+           id="polygon11-7-9-4-0"
+           points="15.707,37.555 15.707,16.706 30.772,27.133 " />
+      </g>
+    </g>
+  </g>
+  <rect
+     style="fill:#b1db00;fill-opacity:1;fill-rule:nonzero;stroke:none"
+     id="rect3453-6-8"
+     width="338.33472"
+     height="104.20509"
+     x="-424.47702"
+     y="8.5152969"
+     transform="matrix(0,-1,1,0,0,0)" />
+  <rect
+     y="15.25382"
+     x="7.0729141"
+     height="61.919025"
+     width="102.44323"
+     id="rect3453-63-4-7"
+     style="fill:#c374e9;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+  <g
+     transform="matrix(2.0856721,0,0,1.2606279,0.93853186,11.546072)"
+     id="g4437-5">
+    <rect
+       width="30.772253"
+       height="29.05797"
+       x="12.113873"
+       y="12.971015"
+       id="rect3821-3"
+       style="fill:#000000;stroke:#000000;stroke-width:1.66447914;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <path
+       inkscape:connector-curvature="0"
+       d="m 13,14.033 0,26.934 29,0 0,-26.934 z M 37.575,35.1 c 0.684,0.683 0.684,1.793 0,2.476 -0.341,0.342 -0.789,0.513 -1.237,0.513 -0.448,0 -0.896,-0.171 -1.238,-0.513 l -7.601,-7.602 -7.602,7.602 c -0.342,0.342 -0.79,0.513 -1.237,0.513 -0.447,0 -0.895,-0.171 -1.237,-0.513 -0.684,-0.683 -0.684,-1.793 0,-2.476 l 7.601,-7.601 -7.601,-7.602 c -0.684,-0.684 -0.684,-1.791 0,-2.474 0.683,-0.684 1.791,-0.684 2.474,0 l 7.602,7.601 7.601,-7.601 c 0.683,-0.684 1.793,-0.684 2.476,0 0.684,0.683 0.684,1.791 0,2.474 l -7.602,7.602 z"
+       id="path3109-5"
+       style="fill:#ffffff;fill-opacity:1;stroke:none" />
+  </g>
+  <g
+     id="g6479"
+     transform="matrix(2.0856721,0,0,1.2606279,0.93853186,11.546072)">
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:1.66447914;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect6481"
+       y="12.971015"
+       x="12.113873"
+       height="29.05797"
+       width="30.772253" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       id="path6483"
+       d="m 13,14.033 0,26.934 29,0 0,-26.934 z M 37.575,35.1 c 0.684,0.683 0.684,1.793 0,2.476 -0.341,0.342 -0.789,0.513 -1.237,0.513 -0.448,0 -0.896,-0.171 -1.238,-0.513 l -7.601,-7.602 -7.602,7.602 c -0.342,0.342 -0.79,0.513 -1.237,0.513 -0.447,0 -0.895,-0.171 -1.237,-0.513 -0.684,-0.683 -0.684,-1.793 0,-2.476 l 7.601,-7.601 -7.601,-7.602 c -0.684,-0.684 -0.684,-1.791 0,-2.474 0.683,-0.684 1.791,-0.684 2.474,0 l 7.602,7.601 7.601,-7.601 c 0.683,-0.684 1.793,-0.684 2.476,0 0.684,0.683 0.684,1.791 0,2.474 l -7.602,7.602 z"
+       inkscape:connector-curvature="0" />
+  </g>
+  <rect
+     y="183.60202"
+     x="9.2743301"
+     height="7.2045002"
+     width="102.44323"
+     id="rect3453-63-4-7-3"
+     style="fill:#c374e9;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+  <text
+     xml:space="preserve"
+     style="font-size:23.52210999px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+     x="16.795761"
+     y="207.7905"
+     id="text6521"
+     sodipodi:linespacing="125%"
+     transform="scale(0.96844064,1.0325878)"><tspan
+       sodipodi:role="line"
+       id="tspan6523"
+       x="16.795761"
+       y="207.7905">373.74</tspan></text>
+  <g
+     style="display:block"
+     transform="matrix(0,-0.60721608,1.1140359,0,25.520832,490.24552)"
+     id="go-next"
+     display="block">
+    <g
+       id="g5">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         id="path7"
+         d="M 22.561,50 C 34.954,50 45,39.924 45,27.498 45,15.076 34.954,5 22.561,5 H 0 v 45 h 22.561 z" />
+      <g
+         id="g9">
+        <polygon
+           style="fill:#4c4d4f"
+           id="polygon11-4"
+           points="30.772,27.133 15.707,37.555 15.707,16.706 " />
+      </g>
+    </g>
+  </g>
+  <rect
+     y="448.05539"
+     x="8.2446671"
+     height="61.919025"
+     width="104.74711"
+     id="rect3453-63-4-7-5"
+     style="fill:#c374e9;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+  <g
+     style="display:block"
+     transform="matrix(0,-0.6612551,1.1140359,0,25.520832,495.10904)"
+     id="go-next-7"
+     display="block">
+    <g
+       id="g5-5">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         id="path7-7"
+         d="M 22.561,50 C 34.954,50 45,39.924 45,27.498 45,15.076 34.954,5 22.561,5 H 0 v 45 h 22.561 z" />
+      <g
+         id="g9-5">
+        <polygon
+           style="fill:#4c4d4f"
+           id="polygon11-7"
+           points="15.707,16.706 30.772,27.133 15.707,37.555 " />
+      </g>
+    </g>
+  </g>
+  <rect
+     style="fill:#b1db00;fill-opacity:1;fill-rule:nonzero;stroke:none"
+     id="rect3453-6-8-7-5"
+     width="338.33472"
+     height="104.20509"
+     x="-424.61792"
+     y="126.73411"
+     transform="matrix(0,-1,1,0,0,0)" />
+  <rect
+     y="85.626221"
+     x="127.49326"
+     height="7.2045002"
+     width="102.44323"
+     id="rect3453-63-4-7-3-5-8"
+     style="fill:#c374e9;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+  <text
+     xml:space="preserve"
+     style="font-size:28.49534607px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+     x="113.86764"
+     y="136.77844"
+     id="text6521-1-2"
+     sodipodi:linespacing="125%"
+     transform="scale(1.1731962,0.85237234)"><tspan
+       sodipodi:role="line"
+       id="tspan6523-4-5"
+       x="113.86764"
+       y="136.77844">880</tspan></text>
+  <g
+     style="display:block"
+     transform="matrix(0,-0.60721608,1.1140359,0,143.73975,490.3864)"
+     id="go-next-1-5"
+     display="block">
+    <g
+       id="g5-1-7">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         id="path7-6-5"
+         d="M 22.561,50 C 34.954,50 45,39.924 45,27.498 45,15.076 34.954,5 22.561,5 H 0 v 45 h 22.561 z" />
+      <g
+         id="g9-9">
+        <polygon
+           style="fill:#4c4d4f"
+           id="polygon11-4-7-9"
+           points="30.772,27.133 15.707,37.555 15.707,16.706 " />
+      </g>
+    </g>
+  </g>
+  <rect
+     y="448.19629"
+     x="126.46348"
+     height="61.919025"
+     width="104.74711"
+     id="rect3453-63-4-7-5-2-4"
+     style="fill:#c374e9;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+  <g
+     style="display:block"
+     transform="matrix(0,-0.6612551,1.1140359,0,143.73975,495.24992)"
+     id="go-next-7-6-2"
+     display="block">
+    <g
+       id="g5-5-4-8">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         id="path7-7-2-9"
+         d="M 22.561,50 C 34.954,50 45,39.924 45,27.498 45,15.076 34.954,5 22.561,5 H 0 v 45 h 22.561 z" />
+      <g
+         id="g9-5-5">
+        <polygon
+           style="fill:#4c4d4f"
+           id="polygon11-7-0-0"
+           points="15.707,16.706 30.772,27.133 15.707,37.555 " />
+      </g>
+    </g>
+  </g>
+</svg>
