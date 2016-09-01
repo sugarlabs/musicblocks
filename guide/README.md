@@ -510,7 +510,8 @@ will expand into *Rhythm* blocks with corresponding values.
 ---------------------
 
 The *Rhythm Ruler* block is used to launch a widget similar to the
-*Matrix*, which can be used to generate rhythmic patterns.
+*Pitch-time Matrix* block, which can be used to generate rhythmic
+patterns.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'</img>
 
@@ -552,8 +553,8 @@ The *Save stack* button will export rhythm stacks.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg'</img>
 
-These stacks of rhythms can be used to define rhythmic patterns in the
-*Matrix*.
+These stacks of rhythms can be used to define rhythmic patterns used
+with the *Pitch-time Matrix* block.
 
 3. Musical Modes
 ----------------
@@ -641,7 +642,7 @@ Note: The build-in modes in Music Blocks can be found in (musicutils.js)[https:/
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Pitch-time Matrix* block.
 
-4. The Pitch Drum Matrix
+4. The Pitch-Drum Matrix
 ------------------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
@@ -662,6 +663,104 @@ each occurance of a `Re` `4`.
 As an expedience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
+
+5. Generating Pitches using Musical Proportions
+-----------------------------------------------
+
+The *Pitch Staircase* block is used to launch a widget similar to the
+*Pitch-time Matrix*, which can be used to generate different pitches
+using a given pitch and musical proportion.
+
+The *Pitch* blocks contained in the clamp of the *Pitch Staircase*
+block define the pitches to be initialized simultaneously. By default,
+one pitch is defined and it have default note "la" and octave "3".
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase0.svg'</img>
+
+When *Pitch Staircase* block is clicked, *Pitch Staircase* widget is
+initialized. The widget contains row for every *Pitch* block contained
+in the clamp of the *Pitch Staircase* block. Input fields in the top
+row of the widget specify the musical proportion to used to create new
+pitches in the staircase. The inputs correspond to the numerator and
+denominator in the proportion resectively. By default the proportion
+is 3:2.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase1.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase2.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase3.svg'</img>
+
+Clicking on the *Play* button to the left of each row will playback
+the note associated with that step in the stairs. The *Play-all*
+button on the upper-left of the widget will play back all the pitch
+steps simultaneously. A second *Play-all* button to its right the
+stair first in increasing order of the frequency and than in the
+decreasing order of the frequency.
+
+The *Save stack* button will export pitch stacks. For example, in the
+configuration, the output is as shown below:
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase4.svg'</img>
+
+These stacks can be used with the *Pitch-tim Matrix* block to define
+the rows in the matrix.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg'</img>
+
+6. Understanding Tempo
+----------------------
+
+The *Tempo* block is used to launch a widget that enables us to
+visualize Tempo, defined as beats per minute (BPM). When *Tempo* block
+is clicked, the *Tempo* widget is initialized.
+
+The *Master Beats per Minute* block contained in the clamp of the
+*Tempo* block sets the initial tempo used by the widget. This
+determines the speed at which the ball in the widget moves back and
+forth. If BPM is 60, then it will take one second for the ball to move
+across the widget. A round-trip would take two seconds.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg'</img>
+
+The top row of the widget holds the *Play/pause* button, the *Speed
+up* and *Slow down* buttons, and an input field for updating the
+Tempo.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg'</img>
+
+You can also update the tempo by clicking twice in succession in the
+widget: the new BPM is determined from the time between clicks. For
+example, if there 1/2 second between clicks, the new BPM is 120.
+
+7. Creating Pitches with continuously varying frequencies
+---------------------------------------------------------
+
+The *Pitch Slider* block is used to launch a widget that is used to
+generate arbitray pitches. It differs from *Pitch Staircase* widget in
+that it is used to create frequencies that vary continuously within
+the range of a specified octave.
+
+Each *Sine* block contained within the clamp of the *Pitch Slider* block defines the initial pitch
+for an ocatve.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg'</img>
+
+When the *Pitch Slider* block is clicked, the *Pitch Slider* widget is
+initialized. The widget will have one column for each *Sine* block in
+the clamp. Every column has a slider that can be used to move go up or
+down in frequency, continuously or in intervals of 1/12th of the
+starting frequency. For continuous case mouse is used. Buttons are
+used for intervals. Arrow keys can also be used to move up and down,
+or between columns.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider.svg'</img>
+
+CLicking in a column will extact corresponding *Note* blocks, for example:
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider4.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider5.svg'</img>
 
 IV. BEYOND MUSIC BLOCKS
 -----------------------
