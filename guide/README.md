@@ -265,29 +265,6 @@ In the above example, the sequence of drum beats is increased over time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
 
-The Pitch Drum Matrix
----------------------
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
-
-The *Set Drum* block is used to map the enclosed pitches into drum
-sounds. Drum sounds are played in a monopitch using the specified drum
-sample. In the example above, a `kick drum` will be substitued for
-each occurance of a `Re` `4`.
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum6.svg'</img>
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg'</img>
-
-As an expedience for creating mapping with the *Set Drum* block, we
-provide the *Drum-Pitch* Matrix. You use it to map between pitches and
-drums. The output is a stack of *Set Dum* blocks.
-
-
 3. Voices
 ---------
 
@@ -663,6 +640,28 @@ Note: The build-in modes in Music Blocks can be found in (musicutils.js)[https:/
 
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Pitch-time Matrix* block.
+
+4. The Pitch Drum Matrix
+------------------------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
+
+The *Set Drum* block is used to map the enclosed pitches into drum
+sounds. Drum sounds are played in a monopitch using the specified drum
+sample. In the example above, a `kick drum` will be substitued for
+each occurance of a `Re` `4`.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum6.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg'</img>
+
+As an expedience for creating mapping with the *Set Drum* block, we
+provide the *Drum-Pitch* Matrix. You use it to map between pitches and
+drums. The output is a stack of *Set Dum* blocks.
 
 IV. BEYOND MUSIC BLOCKS
 -----------------------
