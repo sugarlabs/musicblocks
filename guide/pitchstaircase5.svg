@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="254"
+   height="233.12386"
+   viewBox="0 0 254 233.12383"
+   id="svg4075"
+   version="1.1">
+  <defs
+     id="defs4077" />
+  <path
+     d="m 19,112.12391 0,-8 a 8,8 0 0 1 8,-8.000003 l 8,0 0,4.000003 20,0 0,-4.000003 60,0 8,0 a 8,8 0 0 1 8,8.000003 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z"
+     id="path3194-5"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="95.123848"
+     x="18"
+     id="text3196-8"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="112"
+       y="144.12387"
+       id="tspan3198-7-3">rhythm</tspan>
+  </text>
+  <text
+     y="97.123848"
+     x="18"
+     id="text3200-4-6"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="112"
+       y="119.62385"
+       id="tspan3202-8"># notes</tspan>
+  </text>
+  <text
+     y="99.123848"
+     x="18"
+     id="text3204-2-0"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
+    <tspan
+       x="112"
+       y="163.62387"
+       id="tspan3206-3-6">note value</tspan>
+  </text>
+  <path
+     d="m 133,138.12391 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-1"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-1"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="168"
+     y="137.12387">
+    <tspan
+       x="188"
+       y="163.12387"
+       id="tspan25-8-9-7">4</tspan>
+  </text>
+  <path
+     d="m 133,96.123907 120,0 0,40.000003 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+     id="path21-6-15"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-9-6-9"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="168"
+     y="95.123817">
+    <tspan
+       x="188"
+       y="121.12381"
+       id="tspan25-8-1">3</tspan>
+  </text>
+  <path
+     d="M 1,29.561964 1,21.56198 c 0,-4.188782 3.8112098,-7.999984 7.9999998,-7.999984 l 8.0000002,0 10,-11.9999641 10,11.9999641 18,0 128,0 8,0 c 4.18879,0 8,3.811202 8,7.999984 l 0,7.999984 0,7.999984 0,7.999984 c 0,4.188792 -3.81121,7.999984 -8,7.999984 l -8,0 -128,0 -2,0 0,3.999992 -16,0 0,-3.999992 -2,0 -8,0 c -2.61799,0 -5.21987,1.077738 -7.07107,2.928934 C 18.07773,58.342046 17,60.94391 17,63.561896 l 0,7.999994 0,89.9999 0,8 c 0,2.618 1.07773,5.21987 2.92893,7.07108 1.8512,1.8512 4.53125,3.56389 7.07107,2.92892 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.93628,9.01594 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8.0000002,0 C 4.8112098,219.56179 1,215.75058 1,211.56179 l 0,-8 z"
+     id="path3660-8"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3662-0"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="1.1454526"
+     y="-2.8759217">
+    <tspan
+       x="9.1454525"
+       y="40.123981"
+       id="tspan3664-4">pitch-time matrix</tspan>
+  </text>
+  <g
+     transform="translate(18,53.123966)"
+     id="g3918-9-6">
+    <path
+       style="fill:#ffc000;fill-opacity:1;stroke:#c48d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path3058-8-0"
+       d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 80,0 8,0 a 8,8 0 0 1 8,8 l 0,8 0,8 0,8 a 8,8 0 0 1 -8,8 l -8,0 -80,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,33 l 0,-8 z" />
+    <text
+       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+       id="text3060-6-7">
+      <tspan
+         id="tspan3062-0-5"
+         y="28"
+         x="114">stair</tspan>
+    </text>
+    <flowRoot
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="flowRoot3632"
+       xml:space="preserve"><flowRegion
+         id="flowRegion3634"><rect
+           y="-136.16196"
+           x="420.50018"
+           height="754.89795"
+           width="905.0766"
+           id="rect3636" /></flowRegion><flowPara
+         id="flowPara3638" /></flowRoot>    <flowRoot
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="flowRoot3640"
+       xml:space="preserve"><flowRegion
+         id="flowRegion3642"><rect
+           y="-288.34299"
+           x="360.42871"
+           height="806.95984"
+           width="901.07178"
+           id="rect3644" /></flowRegion><flowPara
+         id="flowPara3646" /></flowRoot>  </g>
+  <metadata
+     id="metadata3718">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title></dc:title>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
