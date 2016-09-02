@@ -2680,7 +2680,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                 logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
             } else if (logo.inPitchStairCase) {
-                var frequency = pitchToFrequency(args[0], args[1], 0 ,logo.keySignature[turtle]);
+                var frequency = pitchToFrequency(args[0], args[1], 0, logo.keySignature[turtle]);
                 var note = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
                 var flag = 0;
 
