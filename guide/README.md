@@ -746,6 +746,8 @@ for an ocatve.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg'</img>
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg'</img>
+
 When the *Pitch Slider* block is clicked, the *Pitch Slider* widget is
 initialized. The widget will have one column for each *Sine* block in
 the clamp. Every column has a slider that can be used to move go up or
@@ -754,11 +756,13 @@ starting frequency. For continuous case mouse is used. Buttons are
 used for intervals. Arrow keys can also be used to move up and down,
 or between columns.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg'</img>
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg'</img>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg'</img>
 
 CLicking in a column will extact corresponding *Note* blocks, for example:
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider4.svg'</img>
 
