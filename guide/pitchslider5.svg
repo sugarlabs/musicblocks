@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="71.684448mm"
-   height="36.688889mm"
-   viewBox="0 0 254.00001 130"
+   version="1.1"
    id="svg4075"
-   version="1.1">
+   viewBox="0 0 254.00001 130"
+   height="36.688889mm"
+   width="71.684448mm">
   <defs
      id="defs4077" />
   <metadata
@@ -25,63 +25,63 @@
     </rdf:RDF>
   </metadata>
   <path
-     d="M 1,17 1,9 c -2e-8,-4.418278 3.581722,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.7136407 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.522847,0 -10,4.477153 -10,10 l 0,8 0,8 0,8 c 0,5.522847 4.477153,10 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.581722,8 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.418278,0 -8,-3.58172 -8,-8 l 0,-8 z"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035"
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     d="M 1,17 1,9 c -2e-8,-4.418278 3.581722,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.7136407 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.522847,0 -10,4.477153 -10,10 l 0,8 0,8 0,8 c 0,5.522847 4.477153,10 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.581722,8 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.418278,0 -8,-3.58172 -8,-8 l 0,-8 z" />
   <text
-     x="-2"
+     y="-2"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
      id="text3037"
-     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-     y="-2">
+     x="-2">
     <tspan
-       x="6"
+       id="tspan3039"
        y="28.5"
-       id="tspan3039">note value</tspan>
+       x="6">note value</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     d="m 133,1.0000016 120,0 0,40.0000004 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
      id="path21-6-72-7"
-     d="m 133,1.0000016 120,0 0,40.0000004 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
-     y="1.9918164e-06"
-     x="168"
+     id="text23-9-5-1"
      style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-     id="text23-9-5-1">
+     x="168"
+     y="1.9918164e-06">
     <tspan
-       id="tspan25-8-7-6"
+       x="188"
        y="26.000002"
-       x="188">8</tspan>
+       id="tspan25-8-7-6">8</tspan>
   </text>
   <path
-     d="m 19,58.999999 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3194"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     d="m 19,58.999999 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z" />
   <text
-     y="21.999994"
-     x="18.00001"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
      id="text3196"
-     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
+     x="18.00001"
+     y="21.999994">
     <tspan
-       x="112.00001"
+       id="tspan3198"
        y="70.999992"
-       id="tspan3198">sine</tspan>
+       x="112.00001">sine</tspan>
   </text>
   <g
-     id="g3710"
-     transform="translate(-165.83636,96.824239)">
+     transform="translate(-165.83636,96.824239)"
+     id="g3710">
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
        id="path21-6"
-       d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
-       y="-54.824242"
-       x="305.83636"
+       id="text23-9"
        style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text23-9">
+       x="319.83636"
+       y="-54.824242">
       <tspan
-         id="tspan25-8"
+         x="339.83636"
          y="-28.824242"
-         x="325.83636">373.74</tspan>
+         id="tspan25-8">373</tspan>
     </text>
   </g>
 </svg>
