@@ -754,7 +754,9 @@ starting frequency. For continuous case mouse is used. Buttons are
 used for intervals. Arrow keys can also be used to move up and down,
 or between columns.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg'</img>
 
 CLicking in a column will extact corresponding *Note* blocks, for example:
 
