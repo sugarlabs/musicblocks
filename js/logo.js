@@ -1088,6 +1088,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 } else {
                     childFlow = logo.actions[name];
                 }
+
                 childFlowCount = 1;
             } else {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
@@ -3496,11 +3497,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
                 }
             }
+
             if (logo.turtleDelay !== 0) {
                 for (var pblk in logo.parameterQueue[turtle]) {
                     logo._updateParameterBlock(logo, turtle, logo.parameterQueue[turtle][pblk]);
                 }
             }
+
             if (isflow){
                 logo._runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
             }
