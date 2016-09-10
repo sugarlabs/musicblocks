@@ -160,7 +160,7 @@ function RhythmRuler () {
             var ruler = docById('ruler' + i);
             var cell = ruler.cells[0];
             cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-            this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drum);
+	    this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);
             
             if (this._playingAll) {
                 this._playNote(0, 0, i, 1);
@@ -177,8 +177,7 @@ function RhythmRuler () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         var drumblockno = blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
         var drum = blocks.blockList[drumblockno].value;
-        this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drum);
-        
+        this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);        
         if (this._playingOne) {
             this._playNote(0, 0, this._rulerSelected, 1)
         }
@@ -214,7 +213,7 @@ function RhythmRuler () {
             notesCounter += 1;
             colIndex += 1;
             if (that._playing) {
-                that._logo.synth.trigger(['C2'], that._logo.defaultBPMFactor / noteValue, drum);
+		that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum);
             }
             
             if (notesCounter < noteValues.length) {

@@ -980,7 +980,7 @@ function Synth () {
                         release: 0.03
                     },
                 };
-                this.synthset[name][1] = new Tone.SimpleSynth(synthOptions);
+                this.synthset[name][1] = new Tone.Synth(synthOptions);
                 break;
             case 'poly':
             case 'default':
@@ -988,16 +988,16 @@ function Synth () {
                 break;
             default:
                 if (name.slice(0, 4) == 'http') {
-                    // console.log('drum name is URL');
-                    // console.log('initializing drum at ' + name);
-                    this.synthset[name] = [name, new Tone.Sampler({'C2' : name})];
-                    // console.log(this.synthset[name][1]);
+                    this.synthset[name] = [name, new Tone.Sampler(name)];
+		} else if (name.slice(0, 4) == 'file') {
+                    this.synthset[name] = [name, new Tone.Sampler(name)];
                 } else {
-                    this.synthset[name][1] = new Tone.Sampler({'C2' : this.synthset[name][0]});
+                    this.synthset[name][1] = new Tone.Sampler(this.synthset[name][0]);
                 }
                 break;
             }
         }
+
         this.getSynthByName(name).toMaster();
     };
 
@@ -1019,21 +1019,26 @@ function Synth () {
             if (drumName != null) {
                 // Work around i8n bug in Firefox.
                 if (drumName === '' && name in this.synthset) {
-                    this.synthset[name][1].triggerAttack('C2', beatValue, 1);
+                    this.synthset[name][1].triggerAttack(0, beatValue);
                 } else if (drumName in this.synthset) {
                     if (this.synthset[drumName][1] == null) {
                         console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
                     } else {
-                        this.synthset[drumName][1].triggerAttack('C2', beatValue, 1);
+			this.synthset[drumName][1].triggerAttack(0);
                     }
+		} else if (name.slice(0, 4) == 'http') {
+                    this.synthset[name][1].triggerAttack(0, beatValue);
+		} else if (name.slice(0, 4) == 'file') {
+                    this.synthset[name][1].triggerAttack(0, beatValue);
                 } else {
                     console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
                 }
             } else if (name === 'drum') {
-                this.synthset[DEFAULTDRUM][1].triggerAttack('C2', beatValue, 1);
+                this.synthset[DEFAULTDRUM][1].triggerAttack(0, beatValue, 1);
             } else if (name.slice(0, 4) == 'http') {
-                console.log('drum name is URL');
-                this.synthset[name][1].triggerAttack('C2', beatValue, 1);
+                this.synthset[name][1].triggerAttack(0, beatValue, 1);
+            } else if (name.slice(0, 4) == 'file') {
+                this.synthset[name][1].triggerAttack(0, beatValue, 1);
             } else {
                 this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
             }
