@@ -25,15 +25,20 @@ function RhythmRuler () {
     this._playing = false;
     this._playingOne = false;
     this._playingAll = false;
-    this._completed = 0;
+    this._cellCounter = 0;
 
+    // Keep a running time for each ruler to maintain sync.
+    this._runningTimes = [];
+    // Starting time from which we measure for sync.
+    this._startingTime = null;
+    this._offset = 0;
     this._rulerSelected = 0;
     this._rulerPlaying = -1;
-    
+
     this._noteWidth = function (noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale * 3) + 'px';
     };
-    
+
     this._calculateZebraStripes = function(rulerno) {
         var ruler = docById('ruler' + rulerno);
         if (this._rulerSelected % 2 === 0) {
@@ -84,10 +89,10 @@ function RhythmRuler () {
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this._rulerSelected][0];
         var divisionHistory = this.Rulers[this._rulerSelected][1];
-        
+
         divisionHistory.push([newCellIndex, inputNum]);
         ruler.deleteCell(newCellIndex);
-        
+
         var noteValue = noteValues[newCellIndex];
         var newNoteValue = inputNum * noteValue;
         var tempwidth = this._noteWidth(newNoteValue);
@@ -95,7 +100,7 @@ function RhythmRuler () {
         var difference = parseFloat(this._noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
         var newCellWidth = parseFloat(this._noteWidth(newNoteValue)) + parseFloat(difference) / inputNum + 'px';
         noteValues.splice(newCellIndex, 1);
-        
+
         for (var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
             noteValues.splice(newCellIndex + i, 0, newNoteValue);
@@ -109,7 +114,7 @@ function RhythmRuler () {
         }
         this._calculateZebraStripes(that._rulerSelected);
     };
-    
+
     this._undo = function() {
         var divisionHistory = this.Rulers[this._rulerSelected][1];
         if (divisionHistory.length === 0) {
@@ -124,152 +129,160 @@ function RhythmRuler () {
         var newCellWidth = parseFloat(cellWidth)*inputNum;
         var oldCellNoteValue = noteValues[newCellIndex];
         var newNoteValue = oldCellNoteValue/inputNum;
-        
+
         var newCell = ruler.insertCell(newCellIndex);
         newCell.style.width = this._noteWidth(newNoteValue);
         newCell.style.minWidth = newCell.style.width;
         newCell.style.maxWidth = newCell.style.width;
         newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
         newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue/inputNum, 1);
-        
+
         noteValues[newCellIndex] = oldCellNoteValue/inputNum;
         noteValues.splice(newCellIndex + 1, inputNum - 1);
-        
+
         var that = this;
         newCell.addEventListener('click', function(event) {
             console.log('adding DISSECT event too');
             that._dissectRuler(event);
         });
-        
+
         for (var i = 0; i < inputNum; i++) {
             ruler.deleteCell(newCellIndex+1);
         }
-        
+
         divisionHistory.pop();
         this._calculateZebraStripes(this._rulerSelected);
     };
-    
-    this._playAll = function() {
-        this._logo.synth.stop();
-        
-        for (var i = 0; i < this.Rulers.length; i++) {
-            var noteValues = this.Rulers[i][0];
-            var noteValue = noteValues[0];
-            var drumblockno = blocks.blockList[this.Drums[i]].connections[1];
-            var drum = blocks.blockList[drumblockno].value;
-            var ruler = docById('ruler' + i);
-            var cell = ruler.cells[0];
-            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-	    this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);
-            
-            if (this._playingAll) {
-                this._playNote(0, 0, i, 1);
-            }
-        }
-    };
-    
-    this._playOne = function() {
-        this._logo.synth.stop();
-        var noteValues = this.Rulers[this._rulerSelected][0];
+
+    this.__playNote = function(i) {
+        var noteValues = this.Rulers[i][0];
         var noteValue = noteValues[0];
-        var ruler = docById('ruler' + this._rulerSelected);
+        var drumBlockNo = this._logo.blocks.blockList[this.Drums[i]].connections[1];
+        var drum = this._logo.blocks.blockList[drumBlockNo].value;
+        var ruler = docById('ruler' + i);
         var cell = ruler.cells[0];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        var drumblockno = blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
-        var drum = blocks.blockList[drumblockno].value;
-        this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);        
-        if (this._playingOne) {
-            this._playNote(0, 0, this._rulerSelected, 1)
+        this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);
+        if (this._playingAll || this._playingOne) {
+            this.__loop(0, 0, i, 1);
+        }
+    }
+
+    this._playAll = function() {
+        this._logo.synth.stop();
+        if (this._startingTime == null) {
+            var d = new Date();
+            this._startingTime = d.getTime();
+	    this._offset = 0;
+	}
+
+        for (var i = 0; i < this.Rulers.length; i++) {
+            this.__playNote(i);
         }
     };
-    
-    this._playNote = function(time, notesCounter, rulerno, colIndex) {
-        var that = this;
-        var noteValues = that.Rulers[rulerno][0];
+
+    this._playOne = function() {
+        this._logo.synth.stop();
+        if (this._startingTime == null) {
+            var d = new Date();
+            this._startingTime = d.getTime();
+	    this._offset = 0;
+	}
+
+        this.__playNote(this._rulerSelected);
+    };
+
+    this.__loop = function(time, notesCounter, rulerNo, colIndex) {
+        var noteValues = this.Rulers[rulerNo][0];
         var noteValue = noteValues[notesCounter];
         time = 1 / noteValue;
-        var drumblockno = blocks.blockList[this.Drums[rulerno]].connections[1];
-        var drum = blocks.blockList[drumblockno].value;
+        var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
+        var drum = this._logo.blocks.blockList[drumblockno].value;
+
+        var that = this;
         setTimeout(function() {
-            var ruler = docById('ruler' + rulerno);
-            
+            var ruler = docById('ruler' + rulerNo);
+
             if (notesCounter === noteValues.length - 1) {
+                // When we get to the end of the rulers, reset the background color.
                 for (var i = 0; i < ruler.cells.length; i++) {
                     var cell = ruler.cells[i];
                     cell.style.backgroundColor =  MATRIXNOTECELLCOLOR;
                 }
             } else {
+                // Mark the current cell.
                 var cell = ruler.cells[colIndex];
                 if (that._playing) {
                     cell.style.backgroundColor = MATRIXBUTTONCOLOR;
                 }
             }
-            
+
             if (notesCounter >= noteValues.length) {
                 notesCounter = 1;
                 that._logo.synth.stop()
             }
-            
+
             notesCounter += 1;
             colIndex += 1;
             if (that._playing) {
-		that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum);
+                var d = new Date();
+                that._offset = d.getTime() - that._startingTime - that._runningTimes[rulerNo]; 
+                that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum);
             }
-            
+
             if (notesCounter < noteValues.length) {
                 if (that._playing) {
-                    that._playNote(time, notesCounter, rulerno, colIndex);
+                    that.__loop(time, notesCounter, rulerNo, colIndex);
                 }
             } else {
-                that._completed += 1;
+                that._cellCounter += 1;
             }
+
             if (that._playingAll) {
-                if (that._completed === that.Rulers.length) {
-                    console.log('playing again all rulers');
-                    that._completed = 0;
+                if (that._cellCounter === that.Rulers.length) {
+                    that._cellCounter = 0;
                     var cell = ruler.cells[0];
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    that._logo.setTurtleDelay(0);
-                    
+
                     for (var i = 0; i < that.Rulers.length; i++) {
                         that._calculateZebraStripes(i);
                     }
-                    
+
                     that._playAll();
                 }
-            }
-            if (that._playingOne) {
-                if (that._completed === 1) {
-                    console.log('playing again ruler' + that._rulerPlaying);
-                    that._completed = 0;
+            } else if (that._playingOne) {
+                if (that._cellCounter === 1) {
+                    that._cellCounter = 0;
                     var cell = ruler.cells[0];
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    that._logo.setTurtleDelay(0);
+
                     that._calculateZebraStripes(that._rulerPlaying);
+
                     that._playOne();
                 }
             }
-        }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
+        }, this._logo.defaultBPMFactor * 1000 * time - this._offset);
+
+        that._runningTimes[rulerNo] += that._logo.defaultBPMFactor * 1000 * time;
     };
-    
+
     this._save = function(selectedruler) {
         var that = this;
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
-        
+
         this._logo.refreshCanvas();
-        
+
         setTimeout(function() {
             var ruler = docById('ruler' + selectedruler);
             var noteValues = that.Rulers[selectedruler][0];
-            
+
             var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'rhythm'}], 0, 0, [0]]];
             var endOfStackIdx = 0;
             var previousBlock = 0;
             var samenotevalue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
-                
                 if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
                     samenotevalue += 1;
                     continue;
@@ -279,23 +292,23 @@ function RhythmRuler () {
                     var notevalueidx = rhythmblockidx + 2;
                     var hiddenidx = rhythmblockidx + 3;
                     var noteValue = noteValues[i];
-                    
+
                     newStack.push([rhythmblockidx, 'rhythm', 0, 0, [previousBlock, noofnotes, notevalueidx, hiddenidx]]);
                     newStack.push([noofnotes, ['number', {'value': samenotevalue}], 0, 0, [rhythmblockidx]]);
                     newStack.push([notevalueidx, ['number', {'value': noteValue}], 0, 0, [rhythmblockidx]]);
-                    
+
                     if (i == ruler.cells.length - 1) {
                         newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, null]]);
                     }
                     else {
                         newStack.push([hiddenidx, 'hidden', 0, 0, [rhythmblockidx, hiddenidx + 1]]);
                     }
-                    
+
                     var previousBlock = hiddenidx;
                     samenotevalue = 1;
                 }
             }
-            
+
             that._logo.blocks.loadNewBlocks(newStack);
             if (selectedruler > that.Rulers.length - 2) {
                 return;
@@ -308,44 +321,46 @@ function RhythmRuler () {
     this.init = function(logo) {
         console.log('init RhythmRuler');
         this._logo = logo;
-        
+
         docById('rulerbody').style.display = 'inline';
         console.log('setting RhythmRuler visible');
         docById('rulerbody').style.visibility = 'visible';
         docById('rulerbody').style.border = 2;
-        
+
         docById('drumDiv').style.display = 'inline';
         docById('drumDiv').style.visibility = 'visible';
         docById('drumDiv').style.border = 2;
-        
+
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = Math.floor(this._cellScale * 24);
-        
+
         docById('rulerbody').style.width = Math.floor(w / 2) + 'px';
         docById('rulerbody').style.overflowX = 'auto';
-        
+
         docById('drumDiv').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
         docById('drumDiv').style.overflowX = 'auto';
-        
+
         var that = this;
         var table = docById('buttonTable');
-        
+
         if (table !== null) {
             table.remove();
         }
-        
+
         var table = docById('drum');
-        
+
         if (table !== null) {
             table.remove();
         }
-        
+
+        this._runningTimes = [];
         for (var i = 0; i < this.Rulers.length; i++) {
             var rulertable = docById('rulerTable' + i);
             var rulerdrum = docById('rulerdrum' + i);
+            this._runningTimes.push(0);
         }
-        
+
         // The play all button
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'drum');
@@ -353,31 +368,30 @@ function RhythmRuler () {
         x.style.borderCollapse = 'collapse';
         x.cellSpacing = 0;
         x.cellPadding = 0;
-        
+
         var drumDiv = docById('drumDiv');
         drumDiv.style.paddingTop = 0 + 'px';
         drumDiv.style.paddingLeft = 0 + 'px';
         drumDiv.appendChild(x);
         drumDivPosition = drumDiv.getBoundingClientRect();
-        
+
         var table = docById('drum');
         var row = table.insertRow(0);
         row.setAttribute('id', 'playalldrums');
         row.style.left = Math.floor(drumDivPosition.left) + 'px';
         row.style.top = Math.floor(drumDivPosition.top) + 'px';
-        
+
         var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play all'));
 
         cell.onclick=function() {
             if (that._playing) {
                 if (that._playingAll) {
-                    console.log('stopping all rulers');
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                     that._playing = false;
                     that._playingAll = false;
                     that._playingOne = false;
-                    that._completed = 0;
                     that._rulerPlaying = -1;
+		    that._startingTime = null;
                     for (var i = 0; i < that.Rulers.length; i++) {
                         that._calculateZebraStripes(i);
                     }
@@ -385,14 +399,17 @@ function RhythmRuler () {
             }
             else {
                 if (!that._playingAll) {
-                    console.log("playing all rulers");
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                     that._logo.setTurtleDelay(0);
                     that._playingAll = true;
                     that._playing = true;
                     that._playingOne = false;
-                    that._completed = 0;
+                    that._cellCounter = 0;
                     that._rulerPlaying = -1;
+                    for (var i = 0; i < that.Rulers.length; i++) {
+                        that._runningTimes[i] = 0;
+                    }
+
                     that._playAll();
                 }
             }
@@ -411,27 +428,27 @@ function RhythmRuler () {
         x.style.borderCollapse = 'collapse';
         x.cellSpacing = 0;
         x.cellPadding = 0;
-        
+
         var rulerbodyDiv = docById('rulerbody');
         rulerbodyDiv.style.paddingTop = 0 + 'px';
         rulerbodyDiv.style.paddingLeft = 0 + 'px';
         rulerbodyDiv.appendChild(x);
         rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
-        
+
         var table = docById('buttonTable');
         var header = table.createTHead();
         var row = header.insertRow(0);
-        
+
         var cell = this._addButton(row, -1, 'export-chunk.svg', iconSize, _('save'));
         cell.onclick=function() {
             that._save(0);
         };
-        
+
         var cell = this._addButton(row, 1, 'restore-button.svg', iconSize, _('undo'));
         cell.onclick=function() {
             that._undo();
         };
-        
+
         // An input for setting the dissect number
         var cell = row.insertCell(2);
         cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dussectNumber" value="' + 2 + '" />';
@@ -444,7 +461,7 @@ function RhythmRuler () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         // FIXME: should be contained in click event
         docById('dissectNumber').classList.add('hasKeyboard');
-        
+
         var cell = this._addButton(row, 3, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             // Save the new dissect history
@@ -465,21 +482,21 @@ function RhythmRuler () {
                 var drum = that._dissectHistory[i][1];
                 if (drums.indexOf(drum) === -1) {
                     var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
-		    dissectHistory.push([history, drum]);
-		}
-	    }
+                    dissectHistory.push([history, drum]);
+                }
+            }
 
             that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
 
             for (var i = 0; i < that.Rulers.length; i++) {
-		var rulertable = docById('rulerTable' + i);
-		var rulerdrum = docById('rulerdrum' + i);
-		if (rulertable !== null) {
+                var rulertable = docById('rulerTable' + i);
+                var rulerdrum = docById('rulerdrum' + i);
+                if (rulertable !== null) {
                     rulertable.remove();
-		}
-		if (rulerdrum !== null) {
+                }
+                if (rulerdrum !== null) {
                     rulerdrum.remove();
-		}
+                }
             }
 
             docById('rulerbody').style.visibility = 'hidden';
@@ -501,27 +518,26 @@ function RhythmRuler () {
             drumcell.onclick=function() {
                 if (that._playing) {
                     if (this.parentNode.id[4] === that._rulerPlaying) {
-                        console.log("stopping ruler" + this.parentNode.id[4]);
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._playing = false;
                         that._playingOne = false;
                         that._playingAll = false;
-                        that._completed = 0;
                         that._rulerPlaying = -1;
+			that._startingTime = null;
                         setTimeout(that._calculateZebraStripes(this.parentNode.id[4]),1000);
                     }
                 }
                 else {
                     if (that._playingOne === false) {
-                        console.log("playing ruler" + this.parentNode.id[4]);
                         that._rulerSelected = this.parentNode.id[4];
                         that._logo.setTurtleDelay(0);
                         that._playing = true;
                         that._playingOne = true;
                         that._playingAll = false;
-                        that._completed = 0;
+                        that._cellCounter = 0;
                         that._rulerPlaying = this.parentNode.id[4];
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                        that._runningTimes[i] = 0;
                         that._playOne();
                     }
                 }
@@ -561,7 +577,7 @@ function RhythmRuler () {
                         rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     }
                 }
-                
+
                 rulercell.addEventListener('click', function(event) {
                     that._dissectRuler(event);
                 });
