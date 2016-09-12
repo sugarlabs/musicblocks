@@ -989,7 +989,7 @@ function Synth () {
             default:
                 if (name.slice(0, 4) == 'http') {
                     this.synthset[name] = [name, new Tone.Sampler(name)];
-		} else if (name.slice(0, 4) == 'file') {
+                } else if (name.slice(0, 4) == 'file') {
                     this.synthset[name] = [name, new Tone.Sampler(name)];
                 } else {
                     this.synthset[name][1] = new Tone.Sampler(this.synthset[name][0]);
@@ -1024,11 +1024,11 @@ function Synth () {
                     if (this.synthset[drumName][1] == null) {
                         console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
                     } else {
-			this.synthset[drumName][1].triggerAttack(0);
+                        this.synthset[drumName][1].triggerAttack(0);
                     }
-		} else if (name.slice(0, 4) == 'http') {
+                } else if (name.slice(0, 4) == 'http') {
                     this.synthset[name][1].triggerAttack(0, beatValue);
-		} else if (name.slice(0, 4) == 'file') {
+                } else if (name.slice(0, 4) == 'file') {
                     this.synthset[name][1].triggerAttack(0, beatValue);
                 } else {
                     console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
