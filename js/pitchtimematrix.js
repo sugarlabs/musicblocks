@@ -912,7 +912,7 @@ function Matrix() {
 
                 for (var i = 0; i < synthNotes.length; i++) {
                     var obj = synthNotes[i].split(':');
-                    that._logo.synth.trigger([Number(obj[1])], this._logo.defaultBPMFactor / noteValue, obj[0]);
+                    that._logo.synth.trigger([Number(obj[1])], that._logo.defaultBPMFactor / noteValue, obj[0]);
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
