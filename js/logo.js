@@ -1362,6 +1362,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push([args[0], args[1]]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetXY(args[0], args[1]);
                 }
@@ -1372,6 +1379,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push([args[0], args[1]]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var delta = args[0] / NOTEDIV;
                     var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
@@ -1470,6 +1484,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var dist = args[0] / NOTEDIV;
                     var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
@@ -1495,6 +1516,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var dist = -args[0] / NOTEDIV;
                     var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
@@ -1520,6 +1548,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var delta = args[0] / NOTEDIV;
                     var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
@@ -1545,6 +1580,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     var delta = -args[0] / NOTEDIV;
                     var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
@@ -1570,6 +1612,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetHeading(args[0]);
                 }
@@ -1676,6 +1725,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetColor(args[0]);
                 }
@@ -1696,6 +1752,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetHue(args[0]);
                 }
@@ -1706,6 +1769,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetValue(args[0]);
                 }
@@ -1716,6 +1786,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else {
                     args[0] %= 101;
                     var alpha = 1.0 - (args[0] / 100);
@@ -1728,6 +1805,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetChroma(args[0]);
                 }
@@ -1738,6 +1822,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetPensize(args[0]);
                 }
@@ -2138,8 +2229,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 childFlowCount = 1;
             }
             logo.inPitchDrumMatrix = true;
-            pitchdrummatrix.solfegeNotes = [];
-            pitchdrummatrix.solfegeOctaves = [];
+            pitchdrummatrix.rowLabels = [];
+            pitchdrummatrix.rowArgs = [];
             pitchdrummatrix.drums = [];
             pitchdrummatrix.clearBlocks();
 
@@ -2147,7 +2238,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                if (pitchdrummatrix.drums.length === 0 || pitchdrummatrix.solfegeNotes.length === 0) {
+                if (pitchdrummatrix.drums.length === 0 || pitchdrummatrix.rowLabels.length === 0) {
                     logo.errorMsg(_('You must have at least one pitch block and one drum block in the matrix.'), blk);
                 } else {
                     // Process queued up rhythms.
@@ -2199,8 +2290,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 childFlowCount = 1;
             }
             logo.inMatrix = true;
-            pitchtimematrix.solfegeNotes = [];
-            pitchtimematrix.solfegeOctaves = [];
+            pitchtimematrix.rowLabels = [];
+            pitchtimematrix.rowArgs = [];
+            pitchtimematrix.graphicsBlocks = [];
             pitchtimematrix.clearBlocks();
 
             logo.tupletRhythms = [];
@@ -2211,7 +2303,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                if (logo.tupletRhythms.length === 0 || pitchtimematrix.solfegeNotes.length === 0) {
+                if (logo.tupletRhythms.length === 0 || pitchtimematrix.rowLabels.length === 0) {
                     logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
                     // } else if(document.getElementById('matrix').style.visibility === 'visible') {
                     //    logo.errorMsg(_('Please close the current matrix before opening a new one.'), blk);
@@ -2428,8 +2520,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inMatrix) {
-                pitchtimematrix.solfegeNotes.push(drumname);
-                pitchtimematrix.solfegeOctaves.push(-1);
+                pitchtimematrix.rowLabels.push(drumname);
+                pitchtimematrix.rowArgs.push(-1);
 
                 pitchtimematrix.addRowBlock(blk);
                 if (logo.drumBlocks.indexOf(blk) === -1) {
@@ -2544,8 +2636,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     if (logo.drumStyle[turtle].length > 0) {
                         pitchdrummatrix.drums.push(last(logo.drumStyle[turtle]));
                     } else {
-                        pitchdrummatrix.solfegeNotes.push(getSolfege(note));
-                        pitchdrummatrix.solfegeOctaves.push(octave);
+                        pitchdrummatrix.rowLabels.push(getSolfege(note));
+                        pitchdrummatrix.rowArgs.push(octave);
                     }
                 }
             } else if (logo.inMatrix) {
@@ -2592,11 +2684,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                     // If we are in a setdrum clamp, override the pitch.
                     if (logo.drumStyle[turtle].length > 0) {
-                        pitchtimematrix.solfegeNotes.push(last(logo.drumStyle[turtle]));
-                        pitchtimematrix.solfegeOctaves.push(-1);
+                        pitchtimematrix.rowLabels.push(last(logo.drumStyle[turtle]));
+                        pitchtimematrix.rowArgs.push(-1);
                     } else {
-                        pitchtimematrix.solfegeNotes.push(getSolfege(note));
-                        pitchtimematrix.solfegeOctaves.push(octave);
+                        pitchtimematrix.rowLabels.push(getSolfege(note));
+                        pitchtimematrix.rowArgs.push(octave);
                     }
                 }
             } else if (logo.inNoteBlock[turtle] > 0) {
@@ -3321,14 +3413,24 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             if (args.length === 1) {
                 var obj = frequencyToPitch(args[0]);
                 // obj[2] is cents
+                /*
                 if (logo.inMatrix) {
                     pitchtimematrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
                     // TODO: add frequency instead of approximate note to matrix
-                    pitchtimematrix.solfegeNotes.push(getSolfege(obj[0]));
-                    pitchtimematrix.solfegeOctaves.push(obj[1]);
+                    pitchtimematrix.rowLabels.push(getSolfege(obj[0]));
+                    pitchtimematrix.rowArgs.push(obj[1]);
+                } else
+                */
+                if (logo.inMatrix) {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inPitchSlider) {
                     pitchslider.Sliders.push([args[0], 0, 0]);
                 } else {
