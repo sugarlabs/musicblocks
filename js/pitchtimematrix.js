@@ -330,15 +330,15 @@ function Matrix() {
         for (var i = 0; i < this.rowLabels.length; i++) {
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+                sortableList.push(-2 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
             }
         }
 
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push(-2 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push(-2 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i][0] + ',' + this.rowArgs[i][1] + ';' + i);
+                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i][0] + ',' + this.rowArgs[i][1] + ';' + i);
             }
         }
 
