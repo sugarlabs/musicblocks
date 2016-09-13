@@ -200,6 +200,9 @@ function Matrix() {
             for (var i = 0; i < that._rowMap.length; i++) {
                 that._rowMap[i] = i;
             }
+            that._logo.synth.stopSound('default');
+            that._logo.synth.stop();
+
         }
 
         var j = 0;
@@ -846,6 +849,10 @@ function Matrix() {
     };
 
     this.__playNote = function(time, noteCounter) {
+        if (docById('pitchtimematrix').style.visibility === 'hidden') {
+            return;
+        }
+
         noteValue = this._notesToPlay[noteCounter][1];
         time = 1 / noteValue;
         var that = this;
