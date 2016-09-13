@@ -302,7 +302,10 @@ function Matrix() {
             return;
         }
 
-        var sortableList = [];        
+        var sortableList = [];
+
+        // Make a list to sort, skipping drums and graphics.
+        // frequency;label;arg;row index
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (this.rowLabels[i].toLowerCase() === 'rest') {
                 continue;
@@ -315,68 +318,77 @@ function Matrix() {
                 continue;
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 continue;
-            } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                continue;
             }
 
-            // FIXME: some sortable code for soflege
-            sortableList.push(this.rowArgs[i] + ':' + SOLFEGE2SORTABLE[this.rowLabels[i]] + ';' + i);
+            // We want to sort based on frequency, so we convert all notes to frequency.
+            if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
+                sortableList.push(this.rowArgs[i] + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+            } else {
+                sortableList.push(noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]) + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+            }
         }
 
-        var sortedList = sortableList.sort(); 
+        // Add the stuff we didn't sort.
+        for (var i = 0; i < this.rowLabels.length; i++) {
+            var drumName = getDrumName(this.rowLabels[i]);
+            if (drumName != null) {
+                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+            }
+        }
+
+        for (var i = 0; i < this.rowLabels.length; i++) {
+            if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
+                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+            } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
+                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i][0] + ',' + this.rowArgs[i][1] + ';' + i);
+            }
+        }
+
+        var sortedList = sortableList.sort();
         // Reverse since we start from the top of the table.
         sortedList = sortedList.reverse();
 
-        for (var i = 0; i < this.rowLabels.length; i++) {
-            if (this.rowLabels[i].toLowerCase() === 'rest') {
-                continue;
-            }
-
-            var drumName = getDrumName(this.rowLabels[i]);
-            if (drumName != null) {
-                sortedList.push('-1:' + this.rowLabels[i] + ';' + i);
-            } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                sortedList.push(this.rowArgs[i] + ':' + this.rowLabels[i] + ';' + i);
-            } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                sortedList.push(this.rowsArgs[i][0] + ',' + this.rowArgs[i][1] + ':' + this.rowLabels[i] + ';' + i);
-            } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                sortedList.push(this.rowArgs[i] + ':' + this.rowLabels[i] + ';' + i);
-            }
-        }
+        console.log(sortedList);
 
         this.rowLabels = [];
         this.rowArgs = [];
         for (var i = 0; i < sortedList.length; i++) {
-            var obj = sortedList[i].split(':');
-            var obj2 = obj[1].split(';');
-            var drumName = getDrumName(obj2[0]);
-            if (drumName == null) {
-                obj2[0] = SORTABLE2SOLFEGE[obj2[0]];
-            } else if (MATRIXSYNTHS.indexOf(obj2[0]) !== -1) {
-                obj2[0] = SORTABLE2SOLFEGE[obj2[0]];
-            } else if (MATRIXGRAPHICS.indexOf(obj2[0]) !== -1) {
-                obj2[0] = SORTABLE2SOLFEGE[obj2[0]];
-            } else if (MATRIXGRAPHICS2.indexOf(obj2[0]) !== -1) {
-                obj2[0] = SORTABLE2SOLFEGE[obj2[0]];
-            }
+            var obj = sortedList[i].split(';');
 
-            this._rowMap[Number(obj2[1])] = i;
-            if (i > 0 && (Number(obj[0]) === last(this.rowArgs) && obj2[0] === last(this.rowLabels))) {
+            this._rowMap[obj[3]] = i;
+
+            var objArgs = obj[2].split(',');
+            if (i > 0 && objArgs.length === 1 && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
                 // skip duplicates
+                console.log('skipping duplicate ' + obj[1] + ' ' + obj[2]);
                 for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
                     this._rowOffset[j] -= 1;
                 }
 
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
+            } else if (i > 0 && obj[1] === last(this.rowLabels)) {
+                // test multiple args for match
+                var argType = typeof(last(this.rowArgs));
+                if (argType === 'object') {
+                    if ((Number(objArgs[0]) === last(this.rowArgs)[0]) && (Number(objArgs[1]) === last(this.rowArgs)[1])) {
+                        // skip duplicates
+                        console.log('skipping duplicate ' + obj[1] + ' ' + obj[2]);
+                        for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
+                            this._rowOffset[j] -= 1;
+                        }
+
+                        this._rowMap[i] = this._rowMap[i - 1];
+                        continue;
+                    }
+                }
             }
 
-            this.rowLabels.push(obj2[0]);
-            var obj3 = obj[0].split(',');
-            if (obj3.length === 2) {
-                this.rowArgs.push([Number(obj3[0]), Number(obj3[1])]);
+            this.rowLabels.push(obj[1]);
+            if (objArgs.length === 2) {
+                this.rowArgs.push([Number(objArgs[0]), Number(objArgs[1])]);
             } else {
-                this.rowArgs.push(Number(obj[0]));
+                this.rowArgs.push(Number(obj[2]));
             }
         }
 
@@ -1016,7 +1028,7 @@ function Matrix() {
             }
         } else if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
             this._logo.synth.trigger([Number(obj[1])], noteValue, obj[0]);
-	}
+        }
     };
 
     this._clear = function() {
