@@ -10,8 +10,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-const SOLFEGE2SORTABLE = {'do♭': 'a', 'do': 'b', 'do♯': 'c', 're♭': 'd', 're': 'e', 're♯': 'f', 'mi♭': 'g', 'mi': 'h', 'mi♯': 'i', 'fa♭': 'j', 'fa': 'k', 'fa♯': 'l', 'sol♭': 'm', 'sol': 'n', 'sol♯': 'o', 'la♭': 'p', 'la': 'q', 'la♯': 'r','ti♭': 's', 'ti': 't', 'ti♯': 'u'};
-const SORTABLE2SOLFEGE = {'a': 'do♭', 'b': 'do', 'c': 'do♯', 'd': 're♭', 'e': 're', 'f': 're♯', 'g': 'mi♭', 'h': 'mi', 'i': 'mi♯', 'j': 'fa♭', 'k': 'fa', 'l': 'fa♯', 'm': 'sol♭', 'n': 'sol', 'o': 'sol♯', 'p': 'la♭', 'q': 'la', 'r': 'la♯', 's': 'ti♭', 't': 'ti', 'u': 'ti♯'};
 const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square'];
@@ -338,9 +336,9 @@ function Matrix() {
 
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+                sortableList.push(-2 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i][0] + ',' + this.rowArgs[i][1] + ';' + i);
+                sortableList.push(-2 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i][0] + ',' + this.rowArgs[i][1] + ';' + i);
             }
         }
 
