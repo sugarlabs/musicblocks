@@ -629,7 +629,7 @@ function durationToNoteValue(duration) {
 
     if (POWER2.indexOf(roundDown) === -1) {
         roundDown = 128;
-    }
+   }
 
     // Next, see if the note has a factor of 2.
     var factorOfTwo = 1;
@@ -724,16 +724,25 @@ function numberToPitch(i) {
     } else if (i > 87) {
         return ['C', 8];
     }
+
     // We start at A0.
     return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
 };
 
 
-function noteToFrequency(note, keySignature) {
+function noteToPitchOctave(note) {
     var len = note.length;
     var octave = last(note);
     var pitch = note.substring(0, len - 1);
-    return pitchToFrequency(pitch, Number(octave), 0, keySignature);
+
+    return [pitch, Number(octave)];
+};
+
+
+function noteToFrequency(note, keySignature) {
+    var obj = noteToPitchOctave(note);
+
+    return pitchToFrequency(obj[0], obj[1], 0, keySignature);
 };
 
 
@@ -887,6 +896,9 @@ function Synth () {
         'square': [null, null],
         'pluck': [null, null],
 
+        // voiced samples
+        'violin': [VIOLINSOUNDSAMPLE, null],
+
         // drum samples
         'bottle': [BOTTLESOUNDSAMPLE, null],
         'clap': [CLAPSOUNDSAMPLE, null],
@@ -930,8 +942,11 @@ function Synth () {
         case 'sine':
             return this.synthset[name][1];
             break;
-        case 'poly':
+        case 'violin':
+            return this.synthset[name][1];
+            break;
         case 'default':
+        case 'poly':
             return this.synthset['poly'][1];
             break;
         default:
@@ -986,6 +1001,9 @@ function Synth () {
             case 'default':
                 this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
+            case 'violin':
+                this.synthset[name][1] = new Tone.Sampler(this.synthset[name][0]);
+                break;
             default:
                 if (name.slice(0, 4) == 'http') {
                     this.synthset[name] = [name, new Tone.Sampler(name)];
@@ -1002,6 +1020,7 @@ function Synth () {
     };
 
     this.trigger = function(notes, beatValue, name) {
+        console.log(name);
         switch (name) {
         case 'pluck':
         case 'triangle':
@@ -1010,8 +1029,15 @@ function Synth () {
         case 'sine':
             this.synthset[name][1].triggerAttackRelease(notes[0], beatValue);
             break;
-        case 'poly':
+        case 'violin':
+            // The violin sample is tuned to C6
+            var zero = pitchToNumber('C', 6, 'C Major');
+            var obj = noteToPitchOctave(notes);
+            var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
+            this.synthset['violin'][1].triggerAttack(noteNo - zero, beatValue);
+            break;
         case 'default':
+        case 'poly':
             this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
             break;
         default:
