@@ -193,6 +193,14 @@ function RhythmRuler () {
     };
 
     this.__loop = function(time, notesCounter, rulerNo, colIndex) {
+        if (docById('rulerbody').style.visibility === 'hidden') {
+            return;
+        }
+
+        if (docById('drumDiv').style.visibility === 'hidden') {
+            return;
+        }
+
         var noteValues = this.Rulers[rulerNo][0];
         var noteValue = noteValues[notesCounter];
         time = 1 / noteValue;
@@ -202,6 +210,10 @@ function RhythmRuler () {
         var that = this;
         setTimeout(function() {
             var ruler = docById('ruler' + rulerNo);
+            if (ruler == null) {
+                console.log('Cannot find ruler ' + rulerNo + '. Widget closed?');
+		return;
+            }
 
             if (notesCounter === noteValues.length - 1) {
                 // When we get to the end of the rulers, reset the background color.
