@@ -246,6 +246,8 @@ const DEFAULTDRUM = 'kick';
 
 var customMode = MUSICALMODES['CUSTOM'];
 
+const SAMPLECENTERNO = {'violin': 63, 'cello': 39, 'basse': 15};
+
 
 function getModeName(name) {
     for (var mode in MODENAMES) {
@@ -1037,11 +1039,10 @@ function Synth () {
         case 'violin':
         case 'cello':
         case 'basse':
-            const CENTERNO = {'violin': 63; 'cello': 39; 'basse': 15};
             // The violin sample is tuned to C6
             // The cello sample is tuned to C4???
             // The basse sample is tuned to C2???
-            var centerNo = CENTERNO[name];
+            var centerNo = SAMPLECENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
             this.synthset[name][1].triggerAttack(noteNo - centerNo, beatValue);
