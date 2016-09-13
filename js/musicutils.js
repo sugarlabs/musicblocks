@@ -1006,8 +1006,8 @@ function Synth () {
                 this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
             case 'violin':
-            case 'cello';
-            case 'basse';
+            case 'cello':
+            case 'basse':
                 this.synthset[name][1] = new Tone.Sampler(this.synthset[name][0]);
                 break;
             default:
