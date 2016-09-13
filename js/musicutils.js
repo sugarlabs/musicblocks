@@ -898,6 +898,8 @@ function Synth () {
 
         // voiced samples
         'violin': [VIOLINSOUNDSAMPLE, null],
+        'cello': [CELLOSOUNDSAMPLE, null],
+        'basse': [BASSESOUNDSAMPLE, null],
 
         // drum samples
         'bottle': [BOTTLESOUNDSAMPLE, null],
@@ -943,6 +945,8 @@ function Synth () {
             return this.synthset[name][1];
             break;
         case 'violin':
+        case 'cello':
+        case 'basse':
             return this.synthset[name][1];
             break;
         case 'default':
@@ -1002,6 +1006,8 @@ function Synth () {
                 this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
             case 'violin':
+            case 'cello';
+            case 'basse';
                 this.synthset[name][1] = new Tone.Sampler(this.synthset[name][0]);
                 break;
             default:
@@ -1020,7 +1026,6 @@ function Synth () {
     };
 
     this.trigger = function(notes, beatValue, name) {
-        console.log(name);
         switch (name) {
         case 'pluck':
         case 'triangle':
@@ -1030,11 +1035,16 @@ function Synth () {
             this.synthset[name][1].triggerAttackRelease(notes[0], beatValue);
             break;
         case 'violin':
+        case 'cello':
+        case 'basse':
+            const CENTERNO = {'violin': 63; 'cello': 39; 'basse': 15};
             // The violin sample is tuned to C6
-            var zero = pitchToNumber('C', 6, 'C Major');
+            // The cello sample is tuned to C4???
+            // The basse sample is tuned to C2???
+            var centerNo = CENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
-            this.synthset['violin'][1].triggerAttack(noteNo - zero, beatValue);
+            this.synthset[name][1].triggerAttack(noteNo - centerNo, beatValue);
             break;
         case 'default':
         case 'poly':
