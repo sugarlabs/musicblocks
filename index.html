@@ -66,12 +66,12 @@
     $(function() {
         $('#drumDiv').draggable({
             drag: function() {
-                jQuery('#rulerbody').css('top',jQuery(this).position().top);
-                jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);
+                jQuery('#rulerBody').css('top',jQuery(this).position().top);
+                jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25);
             },
             stop: function(){
-                jQuery('#rulerbody').css('top',jQuery(this).position().top);                     
-                jQuery('#rulerbody').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
+                jQuery('#rulerBody').css('top',jQuery(this).position().top);                     
+                jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25);                                        
             }
         });
     });
@@ -80,11 +80,11 @@
         $('#rulerBody').draggable({
             drag: function() {
                 jQuery('#drumDiv').css('top',jQuery(this).position().top);
-                jQuery('#drumDiv').css('left',jQuery(this).position().left + $(window).innerWidth/30);
+                jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/25);
             },
             stop: function(){
                 jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
-                jQuery('#drumDiv').css('left',jQuery(this).position().left + $(window).innerWidth/30);                                        
+                jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/25);                                        
             }
         });
     });
@@ -326,7 +326,7 @@
 
   <div id="pitchtimematrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
   <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
-  <div id="rulerbody" overflow-x="auto"></div>
+  <div id="rulerBody" overflow-x="auto"></div>
   <div id="dissectNumber"></div>
   <div id="drumDiv"></div>
   <div id="pitchstaircase"></div>
