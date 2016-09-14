@@ -633,6 +633,62 @@ function initBasicProtoBlocks(palettes, blocks) {
     articulationBlock.flowClampOneArgBlock();
     articulationBlock.defaults.push(25);
 
+    var pppBlock = new ProtoBlock('ppp');
+    pppBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['ppp'] = pppBlock;
+    pppBlock.staticLabels.push('ppp');
+    pppBlock.adjustWidthToLabel();
+    pppBlock.zeroArgBlock();
+
+    var ppBlock = new ProtoBlock('pp');
+    ppBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['pp'] = ppBlock;
+    ppBlock.staticLabels.push('pp');
+    ppBlock.adjustWidthToLabel();
+    ppBlock.zeroArgBlock();
+
+    var pBlock = new ProtoBlock('p');
+    pBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['p'] = pBlock;
+    pBlock.staticLabels.push('p');
+    pBlock.adjustWidthToLabel();
+    pBlock.zeroArgBlock();
+
+    var mpBlock = new ProtoBlock('mp');
+    mpBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['mp'] = mpBlock;
+    mpBlock.staticLabels.push('mp');
+    mpBlock.adjustWidthToLabel();
+    mpBlock.zeroArgBlock();
+
+    var mfBlock = new ProtoBlock('mf');
+    mfBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['mf'] = mfBlock;
+    mfBlock.staticLabels.push('mf');
+    mfBlock.adjustWidthToLabel();
+    mfBlock.zeroArgBlock();
+
+    var fBlock = new ProtoBlock('f');
+    fBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['f'] = fBlock;
+    fBlock.staticLabels.push('f');
+    fBlock.adjustWidthToLabel();
+    fBlock.zeroArgBlock();
+
+    var ffBlock = new ProtoBlock('ff');
+    ffBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['ff'] = ffBlock;
+    ffBlock.staticLabels.push('ff');
+    ffBlock.adjustWidthToLabel();
+    ffBlock.zeroArgBlock();
+
+    var fffBlock = new ProtoBlock('fff');
+    fffBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['fff'] = fffBlock;
+    fffBlock.staticLabels.push('fff');
+    fffBlock.adjustWidthToLabel();
+    fffBlock.zeroArgBlock();
+
     var noteVolumeBlock2 = new ProtoBlock('setnotevolume2');
     noteVolumeBlock2.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setnotevolume2'] = noteVolumeBlock2;
