@@ -822,6 +822,7 @@ define(function (require) {
             document.addEventListener('DOMMouseScroll', scrollEvent, false);
 
             this.document.onkeydown = __keyPressed;
+            _hideStopButton();
         };
 
         function _setupBlocksContainerEvents() {
