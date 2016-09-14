@@ -449,6 +449,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     setbpmBlock.flowClampOneArgBlock();
     setbpmBlock.defaults.push(90);
 
+    var backwardBlock = new ProtoBlock('backward');
+    backwardBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['backward'] = backwardBlock;
+    backwardBlock.staticLabels.push(_('backward'));
+    backwardBlock.adjustWidthToLabel();
+    backwardBlock.flowClampZeroArgBlock();
+
     var skipNotesBlock = new ProtoBlock('skipnotes');
     skipNotesBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['skipnotes'] = skipNotesBlock;
@@ -522,6 +529,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     note2Block.staticLabels.push('A4 8');
     note2Block.adjustWidthToLabel();
     note2Block.zeroArgBlock();
+
+    var note1Block = new ProtoBlock('note1');
+    note1Block.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['note1'] = note1Block;
+    note1Block.staticLabels.push('la 4');
+    note1Block.adjustWidthToLabel();
+    note1Block.zeroArgBlock();
 
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['rhythm'];
@@ -611,13 +625,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     setMasterBPMBlock.oneArgBlock();
     setMasterBPMBlock.defaults.push(90);
 
-    var backwardBlock = new ProtoBlock('backward');
-    backwardBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['backward'] = backwardBlock;
-    backwardBlock.staticLabels.push(_('backward'));
-    backwardBlock.adjustWidthToLabel();
-    backwardBlock.flowClampZeroArgBlock();
-
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['articulation'] = articulationBlock;
@@ -642,6 +649,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     crescendoBlock.flowClampOneArgBlock();
     crescendoBlock.defaults.push(5);
 
+    /*
     var thirdsBlock = new ProtoBlock('thirds');
     thirdsBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['thirds'] = thirdsBlock;
@@ -671,6 +679,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     fifthsBlock.staticLabels.push(_('fifths'));
     fifthsBlock.adjustWidthToLabel();
     fifthsBlock.flowClampZeroArgBlock();
+    */
 
     var intervalBlock = new ProtoBlock('interval');
     intervalBlock.palette = palettes.dict['tone'];
