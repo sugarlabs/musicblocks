@@ -224,13 +224,13 @@ function Matrix() {
                 console.log('drumName is: ' + drumName + ' (' + this.rowLabels[i] + ')');
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize/2 + '" width="' + iconSize/2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="images/synth.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="images/synth.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="images/turtle.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="images/turtle.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="images/turtle.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="images/turtle.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else {
                 cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
             }
@@ -323,9 +323,9 @@ function Matrix() {
 
             // We want to sort based on frequency, so we convert all notes to frequency.
             if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push(this.rowArgs[i] + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+                sortableList.push([this.rowArgs[i], this.rowLabels[i], this.rowArgs[i], i]);
             } else {
-                sortableList.push(noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]) + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+                sortableList.push([noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]), this.rowLabels[i], this.rowArgs[i], i]);
             }
         }
 
@@ -333,19 +333,24 @@ function Matrix() {
         for (var i = 0; i < this.rowLabels.length; i++) {
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                sortableList.push(-2 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+                sortableList.push([-2, this.rowLabels[i], this.rowArgs[i], i]);
             }
         }
 
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i] + ';' + i);
+                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push(-1 + ';' + this.rowLabels[i] + ';' + this.rowArgs[i][0] + ',' + this.rowArgs[i][1] + ';' + i);
+                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i]);
             }
         }
 
-        var sortedList = sortableList.sort();
+        var sortedList = sortableList.sort(
+	    function(a, b) {
+		return a[0] - b[0]
+	    }
+	)
+
         // Reverse since we start from the top of the table.
         sortedList = sortedList.reverse();
 
@@ -354,12 +359,11 @@ function Matrix() {
         this.rowLabels = [];
         this.rowArgs = [];
         for (var i = 0; i < sortedList.length; i++) {
-            var obj = sortedList[i].split(';');
+            var obj = sortedList[i];
 
             this._rowMap[obj[3]] = i;
 
-            var objArgs = obj[2].split(',');
-            if (i > 0 && objArgs.length === 1 && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
+	    if (i > 0 && typeof(obj[2]) !== 'object' && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
                 // skip duplicates
                 console.log('skipping duplicate ' + obj[1] + ' ' + obj[2]);
                 for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
@@ -372,7 +376,7 @@ function Matrix() {
                 // test multiple args for match
                 var argType = typeof(last(this.rowArgs));
                 if (argType === 'object') {
-                    if ((Number(objArgs[0]) === last(this.rowArgs)[0]) && (Number(objArgs[1]) === last(this.rowArgs)[1])) {
+                    if ((Number(obj[2][0]) === last(this.rowArgs)[0]) && (Number(obj[2][1]) === last(this.rowArgs)[1])) {
                         // skip duplicates
                         console.log('skipping duplicate ' + obj[1] + ' ' + obj[2]);
                         for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
@@ -386,11 +390,7 @@ function Matrix() {
             }
 
             this.rowLabels.push(obj[1]);
-            if (objArgs.length === 2) {
-                this.rowArgs.push([Number(objArgs[0]), Number(objArgs[1])]);
-            } else {
-                this.rowArgs.push(Number(obj[2]));
-            }
+            this.rowArgs.push(Number(obj[2]));
         }
 
         this.init(this._logo);
@@ -996,13 +996,12 @@ function Matrix() {
         var drumHTML = solfegeHTML.split('"');
         if (drumHTML.length > 3) {
             var drumName = getDrumSynthName(drumHTML[3]);
-            if (drumHTML[1] === 'images/turtle.svg') {
-                var note = drumHTML[3].replace(/ /g, ':'); // e.g., forward 100
-            } else if (drumHTML[1] === 'images/synth.svg') {
-                var note = drumHTML[3].replace(/ /g, ':'); // e.g., sine 440
-            } else if (drumName != null) {
+            console.log('[' + drumHTML[1].slice(0, 7) + ']');
+	    if (drumName != null) {
                 // If it is a drum, just save the name.
                 var note = drumName;
+            } else if (drumHTML[1].slice(0, 7) === 'images/') {
+                var note = drumHTML[3].replace(/ /g, ':'); // e.g., forward 100
             } else {
                 console.log('something is wrong (drumSynthName is ' + drumName + ')');
                 var note = DEFAULTDRUM;
