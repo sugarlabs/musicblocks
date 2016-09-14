@@ -105,7 +105,7 @@ function PitchStairCase () {
 
             var cell = row.insertCell(-1);
             cell.style.width = (stairDivPosition.width) * parseFloat(DEFUALTFREQUENCY/frequency) * this._cellScale / 3 + 'px';
-            cell.innerHTML = that.Stairs[i][0] + that.Stairs[i][1] + ' ' + frequency.toFixed(2);
+            cell.innerHTML = frequency.toFixed(2) + '<br>' + that.Stairs[i][0] + that.Stairs[i][1];
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = playrow.offsetHeight + 'px';
