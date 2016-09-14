@@ -193,7 +193,7 @@ function RhythmRuler () {
     };
 
     this.__loop = function(time, notesCounter, rulerNo, colIndex) {
-        if (docById('rulerbody').style.visibility === 'hidden') {
+        if (docById('rulerBody').style.visibility === 'hidden') {
             return;
         }
 
@@ -399,10 +399,10 @@ function RhythmRuler () {
         console.log('init RhythmRuler');
         this._logo = logo;
 
-        docById('rulerbody').style.display = 'inline';
+        docById('rulerBody').style.display = 'inline';
         console.log('setting RhythmRuler visible');
-        docById('rulerbody').style.visibility = 'visible';
-        docById('rulerbody').style.border = 2;
+        docById('rulerBody').style.visibility = 'visible';
+        docById('rulerBody').style.border = 2;
 
         docById('drumDiv').style.display = 'inline';
         docById('drumDiv').style.visibility = 'visible';
@@ -412,8 +412,8 @@ function RhythmRuler () {
         this._cellScale = w / 1200;
         var iconSize = Math.floor(this._cellScale * 24);
 
-        docById('rulerbody').style.width = Math.floor(w / 2) + 'px';
-        docById('rulerbody').style.overflowX = 'auto';
+        docById('rulerBody').style.width = Math.floor(w / 2) + 'px';
+        docById('rulerBody').style.overflowX = 'auto';
 
         docById('drumDiv').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
         docById('drumDiv').style.overflowX = 'auto';
@@ -506,11 +506,11 @@ function RhythmRuler () {
         x.cellSpacing = 0;
         x.cellPadding = 0;
 
-        var rulerbodyDiv = docById('rulerbody');
-        rulerbodyDiv.style.paddingTop = 0 + 'px';
-        rulerbodyDiv.style.paddingLeft = 0 + 'px';
-        rulerbodyDiv.appendChild(x);
-        rulerbodyDivPosition = rulerbodyDiv.getBoundingClientRect();
+        var rulerBodyDiv = docById('rulerBody');
+        rulerBodyDiv.style.paddingTop = 0 + 'px';
+        rulerBodyDiv.style.paddingLeft = 0 + 'px';
+        rulerBodyDiv.appendChild(x);
+        rulerBodyDivPosition = rulerBodyDiv.getBoundingClientRect();
 
         var table = docById('buttonTable');
         var header = table.createTHead();
@@ -581,9 +581,9 @@ function RhythmRuler () {
                 }
             }
 
-            docById('rulerbody').style.visibility = 'hidden';
+            docById('rulerBody').style.visibility = 'hidden';
             docById('drumDiv').style.visibility = 'hidden';
-            docById('rulerbody').style.border = 0;
+            docById('rulerBody').style.border = 0;
             docById('drumDiv').style.border = 0;
             that._playing = false;
             that._playingOne = false;
@@ -632,10 +632,10 @@ function RhythmRuler () {
             rulerTable.style.borderCollapse = 'collapse';
             rulerTable.cellSpacing = 0;
             rulerTable.cellPadding = 0;
-            rulerbodyDiv.appendChild(rulerTable);
+            rulerBodyDiv.appendChild(rulerTable);
 
             var row = rulerTable.insertRow(-1);
-            row.style.left = Math.floor(rulerbodyDivPosition.left) + 'px';
+            row.style.left = Math.floor(rulerBodyDivPosition.left) + 'px';
             row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             row.setAttribute('id', 'ruler' + i);
             for (var j = 0; j < that.Rulers[i][0].length; j++) {
