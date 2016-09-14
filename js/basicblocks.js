@@ -759,7 +759,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     slurBlock.staticLabels.push(_('slur'));
     slurBlock.adjustWidthToLabel();
     slurBlock.flowClampOneArgBlock();
-    slurBlock.defaults.push(32);
+    slurBlock.defaults.push(16);
 
     var staccatoBlock = new ProtoBlock('staccato');
     staccatoBlock.palette = palettes.dict['tone'];
