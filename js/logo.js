@@ -3051,7 +3051,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
             break;
         case 'setvoice':
-            var voicename = 'violin';
+            var voicename = null;
             for (var voice in VOICENAMES) {
                 if (VOICENAMES[voice][0] === args[0]) {
                     voicename = VOICENAMES[voice][1];
@@ -3060,18 +3060,36 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 }
             }
 
-            logo.voices[turtle].push(voicename);
-            childFlow = args[1];
-            childFlowCount = 1;
+            // Maybe it is a drum?
+            if (voicename == null) {
+                for (var drum in DRUMNAMES) {
+                    if (DRUMNAMES[drum][0] === args[0]) {
+                        voicename = DRUMNAMES[drum][1];
+                    } else if (DRUMNAMES[drum][1] === args[0]) {
+                        voicename = args[0];
+                    }
+                }
+            }
 
-            var listenerName = '_setvoice_' + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            if (voicename == null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
 
-            var __listener = function (event) {
-                logo.voices[turtle].pop();
-            };
+                childFlow = args[1];
+                childFlowCount = 1;
+            } else {
+                logo.voices[turtle].push(voicename);
+                childFlow = args[1];
+                childFlowCount = 1;
 
-            logo._setListener(turtle, listenerName, __listener);
+                var listenerName = '_setvoice_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    logo.voices[turtle].pop();
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            }
             break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
@@ -3120,7 +3138,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 logo.errorMsg(_('Input to Perfect Block must be 1, 4, 5, or 8'), blk);
                 childFlow = args[1];
                 childFlowCount = 1;
-	    }
+            }
             break;
         case 'diminished':
             if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(args[0]) !== -1) {
