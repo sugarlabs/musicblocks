@@ -186,6 +186,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     this.validNote = true;
     this.drift = {};
     this.drumStyle = {};
+    this.voices = {};
     this.backward = {};
 
     // tuplet
@@ -207,7 +208,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     // Load the default synthesizer
     this.synth = new Synth();
     this.synth.loadSynth('poly');
-    // this.synth.loadSynth(DEFAULTDRUM);
 
     // Mide widget
     this.modeWidget = new ModeWidget();
@@ -662,6 +662,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this.tieCarryOver[turtle] = 0;
             this.drift[turtle] = 0;
             this.drumStyle[turtle] = [];
+            this.voices[turtle] = [];
             this.pitchDrumTable[turtle] = {};
             this.backward[turtle] = [];
         }
@@ -2175,14 +2176,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             var listenerName = '_rhythmruler_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
+
             var __listener = function (event) {
                 rhythmruler.init(logo);
             };
+
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'pitchstaircase':
-            console.log("running pitchstaircase");
-
             pitchstaircase.Stairs = [];
 
             childFlow = args[0];
@@ -2191,9 +2192,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             var listenerName = '_pitchstaircase_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
+
             var __listener = function (event) {
                 pitchstaircase.init(logo);
             };
+
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'tempo':
@@ -2204,25 +2207,28 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             var listenerName = '_tempo_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
+
             var __listener = function (event) {
                 tempo.init(logo);
             };
+
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'pitchslider':
-            console.log("running PitchSlider");
-
             pitchslider.Sliders = [];
+
             childFlow = args[0];
             childFlowCount = 1;
             logo.inPitchSlider = true;
 
             var listenerName = '_pitchslider_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
+
             var __listener = function (event) {
                 pitchslider.init(logo);
                 logo.inPitchSlider = false;
             };
+
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'pitchdrummatrix':
@@ -3044,6 +3050,29 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 rhythmruler.Rulers.push([[],[]]);
             }
             break;
+        case 'setvoice':
+            var voicename = 'violin';
+            for (var voice in VOICENAMES) {
+                if (VOICENAMES[voice][0] === args[0]) {
+                    voicename = VOICENAMES[voice][1];
+                } else if (VOICENAMES[voice][1] === args[0]) {
+                    voicename = args[0];
+                }
+            }
+
+            logo.voices[turtle].push(voicename);
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_setvoice_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.voices[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -3500,63 +3529,20 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 logo.errorMsg(INVALIDPITCH, blk);
                 logo.stopTurtle = true;
             } else if (logo.inMatrix) {
-                if (note.toLowerCase() !== 'rest') {
-                    pitchtimematrix.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
-                        logo.pitchBlocks.push(blk);
-                    }
+                pitchtimematrix.addRowBlock(blk);
+                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                    logo.pitchBlocks.push(blk);
                 }
 
-                if (!(logo.invertList[turtle].length === 0)) {
-                    var delta = 0;
-                    var len = logo.invertList[turtle].length;
-                    // Get an anchor note and its corresponding
-                    // number, which is used to calculate delta.
-                    var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
-                    var num1 = logo.getNumber(note1[0], note1[1]);
-                    for (var i = len - 1; i > -1; i--) {
-                        // Note from which delta is calculated.
-                        var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
-                        var num2 = getNumber(note2[0], note2[1]);
-                        // var a = getNumNote(num1, 0);
-                        if (logo.invertList[turtle][i][2] === 'even') {
-                            delta += num2 - num1;
-                        } else {  // odd
-                            delta += num2 - num1 + 0.5;
-                        }
-                        num1 += 2 * delta;
-                    }
-                }
-
-                if (logo.duplicateFactor[turtle].length > 0) {
-                    var duplicateFactor = logo.duplicateFactor[turtle];
-                } else {
-                    var duplicateFactor = 1;
-                }
-                for (var i = 0; i < duplicateFactor; i++) {
-                    // Apply transpositions
-                    var transposition = 2 * delta;
-                    if (turtle in logo.transposition) {
-                        transposition += logo.transposition[turtle];
-                    }
-
-                    note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
-                    // If we are in a setdrum clamp, override the pitch.
-                    if (logo.drumStyle[turtle].length > 0) {
-                        pitchtimematrix.rowLabels.push(last(logo.drumStyle[turtle]));
-                        pitchtimematrix.rowArgs.push(-1);
-                    } else {
-                        pitchtimematrix.rowLabels.push(getSolfege(note));
-                        pitchtimematrix.rowArgs.push(octave);
-                    }
-                }
+                pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                pitchtimematrix.rowArgs.push(args[0]);
             } else if (logo.inNoteBlock[turtle] > 0) {
 
                 function addPitch(note, octave, cents) {
                     if (logo.drumStyle[turtle].length > 0) {
                         var drumname = last(logo.drumStyle[turtle]);
                         var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
-                        logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
+                        logo.pitchDrumTable[turtle][note2[0] + note2[1]] = drumname;
                     }
                     logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
@@ -3629,11 +3615,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
                 logo.pushedNote[turtle] = true;
             } else if (logo.inPitchStairCase) {
-                var frequency = pitchToFrequency(args[0], args[1], 0, logo.keySignature[turtle]);
-                var note = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
+                var frequency = args[0];
+                var note = frequencyToPitch(args[0]);
                 var flag = 0;
 
-                for (var i=0 ; i < pitchstaircase.Stairs.length; i++) {
+                for (var i = 0 ; i < pitchstaircase.Stairs.length; i++) {
                     if (pitchstaircase.Stairs[i][2] < parseFloat(frequency)) {
                         pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency)]);
                         flag = 1;
@@ -3650,11 +3636,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
                 }
             } else if (logo.inPitchSlider) {
+                console.log('pushing ' + args[0]);
                 pitchslider.Sliders.push([args[0], 0, 0]);
             } else {
                 logo.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
             }
             break;
+            // deprecated
         case 'triangle':
         case 'sine':
         case 'square':
@@ -4279,19 +4267,18 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                                     if (notes.length > 1) {
                                         logo.errorMsg(last(logo.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
-
                                     logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
                                 } else if (logo.drumStyle[turtle].length > 0) {
                                     logo.synth.trigger(notes, beatValue, last(logo.drumStyle[turtle]));
                                 } else if (logo.turtles.turtleList[turtle].drum) {
                                     logo.synth.trigger(notes, beatValue, 'drum');
                                 } else {
-                                    // FIXME: Only if we are in a Drum clamp???
                                     // Look for any notes in the chord that might be in the pitchDrumTable.
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in logo.pitchDrumTable[turtle]) {
-                                            // logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[d]]);
                                             logo.synth.trigger(notes[d], beatValue, logo.pitchDrumTable[turtle][notes[d]]);
+                                        } else if (turtle in logo.voices && last(logo.voices[turtle])) {
+                                            logo.synth.trigger(notes[d], beatValue, last(logo.voices[turtle]));
                                         } else {
                                             logo.synth.trigger(notes[d], beatValue, 'default');
                                         }

@@ -1639,6 +1639,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             };
 
             postProcessArg = [thisBlock, 'kick'];
+        } else if (name === 'voicename') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                me.blockList[thisBlock].value = value;
+                me.blockList[thisBlock].text.text = value;
+                me.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'sine'];
         } else if (name === 'modename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1972,7 +1982,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         for (var blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') {
                 var c = this.blockList[blk].connections[0];
-                if (c != null && ['playdrum', 'setdrum'].indexOf(this.blockList[c].name) !== -1) {
+                if (c != null && ['playdrum', 'setdrum', 'setvoice'].indexOf(this.blockList[c].name) !== -1) {
                     if (this.blockList[blk].value.slice(0, 4) === 'http') {
                         this.logo.synth.loadSynth(this.blockList[blk].value);
                     }
@@ -2827,6 +2837,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
+
+                // Load the synth for this drum
+                this.logo.synth.loadSynth('kick');
                 break;
             case 'action':
             case 'hat':
@@ -3046,6 +3059,19 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
                 // Load the synth for this drum
                 this.logo.synth.loadSynth(getDrumSynthName(value));
+                break;
+            case 'voicename':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+
+                // Load the synth for this voice
+                this.logo.synth.loadSynth(getVoiceSynthName(value));
                 break;
             case 'media':
                 // Load a thumbnail into a media blocks.

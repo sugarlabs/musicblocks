@@ -14,7 +14,7 @@
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden'];
-
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'notename', 'voicename', 'modename', 'drumname'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -329,6 +329,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'bubbles':
         case 'cricket':
         case 'setdrum':
+        case 'setvoice':
         case 'rhythmruler':
         case 'pitchstaircase':
         case 'tempo':
@@ -592,7 +593,7 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Value blocks get a modifiable text label
-        if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname', 'rest'].indexOf(this.name) !== -1) {
+        if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             if (this.value == null) {
                 switch(this.name) {
                 case 'text':
@@ -613,8 +614,11 @@ function Block(protoblock, blocks, overrideName) {
                 case 'modename':
                     this.value = 'Major';
                     break;
+                case 'voicename':
+                    this.value = DEFAULTVOICE;
+                    break;
                 case 'drumname':
-                    this.value = _('kick drum');
+                    this.value = getDrumName(DEFAULTDRUM);
                     break;
                 }
             }
@@ -1010,7 +1014,7 @@ function Block(protoblock, blocks, overrideName) {
         this.text.y = TEXTY * blockScale / 2.;
 
         // Some special cases
-        if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname'].indexOf(this.name) !== -1) {
+        if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
             this.text.x = VALUETEXTX * blockScale / 2.;
         } else if (this.protoblock.args === 0) {
@@ -1284,7 +1288,7 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock._doOpenMedia(thisBlock);
                 } else if (myBlock.name === 'loadFile') {
                     myBlock._doOpenMedia(thisBlock);
-                } else if (['text', 'number', 'solfege', 'notename', 'modename', 'drumname'].indexOf(myBlock.name) !== -1) {
+                } else if (SPECIALINPUTS.indexOf(myBlock.name) !== -1) {
                     if(!myBlock.trash)
                     {
                         myBlock._changeLabel();
@@ -1463,7 +1467,7 @@ function Block(protoblock, blocks, overrideName) {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
             }
-        } else if (['text', 'solfege', 'notename', 'modename', 'drumname', 'number', 'media', 'loadFile'].indexOf(this.name) !== -1) {
+        } else if (SPECIALINPUTS.indexOf(this.name) !== -1 || ['media', 'loadFile'].indexOf(this.name) !== -1) {
             if (!haveClick) {
                 // Simulate click on Android.
                 var d = new Date();
@@ -1684,6 +1688,31 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('drumnameLabel');
+        } else if (this.name === 'voicename') {
+            var type = 'voicename';
+            if (this.value != null) {
+                var selectedvoice = getVoiceName(this.value);
+            } else {
+                var selectedvoice = getVoiceName(DEFAULTVOICE);
+            }
+
+            var labelHTML = '<select name="voicename" id="voicenameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            for (var i = 0; i < VOICENAMES.length; i++) {
+                if (VOICENAMES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + VOICENAMES[i][1] + '">' + VOICENAMES[i][1] + '</option>';
+                } else if (selectedvoice === VOICENAMES[i][0]) {
+                    labelHTML += '<option value="' + selectedvoice + '" selected>' + selectedvoice + '</option>';
+                } else if (selectedvoice === VOICENAMES[i][1]) {
+                    labelHTML += '<option value="' + selectedvoice + '" selected>' + selectedvoice + '</option>';
+                } else {
+                    labelHTML += '<option value="' + VOICENAMES[i][0] + '">' + VOICENAMES[i][0] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('voicenameLabel');
         } else {
             var type = 'number';
             labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
@@ -1937,7 +1966,9 @@ function Block(protoblock, blocks, overrideName) {
         // Load the synth for the selected drum.
         if (this.name === 'drumname') {
             this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
-        }
+        } else if (this.name === 'voicename') {
+            this.blocks.logo.synth.loadSynth(getVoiceSynthName(this.value));
+	}
     };
 
 };

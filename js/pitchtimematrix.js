@@ -12,7 +12,7 @@
 
 const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
-const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square'];
+const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
 
 
 function Matrix() {
