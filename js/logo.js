@@ -170,10 +170,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     this.crescendoVolume = {};
     this.crescendoInitialVolume = {};
     this.intervals = {};
-    this.fifths = {};
-    this.tritones = {};
-    this.fourths = {};
-    this.thirds = {};
+    this.perfect = {};
+    this.diminished = {};
+    this.augmented = {};
+    this.major = {};
+    this.minor = {};
     this.staccato = {};
     this.swing = {};
     this.swingTarget = {};
@@ -647,10 +648,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
             this.intervals[turtle] = [];
-            this.fifths[turtle] = [];
-            this.tritones[turtle] = [];
-            this.fourths[turtle] = [];
-            this.thirds[turtle] = [];
+            this.perfect[turtle] = [];
+            this.diminished[turtle] = [];
+            this.augmented[turtle] = [];
+            this.major[turtle] = [];
+            this.minor[turtle] = [];
             this.staccato[turtle] = [];
             this.swing[turtle] = [];
             this.swingTarget[turtle] = [];
@@ -2170,7 +2172,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             rhythmruler.Rulers = [];
             rhythmruler.Drums = [];
             logo.inRhythmRuler = true;
-            
+
             var listenerName = '_rhythmruler_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
@@ -2219,7 +2221,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
                 pitchslider.init(logo);
-		logo.inPitchSlider = false;
+                logo.inPitchSlider = false;
             };
             logo._setListener(turtle, listenerName, __listener);
             break;
@@ -2466,6 +2468,31 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 }
             }
 
+            if (turtle in logo.perfect && logo.perfect[turtle].length > 0) {
+                var noteObj2 = logo.getNote(note, octave, PERFECT[last(logo.perfect[turtle])], logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.diminished && logo.diminished[turtle].length > 0) {
+                var noteObj2 = logo.getNote(note, octave, DIMINISHED[last(logo.diminished[turtle])], logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.augmented && logo.augmented[turtle].length > 0) {
+                var noteObj2 = logo.getNote(note, octave, AUGMENTED[last(logo.augmented[turtle])], logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.major && logo.major[turtle].length > 0) {
+                var noteObj2 = logo.getNote(note, octave, MAJOR[last(logo.major[turtle])], logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.minor && logo.minor[turtle].length > 0) {
+                var noteObj2 = logo.getNote(note, octave, MINOR[last(logo.minor[turtle])], logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
             if (turtle in logo.transposition) {
                 logo.noteTranspositions[turtle].push(logo.transposition[turtle] + 2 * delta);
             } else {
@@ -2497,7 +2524,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             if (args[0].slice(0, 4) === 'http') {
                 drumname = args[0];
             } else {
-                for (var drum in DRUMNAMES) { 
+                for (var drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0] === args[0]) {
                         drumname = DRUMNAMES[drum][1];
                         break;
@@ -2731,27 +2758,28 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
                 }
 
-                // deprecated
-                if (turtle in logo.fifths && logo.fifths[turtle].length > 0) {
-                    var noteObj = logo.getNote(note, octave, 7, logo.keySignature[turtle]);
+                if (turtle in logo.perfect && logo.perfect[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, PERFECT[last(logo.perfect[turtle])], logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
                 }
 
-                // deprecated
-                if (turtle in logo.tritones && logo.tritones[turtle].length > 0) {
-                    var noteObj = logo.getNote(note, octave, 6, logo.keySignature[turtle]);
+                if (turtle in logo.diminished && logo.diminished[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, DIMINISHED[last(logo.diminished[turtle])], logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
                 }
-                
-                // deprecated
-                if (turtle in logo.fourths && logo.fourths[turtle].length > 0) {
-                    var noteObj = logo.getNote(note, octave, 5, logo.keySignature[turtle]);
+
+                if (turtle in logo.augmented && logo.augmented[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, AUGMENTED[last(logo.augmented[turtle])], logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
                 }
-                
-                // deprecated
-                if (turtle in logo.thirds && logo.thirds[turtle].length > 0) {
-                    var noteObj = logo.getNote(note, octave, 4, logo.keySignature[turtle]);
+
+                if (turtle in logo.major && logo.major[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, MAJOR[last(logo.major[turtle])], logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1], cents);
+                }
+
+                if (turtle in logo.minor && logo.minor[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, MINOR[last(logo.minor[turtle])], logo.keySignature[turtle]);
                     addPitch(noteObj[0], noteObj[1], cents);
                 }
 
@@ -2787,13 +2815,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency)]);
                         flag = 1;
                         break;
-                    } 
+                    }
                 }
 
                 if (flag === 0) {
                     pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
                 }
-            } 
+            }
             else {
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
             }
@@ -2990,7 +3018,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             break;
         case 'setdrum':
             var drumname = 'kick';
-            for (var drum in DRUMNAMES) { 
+            for (var drum in DRUMNAMES) {
                 if (DRUMNAMES[drum][0] === args[0]) {
                     drumname = DRUMNAMES[drum][1];
                 } else if (DRUMNAMES[drum][1] === args[0]) {
@@ -3045,61 +3073,105 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             childFlow = args[1];
             childFlowCount = 1;
             break;
-        case 'fifths':
-            logo.fifths[turtle].push(true);
-            childFlow = args[0];
-            childFlowCount = 1;
+        case 'perfect':
+            if ([1, 4, 5, 8].indexOf(args[0]) !== -1) {
+                logo.perfect[turtle].push(args[0]);
+                childFlow = args[1];
+                childFlowCount = 1;
 
-            var listenerName = '_fifths_' + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+                var listenerName = '_perfect_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function (event) {
-                logo.fifths[turtle].pop();
-            };
+                var __listener = function (event) {
+                    logo.perfect[turtle].pop();
+                };
 
-            logo._setListener(turtle, listenerName, __listener);
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Perfect Block must be 1, 4, 5, or 8'), blk);
+                childFlow = args[1];
+                childFlowCount = 1;
+	    }
             break;
-        case 'tritone':
-            logo.tritones[turtle].push(true);
-            childFlow = args[0];
-            childFlowCount = 1;
+        case 'diminished':
+            if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(args[0]) !== -1) {
+                logo.diminished[turtle].push(args[0]);
+                childFlow = args[1];
+                childFlowCount = 1;
 
-            var listenerName = '_tritone_' + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+                var listenerName = '_diminished_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function (event) {
-                logo.tritones[turtle].pop();
-            };
+                var __listener = function (event) {
+                    logo.diminished[turtle].pop();
+                };
 
-            logo._setListener(turtle, listenerName, __listener);
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8'), blk);
+                childFlow = args[1];
+                childFlowCount = 1;
+            }
             break;
-        case 'fourths':
-            logo.fourths[turtle].push(true);
-            childFlow = args[0];
-            childFlowCount = 1;
+        case 'augmented':
+            if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(args[0]) !== -1) {
+            logo.augmented[turtle].push(args[0]);
+                childFlow = args[1];
+                childFlowCount = 1;
 
-            var listenerName = '_fourths_' + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+                var listenerName = '_tritone_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function (event) {
-                logo.fourths[turtle].pop();
-            };
+                var __listener = function (event) {
+                    logo.augmented[turtle].pop();
+                };
 
-            logo._setListener(turtle, listenerName, __listener);
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8'), blk);
+                childFlow = args[1];
+                childFlowCount = 1;
+            }
             break;
-        case 'thirds':
-            logo.thirds[turtle].push(true);
-            childFlow = args[0];
-            childFlowCount = 1;
+        case 'major':
+            if ([2, 3, 6, 7].indexOf(args[0]) !== -1) {
+                logo.major[turtle].push(args[0]);
+                childFlow = args[1];
+                childFlowCount = 1;
 
-            var listenerName = '_thirds_' + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+                var listenerName = '_major_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function (event) {
-                logo.thirds[turtle].pop();
-            };
+                var __listener = function (event) {
+                    logo.major[turtle].pop();
+                };
 
-            logo._setListener(turtle, listenerName, __listener);
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Major Block must be 2, 3, 6, or 7'), blk);
+                childFlow = args[1];
+                childFlowCount = 1;
+            }
+            break;
+        case 'minor':
+            if ([2, 3, 6, 7].indexOf(args[0]) !== -1) {
+                logo.minor[turtle].push(args[0]);
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                var listenerName = '_minor_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    logo.minor[turtle].pop();
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Minor Block must be 2, 3, 6, or 7'), blk);
+                childFlow = args[1];
+                childFlowCount = 1;
+            }
             break;
         case 'staccato':
             if (args.length > 1) {
@@ -3350,7 +3422,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             break;
         case 'articulation':
             if (args.length === 2 && typeof(args[0]) === 'number' && args[0] > 0) {
-            
                 var newVolume = last(logo.polyVolume[turtle]) * (100 + args[0]) / 100;
                 if (newVolume > 100) {
                     console.log('articulated volume exceeds 100%. clipping');
@@ -4025,8 +4096,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
                             if (logo.turtles.turtleList[turtle].drum) {
                                 for (var i = 0; i < notes.length; i++) {
-                                    // Remove pitch
-                                    notes[i] = 'C2';
+                                    notes[i] = notes[i].replace(/♭/g, 'b').replace(/♯/g, '#'); // 'C2'; // Remove pitch
+
                                 }
                             } else {
                                 for (var i = 0; i < notes.length; i++) {
@@ -4052,7 +4123,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                                     // Look for any notes in the chord that might be in the pitchDrumTable.
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in logo.pitchDrumTable[turtle]) {
-                                            logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[d]]);
+                                            // logo.synth.trigger('C2', beatValue, logo.pitchDrumTable[turtle][notes[d]]);
+                                            logo.synth.trigger(notes[d], beatValue, logo.pitchDrumTable[turtle][notes[d]]);
                                         } else {
                                             logo.synth.trigger(notes[d], beatValue, 'default');
                                         }
@@ -4148,7 +4220,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 for (var i = 0; i < logo.arcListener[turtle][blk].length; i++) {
                     logo.stage.removeEventListener('_arc_' + turtle + '_' + blk, logo.arcListener[turtle][blk][i], false);
                 }
-                delete logo.arcListener[turtle][blk];    
+                delete logo.arcListener[turtle][blk];
             }
 
         }, beatValue * 1000);

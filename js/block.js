@@ -288,10 +288,11 @@ function Block(protoblock, blocks, overrideName) {
         case 'swing':
         case 'drift':
         case 'interval':
-        case 'fifths':
-        case 'tritone':
-        case 'fourths':
-        case 'thirds':
+        case 'major':
+        case 'minor':
+        case 'diminished':
+        case 'perfect':
+        case 'augmented':
         case 'staccato':
         case 'slur':
         case 'crescendo':
