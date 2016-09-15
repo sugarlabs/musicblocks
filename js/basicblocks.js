@@ -89,6 +89,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['square'] = squareBlock;
+    squareBlock.hidden = true;
     squareBlock.staticLabels.push(_('square'));
     squareBlock.adjustWidthToLabel();
     squareBlock.oneArgBlock();
@@ -97,6 +98,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var triangleBlock = new ProtoBlock('triangle');
     triangleBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['triangle'] = triangleBlock;
+    triangleBlock.hidden = true;
     triangleBlock.staticLabels.push(_('triangle'));
     triangleBlock.adjustWidthToLabel();
     triangleBlock.oneArgBlock();
@@ -105,6 +107,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var sineBlock = new ProtoBlock('sine');
     sineBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['sine'] = sineBlock;
+    sineBlock.hidden = true;
     sineBlock.staticLabels.push(_('sine'));
     sineBlock.adjustWidthToLabel();
     sineBlock.oneArgBlock();
@@ -113,6 +116,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var sawtoothBlock = new ProtoBlock('sawtooth');
     sawtoothBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['sawtooth'] = sawtoothBlock;
+    sawtoothBlock.hidden = true;
     sawtoothBlock.staticLabels.push(_('sawtooth'));
     sawtoothBlock.adjustWidthToLabel();
     sawtoothBlock.oneArgBlock();
@@ -632,6 +636,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     setMasterBPMBlock.adjustWidthToLabel();
     setMasterBPMBlock.oneArgBlock();
     setMasterBPMBlock.defaults.push(90);
+
+    var voicenameBlock = new ProtoBlock('voicename');
+    voicenameBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['voicename'] = voicenameBlock;
+    voicenameBlock.valueBlock();
+    voicenameBlock.dockTypes[0] = 'textout';
+
+    var voiceBlock = new ProtoBlock('setvoice');
+    voiceBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setvoice'] = voiceBlock;
+    voiceBlock.staticLabels.push(_('set voice'));
+    voiceBlock.adjustWidthToLabel();
+    voiceBlock.flowClampOneArgBlock();
+    voiceBlock.dockTypes[1] = 'textin';
+    voiceBlock.defaults.push(_('sine'));
 
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];

@@ -200,6 +200,25 @@ const MODENAMES = [
     [_('Custom'), 'CUSTOM'],
 ];
 
+const VOICENAMES = [
+    //.TRANS: musical instrument
+    [_('violin'), 'violin', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    [_('cello'), 'cello', 'images/voices.svg'],
+    //.TRANS: musical instrument
+    // [_('basse'), 'basse', 'images/voices.svg'],
+    //.TRANS: polytone synthesizer
+    [_('poly'), 'poly', 'images/synth.svg'],
+    //.TRANS: sine wave
+    [_('sine'), 'sine', 'images/synth.svg'],
+    //.TRANS: square wave
+    [_('square'), 'square', 'images/synth.svg'],
+    //.TRANS: sawtooth wave
+    [_('sawtooth'), 'sawtooth', 'images/synth.svg'],
+    //.TRANS: triangle wave
+    [_('triangle'), 'triangle', 'images/synth.svg'],
+];
+
 const DRUMNAMES = [
     //.TRANS: musical instrument
     [_('snare drum'), 'snaredrum', 'images/drum.svg'],
@@ -249,6 +268,7 @@ const DRUMNAMES = [
     [_('duck'), 'duck', 'images/duck.svg'],
 ];
 
+const DEFAULTVOICE = 'sine';
 const DEFAULTDRUM = 'kick';
 
 var customMode = MUSICALMODES['CUSTOM'];
@@ -327,6 +347,66 @@ function getDrumSynthName(name) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
         if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
             return DRUMNAMES[i][1];
+        }
+    }
+    return null;
+};
+
+
+function getVoiceName(name) {
+    if (name === '') {
+        console.log('getVoiceName passed blank name. Returning ' + DEFAULTVOICE);
+        name = DEFAULTVOICE;
+    } else if (name.slice(0, 4) == 'http') {
+        // console.log('voice name is URL');
+        return null;
+    }
+
+    for (var i = 0; i < VOICENAMES.length; i++) {
+        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
+            if (VOICENAMES[i][0] != '') {
+                return VOICENAMES[i][0];
+            } else {
+                console.log('i18n is misbehaving?');
+                return VOICENAMES[i][1];
+            }
+        }
+    }
+    return null;
+};
+
+
+function getVoiceIcon(name) {
+    if (name === '') {
+        console.log('getVoiceIcon passed blank name. Returning ' + DEFAULTVOICE);
+        name = DEFAULTVOICE;
+    } else if (name.slice(0, 4) == 'http') {
+        return 'images/voices.svg';
+    }
+
+    for (var i = 0; i < VOICENAMES.length; i++) {
+        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
+            return VOICENAMES[i][2];
+        }
+    }
+    return 'images/voices.svg';
+};
+
+
+function getVoiceSynthName(name) {
+    if (name == null || name == undefined) {
+        console.log('getVoiceSynthName passed null name. Returning null');
+        return null;
+    } else if (name === '') {
+        console.log('getVoiceSynthName passed blank name. Returning ' + DEFAULTVOICE);
+        name = DEFAULTVOICE;
+    } else if (name.slice(0, 4) == 'http') {
+        return name;
+    }
+
+    for (var i = 0; i < VOICENAMES.length; i++) {
+        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
+            return VOICENAMES[i][1];
         }
     }
     return null;
@@ -724,7 +804,7 @@ function frequencyToPitch(hz) {
         }
     }
     console.log('could not find note/octave for ' + hz);
-    return ['?', -1];
+    return ['?', -1, 0];
 };
 
 
@@ -1043,7 +1123,12 @@ function Synth () {
         case 'square':
         case 'sawtooth':
         case 'sine':
-            this.synthset[name][1].triggerAttackRelease(notes[0], beatValue);
+            if (typeof(notes) === 'object') {
+                var noteToPlay = notes[0];
+	    } else {
+                var noteToPlay = notes;
+	    }
+            this.synthset[name][1].triggerAttackRelease(noteToPlay, beatValue);
             break;
         case 'violin':
         case 'cello':
@@ -1054,7 +1139,7 @@ function Synth () {
             var centerNo = SAMPLECENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
-            this.synthset[name][1].triggerAttack(noteNo - centerNo, beatValue);
+            this.synthset[name][1].triggerAttackRelease(noteNo - centerNo, beatValue);
             break;
         case 'default':
         case 'poly':

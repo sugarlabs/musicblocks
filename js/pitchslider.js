@@ -20,6 +20,7 @@ function PitchSlider () {
     this._initialTop;
     this._focusedCellIndex = 0;
     this._isKeyPressed = 0;
+    this._delta = 0;
 
     this._addButton = function(row, colIndex, icon, iconSize, label) {
         var cell = row.insertCell();
@@ -96,16 +97,18 @@ function PitchSlider () {
 
         this._logo.refreshCanvas();
 
-        var newStack = [[0, 'note', 100, 100, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]]];
+        var newStack = [[0, 'note', 100 + this._delta, 100 + this._delta, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]]];
+        this._delta += 21;
+
         var endOfStackIdx = 0;
         var previousBlock = 0;
 
-        var sineblockidx = newStack.length;
-        var frequencyidx = sineblockidx + 1;
-        var hiddenidx = sineblockidx + 2;
-        newStack.push([sineblockidx, 'sine', 0, 0, [previousBlock, frequencyidx, hiddenidx]]);
-        newStack.push([frequencyidx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [sineblockidx]]);
-        newStack.push([hiddenidx, 'hidden', 0, 0, [sineblockidx, null]]);
+        var hertzIdx = newStack.length;
+        var frequencyIdx = hertzIdx + 1;
+        var hiddenIdx = hertzIdx + 2;
+        newStack.push([hertzIdx, 'hertz', 0, 0, [previousBlock, frequencyIdx, hiddenIdx]]);
+        newStack.push([frequencyIdx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [hertzIdx]]);
+        newStack.push([hiddenIdx, 'hidden', 0, 0, [hertzIdx, null]]);
 
         that._logo.blocks.loadNewBlocks(newStack);
     }
@@ -284,6 +287,7 @@ function PitchSlider () {
         movedownrow.setAttribute('id', 'moveDownslider');
 
         for (var i = 0; i < this.Sliders.length; i++) {
+            console.log(this.Sliders[i]);
             var cell = row.insertCell(i);
             cell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
             cell.style.minWidth = cell.style.width;
