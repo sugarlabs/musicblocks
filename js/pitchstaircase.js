@@ -110,6 +110,7 @@ function PitchStairCase () {
             cell.style.maxWidth = cell.style.width;
             cell.style.height = playrow.offsetHeight + 'px';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            // cell.style.backgroundURL = 'images/synth.svg';
 
             cell.addEventListener('click', function (event) {
                 that._dissectStair(event);
