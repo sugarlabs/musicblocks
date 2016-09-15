@@ -3477,6 +3477,184 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             // Deprecated P5 tone generator replaced by macro.
         case 'tone':
             break;
+        case 'hertz':
+            if (args.length !== 1 || args[0] == null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            if (typeof(args[0]) !== 'number') {
+                logo.errorMsg(NANERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            var obj = frequencyToPitch(args[0]);
+            var note = obj[0];
+            var octave = obj[1];
+            var cents = obj[2];
+            var delta = 0;
+
+            if (note === '?') {
+                logo.errorMsg(INVALIDPITCH, blk);
+                logo.stopTurtle = true;
+            } else if (logo.inMatrix) {
+                if (note.toLowerCase() !== 'rest') {
+                    pitchtimematrix.addRowBlock(blk);
+                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        logo.pitchBlocks.push(blk);
+                    }
+                }
+
+                if (!(logo.invertList[turtle].length === 0)) {
+                    var delta = 0;
+                    var len = logo.invertList[turtle].length;
+                    // Get an anchor note and its corresponding
+                    // number, which is used to calculate delta.
+                    var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
+                    var num1 = logo.getNumber(note1[0], note1[1]);
+                    for (var i = len - 1; i > -1; i--) {
+                        // Note from which delta is calculated.
+                        var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
+                        var num2 = getNumber(note2[0], note2[1]);
+                        // var a = getNumNote(num1, 0);
+                        if (logo.invertList[turtle][i][2] === 'even') {
+                            delta += num2 - num1;
+                        } else {  // odd
+                            delta += num2 - num1 + 0.5;
+                        }
+                        num1 += 2 * delta;
+                    }
+                }
+
+                if (logo.duplicateFactor[turtle].length > 0) {
+                    var duplicateFactor = logo.duplicateFactor[turtle];
+                } else {
+                    var duplicateFactor = 1;
+                }
+                for (var i = 0; i < duplicateFactor; i++) {
+                    // Apply transpositions
+                    var transposition = 2 * delta;
+                    if (turtle in logo.transposition) {
+                        transposition += logo.transposition[turtle];
+                    }
+
+                    note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                    // If we are in a setdrum clamp, override the pitch.
+                    if (logo.drumStyle[turtle].length > 0) {
+                        pitchtimematrix.rowLabels.push(last(logo.drumStyle[turtle]));
+                        pitchtimematrix.rowArgs.push(-1);
+                    } else {
+                        pitchtimematrix.rowLabels.push(getSolfege(note));
+                        pitchtimematrix.rowArgs.push(octave);
+                    }
+                }
+            } else if (logo.inNoteBlock[turtle] > 0) {
+
+                function addPitch(note, octave, cents) {
+                    if (logo.drumStyle[turtle].length > 0) {
+                        var drumname = last(logo.drumStyle[turtle]);
+                        var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                        logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
+                    }
+                    logo.notePitches[turtle].push(note);
+                    logo.noteOctaves[turtle].push(octave);
+                    logo.noteCents[turtle].push(cents);
+                }
+
+                if (!(logo.invertList[turtle].length === 0)) {
+                    var len = logo.invertList[turtle].length;
+                    var note1 = logo.getNote(note, octave, 0, logo.keySignature[turtle]);
+                    var num1 = getNumber(note1[0], note1[1]);
+                    for (var i = len - 1; i > -1; i--) {
+                        var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
+                        var num2 = getNumber(note2[0], note2[1]);
+                        // var a = getNumNote(num1, 0);
+                        if (logo.invertList[turtle][i][2] === 'even') {
+                            delta += num2 - num1;
+                        } else {  // odd
+                            delta += num2 - num1 + 0.5;
+                        }
+                        num1 += 2 * delta;
+                    }
+                }
+
+                addPitch(note, octave, cents);
+
+                if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
+                    for (var i = 0; i < logo.intervals[turtle].length; i++) {
+                        var ii = getInterval(logo.intervals[turtle][i], logo.keySignature[turtle], note);
+                        var noteObj = logo.getNote(note, octave, ii, logo.keySignature[turtle]);
+                        addPitch(noteObj[0], noteObj[1], cents);
+                    }
+                }
+
+                if (turtle in logo.perfect && logo.perfect[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, PERFECT[last(logo.perfect[turtle])], logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1], cents);
+                }
+
+                if (turtle in logo.diminished && logo.diminished[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, DIMINISHED[last(logo.diminished[turtle])], logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1], cents);
+                }
+
+                if (turtle in logo.augmented && logo.augmented[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, AUGMENTED[last(logo.augmented[turtle])], logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1], cents);
+                }
+
+                if (turtle in logo.major && logo.major[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, MAJOR[last(logo.major[turtle])], logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1], cents);
+                }
+
+                if (turtle in logo.minor && logo.minor[turtle].length > 0) {
+                    var noteObj = logo.getNote(note, octave, MINOR[last(logo.minor[turtle])], logo.keySignature[turtle]);
+                    addPitch(noteObj[0], noteObj[1], cents);
+                }
+
+                if (turtle in logo.transposition) {
+                    logo.noteTranspositions[turtle].push(logo.transposition[turtle] + 2 * delta);
+                } else {
+                    logo.noteTranspositions[turtle].push(2 * delta);
+                }
+
+                if (turtle in logo.beatFactor) {
+                    logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+                } else {
+                    logo.noteBeatValues[turtle].push(1);
+                }
+
+                logo.pushedNote[turtle] = true;
+            } else if (logo.inPitchStairCase) {
+                var frequency = pitchToFrequency(args[0], args[1], 0, logo.keySignature[turtle]);
+                var note = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
+                var flag = 0;
+
+                for (var i=0 ; i < pitchstaircase.Stairs.length; i++) {
+                    if (pitchstaircase.Stairs[i][2] < parseFloat(frequency)) {
+                        pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency)]);
+                        flag = 1;
+                        break;
+                    }
+                    if (pitchstaircase.Stairs[i][2] === parseFloat(frequency)) {
+                        pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency)]);
+                        flag = 1;
+                        break;
+                    }
+                }
+
+                if (flag === 0) {
+                    pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
+                }
+            } else if (logo.inPitchSlider) {
+                pitchslider.Sliders.push([args[0], 0, 0]);
+            } else {
+                logo.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
+            }
+            break;
         case 'triangle':
         case 'sine':
         case 'square':
@@ -3484,17 +3662,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             if (args.length === 1) {
                 var obj = frequencyToPitch(args[0]);
                 // obj[2] is cents
-                /*
-                if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    // TODO: add frequency instead of approximate note to matrix
-                    pitchtimematrix.rowLabels.push(getSolfege(obj[0]));
-                    pitchtimematrix.rowArgs.push(obj[1]);
-                } else
-                */
                 if (logo.inMatrix) {
                     pitchtimematrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {

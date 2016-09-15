@@ -237,6 +237,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     sharpBlock.adjustWidthToLabel();
     sharpBlock.flowClampZeroArgBlock();
     
+    var hertzBlock = new ProtoBlock('hertz');
+    hertzBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['hertz'] = hertzBlock;
+    hertzBlock.staticLabels.push(_('hertz'));
+    hertzBlock.adjustWidthToLabel();
+    hertzBlock.oneArgBlock();
+    hertzBlock.defaults.push(440);
+
     var pitchStepBlock = new ProtoBlock('steppitch');
     pitchStepBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['steppitch'] = pitchStepBlock;
