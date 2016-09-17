@@ -517,7 +517,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var rest2Block = new ProtoBlock('rest2');
     rest2Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['rest2'] = rest2Block;
-    rest2Block.staticLabels.push(_('note value') + ' ' + _('silence'));
+    rest2Block.staticLabels.push(_('silence'));
     rest2Block.adjustWidthToLabel();
     rest2Block.zeroArgBlock();
 
@@ -531,31 +531,40 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note3Block = new ProtoBlock('note3');
     note3Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note3'] = note3Block;
-    note3Block.staticLabels.push(_('note value') + ' 440 8');
+    note3Block.staticLabels.push(_('note value') + ' ' + _('440 hertz'));
     note3Block.adjustWidthToLabel();
     note3Block.zeroArgBlock();
 
     var note2Block = new ProtoBlock('note2');
     note2Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note2'] = note2Block;
-    note2Block.staticLabels.push(_('note value') + ' A4 8');
+    note2Block.staticLabels.push(_('note value') + ' ' + 'A4');
     note2Block.adjustWidthToLabel();
     note2Block.zeroArgBlock();
 
     var note1Block = new ProtoBlock('note1');
     note1Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note1'] = note1Block;
-    note1Block.staticLabels.push(_('note value') + ' La 4');
+    note1Block.staticLabels.push(_('note value') + ' ' + 'La 4');
     note1Block.adjustWidthToLabel();
     note1Block.zeroArgBlock();
 
     var noteBlock = new ProtoBlock('note');
     noteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note'] = noteBlock;
-    noteBlock.staticLabels.push(_('note value'));
+    noteBlock.hidden = true;
+    noteBlock.staticLabels.push(_('deprecated note value'));
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(8);
+
+    var newnoteBlock = new ProtoBlock('newnote');
+    newnoteBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['newnote'] = newnoteBlock;
+    newnoteBlock.staticLabels.push(_('note value'));
+    newnoteBlock.adjustWidthToLabel();
+    newnoteBlock.flowClampOneArgBlock();
+    newnoteBlock.defaults.push(0.125);
 
     // TONE (ARTICULATION) PALETTE
 

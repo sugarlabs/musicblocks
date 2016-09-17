@@ -346,10 +346,10 @@ function Matrix() {
         }
 
         var sortedList = sortableList.sort(
-	    function(a, b) {
-		return a[0] - b[0]
-	    }
-	)
+            function(a, b) {
+                return a[0] - b[0]
+            }
+        )
 
         // Reverse since we start from the top of the table.
         sortedList = sortedList.reverse();
@@ -363,7 +363,7 @@ function Matrix() {
 
             this._rowMap[obj[3]] = i;
 
-	    if (i > 0 && typeof(obj[2]) !== 'object' && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
+            if (i > 0 && typeof(obj[2]) !== 'object' && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
                 // skip duplicates
                 console.log('skipping duplicate ' + obj[1] + ' ' + obj[2]);
                 for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
@@ -997,7 +997,7 @@ function Matrix() {
         if (drumHTML.length > 3) {
             var drumName = getDrumSynthName(drumHTML[3]);
             console.log('[' + drumHTML[1].slice(0, 7) + ']');
-	    if (drumName != null) {
+            if (drumName != null) {
                 // If it is a drum, just save the name.
                 var note = drumName;
             } else if (drumHTML[1].slice(0, 7) === 'images/') {
@@ -1083,7 +1083,7 @@ function Matrix() {
 
             // Add the Note block and its value
             var idx = newStack.length;
-            newStack.push([idx, 'note', 0, 0, [endOfStackIdx, idx + 1, idx + 2, null]]);
+            newStack.push([idx, 'newnote', 0, 0, [endOfStackIdx, idx + 1, idx + 2, null]]);
             var n = newStack[idx][4].length;
             if (i === 0) {  // the action block
                 newStack[endOfStackIdx][4][n - 2] = idx;
@@ -1092,29 +1092,27 @@ function Matrix() {
             }
             var endOfStackIdx = idx;
 
-            // If it is a dotted note, use a divide block.
+            // Add a vspace to prevent divide block from obscuring the pitch block.
+            newStack.push([idx + 1, 'vspace', 0, 0, [idx, idx + 5]]);
+
+            // note value is saved as a fraction
+            newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+
             if (parseInt(note[1]) < note[1]) {
+                // dotted note
                 var obj = toFraction(note[1]);
-
-                console.log('converting ' + note[1] + ' to ' + obj[0] + '/' + obj[1]);
-
-                // Add a vspace to prevent divide block from obscuring the pitch block.
-                newStack.push([idx + 1, 'vspace', 0, 0, [idx, idx + 5]]);
-
-                // Display the dotted note as a fraction.
-                newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
-                newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
-                newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
-
-                // Connect the Note block flow to the divide and vspace blocks.
-                newStack[idx][4][1] = idx + 2;
-                newStack[idx][4][2] = idx + 1;
-
-                var delta = 5;
+                newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
             } else {
-                newStack.push([idx + 1, ['number', {'value': note[1]}], 0, 0, [idx]]);
-                var delta = 2;
+                newStack.push([idx + 3, ['number', {'value': 1}], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, ['number', {'value': note[1]}], 0, 0, [idx + 2]]);
             }
+
+            // Connect the Note block flow to the divide and vspace blocks.
+            newStack[idx][4][1] = idx + 2;
+            newStack[idx][4][2] = idx + 1;
+
+            var delta = 5;
 
             // FIXME: Does the undefined case ever occur?
             if (note[0][0] === 'R' || note[0][0] == undefined) {

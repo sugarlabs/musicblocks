@@ -292,14 +292,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
                     var blk = logo.stepQueue[turtle].pop();
                     if (blk != null && blk !== notesFinish[turtle]) {
-                      var block = logo.blocks.blockList[blk];
+                        var block = logo.blocks.blockList[blk];
                         if (block.name === 'note') {
-                          tempStepQueue[turtle] = blk;
-                          notesFinish[turtle] = last(block.connections);
-                          if (notesFinish[turtle] == null) { // end of flow
-                              notesFinish[turtle] = last(logo.turtles.turtleList[turtle].queue) && last(logo.turtles.turtleList[turtle].queue).blk;
-                              // catch case of null - end of project
-                          }
+                            tempStepQueue[turtle] = blk;
+                            notesFinish[turtle] = last(block.connections);
+                            if (notesFinish[turtle] == null) { // end of flow
+                                notesFinish[turtle] = last(logo.turtles.turtleList[turtle].queue) && last(logo.turtles.turtleList[turtle].queue).blk;
+                                // catch case of null - end of project
+                            }
                             // logo.playedNote[turtle] = true;
                             logo.playedNoteTimes[turtle] = logo.playedNoteTimes[turtle] || 0;
                             thisNote[turtle] = Math.pow(logo._parseArg(logo, turtle, block.connections[1], blk, null), -1);
@@ -2886,6 +2886,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         case 'meter':
             break;
         case 'osctime':
+        case 'newnote':
         case 'note':
             // We queue up the child flow of the note clamp and
             // once all of the children are run, we trigger a
@@ -2909,13 +2910,16 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo.noteBeatValues[turtle] = [];
             logo.noteDrums[turtle] = [];
 
-
             // Ensure that note duration is positive.
             if (args[0] < 0) {
                 logo.errorMsg(_('Note value must be greater than 0'), blk);
                 var noteBeatValue = 0;
             } else {
-                var noteBeatValue = args[0];
+                if (logo.blocks.blockList[blk].name === 'newnote') {
+                    var noteBeatValue = 1 / args[0];
+		} else {
+                    var noteBeatValue = args[0];
+                }
             }
 
             logo.inNoteBlock[turtle] += 1;

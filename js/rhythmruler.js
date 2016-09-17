@@ -212,7 +212,7 @@ function RhythmRuler () {
             var ruler = docById('ruler' + rulerNo);
             if (ruler == null) {
                 console.log('Cannot find ruler ' + rulerNo + '. Widget closed?');
-		return;
+                return;
             }
 
             if (notesCounter === noteValues.length - 1) {
@@ -356,30 +356,36 @@ function RhythmRuler () {
 
                     if (sameNoteValue === 1) {
                         // Add a note block
-                        newStack.push([idx, 'note', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 4]]);
-                        newStack.push([idx + 1, ['number', {'value': noteValue}], 0, 0, [idx]]);
-                        newStack.push([idx + 2, 'playdrum', 0, 0, [idx, idx + 3, null]]);
-                        newStack.push([idx + 3, ['drumname', {'value': drum}], 0, 0, [idx + 2]]);
+                        newStack.push([idx, 'newnote', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 7]]);
+                        newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
+                        newStack.push([idx + 2, ['number', {'value': 1}], 0, 0, [idx + 1]]);
+                        newStack.push([idx + 3, ['number', {'value': noteValue}], 0, 0, [idx + 1]]);
+                        newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
+                        newStack.push([idx + 5, 'playdrum', 0, 0, [idx + 4, idx + 6, null]]);
+                        newStack.push([idx + 6, ['drumname', {'value': drum}], 0, 0, [idx + 5]]);
                         if (i == ruler.cells.length - 1) {
-                            newStack.push([idx + 4, 'hidden', 0, 0, [idx, null]]);
+                            newStack.push([idx + 7, 'hidden', 0, 0, [idx, null]]);
                         } else {
-                            newStack.push([idx + 4, 'hidden', 0, 0, [idx, idx + 5]]);
-                            previousBlock = idx + 4;
+                            newStack.push([idx + 7, 'hidden', 0, 0, [idx, idx + 8]]);
+                            previousBlock = idx + 7;
                         }
                     } else {
                         // Add a note block inside a repeat block
                         if (i == ruler.cells.length - 1) {
                             newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, null]]);
                         } else {
-                            newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 7]]);
+                            newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 10]]);
                             previousBlock = idx;
                         }
                         newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
-                        newStack.push([idx + 2, 'note', 0, 0, [idx, idx + 3, idx + 4, idx + 6]]);
-                        newStack.push([idx + 3, ['number', {'value': noteValue}], 0, 0, [idx + 2]]);
-                        newStack.push([idx + 4, 'playdrum', 0, 0, [idx + 2, idx + 5, null]]);
-                        newStack.push([idx + 5, ['drumname', {'value': drum}], 0, 0, [idx + 4]]);
-                        newStack.push([idx + 6, 'hidden', 0, 0, [idx + 2, null]]);
+                        newStack.push([idx + 2, 'newnote', 0, 0, [idx, idx + 3, idx + 6, idx + 9]]);
+                        newStack.push([idx + 3, 'divide', 0, 0, [idx + 2, idx + 4, idx + 5]]);
+                        newStack.push([idx + 4, ['number', {'value': 1}], 0, 0, [idx + 3]]);
+                        newStack.push([idx + 5, ['number', {'value': noteValue}], 0, 0, [idx + 3]]);
+                        newStack.push([idx + 6, 'vspace', 0, 0, [idx + 2, idx + 7]]);
+                        newStack.push([idx + 7, 'playdrum', 0, 0, [idx + 6, idx + 8, null]]);
+                        newStack.push([idx + 8, ['drumname', {'value': drum}], 0, 0, [idx + 7]]);
+                        newStack.push([idx + 9, 'hidden', 0, 0, [idx + 2, null]]);
                     }
 
                     sameNoteValue = 1;
