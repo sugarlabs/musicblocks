@@ -50,14 +50,14 @@ value* block is a container for a pitch that specifies the duration
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
 
 At the top of the example above, a single *Note value* block is
-shown. The `1/4` is the note value, in this case, a quarter note. The
+shown. The `1/8` is the note value, in this case, an eighth note. The
 pitch, specified by the *Pitch* block, contains a pitch, `La` at
 `Octave 4`. At the bottom, two consecutive notes are shown.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg'</img>
 
 In this example, different note values are shown. From top to bottom,
-`1/8` for an eighth note, `1/16` for a sixteenth note, and `1/2` for a half
+`1/4` for an quarter note, `1/16` for a sixteenth note, and `1/2` for a half
 note.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
