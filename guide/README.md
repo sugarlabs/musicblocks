@@ -257,17 +257,17 @@ The *Backward* block will play the contained notes in reverse order
 `Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
 stack.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg'</img>
-
-The *Set Voice* block selected a voice for the synthesizer for any
-contained blocks, e.g., violin or cello.
-
 [RUN
 LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
 
 Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg'</img>
+
+The *Set Voice* block selected a voice for the synthesizer for any
+contained blocks, e.g., violin or cello.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg'</img>
 
