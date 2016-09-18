@@ -287,6 +287,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'rhythmicdot':
         case 'tie':
         case 'swing':
+        case 'newswing':
         case 'drift':
         case 'interval':
         case 'major':
@@ -296,6 +297,8 @@ function Block(protoblock, blocks, overrideName) {
         case 'augmented':
         case 'staccato':
         case 'slur':
+        case 'newstaccato':
+        case 'newslur':
         case 'crescendo':
         case 'articulation':
         case 'backward':
@@ -1969,7 +1972,7 @@ function Block(protoblock, blocks, overrideName) {
             this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
         } else if (this.name === 'voicename') {
             this.blocks.logo.synth.loadSynth(getVoiceSynthName(this.value));
-	}
+        }
     };
 
 };

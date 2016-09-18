@@ -2772,6 +2772,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'multiplybeatfactor':
             case 'note':
             case 'newnote':
+            case 'newslur':
+            case 'newstaccato':
+            case 'newswing':
             case 'osctime':
 	    case 'perfect':
             case 'pitchdrummatrix':
@@ -2810,7 +2813,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 		    }
                 }
 
-                if (name === 'note') {
+                if (['note', 'slur', 'staccato', 'swing'].indexOf(name) !== -1) {
                     // We need to convert to newnote style:
                     // (1) add a vspace to the start of the clamp of a note block.
                     console.log('note: ' + b);
@@ -2842,9 +2845,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
                     // (3) create a newnote block instead.
 		    if (typeof(blockObjs[b][1]) === 'object') {
-			blockObjs[b][1][0] = 'newnote';
+			blockObjs[b][1][0] = 'new' + name;
 		    } else {
-			blockObjs[b][1] = 'newnote';
+			blockObjs[b][1] = 'new' + name;
 		    }
                 }
                 break;

@@ -564,7 +564,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     newnoteBlock.staticLabels.push(_('note value'));
     newnoteBlock.adjustWidthToLabel();
     newnoteBlock.flowClampOneArgBlock();
-    newnoteBlock.defaults.push(0.125);
+    newnoteBlock.defaults.push(1/8);
 
     // TONE (ARTICULATION) PALETTE
 
@@ -797,6 +797,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     swingBlock.adjustWidthToLabel();
     swingBlock.flowClampOneArgBlock();
     swingBlock.defaults.push(32);
+    swingBlock.hidden = true;
 
     var slurBlock = new ProtoBlock('slur');
     slurBlock.palette = palettes.dict['tone'];
@@ -805,6 +806,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     slurBlock.adjustWidthToLabel();
     slurBlock.flowClampOneArgBlock();
     slurBlock.defaults.push(16);
+    slurBlock.hidden = true;
 
     var staccatoBlock = new ProtoBlock('staccato');
     staccatoBlock.palette = palettes.dict['tone'];
@@ -813,6 +815,31 @@ function initBasicProtoBlocks(palettes, blocks) {
     staccatoBlock.adjustWidthToLabel();
     staccatoBlock.flowClampOneArgBlock();
     staccatoBlock.defaults.push(32);
+    staccatoBlock.hidden = true;
+
+    var newswingBlock = new ProtoBlock('swing');
+    newswingBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['newswing'] = newswingBlock;
+    newswingBlock.staticLabels.push(_('swing'));
+    newswingBlock.adjustWidthToLabel();
+    newswingBlock.flowClampOneArgBlock();
+    newswingBlock.defaults.push(1/32);
+
+    var newslurBlock = new ProtoBlock('slur');
+    newslurBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['newslur'] = newslurBlock;
+    newslurBlock.staticLabels.push(_('slur'));
+    newslurBlock.adjustWidthToLabel();
+    newslurBlock.flowClampOneArgBlock();
+    newslurBlock.defaults.push(1/16);
+
+    var newstaccatoBlock = new ProtoBlock('staccato');
+    newstaccatoBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['newstaccato'] = newstaccatoBlock;
+    newstaccatoBlock.staticLabels.push(_('staccato'));
+    newstaccatoBlock.adjustWidthToLabel();
+    newstaccatoBlock.flowClampOneArgBlock();
+    newstaccatoBlock.defaults.push(1/32);
 
     // DRUM PALETTE
     var drumnameBlock = new ProtoBlock('drumname');

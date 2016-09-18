@@ -2917,7 +2917,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             } else {
                 if (logo.blocks.blockList[blk].name === 'newnote') {
                     var noteBeatValue = 1 / args[0];
-		} else {
+                } else {
                     var noteBeatValue = args[0];
                 }
             }
@@ -3224,9 +3224,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 childFlowCount = 1;
             }
             break;
+        case 'newstaccato':
         case 'staccato':
             if (args.length > 1) {
-                logo.staccato[turtle].push(args[0]);
+                if (logo.blocks.blockList[blk].name === 'newstaccato') {
+                    logo.staccato[turtle].push(1 / args[0]);
+                } else {
+                    logo.staccato[turtle].push(args[0]);
+                }
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -3240,9 +3245,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 logo._setListener(turtle, listenerName, __listener);
             }
             break;
+        case 'newslur':
         case 'slur':
             if (args.length > 1) {
-                logo.staccato[turtle].push(-args[0]);
+                if (logo.blocks.blockList[blk].name === 'newslur') {
+                    logo.staccato[turtle].push(-1 / args[0]);
+                } else {
+                    logo.staccato[turtle].push(-args[0]);
+                }
+
                 logo._lilypondBeginSlur(turtle);
                 childFlow = args[1];
                 childFlowCount = 1;
@@ -3301,10 +3312,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             logo._setListener(turtle, listenerName, __listener);
             break;
+        case 'newswing':
         case 'swing':
             // Grab a bit from the next note to give to the current note.
             logo.swingTarget[turtle].push(null);
-            logo.swing[turtle].push(args[0]);
+            if (logo.blocks.blockList[blk].name === 'newswing') {
+                logo.swing[turtle].push(1/args[0]);
+            } else {
+                logo.swing[turtle].push(args[0]);
+            }
             logo.swingCarryOver[turtle] = 0;
             childFlow = args[1];
             childFlowCount = 1;
