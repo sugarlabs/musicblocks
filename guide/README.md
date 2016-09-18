@@ -50,14 +50,14 @@ value* block is a container for a pitch that specifies the duration
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
 
 At the top of the example above, a single *Note value* block is
-shown. The `4` is the note value, in this case, a quarter note. The
-pitch, specified by the *Pitch* block, contains a pitch, `Re` at
+shown. The `1/4` is the note value, in this case, a quarter note. The
+pitch, specified by the *Pitch* block, contains a pitch, `La` at
 `Octave 4`. At the bottom, two consecutive notes are shown.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg'</img>
 
 In this example, different note values are shown. From top to bottom,
-`8` for an eighth note, `16` for a sixteenth note, and `2` for a half
+`1/8` for an eighth note, `1/16` for a sixteenth note, and `1/2` for a half
 note.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
@@ -69,15 +69,18 @@ in combination determine the frequency at which a note is played.
 You can plug different values into the *Pitch* block name and octave
 slots. Some examples are shown above. Starting from the top, the pitch
 name block is specified using a *Solfege* block (`Sol` in `Octave 6`);
-the pitch name is specified using a *Ppppppitch-name* block (`B flat` in
-`Octave 4`); the pitch name is specified using a *Number* block (`440`
-Hertz).
+the pitch name is specified using a *Pitch-name* block (`B flat` in
+`Octave 4`); the pitch is specified using the *Hertz* block and a
+*Number* block (`440` Hertz).
 
 The octave is specified using a number block and is restricted to
 whole numbers. In the case where the pitch name is specified by
 frequency, the octave is ignored.
 
 Note that the pitch name can also be specified using a *Text* block.
+
+Also note that any mathematical operation can be used as input to the
+*Note value*.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg'</img>
 
