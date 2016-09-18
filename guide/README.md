@@ -52,7 +52,8 @@ value* block is a container for a pitch that specifies the duration
 At the top of the example above, a single *Note value* block is
 shown. The `1/8` is the note value, in this case, an eighth note. The
 pitch, specified by the *Pitch* block, contains a pitch, `La` at
-`Octave 4`. At the bottom, two consecutive notes are shown.
+`Octave 4`. At the bottom, two notes that are played consecutively are
+shown.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg'</img>
 
@@ -235,11 +236,19 @@ it into the next note.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'</img>
 
-The *Interval* block calculates an interval, e.g., a fifth, and adds
+The *Interval* block calculates a relative interval, e.g., a fifth, and adds
 the additional pitches to a note. In the figure, we add `Sol` to `Do` and
 `Do` to `Fa`.
 
 The *Articulation* block changes the volume of a group of notes.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9a.svg'</img>
+
+The *Augmented* block calculates an absolute interval, e.g., an
+augmented fifth, and adds the additional pitches to a note. Similarly,
+the *Minor* block calculates an absolute interval, e.g., a minor
+third. Other absolute intervals include *Perfect*, *Diminished*, and
+*Major*.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
 
@@ -247,6 +256,11 @@ The *Backward* block will play the contained notes in reverse order
 (retrograde). In the example above, the notes in *Chunk* are played as
 `Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
 stack.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg'</img>
+
+The *Set Voice* block selected a voice for the synthesizer for any
+contained blocks, e.g., violin or cello.
 
 [RUN
 LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
