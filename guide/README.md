@@ -288,6 +288,7 @@ In the above example, the sequence of drum beats is increased over time.
 Each *Start* block runs as a separate voice in Music Blocks. (When
 you click on the Run button, all of the *Start* blocks are run
 concurrently.)
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg'</img>
 
 If we put our song into an action...
