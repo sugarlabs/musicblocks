@@ -574,6 +574,11 @@ The *Save stack* button will export rhythm stacks.
 These stacks of rhythms can be used to define rhythmic patterns used
 with the *Pitch-time Matrix* block.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg'</img>
+
+The *Save drum machine* button will export *Start* stacks that will
+play the rhythms as drum machines.
+
 3. Musical Modes
 ----------------
 
