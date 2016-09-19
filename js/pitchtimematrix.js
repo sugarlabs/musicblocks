@@ -226,11 +226,23 @@ function Matrix() {
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize/2 + '" width="' + iconSize/2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="images/synth.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle"/>&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
+                cell.style.backgroundImage = "url('images/synth2.svg')";
+                cell.style.backgroundRepeat = 'no-repeat';
+                cell.style.backgroundPosition = 'center center';
+                cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="images/turtle.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle"/>&nbsp;&nbsp;';
+                cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i];
+                cell.style.backgroundImage = "url('images/turtle2.svg')";
+                cell.style.backgroundRepeat = 'no-repeat';
+                cell.style.backgroundPosition = 'center center';
+                cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="images/turtle.svg" title="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1] + '" alt="' + _(this.rowLabels[i]) + ' ' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1] + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle"/>&nbsp;&nbsp;';
+                cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
+                cell.style.backgroundImage = "url('images/turtle2.svg')";
+                cell.style.backgroundRepeat = 'no-repeat';
+                cell.style.backgroundPosition = 'center center';
+                cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
             } else {
                 cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
             }
