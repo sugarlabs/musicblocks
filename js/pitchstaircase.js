@@ -12,8 +12,9 @@
 // This widget enable us to create new pitches with help of a initial
 // pitch value by applying music ratios.
 
-var DEFUALTFREQUENCY = 220.0;
-
+const DEFUALTFREQUENCY = 220.0;
+// Scalable sinewave graphic
+const SYNTHSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" y="0px" xml:space="preserve" x="0px" width="SVGWIDTHpx" viewBox="0 0 SVGWIDTH 55" version="1.1" height="55px" enable-background="new 0 0 SVGWIDTH 55"><g transform="scale(XSCALE,1)"><path d="m 1.5010855,27.5 c 0,0 0.774772,-17.5525317 12.2499995,-17.5 11.475228,0.05253 18.877297,35.098475 30.5,35 11.622703,-0.09848 12.25,-17.5 12.25,-17.5" style="stroke:#90c100;fill-opacity:1;fill:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /></g></svg>';
 
 function PitchStairCase () {
 
@@ -110,7 +111,13 @@ function PitchStairCase () {
             cell.style.maxWidth = cell.style.width;
             cell.style.height = playrow.offsetHeight + 'px';
             cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            // cell.style.backgroundURL = 'images/synth.svg';
+            var cellWidth = Number(cell.style.width.replace(/px/, ''));
+            var svgWidth = cellWidth.toString();
+            var svgScale = (cellWidth / 55).toString();
+            var svgData = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SYNTHSVG.replace(/SVGWIDTH/g, svgWidth).replace(/XSCALE/g, svgScale))));
+	    cell.style.backgroundImage = 'url(' + svgData + ')';
+            cell.style.backgroundRepeat = 'no-repeat';
+            cell.style.backgroundPosition = 'center center';
 
             cell.addEventListener('click', function (event) {
                 that._dissectStair(event);
