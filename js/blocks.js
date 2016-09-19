@@ -683,7 +683,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 this.blockList[newSilenceBlock].connections[0] = cblk;
                 this.blockList[newSilenceBlock].connections[1] = null;
                 this.blockList[cblk].connections[1] = newSilenceBlock;
-	    }
+            }
             return;
         }
     };
@@ -2748,15 +2748,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (typeof(blockObjs[b][1]) === 'object') {
                 var name = blockObjs[b][1][0];
             } else {
-		var name = blockObjs[b][1];
+                var name = blockObjs[b][1];
             }
 
             switch (name) {
-	    case 'articulation':
-	    case 'augmented':
-	    case 'backward':
+            case 'articulation':
+            case 'augmented':
+            case 'backward':
             case 'crescendo':
-	    case 'diminished':
+            case 'diminished':
             case 'dividebeatfactor':
             case 'drift':
             case 'duplicatenotes':
@@ -2768,7 +2768,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'major':
             case 'matrix':
             case 'minor':
-	    case 'modewidget':
+            case 'modewidget':
             case 'multiplybeatfactor':
             case 'note':
             case 'newnote':
@@ -2776,17 +2776,17 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'newstaccato':
             case 'newswing':
             case 'osctime':
-	    case 'perfect':
+            case 'perfect':
             case 'pitchdrummatrix':
             case 'pitchslider':
             case 'pitchstaircase':
-	    case 'pluck':
+            case 'pluck':
             case 'rhythmicdot':
             case 'rhythmruler':
             case 'setbpm':
             case 'setnotevolume2':
             case 'settransposition':
-	    case 'setvoice':
+            case 'setvoice':
             case 'sharp':
             case 'skipnotes':
             case 'slur':
@@ -2804,13 +2804,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     extraBlocksLength += 1;
                 } else {
                     var nextBlock = blockObjs[b][4][len - 1];
-		    if (blockObjs[nextBlock][1] !== 'hidden') {
-			// If the next block is not a hidden block, add one.
-			blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
-			blockObjs[nextBlock][4][0] = blockObjsLength + extraBlocksLength;
-			blockObjs.push([blockObjsLength + extraBlocksLength, 'hidden', 0, 0, [b, nextBlock]]);
-			extraBlocksLength += 1;
-		    }
+                    if (blockObjs[nextBlock][1] !== 'hidden') {
+                        // If the next block is not a hidden block, add one.
+                        blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
+                        blockObjs[nextBlock][4][0] = blockObjsLength + extraBlocksLength;
+                        blockObjs.push([blockObjsLength + extraBlocksLength, 'hidden', 0, 0, [b, nextBlock]]);
+                        extraBlocksLength += 1;
+                    }
                 }
 
                 if (['note', 'slur', 'staccato', 'swing'].indexOf(name) !== -1) {
@@ -2826,7 +2826,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         blockObjs.push([blockObjsLength + extraBlocksLength, 'vspace', 0, 0, [b, clampBlock]]);
                     }
 
-		    extraBlocksLength += 1;
+                    extraBlocksLength += 1;
 
                     // (2) switch the first connection to divide 1 / arg.
                     var argBlock = blockObjs[b][4][1];
@@ -2835,26 +2835,27 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         blockObjs.push([blockObjsLength + extraBlocksLength, 'divide', 0, 0, [b, blockObjsLength + extraBlocksLength + 1, blockObjsLength + extraBlocksLength + 2]]);
                         blockObjs.push([blockObjsLength + extraBlocksLength + 1, ['number', {'value': 1}], 0, 0, [blockObjsLength + extraBlocksLength]]);
                         blockObjs.push([blockObjsLength + extraBlocksLength + 2, ['number', {'value': 1}], 0, 0, [blockObjsLength + extraBlocksLength]]);
-			extraBlocksLength += 3;
+                        extraBlocksLength += 3;
                     } else {
                         blockObjs[argBlock][4][0] = blockObjsLength + extraBlocksLength;
                         blockObjs.push([blockObjsLength + extraBlocksLength, 'divide', 0, 0, [b, blockObjsLength + extraBlocksLength + 1, argBlock]]);
                         blockObjs.push([blockObjsLength + extraBlocksLength + 1, ['number', {'value': 1}], 0, 0, [blockObjsLength + extraBlocksLength]]);
-			extraBlocksLength += 2;
+                        extraBlocksLength += 2;
                     }
 
                     // (3) create a newnote block instead.
-		    if (typeof(blockObjs[b][1]) === 'object') {
-			blockObjs[b][1][0] = 'new' + name;
-		    } else {
-			blockObjs[b][1] = 'new' + name;
-		    }
+                    if (typeof(blockObjs[b][1]) === 'object') {
+                        blockObjs[b][1][0] = 'new' + name;
+                    } else {
+                        blockObjs[b][1] = 'new' + name;
+                    }
                 }
                 break;
-	    }
-	}
+            }
+        }
 
         // Append to the current set of blocks.
+        this._adjustTheseStacks = [];
         this._adjustTheseDocks = [];
         this._loadCounter = blockObjs.length;
 
@@ -3342,6 +3343,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     this.blockList[thisBlock].container.x = blkData[2];
                     this.blockList[thisBlock].container.y = blkData[3];
                     this._adjustTheseDocks.push(thisBlock);
+                    if (blkData[4][0] == null) {
+                        this._adjustTheseStacks.push(thisBlock);
+                    }
                     if (blkData[2] < 0 || blkData[3] < 0 || blkData[2] > canvas.width || blkData[3] > canvas.height) {
                         this._homeButtonContainers[0].visible = true;
                         this._homeButtonContainers[1].visible = false;
@@ -3410,6 +3414,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             this.adjustDocks(this._adjustTheseDocks[blk], true);
             // blockBlocks._expandTwoArgs();
             blockBlocks._expandClamps();
+        }
+
+        for (var blk = 0; blk < this._adjustTheseStacks.length; blk++) {
+            // console.log('Adjust Stack: ' + this.blockList[this._adjustTheseStacks[blk]].name);
+            this.raiseStackToTop(this._adjustTheseStacks[blk]);
         }
     };
 
