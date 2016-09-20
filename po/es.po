@@ -174,7 +174,7 @@ msgstr "modo"
 #: js/rhythmruler.js:472
 #: js/rhythmruler.js:472
 msgid "play all"
-msgstr ""
+msgstr "jugar todo"
 
 #: js/modewidget.js:101
 #: js/pitchdrummatrix.js:161
@@ -192,11 +192,11 @@ msgstr "limpiar"
 
 #: js/modewidget.js:111
 msgid "rotate counter clockwise"
-msgstr ""
+msgstr "girar antihorario"
 
 #: js/modewidget.js:116
 msgid "rotate clockwise"
-msgstr ""
+msgstr "girar horario"
 
 #: js/modewidget.js:121
 msgid "invert"
@@ -205,7 +205,7 @@ msgstr "invertir"
 #: js/modewidget.js:126
 #: js/rhythmruler.js:535
 msgid "undo"
-msgstr ""
+msgstr "anular"
 
 #: js/modewidget.js:131
 #: js/pitchdrummatrix.js:171
@@ -221,7 +221,7 @@ msgstr "cerrar"
 
 #: js/modewidget.js:755
 msgid "custom"
-msgstr ""
+msgstr "personalizado"
 
 #: js/clearbox.js:46
 msgid "confirm"
@@ -261,11 +261,11 @@ msgstr "tambor"
 
 #: js/pitchstaircase.js:380
 msgid "play chord"
-msgstr ""
+msgstr "jugar acorde"
 
 #: js/pitchstaircase.js:404
 msgid "play scale"
-msgstr ""
+msgstr "jugar escala"
 
 #: js/pitchtimematrix.js:185
 msgid "export"
@@ -273,7 +273,7 @@ msgstr "exportar"
 
 #: js/pitchtimematrix.js:190
 msgid "sort"
-msgstr ""
+msgstr "ordenar"
 
 #: js/pitchtimematrix.js:265
 #: js/pitchtimematrix.js:608
@@ -304,20 +304,20 @@ msgstr "iniciar"
 
 #: js/block.js:696
 msgid "matrix"
-msgstr ""
+msgstr "matriz"
 
 #: js/block.js:699
 #: js/basicblocks.js:399
 msgid "status"
-msgstr ""
+msgstr "estatus"
 
 #: js/block.js:705
 msgid "ruler"
-msgstr ""
+msgstr "regla"
 
 #: js/block.js:708
 msgid "stair"
-msgstr ""
+msgstr "escalera"
 
 #: js/block.js:711
 #: js/basicblocks.js:356
@@ -326,12 +326,12 @@ msgstr ""
 
 #: js/block.js:716
 msgid "slider"
-msgstr ""
+msgstr "deslizador"
 
 #: js/logo.js:27
 #.TRANS:  Animal names used in Lilypond output
 msgid "mouse"
-msgstr ""
+msgstr "raton"
 
 #: js/logo.js:27
 msgid "brown rat"
@@ -428,11 +428,11 @@ msgstr ""
 
 #: js/logo.js:402
 msgid "true"
-msgstr ""
+msgstr "verdadero"
 
 #: js/logo.js:404
 msgid "false"
-msgstr ""
+msgstr "falso"
 
 #: js/logo.js:642
 #: js/palette.js:1796
@@ -521,27 +521,27 @@ msgstr "Valor de la nota debe ser mayor que 0"
 
 #: js/logo.js:3142
 msgid "Input to Perfect Block must be 1, 4, 5, or 8"
-msgstr ""
+msgstr "Entrada al bloque de perfecto debe ser de 1, 4, 5 o 8"
 
 #: js/logo.js:3162
 msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
-msgstr ""
+msgstr "De entrada al bloque de disminuido debe ser 1, 2, 3, 4, 5, 6, 7, o 8"
 
 #: js/logo.js:3182
 msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
-msgstr ""
+msgstr "De entrada al bloque de aumentado debe ser 1, 2, 3, 4, 5, 6, 7, o 8"
 
 #: js/logo.js:3202
 msgid "Input to Major Block must be 2, 3, 6, or 7"
-msgstr ""
+msgstr "De entrada al bloque de mayor debe ser de 2, 3, 6 ó 7"
 
 #: js/logo.js:3222
 msgid "Input to Minor Block must be 2, 3, 6, or 7"
-msgstr ""
+msgstr "De entrada al bloque de minor debe ser de 2, 3, 6 ó 7"
 
 #: js/logo.js:3680
 msgid "Hertz Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "Bloque de Hertz: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/logo.js:3740
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
@@ -580,15 +580,15 @@ msgstr "iniciar tambor"
 #: js/tempo.js:208
 #: js/tempo.js:208
 msgid "pause"
-msgstr ""
+msgstr "pausa"
 
 #: js/rhythmruler.js:525
 msgid "save rhythms"
-msgstr ""
+msgstr "guardar ritmos"
 
 #: js/rhythmruler.js:530
 msgid "save drum machine"
-msgstr ""
+msgstr "guardar caja de ritmos"
 
 #: js/utilitybox.js:36
 #: js/turtledefs.js:102
@@ -648,7 +648,7 @@ msgstr "cajas"
 
 #: js/turtledefs.js:21
 msgid "widgets"
-msgstr ""
+msgstr "aparatos"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
@@ -876,21 +876,21 @@ msgstr "Ha terminado la gira. Por favor, disfrutar de Bloques de Música!"
 
 #: js/tempo.js:225
 msgid "speed up"
-msgstr ""
+msgstr "acelerar"
 
 #: js/tempo.js:238
 msgid "slow down"
-msgstr ""
+msgstr "retardar"
 
 #: js/pitchslider.js:353
 #: js/pitchslider.js:353
 msgid "move up"
-msgstr ""
+msgstr "ascender"
 
 #: js/pitchslider.js:373
 #: js/pitchslider.js:373
 msgid "move down"
-msgstr ""
+msgstr "descender"
 
 #: js/samplesviewer.js:26
 #: js/samplesviewer.js:26
@@ -1230,7 +1230,7 @@ msgstr "número a octava"
 
 #: js/basicblocks.js:194
 msgid "invert (odd)"
-msgstr ""
+msgstr "invertir (impar)"
 
 #: js/basicblocks.js:194
 #: js/basicblocks.js:206
@@ -1242,7 +1242,7 @@ msgstr "octava"
 
 #: js/basicblocks.js:206
 msgid "invert (even)"
-msgstr ""
+msgstr "invertir (par)"
 
 #: js/basicblocks.js:218
 msgid "adjust transposition"
@@ -1303,7 +1303,7 @@ msgstr "número de notas"
 
 #: js/basicblocks.js:349
 msgid "custom mode"
-msgstr ""
+msgstr "modo personalizado"
 
 #: js/basicblocks.js:363
 msgid "pitch-drum matrix"
@@ -1311,15 +1311,15 @@ msgstr "matriz de tono en tambor"
 
 #: js/basicblocks.js:370
 msgid "pitchslider"
-msgstr ""
+msgstr "deslizador de tono"
 
 #: js/basicblocks.js:377
 msgid "pitch staircase"
-msgstr ""
+msgstr "escalera de tono"
 
 #: js/basicblocks.js:384
 msgid "rhythm ruler"
-msgstr ""
+msgstr "regla de ritmo"
 
 #: js/basicblocks.js:392
 msgid "pitch-time matrix"
@@ -1405,7 +1405,7 @@ msgstr "factor de staccato"
 
 #: js/basicblocks.js:591
 msgid "slur factor"
-msgstr ""
+msgstr "factor de legato"
 
 #: js/basicblocks.js:598
 msgid "note volume"
@@ -1481,7 +1481,7 @@ msgstr "swing"
 #: js/basicblocks.js:805
 #: js/basicblocks.js:831
 msgid "slur"
-msgstr ""
+msgstr "legato"
 
 #: js/basicblocks.js:814
 #: js/basicblocks.js:839
@@ -1490,7 +1490,7 @@ msgstr "staccato"
 
 #: js/basicblocks.js:882
 msgid "pluck"
-msgstr ""
+msgstr "puntear"
 
 #: js/basicblocks.js:1008
 #: js/musicutils.js:226
@@ -1987,7 +1987,7 @@ msgstr "botón del ratón"
 
 #: js/basicblocks.js:2188
 msgid "to ASCII"
-msgstr ""
+msgstr "a ASCII"
 
 #: js/basicblocks.js:2195
 msgid "keyboard"
@@ -2157,17 +2157,17 @@ msgstr ""
 
 #: js/musicutils.js:200
 msgid "Custom"
-msgstr ""
+msgstr "Personalizado"
 
 #: js/musicutils.js:205
 #.TRANS: : musical instrument
 msgid "violin"
-msgstr ""
+msgstr "violín"
 
 #: js/musicutils.js:207
 #.TRANS: : musical instrument
 msgid "cello"
-msgstr ""
+msgstr "violonchelo"
 
 #: js/musicutils.js:209
 #.TRANS: : musical instrument
@@ -2177,7 +2177,7 @@ msgstr ""
 #: js/musicutils.js:211
 #.TRANS: : polytone synthesizer
 msgid "poly"
-msgstr ""
+msgstr "polifónico"
 
 #: plugins/gmap.rtp:30
 msgid "city latitude"
