@@ -377,7 +377,7 @@ function PitchStairCase () {
         row.style.top = Math.floor(playPitchDivPosition.top) + 'px';
         row.setAttribute('id', 'playAllStair');
 
-        var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play chord'));
+        var cell = this._addButton(row, -1, 'play-chord.svg', iconSize, _('play chord'));
         cell.onclick=function() {
             that._playAll();
         }
@@ -401,7 +401,7 @@ function PitchStairCase () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play scale'));
+        var cell = this._addButton(row, 1, 'play-scale.svg', iconSize, _('play scale'));
         cell.onclick=function() {
             that._PlayUpandDown();
         };
