@@ -2410,7 +2410,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
 
             if (logo.lastNotePlayed[turtle] == null) {
-                logo.errorMsg(INVALIDPITCH, blk);
+                logo.errorMsg('The Step Pitch Block must be preceded by a Pitch Block.', blk);
                 logo.stopTurtle = true;
                 break;
             }
