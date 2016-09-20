@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   version="1.1"
-   width="55"
+   id="svg2"
    height="55"
-   id="svg2">
+   width="55"
+   version="1.1">
   <metadata
      id="metadata20">
     <rdf:RDF>
@@ -25,40 +23,51 @@
   </metadata>
   <defs
      id="defs18" />
-  <line
-     x1="5"
-     y1="39"
-     x2="38"
-     y2="39"
-     id="line4"
-     style="fill:#000000;stroke:#000000;stroke-width:3.5;stroke-opacity:1" />
-  <line
-     x1="4.9661016"
-     y1="31"
-     x2="26.966103"
-     y2="31"
-     id="line6"
-     style="fill:#000000;stroke:#000000;stroke-width:3.5;stroke-opacity:1" />
-  <line
-     x1="4.8834743"
-     y1="23"
-     x2="17.883474"
-     y2="23"
-     id="line8"
-     style="fill:#000000;stroke:#000000;stroke-width:3.5;stroke-opacity:1" />
-  <line
-     x1="5.2669487"
-     y1="15"
-     x2="9.2669487"
-     y2="15"
-     id="line10"
-     style="fill:#000000;stroke:#000000;stroke-width:3.5;stroke-opacity:1" />
-  <path
-     d="m 46,37 7,-7 -14,0 z"
-     id="path12"
-     style="fill:#000000;stroke:none" />
-  <path
-     d="m 46,16 7,7 -14,0 z"
-     id="path14"
-     style="fill:#000000;stroke:none" />
+  <g
+     transform="translate(-36,0)"
+     id="g4767">
+    <path
+       d="m 46,37 7,-7 -14,0 z"
+       id="path12"
+       style="fill:#000000;stroke:none" />
+    <path
+       d="m 46,16 7,7 -14,0 z"
+       id="path14"
+       style="fill:#000000;stroke:none" />
+  </g>
+  <g
+     id="g6677"
+     transform="translate(-1.0589937,-1.7597518)">
+    <g
+       transform="matrix(1.1045431,0,0,0.73635024,-16.252282,14.250369)"
+       id="g4166"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1">
+      <path
+         id="path4168"
+         d="m 42.833345,41.891892 q 0,-2.342343 2.297297,-4.144145 2.297298,-1.846846 4.864865,-1.846846 1.486487,0 2.657658,0.765765 l 0,-26.666666 0.990991,0 0,29.144144 q 0,2.522522 -2.207208,4.189189 Q 49.229741,45 46.572084,45 45.085597,45 43.959471,44.144144 42.833345,43.243243 42.833345,41.891892 Z"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="matrix(1.1045431,0,0,0.73635024,-4.2522824,6.8767456)"
+       id="g4166-1"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1">
+      <path
+         id="path4168-1"
+         d="m 42.833345,41.891892 q 0,-2.342343 2.297297,-4.144145 2.297298,-1.846846 4.864865,-1.846846 1.486487,0 2.657658,0.765765 l 0,-26.666666 0.990991,0 0,29.144144 q 0,2.522522 -2.207208,4.189189 Q 49.229741,45 46.572084,45 45.085597,45 43.959471,44.144144 42.833345,43.243243 42.833345,41.891892 Z"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="matrix(1.1045431,0,0,0.73635024,-28.252282,21.623991)"
+       id="g4166-6"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1">
+      <path
+         id="path4168-7"
+         d="m 42.833345,41.891892 q 0,-2.342343 2.297297,-4.144145 2.297298,-1.846846 4.864865,-1.846846 1.486487,0 2.657658,0.765765 l 0,-26.666666 0.990991,0 0,29.144144 q 0,2.522522 -2.207208,4.189189 Q 49.229741,45 46.572084,45 45.085597,45 43.959471,44.144144 42.833345,43.243243 42.833345,41.891892 Z"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1" />
+    </g>
+    <path
+       id="path6675"
+       d="M 31,29 54,14.25"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
 </svg>
