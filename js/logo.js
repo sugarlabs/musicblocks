@@ -1102,12 +1102,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             // block.
         case 'action':
         case 'do':
-            if (args.length === 1) {
+            if (args.length > 0) {
                 if (args[0] in logo.actions) {
                     logo._lilypondLineBreak(turtle);
                     childFlow = logo.actions[args[0]];
                     childFlowCount = 1;
                 } else {
+                    console.log('action ' + args[0] + ' not found');
                     logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
                     logo.stopTurtle = true;
                 }
