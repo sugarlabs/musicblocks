@@ -1160,15 +1160,27 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
     this.bringToTop = function () {
         // Move all the blocks to the top layer of the stage
+        this._adjustTheseStacks = [];
+
         for (var blk in this.blockList) {
             var myBlock = this.blockList[blk];
+            /*
             this.stage.removeChild(myBlock.container);
             this.stage.addChild(myBlock.container);
             if (myBlock.collapseContainer != null) {
                 this.stage.removeChild(myBlock.collapseContainer);
                 this.stage.addChild(myBlock.collapseContainer);
             }
+            */
+            if (myBlock.connections[0] == null) {
+                this._adjustTheseStacks.push(blk);
+            }
         }
+        for (var blk = 0; blk < this._adjustTheseStacks.length; blk++) {
+            // console.log('Adjust Stack: ' + this.blockList[this._adjustTheseStacks[blk]].name);
+            this.raiseStackToTop(this._adjustTheseStacks[blk]);
+        }
+
         this.refreshCanvas();
     };
 
