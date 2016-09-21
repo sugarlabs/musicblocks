@@ -453,6 +453,23 @@ function initBasicProtoBlocks(palettes, blocks) {
     osctimeBlock.flowClampOneArgBlock();
     osctimeBlock.defaults.push(200);
 
+    var swingBlock = new ProtoBlock('swing');
+    swingBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['swing'] = swingBlock;
+    swingBlock.staticLabels.push(_('swing'));
+    swingBlock.adjustWidthToLabel();
+    swingBlock.flowClampOneArgBlock();
+    swingBlock.defaults.push(32);
+    swingBlock.hidden = true;
+
+    var newswingBlock = new ProtoBlock('swing');
+    newswingBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['newswing'] = newswingBlock;
+    newswingBlock.staticLabels.push(_('swing'));
+    newswingBlock.adjustWidthToLabel();
+    newswingBlock.flowClampOneArgBlock();
+    newswingBlock.defaults.push(1/32);
+
     var setbpmBlock = new ProtoBlock('setbpm');
     setbpmBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['setbpm'] = setbpmBlock;
@@ -790,15 +807,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     intervalBlock.flowClampOneArgBlock();
     intervalBlock.defaults.push(5);
 
-    var swingBlock = new ProtoBlock('swing');
-    swingBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['swing'] = swingBlock;
-    swingBlock.staticLabels.push(_('swing'));
-    swingBlock.adjustWidthToLabel();
-    swingBlock.flowClampOneArgBlock();
-    swingBlock.defaults.push(32);
-    swingBlock.hidden = true;
-
     var slurBlock = new ProtoBlock('slur');
     slurBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['slur'] = slurBlock;
@@ -816,14 +824,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     staccatoBlock.flowClampOneArgBlock();
     staccatoBlock.defaults.push(32);
     staccatoBlock.hidden = true;
-
-    var newswingBlock = new ProtoBlock('swing');
-    newswingBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['newswing'] = newswingBlock;
-    newswingBlock.staticLabels.push(_('swing'));
-    newswingBlock.adjustWidthToLabel();
-    newswingBlock.flowClampOneArgBlock();
-    newswingBlock.defaults.push(1/32);
 
     var newslurBlock = new ProtoBlock('slur');
     newslurBlock.palette = palettes.dict['tone'];
