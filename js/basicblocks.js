@@ -802,7 +802,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var intervalBlock = new ProtoBlock('interval');
     intervalBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['interval'] = intervalBlock;
-    intervalBlock.staticLabels.push(_('interval'));
+    intervalBlock.staticLabels.push(_('relative interval'));
     intervalBlock.adjustWidthToLabel();
     intervalBlock.flowClampOneArgBlock();
     intervalBlock.defaults.push(5);
