@@ -3319,7 +3319,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo.swingTarget[turtle].push(null);
             if (logo.blocks.blockList[blk].name === 'newswing') {
                 logo.swing[turtle].push(1/args[0]);
-                console.log('swing factor is ' + last(logo.swing[turtle]));
             } else {
                 logo.swing[turtle].push(args[0]);
             }
