@@ -462,13 +462,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     swingBlock.defaults.push(32);
     swingBlock.hidden = true;
 
-    var newswingBlock = new ProtoBlock('swing');
+    var newswingBlock = new ProtoBlock('newswing');
     newswingBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newswing'] = newswingBlock;
     newswingBlock.staticLabels.push(_('swing'));
     newswingBlock.adjustWidthToLabel();
     newswingBlock.flowClampOneArgBlock();
-    newswingBlock.defaults.push(1/32);
+    newswingBlock.defaults.push(1 / 32);
 
     var setbpmBlock = new ProtoBlock('setbpm');
     setbpmBlock.palette = palettes.dict['rhythm'];
@@ -581,7 +581,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     newnoteBlock.staticLabels.push(_('note value'));
     newnoteBlock.adjustWidthToLabel();
     newnoteBlock.flowClampOneArgBlock();
-    newnoteBlock.defaults.push(1/8);
+    newnoteBlock.defaults.push(1 / 8);
 
     // TONE (ARTICULATION) PALETTE
 
@@ -831,7 +831,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     newslurBlock.staticLabels.push(_('slur'));
     newslurBlock.adjustWidthToLabel();
     newslurBlock.flowClampOneArgBlock();
-    newslurBlock.defaults.push(1/16);
+    newslurBlock.defaults.push(1 / 16);
 
     var newstaccatoBlock = new ProtoBlock('staccato');
     newstaccatoBlock.palette = palettes.dict['tone'];
@@ -839,7 +839,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     newstaccatoBlock.staticLabels.push(_('staccato'));
     newstaccatoBlock.adjustWidthToLabel();
     newstaccatoBlock.flowClampOneArgBlock();
-    newstaccatoBlock.defaults.push(1/32);
+    newstaccatoBlock.defaults.push(1 / 32);
 
     // DRUM PALETTE
     var drumnameBlock = new ProtoBlock('drumname');
