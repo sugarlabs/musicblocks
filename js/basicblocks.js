@@ -825,7 +825,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     staccatoBlock.defaults.push(32);
     staccatoBlock.hidden = true;
 
-    var newslurBlock = new ProtoBlock('slur');
+    var newslurBlock = new ProtoBlock('newslur');
     newslurBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['newslur'] = newslurBlock;
     newslurBlock.staticLabels.push(_('slur'));
@@ -833,7 +833,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     newslurBlock.flowClampOneArgBlock();
     newslurBlock.defaults.push(1 / 16);
 
-    var newstaccatoBlock = new ProtoBlock('staccato');
+    var newstaccatoBlock = new ProtoBlock('newstaccato');
     newstaccatoBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['newstaccato'] = newstaccatoBlock;
     newstaccatoBlock.staticLabels.push(_('staccato'));
