@@ -337,13 +337,27 @@ define(function (require) {
         };
 
         function _doFastButton(env) {
+            var currentDelay = logo.turtleDelay;
             logo.setTurtleDelay(0);
             if (docById('pitchtimematrix').style.visibility === 'visible') {
                 matrix.playAll();
             } else if (!turtles.running()) {
+                console.log('running');
                 logo.runLogoCommands(null, env);
             } else {
-                logo.step(null, env);
+                if (currentDelay !== 0) {
+                    // keep playing at full speep
+                    console.log('running from step');
+                    logo.step();
+		} else {
+                    // stop and restart
+                    console.log('stopping...');
+		    logo.doStopTurtle();
+                    setTimeout(function () {                    
+			console.log('and running');
+			logo.runLogoCommands(null, env);
+		    }, 500);
+		}
             }
         };
 
