@@ -665,7 +665,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return;
         }
 
-        if (this.blockList[parentblk].name === 'newnote') {
+        if (['newnote', 'osctime'].indexOf(this.blockList[parentblk].name) !== -1) {
             var cblk = this.blockList[parentblk].connections[2];
             if (cblk == null) {
                 var blkname = 'vspace';
@@ -991,7 +991,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
             // Remove the silence block (if it is present) after
             // adding a new block inside of a note block.
-            if (this._insideExpandableBlock(thisBlock) != null && ['note', 'newnote'].indexOf(this.blockList[this._insideExpandableBlock(thisBlock)].name) !== -1) {
+            if (this._insideExpandableBlock(thisBlock) != null && ['note', 'newnote', 'osctime'].indexOf(this.blockList[this._insideExpandableBlock(thisBlock)].name) !== -1) {
                 // If blocks are inserted above the silence block.
                 if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
