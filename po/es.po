@@ -1301,6 +1301,9 @@ msgstr ""
 msgid "number of notes"
 msgstr "número de notas"
 
+msgid "# notes"
+msgstr "número de notas"
+
 #: js/basicblocks.js:349
 msgid "custom mode"
 msgstr "modo personalizado"
@@ -1470,8 +1473,8 @@ msgid "augmented"
 msgstr ""
 
 #: js/basicblocks.js:788
-msgid "interval"
-msgstr "intervalo"
+msgid "relative interval"
+msgstr "intervalo relativa"
 
 #: js/basicblocks.js:796
 #: js/basicblocks.js:823

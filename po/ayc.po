@@ -1770,8 +1770,8 @@ msgid "augmented"
 msgstr ""
 
 #: js/basicblocks.js:788
-#.TRANS: intervalo
-msgid "interval"
+#.TRANS: intervalo relativa
+msgid "relative interval"
 msgstr ""
 
 #: js/basicblocks.js:796
