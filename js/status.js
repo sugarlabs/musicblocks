@@ -104,12 +104,13 @@ function StatusMatrix() {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
+        var t = 0;
         for (var i = 0; i < this._logo.turtles.turtleList.length; i++) {
             if (this._logo.turtles.turtleList[i].trash) {
                 continue;
             }
 
-            var row = header.insertRow(i + 1);
+            var row = header.insertRow(t + 1);
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
 
@@ -125,12 +126,15 @@ function StatusMatrix() {
                 cell.innerHTML = '';
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             }
+
+            t += 1;
         }
     };
 
     this.updateAll = function() {
-        // Update status of  all of the voices in the matrix.
+        // Update status of all of the voices in the matrix.
         var table = docById('statusTable');
+        var t = 0;
         for (var i = 0; i < this._logo.turtles.turtleList.length; i++) {
             if (this._logo.turtles.turtleList[i].trash) {
                 continue;
@@ -201,7 +205,7 @@ function StatusMatrix() {
                     console.log('??? ' + this._logo.statusFields[j]);
                     break;
                 }
-                var cell = table.rows[i + 1].cells[j + 1];
+                var cell = table.rows[t + 1].cells[j + 1];
                 if (cell != null) {
                     cell.innerHTML = innerHTML;
                 }
@@ -215,10 +219,12 @@ function StatusMatrix() {
                 var value = '';
             }
 
-            var cell = table.rows[i + 1].cells[j + 1];
+            var cell = table.rows[t + 1].cells[j + 1];
             if (cell != null) {
                 cell.innerHTML = note + ' ' + value;
             }
+
+            t += 1;
         }
     };
 };
