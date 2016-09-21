@@ -3319,6 +3319,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo.swingTarget[turtle].push(null);
             if (logo.blocks.blockList[blk].name === 'newswing') {
                 logo.swing[turtle].push(1/args[0]);
+                console.log('swing factor is ' + last(logo.swing[turtle]));
             } else {
                 logo.swing[turtle].push(args[0]);
             }
@@ -4159,9 +4160,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         noteBeatValue = 1 / ((1 / noteBeatValue) + (1 / swingValue));
                         this.swingCarryOver[turtle] = swingValue;
                     } else {
-                        noteBeatValue = 1 / ((1 / noteBeatValue) - (1 / swingValue));
+                        if (noteBeatValue === swingValue) {
+                            noteBeatValue = 0;
+                        } else {
+                            noteBeatValue = 1 / ((1 / noteBeatValue) - (1 / swingValue));
+                        }
+
                         this.swingCarryOver[turtle] = 0;
                     }
+
                     if (noteBeatValue < 0) {
                         noteBeatValue = 0;
                     }
