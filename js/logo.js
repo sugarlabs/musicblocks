@@ -3319,16 +3319,24 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'newswing':
+        case 'newswing2':
         case 'swing':
             // Grab a bit from the next note to give to the current note.
-            logo.swingTarget[turtle].push(null);
-            if (logo.blocks.blockList[blk].name === 'newswing') {
-                logo.swing[turtle].push(1/args[0]);
+            if (logo.blocks.blockList[blk].name === 'newswing2') {
+                logo.swing[turtle].push(1 / args[0]);
+                logo.swingTarget[turtle].push(1 / args[1]);
+                childFlow = args[2];
+            } else if (logo.blocks.blockList[blk].name === 'newswing') {
+                logo.swing[turtle].push(1 / args[0]);
+                logo.swingTarget[turtle].push(null);
+                childFlow = args[1];
             } else {
                 logo.swing[turtle].push(args[0]);
+                logo.swingTarget[turtle].push(null);
+                childFlow = args[1];
             }
             logo.swingCarryOver[turtle] = 0;
-            childFlow = args[1];
+
             childFlowCount = 1;
 
             var listenerName = '_swing_' + turtle;
@@ -4151,6 +4159,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             // FIXME: Will not work when using dup and skip.
             // FIXME: Could behave weirdly with tie.
             if (this.swing[turtle].length > 0) {
+                // Deprecated
+                // newswing2 takes the target as an argument
                 if (last(this.swingTarget[turtle]) == null) {
                     // When we start a swing we need to keep track of
                     // the initial beat value.

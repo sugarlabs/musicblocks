@@ -273,94 +273,95 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseArtwork = obj[0];
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
-        case 'note':
-        case 'newnote':
+        case 'articulation':
+        case 'augmented':
+        case 'backward':
+        case 'bottle':
+        case 'bubbles':
+        case 'cat':
+        case 'chine':
+        case 'clamp':
+        case 'clang':
+        case 'clap':
+        case 'cowbell':
+        case 'crash':
+        case 'crescendo':
+        case 'cricket':
+        case 'cup':
+        case 'darbuka':
+        case 'diminished':
+        case 'dividebeatfactor':
+        case 'dog':
+        case 'drift':
+        case 'duck':
+        case 'duplicatenotes':
+        case 'fill':
+        case 'fingercymbals':
+        case 'flat':
+        case 'floortom':
+        case 'forever':
+        case 'hihat':
+        case 'hollowline':
+        case 'if':
+        case 'interval':
         case 'invert':
         case 'invert2':
-        case 'notation':
-        case 'flat':
-        case 'sharp':
-        case 'multiplybeatfactor':
-        case 'dividebeatfactor':
-        case 'duplicatenotes':
-        case 'skipnotes':
-        case 'rhythmicdot':
-        case 'tie':
-        case 'swing':
-        case 'newswing':
-        case 'drift':
-        case 'interval':
+        case 'kick':
         case 'major':
         case 'minor':
-        case 'diminished':
-        case 'perfect':
-        case 'augmented':
-        case 'staccato':
-        case 'slur':
-        case 'newstaccato':
+        case 'modewidget':
+        case 'multiplybeatfactor':
+        case 'newnote':
         case 'newslur':
-        case 'crescendo':
-        case 'articulation':
-        case 'backward':
+        case 'newstaccato':
+        case 'newswing':
+        case 'newswing2':
+        case 'notation':
+        case 'note':
+        case 'osctime':
+        case 'perfect':
+        case 'pitchslider':
+        case 'pitchstaircase':
+        case 'pluck':
+        case 'repeat':
+        case 'rhythmicdot':
+        case 'rhythmruler':
+        case 'ridebell':
+        case 'setbpm':
+        case 'setdrum':
+        case 'setnotevolume2':
         case 'settransposition':
+        case 'setvoice':
+        case 'sharp':
+        case 'skipnotes':
+        case 'slap':
+        case 'slur':
+        case 'snare':
+        case 'splash':
+        case 'staccato':
+        case 'swing':
+        case 'tempo':
+        case 'tie':
+        case 'tom':
+        case 'triangle1':
         case 'tuplet':
         case 'tuplet2':
-        case 'osctime':
-        case 'setbpm':
-        case 'setnotevolume2':
-        case 'darbuka':
-        case 'clang':
-        case 'bottle':
-        case 'duck':
-        case 'snare':
-        case 'hihat':
-        case 'tom':
-        case 'kick':
-        case 'pluck':
-        case 'triangle1':
-        case 'slap':
-        case 'fingercymbals':
-        case 'cup':
-        case 'cowbell':
-        case 'splash':
-        case 'ridebell':
-        case 'floortom':
-        case 'crash':
-        case 'chine':
-        case 'dog':
-        case 'cat':
-        case 'clap':
-        case 'bubbles':
-        case 'cricket':
-        case 'setdrum':
-        case 'setvoice':
-        case 'rhythmruler':
-        case 'pitchstaircase':
-        case 'tempo':
-        case 'pitchslider':
-        case 'modewidget':
-        case 'repeat':
-        case 'fill':
-        case 'hollowline':
-        case 'clamp':
-        case 'forever':
-        case 'if':
-        case 'while':
         case 'until':
+        case 'while':
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
-        case 'less':
-        case 'greater':
         case 'equal':
+        case 'greater':
+        case 'less':
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;
         case 'ifthenelse':
             var obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
             break;
-        case 'nameddoArg':
-        case 'namedcalcArg':
-        case 'doArg':
         case 'calcArg':
+        case 'doArg':
+        case 'namedcalcArg':
+        case 'nameddoArg':
             var obj = this.protoblock.generator(this.argClampSlots);
             this.size = 2;
             for (var i = 0; i < this.argClampSlots.length; i++) {
