@@ -28,11 +28,46 @@ const NOTESTABLE = {1: "do", 2: "do♯", 3: "re", 4: "re♯", 5: "mi", 6: "fa", 
 const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 // Halfsteps used in calculating absolute intervals
-const PERFECT = {1: 0, 4: 5, 5: 7, 8: 12};
-const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
-const MAJOR = {2: 2, 3: 4, 6: 9, 7: 11};
-const DIMINISHED = {1: -1, 4: 4, 5: 6, 8: 11, 2: 0, 3: 2, 6: 7, 7: 9};
 const AUGMENTED = {1: 1, 4: 6, 5: 8, 8: 13, 2: 2, 3: 5, 6: 9, 7: 11};
+const PERFECT = {1: 0, 4: 5, 5: 7, 8: 12};
+const DIMINISHED = {1: -1, 4: 4, 5: 6, 8: 11, 2: 0, 3: 2, 6: 7, 7: 9};
+const MAJOR = {2: 2, 3: 4, 6: 9, 7: 11};
+const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
+
+
+function mod12(a) {
+    while (a < 0) {
+        a += 12;
+    }
+
+    return a % 12;
+}
+
+
+function calcAugmented(a) {
+    return AUGMENTED[mod12(a)] + Math.floor(a / 12) * 12;
+}
+
+
+function calcPerfect(a) {
+    return PERFECT[mod12(a)] + Math.floor(a / 12) * 12;
+}
+
+
+function calcDiminished(a) {
+    return DIMINISHED[mod12(a)] + Math.floor(a / 12) * 12;
+}
+
+
+function calcMajor(a) {
+    return MAJOR[mod12(a)] + Math.floor(a / 12) * 12;
+}
+
+
+function calcMinor(a) {
+    return MINOR[mod12(a)] + Math.floor(a / 12) * 12;
+}
+
 
 const SEMITONES = 12;
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
