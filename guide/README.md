@@ -214,8 +214,15 @@ Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg'</img>
 
-The *Swing* block works on pairs of notes, adding some duration to the
-first note and taking the same amount from the second note.
+The *Swing* block works on pairs of notes (specified by note value),
+adding some duration (specified by swing value) to the first note and
+taking the same amount from the second note. Notes that do not match
+note value are unchanged.
+
+In the example, `re5` would be played as a `1/6` note and `me5` would
+be played as a `1/12` note (`1/8 + 1/24 === 1/6' and `1/8 - 1/24 ===
+1/12`). Observe that the total duration of the pair of notes is
+unchanged.
 
 Tie also works on pairs of notes, combining them into one note. (The
 notes must be identical in pitch, but can vary in rhythm.)
