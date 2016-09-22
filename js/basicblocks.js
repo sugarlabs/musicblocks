@@ -468,7 +468,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     newswingBlock.staticLabels.push(_('swing'));
     newswingBlock.adjustWidthToLabel();
     newswingBlock.flowClampOneArgBlock();
-    newswingBlock.defaults.push(1 / 32);
+    newswingBlock.defaults.push(1 / 24);
+    newswingBlock.hidden = true;
+
+    var newswingBlock = new ProtoBlock('newswing2');
+    newswingBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['newswing2'] = newswingBlock;
+    newswingBlock.staticLabels.push(_('swing'), _('swing value'), _('note value'));
+    newswingBlock.adjustWidthToLabel();
+    newswingBlock.flowClampTwoArgBlock();
+    newswingBlock.defaults.push(1 / 24);
+    newswingBlock.defaults.push(1 / 8);
 
     var setbpmBlock = new ProtoBlock('setbpm');
     setbpmBlock.palette = palettes.dict['rhythm'];

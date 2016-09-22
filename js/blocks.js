@@ -2787,6 +2787,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'newslur':
             case 'newstaccato':
             case 'newswing':
+            case 'newswing2':
             case 'osctime':
             case 'perfect':
             case 'pitchdrummatrix':
