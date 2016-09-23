@@ -200,7 +200,10 @@ beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg'</img>
 
 You can also multiply (or divide) the beat value, which will speed up
-or slowdown the notes.
+or slowdown the notes. Multiplying the beat value of an `1/8` note by
+`2` is the equivalent of playing a `1/16` note. Dividing the beat
+value of an `1/8` note by '2' is the equivalent of playing a `1/4`
+note.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg'</img>
 
@@ -256,6 +259,11 @@ augmented fifth, and adds the additional pitches to a note. Similarly,
 the *Minor* block calculates an absolute interval, e.g., a minor
 third. Other absolute intervals include *Perfect*, *Diminished*, and
 *Major*.
+
+In the augmented fifth example above, a chord of D5 and A5 are played,
+followed by a chord of E5 and C5. In the minor third example, which
+includes a shift of one octave, first a chord of D5 and F5 is played,
+followed by chord of E5 and G6.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
 
