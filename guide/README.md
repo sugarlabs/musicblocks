@@ -252,7 +252,7 @@ the additional pitches to a note. In the figure, we add `Sol` to `Do` and
 
 The *Articulation* block changes the volume of a group of notes.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg'</img>
 
 The *Augmented* block calculates an absolute interval, e.g., an
 augmented fifth, and adds the additional pitches to a note. Similarly,
