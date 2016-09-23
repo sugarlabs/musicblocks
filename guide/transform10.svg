@@ -53,7 +53,7 @@
       <tspan
          x="94.896423"
          y="48.716801"
-         id="tspan3198-0-1-1">set key</tspan>
+         id="tspan3198-0-1-1">fijar clave</tspan>
     </text>
     <text
        id="text3200-6-0-8"
@@ -63,7 +63,7 @@
       <tspan
          x="95.409119"
          y="24.216803"
-         id="tspan3202-5-0-1">key</tspan>
+         id="tspan3202-5-0-1">clave</tspan>
     </text>
     <text
        id="text3204-9-5-7"
@@ -73,7 +73,7 @@
       <tspan
          x="94.896423"
          y="68.21682"
-         id="tspan3206-0-8-6">mode</tspan>
+         id="tspan3206-0-8-6">modo</tspan>
     </text>
     <g
        transform="translate(-36.000046,-210.00004)"
@@ -90,7 +90,7 @@
         <tspan
            x="181.99998"
            y="278.00006"
-           id="tspan25-7-2-2-6">Major</tspan>
+           id="tspan25-7-2-2-6">Mayor</tspan>
       </text>
     </g>
   </g>
@@ -106,7 +106,7 @@
     <tspan
        x="7.9999852"
        y="43.562065"
-       id="tspan3664">start</tspan>
+       id="tspan3664">iniciar</tspan>
   </text>
   <g
      id="g3037"
@@ -245,7 +245,7 @@
     <tspan
        x="25.999996"
        y="628.62402"
-       id="tspan3039-9">repeat</tspan>
+       id="tspan3039-9">repetir</tspan>
   </text>
   <path
      style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -276,7 +276,7 @@
       <tspan
          id="tspan3105-9"
          y="332.12408"
-         x="160">step pitch</tspan>
+         x="160">paso el tono</tspan>
     </text>
     <path
        d="m 181,305.12409 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -305,7 +305,7 @@
     <tspan
        x="25.999996"
        y="378.62402"
-       id="tspan3039-26-4">repeat</tspan>
+       id="tspan3039-26-4">repetir</tspan>
   </text>
   <path
      style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -333,7 +333,7 @@
     <tspan
        x="130.00003"
        y="271.6861"
-       id="tspan3198">pitch</tspan>
+       id="tspan3198">tono</tspan>
   </text>
   <text
      id="text3200"
@@ -343,7 +343,7 @@
     <tspan
        x="130.00003"
        y="247.18607"
-       id="tspan3202">note</tspan>
+       id="tspan3202">nota</tspan>
   </text>
   <text
      id="text3204"
@@ -353,7 +353,7 @@
     <tspan
        x="130.00003"
        y="291.1861"
-       id="tspan3206">octave</tspan>
+       id="tspan3206">octava</tspan>
   </text>
   <path
      style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
@@ -367,7 +367,7 @@
     <tspan
        id="tspan25"
        y="248.68607"
-       x="200.00003">do</tspan>
+       x="200.00003">hacer</tspan>
   </text>
   <path
      d="m 151.00002,265.68607 120.00001,0 0,40 -120.00001,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -395,7 +395,7 @@
     <tspan
        x="23.999996"
        y="167.18608"
-       id="tspan3039-5">note value</tspan>
+       id="tspan3039-5">valor de la nota</tspan>
   </text>
   <path
      d="m 265.00003,181.68608 120.00002,0 0,40 -120.00002,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -472,7 +472,7 @@
       <tspan
          id="tspan3105-3-0"
          y="540.12408"
-         x="160">step pitch</tspan>
+         x="160">paso el tono</tspan>
     </text>
     <path
        d="m 181,513.12409 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
@@ -501,7 +501,7 @@
     <tspan
        x="41.999996"
        y="667.1861"
-       id="tspan3039-2">note value</tspan>
+       id="tspan3039-2">valor de la nota</tspan>
   </text>
   <g
      transform="translate(35.999995,680.68616)"
@@ -583,7 +583,7 @@
     <tspan
        x="41.999996"
        y="417.1861"
-       id="tspan3039-0">note value</tspan>
+       id="tspan3039-0">valor de la nota</tspan>
   </text>
   <g
      transform="translate(35.999995,430.68612)"
