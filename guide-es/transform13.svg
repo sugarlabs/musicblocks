@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="418.00003"
+   height="690.00006"
+   id="svg3641">
+  <metadata
+     id="metadata3670">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3668" />
+  <g
+     transform="matrix(2,0,0,2,172,82.92332)"
+     id="g4-2">
+    <filter
+       height="1.3"
+       id="dropshadow-6"
+       style="color-interpolation-filters:sRGB">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="3"
+         id="feGaussianBlur7-6" />
+      <feOffset
+         dx="2"
+         dy="2"
+         result="offsetblur"
+         id="feOffset9-0" />
+      <feComponentTransfer
+         id="feComponentTransfer11-7">
+        <feFuncA
+           type="linear"
+           slope="0.2"
+           id="feFuncA13-7" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge15-19">
+        <feMergeNode
+           id="feMergeNode17-1" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode19-3" />
+      </feMerge>
+    </filter>
+    <path
+       d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
+       id="path21-3"
+       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+    <text
+       id="text23-6"
+       style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
+       x="25">
+      <tspan
+         x="35"
+         y="13"
+         id="tspan25-9">sol</tspan>
+    </text>
+  </g>
+  <path
+     d="m 19.015319,100.14693 0,-8.10193 c 0,-4.47457 3.645846,-8.10193 8.143225,-8.10193 l 8.143226,0 0,4.05097 20.358063,0 0,-4.05097 18.322256,0 96.716131,0 8.14322,0 c 4.49738,0 7.07085,3.75776 8.14323,8.10193 l 0,8.10193 -7.98467,0 0,-6.22363 -8,0 0,20 8,0 0.008,-6 7.98467,0 3.4e-4,34 -7.98466,0 -0.008,-6 -8,0 0,20 8,0 0.008,-6 7.98467,0 -0.008,8.48896 c -0.004,4.47457 -3.64585,8.03739 -8.14323,8.03739 l -8.14322,0 -97.680667,0 -2.035806,0 0,5 -15.964193,0 0,-5 -2.035807,0 -7.500946,0 c -5.621724,0 -10.179031,4.59873 -10.179031,10.19195 l 0,8.10193 0,47.90087 0,8.10192 c 0,5.59322 4.583757,9.58272 10.179031,10.12741 l 7.500946,0.73021 0,4.31936 20.035806,0 0,-4.31936 17.250987,-0.73021 0,12.1529 0,12.15289 0,9.66734 c 0,4.47457 -3.775657,7.03463 -8.143226,8.10193 l -8.143225,0 -18.322256,0 -2.035807,0 0,4.05096 -16.28645,0 0,-4.05096 -2.035806,0 -8.143226,0 c -4.497379,0 -8.143225,-3.62736 -8.143225,-8.10193 l 0,-9.66734 z"
+     id="path21-8"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2.03063774;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-8"
+     style="font-size:20.3063755px;font-family:sans-serif;text-anchor:start;fill:#000000;fill-opacity:1"
+     transform="scale(1.0025453,0.99746116)"
+     x="23.939068"
+     y="83.144012">
+    <tspan
+       x="34.769135"
+       y="127.64883"
+       id="tspan25-5"
+       style="fill:#000000;fill-opacity:1">invertir (par)</tspan>
+  </text>
+  <text
+     id="text27"
+     style="font-size:13.5375843px;font-family:sans-serif;text-anchor:end;fill:#000000;fill-opacity:1"
+     transform="scale(1.0025453,0.99746116)"
+     x="73.812119"
+     y="83.144012">
+    <tspan
+       x="165.86761"
+       y="105.98871"
+       id="tspan29"
+       style="fill:#000000;fill-opacity:1">nota</tspan>
+  </text>
+  <text
+     id="text31"
+     style="font-size:13.5375843px;font-family:sans-serif;text-anchor:end;fill:#000000;fill-opacity:1"
+     transform="scale(1.0025453,0.99746116)"
+     x="73.812119"
+     y="83.144012">
+    <tspan
+       x="165.86761"
+       y="148.63208"
+       id="tspan33"
+       style="fill:#000000;fill-opacity:1">octava</tspan>
+  </text>
+  <text
+     x="374.21991"
+     y="103.95403"
+     id="text3033"
+     style="font-size:18.05011177px;font-family:Sans;text-anchor:end;fill:#000000"
+     transform="scale(1.0025453,0.99746116)">
+    <tspan
+       x="501.47321"
+       y="134.41359"
+       id="tspan3035" />
+  </text>
+  <g
+     id="g3715-4"
+     transform="translate(-187.8,136.4203)">
+    <path
+       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path21-6-1-8"
+       d="m 376.8,-10.49697 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-15.9999997 4,0 0,6 12,0 0,-2 z" />
+    <text
+       y="-11.496969"
+       x="411.80002"
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+       id="text23-9-1-0">
+      <tspan
+         id="tspan25-8-9-4"
+         y="14.503031"
+         x="431.80002">4</tspan>
+    </text>
+  </g>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3194-2-66"
+     d="m 37,183.9233 0,-8.00001 a 8.0000007,8.0000006 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 59.99999,0 8.00002,0 a 8.0000007,8.0000006 0 0 1 8,8 l 0,8.00001 -8,0 0,-6.00001 -8.00002,0 0,20.00001 8.00002,0 0,-6 8,0 0,34 -8,0 0,-5.99999 -8.00002,0 0,19.99999 8.00002,0 0,-6 8,0 0,8 a 8.0000007,8.0000006 0 0 1 -8,8 l -8.00002,0 -59.99999,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8.0000007,8.0000006 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z" />
+  <text
+     y="167.99997"
+     x="36.577442"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3196-91-4">
+    <tspan
+       id="tspan3198-2-95"
+       y="217.00003"
+       x="130.57747">tono</tspan>
+  </text>
+  <text
+     y="170.00003"
+     x="36.577442"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3200-7-0">
+    <tspan
+       id="tspan3202-0-4"
+       y="192.49997"
+       x="130.57747">nota</tspan>
+  </text>
+  <text
+     y="172.00003"
+     x="36.577442"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3204-93-8">
+    <tspan
+       id="tspan3206-6-7"
+       y="236.49997"
+       x="130.57747">octava</tspan>
+  </text>
+  <path
+     d="m 151.00002,167.92328 120,0 0,40.00002 -120,0 0,-16.00001 0,-2 -12,0 0,6 -4.00002,0 0,-16.00001 4.00002,0 0,6.00001 12,0 0,-2 z"
+     id="path21-0-1"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="167.99997"
+     id="text23-6-72"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="180.57741">
+    <tspan
+       x="200.57741"
+       y="193.99997"
+       id="tspan25-2-7">re</tspan>
+  </text>
+  <path
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-6-6-2"
+     d="m 151.00002,209.9233 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4.00002,0 0,-16 4.00002,0 0,6 12,0 0,-2 z" />
+  <text
+     y="210.00003"
+     x="186.57741"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-9-1-2">
+    <tspan
+       id="tspan25-8-8-6"
+       y="235.99997"
+       x="206.57741">4</tspan>
+  </text>
+  <path
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3035-5-1"
+     d="m 1,17.00001 0,-8 c 0,-4.41828 3.58173,-8 8.00001,-8 l 8,0 0,4 20,0 0,-4 18,0 109.99999,0 8.00002,0 c 4.41827,0 9.07158,3.71364 8,8 l 0,8 -8,0 0,-6 -8.00002,0 0,20 8.00002,0 0,-6 8,0 0,8 c 0,4.41828 -3.58173,8 -8,8 l -8.00002,0 -109.99999,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.47715 -10,10 l 0,8 0,218.00001 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.07161 -8,8.00001 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 C 4.58173,335.00002 1,331.41829 1,327.00001 l 0,-8 z" />
+  <text
+     x="-1.9999599"
+     y="-2.0000353"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text3037-3-0">
+    <tspan
+       id="tspan3039-5-61"
+       y="28.499964"
+       x="6.0000401">valor de la nota</tspan>
+  </text>
+  <path
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-6-1-7-5"
+     d="m 297.00002,43.00001 120.00002,0 0,40 -120.00002,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     y="41.999966"
+     x="327.99994"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-9-82-9-94">
+    <tspan
+       id="tspan25-8-5-2-9"
+       y="68.000023"
+       x="348">4</tspan>
+  </text>
+  <path
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3798-4-4-5-09"
+     d="m 183.00002,17.00001 0,-8 c 0,-4.4182778 3.58172,-7.9999996 8,-8 l 8,0 20,0 60,0 8,0 c 4.41828,4e-7 8,3.5817222 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -20,0 -8,0 c -4.41828,0 -8,-3.581722 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4.00002,0 0,-16 4.00002,0 0,6 12,0 z" />
+  <text
+     x="158.00006"
+     style="font-size:28px;font-family:sans-serif;text-anchor:end;fill:#000000"
+     id="text3800-3-2-0-17"
+     y="-3.5371093e-05">
+    <tspan
+       id="tspan3802-6-2-5-7"
+       y="48.999966"
+       x="268">/</tspan>
+  </text>
+  <g
+     id="g5147-1"
+     transform="translate(50,-42)">
+    <path
+       d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+       id="path21-8-2-1-0-6-1"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+    <text
+       x="279"
+       y="44"
+       id="text23-0-1-0-1-0-5"
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+      <tspan
+         x="299"
+         y="70.000031"
+         id="tspan25-7-0-5-2-5-9">1</tspan>
+    </text>
+  </g>
+  <path
+     d="m 19.00001,59.00001 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 59.99999,0 8.00002,0 c 4.41827,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71365,6.92841 -8,8 l -8.00002,0 -59.99999,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
+     id="path3124-7"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="100.82307"
+     y="69.923119"
+     id="text6137-7"><tspan
+       id="tspan6139-6"
+       x="100.82307"
+       y="69.923119"
+       style="font-size:22.5px">↓</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="102"
+     y="107.58996"
+     id="text5034"><tspan
+       id="tspan5036"
+       x="102"
+       y="107.58996" /></text>
+  <g
+     transform="matrix(2,0,0,2,188,432.92334)"
+     id="g4-2-3">
+    <filter
+       height="1.3"
+       id="dropshadow-6-6"
+       style="color-interpolation-filters:sRGB">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="3"
+         id="feGaussianBlur7-6-7" />
+      <feOffset
+         dx="2"
+         dy="2"
+         result="offsetblur"
+         id="feOffset9-0-5" />
+      <feComponentTransfer
+         id="feComponentTransfer11-7-3">
+        <feFuncA
+           type="linear"
+           slope="0.2"
+           id="feFuncA13-7-5" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge15-19-6">
+        <feMergeNode
+           id="feMergeNode17-1-2" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode19-3-9" />
+      </feMerge>
+    </filter>
+    <path
+       d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
+       id="path21-3-1"
+       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+    <text
+       id="text23-6-2"
+       style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
+       x="25">
+      <tspan
+         x="35"
+         y="13"
+         id="tspan25-9-7">sol</tspan>
+    </text>
+  </g>
+  <path
+     d="m 19.01532,450.14695 0,-8.10193 c 0,-4.47457 3.64584,-8.10193 8.14322,-8.10193 l 8.14323,0 0,4.05097 20.35806,0 0,-4.05097 18.32226,0 112.71613,0 8.14322,0 c 4.49738,0 7.07085,3.75776 8.14323,8.10193 l 0,8.10193 -7.98467,0 0,-6.22363 -8,0 0,20 8,0 0.008,-6 7.98467,0 3.4e-4,34 -7.98466,0 -0.008,-6 -8,0 0,20 8,0 0.008,-6 7.98467,0 -0.008,8.48896 c -0.004,4.47457 -3.64585,8.03739 -8.14323,8.03739 l -8.14322,0 -113.68067,0 -2.03581,0 0,5 -15.96419,0 0,-5 -2.03581,0 -7.50094,0 c -5.62173,0 -10.17903,4.59873 -10.17903,10.19195 l 0,8.10193 0,47.90087 0,8.10192 c 0,5.59322 4.58375,9.58272 10.17903,10.12741 l 7.50094,0.73021 0,4.31936 20.03581,0 0,-4.31936 17.25099,-0.73021 0,12.1529 0,12.15289 0,9.66734 c 0,4.47457 -3.77566,7.03463 -8.14323,8.10193 l -8.14322,0 -18.32226,0 -2.03581,0 0,4.05096 -16.28645,0 0,-4.05096 -2.0358,0 -8.14323,0 c -4.49738,0 -8.14322,-3.62736 -8.14322,-8.10193 l 0,-9.66734 z"
+     id="path21-8-0"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2.03063774;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23-8-9"
+     style="font-size:20.3063755px;font-family:sans-serif;text-anchor:start;fill:#000000;fill-opacity:1"
+     transform="scale(1.0025453,0.99746116)"
+     x="17.954296"
+     y="434.03528">
+    <tspan
+       x="28.784359"
+       y="478.54007"
+       id="tspan25-5-3"
+       style="fill:#000000;fill-opacity:1">invertir (impar)</tspan>
+  </text>
+  <text
+     id="text27-6"
+     style="font-size:13.5375843px;font-family:sans-serif;text-anchor:end;fill:#000000;fill-opacity:1"
+     transform="scale(1.0025453,0.99746116)"
+     x="89.771469"
+     y="434.03528">
+    <tspan
+       x="181.82695"
+       y="456.87997"
+       id="tspan29-0"
+       style="fill:#000000;fill-opacity:1">nota</tspan>
+  </text>
+  <text
+     id="text31-6"
+     style="font-size:13.5375843px;font-family:sans-serif;text-anchor:end;fill:#000000;fill-opacity:1"
+     transform="scale(1.0025453,0.99746116)"
+     x="89.771469"
+     y="434.03528">
+    <tspan
+       x="181.82695"
+       y="499.52335"
+       id="tspan33-2"
+       style="fill:#000000;fill-opacity:1">octava</tspan>
+  </text>
+  <g
+     id="g3715-4-6"
+     transform="translate(-171.8,486.42032)">
+    <path
+       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path21-6-1-8-1"
+       d="m 376.8,-10.49697 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-15.9999997 4,0 0,6 12,0 0,-2 z" />
+    <text
+       y="-11.496969"
+       x="411.80002"
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+       id="text23-9-1-0-8">
+      <tspan
+         id="tspan25-8-9-4-7"
+         y="14.503031"
+         x="431.80002">4</tspan>
+    </text>
+  </g>
+  <path
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3194-2-66-9"
+     d="m 37,533.92332 0,-8.00001 a 8.0000007,8.0000006 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 59.99999,0 8.00002,0 a 8.0000007,8.0000006 0 0 1 8,8 l 0,8.00001 -8,0 0,-6.00001 -8.00002,0 0,20.00001 8.00002,0 0,-6 8,0 0,34 -8,0 0,-5.99999 -8.00002,0 0,19.99999 8.00002,0 0,-6 8,0 0,8 a 8.0000007,8.0000006 0 0 1 -8,8 l -8.00002,0 -59.99999,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8.0000007,8.0000006 0 0 1 -8,-8 l 0,-8 0,-42 0,-8 z" />
+  <text
+     y="518"
+     x="36.577446"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3196-91-4-2">
+    <tspan
+       id="tspan3198-2-95-0"
+       y="567.00006"
+       x="130.57745">tono</tspan>
+  </text>
+  <text
+     y="520.00006"
+     x="36.577446"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3200-7-0-2">
+    <tspan
+       id="tspan3202-0-4-3"
+       y="542.5"
+       x="130.57745">nota</tspan>
+  </text>
+  <text
+     y="522.00006"
+     x="36.577446"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3204-93-8-7">
+    <tspan
+       id="tspan3206-6-7-5"
+       y="586.5"
+       x="130.57745">octava</tspan>
+  </text>
+  <path
+     d="m 151.00002,517.9233 120,0 0,40.00002 -120,0 0,-16.00001 0,-2 -12,0 0,6 -4.00002,0 0,-16.00001 4.00002,0 0,6.00001 12,0 0,-2 z"
+     id="path21-0-1-9"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="518"
+     id="text23-6-72-2"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="180.57739">
+    <tspan
+       x="200.57739"
+       y="544"
+       id="tspan25-2-7-2">re</tspan>
+  </text>
+  <path
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-6-6-2-8"
+     d="m 151.00002,559.92332 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4.00002,0 0,-16 4.00002,0 0,6 12,0 0,-2 z" />
+  <text
+     y="560.00006"
+     x="186.57739"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-9-1-2-9">
+    <tspan
+       id="tspan25-8-8-6-7"
+       y="586"
+       x="206.57739">4</tspan>
+  </text>
+  <path
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3035-5-1-3"
+     d="m 1,367.00003 0,-8 c 0,-4.41828 3.58173,-8 8.00001,-8 l 8,0 0,4 20,0 0,-4 18,0 109.99999,0 8.00002,0 c 4.41827,0 9.07158,3.71364 8,8 l 0,8 -8,0 0,-6 -8.00002,0 0,20 8.00002,0 0,-6 8,0 0,8 c 0,4.41828 -3.58173,8 -8,8 l -8.00002,0 -109.99999,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.47715 -10,10 l 0,8 0,218.00001 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.07161 -8,8.00001 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 C 4.58173,685.00004 1,681.41831 1,677.00003 l 0,-8 z" />
+  <text
+     x="-1.999963"
+     y="348"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text3037-3-0-6">
+    <tspan
+       id="tspan3039-5-61-1"
+       y="378.5"
+       x="6.0000372">valor de la nota</tspan>
+  </text>
+  <path
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path21-6-1-7-5-2"
+     d="m 297.00002,393.00003 120.00002,0 0,40 -120.00002,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+  <text
+     y="392"
+     x="327.99994"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     id="text23-9-82-9-94-9">
+    <tspan
+       id="tspan25-8-5-2-9-3"
+       y="418.00003"
+       x="348">4</tspan>
+  </text>
+  <path
+     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3798-4-4-5-09-1"
+     d="m 183.00002,367.00003 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 20,0 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -60,0 -20,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4.00002,0 0,-16 4.00002,0 0,6 12,0 z" />
+  <text
+     x="158.00006"
+     style="font-size:28px;font-family:sans-serif;text-anchor:end;fill:#000000"
+     id="text3800-3-2-0-17-9"
+     y="350">
+    <tspan
+       id="tspan3802-6-2-5-7-4"
+       y="399"
+       x="268">/</tspan>
+  </text>
+  <g
+     id="g5147-1-7"
+     transform="translate(50,308.00002)">
+    <path
+       d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+       id="path21-8-2-1-0-6-1-8"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+    <text
+       x="279"
+       y="44"
+       id="text23-0-1-0-1-0-5-4"
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+      <tspan
+         x="299"
+         y="70.000031"
+         id="tspan25-7-0-5-2-5-9-5">1</tspan>
+    </text>
+  </g>
+  <path
+     d="m 19.00001,409.00003 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 59.99999,0 8.00002,0 c 4.41827,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71365,6.92841 -8,8 l -8.00002,0 -59.99999,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
+     id="path3124-7-0"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="100.82307"
+     y="419.92313"
+     id="text6137-7-3"><tspan
+       id="tspan6139-6-6"
+       x="100.82307"
+       y="419.92313"
+       style="font-size:22.5px">↓</tspan></text>
+</svg>
