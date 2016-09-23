@@ -252,7 +252,7 @@ the additional pitches to a note. In the figure, we add `Sol` to `Do` and
 
 The *Articulation* block changes the volume of a group of notes.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9a.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg'</img>
 
 The *Augmented* block calculates an absolute interval, e.g., an
 augmented fifth, and adds the additional pitches to a note. Similarly,
@@ -264,6 +264,17 @@ In the augmented fifth example above, a chord of D5 and A5 are played,
 followed by a chord of E5 and C5. In the minor third example, which
 includes a shift of one octave, first a chord of D5 and F5 is played,
 followed by chord of E5 and G6.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg'</img>
+
+The *Invert* block will invert a series of notes around a target
+note. There are two different versions of the *Invert* block: *odd*
+and *even*, the latter shifts the point of rotation up by a `1/4`
+step, enabling rotation around a point between two notes.
+
+In the *invert (even)* example, `D4` is inverted around `G4`,
+resulting in a `C5`. In the *invert (odd)* example, `D4` is inverted
+around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
 
