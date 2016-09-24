@@ -51,7 +51,7 @@ Nota*. El bloque de *Valores de Nota* es un contenedor para un campo
 que especifica la duración (valor de nota) del terreno de juego. (El
 bloque de *Tono* se detalla a continuación.)
 
-<img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/note1.svg '</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/note1.svg'</img>
 
 En la parte superior del ejemplo anterior, un único *Valores de
 Nota* es mostrado. El `1 / 8` es el valor de la nota, en este caso,
@@ -59,13 +59,13 @@ una corchea. los terreno de juego, a que el bloque de *Tono*, contiene
 un lanzamiento, `La` en `4'Octave. En la parte inferior, dos notas que
 se tocan son consecutivamente mostrado.
 
-<img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/note2.svg '</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/note2.svg'</img>
 
 En este ejemplo, se muestran diferentes valores de las notas. De
 arriba a abajo, `1 / 4'para un cuarto de nota,` 1 / 16` de una
 semicorchea, y `1/2` por una media Nota.
 
-<Img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/note3.svg '</ img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/note3.svg'</img>
 
 Como hemos visto, bloques de *Tono* se utilizan dentro del bloques de
 *Valor de la Nota*. El bloque *Tono* especifica un nombre de brea y
@@ -78,7 +78,7 @@ parte superior, el terreno de juego nombre del bloque se especifica el
 uso de un bloque de *Solfeo* ( `` Sol` en Octava 6`); el nombre de tono
 se especifica el uso de un bloque *Tono-nombre* ( `B en flat`
 `Octava 4'); el terreno de juego se especifica utilizando el bloque de
-Hertz * * y una bloque de *Número* ( `440` Hertz).
+*Hertz* y una bloque de *Número* ( `440` Hertz).
 
 La octava se especifica mediante un bloque de número y se limita a
 todos los números. En el caso en que el nombre de pitch se especifica
@@ -90,12 +90,12 @@ uso de un bloque de *Texto*.
 También tenga en cuenta que cualquier operación matemática se puede
 utilizar como entrada para el *Valor de Nota*.
 
-<Img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/note4.svg '</ img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/note4.svg'</img>
 
 Un acorde (múltiples, campos simultáneos) puede ser especificado por
 complemento *Tono* múltiples bloques a un *valor de Nota* contenedor.
 
-<Img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/silence.svg '</ img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/silence.svg'</img>
 
 Un resto de valor de la nota duración se puede construir usando un *
 bloque de silencio *.  Google Translate for Business:Translator
