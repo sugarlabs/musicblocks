@@ -42,7 +42,6 @@ I. NOTES
 --------
 </a>
 
-
 Music Blocks exposed the common elements of music: pitch, rhythm, and
 sonic quality, e.g., loudness and softness, and to some degree, timbre
 and texture.
@@ -117,12 +116,22 @@ II. PROGRAMMING WITH MUSIC
 --------------------------
 </a>
 
+This section of the guide is divided into the following subsections:<br>
+1. [A chunk of notes](#chunks)<br>
+2. [Musical transformations](#transformations)<br>
+3. [Programming multiple voices](#voices)<br>
+4. [Adding graphics synchronized to music](#graphics)<br>
+5. [Adding interaction](#interaction)
+
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
-hand or use the *Pitch-time Matrix* widget described in Section III.
+hand or use the *Pitch-time Matrix* widget described in [Section
+III](#pitch-time) to help you get started.
 
+<a name="chunks">
 1. A chunk of notes
 --------------------
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
 
@@ -164,8 +173,10 @@ chunk1 twice, and then chunk again.
 A few more chunks and we can make a song. (Can you read the block
 notation in order to guess what song we've programmed?)
 
+<a name="transformations">
 2. Transformations
 ------------------
+</a>
 
 There are many ways to transform pitch, rhythm, and other qualities of
 the sound.
@@ -314,8 +325,10 @@ In the above example, the sequence of drum beats is increased over time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
 
+<a name="voices">
 3. Voices
 ---------
+</a>
 
 Each *Start* block runs as a separate voice in Music Blocks. (When
 you click on the Run button, all of the *Start* blocks are run
@@ -347,8 +360,10 @@ drum will be played as `C2` with the default drum sample. In the
 example above, all of the notes in `chunk` will be played with a kick
 drum.
 
+<a name="graphics">
 4. Adding graphics
 ------------------
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'</img>
 
@@ -377,8 +392,10 @@ the master clock.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
 
+<a name="interaction">
 5. Interaction
 --------------
+</a>
 
 There are many ways to interactive with Music Blocks, including
 tracking the mouse position to impact some aspect of the music.
@@ -413,8 +430,20 @@ III. WIDGETS
 ------------
 </a>
 
+This section of the guide is divided into the following subjections:<br>
+1. [Monitoring status](#status)<br>
+2. [Generating chunks of notes](#pitch-time)<br>
+3. [Generating rhythms](#rhythms)<br>
+4. [Setting the musical mode](#modes)<br>
+5. [Mapping pitches to drums](#pitch-drum)<br>
+6. [Exploring musical proportions](#staircase)<br>
+7. [Generating arbitrary pitches](#slider)<br>
+8. [Changing tempo](#tempo)
+
+<a name="status">
 1. Status
 ---------
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg'</img>
 
@@ -430,8 +459,10 @@ display additional music factors, e.g., duplicate, transposition,
 skip, staccato, slur, and graphics factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
 
+<a name="pitch-time">
 2. The Pitch-Time Matrix
 ------------------------
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg'</img>
 
@@ -575,8 +606,10 @@ Using individual notes in the matrix
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with corresponding values.
 
+<a name="rhythms">
 3. Generating Rhythms
 ---------------------
+</a>
 
 The *Rhythm Ruler* block is used to launch a widget similar to the
 *Pitch-time Matrix* block, which can be used to generate rhythmic
@@ -630,8 +663,10 @@ with the *Pitch-time Matrix* block.
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
 
+<a name="modes">
 4. Musical Modes
 ----------------
+</a>
 
 Musical modes are used to specify the relationship between intervals
 (or steps) in a scale. Since Western music is based on 12 half-steps
@@ -716,8 +751,10 @@ Note: The build-in modes in Music Blocks can be found in (musicutils.js)[https:/
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Pitch-time Matrix* block.
 
+<a name="pitch-drum">
 5. The Pitch-Drum Matrix
 ------------------------
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
 
@@ -738,8 +775,10 @@ As an expedience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
 
+<a name="stairs">
 6. Generating Pitches using Musical Proportions
 -----------------------------------------------
+</a>
 
 The *Pitch Staircase* block is used to launch a widget similar to the
 *Pitch-time Matrix*, which can be used to generate different pitches
@@ -782,33 +821,10 @@ the rows in the matrix.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg'</img>
 
-7. Understanding Tempo
-----------------------
-
-The *Tempo* block is used to launch a widget that enables us to
-visualize Tempo, defined as beats per minute (BPM). When *Tempo* block
-is clicked, the *Tempo* widget is initialized.
-
-The *Master Beats per Minute* block contained in the clamp of the
-*Tempo* block sets the initial tempo used by the widget. This
-determines the speed at which the ball in the widget moves back and
-forth. If BPM is 60, then it will take one second for the ball to move
-across the widget. A round-trip would take two seconds.
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg'</img>
-
-The top row of the widget holds the *Play/pause* button, the *Speed
-up* and *Slow down* buttons, and an input field for updating the
-Tempo.
-
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg'</img>
-
-You can also update the tempo by clicking twice in succession in the
-widget: the new BPM is determined from the time between clicks. For
-example, if there 1/2 second between clicks, the new BPM is 120.
-
-8. Creating Pitches with continuously varying frequencies
+<a name="slider">
+7. Creating Pitches with continuously varying frequencies
 ---------------------------------------------------------
+</a>
 
 The *Pitch Slider* block is used to launch a widget that is used to
 generate arbitray pitches. It differs from *Pitch Staircase* widget in
@@ -841,6 +857,33 @@ CLicking in a column will extact corresponding *Note* blocks, for example:
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider4.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider5.svg'</img>
+
+<a name="tempo">
+8. Understanding Tempo
+----------------------
+</a>
+
+The *Tempo* block is used to launch a widget that enables us to
+visualize Tempo, defined as beats per minute (BPM). When *Tempo* block
+is clicked, the *Tempo* widget is initialized.
+
+The *Master Beats per Minute* block contained in the clamp of the
+*Tempo* block sets the initial tempo used by the widget. This
+determines the speed at which the ball in the widget moves back and
+forth. If BPM is 60, then it will take one second for the ball to move
+across the widget. A round-trip would take two seconds.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg'</img>
+
+The top row of the widget holds the *Play/pause* button, the *Speed
+up* and *Slow down* buttons, and an input field for updating the
+Tempo.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg'</img>
+
+You can also update the tempo by clicking twice in succession in the
+widget: the new BPM is determined from the time between clicks. For
+example, if there 1/2 second between clicks, the new BPM is 120.
 
 <a name="BEYOND-MUSIC-BLOCKS">
 IV. BEYOND-MUSIC-BLOCKS
