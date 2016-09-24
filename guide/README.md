@@ -28,16 +28,17 @@ JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 ABOUT THIS GUIDE
 ----------------
 
-This guide is broken into four sections: (i) an overview of the *Note*
-structure; (ii) a programming guide; (iii) widgets that provide some
-scaffolding to the programmer; and (iv) a section on exporting your
-work into other music systems.
+This guide is broken into four sections: (i) an overview of the
+[*Notes*](#NOTES) structure; (ii) a [programming
+guide](#PROGRAMMING-WITH-MUSIC); (iii) [widgets](#WIDGETS) that provide
+some scaffolding to the programmer; and (iv) a section on [exporting
+your work](#BEYOND MUSIC BLOCKS) into other music systems.
 
 Many of the examples given in the guide have links to code you can
 run. Look for RUN LIVE links.
 
-I. NOTES
---------
+(#NOTES)
+-----------
 
 Music Blocks exposed the common elements of music: pitch, rhythm, and
 sonic quality, e.g., loudness and softness, and to some degree, timbre
@@ -108,8 +109,8 @@ Just as in the chord example above, you can use multiple *Drum* blocks
 within a single *Note value* block and combine them with *Pitch*
 blocks.
 
-II. PROGRAMMING WITH MUSIC
---------------------------
+(#PROGRAMMING-WITH-MUSIC)
+-------------------------
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
@@ -402,8 +403,8 @@ above, the *One-of* block is used to randomly assign either `Do` or
 above, the *One-of* block is used to randomly select between `chunk1`
 and `chunk2`.
 
-III. WIDGETS
-------------
+(#WIDGETS)
+----------
 
 1. Status
 ---------
@@ -834,8 +835,8 @@ CLicking in a column will extact corresponding *Note* blocks, for example:
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider5.svg'</img>
 
-IV. BEYOND MUSIC BLOCKS
------------------------
+(#BEYOND-MUSIC-BLOCKS)
+----------------------
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools. One such tool is
