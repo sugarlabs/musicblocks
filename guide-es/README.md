@@ -1,96 +1,106 @@
-Guide to Programming with Music Blocks
-======================================
+Guía de Programación con Bloques de Música
+==========================================
 
-Music Blocks is a programming environment for children interested in
-music and graphics. It expands upon Turtle Blocks in that it has a
-collection of features relating to pitch and rhythm.
+Bloques de Música es un entorno de programación para lqs niños
+interesados en música y gráficos. Se amplía la Tortugaarte en que
+tiene una colección de funciones relacionadas con el tono y el ritmo.
 
-The Turtle Blocks guide is a good place to start learning about the
-basics. In this guide, we illustrate the music features walking the
-reader through numerous examples.
+La guía de la Tortugaarte es un buen lugar para comenzar a aprender
+acerca de la lo esencial. En esta guía, se ilustran las
+características de la música que recorren la lector a través de
+numerosos ejemplos.
 
-Getting Started
----------------
+Empezando
+---------
 
-Music Blocks is designed to run in a browser. Most of the development
-has been done in Chrome, but it should also work in Firefox (although
-you may need to disable hardware acceleration). You can run it from
-[github io](http://walterbender.github.io/musicblocks) or by
-downloading a copy of the code and running directly from the file
-system of your computer.
+Bloques de música está diseñado para ejecutarse en un navegador. La
+mayor parte del desarrollo se ha hecho en cromo, pero también debería
+funcionar en Fireqfox (aunque puede que tenga que desactivar la
+aceleración de hardware). Se puede ejecutar desde [github io]
+(http://walterbender.github.io/musicblocks) o por la descarga de una
+copia del código y se ejecuta directamente desde el archivo sistema de
+su computadora.
 
-For more details on how to use Music Blocks, see [Using Music
-Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation)
-and for more details on how to use Turtle Blocks, see [Using Turtle
-Blocks
-JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
+Para más detalles sobre el uso de Bloques de Música, ver [Uso de
+Música Bloques]
+(http://github.com/walterbender/musicblocks/tree/master/documentation)
+y para más detalles sobre cómo utilizar los bloques de la tortuga, ver
+[Uso de la tortuga bloques
 
-ABOUT THIS GUIDE
-----------------
+ACERCA DE ESTA GUÍA
+-------------------
 
-This guide is broken into four sections: (i) an overview of the *Note*
-structure; (ii) a programming guide; (iii) widgets that provide some
-scaffolding to the programmer; and (iv) a section on exporting your
-work into other music systems.
+Esta guía se divide en cuatro secciones: (i) una descripción general
+de la *Nota* estructura; (ii) una guía de programación; (iii) los
+widgets que proporcionan alguna andamio para el programador; y (iv)
+una sección sobre la exportación de tu trabajar en otros sistemas de
+música.
 
-Many of the examples given in the guide have links to code you can
-run. Look for EJECUTAR EN VIVO links.
+Muchos de los ejemplos dados en la guía tienen enlaces a código que puede
+correr. Busque vínculos EJECUTAR EN VIVO.
 
-I. NOTES
+I. NOTAS
 --------
 
-Music Blocks exposed the common elements of music: pitch, rhythm, and
-sonic quality, e.g., loudness and softness, and to some degree, timbre
-and texture.
+Bloques musicales expuestos los elementos comunes de la música: el
+tono, el ritmo y la calidad de sonido, por ejemplo, el volumen y la
+suavidad, y en cierto grado, timbre y la textura.
 
-At the heart of Music Blocks is the *Note value* block. The *Note
-value* block is a container for a pitch that specifies the duration
-(note value) of the pitch. (The *Pitch* block is detailed below.)
+En el corazón de los bloques de música es el bloque de *Valores de
+Nota*. El bloque de *Valores de Nota* es un contenedor para un campo
+que especifica la duración (valor de nota) del terreno de juego. (El
+bloque de *Tono* se detalla a continuación.)
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/note1.svg'</img>
+<img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/note1.svg '</img>
 
-At the top of the example above, a single *Note value* block is
-shown. The `1/8` is the note value, in this case, an eighth note. The
-pitch, specified by the *Pitch* block, contains a pitch, `La` at
-`Octave 4`. At the bottom, two notes that are played consecutively are
-shown.
+En la parte superior del ejemplo anterior, un único *Valores de
+Nota* es mostrado. El `1 / 8` es el valor de la nota, en este caso,
+una corchea. los terreno de juego, a que el bloque de *Tono*, contiene
+un lanzamiento, `La` en `4'Octave. En la parte inferior, dos notas que
+se tocan son consecutivamente mostrado.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/note2.svg'</img>
+<img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/note2.svg '</img>
 
-In this example, different note values are shown. From top to bottom,
-`1/4` for an quarter note, `1/16` for a sixteenth note, and `1/2` for a half
-note.
+En este ejemplo, se muestran diferentes valores de las notas. De
+arriba a abajo, `1 / 4'para un cuarto de nota,` 1 / 16` de una
+semicorchea, y `1/2` por una media Nota.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/note3.svg'</img>
+<Img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/note3.svg '</ img>
 
-As we have seen, *Pitch* blocks are used inside the *Note value*
-blocks. The *Pitch* block specifies a pitch name and pitch octave that
-in combination determine the frequency at which a note is played.
+Como hemos visto, bloques de *Tono* se utilizan dentro del bloques de
+*Valor de la Nota*. El bloque *Tono* especifica un nombre de brea y
+octava que en combinación determinar la frecuencia con la que se toca
+una nota.
 
-You can plug different values into the *Pitch* block name and octave
-slots. Some examples are shown above. Starting from the top, the pitch
-name block is specified using a *Solfege* block (`Sol` in `Octave 6`);
-the pitch name is specified using a *Pitch-name* block (`B flat` in
-`Octave 4`); the pitch is specified using the *Hertz* block and a
-*Number* block (`440` Hertz).
+Puede conectar diferentes valores en el *Tono* nombre del bloque y
+la octava ranuras. Algunos ejemplos se muestran arriba. A partir de la
+parte superior, el terreno de juego nombre del bloque se especifica el
+uso de un bloque de *Solfeo* ( `` Sol` en Octava 6`); el nombre de tono
+se especifica el uso de un bloque *Tono-nombre* ( `B en flat`
+`Octava 4'); el terreno de juego se especifica utilizando el bloque de
+Hertz * * y una bloque de *Número* ( `440` Hertz).
 
-The octave is specified using a number block and is restricted to
-whole numbers. In the case where the pitch name is specified by
-frequency, the octave is ignored.
+La octava se especifica mediante un bloque de número y se limita a
+todos los números. En el caso en que el nombre de pitch se especifica
+por la frecuencia, la octava se ignora.
 
-Note that the pitch name can also be specified using a *Text* block.
+Tenga en cuenta que el nombre de tono también se puede especificar el
+uso de un bloque de *Texto*.
 
-Also note that any mathematical operation can be used as input to the
-*Note value*.
+También tenga en cuenta que cualquier operación matemática se puede
+utilizar como entrada para el *Valor de Nota*.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/note4.svg'</img>
+<Img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/note4.svg '</ img>
 
-A chord (multiple, simultaneous pitches) can be specified by add
-multiple *Pitch* blocks to a *Note value* container.
+Un acorde (múltiples, campos simultáneos) puede ser especificado por
+complemento *Tono* múltiples bloques a un *valor de Nota* contenedor.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/silence.svg'</img>
+<Img src = "https: //rawgithub.com/walterbender/musicblocks/master/guide-es/silence.svg '</ img>
 
-A rest of duration note value can be constructed using a *Silence* block.
+Un resto de valor de la nota duración se puede construir usando un *
+bloque de silencio *.  Google Translate for Business:Translator
+ToolkitWebsite TranslatorGlobal Market Finder
+
 
 Using drums
 -----------
@@ -405,7 +415,24 @@ and `chunk2`.
 III. WIDGETS
 ------------
 
-1. The Pitch-Time Matrix
+1. Status
+---------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg'</img>
+
+The *Status widget* is a tool for inspecting the status of Music
+Blocks as it is running. By default, the key, BPM, and volume are
+displayed. Also, each note is displayed as it is played. There is one
+row per voice in the status table.
+
+Additional *Print* blocks can be added to the *Status* widget to
+display additional music factors, e.g., duplicate, transposition,
+skip, staccato, slur, and graphics factors, e.g., x, y, heading,
+color, shade, grey, and pensize.
+
+2. The Pitch-Time Matrix
 ------------------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/matrix1.svg'</img>
@@ -550,7 +577,7 @@ Using individual notes in the matrix
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with corresponding values.
 
-2. Generating Rhythms
+3. Generating Rhythms
 ---------------------
 
 The *Rhythm Ruler* block is used to launch a widget similar to the
@@ -605,7 +632,7 @@ with the *Pitch-time Matrix* block.
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
 
-3. Musical Modes
+4. Musical Modes
 ----------------
 
 Musical modes are used to specify the relationship between intervals
@@ -691,7 +718,7 @@ Note: The build-in modes in Music Blocks can be found in (musicutils.js)[https:/
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Pitch-time Matrix* block.
 
-4. The Pitch-Drum Matrix
+5. The Pitch-Drum Matrix
 ------------------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/drum2.svg'</img>
@@ -713,7 +740,7 @@ As an expedience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
 
-5. Generating Pitches using Musical Proportions
+6. Generating Pitches using Musical Proportions
 -----------------------------------------------
 
 The *Pitch Staircase* block is used to launch a widget similar to the
@@ -757,7 +784,7 @@ the rows in the matrix.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/pitchstaircase5.svg'</img>
 
-6. Understanding Tempo
+7. Understanding Tempo
 ----------------------
 
 The *Tempo* block is used to launch a widget that enables us to
@@ -782,7 +809,7 @@ You can also update the tempo by clicking twice in succession in the
 widget: the new BPM is determined from the time between clicks. For
 example, if there 1/2 second between clicks, the new BPM is 120.
 
-7. Creating Pitches with continuously varying frequencies
+8. Creating Pitches with continuously varying frequencies
 ---------------------------------------------------------
 
 The *Pitch Slider* block is used to launch a widget that is used to
