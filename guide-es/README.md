@@ -75,9 +75,9 @@ una nota.
 Puede conectar diferentes valores en el *Tono* nombre del bloque y
 la octava ranuras. Algunos ejemplos se muestran arriba. A partir de la
 parte superior, el terreno de juego nombre del bloque se especifica el
-uso de un bloque de *Solfeo* ( `` Sol` en Octava 6`); el nombre de tono
+uso de un bloque de *Solfeo* ( `Sol` en `Octava 6`); el nombre de tono
 se especifica el uso de un bloque *Tono-nombre* ( `B en flat`
-`Octava 4'); el terreno de juego se especifica utilizando el bloque de
+`Octava 4`); el terreno de juego se especifica utilizando el bloque de
 *Hertz* y una bloque de *Número* ( `440` Hertz).
 
 La octava se especifica mediante un bloque de número y se limita a
@@ -97,9 +97,8 @@ complemento *Tono* múltiples bloques a un *valor de Nota* contenedor.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/silence.svg'</img>
 
-Un resto de valor de la nota duración se puede construir usando un *
-bloque de silencio *.  Google Translate for Business:Translator
-ToolkitWebsite TranslatorGlobal Market Finder
+Un resto de valor de la nota duración se puede construir usando un
+bloque de *Silencio*.
 
 
 Using drums
