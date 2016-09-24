@@ -405,7 +405,24 @@ and `chunk2`.
 III. WIDGETS
 ------------
 
-1. The Pitch-Time Matrix
+1. Status
+---------
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg'</img>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg'</img>
+
+The *Status widget* is a tool for inspecting the status of Music
+Blocks as it is running. By default, the key, BPM, and volume are
+displayed. Also, each note is displayed as it is played. There is one
+row per voice in the status table.
+
+Additional *Print* blocks can be added to the *Status* widget to
+display additional music factors, e.g., duplicate, transposition,
+skip, staccato, slur, and graphics factors, e.g., x, y, heading,
+color, shade, grey, and pensize.
+
+2. The Pitch-Time Matrix
 ------------------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg'</img>
@@ -550,7 +567,7 @@ Using individual notes in the matrix
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with corresponding values.
 
-2. Generating Rhythms
+3. Generating Rhythms
 ---------------------
 
 The *Rhythm Ruler* block is used to launch a widget similar to the
@@ -605,7 +622,7 @@ with the *Pitch-time Matrix* block.
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
 
-3. Musical Modes
+4. Musical Modes
 ----------------
 
 Musical modes are used to specify the relationship between intervals
@@ -691,7 +708,7 @@ Note: The build-in modes in Music Blocks can be found in (musicutils.js)[https:/
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Pitch-time Matrix* block.
 
-4. The Pitch-Drum Matrix
+5. The Pitch-Drum Matrix
 ------------------------
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
@@ -713,7 +730,7 @@ As an expedience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
 
-5. Generating Pitches using Musical Proportions
+6. Generating Pitches using Musical Proportions
 -----------------------------------------------
 
 The *Pitch Staircase* block is used to launch a widget similar to the
@@ -757,7 +774,7 @@ the rows in the matrix.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg'</img>
 
-6. Understanding Tempo
+7. Understanding Tempo
 ----------------------
 
 The *Tempo* block is used to launch a widget that enables us to
@@ -782,7 +799,7 @@ You can also update the tempo by clicking twice in succession in the
 widget: the new BPM is determined from the time between clicks. For
 example, if there 1/2 second between clicks, the new BPM is 120.
 
-7. Creating Pitches with continuously varying frequencies
+8. Creating Pitches with continuously varying frequencies
 ---------------------------------------------------------
 
 The *Pitch Slider* block is used to launch a widget that is used to
