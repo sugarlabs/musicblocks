@@ -239,8 +239,8 @@ adding some duration (specified by swing value) to the first note and
 taking the same amount from the second note. Notes that do not match
 note value are unchanged.
 
-In the example, `re5` would be played as a `1/6` note and `me5` would
-be played as a `1/12` note (`1/8 + 1/24 === 1/6' and `1/8 - 1/24 ===
+In the example, `re5` would be played as a `1/6` note and `mi5` would
+be played as a `1/12` note (`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===
 1/12`). Observe that the total duration of the pair of notes is
 unchanged.
 
