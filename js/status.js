@@ -211,17 +211,21 @@ function StatusMatrix() {
                 }
             }
 
-            if (this._logo.lastNotePlayed[i] != null) {
-                var note = this._logo.lastNotePlayed[i][0];
-                var value = this._logo.lastNotePlayed[i][1];
-            } else {
-                var note = '';
-                var value = '';
+            var note = '';
+            var value = '';
+            if (this._logo.noteStatus[i] != null) {
+                var notes = this._logo.noteStatus[i][0];
+                for (var n = 0; n < notes.length; n++) {
+                    note += notes[n];
+		    note += ' ';
+		}
+                var value = this._logo.noteStatus[i][1];
+                note += value;
             }
 
             var cell = table.rows[t + 1].cells[j + 1];
             if (cell != null) {
-                cell.innerHTML = note + ' ' + value;
+		cell.innerHTML = note;
             }
 
             t += 1;

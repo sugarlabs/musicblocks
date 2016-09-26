@@ -145,6 +145,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     this.noteBeatValues = {};
 
     this.lastNotePlayed = {};
+    this.noteStatus = {};
 
     // graphics listeners during note play
     this.forwardListener = {};
@@ -623,6 +624,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this.noteBeat[turtle] = [];
             this.noteCents[turtle] = [];
             this.lastNotePlayed[turtle] = null;
+            this.noteStatus[turtle] = null;
             this.noteDrums[turtle] = [];
             this.notePitches[turtle] = [];
             this.noteOctaves[turtle] = [];
@@ -4354,6 +4356,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                             }
 
                             logo.lastNotePlayed[turtle] = [notes[0], noteBeatValue];
+                            logo.noteStatus[turtle] = [notes, noteBeatValue];
                         }
                     }
 
