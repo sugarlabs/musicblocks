@@ -5404,6 +5404,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     octave += 1;
                 }
                 note = thisScale[index];
+                console.log(note);
             } else if (halfSteps.indexOf(solfege.substr(0, 3).toLowerCase()) !== -1) {
                 var index = halfSteps.indexOf(solfege.substr(0, 3).toLowerCase()) + offset;
                 if (index > 11) {
@@ -5411,10 +5412,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     octave += 1;
                 }
                 note = thisScale[index];
+                console.log(note);
             } else {
-                console.log('WARNING: Note ' + solfege + ' not found in ' + halfSteps + '. Returning C');
-                this.validNote = false;
-                return ['C', octave];
+                console.log('WARNING: Note ' + solfege + ' not found in ' + halfSteps + '. Returning REST');
+                // this.validNote = false;
+                this.errorMsg(INVALIDPITCH, null);
+                return ['R', ''];
             }
 
             if (note in EXTRATRANSPOSITIONS) {
