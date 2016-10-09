@@ -2161,6 +2161,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     if (MODENAMES[i][0] === args[1]) {
                         modename = MODENAMES[i][1];
                         logo._modeBlock = logo.blocks.blockList[blk].connections[2];
+                        console.log(modename);
                         break;
                     }
                 }
@@ -2270,6 +2271,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
+                console.log(logo.keySignature[turtle]);
                 logo.modeWidget.init(logo, logo._modeBlock);
             }
 
