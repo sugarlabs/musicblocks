@@ -1470,7 +1470,7 @@ define(function (require) {
         function _doOpenSamples() {
             localStorage.setItem('isMatrixHidden', document.getElementById('pitchtimematrix').style.visibility);
             localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
-            localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerbody').style.visibility);
+            localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerBody').style.visibility);
             localStorage.setItem('isStatusHidden', document.getElementById('statusmatrix').style.visibility);
             localStorage.setItem('isModeWidgetHidden', document.getElementById('modewidget').style.visibility);
 
@@ -1484,9 +1484,9 @@ define(function (require) {
                 document.getElementById('pitchdrummatrix').style.border = 0;
             }
 
-            if(document.getElementById('rulerbody').style.visibility !== 'hidden') {
-                document.getElementById('rulerbody').style.visibility = 'hidden';
-                document.getElementById('rulerbody').style.border = 0;
+            if(document.getElementById('rulerBody').style.visibility !== 'hidden') {
+                document.getElementById('rulerBody').style.visibility = 'hidden';
+                document.getElementById('rulerBody').style.border = 0;
             }              
 
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
