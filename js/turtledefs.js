@@ -56,7 +56,7 @@ function createDefaultStack() {
          [15, ['solfege', {value:'re'}], 0, 0, [14]],
          [16, ['number', {value:'4'}], 0, 0, [14]],
 
-         [17, "rhythm", 0, 0, [16, 18, 19, 20]],
+         [17, "rhythm", 0, 0, [14, 18, 19, 20]],
          [18, ["number", {"value":6}], 0, 0, [17]],
          [19, ["number", {"value":4}], 0, 0, [17]],
 
