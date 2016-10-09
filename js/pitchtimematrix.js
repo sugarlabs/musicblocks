@@ -1137,8 +1137,8 @@ function Matrix() {
                 }
                 delta -= 2;
                 var thisBlock = idx + delta;
-                previousBlock += delta;
                 newStack.push([thisBlock + 1, 'rest2', 0, 0, [previousBlock, lastConnection]]);
+                previousBlock += delta;
             } else {
                 // Add the pitch and/or playdrum blocks to the Note block
                 var thisBlock = idx + delta;
