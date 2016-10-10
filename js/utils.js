@@ -651,11 +651,12 @@ function hideDOMLabel() {
 
 
 function displayMsg(blocks, text) {
-    return;
-
+    /*
     var msgContainer = blocks.msgText.parent;
     msgContainer.visible = true;
     blocks.msgText.text = text;
     msgContainer.updateCache();
     blocks.stage.setChildIndex(msgContainer, blocks.stage.getNumChildren() - 1);
+    */
+    return;
 };
