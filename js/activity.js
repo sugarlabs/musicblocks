@@ -67,6 +67,7 @@ define(function (require) {
 
     require('activity/utils');
     require('activity/artwork');
+    require('activity/musicutils');
     require('activity/munsell');
     require('activity/trash');
     require('activity/boundary');
@@ -88,7 +89,6 @@ define(function (require) {
     require('activity/basicblocks');
     require('activity/analytics');
     require('activity/soundsamples');
-    require('activity/musicutils');
     require('activity/pitchtimematrix');
     require('activity/pitchdrummatrix');
     require('activity/rhythmruler');
