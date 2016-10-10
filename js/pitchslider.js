@@ -316,7 +316,7 @@ function PitchSlider () {
                 this.blur();
             };
 
-            cell.onmousemove = function() {
+            cell.onmousemove = function(event) {
                 var cellDiv = this.childNodes[0];
                 var moveValue = parseFloat(Math.floor(SLIDERWIDTH * that._cellScale)) / 3;
                 var divMoved = jQuery(sliderDiv).position().top - that._initialTop;
