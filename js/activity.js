@@ -331,9 +331,11 @@ define(function (require) {
                 table.remove();
             }
 
+            /*
             var canvas = document.getElementById("music");
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
+            */
         };
 
         function _doFastButton(env) {
