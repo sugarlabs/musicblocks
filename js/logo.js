@@ -2480,27 +2480,27 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
 
             if (turtle in logo.perfect && logo.perfect[turtle].length > 0) {
-                var noteObj2 = logo.getNote(note, octave, calcPerfect(last(logo.perfect[turtle])), logo.keySignature[turtle]);
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcPerfect(last(logo.perfect[turtle])), logo.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             if (turtle in logo.diminished && logo.diminished[turtle].length > 0) {
-                var noteObj2 = logo.getNote(note, octave, calcDiminished(last(logo.diminished[turtle])), logo.keySignature[turtle]);
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcDiminished(last(logo.diminished[turtle])), logo.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             if (turtle in logo.augmented && logo.augmented[turtle].length > 0) {
-                var noteObj2 = logo.getNote(note, octave, calcAugmented(last(logo.augmented[turtle])), logo.keySignature[turtle]);
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcAugmented(last(logo.augmented[turtle])), logo.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             if (turtle in logo.major && logo.major[turtle].length > 0) {
-                var noteObj2 = logo.getNote(note, octave, calcMajor(last(logo.major[turtle])), logo.keySignature[turtle]);
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcMajor(last(logo.major[turtle])), logo.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
             if (turtle in logo.minor && logo.minor[turtle].length > 0) {
-                var noteObj2 = logo.getNote(note, octave, calcMinor(last(logo.minor[turtle])), logo.keySignature[turtle]);
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcMinor(last(logo.minor[turtle])), logo.keySignature[turtle]);
                 addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
