@@ -1658,7 +1658,12 @@ function Block(protoblock, blocks, overrideName) {
 
             var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
             for (var i = 0; i < MODENAMES.length; i++) {
-                if (selectednote === MODENAMES[i][0]) {
+                if (MODENAMES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + MODENAMES[i][1] + '">' + MODENAMES[i][1] + '</option>';
+                } else if (selectednote === MODENAMES[i][0]) {
+                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
+                } else if (selectednote === MODENAMES[i][1]) {
                     labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
                 } else {
                     labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
