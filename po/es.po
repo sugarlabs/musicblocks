@@ -9,6 +9,9 @@
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
+msgid "ti la sol fa mi re do"
+msgstr "si la sol fa mi re do"
+
 #: js/activity.js:443
 #: js/activity.js:443
 #: js/activity.js:444
