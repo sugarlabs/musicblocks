@@ -192,7 +192,7 @@ const MAQAMTABLE = {
     'AJAM MAQAM': 'Bb MAQAM',
 };
 
-const MODENAMES = [
+var MODENAMES = [
     //.TRANS: twelve semi-tone scale for music
     [_('Chromatic'), 'CHROMATIC'],
     [_('Algerian'), 'ALGERIAN'],
@@ -254,7 +254,9 @@ const MODENAMES = [
     [_('Custom'), 'CUSTOM'],
 ];
 
-const VOICENAMES = [
+// console.log(MODENAMES);
+
+var VOICENAMES = [
     //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg'],
     //.TRANS: musical instrument
@@ -273,7 +275,9 @@ const VOICENAMES = [
     [_('triangle'), 'triangle', 'images/synth.svg'],
 ];
 
-const DRUMNAMES = [
+// console.log(VOICENAMES);
+
+var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('snare drum'), 'snaredrum', 'images/drum.svg'],
     //.TRANS: musical instrument
@@ -322,6 +326,8 @@ const DRUMNAMES = [
     [_('duck'), 'duck', 'images/duck.svg'],
 ];
 
+// console.log(DRUMNAMES);
+
 const DEFAULTVOICE = 'sine';
 const DEFAULTDRUM = 'kick';
 const DEFAULTMODE = 'Major';
@@ -341,10 +347,12 @@ function getModeName(name) {
                 return MODENAMES[mode][0];
             } else {
                 console.log('i18n is misbehaving?');
+                console.log(name + ' ' + name.toUpperCase() + ' ' + MODENAMES[mode][0] + ' ' + MODENAMES[mode][1]);
                 return MODENAMES[mode][1];
             }
         }
     }
+
     console.log(name + ' not found in MODENAMES');
     return name;
 };
@@ -359,17 +367,19 @@ function getDrumName(name) {
         return null;
     }
 
-    for (var i = 0; i < DRUMNAMES.length; i++) {
-        // if (DRUMNAMES[i].indexOf(name) !== -1) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name.toLowerCase()) {
-            if (DRUMNAMES[i][0] != '') {
-                return DRUMNAMES[i][0];
+    for (var drum = 0; drum < DRUMNAMES.length; drum++) {
+        if (DRUMNAMES[drum][0] === name || DRUMNAMES[drum][1] === name.toLowerCase()) {
+            if (DRUMNAMES[drum][0] != '') {
+                return DRUMNAMES[drum][0];
             } else {
                 console.log('i18n is misbehaving?');
-                return DRUMNAMES[i][1];
+                console.log(name + ' ' + name.toUpperCase() + ' ' + DRUMNAMES[drum][0] + ' ' + DRUMNAMES[drum][1]);
+                return DRUMNAMES[drum][1];
             }
         }
     }
+
+    console.log(name + ' not found in DRUMAMES');
     return null;
 };
 

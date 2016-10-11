@@ -65,11 +65,12 @@ define(function (require) {
     require('jquery.ruler');
     require('modernizr-2.6.2.min');
 
+    require('activity/utils');
+
     // Constants used by both Turtle and Music Blocks
     require('activity/artwork');
     require('activity/musicutils');
 
-    require('activity/utils');
     require('activity/munsell');
     require('activity/trash');
     require('activity/boundary');

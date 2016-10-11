@@ -11,6 +11,9 @@ msgstr ""
 "Language: en\n"
 "X-Generator: js2pot.py script\n"
 
+msgid "ti la sol fa mi re do"
+msgstr ""
+
 #: js/activity.js:453
 msgid "Close"
 msgstr ""
