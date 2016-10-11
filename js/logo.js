@@ -5360,6 +5360,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 octave = parseInt(solfege.slice(solfege.indexOf('>') + 1, solfege.indexOf('/') - 1));
                 solfege = solfege.substr(0, solfege.indexOf('<'));
             }
+
             if(['#', '♯', '♭', 'b'].indexOf(solfege.substr(-1)) !== -1) {
                 sharpFlat = true;
             }
@@ -5394,17 +5395,22 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 }
             }
 
+            // Reverse any i18n
+	    // solfnotes_ is used in the interface for i18n
+	    //.TRANS: the note names must be separated by single spaces 
+	    var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+            if (solfnotes_.indexOf(solfege.substr(0, 2).toLowerCase()) !== -1) {
+                var solfegePart = SOLFNOTES[solfnotes_.indexOf(solfege.substr(0, 2).toLowerCase())];
+	    } else if (solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase()) !== -1) {
+                var solfegePart = SOLFNOTES[solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase())];
+	    } else {  // FIXME: Should be everything but the sharp/flat
+                var solfegePart = solfege.substr(0, 2).toLowerCase();
+            }
+
             if (solfege.toLowerCase().substr(0, 4) === 'rest') {
                 return ['R', ''];
-            } else if (halfSteps.indexOf(solfege.substr(0, 2).toLowerCase()) !== -1) {
-                var index = halfSteps.indexOf(solfege.substr(0, 2).toLowerCase()) + offset;
-                if (index > 11) {
-                    index -= 12;
-                    octave += 1;
-                }
-                note = thisScale[index];
-            } else if (halfSteps.indexOf(solfege.substr(0, 3).toLowerCase()) !== -1) {
-                var index = halfSteps.indexOf(solfege.substr(0, 3).toLowerCase()) + offset;
+            } else if (halfSteps.indexOf(solfegePart) !== -1) {
+                var index = halfSteps.indexOf(solfegePart) + offset;
                 if (index > 11) {
                     index -= 12;
                     octave += 1;
