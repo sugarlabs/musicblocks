@@ -155,7 +155,8 @@ function StatusMatrix() {
                     innerHTML = last(this._logo.polyVolume[i]);
                     break;
                 case 'key':
-                    innerHTML = this._logo.keySignature[i].replace(/ /g, '&nbsp;');
+                    var obj = this._logo.keySignature[i].split(' ');
+                    innerHTML = obj[0] + '&nbsp;' + getModeName(obj[1]);
                     break;
                 case 'duplicate':
                     innerHTML = this._logo.duplicateFactor[i];
