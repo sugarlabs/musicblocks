@@ -13,7 +13,7 @@
 // Length of a long touch
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
-const NOHIT = ['hidden'];
+const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'notename', 'voicename', 'modename', 'drumname'];
 
 // Define block instance objects and any methods that are intra-block.
@@ -605,10 +605,10 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = '---';
                     break;
                 case 'solfege':
-                    this.value = 'sol';
+                    this.value = 'la';
                     break;
                 case 'notename':
-                    this.value = 'G';
+                    this.value = 'A';
                     break;
                 case 'rest':
                     this.value = _('rest');
@@ -617,7 +617,7 @@ function Block(protoblock, blocks, overrideName) {
                     this.value = NUMBERBLOCKDEFAULT;
                     break;
                 case 'modename':
-                    this.value = 'Major';
+                    this.value = getModeName(DEFAULTMODE);
                     break;
                 case 'voicename':
                     this.value = DEFAULTVOICE;
@@ -628,7 +628,18 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            var label = this.value.toString();
+            if (this.name === 'solfege') {
+                var obj = splitSolfege(this.value);
+		var label = i18nSolfege(obj[0]);
+                var attr = obj[1];
+
+                if (attr !== '♮') {
+                    label += attr;
+                }
+            } else {
+                var label = this.value.toString();
+            }
+
             if (label.length > 8) {
                 label = label.substr(0, 7) + '...';
             }
@@ -1556,38 +1567,23 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('textLabel');
         } else if (this.name === 'solfege') {
             var type = 'solfege';
-            const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
-            const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
-            if (this.value != null) {
-                if (SOLFNOTES.indexOf(this.value) !== -1) {
-                    var selectednote = this.value;
-                    var selectedattr = '♮';
-                } else if (this.value.slice(0, 3) === 'sol') {
-                    var selectednote = 'sol';
-                    if (this.value.length === 4) {
-                        var selectedattr = this.value[3];
-                    } else {
-                        var selectedattr = this.value[3] + this.value[3];
-                    }
-                } else {
-                    var selectednote = this.value.slice(0, 2);
-                    if (this.value.length === 3) {
-                        var selectedattr = this.value[2];
-                    } else {
-                        var selectedattr = this.value[2] + this.value[2];
-                    }
-                }
-            } else {
-                var selectednote = 'sol';
-                var selectedattr = '♮'
-            }
+
+            var obj = splitSolfege(this.value);
+            var selectednote = obj[0];
+            var selectedattr = obj[1];
+
+            // solfnotes_ is used in the interface for i18n
+            //.TRANS: the note names must be separated by single spaces 
+            var solfnotes_ = _('ti la sol fa mi re do').split(' ');
 
             var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
             for (var i = 0; i < SOLFNOTES.length; i++) {
-                if (selectednote === SOLFNOTES[i]) {
-                    labelHTML += '<option value="' + selectednote + '" selected>' + selectednote + '</option>';
+                if (selectednote === solfnotes_[i]) {
+                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + solfnotes_[i] + '</option>';
+                } else if (selectednote === SOLFNOTES[i]) {
+                    labelHTML += '<option value="' + SOLFNOTES[i] + '" selected>' + solfnotes_[i] + '</option>';
                 } else {
-                    labelHTML += '<option value="' + SOLFNOTES[i] + '">' + SOLFNOTES[i] + '</option>';
+                    labelHTML += '<option value="' + SOLFNOTES[i] + '">' + solfnotes_[i] + '</option>';
                 }
             }
 
@@ -1606,7 +1602,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'notename') {
-            console.log('notename');
             var type = 'notename';
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
             const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
@@ -1653,7 +1648,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.value != null) {
                 var selectedmode = this.value[0];
             } else {
-                var selectedmode = 'Major';
+                var selectedmode = getModeName(DEFAULTMODE);
             }
 
             var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
@@ -1739,6 +1734,7 @@ function Block(protoblock, blocks, overrideName) {
             if (!focused) {
                 return;
             }
+
             myBlock._labelChanged();
 
             event.preventDefault();
@@ -1889,10 +1885,22 @@ function Block(protoblock, blocks, overrideName) {
             this.value = newValue;
         }
 
-        var label = this.value.toString();
+        if (this.name === 'solfege') {
+            var obj = splitSolfege(this.value);
+            var label = i18nSolfege(obj[0]);
+            var attr = obj[1];
+
+            if (attr !== '♮') {
+                label += attr;
+            }
+        } else {
+            var label = this.value.toString();
+        }
+
         if (label.length > 8) {
             label = label.substr(0, 7) + '...';
         }
+
         this.text.text = label;
 
         // and hide the DOM textview...

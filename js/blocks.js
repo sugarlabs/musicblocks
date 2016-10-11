@@ -1263,6 +1263,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (myBlock.text == null) {
             return;
         }
+
         if (myBlock.name === 'loadFile') {
             try {
                 var label = myBlock.value[0].toString();
@@ -1270,12 +1271,22 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 var label = _('open file');
             }
             maxLength = 10;
+	} else if (myBlock.name === 'solfege') {
+            var obj = splitSolfege(myBlock.value);
+	    var label = i18nSolfege(obj[0]);
+            var attr = obj[1];
+
+            if (attr !== '♮') {
+                label += attr;
+            }
         } else {
             var label = myBlock.value.toString();
         }
+
         if (label.length > maxLength) {
             label = label.substr(0, maxLength - 1) + '...';
         }
+
         myBlock.text.text = label;
 
         // Make sure text is on top.
@@ -1656,7 +1667,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
 
-            postProcessArg = [thisBlock, _('sol')];
+            postProcessArg = [thisBlock, 'la'];
         } else if (name === 'notename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1666,7 +1677,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
 
-            postProcessArg = [thisBlock, 'G'];
+            postProcessArg = [thisBlock, 'A'];
         } else if (name === 'drumname') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2778,9 +2789,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'flat':
             case 'hollowline':
             case 'major':
-            case 'matrix':
             case 'minor':
-            case 'modewidget':
             case 'multiplybeatfactor':
             case 'note':
             case 'newnote':
@@ -2790,12 +2799,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'newswing2':
             case 'osctime':
             case 'perfect':
-            case 'pitchdrummatrix':
-            case 'pitchslider':
-            case 'pitchstaircase':
             case 'pluck':
             case 'rhythmicdot':
-            case 'rhythmruler':
             case 'setbpm':
             case 'setnotevolume2':
             case 'settransposition':
@@ -2804,9 +2809,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'skipnotes':
             case 'slur':
             case 'staccato':
-            case 'status':
             case 'swing':
-            case 'tempo':
             case 'tie':
             case 'tuplet2':
                 var len = blockObjs[b][4].length;

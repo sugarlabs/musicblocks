@@ -63,7 +63,8 @@ function createDefaultStack() {
          [20, "rhythm", 0, 0, [17, 21, 22, null]],
          [21, ["number", {"value":1}], 0, 0, [20]],
          [22, ["number", {"value":2}], 0, 0, [20]],
-         [23, 'hidden', 0, 0, [1, null]]
+
+	 [23, "hiddennoflow", 0, 0, [1, null]]
         ];
 };
 
