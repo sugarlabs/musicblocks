@@ -2815,12 +2815,21 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 var len = blockObjs[b][4].length;
                 if (last(blockObjs[b][4]) == null) {
                     // If there is no next block, add a hidden block;
+                    console.log('last connection of ' + name + ' is null: adding hidden block');
                     blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
                     blockObjs.push([blockObjsLength + extraBlocksLength, 'hidden', 0, 0, [b, null]]);
                     extraBlocksLength += 1;
                 } else {
                     var nextBlock = blockObjs[b][4][len - 1];
-                    if (blockObjs[nextBlock][1] !== 'hidden') {
+
+		    if (typeof(blockObjs[nextBlock][1]) === 'object') {
+			var nextName = blockObjs[nextBlock][1][0];
+		    } else {
+			var nextName = blockObjs[nextBlock][1];
+		    }
+
+                    if (nextName !== 'hidden') {
+			console.log('last connection of ' + name + ' is ' + nextName + ': adding hidden block');
                         // If the next block is not a hidden block, add one.
                         blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
                         blockObjs[nextBlock][4][0] = blockObjsLength + extraBlocksLength;
