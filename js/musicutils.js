@@ -49,6 +49,10 @@ const DIMINISHED = {1: -1, 4: 4, 5: 6, 8: 11, 2: 0, 3: 2, 6: 7, 7: 9};
 const MAJOR = {2: 2, 3: 4, 6: 9, 7: 11};
 const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
 
+// SOLFNOTES is the internal representation used in selectors
+const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
+
 
 function mod12(a) {
     while (a < 0) {
@@ -320,17 +324,25 @@ const DRUMNAMES = [
 
 const DEFAULTVOICE = 'sine';
 const DEFAULTDRUM = 'kick';
+const DEFAULTMODE = 'Major';
 
 var customMode = MUSICALMODES['CUSTOM'];
 
+// The sample has a pitch which is subsequently transposed. This
+// number is that starting pitch.
 const SAMPLECENTERNO = {'violin': 63, 'cello': 39, 'basse': 15};
 
 
 function getModeName(name) {
     for (var mode in MODENAMES) {
         // console.log(MODENAMES[mode]);
-        if (MODENAMES[mode][1] === name) {
-            return MODENAMES[mode][0];
+        if (MODENAMES[mode][0] === name || MODENAMES[mode][1] === name.toUpperCase()) {
+            if (MODENAMES[mode][0] != '') {
+                return MODENAMES[mode][0];
+            } else {
+                console.log('i18n is misbehaving?');
+                return MODENAMES[mode][1];
+            }
         }
     }
     console.log(name + ' not found in MODENAMES');
@@ -349,7 +361,7 @@ function getDrumName(name) {
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name.toLowerCase()) {
             if (DRUMNAMES[i][0] != '') {
                 return DRUMNAMES[i][0];
             } else {
@@ -373,7 +385,7 @@ function getDrumIcon(name) {
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name.toLowerCase()) {
             return DRUMNAMES[i][2];
         }
     }
@@ -395,7 +407,7 @@ function getDrumSynthName(name) {
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name.toLowerCase()) {
             return DRUMNAMES[i][1];
         }
     }
@@ -947,6 +959,49 @@ function getSolfege(note) {
 };
 
 
+function i18nSolfege(note) {
+    // solfnotes_ is used in the interface for i18n
+    //.TRANS: the note names must be separated by single spaces 
+    var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+    var i = SOLFNOTES.indexOf(note);
+    if (i !== -1) {
+        return solfnotes_[i];
+    } else {
+        console.log(note + ' NOT FOUND');
+        return note;
+    }
+}
+
+
+function splitSolfege(value) {
+    if (value != null) {
+        if (SOLFNOTES.indexOf(value) !== -1) {
+            var note = value;
+            var attr = '♮';
+        } else if (value.slice(0, 3) === 'sol') {
+            var note = 'sol';
+            if (value.length === 4) {
+                var attr = value[3];
+            } else {
+                var attr = value[3] + value[3];
+            }
+        } else {
+            var note = value.slice(0, 2);
+            if (value.length === 3) {
+                var attr = value[2];
+            } else {
+                var attr = value[2] + value[2];
+            }
+        }
+    } else {
+        var note = 'la';
+        var attr = '♮'
+    }
+
+    return [note, attr];
+}
+
+
 function getNumber(notename, octave) {
     // Converts a note, e.g., C, and octave to a number
 
@@ -1175,9 +1230,10 @@ function Synth () {
         case 'sine':
             if (typeof(notes) === 'object') {
                 var noteToPlay = notes[0];
-	    } else {
+            } else {
                 var noteToPlay = notes;
-	    }
+            }
+
             this.synthset[name][1].triggerAttackRelease(noteToPlay, beatValue);
             break;
         case 'violin':

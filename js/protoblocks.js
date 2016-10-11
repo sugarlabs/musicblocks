@@ -94,15 +94,24 @@ function ProtoBlock(name) {
     };
 
     // E.g., hidden (used at end of clamp)
-    this.hiddenBlockNoFlow = function() {
+    this.hiddenBlockFlow = function() {
         this.args = 0;
         this.size = 0;
         this.dockTypes.push('out');
         this.dockTypes.push('in');
-        this.generator = this.hiddenBlockNoFlowGenerator;
+        this.generator = this.hiddenBlockFlowGenerator;
     };
 
-    this.hiddenBlockNoFlowGenerator = function() {
+    // E.g., hidden (used at end of no flow clamp)
+    this.hiddenBlockNoFlow = function() {
+        this.args = 0;
+        this.size = 0;
+        this.dockTypes.push('out');
+        this.dockTypes.push('unavailable');
+        this.generator = this.hiddenBlockFlowGenerator;
+    };
+
+    this.hiddenBlockFlowGenerator = function() {
         // TODO: return empty SVG
         var svg = new SVG();
         svg.init();

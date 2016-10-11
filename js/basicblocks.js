@@ -572,7 +572,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note1Block = new ProtoBlock('note1');
     note1Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note1'] = note1Block;
-    note1Block.staticLabels.push(_('note value') + ' ' + 'La 4');
+    note1Block.staticLabels.push(_('note value') + ' ' + i18nSolfege('la') + '4');
     note1Block.adjustWidthToLabel();
     note1Block.zeroArgBlock();
 
@@ -1986,11 +1986,17 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // FLOW PALETTE
 
+    var hiddenNoFlowBlock = new ProtoBlock('hiddennoflow');
+    hiddenNoFlowBlock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['hiddennoflow'] = hiddenNoFlowBlock;
+    hiddenNoFlowBlock.hiddenNoFlow = true;
+    hiddenNoFlowBlock.hiddenBlockNoFlow();
+
     var hiddenBlock = new ProtoBlock('hidden');
     hiddenBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['hidden'] = hiddenBlock;
-    hiddenBlock.hidden = true;  // Now there is a surprise :)
-    hiddenBlock.hiddenBlockNoFlow();
+    hiddenBlock.hidden = true;
+    hiddenBlock.hiddenBlockFlow();
 
     var clampBlock = new ProtoBlock('clamp');
     clampBlock.palette = palettes.dict['flow'];

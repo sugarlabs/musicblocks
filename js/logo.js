@@ -1171,6 +1171,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
             break;
         case 'hidden':
+        case 'hiddennoflow':
             // Hidden block is used at end of clamps and actions to
             // trigger listeners.
             break;
@@ -2318,8 +2319,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             var __listener = function (event) {
                 if (logo.tupletRhythms.length === 0 || pitchtimematrix.rowLabels.length === 0) {
                     logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
-                    // } else if(document.getElementById('matrix').style.visibility === 'visible') {
-                    //    logo.errorMsg(_('Please close the current matrix before opening a new one.'), blk);
                 } else {
                     // Process queued up rhythms.
                     pitchtimematrix.init(logo);
@@ -3992,7 +3991,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         var me = this;
         this.saveTimeout = setTimeout(function () {
             // Save at the end to save an image
-            console.log('in saveTimeout');
+            // console.log('in saveTimeout');
             me.saveLocally();
         }, DEFAULTDELAY * 1.5);
     };
