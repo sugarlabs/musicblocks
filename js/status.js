@@ -226,7 +226,7 @@ function StatusMatrix() {
 
             var cell = table.rows[t + 1].cells[j + 1];
             if (cell != null) {
-		cell.innerHTML = note;
+		cell.innerHTML = note.replace(/#/g, '♯').replace(/b/, '♭');
             }
 
             t += 1;
