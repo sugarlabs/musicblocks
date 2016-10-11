@@ -244,7 +244,7 @@ function Matrix() {
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
             } else {
-                cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
             }
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
