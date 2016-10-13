@@ -310,7 +310,6 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
 
     this.remove = function(name) {
-        console.log(this.buttons);
         if (!(name in this.buttons)) {
             console.log('Palette.remove: Cannot find palette ' + name);
             return;
@@ -549,6 +548,7 @@ function PaletteModel(palette, palettes, name) {
             }
 
             var label = '';
+            // console.log(protoBlock.name);
             switch (protoBlock.name) {
             case 'text':
                 label = _('text');
@@ -573,7 +573,7 @@ function PaletteModel(palette, palettes, name) {
                 break;
             default:
                 if (blkname != modname) {
-                    // Override label for do, storein, and box
+                    // Override label for do, storein, box, and namedarg
                     if (blkname === 'storein' && block.defaults[0] === _('box')) {
                         label = _('store in');
                     } else {
@@ -1042,7 +1042,6 @@ function Palette(palettes, name) {
 
         function __processFiller(palette, modname, bitmap, args) {
             var b = args[0];
-
             makePaletteBitmap(palette, b.artwork, b.modname, __processBitmap, args);
         };
 
@@ -1719,7 +1718,6 @@ function Palette(palettes, name) {
     };
 
     this._makeBlockFromProtoblock = function(protoblk, moved, blkname, event, saveX, saveY) {
-
         var palette = this;
 
         // Some blocks are expanded on load.
