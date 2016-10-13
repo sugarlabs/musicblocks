@@ -1271,9 +1271,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 var label = _('open file');
             }
             maxLength = 10;
-	} else if (myBlock.name === 'solfege') {
+        } else if (myBlock.name === 'solfege') {
             var obj = splitSolfege(myBlock.value);
-	    var label = i18nSolfege(obj[0]);
+            var label = i18nSolfege(obj[0]);
             var attr = obj[1];
 
             if (attr !== '♮') {
@@ -2223,25 +2223,35 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this._newLocalArgBlock = function (name) {
         // name === 1, 2, 3, ...
         var blkname = 'arg_' + name;
+        if ('myArg_' + name in this.protoBlockDict) {
+            return;
+        }
+
         if (blkname in this.protoBlockDict) {
             return;
         }
 
         var myNamedArgBlock = new ProtoBlock('namedarg');
-        this.protoBlockDict[blkname] = myNamedArgBlock;
+        this.protoBlockDict['myArg_' + blkname] = myNamedArgBlock;
         myNamedArgBlock.palette = this.palettes.dict['action'];
         myNamedArgBlock.defaults.push(name);
         myNamedArgBlock.staticLabels.push('arg ' + name);
         myNamedArgBlock.parameterBlock();
-        if (name === 'arg 1') {
+
+        if (blkname === 'arg_1') {
             return;
         }
 
-        myNamedArgBlock.palette.add(myNamedArgBlock);
+        myNamedArgBlock.palette.add(myNamedArgBlock, true);
+
         // Force regeneration of palette after adding new block.
-        this.palettes.hide();
-        this.palettes.updatePalettes('action');
-        this.palettes.show();
+        // Add delay to avoid race condition.
+        var that = this;
+        setTimeout(function () {
+            that.palettes.hide();
+            that.palettes.updatePalettes('action');
+            that.palettes.show();
+        }, 500);
     };
 
     this._removeNamedoEntries = function (name) {
@@ -2822,14 +2832,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 } else {
                     var nextBlock = blockObjs[b][4][len - 1];
 
-		    if (typeof(blockObjs[nextBlock][1]) === 'object') {
-			var nextName = blockObjs[nextBlock][1][0];
-		    } else {
-			var nextName = blockObjs[nextBlock][1];
-		    }
+                    if (typeof(blockObjs[nextBlock][1]) === 'object') {
+                        var nextName = blockObjs[nextBlock][1][0];
+                    } else {
+                        var nextName = blockObjs[nextBlock][1];
+                    }
 
                     if (nextName !== 'hidden') {
-			console.log('last connection of ' + name + ' is ' + nextName + ': adding hidden block');
+                        console.log('last connection of ' + name + ' is ' + nextName + ': adding hidden block');
                         // If the next block is not a hidden block, add one.
                         blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
                         blockObjs[nextBlock][4][0] = blockObjsLength + extraBlocksLength;
