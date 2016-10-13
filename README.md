@@ -13,12 +13,11 @@ Using Music Blocks
 
 Music Blocks is designed to run in a browser. It is derived from
 Turtle Blocks JS which can be found
-[here](https://github.com/walterbender/turtleblocksjs). You can run it
-directly from index.html, from the
+[here](https://github.com/walterbender/turtleblocksjs). You can run the software locally from the index.html file, from the
 [github](walterbender.github.io/musicblocks) repo, or by setting up a
 local server.
 
-If you want to run Music Blocks off line, download this repo and point
+If you want to run Music Blocks offline, download this repo and point
 your browser to the index.html file found in the musicblocks directory on
 your local file system.
 
@@ -48,7 +47,9 @@ worked at Affron Scripp & Associates, LLC.
 Some of the graphics were contributed by Chie Yasuda.
 
 Much of the initial coding of the fork from Turtle Blocks was done by
-Yash Khandelwal as part of Google Summer of Code (GSOC) 2015.
+Yash Khandelwal as part of Google Summer of Code (GSOC) 2015. Hemant Kasat contributed to additional widgets as part of GSOC 2016.
+
+Many students contributed to the code as part of Google Code-in (2015-16)
 
 Reporting Bugs
 --------------

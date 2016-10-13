@@ -16,7 +16,7 @@ Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox (although
 you may need to disable hardware acceleration). You can run it from
 [github io](http://walterbender.github.io/musicblocks) or by
-downloading a copy of the code and running directly from the file
+downloading a copy of the code and running a local copy directly from the file
 system of your computer.
 
 For more details on how to use Music Blocks, see [Using Music
@@ -93,7 +93,7 @@ multiple *Pitch* blocks to a *Note value* container.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg'</img>
 
-A rest of duration note value can be constructed using a *Silence* block.
+A rest of the specified note value duration can be constructed using a *Silence* block.
 
 Using drums
 -----------
@@ -138,9 +138,9 @@ III](#pitch-time) to help you get started.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg'</img>
 
 Every time you create a new *Action* stack, Music Blocks creates a new
-block specific to that stack. (The new block is found at the top of
+block specific to, and linked with, that stack. (The new block is found at the top of
 the *Block* palette, found on the left edge of the screen.) Clicking
-on this block is the same as clicking on your stack. By default, the
+on and running this block is the same as clicking on your stack. By default, the
 new blocks are named `chunk`, `chunk1`, `chunk2`... but you can rename
 them by editing the labels on the *Action* blocks.
 
@@ -163,15 +163,15 @@ You can repeat chunks either by using multiple *Chunk* blocks or using a
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
 
-You can also mix and match chunks. Here we play chunk, followed by
-chunk1 twice, and then chunk again.
+You can also mix and match chunks. Here we play the action block with name "chunk", followed by
+"chunk1" twice, and then "chunk" again.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg'</img>
 
 A few more chunks and we can make a song. (Can you read the block
-notation in order to guess what song we've programmed?)
+notation well enough to guess the outcome? Are you familiar with the song we created?)
 
 <a name="transformations">
 2. Transformations
@@ -200,7 +200,7 @@ on the right, both pitch blocks are raised by one half step.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg'</img>
 
 The *Adjust-transposition* block can be used to make larger shifts in
-pitch. To shift an entire octave, transpose by 12 half-steps up. -12
+pitch in half step units. A positive number shifts the pitch up and a negative number shifts the pitch down. The input must be a whole number. To shift an entire octave, transpose by 12 half-steps up. -12
 will shift an octave down.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg'</img>
@@ -210,7 +210,7 @@ raise it by one octave.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg'</img>
 
-You can "dot" notes using the *Dot* block. A dotted note extends by
+You can "dot" notes using the *Dot* block. A dotted note extends the rhythmic duration of a note by
 50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a
 beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
 
@@ -253,21 +253,21 @@ The *Set volume* block will change the volume of the notes. The
 default is 50; the range is 0 (silence) to 100 (full volume).
 
 The *Crescendo* block will increase (or decrease) the volume of the
-contained notes by an amount specified.
+contained notes by a specified amount for every note played. For example, if you have 3 notes in sequence contained in a *Crescendo* block with a value of 5, the final note will be at 15% more volume than the original value for volume.  
 
-The *Staccato* block will play back notes in tight bursts while
-maintaining the specified rhymic value of the notes.
+The *Staccato* block shortens the sustain of notes--in tighter bursts--while
+maintaining the specified rhythmic value of the notes.
 
-The *Slur* block will run a note past its noted duration, blending
-it into the next note.
+The *Slur* block lengthens the sustain of notes--running longer than the noted duration and blending
+it into the next note--while maintaining the specified rhythmic value of the notes.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'</img>
 
 The *Interval* block calculates a relative interval, e.g., a fifth, and adds
-the additional pitches to a note. In the figure, we add `Sol` to `Do` and
+the additional pitches to a note's playback. In the figure, we add `Sol` to `Do` and
 `Do` to `Fa`.
 
-The *Articulation* block changes the volume of a group of notes.
+The *Articulation* block changes the volume of a group of notes without affecting the master volume for the rest of the user's Music Blocks code.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg'</img>
 
@@ -317,7 +317,7 @@ contained blocks, e.g., violin or cello.
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
-and a number of more exotic modes, such as Bebop, Geez, Maqam, et al.
+and a number of more exotic modes, such as Bebop, Geez, Maqam, et al. This block allows users to access "movable Do" within Music Blocks, where the mapping of solfege to particular pitch changes depending on the user's specified tonality.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg'</img>
 
@@ -388,7 +388,7 @@ the graphics commands inside of *Note value* blocks.
 
 In this example, because the computation and graphics are more
 complex, a *Free-time* block is used to decouple the graphics from
-the master clock.
+the master clock. The "Free-time* block prioritizes the sequence of actions over the specified rhythm.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
 
