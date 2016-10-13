@@ -16,8 +16,8 @@ Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox (although
 you may need to disable hardware acceleration). You can run it from
 [github io](http://walterbender.github.io/musicblocks) or by
-downloading a copy of the code and running a local copy directly from the file
-system of your computer.
+downloading a copy of the code and running a local copy directly from
+the file system of your computer.
 
 For more details on how to use Music Blocks, see [Using Music
 Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation)
@@ -138,11 +138,12 @@ III](#pitch-time) to help you get started.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg'</img>
 
 Every time you create a new *Action* stack, Music Blocks creates a new
-block specific to, and linked with, that stack. (The new block is found at the top of
-the *Block* palette, found on the left edge of the screen.) Clicking
-on and running this block is the same as clicking on your stack. By default, the
-new blocks are named `chunk`, `chunk1`, `chunk2`... but you can rename
-them by editing the labels on the *Action* blocks.
+block specific to, and linked with, that stack. (The new block is
+found at the top of the *Block* palette, found on the left edge of the
+screen.) Clicking on and running this block is the same as clicking on
+your stack. By default, the new blocks are named `chunk`, `chunk1`,
+`chunk2`... but you can rename them by editing the labels on the
+*Action* blocks.
 
 In the example above, the *Chunk* block is inside of a *Start* block,
 which ties it to the *Run* button in the upper-left corner of the
@@ -163,15 +164,16 @@ You can repeat chunks either by using multiple *Chunk* blocks or using a
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
 
-You can also mix and match chunks. Here we play the action block with name "chunk", followed by
-"chunk1" twice, and then "chunk" again.
+You can also mix and match chunks. Here we play the action block with
+name "chunk", followed by "chunk1" twice, and then "chunk" again.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'</img>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg'</img>
 
 A few more chunks and we can make a song. (Can you read the block
-notation well enough to guess the outcome? Are you familiar with the song we created?)
+notation well enough to guess the outcome? Are you familiar with the
+song we created?)
 
 <a name="transformations">
 2. Transformations
@@ -191,16 +193,18 @@ of *Repeat* blocks to play up and down a scale.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
 
-The *Sharp* and *Flat* blocks can be wrapped around *Pitch*
-blocks, *Note value* blocks, or chunks. A sharp will raise the pitch by
-one half step. A flat will lower by one half step. In the example, on
-the left, just the *Pitch* block `Mi` is lowered by one half step;
-on the right, both pitch blocks are raised by one half step.
+The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
+*Note value* blocks, or chunks. A sharp will raise the pitch by one
+half step. A flat will lower by one half step. In the example, on the
+left, just the *Pitch* block `Mi` is lowered by one half step; on the
+right, both pitch blocks are raised by one half step.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg'</img>
 
 The *Adjust-transposition* block can be used to make larger shifts in
-pitch in half step units. A positive number shifts the pitch up and a negative number shifts the pitch down. The input must be a whole number. To shift an entire octave, transpose by 12 half-steps up. -12
+pitch in half step units. A positive number shifts the pitch up and a
+negative number shifts the pitch down. The input must be a whole
+number. To shift an entire octave, transpose by 12 half-steps up. -12
 will shift an octave down.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg'</img>
@@ -253,19 +257,23 @@ The *Set volume* block will change the volume of the notes. The
 default is 50; the range is 0 (silence) to 100 (full volume).
 
 The *Crescendo* block will increase (or decrease) the volume of the
-contained notes by a specified amount for every note played. For example, if you have 3 notes in sequence contained in a *Crescendo* block with a value of 5, the final note will be at 15% more volume than the original value for volume.  
+contained notes by a specified amount for every note played. For
+example, if you have 3 notes in sequence contained in a *Crescendo*
+block with a value of 5, the final note will be at 15% more volume
+than the original value for volume.
 
-The *Staccato* block shortens the sustain of notes--in tighter bursts--while
+The *Staccato* block shortens the sustain of notes--in tighter
+bursts--while maintaining the specified rhythmic value of the notes.
+
+The *Slur* block lengthens the sustain of notes--running longer than
+the noted duration and blending it into the next note--while
 maintaining the specified rhythmic value of the notes.
-
-The *Slur* block lengthens the sustain of notes--running longer than the noted duration and blending
-it into the next note--while maintaining the specified rhythmic value of the notes.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'</img>
 
-The *Interval* block calculates a relative interval, e.g., a fifth, and adds
-the additional pitches to a note's playback. In the figure, we add `Sol` to `Do` and
-`Do` to `Fa`.
+The *Interval* block calculates a relative interval, e.g., a fifth,
+and adds the additional pitches to a note's playback. In the figure,
+we add `Sol` to `Do` and `Do` to `Fa`.
 
 The *Articulation* block changes the volume of a group of notes without affecting the master volume for the rest of the user's Music Blocks code.
 
@@ -317,7 +325,10 @@ contained blocks, e.g., violin or cello.
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
-and a number of more exotic modes, such as Bebop, Geez, Maqam, et al. This block allows users to access "movable Do" within Music Blocks, where the mapping of solfege to particular pitch changes depending on the user's specified tonality.
+and a number of more exotic modes, such as Bebop, Geez, Maqam, et
+al. This block allows users to access "movable Do" within Music
+Blocks, where the mapping of solfege to particular pitch changes
+depending on the user's specified tonality.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg'</img>
 
@@ -387,8 +398,9 @@ the graphics commands inside of *Note value* blocks.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg'</img>
 
 In this example, because the computation and graphics are more
-complex, a *Free-time* block is used to decouple the graphics from
-the master clock. The "Free-time* block prioritizes the sequence of actions over the specified rhythm.
+complex, a *Free-time* block is used to decouple the graphics from the
+master clock. The "Free-time* block prioritizes the sequence of
+actions over the specified rhythm.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
 
@@ -545,17 +557,17 @@ the matrix to corresponds to that chunk.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
 
 The chunk created when you click on the matrix is a stack of
-blocks. The blocks are nested: an *Action* block contains three *Note value*
-blocks, each of which contains a *Pitch* block. The *Action* block has a
-name automatically generated by the matrix, in this case, chunk. (You
-can rename the action by clicking on the name.). Each note has a
-duration (in this case 4, which represents a quarter note). Try
+blocks. The blocks are nested: an *Action* block contains three *Note
+value* blocks, each of which contains a *Pitch* block. The *Action*
+block has a name automatically generated by the matrix, in this case,
+chunk. (You can rename the action by clicking on the name.). Each note
+has a duration (in this case 4, which represents a quarter note). Try
 putting different numbers in and see (hear) what happens. Each note
 block also has a pitch block (if it were a chord, there would be
 multiple *Pitch* blocks nested inside the Note block's clamp). Each
-pitch block has a pitch name (`Re`, `Mi`, and `Sol`), and a pitch octave; in
-this example, the octave is 4 for each pitch. (Try changing the pitch
-names and the pitch octaves.)
+pitch block has a pitch name (`Re`, `Mi`, and `Sol`), and a pitch
+octave; in this example, the octave is 4 for each pitch. (Try changing
+the pitch names and the pitch octaves.)
 
 To play the chuck, simply click on the action block (on the word
 action). You should hear the notes play, ordered from top to bottom.

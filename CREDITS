@@ -9,7 +9,9 @@ matrix, musical cups) developed and published by Dr. Lawrence Scripp
 with whom Devin studied at New England Conservatory and for whom he
 worked at Affron Scripp & Associates, LLC.
 
-Richard Hermann, Professor of Theory and Composition at the University of New Mexico, shared ideas and his publications with our team that inspired new features and improvements.
+Richard Hermann, Professor of Theory and Composition at the University
+of New Mexico, shared ideas and his publications with our team that
+inspired new features and improvements.
 
 Related Websites
 ----------------
@@ -24,12 +26,18 @@ originates with her). She also has been very patient with Devin as he
 works on this--thanks Chie!
 
 Much of the initial coding was done by Yash Khandelwal as part of
-Google Summer of Code (GSOC) 2015. Hemant Kasat worked on additional widgets as part of GSOC 2016. Many students contributed to various parts of the code, bug reports, and other important tasks as part of Google Code-in (GCI) 2015-16.
+Google Summer of Code (GSOC) 2015. Hemant Kasat worked on additional
+widgets as part of GSOC 2016. Many students contributed to various
+parts of the code, bug reports, and other important tasks as part of
+Google Code-in (GCI) 2015-16.
 
 Libraries specific to Music Blocks
 ----------------------------------
 
-tonejs --> Web audio framework for creating interactive music in the browser [Tone.js](https://github.com/Tonejs/Tone.js/blob/master/README.md)
+tonejs --> Web audio framework for creating interactive music in the
+browser
+[Tone.js](https://github.com/Tonejs/Tone.js/blob/master/README.md)
 
-vexflow --> Allows to create standard music notation and guitar tablature [Vexflow](http://www.vexflow.com/)
+vexflow --> Allows to create standard music notation and guitar
+tablature [Vexflow](http://www.vexflow.com/)
 
