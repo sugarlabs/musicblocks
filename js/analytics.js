@@ -163,7 +163,7 @@ const TACAT = {
     'do': 'action',
     'nameddo': 'action',
     'listen': 'action',
-    'broadcast': 'action',
+    'dispatch': 'action',
     'calc': 'action',
     'doArg': 'action',
     'calcArg': 'action',
@@ -171,9 +171,13 @@ const TACAT = {
     'namedcalc': 'action',
     'nameddoArg': 'action',
     'namedcalcArg': 'action',
+    'arg': 'action',
+    'namedarg': 'action',
+    'return': 'action',
 
     'storein': 'box',
     'namedbox': 'box',
+    'increment': 'box',
     'incrementOne': 'box',
 
     'luminance': 'sensor',
