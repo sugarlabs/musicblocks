@@ -85,7 +85,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     currentOctaveBlock.adjustWidthToLabel();
     currentOctaveBlock.parameterBlock();
 
-    // Synth blocks
+    // deprecated
     var squareBlock = new ProtoBlock('square');
     squareBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['square'] = squareBlock;
@@ -95,6 +95,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     squareBlock.oneArgBlock();
     squareBlock.defaults.push(440);
 
+    // deprecated
     var triangleBlock = new ProtoBlock('triangle');
     triangleBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['triangle'] = triangleBlock;
@@ -104,6 +105,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     triangleBlock.oneArgBlock();
     triangleBlock.defaults.push(440);
 
+    // deprecated
     var sineBlock = new ProtoBlock('sine');
     sineBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['sine'] = sineBlock;
@@ -113,6 +115,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sineBlock.oneArgBlock();
     sineBlock.defaults.push(440);
 
+    // deprecated
     var sawtoothBlock = new ProtoBlock('sawtooth');
     sawtoothBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['sawtooth'] = sawtoothBlock;
