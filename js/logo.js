@@ -4171,23 +4171,18 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 }
 
                 var swingValue = last(this.swing[turtle]);
-                console.log('swingValue: ' + swingValue);
                 // If this notevalue matches the target, either we are
                 // starting a swing or ending a swing.
                 if (noteBeatValue === last(this.swingTarget[turtle])) {
                     if (this.swingCarryOver[turtle] === 0) {
-                        console.log('carry over = 0');
                         noteBeatValue = 1 / ((1 / noteBeatValue) + (1 / swingValue));
-                        console.log(noteBeatValue);
                         this.swingCarryOver[turtle] = swingValue;
                     } else {
-                        console.log('carry over = ' + this.swingCarryOver[turtle]);
                         if (noteBeatValue === swingValue) {
                             noteBeatValue = 0;
                         } else {
                             noteBeatValue = 1 / ((1 / noteBeatValue) - (1 / swingValue));
                         }
-                        console.log(noteBeatValue);
                         this.swingCarryOver[turtle] = 0;
                     }
 
