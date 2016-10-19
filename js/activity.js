@@ -86,6 +86,7 @@ define(function (require) {
 
     // Music Block-specific modules
     require('activity/turtledefs');
+    require('activity/lilypond');
     require('activity/status');
     require('activity/modewidget');
     require('activity/logo');
