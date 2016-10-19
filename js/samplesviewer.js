@@ -98,30 +98,33 @@ function PlanetModel(controller) {
         }
 
         var name = image.replace('.b64', '');
-        var mbcheck=0;
+        var mbcheck = false;
         if(name.slice(0, 'MusicBlocks_'.length) === 'MusicBlocks_'){
-        	name = name.substring('MusicBlocks_'.length);
-        	mbcheck = 1;
+            name = name.substring('MusicBlocks_'.length);
+            mbcheck = true;
         }
 
         if (model.globalImagesCache[image] !== undefined) {
             model.globalProjects.push({title: name,
-                                    img: model.globalImagesCache[image]});
+                                       img: model.globalImagesCache[image]});
             model.updated();
             model.getImages(todo);
         } else {
             jQuery.ajax({
-  	            url: SERVER + image,
+  	        url: SERVER + image,
                 headers: {
                     'x-api-key' : '3tgTzMXbbw6xEKX7'
                 },
                 dataType: 'text'
             }).done(function (d) {
-                if(!validateImageData(d)){
-                    d = EMPTYIMAGE;
+                if (!validateImageData(d)) {
+                    d = 'images/planetgraphic.png'; // EMPTYIMAGE;
                 }
-                if(mbcheck) 
-                	d = 'images/planetgraphic.png';
+
+                if (mbcheck) {
+                    d = 'images/planetgraphic.png';
+		}
+
                 model.globalImagesCache[image] = d;
                 model.globalProjects.push({title: name, img: d, url: image});
                 model.updated();
@@ -136,7 +139,7 @@ function PlanetModel(controller) {
         l.forEach(function (p, i) {
             var img = localStorage['SESSIONIMAGE' + p];
             if (img === 'undefined') {
-                img = EMPTYIMAGE;
+                img = 'images/planetgraphic.png'; // EMPTYIMAGE;
             }
 
             var e = {
