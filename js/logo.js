@@ -20,8 +20,7 @@ const OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need
                                  // to scale back its volume.
 
 // This header is prepended to the Lilypond output.
-// Note: We are using URL encoding, e.g., \ (%5C) and newline (%0A)
-const LILYPONDHEADER = '%5Cversion "2.18.2"%0A%0A%25 ****************************************************************%0A%25 %0A%25 WHAT IS THIS? -- This is a LilyPond file generated from Music%0A%25 Blocks software (Read about it at www.musicblocks.net).%0A%25 %0A%25 DOWNLOAD LILYPOND -- In order to create notation with this file,%0A%25 you will need to download and install LilyPond software onto your%0A%25 computer (http:%2F%2Flilypond.org%2Fdownload.html). Frescobaldi%0A%25 software is also handy for editing LilyPond files%0A%25 (http:%2F%2Ffrescobaldi.org%2Fdownload).%0A%25 %0A%25 LILYPOND INSTRUCTIONS -- For instructions on how to further%0A%25 manipulate musical notation using LilyPond software, please%0A%25 read the Introduction (http:%2F%2Flilypond.org%2Ftext-input.html) and%0A%25 the Manual%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2FDocumentation%2Flearning%2Findex.html).%0A%25 %0A%25 GLOSSARY -- A glossary with helpful examples may be found here%0A%25 (http:%2F%2Fwww.lilypond.org%2Fdoc%2Fv2.19%2FDocumentation%2Fmusic-glossary%2F).%0A%25 %0A%25 MUTOPIA -- You may also benefit from studying scores from the%0A%25 Mutopia Project website, which has freely sharable music notation%0A%25 generated with LilyPond (http:%2F%2Fwww.mutopiaproject.org%2F).%0A%25 %0A%25 TUNEFL -- You can explore your Lilypond output in a web browser at%0A%25 (https://www.tunefl.com/).%0A%25 %0A%25 COMMENTS -- Some of the code below is commented out. You can%0A%25 enable it by deleting the %25 that precedes the text or, in the%0A%25 case of a commented section, deleting the %{ and %} that surrounds%0A%25 the section.%0A%25 %0A%25 ****************************************************************%0A%0A%25 Please add your own name, the title of your musical creation,%0A%25 and the intended copyright below.%0A%25 The copyright is great for sharing (and re-sharing)!%0A%25 Read more about it here (http:%2F%2Fcreativecommons.org%2Flicenses%2Fby-sa%2F4.0%2F).%0A%25 Of course, you can use any copyright you like -- you made it!%0A%5Cheader {%0A   dedication = %5Cmarkup {%0A      %5Cabs-fontsize #8 %5Csans "Made with LilyPond and Music Blocks" %5Cwith-url #"http://walterbender.github.io/musicblocks/" {%0A         %5Cabs-fontsize #8 %5Csans "(http://walterbender.github.io/musicblocks/)"%0A      }%0A   }%0A   title = "My Music Blocks Creation"%0A%25   subtitle = "Subtitle"%0A%25   instrument = "Instrument"%0A   composer = "Mr. Mouse"%0A%25   arranger = "Arranger"%0A   copyright = "Mr. Mouse (c) 2015 -- CC-BY-SA"%0A   tagline = "Made from Music Blocks v.0.9"%0A   footer = %5Cmarkup {%0A      %5Cwith-url #"http://walterbender.github.io/musicblocks/" "Made with Music Blocks Software v.0.9." Engraved on %5Csimple #(strftime "%Y-%m-%d" (localtime (current-time)))%0A   }%0A   currentYear = %5Cmarkup {%0A      %5Csimple #(strftime "%Y" (localtime (current-time)))%0A   }%0A   copyTag =  " free to distribute, modify, and perform"%0A   copyType = %5Cmarkup {%0A      %5Cwith-url #"http://creativecommons.org/licenses/by-sa/3.0/" "Creative Commons Attribution ShareAlike 3.0 (Unported) License "%0A   }%0A   copyright = %5Cmarkup {%0A      %5Coverride #\'(baseline-skip . 0 ) %5Cright-column {%0A         %5Csans %5Cbold %5Cwith-url #"http://musicblocks.net" {%0A            %5Cabs-fontsize #9  "Music " %5Cconcat {%0A               %5Cabs-fontsize #12 %5Cwith-color #white %5Cchar ##x01C0 %5Cabs-fontsize #9 "Blocks "%0A            }%0A         }%0A      }%0A      %5Coverride #\'(baseline-skip . 0 ) %5Ccenter-column {%0A         %5Cabs-fontsize #11.9 %5Cwith-color #grey %5Cbold {%0A            %5Cchar ##x01C0 %5Cchar ##x01C0%0A         }%0A      }%0A      %5Coverride #\'(baseline-skip . 0 ) %5Ccolumn {%0A         %5Cabs-fontsize #8 %5Csans %5Cconcat {%0A            " Typeset using " %5Cwith-url #"http://www.lilypond.org" "LilyPond software " %5Cchar ##x00A9 " " %5CcurrentYear " by " %5Ccomposer " " %5Cchar ##x2014 " " %5Cfooter%0A         }%0A         %5Cconcat {%0A            %5Cconcat {%0A               %5Cabs-fontsize #8 %5Csans {%0A                  " " %5CcopyType %5Cchar ##x2014 %5CcopyTag%0A               }%0A            }%0A            %5Cabs-fontsize #13 %5Cwith-color #white %5Cchar ##x01C0%0A         }%0A      }%0A   }%0A   tagline = ##f%0A}%0A%0A%25 To change the meter make adjustments in the following section.%0A%25 You must also delete the %25 before %5Cmeter everywhere it appears below.%0Ameter = {%0A   %5Ctime 3/4%0A   %5Ckey c %5Cminor%0A   %5CnumericTimeSignature%0A   %5Cpartial 4 %0A   %5Ctempo "Andante" 4=90%0A}%0A%0A'
+const LILYPONDHEADER = '\\version "2.18.2"\n\n% ****************************************************************\n% \n% WHAT IS THIS? -- This is a LilyPond file generated from Music\n% Blocks software (Read about it at www.musicblocks.net).\n% \n% DOWNLOAD LILYPOND -- In order to create notation with this file,\n% you will need to download and install LilyPond software onto your\n% computer (http://lilypond.org/download.html). Frescobaldi\n% software is also handy for editing LilyPond files\n% (http://frescobaldi.org/download).\n% \n% LILYPOND INSTRUCTIONS -- For instructions on how to further\n% manipulate musical notation using LilyPond software, please\n% read the Introduction (http://lilypond.org/text-input.html) and\n% the Manual\n% (http://lilypond.org/doc/v2.18/Documentation/learning/index.html).\n% \n% GLOSSARY -- A glossary with helpful examples may be found here\n% (http://www.lilypond.org/doc/v2.19/Documentation/music-glossary/).\n% \n% MUTOPIA -- You may also benefit from studying scores from the\n% Mutopia Project website, which has freely sharable music notation\n% generated with LilyPond (http://www.mutopiaproject.org/).\n% \n% TUNEFL -- You can explore your Lilypond output in a web browser at\n% (https://www.tunefl.com/).\n% \n% COMMENTS -- Some of the code below is commented out. You can\n% enable it by deleting the % that precedes the text or, in the\n% case of a commented section, deleting the %{ and %} that surrounds\n% the section.\n% \n% ****************************************************************\n\n% Please add your own name, the title of your musical creation,\n% and the intended copyright below.\n% The copyright is great for sharing (and re-sharing)!\n% Read more about it here (http://creativecommons.org/licenses/by-sa/4.0/).\n% Of course, you can use any copyright you like -- you made it!\n\\header {\n   dedication = \\markup {\n      \\abs-fontsize #8 \\sans "Made with LilyPond and Music Blocks" \\with-url #"http://walterbender.github.io/musicblocks/" {\n         \\abs-fontsize #8 \\sans "(http://walterbender.github.io/musicblocks/)"\n      }\n   }\n   title = "My Music Blocks Creation"\n%   subtitle = "Subtitle"\n%   instrument = "Instrument"\n   composer = "Mr. Mouse"\n%   arranger = "Arranger"\n   copyright = "Mr. Mouse (c) 2015 -- CC-BY-SA"\n   tagline = "Made from Music Blocks v.0.9"\n   footer = \\markup {\n      \\with-url #"http://walterbender.github.io/musicblocks/" "Made with Music Blocks Software v.0.9." Engraved on \\simple #(strftime "%Y-%m-%d" (localtime (current-time)))\n   }\n   currentYear = \\markup {\n      \\simple #(strftime "%Y" (localtime (current-time)))\n   }\n   copyTag =  " free to distribute, modify, and perform"\n   copyType = \\markup {\n      \\with-url #"http://creativecommons.org/licenses/by-sa/3.0/" "Creative Commons Attribution ShareAlike 3.0 (Unported) License "\n   }\n   copyright = \\markup {\n      \\override #\'(baseline-skip . 0 ) \\right-column {\n         \\sans \\bold \\with-url #"http://musicblocks.net" {\n            \\abs-fontsize #9  "Music " \\concat {\n               \\abs-fontsize #12 \\with-color #white \\char ##x01C0 \\abs-fontsize #9 "Blocks "\n            }\n         }\n      }\n      \\override #\'(baseline-skip . 0 ) \\center-column {\n         \\abs-fontsize #11.9 \\with-color #grey \\bold {\n            \\char ##x01C0 \\char ##x01C0\n         }\n      }\n      \\override #\'(baseline-skip . 0 ) \\column {\n         \\abs-fontsize #8 \\sans \\concat {\n            " Typeset using " \\with-url #"http://www.lilypond.org" "LilyPond software " \\char ##x00A9 " " \\currentYear " by " \\composer " " \\char ##x2014 " " \\footer\n         }\n         \\concat {\n            \\concat {\n               \\abs-fontsize #8 \\sans {\n                  " " \\copyType \\char ##x2014 \\copyTag\n               }\n            }\n            \\abs-fontsize #13 \\with-color #white \\char ##x01C0\n         }\n      }\n   }\n   tagline = ##f\n}\n\n% To change the meter make adjustments in the following section.\n% You must also delete the % before \\meter everywhere it appears below.\nmeter = {\n   \\time 3/4\n   \\key c \\minor\n   \\numericTimeSignature\n   \\partial 4 \n   \\tempo "Andante" 4=90\n}\n\n';
 
 //.TRANS Animal names used in Lilypond output
 const RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
@@ -5516,7 +5515,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             if (typeof(obj) === 'string') {
                 if (obj === 'break') {
                     if (i > 0) {
-                        this.lilypondNotes[turtle] += '%0A';
+                        this.lilypondNotes[turtle] += '\n';
                     }
                     counter = 0;
                 } else {
@@ -5533,7 +5532,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 }
             } else {
                 if (counter % 8 === 0 && counter > 0) {
-                    this.lilypondNotes[turtle] += '%0A';
+                    this.lilypondNotes[turtle] += '\n';
                 }
                 counter += 1;
 
@@ -5583,7 +5582,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
                             logo.lilypondNotes[turtle] += __toLilynote(logo.lilypondStaging[turtle][i + j][LYNOTE]);
                             if (obj[LYSTACCATO]) {
-                                logo.lilypondNotes[turtle] += '%5Cstaccato';
+                                logo.lilypondNotes[turtle] += '\\staccato';
                             }
 
                             logo.lilypondNotes[turtle] += ' ';
@@ -5597,7 +5596,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         } else {
                             logo.lilypondNotes[turtle] += __toLilynote(logo.lilypondStaging[turtle][i + j][LYNOTE]) + logo.lilypondStaging[turtle][i + j][LYROUNDDOWN];
                             if (obj[LYSTACCATO]) {
-                                logo.lilypondNotes[turtle] += '%5Cstaccato';
+                                logo.lilypondNotes[turtle] += '\\staccato';
                             }
 
                             logo.lilypondNotes[turtle] += ' ';
@@ -5632,12 +5631,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
                     if (incompleteTuplet === 0) {
                         var tupletFraction = toFraction(tupletDuration / targetDuration);
-                        this.lilypondNotes[turtle] += '%5Ctuplet ' + tupletFraction[0] + '%2F' + tupletFraction[1] + ' { ';
+                        this.lilypondNotes[turtle] += '\\tuplet ' + tupletFraction[0] + '/' + tupletFraction[1] + ' { ';
 
                         i += __processTuplet(this, turtle, i, obj[LYTUPLETVALUE]) - 1;
                     } else {
                         var tupletFraction = toFraction(obj[LYTUPLETVALUE] / incompleteTuplet);
-                        this.lilypondNotes[turtle] += '%5Ctuplet ' + tupletFraction[0] + '%2F' + tupletFraction[1] + ' { ';
+                        this.lilypondNotes[turtle] += '\\tuplet ' + tupletFraction[0] + '/' + tupletFraction[1] + ' { ';
 
                         i += __processTuplet(this, turtle, i, incompleteTuplet) - 1;
                     }
@@ -5681,7 +5680,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
 
                     if (obj[LYSTACCATO]) {
-                        this.lilypondNotes[turtle] += '%5Cstaccato';
+                        this.lilypondNotes[turtle] += '\\staccato';
                     }
 
                     targetDuration = 0;
@@ -5724,14 +5723,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         }
 
         if (factor > 0) {
-            this.lilypondStaging[turtle].push('%5C< ');
+            this.lilypondStaging[turtle].push('\\< ');
         } else {
-            this.lilypondStaging[turtle].push('%5C> ');
+            this.lilypondStaging[turtle].push('\\> ');
         }
     };
 
     this._lilypondEndCrescendo = function(turtle) {
-        this.lilypondStaging[turtle].push('%5C! ');
+        this.lilypondStaging[turtle].push('\\! ');
     };
 
     this._lilypondBeginSlur = function(turtle) {
@@ -5766,7 +5765,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         }
         console.log('saving as lilypond: ' + turtleCount);
 
-        this.lilypondOutput += '%25 You can change the MIDI instruments below to anything on this list:%0A%25 (http:%2F%2Flilypond.org%2Fdoc%2Fv2.18%2Fdocumentation%2Fnotation%2Fmidi-instruments)%0A%0A';
+        this.lilypondOutput += '% You can change the MIDI instruments below to anything on this list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n';
 
         var c = 0;
         for (var t in this.lilypondStaging) {
@@ -5820,40 +5819,40 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 }
                 instrumentName = instrumentName.replace(/ /g, '_');
 
-                this.lilypondOutput += instrumentName + ' = {%0A';
-                this.lilypondOutput += '%25 %5Cmeter%0A';
+                this.lilypondOutput += instrumentName + ' = {\n';
+                this.lilypondOutput += '% \\meter\n';
                 this.lilypondOutput += this.lilypondNotes[t];
 
                 // Add bar to last turtle's output.
                 if (c === turtleCount - 1) {
-                    this.lilypondOutput += ' %5Cbar "%7C."'
+                    this.lilypondOutput += ' \\bar "%7C."'
                 }
-                this.lilypondOutput += '%0A}%0A%0A';
+                this.lilypondOutput += '\n}\n\n';
 
                 var shortInstrumentName = RODENTSSHORT[t % 12];
 
                 this.lilypondOutput += instrumentName.replace(/ /g, '_') + 'Voice = ';
                 if (this.turtles.turtleList[t].drum) {
-                    this.lilypondOutput += '%5Cnew DrumStaff %5Cwith {%0A';
-                    // this.lilypondOutput += '   %5Cdrummode {%0A      hihat4 hh bassdrum bd%0A   }%0A';
+                    this.lilypondOutput += '\\new DrumStaff \\with {\n';
+                    // this.lilypondOutput += '   \\drummode {\n      hihat4 hh bassdrum bd\n   }\n';
                 } else {
-                    this.lilypondOutput += '%5Cnew Staff %5Cwith {%0A';
+                    this.lilypondOutput += '\\new Staff \\with {\n';
                 }
-                this.lilypondOutput += '   %5Cclef "' + last(clef) + '"%0A';
-                this.lilypondOutput += '   instrumentName = "' + instrumentName + '"%0A';
-                this.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"%0A';
-                this.lilypondOutput += '   midiInstrument = "acoustic grand"%0A';
+                this.lilypondOutput += '   \\clef "' + last(clef) + '"\n';
+                this.lilypondOutput += '   instrumentName = "' + instrumentName + '"\n';
+                this.lilypondOutput += '   shortInstrumentName = "' + shortInstrumentName + '"\n';
+                this.lilypondOutput += '   midiInstrument = "acoustic grand"\n';
                 // Automatic note splitting
-                this.lilypondOutput += '%0A   %5Cremove "Note_heads_engraver"%0A   %5Cconsists "Completion_heads_engraver"%0A   %5Cremove "Rest_engraver"%0A   %5Cconsists "Completion_rest_engraver"%0A'
+                this.lilypondOutput += '\n   \\remove "Note_heads_engraver"\n   \\consists "Completion_heads_engraver"\n   \\remove "Rest_engraver"\n   \\consists "Completion_rest_engraver"\n'
 
-                this.lilypondOutput += '} { %5Cclef "' + last(clef) + '" %5C' + instrumentName.replace(/ /g, '_') + ' }%0A%0A';
+                this.lilypondOutput += '} { \\clef "' + last(clef) + '" \\' + instrumentName.replace(/ /g, '_') + ' }\n\n';
             }
             c += 1;
         }
 
         // Begin the SCORE section.
-        this.lilypondOutput += '%0A%5Cscore {%0A';
-        this.lilypondOutput += '   <<%0A';
+        this.lilypondOutput += '\n\\score {\n';
+        this.lilypondOutput += '   <<\n';
 
         // Sort the staffs, treble on top, bass_8 on the bottom.
         for (var c = 0; c < CLEFS.length; c++) {
@@ -5868,14 +5867,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                             instrumentName = RODENTS[t % 12];
                         }
                         instrumentName = instrumentName.replace(/ /g, '_');
-                        this.lilypondOutput += '      %5C' + instrumentName + 'Voice%0A';
+                        this.lilypondOutput += '      \\' + instrumentName + 'Voice\n';
                     }
                 }
             }
         }
 
         // Add GUITAR TAB in comments.
-        this.lilypondOutput += '%0A%0A%25 GUITAR TAB SECTION%0A%25 Delete the %25{ and %25} below to include guitar tablature output.%0A%25{%0A      %5Cnew TabStaff = "guitar tab" %0A      <<%0A         %5Cclef moderntab%0A';
+        this.lilypondOutput += '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
         for (var c = 0; c < CLEFS.length; c++) {
             var i = 0;
             for (var t in this.lilypondNotes) {
@@ -5888,26 +5887,26 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                             instrumentName = RODENTS[t % 12];
                         }
                         instrumentName = instrumentName.replace(/ /g, '_');
-                        this.lilypondOutput += '         %5Ccontext TabVoice = "'+ instrumentName + '" %5C' + instrumentName.replace(/ /g, '_') + '%0A';
+                        this.lilypondOutput += '         \\context TabVoice = "'+ instrumentName + '" \\' + instrumentName.replace(/ /g, '_') + '\n';
                     }
                 }
             }
         }
 
         // Close the SCORE sections.
-        this.lilypondOutput += '      >>%0A%25}%0A';
-        this.lilypondOutput += '%0A   >>%0A   %5Clayout {}%0A%0A';
+        this.lilypondOutput += '      >>\n%}\n';
+        this.lilypondOutput += '\n   >>\n   \\layout {}\n\n';
 
         // Add MIDI OUTPUT in comments.
-        this.lilypondOutput += '%25 MIDI SECTION%0A%25 Delete the %25{ and %25} below to include MIDI output.%0A%25{%0A%5Cmidi {%0A   %5Ctempo 4=90%0A}%0A%25}%0A%0A}%0A%0A';
+        this.lilypondOutput += '% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n';
 
         // ADD TURTLE BLOCKS CODE HERE
-        this.lilypondOutput += '%25 MUSIC BLOCKS CODE%0A';
-        this.lilypondOutput += '%25 Below is the code for the Music Blocks project that generated this Lilypond file.%0A%25{%0A%0A';
+        this.lilypondOutput += '% MUSIC BLOCKS CODE\n';
+        this.lilypondOutput += '% Below is the code for the Music Blocks project that generated this Lilypond file.\n%{\n\n';
         // prepareExport() returns json-encoded project data.
         var projectData = prepareExport();
-        this.lilypondOutput += projectData.replace(/]],/g, ']],%0A');
-        this.lilypondOutput += '%0A%25}%0A%0A';
+        this.lilypondOutput += projectData.replace(/]],/g, ']],\n');
+        this.lilypondOutput += '\n%}\n\n';
 
         doSaveLilypond(this, saveName);
     };
