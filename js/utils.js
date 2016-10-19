@@ -491,7 +491,7 @@ function doSaveSVG(logo, desc) {
 
 
 function doSaveLilypond(logo, desc) {
-    download(desc, 'data:text;utf8,' + logo.lilypondOutput, desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
+    download(desc, 'data:text;utf8,' + encodeURIComponent(logo.lilypondOutput), desc, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
 };
 
 
