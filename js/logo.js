@@ -286,7 +286,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                             }
                             // logo.playedNote[turtle] = true;
                             logo.playedNoteTimes[turtle] = logo.playedNoteTimes[turtle] || 0;
-                            thisNote[turtle] = Math.pow(logo._parseArg(logo, turtle, block.connections[1], blk, null), -1);
+                            thisNote[turtle] = Math.pow(logo.parseArg(logo, turtle, block.connections[1], blk, null), -1);
                             logo.playedNoteTimes[turtle] += thisNote[turtle];
                             // Keep track of how long the note played for, so we can go back and play it again if needed
                         }
@@ -408,7 +408,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 break;
             case 'box':
                 var cblk = this.blocks.blockList[blk].connections[1];
-                var boxname = this._parseArg(logo, turtle, cblk, blk);
+                var boxname = this.parseArg(logo, turtle, cblk, blk);
                 if (boxname in this.boxes) {
                     value = this.boxes[boxname];
                 } else {
@@ -853,7 +853,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             break;
         case 'box':
             var cblk = this.blocks.blockList[blk].connections[1];
-            var name = this._parseArg(this, turtle, cblk, blk);
+            var name = this.parseArg(this, turtle, cblk, blk);
             if (name in this.boxes) {
                 this.boxes[name] = value;
             } else {
@@ -947,7 +947,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         var args = [];
         if (logo.blocks.blockList[blk].protoblock.args > 0) {
             for (var i = 1; i < logo.blocks.blockList[blk].protoblock.args + 1; i++) {
-                args.push(logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i], blk, receivedArg));
+                args.push(logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i], blk, receivedArg));
             }
         }
 
@@ -1106,7 +1106,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                    var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
+                    var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
                     actionArgs.push(t);
                 }
             }
@@ -1125,7 +1125,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                    var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
+                    var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
                     actionArgs.push(t);
                 }
             }
@@ -3761,7 +3761,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             } else {
                 // Could be an arg block, so we need to print its value.
                 if (logo.blocks.blockList[blk].isArgBlock()) {
-                    args.push(logo._parseArg(logo, turtle, blk));
+                    args.push(logo.parseArg(logo, turtle, blk));
                     console.log('block: ' + blk + ' turtle: ' + turtle);
                     console.log('block name: ' + logo.blocks.blockList[blk].name);
                     console.log('block value: ' + logo.blocks.blockList[blk].value);
@@ -4531,7 +4531,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         }
     };
 
-    this._parseArg = function(logo, turtle, blk, parentBlk, receivedArg) {
+    this.parseArg = function(logo, turtle, blk, parentBlk, receivedArg) {
         // Retrieve the value of a block.
         if (blk == null) {
             logo.errorMsg('Missing argument.', parentBlk);
@@ -4573,13 +4573,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'eval':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = Number(eval(a.replace(/x/g, b.toString())));
                 break;
             case 'arg':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var name = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 var action_args=receivedArg
                 if(action_args.length >= Number(name)){
                     var value = action_args[Number(name)-1];
@@ -4592,7 +4592,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 break;
             case 'box':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var name = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.boxes) {
                     logo.blocks.blockList[blk].value = logo.boxes[name];
                 } else {
@@ -4627,7 +4627,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 break;
             case 'sqrt':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var a = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (a < 0) {
                     logo.errorMsg(NOSQRTERRORMSG, blk);
                     logo.stopTurtle = true;
@@ -4637,93 +4637,93 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 break;
             case 'int':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var a = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 logo.blocks.blockList[blk].value = Math.floor(a);
                 break;
             case 'mod':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = logo._doMod(a, b);
                 break;
             case 'not':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var a = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 logo.blocks.blockList[blk].value = !a;
                 break;
             case 'greater':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = (Number(a) > Number(b));
                 break;
             case 'equal':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = (a === b);
                 break;
             case 'less':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 var result = (Number(a) < Number(b));
                 logo.blocks.blockList[blk].value = result;
                 break;
             case 'random':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = logo._doRandom(a, b);
                 break;
             case 'oneOf':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = logo._doOneOf(a, b);
                 break;
             case 'plus':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = logo._doPlus(a, b);
                 break;
             case 'multiply':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = logo._doMultiply(a, b);
                 break;
             case 'divide':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = logo._doDivide(a, b);
                 break;
             case 'minus':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = logo._doMinus(a, b);
                 break;
             case 'neg':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 logo.blocks.blockList[blk].value = logo._doMinus(0, a);
                 break;
             case 'toascii':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 logo.blocks.blockList[blk].value = String.fromCharCode(a);
                 break;
             case 'myclick':
@@ -4753,7 +4753,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'xturtle':
             case 'yturtle':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var targetTurtle = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 for (var i = 0; i < logo.turtles.turtleList.length; i++) {
                     var logoTurtle = logo.turtles.turtleList[i];
                     if (targetTurtle === logoTurtle.name) {
@@ -4854,7 +4854,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'number2pitch':
             case 'number2octave':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var num = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (num != null && typeof(num) === 'number') {
                     var obj = numberToPitch(num);
                     if (logo.blocks.blockList[blk].name === 'number2pitch') {
@@ -4870,7 +4870,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'turtlepitch':
                 var value = null;
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var targetTurtle = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 for (var i = 0; i < logo.turtles.turtleList.length; i++) {
                     var logoTurtle = logo.turtles.turtleList[i];
                     if (targetTurtle === logoTurtle.name) {
@@ -4898,7 +4898,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'turtlenote':
                 var value = null;
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var targetTurtle = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 for (var i = 0; i < logo.turtles.turtleList.length; i++) {
                     var logoTurtle = logo.turtles.turtleList[i];
                     if (targetTurtle === logoTurtle.name) {
@@ -4958,15 +4958,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'and':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = a && b;
                 break;
             case 'or':
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 logo.blocks.blockList[blk].value = a || b;
                 break;
             case 'time':
@@ -4975,7 +4975,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 break;
             case 'hspace':
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var v = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var v = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 logo.blocks.blockList[blk].value = v;
                 break;
             case 'mousex':
@@ -4992,6 +4992,28 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 logo.blocks.blockList[blk].value = logo.lastKeyCode;
                 logo.clearCurrentKeyCode();
                 break;
+            case 'getred':
+            case 'getgreen':
+            case 'getblue':
+                var colorString = logo.turtles.turtleList[turtle].canvasColor;
+		// 'rgba(255,0,49,1)' or '#ff0031'
+		if (colorString[0] === "#") {
+                    colorString = hex2rgb(colorString.split("#")[1]);
+		}
+                var obj = colorString.split('(');
+                var obj = obj[1].split(',');
+                switch (logo.blocks.blockList[blk].name) {
+		case 'getred':
+                    logo.blocks.blockList[blk].value = parseInt(Number(obj[0]) / 2.55);
+		    break;
+		case 'getgreen':
+                    logo.blocks.blockList[blk].value = parseInt(Number(obj[1]) / 2.55);
+		    break;
+		case 'getblue':
+                    logo.blocks.blockList[blk].value = parseInt(Number(obj[2]) / 2.55);
+		    break;
+		}
+		break;
             case 'getcolorpixel':
                 var wasVisible = logo.turtles.turtleList[turtle].container.visible;
                 logo.turtles.turtleList[turtle].container.visible = false;
@@ -5017,8 +5039,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 var block = logo.blocks.blockList[blk];
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo._parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo._parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 block.value = Math.round(pitchToFrequency(a, b, 0, logo.keySignature[turtle]));
                 break;
             case 'pop':
@@ -5033,7 +5055,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'indexHeap':
                 var block = logo.blocks.blockList[blk];
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var a = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (!(turtle in logo.turtleHeaps)) {
                     logo.turtleHeaps[turtle] = [];
                 }
@@ -5062,7 +5084,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'calc':
                 var actionArgs = [];
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var name = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 actionArgs = receivedArg;
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
@@ -5094,12 +5116,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 // logo.getBlockAtStartOfArg(blk);
                 if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                     for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                        var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
+                        var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
                         actionArgs.push(t);
                     }
                 }
                 var cblk = logo.blocks.blockList[blk].connections[1];
-                var name = logo._parseArg(logo, turtle, cblk, blk, receivedArg);
+                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
                     logo.turtles.turtleList[turtle].running = true;
                     logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
@@ -5115,7 +5137,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 // logo.getBlockAtStartOfArg(blk);
                 if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                     for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++){
-                        var t = (logo._parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
+                        var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
                         actionArgs.push(t);
                     }
                 }
