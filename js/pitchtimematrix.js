@@ -10,6 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+// FIXME: i18n for graphics blocks
 const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
@@ -224,7 +225,7 @@ function Matrix() {
                 console.log('drumName is: ' + drumName + ' (' + this.rowLabels[i] + ')');
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize/2 + '" width="' + iconSize/2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
                 cell.style.backgroundImage = "url('images/synth2.svg')";
@@ -797,6 +798,7 @@ function Matrix() {
         var pitchNotes = [];
         var synthNotes = [];
         var drumNotes = [];
+
         // Note can be a chord, hence it is an array.
         for (var i = 0; i < note.length; i++) {
             var drumName = getDrumName(note[i]);
@@ -907,10 +909,10 @@ function Matrix() {
                 noteValue = that._notesToPlay[that._notesCounter][1];
                 that._notesCounter += 1;
 
-                // Note can be a chord, hence it is an array.
                 var pitchNotes = [];
                 var synthNotes = [];
                 var drumNotes = [];
+
                 // Note can be a chord, hence it is an array.
                 for (var i = 0; i < note.length; i++) {
                     var drumName = getDrumName(note[i]);
@@ -1006,6 +1008,9 @@ function Matrix() {
         var table = docById('pitchTimeTable');
         var solfegeHTML = table.rows[j].cells[0].innerHTML;
         var drumHTML = solfegeHTML.split('"');
+        var turtleHTML = drumHTML[0].split('<br>');
+        var graphicsBlock = false;
+        console.log(turtleHTML);
         if (drumHTML.length > 3) {
             var drumName = getDrumSynthName(drumHTML[3]);
             console.log('[' + drumHTML[1].slice(0, 7) + ']');
@@ -1018,6 +1023,12 @@ function Matrix() {
                 console.log('something is wrong (drumSynthName is ' + drumName + ')');
                 var note = DEFAULTDRUM;
             }
+        } else if (MATRIXGRAPHICS.indexOf(turtleHTML[0]) != -1) {
+            var note = turtleHTML[0] + ':' + turtleHTML[1];
+            var graphicsBlock = true;
+        } else if (MATRIXGRAPHICS2.indexOf(turtleHTML[0]) != -1) {
+            var note = turtleHTML[0] + ':' + turtleHTML[1].replace(/ /g, ':');
+            var graphicsBlock = true;
         } else {
             // Both solfege and octave are extracted from HTML by getNote.
             var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
@@ -1030,7 +1041,7 @@ function Matrix() {
 
         // innerHTML looks something like: 1<br>&mdash;<br>4<br>&#x1D15F;
         noteParts = noteValue.split('<br>');
-        noteValue = Number(noteParts[0])/Number(noteParts[2]);
+        noteValue = Number(noteParts[0]) / Number(noteParts[2]);
         noteValue = noteValue.toString();
 
         var obj = note.split(':');
@@ -1038,7 +1049,7 @@ function Matrix() {
             if (playNote) {
                 if (drumName != null) {
                     this._logo.synth.trigger('C2', noteValue, drumName);
-                } else {
+                } else if (graphicsBlock !== true) {
                     this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
                 }
             }
