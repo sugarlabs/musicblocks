@@ -379,7 +379,7 @@ function getDrumName(name) {
         }
     }
 
-    console.log(name + ' not found in DRUMAMES');
+    // console.log(name + ' not found in DRUMAMES');
     return null;
 };
 
