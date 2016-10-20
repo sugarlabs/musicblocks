@@ -31,7 +31,7 @@ const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
 function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitchslider,
-	      canvas, blocks, turtles, stage,
+              canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
               getStageMouseDown, getCurrentKeyCode,
@@ -1377,20 +1377,22 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push([args[0], args[1]]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var delta = args[0] / NOTEDIV;
-                    var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
+                    if (!logo.lilypondSaveOnly) {
+                        var delta = args[0] / NOTEDIV;
+                        var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var __listener = function (event) {
-                        logo.turtles.turtleList[turtle].doArc(delta, args[1]);
-                    };
+                        var __listener = function (event) {
+                            logo.turtles.turtleList[turtle].doArc(delta, args[1]);
+                        };
 
-                    if (logo.whichNoteBlock[turtle] in logo.arcListener[turtle]) {
-                        logo.arcListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
-                    } else {
-                        logo.arcListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        if (logo.whichNoteBlock[turtle] in logo.arcListener[turtle]) {
+                            logo.arcListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
+                        } else {
+                            logo.arcListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        }
+
+                        logo.stage.addEventListener(listenerName, __listener, false);
                     }
-
-                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
                 }
@@ -1482,20 +1484,22 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var dist = args[0] / NOTEDIV;
-                    var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
+                    if (!logo.lilypondSaveOnly) {
+                        var dist = args[0] / NOTEDIV;
+                        var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var __listener = function (event) {
-                        logo.turtles.turtleList[turtle].doForward(dist);
-                    };
+                        var __listener = function (event) {
+                            logo.turtles.turtleList[turtle].doForward(dist);
+                        };
 
-                    if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
-                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
-                    } else {
-                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
+                            logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
+                        } else {
+                            logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        }
+
+                        logo.stage.addEventListener(listenerName, __listener, false);
                     }
-
-                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(args[0]);
                 }
@@ -1514,20 +1518,22 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var dist = -args[0] / NOTEDIV;
-                    var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
+                    if (!logo.lilypondSaveOnly) {
+                        var dist = -args[0] / NOTEDIV;
+                        var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var __listener = function (event) {
-                        logo.turtles.turtleList[turtle].doForward(dist);
-                    };
+                        var __listener = function (event) {
+                            logo.turtles.turtleList[turtle].doForward(dist);
+                        };
 
-                    if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
-                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
-                    } else {
-                        logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
+                            logo.forwardListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
+                        } else {
+                            logo.forwardListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        }
+
+                        logo.stage.addEventListener(listenerName, __listener, false);
                     }
-
-                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doForward(-args[0]);
                 }
@@ -1546,20 +1552,22 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var delta = args[0] / NOTEDIV;
-                    var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
+                    if (!logo.lilypondSaveOnly) {
+                        var delta = args[0] / NOTEDIV;
+                        var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var __listener = function (event) {
-                        logo.turtles.turtleList[turtle].doRight(delta);
-                    };
+                        var __listener = function (event) {
+                            logo.turtles.turtleList[turtle].doRight(delta);
+                        };
 
-                    if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
-                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
-                    } else {
-                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
+                            logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
+                        } else {
+                            logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        }
+
+                        logo.stage.addEventListener(listenerName, __listener, false);
                     }
-
-                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(args[0]);
                 }
@@ -1578,20 +1586,22 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    var delta = -args[0] / NOTEDIV;
-                    var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
+                    if (!logo.lilypondSaveOnly) {
+                        var delta = -args[0] / NOTEDIV;
+                        var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
-                    var __listener = function (event) {
-                        logo.turtles.turtleList[turtle].doRight(delta);
-                    };
+                        var __listener = function (event) {
+                            logo.turtles.turtleList[turtle].doRight(delta);
+                        };
 
-                    if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
-                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
-                    } else {
-                        logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
+                            logo.rightListener[turtle][logo.whichNoteBlock[turtle]].push(__listener);
+                        } else {
+                            logo.rightListener[turtle][logo.whichNoteBlock[turtle]] = [__listener];
+                        }
+
+                        logo.stage.addEventListener(listenerName, __listener, false);
                     }
-
-                    logo.stage.addEventListener(listenerName, __listener, false);
                 } else {
                     logo.turtles.turtleList[turtle].doRight(-args[0]);
                 }
@@ -4996,24 +5006,24 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'getgreen':
             case 'getblue':
                 var colorString = logo.turtles.turtleList[turtle].canvasColor;
-		// 'rgba(255,0,49,1)' or '#ff0031'
-		if (colorString[0] === "#") {
+                // 'rgba(255,0,49,1)' or '#ff0031'
+                if (colorString[0] === "#") {
                     colorString = hex2rgb(colorString.split("#")[1]);
-		}
+                }
                 var obj = colorString.split('(');
                 var obj = obj[1].split(',');
                 switch (logo.blocks.blockList[blk].name) {
-		case 'getred':
+                case 'getred':
                     logo.blocks.blockList[blk].value = parseInt(Number(obj[0]) / 2.55);
-		    break;
-		case 'getgreen':
+                    break;
+                case 'getgreen':
                     logo.blocks.blockList[blk].value = parseInt(Number(obj[1]) / 2.55);
-		    break;
-		case 'getblue':
+                    break;
+                case 'getblue':
                     logo.blocks.blockList[blk].value = parseInt(Number(obj[2]) / 2.55);
-		    break;
-		}
-		break;
+                    break;
+                }
+                break;
             case 'getcolorpixel':
                 var wasVisible = logo.turtles.turtleList[turtle].container.visible;
                 logo.turtles.turtleList[turtle].container.visible = false;
@@ -5396,14 +5406,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
 
             // Reverse any i18n
-	    // solfnotes_ is used in the interface for i18n
-	    //.TRANS: the note names must be separated by single spaces 
-	    var solfnotes_ = _('ti la sol fa mi re do').split(' ');
+            // solfnotes_ is used in the interface for i18n
+            //.TRANS: the note names must be separated by single spaces 
+            var solfnotes_ = _('ti la sol fa mi re do').split(' ');
             if (solfnotes_.indexOf(solfege.substr(0, 2).toLowerCase()) !== -1) {
                 var solfegePart = SOLFNOTES[solfnotes_.indexOf(solfege.substr(0, 2).toLowerCase())];
-	    } else if (solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase()) !== -1) {
+            } else if (solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase()) !== -1) {
                 var solfegePart = SOLFNOTES[solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase())];
-	    } else {  // FIXME: Should be everything but the sharp/flat
+            } else {  // FIXME: Should be everything but the sharp/flat
                 var solfegePart = solfege.substr(0, 2).toLowerCase();
             }
 
