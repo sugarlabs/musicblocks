@@ -100,7 +100,8 @@
        x="64.453125"
        id="tspan4478">sol<tspan
    id="tspan4492"
-   style="font-size:64.99999166%;baseline-shift:sub">4</tspan>  <text
+   style="font-size:64.99999166%;baseline-shift:sub">4</tspan></tspan></text>
+  <text
      id="text4480"
      y="93.478127"
      x="62.894531"
@@ -110,7 +111,8 @@
        x="62.894531"
        id="tspan4482">mi<tspan
    id="tspan4494"
-   style="font-size:64.99999166%;baseline-shift:sub">4</tspan>  <text
+   style="font-size:64.99999166%;baseline-shift:sub">4</tspan></tspan></text>
+  <text
      id="text4484"
      y="127.88047"
      x="60.925781"
@@ -120,18 +122,19 @@
        x="60.925781"
        id="tspan4486">re<tspan
    id="tspan4496"
-   style="font-size:64.99999166%;baseline-shift:sub">4</tspan>  <text
+   style="font-size:64.99999166%;baseline-shift:sub">4</tspan></tspan></text>
+  <text
      id="text4488"
      y="158.39812"
      x="49.785904"
      style="font-style:normal;font-weight:normal;font-size:10.31685257px;line-height:125%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     xml:space="preserve">tuplet</text>
+     xml:space="preserve">valor de la nota</text>
   <text
      id="text5874"
      y="170.39812"
      x="49.785904"
      style="font-style:normal;font-weight:normal;font-size:10.31685257px;line-height:125%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     xml:space="preserve">note values</text>
+     xml:space="preserve" />
   <text
      id="text4500"
      y="166.39378"
@@ -234,7 +237,7 @@
      y="200.39812"
      x="49.785904"
      style="font-style:normal;font-weight:normal;font-size:10.31685257px;line-height:125%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     xml:space="preserve">tuplet value</text>
+     xml:space="preserve">valor de la tuplet</text>
   <rect
      y="215.99998"
      x="102"
@@ -251,16 +254,22 @@
      style="opacity:1;fill:#90c100;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
   <text
      id="text4488-6-9"
+     y="218.39812"
+     x="49.785904"
+     style="font-style:normal;font-weight:normal;font-size:10.31685257px;line-height:125%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       id="tspan4498-4-1"
+       y="231.29417"
+       x="49.785904">valor de la nota</tspan></text>
+  <text
+     id="text4263"
      y="230.39812"
      x="49.785904"
      style="font-style:normal;font-weight:normal;font-size:10.31685257px;line-height:125%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
      xml:space="preserve"><tspan
-       y="230.39812"
-       x="49.785904"
-       id="tspan4490-6-3">rhythmic</tspan><tspan
-       id="tspan4498-4-1"
+       id="tspan4265"
        y="243.29417"
-       x="49.785904">note values</tspan></text>
+       x="49.785904">ritmo</tspan></text>
   <text
      id="text4500-3-0-8"
      y="238.39378"
@@ -640,4 +649,14 @@
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
+  <text
+     id="text4259"
+     y="169.49153"
+     x="46.912834"
+     style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       style="font-size:10.3125px"
+       y="169.49153"
+       x="46.912834"
+       id="tspan4261">tuplet</tspan></text>
 </svg>
