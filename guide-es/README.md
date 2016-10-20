@@ -417,9 +417,9 @@ III. WIDGETS
 1. Status
 ---------
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/status1.svg'</img>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/status2.svg'</img>
 
 The *Status widget* is a tool for inspecting the status of Music
 Blocks as it is running. By default, the key, BPM, and volume are
