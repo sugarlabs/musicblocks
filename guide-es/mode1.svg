@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="71.684418mm"
-   height="54.38028mm"
-   viewBox="0 0 253.99991 192.68605"
+   version="1.1"
    id="svg5587"
-   version="1.1">
+   viewBox="0 0 269.99991 192.68606"
+   height="54.380283mm"
+   width="76.199974mm">
   <defs
      id="defs5589" />
   <metadata
@@ -25,133 +25,133 @@
     </rdf:RDF>
   </metadata>
   <path
-     d="m 132.99991,55.68606 120,0 0,39.999999 -120,0 0,-16 0,-2 -12,0 0,6 -3.99999,0 0,-15.999999 3.99999,0 0,5.999999 12,0 0,-2 z"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-2-3-94"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     d="m 148.99992,55.68606 120,0 0,39.999999 -120,0 0,-16 0,-2 -12,0 0,6 -3.99999,0 0,-15.999999 3.99999,0 0,5.999999 12,0 0,-2 z" />
   <text
-     y="54.68605"
-     id="text23-0-6-52"
+     x="179.99994"
      style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-     x="163.99992">
+     id="text23-0-6-52"
+     y="54.68605">
     <tspan
-       x="183.99992"
+       id="tspan25-7-2-4"
        y="80.68605"
-       id="tspan25-7-2-4">C</tspan>
+       x="199.99994">C</tspan>
   </text>
   <path
-     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     d="m 18.999902,71.686059 0,-7.999999 c 0,-4.418278 3.581722,-8 8,-8 l 8,0 0,4 20,0 0,-4 75.999998,0 7.99999,0 c 4.41828,0 9.0716,3.713637 8.00001,8 l 0,7.999999 -8.00001,0 0,-5.999999 -7.99999,0 0,19.999999 7.99999,0 0,-6 8.00001,0 0,34.000001 -8.00001,0 0,-6 -7.99999,0 0,20 7.99999,0 0,-6 8.00001,0 0,8 c 0,4.41828 -3.58173,8 -8.00001,8 l -7.99999,0 -75.999998,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.418278,0 -8,-3.58172 -8,-8 l 0,-8 0,-42.000001 z"
      id="path3194-3-8-43"
-     d="m 18.999894,71.686059 0,-7.999999 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 59.999996,0 7.99999,0 a 8,8 0 0 1 8.00001,8 l 0,7.999999 -8.00001,0 0,-5.999999 -7.99999,0 0,19.999999 7.99999,0 0,-6 8.00001,0 0,34.000001 -8.00001,0 0,-6 -7.99999,0 0,20 7.99999,0 0,-6 8.00001,0 0,8 a 8,8 0 0 1 -8.00001,8 l -7.99999,0 -59.999996,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42.000001 0,-8 z" />
+     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
-     y="54.402863"
-     x="18.89637"
+     id="text3196-7-6-6"
      style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
-     id="text3196-7-6-6">
+     x="32.896378"
+     y="54.402863">
     <tspan
-       id="tspan3198-0-1-1"
+       x="126.89639"
        y="103.40286"
-       x="112.89638">fijar clave</tspan>
+       id="tspan3198-0-1-1">fijar clave</tspan>
   </text>
   <text
-     y="56.402863"
-     x="19.409065"
+     id="text3200-6-0-8"
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
-     id="text3200-6-0-8">
+     x="33.409073"
+     y="56.402863">
     <tspan
-       id="tspan3202-5-0-1"
+       x="127.40908"
        y="78.902863"
-       x="113.40907">clave</tspan>
+       id="tspan3202-5-0-1">clave</tspan>
   </text>
   <text
-     y="58.402863"
-     x="18.89637"
+     id="text3204-9-5-7"
      style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
-     id="text3204-9-5-7">
+     x="32.896378"
+     y="58.402863">
     <tspan
-       id="tspan3206-0-8-6"
+       x="126.89639"
        y="122.90288"
-       x="112.89638">modo</tspan>
+       id="tspan3206-0-8-6">modo</tspan>
   </text>
   <g
-     id="g4225"
-     transform="translate(-18.000091,-155.31398)">
+     transform="translate(-2.000083,-155.31398)"
+     id="g4225">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       d="m 150.99998,253.00004 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
        id="path21-2-3-9-1"
-       d="m 150.99998,253.00004 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
-       x="161.99998"
-       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+       y="252.00005"
        id="text23-0-6-5-0"
-       y="252.00005">
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+       x="161.99998">
       <tspan
-         id="tspan25-7-2-2-6"
+         x="181.99998"
          y="278.00006"
-         x="181.99998">Mayor</tspan>
+         id="tspan25-7-2-2-6">Mayor</tspan>
     </text>
   </g>
   <path
-     d="m 0.99998474,29.56205 0,-8 c 0,-4.18879 3.81120996,-8 7.99999996,-8 l 8.0000003,0 10,-12.0000001 10,12.0000001 18,0 88.000005,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.93628,9.01593 -8,8 l -8,0 -88.000005,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.07773 -7.07107,2.92893 -1.8512,1.85121 -2.92893,4.45308 -2.92893,7.07107 l 0,8 0,8 0,49.56196 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.53124,2.29397 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.93628,6.98407 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8.0000003,0 c -4.18879,0 -7.99999996,-3.81121 -7.99999996,-8 l 0,-8 z"
+     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3660"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     d="m 0.99999237,29.56205 0,-8 c 0,-4.18879 3.81120993,-8 7.99999993,-8 l 8.0000007,0 10,-12.0000001 10,12.0000001 18,0 152.000007,0 8,0 c 4.18879,0 9.01593,3.936277 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.93628,9.01593 -8,8 l -8,0 -152.000007,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.07773 -7.07107,2.92893 -1.8512,1.85121 -2.92893,4.45308 -2.92893,7.07107 l 0,8 0,8 0,49.56196 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.53124,2.29397 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.93628,6.98407 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8.0000007,0 c -4.18879,0 -7.99999993,-3.81121 -7.99999993,-8 l 0,-8 z" />
   <text
-     y="0.56206709"
-     x="-1.4739401e-05"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
      id="text3662"
-     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+     x="-7.1087961e-06"
+     y="0.56206715">
     <tspan
-       x="7.9999852"
+       id="tspan3664"
        y="43.562065"
-       id="tspan3664">modo personalizado</tspan>
+       x="7.9999928">modo personalizado</tspan>
   </text>
   <text
-     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     y="559.12415"
+     x="35.999992"
      id="text3095"
-     x="35.999985"
-     y="559.12415">
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
-       id="tspan3097"
+       x="146.00002"
        y="581.62415"
-       x="146" />
+       id="tspan3097" />
   </text>
   <text
-     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     y="349.12415"
+     x="35.999992"
      id="text3107"
-     x="35.999985"
-     y="349.12415">
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
-       id="tspan3109"
+       x="130.00002"
        y="371.62415"
-       x="130" />
+       id="tspan3109" />
   </text>
   <text
-     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     y="307.12411"
+     x="35.999992"
      id="text3033"
-     x="35.999985"
-     y="307.12411">
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
-       id="tspan3035"
+       x="138.00002"
        y="329.62411"
-       x="138" />
+       id="tspan3035" />
   </text>
   <text
-     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     y="139.12411"
+     x="17.999992"
      id="text3317"
-     x="17.999985"
-     y="139.12411">
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
-       id="tspan3319"
+       x="160.00002"
        y="161.62411"
-       x="160" />
+       id="tspan3319" />
   </text>
   <text
-     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     y="517.12415"
+     x="35.999992"
      id="text3095-2"
-     x="35.999985"
-     y="517.12415">
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
     <tspan
-       id="tspan3097-4"
+       x="146.00002"
        y="539.62415"
-       x="146" />
+       id="tspan3097-4" />
   </text>
 </svg>

@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="71.684448mm"
-   height="42.086136mm"
-   viewBox="0 0 254.00001 149.1241"
+   version="1.1"
    id="svg4167"
-   version="1.1">
+   viewBox="0 0 254.00001 149.1241"
+   height="42.086136mm"
+   width="71.684448mm">
   <defs
      id="defs4169" />
   <metadata
@@ -25,56 +25,56 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
-     transform="translate(387,22.199845)">
+     transform="translate(387,22.199845)"
+     id="layer1">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       d="m -368,47.924255 0,-8 c 0,-4.418278 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.581722 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.581722 -8,-8 l 0,-8 0,0 z"
        id="path3194"
-       d="m -368,47.924255 0,-8 c 0,-4.418278 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.581722 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.581722 -8,-8 l 0,-8 0,0 z" />
+       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
-       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
-       id="text3196"
+       y="10.924254"
        x="-369"
-       y="10.924254">
+       id="text3196"
+       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
       <tspan
-         id="tspan3198"
+         x="-275"
          y="59.924255"
-         x="-275">hertz</tspan>
+         id="tspan3198">hertz</tspan>
     </text>
     <g
-       transform="translate(-552.83636,85.748495)"
-       id="g3710">
+       id="g3710"
+       transform="translate(-552.83636,85.748495)">
       <path
-         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
+         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
          id="path21-6"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
       <text
-         id="text23-9"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+         y="-54.824242"
          x="319.83636"
-         y="-54.824242">
+         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+         id="text23-9">
         <tspan
-           x="339.83636"
+           id="tspan25-8"
            y="-28.824242"
-           id="tspan25-8">220</tspan>
+           x="339.83636">220</tspan>
       </text>
     </g>
     <g
-       transform="translate(-387,-21.075745)"
-       id="g3990">
+       id="g3990"
+       transform="translate(-387,-21.075745)">
       <path
-         d="m 1,28.43795 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 L 27,0.43795006 37,12.43795 l 18,0 60,0 8,0 c 4.18879,0 6.98407,3.936277 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.077731 -7.07107,2.928932 C 18.07773,57.218083 17,59.819956 17,62.43795 l 0,8 0,6 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.531247,3.56389 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.936277,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81121 -8,-8 l 0,-8 z"
+         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
          id="path3660"
-         style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         d="m 1,28.43795 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 L 27,0.43795006 37,12.43795 l 18,0 134,0 8,0 c 4.18879,0 6.98407,3.936277 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -134,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.077731 -7.07107,2.928932 C 18.07773,57.218083 17,59.819956 17,62.43795 l 0,8 0,6 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.531247,3.56389 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.936277,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81121 -8,-8 l 0,-8 z" />
       <text
-         id="text3662"
-         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+         y="-4"
          x="1.1454468"
-         y="-4">
+         style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+         id="text3662">
         <tspan
-           x="9.1454468"
+           id="tspan3664"
            y="39"
-           id="tspan3664">pitch slider</tspan>
+           x="9.1454468">deslizador de tono</tspan>
       </text>
     </g>
   </g>
