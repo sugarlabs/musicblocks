@@ -296,15 +296,17 @@ function Matrix() {
     };
 
     this._generateDataURI = function(file) {
-        // Deprecated since we now use SVG for note artwork.
+        // Deprecated since we now use SVG for note artwork.  Using
+        // HTML chars failed on some browsers since font was not
+        // always available.
         /*
-        file=file.replace(/𝅝/g,"&#x1D15D;");
-        file=file.replace(/𝅗𝅥/g,"&#x1D15E;");
-        file=file.replace(/𝅘𝅥/g,"&#x1D15F;");
-        file=file.replace(/𝅘𝅥𝅮/g,"&#x1D160;");
-        file=file.replace(/𝅘𝅥𝅯/g,"&#x1D161;");
-        file=file.replace(/𝅘𝅥𝅰/g,"&#x1D162;");
-        file=file.replace(/𝅘𝅥𝅱/g,"&#x1D163;");
+        file = file.replace(/𝅝/g,"&#x1D15D;");
+        file = file.replace(/𝅗𝅥/g,"&#x1D15E;");
+        file = file.replace(/𝅘𝅥/g,"&#x1D15F;");
+        file = file.replace(/𝅘𝅥𝅮/g,"&#x1D160;");
+        file = file.replace(/𝅘𝅥𝅯/g,"&#x1D161;");
+        file = file.replace(/𝅘𝅥𝅰/g,"&#x1D162;");
+        file = file.replace(/𝅘𝅥𝅱/g,"&#x1D163;");
         */
         var data = "data:text/html;charset=utf-8," + encodeURIComponent(file);
         return data;
@@ -501,6 +503,9 @@ function Matrix() {
         var tupletTimeFactor = param[0][0] / param[0][1];
         var numberOfNotes = param[1].length;
         var totalNoteInterval = 0;
+        var matrixDiv = docById('pitchtimematrix');
+        var matrixDivPosition = matrixDiv.getBoundingClientRect();
+
         for (var i = 0; i < numberOfNotes; i++) {
             totalNoteInterval += 32 / param[1][i];
         }
