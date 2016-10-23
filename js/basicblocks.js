@@ -334,6 +334,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     tuplet2Block.defaults.push(1);
     tuplet2Block.defaults.push(4);
 
+    // deprecated
     var rhythm = new ProtoBlock('rhythm');
     rhythm.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['rhythm'] = rhythm;
@@ -345,6 +346,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm.twoArgBlock();
     rhythm.dockTypes[1] = 'anyin';
     rhythm.dockTypes[2] = 'anyin';
+    rhythm.hidden = true;
+
+    var rhythm2 = new ProtoBlock('rhythm2');
+    rhythm2.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['rhythm2'] = rhythm2;
+    rhythm2.staticLabels.push(_('rhythm'), _('number of notes'), _('note value'));
+    rhythm2.extraWidth = 10;
+    rhythm2.adjustWidthToLabel();
+    rhythm2.defaults.push(3);
+    rhythm2.defaults.push(4);
+    rhythm2.twoArgBlock();
+    rhythm2.dockTypes[1] = 'anyin';
+    rhythm2.dockTypes[2] = 'anyin';
 
     var modewidgetBlock = new ProtoBlock('modewidget');
     modewidgetBlock.palette = palettes.dict['widgets'];
