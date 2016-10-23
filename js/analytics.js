@@ -221,6 +221,7 @@ const TACAT = {
     'clearheap': 'extras',
     'isheapempty': 'extras',
     'chr': 'extras',
+    'print': 'extras',
 
     'int': 'number',
 
