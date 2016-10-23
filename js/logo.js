@@ -315,7 +315,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     logo.playedNote[turtle] = false;
                     notesArray.push(logo.playedNoteTimes[turtle]);
                 }
-                // If some notes are supposed to play for longer, add them back to the queue
+
+                // If some notes are supposed to play for longer, add
+                // them back to the queue
                 var shortestNote = Math.min.apply(null, notesArray);
                 var continueFrom;
                 for (var turtle in logo.playedNoteTimes) {
@@ -2829,6 +2831,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 logo.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
             }
             break;
+        case 'rhythm2':
         case 'rhythm':
             if (args.length < 2 || typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number' || args[0] < 1 || args[1] <= 0) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -2836,21 +2839,29 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 break;
             }
 
+            if (logo.blocks.blockList[blk].name === 'rhythm2') {
+                var noteBeatValue = 1 / args[1];
+            } else {
+                var noteBeatValue = args[1];
+            }
+
+            console.log(logo.blocks.blockList[blk].name + ' ' + noteBeatValue);
             if (logo.inMatrix) {
                 pitchtimematrix.addColBlock(blk, args[0]);
                 for (var i = 0; i < args[0]; i++) {
-                    logo._processNote(args[1], blk, turtle);
+                    logo._processNote(noteBeatValue, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
                 var drumIndex = rhythmruler.Drums.indexOf(logo._currentDrumBlock);
                 if (drumIndex !== -1) {
                     for (var i = 0; i < args[0]; i++) {
-                        rhythmruler.Rulers[drumIndex][0].push(args[1]);
+                        rhythmruler.Rulers[drumIndex][0].push(noteBeatValue);
                     }
                 }
             } else {
                 logo.errorMsg(_('Rhythm Block: Did you mean to use a Matrix block?'), blk);
             }
+
             break;
             // FIXME: What is this supposed to do?
         case 'timeSign':
@@ -4114,7 +4125,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         this.tieNote[turtle] = [];
                         // Remove the note from the Lilypond list.
                         for (var i = 0; i < this.notePitches[turtle].length; i++) {
-                            lilypondRemoveTie(logo, turtle);
+                            lilypondRemoveTie(this, turtle);
                         }
 
                         this._processNote(tmpBeatValue, blk, turtle);
@@ -4380,7 +4391,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
                 if (this.crescendoDelta[turtle].length > 0) {
                     if (last(this.crescendoVolume[turtle]) === last(this.crescendoInitialVolume[turtle])) {
-                        lilypondBeginCrescendo(logo, turtle, last(this.crescendoDelta[turtle]));
+                        lilypondBeginCrescendo(this, turtle, last(this.crescendoDelta[turtle]));
                     }
                     var len = this.crescendoVolume[turtle].length
                     this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
