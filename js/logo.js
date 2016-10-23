@@ -2845,7 +2845,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 var noteBeatValue = args[1];
             }
 
-            console.log(logo.blocks.blockList[blk].name + ' ' + noteBeatValue);
             if (logo.inMatrix) {
                 pitchtimematrix.addColBlock(blk, args[0]);
                 for (var i = 0; i < args[0]; i++) {
