@@ -127,15 +127,17 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
 
     this.createBox = function(scale, x, y) {
         this.scale = scale;
+        console.log(scale);
 
         function __processBackground(box, name, bitmap, extras) {
             box.container.addChild(bitmap);
             box._loadUtilityContainerHandler();
 
-            var hitArea = new createjs.Shape();
             box.bounds = box.container.getBounds();
             box.container.cache(box.bounds.x, box.bounds.y, box.bounds.width, box.bounds.height);
-            hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+            var hitArea = new createjs.Shape();
+            hitArea.graphics.beginFill('#FFF').drawRect(box.bounds.x, box.bounds.y, box.bounds.width, box.bounds.height);
             hitArea.x = 0;
             hitArea.y = 0;
             box.container.hitArea = hitArea;
@@ -176,6 +178,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
                 console.log('debouncing click');
                 return;
             }
+
             locked = true;
             setTimeout(function() {
                 locked = false;
@@ -183,6 +186,7 @@ function UtilityBox(canvas, stage, refreshCanvas, bigger, smaller, plugins, stat
             
             var x = (event.stageX / box.scale) - box.container.x;
             var y = (event.stageY / box.scale) - box.container.y;
+
             if (y < 55) {
                 box.hide();
             }
