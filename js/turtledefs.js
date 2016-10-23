@@ -33,6 +33,40 @@ function getAuxToolbarButtonNames(name) {
 
 function createDefaultStack() {
     DATAOBJS =
+        [[0, 'start', 200, 75, [null, 1, null]],
+
+         [1, 'newnote', 0, 0, [0, 2, 5, 9]],
+         [2, 'divide', 0, 0, [1, 3, 4]],
+         [3, ['number', {'value': 1}], 0, 0, [2]],
+         [4, ['number', {'value': 4}], 0, 0, [2]],
+         [5, 'vspace', 0, 0, [1, 6]],
+         [6, 'pitch', 0, 0, [5, 7, 8, null]],
+         [7, ['text', {'value': 'ti'}], 0, 0, [6]],
+         [8, ['number', {'value': 4}], 0, 0, [6]],
+         [9, 'hidden', 0, 0, [1, 10]],
+
+         [10, 'newnote', 0, 0, [9, 11, 14, 18]],
+         [11, 'divide', 0, 0, [10, 12, 13]],
+         [12, ['number', {'value': 1}], 0, 0, [11]],
+         [13, ['number', {'value': 4}], 0, 0, [11]],
+         [14, 'vspace', 0, 0, [10, 15]],
+         [15, 'pitch', 0, 0, [14, 16, 17, null]],
+         [16, ['text', {'value': 'do'}], 0, 0, [15]],
+         [17, ['number', {'value': 5}], 0, 0, [15]],
+         [18, 'hidden', 0, 0, [10, 19]],
+
+         [19, 'newnote', 0, 0, [18, 20, 23, 27]],
+         [20, 'divide', 0, 0, [19, 21, 22]],
+         [21, ['number', {'value': 1}], 0, 0, [20]],
+         [22, ['number', {'value': 2}], 0, 0, [20]],
+         [23, 'vspace', 0, 0, [19, 24]],
+         [24, 'pitch', 0, 0, [23, 25, 26, null]],
+         [25, ['text', {'value': 're'}], 0, 0, [24]],
+         [26, ['number', {'value': 5}], 0, 0, [24]],
+         [27, 'hidden', 0, 0, [19, null]]
+        ];
+    /*
+    DATAOBJS =
         [[0, 'start', 250, 100, [null, null, null]],
          [1, 'matrix', 800, 100, [null, 2, 23]],
 
@@ -64,8 +98,9 @@ function createDefaultStack() {
          [21, ["number", {"value":1}], 0, 0, [20]],
          [22, ["number", {"value":2}], 0, 0, [20]],
 
-	 [23, "hiddennoflow", 0, 0, [1, null]]
+         [23, "hiddennoflow", 0, 0, [1, null]]
         ];
+   */
 };
 
 
