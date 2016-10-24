@@ -431,6 +431,11 @@ display additional music factors, e.g., duplicate, transposition,
 skip, staccato, slur, and graphics factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide-es/status3.svg'</img>
+
+You can do additional programming within the status block. In the
+example above, the volume is divided by 10 before being displayed.
+
 2. The Pitch-Time Matrix
 ------------------------
 
