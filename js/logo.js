@@ -4561,9 +4561,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         }
 
         if (logo.blocks.blockList[blk].protoblock.parameter) {
-            if (logo.parameterQueue[turtle].indexOf(blk) === -1) {
-                logo.parameterQueue[turtle].push(blk);
-            }
+            if (turtle in logo.parameterQueue) {
+		if (logo.parameterQueue[turtle].indexOf(blk) === -1) {
+                    logo.parameterQueue[turtle].push(blk);
+		}
+	    } else {
+                console.log('turtle ' + turtle + ' has no parameterQueue');
+	    }
         }
 
         if (logo.blocks.blockList[blk].isValueBlock()) {
