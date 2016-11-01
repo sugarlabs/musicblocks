@@ -1178,7 +1178,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         case 'print':
             if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
-                    logo.textMsg(args[0].toString());
+                    if (args[0] !== null) {
+                        logo.textMsg(args[0].toString());
+                    }
                 }
             }
             break;
@@ -4562,12 +4564,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
         if (logo.blocks.blockList[blk].protoblock.parameter) {
             if (turtle in logo.parameterQueue) {
-		if (logo.parameterQueue[turtle].indexOf(blk) === -1) {
+                if (logo.parameterQueue[turtle].indexOf(blk) === -1) {
                     logo.parameterQueue[turtle].push(blk);
-		}
-	    } else {
+                }
+            } else {
                 console.log('turtle ' + turtle + ' has no parameterQueue');
-	    }
+            }
         }
 
         if (logo.blocks.blockList[blk].isValueBlock()) {
@@ -4652,7 +4654,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 break;
             case 'sqrt':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'sqrt']);
+                    logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
                 } else {
                     var cblk = logo.blocks.blockList[blk].connections[1];
                     var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
