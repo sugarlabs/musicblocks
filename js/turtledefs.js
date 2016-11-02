@@ -33,7 +33,7 @@ function getAuxToolbarButtonNames(name) {
 
 function createDefaultStack() {
     DATAOBJS =
-        [[0, 'start', 200, 75, [null, 1, null]],
+        [[0, 'start', 800, 75, [null, 1, null]],
 
          [1, 'newnote', 0, 0, [0, 2, 5, 9]],
          [2, 'divide', 0, 0, [1, 3, 4]],
