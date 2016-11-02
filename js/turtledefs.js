@@ -33,7 +33,7 @@ function getAuxToolbarButtonNames(name) {
 
 function createDefaultStack() {
     DATAOBJS =
-        [[0, 'start', 200, 75, [null, 1, null]],
+        [[0, 'start', 800, 75, [null, 1, null]],
 
          [1, 'newnote', 0, 0, [0, 2, 5, 9]],
          [2, 'divide', 0, 0, [1, 3, 4]],
@@ -41,7 +41,7 @@ function createDefaultStack() {
          [4, ['number', {'value': 4}], 0, 0, [2]],
          [5, 'vspace', 0, 0, [1, 6]],
          [6, 'pitch', 0, 0, [5, 7, 8, null]],
-         [7, ['solfege', {'value': 'ti'}], 0, 0, [6]],
+         [7, ['solfege', {'value': 'sol'}], 0, 0, [6]],
          [8, ['number', {'value': 4}], 0, 0, [6]],
          [9, 'hidden', 0, 0, [1, 10]],
 
@@ -51,8 +51,8 @@ function createDefaultStack() {
          [13, ['number', {'value': 4}], 0, 0, [11]],
          [14, 'vspace', 0, 0, [10, 15]],
          [15, 'pitch', 0, 0, [14, 16, 17, null]],
-         [16, ['solfege', {'value': 'do'}], 0, 0, [15]],
-         [17, ['number', {'value': 5}], 0, 0, [15]],
+         [16, ['solfege', {'value': 'mi'}], 0, 0, [15]],
+         [17, ['number', {'value': 4}], 0, 0, [15]],
          [18, 'hidden', 0, 0, [10, 19]],
 
          [19, 'newnote', 0, 0, [18, 20, 23, 27]],
@@ -61,8 +61,8 @@ function createDefaultStack() {
          [22, ['number', {'value': 2}], 0, 0, [20]],
          [23, 'vspace', 0, 0, [19, 24]],
          [24, 'pitch', 0, 0, [23, 25, 26, null]],
-         [25, ['solfege', {'value': 're'}], 0, 0, [24]],
-         [26, ['number', {'value': 5}], 0, 0, [24]],
+         [25, ['solfege', {'value': 'sol'}], 0, 0, [24]],
+         [26, ['number', {'value': 4}], 0, 0, [24]],
          [27, 'hidden', 0, 0, [19, null]]
         ];
     /*
