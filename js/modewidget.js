@@ -23,6 +23,7 @@ function ModeWidget() {
         this._logo = logo;
         this._modeBlock = modeBlock;
         this._locked = false;
+        console.log(this._logo.keySignature);
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
 
