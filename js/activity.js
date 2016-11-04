@@ -34,6 +34,7 @@ try {
         if (d.getElementById(id)) {
             return;
         }
+
         js = d.createElement(s);
         js.id = id;
         js.src = "//connect.facebook.net/en_US/sdk.js";
@@ -41,6 +42,7 @@ try {
     }(document, 'script', 'facebook-jssdk'));
 } catch (e) {
 };
+
 
 var lang = document.webL10n.getLanguage();
 if (lang.indexOf("-") !== -1) {
