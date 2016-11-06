@@ -1512,6 +1512,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     notBlock.staticLabels.push(_('not'));
     notBlock.booleanOneBooleanArgBlock();
 
+    // Only used to excute methods in the Math library
+    var evalBlock = new ProtoBlock('eval');
+    evalBlock.palette = palettes.dict['number'];
+    blocks.protoBlockDict['eval'] = evalBlock;
+    evalBlock.staticLabels.push(_('eval'));
+    evalBlock.staticLabels.push('f(x)');
+    evalBlock.staticLabels.push('x');
+    evalBlock.adjustWidthToLabel();
+    evalBlock.twoArgMathBlock();
+    evalBlock.dockTypes[1] = 'textin';
+    evalBlock.defaults.push('abs(x)');
+    evalBlock.defaults.push(-100);
+    
     var modBlock = new ProtoBlock('mod');
     modBlock.palette = palettes.dict['number'];
     blocks.protoBlockDict['mod'] = modBlock;
@@ -2392,21 +2405,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     keyboardBlock.adjustWidthToLabel();
     keyboardBlock.parameterBlock();
 
-    // REMOVED UNTIL WE PLUG THE SECURITY HOLE
-    /*
-    var evalBlock = new ProtoBlock('eval');
-    evalBlock.palette = palettes.dict['number'];
-    blocks.protoBlockDict['eval'] = evalBlock;
-    evalBlock.staticLabels.push(_('eval'));
-    evalBlock.staticLabels.push('f(x)');
-    evalBlock.staticLabels.push('x');
-    evalBlock.adjustWidthToLabel();
-    evalBlock.twoArgMathBlock();
-    evalBlock.dockTypes[1] = 'textin';
-    evalBlock.defaults.push('x');
-    evalBlock.defaults.push(100);
-    */
-    
     // Push protoblocks onto their palettes.
     for (var protoblock in blocks.protoBlockDict) {
         if (blocks.protoBlockDict[protoblock].palette != null) {
