@@ -4602,7 +4602,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
                 var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = Number(eval(a.replace(/x/g, b.toString())));
+                // Restricted to math methods
+                logo.blocks.blockList[blk].value = Number(eval('Math.' + a.replace(/x/g, b.toString())));
                 break;
             case 'arg':
                 var cblk = logo.blocks.blockList[blk].connections[1];
