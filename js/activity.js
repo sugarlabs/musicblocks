@@ -357,15 +357,15 @@ define(function (require) {
                     // keep playing at full speep
                     console.log('running from step');
                     logo.step();
-		} else {
+                } else {
                     // stop and restart
                     console.log('stopping...');
-		    logo.doStopTurtle();
+                    logo.doStopTurtle();
                     setTimeout(function () {                    
-			console.log('and running');
-			logo.runLogoCommands(null, env);
-		    }, 500);
-		}
+                        console.log('and running');
+                        logo.runLogoCommands(null, env);
+                    }, 500);
+                }
             }
         };
 
@@ -662,11 +662,11 @@ define(function (require) {
             }
 
             // Load custom mode saved in local storage.
-	    var custommodeData = storage.custommode;
+            var custommodeData = storage.custommode;
             if (custommodeData != undefined) {
-		customMode = JSON.parse(custommodeData);
+                customMode = JSON.parse(custommodeData);
                 console.log('restoring custom mode: ' + customMode);
-	    }
+            }
 
             fileChooser.addEventListener('click', function (event) {
                 this.value = null;
@@ -1173,10 +1173,14 @@ define(function (require) {
                     logo.runLogoCommands();
                     break;
                 default:
-                    currentKey = String.fromCharCode(event.keyCode);
-                    currentKeyCode = event.keyCode;
+                    // currentKey = String.fromCharCode(event.keyCode);
+                    // currentKeyCode = event.keyCode;
                     break;
                 }
+                // Always store current key so as not to mask it from
+                // the keyboard block.
+                currentKey = String.fromCharCode(event.keyCode);
+                currentKeyCode = event.keyCode;
             }
         };
 
@@ -1348,7 +1352,7 @@ define(function (require) {
                                 }
                                 me.text.text = label;
                                 me.overrideName = label;
-				me.regenerateArtwork();
+                                me.regenerateArtwork();
                                 me.container.updateCache();
                             }
                         }
