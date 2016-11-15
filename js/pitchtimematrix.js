@@ -156,6 +156,7 @@ function Matrix() {
 
         var solfaCell = row.insertCell(-1);
         solfaCell.style.fontSize = this._cellScale * 100 + '%';
+        //.TRANS: solfège is the study of singing using syllables, e.g., do re mi
         solfaCell.innerHTML = '<b>' + _('Solfa') + '</b>';
         solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         solfaCell.style.minWidth = solfaCell.style.width;
