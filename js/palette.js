@@ -684,6 +684,7 @@ function PopdownPalette(palettes) {
             html += '<div class="palette">';
             var icon = PALETTEICONS[name]
                 .replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
+	    //.TRANS: popout: to detach as a separate window
             html += format('<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
                                 <img class="hide-button" src="header-icons/hide.svg" \
