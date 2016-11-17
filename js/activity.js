@@ -1207,6 +1207,7 @@ define(function (require) {
             }
 
             var smallSide = Math.min(w, h);
+
             if (smallSide < cellSize * 11) {
                 var mobileSize = true;
                 if (w < cellSize * 10) {
@@ -1253,8 +1254,10 @@ define(function (require) {
 
             // Hide palette icons on mobile
             if (mobileSize) {
+		palettes.setMobile(true);
                 palettes.hide();
             } else {
+		palettes.setMobile(false);
                 palettes.show();
                 palettes.bringToTop();
             }
@@ -2064,8 +2067,7 @@ define(function (require) {
             }
 
             headerContainer = new createjs.Shape();
-            headerContainer.graphics.f(platformColor.header).r(0, 0,
-                screen.width / turlteBlocksScale, cellSize);
+            headerContainer.graphics.f(platformColor.header).r(0, 0, screen.width / turlteBlocksScale, cellSize);
 
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
@@ -2110,6 +2112,7 @@ define(function (require) {
 
             for (var i = 0; i < buttonNames.length; i++) {
                 if (!getMainToolbarButtonNames(buttonNames[i][0])) {
+                    console.log('continue');
                     continue;
                 }
 
@@ -2204,6 +2207,7 @@ define(function (require) {
         };
 
         function doPopdownPalette() {
+            console.log('doPopdownPalette');
             var p = new PopdownPalette(palettes);
             p.popdown();
         };

@@ -1053,7 +1053,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
             break;
         case 'nameddo':
-            // FIXME: Add backward support to other instances fo 'do'
+            // FIXME: Add backward support to other instances of 'do'
             var name = logo.blocks.blockList[blk].privateData;
             if (name in logo.actions) {
                 lilypondLineBreak(logo, turtle);
