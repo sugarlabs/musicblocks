@@ -2393,6 +2393,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         case 'rest2':
             logo.notePitches[turtle].push('rest');
             logo.noteOctaves[turtle].push(4);
+            logo.noteCents[turtle].push(0);
             logo.noteBeatValues[turtle].push(1);
             logo.pushedNote[turtle] = true;
             break;
