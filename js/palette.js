@@ -743,13 +743,17 @@ function PopdownPalette(palettes) {
                            {i: icon, n: _(name)});
             html += '<ul>';
             this.models[name].update();
-            for (var blk in this.models[name].blocks) {
+            
+            var blocks = this.models[name].blocks;
+            blocks.reverse();
+            
+            for (var blk in blocks) {
                 html += format('<li title="{label}" \
                                     data-blk="{blk}" \
                                     data-palettename="{palettename}" \
                                     data-modname="{modname}"> \
                                     <img src="{artwork64}" alt="{label}" /> \
-                                </li>', this.models[name].blocks[blk]);
+                                </li>', blocks[blk]);
             }
             html += '</div>';
         }
