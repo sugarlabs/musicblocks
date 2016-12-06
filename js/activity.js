@@ -2076,19 +2076,18 @@ define(function (require) {
             stage.addChild(headerContainer);
 
             // Buttons used when running turtle programs
+            // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
             var buttonNames = [
-                ['fast', _doFastButton, _('Run fast')],
-                ['slow', _doSlowButton, _('Run slow')],
-                ['step', _doStepButton, _('Run step by step')],
-                ['slow-music', _doSlowMusicButton, _('Run music slow')],
-                ['step-music', _doStepMusicButton, _('Run note by note')],
-                ['stop-turtle', doStopButton, _('Stop')],
-                ['clear', _allClear, _('Clean')],
-                ['palette', _changePaletteVisibility, _('Show/hide palettes')],
-                ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks')],
-                ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks')],
-                ['go-home', _findBlocks, _('Home')],
-                ['help', _showHelp, _('Help')]
+                ['run', _doFastButton, _('Run fast / long press to run slow / extra-long press to run music slow'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
+                ['step', _doStepButton, _('Run step by step'), null, null, null, null],
+                ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
+                ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
+                ['clear', _allClear, _('Clean'), null, null, null, null],
+                ['palette', _changePaletteVisibility, _('Show/hide palettes'), null, null, null, null],
+                ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+                ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+                ['go-home', _findBlocks, _('Home'), null, null, null, null],
+                ['help', _showHelp, _('Help'), null, null, null, null]
             ];
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -2117,7 +2116,7 @@ define(function (require) {
                 }
 
                 var container = _makeButton(buttonNames[i][0] + '-button', buttonNames[i][2], x, y, btnSize, 0);
-                _loadButtonDragHandler(container, x, y, buttonNames[i][1]);
+                _loadButtonDragHandler(container, x, y, buttonNames[i][1], buttonNames[i][3], buttonNames[i][4], buttonNames[i][5], buttonNames[i][6]);
                 onscreenButtons.push(container);
 
                 if (buttonNames[i][0] === 'stop-turtle') {
@@ -2459,9 +2458,18 @@ define(function (require) {
             return container;
         };
 
-        function _loadButtonDragHandler(container, ox, oy, action) {
+        function _loadButtonDragHandler(container, ox, oy, action, long_action = action, extra_long_action = long_action, long_img = null, extra_long_img = null) {
             // Prevent multiple button presses (i.e., debounce).
             var locked = false;
+            
+            if (long_action === null) 
+                long_action = action;
+            if (extra_long_action === null) 
+                extra_long_action = long_action;
+            
+            // Long and extra-long press variables declaration
+            var pressTimer, pressTimerExtra, isLong = false, isExtraLong = false;
+            var formerContainer = container;
 
             container.on('mousedown', function (event) {
                 var moved = true;
@@ -2470,13 +2478,34 @@ define(function (require) {
                     y: container.y - Math.round(event.stageY / turlteBlocksScale)
                 };
 
+                pressTimer = setTimeout(function() {
+                    isLong = true;
+                    if (long_img !== null) {
+                        container.visible = false;
+                        container = _makeButton(long_img, "", ox, oy, cellSize, 0);
+                    }
+                }, 500);
+                
+                pressTimerExtra = setTimeout(function() {
+                    isExtraLong = true;
+                    if (extra_long_img !== null) {
+                        container.visible = false;
+                        container = _makeButton(extra_long_img, "", ox, oy, cellSize, 0);
+                    }
+                }, 1000);
+                
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turlteBlocksScale, stage);
 
                 container.on('pressup', function (event) {
                     hideButtonHighlight(circles, stage);
                     container.x = ox;
                     container.y = oy;
-
+                    
+                    if (long_img !== null || extra_long_img !== null) {
+                        container.visible = false;
+                        container = formerContainer;
+                        container.visible = true;
+                    }          
                     if (action != null && moved && !locked) {
                         locked = true;
 
@@ -2484,11 +2513,20 @@ define(function (require) {
                             locked = false;
                         }, 500);
 
-                        action();
+                        clearTimeout(pressTimer);
+                        clearTimeout(pressTimerExtra);
+                        
+                        if (!isLong) 
+                            action();
+                        else if (!isExtraLong) 
+                            long_action();
+                        else 
+                            extra_long_action();
                     }
-
                     moved = false;
                 });
+                isLong = false;
+                isExtraLong = false;
             });
         };
     };

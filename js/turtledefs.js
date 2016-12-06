@@ -22,7 +22,7 @@ const BUILTINPALETTESFORL23N = [_('rhythm'), _('pitch'), _('tone'), _('intervals
 
 
 function getMainToolbarButtonNames(name) {
-    return (['popdown-palette', 'fast', 'slow', 'slow-music', 'step', 'step-music', 'stop-turtle', 'clear', 'palette', 'hide-blocks', 'collapse-blocks', 'go-home', 'help'].indexOf(name) > -1);
+    return (['popdown-palette', 'run', 'step', 'step-music', 'stop-turtle', 'clear', 'palette', 'hide-blocks', 'collapse-blocks', 'go-home', 'help'].indexOf(name) > -1);
 };
 
 
