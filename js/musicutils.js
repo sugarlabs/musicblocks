@@ -1259,6 +1259,7 @@ function Synth () {
             break;
         case 'default':
         case 'poly':
+            console.log(notes);
             this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
             break;
         default:
