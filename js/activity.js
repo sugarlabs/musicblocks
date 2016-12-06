@@ -361,7 +361,8 @@ define(function (require) {
                     // stop and restart
                     console.log('stopping...');
                     logo.doStopTurtle();
-                    setTimeout(function () {                    
+
+                    setTimeout(function () {
                         console.log('and running');
                         logo.runLogoCommands(null, env);
                     }, 500);
@@ -1056,7 +1057,7 @@ define(function (require) {
             if (docById('BPMInput').classList.contains('hasKeyboard')) {
                 return ;
             }
-            
+
             if (docById('musicratio1').classList.contains('hasKeyboard')) {
                 return;
             }
@@ -1502,7 +1503,7 @@ define(function (require) {
             if(document.getElementById('rulerBody').style.visibility !== 'hidden') {
                 document.getElementById('rulerBody').style.visibility = 'hidden';
                 document.getElementById('rulerBody').style.border = 0;
-            }              
+            }
 
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
                 document.getElementById('statusmatrix').style.visibility = 'hidden';
@@ -2461,12 +2462,12 @@ define(function (require) {
         function _loadButtonDragHandler(container, ox, oy, action, long_action = action, extra_long_action = long_action, long_img = null, extra_long_img = null) {
             // Prevent multiple button presses (i.e., debounce).
             var locked = false;
-            
-            if (long_action === null) 
+
+            if (long_action === null)
                 long_action = action;
-            if (extra_long_action === null) 
+            if (extra_long_action === null)
                 extra_long_action = long_action;
-            
+
             // Long and extra-long press variables declaration
             var pressTimer, pressTimerExtra, isLong = false, isExtraLong = false;
             var formerContainer = container;
@@ -2485,7 +2486,7 @@ define(function (require) {
                         container = _makeButton(long_img, "", ox, oy, cellSize, 0);
                     }
                 }, 500);
-                
+
                 pressTimerExtra = setTimeout(function() {
                     isExtraLong = true;
                     if (extra_long_img !== null) {
@@ -2493,19 +2494,20 @@ define(function (require) {
                         container = _makeButton(extra_long_img, "", ox, oy, cellSize, 0);
                     }
                 }, 1000);
-                
+
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turlteBlocksScale, stage);
 
                 container.on('pressup', function (event) {
                     hideButtonHighlight(circles, stage);
                     container.x = ox;
                     container.y = oy;
-                    
+
                     if (long_img !== null || extra_long_img !== null) {
                         container.visible = false;
                         container = formerContainer;
                         container.visible = true;
-                    }          
+                    }
+
                     if (action != null && moved && !locked) {
                         locked = true;
 
@@ -2515,12 +2517,12 @@ define(function (require) {
 
                         clearTimeout(pressTimer);
                         clearTimeout(pressTimerExtra);
-                        
-                        if (!isLong) 
+
+                        if (!isLong)
                             action();
-                        else if (!isExtraLong) 
+                        else if (!isExtraLong)
                             long_action();
-                        else 
+                        else
                             extra_long_action();
                     }
                     moved = false;
