@@ -289,9 +289,9 @@ function RhythmRuler () {
         setTimeout(function() {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-
+            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(" ")[0] + "_rhythm"; //get first word of drum's name (skip "drum" word itself) and add "rhythm"
             var delta = selectedRuler * 42;
-            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': 'rhythm'}], 0, 0, [0]]];
+            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
             var previousBlock = 0;
             var sameNoteValue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
