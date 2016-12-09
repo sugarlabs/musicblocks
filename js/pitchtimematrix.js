@@ -224,14 +224,10 @@ function Matrix() {
             var drumName = getDrumName(this.rowLabels[i]);
             var noteStored = [];
             if (drumName != null) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + 
-                                '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + 
-                                '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                 noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + 
-                                '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + 
-                                '" vertical-align="middle"/>&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
                 noteStored.push(this.rowLabels[i].replace(/ /g,':'));
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
