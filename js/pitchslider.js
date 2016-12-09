@@ -118,7 +118,7 @@ function PitchSlider () {
         cell.focus();
 
         cell.addEventListener('keydown', function(event) {
-            that._isKeyPressed = 1;
+            that._isKeyPressed = 0;
             if (event.keyCode >= 37 && event.keyCode <= 40) {
                 that._isKeyPressed = 1;
             }
