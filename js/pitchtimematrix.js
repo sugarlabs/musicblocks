@@ -226,12 +226,12 @@ function Matrix() {
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + 
                                 '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                noteStored.push(cell.innerHTML.split('"'));
+                noteStored.push(drumname);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + 
                                 '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + 
                                 '" vertical-align="middle"/>&nbsp;&nbsp;';
-                noteStored.push(cell.innerHTML.split('"'));
+                noteStored.push(this.rowLabels[i]);
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
                 cell.style.backgroundImage = "url('images/synth2.svg')";
@@ -1037,7 +1037,7 @@ function Matrix() {
             var graphicsBlock = true;
         } else {
             // Both solfege and octave are extracted from HTML by getNote.
-            var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
+            var noteObj = this._logo.getNote(drumHTML.join('"'), -1, 0, this._logo.keySignature[0]);
             var note = noteObj[0] + noteObj[1];
         }
 
