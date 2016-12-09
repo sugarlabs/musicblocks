@@ -225,37 +225,40 @@ function Matrix() {
             var noteStored = [];
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + 
-                                '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                noteStored.push(drumname);
+                                '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + 
+                                '" vertical-align="middle">&nbsp;&nbsp;';
+                noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + 
                                 '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + 
                                 '" vertical-align="middle"/>&nbsp;&nbsp;';
-                noteStored.push(this.rowLabels[i]);
+                noteStored.push(this.rowLabels[i].replace(/ /g,':'));
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
                 cell.style.backgroundImage = "url('images/synth2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
-                noteStored.push(cell.innerHTML.split('"'));
+                var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
+                noteStored.push(noteObj[0] + noteObj[1]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
-                noteStored.push(cell.innerHTML.split('"'));
+                noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
-                noteStored.push(cell.innerHTML.split('"'));
+                noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
                 cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
-                noteStored.push(cell.innerHTML.split('"'));
+                var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
+                noteStored.push(noteObj[0] + noteObj[1]);
             }
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
@@ -1013,34 +1016,15 @@ function Matrix() {
     };
 
     this._setNoteCell = function(j, colIndex, cell, playNote) {
-        var drumHTML = noteStored[j];
-        var turtleHTML = drumHTML[0].split('<br>');
+        var note = noteStored[j];
         var graphicsBlock = false;
 
-        if (drumHTML.length > 3) {
-            var drumName = getDrumSynthName(drumHTML[3]);
-
-            if (drumName != null) {
-                // If it is a drum, just save the name.
-                var note = drumName;
-            } else if (drumHTML[1].slice(0, 7) === 'images/') {
-                var note = drumHTML[3].replace(/ /g, ':'); // e.g., forward 100
-            } else {
-                console.log('something is wrong (drumSynthName is ' + drumName + ')');
-                var note = DEFAULTDRUM;
-            }
-        } else if (MATRIXGRAPHICS.indexOf(turtleHTML[0]) != -1) {
-            var note = turtleHTML[0] + ':' + turtleHTML[1];
+        graphicNote = note.split(':');
+        if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && (MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
             var graphicsBlock = true;
-        } else if (MATRIXGRAPHICS2.indexOf(turtleHTML[0]) != -1) {
-            var note = turtleHTML[0] + ':' + turtleHTML[1].replace(/ /g, ':');
-            var graphicsBlock = true;
-        } else {
-            // Both solfege and octave are extracted from HTML by getNote.
-            var noteObj = this._logo.getNote(drumHTML.join('"'), -1, 0, this._logo.keySignature[0]);
-            var note = noteObj[0] + noteObj[1];
-        }
-
+        } else 
+            continue;
+            
         this._notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
         var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
