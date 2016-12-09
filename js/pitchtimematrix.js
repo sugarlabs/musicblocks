@@ -222,30 +222,40 @@ function Matrix() {
             cell.style.fontSize = this._cellScale * 100 + '%';
 
             var drumName = getDrumName(this.rowLabels[i]);
+            var noteStored = [];
             if (drumName != null) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + 
+                                '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                noteStored.push(cell.innerHTML.split('"'));
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + 
+                                '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + 
+                                '" vertical-align="middle"/>&nbsp;&nbsp;';
+                noteStored.push(cell.innerHTML.split('"'));
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
                 cell.style.backgroundImage = "url('images/synth2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+                noteStored.push(cell.innerHTML.split('"'));
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
+                noteStored.push(cell.innerHTML.split('"'));
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
+                noteStored.push(cell.innerHTML.split('"'));
             } else {
                 cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
+                noteStored.push(cell.innerHTML.split('"'));
             }
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
@@ -1003,9 +1013,7 @@ function Matrix() {
     };
 
     this._setNoteCell = function(j, colIndex, cell, playNote) {
-        var table = docById('pitchTimeTable');
-        var solfegeHTML = table.rows[j].cells[0].innerHTML;
-        var drumHTML = solfegeHTML.split('"');
+        var drumHTML = noteStored[j];
         var turtleHTML = drumHTML[0].split('<br>');
         var graphicsBlock = false;
 
