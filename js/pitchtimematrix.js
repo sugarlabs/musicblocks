@@ -27,6 +27,7 @@ function Matrix() {
     this._matrixHasTuplets = false;
     this._noteValue = 4;
     this._notesCounter = 0;
+    this._noteStored = [];
 
     // The pitch-block number associated with a row; a rhythm block is
     // associated with a column. We need to keep track of which
@@ -222,13 +223,12 @@ function Matrix() {
             cell.style.fontSize = this._cellScale * 100 + '%';
 
             var drumName = getDrumName(this.rowLabels[i]);
-            var noteStored = [];
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                noteStored.push(drumName);
+                this._noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
-                noteStored.push(this.rowLabels[i].replace(/ /g,':'));
+                this._noteStored.push(this.rowLabels[i].replace(/ /g,':'));
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
                 cell.style.backgroundImage = "url('images/synth2.svg')";
@@ -236,25 +236,25 @@ function Matrix() {
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
-                noteStored.push(noteObj[0] + noteObj[1]);
+                this._noteStored.push(noteObj[0] + noteObj[1]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
-                noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
+                this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
-                noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
+                this._noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
                 cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
                 var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
-                noteStored.push(noteObj[0] + noteObj[1]);
+                this._noteStored.push(noteObj[0] + noteObj[1]);
             }
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
@@ -1012,14 +1012,14 @@ function Matrix() {
     };
 
     this._setNoteCell = function(j, colIndex, cell, playNote) {
-        var note = noteStored[j];
+        var note = this._noteStored[j];
         var graphicsBlock = false;
 
         graphicNote = note.split(':');
-        if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && (MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
+        if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
             var graphicsBlock = true;
         } else 
-            continue;
+            return;
             
         this._notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
