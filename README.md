@@ -15,7 +15,7 @@ Music Blocks is designed to run in a browser. It is derived from
 Turtle Blocks JS which can be found
 [here](https://github.com/walterbender/turtleblocksjs). You can run
 the software locally from the index.html file, from the
-[github](walterbender.github.io/musicblocks) repo, or by setting up a
+[github](http://walterbender.github.io/musicblocks/) repo, or by setting up a
 local server.
 
 If you want to run Music Blocks offline, download this repo and point
