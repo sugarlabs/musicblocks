@@ -279,15 +279,15 @@ var VOICENAMES = [
 
 var DRUMNAMES = [
     //.TRANS: musical instrument
-    [_('snare drum'), 'snaredrum', 'images/drum.svg'],
+    [_('snare drum'), 'snaredrum', 'images/snaredrum.svg'],
     //.TRANS: musical instrument
-    [_('kick drum'), 'kick', 'images/drum.svg'],
+    [_('kick drum'), 'kick', 'images/kick.svg'],
     //.TRANS: musical instrument
-    [_('tom tom'), 'tom', 'images/tomtom.svg'],
+    [_('tom tom'), 'tom', 'images/tom.svg'],
     //.TRANS: musical instrument
     [_('floor tom tom'), 'floortom', 'images/floortom.svg'],
     //.TRANS: a drum made from an inverted cup
-    [_('cup drum'), 'cup', 'images/drum.svg'],
+    [_('cup drum'), 'cup', 'images/cup.svg'],
     //.TRANS: musical instrument
     [_('darbuka drum'), 'darbuka', 'images/darbuka.svg'],
     //.TRANS: musical instrument
@@ -295,27 +295,27 @@ var DRUMNAMES = [
     //.TRANS: a small metal bell
     [_('ride bell'), 'ridebell', 'images/ridebell.svg'],
     //.TRANS: musical instrument
-    [_('cow bell'), 'cowbell', 'images/bell.svg'],
+    [_('cow bell'), 'cowbell', 'images/cowbell.svg'],
     //.TRANS: musical instrument
-    [_('triangle bell'), 'trianglebell', 'images/triangle.svg'],
+    [_('triangle bell'), 'trianglebell', 'images/trianglebell.svg'],
     //.TRANS: musical instrument
     [_('finger cymbals'), 'fingercymbals', 'images/fingercymbals.svg'],
     //.TRANS: a musically tuned set of bells
-    [_('chine'), 'chine', 'images/bell.svg'],
+    [_('chine'), 'chine', 'images/chine.svg'],
     //.TRANS: sound effect
-    [_('clang'), 'clang', 'images/bell.svg'],
+    [_('clang'), 'clang', 'images/clang.svg'],
     //.TRANS: sound effect
-    [_('crash'), 'crash', 'images/bell.svg'],
+    [_('crash'), 'crash', 'images/crash.svg'],
     //.TRANS: sound effect
-    [_('bottle'), 'bottle', 'images/drum.svg'],
+    [_('bottle'), 'bottle', 'images/bottle.svg'],
     //.TRANS: sound effect
-    [_('clap'), 'clap', 'images/drum.svg'],
+    [_('clap'), 'clap', 'images/clap.svg'],
     //.TRANS: sound effect
-    [_('slap'), 'slap', 'images/drum.svg'],
+    [_('slap'), 'slap', 'images/slap.svg'],
     //.TRANS: sound effect
-    [_('splash'), 'splash', 'images/drum.svg'],
+    [_('splash'), 'splash', 'images/splash.svg'],
     //.TRANS: sound effect
-    [_('bubbles'), 'bubbles', 'images/drum.svg'],
+    [_('bubbles'), 'bubbles', 'images/bubbles.svg'],
     //.TRANS: animal sound effect
     [_('cat'), 'cat', 'images/cat.svg'],
     //.TRANS: animal sound effect
