@@ -1243,7 +1243,7 @@ function Matrix() {
                         i += 1;
                         break;
                     }
-                
+                }
                 if (getDrumName(this._noteStored[i]) !== -1) {
                     notesAlreadyStored.push([-2, i]);
                 } else if (MATRIXGRAPHICS.indexOf(this._noteStored[i]) !== -1) {
