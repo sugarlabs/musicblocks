@@ -27,6 +27,7 @@ function Matrix() {
     this._matrixHasTuplets = false;
     this._noteValue = 4;
     this._notesCounter = 0;
+    this._noteStored = [];
 
     // The pitch-block number associated with a row; a rhythm block is
     // associated with a column. We need to keep track of which
@@ -224,28 +225,36 @@ function Matrix() {
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                this._noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
+                this._noteStored.push(this.rowLabels[i].replace(/ /g,':'));
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
                 cell.style.backgroundImage = "url('images/synth2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+                var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
+                this._noteStored.push(noteObj[0] + noteObj[1]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
+                this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
+                this._noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
                 cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
+                var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
+                this._noteStored.push(noteObj[0] + noteObj[1]);
             }
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
@@ -272,6 +281,7 @@ function Matrix() {
         cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
         // cell.style.top = Math.floor(marginFromTop + (i * this._cellScale * 2)) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
+        _sortNoteStored();
     };
 
     this._addButton = function(row, colIndex, icon, iconSize, label) {
@@ -1003,36 +1013,16 @@ function Matrix() {
     };
 
     this._setNoteCell = function(j, colIndex, cell, playNote) {
-        var table = docById('pitchTimeTable');
-        var solfegeHTML = table.rows[j].cells[0].innerHTML;
-        var drumHTML = solfegeHTML.split('"');
-        var turtleHTML = drumHTML[0].split('<br>');
+        var note = this._noteStored[j-1];
+        var drumName = getDrumName(note);
         var graphicsBlock = false;
 
-        if (drumHTML.length > 3) {
-            var drumName = getDrumSynthName(drumHTML[3]);
-
-            if (drumName != null) {
-                // If it is a drum, just save the name.
-                var note = drumName;
-            } else if (drumHTML[1].slice(0, 7) === 'images/') {
-                var note = drumHTML[3].replace(/ /g, ':'); // e.g., forward 100
-            } else {
-                console.log('something is wrong (drumSynthName is ' + drumName + ')');
-                var note = DEFAULTDRUM;
-            }
-        } else if (MATRIXGRAPHICS.indexOf(turtleHTML[0]) != -1) {
-            var note = turtleHTML[0] + ':' + turtleHTML[1];
+        graphicNote = note.split(':');
+        if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
             var graphicsBlock = true;
-        } else if (MATRIXGRAPHICS2.indexOf(turtleHTML[0]) != -1) {
-            var note = turtleHTML[0] + ':' + turtleHTML[1].replace(/ /g, ':');
-            var graphicsBlock = true;
-        } else {
-            // Both solfege and octave are extracted from HTML by getNote.
-            var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
-            var note = noteObj[0] + noteObj[1];
-        }
-
+        } else 
+            return;
+            
         this._notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
         var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
@@ -1242,7 +1232,45 @@ function Matrix() {
                 }
             }
         }
-
+        this._sortNoteStored = function() {
+            var notesAlreadyStored = [];
+            var noteSorted = [];
+            var noteStored = [];
+            
+            for (var i=0; i<this._noteStored.length; i++) {
+                for (var j=0; i<notesAlreadyStored.length; j++) {
+                    if (this._noteStored[i] === this._noteStored[notesAlreadyStored[j][1]]) {
+                        i += 1;
+                        break;
+                    }
+                }
+                if (getDrumName(this._noteStored[i]) !== -1) {
+                    notesAlreadyStored.push([-2, i]);
+                } else if (MATRIXGRAPHICS.indexOf(this._noteStored[i]) !== -1) {
+                    notesAlreadyStored.push([-1, i]);
+                } else if (MATRIXGRAPHICS2.indexOf(this._noteStored[i]) !== -1) {
+                    notesAlreadyStored.push([-1, i]);
+                } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {  //one index in rowLabels and noteStored points to the same note
+                    notesAlreadyStored.push([this.rowArgs[i], i]);
+                } else 
+                    notesAlreadyStored.push([noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]), i]);
+                }
+            }
+            
+            noteSorted = notesAlreadyStored.sort(
+                function(a,b) {
+                    return a[0] - b[0];
+                }
+            )
+            
+            for (var i=0; i<this.noteStored.length; i++) {
+                noteStored = this._noteStored[noteSorted[i][1]];
+            }
+            
+            this.noteStored = noteStored;
+        }
+        
+        
         // Create a new stack for the chunk.
         console.log(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
