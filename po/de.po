@@ -2307,7 +2307,7 @@ msgstr "Sprache einstellen"
 
 #: plugins/rodi.rtp:30
 msgid "blink (ms)"
-msgstr ""
+msgstr "Blinke (ms)"
 
 #: plugins/rodi.rtp:57
 msgid "move"
