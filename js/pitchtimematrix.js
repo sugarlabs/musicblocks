@@ -281,7 +281,6 @@ function Matrix() {
         cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
         // cell.style.top = Math.floor(marginFromTop + (i * this._cellScale * 2)) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
-        _sortNoteStored();
     };
 
     this._addButton = function(row, colIndex, icon, iconSize, label) {
@@ -333,6 +332,7 @@ function Matrix() {
         // Make a list to sort, skipping drums and graphics.
         // frequency;label;arg;row index
         for (var i = 0; i < this.rowLabels.length; i++) {
+            console.log(i + ': ' + this.rowLabels[i] + ' ' + this._noteStored[i]);
             if (this.rowLabels[i].toLowerCase() === 'rest') {
                 continue;
             }
@@ -348,9 +348,9 @@ function Matrix() {
 
             // We want to sort based on frequency, so we convert all notes to frequency.
             if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([this.rowArgs[i], this.rowLabels[i], this.rowArgs[i], i]);
+                sortableList.push([this.rowArgs[i], this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else {
-                sortableList.push([noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]), this.rowLabels[i], this.rowArgs[i], i]);
+                sortableList.push([noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]), this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
 
@@ -358,15 +358,15 @@ function Matrix() {
         for (var i = 0; i < this.rowLabels.length; i++) {
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                sortableList.push([-2, this.rowLabels[i], this.rowArgs[i], i]);
+                sortableList.push([-2, this.rowLabels[i], this.rowArgs[i], i], this._noteStored[i]);
             }
         }
 
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i]);
+                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i]);
+                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
 
@@ -385,6 +385,7 @@ function Matrix() {
             var obj = sortedList[i];
 
             this._rowMap[obj[3]] = i;
+            this._noteStored[i] = obj[4];
 
             if (i > 0 && typeof(obj[2]) !== 'object' && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
                 // skip duplicates
@@ -1013,18 +1014,18 @@ function Matrix() {
     };
 
     this._setNoteCell = function(j, colIndex, cell, playNote) {
-        var note = this._noteStored[j-1];
+        var note = this._noteStored[j - 1];
         var drumName = getDrumName(note);
         var graphicsBlock = false;
 
         graphicNote = note.split(':');
         if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
             var graphicsBlock = true;
-        } else 
-            return;
+        }
             
         this._notesToPlay[parseInt(colIndex) - 1][0].push(note);
 
+        var table = docById('pitchTimeTable');
         var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
 
         // innerHTML looks something like: 1<br>&mdash;<br>4<br>&#x1D15F;
@@ -1232,43 +1233,7 @@ function Matrix() {
                 }
             }
         }
-        this._sortNoteStored = function() {
-            var notesAlreadyStored = [];
-            var noteSorted = [];
-            var noteStored = [];
-            
-            for (var i=0; i<this._noteStored.length; i++) {
-                for (var j=0; i<notesAlreadyStored.length; j++) {
-                    if (this._noteStored[i] === this._noteStored[notesAlreadyStored[j][1]]) {
-                        i += 1;
-                        break;
-                    }
-                }
-                if (getDrumName(this._noteStored[i]) !== -1) {
-                    notesAlreadyStored.push([-2, i]);
-                } else if (MATRIXGRAPHICS.indexOf(this._noteStored[i]) !== -1) {
-                    notesAlreadyStored.push([-1, i]);
-                } else if (MATRIXGRAPHICS2.indexOf(this._noteStored[i]) !== -1) {
-                    notesAlreadyStored.push([-1, i]);
-                } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {  //one index in rowLabels and noteStored points to the same note
-                    notesAlreadyStored.push([this.rowArgs[i], i]);
-                } else 
-                    notesAlreadyStored.push([noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]), i]);
-                }
-            }
-            
-            noteSorted = notesAlreadyStored.sort(
-                function(a,b) {
-                    return a[0] - b[0];
-                }
-            )
-            
-            for (var i=0; i<this.noteStored.length; i++) {
-                noteStored = this._noteStored[noteSorted[i][1]];
-            }
-            
-            this.noteStored = noteStored;
-        }
+
         
         
         // Create a new stack for the chunk.
@@ -1276,4 +1241,3 @@ function Matrix() {
         this._logo.blocks.loadNewBlocks(newStack);
     };
 };
-
