@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+		<title>Rhythm-Ruler</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		
+		
+		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+		
+	</head>
+
+	<body>
+
+		<h4>Rhythm-Ruler</h4>
+		
+		<div>
+    			<ul class="list">
+      				<a href="#"><li></li></a>
+    			</ul>
+  		</div>
+
+  		<script>
+
+			// A function to make the ruler clickable and execute the dissection functionality on click.
+
+			$("ul").delegate("li", "click", function()
+			{
+			    var inputNum = prompt("Divide By:");
+			    var w = $(this).width();
+			    
+			    if( inputNum > 1 )
+			    {
+			        var i;
+			        var newW = w/inputNum;
+			    }
+			     
+			    else 
+			    {
+			        newW = w;
+			    }
+			     
+			    for ( i = 1; i <= inputNum; i++ )
+			    {
+			     	var newList=document.createElement("li");
+			     	$(newList).text("1/" + inputNum).css('width',newW).insertAfter($(this));
+			    }
+			     
+			    if(inputNum>1)
+			    {
+			     
+			    	$(this).remove();
+			 	
+			 	}
+
+			});
+
+		</script>
+
+
+	</body>
+
+</html>
