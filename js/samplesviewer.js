@@ -18,7 +18,47 @@ const EMPTYIMAGE = 'data:image/svg+xml;base64,' + btoa('<svg \
 const SERVER = 'https://turtle.sugarlabs.org/server/';
 window.server = SERVER; 'https://turtle.sugarlabs.org/server/'; // '/server/';
 
-const LOCAL_PROJECT_TEMPLATE = '\
+//{NAME} will be replaced with project name
+const SHAREURL = 'https://walterbender.github.io/musicblocks/?file={name}&run=True';
+const NAMESUBTEXT = '{name}';
+
+const LOCAL_PROJECT_STYLE ='\
+<style> \
+.shareurlspan { \
+    position: relative; \
+} \
+.shareurlspan .shareurltext { \
+    visibility: hidden; \
+    background-color: black; \
+    color: #fff; \
+    text-align: center; \
+    padding: 10px; \
+    margin-top; 5px; \
+    border-radius: 6px; \
+    position: absolute; \
+    z-index: 1; \
+    text-align: left; \
+} \
+.shareurltext{ \
+    top: 25px; \
+    left: -200px; \
+    visibility: hidden; \
+} \
+.tooltiptriangle{ \
+    position: absolute; \
+    visibility: hidden; \
+    top: 15px; \
+    left: 0px; \
+    width: 0; \
+    height: 0; \
+    border-style: solid; \
+    border-width: 0 15px 15px 15px; \
+    border-color: transparent transparent black transparent; \
+} \
+</style>';
+
+//style block is for the tooltip. num will be replaced with a unique number
+const LOCAL_PROJECT_TEMPLATE ='\
 <li data=\'{data}\' title="{title}" current="{current}"> \
     <img class="thumbnail" src="{img}" /> \
     <div class="options"> \
@@ -26,6 +66,14 @@ const LOCAL_PROJECT_TEMPLATE = '\
         <img class="open icon" title="' + _('Open') + '" alt="' + _('Open') + '" src="header-icons/edit.svg" /> \
         <img class="delete icon" title="' + _('Delete') + '" alt="' + _('Delete') + '" src="header-icons/delete.svg" /> \
         <img class="publish icon" title="' + _('Publish') + '" alt="' + _('Publish') + '" src="header-icons/publish.svg" /> \
+        <span class="shareurlspan"> \
+        <img class="share icon" title="' + _('Share') + '" alt="' + _('Share') + '" src="header-icons/share.svg" /> \
+        <div class="tooltiptriangle" id="shareurltrinum"></div> \
+        <div class="shareurltext" id="shareurldivnum"> \
+            Copy the link to share your project:\
+            <input type="text" name="shareurl" id="shareurlboxnum" value="url here" style="margin-top:5px;width: 350px;text-align:left;" onblur="document.getElementById(\'shareurldivnum\').style.visibility = \'hidden\';document.getElementById(\'shareurlboxnum\').style.visibility = \'hidden\';document.getElementById(\'shareurltrinum\').style.visibility = \'hidden\';"/> \
+        </div> \
+        </span> \
         <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
     </div> \
 </li>'
@@ -258,12 +306,16 @@ function PlanetModel(controller) {
         });
     };
 
+    this.getPublishableName = function (name) {
+        return name.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^`{|}~']/g, '').replace(/ /g, '_');
+    };
+
     this.publish = function (name, data, image) {
         // Show busy cursor.
         document.body.style.cursor = 'wait';
 
         setTimeout(function () {
-            name = name.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^`{|}~']/g, '').replace(/ /g, '_');
+            name = model.getPublishableName(name);
             name = 'MusicBlocks_'+name;
             httpPost(name + '.tb', data);
             httpPost(name + '.b64', image);
@@ -310,18 +362,24 @@ function PlanetView(model, controller) {
 
         if (model.localChanged) {
             html = '';
+            html = html + LOCAL_PROJECT_STYLE;
             model.localProjects.forEach(function (project, i) {
-                html = html + format(LOCAL_PROJECT_TEMPLATE, project);
+                html = html + format(LOCAL_PROJECT_TEMPLATE, project).replace(new RegExp("num", 'g'), i.toString());
+                console.log(i);
+                console.log(project);
             });
-
             document.querySelector('.planet .content.l').innerHTML = html;
 
             var eles = document.querySelectorAll('.planet .content.l li');
             Array.prototype.forEach.call(eles, function (ele, i) {
+                console.log(i);
+                console.log(ele);
                 ele.querySelector('.open')
                     .addEventListener('click', planet.open(ele));
                 ele.querySelector('.publish')
                     .addEventListener('click', planet.publish(ele));
+                ele.querySelector('.share')
+                    .addEventListener('click', planet.share(ele,i));
                 ele.querySelector('.download')
                    .addEventListener('click', planet.download(ele));
                 ele.querySelector('.delete')
@@ -331,7 +389,6 @@ function PlanetView(model, controller) {
                 ele.querySelector('.thumbnail')
                    .addEventListener('click', planet.open(ele));
             });
-
             model.localChanged = false;
         }
 
@@ -339,7 +396,6 @@ function PlanetView(model, controller) {
         model.globalProjects.forEach(function (project, i) {
             html += format(GLOBAL_PROJECT_TEMPLATE, project);
         });
-
         document.querySelector('.planet .content.w').innerHTML = html;
 
         var eles = document.querySelectorAll('.planet .content.w li');
@@ -368,6 +424,27 @@ function PlanetView(model, controller) {
             document.querySelector('#loading-image-container')
                     .style.display = 'none';
         }
+    };
+
+    this.share = function (ele,i) {
+        return function () {
+            document.querySelector('#loading-image-container')
+                    .style.display = '';
+            planet.model.publish(ele.attributes.title.value,
+                             ele.attributes.data.value,
+                             ele.querySelector('img').src);
+            document.querySelector('#loading-image-container')
+                    .style.display = 'none';
+            var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
+            console.log(url);
+            var n = i.toString();
+            document.getElementById('shareurldiv'+n).style.visibility = 'visible';
+            document.getElementById('shareurlbox'+n).style.visibility = 'visible';
+            document.getElementById('shareurltri'+n).style.visibility = 'visible';
+            document.getElementById('shareurlbox'+n).value = url;
+            document.getElementById('shareurlbox'+n).focus();
+            document.getElementById('shareurlbox'+n).select();
+        };
     };
 
     this.download = function (ele) {
