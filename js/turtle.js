@@ -976,11 +976,16 @@ function Turtle (name, turtles, drum) {
         }
     };
 
-    this.blink = function() {
+    this.blink = function(duration) {
         var turtle = this;
+        var defaultsize = 55;
+        var newsize = 60;
         turtle.bitmap.alpha = 0.5;
+        turtle.bitmap.scaleX = Number(newsize) / defaultsize;
+        turtle.bitmap.scaleY = turtle.bitmap.scaleX;
+        turtle.bitmap.scale = turtle.bitmap.scaleX;
+        var isSkinChanged = turtle.skinChanged;
         turtle.skinChanged = true;
-
         turtle.container.uncache();
         turtle.turtles.refreshCanvas();
         var bounds = turtle.container.getBounds();
@@ -988,13 +993,16 @@ function Turtle (name, turtles, drum) {
         turtle.turtles.refreshCanvas();
         setTimeout(function() {
             turtle.bitmap.alpha = 1;
-            turtle.skinChanged = true;
-
+            turtle.bitmap.scaleX = 1;
+            turtle.bitmap.scaleY = turtle.bitmap.scaleX;
+            turtle.bitmap.scale = turtle.bitmap.scaleX;
+            turtle.skinChanged = isSkinChanged;
             turtle.container.uncache();
             var bounds = turtle.container.getBounds();
             turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             turtle.turtles.refreshCanvas();
-        }, 100);
+        //1000*(1/duration)/2
+        }, 500/duration);
     };
 };
 
