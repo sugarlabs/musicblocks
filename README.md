@@ -1,7 +1,7 @@
 MUSIC BLOCKS
 ============
 
-Music Blocks a collection of manipulative tools for exploring
+Music Blocks is a collection of manipulative tools for exploring
 fundamental musical concepts in an integrative and fun way.
 
 <img
