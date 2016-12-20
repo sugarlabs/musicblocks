@@ -975,6 +975,27 @@ function Turtle (name, turtles, drum) {
             myTurtle.turtles.refreshCanvas();
         }
     };
+
+    this.blink = function() {
+        var turtle = this;
+        turtle.bitmap.alpha = 0.5;
+        turtle.skinChanged = true;
+
+        turtle.container.uncache();
+        turtle.turtles.refreshCanvas();
+        var bounds = turtle.container.getBounds();
+        turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+        turtle.turtles.refreshCanvas();
+        setTimeout(function() {
+            turtle.bitmap.alpha = 1;
+            turtle.skinChanged = true;
+
+            turtle.container.uncache();
+            var bounds = turtle.container.getBounds();
+            turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            turtle.turtles.refreshCanvas();
+        }, 100);
+    };
 };
 
 
