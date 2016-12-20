@@ -27,8 +27,11 @@ function StatusMatrix() {
         docById('statusmatrix').style.border = 2;
 
         // FIXME: make this number based on canvas size.
+	
+        var canvas = docById('myCanvas')
+	var w2 = canvas.width;
         var w = window.innerWidth;
-        this._cellScale = w / 1200;
+        this._cellScale = w / w2;
         docById('statusmatrix').style.overflowX = 'auto';
 
         // Used to remove the matrix table
