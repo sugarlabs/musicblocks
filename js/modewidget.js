@@ -33,7 +33,6 @@ function ModeWidget() {
         docById('modewidget').style.visibility = 'visible';
         docById('modewidget').style.border = 2;
 
-        // FIXME: make this number based on canvas size.
         this._cellScale = window.innerWidth / 1200;
         docById('modewidget').style.overflowX = 'auto';
 
