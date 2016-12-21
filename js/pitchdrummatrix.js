@@ -96,7 +96,6 @@ function PitchDrumMatrix() {
         docById('pitchdrummatrix').style.visibility = 'visible';
         docById('pitchdrummatrix').style.border = 2;
 
-        // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         docById('pitchdrummatrix').style.width = Math.floor(w / 2) + 'px';
