@@ -109,7 +109,6 @@ function Matrix() {
         docById('pitchtimematrix').style.visibility = 'visible';
         docById('pitchtimematrix').style.border = 2;
 
-        // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         docById('pitchtimematrix').style.width = Math.floor(w / 2) + 'px';
