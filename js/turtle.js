@@ -978,10 +978,9 @@ function Turtle (name, turtles, drum) {
 
     this.blink = function(duration) {
         var turtle = this;
-        var defaultsize = 55;
-        var newsize = 60;
+        var scalefactor = 60/55;
         turtle.bitmap.alpha = 0.5;
-        turtle.bitmap.scaleX = Number(newsize) / defaultsize;
+        turtle.bitmap.scaleX = turtle.bitmap.scaleX*scalefactor;
         turtle.bitmap.scaleY = turtle.bitmap.scaleX;
         turtle.bitmap.scale = turtle.bitmap.scaleX;
         var isSkinChanged = turtle.skinChanged;
@@ -993,7 +992,7 @@ function Turtle (name, turtles, drum) {
         turtle.turtles.refreshCanvas();
         setTimeout(function() {
             turtle.bitmap.alpha = 1;
-            turtle.bitmap.scaleX = 1;
+            turtle.bitmap.scaleX = turtle.bitmap.scaleX/scalefactor;
             turtle.bitmap.scaleY = turtle.bitmap.scaleX;
             turtle.bitmap.scale = turtle.bitmap.scaleX;
             turtle.skinChanged = isSkinChanged;
