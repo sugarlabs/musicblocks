@@ -4249,7 +4249,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
 
                     logo.noteBeat[turtle] = noteBeatValue;
-
+                    
+                    // do not process a note if its duration is equal to infinity or NaN
+                    if (!isFinite(duration)) {
+                        return;
+                    }
+                    
                     // Use the beatValue of the first note in
                     // the group since there can only be one.
                     if (logo.staccato[turtle].length > 0) {
@@ -4304,7 +4309,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                             } else if (logo.tieCarryOver[turtle] > 0) {
                                 updateLilypondNotation(logo, note, logo.tieCarryOver[turtle], turtle, insideChord);
                             } else {
-                                // console.log('durarion == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
+                                // console.log('duration == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
                             }
                         }
 
