@@ -112,7 +112,6 @@ function ProtoBlock(name) {
     };
 
     this.hiddenBlockFlowGenerator = function() {
-        // TODO: return empty SVG
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);

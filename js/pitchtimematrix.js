@@ -880,10 +880,6 @@ function Matrix() {
         time = 1 / noteValue;
         var that = this;
 
-        // FIXME: Highlight does not work properly with tuplets: each
-        // note in the tuplet is counted once, but since the bottom
-        // cell of the tuplet spams multiple columns, the highlight
-        // gets ahead of itself.
         setTimeout(function() {
             var table = docById('pitchTimeTable');
             // Did we just play the last note?
@@ -987,8 +983,7 @@ function Matrix() {
         var rhythmBlockObj = this._colBlocks[colIndex - 1];
 
         if (playNote) {
-            // FIXME: What is rhythmBlockObj[2]???
-            this.addNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);  //, rhythmBlockObj[2]);
+            this.addNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         } else {
             this.removeNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         }

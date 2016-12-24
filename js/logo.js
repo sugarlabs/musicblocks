@@ -2368,7 +2368,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         case 'backward':
             logo.backward[turtle].push(blk);
             // Set child to bottom block inside clamp
-            // FIXME: We need to do the same inside any contained stack.
             childFlow = logo.blocks.findBottomBlock(args[0]);
             childFlowCount = 1;
 
