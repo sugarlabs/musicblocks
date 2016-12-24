@@ -217,23 +217,32 @@
             }, 2000);
         });
     });
-      
+
+    var isDragging = false;
     function moveMatrix(event) {
-        var myDiv = document.getElementById('pitchtimematrix');
-        var myDivPosition = myDiv.getBoundingClientRect();
-
+        isDragging = true;
         var table = document.getElementById('pitchTimeTable');
-        var row = table.rows.item(0);
-        row.style.left = myDivPosition.left + 'px';
-        row.style.top = myDivPosition.top + 'px';
+        var tableStyle = window.getComputedStyle(table);
+        var matrixPosition = docById('pitchtimematrix').getBoundingClientRect();
+        var solfaCellPosition = docById('solfaCell').getBoundingClientRect();
+        var borderSpacingH = parseInt(tableStyle.borderSpacing.split(" ")[0]);
+        var borderSpacingV = parseInt(tableStyle.borderSpacing.split(" ")[1]);
 
-        // What does this do?
-        var marginFromTop = Math.floor(myDivPosition.top + this.cellScale * 2 + parseInt(myDiv.style.paddingTop));
+        var row = table.rows.item(0);
+        var marginTemp = matrixPosition.top + solfaCellPosition.height + borderSpacingV * 2;
         for (var i = 1, row; row = table.rows[i]; i++) {
             cell = row.cells[0];
-            cell.style.left = myDivPosition.left + 2 + 'px';
-            cell.style.top = marginFromTop + 'px';
-            marginFromTop += parseInt(cell.style.height);
+            cell.style.left = matrixPosition.left + borderSpacingH + 'px';
+            cell.style.top = marginTemp + 'px';
+            marginTemp += cell.getBoundingClientRect().height + borderSpacingV;
+        }
+
+        var matrixButtons = document.getElementsByClassName('matrixButton');
+        marginTemp = matrixPosition.left + solfaCellPosition.width + borderSpacingH * 2;
+        for (var i = 0; i < matrixButtons.length; i++) {
+            matrixButtons[i].style.left = marginTemp + 'px';
+            matrixButtons[i].style.top = matrixPosition.top + borderSpacingV + 'px';
+            marginTemp += matrixButtons[i].getBoundingClientRect().width + borderSpacingH;
         }
     };
 
@@ -320,7 +329,7 @@
     </div>
   </div>
 
-  <div id="pitchtimematrix" overflow-x="auto" ondrag="moveMatrix(event)" onmouseup="moveMatrix(event)"></div>
+  <div id="pitchtimematrix" overflow-x="auto" draggable="true" ondrag="moveMatrix(event)" onmouseup="if(isDragging) moveMatrix(event); isDragging = false;"></div>
   <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
   <div id="rulerBody" overflow-x="auto"></div>
   <div id="dissectNumber"></div>
