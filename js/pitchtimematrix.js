@@ -149,6 +149,7 @@ function Matrix() {
         var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
         var table = docById('pitchTimeTable');
+        var tableStyle = window.getComputedStyle(table);
         var header = table.createTHead();
         var row = header.insertRow(0);
         row.style.left = Math.floor(matrixDivPosition.left) + 'px';
@@ -163,38 +164,48 @@ function Matrix() {
         solfaCell.style.maxWidth = solfaCell.style.width;
         solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         solfaCell.style.backgroundColor = MATRIXLABELCOLOR;
+        solfaCell.id = "solfaCell";
 
         // Add the buttons to the top row.
         var that = this;
         var iconSize = Math.floor(this._cellScale * 24);
+        var borderSpacingH = parseInt(tableStyle.borderSpacing.split(" ")[0]);
+        var borderSpacingV = parseInt(tableStyle.borderSpacing.split(" ")[1]);
+        var leftMargin = solfaCell.getBoundingClientRect().left + parseInt(solfaCell.getBoundingClientRect().width) + borderSpacingH;
+        var topMargin = matrixDivPosition.top + borderSpacingV;
 
-        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play'));
+        var cell = this._addButton(row, leftMargin, topMargin, 'play-button.svg', iconSize, _('play'));
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
+        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, 2, 'export-chunk.svg', iconSize, _('save'));
+        var cell = this._addButton(row, leftMargin, topMargin, 'export-chunk.svg', iconSize, _('save'));
         cell.onclick=function() {
             that._save();
         }
+        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, 3, 'erase-button.svg', iconSize, _('clear'));
+        var cell = this._addButton(row, leftMargin, topMargin, 'erase-button.svg', iconSize, _('clear'));
         cell.onclick=function() {
             that._clear();
         }
+        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, 4, 'export-button.svg', iconSize, _('export'));
+        var cell = this._addButton(row, leftMargin, topMargin, 'export-button.svg', iconSize, _('export'));
         cell.onclick=function() {
             that._export();
         }
+        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, 5, 'sort.svg', iconSize, _('sort'));
+        var cell = this._addButton(row, leftMargin, topMargin, 'sort.svg', iconSize, _('sort'));
         cell.onclick=function() {
             that._sort();
         }
+        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, 6, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, leftMargin, topMargin, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             docById('pitchtimematrix').style.visibility = 'hidden';
             docById('pitchtimematrix').style.border = 0;
@@ -282,15 +293,19 @@ function Matrix() {
         cell.style.backgroundColor = MATRIXLABELCOLOR;
     };
 
-    this._addButton = function(row, colIndex, icon, iconSize, label) {
+    this._addButton = function(row, leftM, topM, icon, iconSize, label) {
         var table = docById('drumTable');
         var cell = row.insertCell();
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.className = 'matrixButton';
+        cell.style.position = 'fixed';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
+        cell.style.left = leftM + 'px';
+        cell.style.top = topM + 'px';
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" style="margin-top: ' + (parseInt(cell.style.height) - iconSize) / 2 + 'px' + '">&nbsp;&nbsp;';
 
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
