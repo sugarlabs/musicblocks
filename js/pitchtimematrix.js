@@ -155,23 +155,18 @@ function Matrix() {
         row.style.left = Math.floor(matrixDivPosition.left) + 'px';
         row.style.top = Math.floor(matrixDivPosition.top) + 'px';
 
-        var solfaCell = row.insertCell(-1);
-        solfaCell.style.fontSize = this._cellScale * 100 + '%';
-        //.TRANS: solfège is the study of singing using syllables, e.g., do re mi
-        solfaCell.innerHTML = '<b>' + _('Solfa') + '</b>';
-        solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        solfaCell.style.minWidth = solfaCell.style.width;
-        solfaCell.style.maxWidth = solfaCell.style.width;
-        solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        solfaCell.style.backgroundColor = MATRIXLABELCOLOR;
-        solfaCell.id = "solfaCell";
+        var blankCell = row.insertCell(-1);
+        blankCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        blankCell.style.minWidth = blankCell.style.width;
+        blankCell.style.maxWidth = blankCell.style.width;
+        blankCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
 
         // Add the buttons to the top row.
         var that = this;
         var iconSize = Math.floor(this._cellScale * 24);
         var borderSpacingH = parseInt(tableStyle.borderSpacing.split(" ")[0]);
         var borderSpacingV = parseInt(tableStyle.borderSpacing.split(" ")[1]);
-        var leftMargin = solfaCell.getBoundingClientRect().left + parseInt(solfaCell.getBoundingClientRect().width) + borderSpacingH;
+        var leftMargin = matrixDivPosition.left + borderSpacingH;
         var topMargin = matrixDivPosition.top + borderSpacingV;
 
         var cell = this._addButton(row, leftMargin, topMargin, 'play-button.svg', iconSize, _('play'));
@@ -219,7 +214,6 @@ function Matrix() {
         }
 
         var j = 0;
-        var marginFromTop = Math.floor(matrixDivPosition.top + this._cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (this.rowLabels[i].toLowerCase() === 'rest') {
                 this._rests += 1;
@@ -227,7 +221,7 @@ function Matrix() {
             }
 
             var row = header.insertRow(i + 1);
-            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            row.style.top = (matrixDivPosition.top + MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale + (i+2) * borderSpacingV) + 'px';
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             cell.style.fontSize = this._cellScale * 100 + '%';
@@ -273,8 +267,7 @@ function Matrix() {
             cell.style.maxWidth = cell.style.minWidth;
             cell.style.position = 'fixed';
             cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
-            // cell.style.top = Math.floor(marginFromTop + (i * this._cellScale * 2)) + 'px';
-            marginFromTop += parseInt(cell.style.height.replace('px', ''));
+            cell.style.top = (matrixDivPosition.top + MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale + (i+3) * borderSpacingV) + 'px';
             j += 1;
         }
 
@@ -289,8 +282,8 @@ function Matrix() {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
-        // cell.style.top = Math.floor(marginFromTop + (i * this._cellScale * 2)) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
+        moveMatrix();
     };
 
     this._addButton = function(row, leftM, topM, icon, iconSize, label) {
@@ -298,7 +291,7 @@ function Matrix() {
         var cell = row.insertCell();
         cell.className = 'matrixButton';
         cell.style.position = 'fixed';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.left = leftM + 'px';
