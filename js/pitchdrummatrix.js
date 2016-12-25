@@ -58,17 +58,14 @@ function PitchDrumMatrix() {
     };
 
     this.addRowBlock = function(pitchBlock) {
-        console.log('adding pitchBlock (row) ' + pitchBlock);
         this._rowBlocks.push(pitchBlock);
     };
 
     this.addColBlock = function(drumBlock) {
-        console.log('adding drumBlock (col) ' + drumBlock);
         this._colBlocks.push(drumBlock);
     };
 
     this.addNode = function(pitchBlock, drumBlock) {
-        console.log('adding node ' + pitchBlock + ' ' + drumBlock);
         for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1] === drumBlock) {
