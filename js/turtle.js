@@ -39,6 +39,8 @@ function Turtle (name, turtles, drum) {
     this.y = 0;
     this.bitmap = null;
     this.skinChanged = false;  // Should we reskin the turtle on clear?
+    this.blinkFinished = true;
+    this.beforeBlinkSize = null;
 
     // Which start block is assocated with this turtle?
     this.startBlock = null;
@@ -975,6 +977,39 @@ function Turtle (name, turtles, drum) {
             myTurtle.turtles.refreshCanvas();
         }
     };
+
+    this.blink = function(duration,volume) {
+        var turtle = this;
+        var sizeinuse;
+        if (this.blinkFinished==false){
+            sizeinuse = this.beforeBlinkSize;
+        } else {
+            sizeinuse = turtle.bitmap.scaleX;
+            this.beforeBlinkSize = sizeinuse;
+        }
+        this.blinkFinished = false;
+        turtle.container.uncache();
+        var scalefactor = 60 / 55;
+        var volumescalefactor = 4 * (volume + 200) / 1000;
+        //Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.196
+        turtle.bitmap.alpha = 0.5;
+        turtle.bitmap.scaleX = sizeinuse * scalefactor * volumescalefactor;
+        turtle.bitmap.scaleY = turtle.bitmap.scaleX;
+        turtle.bitmap.scale = turtle.bitmap.scaleX;
+        var isSkinChanged = turtle.skinChanged;
+        turtle.skinChanged = true;
+        createjs.Tween.get(turtle.bitmap).to({alpha: 1, scaleX: sizeinuse, scaleY: sizeinuse, scale: sizeinuse}, 500 / duration);
+        setTimeout(function() {
+            turtle.bitmap.scaleX = sizeinuse;
+            turtle.bitmap.scaleY = turtle.bitmap.scaleX;
+            turtle.bitmap.scale = turtle.bitmap.scaleX;
+            turtle.skinChanged = isSkinChanged;
+            var bounds = turtle.container.getBounds();
+            turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            this.blinkFinished = true;
+        //It's 500/duration because 1000ms * (1 / duration) / 2
+        }, 500 / duration);
+    };
 };
 
 
@@ -1045,7 +1080,7 @@ function Turtles(canvas, stage, refreshCanvas) {
         this.stage.addChild(myTurtle.drawingCanvas);
         // In theory, this prevents some unnecessary refresh of the
         // canvas.
-        myTurtle.drawingCanvas.tickEnabled = false;
+        //myTurtle.drawingCanvas.tickEnabled = false;
 
         var turtleImage = new Image();
         i %= 10;
