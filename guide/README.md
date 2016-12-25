@@ -6,11 +6,40 @@ music and graphics. It expands upon Turtle Blocks in that it has a
 collection of features relating to pitch and rhythm.
 
 The Turtle Blocks guide is a good place to start learning about the
-basics. In this guide, we illustrate the music features walking the
+basics. In this guide, we illustrate the musical features by walking the
 reader through numerous examples.
 
-Getting Started
+<a name="TOC">
+Table of Content
+----------------
+</a>
+
+1. [Getting Started](#GETTING-STARTED)
+2. [Notes] (#NOTES)
+3. Programming Guide
+4. Widgets
+5. Exporting your work
+
+---------DELETE------------------
+
+This guide is broken into four sections: (i) an overview of the
+[*Notes*](#NOTES) structure; (ii) a [programming
+guide](#PROGRAMMING-WITH-MUSIC); (iii) [widgets](#WIDGETS) that provide
+some scaffolding to the programmer; and (iv) a section on [exporting
+your work](#BEYOND MUSIC BLOCKS) into other music systems.
+
+-----------------ENDDELETE-------------
+
+
+Many of the examples given in the guide have links to code you can
+run. Look for RUN LIVE links.
+
+
+<a name="GETTING-STARTED">
+1. GETTING STARTED
 ---------------
+</a>
+[Back to Table of Content](#TOC)
 
 Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox (although
@@ -25,22 +54,11 @@ and for more details on how to use Turtle Blocks, see [Using Turtle
 Blocks
 JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
-ABOUT THIS GUIDE
-----------------
-
-This guide is broken into four sections: (i) an overview of the
-[*Notes*](#NOTES) structure; (ii) a [programming
-guide](#PROGRAMMING-WITH-MUSIC); (iii) [widgets](#WIDGETS) that provide
-some scaffolding to the programmer; and (iv) a section on [exporting
-your work](#BEYOND MUSIC BLOCKS) into other music systems.
-
-Many of the examples given in the guide have links to code you can
-run. Look for RUN LIVE links.
-
 <a name="NOTES">
-I. NOTES
+2. NOTES
 --------
 </a>
+[Back to Table of Content](#TOC)
 
 Music Blocks exposed the common elements of music: pitch, rhythm, and
 sonic quality, e.g., loudness and softness, and to some degree, timbre
