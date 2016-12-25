@@ -2249,7 +2249,7 @@ msgstr "von"
 
 #: plugins/maths.rtp:47
 msgid "power"
-msgstr ""
+msgstr "Potenzieren"
 
 #: plugins/maths.rtp:47
 msgid "base"

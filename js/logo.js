@@ -2368,7 +2368,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         case 'backward':
             logo.backward[turtle].push(blk);
             // Set child to bottom block inside clamp
-            // FIXME: We need to do the same inside any contained stack.
             childFlow = logo.blocks.findBottomBlock(args[0]);
             childFlowCount = 1;
 
@@ -4249,7 +4248,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
 
                     logo.noteBeat[turtle] = noteBeatValue;
-
+                    
+                    // do not process a note if its duration is equal to infinity or NaN
+                    if (!isFinite(duration)) {
+                        return;
+                    }
+                    
                     // Use the beatValue of the first note in
                     // the group since there can only be one.
                     if (logo.staccato[turtle].length > 0) {
@@ -4304,12 +4308,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                             } else if (logo.tieCarryOver[turtle] > 0) {
                                 updateLilypondNotation(logo, note, logo.tieCarryOver[turtle], turtle, insideChord);
                             } else {
-                                // console.log('durarion == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
+                                // console.log('duration == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
                             }
                         }
 
                         console.log("notes to play " + notes + ' ' + noteBeatValue);
-
+                        logo.turtles.turtleList[turtle].blink(duration,last(logo.polyVolume[turtle]));
                         if (notes.length > 0) {
                             var len = notes[0].length;
 
