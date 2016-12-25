@@ -1,5 +1,7 @@
 Guide to Programming with Music Blocks
 ======================================
+<a name="Placeholder"> 
+</a>
 
 Music Blocks is a programming environment for children interested in
 music and graphics. It expands upon Turtle Blocks in that it has a
