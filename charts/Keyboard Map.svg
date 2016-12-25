@@ -11,13 +11,13 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="2035.308"
-   height="1295.9618"
-   viewBox="0 0 2035.308 1295.9618"
+   width="2167.3975"
+   height="1309.0405"
+   viewBox="0 0 2167.3975 1309.0405"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="Keyboard Map Redone.svg">
+   sodipodi:docname="Keyboard Map.svg">
   <title
      id="title3953">Keyboard Map</title>
   <defs
@@ -280,21 +280,21 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.58781078"
-     inkscape:cx="1113.7811"
-     inkscape:cy="895.60514"
+     inkscape:zoom="0.43852551"
+     inkscape:cx="988.60342"
+     inkscape:cy="143.53341"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
      inkscape:window-width="1280"
-     inkscape:window-height="657"
+     inkscape:window-height="616"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      fit-margin-top="100"
      fit-margin-right="100"
-     fit-margin-left="115"
+     fit-margin-left="116"
      fit-margin-bottom="117" />
   <metadata
      id="metadata7">
@@ -336,7 +336,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(280.18652,201.45335)">
+     transform="translate(412.27589,200.53209)">
     <image
        y="-57.394421"
        x="97.950188"
@@ -2754,7 +2754,7 @@
        inkscape:connector-curvature="0" />
     <text
        id="text3196-75"
-       style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans"
+       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
        x="609.81348"
        y="800.50842">
       <tspan
@@ -2764,7 +2764,7 @@
     </text>
     <text
        id="text3200-5"
-       style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans"
+       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
        x="609.81348"
        y="802.50842">
       <tspan
@@ -2774,7 +2774,7 @@
     </text>
     <text
        id="text3204-2"
-       style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans"
+       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
        x="609.81348"
        y="804.50842">
       <tspan
@@ -2790,7 +2790,7 @@
        sodipodi:nodetypes="ccccccccccccccc" />
     <text
        x="749.65802"
-       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
        id="text23-2-2"
        y="800.24695">
       <tspan
@@ -2806,7 +2806,7 @@
        sodipodi:nodetypes="ccccccccccccccc" />
     <text
        id="text23-9-3-2"
-       style="font-size:20px;text-anchor:start;fill:#000000;font-family:Sans"
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
        x="759.65802"
        y="842.24695">
       <tspan
@@ -2829,7 +2829,7 @@
        id="text4991"
        y="826.70844"
        x="846.80286"
-       style="font-size:17.5px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:17.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="826.70844"
          x="846.80286"
@@ -2840,7 +2840,7 @@
        id="text4995"
        y="833.92029"
        x="854.49518"
-       style="font-size:25px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:25px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="833.92029"
          x="854.49518"
@@ -2851,7 +2851,7 @@
        id="text4999"
        y="870.93915"
        x="858.34131"
-       style="font-size:25px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:25px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="870.93915"
          x="858.34131"
@@ -2862,7 +2862,7 @@
        id="text5003"
        y="873.20062"
        x="856.41821"
-       style="font-size:25px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:25px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="873.20062"
          x="856.41821"
@@ -3023,7 +3023,7 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-size:17.5px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:17.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        x="618.53656"
        y="722.93921"
        id="text5158"
@@ -3049,7 +3049,7 @@
          y="944.01624" /></text>
     <text
        xml:space="preserve"
-       style="font-size:17.5px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:17.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        x="612.5365"
        y="956.09308"
        id="text5169"
@@ -3064,7 +3064,7 @@
          id="tspan5173">Code Block</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:37.5px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:37.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        x="-44.090816"
        y="-71.857773"
        id="text5175"
@@ -3075,7 +3075,7 @@
          y="-71.857773">Staff Notation</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:37.5px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:37.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        x="-29.830317"
        y="295.49966"
        id="text5179"
@@ -3086,7 +3086,7 @@
          y="295.49966">Keyboard</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:30px;font-style:normal;font-weight:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none"
        x="-22.650398"
        y="593.10315"
        id="text5183"
@@ -3095,10 +3095,10 @@
          id="tspan5185"
          x="-22.650398"
          y="593.10315"
-         style="font-size:22.5px;text-align:end;text-anchor:end">Scale Degree:</tspan></text>
+         style="font-size:22.5px;text-align:end;text-anchor:end">Scale Degree (C Major):</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:30px;font-style:normal;font-weight:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none"
        x="-22.108162"
        y="648.2887"
        id="text5187"
@@ -3110,7 +3110,7 @@
          style="font-size:22.5px;text-align:end;text-anchor:end">Note Name:</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:30px;font-style:normal;font-weight:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none"
        x="-24.438215"
        y="500.18985"
        id="text5191"
@@ -3127,7 +3127,7 @@
          id="tspan5195" /></text>
     <text
        xml:space="preserve"
-       style="font-size:30px;font-style:normal;font-weight:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none"
        x="-22.986059"
        y="535.10315"
        id="text5197"
@@ -3139,7 +3139,7 @@
          style="font-size:22.5px;text-align:end;text-anchor:end">Sharps:</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:37.5px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:37.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        x="114.11055"
        y="834.40076"
        id="text5201"
@@ -4133,22 +4133,22 @@
          x="1562.3135"
          y="534.50842">D#</tspan></text>
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 851.81348,76.50844 164.00002,-66 192,0"
        id="path4170"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 1267.8135,0.50844 132,-62 123.4868,4.09714"
        id="path4972"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 767.81348,94.50844 -172,8 -174,60"
        id="path4974"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 347.81348,186.50844 -180,16"
        id="path4976"
        inkscape:connector-curvature="0" />
@@ -4176,7 +4176,7 @@
          y="222.50844">C3</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:20px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00ff00;fill-opacity:1;stroke:#0000ff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+       style="font-style:normal;font-weight:normal;font-size:20px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00ff00;fill-opacity:1;stroke:#0000ff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="839.81348"
        y="130.50844"
        id="text4986"
@@ -4196,7 +4196,7 @@
          id="tspan4992"
          x="1265.8135"
          y="46.508442"
-         style="stroke:#0000ff;fill:#00ff00">C5</tspan></text>
+         style="fill:#00ff00;stroke:#0000ff">C5</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:20px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
