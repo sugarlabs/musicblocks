@@ -10,12 +10,12 @@ basics. In this guide, we illustrate the musical features by walking the
 reader through numerous examples.
 
 <a name="TOC">
-Table of Content
+TABLE OF CONTENTS
 ----------------
 </a>
 
 1. [Getting Started](#GETTING-STARTED)
-2. [Notes] (#NOTES)
+2. [Notes](#NOTES)
 3. Programming Guide
 4. Widgets
 5. Exporting your work
@@ -39,7 +39,7 @@ run. Look for RUN LIVE links.
 1. GETTING STARTED
 ---------------
 </a>
-[Back to Table of Content](#TOC)
+[Back to Table of Contents](#TOC)
 
 Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox (although
