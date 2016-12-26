@@ -2,7 +2,7 @@ Guide to Programming with Music Blocks
 ======================================
 
 Music Blocks is a programming environment for children interested in
-music and graphics. It expands upon Turtle Blocks in that it has a
+music and graphics. It expands upon Turtle Blocks by adding a 
 collection of features relating to pitch and rhythm.
 
 The Turtle Blocks guide is a good place to start learning about the
@@ -31,7 +31,7 @@ run. Look for RUN LIVE links.
 </a>
 [Back to Table of Contents](#TOC)
 
-Music Blocks is designed to run in a browser. Most of the development
+Music Blocks is designed to be run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox (although
 you may need to disable hardware acceleration). You can run it from
 [github io](http://walterbender.github.io/musicblocks) or by
@@ -39,8 +39,8 @@ downloading a copy of the code and running a local copy directly from
 the file system of your computer.
 
 For more details on how to use Music Blocks, see [Using Music
-Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation)
-and for more details on how to use Turtle Blocks, see [Using Turtle
+Blocks](http://github.com/walterbender/musicblocks/tree/master/documentation).
+For more details on how to use Turtle Blocks, see [Using Turtle
 Blocks
 JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
@@ -50,9 +50,8 @@ JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 </a>
 [Back to Table of Contents](#TOC)
 
-Music Blocks exposed the common elements of music: pitch, rhythm, and
-sonic quality, e.g., loudness and softness, and to some degree, timbre
-and texture.
+Music Blocks incorporates many common elements of music, such as pitch, rhythm, volume,
+and, to some degree, timbre and texture.
 <a name="NOTE-VALUE">
 ### 2.1 Note Value Block
 </a>
@@ -63,11 +62,11 @@ value* block is a container for a [pitch block](#PITCH) that specifies the durat
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
 
-At the top of the example above, a single *Note value* block is
-shown. The `1/8` is the note value, in this case, an eighth note. The
-pitch, specified by the *Pitch* block, contains a pitch, `La` at
-`Octave 4`. At the bottom, two notes that are played consecutively are
-shown.
+At the top of the example above, a single (detached) *Note value* block is
+shown. The `1/8` is value of the note, which is, in this case, an eighth note. 
+
+At the bottom, two notes that are played consecutively are
+shown. They are both `1/8` notes, making the duration of the entire sequence `1/4`. 
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg'</img>
 
