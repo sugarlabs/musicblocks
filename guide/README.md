@@ -967,7 +967,7 @@ CLicking in a column will extact the corresponding *Note* blocks, for example:
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider5.svg'</img>
 
 <a name="tempo">
-### 4.8 Understanding Tempo
+### 4.8 Changing Tempo
 </a>
 
 The *Tempo* block is used to launch a widget that enables the user to
@@ -996,6 +996,7 @@ example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.
 5. Beyond Music Blocks
 -----------------------
 </a>
+[Back to Table of Contents](#TOC)
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools. One such tool is
