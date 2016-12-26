@@ -46,22 +46,20 @@ JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
 <a name="NOTES">
 2. MAKING A SOUND
---------
+--------------------
 </a>
 [Back to Table of Contents](#TOC)
 
 Music Blocks exposed the common elements of music: pitch, rhythm, and
 sonic quality, e.g., loudness and softness, and to some degree, timbre
 and texture.
-
 <a name="NOTE-VALUE">
-2.1 Note Value Block
-----------------------
+### 2.1 Note Value Block
 </a>
 
 At the heart of Music Blocks is the *Note value* block. The *Note
-value* block is a container for a pitch that specifies the duration
-(note value) of the pitch. (The *Pitch* block is detailed below.)
+value* block is a container for a [pitch block](#PITCH) that specifies the duration
+(note value) of the pitch. 
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
 
