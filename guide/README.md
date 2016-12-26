@@ -1,7 +1,5 @@
 Guide to Programming with Music Blocks
 ======================================
-<a name="Placeholder"> 
-</a>
 
 Music Blocks is a programming environment for children interested in
 music and graphics. It expands upon Turtle Blocks in that it has a
@@ -17,28 +15,18 @@ TABLE OF CONTENTS
 </a>
 
 1. [Getting Started](#GETTING-STARTED)
-2. [Notes](#NOTES)
+2. [Making a Sound](#NOTES)
+  1. [Note Value Block](#NOTE-VALUE)
 3. Programming Guide
 4. Widgets
 5. Exporting your work
-
----------DELETE------------------
-
-This guide is broken into four sections: (i) an overview of the
-[*Notes*](#NOTES) structure; (ii) a [programming
-guide](#PROGRAMMING-WITH-MUSIC); (iii) [widgets](#WIDGETS) that provide
-some scaffolding to the programmer; and (iv) a section on [exporting
-your work](#BEYOND MUSIC BLOCKS) into other music systems.
-
------------------ENDDELETE-------------
-
 
 Many of the examples given in the guide have links to code you can
 run. Look for RUN LIVE links.
 
 
 <a name="GETTING-STARTED">
-1. GETTING STARTED
+1. GETTING STARTED                                                     
 ---------------
 </a>
 [Back to Table of Contents](#TOC)
@@ -57,14 +45,19 @@ Blocks
 JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 
 <a name="NOTES">
-2. NOTES
+2. MAKING A SOUND
 --------
 </a>
-[Back to Table of Content](#TOC)
+[Back to Table of Contents](#TOC)
 
 Music Blocks exposed the common elements of music: pitch, rhythm, and
 sonic quality, e.g., loudness and softness, and to some degree, timbre
 and texture.
+
+<a name="NOTE-VALUE">
+2.1 Note Value Block
+----------------------
+</a>
 
 At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a pitch that specifies the duration
