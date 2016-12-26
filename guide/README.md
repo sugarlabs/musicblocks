@@ -63,7 +63,7 @@ run. Look for RUN LIVE links.
 1. GETTING STARTED                                                     
 ---------------
 </a>
-[Back to Table of Contents](#TOC)
+[Back to Table of Contents](#TOC) | [Next Section (2. Making a sound)](#NOTES)
 
 Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox (although
@@ -82,7 +82,7 @@ JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 2. MAKING A SOUND
 --------------------
 </a>
-[Back to Table of Contents](#TOC)
+[Previous Section (1. Getting Started)](#GETTING-STARTED) | [Back to Table of Contents](#TOC) | [Next Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC)
 
 Music Blocks incorporates many common elements of music, such as pitch, rhythm, volume,
 and, to some degree, timbre and texture.
@@ -173,7 +173,7 @@ blocks as well.
 3. PROGRAMMING WITH MUSIC
 --------------------------
 </a>
-[Back to Table of Contents](#TOC)
+[Previous Section (2. Making a Sound)](#NOTES) | [Back to Table of Contents](#TOC) | [Next Section (4. Widgets)](#WIDGETS)
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
@@ -543,7 +543,7 @@ and `chunk2`.
 4. WIDGETS
 ------------
 </a>
-[Back to Table of Contents](#TOC)
+[Previous Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC) | [Back to Table of Contents](#TOC) | [Next Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS)
 
 This section of the guide will talk about the various Widgets that can be added to Music Blocks
 to enhance your experience.
@@ -1000,7 +1000,7 @@ example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.
 5. Beyond Music Blocks
 -----------------------
 </a>
-[Back to Table of Contents](#TOC)
+[Previous Section (4. Widgets)](#WIDGETS) | [Back to Table of Contents](#TOC)
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools. One such tool is
