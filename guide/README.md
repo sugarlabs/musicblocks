@@ -154,8 +154,8 @@ A rest of the specified note value duration can be constructed using a *Silence*
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg'</img>
 
-Anywhere  a *Pitch* block can be used -- e.g., inside of the matrix or a
-*Note value* block -- a *Drum Sample* block can also be used instead. Currently there
+Anywhere  a *Pitch* block can be used&mdash;e.g., inside of the matrix or a
+*Note value* block&mdash;a *Drum Sample* block can also be used instead. Currently there
 about two dozen different samples from which to choose. The default
 drum is a kick drum.
 
@@ -344,11 +344,11 @@ example, if you have 3 notes in sequence contained in a *Crescendo*
 block with a value of 5, the final note will be at 15% more 
 than the original value for volume.
 
-The *Staccato* block shortens the length of the actual note -- making them tighter
-bursts -- while maintaining the specified rhythmic value of the notes.
+The *Staccato* block shortens the length of the actual note&mdash;making them tighter
+bursts&mdash;while maintaining the specified rhythmic value of the notes.
 
-The *Slur* block lengthens the sustain of notes -- running longer than
-the noted duration and blending it into the next note -- while
+The *Slur* block lengthens the sustain of notes&mdash;running longer than
+the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
 <a name="INTERVALS-AND-ARTICULATION">
@@ -705,7 +705,7 @@ notes.
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
 are not based on a power of 2. In the example above, three quarter
-notes--defined in the *Rhythm* block--are played in the time of a
+notes&mdash;defined in the *Rhythm* block&mdash;are played in the time of a
 single quarter note. The result is three twelfth notes.
 
 You can mix and match *Rhythm* blocks and *Tuplet* blocks when
