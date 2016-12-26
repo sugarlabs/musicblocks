@@ -21,7 +21,13 @@ TABLE OF CONTENTS
   3. [Chords] (#CHORDS)
   4. [Rests] (#RESTS)
   5. [Drums] (#DRUMS)
-3. Programming Guide
+3. [Programming with Music] (#PROGRAMMING-WITH-MUSIC)
+  1. [Chunks] (#CHUNKS)
+  2. [Musical Transformation] (#TRANSFORMATION)
+  3. Programming Multiple Voices
+  4. Adding Graphics Synchronized With Music
+  5. Adding Interactions
+  
 4. Widgets
 5. Exporting your work
 
@@ -136,25 +142,18 @@ within a single *Note value* blocks, and combine them with *Pitch*
 blocks as well.
 
 <a name="PROGRAMMING-WITH-MUSIC">
-II. PROGRAMMING WITH MUSIC
+3. PROGRAMMING WITH MUSIC
 --------------------------
 </a>
-
-This section of the guide is divided into the following subsections:<br>
-1. [A chunk of notes](#chunks)<br>
-2. [Musical transformations](#transformations)<br>
-3. [Programming multiple voices](#voices)<br>
-4. [Adding graphics synchronized to music](#graphics)<br>
-5. [Adding interaction](#interaction)
+[Back to Table of Contents](#TOC)
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
 hand or use the *Pitch-time Matrix* widget described in [Section
-III](#pitch-time) to help you get started.
+4](#pitch-time) to help you get started.
 
-<a name="chunks">
-1. A chunk of notes
---------------------
+<a name="CHUNKS">
+### 3.1 Chunks
 </a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
@@ -169,13 +168,21 @@ your stack. By default, the new blocks are named `chunk`, `chunk1`,
 `chunk2`... but you can rename them by editing the labels on the
 *Action* blocks.
 
-In the example above, the *Chunk* block is inside of a *Start* block,
-which ties it to the *Run* button in the upper-left corner of the
-screen (the "rabbit"). Try clicking on the *Run* button. Also try the
-*Run Slow* button (the "turtle") and the *Step* button (the "snail"),
-which steps through the program one block per button press. There are
-also buttons for playing the music back slowly and for stepping one
-note per button press.
+An *Action* block contains a sequence of actions that will only be executed
+when the block is referred to by something else, such as a start block. This is useful
+in orchestrating more complex programs of music.
+
+A *Start* Block is a *chunk* that will automatically be executed once the start button is pressed.
+This is where most of your programs will begin at.  There are many ways to *Run* a program: you can click
+on the *Run* button at the upper-left corner of the screen (the "rabbit") to run the music at a fast speed; click on the
+*Run Slow* button (the "turtle") to run it slower; and the *Step* button (the "snail"),
+to step  through the program one block per button press. 
+
+
+In the example above, the *Chunk* block is inside of a *Start* block, which means
+that when any of the start buttons is pressed, the code inside the *Start* block (the *Chunk* block) will
+be executed. You can add more chunks after this one inside the *Start* block to execute them
+sequentially.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg'</img>
 
@@ -199,22 +206,25 @@ A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
 song we created?)
 
-<a name="transformations">
-2. Transformations
-------------------
+<a name="TRANSFORMATION">
+### 3.2 Musical Transformations
 </a>
 
-There are many ways to transform pitch, rhythm, and other qualities of
-the sound.
-
+There are many ways to transform pitch, rhythm, and other sonic qualities.
+<a name="STEP-PITCH">
+#### 3.2.1 Step Pitch
+</a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg'</img>
 
 The *Step Pitch* block will move up or down notes in a scale from the
-current note. In the example above, *Step Pitch* blocks are used inside
-of *Repeat* blocks to play up and down a scale.
+last played note. In the example above, *Step Pitch* blocks are used inside
+of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb&run=true)
 
+<a name="SHARPS-AND-FLATS">
+#### 3.2.2 Sharps And Flats
+</a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
 
 The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
@@ -222,6 +232,10 @@ The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
 half step. A flat will lower by one half step. In the example, on the
 left, just the *Pitch* block `Mi` is lowered by one half step; on the
 right, both pitch blocks are raised by one half step.
+
+<a name="ADJUST-TRANSPOSITION">
+#### 3.2.3 Adjust-Transposition
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg'</img>
 
@@ -236,12 +250,20 @@ will shift an octave down.
 In the example above, we take the song we programmed previously and
 raise it by one octave.
 
+<a name="DOTTED">
+#### 3.2.4 Dotted Notes
+</a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg'</img>
 
 You can "dot" notes using the *Dot* block. A dotted note extends the rhythmic duration of a note by
 50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a
 beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
 
+You can also simply change the note value to mimic a dotted note, for example indicating 3/8 instead of 1/4, for a dotted quarter note.
+
+<a name="MULTIPLY-AND-DIVIDE">
+#### 3.2.5 Speeding Up and Slowing Down via Mathematical Operations
+</a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg'</img>
 
 You can also multiply (or divide) the beat value, which will speed up
@@ -249,6 +271,10 @@ or slowdown the notes. Multiplying the beat value of an `1/8` note by
 `2` is the equivalent of playing a `1/16` note. Dividing the beat
 value of an `1/8` note by '2' is the equivalent of playing a `1/4`
 note.
+
+<a name="REPETITION">
+#### 3.2.6 Repeating Notes
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg'</img>
 
@@ -259,6 +285,10 @@ note in a sequence.
 In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
+
+<a name="SWINGING">
+#### 3.2.7 Swinging Notes and Tied Notes
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg'</img>
 
@@ -275,6 +305,10 @@ unchanged.
 Tie also works on pairs of notes, combining them into one note. (The
 notes must be identical in pitch, but can vary in rhythm.)
 
+<a name="MORE-TRANSFORMATIONS">
+#### 3.2.8 Set Volume, Crescendo, Staccato, and Slur
+</a>
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg'</img>
 
 The *Set volume* block will change the volume of the notes. The
@@ -283,24 +317,30 @@ default is 50; the range is 0 (silence) to 100 (full volume).
 The *Crescendo* block will increase (or decrease) the volume of the
 contained notes by a specified amount for every note played. For
 example, if you have 3 notes in sequence contained in a *Crescendo*
-block with a value of 5, the final note will be at 15% more volume
+block with a value of 5, the final note will be at 15% more 
 than the original value for volume.
 
-The *Staccato* block shortens the sustain of notes--in tighter
-bursts--while maintaining the specified rhythmic value of the notes.
+The *Staccato* block shortens the length of the actual note -- making them tighter
+bursts -- while maintaining the specified rhythmic value of the notes.
 
-The *Slur* block lengthens the sustain of notes--running longer than
-the noted duration and blending it into the next note--while
+The *Slur* block lengthens the sustain of notes -- running longer than
+the noted duration and blending it into the next note -- while
 maintaining the specified rhythmic value of the notes.
 
+<a name="INTERVALS-AND-ARTICULATION">
+#### 3.2.9 Intervals and Articulation
+</a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'</img>
 
 The *Interval* block calculates a relative interval, e.g., a fifth,
 and adds the additional pitches to a note's playback. In the figure,
-we add `Sol` to `Do` and `Do` to `Fa`.
+we add `La` to `Re` and `Ti` to `Mi`.
 
 The *Articulation* block changes the volume of a group of notes without affecting the master volume for the rest of the user's Music Blocks code.
 
+<a name= "ABSOLUTE-INTERVALS">
+#### 3.2.10 Absolute Intervals
+</a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg'</img>
 
 The *Augmented* block calculates an absolute interval, e.g., an
@@ -313,6 +353,10 @@ In the augmented fifth example above, a chord of D5 and A5 are played,
 followed by a chord of E5 and C5. In the minor third example, which
 includes a shift of one octave, first a chord of D5 and F5 is played,
 followed by chord of E5 and G6.
+
+<a name= "INVERSION">
+#### 3.2.11 Inversion
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg'</img>
 
@@ -327,6 +371,10 @@ around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
 
+<a name = "BACKWARDS">
+#### 3.2.12 Backwards
+</a>
+
 The *Backward* block will play the contained notes in reverse order
 (retrograde). In the example above, the notes in *Chunk* are played as
 `Sol`, `Ti`, `La`, `Sol`, i.e., from the bottom to the top of the
@@ -339,9 +387,13 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
+<a name= "SETTING">
+#### 3.2.13 Setting Voice and Keys
+</a>
+
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg'</img>
 
-The *Set Voice* block selected a voice for the synthesizer for any
+The *Set Voice* block selects a voice for the synthesizer for any
 contained blocks, e.g., violin or cello.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg'</img>
@@ -349,8 +401,8 @@ contained blocks, e.g., violin or cello.
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
-and a number of more exotic modes, such as Bebop, Geez, Maqam, et
-al. This block allows users to access "movable Do" within Music
+and a number of more exotic modes, such as Bebop, Geez, Maqam, etc. 
+This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user's specified tonality.
 
