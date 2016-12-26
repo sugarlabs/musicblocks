@@ -1,6 +1,8 @@
 Guide to Programming with Music Blocks
 ======================================
-
+~~Current Concerns: 
+  Why is there a space in the TOC~~
+  
 Music Blocks is a programming environment for children interested in
 music and graphics. It expands upon Turtle Blocks by adding a 
 collection of features relating to pitch and rhythm.
@@ -37,10 +39,9 @@ TABLE OF CONTENTS
     11. [Inversion] (#INVERSION)
     12. [Backwards] (#BACKWARDS)
     13. [Setting Voice and Keys] (#SETTING)
-  3. Programming Multiple Voices
-  4. Adding Graphics Synchronized With Music
-  5. Adding Interactions
-  
+  3. [Voices] (#VOICES)
+  4. [Graphics] (#GRAPHICS)
+  5. [Interactions] (#INTERACTIONS)
 4. Widgets
 5. Exporting your work
 
@@ -425,9 +426,8 @@ In the above example, the sequence of drum beats is increased over time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
 
-<a name="voices">
-3. Voices
----------
+<a name="VOICES">
+### 3.3 Voices
 </a>
 
 Each *Start* block runs as a separate voice in Music Blocks. (When
@@ -460,9 +460,8 @@ drum will be played as `C2` with the default drum sample. In the
 example above, all of the notes in `chunk` will be played with a kick
 drum.
 
-<a name="graphics">
-4. Adding graphics
-------------------
+<a name="GRAPHICS">
+### 3.4 Adding graphics
 </a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'</img>
@@ -493,9 +492,8 @@ actions over the specified rhythm.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
 
-<a name="interaction">
-5. Interaction
---------------
+<a name="INTERACTIONS">
+### 3.5 Interactions
 </a>
 
 There are many ways to interactive with Music Blocks, including
