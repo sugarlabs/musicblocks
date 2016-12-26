@@ -16,7 +16,11 @@ TABLE OF CONTENTS
 
 1. [Getting Started](#GETTING-STARTED)
 2. [Making a Sound](#NOTES)
-  1. [Note Value Block](#NOTE-VALUE)
+  1. [Note Value Blocks](#NOTE-VALUE)
+  2. [Pitch Blocks] (#PITCH)
+  3. [Chords] (#CHORDS)
+  4. [Rests] (#RESTS)
+  5. [Drums] (#DRUMS)
 3. Programming Guide
 4. Widgets
 5. Exporting your work
@@ -31,7 +35,7 @@ run. Look for RUN LIVE links.
 </a>
 [Back to Table of Contents](#TOC)
 
-Music Blocks is designed to be run in a browser. Most of the development
+Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox (although
 you may need to disable hardware acceleration). You can run it from
 [github io](http://walterbender.github.io/musicblocks) or by
@@ -53,7 +57,7 @@ JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 Music Blocks incorporates many common elements of music, such as pitch, rhythm, volume,
 and, to some degree, timbre and texture.
 <a name="NOTE-VALUE">
-### 2.1 Note Value Block
+### 2.1 Note Value Blocks
 </a>
 
 At the heart of Music Blocks is the *Note value* block. The *Note
@@ -70,56 +74,66 @@ shown. They are both `1/8` notes, making the duration of the entire sequence `1/
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg'</img>
 
-In this example, different note values are shown. From top to bottom,
+In this example, different note values are shown. From top to bottom, they are: 
 `1/4` for an quarter note, `1/16` for a sixteenth note, and `1/2` for a half
 note.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
 
-As we have seen, *Pitch* blocks are used inside the *Note value*
-blocks. The *Pitch* block specifies a pitch name and pitch octave that
-in combination determine the frequency at which a note is played.
+Note that any mathematical operations can be used as input to the *Note value*.
 
-You can plug different values into the *Pitch* block name and octave
-slots. Some examples are shown above. Starting from the top, the pitch
-name block is specified using a *Solfege* block (`Sol` in `Octave 6`);
-the pitch name is specified using a *Pitch-name* block (`B flat` in
-`Octave 4`); the pitch is specified using the *Hertz* block and a
-*Number* block (`440` Hertz).
+<a name="PITCH">
+### 2.2 Pitch Blocks
+</a>
+
+As we have seen, *Pitch* blocks are used inside the *Note value*
+blocks. The *Pitch* block specifies the pitch name and pitch octave of a note
+that in combination determines the frequency (and therefore pitch) at which the note is played.
+
+There are many systems you can use to specify a *pitch* block's name and octave. Some examples are
+shown above. The top pitch block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
+the notes `Do Re Me Fa Sol La Ti `. The middle block is specified using a *Pitch-name* block (`B flat` in `Octave 4`),
+which contains the notes `C D E F G A B`. The last block is specified using the *Hertz* block in conjunction
+with a *Number* block (`440` Hertz) , which corresponds to the frequency of the sound made.
 
 The octave is specified using a number block and is restricted to
 whole numbers. In the case where the pitch name is specified by
 frequency, the octave is ignored.
 
-Note that the pitch name can also be specified using a *Text* block.
+Note that the pitch name can also be specified using a *Text* block. 
 
-Also note that any mathematical operation can be used as input to the
-*Note value*.
-
+<a name="CHORDS">
+### 2.3 Chords
+</a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg'</img>
 
-A chord (multiple, simultaneous pitches) can be specified by add
-multiple *Pitch* blocks to a *Note value* container.
+A chord (multiple, simultaneous pitches) can be specified by adding
+multiple *Pitch* blocks into a single *Note value* block, like the above example.
+
+<a name="RESTS">
+### 2.4 Rests
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg'</img>
 
-A rest of the specified note value duration can be constructed using a *Silence* block.
+A rest of the specified note value duration can be constructed using a *Silence* block in place of a *pitch* block.
 
-Using drums
------------
+<a name="DRUMS">
+### 2.5 Drums
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg'</img>
 
-Anywhere you can use a *Pitch* block--e.g., inside of the matrix or a
-*Note value* block--you can also specify a drum sample. Currently there
+Anywhere  a *Pitch* block can be used -- e.g., inside of the matrix or a
+*Note value* block -- a *Drum Sample* block can also be used instead. Currently there
 about two dozen different samples from which to choose. The default
 drum is a kick drum.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg'</img>
 
 Just as in the chord example above, you can use multiple *Drum* blocks
-within a single *Note value* block and combine them with *Pitch*
-blocks.
+within a single *Note value* blocks, and combine them with *Pitch*
+blocks as well.
 
 <a name="PROGRAMMING-WITH-MUSIC">
 II. PROGRAMMING WITH MUSIC
