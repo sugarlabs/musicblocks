@@ -78,8 +78,6 @@ In this example, different note values are shown. From top to bottom, they are:
 `1/4` for an quarter note, `1/16` for a sixteenth note, and `1/2` for a half
 note.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
-
 Note that any mathematical operations can be used as input to the *Note value*.
 
 <a name="PITCH">
@@ -89,6 +87,8 @@ Note that any mathematical operations can be used as input to the *Note value*.
 As we have seen, *Pitch* blocks are used inside the *Note value*
 blocks. The *Pitch* block specifies the pitch name and pitch octave of a note
 that in combination determines the frequency (and therefore pitch) at which the note is played.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
 
 There are many systems you can use to specify a *pitch* block's name and octave. Some examples are
 shown above. The top pitch block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
