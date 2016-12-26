@@ -40,7 +40,19 @@ TABLE OF CONTENTS
   3. [Voices] (#VOICES)
   4. [Graphics] (#GRAPHICS)
   5. [Interactions] (#INTERACTIONS)
-4. Widgets
+4. [Widgets] (#WIDGETS)
+  1. [Monitoring status](#status)<br>
+  2. [Generating chunks of notes](#pitch-time)<br>
+    1. [Pitch-Time Matrix] (#pitch-time) 
+    2. [The Rhythm Block] (#THE-RHYTHM-BLOCK) 
+    3. [Creating Tuplets] (#CREATING-TUPLETS)
+    4. [Using Individual Notes in the Matrix] (#INDIVIDUAL-NOTES)
+  3. [Generating rhythms](#rhythms)<br>
+  4. [Setting the musical mode](#modes)<br>
+  5. [Mapping pitches to drums](#pitch-drum)<br>
+  6. [Exploring musical proportions](#staircase)<br>
+  7. [Generating arbitrary pitches](#slider)<br>
+  8. [Changing tempo](#tempo)
 5. Exporting your work
 
 Many of the examples given in the guide have links to code you can
@@ -524,23 +536,16 @@ above, the *One-of* block is used to randomly select between `chunk1`
 and `chunk2`.
 
 <a name="WIDGETS">
-III. WIDGETS
+4. WIDGETS
 ------------
 </a>
+[Back to Table of Contents](#TOC)
 
-This section of the guide is divided into the following subjections:<br>
-1. [Monitoring status](#status)<br>
-2. [Generating chunks of notes](#pitch-time)<br>
-3. [Generating rhythms](#rhythms)<br>
-4. [Setting the musical mode](#modes)<br>
-5. [Mapping pitches to drums](#pitch-drum)<br>
-6. [Exploring musical proportions](#staircase)<br>
-7. [Generating arbitrary pitches](#slider)<br>
-8. [Changing tempo](#tempo)
+This section of the guide will talk about the various Widgets that can be added to Music Blocks
+to enhance your experience.
 
 <a name="status">
-1. Status
----------
+### 4.1 Status
 </a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg'</img>
@@ -561,10 +566,14 @@ color, shade, grey, and pensize.
 
 You can do additional programming within the status block. In the
 example above, the volume is divided by 10 before being displayed.
+<a name = "GENERATION">
+### 4.2 Generating Chunks of Notes 
+</a>
+
+Using the Pitch-Time Matrix, it is possible to generate chunks of notes at a much faster speed.
 
 <a name="pitch-time">
-2. The Pitch-Time Matrix
-------------------------
+#### 4.2.1 The Pitch-Time Matrix
 </a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg'</img>
@@ -615,7 +624,7 @@ Once you have a group of notes (a "chunk") that you like, click on the
 create a stack of blocks that can used to play these same notes
 programmatically. (More on that below.)
 
-You can rearrange the selected notes in the grid and safe other chunks
+You can rearrange the selected notes in the grid and save other chunks
 as well.
 
 <img
@@ -629,7 +638,7 @@ to lowest and eliminate any duplicate *Pitch* blocks.
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg'
 height="36"</img>
 
-Or hide the matrix by clicking on the *Close* button (the right-most
+You can hide the matrix by clicking on the *Close* button (the right-most
 button in the top row of the grid.)
 
 <img
@@ -662,19 +671,19 @@ the pitch names and the pitch octaves.)
 
 To play the chuck, simply click on the action block (on the word
 action). You should hear the notes play, ordered from top to bottom.
-
-About the Rhythm Block
-----------------------
+<a name = "THE-RHYTHM-BLOCK">
+#### 4.2.2 The Rhythm Block
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg'</img>
 
 *Rhythm* blocks are used to generate rhythm patterns in the
 *Pitch-time Matrix* block. The top argument to the *Rhythm* block
-*is the number of notes. The bottom argument is the duration of the
-*note. In the top example above, three columns for quarter notes
-*would be generated in the matrix. In the middle example, one column
-*for an eighth note would be generated. In the bottom example, seven
-*columns for 16th notes would be generated.
+is the number of notes. The bottom argument is the duration of the
+note. In the top example above, three columns for quarter notes
+would be generated in the matrix. In the middle example, one column
+for an eighth note would be generated. In the bottom example, seven
+columns for 16th notes would be generated.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix7.svg'</img>
 
@@ -685,8 +694,9 @@ You can use as many *Rhythm* blocks as you'd like inside the
 blocks are used, resulting in three quarter notes and six eighth
 notes.
 
-Creating Tuplets
-----------------
+<a name= "CREATING-TUPLETS">
+#### 4.2.3 Creating Tuplets
+</a>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'</img>
 
@@ -701,17 +711,16 @@ single quarter note. The result is three twelfth notes.
 You can mix and match *Rhythm* blocks and *Tuplet* blocks when
 defining your matrix.
 
-Using individual notes in the matrix
-------------------------------------
-
+<a name= "INDIVIDUAL-NOTES">
+#### 4.2.4 Using individual notes in the matrix
+</a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg'</img>
 
 You can also use individual notes when defining the grid. These blocks
-will expand into *Rhythm* blocks with corresponding values.
+will expand into *Rhythm* blocks with the corresponding values.
 
 <a name="rhythms">
-3. Generating Rhythms
----------------------
+### 4.3 Generating Rhythms
 </a>
 
 The *Rhythm Ruler* block is used to launch a widget similar to the
