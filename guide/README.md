@@ -24,6 +24,19 @@ TABLE OF CONTENTS
 3. [Programming with Music] (#PROGRAMMING-WITH-MUSIC)
   1. [Chunks] (#CHUNKS)
   2. [Musical Transformation] (#TRANSFORMATION)
+    1. [Step Pitch Block] (#STEP-PITCH)
+    2. [Sharps and Flats] (#SHARPS-AND-FLATS)
+    3. [Adjust-Transposition Block] (#ADJUST-TRANSPOSITION)
+    4. [Dotted Notes] (#DOTTED)
+    5. [Speeding Up and Slowing Down Notes via Mathematical Operations] (#MULTIPLY-AND-DIVIDE)
+    6. [Repeating Notes] (#REPETITION)
+    7. [Swinging Notes and Tied Notes] (#SWINGING)
+    8. [Set Volume, Crescendo, Staccato, and Slur Blocks] (#MORE-TRANSFORMATIONS)
+    9. [Intervals and Articulation] (#INTERVALS-AND-ARTICULATION)
+    10. [Absolute Intervals] (#ABSOLUTE-INTERVALS)
+    11. [Inversion] (#INVERSION)
+    12. [Backwards] (#BACKWARDS)
+    13. [Setting Voice and Keys] (#SETTING)
   3. Programming Multiple Voices
   4. Adding Graphics Synchronized With Music
   5. Adding Interactions
@@ -212,7 +225,7 @@ song we created?)
 
 There are many ways to transform pitch, rhythm, and other sonic qualities.
 <a name="STEP-PITCH">
-#### 3.2.1 Step Pitch
+#### 3.2.1 Step Pitch Block
 </a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg'</img>
 
@@ -262,7 +275,7 @@ beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
 You can also simply change the note value to mimic a dotted note, for example indicating 3/8 instead of 1/4, for a dotted quarter note.
 
 <a name="MULTIPLY-AND-DIVIDE">
-#### 3.2.5 Speeding Up and Slowing Down via Mathematical Operations
+#### 3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations
 </a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg'</img>
 
