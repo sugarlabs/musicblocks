@@ -993,7 +993,7 @@ widget: the new BPM is determined as the time between the two clicks. For
 example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.
 
 <a name="BEYOND-MUSIC-BLOCKS">
-5. BEYOND-MUSIC-BLOCKS
+5. Beyond Music Blocks
 -----------------------
 </a>
 
