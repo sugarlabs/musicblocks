@@ -41,19 +41,19 @@ TABLE OF CONTENTS
   4. [Graphics] (#GRAPHICS)
   5. [Interactions] (#INTERACTIONS)
 4. [Widgets] (#WIDGETS)
-  1. [Monitoring status](#status)<br>
-  2. [Generating chunks of notes](#pitch-time)<br>
+  1. [Monitoring status](#status)
+  2. [Generating chunks of notes](#pitch-time)
     1. [Pitch-Time Matrix] (#pitch-time) 
     2. [The Rhythm Block] (#THE-RHYTHM-BLOCK) 
     3. [Creating Tuplets] (#CREATING-TUPLETS)
     4. [Using Individual Notes in the Matrix] (#INDIVIDUAL-NOTES)
-  3. [Generating rhythms](#rhythms)<br>
-  4. [Musical Modes](#modes)<br>
-  5. [The Pitch-Drum Matrix](#pitch-drum)<br>
-  6. [Exploring musical proportions](#staircase)<br>
-  7. [Generating arbitrary pitches](#slider)<br>
+  3. [Generating rhythms](#rhythms)
+  4. [Musical Modes](#modes)
+  5. [The Pitch-Drum Matrix](#pitch-drum)
+  6. [Exploring musical proportions](#staircase)
+  7. [Generating arbitrary pitches](#slider)
   8. [Changing tempo](#tempo)
-5. Exporting your work
+5. [Beyond Music Blocks] (#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
 run. Look for RUN LIVE links.
