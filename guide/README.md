@@ -1,7 +1,5 @@
 Guide to Programming with Music Blocks
 ======================================
-~~Current Concerns: 
-  Why is there a space in the TOC~~
   
 Music Blocks is a programming environment for children interested in
 music and graphics. It expands upon Turtle Blocks by adding a 
@@ -383,11 +381,12 @@ In the *invert (even)* example, `D4` is inverted around `G4`,
 resulting in a `C5`. In the *invert (odd)* example, `D4` is inverted
 around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
 
 <a name = "BACKWARDS">
 #### 3.2.12 Backwards
 </a>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
 
 The *Backward* block will play the contained notes in reverse order
 (retrograde). In the example above, the notes in *Chunk* are played as
