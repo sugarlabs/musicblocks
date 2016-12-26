@@ -50,7 +50,7 @@ TABLE OF CONTENTS
   3. [Generating rhythms](#rhythms)
   4. [Musical Modes](#modes)
   5. [The Pitch-Drum Matrix](#pitch-drum)
-  6. [Exploring musical proportions](#staircase)
+  6. [Exploring musical proportions](#stairs)
   7. [Generating arbitrary pitches](#slider)
   8. [Changing tempo](#tempo)
 5. [Beyond Music Blocks] (#BEYOND-MUSIC-BLOCKS)
