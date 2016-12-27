@@ -84,8 +84,8 @@ JS](http://github.com/walterbender/turtleblocksjs/tree/master/documentation).
 </a>
 [Previous Section (1. Getting Started)](#GETTING-STARTED) | [Back to Table of Contents](#TOC) | [Next Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC)
 
-Music Blocks incorporates many common elements of music, such as pitch, rhythm, volume,
-and, to some degree, timbre and texture.
+Music Blocks incorporates many common elements of music, such as [pitch](#PITCH), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
+and, to some degree, [timbre and texture](#VOICES).
 <a name="NOTE-VALUE">
 ### 2.1 Note Value Blocks
 </a>
@@ -114,7 +114,7 @@ Note that any mathematical operations can be used as input to the *Note value*.
 ### 2.2 Pitch Blocks
 </a>
 
-As we have seen, *Pitch* blocks are used inside the *Note value*
+As we have seen, *Pitch* blocks are used inside the [*Note value*] (#NOTE-VALUE)
 blocks. The *Pitch* block specifies the pitch name and pitch octave of a note
 that in combination determines the frequency (and therefore pitch) at which the note is played.
 
@@ -165,7 +165,7 @@ drum is a kick drum.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg'</img>
 
-Just as in the chord example above, you can use multiple *Drum* blocks
+Just as in the [chord](#CHORD) example above, you can use multiple *Drum* blocks
 within a single *Note value* blocks, and combine them with *Pitch*
 blocks as well.
 
@@ -177,8 +177,7 @@ blocks as well.
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
-hand or use the *Pitch-time Matrix* widget described in [Section
-4](#pitch-time) to help you get started.
+hand or use the [*Pitch-time Matrix*](#pitch-time) widget to help you get started.
 
 <a name="CHUNKS">
 ### 3.1 Chunks
@@ -216,7 +215,7 @@ sequentially.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg'</img>
 
-You can repeat chunks either by using multiple *Chunk* blocks or using a
+You can [repeat](#REPETITION) chunks either by using multiple *Chunk* blocks or using a
 *Repeat* block.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg'</img>
@@ -256,7 +255,7 @@ of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
 
 The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
-*Note value* blocks, or chunks. A sharp will raise the pitch by one
+*Note value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by one
 half step. A flat will lower by one half step. In the example, on the
 left, just the *Pitch* block `Mi` is lowered by one half step; on the
 right, both pitch blocks are raised by one half step.
@@ -422,7 +421,7 @@ notes.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg'</img>
 
-The *Set Voice* block selects a voice for the synthesizer for any
+The *Set Voice* block selects a [voice](#VOICES) for the synthesizer for any
 contained blocks, e.g., violin or cello.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg'</img>
@@ -437,7 +436,7 @@ depending on the user's specified tonality.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg'</img>
 
-In the above example, the sequence of drum beats is increased over time.
+In the above example, the sequence of [drum](#DRUMS) beats is increased over time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
 
@@ -563,7 +562,7 @@ row per voice in the status table.
 
 Additional *Print* blocks can be added to the *Status* widget to
 display additional music factors, e.g., duplicate, transposition,
-skip, staccato, slur, and graphics factors, e.g., x, y, heading,
+skip, [staccato](#MORE-TRANSFORMATIONS), [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg'</img>
@@ -783,12 +782,12 @@ play the rhythms as drum machines.
 ### 4.4 Musical Modes
 </a>
 
-Musical modes are used to specify the relationship between intervals
+Musical modes are used to specify the relationship between [intervals](#INTERVALS-AND-ARTICULATION)
 (or steps) in a scale. Since Western music is based on 12 half-steps
 per octave, modes speficy how many half steps there are between each
 note in a scale.
 
-By default, Music Blocks uses the *Major* mode, which, in the Key of
+By default, Music Blocks uses the *Major* mode, which, in the [Key](#SETTING) of
 C, maps to the white keys on a piano. The intervals in the *Major*
 mode are `2, 2, 1, 2, 2, 2, 1`. Many other common modes are
 built into Music Blocks, including, of course, *Minor* mode, which
