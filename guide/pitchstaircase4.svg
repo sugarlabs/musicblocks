@@ -27,7 +27,7 @@
   <path
      d="m 165,181.62411 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
      id="path21-6-7-2-79-55"
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      id="text23-9-8-9-32-4"
      style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -41,7 +41,7 @@
   <path
      d="m 19,155.62411 0,-7.99999 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 92.00001,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.99999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 c 0,4.41828 -3.58172,8 -8,8 l -8,0 -92.00001,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,-42 z"
      id="path3194-3-8-8-6"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      id="text3196-7-6-0-5"
      style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
@@ -107,7 +107,7 @@
     <path
        d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
        id="path21-3"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
     <text
        id="text23-6"
        style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -140,7 +140,7 @@
      id="g4017"
      transform="translate(-565.10161,-496.91628)">
     <path
-       style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-2-0"
        d="m 708.10161,510.47838 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -155,7 +155,7 @@
     </text>
   </g>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3101"
      d="m 19,113.62411 0,-8 a 8,8 0 0 1 8,-7.999986 l 8,0 0,3.999996 20,0 0,-3.999996 60,0 8,0 a 8,8 0 0 1 8,7.999986 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-8 z" />
   <text
@@ -169,7 +169,7 @@
        x="111.43839">hertz</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-7"
      d="m 133,97.624124 120.00001,0 0,39.999996 -120.00001,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
   <text
@@ -183,7 +183,7 @@
        x="176.28903">330</tspan>
   </text>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3101-8"
      d="m 19,71.624263 0,-8 a 8.0000002,8.0000002 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8.0000002,8.0000002 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,19.999996 8,0 0,-6 8,0 0,8 a 8.0000002,8.0000002 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,3.999996 -16,0 0,-3.999996 -2,0 -8,0 a 8.0000002,8.0000002 0 0 1 -8,-8 l 0,-8 0,-7.999996 z" />
   <text
@@ -197,7 +197,7 @@
        x="112.04111">hertz</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-7-1"
      d="m 133,55.624263 120.00002,0 0,39.999996 -120.00002,0 0,-16 0,-1.999996 -12,0 0,5.999996 -4,0 0,-15.999996 4,0 0,6 12,0 0,-2 z" />
   <text

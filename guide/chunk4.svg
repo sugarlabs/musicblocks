@@ -41,7 +41,7 @@
   <path
      d="m 539,13.56205 h 120 v 40 H 539 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-2-0-2"
-     style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      x="545.2179"
      y="12.018046"
@@ -69,7 +69,7 @@
   <path
      d="m 143,13.56205 h 120 v 40 H 143 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-2-0"
-     style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      x="149.21786"
      y="12.018046"
@@ -81,7 +81,7 @@
        id="tspan25-1">chunk</tspan>
   </text>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3194-36"
      d="m 433,576.12408 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -5.99999 h -8 v 19.99999 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 -42 z" />
   <text
@@ -117,7 +117,7 @@
   <path
      d="m 547,560.12408 h 120 v 40.00001 H 547 v -16.00001 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-1"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      y="559.12408"
      id="text23-2-2"
@@ -129,7 +129,7 @@
        id="tspan25-70">re</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-9"
      d="m 547,602.12408 h 120 v 40 H 547 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -143,7 +143,7 @@
        x="602">5</tspan>
   </text>
   <path
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035-0"
      d="m 415,492.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 18 60 8 c 4.41828,0 9.07159,3.71364 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 c 0,4.41827 -3.58172,8 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 c -5.52285,0 -10,4.47715 -10,9.99999 v 8 92.00001 7.99999 c 0,5.52285 4.64205,11.3395 10,10 h 8 v 4 h 20 v -4 h 16 v 12 12 8 c 0,4.41828 -3.71365,9.0716 -8,8 h -8 -18 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 z" />
   <text
@@ -157,7 +157,7 @@
        x="420">note value</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-1-1-6"
      d="m 661,518.1241 h 120 v 40 H 661 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -171,7 +171,7 @@
        x="716">2</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3798-4-4-5-2"
      d="m 547,492.1241 v -8 a 8,8 0 0 1 8,-8 h 8 20 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -20 -8 a 8,8 0 0 1 -8,-8 v -8 -42 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 z" />
   <text
@@ -190,7 +190,7 @@
     <path
        d="M 247,43 H 367 V 83 H 247 V 67 65 h -12 v 6 h -4 V 55 h 4 v 6 h 12 v -2 z"
        id="path21-8-2-1-0-6-7"
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        x="279"
        y="44"
@@ -205,7 +205,7 @@
   <path
      d="m 433,534.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 60 8 c 4.41828,0 8,3.58172 8,8 v 8 8 8 c 0,4.41828 -3.71364,6.92841 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 0 z"
      id="path3124-2"
-     style="fill:#ff0066;fill-opacity:1;stroke:#ef003e;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#BE6152;fill-opacity:1;stroke:#923111;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -217,7 +217,7 @@
        y="545.04718"
        style="font-size:22.5px">↓</tspan></text>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3194-36-1"
      d="m 433,366.12408 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -5.99999 h -8 v 19.99999 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 -42 z" />
   <text
@@ -253,7 +253,7 @@
   <path
      d="m 547,350.12408 h 120 v 40.00001 H 547 v -16.00001 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-1-1"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      y="349.12408"
      id="text23-2-2-7"
@@ -265,7 +265,7 @@
        id="tspan25-70-7">do</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-9-1"
      d="m 547,392.12408 h 120 v 40 H 547 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -279,7 +279,7 @@
        x="602">5</tspan>
   </text>
   <path
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035-0-9"
      d="m 415,282.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 18 60 8 c 4.41828,0 9.07159,3.71364 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 c 0,4.41828 -3.58172,8 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 c -5.52285,0 -10,4.47715 -10,9.99999 v 8 92.00001 7.99999 c 0,5.52285 4.64205,11.3395 10,10 h 8 v 4 h 20 v -4 h 16 v 12 12 8 c 0,4.41828 -3.71365,9.0716 -8,8 h -8 -18 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 z" />
   <text
@@ -293,7 +293,7 @@
        x="420">note value</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-1-1-6-7"
      d="m 661,308.1241 h 120 v 40 H 661 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -307,7 +307,7 @@
        x="716">4</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3798-4-4-5-2-6"
      d="m 547,282.1241 v -8 a 8,8 0 0 1 8,-8 h 8 20 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -20 -8 a 8,8 0 0 1 -8,-8 v -8 -42 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 z" />
   <text
@@ -326,7 +326,7 @@
     <path
        d="M 247,43 H 367 V 83 H 247 V 67 65 h -12 v 6 h -4 V 55 h 4 v 6 h 12 v -2 z"
        id="path21-8-2-1-0-6-7-8"
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        x="279"
        y="44"
@@ -341,7 +341,7 @@
   <path
      d="m 433,324.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 60 8 c 4.41828,0 8,3.58172 8,8 v 8 8 8 c 0,4.41828 -3.71364,6.92841 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 0 z"
      id="path3124-2-9"
-     style="fill:#ff0066;fill-opacity:1;stroke:#ef003e;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#BE6152;fill-opacity:1;stroke:#923111;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -353,7 +353,7 @@
        y="335.04718"
        style="font-size:22.5px">↓</tspan></text>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3194-9-1-8"
      d="m 433.00004,156.12408 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -5.99999 h -8 v 19.99999 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 -42 z" />
   <text
@@ -389,7 +389,7 @@
   <path
      d="m 547.00004,140.12408 h 120 v 40.00001 h -120 v -16.00001 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-9-8"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      y="139.12408"
      id="text23-4-5"
@@ -401,7 +401,7 @@
        id="tspan25-78-6">ti</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-4-1"
      d="m 547.00004,182.12408 h 120 v 40 h -120 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -415,7 +415,7 @@
        x="602">4</tspan>
   </text>
   <path
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035-6-9"
      d="M 415.00004,72.124097 V 64.1241 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 18 60 8 c 4.41828,0 9.07159,3.71364 8,8 v 7.999997 h -8 V 66.1241 h -8 v 19.999997 h 8 v -6 h 8 v 8 c 0,4.418278 -3.58172,8 -8,8 h -8 -60 -2 v 4.000003 h -16 v -4.000003 h -2 -8 c -5.52285,0 -10,4.477153 -10,9.999993 v 8 92.00001 7.99999 c 0,5.52285 4.64205,11.3395 10,10 h 8 v 4 h 20 v -4 h 16 v 12 12 8 c 0,4.41828 -3.71364,9.0716 -8,8 h -8 -18 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 z" />
   <text
@@ -429,7 +429,7 @@
        x="420.00003">note value</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-1-20-1"
      d="m 661.00004,98.1241 h 120 v 40 h -120 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -443,7 +443,7 @@
        x="716.00006">4</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3798-4-4-5-4-4"
      d="m 547.00004,72.1241 v -8 a 8,8 0 0 1 8,-8 h 8 20 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -20 -8 a 8,8 0 0 1 -8,-8 v -8 -42 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 z" />
   <text
@@ -462,7 +462,7 @@
     <path
        d="M 247,43 H 367 V 83 H 247 V 67 65 h -12 v 6 h -4 V 55 h 4 v 6 h 12 v -2 z"
        id="path21-8-2-1-0-6-6-7"
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        x="279"
        y="44"
@@ -477,7 +477,7 @@
   <path
      d="m 433.00004,114.1241 v -8 c 0,-4.41828 3.58172,-8.000003 8,-8.000003 h 8 v 4.000003 h 20 v -4.000003 h 60 8 c 4.41828,0 8,3.581723 8,8.000003 v 8 8 8 c 0,4.41828 -3.71364,6.92841 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 0 z"
      id="path3124-7-1"
-     style="fill:#ff0066;fill-opacity:1;stroke:#ef003e;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#BE6152;fill-opacity:1;stroke:#923111;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -489,7 +489,7 @@
        y="125.0472"
        style="font-size:22.5px">↓</tspan></text>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3194-36-6"
      d="m 37,786.12408 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -5.99999 h -8 v 19.99999 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 -42 z" />
   <text
@@ -525,7 +525,7 @@
   <path
      d="m 151,770.12408 h 120 v 40.00001 H 151 v -16.00001 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-1-4"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      y="769.12408"
      id="text23-2-2-1"
@@ -537,7 +537,7 @@
        id="tspan25-70-8">sol</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-9-5"
      d="m 151,812.12408 h 120 v 40 H 151 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -551,7 +551,7 @@
        x="206">4</tspan>
   </text>
   <path
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035-0-5"
      d="m 19,702.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 18 60 8 c 4.41828,0 9.07159,3.71364 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 c 0,4.41827 -3.58172,8 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 c -5.52285,0 -10,4.47715 -10,9.99999 v 8 92.00001 7.99999 c 0,5.52285 4.64205,11.3395 10,10 h 8 v 4 h 20 v -4 h 16 v 12 12 8 c 0,4.41828 -3.71365,9.0716 -8,8 H 73 55 53 v 4 H 37 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 z" />
   <text
@@ -565,7 +565,7 @@
        x="23.999992">note value</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-1-1-6-3"
      d="m 265,728.1241 h 120 v 40 H 265 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -579,7 +579,7 @@
        x="320">4</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3798-4-4-5-2-64"
      d="m 151,702.1241 v -8 a 8,8 0 0 1 8,-8 h 8 20 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -20 -8 a 8,8 0 0 1 -8,-8 v -8 -42 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 z" />
   <text
@@ -598,7 +598,7 @@
     <path
        d="M 247,43 H 367 V 83 H 247 V 67 65 h -12 v 6 h -4 V 55 h 4 v 6 h 12 v -2 z"
        id="path21-8-2-1-0-6-7-6"
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        x="279"
        y="44"
@@ -613,7 +613,7 @@
   <path
      d="m 37,744.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 60 8 c 4.41828,0 8,3.58172 8,8 v 8 8 8 c 0,4.41828 -3.71364,6.92841 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 0 z"
      id="path3124-2-8"
-     style="fill:#ff0066;fill-opacity:1;stroke:#ef003e;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#BE6152;fill-opacity:1;stroke:#923111;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -625,7 +625,7 @@
        y="755.04718"
        style="font-size:22.5px">↓</tspan></text>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3194-9-1-7"
      d="m 37.00004,576.12408 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -5.99999 h -8 v 19.99999 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 -42 z" />
   <text
@@ -661,7 +661,7 @@
   <path
      d="m 151.00004,560.12408 h 120 v 40.00001 h -120 v -16.00001 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-9-9"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      y="559.12408"
      id="text23-4-2"
@@ -673,7 +673,7 @@
        id="tspan25-78-5">ti</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-4-4"
      d="m 151.00004,602.12408 h 120 v 40 h -120 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -687,7 +687,7 @@
        x="206.00003">4</tspan>
   </text>
   <path
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035-6-4"
      d="m 19.00004,492.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 18 60 8 c 4.41828,0 9.07159,3.71364 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 c 0,4.41827 -3.58172,8 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 c -5.52285,0 -10,4.47715 -10,9.99999 v 8 92.00001 7.99999 c 0,5.52285 4.64205,11.3395 10,10 h 8 v 4 h 20 v -4 h 16 v 12 12 8 c 0,4.41828 -3.71364,9.0716 -8,8 h -8 -18 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 z" />
   <text
@@ -701,7 +701,7 @@
        x="24.000046">note value</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-1-20-2"
      d="m 265.00004,518.1241 h 120 v 40 h -120 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -715,7 +715,7 @@
        x="320.00003">4</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3798-4-4-5-4-5"
      d="m 151.00004,492.1241 v -8 a 8,8 0 0 1 8,-8 h 8 20 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -20 -8 a 8,8 0 0 1 -8,-8 v -8 -42 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 z" />
   <text
@@ -734,7 +734,7 @@
     <path
        d="M 247,43 H 367 V 83 H 247 V 67 65 h -12 v 6 h -4 V 55 h 4 v 6 h 12 v -2 z"
        id="path21-8-2-1-0-6-6-8"
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        x="279"
        y="44"
@@ -749,7 +749,7 @@
   <path
      d="m 37.00004,534.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 60 8 c 4.41828,0 8,3.58172 8,8 v 8 8 8 c 0,4.41828 -3.71364,6.92841 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 0 z"
      id="path3124-7-8"
-     style="fill:#ff0066;fill-opacity:1;stroke:#ef003e;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#BE6152;fill-opacity:1;stroke:#923111;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -761,7 +761,7 @@
        y="545.04718"
        style="font-size:22.5px">↓</tspan></text>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3194-36-0"
      d="m 37,366.12408 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -5.99999 h -8 v 19.99999 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 -42 z" />
   <text
@@ -797,7 +797,7 @@
   <path
      d="m 151,350.12408 h 120 v 40.00001 H 151 v -16.00001 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-1-6"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      y="349.12408"
      id="text23-2-2-2"
@@ -809,7 +809,7 @@
        id="tspan25-70-5">la</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-9-8"
      d="m 151,392.12408 h 120 v 40 H 151 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -823,7 +823,7 @@
        x="206">4</tspan>
   </text>
   <path
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035-0-8"
      d="m 19,282.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 18 60 8 c 4.41828,0 9.07159,3.71364 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 c 0,4.41828 -3.58172,8 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 c -5.52285,0 -10,4.47715 -10,9.99999 v 8 92.00001 7.99999 c 0,5.52285 4.64205,11.3395 10,10 h 8 v 4 h 20 v -4 h 16 v 12 12 8 c 0,4.41828 -3.71365,9.0716 -8,8 H 73 55 53 v 4 H 37 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 z" />
   <text
@@ -837,7 +837,7 @@
        x="23.999992">note value</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-1-1-6-0"
      d="m 265,308.1241 h 120 v 40 H 265 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -851,7 +851,7 @@
        x="320">4</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3798-4-4-5-2-0"
      d="m 151,282.1241 v -8 a 8,8 0 0 1 8,-8 h 8 20 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -20 -8 a 8,8 0 0 1 -8,-8 v -8 -42 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 z" />
   <text
@@ -870,7 +870,7 @@
     <path
        d="M 247,43 H 367 V 83 H 247 V 67 65 h -12 v 6 h -4 V 55 h 4 v 6 h 12 v -2 z"
        id="path21-8-2-1-0-6-7-1"
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        x="279"
        y="44"
@@ -885,7 +885,7 @@
   <path
      d="m 37,324.1241 v -8 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 60 8 c 4.41828,0 8,3.58172 8,8 v 8 8 8 c 0,4.41828 -3.71364,6.92841 -8,8 h -8 -60 -2 v 4 H 55 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 0 z"
      id="path3124-2-4"
-     style="fill:#ff0066;fill-opacity:1;stroke:#ef003e;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#BE6152;fill-opacity:1;stroke:#923111;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -897,7 +897,7 @@
        y="335.04718"
        style="font-size:22.5px">↓</tspan></text>
   <path
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3194-9-1-9"
      d="m 37.00004,156.12408 v -8 a 8,8 0 0 1 8,-8 h 8 v 4 h 20 v -4 h 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -5.99999 h -8 v 19.99999 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 a 8,8 0 0 1 -8,-8 v -8 -42 z" />
   <text
@@ -933,7 +933,7 @@
   <path
      d="m 151.00004,140.12408 h 120 v 40.00001 h -120 v -16.00001 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z"
      id="path21-9-6"
-     style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      y="139.12408"
      id="text23-4-4"
@@ -945,7 +945,7 @@
        id="tspan25-78-0">sol</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-4-0"
      d="m 151.00004,182.12408 h 120 v 40 h -120 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -959,7 +959,7 @@
        x="206.00003">4</tspan>
   </text>
   <path
-     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3035-6-2"
      d="M 19.00004,72.124097 V 64.1241 c 0,-4.41828 3.58172,-8 8,-8 h 8 v 4 h 20 v -4 h 18 60 8 c 4.41828,0 9.07159,3.71364 8,8 v 7.999997 h -8 V 66.1241 h -8 v 19.999997 h 8 v -6 h 8 v 8 c 0,4.418278 -3.58172,8 -8,8 h -8 -60 -2 v 4.000003 h -16 v -4.000003 h -2 -8 c -5.52285,0 -10,4.477153 -10,9.999993 v 8 92.00001 7.99999 c 0,5.52285 4.64205,11.3395 10,10 h 8 v 4 h 20 v -4 h 16 v 12 12 8 c 0,4.41828 -3.71364,9.0716 -8,8 h -8 -18 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 z" />
   <text
@@ -973,7 +973,7 @@
        x="24.000046">note value</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-6-1-20-9"
      d="m 265.00004,98.1241 h 120 v 40 h -120 v -16 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 v -2 z" />
   <text
@@ -987,7 +987,7 @@
        x="320.00003">4</tspan>
   </text>
   <path
-     style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path3798-4-4-5-4-2"
      d="m 151.00004,72.1241 v -8 a 8,8 0 0 1 8,-8 h 8 20 60 8 a 8,8 0 0 1 8,8 v 8 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 34 h -8 v -6 h -8 v 20 h 8 v -6 h 8 v 8 a 8,8 0 0 1 -8,8 h -8 -60 -20 -8 a 8,8 0 0 1 -8,-8 v -8 -42 -2 h -12 v 6 h -4 v -16 h 4 v 6 h 12 z" />
   <text
@@ -1006,7 +1006,7 @@
     <path
        d="M 247,43 H 367 V 83 H 247 V 67 65 h -12 v 6 h -4 V 55 h 4 v 6 h 12 v -2 z"
        id="path21-8-2-1-0-6-6-0"
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        x="279"
        y="44"
@@ -1021,7 +1021,7 @@
   <path
      d="m 37.00004,114.1241 v -8 c 0,-4.41828 3.58172,-8.000003 8,-8.000003 h 8 v 4.000003 h 20 v -4.000003 h 60 8 c 4.41828,0 8,3.581723 8,8.000003 v 8 8 8 c 0,4.41828 -3.71364,6.92841 -8,8 h -8 -60 -2 v 4 h -16 v -4 h -2 -8 c -4.41828,0 -8,-3.58172 -8,-8 v -8 0 z"
      id="path3124-7-6"
-     style="fill:#ff0066;fill-opacity:1;stroke:#ef003e;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+     style="fill:#BE6152;fill-opacity:1;stroke:#923111;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
