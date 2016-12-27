@@ -11,7 +11,7 @@
 
 var blockBlocks = null;
 
-// Minimum distance (squared) between to docks required before
+// Minimum distance (squared) between two docks required before
 // connecting them.
 const MINIMUMDOCKDISTANCE = 400;
 
@@ -814,8 +814,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         var newBlock = null;
         var newConnection = null;
 
-        // TODO: Make minimum distance relative to scale.
-        var min = MINIMUMDOCKDISTANCE;
+        var min = (MINIMUMDOCKDISTANCE/DEFAULTBLOCKSCALE) * this.blockScale;
+        
         var blkType = myBlock.docks[0][2];
 
         //Is the added block above the silence block or below ?
