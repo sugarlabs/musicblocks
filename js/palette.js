@@ -2012,7 +2012,7 @@ function Palette(palettes, name) {
             'setbpm': BPMOBJ,
             'setdrum': SETDRUMOBJ,
             'setkey2': SETKEYOBJ,
-            'sEtnotevolume2': VOLOBJ,
+            'setnotevolume2': VOLOBJ,
             'settransposition': TRANSPOBJ,
             'setturtlename': SETTURTLENAMEOBJ,
             'setvoice': SETVOICEOBJ,

@@ -2368,7 +2368,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         case 'backward':
             logo.backward[turtle].push(blk);
             // Set child to bottom block inside clamp
-            // FIXME: We need to do the same inside any contained stack.
             childFlow = logo.blocks.findBottomBlock(args[0]);
             childFlowCount = 1;
 
@@ -2668,7 +2667,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
 
                     note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
-                    // If we are in a setdrum clamp, override the pitch.
                     if (logo.drumStyle[turtle].length > 0) {
                         pitchdrummatrix.drums.push(last(logo.drumStyle[turtle]));
                     } else {
@@ -2866,8 +2864,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
 
             break;
-            // FIXME: What is this supposed to do?
         case 'timeSign':
+            // FIXME: What is this supposed to do?
             console.log('Time Signatature' + args[0]);
             break;
 
@@ -2893,8 +2891,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         case 'sixtyfourthNote':
             logo._processNote(64, blk, turtle);
             break;
-            // FIXME: What is this supposed to do?
         case 'meter':
+            // FIXME: What is this supposed to do?
             break;
         case 'osctime':
         case 'newnote':
@@ -4037,9 +4035,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this._setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
 
-        if (this.inPitchDrumMatrix) {
-            // FIXME
-        } else if (this.inMatrix) {
+        if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
                 pitchtimematrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
@@ -4249,7 +4245,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
 
                     logo.noteBeat[turtle] = noteBeatValue;
-
+                    
+                    // do not process a note if its duration is equal to infinity or NaN
+                    if (!isFinite(duration)) {
+                        return;
+                    }
+                    
                     // Use the beatValue of the first note in
                     // the group since there can only be one.
                     if (logo.staccato[turtle].length > 0) {
@@ -4304,7 +4305,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                             } else if (logo.tieCarryOver[turtle] > 0) {
                                 updateLilypondNotation(logo, note, logo.tieCarryOver[turtle], turtle, insideChord);
                             } else {
-                                // console.log('durarion == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
+                                // console.log('duration == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
                             }
                         }
 

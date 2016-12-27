@@ -26,7 +26,6 @@ function StatusMatrix() {
         docById('statusmatrix').style.visibility = 'visible';
         docById('statusmatrix').style.border = 2;
 
-        // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         docById('statusmatrix').style.overflowX = 'auto';

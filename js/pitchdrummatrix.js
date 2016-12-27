@@ -32,10 +32,10 @@ const DRUMNAMEWIDTH = 50;
 
 
 function PitchDrumMatrix() {
-    this.solfegeNotes = [];
-    this.solfegeOctaves = [];
-    this._rests = 0;
+    this.rowLabels = [];
+    this.rowArgs = [];
     this.drums = [];
+    this._rests = 0;
 
     // The pitch-block number associated with a row; a drum block is
     // associated with a column. We need to keep track of which
@@ -96,13 +96,10 @@ function PitchDrumMatrix() {
         docById('pitchdrummatrix').style.visibility = 'visible';
         docById('pitchdrummatrix').style.border = 2;
 
-        // FIXME: make this number based on canvas size.
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         docById('pitchdrummatrix').style.width = Math.floor(w / 2) + 'px';
         docById('pitchdrummatrix').style.overflowX = 'auto';
-
-        console.log('notes ' + this.solfegeNotes + ' octave ' + this.solfegeOctaves + ' dum ' + this.drums);
 
         // Used to remove the matrix table
         Element.prototype.remove = function() {
@@ -175,9 +172,10 @@ function PitchDrumMatrix() {
         }
 
         var j = 0;
+        console.log('notes ' + this.rowLabels + ' octave ' + this.rowArgs + ' drums ' + this.drums);
         var marginFromTop = Math.floor(matrixDivPosition.top + this._cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
-        for (var i = 0; i < this.solfegeNotes.length; i++) {
-            if (this.solfegeNotes[i].toLowerCase() === _('rest')) {
+        for (var i = 0; i < this.rowLabels.length; i++) {
+            if (this.rowLabels[i].toLowerCase() === _('rest')) {
                 // In case there are rest notes included.
                 this._rests += 1;
                 continue;
@@ -189,13 +187,13 @@ function PitchDrumMatrix() {
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             cell.style.fontSize = this._cellScale * 100 + '%';
 
-            var drumName = getDrumName(this.solfegeNotes[i]);
+            var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
                 // if it is a drum, we'll make it a column below.
                 this.drums.push(drumName);
                 continue;
             } else {
-                cell.innerHTML = this.solfegeNotes[i] + this.solfegeOctaves[i].toString().sub();
+                cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
             }
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
@@ -208,7 +206,7 @@ function PitchDrumMatrix() {
             j += 1;
         }
 
-        var row = header.insertRow(this.solfegeNotes.length - this._rests + 1);
+        var row = header.insertRow(this.rowLabels.length - this._rests + 1);
         row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         var cell = row.insertCell(0);
         cell.style.fontSize = this._cellScale * 75 + '%';
@@ -253,7 +251,7 @@ function PitchDrumMatrix() {
     this._addDrum = function(drumname) {
         var table = docById('drumTable');
 
-        var rowCount = this.solfegeNotes.length + 1 - this._rests;
+        var rowCount = this.rowLabels.length + 1 - this._rests;
         var iconSize = Math.floor(this._cellScale * 24);
 
         for (var i = 1; i <= rowCount; i++) {
