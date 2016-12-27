@@ -132,7 +132,7 @@ frequency, the octave is ignored.
 
 Note that the pitch name can also be specified using a *Text* block. 
 
-<img src='https://rawgithub.com/walterbender/musicblocks/guide/Keyboard%Chart.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/Keyboard%20Chart.svg'</img>
 Please refer to the above picture for
 a visual representation of where a certain note is located in a keyboard or staff.
 
