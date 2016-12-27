@@ -2667,7 +2667,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
 
                     note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
-                    // If we are in a setdrum clamp, override the pitch.
                     if (logo.drumStyle[turtle].length > 0) {
                         pitchdrummatrix.drums.push(last(logo.drumStyle[turtle]));
                     } else {
@@ -2865,8 +2864,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
 
             break;
-            // FIXME: What is this supposed to do?
         case 'timeSign':
+            // FIXME: What is this supposed to do?
             console.log('Time Signatature' + args[0]);
             break;
 
@@ -2892,8 +2891,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         case 'sixtyfourthNote':
             logo._processNote(64, blk, turtle);
             break;
-            // FIXME: What is this supposed to do?
         case 'meter':
+            // FIXME: What is this supposed to do?
             break;
         case 'osctime':
         case 'newnote':
@@ -4036,9 +4035,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this._setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
 
-        if (this.inPitchDrumMatrix) {
-            // FIXME
-        } else if (this.inMatrix) {
+        if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
                 pitchtimematrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
