@@ -230,6 +230,7 @@ function Matrix() {
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                 this._noteStored.push(drumName);
+		console.log(this.rowLabels[i] + ' ' + drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
                 this._noteStored.push(this.rowLabels[i].replace(/ /g,':'));
@@ -824,6 +825,7 @@ function Matrix() {
         for (var i = 0; i < note.length; i++) {
             var drumName = getDrumName(note[i]);
             if (drumName != null) {
+                console.log('playAll: ' + drumName);
                 drumNotes.push(drumName);
             } else if (note[i].slice(0, 4) === 'http') {
                 drumNotes.push(note[i]);
@@ -873,6 +875,7 @@ function Matrix() {
         }
 
         for (var i = 0; i < drumNotes.length; i++) {
+            console.log('trigger: ' + drumNotes[i]);
             this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i]);
         }
 
@@ -930,6 +933,7 @@ function Matrix() {
                 for (var i = 0; i < note.length; i++) {
                     var drumName = getDrumName(note[i]);
                     if (drumName != null) {
+			console.log('__playNote ' + note[i] + ' ' + drumName);
                         drumNotes.push(drumName);
                     } else if (note[i].slice(0, 4) === 'http') {
                         drumNotes.push(note[i]);
@@ -958,6 +962,7 @@ function Matrix() {
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
+		    console.log('trigger: ' + drumNotes[i]);
                     that._logo.synth.trigger(['C2'], that._logo.defaultBPMFactor / noteValue, drumNotes[i]);
                 }
 
@@ -1018,6 +1023,7 @@ function Matrix() {
     this._setNoteCell = function(j, colIndex, cell, playNote) {
         var note = this._noteStored[j - 1];
         var drumName = getDrumName(note);
+        console.log('setNoteCell: ' + note + ' ' + drumName);
         var graphicsBlock = false;
 
         graphicNote = note.split(':');
@@ -1039,6 +1045,7 @@ function Matrix() {
         if (obj.length === 1) {
             if (playNote) {
                 if (drumName != null) {
+		    console.log('trigger: ' + drumName);
                     this._logo.synth.trigger('C2', noteValue, drumName);
                 } else if (graphicsBlock !== true) {
                     this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
@@ -1157,6 +1164,7 @@ function Matrix() {
 
                     var obj = note[0][j].split(':');
                     var drumName = getDrumName(note[0][j]);
+                    console.log('save: ' + ' ' + note[0][j] + ' ' + drumName);
                     if (drumName != null) {
                         // add a playdrum block
                         // The last connection in last pitch block is null.
