@@ -82,7 +82,7 @@ Toolbars
 
 There are three toolbars: (1) the Main toolbar across the top of the
 screen; (2) the Secondary toolbar on the right side of the screen; and
-(3) the Palette toolbar on the right side of the screen. An additional
+(3) the Palette toolbar on the left side of the screen. An additional
 menu appears when a "long press" is applied to a stack of
 blocks. There is also a utility panel with additional controls.
 
