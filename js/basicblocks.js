@@ -1,4 +1,4 @@
-// Copyright (c) 2014-16 Walter Bender
+﻿// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -194,6 +194,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['solfege'] = solfegeBlock;
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
+
 
     // Transposition blocks
     var invertBlock2 = new ProtoBlock('invert2');
@@ -1574,7 +1575,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     divideBlock.fontsize = 14;
     divideBlock.staticLabels.push('/');
     divideBlock.twoArgMathBlock();
-    divideBlock.defaults.push(100, 10)
+    divideBlock.defaults.push(1, 4)
 
     var multiplyBlock = new ProtoBlock('multiply');
     multiplyBlock.palette = palettes.dict['number'];
