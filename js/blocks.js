@@ -864,11 +864,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         newBlock = b;
                         newConnection = i;
                         min = dist;
+
                     }
-                } else {
-                    // TODO: bounce away from illegal connection?
-                    // only if the distance was small
-                    // console.log('cannot not connect these two block types');
+                } 
+                else {
+                    var x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];
+                    var y2 = this.blockList[b].container.y + this.blockList[b].docks[i][1];
+                    var dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+                    if(dist < min){
+                        console.log('Cannot connect these two block types: Invalid Connection');
+                    }
                 }
             }
         }
