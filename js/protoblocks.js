@@ -9,10 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// There are three "classes" defined in this file: ProtoBlocks,
-// Blocks, and Block. Protoblocks are the prototypes from which Blocks
-// are created; Blocks is the list of all blocks; and Block is a block
-// instance.
+//The ProtoBlock class is defined in this file. Protoblocks are the prototypes
+//from which Blocks are created.
 
 // Protoblock contain generic information about blocks and some
 // methods common to all blocks.
