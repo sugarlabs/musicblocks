@@ -15,7 +15,7 @@
 // restore trash.
 require(['activity/utils']);
 
-var TRASHWIDTH = 320;
+var TRASHWIDTH = 120;
 var TRASHHEIGHT = 120;
 
 function Trashcan (canvas, stage, size, refreshCanvas) {
