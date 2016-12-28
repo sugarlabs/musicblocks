@@ -27,6 +27,7 @@
 </head>
 
 <body data-title="index" id="body" style="background: #96D3F3;">
+
   <script>
     window.fbAsyncInit = function() {
         FB.init({
@@ -274,8 +275,15 @@
         row.style.left = modeDivPosition.left + 'px';
         row.style.top = modeDivPosition.top + 'px';
     };
-  </script>
 
+    function playSound(soundObj) {
+        var sound = document.getElementById(soundObj);
+        sound.play();
+    
+    };
+
+  </script>
+  <audio src="sounds/ERROR.wav" autostart="false" width="0" height="0" id="Error" enablejavascript="true"></audio>
   <!-- see activity/activity-icon-color-loading.svg for info -->
   <div class="canvasHolder">
     <canvas id="myCanvas" width="1200" height="900"></canvas>
