@@ -820,21 +820,25 @@ function Turtle (name, turtles, drum) {
         this.orientation += Number(degrees);
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
-        this.updateCache();
+        // We cannot update the cache during the 'tween'.
+        if (this.blinkFinished) {
+            this.updateCache();
+        }
     };
 
     this.doSetHeading = function(degrees) {
         this.orientation = Number(degrees);
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
-        this.updateCache();
+        // We cannot update the cache during the 'tween'.
+        if (this.blinkFinished) {
+            this.updateCache();
+        }
     };
 
     this.doSetFont = function(font) {
         this.font = font;
-        this.updateCache();
     };
-
 
     this.doSetColor = function(color) {
         // Color sets hue but also selects maximum chroma.
@@ -958,6 +962,7 @@ function Turtle (name, turtles, drum) {
                 myTurtle.createCache();
             }, 200);
         } else {
+            console.log('creating cache');
             myTurtle.container.cache(myTurtle.bounds.x, myTurtle.bounds.y, myTurtle.bounds.width, myTurtle.bounds.height);
         }
     };
@@ -970,6 +975,7 @@ function Turtle (name, turtles, drum) {
         if (myTurtle.bounds == null) {
             console.log('Block container for ' + myTurtle.name + ' not yet ready.');
             setTimeout(function() {
+                console.log('stalled');
                 myTurtle.updateCache();
             }, 300);
         } else {
@@ -981,7 +987,7 @@ function Turtle (name, turtles, drum) {
     this.blink = function(duration,volume) {
         var turtle = this;
         var sizeinuse;
-        if (this.blinkFinished==false){
+        if (this.blinkFinished == false){
             sizeinuse = this.beforeBlinkSize;
         } else {
             sizeinuse = turtle.bitmap.scaleX;
@@ -1003,12 +1009,12 @@ function Turtle (name, turtles, drum) {
             turtle.bitmap.scaleX = sizeinuse;
             turtle.bitmap.scaleY = turtle.bitmap.scaleX;
             turtle.bitmap.scale = turtle.bitmap.scaleX;
+            turtle.bitmap.rotation = turtle.orientation;
             turtle.skinChanged = isSkinChanged;
             var bounds = turtle.container.getBounds();
             turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            this.blinkFinished = true;
-        //It's 500/duration because 1000ms * (1 / duration) / 2
-        }, 500 / duration);
+            turtle.blinkFinished = true;
+        }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
     };
 };
 
