@@ -2591,11 +2591,26 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
 
             if (typeof(args[0]) === 'number') {
-                // If frequency is input, ignore octave (args[1]).
-                var obj = frequencyToPitch(args[0]);
-                var note = obj[0];
-                var octave = obj[1];
-                var cents = obj[2];
+                // We interpret numbers two different ways:
+                // (1) a positive integer between 1 and 12 is taken to be
+                // a moveable solfege, e.g., 1 == do; 2 == re...
+                // (2) if frequency is input, ignore octave (args[1]).
+                // Negative numbers will throw an error.
+                if (args[0] < 1) {
+                    note = '?'; // throws an error
+                } else if (args[0] < 13) { // moveable solfege
+		    note = scaleDegreeToPitch(logo.keySignature[turtle], Math.floor(args[0]));
+                    var octave = Math.floor(args[1]);
+                    var cents = 0;
+                } else if (args[0] < A0 || args[0] > C8) {
+                    note = '?'; // throws an error
+                } else {
+                    var obj = frequencyToPitch(args[0]);
+                    var note = obj[0];
+                    var octave = obj[1];
+                    var cents = obj[2];
+                }
+
                 if (note === '?') {
                     logo.errorMsg(INVALIDPITCH, blk);
                     logo.stopTurtle = true;

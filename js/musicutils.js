@@ -565,37 +565,14 @@ function getStepSizeDown(keySignature, pitch) {
 
 function _getStepSize(keySignature, pitch, direction) {
     // Returns how many half-steps to the next note in this key.
-    var obj = keySignatureToMode(keySignature);
-    var myKeySignature = obj[0];
-    if (obj[1] === 'CUSTOM') {
-        var halfSteps = customMode;
-    } else {
-        var halfSteps = MUSICALMODES[obj[1]];
-    }
-
-    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        var thisScale = NOTESFLAT;
-    } else {
-        var thisScale = NOTESSHARP;
-    }
-
-    var idx = thisScale.indexOf(myKeySignature);
-
-    if (idx === -1) {
-        idx = 0;
-    }
+    var obj = _buildScale(keySignature);
+    var scale = obj[0];
+    var halfSteps = obj[1];
 
     if (pitch in BTOFLAT) {
         pitch = BTOFLAT[pitch];
     } else if (pitch in STOSHARP) {
         pitch = STOSHARP[pitch];
-    }
-
-    var scale = [myKeySignature];
-    var ii = idx;
-    for (var i = 0; i < halfSteps.length; i++) {
-        ii += halfSteps[i];
-        scale.push(thisScale[ii % SEMITONES]);
     }
 
     ii = scale.indexOf(pitch);
@@ -633,6 +610,52 @@ function _getStepSize(keySignature, pitch, direction) {
     return 1;
 };
 
+function _buildScale(keySignature) {
+    var obj = keySignatureToMode(keySignature);
+    var myKeySignature = obj[0];
+    if (obj[1] === 'CUSTOM') {
+        var halfSteps = customMode;
+    } else {
+        var halfSteps = MUSICALMODES[obj[1]];
+    }
+
+    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
+        var thisScale = NOTESFLAT;
+    } else {
+        var thisScale = NOTESSHARP;
+    }
+
+    var idx = thisScale.indexOf(myKeySignature);
+
+    if (idx === -1) {
+        idx = 0;
+    }
+
+    var scale = [myKeySignature];
+    var ii = idx;
+    for (var i = 0; i < halfSteps.length; i++) {
+        ii += halfSteps[i];
+        scale.push(thisScale[ii % SEMITONES]);
+    }
+
+    return [scale, halfSteps];
+}
+
+function scaleDegreeToPitch(keySignature, scaleDegree) {
+    // Returns note corresponding to scale degree in current key
+    // signature. Used for moveable solfege.
+    var obj = _buildScale(keySignature);
+    var scale = obj[0];
+
+    // Scale degree is specified as do == 1, re == 2, etc., so we need
+    // to subtract 1 to make it zero-based.
+    scaleDegree -= 1;
+
+    // We mod to ensure we don't run out of notes.
+    // FixMe: bump octave if we wrap.
+    scaleDegree %= (scale.length - 1);
+    return (scale[scaleDegree]);
+};
 
 function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
@@ -670,32 +693,9 @@ function getScaleAndHalfSteps(keySignature) {
 // steps within the current key and mode.
 function getInterval (interval, keySignature, pitch) {
     // Step size interval based on the position (pitch) in the scale
-    var obj = keySignatureToMode(keySignature);
-    var myKeySignature = obj[0];
-    if (obj[1] === 'CUSTOM') {
-        var halfSteps = customMode;
-    } else {
-        var halfSteps = MUSICALMODES[obj[1]];
-    }
-
-    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        var thisScale = NOTESFLAT;
-    } else {
-        var thisScale = NOTESSHARP;
-    }
-
-    var idx = thisScale.indexOf(myKeySignature);
-
-    if (idx === -1) {
-        idx = 0;
-    }
-
-    var scale = [myKeySignature];
-    var ii = idx;
-    for (var i = 0; i < halfSteps.length; i++) {
-        ii += halfSteps[i];
-        scale.push(thisScale[ii % SEMITONES]);
-    }
+    var obj = _buildScale(keySignature);
+    var scale = obj[0];
+    var halfSteps = obj[1];
  
     if (pitch in BTOFLAT) {
         pitch = BTOFLAT[pitch];
