@@ -1007,9 +1007,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
 
-            // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
+            console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
-            // TODO: some graphical feedback re new connection?
+            playSound("Connect");
+            
         }
 
         // If it is an arg block, where is it coming from?
