@@ -846,6 +846,7 @@ define(function (require) {
 
             this.document.onkeydown = __keyPressed;
             _hideStopButton();
+
         };
 
         function _setupBlocksContainerEvents() {
@@ -1762,6 +1763,7 @@ define(function (require) {
             update = true;
 
             docById('loading-image-container').style.display = 'none';
+            docById('hideContents').style.display = 'block';
         };
 
         function hideMsgs() {
