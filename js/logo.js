@@ -5512,7 +5512,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 var solfegePart = SOLFNOTES[solfnotes_.indexOf(solfege.substr(0, 2).toLowerCase())];
             } else if (solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase()) !== -1) {
                 var solfegePart = SOLFNOTES[solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase())];
-            } else {  // FIXME: Should be everything but the sharp/flat
+            } else {
                 var solfegePart = solfege.substr(0, 2).toLowerCase();
             }
 
