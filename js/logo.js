@@ -130,6 +130,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     this.lastNotePlayed = {};
     this.noteStatus = {};
 
+    this.pitchNumberOffset = 39;  // C4
+
     // graphics listeners during note play
     this.forwardListener = {};
     this.rightListener = {};
@@ -501,10 +503,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             case 'turtlepitch':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
-                    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)), this.keySignature[turtle]);
+                    value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)), this.keySignature[turtle]) - logo.pitchNumberOffset;
                 } else {
                     console.log('Could not find a note for turtle ' + turtle);
-                    value = pitchToNumber('A', 4, this.keySignature[turtle]);
+                    value = pitchToNumber('A', 4, this.keySignature[turtle])  - logo.pitchNumberOffset;
                 }
                 break;
                 // Deprecated
@@ -654,6 +656,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this.pitchDrumTable[turtle] = {};
             this.backward[turtle] = [];
         }
+
+        this.pitchNumberOffset = 39;  // C4
 
         if (!this.lilypondSaveOnly) {
             this._setSynthVolume(DEFAULTVOLUME, Math.max(this.turtles.turtleList.length - 1), 0);
@@ -904,7 +908,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             }
             break;
         case 'turtlepitch':
-            var obj = numberToPitch(value);
+            var obj = numberToPitch(value + this.pitchNumberOffset);
             this.lastNotePlayed[turtle] = [obj[0]+obj[1], this.lastNotePlayed[turtle][1]];
             break;
         // Deprecated
@@ -2577,50 +2581,97 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             logo.pushedNote[turtle] = true;
             break;
-        case 'pitch':
+        case 'setpitchnumberoffset':
             if (args.length !== 2 || args[0] == null || args[1] == null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
                 break;
             }
 
-            if (typeof(args[1]) !== 'number') {
-                logo.errorMsg(NANERRORMSG, blk);
-                logo.stopTurtle = true;
-                break;
-            }
-
-            if (typeof(args[0]) === 'number') {
-                // If frequency is input, ignore octave (args[1]).
-                var obj = frequencyToPitch(args[0]);
-                var note = obj[0];
-                var octave = obj[1];
-                var cents = obj[2];
-                if (note === '?') {
-                    logo.errorMsg(INVALIDPITCH, blk);
+            logo.pitchNumberOffset = pitchToNumber(args[0], args[1], logo.keySignature[turtle]);
+            break;
+        case 'pitchnumber':
+        case 'scaledegree':
+        case 'pitch':
+            if (logo.blocks.blockList[blk].name == 'pitchnumber') {
+                if (args.length !== 1 || args[0] == null) {
+                    logo.errorMsg(NOINPUTERRORMSG, blk);
                     logo.stopTurtle = true;
                     break;
                 }
+
+                if (typeof(args[0]) !== 'number') {
+                    logo.errorMsg(NANERRORMSG, blk);
+                    logo.stopTurtle = true;
+                    break;
+                }
+
+                // In number to pitch we assume A0 == 0. Here we
+                // assume that C4 == 0, so we need an offset of 39.
+                var obj = numberToPitch(Math.floor(args[0] + logo.pitchNumberOffset));
+                note = obj[0];
+		octave = obj[1];
+		cents = 0;
             } else {
-                var cents = 0;
-                var note = args[0];
-                if (args[1] < 1) {
-                    console.log('minimum allowable octave is 1');
-                    var octave = 1;
-                } else if (args[1] > 10) {
-                    // Humans can only hear 10 octaves.
-                    console.log('clipping octave at 10');
-                    var octave = 10;
-                } else {
-                    // Octave must be a whole number.
-                    var octave = Math.floor(args[1]);
-                }
-
-                logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
-                if (!logo.validNote) {
-                    logo.errorMsg(INVALIDPITCH, blk);
+                if (args.length !== 2 || args[0] == null || args[1] == null) {
+                    logo.errorMsg(NOINPUTERRORMSG, blk);
                     logo.stopTurtle = true;
                     break;
+                }
+
+                if (typeof(args[1]) !== 'number') {
+                    logo.errorMsg(NANERRORMSG, blk);
+                    logo.stopTurtle = true;
+                    break;
+                }
+
+                if (typeof(args[0]) === 'number') {
+                    // We interpret numbers two different ways:
+                    // (1) a positive integer between 1 and 12 is taken to be
+                    // a moveable solfege, e.g., 1 == do; 2 == re...
+                    // (2) if frequency is input, ignore octave (args[1]).
+                    // Negative numbers will throw an error.
+                    if (args[0] < 1) {
+                        note = '?'; // throws an error
+                    } else if (args[0] < 13) { // moveable solfege
+                        note = scaleDegreeToPitch(logo.keySignature[turtle], Math.floor(args[0]));
+                        var octave = Math.floor(args[1]);
+                        var cents = 0;
+                    } else if (args[0] < A0 || args[0] > C8) {
+                        note = '?'; // throws an error
+                    } else {
+                        var obj = frequencyToPitch(args[0]);
+                        var note = obj[0];
+                        var octave = obj[1];
+                        var cents = obj[2];
+                    }
+
+                    if (note === '?') {
+                        logo.errorMsg(INVALIDPITCH, blk);
+                        logo.stopTurtle = true;
+                        break;
+                    }
+                } else {
+                    var cents = 0;
+                    var note = args[0];
+                    if (args[1] < 1) {
+                        console.log('minimum allowable octave is 1');
+                        var octave = 1;
+                    } else if (args[1] > 10) {
+                        // Humans can only hear 10 octaves.
+                        console.log('clipping octave at 10');
+                        var octave = 10;
+                    } else {
+                        // Octave must be a whole number.
+                        var octave = Math.floor(args[1]);
+                    }
+
+                    logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
+                    if (!logo.validNote) {
+                        logo.errorMsg(INVALIDPITCH, blk);
+                        logo.stopTurtle = true;
+                        break;
+                    }
                 }
             }
 
@@ -4914,7 +4965,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 var cblk = logo.blocks.blockList[blk].connections[1];
                 var num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (num != null && typeof(num) === 'number') {
-                    var obj = numberToPitch(num);
+                    var obj = numberToPitch(num + logo.pitchNumberOffset);
                     if (logo.blocks.blockList[blk].name === 'number2pitch') {
                         logo.blocks.blockList[blk].value = obj[0];
                     } else {
@@ -4944,7 +4995,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                             console.log('Could not find a note for turtle ' + turtle);
                             var obj = ['C', 0];
                         }
-                        value = pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]);
+                        value = pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) - logo.pitchNumberOffset;
                         logo.blocks.blockList[blk].value = value;
                     }
                 }
@@ -5461,7 +5512,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 var solfegePart = SOLFNOTES[solfnotes_.indexOf(solfege.substr(0, 2).toLowerCase())];
             } else if (solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase()) !== -1) {
                 var solfegePart = SOLFNOTES[solfnotes_.indexOf(solfege.substr(0, 3).toLowerCase())];
-            } else {  // FIXME: Should be everything but the sharp/flat
+            } else {
                 var solfegePart = solfege.substr(0, 2).toLowerCase();
             }
 
