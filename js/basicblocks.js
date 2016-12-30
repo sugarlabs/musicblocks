@@ -1,4 +1,4 @@
-// Copyright (c) 2014-16 Walter Bender
+﻿// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -158,6 +158,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtlePitchBlock.adjustWidthToLabel();
     turtlePitchBlock.dockTypes[1] = 'anyin';
 
+    var setPitchNumberOffsetBlock = new ProtoBlock('setpitchnumberoffset');
+    setPitchNumberOffsetBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['setpitchnumberoffset'] = setPitchNumberOffsetBlock;
+    setPitchNumberOffsetBlock.staticLabels.push(_('set pitch number offset'), _('name'), _('octave'));
+    setPitchNumberOffsetBlock.adjustWidthToLabel();
+    setPitchNumberOffsetBlock.twoArgBlock();
+    setPitchNumberOffsetBlock.defaults.push('C');
+    setPitchNumberOffsetBlock.defaults.push('4');
+    setPitchNumberOffsetBlock.dockTypes[1] = 'notein';
+    setPitchNumberOffsetBlock.dockTypes[2] = 'numberin';
+
     var numberToPitchBlock = new ProtoBlock('number2pitch');
     numberToPitchBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['number2pitch'] = numberToPitchBlock;
@@ -256,6 +267,26 @@ function initBasicProtoBlocks(palettes, blocks) {
     hertzBlock.adjustWidthToLabel();
     hertzBlock.oneArgBlock();
     hertzBlock.defaults.push(440);
+
+    var pitchNumberBlock = new ProtoBlock('pitchnumber');
+    pitchNumberBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['pitchnumber'] = pitchNumberBlock;
+    pitchNumberBlock.staticLabels.push(_('pitch number'));
+    pitchNumberBlock.adjustWidthToLabel();
+    pitchNumberBlock.oneArgBlock();
+    pitchNumberBlock.defaults.push(9);  // A4
+    pitchNumberBlock.dockTypes[1] = 'numberin';
+
+    var scaleDegree = new ProtoBlock('scaledegree');
+    scaleDegree.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['scaledegree'] = scaleDegree;
+    scaleDegree.staticLabels.push(_('scale degree'), _('number'), _('octave'));
+    scaleDegree.adjustWidthToLabel();
+    scaleDegree.defaults.push(6); // A in C Major
+    scaleDegree.defaults.push(4);
+    scaleDegree.twoArgBlock();
+    scaleDegree.dockTypes[1] = 'numberin';
+    scaleDegree.dockTypes[2] = 'numberin';
 
     var pitchStepBlock = new ProtoBlock('steppitch');
     pitchStepBlock.palette = palettes.dict['pitch'];
@@ -1574,7 +1605,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     divideBlock.fontsize = 14;
     divideBlock.staticLabels.push('/');
     divideBlock.twoArgMathBlock();
-    divideBlock.defaults.push(100, 10)
+    divideBlock.defaults.push(1, 4)
 
     var multiplyBlock = new ProtoBlock('multiply');
     multiplyBlock.palette = palettes.dict['number'];

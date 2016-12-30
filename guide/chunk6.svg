@@ -49,7 +49,7 @@
        x="403.94458">action</tspan>
   </text>
   <path
-     style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-2-0-2-9"
      d="m 539,13.56205 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
   <text
@@ -77,7 +77,7 @@
        x="7.9446411">action</tspan>
   </text>
   <path
-     style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     style="fill:#5DC1BC;fill-opacity:1;stroke:#5AA4AF;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
      id="path21-2-0-7"
      d="m 143,13.56205 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
   <text
@@ -94,7 +94,7 @@
      transform="translate(189.971,588.87954)"
      id="g6246">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-36"
        d="m 243.02906,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -130,7 +130,7 @@
     <path
        d="m 357.02906,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-1"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-2-2"
@@ -142,7 +142,7 @@
          id="tspan25-70">sol</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-9"
        d="m 357.02906,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -156,7 +156,7 @@
          x="412.02905">4</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-0"
        d="m 225.02906,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71365,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -175,7 +175,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-1-6"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-8"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -193,7 +193,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-2"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-0"
@@ -208,7 +208,7 @@
          transform="translate(0,-42)"
          id="g5147-3">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-7"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -226,7 +226,7 @@
     <path
        d="m 243.02906,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-2"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -242,7 +242,7 @@
      transform="translate(189.971,378.87953)"
      id="g6246-6">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-36-1"
        d="m 243.02906,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -278,7 +278,7 @@
     <path
        d="m 357.02906,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-1-1"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-2-2-7"
@@ -290,7 +290,7 @@
          id="tspan25-70-7">re</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-9-1"
        d="m 357.02906,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -304,7 +304,7 @@
          x="412.02905">4</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-0-9"
        d="m 225.02906,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71365,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -323,7 +323,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-1-6-7"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-8-3"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -341,7 +341,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-2-6"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-0-3"
@@ -356,7 +356,7 @@
          transform="translate(0,-42)"
          id="g5147-3-4">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-7-8"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -374,7 +374,7 @@
     <path
        d="m 243.02906,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-2-9"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -390,7 +390,7 @@
      transform="translate(189.2955,168.87954)"
      id="g6345-0">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-9-1-8"
        d="m 243.7046,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -426,7 +426,7 @@
     <path
        d="m 357.7046,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-9-8"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-4-5"
@@ -438,7 +438,7 @@
          id="tspan25-78-6">sol</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-4-1"
        d="m 357.7046,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -452,7 +452,7 @@
          x="412.70459">4</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-6-9"
        d="m 225.7046,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -471,7 +471,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-20-1"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-6-0"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -489,7 +489,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-4-4"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-7-4"
@@ -504,7 +504,7 @@
          transform="translate(0,-42)"
          id="g5147-5-4">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-6-7"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -522,7 +522,7 @@
     <path
        d="m 243.7046,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-7-1"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -538,7 +538,7 @@
      transform="translate(-206.029,798.87954)"
      id="g6246-9">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-36-6"
        d="m 243.02906,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -574,7 +574,7 @@
     <path
        d="m 357.02906,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-1-4"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-2-2-1"
@@ -586,7 +586,7 @@
          id="tspan25-70-8">do</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-9-5"
        d="m 357.02906,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -600,7 +600,7 @@
          x="412.02905">5</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-0-5"
        d="m 225.02906,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71365,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -619,7 +619,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-1-6-3"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-8-1"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -637,7 +637,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-2-64"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-0-33"
@@ -652,7 +652,7 @@
          transform="translate(0,-42)"
          id="g5147-3-8">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-7-6"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -670,7 +670,7 @@
     <path
        d="m 243.02906,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-2-8"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -686,7 +686,7 @@
      transform="translate(-206.7045,588.87954)"
      id="g6345-9">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-9-1-7"
        d="m 243.7046,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -722,7 +722,7 @@
     <path
        d="m 357.7046,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-9-9"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-4-2"
@@ -734,7 +734,7 @@
          id="tspan25-78-5">re</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-4-4"
        d="m 357.7046,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -748,7 +748,7 @@
          x="412.70459">5</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-6-4"
        d="m 225.7046,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -767,7 +767,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-20-2"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-6-4"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -785,7 +785,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-4-5"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-7-48"
@@ -800,7 +800,7 @@
          transform="translate(0,-42)"
          id="g5147-5-2">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-6-8"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -818,7 +818,7 @@
     <path
        d="m 243.7046,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-7-8"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -834,7 +834,7 @@
      transform="translate(-206.029,378.87953)"
      id="g6246-1">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-36-0"
        d="m 243.02906,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -870,7 +870,7 @@
     <path
        d="m 357.02906,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-1-6"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-2-2-2"
@@ -882,7 +882,7 @@
          id="tspan25-70-5">mi</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-9-8"
        d="m 357.02906,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -896,7 +896,7 @@
          x="412.02905">5</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-0-8"
        d="m 225.02906,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71365,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -915,7 +915,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-1-6-0"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-8-6"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -933,7 +933,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-2-0"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-0-8"
@@ -948,7 +948,7 @@
          transform="translate(0,-42)"
          id="g5147-3-3">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-7-1"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -966,7 +966,7 @@
     <path
        d="m 243.02906,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-2-4"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -982,7 +982,7 @@
      transform="translate(-206.7045,168.87954)"
      id="g6345-91">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-9-1-9"
        d="m 243.7046,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -1018,7 +1018,7 @@
     <path
        d="m 357.7046,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-9-6"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-4-4"
@@ -1030,7 +1030,7 @@
          id="tspan25-78-0">re</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-4-0"
        d="m 357.7046,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -1044,7 +1044,7 @@
          x="412.70459">5</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-6-2"
        d="m 225.7046,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -1063,7 +1063,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-20-9"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-6-8"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -1081,7 +1081,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-4-2"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-7-9"
@@ -1096,7 +1096,7 @@
          transform="translate(0,-42)"
          id="g5147-5-6">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-6-0"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -1114,7 +1114,7 @@
     <path
        d="m 243.7046,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-7-6"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -1130,7 +1130,7 @@
      transform="translate(-206.02906,1218.8795)"
      id="g6246-9-7">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-36-6-0"
        d="m 243.02906,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -1166,7 +1166,7 @@
     <path
        d="m 357.02906,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-1-4-6"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-2-2-1-1"
@@ -1178,7 +1178,7 @@
          id="tspan25-70-8-0">sol</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-9-5-4"
        d="m 357.02906,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -1192,7 +1192,7 @@
          x="412.02905">4</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-0-5-2"
        d="m 225.02906,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71365,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -1211,7 +1211,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-1-6-3-2"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-8-1-9"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -1229,7 +1229,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-2-64-8"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-0-33-3"
@@ -1244,7 +1244,7 @@
          transform="translate(0,-42)"
          id="g5147-3-8-0">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-7-6-4"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -1262,7 +1262,7 @@
     <path
        d="m 243.02906,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-2-8-1"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -1278,7 +1278,7 @@
      transform="translate(-206.70456,1008.8795)"
      id="g6345-9-2">
     <path
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3194-9-1-7-5"
        d="m 243.7046,-12.755463 0,-7.999995 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,7.999995 -8,0 0,-5.999995 -8,0 0,19.9999951 8,0 0,-6 8,0 0,33.9999999 -8,0 0,-5.99999 -8,0 0,19.99999 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-41.9999999 0,-8.0000001 z" />
     <text
@@ -1314,7 +1314,7 @@
     <path
        d="m 357.7046,-28.755458 120,0 0,40.000005 -120,0 0,-16.0000099 0,-2 -12,0 0,5.99999996 -4,0 0,-15.99999506 4,0 0,5.999995 12,0 0,-2 z"
        id="path21-9-9-0"
-       style="fill:#00b700;fill-opacity:1;stroke:#007b00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        y="-29.755459"
        id="text23-4-2-5"
@@ -1326,7 +1326,7 @@
          id="tspan25-78-5-0">ti</tspan>
     </text>
     <path
-       style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path21-6-4-4-2"
        d="m 357.7046,13.244537 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
     <text
@@ -1340,7 +1340,7 @@
          x="412.70459">4</tspan>
     </text>
     <path
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
        id="path3035-6-4-3"
        d="m 225.7046,-96.755443 0,-7.999997 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 18,0 60,0 8,0 c 4.41828,0 9.07159,3.71364 8,8 l 0,7.999997 -8,0 0,-5.999997 -8,0 0,19.999997 8,0 0,-6 8,0 0,8 c 0,4.418278 -3.58172,8 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -5.52285,0 -10,4.477153 -10,9.999995 l 0,8 0,92.000005 0,7.99999 c 0,5.52285 4.64205,11.3395 10,10 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.41828 -3.71364,9.0716 -8,8 l -8,0 -18,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 z" />
     <text
@@ -1359,7 +1359,7 @@
       <path
          d="m 247,1.000003 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path21-6-1-20-2-4"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          id="text23-9-82-6-4-3"
          style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
@@ -1377,7 +1377,7 @@
       <path
          d="m 133,17 0,-8 a 8,8 0 0 1 8,-8 l 8,0 20,0 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -20,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
          id="path3798-4-4-5-4-5-6"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+         style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
       <text
          y="-2.2888184e-05"
          id="text3800-3-2-0-7-48-9"
@@ -1392,7 +1392,7 @@
          transform="translate(0,-42)"
          id="g5147-5-2-2">
         <path
-           style="fill:#ff00ff;fill-opacity:1;stroke:#c700d3;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
            id="path21-8-2-1-0-6-6-8-2"
            d="m 247,43 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
         <text
@@ -1410,7 +1410,7 @@
     <path
        d="m 243.7046,-54.755443 0,-8 c 0,-4.41828 3.58172,-8 8,-8 l 8,0 0,4 20,0 0,-4 60,0 8,0 c 4.41828,0 8,3.58172 8,8 l 0,8 0,8 0,8 c 0,4.41828 -3.71364,6.92841 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -4.41828,0 -8,-3.58172 -8,-8 l 0,-8 0,0 z"
        id="path3124-7-8-1"
-       style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+       style="fill:#F2740B;fill-opacity:1;stroke:#A86129;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
