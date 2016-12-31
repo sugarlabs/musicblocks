@@ -24,9 +24,32 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" sizes="192x192" href="activity/activity-icon-color-4-00.png">
   <meta id="theme-color" name="theme-color" content="#2196F3">
+
+  <!--animation scripts -->
+  <script src="http://code.createjs.com/easeljs-0.7.1.min.js"></script>
+  <script src="http://code.createjs.com/tweenjs-0.5.1.min.js"></script>
+  <script src="http://code.createjs.com/movieclip-0.7.1.min.js"></script>
+  <script src="activity/SugarAnimation.js"></script>
+
+  <script>
+  var canvas, stage, exportRoot;
+
+  function init() {
+      canvas = document.getElementById("canvas");
+      exportRoot = new lib.SugarAnimation();
+
+      stage = new createjs.Stage(canvas);
+      stage.addChild(exportRoot);
+      stage.update();
+
+      createjs.Ticker.setFPS(lib.properties.fps);
+      createjs.Ticker.addEventListener("tick", stage);
+  }
+  </script>
+
 </head>
 
-<body data-title="index" id="body" style="background: #96D3F3;">
+<body onload="init();" data-title="index" id="body" style="background: #96D3F3;">
   <script>
     window.fbAsyncInit = function() {
         FB.init({
@@ -276,9 +299,8 @@
     };
   </script>
 
-  <!-- see activity/activity-icon-color-loading.svg for info -->
-  <img src='./activity/LoadingAnimation.gif' style="width: 80%; margin: auto; display: block;" />
-    </div>
+  <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
+  </canvas>
   <!--hidden at the beginning whilst everything loads-->
   <div id = "hideContents" style="display: none;">
     <div class="canvasHolder">
@@ -349,5 +371,3 @@
   </div>
 </body>
 </html>
-    <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
-  <!--loading image-->
