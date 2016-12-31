@@ -20,6 +20,8 @@ function Tempo () {
     this._widgetFirstTime = null;
     this._widgetNextTime = 0;
     this._interval = 0;
+    this._yradius = 25;
+    this._xradius = 25;
     this._firstClickTime = null;
 
     this.BPM;
@@ -115,15 +117,26 @@ function Tempo () {
 
             // Ensure we are at the edge.
             if (this._direction === -1) {
-                var x = 0;
                 this._direction = 1;
             } else {
-                var x = canvas.width;
                 this._direction = -1;
             }
         } else {
             // Determine new x position based on delta time.
-            var dx = canvas.width * (deltaTime / this._interval);
+            if (this._interval !== 0) {
+                var dx = (canvas.width) * (deltaTime / this._interval);
+            }
+
+            //Set this._xradius based on the dx to achieve the compressing effect
+            if (canvas.width - dx <= this._yradius) {
+                this._xradius =  canvas.width - dx;
+            } else if (dx <= this._yradius) {
+                this._xradius = dx;
+            } else {
+                this._xradius = this._yradius;
+            }
+
+            //Set x based on dx and direction
             if (this._direction === -1) {
                 var x = canvas.width - dx;
             } else {
@@ -131,11 +144,20 @@ function Tempo () {
             }
         }
 
+        //Set x value if it is undefined
+        if (x === undefined) {
+            if (this._direction === -1) {
+                x = 0;
+            } else {
+                x = canvas.width;
+            }
+        }
+
         var ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.fillStyle = '';
-        ctx.arc(x, this.cellScale * 36, 25, 0, Math.PI * 2);
+        ctx.ellipse(x, this.cellScale * 36, this._xradius, this._yradius, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
     };
