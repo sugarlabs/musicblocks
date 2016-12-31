@@ -547,8 +547,6 @@ function RhythmRuler () {
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        // FIXME: should be contained in click event
-        docById('dissectNumber').classList.add('hasKeyboard');
 
         var cell = this._addButton(row, 4, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
@@ -561,6 +559,7 @@ function RhythmRuler () {
                     history.push(that.Rulers[i][1][j]);
                 }
 
+                docById('dissectNumber').classList.add('hasKeyboard');
                 dissectHistory.push([history, that.Drums[i]]);
                 drums.push(that.Drums[i]);
             }
@@ -594,8 +593,6 @@ function RhythmRuler () {
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
-            // FIXME: should be contained in click event
-            docById('dissectNumber').classList.remove('hasKeyboard');
         };
 
         // Create a play button for each ruler

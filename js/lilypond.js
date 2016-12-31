@@ -400,7 +400,7 @@ saveLilypondOutput = function(logo, saveName) {
 	    
             // Add bar to last turtle's output.
             if (c === turtleCount - 1) {
-                logo.lilypondOutput += ' \\bar "%7C."'
+                logo.lilypondOutput += ' \\bar "|."'
             }
             logo.lilypondOutput += '\n}\n\n';
 	    
