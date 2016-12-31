@@ -64,10 +64,14 @@
             drag: function() {
                 jQuery('#rulerBody').css('top',jQuery(this).position().top);
                 jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25);
+		jQuery('#recordRhythm').css('top',jQuery(this).position().top);
+		jQuery('#recordRhythm').css('left',jQuery(this).position().left - $(window).innerWidth/25);
             },
             stop: function(){
                 jQuery('#rulerBody').css('top',jQuery(this).position().top);                     
-                jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25);                                        
+                jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25);  
+		jQuery('#recordRhythm').css('top',jQuery(this).position().top);
+		jQuery('#recordRhythm').css('left',jQuery(this).position().left - $(window).innerWidth/25);
             }
         });
     });
@@ -77,10 +81,30 @@
             drag: function() {
                 jQuery('#drumDiv').css('top',jQuery(this).position().top);
                 jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/25);
+		jQuery('#recordRhythm').css('top',jQuery(this).position().top);
+		jQuery('#recordRhythm').css('left',jQuery(this).position().left - $(window).innerWidth/25 * 2);
             },
             stop: function(){
                 jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
-                jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/25);                                        
+                jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/25);   
+		jQuery('#recordRhythm').css('top',jQuery(this).position().top);
+		jQuery('#recordRhythm').css('left',jQuery(this).position().left - $(window).innerWidth/25 * 2);
+            }
+        });
+    });
+	$(function() {
+        $('#recordRhythm').draggable({
+            drag: function() {
+                jQuery('#drumDiv').css('top',jQuery(this).position().top);
+                jQuery('#drumDiv').css('left',jQuery(this).position().left + $(window).innerWidth/25);
+		jQuery('#rulerBody').css('top',jQuery(this).position().top);
+		jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25 * 2);
+            },
+            stop: function(){
+                jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
+                jQuery('#drumDiv').css('left',jQuery(this).position().left + $(window).innerWidth/25);   
+		jQuery('#rulerBody').css('top',jQuery(this).position().top);
+		jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25 * 2);
             }
         });
     });
@@ -333,6 +357,7 @@
   <div id="rulerBody" overflow-x="auto"></div>
   <div id="dissectNumber"></div>
   <div id="drumDiv"></div>
+  <div id="recordRhythm"></div> 
   <div id="pitchstaircase" style="visibility:hidden"></div>
   <div id="pitchSliderDiv" style="visibility:hidden"></div>
   <div id="playPitch" style="visibility:hidden"></div>
