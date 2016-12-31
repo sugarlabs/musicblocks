@@ -25,9 +25,7 @@
   <link rel="icon" sizes="192x192" href="activity/activity-icon-color-4-00.png">
   <meta id="theme-color" name="theme-color" content="#2196F3">
 </head>
-
 <body data-title="index" id="body" style="background: #96D3F3;">
-
   <script>
     window.fbAsyncInit = function() {
         FB.init({
@@ -277,9 +275,7 @@
     };
 
     function playSound(soundObj) {
-        var sound = document.getElementById(soundObj);
-        sound.play();
-    
+        docById(soundObj).play();
     };
 
   </script>

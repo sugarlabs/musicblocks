@@ -864,14 +864,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         newBlock = b;
                         newConnection = i;
                         min = dist;
-
                     }
                 } 
                 else {
                     var x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];
                     var y2 = this.blockList[b].container.y + this.blockList[b].docks[i][1];
                     var dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-                    if(dist < min){
+                    if (dist < min){
                        
                         console.log('Cannot connect these two block types: Invalid Connection');
                         playSound("Error");
@@ -1007,10 +1006,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
 
-            console.log('Adjust Docks: ' + this.blockList[newBlock].name);
+            //console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
             playSound("Connect");
-            
         }
 
         // If it is an arg block, where is it coming from?
