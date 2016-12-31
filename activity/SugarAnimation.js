@@ -846,7 +846,7 @@ p.nominalBounds = new cjs.Rectangle(204,156,1496,1280);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("octave", "56px 'Myriad Pro'");
+	this.text = new cjs.Text("octave", "56px Arial");
 	this.text.lineHeight = 67;
 	this.text.setTransform(-2,-8.3);
 
@@ -859,7 +859,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,159.6,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("octave", "56px 'Myriad Pro'");
+	this.text = new cjs.Text("octave", "56px Arial");
 	this.text.lineHeight = 67;
 	this.text.setTransform(-2,-8.3);
 
@@ -872,7 +872,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,159.6,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("octave", "56px 'Myriad Pro'");
+	this.text = new cjs.Text("octave", "56px Arial");
 	this.text.lineHeight = 67;
 	this.text.setTransform(-2,-8.4);
 
@@ -885,7 +885,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.4,159.6,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("octave", "56px 'Myriad Pro'");
+	this.text = new cjs.Text("octave", "56px Arial");
 	this.text.lineHeight = 67;
 	this.text.setTransform(-2,-8.4);
 
@@ -898,7 +898,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.4,159.6,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("note", "56px 'Myriad Pro'");
+	this.text = new cjs.Text("note", "56px Arial");
 	this.text.lineHeight = 67;
 	this.text.setTransform(-2,-8.3);
 
@@ -911,7 +911,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,112,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("note", "56px 'Myriad Pro'");
+	this.text = new cjs.Text("note", "56px Arial");
 	this.text.lineHeight = 67;
 	this.text.setTransform(-2,-8.3);
 
@@ -924,7 +924,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,112,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("note", "56px 'Myriad Pro'");
+	this.text = new cjs.Text("note", "56px Arial");
 	this.text.lineHeight = 67;
 	this.text.setTransform(-2,-8.4);
 
@@ -937,7 +937,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.4,112,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("note", "56px 'Myriad Pro'");
+	this.text = new cjs.Text("note", "56px Arial");
 	this.text.lineHeight = 67;
 	this.text.setTransform(-2,-8.3);
 
@@ -950,7 +950,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,112,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("pitch", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("pitch", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.5);
 
@@ -963,7 +963,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,182.7,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("pitch", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("pitch", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.5);
 
@@ -976,7 +976,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,182.7,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("pitch", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("pitch", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -989,7 +989,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,182.7,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("pitch", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("pitch", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -1002,7 +1002,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,182.7,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("action", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("action", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -1015,7 +1015,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,221.2,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("do", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("do", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.5);
 
@@ -1028,7 +1028,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,97.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("4", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("4", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -1041,7 +1041,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,47.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("5", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("5", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.5);
 
@@ -1054,7 +1054,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,47.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("4", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("4", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.5);
 
@@ -1067,7 +1067,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,47.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("4", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("4", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -1080,7 +1080,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,47.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("Chunk 2", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("Chunk 2", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -1093,7 +1093,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,291.1,221.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("la", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("la", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -1106,7 +1106,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,64.2,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("ti", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("ti", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -1119,7 +1119,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,51.4,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text = new cjs.Text("sol", "84px 'Myriad Pro'");
+	this.text = new cjs.Text("sol", "84px Arial");
 	this.text.lineHeight = 100;
 	this.text.setTransform(-2,-11.6);
 
@@ -1132,7 +1132,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,102.8,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("octave", "56px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("octave", "56px Arial");
 	this.text_1.lineHeight = 67;
 	this.text_1.setTransform(-2,-8.3);
 
@@ -1145,7 +1145,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,159.6,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("octave", "56px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("octave", "56px Arial");
 	this.text_1.lineHeight = 67;
 	this.text_1.setTransform(-2,-8.3);
 
@@ -1158,7 +1158,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,159.6,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("octave", "56px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("octave", "56px Arial");
 	this.text_1.lineHeight = 67;
 	this.text_1.setTransform(-2,-8.4);
 
@@ -1171,7 +1171,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.4,159.6,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("octave", "56px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("octave", "56px Arial");
 	this.text_1.lineHeight = 67;
 	this.text_1.setTransform(-2,-8.4);
 
@@ -1184,7 +1184,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.4,159.6,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("note", "56px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("note", "56px Arial");
 	this.text_1.lineHeight = 67;
 	this.text_1.setTransform(-2,-8.3);
 
@@ -1197,7 +1197,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,112,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("note", "56px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("note", "56px Arial");
 	this.text_1.lineHeight = 67;
 	this.text_1.setTransform(-2,-8.3);
 
@@ -1210,7 +1210,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,112,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("note", "56px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("note", "56px Arial");
 	this.text_1.lineHeight = 67;
 	this.text_1.setTransform(-2,-8.4);
 
@@ -1223,7 +1223,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.4,112,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("note", "56px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("note", "56px Arial");
 	this.text_1.lineHeight = 67;
 	this.text_1.setTransform(-2,-8.3);
 
@@ -1236,7 +1236,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-8.3,112,70.9);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("pitch", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("pitch", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.5);
 
@@ -1249,7 +1249,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,182.7,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("pitch", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("pitch", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.5);
 
@@ -1262,7 +1262,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,182.7,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("pitch", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("pitch", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
@@ -1275,7 +1275,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,182.7,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("pitch", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("pitch", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
@@ -1288,7 +1288,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,182.7,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("action", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("action", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
@@ -1301,7 +1301,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,221.2,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("fa", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("fa", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.5);
 
@@ -1314,7 +1314,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,68.8,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("4", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("4", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
@@ -1327,7 +1327,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,47.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("4", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("4", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.5);
 
@@ -1340,7 +1340,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,47.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("4", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("4", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.5);
 
@@ -1353,7 +1353,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.5,47.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("4", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("4", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
@@ -1366,7 +1366,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,47.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("Chunk 1", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("Chunk 1", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
@@ -1379,7 +1379,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,291.1,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("re", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("re", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
@@ -1392,7 +1392,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,73.3,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("mi", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("mi", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
@@ -1405,7 +1405,7 @@ p.nominalBounds = new cjs.Rectangle(-2,-11.6,93.4,104.4);
 	this.initialize();
 
 	// Layer 1
-	this.text_1 = new cjs.Text("do", "84px 'Myriad Pro'");
+	this.text_1 = new cjs.Text("do", "84px Arial");
 	this.text_1.lineHeight = 100;
 	this.text_1.setTransform(-2,-11.6);
 
