@@ -1722,23 +1722,24 @@ define(function (require) {
 
         // Calculate time such that no matter how long loading the program takes, the loading animation will cycle at least once
         function loadStartWrapper() {
-            var time1 = performance.now();
+            var time1 = new Date();
             _loadStart();
-            var time2 = performance.now();
-            var elapsedTime = time2 - time1;
-            var timeLeft = 4000 - elapsedTime;
+            var time2 = new Date();
+            var elapsedTime = time2.getTime() - time1.getTime();
+            var timeLeft = 6000 - elapsedTime;
 
-            //In case timeLeft is a negative number (might bug 'setTimeout'
+            //In case timeLeft is a negative number (might bug 'setTimeout')
             if (timeLeft < 0){
-                timeLeft = 0;
+                timeLeft = 0
             }
 
             setTimeout(showContents, timeLeft);
+
         }
 
         // Hides the loading animation and unhides the background
         function showContents(){
-        docById('loading-image-container').style.display = 'none';
+        docById('canvas').style.display = 'none';
         docById('hideContents').style.display = 'block';
         }
 
