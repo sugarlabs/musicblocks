@@ -94,7 +94,7 @@ At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [pitch block](#PITCH) that specifies the duration
 (note value) of the pitch. 
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'/>
 
 At the top of the example above, a single (detached) *Note value* block is
 shown. The `1/8` is value of the note, which is, in this case, an eighth note. 
@@ -102,7 +102,7 @@ shown. The `1/8` is value of the note, which is, in this case, an eighth note.
 At the bottom, two notes that are played consecutively are
 shown. They are both `1/8` notes, making the duration of the entire sequence `1/4`. 
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg'/>
 
 In this example, different note values are shown. From top to bottom, they are: 
 `1/4` for an quarter note, `1/16` for a sixteenth note, and `1/2` for a half
@@ -110,7 +110,7 @@ note.
 
 Note that any mathematical operations can be used as input to the *Note value*.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg'/>
 Please refer to the above picture for a visual representation of note values.
 
 <a name="PITCH">
@@ -121,7 +121,7 @@ As we have seen, *Pitch* blocks are used inside the [*Note value*] (#NOTE-VALUE)
 blocks. The *Pitch* block specifies the pitch name and pitch octave of a note
 that in combination determines the frequency (and therefore pitch) at which the note is played.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'/>
 
 There are many systems you can use to specify a *pitch* block's name and octave. Some examples are
 shown above. The top pitch block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
@@ -135,13 +135,13 @@ frequency, the octave is ignored.
 
 Note that the pitch name can also be specified using a *Text* block. 
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg'/>
 Please refer to the above picture for a visual representation of where notes are located on a keyboard or staff.
 
 <a name="CHORDS">
 ### 2.3 Chords
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg'/>
 
 A chord (multiple, simultaneous pitches) can be specified by adding
 multiple *Pitch* blocks into a single *Note value* block, like the above example.
@@ -150,7 +150,7 @@ multiple *Pitch* blocks into a single *Note value* block, like the above example
 ### 2.4 Rests
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg'/>
 
 A rest of the specified note value duration can be constructed using a *Silence* block in place of a *pitch* block.
 
@@ -158,14 +158,14 @@ A rest of the specified note value duration can be constructed using a *Silence*
 ### 2.5 Drums
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg'/>
 
 Anywhere  a *Pitch* block can be used&mdash;e.g., inside of the matrix or a
 *Note value* block&mdash;a *Drum Sample* block can also be used instead. Currently there
 about two dozen different samples from which to choose. The default
 drum is a kick drum.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg'/>
 
 Just as in the [chord](#CHORD) example above, you can use multiple *Drum* blocks
 within a single *Note value* blocks, and combine them with *Pitch*
@@ -185,9 +185,9 @@ hand or use the [*Pitch-time Matrix*](#pitch-time) widget to help you get starte
 ### 3.1 Chunks
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk1.svg'/>
 
 Every time you create a new *Action* stack, Music Blocks creates a new
 block specific to, and linked with, that stack. (The new block is
@@ -213,23 +213,23 @@ that when any of the start buttons is pressed, the code inside the *Start* block
 be executed. You can add more chunks after this one inside the *Start* block to execute them
 sequentially.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk2.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk3.svg'/>
 
 You can [repeat](#REPETITION) chunks either by using multiple *Chunk* blocks or using a
 *Repeat* block.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk4.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk5.svg'/>
 
 You can also mix and match chunks. Here we play the action block with
 name "chunk", followed by "chunk1" twice, and then "chunk" again.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk6.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/chunk7.svg'/>
 
 A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
@@ -243,7 +243,7 @@ There are many ways to transform pitch, rhythm, and other sonic qualities.
 <a name="STEP-PITCH">
 #### 3.2.1 Step Pitch Block
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform0.svg'/>
 
 The *Step Pitch* block will move up or down notes in a scale from the
 last played note. In the example above, *Step Pitch* blocks are used inside
@@ -254,7 +254,7 @@ of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
 <a name="SHARPS-AND-FLATS">
 #### 3.2.2 Sharps And Flats
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg'/>
 
 The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
 *Note value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by one
@@ -266,7 +266,7 @@ right, both pitch blocks are raised by one half step.
 #### 3.2.3 Adjust-Transposition
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform2.svg'/>
 
 The *Adjust-transposition* block can be used to make larger shifts in
 pitch in half step units. A positive number shifts the pitch up and a
@@ -274,7 +274,7 @@ negative number shifts the pitch down. The input must be a whole
 number. To shift an entire octave, transpose by 12 half-steps up. -12
 will shift an octave down.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform3.svg'/>
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
@@ -282,7 +282,7 @@ raise it by one octave.
 <a name="DOTTED">
 #### 3.2.4 Dotted Notes
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform4.svg'/>
 
 You can "dot" notes using the *Dot* block. A dotted note extends the rhythmic duration of a note by
 50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a
@@ -293,7 +293,7 @@ You can also simply change the note value to mimic a dotted note, for example in
 <a name="MULTIPLY-AND-DIVIDE">
 #### 3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform5.svg'/>
 
 You can also multiply (or divide) the beat value, which will speed up
 or slowdown the notes. Multiplying the beat value of an `1/8` note by
@@ -305,7 +305,7 @@ note.
 #### 3.2.6 Repeating Notes
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform6.svg'/>
 
 There are several ways to repeat notes. The *Repeat* block will play a
 sequence of notes multiple times; the *Duplicate* block will repeat each
@@ -319,7 +319,7 @@ Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 #### 3.2.7 Swinging Notes and Tied Notes
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform7.svg'/>
 
 The *Swing* block works on pairs of notes (specified by note value),
 adding some duration (specified by swing value) to the first note and
@@ -338,7 +338,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 #### 3.2.8 Set Volume, Crescendo, Staccato, and Slur
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform8.svg'/>
 
 The *Set volume* block will change the volume of the notes. The
 default is 50; the range is 0 (silence) to 100 (full volume).
@@ -359,7 +359,7 @@ maintaining the specified rhythmic value of the notes.
 <a name="INTERVALS-AND-ARTICULATION">
 #### 3.2.9 Intervals and Articulation
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'/>
 
 The *Interval* block calculates a relative interval, e.g., a fifth,
 and adds the additional pitches to a note's playback. In the figure,
@@ -370,7 +370,7 @@ The *Articulation* block changes the volume of a group of notes without affectin
 <a name= "ABSOLUTE-INTERVALS">
 #### 3.2.10 Absolute Intervals
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform14.svg'/>
 
 The *Augmented* block calculates an absolute interval, e.g., an
 augmented fifth, and adds the additional pitches to a note. Similarly,
@@ -387,7 +387,7 @@ followed by chord of E5 and G6.
 #### 3.2.11 Inversion
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg'/>
 
 The *Invert* block will invert a series of notes around a target
 note. There are two different versions of the *Invert* block: *odd*
@@ -403,7 +403,7 @@ around a point midway between `G4` and `G♯4` resulting in a `C♯5`
 #### 3.2.12 Backwards
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform11.svg'/>
 
 The *Backward* block will play the contained notes in reverse order
 (retrograde). In the example above, the notes in *Chunk* are played as
@@ -421,12 +421,12 @@ notes.
 #### 3.2.13 Setting Voice and Keys
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform12.svg'/>
 
 The *Set Voice* block selects a [voice](#VOICES) for the synthesizer for any
 contained blocks, e.g., violin or cello.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform10.svg'/>
 
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
@@ -436,7 +436,7 @@ This block allows users to access "movable Do" within Music
 Blocks, where the mapping of solfege to particular pitch changes
 depending on the user's specified tonality.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum4.svg'/>
 
 In the above example, the sequence of [drum](#DRUMS) beats is increased over time.
 
@@ -450,25 +450,25 @@ Each *Start* block runs as a separate voice in Music Blocks. (When
 you click on the Run button, all of the *Start* blocks are run
 concurrently.)
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices1.svg'/>
 
 If we put our song into an action...
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices2.svg'/>
 
 ...we can run it from multiple *Start* blocks.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices3.svg'/>
 
 It gets more interesting if we shift up and down octaves.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg'/>
 
 And even more interesting if we bring the various voices offset in time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg'/>
 
 A special "drum" version of the *Start* block is available for laying
 down a drum track. Any pitch blocks encounted while starting from a
@@ -480,9 +480,9 @@ drum.
 ### 3.4 Adding graphics
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics1.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics2.png'/>
 
 Turtle graphics can be combined with the music blocks. By placing
 graphics blocks, e.g., *Forward* and *Right*, inside of *Note value*
@@ -492,21 +492,21 @@ right during the eighth note. The pitch is raised by one half step,
 the pen size decreases, and the pen color increases at each step in
 the inner repeat loop.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics3.svg'/>
 
 In this example, the graphics are synchronized to the music by placing
 the graphics commands inside of *Note value* blocks.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb&run=true)
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg'/>
 
 In this example, because the computation and graphics are more
 complex, a *Free-time* block is used to decouple the graphics from the
 master clock. The "Free-time* block prioritizes the sequence of
 actions over the specified rhythm.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png'/>
 
 <a name="INTERACTIONS">
 ### 3.5 Interactions
@@ -515,7 +515,7 @@ actions over the specified rhythm.
 There are many ways to interactive with Music Blocks, including
 tracking the mouse position to impact some aspect of the music.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive.svg'/>
 
 For example, we can launch the phrases (chunks) interactively. When
 the mouse is in the lower-left quadrant, `chunk` is played;
@@ -524,7 +524,7 @@ upper-right quadrant, `chunk3`.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb&run=true)
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'/>
 
 In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
@@ -532,7 +532,7 @@ make an 8-key piano?
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb&run=true)
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg'/>
 
 You can also add a bit of randomness to your music. In the top example
 above, the *One-of* block is used to randomly assign either `Do` or
@@ -553,9 +553,9 @@ to enhance your experience.
 ### 4.1 Status
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status1.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status2.svg'/>
 
 The *Status widget* is a tool for inspecting the status of Music
 Blocks as it is running. By default, the key, BPM, and volume are
@@ -567,7 +567,7 @@ display additional music factors, e.g., duplicate, transposition,
 skip, [staccato](#MORE-TRANSFORMATIONS), [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors, e.g., x, y, heading,
 color, shade, grey, and pensize.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/status3.svg'/>
 
 You can do additional programming within the status block. In the
 example above, the volume is divided by 10 before being displayed.
@@ -581,7 +581,7 @@ Using the Pitch-Time Matrix, it is possible to generate chunks of notes at a muc
 #### 4.2.1 The Pitch-Time Matrix
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix1.svg'/>
 
 Music Blocks provides a widget, the *Pitch-time Matrix*, as a scaffold
 for getting started.
@@ -591,7 +591,7 @@ on the *Pitch-time Matrix* stack that appears in the middle of the
 screen. (For the moment, ignore the *Start* block.) You'll see a grid
 organized vertically by pitch and horizontally by rhythm.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix2.svg'/>
 
 The matrix in the figure above has three *Pitch* blocks and one
 *Rhythm* block, which is used to create a 3 x 3 grid of pitch and
@@ -605,7 +605,7 @@ notes followed by one half note. Since the *Rhythm* blocks are inside
 of a *Repeat* block, there are fourteen (2 x 7) columns for selecting
 notes.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix3.svg'/>
 
 By clicking on individual cells in the grid, you should hear
 individual notes (or chords if you click on more than one cell in a
@@ -614,7 +614,7 @@ cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg'
-height="36"</img>
+height="36"/>
 
 If you click on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `Re 4`,
@@ -622,7 +622,7 @@ you will hear a sequence of notes played (from left to right): `Re 4`,
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg'
-height="36"</img>
+height="36"/>
 
 Once you have a group of notes (a "chunk") that you like, click on the
 *Save* button (just to the right of the *Play* button). This will
@@ -634,21 +634,21 @@ as well.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/sort.svg'
-height="36"</img>
+height="36"/>
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg'
-height="36"</img>
+height="36"/>
 
 You can hide the matrix by clicking on the *Close* button (the right-most
 button in the top row of the grid.)
 
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg'
-height="36"</img>
+height="36"/>
 
 There is also an Erase button that will clear the grid.
 
@@ -659,7 +659,7 @@ want, feel free to experiment.
 Tip: You can put a chunk inside a *Pitch-time Matrix* block to generate
 the matrix to corresponds to that chunk.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix4.svg'/>
 
 The chunk created when you click on the matrix is a stack of
 blocks. The blocks are nested: an *Action* block contains three *Note
@@ -680,7 +680,7 @@ action). You should hear the notes play, ordered from top to bottom.
 #### 4.2.2 The Rhythm Block
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix6.svg'/>
 
 *Rhythm* blocks are used to generate rhythm patterns in the
 *Pitch-time Matrix* block. The top argument to the *Rhythm* block
@@ -690,9 +690,9 @@ would be generated in the matrix. In the middle example, one column
 for an eighth note would be generated. In the bottom example, seven
 columns for 16th notes would be generated.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix7.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix7.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix8.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix8.svg'/>
 
 You can use as many *Rhythm* blocks as you'd like inside the
 *Pitch-time Matrix* block. In the above example, two *Rhythm*
@@ -703,9 +703,9 @@ notes.
 #### 4.2.3 Creating Tuplets
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix10.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix10.svg'/>
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
@@ -719,7 +719,7 @@ defining your matrix.
 <a name= "INDIVIDUAL-NOTES">
 #### 4.2.4 Using individual notes in the matrix
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg'/>
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
@@ -732,7 +732,7 @@ The *Rhythm Ruler* block is used to launch a widget similar to the
 *Pitch-time Matrix* block. The widget can be used to generate rhythmic
 patterns.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm1.svg'/>
 
 The argument to the *Rhythm Ruler* block specifies the duration that
 will be subdivided to generate a rhythmic pattern. By default, it is 1
@@ -743,7 +743,7 @@ block indicates the number of rhythms to be defined simultaneously. By
 default, two rhythms are defined. The embedded *Rhythm* blocks define
 the initial subdivision of each rhythm ruler.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm2.svg'/>
 
 When the *Rhythm Ruler* block is clicked, the *Rhythm Ruler* widget is
 opened. It contains a row for each rhythm ruler. An input in the top
@@ -751,7 +751,7 @@ row of the widget is used to specify how many subdivisions will be
 created within a cell when it is clicked. By default, 2 subdivisions
 are created.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm3.svg'/>
 
 As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
@@ -760,22 +760,22 @@ will playback the rhythm using a drum for each beat. The *Play-all*
 button on the upper-left of the widget will play back all rhythms
 simultaneously.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg'/>
 
 The rhythm can be further subdivided by clicking in individual
 cells. In the example above, two quarter-notes have been created by
 clicking on one of the half-notes.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg'/>
 
 The *Save stack* button will export rhythm stacks.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm6.svg'/>
 
 These stacks of rhythms can be used to define rhythmic patterns used
 with the *Pitch-time Matrix* block.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm7.svg'/>
 
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
@@ -801,14 +801,14 @@ Note that not every mode uses 7 intervals per octave. For example, the
 2, 3, 2],`. What is important is that the sum of the intervals
 in an octave is 12 half-steps.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode1.svg'/>
 
 The *Mode* widget lets you explore modes and generate custom
 modes. You invoke the widget with the *Custom mode* block. The mode
 specified in the *Set key* block will be the default mode when the
 widget launches.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode2.svg'/>
 
 In the above example, the widget has been launched with *Major* mode
 (the default). Note that the notes included in the mode are indicated by
@@ -845,24 +845,24 @@ You can also click on individual notes to activate or deactivate them.
 Note that the mode inside the *Custom mode* block is updated whenever
 the mode is changed inside the widget.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode3.svg'/>
 
 In the above example, the *Major* mode has been rotated clockwise,
 transforming it into *Dorian*.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode4.svg'/>
 
 In the above example, the *Major* mode has been rotated
 counter-clockwise, transforming it into *Locrian*.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode5.svg'/>
 
 In the above example, the *Major* mode has been inverted, transforming
 it into *Phrygian*.
 
 Note: The build-in modes in Music Blocks can be found in [musicutils.js] (https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg'/>
 
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Pitch-time Matrix* block.
@@ -871,20 +871,20 @@ can be used inside the *Pitch-time Matrix* block.
 ### 4.5 The Pitch-Drum Matrix
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum2.svg'/>
 
 The *Set Drum* block is used to map the enclosed pitches into drum
 sounds. Drum sounds are played in a monopitch using the specified drum
 sample. In the example above, a `kick drum` will be substitued for
 each occurance of a `Re` `4`.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum8.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum5.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum6.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum6.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum7.svg'/>
 
 As an expedience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
@@ -902,7 +902,7 @@ The *Pitch* blocks contained in the clamp of the *Pitch Staircase*
 block define the pitches to be initialized simultaneously. By default,
 one pitch is defined and it have default note "la" and octave "3".
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase0.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase0.svg'/>
 
 When *Pitch Staircase* block is clicked, the *Pitch Staircase* widget is
 initialized. The widget contains row for every *Pitch* block contained
@@ -912,11 +912,11 @@ pitches in the staircase. The inputs correspond to the numerator and
 denominator in the proportion resectively. By default the proportion
 is 3:2.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase1.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase2.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase3.svg'/>
 
 Clicking on the *Play* button to the left of each row will playback
 the notes associated with that step in the stairs. The *Play-all*
@@ -928,12 +928,12 @@ decreasing order of frequency as well, completing a scale.
 The *Save stack* button will export pitch stacks. For example, in the above 
 configuration, the output  from pressing the *Save stack* button is shown below:
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase4.svg'/>
 
 These stacks can be used with the *Pitch-time Matrix* block to define
 the rows in the matrix.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchstaircase5.svg'/>
 
 <a name="slider">
 ### 4.7 Generating Arbritary Pitches
@@ -947,9 +947,9 @@ the range of a specified octave.
 Each *Sine* block contained within the clamp of the *Pitch Slider* block defines the initial pitch
 for an ocatve.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider1.svg'/>
 
 When the *Pitch Slider* block is clicked, the *Pitch Slider* widget is
 initialized. The widget will have one column for each *Sine* block in
@@ -959,17 +959,17 @@ starting frequency. The mouse is used to move the frequency up and down continuo
 used for intervals. Arrow keys can also be used to move up and down,
 or between columns.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider0a.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider2.svg'/>
 
 CLicking in a column will extact the corresponding *Note* blocks, for example:
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider3.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider4.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider4.svg'/>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider5.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/pitchslider5.svg'/>
 
 <a name="tempo">
 ### 4.8 Changing Tempo
@@ -985,13 +985,13 @@ determines the speed at which the ball in the widget moves back and
 forth. If BPM is 60, then it will take one second for the ball to move
 across the widget. A round-trip would take two seconds.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo0.svg'/>
 
 The top row of the widget holds the *Play/pause* button, the *Speed
 up* and *Slow down* buttons, and an input field for updating the
 Tempo.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/tempo1.svg'/>
 
 You can also update the tempo by clicking twice in spaced succession in the
 widget: the new BPM is determined as the time between the two clicks. For
@@ -1007,13 +1007,13 @@ Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools. One such tool is
 [Lilypond](http://lilypond.org), a music engraving program.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond1.svg'/>
 
 The *Save as Lilypond* block will transcribe your composition. The
 output of the program above is saved to `Downloads/hotdog.ly`. There is
 also a *Save as Lilypond* button on the secondary toolbar.
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond2.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/lilypond2.svg'/>
 
 ```
 \version "2.18.2"
@@ -1035,6 +1035,6 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 }
 ```
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/hotdog.png'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/hotdog.png'/>
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_hotdog.tb&run=true)
