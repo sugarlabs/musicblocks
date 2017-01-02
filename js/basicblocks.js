@@ -2039,7 +2039,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     toFrequencyBlock.defaults.push('A');
     toFrequencyBlock.defaults.push('4');
     toFrequencyBlock.twoArgMathBlock();
-    toFrequencyBlock.dockTypes[1] = 'anyin';
+    toFrequencyBlock.dockTypes[1] = 'notein';
     toFrequencyBlock.dockTypes[2] = 'numberin';
 
     var shellBlock = new ProtoBlock('turtleshell');
