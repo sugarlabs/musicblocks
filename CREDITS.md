@@ -25,27 +25,28 @@ inspired new features and improvements.
 Related Websites
 ----------------
 http://www.larryscripp.net/
+
 http://centerformie.org/
+
 http://music-in-education.org/
+
 http://www.richardhermann.net/
+
 http://www.devinulibarri.com/
 
 Some of the graphics were contributed by Chie Yasuda (the Mouse theme
 originates with her). She also has been very patient with Devin as he
-works on this--thanks Chie!
+works on this&mdash;thanks Chie!
 
 Much of the initial coding was done by Yash Khandelwal as part of
 Google Summer of Code (GSOC) 2015. Hemant Kasat worked on additional
 widgets as part of GSOC 2016. Many students contributed to various
 parts of the code, bug reports, and other important tasks as part of
-Google Code-in (GCI) 2015-16.
+Google Code-in (GCI) 2015&ndash;16.
 
 Libraries specific to Music Blocks
 ----------------------------------
 
-tonejs --> Web audio framework for creating interactive music in the
-browser
-[Tone.js](https://github.com/Tonejs/Tone.js/blob/master/README.md)
+[Tone.js](https://github.com/Tonejs/Tone.js/blob/master/README.md) Web audio framework for creating interactive music using Javascript
 
-createjs --> library for creating HTML5 animation 
-[createjs](#https://github.com/CreateJS)
+[createjs](#https://github.com/CreateJS) library for creating HTML5 animation
