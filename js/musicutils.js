@@ -927,21 +927,39 @@ function pitchToNumber(pitch, octave, keySignature) {
         return 0;
     }
 
-    if (pitch in BTOFLAT) {
-        pitch = BTOFLAT[pitch];
-    } else if (pitch in STOSHARP) {
-        pitch = STOSHARP[pitch];
+    // Check for flat, sharp, double flat, or double sharp.
+    var transposition = 0;
+    var len = pitch.length;
+    if (len > 1) {
+        if (len > 2) {
+            var lastTwo = pitch.slice(len - 2);
+            if (lastTwo === 'bb' || lastTwo === '♭♭') {
+                pitch = pitch.slice(0, len - 2);
+                transposition -= 2;
+            } else if (lastTwo === '##' || lastTwo === '♯♯') {
+                pitch = pitch.slice(0, len - 2);
+                transposition += 2;
+            } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
+                // Not sure this could occur... but just in case.
+                pitch = pitch.slice(0, len - 2);
+            }
+	}
+
+        if (pitch.length > 1) {
+            var lastOne = pitch.slice(len - 1);
+            if (lastOne === 'b' || lastOne === '♭') {
+                pitch = pitch.slice(0, len - 1);
+                transposition -= 1;
+            } else if (lastOne === '#' || lastOne === '♯') {
+                pitch = pitch.slice(0, len - 1);
+                transposition += 1;
+            }
+        }
     }
 
     var pitchNumber = 0;
     if (PITCHES.indexOf(pitch) !== -1) {
         pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
-    } else if (PITCHES1.indexOf(pitch.toUpperCase()) !== -1) {
-        pitchNumber = PITCHES1.indexOf(pitch.toUpperCase());
-    } else if (PITCHES2.indexOf(pitch.toUpperCase()) !== -1) {
-        pitchNumber = PITCHES2.indexOf(pitch.toUpperCase());
-    } else if (PITCHES3.indexOf(pitch.toUpperCase()) !== -1) {
-        pitchNumber = PITCHES3.indexOf(pitch.toUpperCase());
     } else {
         // obj[1] is the solfege mapping for the current key/mode
         var obj = getScaleAndHalfSteps(keySignature)
@@ -954,7 +972,7 @@ function pitchToNumber(pitch, octave, keySignature) {
     }
 
     // We start at A0.
-    return Math.max(octave, 0) * 12 + pitchNumber - PITCHES.indexOf('A');
+    return Math.max(octave, 0) * 12 + pitchNumber - PITCHES.indexOf('A') + transposition;
 };
 
 
