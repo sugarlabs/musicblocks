@@ -1,6 +1,6 @@
 <img
 src='https://rawgithub.com/walterbender/musicblocks/master/Minsky.jpg'/>
-Photo by Cynthia Solomon (2016)
+Photo by Cynthia Solomon (CC-BY 2016)
 
 Marvin Minsky, the inventor of the digital synthesizer, inspired a
 music extension of the Logo programming language in the early
@@ -49,4 +49,4 @@ Libraries specific to Music Blocks
 
 [Tone.js](https://github.com/Tonejs/Tone.js/blob/master/README.md) Web audio framework for creating interactive music using Javascript
 
-[createjs](#https://github.com/CreateJS) library for creating HTML5 animation
+[Create.js](https://github.com/CreateJS) a Javascript library for creating HTML5 graphics and animation
