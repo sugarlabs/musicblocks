@@ -41,3 +41,6 @@ browser
 vexflow --> Allows to create standard music notation and guitar
 tablature [Vexflow](http://www.vexflow.com/)
 
+createjs --> library for creating HTML5 animation 
+[createjs](#https://github.com/CreateJS)
+

@@ -837,7 +837,7 @@ define(function (require) {
                 }, 2000);
             } else {
                 setTimeout(function () {
-                    _loadStart();
+                    loadStartWrapper();
                 }, 2000);
             }
 
@@ -846,6 +846,7 @@ define(function (require) {
 
             this.document.onkeydown = __keyPressed;
             _hideStopButton();
+
         };
 
         function _setupBlocksContainerEvents() {
@@ -1644,7 +1645,7 @@ define(function (require) {
                     saveLocally();
                 } catch (e) {
                     console.log(e);
-                    _loadStart();
+                    loadStartWrapper();
                 }
 
                 // Restore default cursor
@@ -1680,7 +1681,7 @@ define(function (require) {
         };
 
         function saveProject(projectName) {
-            // palettes.updatePalettes();
+           // palettes.updatePalettes();
             // Show busy cursor.
             document.body.style.cursor = 'wait';
             setTimeout(function () {
@@ -1717,6 +1718,31 @@ define(function (require) {
                 }
             }, 200);
         };
+
+
+        // Calculate time such that no matter how long loading the program takes, the loading animation will cycle at least once
+        function loadStartWrapper() {
+            var time1 = new Date();
+            _loadStart();
+            var time2 = new Date();
+            var elapsedTime = time2.getTime() - time1.getTime();
+            var timeLeft = 6000 - elapsedTime;
+
+            //In case timeLeft is a negative number (might bug 'setTimeout')
+            if (timeLeft < 0){
+                timeLeft = 0
+            }
+
+            setTimeout(showContents, timeLeft);
+
+        }
+
+        // Hides the loading animation and unhides the background
+        function showContents(){
+        docById('canvas').style.display = 'none';
+        docById('hideContents').style.display = 'block';
+        }
+
 
         function _loadStart() {
             // where to put this?
@@ -1761,7 +1787,7 @@ define(function (require) {
 
             update = true;
 
-            docById('loading-image-container').style.display = 'none';
+
         };
 
         function hideMsgs() {
