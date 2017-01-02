@@ -110,6 +110,9 @@ note.
 
 Note that any mathematical operations can be used as input to the *Note value*.
 
+<img src='https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg'</img>
+Please refer to the above picture for a visual representation of note values.
+
 <a name="PITCH">
 ### 2.2 Pitch Blocks
 </a>
@@ -132,7 +135,7 @@ frequency, the octave is ignored.
 
 Note that the pitch name can also be specified using a *Text* block. 
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/Keyboard%20Chart.svg'</img>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg'</img>
 Please refer to the above picture for a visual representation of where notes are located on a keyboard or staff.
 
 <a name="CHORDS">
