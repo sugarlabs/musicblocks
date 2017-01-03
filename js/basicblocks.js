@@ -1256,35 +1256,35 @@ function initBasicProtoBlocks(palettes, blocks) {
     // TURTLE PALETTE
 
     var headingBlock = new ProtoBlock('heading');
-    headingBlock.palette = palettes.dict['turtle'];
+    headingBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['heading'] = headingBlock;
     headingBlock.staticLabels.push(_('heading'));
     headingBlock.adjustWidthToLabel();
     headingBlock.parameterBlock();
 
     var xBlock = new ProtoBlock('x');
-    xBlock.palette = palettes.dict['turtle'];
+    xBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['x'] = xBlock;
     xBlock.staticLabels.push(_('x'));
     xBlock.adjustWidthToLabel();
     xBlock.parameterBlock();
 
     var yBlock = new ProtoBlock('y');
-    yBlock.palette = palettes.dict['turtle'];
+    yBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['y'] = yBlock;
     yBlock.staticLabels.push(_('y'));
     yBlock.adjustWidthToLabel();
     yBlock.parameterBlock();
 
     var clearBlock = new ProtoBlock('clear');
-    clearBlock.palette = palettes.dict['turtle'];
+    clearBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['clear'] = clearBlock;
     clearBlock.staticLabels.push(_('clear'));
     clearBlock.adjustWidthToLabel();
     clearBlock.zeroArgBlock();
 
     var controlPoint2Block = new ProtoBlock('controlpoint2');
-    controlPoint2Block.palette = palettes.dict['turtle'];
+    controlPoint2Block.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['controlpoint2'] = controlPoint2Block;
     controlPoint2Block.staticLabels.push(_('control point 2'), _('x'), _('y'));
     controlPoint2Block.adjustWidthToLabel();
@@ -1295,7 +1295,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     controlPoint2Block.dockTypes[2] = 'numberin';
 
     var controlPoint1Block = new ProtoBlock('controlpoint1');
-    controlPoint1Block.palette = palettes.dict['turtle'];
+    controlPoint1Block.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['controlpoint1'] = controlPoint1Block;
     controlPoint1Block.staticLabels.push(_('control point 1'), _('x'), _('y'));
     controlPoint1Block.adjustWidthToLabel();
@@ -1306,7 +1306,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     controlPoint1Block.dockTypes[2] = 'numberin';
 
     var bezierBlock = new ProtoBlock('bezier');
-    bezierBlock.palette = palettes.dict['turtle'];
+    bezierBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['bezier'] = bezierBlock;
     //.TRANS: Bézier curves employ at least three points to define a curve
     bezierBlock.staticLabels.push(_('bezier'), _('x'), _('y'));
@@ -1318,7 +1318,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     bezierBlock.dockTypes[2] = 'numberin';
 
     var arcBlock = new ProtoBlock('arc');
-    arcBlock.palette = palettes.dict['turtle'];
+    arcBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['arc'] = arcBlock;
     arcBlock.staticLabels.push(_('arc'), _('angle'), _('radius'));
     arcBlock.adjustWidthToLabel();
@@ -1328,7 +1328,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     arcBlock.dockTypes[1] = 'numberin';
 
     var setheadingBlock = new ProtoBlock('setheading');
-    setheadingBlock.palette = palettes.dict['turtle'];
+    setheadingBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['setheading'] = setheadingBlock;
     setheadingBlock.staticLabels.push(_('set heading'));
     setheadingBlock.adjustWidthToLabel();
@@ -1336,7 +1336,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setheadingBlock.defaults.push(0);
 
     var setxyBlock = new ProtoBlock('setxy');
-    setxyBlock.palette = palettes.dict['turtle'];
+    setxyBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['setxy'] = setxyBlock;
     setxyBlock.staticLabels.push(_('set xy'), _('x'), _('y'));
     setxyBlock.adjustWidthToLabel();
@@ -1346,7 +1346,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setxyBlock.dockTypes[1] = 'numberin';
 
     var rightBlock = new ProtoBlock('right');
-    rightBlock.palette = palettes.dict['turtle'];
+    rightBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['right'] = rightBlock;
     rightBlock.staticLabels.push(_('right'));
     rightBlock.adjustWidthToLabel();
@@ -1354,7 +1354,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     rightBlock.defaults.push(90);
 
     var leftBlock = new ProtoBlock('left');
-    leftBlock.palette = palettes.dict['turtle'];
+    leftBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['left'] = leftBlock;
     leftBlock.staticLabels.push(_('left'));
     leftBlock.adjustWidthToLabel();
@@ -1362,7 +1362,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     leftBlock.defaults.push(90);
 
     var backBlock = new ProtoBlock('back');
-    backBlock.palette = palettes.dict['turtle'];
+    backBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['back'] = backBlock;
     backBlock.staticLabels.push(_('back'));
     backBlock.adjustWidthToLabel();
@@ -1370,7 +1370,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     backBlock.defaults.push(100);
 
     var forwardBlock = new ProtoBlock('forward');
-    forwardBlock.palette = palettes.dict['turtle'];
+    forwardBlock.palette = palettes.dict['mouse'];
     blocks.protoBlockDict['forward'] = forwardBlock;
     forwardBlock.staticLabels.push(_('forward'));
     forwardBlock.adjustWidthToLabel();
