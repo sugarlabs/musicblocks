@@ -14,7 +14,9 @@
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'notename', 'voicename', 'modename', 'drumname'];
+//Emily: Added eastindiansolfege to specialinputs
+//CHECKED: No errors in Javascript console
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'notename', 'voicename', 'modename', 'drumname', 'eastindiansolfege'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -243,6 +245,8 @@ function Block(protoblock, blocks, overrideName) {
             this._positionCollapseLabel(scale);
         }
     };
+
+    //Emily: Just wondering, is there a need to add a case for eastindiansolfege?
 
     this.newArtwork = function(plusMinus) {
         switch (this.name) {
@@ -607,6 +611,11 @@ function Block(protoblock, blocks, overrideName) {
                 case 'solfege':
                     this.value = 'la';
                     break;
+                //Emily: Added case for eastindiansolfege
+                //CHECKED: No errors in Javascript console
+                case 'eastindiansolfege':
+                    this.value = 'la'; //Emily: Should this be 'la' or 'dha'? 
+                    break;
                 case 'notename':
                     this.value = 'A';
                     break;
@@ -629,20 +638,37 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.name === 'solfege') {
-                var obj = splitSolfege(this.value);
-		var label = i18nSolfege(obj[0]);
-                var attr = obj[1];
+            var obj = splitSolfege(this.value);
+            var label = i18nSolfege(obj[0]);
+            var attr = obj[1];
 
-                if (attr !== '♮') {
-                    label += attr;
+            if (attr !== '♮') {
+                label += attr;
+            }
+            
+            //Emily: Added eastindiansolfege elseif; set up a dictionary for translation between Western and East Indian Notation
+            //CHECKED: No errors in Javascript console
+            } else if (this.name === 'eastindianSolfege') {
+                var my_dictionary = {
+                    //sa re ga ma pa dha ni
+                    //do re mi fa sol la ti
+                    "do"  : "sa",
+                    "re"  : "re",
+                    "mi"  : "ga",
+                    "fa"  : "ma",
+                    "sol" : "pa",
+                    "la"  : "dha",
+                    "ti"  : "ni",
                 }
-            } else {
-                var label = this.value.toString();
-            }
+                var label = my_dictionary[this.value];
 
-            if (label.length > 8) {
-                label = label.substr(0, 7) + '...';
-            }
+        } else {
+            var label = this.value.toString();
+        }
+
+        if (label.length > 8) {
+            label = label.substr(0, 7) + '...';
+        }
 
             this.text.text = label;
             this.container.addChild(this.text);
@@ -1601,6 +1627,46 @@ function Block(protoblock, blocks, overrideName) {
             labelElem.innerHTML = labelHTML;
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
+
+        //Emily: Added elseif for eastindian text labels
+        //CHECKED: No errors in Javascript console
+        } else if (this.name === 'eastindiansolfege') {
+            var type = 'solfege';
+
+            var obj = splitSolfege(this.value);
+            var selectednote = obj[0];
+            var selectedattr = obj[1];
+
+            // solfnotes_ is used in the interface for i18n
+            //.TRANS: the note names must be separated by single spaces 
+            var eastindiansolfnotes_ = _('re ga ma pa dha ni sa').split(' ');
+
+            var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
+            for (var i = 0; i < EASTINDIANSOLFNOTES.length; i++) {
+                if (selectednote === eastindiansolfnotes_[i]) {
+                    labelHTML += '<option value="' + EASTINDIANSOLFNOTES[i] + '" selected>' + eastindiansolfnotes_[i] + '</option>';
+                } else if (selectednote === EASTINDIANSOLFNOTES[i]) {
+                    labelHTML += '<option value="' + EASTINDIANSOLFNOTES[i] + '" selected>' + eastindiansolfnotes_[i] + '</option>';
+                } else {
+                    labelHTML += '<option value="' + EASTINDIANSOLFNOTES[i] + '">' + eastindiansolfnotes_[i] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
+            for (var i = 0; i < SOLFATTRS.length; i++) {
+                if (selectedattr === SOLFATTRS[i]) {
+                    labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
+                } else {
+                    labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('solfegeLabel');
+            this.labelattr = docById('noteattrLabel');
+            //Emily: END
         } else if (this.name === 'notename') {
             var type = 'notename';
             const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
@@ -1893,6 +1959,23 @@ function Block(protoblock, blocks, overrideName) {
             if (attr !== '♮') {
                 label += attr;
             }
+            
+            //Emily: Added eastindiansolfege elseif; set up a dictionary for translation between Western and East Indian Notation
+            //CHECKED: No errors in Javascript console
+            } else if (this.name === 'eastindianSolfege') {
+                var my_dictionary = {
+                    //sa re ga ma pa dha ni
+                    //do re mi fa sol la ti
+                    "do"  : "sa",
+                    "re"  : "re",
+                    "mi"  : "ga",
+                    "fa"  : "ma",
+                    "sol" : "pa",
+                    "la"  : "dha",
+                    "ti"  : "ni",
+                }
+                var label = my_dictionary[this.value];
+
         } else {
             var label = this.value.toString();
         }
