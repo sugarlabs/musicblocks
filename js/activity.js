@@ -562,7 +562,8 @@ define(function (require) {
         var msgText = null;
 
         // ErrorMsg block
-        var errorMsgText = null;
+        var 
+	Text = null;
         var errorMsgArrow = null;
         var errorArtwork = {};
         const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
@@ -1820,7 +1821,7 @@ define(function (require) {
                 // The container may not be ready yet... so do nothing
                 return;
             }
-
+            _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (blk !== undefined && blk != null && !blocks.blockList[blk].collapsed) {
                 var fromX = (canvas.width - 1000) / 2;
                 var fromY = 128;
