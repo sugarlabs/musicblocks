@@ -1816,6 +1816,7 @@ define(function (require) {
         };
 
         function errorMsg(msg, blk, text) {
+	     _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
                 return;
@@ -1824,7 +1825,6 @@ define(function (require) {
 	    	//Do nothing if there's an empty clamp -- let it pass
 		return;
 	    }
-            _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (blk !== undefined && blk != null && !blocks.blockList[blk].collapsed) {
                 var fromX = (canvas.width - 1000) / 2;
                 var fromY = 128;
