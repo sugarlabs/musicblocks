@@ -1820,6 +1820,10 @@ define(function (require) {
                 // The container may not be ready yet... so do nothing
                 return;
             }
+	    if (msg === NOINPUTERRORMSG) {
+	    	//Do nothing if there's an empty clamp -- let it pass
+		return;
+	    }
             _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (blk !== undefined && blk != null && !blocks.blockList[blk].collapsed) {
                 var fromX = (canvas.width - 1000) / 2;
@@ -1888,10 +1892,6 @@ define(function (require) {
             case NANERRORMSG:
                 errorArtwork['notanumber'].visible = true;
                 stage.setChildIndex(errorArtwork['notanumber'], stage.getNumChildren() - 1);
-                break;
-            case NOINPUTERRORMSG:
-                errorArtwork['noinput'].visible = true;
-                stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
                 break;
             default:
                 var errorMsgContainer = errorMsgText.parent;
