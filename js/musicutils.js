@@ -35,6 +35,11 @@ const EQUIVALENTNOTES = {'C♯': 'D♭', 'D♯': 'E♭', 'F♯': 'G♭', 'G♯':
 const EXTRATRANSPOSITIONS = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
 const SOLFEGENAMES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
 const SOLFEGECONVERSIONTABLE = {'C': 'do', 'C♯': 'do' + '♯', 'D': 're', 'D♯': 're' + '♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa' + '♯', 'G': 'sol', 'G♯': 'sol' + '♯', 'A': 'la', 'A♯': 'la' + '♯', 'B': 'ti', 'D♭': 're' + '♭', 'E♭': 'mi' + '♭', 'G♭': 'sol' + '♭', 'A♭': 'la' + '♭', 'B♭': 'ti' + '♭', 'R': _('rest')};
+
+//Emily: East Indian Solfege
+const EASTINDIANSOLFEGENAMES = ['sa', 're', 'ga', 'ma', 'pa', 'dha', 'ni' ];
+const EASTINDIANSOLFEGECONVERSIONTABLE = {'C': 'sa', 'C♯': 'sa' + '♯', 'D': 're', 'D♯': 're' + '♯', 'E': 'ga', 'F': 'ma', 'F♯': 'ma' + '♯', 'G': 'pa', 'G♯': 'pa' + '♯', 'A': 'dha', 'A♯': 'dha' + '♯', 'B': 'ni', 'D♭': 're' + '♭', 'E♭': 'ga' + '♭', 'G♭': 'pa' + '♭', 'A♭': 'dha' + '♭', 'B♭': 'ni' + '♭', 'R': _('rest')};
+
 const PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
 const PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 const PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
@@ -52,6 +57,10 @@ const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
 const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
+
+//Emily: East Indian
+const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa'];
+const EASTINDIANSOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
 
 
 function mod12(a) {
