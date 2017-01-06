@@ -562,8 +562,7 @@ define(function (require) {
         var msgText = null;
 
         // ErrorMsg block
-        var 
-	Text = null;
+        var errorMsgText = null;
         var errorMsgArrow = null;
         var errorArtwork = {};
         const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
