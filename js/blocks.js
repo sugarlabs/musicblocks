@@ -1279,6 +1279,23 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (attr !== '♮') {
                 label += attr;
             }
+                //Emily: Added an elseif case for eastindiansolfege
+                //CHECKED: No errors in Javascript console
+
+            } else if (this.name === 'eastindianSolfege') {
+                var my_dictionary = {
+                    //sa re ga ma pa dha ni
+                    //do re mi fa sol la ti
+                    "do"  : "sa",
+                    "re"  : "re",
+                    "mi"  : "ga",
+                    "fa"  : "ma",
+                    "sol" : "pa",
+                    "la"  : "dha",
+                    "ti"  : "ni",
+                }
+                var label = my_dictionary[this.value];
+
         } else {
             var label = myBlock.value.toString();
         }
@@ -1668,7 +1685,20 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             };
 
             postProcessArg = [thisBlock, 'la'];
-        } else if (name === 'notename') {
+            //Emily: Added elseif for eastindiansolfege
+            //CHECKED: No errors in Javascript console
+        } else if (name==='eastindiansolfege') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                me.blockList[thisBlock].value = value;
+                me.blockList[thisBlock].text.text = value;
+                me.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'la'];
+
+        }else if (name === 'notename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
@@ -1877,6 +1907,18 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 };
 
                 this.makeNewBlock('solfege', postProcess, [thisBlock, value]);
+            } else if (myBlock.docks[i + 1][2] === 'notein') {
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    var label = value.toString();
+                    me.blockList[thisBlock].text.text = label;
+                };
+
+                //Emily: Added a new block for eastindiansolfege
+                //CHECKED: No errors in Javascript console
+                this.makeNewBlock('eastindiansolfege', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'notein') {
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -2713,7 +2755,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 var name = blkData[1][1]['value'];
             }
 
-            // If we have a stack named 'action', make te protoblock visible.
+            // If we have a stack named 'action', make the protoblock visible.
             if (name === _('action')) {
                 this.setActionProtoVisiblity(true);
             }
@@ -3157,6 +3199,18 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
+            //Emily: Added a case for eastindiansolfege
+            //CHECKED: No errors in Javascript console
+            case 'eastindiansolfege':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
             case 'notename':
                 postProcess = function (args) {
                     var thisBlock = args[0];
@@ -3173,6 +3227,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     me.blockList[thisBlock].value = value;
                     me.updateBlockText(thisBlock);
                 };
+
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case 'drumname':
