@@ -1885,14 +1885,14 @@ define(function (require) {
                 errorArtwork['zerodivide'].visible = true;
                 stage.setChildIndex(errorArtwork['zerodivide'], stage.getNumChildren() - 1);
                 break;
-  	   case NOINPUTERRORMSG:
-                errorArtwork['noinput'].visible = true;
-                stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
-                break;			    
-            case NANERRORMSG:
+  	    case NANERRORMSG:
                 errorArtwork['notanumber'].visible = true;
                 stage.setChildIndex(errorArtwork['notanumber'], stage.getNumChildren() - 1);
                 break;
+	    case NOINPUTERRORMSG:
+                errorArtwork['noinput'].visible = true;
+                stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
+                break;			    
             default:
                 var errorMsgContainer = errorMsgText.parent;
                 errorMsgContainer.visible = true;
