@@ -953,7 +953,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (logo.blocks.blockList[blk].protoblock.dockTypes[i] === 'in' && logo.blocks.blockList[blk].connections[i] == null){
                     console.log('skipping null inflow args');
                 } else {
-                args.push(logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i], blk, receivedArg));
+                    args.push(logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i], blk, receivedArg));
                 }
             }
         }
