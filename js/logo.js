@@ -950,7 +950,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         var args = [];
         if (logo.blocks.blockList[blk].protoblock.args > 0) {
             for (var i = 1; i < logo.blocks.blockList[blk].protoblock.args + 1; i++) {
+                if (logo.blocks.blockList[blk].protoblock.dockTypes[i] === 'in' && logo.blocks.blockList[blk].connections[i] == null){
+                    console.log('skipping null inflow args');
+                } else {
                 args.push(logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i], blk, receivedArg));
+                }
             }
         }
 
