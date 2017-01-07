@@ -209,7 +209,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     //Emily: Added eastindiansolfege block
     //Checked: No errors in Javascript console
     var eastindiansolfegeBlock = new ProtoBlock('eastindiansolfege');
-    solfegeBlock.palette = palettes.dict['pitch'];
+    eastindiansolfegeBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['eastindiansolfege'] = eastindiansolfegeBlock;
     eastindiansolfegeBlock.valueBlock();
     eastindiansolfegeBlock.dockTypes[0] = 'solfegeout';
