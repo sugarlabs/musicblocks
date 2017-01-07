@@ -1816,11 +1816,11 @@ define(function (require) {
         };
 
         function errorMsg(msg, blk, text) {
+	     _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
                 return;
             }
-
             if (blk !== undefined && blk != null && !blocks.blockList[blk].collapsed) {
                 var fromX = (canvas.width - 1000) / 2;
                 var fromY = 128;
@@ -1885,14 +1885,14 @@ define(function (require) {
                 errorArtwork['zerodivide'].visible = true;
                 stage.setChildIndex(errorArtwork['zerodivide'], stage.getNumChildren() - 1);
                 break;
-            case NANERRORMSG:
+  	    case NANERRORMSG:
                 errorArtwork['notanumber'].visible = true;
                 stage.setChildIndex(errorArtwork['notanumber'], stage.getNumChildren() - 1);
                 break;
-            case NOINPUTERRORMSG:
+	    case NOINPUTERRORMSG:
                 errorArtwork['noinput'].visible = true;
                 stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
-                break;
+                break;			    
             default:
                 var errorMsgContainer = errorMsgText.parent;
                 errorMsgContainer.visible = true;
