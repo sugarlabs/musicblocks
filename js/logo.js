@@ -2350,7 +2350,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             logo._setListener(turtle, listenerName, __listener);
             break;
-        case 'invert2':
         case 'invert':
             if (logo.blocks.blockList[blk].name === 'invert') {
                 logo.invertList[turtle].push([args[0], args[1], 'even']);

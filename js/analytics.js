@@ -69,8 +69,7 @@ const TACAT = {
 
     'settransposition': 'transpose',
     'invert': 'transpose',
-    'invert2': 'transpose',
-
+    
     'diminished': 'pitchchord',
     'augmented': 'pitchchord',
     'perfect': 'pitchchord',
@@ -356,12 +355,16 @@ function analyzeProject(blocks) {
 		continue;
 	    }
 	    break;
-        case 'invert':
         case 'tuplet2':
             if (blocks.blockList[blk].connections[3] == null) {
 		continue;
 	    }
 	    break;
+        case 'invert':
+            if (blocks.blockList[blk].connections[4] == null) {
+        continue;
+        }
+        break;
 	default:
             if (blocks.blockList[blk].connections[0] == null && last(blocks.blockList[blk].connections) == null) {
 		continue;
