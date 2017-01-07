@@ -649,74 +649,74 @@ msgstr ""
 #: js/analytics.js:316
 #: js/basicblocks.js:341
 #: js/basicblocks.js:354
-msgid "rhythm"
+msgid "Rhythm"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:267
-msgid "pitch"
+msgid "Pitch"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:1952
-msgid "tone"
+msgid "Tone"
 msgstr ""
 
 #: js/turtledefs.js:21
-msgid "intervals"
+msgid "Intervals"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "flow"
+msgid "Flow"
 msgstr "fluxo"
 
 #: js/turtledefs.js:21
-msgid "boxes"
+msgid "Boxes"
 msgstr ""
 
 #: js/turtledefs.js:21
-msgid "widgets"
+msgid "Widgets"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "turtle"
+msgid "Turtle"
 msgstr "tartaruga"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "pen"
+msgid "Pen"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "number"
+msgid "Number"
 msgstr "número"
 
 #: js/turtledefs.js:21
-msgid "boolean"
+msgid "Boolean"
 msgstr "booleano"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "media"
+msgid "Media"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "sensors"
+msgid "Sensors"
 msgstr "sensores"
 
 #: js/turtledefs.js:21
-msgid "heap"
+msgid "Heap"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "extras"
+msgid "Extras"
 msgstr "extras"
 
 #: js/turtledefs.js:109

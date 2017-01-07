@@ -631,74 +631,74 @@ msgstr "Scrollen deaktivieren"
 #: js/turtledefs.js:21
 #: js/analytics.js:104
 #: js/basicblocks.js:337
-msgid "rhythm"
+msgid "Rhythm"
 msgstr "Rhythmus"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
 #: js/basicblocks.js:264
-msgid "pitch"
+msgid "Pitch"
 msgstr "Tonlage"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
 #: js/basicblocks.js:1935
-msgid "tone"
+msgid "Tone"
 msgstr "Ton"
 
 #: js/turtledefs.js:21
-msgid "intervals"
+msgid "Intervals"
 msgstr "Intervalle"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-msgid "flow"
+msgid "Flow"
 msgstr "Programmfluss"
 
 #: js/turtledefs.js:21
-msgid "boxes"
+msgid "Boxes"
 msgstr "Kästen"
 
 #: js/turtledefs.js:21
-msgid "widgets"
+msgid "Widgets"
 msgstr "Widgets"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-msgid "turtle"
+msgid "Turtle"
 msgstr "Schildkröte"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-msgid "pen"
+msgid "Pen"
 msgstr "Stift"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-msgid "number"
+msgid "Number"
 msgstr "Zahl"
 
 #: js/turtledefs.js:21
-msgid "boolean"
+msgid "Boolean"
 msgstr "logisch"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-msgid "media"
+msgid "Media"
 msgstr "Medien"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-msgid "sensors"
+msgid "Sensors"
 msgstr "Sensoren"
 
 #: js/turtledefs.js:21
-msgid "heap"
+msgid "Heap"
 msgstr "Stapel"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:104
-msgid "extras"
+msgid "Extras"
 msgstr "Extras"
 
 #: js/turtledefs.js:74
