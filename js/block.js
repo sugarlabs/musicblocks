@@ -305,7 +305,6 @@ function Block(protoblock, blocks, overrideName) {
         case 'if':
         case 'interval':
         case 'invert':
-        case 'invert2':
         case 'kick':
         case 'major':
         case 'minor':

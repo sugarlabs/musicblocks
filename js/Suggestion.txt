@@ -1,0 +1,5 @@
+There are 17 Palettes .
+The palettes can be divided into 4 parts:
+i.e. 4,4,4,5
+Each person can pick one part and start working on it.
+(This way ,analysis can be better and work can be done in a faster and efficient way rather than one person doing it since it's a huge spreadsheet.)
