@@ -69,6 +69,7 @@ const TACAT = {
 
     'settransposition': 'transpose',
     'invert': 'transpose',
+//  'invert2': 'transpose',
     
     'diminished': 'pitchchord',
     'augmented': 'pitchchord',

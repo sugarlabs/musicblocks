@@ -2354,7 +2354,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             logo._setListener(turtle, listenerName, __listener);
             break;
-            case 'invert1':
+        case 'invert1':
             if (typeof(args[2]) === 'number') {
                 if (args[2]%2 === 0){
                     args[2] = 'even';
@@ -2365,8 +2365,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             
             if (args[2] === 'even' || args[2] === 'odd'){
                 logo.invertList[turtle].push([args[0], args[1], args[2]]);
+            } else {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
             }
-            
+
             childFlow = args[3];
             childFlowCount = 1;
             var listenerName = '_invert_' + turtle;
@@ -2378,6 +2382,25 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             logo._setListener(turtle, listenerName, __listener);
             break;
+       /*   case 'invert2':
+            case 'invert':
+            if (logo.blocks.blockList[blk].name === 'invert') {
+                logo.invertList[turtle].push([args[0], args[1], 'even']);
+            } else {
+                logo.invertList[turtle].push([args[0], args[1], 'odd']);
+            }
+            childFlow = args[2];
+            childFlowCount = 1;
+
+            var listenerName = '_invert_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function(event) {
+                logo.invertList[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break; */
         case 'backward':
             logo.backward[turtle].push(blk);
             // Set child to bottom block inside clamp
