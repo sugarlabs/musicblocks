@@ -2793,7 +2793,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'dividebeatfactor':
             case 'drift':
             case 'duplicatenotes':
-            case 'invert':
+            case 'invert1':
             case 'fill':
             case 'flat':
             case 'hollowline':
