@@ -57,7 +57,7 @@ const LOCAL_PROJECT_STYLE ='\
 } \
 </style>';
 
-//style block is for the tooltip. num will be replaced with a unique number
+//style block is for the tooltip. _NUM_ will be replaced with a unique number
 const LOCAL_PROJECT_TEMPLATE ='\
 <li data=\'{data}\' title="{title}" current="{current}"> \
     <img class="thumbnail" src="{img}" /> \
@@ -68,10 +68,10 @@ const LOCAL_PROJECT_TEMPLATE ='\
         <img class="publish icon" title="' + _('Publish') + '" alt="' + _('Publish') + '" src="header-icons/publish.svg" /> \
         <span class="shareurlspan"> \
         <img class="share icon" title="' + _('Share') + '" alt="' + _('Share') + '" src="header-icons/share.svg" /> \
-        <div class="tooltiptriangle" id="shareurltrinum"></div> \
-        <div class="shareurltext" id="shareurldivnum"> \
+        <div class="tooltiptriangle" id="shareurltri_NUM_"></div> \
+        <div class="shareurltext" id="shareurldiv_NUM_"> \
             Copy the link to share your project:\
-            <input type="text" name="shareurl" id="shareurlboxnum" value="url here" style="margin-top:5px;width: 350px;text-align:left;" onblur="document.getElementById(\'shareurldivnum\').style.visibility = \'hidden\';document.getElementById(\'shareurlboxnum\').style.visibility = \'hidden\';document.getElementById(\'shareurltrinum\').style.visibility = \'hidden\';"/> \
+            <input type="text" name="shareurl" id="shareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;" onblur="document.getElementById(\'shareurldiv_NUM_\').style.visibility = \'hidden\';document.getElementById(\'shareurlbox_NUM_\').style.visibility = \'hidden\';document.getElementById(\'shareurltri_NUM_\').style.visibility = \'hidden\';"/> \
         </div> \
         </span> \
         <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
@@ -79,13 +79,19 @@ const LOCAL_PROJECT_TEMPLATE ='\
 </li>'
 
 const GLOBAL_PROJECT_TEMPLATE = '\
-<li url="{url}" title="{title}"> \
-    <img class="thumbnail" src="{img}" /> \
-    <div class="options"> \
-        <span>{title}</span><br/> \
-        <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
+<img class="thumbnail" src="{img}" /> \
+<div class="options"> \
+    <span>{title}</span><br/> \
+    <span class="shareurlspan"> \
+    <img class="share icon" title="' + _('Share') + '" alt="' + _('Share') + '" src="header-icons/share.svg" /> \
+    <div class="tooltiptriangle" id="plshareurltri_NUM_"></div> \
+    <div class="shareurltext" id="plshareurldiv_NUM_"> \
+        Copy the link to share your project:\
+        <input type="text" name="shareurl" id="plshareurlbox_NUM_" value="url here" style="margin-top:5px;width: 350px;text-align:left;" onblur="document.getElementById(\'plshareurldiv_NUM_\').style.visibility = \'hidden\';document.getElementById(\'plshareurlbox_NUM_\').style.visibility = \'hidden\';document.getElementById(\'plshareurltri_NUM_\').style.visibility = \'hidden\';"/> \
     </div> \
-</li>';
+    </span> \
+    <img class="download icon" title="' + _('Download') + '" alt="' + _('Download') + '" src="header-icons/download.svg" /> \
+</div>';
 
 
 function PlanetModel(controller) {
@@ -95,7 +101,9 @@ function PlanetModel(controller) {
     this.localChanged = false;
     this.globalImagesCache = {};
     this.updated = function () {};
+    this.addGlobalElement = function () {};
     this.stop = false;
+    this.count = 0;
     var model = this;
 
     if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -104,13 +112,16 @@ function PlanetModel(controller) {
         storage = localStorage;
     }
 
-    this.start = function (cb) {
+    this.start = function (cb,glo) {
         model.updated = cb;
+        model.addGlobalElement = glo;
         model.stop = false;
-
+        var myNode = document.querySelector('.planet .content.w');
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.firstChild);
+        } 
         this.redoLocalStorageData();
         model.updated();
-
         this.downloadWorldWideProjects();
     };
 
@@ -130,7 +141,9 @@ function PlanetModel(controller) {
                     todo.push(name);
                 }
             });
-
+            // console.log('todo');
+            // console.log(todo);
+            model.count = 0;
             model.getImages(todo);
         });
     };
@@ -155,7 +168,8 @@ function PlanetModel(controller) {
         if (model.globalImagesCache[image] !== undefined) {
             model.globalProjects.push({title: name,
                                        img: model.globalImagesCache[image]});
-            model.updated();
+            model.addGlobalElement(model.globalProjects[model.globalProjects.length-1],model.count);
+            model.count++;
             model.getImages(todo);
         } else {
             jQuery.ajax({
@@ -175,7 +189,8 @@ function PlanetModel(controller) {
 
                 model.globalImagesCache[image] = d;
                 model.globalProjects.push({title: name, img: d, url: image});
-                model.updated();
+                model.addGlobalElement(model.globalProjects[model.globalProjects.length-1],model.count);
+                model.count++;
                 model.getImages(todo);
             });
         }
@@ -319,7 +334,8 @@ function PlanetModel(controller) {
             name = 'MusicBlocks_'+name;
             httpPost(name + '.tb', data);
             httpPost(name + '.b64', image);
-            model.downloadWorldWideProjects();
+            //TODO: append project at beginning
+            //model.downloadWorldWideProjects();
 
             // Restore default cursor.
             document.body.style.cursor = 'default';
@@ -360,20 +376,21 @@ function PlanetView(model, controller) {
         // This is werid
         var model = this;
 
+        // console.log('update');
         if (model.localChanged) {
             html = '';
             html = html + LOCAL_PROJECT_STYLE;
             model.localProjects.forEach(function (project, i) {
-                html = html + format(LOCAL_PROJECT_TEMPLATE, project).replace(new RegExp("num", 'g'), i.toString());
-                console.log(i);
-                console.log(project);
+                html = html + format(LOCAL_PROJECT_TEMPLATE, project).replace(new RegExp('_NUM_', 'g'), i.toString());
+                // console.log(i);
+                // console.log(project);
             });
             document.querySelector('.planet .content.l').innerHTML = html;
 
             var eles = document.querySelectorAll('.planet .content.l li');
             Array.prototype.forEach.call(eles, function (ele, i) {
-                console.log(i);
-                console.log(ele);
+                // console.log(i);
+                // console.log(ele);
                 ele.querySelector('.open')
                     .addEventListener('click', planet.open(ele));
                 ele.querySelector('.publish')
@@ -391,17 +408,6 @@ function PlanetView(model, controller) {
             });
             model.localChanged = false;
         }
-
-        html = '';
-        model.globalProjects.forEach(function (project, i) {
-            html += format(GLOBAL_PROJECT_TEMPLATE, project);
-        });
-        document.querySelector('.planet .content.w').innerHTML = html;
-
-        var eles = document.querySelectorAll('.planet .content.w li');
-        Array.prototype.forEach.call(eles, function (ele, i) {
-            ele.addEventListener('click', planet.load(ele))
-        });
     };
 
     this.load = function (ele) {
@@ -413,6 +419,22 @@ function PlanetView(model, controller) {
             planet.controller.hide();
         }
     };
+
+    this.addGlobalElement = function(glob, i){
+        var d = document.createElement('li');
+        d.setAttribute('url', glob.url);
+        d.setAttribute('title', glob.title);
+        html = '';
+        html += format(GLOBAL_PROJECT_TEMPLATE, glob).replace(new RegExp('_NUM_', 'g'), i.toString());
+        d.innerHTML = html;
+        var htmldata = d;
+        // console.log(htmldata);
+        htmldata.querySelector('.download')
+            .addEventListener('click', planet.load(htmldata));
+        htmldata.querySelector('.share')
+            .addEventListener('click', planet.planetshare(htmldata,i));
+        document.querySelector('.planet .content.w').appendChild(htmldata);
+    }
 
     this.publish = function (ele) {
         return function () {
@@ -444,6 +466,21 @@ function PlanetView(model, controller) {
             document.getElementById('shareurlbox'+n).value = url;
             document.getElementById('shareurlbox'+n).focus();
             document.getElementById('shareurlbox'+n).select();
+        };
+    };
+
+    this.planetshare = function (ele,i) {
+        return function () {
+            console.log(ele);
+            var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
+            console.log(url);
+            var n = i.toString();
+            document.getElementById('plshareurldiv'+n).style.visibility = 'visible';
+            document.getElementById('plshareurlbox'+n).style.visibility = 'visible';
+            document.getElementById('plshareurltri'+n).style.visibility = 'visible';
+            document.getElementById('plshareurlbox'+n).value = url;
+            document.getElementById('plshareurlbox'+n).focus();
+            document.getElementById('plshareurlbox'+n).select();
         };
     };
 
@@ -532,7 +569,7 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
         }, 250);
         window.scroll(0, 0);
 
-        this.model.start(this.view.update);
+        this.model.start(this.view.update,this.view.addGlobalElement);
         return true;
     };
 };

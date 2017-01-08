@@ -158,6 +158,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtlePitchBlock.adjustWidthToLabel();
     turtlePitchBlock.dockTypes[1] = 'anyin';
 
+    var setPitchNumberOffsetBlock = new ProtoBlock('setpitchnumberoffset');
+    setPitchNumberOffsetBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['setpitchnumberoffset'] = setPitchNumberOffsetBlock;
+    setPitchNumberOffsetBlock.staticLabels.push(_('set pitch number offset'), _('name'), _('octave'));
+    setPitchNumberOffsetBlock.adjustWidthToLabel();
+    setPitchNumberOffsetBlock.twoArgBlock();
+    setPitchNumberOffsetBlock.defaults.push('C');
+    setPitchNumberOffsetBlock.defaults.push('4');
+    setPitchNumberOffsetBlock.dockTypes[1] = 'notein';
+    setPitchNumberOffsetBlock.dockTypes[2] = 'numberin';
+
     var numberToPitchBlock = new ProtoBlock('number2pitch');
     numberToPitchBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['number2pitch'] = numberToPitchBlock;
@@ -194,7 +205,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['solfege'] = solfegeBlock;
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
-
 
     // Transposition blocks
     var invertBlock2 = new ProtoBlock('invert2');
@@ -257,6 +267,26 @@ function initBasicProtoBlocks(palettes, blocks) {
     hertzBlock.adjustWidthToLabel();
     hertzBlock.oneArgBlock();
     hertzBlock.defaults.push(440);
+
+    var pitchNumberBlock = new ProtoBlock('pitchnumber');
+    pitchNumberBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['pitchnumber'] = pitchNumberBlock;
+    pitchNumberBlock.staticLabels.push(_('pitch number'));
+    pitchNumberBlock.adjustWidthToLabel();
+    pitchNumberBlock.oneArgBlock();
+    pitchNumberBlock.defaults.push(9);  // A4
+    pitchNumberBlock.dockTypes[1] = 'numberin';
+
+    var scaleDegree = new ProtoBlock('scaledegree');
+    scaleDegree.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['scaledegree'] = scaleDegree;
+    scaleDegree.staticLabels.push(_('scale degree'), _('number'), _('octave'));
+    scaleDegree.adjustWidthToLabel();
+    scaleDegree.defaults.push(6); // A in C Major
+    scaleDegree.defaults.push(4);
+    scaleDegree.twoArgBlock();
+    scaleDegree.dockTypes[1] = 'numberin';
+    scaleDegree.dockTypes[2] = 'numberin';
 
     var pitchStepBlock = new ProtoBlock('steppitch');
     pitchStepBlock.palette = palettes.dict['pitch'];
@@ -2009,7 +2039,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     toFrequencyBlock.defaults.push('A');
     toFrequencyBlock.defaults.push('4');
     toFrequencyBlock.twoArgMathBlock();
-    toFrequencyBlock.dockTypes[1] = 'anyin';
+    toFrequencyBlock.dockTypes[1] = 'notein';
     toFrequencyBlock.dockTypes[2] = 'numberin';
 
     var shellBlock = new ProtoBlock('turtleshell');
