@@ -692,7 +692,6 @@ function PaletteModel(palette, palettes, name) {
                 artwork = artwork.replace('arg_label_' + i, protoBlock.staticLabels[i] || '');
             }
 
-            // TODO: use ES6 format so there is less "X: X"
             this.blocks.push({
                 blk,
                 blkname,
