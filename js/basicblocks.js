@@ -207,7 +207,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     solfegeBlock.dockTypes[0] = 'solfegeout';
 
     // Transposition blocks
-    var invertBlock2 = new ProtoBlock('invert2');
+    var invertBlock = new ProtoBlock('invert1');
+    invertBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['invert1'] = invertBlock;
+    invertBlock.staticLabels.push(_('invert'), _('note'), _('octave'), _('even/odd'));
+    invertBlock.adjustWidthToLabel();
+    invertBlock.flowClampThreeArgBlock();
+    invertBlock.adjustWidthToLabel();
+    invertBlock.defaults.push('sol');
+    invertBlock.defaults.push(4);
+    invertBlock.defaults.push('even');
+    invertBlock.dockTypes[1] = 'solfegein';
+    invertBlock.dockTypes[2] = 'anyin';
+    invertBlock.dockTypes[3] = 'anyin';
+
+/*  var invertBlock2 = new ProtoBlock('invert2');
     invertBlock2.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invert2'] = invertBlock2;
     invertBlock2.staticLabels.push(_('invert (odd)'), _('note'), _('octave'));
@@ -229,7 +243,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     invertBlock.defaults.push('sol');
     invertBlock.defaults.push(4);
     invertBlock.dockTypes[1] = 'solfegein';
-    invertBlock.dockTypes[2] = 'anyin';
+    invertBlock.dockTypes[2] = 'anyin'; */
 
     var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['pitch'];
