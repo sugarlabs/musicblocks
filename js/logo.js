@@ -2356,13 +2356,21 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             break;
         case 'invert1':
             if (typeof(args[2]) === 'number') {
-                if (args[2]%2 === 0){
+                if (args[2] % 2 === 0){
                     args[2] = 'even';
                 } else {
                     args[2] = 'odd';
                 }
             } 
             
+            if (args[2] === _('even')) {
+                args2 = 'even';
+            }
+
+            if (args[2] === _('odd')) {
+                args2 = 'odd';
+            }
+
             if (args[2] === 'even' || args[2] === 'odd'){
                 logo.invertList[turtle].push([args[0], args[1], args[2]]);
             } else {
@@ -2382,8 +2390,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
 
             logo._setListener(turtle, listenerName, __listener);
             break;
-       /*   case 'invert2':
-            case 'invert':
+        case 'invert2':
+        case 'invert':
+            // Deprecated
             if (logo.blocks.blockList[blk].name === 'invert') {
                 logo.invertList[turtle].push([args[0], args[1], 'even']);
             } else {
@@ -2400,7 +2409,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             };
 
             logo._setListener(turtle, listenerName, __listener);
-            break; */
+            break;
         case 'backward':
             logo.backward[turtle].push(blk);
             // Set child to bottom block inside clamp
@@ -2642,8 +2651,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 // assume that C4 == 0, so we need an offset of 39.
                 var obj = numberToPitch(Math.floor(args[0] + logo.pitchNumberOffset));
                 note = obj[0];
-		octave = obj[1];
-		cents = 0;
+                octave = obj[1];
+                cents = 0;
             } else {
                 if (args.length !== 2 || args[0] == null || args[1] == null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
