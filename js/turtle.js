@@ -39,6 +39,8 @@ function Turtle (name, turtles, drum) {
     this.y = 0;
     this.bitmap = null;
     this.skinChanged = false;  // Should we reskin the turtle on clear?
+    this.blinkFinished = true;
+    this.beforeBlinkSize = null;
 
     // Which start block is assocated with this turtle?
     this.startBlock = null;
@@ -877,14 +879,20 @@ function Turtle (name, turtles, drum) {
         this.orientation += Number(degrees);
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
-        this.updateCache();
+        // We cannot update the cache during the 'tween'.
+        if (this.blinkFinished) {
+            this.updateCache();
+        }
     };
 
     this.doSetHeading = function(degrees) {
         this.orientation = Number(degrees);
         this.orientation %= 360;
         this.bitmap.rotation = this.orientation;
-        this.updateCache();
+        // We cannot update the cache during the 'tween'.
+        if (this.blinkFinished) {
+            this.updateCache();
+	}
     };
 
     this.doSetFont = function(font) {
@@ -1037,6 +1045,39 @@ function Turtle (name, turtles, drum) {
             myTurtle.container.updateCache();
             myTurtle.turtles.refreshCanvas();
         }
+    };
+
+    this.blink = function(duration,volume) {
+        var turtle = this;
+        var sizeinuse;
+        if (this.blinkFinished == false){
+            sizeinuse = this.beforeBlinkSize;
+        } else {
+            sizeinuse = turtle.bitmap.scaleX;
+            this.beforeBlinkSize = sizeinuse;
+        }
+        this.blinkFinished = false;
+        turtle.container.uncache();
+        var scalefactor = 60 / 55;
+        var volumescalefactor = 4 * (volume + 200) / 1000;
+        //Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.1
+        turtle.bitmap.alpha = 0.5;
+        turtle.bitmap.scaleX = sizeinuse * scalefactor * volumescalefactor;
+        turtle.bitmap.scaleY = turtle.bitmap.scaleX;
+        turtle.bitmap.scale = turtle.bitmap.scaleX;
+        var isSkinChanged = turtle.skinChanged;
+        turtle.skinChanged = true;
+        createjs.Tween.get(turtle.bitmap).to({alpha: 1, scaleX: sizeinuse, scaleY: sizeinuse, scale: sizeinuse}, 500 / duration);
+        setTimeout(function() {
+            turtle.bitmap.scaleX = sizeinuse;
+            turtle.bitmap.scaleY = turtle.bitmap.scaleX;
+            turtle.bitmap.scale = turtle.bitmap.scaleX;
+            turtle.bitmap.rotation = turtle.orientation;
+            turtle.skinChanged = isSkinChanged;
+            var bounds = turtle.container.getBounds();
+            turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            turtle.blinkFinished = true;
+        }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
     };
 };
 
