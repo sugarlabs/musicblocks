@@ -1264,6 +1264,18 @@ define(function (require) {
                 palettes.bringToTop();
             }
 
+            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                var tur = turtles.turtleList[turtle];
+                tur.clearPenStrokes();
+                tur.container.x = tur.turtles.turtleX2screenX(tur.x);
+                tur.container.y = tur.turtles.turtleY2screenY(tur.y);
+                tur.turtles.refreshCanvas();
+            }
+
+            var artcanvas = document.getElementById("overlayCanvas");
+            artcanvas.width = w;
+            artcanvas.height = h;
+
             // Music stuff
             if (matrix.isMatrix === 1) {
                 matrixTable = document.getElementById("myTable");
@@ -1516,6 +1528,9 @@ define(function (require) {
                 document.getElementById('modewidget').style.border = 0;
             }
 
+            logo.doStopTurtle();
+            helpContainer.visible = false;
+            docById('helpElem').style.visibility = 'hidden';
             console.log('save locally');
             saveLocally();
             thumbnails.show()
