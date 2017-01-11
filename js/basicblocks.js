@@ -210,13 +210,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     var invertBlock = new ProtoBlock('invert1');
     invertBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invert1'] = invertBlock;
-    invertBlock.staticLabels.push(_('invert'), _('note'), _('octave'), _('even/odd'));
+    invertBlock.staticLabels.push(_('invert'), _('note'), _('octave'), _('even') + '/' + _('odd'));
     invertBlock.adjustWidthToLabel();
     invertBlock.flowClampThreeArgBlock();
     invertBlock.adjustWidthToLabel();
     invertBlock.defaults.push('sol');
     invertBlock.defaults.push(4);
-    invertBlock.defaults.push('even');
+    invertBlock.defaults.push('odd');
     invertBlock.dockTypes[1] = 'solfegein';
     invertBlock.dockTypes[2] = 'anyin';
     invertBlock.dockTypes[3] = 'anyin';
