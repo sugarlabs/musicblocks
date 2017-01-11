@@ -175,6 +175,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     this.voices = {};
     this.backward = {};
 
+    // scale factor for turtle graphics embedded in notes
+    this.dispatchFactor = {};
+
     // tuplet
     this.tuplet = false;
     this.tupletParams = [];
@@ -655,6 +658,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this.voices[turtle] = [];
             this.pitchDrumTable[turtle] = {};
             this.backward[turtle] = [];
+            this.dispatchFactor[turtle] = 1;
         }
 
         this.pitchNumberOffset = 39;  // C4
@@ -1395,7 +1399,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                         var __listener = function (event) {
-                            logo.turtles.turtleList[turtle].doArc(delta, args[1]);
+                            logo.turtles.turtleList[turtle].doArc(delta * logo.dispatchFactor[turtle], args[1]);
                         };
 
                         if (logo.whichNoteBlock[turtle] in logo.arcListener[turtle]) {
@@ -1502,7 +1506,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                         var __listener = function (event) {
-                            logo.turtles.turtleList[turtle].doForward(dist);
+                            logo.turtles.turtleList[turtle].doForward(dist * logo.dispatchFactor[turtle]);
                         };
 
                         if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
@@ -1536,7 +1540,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                         var __listener = function (event) {
-                            logo.turtles.turtleList[turtle].doForward(dist);
+                            logo.turtles.turtleList[turtle].doForward(dist * logo.dispatchFactor[turtle]);
                         };
 
                         if (logo.whichNoteBlock[turtle] in logo.forwardListener[turtle]) {
@@ -1570,7 +1574,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                         var __listener = function (event) {
-                            logo.turtles.turtleList[turtle].doRight(delta);
+                            logo.turtles.turtleList[turtle].doRight(delta * logo.dispatchFactor[turtle]);
                         };
 
                         if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
@@ -1604,7 +1608,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
                         var __listener = function (event) {
-                            logo.turtles.turtleList[turtle].doRight(delta);
+                            logo.turtles.turtleList[turtle].doRight(delta * logo.dispatchFactor[turtle]);
                         };
 
                         if (logo.whichNoteBlock[turtle] in logo.rightListener[turtle]) {
@@ -4360,7 +4364,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
                     }
 
-                    logo._dispatchTurtleSignals(turtle, beatValue, blk);
+                    logo._dispatchTurtleSignals(turtle, beatValue, blk, noteBeatValue);
 
                     // Process pitches
                     if (logo.notePitches[turtle].length > 0) {
@@ -4501,11 +4505,29 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
         }
     };
 
-    this._dispatchTurtleSignals = function(turtle, beatValue, blk) {
+    this._dispatchTurtleSignals = function(turtle, beatValue, blk, noteBeatValue) {
         // When turtle commands (forward, right, arc) are inside of Notes,
         // they are progressive.
         var logo = this;
-        for (var t = 0; t < NOTEDIV; t++) {
+        var stepTime = beatValue * 1000 / (NOTEDIV + 4);
+
+        // We want to update the turtle graphics every 50ms with a note.
+        // FIXME: Do this more efficiently
+        if (stepTime > 200) {
+            logo.dispatchFactor[turtle] = 0.25;
+        } else if (stepTime > 100) {
+            logo.dispatchFactor[turtle] = 0.5;
+        } else if (stepTime > 50) {
+            logo.dispatchFactor[turtle] = 1;
+        } else if (stepTime > 25) {
+            logo.dispatchFactor[turtle] = 2;
+        } else if (stepTime > 12.5) {
+            logo.dispatchFactor[turtle] = 4;
+        } else {
+            logo.dispatchFactor[turtle] = 8;
+        }
+
+        for (var t = 0; t < (NOTEDIV / logo.dispatchFactor[turtle]); t++) {
             setTimeout(function() {
                 if (turtle in logo.forwardListener && blk in logo.forwardListener[turtle]) {
                     logo.stage.dispatchEvent('_forward_' + turtle + '_' + blk);
@@ -4520,7 +4542,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             // finish a bit ahead of the note in order t minimize the
             // risk that there is overlap with the next note scheduled
             // to trigger.
-            }, t * beatValue * 1000 / (NOTEDIV + 4));
+            }, t * stepTime * logo.dispatchFactor[turtle]);
         }
 
         setTimeout(function() {
