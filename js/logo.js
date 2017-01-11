@@ -4516,7 +4516,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (turtle in logo.arcListener && blk in logo.arcListener[turtle]) {
                     logo.stage.dispatchEvent('_arc_' + turtle + '_' + blk);
                 }
-            }, t * beatValue * 1000 / NOTEDIV);
+            // (NOTEDIV + 4) is a workaround so that the graphics
+            // finish a bit ahead of the note in order t minimize the
+            // risk that there is overlap with the next note scheduled
+            // to trigger.
+            }, t * beatValue * 1000 / (NOTEDIV + 4));
         }
 
         setTimeout(function() {
