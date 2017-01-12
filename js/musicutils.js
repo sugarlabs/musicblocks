@@ -1249,7 +1249,29 @@ function Synth () {
         this.getSynthByName(name).toMaster();
     };
 
-    this.trigger = function(notes, beatValue, name) {
+    this.performNotes = function(synth, notes, beatValue, doVibrato = false, vibratoIntensity = 0, vibratoFrequency = 0) {
+        if (doVibrato) {
+            var vibrato = new Tone.Vibrato(1/vibratoFrequency, vibratoIntensity);
+            synth.chain(vibrato, Tone.Master);
+            synth.triggerAttackRelease(notes, beatValue);
+            setTimeout(function() {
+                vibrato.dispose();
+            }, beatValue*1000); //disable vibrato effect when beat is over
+        } else {
+            synth.triggerAttackRelease(notes, beatValue);
+        }
+    }
+
+    this.trigger = function(notes, beatValue, name, vibratoArgs = []) {
+        var doVibrato = false;
+        var vibratoIntensity = 0;
+        var vibratoFrequency = 0;
+        if (vibratoArgs.length == 2 && vibratoArgs[0] != 0) {
+            doVibrato = true;
+            vibratoIntensity = vibratoArgs[0];
+            vibratoFrequency = vibratoArgs[1];
+        }
+
         switch (name) {
         case 'pluck':
         case 'triangle':
@@ -1261,8 +1283,7 @@ function Synth () {
             } else {
                 var noteToPlay = notes;
             }
-
-            this.synthset[name][1].triggerAttackRelease(noteToPlay, beatValue);
+            this.performNotes(this.synthset[name][1], noteToPlay, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
             break;
         case 'violin':
         case 'cello':
@@ -1273,11 +1294,11 @@ function Synth () {
             var centerNo = SAMPLECENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
-            this.synthset[name][1].triggerAttackRelease(noteNo - centerNo, beatValue);
+            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
             break;
         case 'default':
         case 'poly':
-            this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
+            this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
             break;
         default:
             var drumName = getDrumSynthName(name);
@@ -1305,7 +1326,7 @@ function Synth () {
             } else if (name.slice(0, 4) == 'file') {
                 this.synthset[name][1].triggerAttack(0, beatValue, 1);
             } else {
-                this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
             }
             break;
         }
