@@ -46,7 +46,8 @@ TABLE OF CONTENTS
     1. [Pitch-Time Matrix] (#pitch-time) 
     2. [The Rhythm Block] (#THE-RHYTHM-BLOCK) 
     3. [Creating Tuplets] (#CREATING-TUPLETS)
-    4. [Using Individual Notes in the Matrix] (#INDIVIDUAL-NOTES)
+    4. [What is a Tuplet?] (#WHAT-IS-TUPLET)
+    5. [Using Individual Notes in the Matrix] (#INDIVIDUAL-NOTES)
   3. [Generating rhythms](#rhythms)
   4. [Musical Modes](#modes)
   5. [The Pitch-Drum Matrix](#pitch-drum)
@@ -289,6 +290,7 @@ You can "dot" notes using the *Dot* block. A dotted note extends the rhythmic du
 beat. A dotted eighth note will play for 3/16 (1/8 + 1/16) of a beat.
 
 You can also simply change the note value to mimic a dotted note, for example indicating 3/8 instead of 1/4, for a dotted quarter note.
+<img src='https://rawgit.com/walterbender/musicblocks/master/charts/DotsChart.svg'/>
 
 <a name="MULTIPLY-AND-DIVIDE">
 #### 3.2.5 Speeding Up and Slowing Down Notes via Mathematical Operations
@@ -333,6 +335,8 @@ unchanged.
 
 Tie also works on pairs of notes, combining them into one note. (The
 notes must be identical in pitch, but can vary in rhythm.)
+
+<img src='https://rawgit.com/walterbender/musicblocks/master/charts/TiesChart.svg'/>
 
 <a name="MORE-TRANSFORMATIONS">
 #### 3.2.8 Set Volume, Crescendo, Staccato, and Slur
@@ -716,13 +720,21 @@ single quarter note. The result is three twelfth notes.
 You can mix and match *Rhythm* blocks and *Tuplet* blocks when
 defining your matrix.
 
+<a name= "WHAT-IS-TUPLET">
+#### 4.2.4 What is a tuplet?
+</a>
+<img src='https://rawgit.com/walterbender/musicblocks/master/charts/TupletChart.svg'/>
+
+<img src='https://rawgit.com/walterbender/musicblocks/master/charts/TripletChart.svg'/>
+
 <a name= "INDIVIDUAL-NOTES">
-#### 4.2.4 Using individual notes in the matrix
+#### 4.2.5 Using individual notes in the matrix
 </a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg'/>
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
+
 
 <a name="rhythms">
 ### 4.3 Generating Rhythms
