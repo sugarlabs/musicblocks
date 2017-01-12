@@ -175,7 +175,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     this.voices = {};
     this.backward = {};
     this.vibratoIntensity = {}
-    this.vibratoTime = {}
+    this.vibratoRate = {}
 
     // scale factor for turtle graphics embedded in notes
     this.dispatchFactor = {};
@@ -661,7 +661,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this.pitchDrumTable[turtle] = {};
             this.backward[turtle] = [];
             this.vibratoIntensity[turtle] = [];
-            this.vibratoTime[turtle] = [];
+            this.vibratoRate[turtle] = [];
             this.dispatchFactor[turtle] = 1;
         }
 
@@ -3206,24 +3206,29 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             break;
         case 'vibrato':
             var intensity = args[0];
-            var time = args[1];
+            var rate = args[1];
 
             if (intensity < 1 || intensity > 100) {
-                logo.errorMsg('Vibrato intensity must be between 1 and 100', blk);
+                logo.errorMsg(_('Vibrato intensity must be between 1 and 100.'), blk);
+                logo.stopTurtle = true;
+            }
+
+            if (rate <= 0) {
+                logo.errorMsg(_('Vibrato rate must be greater than 0.'), blk);
                 logo.stopTurtle = true;
             }
 
             childFlow = args[2];
             childFlowCount = 1;
 
-            logo.vibratoIntensity[turtle].push(intensity/100);
-            logo.vibratoTime[turtle].push(Math.floor(Math.pow(time, -1)));
+            logo.vibratoIntensity[turtle].push(intensity / 100);
+            logo.vibratoRate[turtle].push(Math.floor(Math.pow(rate, -1)));
 
             var listenerName = '_vibrato_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
                logo.vibratoIntensity[turtle].pop();
-               logo.vibratoTime[turtle].pop();
+               logo.vibratoRate[turtle].pop();
             };
             logo._setListener(turtle, listenerName, __listener);
             break;
@@ -4152,12 +4157,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             var noteBeatValue = noteValue;
         }
 
-        var vibratoTime = 0;
+        var vibratoRate = 0;
         var vibratoValue = 0;
         var vibratoIntensity = 0;
         var doVibrato = false;
-        if (this.vibratoTime[turtle].length > 0) {
-            vibratoTime = last(this.vibratoTime[turtle]);
+        if (this.vibratoRate[turtle].length > 0) {
+            vibratoRate = last(this.vibratoRate[turtle]);
             vibratoIntensity = last(this.vibratoIntensity[turtle]);
             doVibrato = true;
         }
@@ -4402,7 +4407,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     }
 
                     if (doVibrato)
-                        vibratoValue = beatValue * (duration / vibratoTime);
+                        vibratoValue = beatValue * (duration / vibratoRate);
 
                     logo._dispatchTurtleSignals(turtle, beatValue, blk, noteBeatValue);
                     // Process pitches
