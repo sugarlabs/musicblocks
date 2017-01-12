@@ -348,6 +348,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'tuplet':
         case 'tuplet2':
         case 'until':
+        case 'vibrato':
         case 'while':
             var obj = this.protoblock.generator(this.clampCount[0]);
             break;

@@ -2821,6 +2821,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'swing':
             case 'tie':
             case 'tuplet2':
+            case 'vibrato':
                 var len = blockObjs[b][4].length;
                 if (last(blockObjs[b][4]) == null) {
                     // If there is no next block, add a hidden block;

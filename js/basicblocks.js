@@ -761,6 +761,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     voicenameBlock.valueBlock();
     voicenameBlock.dockTypes[0] = 'textout';
 
+    var vibratoBlock = new ProtoBlock('vibrato');
+    vibratoBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['vibrato'] = vibratoBlock;
+    vibratoBlock.staticLabels.push(_('vibrato'), _('intensity'), _('rate'));
+    vibratoBlock.adjustWidthToLabel();
+    vibratoBlock.flowClampTwoArgBlock();
+    vibratoBlock.defaults.push(10);
+    vibratoBlock.defaults.push(1 / 16);
+
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;
