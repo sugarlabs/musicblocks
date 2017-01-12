@@ -200,7 +200,7 @@ function PitchDrumMatrix() {
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.maxWidth = cell.style.minWidth;
-            cell.style.position = 'fixed';
+            cell.style.position = 'static';
             cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
             marginFromTop += parseInt(cell.style.height.replace('px', ''));
             j += 1;
@@ -211,7 +211,7 @@ function PitchDrumMatrix() {
         var cell = row.insertCell(0);
         cell.style.fontSize = this._cellScale * 75 + '%';
         cell.innerHTML = ''; // '<b>' + _('drum') + '</b>';
-        cell.style.position = 'fixed';
+        cell.style.position = 'static';
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
