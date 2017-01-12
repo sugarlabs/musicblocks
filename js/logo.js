@@ -174,6 +174,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
     this.drumStyle = {};
     this.voices = {};
     this.backward = {};
+    this.vibratoIntensity = {}
+    this.vibratoTime = {}
 
     // tuplet
     this.tuplet = false;
@@ -655,6 +657,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this.voices[turtle] = [];
             this.pitchDrumTable[turtle] = {};
             this.backward[turtle] = [];
+            this.vibratoIntensity[turtle] = [];
+            this.vibratoTime[turtle] = [];
         }
 
         this.pitchNumberOffset = 39;  // C4
@@ -3196,6 +3200,29 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 logo._setListener(turtle, listenerName, __listener);
             }
             break;
+        case 'vibrato':
+            var intensity = args[0];
+            var time = args[1];
+
+            if (intensity < 1 || intensity > 100) {
+                logo.errorMsg('Vibrato intensity must be between 1 and 100', blk);
+                logo.stopTurtle = true;
+            }
+
+            childFlow = args[2];
+            childFlowCount = 1;
+
+            logo.vibratoIntensity[turtle].push(intensity/100);
+            logo.vibratoTime[turtle].push(Math.floor(Math.pow(time, -1)));
+
+            var listenerName = '_vibrato_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+            var __listener = function (event) {
+               logo.vibratoIntensity[turtle].pop();
+               logo.vibratoTime[turtle].pop();
+            };
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -4121,6 +4148,16 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             var noteBeatValue = noteValue;
         }
 
+        var vibratoTime = 0;
+        var vibratoValue = 0;
+        var vibratoIntensity = 0;
+        var doVibrato = false;
+        if (this.vibratoTime[turtle].length > 0) {
+            vibratoTime = last(this.vibratoTime[turtle]);
+            vibratoIntensity = last(this.vibratoIntensity[turtle]);
+            doVibrato = true;
+        }
+
         var carry = 0;
 
         if (this.crescendoDelta[turtle].length === 0) {
@@ -4342,7 +4379,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     if (!isFinite(duration)) {
                         return;
                     }
-                    
+
                     // Use the beatValue of the first note in
                     // the group since there can only be one.
                     if (logo.staccato[turtle].length > 0) {
@@ -4359,6 +4396,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     } else {
                         var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
                     }
+
+                    if (doVibrato)
+                        vibratoValue = beatValue * (duration / vibratoTime);
 
                     logo._dispatchTurtleSignals(turtle, beatValue, blk);
 
@@ -4430,7 +4470,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                                     if (notes.length > 1) {
                                         logo.errorMsg(last(logo.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
-                                    logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]));
+                                    logo.synth.trigger(notes, beatValue, last(logo.oscList[turtle]), [vibratoIntensity, vibratoValue]);
                                 } else if (logo.drumStyle[turtle].length > 0) {
                                     logo.synth.trigger(notes, beatValue, last(logo.drumStyle[turtle]));
                                 } else if (logo.turtles.turtleList[turtle].drum) {
@@ -4441,9 +4481,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                                         if (notes[d] in logo.pitchDrumTable[turtle]) {
                                             logo.synth.trigger(notes[d], beatValue, logo.pitchDrumTable[turtle][notes[d]]);
                                         } else if (turtle in logo.voices && last(logo.voices[turtle])) {
-                                            logo.synth.trigger(notes[d], beatValue, last(logo.voices[turtle]));
+                                            logo.synth.trigger(notes[d], beatValue, last(logo.voices[turtle]), [vibratoIntensity, vibratoValue]);
                                         } else {
-                                            logo.synth.trigger(notes[d], beatValue, 'default');
+                                            logo.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue]);
                                         }
                                     }
                                 }
