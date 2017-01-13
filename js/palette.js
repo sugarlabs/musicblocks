@@ -599,7 +599,7 @@ function PaletteModel(palette, palettes, name) {
             case 'solfege':
                 label = i18nSolfege('la');
                 break;
-	    case 'eastindiansolfege':
+            case 'eastindiansolfege':
                 label = 'dha';
                 break;
             case 'notename':
@@ -946,14 +946,7 @@ function Palette(palettes, name) {
         this.menuContainer.removeAllChildren();
 
         // Create the menu button
-        var idx = BUILTINPALETTES.indexOf(this.name);
-        if (idx !== -1) {
-            var label = BUILTINPALETTESFORL23N[idx];
-        } else {
-            var label = _(this.name);
-	}
-
-        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', '#282828').replace('palette_label', label).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
+        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', '#282828').replace('palette_label', _(this.name)).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
     };
 
     this._getDownButtonY = function () {
