@@ -537,7 +537,7 @@ function PaletteModel(palette, palettes, name) {
                     var arg = block.defaults[0];
                 }
                 break;
-            case 'namedarg':
+	    case 'namedarg':
                 if (block.defaults[0] === undefined) {
                     modname = 'namedarg';
                     var arg = '1';
@@ -600,7 +600,7 @@ function PaletteModel(palette, palettes, name) {
                 label = i18nSolfege('la');
                 break;
             case 'eastindiansolfege':
-                label = 'sagram';
+                label = 'sargam';
                 break;
             case 'notename':
                 label = 'A';
