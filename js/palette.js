@@ -600,7 +600,7 @@ function PaletteModel(palette, palettes, name) {
                 label = i18nSolfege('la');
                 break;
             case 'eastindiansolfege':
-                label = 'pa';
+                label = 'sagram';
                 break;
             case 'notename':
                 label = 'A';
