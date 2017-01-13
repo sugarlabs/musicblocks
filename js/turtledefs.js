@@ -64,11 +64,6 @@ function createDefaultStack() {
          [25, ['solfege', {'value': 'sol'}], 0, 0, [24]],
          [26, ['number', {'value': 4}], 0, 0, [24]],
          [27, 'hidden', 0, 0, [19, null]],
-         //Emily: Added eastindiansolfege
-         //CHECKED: No errors in Javascript console
-         [28, ['eastindiansolfege', {'value': 'sol'}], 0, 0, [6]],
-         [29, ['eastindiansolfege', {'value': 'mi'}], 0, 0, [15]],
-         [30, ['eastindiansolfege', {'value': 'sol'}], 0, 0, [24]]
         ];
     /*
     DATAOBJS =
