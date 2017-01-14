@@ -671,74 +671,74 @@ msgstr ""
 #: js/analytics.js:316
 #: js/basicblocks.js:341
 #: js/basicblocks.js:354
-msgid "rhythm"
+msgid "Rhythm"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:267
-msgid "pitch"
+msgid "Pitch"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:1952
-msgid "tone"
+msgid "Tone"
 msgstr ""
 
 #: js/turtledefs.js:21
-msgid "intervals"
-msgstr ""
-
-#: js/turtledefs.js:21
-#: js/analytics.js:316
-msgid "flow"
-msgstr ""
-
-#: js/turtledefs.js:21
-msgid "boxes"
-msgstr ""
-
-#: js/turtledefs.js:21
-msgid "widgets"
+msgid "Intervals"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "turtle"
+msgid "Flow"
+msgstr ""
+
+#: js/turtledefs.js:21
+msgid "Boxes"
+msgstr ""
+
+#: js/turtledefs.js:21
+msgid "Widgets"
+msgstr ""
+
+#: js/turtledefs.js:21
+#: js/analytics.js:316
+msgid "Turtle"
 msgstr "টার্টেল"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "pen"
+msgid "Pen"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "number"
+msgid "Number"
 msgstr "সংখ্যা"
 
 #: js/turtledefs.js:21
-msgid "boolean"
+msgid "Boolean"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "media"
+msgid "Media"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "sensors"
+msgid "Sensors"
 msgstr ""
 
 #: js/turtledefs.js:21
-msgid "heap"
+msgid "Heap"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "extras"
+msgid "Extras"
 msgstr ""
 
 #: js/turtledefs.js:109

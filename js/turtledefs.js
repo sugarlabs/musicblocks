@@ -18,7 +18,7 @@ const DEFAULTPALETTE = 'rhythm';
 // plugins from the extras palette.
 BUILTINPALETTES = ['rhythm', 'pitch', 'tone', 'intervals', 'drum', 'flow', 'action', 'boxes', 'widgets', 'turtle', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'extras'];
 
-const BUILTINPALETTESFORL23N = [_('rhythm'), _('pitch'), _('tone'), _('intervals'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('extras')];
+const BUILTINPALETTESFORL23N = [_('Rhythm'), _('Pitch'), _('Tone'), _('Intervals'), _('Drum'), _('Flow'), _('Action'), _('Boxes'), _('Widgets'), _('Mouse'), _('Pen'), _('Number'), _('Boolean'), _('Media'), _('Sensors'), _('Heap'), _('Extras')];
 
 
 function getMainToolbarButtonNames(name) {

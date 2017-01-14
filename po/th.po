@@ -646,74 +646,74 @@ msgstr ""
 #: js/analytics.js:316
 #: js/basicblocks.js:341
 #: js/basicblocks.js:354
-msgid "rhythm"
+msgid "Rhythm"
 msgstr "จังหวะ"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:267
-msgid "pitch"
+msgid "Pitch"
 msgstr "ระดับเสียง"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:1952
-msgid "tone"
+msgid "Tone"
 msgstr "โทน"
 
 #: js/turtledefs.js:21
-msgid "intervals"
+msgid "Intervals"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "flow"
+msgid "Flow"
 msgstr "ความคล่องตัว"
 
 #: js/turtledefs.js:21
-msgid "boxes"
+msgid "Boxes"
 msgstr "กล่อง"
 
 #: js/turtledefs.js:21
-msgid "widgets"
+msgid "Widgets"
 msgstr ""
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "turtle"
+msgid "Turtle"
 msgstr "เต่า"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "pen"
+msgid "Pen"
 msgstr "ปากกา"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "number"
+msgid "Number"
 msgstr "ตัวเลข"
 
 #: js/turtledefs.js:21
-msgid "boolean"
+msgid "Boolean"
 msgstr "บูลีน"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "media"
+msgid "Media"
 msgstr "สื่อ"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "sensors"
+msgid "Sensors"
 msgstr "เซนเซอร์"
 
 #: js/turtledefs.js:21
-msgid "heap"
+msgid "Heap"
 msgstr "ฮีป"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "extras"
+msgid "Extras"
 msgstr "เพิ่มเติม"
 
 #: js/turtledefs.js:109

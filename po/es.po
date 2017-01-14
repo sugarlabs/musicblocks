@@ -636,74 +636,74 @@ msgstr "Desactivar scroll"
 #: js/analytics.js:316
 #: js/basicblocks.js:341
 #: js/basicblocks.js:354
-msgid "rhythm"
+msgid "Rhythm"
 msgstr "ritmo"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:267
-msgid "pitch"
+msgid "Pitch"
 msgstr "tono"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:1952
-msgid "tone"
+msgid "Tone"
 msgstr "tono"
 
 #: js/turtledefs.js:21
-msgid "intervals"
+msgid "Intervals"
 msgstr "intervalos"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "flow"
+msgid "Flow"
 msgstr "flujo"
 
 #: js/turtledefs.js:21
-msgid "boxes"
+msgid "Boxes"
 msgstr "cajas"
 
 #: js/turtledefs.js:21
-msgid "widgets"
+msgid "Widgets"
 msgstr "aparatos"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "turtle"
+msgid "Turtle"
 msgstr "tortuga"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "pen"
+msgid "Pen"
 msgstr "pluma"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "number"
+msgid "Number"
 msgstr "número"
 
 #: js/turtledefs.js:21
-msgid "boolean"
+msgid "Boolean"
 msgstr "booleano"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "media"
+msgid "Media"
 msgstr "medios"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "sensors"
+msgid "Sensors"
 msgstr "sensores"
 
 #: js/turtledefs.js:21
-msgid "heap"
+msgid "Heap"
 msgstr "pila"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
-msgid "extras"
+msgid "Extras"
 msgstr "extras"
 
 #: js/turtledefs.js:109

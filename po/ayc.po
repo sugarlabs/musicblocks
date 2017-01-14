@@ -765,88 +765,88 @@ msgstr "qhantäwi wayt'ayaña"
 #: js/basicblocks.js:341
 #: js/basicblocks.js:354
 #.TRANS: ritmo
-msgid "rhythm"
+msgid "Rhythm"
 msgstr "Warurt'äwi ira"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:267
 #.TRANS: tono
-msgid "pitch"
+msgid "Pitch"
 msgstr "ira"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #: js/basicblocks.js:1952
 #.TRANS: tono
-msgid "tone"
+msgid "Tone"
 msgstr "ist’äwi"
 
 #: js/turtledefs.js:21
 #.TRANS: intervalos
-msgid "intervals"
+msgid "Intervals"
 msgstr "jaljanaka"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #.TRANS: flujo
-msgid "flow"
+msgid "Flow"
 msgstr "siqi"
 
 #: js/turtledefs.js:21
 #.TRANS: cajas
-msgid "boxes"
+msgid "Boxes"
 msgstr "kajunanaka"
 
 #: js/turtledefs.js:21
 #.TRANS: aparatos
-msgid "widgets"
+msgid "Widgets"
 msgstr "apanaqañanaka"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #.TRANS: tortuga
-msgid "turtle"
+msgid "Turtle"
 msgstr "tortuga wakichata"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #.TRANS: pluma
-msgid "pen"
+msgid "Pen"
 msgstr "phuyu"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #.TRANS: número
-msgid "number"
+msgid "Number"
 msgstr "jakhu"
 
 #: js/turtledefs.js:21
 #.TRANS: booleano
-msgid "boolean"
+msgid "Boolean"
 msgstr "booleano wakichata"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #.TRANS: medios
-msgid "media"
+msgid "Media"
 msgstr "wakisirinaka"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #.TRANS: sensores
-msgid "sensors"
+msgid "Sensors"
 msgstr "katjiri"
 
 #: js/turtledefs.js:21
 #.TRANS: pila
-msgid "heap"
+msgid "Heap"
 msgstr "qutu"
 
 #: js/turtledefs.js:21
 #: js/analytics.js:316
 #.TRANS: extras
-msgid "extras"
+msgid "Extras"
 msgstr "yaqhanaka"
 
 #: js/turtledefs.js:109
