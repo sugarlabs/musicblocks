@@ -297,8 +297,14 @@
         row.style.left = modeDivPosition.left + 'px';
         row.style.top = modeDivPosition.top + 'px';
     };
-  </script>
 
+    function playSound(soundObj) {
+        docById(soundObj).play();
+    };
+  </script>
+  
+  <audio src="sounds/ERROR.wav" autostart="false" width="0" height="0" id="Error" enablejavascript="true"></audio>
+  <audio src="sounds/Connection.wav" autostart="false" width="0" height="0" id="Connect" enablejavascript="true"></audio>
   <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
   </canvas>
   <!--hidden at the beginning whilst everything loads-->
@@ -319,7 +325,7 @@
       </div>
       <div id="audio"></div>
       <div id="tourData"></div>
-    </div>
+  </div>
 
     <div id="popdown-palette"></div>
 
