@@ -37,6 +37,7 @@ TABLE OF CONTENTS
     11. [Inversion] (#INVERSION)
     12. [Backwards] (#BACKWARDS)
     13. [Setting Voice and Keys] (#SETTING)
+    14. [Vibrato] (#VIBRATO)
   3. [Voices] (#VOICES)
   4. [Graphics] (#GRAPHICS)
   5. [Interactions] (#INTERACTIONS)
@@ -394,14 +395,13 @@ followed by chord of E5 and G6.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform13.svg'/>
 
 The *Invert* block will invert a series of notes around a target
-note. There are two different versions of the *Invert* block: *odd*
+note. There are two different modes of the *Invert* block: *odd*
 and *even*, the latter shifts the point of rotation up by a `1/4`
 step, enabling rotation around a point between two notes.
 
 In the *invert (even)* example, `D4` is inverted around `G4`,
 resulting in a `C5`. In the *invert (odd)* example, `D4` is inverted
 around a point midway between `G4` and `G♯4` resulting in a `C♯5`
-
 
 <a name = "BACKWARDS">
 #### 3.2.12 Backwards
@@ -445,6 +445,17 @@ depending on the user's specified tonality.
 In the above example, the sequence of [drum](#DRUMS) beats is increased over time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
+
+<a name= "VIBRATO">
+#### 3.2.14 Vibrato
+</a>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform15.svg'/>
+
+The *Vibrato* Block adds a rapid variation in pitch to any contained
+notes. The intensity of the variation ranges from 1 to 100 (cents),
+e.g. plus or minus up to one half step. The rate argument determines
+the rate of the variation.
 
 <a name="VOICES">
 ### 3.3 Voices
