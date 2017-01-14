@@ -206,8 +206,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
 
-    //Emily: Added eastindiansolfege block
-    //Checked: No errors in Javascript console
     var eastindiansolfegeBlock = new ProtoBlock('eastindiansolfege');
     eastindiansolfegeBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['eastindiansolfege'] = eastindiansolfegeBlock;
