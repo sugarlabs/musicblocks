@@ -18,7 +18,7 @@ const DEFAULTPALETTE = 'rhythm';
 // plugins from the extras palette.
 BUILTINPALETTES = ['rhythm', 'pitch', 'tone', 'intervals', 'drum', 'flow', 'action', 'boxes', 'widgets', 'turtle', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'extras'];
 
-const BUILTINPALETTESFORL23N = [_('rhythm'), _('pitch'), _('tone'), _('intervals'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('mouse'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('extras')];
+const BUILTINPALETTESFORL23N = [_('rhythm'), _('pitch'), _('tone'), _('intervals'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('turtle'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('extras')];
 
 
 function getMainToolbarButtonNames(name) {
@@ -63,7 +63,7 @@ function createDefaultStack() {
          [24, 'pitch', 0, 0, [23, 25, 26, null]],
          [25, ['solfege', {'value': 'sol'}], 0, 0, [24]],
          [26, ['number', {'value': 4}], 0, 0, [24]],
-         [27, 'hidden', 0, 0, [19, null]]
+         [27, 'hidden', 0, 0, [19, null]],
         ];
     /*
     DATAOBJS =
