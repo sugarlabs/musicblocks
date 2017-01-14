@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-16 Walter Bender
+// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -205,6 +205,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['solfege'] = solfegeBlock;
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
+
+    //Emily: Added eastindiansolfege block
+    //Checked: No errors in Javascript console
+    var eastindiansolfegeBlock = new ProtoBlock('eastindiansolfege');
+    eastindiansolfegeBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['eastindiansolfege'] = eastindiansolfegeBlock;
+    eastindiansolfegeBlock.valueBlock();
+    eastindiansolfegeBlock.dockTypes[0] = 'solfegeout';
 
     // Transposition blocks
     var invertBlock = new ProtoBlock('invert1');
