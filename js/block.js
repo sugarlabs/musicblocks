@@ -1424,11 +1424,11 @@ function Block(protoblock, blocks, overrideName) {
                 if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
                     // But only after a slight delay.
                     if (!trashcan.isVisible) {
-                        if (!blocks.trashTimeoutSet) {
-                            blocks.trashTimeoutSet = true;
-                            blocks.trashTimeout = setTimeout(function() {
+                        if (!trashcan.timeoutSet) {
+                            trashcan.timeoutSet = true;
+                            trashcan.timeout = setTimeout(function() {
                                 trashcan.highlight();
-                                blocks.trashTimeoutSet = false;
+                                trashcan.timeoutSet = false;
                             }, 1000);
                         }
                     }
@@ -1490,16 +1490,15 @@ function Block(protoblock, blocks, overrideName) {
             this.blocks.longPressTimeout = null;
         }
 
-        if (this.blocks.trashTimeout != null) {
-            clearTimeout(blocks.trashTimeout);
-            this.blocks.trashTimeout = null;
-            this.blocks.trashTimeoutSet = false;
+        if (trashcan.timeout != null) {
+            clearTimeout(trashcan.timeout);
+            trashcan.timeout = null;
+            trashcan.timeoutSet = false;
         }
 
         if (moved) {
             // Check if block is in the trash.
             if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-		console.log(trashcan.isVisible);
                 if (trashcan.isVisible) {
                     blocks.sendStackToTrash(this);
                 }
