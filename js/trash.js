@@ -24,6 +24,8 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this.refreshCanvas = refreshCanvas;
     this.size = size;
     this.isVisible = false;
+    this.timeout = null;
+    this.timeoutSet = false;
 
     this.iconsize = 55;  // default value
     this.container = new createjs.Container();

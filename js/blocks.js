@@ -49,8 +49,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     // Track the time with mouse down.
     this.mouseDownTime = 0;
     this.longPressTimeout = null;
-    this.trashTimeout = null;
-    this.trashTimeoutSet = false;
 
     // "Copy stack" selects a stack for pasting. Are we selecting?
     this.selectingStack = false;
