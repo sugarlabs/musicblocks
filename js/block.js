@@ -1299,6 +1299,7 @@ function Block(protoblock, blocks, overrideName) {
             if (locked) {
                 return;
             }
+
             locked = true;
             setTimeout(function() {
                 locked = false;
@@ -1344,9 +1345,9 @@ function Block(protoblock, blocks, overrideName) {
                 }, LONGPRESSTIME);
             }
  
-            // Always show the trash when there is a block selected.
+            // Always show the trash when there is a block selected,
             trashcan.show();
- 
+
             // Raise entire stack to the top.
             blocks.raiseStackToTop(thisBlock);
  
@@ -1391,11 +1392,11 @@ function Block(protoblock, blocks, overrideName) {
                 // FIXME: More voodoo
                 event.nativeEvent.preventDefault();
  
-                // FIXME: need to remove timer
                 if (blocks.longPressTimeout != null) {
                     clearTimeout(blocks.longPressTimeout);
                     blocks.longPressTimeout = null;
                 }
+
                 if (!moved && myBlock.label != null) {
                     myBlock.label.style.display = 'none';
                 }
@@ -1421,9 +1422,20 @@ function Block(protoblock, blocks, overrideName) {
  
                 // If we are over the trash, warn the user.
                 if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                    trashcan.highlight();
+                    // But only after a slight delay.
+                    if (!trashcan.isVisible) {
+                        if (!blocks.trashTimeoutSet) {
+                            blocks.trashTimeoutSet = true;
+                            blocks.trashTimeout = setTimeout(function() {
+                                trashcan.highlight();
+                                blocks.trashTimeoutSet = false;
+                            }, 1000);
+                        }
+                    }
                 } else {
-                    trashcan.unhighlight();
+                    if (trashcan.isVisible) {
+                        trashcan.unhighlight();
+                    }
                 }
  
                 if (myBlock.isValueBlock() && myBlock.name !== 'media') {
@@ -1471,17 +1483,26 @@ function Block(protoblock, blocks, overrideName) {
         var scale = blocks.getStageScale();
  
         // Always hide the trash when there is no block selected.
-        // FIXME: need to remove timer
+        trashcan.hide();
+ 
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
             this.blocks.longPressTimeout = null;
         }
-        trashcan.hide();
- 
+
+        if (this.blocks.trashTimeout != null) {
+            clearTimeout(blocks.trashTimeout);
+            this.blocks.trashTimeout = null;
+            this.blocks.trashTimeoutSet = false;
+        }
+
         if (moved) {
             // Check if block is in the trash.
             if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                blocks.sendStackToTrash(this);
+		console.log(trashcan.isVisible);
+                if (trashcan.isVisible) {
+                    blocks.sendStackToTrash(this);
+                }
             } else {
                 // Otherwise, process move.
                 // Keep track of time of last move
@@ -1489,7 +1510,7 @@ function Block(protoblock, blocks, overrideName) {
                 blocks.mouseDownTime = d.getTime();
                 this.blocks.blockMoved(thisBlock);
  
-                // Just incase the blocks are not properly docked after
+                // Just in case the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
@@ -1499,7 +1520,7 @@ function Block(protoblock, blocks, overrideName) {
                 // Simulate click on Android.
                 var d = new Date();
                 if ((d.getTime() - blocks.mouseDownTime) < 500) {
-                    if(!this.trash)
+                    if (!this.trash)
                     {
                         var d = new Date();
                         blocks.mouseDownTime = d.getTime();
