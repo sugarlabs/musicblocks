@@ -742,7 +742,7 @@ function PopdownPalette(palettes) {
                                      alt="{' + _('popout') + '}" \
                                      title="{' + _('popout') + '}" /> \
                             </h2>',
-                           {i: icon, n: _(name)});
+                           {i: icon, n: toTitleCase(_(name))});
             html += '<ul>';
             this.models[name].update();
             
@@ -945,7 +945,7 @@ function Palette(palettes, name) {
         this.menuContainer.removeAllChildren();
 
         // Create the menu button
-        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', '#282828').replace('palette_label', _(this.name)).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
+        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', '#282828').replace('palette_label', toTitleCase(_(this.name))).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
     };
 
     this._getDownButtonY = function () {
