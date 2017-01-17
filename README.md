@@ -5,7 +5,7 @@ Music Blocks is a collection of manipulative tools for exploring
 fundamental musical concepts in an integrative and fun way.
 
 <img
-src='https://rawgithub.com/walterbender/musicblocks/master/screenshots/Screenshot-1.png'</img>
+src='https://cloud.githubusercontent.com/assets/21200681/22021228/f4f41dec-dcf6-11e6-9a88-30a0138253b1.png'</img>
 
 
 Using Music Blocks
