@@ -1204,9 +1204,20 @@ function Block(protoblock, blocks, overrideName) {
  
             // If we are over the trash, warn the user.
             if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                trashcan.highlight();
+                // But only after a slight delay.
+                if (!trashcan.isReady) {
+                    if (!trashcan.timeoutSet) {
+                        trashcan.timeoutSet = true;
+                        trashcan.timeout = setTimeout(function() {
+                            trashcan.highlight();
+                            trashcan.timeoutSet = false;
+                        }, 1000);
+                    }
+                }
             } else {
-                trashcan.unhighlight();
+                if (trashcan.isReady) {
+                    trashcan.unhighlight();
+                }
             }
  
             myBlock.blocks.findDragGroup(thisBlock)
@@ -1423,7 +1434,7 @@ function Block(protoblock, blocks, overrideName) {
                 // If we are over the trash, warn the user.
                 if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
                     // But only after a slight delay.
-                    if (!trashcan.isVisible) {
+                    if (!trashcan.isReady) {
                         if (!trashcan.timeoutSet) {
                             trashcan.timeoutSet = true;
                             trashcan.timeout = setTimeout(function() {
@@ -1433,7 +1444,7 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 } else {
-                    if (trashcan.isVisible) {
+                    if (trashcan.isReady) {
                         trashcan.unhighlight();
                     }
                 }
@@ -1499,7 +1510,7 @@ function Block(protoblock, blocks, overrideName) {
         if (moved) {
             // Check if block is in the trash.
             if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                if (trashcan.isVisible) {
+                if (trashcan.isReady) {
                     blocks.sendStackToTrash(this);
                 }
             } else {
