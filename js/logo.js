@@ -4450,7 +4450,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                         }
 
                         console.log("notes to play " + notes + ' ' + noteBeatValue);
-                        logo.turtles.turtleList[turtle].blink(duration,last(logo.polyVolume[turtle]));
+                        if (!logo.lilypondSaveOnly) {
+                            logo.turtles.turtleList[turtle].blink(duration,last(logo.polyVolume[turtle]));
+                        }
                         if (notes.length > 0) {
                             var len = notes[0].length;
 
