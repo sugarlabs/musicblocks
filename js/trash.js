@@ -29,12 +29,12 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this.container = new createjs.Container();
 
     this._borderHighlightBitmap = null;
-    this.__isHighlightInitialized = false;
+    this._isHighlightInitialized = false;
     this._inAnimation = false;
     this._animationInterval = null;
     this._highlightPower = 255;
     this._animationLevel = 0;
-    this.animationTime = 500;
+    this.animationTime = 1000;
 
     this._makeBorderHighlight = function(isRed = false) {
         var img = new Image();
@@ -109,6 +109,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     };
 
     this.show = function() {
+        this.stopHighlightAnimation();
         createjs.Tween.get(this.container).to({alpha: 0.0, visible: true}).to({alpha: 1.0}, 200);
     };
 
@@ -131,7 +132,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
             that.refreshCanvas();
         }, 20);
         this._switchHighlightVisibility(true);
-    }
+    };
 
     this.stopHighlightAnimation = function() {
         if(!this._inAnimation)
@@ -143,14 +144,14 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
         this._highlightPower = 255;
         this._makeBorderHighlight();
         this._switchHighlightVisibility(false);
-    }
+    };
 
     this._switchHighlightVisibility = function(bool) {
         last(this.container.children).visible = bool;
         this.container.children[1].visible = !bool;
         this.container.visible = true;
         this.refreshCanvas();
-    }
+    };
 
     this.overTrashcan = function(x, y) {
         var tx = this.container.x;
