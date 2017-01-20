@@ -14,9 +14,10 @@ const LILYPONDHEADER = '\\version "2.18.2"\n\n% ********************************
 
 //.TRANS Animal names used in Lilypond output
 const RODENTS = [_('mouse'), _('brown rat'), _('mole'), _('chipmunk'), _('red squirrel'), _('guinea pig'), _('capybara'), _('coypu'), _('black rat'), _('grey squirrel'), _('flying squirrel'), _('bat')];
-
+const RODENTSEN = ['mouse', 'brown rat', 'mole', 'chipmunk', 'red squirrel', 'guinea pig', 'capybara', 'coypu', 'black rat', 'grey squirrel', 'flying squirrel', 'bat'];
 //.TRANS Abbreviations for names used in Lilypind output, e.g., m for mouse
 const RODENTSSHORT = [_('m'), _('br'), _('ml'), _('ch'), _('rs'), _('gp'), _('cb'), _('cp'), _('bk'), _('gs'), _('fs'), _('bt')];
+const RODENTSSHORTEN = ['m', 'br', 'ml', 'ch', 'rs', 'gp', 'cb', 'cp', 'bk', 'gs', 'fs', 'bt'];
 const LYNOTE = 0;
 const LYDURATION = 1;
 const LYDOTCOUNT = 2;
@@ -392,6 +393,11 @@ saveLilypondOutput = function(logo, saveName) {
             } else if (instrumentName === t.toString()) {
                 instrumentName = RODENTS[t % 12];
             }
+
+            if (instrumentName === "") {
+            	instrumentName = RODENTSEN[t % 12];
+            }
+
             instrumentName = instrumentName.replace(/ /g, '_');
 	    
             logo.lilypondOutput += instrumentName + ' = {\n';
@@ -405,7 +411,11 @@ saveLilypondOutput = function(logo, saveName) {
             logo.lilypondOutput += '\n}\n\n';
 	    
             var shortInstrumentName = RODENTSSHORT[t % 12];
-	    
+
+            if (shortInstrumentName === "") {
+            	shortInstrumentName = RODENTSSHORTEN[t % 12];
+            }
+
             logo.lilypondOutput += instrumentName.replace(/ /g, '_') + 'Voice = ';
             if (logo.turtles.turtleList[t].drum) {
                 logo.lilypondOutput += '\\new DrumStaff \\with {\n';

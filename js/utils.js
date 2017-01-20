@@ -208,6 +208,14 @@ function _(text) {
     }
 };
 
+function toTitleCase(str) {
+    if (typeof str !== 'string')
+        return;
+    var tempStr = '';
+    if (str.length > 1)
+        tempStr = str.substring(1);
+    return str.toUpperCase()[0] + tempStr;
+}
 
 function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
     // console.log(rawData);
