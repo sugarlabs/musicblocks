@@ -57,7 +57,7 @@ function ClearBox(canvas, stage, refreshCanvas, clear) {
     this._loadClearContainerHandler = function() {
         var hitArea = new createjs.Shape();
         this.bounds = this.container.getBounds();
-        hitArea.graphics.beginFill('#FFF').drawRect(bounds.x, bounds.y, bounds. width, bounds.height);
+        hitArea.graphics.beginFill('#FFF').drawRect(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
         hitArea.x = 0;
         hitArea.y = 0;
         this.container.hitArea = hitArea;
