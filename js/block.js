@@ -1203,23 +1203,11 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.container.y += dy;
  
             // If we are over the trash, warn the user.
-            if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                // But only after a slight delay.
-                if (!trashcan.isReady) {
-                    if (!trashcan.timeoutSet) {
-                        trashcan.timeoutSet = true;
-                        trashcan.timeout = setTimeout(function() {
-                            trashcan.highlight();
-                            trashcan.timeoutSet = false;
-                        }, 1000);
-                    }
-                }
-            } else {
-                if (trashcan.isReady) {
-                    trashcan.unhighlight();
-                }
-            }
- 
+            if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale))
+                trashcan.startHighlightAnimation();
+            else
+                trashcan.stopHighlightAnimation();
+
             myBlock.blocks.findDragGroup(thisBlock)
             if (myBlock.blocks.dragGroup.length > 0) {
                 for (var b = 0; b < myBlock.blocks.dragGroup.length; b++) {
@@ -1243,7 +1231,8 @@ function Block(protoblock, blocks, overrideName) {
         if (moved) {
             // Check if block is in the trash.
             if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                blocks.sendStackToTrash(this);
+                if(trashcan.isVisible)
+                    blocks.sendStackToTrash(this);
             } else {
                 // Otherwise, process move.
                 blocks.blockMoved(thisBlock);
@@ -1432,23 +1421,11 @@ function Block(protoblock, blocks, overrideName) {
                 blocks.moveBlockRelative(thisBlock, dx, dy);
  
                 // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                    // But only after a slight delay.
-                    if (!trashcan.isReady) {
-                        if (!trashcan.timeoutSet) {
-                            trashcan.timeoutSet = true;
-                            trashcan.timeout = setTimeout(function() {
-                                trashcan.highlight();
-                                trashcan.timeoutSet = false;
-                            }, 1000);
-                        }
-                    }
-                } else {
-                    if (trashcan.isReady) {
-                        trashcan.unhighlight();
-                    }
-                }
- 
+                if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale))
+                        trashcan.startHighlightAnimation();
+                else
+                        trashcan.stopHighlightAnimation();
+
                 if (myBlock.isValueBlock() && myBlock.name !== 'media') {
                     // Ensure text is on top
                     var z = myBlock.container.getNumChildren() - 1;
@@ -1501,16 +1478,10 @@ function Block(protoblock, blocks, overrideName) {
             this.blocks.longPressTimeout = null;
         }
 
-        if (trashcan.timeout != null) {
-            clearTimeout(trashcan.timeout);
-            trashcan.timeout = null;
-            trashcan.timeoutSet = false;
-        }
-
         if (moved) {
             // Check if block is in the trash.
             if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                if (trashcan.isReady) {
+                if (trashcan.isVisible) {
                     blocks.sendStackToTrash(this);
                 }
             } else {
