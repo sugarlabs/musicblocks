@@ -153,6 +153,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
         this.refreshCanvas();
     };
 
+
     this.overTrashcan = function(x, y) {
         var tx = this.container.x;
         var ty = this.container.y;
