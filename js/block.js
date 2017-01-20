@@ -1481,7 +1481,7 @@ function Block(protoblock, blocks, overrideName) {
         if (moved) {
             // Check if block is in the trash.
             if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                if (trashcan.isVisible) {
+                if (trashcan.isReady) {
                     blocks.sendStackToTrash(this);
                 }
             } else {
