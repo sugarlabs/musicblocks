@@ -1413,13 +1413,17 @@ function Block(protoblock, blocks, overrideName) {
  
                 var oldX = myBlock.container.x;
                 var oldY = myBlock.container.y;
- 
+                
                 var dx = Math.round(Math.round(event.stageX / scale) + offset.x - oldX);
                 var dy = Math.round(Math.round(event.stageY / scale) + offset.y - oldY);
- 
-                // Move this block...
+                var finalPos = oldY + dy;
+                
+                if (finalPos < (70 * scale)){
+                	dy = Math.round(Math.round(event.stageY / scale) + offset.y - oldY + 70);
+                }
                 blocks.moveBlockRelative(thisBlock, dx, dy);
- 
+                
+
                 // If we are over the trash, warn the user.
                 if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale))
                         trashcan.startHighlightAnimation();
