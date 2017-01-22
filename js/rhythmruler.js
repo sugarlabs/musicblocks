@@ -681,10 +681,10 @@ function RhythmRuler () {
 
                 var rulerTable = docById('rulerTable' + drum);
                 for (var j = 0; j < this._dissectHistory[i].length; j++) {
-                    this._rulerSelected = drum;
                     if (this._dissectHistory[i][0][j] == undefined) {
                         continue;
                     }
+                    this._rulerSelected = drum;
 
                     var cell = rulerTable.rows[0].cells[this._dissectHistory[i][0][j][0]];
                     if (cell != undefined) {
