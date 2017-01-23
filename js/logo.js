@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2016 Walter Bender
+// Copyright (c) 2014-2017 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
 //
 // This program is free software; you can redistribute it and/or
@@ -284,7 +284,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                     var blk = logo.stepQueue[turtle].pop();
                     if (blk != null && blk !== notesFinish[turtle]) {
                         var block = logo.blocks.blockList[blk];
-                        if (block.name === 'note') {
+                        if (block.name === 'newnote') {
                             tempStepQueue[turtle] = blk;
                             notesFinish[turtle] = last(block.connections);
                             if (notesFinish[turtle] == null) { // end of flow
