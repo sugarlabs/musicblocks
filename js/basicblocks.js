@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-16 Walter Bender
+// Copyright (c) 2014-16 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -206,7 +206,27 @@ function initBasicProtoBlocks(palettes, blocks) {
     solfegeBlock.valueBlock();
     solfegeBlock.dockTypes[0] = 'solfegeout';
 
+    var eastindiansolfegeBlock = new ProtoBlock('eastindiansolfege');
+    eastindiansolfegeBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['eastindiansolfege'] = eastindiansolfegeBlock;
+    eastindiansolfegeBlock.valueBlock();
+    eastindiansolfegeBlock.dockTypes[0] = 'solfegeout';
+
     // Transposition blocks
+    var invertBlock = new ProtoBlock('invert1');
+    invertBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['invert1'] = invertBlock;
+    invertBlock.staticLabels.push(_('invert'), _('note'), _('octave'), _('even') + '/' + _('odd'));
+    invertBlock.adjustWidthToLabel();
+    invertBlock.flowClampThreeArgBlock();
+    invertBlock.adjustWidthToLabel();
+    invertBlock.defaults.push('sol');
+    invertBlock.defaults.push(4);
+    invertBlock.defaults.push('odd');
+    invertBlock.dockTypes[1] = 'solfegein';
+    invertBlock.dockTypes[2] = 'anyin';
+    invertBlock.dockTypes[3] = 'anyin';
+
     var invertBlock2 = new ProtoBlock('invert2');
     invertBlock2.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invert2'] = invertBlock2;
@@ -218,6 +238,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     invertBlock2.defaults.push(4);
     invertBlock2.dockTypes[1] = 'solfegein';
     invertBlock2.dockTypes[2] = 'anyin';
+    invertBlock2.hidden = true;
 
     var invertBlock = new ProtoBlock('invert');
     invertBlock.palette = palettes.dict['pitch'];
@@ -230,6 +251,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     invertBlock.defaults.push(4);
     invertBlock.dockTypes[1] = 'solfegein';
     invertBlock.dockTypes[2] = 'anyin';
+    invertBlock.hidden = true;
 
     var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['pitch'];
@@ -620,21 +642,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note3Block = new ProtoBlock('note3');
     note3Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note3'] = note3Block;
-    note3Block.staticLabels.push(_('note value') + ' ' + _('440 hertz'));
+    note3Block.staticLabels.push(_('note value') + ' ' + _('392 hertz'));
     note3Block.adjustWidthToLabel();
     note3Block.zeroArgBlock();
 
     var note2Block = new ProtoBlock('note2');
     note2Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note2'] = note2Block;
-    note2Block.staticLabels.push(_('note value') + ' ' + 'A4');
+    note2Block.staticLabels.push(_('note value') + ' ' + 'G4');
     note2Block.adjustWidthToLabel();
     note2Block.zeroArgBlock();
 
     var note1Block = new ProtoBlock('note1');
     note1Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note1'] = note1Block;
-    note1Block.staticLabels.push(_('note value') + ' ' + i18nSolfege('la') + '4');
+    note1Block.staticLabels.push(_('note value') + ' ' + i18nSolfege('sol') + '4');
     note1Block.adjustWidthToLabel();
     note1Block.zeroArgBlock();
 
@@ -744,6 +766,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['voicename'] = voicenameBlock;
     voicenameBlock.valueBlock();
     voicenameBlock.dockTypes[0] = 'textout';
+
+    var vibratoBlock = new ProtoBlock('vibrato');
+    vibratoBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['vibrato'] = vibratoBlock;
+    vibratoBlock.staticLabels.push(_('vibrato'), _('intensity'), _('rate'));
+    vibratoBlock.adjustWidthToLabel();
+    vibratoBlock.flowClampTwoArgBlock();
+    vibratoBlock.defaults.push(10);
+    vibratoBlock.defaults.push(1 / 16);
 
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
@@ -2039,7 +2070,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     toFrequencyBlock.defaults.push('A');
     toFrequencyBlock.defaults.push('4');
     toFrequencyBlock.twoArgMathBlock();
-    toFrequencyBlock.dockTypes[1] = 'anyin';
+    toFrequencyBlock.dockTypes[1] = 'notein';
     toFrequencyBlock.dockTypes[2] = 'numberin';
 
     var shellBlock = new ProtoBlock('turtleshell');

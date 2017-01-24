@@ -35,6 +35,8 @@ const EQUIVALENTNOTES = {'C♯': 'D♭', 'D♯': 'E♭', 'F♯': 'G♭', 'G♯':
 const EXTRATRANSPOSITIONS = {'E♯': ['F', 0], 'B♯': ['C', 1], 'C♭': ['B', -1], 'F♭': ['E', 0], 'e♯': ['F', 0], 'b♯': ['C', 1], 'c♭': ['B', -1], 'f♭': ['E', 0]};
 const SOLFEGENAMES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
 const SOLFEGECONVERSIONTABLE = {'C': 'do', 'C♯': 'do' + '♯', 'D': 're', 'D♯': 're' + '♯', 'E': 'mi', 'F': 'fa', 'F♯': 'fa' + '♯', 'G': 'sol', 'G♯': 'sol' + '♯', 'A': 'la', 'A♯': 'la' + '♯', 'B': 'ti', 'D♭': 're' + '♭', 'E♭': 'mi' + '♭', 'G♭': 'sol' + '♭', 'A♭': 'la' + '♭', 'B♭': 'ti' + '♭', 'R': _('rest')};
+const WESTERN2EISOLFEGENAMES = {'do': 'sa', 're': 're', 'mi': 'ga', 'fa': 'ma', 'sol': 'pa', 'la': 'dha', 'ti': 'ni'};
+
 const PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
 const PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 const PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
@@ -51,8 +53,8 @@ const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
 
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
 const SOLFATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
-
 
 function mod12(a) {
     while (a < 0) {
@@ -688,7 +690,6 @@ function getScaleAndHalfSteps(keySignature) {
     return [thisScale, solfege, myKeySignature, obj[1]];
 };
 
-
 // Relative interval (used by the Interval Block) is based on the
 // steps within the current key and mode.
 function getInterval (interval, keySignature, pitch) {
@@ -927,21 +928,39 @@ function pitchToNumber(pitch, octave, keySignature) {
         return 0;
     }
 
-    if (pitch in BTOFLAT) {
-        pitch = BTOFLAT[pitch];
-    } else if (pitch in STOSHARP) {
-        pitch = STOSHARP[pitch];
+    // Check for flat, sharp, double flat, or double sharp.
+    var transposition = 0;
+    var len = pitch.length;
+    if (len > 1) {
+        if (len > 2) {
+            var lastTwo = pitch.slice(len - 2);
+            if (lastTwo === 'bb' || lastTwo === '♭♭') {
+                pitch = pitch.slice(0, len - 2);
+                transposition -= 2;
+            } else if (lastTwo === '##' || lastTwo === '♯♯') {
+                pitch = pitch.slice(0, len - 2);
+                transposition += 2;
+            } else if (lastTwo === '#b' || lastTwo === '♯♭' || lastTwo === 'b#' || lastTwo === '♭♯') {
+                // Not sure this could occur... but just in case.
+                pitch = pitch.slice(0, len - 2);
+            }
+	}
+
+        if (pitch.length > 1) {
+            var lastOne = pitch.slice(len - 1);
+            if (lastOne === 'b' || lastOne === '♭') {
+                pitch = pitch.slice(0, len - 1);
+                transposition -= 1;
+            } else if (lastOne === '#' || lastOne === '♯') {
+                pitch = pitch.slice(0, len - 1);
+                transposition += 1;
+            }
+        }
     }
 
     var pitchNumber = 0;
     if (PITCHES.indexOf(pitch) !== -1) {
         pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
-    } else if (PITCHES1.indexOf(pitch.toUpperCase()) !== -1) {
-        pitchNumber = PITCHES1.indexOf(pitch.toUpperCase());
-    } else if (PITCHES2.indexOf(pitch.toUpperCase()) !== -1) {
-        pitchNumber = PITCHES2.indexOf(pitch.toUpperCase());
-    } else if (PITCHES3.indexOf(pitch.toUpperCase()) !== -1) {
-        pitchNumber = PITCHES3.indexOf(pitch.toUpperCase());
     } else {
         // obj[1] is the solfege mapping for the current key/mode
         var obj = getScaleAndHalfSteps(keySignature)
@@ -954,7 +973,7 @@ function pitchToNumber(pitch, octave, keySignature) {
     }
 
     // We start at A0.
-    return Math.max(octave, 0) * 12 + pitchNumber - PITCHES.indexOf('A');
+    return Math.max(octave, 0) * 12 + pitchNumber - PITCHES.indexOf('A') + transposition;
 };
 
 
@@ -981,7 +1000,6 @@ function i18nSolfege(note) {
         return note;
     }
 }
-
 
 function splitSolfege(value) {
     if (value != null) {
@@ -1231,7 +1249,29 @@ function Synth () {
         this.getSynthByName(name).toMaster();
     };
 
-    this.trigger = function(notes, beatValue, name) {
+    this.performNotes = function(synth, notes, beatValue, doVibrato = false, vibratoIntensity = 0, vibratoFrequency = 0) {
+        if (doVibrato) {
+            var vibrato = new Tone.Vibrato(1/vibratoFrequency, vibratoIntensity);
+            synth.chain(vibrato, Tone.Master);
+            synth.triggerAttackRelease(notes, beatValue);
+            setTimeout(function() {
+                vibrato.dispose();
+            }, beatValue*1000); //disable vibrato effect when beat is over
+        } else {
+            synth.triggerAttackRelease(notes, beatValue);
+        }
+    }
+
+    this.trigger = function(notes, beatValue, name, vibratoArgs = []) {
+        var doVibrato = false;
+        var vibratoIntensity = 0;
+        var vibratoFrequency = 0;
+        if (vibratoArgs.length == 2 && vibratoArgs[0] != 0) {
+            doVibrato = true;
+            vibratoIntensity = vibratoArgs[0];
+            vibratoFrequency = vibratoArgs[1];
+        }
+
         switch (name) {
         case 'pluck':
         case 'triangle':
@@ -1243,8 +1283,7 @@ function Synth () {
             } else {
                 var noteToPlay = notes;
             }
-
-            this.synthset[name][1].triggerAttackRelease(noteToPlay, beatValue);
+            this.performNotes(this.synthset[name][1], noteToPlay, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
             break;
         case 'violin':
         case 'cello':
@@ -1255,11 +1294,11 @@ function Synth () {
             var centerNo = SAMPLECENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
-            this.synthset[name][1].triggerAttackRelease(noteNo - centerNo, beatValue);
+            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
             break;
         case 'default':
         case 'poly':
-            this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
+            this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
             break;
         default:
             var drumName = getDrumSynthName(name);
@@ -1287,7 +1326,7 @@ function Synth () {
             } else if (name.slice(0, 4) == 'file') {
                 this.synthset[name][1].triggerAttack(0, beatValue, 1);
             } else {
-                this.synthset['poly'][1].triggerAttackRelease(notes, beatValue);
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
             }
             break;
         }

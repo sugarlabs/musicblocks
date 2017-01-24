@@ -63,7 +63,7 @@ function createDefaultStack() {
          [24, 'pitch', 0, 0, [23, 25, 26, null]],
          [25, ['solfege', {'value': 'sol'}], 0, 0, [24]],
          [26, ['number', {'value': 4}], 0, 0, [24]],
-         [27, 'hidden', 0, 0, [19, null]]
+         [27, 'hidden', 0, 0, [19, null]],
         ];
     /*
     DATAOBJS =
