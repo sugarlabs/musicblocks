@@ -419,6 +419,8 @@ function PlanetView(model, controller) {
         d.innerHTML = html;
         var htmldata = d;
         // console.log(htmldata);
+        htmldata.querySelector('.thumbnail')
+            .addEventListener('click', planet.load(htmldata));
         htmldata.querySelector('.download')
             .addEventListener('click', planet.load(htmldata));
         htmldata.querySelector('.share')
