@@ -1674,8 +1674,6 @@ define(function (require) {
                     _doFastButton(env);
                 }, 2000);
             }
-
-            docById('loading-image-container').style.display = 'none';
         };
 
         function loadRawProject(data) {
@@ -1690,8 +1688,6 @@ define(function (require) {
 
             var obj = JSON.parse(data);
             blocks.loadNewBlocks(obj);
-
-            docById('loading-image-container').style.display = 'none';
             document.body.style.cursor = 'default';
         };
 
