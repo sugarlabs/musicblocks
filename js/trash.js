@@ -23,27 +23,42 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this.stage = stage;
     this.refreshCanvas = refreshCanvas;
     this.size = size;
+    this.isVisible = false;
 
     this.iconsize = 55;  // default value
     this.container = new createjs.Container();
 
-    this._makeBorderHighlight = function() {
+    this._borderHighlightBitmap = null;
+    this._isHighlightInitialized = false;
+    this._inAnimation = false;
+    this._animationInterval = null;
+    this._highlightPower = 255;
+    this._animationLevel = 0;
+    this.animationTime = 1000;
+
+    this._makeBorderHighlight = function(isRed = false) {
         var img = new Image();
         var trash = this;
 
         img.onload = function () {
-            bitmap = new createjs.Bitmap(img);
-            bitmap.scaleX = size / trash.iconsize;
-            bitmap.scaleY = size / trash.iconsize;
-            trash.container.addChild(bitmap);
-            bitmap.visible = false;
-            bounds = trash.container.getBounds();
-            trash.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            // Hide the trash until a block is moved.
-            trash.container.visible = false;
+            trash._borderHighlightBitmap = new createjs.Bitmap(img);
+            trash._borderHighlightBitmap.scaleX = size / trash.iconsize;
+            trash._borderHighlightBitmap.scaleY = size / trash.iconsize;
+            if (!trash._isHighlightInitialized) {
+                trash.container.visible = false;
+                trash._isHighlightInitialized = true;
+            } else {
+               trash.container.removeChildAt(trash.container.children.length-1);
+            }
+            trash.container.addChild(trash._borderHighlightBitmap);
+            trash._borderHighlightBitmap.visible = true;
         };
 
-        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', '#000000'))));
+        var highlightString = 'rgb(' + this._highlightPower + ',' + this._highlightPower + ',' + this._highlightPower + ')';
+        if (isRed) {
+            highlightString = 'rgb(255, 0, 0)'; // when trash is activated, highlight should be red (warn)
+        }
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', highlightString))));
     };
 
     this._makeBorder = function() {
@@ -94,28 +109,50 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     };
 
     this.show = function() {
+        this.stopHighlightAnimation();
         createjs.Tween.get(this.container).to({alpha: 0.0, visible: true}).to({alpha: 1.0}, 200);
     };
 
-    this.highlight = function() {
-        if (!last(this.container.children).visible) {
-            last(this.container.children).visible = true;
-            this.container.children[1].visible = false;
-            this.container.visible = true;
-            this.container.updateCache();
-            this.refreshCanvas();
-        }
+    this.startHighlightAnimation = function() {
+        if(this._inAnimation)
+            return;
+        this._inAnimation = true;
+        var that = this;
+        this._animationInterval = setInterval(function() {
+            that._animationLevel += 20;
+            if(that._animationLevel >= that.animationTime) {
+                that.isVisible = true;
+                that._makeBorderHighlight(true); // make it red
+                that.refreshCanvas();
+                clearInterval(that._animationInterval); // autostop animation
+                return;
+            }
+            that._highlightPower = parseInt(255 - (255 * (that._animationLevel / that.animationTime)), 10);
+            that._makeBorderHighlight();
+            that.refreshCanvas();
+        }, 20);
+        this._switchHighlightVisibility(true);
     };
 
-    this.unhighlight = function() {
-        if (last(this.container.children).visible) {
-            last(this.container.children).visible = false;
-            this.container.children[1].visible = true;
-            this.container.visible = true;
-            this.container.updateCache();
-            this.refreshCanvas();
-        }
+    this.stopHighlightAnimation = function() {
+        if(!this._inAnimation)
+            return;
+        clearInterval(this._animationInterval);
+        this._inAnimation = false;
+        this.isVisible = false;
+        this._animationLevel = 0;
+        this._highlightPower = 255;
+        this._makeBorderHighlight();
+        this._switchHighlightVisibility(false);
     };
+
+    this._switchHighlightVisibility = function(bool) {
+        last(this.container.children).visible = bool;
+        this.container.children[1].visible = !bool;
+        this.container.visible = true;
+        this.refreshCanvas();
+    };
+
 
     this.overTrashcan = function(x, y) {
         var tx = this.container.x;

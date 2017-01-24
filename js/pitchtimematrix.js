@@ -1,5 +1,5 @@
 // Copyright (c) 2015 Yash Khandelwal
-// Copyright (c) 2015,16 Walter Bender
+// Copyright (c) 2015-17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,6 +13,7 @@
 // FIXME: i18n for graphics blocks
 const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
+// Deprecated
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
 
 
@@ -210,7 +211,6 @@ function Matrix() {
             }
             that._logo.synth.stopSound('default');
             that._logo.synth.stop();
-
         }
 
         var j = 0;
@@ -230,18 +230,17 @@ function Matrix() {
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                 this._noteStored.push(drumName);
-		console.log(this.rowLabels[i] + ' ' + drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
                 this._noteStored.push(this.rowLabels[i].replace(/ /g,':'));
+                // Deprecated
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
                 cell.style.backgroundImage = "url('images/synth2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
-                var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
-                this._noteStored.push(noteObj[0] + noteObj[1]);
+                this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
@@ -340,7 +339,6 @@ function Matrix() {
         // Make a list to sort, skipping drums and graphics.
         // frequency;label;arg;row index
         for (var i = 0; i < this.rowLabels.length; i++) {
-            console.log(i + ': ' + this.rowLabels[i] + ' ' + this._noteStored[i]);
             if (this.rowLabels[i].toLowerCase() === 'rest') {
                 continue;
             }
@@ -355,6 +353,7 @@ function Matrix() {
             }
 
             // We want to sort based on frequency, so we convert all notes to frequency.
+            // Deprecated
             if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 sortableList.push([this.rowArgs[i], this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else {
@@ -397,7 +396,6 @@ function Matrix() {
 
             if (i > 0 && typeof(obj[2]) !== 'object' && (Number(obj[2]) === last(this.rowArgs) && obj[1] === last(this.rowLabels))) {
                 // skip duplicates
-                console.log('skipping duplicate ' + obj[1] + ' ' + obj[2]);
                 for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
                     this._rowOffset[j] -= 1;
                 }
@@ -410,7 +408,6 @@ function Matrix() {
                 if (argType === 'object') {
                     if ((Number(obj[2][0]) === last(this.rowArgs)[0]) && (Number(obj[2][1]) === last(this.rowArgs)[1])) {
                         // skip duplicates
-                        console.log('skipping duplicate ' + obj[1] + ' ' + obj[2]);
                         for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
                             this._rowOffset[j] -= 1;
                         }
@@ -805,7 +802,6 @@ function Matrix() {
 
         var notes = [];
 
-        console.log(this._notesToPlay);
         for (var i in this._notesToPlay) {
             notes.push(this._notesToPlay[i]);
         }
@@ -823,15 +819,22 @@ function Matrix() {
 
         // Note can be a chord, hence it is an array.
         for (var i = 0; i < note.length; i++) {
-            var drumName = getDrumName(note[i]);
-            if (drumName != null) {
-                console.log('playAll: ' + drumName);
+            if (typeof(note[i]) === 'number') {
+                var drumName = null;
+            } else {
+                var drumName = getDrumName(note[i]);
+            }
+
+            if (typeof(note[i]) === 'number') {
+                synthNotes.push(note[i]);
+            } else if (drumName != null) {
                 drumNotes.push(drumName);
             } else if (note[i].slice(0, 4) === 'http') {
                 drumNotes.push(note[i]);
             } else {
                 var obj = note[i].split(':');
                 if (obj.length > 1) {
+                    // Deprecated
                     if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
                         synthNotes.push(note[i]);
                     } else {
@@ -870,12 +873,10 @@ function Matrix() {
         }
 
         for (var i = 0; i < synthNotes.length; i++) {
-            var obj = synthNotes[i].split(':');
-            this._logo.synth.trigger([Number(obj[1])], this._logo.defaultBPMFactor / noteValue, obj[0]);
+            this._logo.synth.trigger([Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, 'poly');
         }
 
         for (var i = 0; i < drumNotes.length; i++) {
-            console.log('trigger: ' + drumNotes[i]);
             this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i]);
         }
 
@@ -931,14 +932,21 @@ function Matrix() {
 
                 // Note can be a chord, hence it is an array.
                 for (var i = 0; i < note.length; i++) {
-                    var drumName = getDrumName(note[i]);
-                    if (drumName != null) {
-			console.log('__playNote ' + note[i] + ' ' + drumName);
+                    if (typeof(note[i]) === 'number') {
+                        var drumName = null;
+                    } else {
+                        var drumName = getDrumName(note[i]);
+                    }
+
+                    if (typeof(note[i]) === 'number') {
+                        synthNotes.push(note[i]);
+                    } else if (drumName != null) {
                         drumNotes.push(drumName);
                     } else if (note[i].slice(0, 4) === 'http') {
                         drumNotes.push(note[i]);
                     } else {
                         var obj = note[i].split(':');
+                        // Deprecated
                         if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
                             synthNotes.push(note[i]);
                             continue;
@@ -957,12 +965,10 @@ function Matrix() {
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
-                    var obj = synthNotes[i].split(':');
-                    that._logo.synth.trigger([Number(obj[1])], that._logo.defaultBPMFactor / noteValue, obj[0]);
+                    that._logo.synth.trigger([Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, 'poly');
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
-		    console.log('trigger: ' + drumNotes[i]);
                     that._logo.synth.trigger(['C2'], that._logo.defaultBPMFactor / noteValue, drumNotes[i]);
                 }
 
@@ -1022,13 +1028,18 @@ function Matrix() {
 
     this._setNoteCell = function(j, colIndex, cell, playNote) {
         var note = this._noteStored[j - 1];
-        var drumName = getDrumName(note);
-        console.log('setNoteCell: ' + note + ' ' + drumName);
-        var graphicsBlock = false;
-
-        graphicNote = note.split(':');
-        if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
-            var graphicsBlock = true;
+        if (this.rowLabels[j - 1] === 'hertz') {
+            var drumName = null;
+            var graphicsBlock = false;
+            var obj = [note];
+        } else {
+            var drumName = getDrumName(note);
+            var graphicsBlock = false;
+            graphicNote = note.split(':');
+            if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
+                var graphicsBlock = true;
+            }
+            var obj = note.split(':');
         }
             
         this._notesToPlay[parseInt(colIndex) - 1][0].push(note);
@@ -1041,14 +1052,16 @@ function Matrix() {
         noteValue = Number(noteParts[0]) / Number(noteParts[2]);
         noteValue = noteValue.toString();
 
-        var obj = note.split(':');
         if (obj.length === 1) {
             if (playNote) {
                 if (drumName != null) {
-		    console.log('trigger: ' + drumName);
                     this._logo.synth.trigger('C2', noteValue, drumName);
+                } else if (this.rowLabels[j - 1] === 'hertz') {
+                    this._logo.synth.trigger(Number(note), noteValue, 'poly');
                 } else if (graphicsBlock !== true) {
                     this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
+                } else {
+                    console.log('???');
                 }
             }
         } else if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
@@ -1162,10 +1175,28 @@ function Matrix() {
                         }
                     }
 
-                    var obj = note[0][j].split(':');
-                    var drumName = getDrumName(note[0][j]);
-                    console.log('save: ' + ' ' + note[0][j] + ' ' + drumName);
-                    if (drumName != null) {
+                    if (typeof(note[0][j]) === 'number') {
+                        var obj = null;
+                        var drumName = null;
+                    } else {
+                       var obj = note[0][j].split(':');
+                       var drumName = getDrumName(note[0][j]);
+                    }
+
+                    if (obj == null) {
+                        // add a hertz block
+                        // The last connection in last pitch block is null.
+                        if (note[0].length === 1 || j === note[0].length - 1) {
+                            var lastConnection = null;
+                        } else {
+                            var lastConnection = thisBlock + 2;
+                        }
+
+                        newStack.push([thisBlock, 'hertz', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
+                        newStack.push([thisBlock + 1, ['number', {'value': note[0][j]}], 0, 0, [thisBlock]]);
+                        thisBlock += 2;
+                        previousBlock = thisBlock - 2;
+                    } else if (drumName != null) {
                         // add a playdrum block
                         // The last connection in last pitch block is null.
                         if (note[0].length === 1 || j === note[0].length - 1) {

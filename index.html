@@ -24,9 +24,32 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" sizes="192x192" href="activity/activity-icon-color-4-00.png">
   <meta id="theme-color" name="theme-color" content="#2196F3">
+
+  <!--animation scripts -->
+  <script src="lib/easeljs-0.7.1.min.js"></script>
+  <script src="lib/tweenjs-0.5.1.min.js"></script>
+  <script src="lib/movieclip-0.7.1.min.js"></script>
+  <script src="activity/SugarAnimation.js"></script>
+
+  <script>
+  var canvas, stage, exportRoot;
+
+  function init() {
+      canvas = document.getElementById("canvas");
+      exportRoot = new lib.SugarAnimation();
+
+      stage = new createjs.Stage(canvas);
+      stage.addChild(exportRoot);
+      stage.update();
+
+      createjs.Ticker.setFPS(lib.properties.fps);
+      createjs.Ticker.addEventListener("tick", stage);
+  }
+  </script>
+
 </head>
 
-<body data-title="index" id="body" style="background: #96D3F3;">
+<body onload="init();" data-title="index" id="body" style="background: #96D3F3;">
   <script>
     window.fbAsyncInit = function() {
         FB.init({
@@ -276,75 +299,76 @@
     };
   </script>
 
-  <!-- see activity/activity-icon-color-loading.svg for info -->
-  <div class="canvasHolder">
-    <canvas id="myCanvas" width="1200" height="900"></canvas>
-    <canvas id="myChart" width="600" height="600"></canvas>
-    <video id="camVideo" style="visibility:hidden;"></video>
-    <canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;"></canvas>
-    <canvas id="camCanvas" style="visibility:hidden;"></canvas>
-    <div id="labelDiv"></div>
-    <div id="ioDiv">
-      <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*"></input>
-      <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb"></input>
-      <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json"></input>
-      <input tabindex="-1" class="file" type="file" id="myOpenAll"></input>
-    </div>
-    <div id="audio"></div>
-    <div id="tourData"></div>
-  </div>
-
-  <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
-    <img src="./activity/mouse.svg" style="max-width:50%; height: 512px; width: 512px; margin: auto; display: block;" />
-  </div>
-
-  <div id="popdown-palette"></div>
-
-  <div id="main-toolbar" class="toolbar"></div>
-
-  <div id="loader"></div>
-
-  <div id="header" class="EaselJS"></div>
-
-  <div class="planet" style="display: none;">
-    <nav>
-      <div class="nav-container">
-        <img src="header-icons/planet-button.svg" class="logo" />
-        <h1 id="planetTitle"></h1>
-        <ul>
-          <li class="back"><img src="header-icons/cancel-button.svg" /></li>
-          <li class="new"><img src="header-icons/add.svg" /></li>
-          <li class="open"><img src="header-icons/folder-open.svg" /></li>
-        </ul>
+  <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
+  </canvas>
+  <!--hidden at the beginning whilst everything loads-->
+  <div id = "hideContents" style="display: none;">
+    <div class="canvasHolder">
+      <canvas id="myCanvas" width="1200" height="900"></canvas>
+      <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute;pointer-events:none;left:0;top:0;z-index:-100;visibility:hidden;"></canvas>
+      <canvas id="myChart" width="600" height="600"></canvas>
+      <video id="camVideo" style="visibility:hidden;"></video>
+      <canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;"></canvas>
+      <canvas id="camCanvas" style="visibility:hidden;"></canvas>
+      <div id="labelDiv"></div>
+      <div id="ioDiv">
+        <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*"></input>
+        <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb"></input>
+        <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json"></input>
+        <input tabindex="-1" class="file" type="file" id="myOpenAll"></input>
       </div>
-    </nav>
-
-    <div class="nav-spacer"></div>
-    <div class="planet-content">
-      <h2 id="planetMyDevice"></h2>
-      <ul class="content l"></ul>
-      <h2 id="planetWorldwide"></h2>
-      <ul class="content w"></ul>
+      <div id="audio"></div>
+      <div id="tourData"></div>
     </div>
-  </div>
 
-  <div id="pitchtimematrix" overflow-x="auto" draggable="true" ondrag="moveMatrix(event)" onmouseup="if (isDragging) moveMatrix(event); isDragging = false;"></div>
-  <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
-  <div id="rulerBody" overflow-x="auto"></div>
-  <div id="dissectNumber"></div>
-  <div id="drumDiv"></div>
-  <div id="pitchstaircase" style="visibility:hidden"></div>
-  <div id="pitchSliderDiv" style="visibility:hidden"></div>
-  <div id="playPitch" style="visibility:hidden"></div>
-  <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>   
-  <div id="moveUpSliderDiv"></div>
-  <div id="moveDownSliderDiv"></div>
-  <div id="sliderInCell"></div>
-  <div id="tempoDiv"></div>
-  <div id="BPMInput"></div>
-  <div id="musicratio1"></div>
-  <div id="musicratio2"></div>
-  <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>    
-  <div id="helpElem"></div>
+    <div id="popdown-palette"></div>
+
+    <div id="main-toolbar" class="toolbar"></div>
+
+    <div id="loader"></div>
+
+    <div id="header" class="EaselJS"></div>
+
+    <div class="planet" style="display: none;">
+      <nav>
+        <div class="nav-container">
+          <img src="header-icons/planet-button.svg" class="logo" />
+          <h1 id="planetTitle"></h1>
+          <ul>
+            <li class="back"><img src="header-icons/cancel-button.svg" /></li>
+            <li class="new"><img src="header-icons/add.svg" /></li>
+            <li class="open"><img src="header-icons/folder-open.svg" /></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="nav-spacer"></div>
+      <div class="planet-content">
+        <h2 id="planetMyDevice"></h2>
+        <ul class="content l"></ul>
+        <h2 id="planetWorldwide"></h2>
+        <ul class="content w"></ul>
+      </div>
+    </div>
+
+    <div id="pitchtimematrix" overflow-x="auto" draggable="true" ondrag="moveMatrix(event)" onmouseup="if (isDragging) moveMatrix(event); isDragging = false;"></div>
+    <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
+    <div id="rulerBody" overflow-x="auto"></div>
+    <div id="dissectNumber"></div>
+    <div id="drumDiv"></div>
+    <div id="pitchstaircase" style="visibility:hidden"></div>
+    <div id="pitchSliderDiv" style="visibility:hidden"></div>
+    <div id="playPitch" style="visibility:hidden"></div>
+    <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>
+    <div id="moveUpSliderDiv"></div>
+    <div id="moveDownSliderDiv"></div>
+    <div id="sliderInCell"></div>
+    <div id="tempoDiv"></div>
+    <div id="BPMInput"></div>
+    <div id="musicratio1"></div>
+    <div id="musicratio2"></div>
+    <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>
+    <div id="helpElem"></div>
+  </div>
 </body>
 </html>

@@ -837,7 +837,7 @@ define(function (require) {
                 }, 2000);
             } else {
                 setTimeout(function () {
-                    _loadStart();
+                    loadStartWrapper();
                 }, 2000);
             }
 
@@ -846,6 +846,7 @@ define(function (require) {
 
             this.document.onkeydown = __keyPressed;
             _hideStopButton();
+
         };
 
         function _setupBlocksContainerEvents() {
@@ -1263,6 +1264,18 @@ define(function (require) {
                 palettes.bringToTop();
             }
 
+            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                var tur = turtles.turtleList[turtle];
+                tur.clearPenStrokes();
+                tur.container.x = tur.turtles.turtleX2screenX(tur.x);
+                tur.container.y = tur.turtles.turtleY2screenY(tur.y);
+                tur.turtles.refreshCanvas();
+            }
+
+            var artcanvas = document.getElementById("overlayCanvas");
+            artcanvas.width = w;
+            artcanvas.height = h;
+
             // Music stuff
             if (matrix.isMatrix === 1) {
                 matrixTable = document.getElementById("myTable");
@@ -1515,6 +1528,9 @@ define(function (require) {
                 document.getElementById('modewidget').style.border = 0;
             }
 
+            logo.doStopTurtle();
+            helpContainer.visible = false;
+            docById('helpElem').style.visibility = 'hidden';
             console.log('save locally');
             saveLocally();
             thumbnails.show()
@@ -1644,7 +1660,7 @@ define(function (require) {
                     saveLocally();
                 } catch (e) {
                     console.log(e);
-                    _loadStart();
+                    loadStartWrapper();
                 }
 
                 // Restore default cursor
@@ -1680,7 +1696,7 @@ define(function (require) {
         };
 
         function saveProject(projectName) {
-            // palettes.updatePalettes();
+           // palettes.updatePalettes();
             // Show busy cursor.
             document.body.style.cursor = 'wait';
             setTimeout(function () {
@@ -1717,6 +1733,31 @@ define(function (require) {
                 }
             }, 200);
         };
+
+
+        // Calculate time such that no matter how long loading the program takes, the loading animation will cycle at least once
+        function loadStartWrapper() {
+            var time1 = new Date();
+            _loadStart();
+            var time2 = new Date();
+            var elapsedTime = time2.getTime() - time1.getTime();
+            var timeLeft = 6000 - elapsedTime;
+
+            //In case timeLeft is a negative number (might bug 'setTimeout')
+            if (timeLeft < 0){
+                timeLeft = 0
+            }
+
+            setTimeout(showContents, timeLeft);
+
+        }
+
+        // Hides the loading animation and unhides the background
+        function showContents(){
+        docById('canvas').style.display = 'none';
+        docById('hideContents').style.display = 'block';
+        }
+
 
         function _loadStart() {
             // where to put this?
@@ -1761,7 +1802,7 @@ define(function (require) {
 
             update = true;
 
-            docById('loading-image-container').style.display = 'none';
+
         };
 
         function hideMsgs() {
@@ -1790,11 +1831,11 @@ define(function (require) {
         };
 
         function errorMsg(msg, blk, text) {
+	     _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
                 return;
             }
-
             if (blk !== undefined && blk != null && !blocks.blockList[blk].collapsed) {
                 var fromX = (canvas.width - 1000) / 2;
                 var fromY = 128;
@@ -1859,14 +1900,14 @@ define(function (require) {
                 errorArtwork['zerodivide'].visible = true;
                 stage.setChildIndex(errorArtwork['zerodivide'], stage.getNumChildren() - 1);
                 break;
-            case NANERRORMSG:
+  	    case NANERRORMSG:
                 errorArtwork['notanumber'].visible = true;
                 stage.setChildIndex(errorArtwork['notanumber'], stage.getNumChildren() - 1);
                 break;
-            case NOINPUTERRORMSG:
+	    case NOINPUTERRORMSG:
                 errorArtwork['noinput'].visible = true;
                 stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
-                break;
+                break;			    
             default:
                 var errorMsgContainer = errorMsgText.parent;
                 errorMsgContainer.visible = true;
