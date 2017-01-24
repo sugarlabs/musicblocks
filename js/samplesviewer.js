@@ -410,16 +410,6 @@ function PlanetView(model, controller) {
         }
     };
 
-    this.load = function (ele) {
-        return function () {
-            document.querySelector('#loading-image-container')
-                    .style.display = '';
-
-            planet.model.load(ele.attributes.title.value);
-            planet.controller.hide();
-        }
-    };
-
     this.addGlobalElement = function(glob, i){
         var d = document.createElement('li');
         d.setAttribute('url', glob.url);
@@ -436,27 +426,26 @@ function PlanetView(model, controller) {
         document.querySelector('.planet .content.w').appendChild(htmldata);
     }
 
+    this.load = function (ele) {
+        return function () {
+            planet.model.load(ele.attributes.title.value);
+            planet.controller.hide();
+        }
+    };
+
     this.publish = function (ele) {
         return function () {
-            document.querySelector('#loading-image-container')
-                    .style.display = '';
             planet.model.publish(ele.attributes.title.value,
                              ele.attributes.data.value,
                              ele.querySelector('img').src);
-            document.querySelector('#loading-image-container')
-                    .style.display = 'none';
         }
     };
 
     this.share = function (ele,i) {
         return function () {
-            document.querySelector('#loading-image-container')
-                    .style.display = '';
             planet.model.publish(ele.attributes.title.value,
                              ele.attributes.data.value,
                              ele.querySelector('img').src);
-            document.querySelector('#loading-image-container')
-                    .style.display = 'none';
             var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
             console.log(url);
             var n = i.toString();
