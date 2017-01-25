@@ -832,12 +832,12 @@ define(function (require) {
 
             if (projectName != null) {
                 setTimeout(function () {
-                    console.log('load ' + projectName);
-                    loadProject(projectName, runProjectOnLoad, env);
+                    console.log('loading ' + projectName);
+                    loadStartWrapper(loadProject, projectName, runProjectOnLoad, env);
                 }, 2000);
             } else {
                 setTimeout(function () {
-                    loadStartWrapper();
+                    loadStartWrapper(_loadStart);
                 }, 2000);
             }
 
@@ -1645,7 +1645,6 @@ define(function (require) {
 
                     if (server) {
                         var rawData = httpGet(projectName);
-                        console.log('receiving ' + rawData);
                         var cleanData = rawData.replace('\n', '');
                     }
 
@@ -1656,11 +1655,10 @@ define(function (require) {
 
                     var obj = JSON.parse(cleanData);
                     blocks.loadNewBlocks(obj);
-                    console.log('save locally');
                     saveLocally();
                 } catch (e) {
                     console.log(e);
-                    loadStartWrapper();
+                    loadStartWrapper(_loadStart);
                 }
 
                 // Restore default cursor
@@ -1730,35 +1728,29 @@ define(function (require) {
             }, 200);
         };
 
-
-        // Calculate time such that no matter how long loading the program takes, the loading animation will cycle at least once
-        function loadStartWrapper() {
+        // Calculate time such that no matter how long it takes to
+        // load the program, the loading animation will cycle at least
+        // once.
+        function loadStartWrapper(func, arg1, arg2, arg3) {
             var time1 = new Date();
-            _loadStart();
+            func(arg1, arg2, arg3);
+
             var time2 = new Date();
             var elapsedTime = time2.getTime() - time1.getTime();
-            var timeLeft = 6000 - elapsedTime;
-
-            //In case timeLeft is a negative number (might bug 'setTimeout')
-            if (timeLeft < 0){
-                timeLeft = 0
-            }
-
+            var timeLeft = Math.max(6000 - elapsedTime);
             setTimeout(showContents, timeLeft);
+        };
 
-        }
-
-        // Hides the loading animation and unhides the background
+        // Hides the loading animation and unhides the background.
         function showContents(){
-        docById('canvas').style.display = 'none';
-        docById('hideContents').style.display = 'block';
-        }
-
+            docById('canvas').style.display = 'none';
+            docById('hideContents').style.display = 'block';
+        };
 
         function _loadStart() {
             // where to put this?
             // palettes.updatePalettes();
-            console.log(" LOAD START")
+            console.log('LOAD START')
             justLoadStart = function () {
                 console.log('loading start and a matrix');
                 blocks.loadNewBlocks(DATAOBJS);
@@ -1974,16 +1966,29 @@ define(function (require) {
                 } else if (myBlock.name === 'start' || myBlock.name === 'drum') {
                     // Find the turtle associated with this block.
                     var turtle = turtles.turtleList[myBlock.value];
-                    var args = {
-                        'collapsed': myBlock.collapsed,
-                        'xcor': turtle.x,
-                        'ycor': turtle.y,
-                        'heading': turtle.orientation,
-                        'color': turtle.color,
-                        'shade': turtle.value,
-                        'pensize': turtle.stroke,
-                        'grey': turtle.chroma
-                    };
+                    if (turtle == null) {
+                        var args = {
+                            'collapsed': false,
+                            'xcor': 0,
+                            'ycor': 0,
+                            'heading': 0,
+                            'color': 0,
+                            'shade': 50,
+                            'pensize': 5,
+                            'grey': 100
+                        };
+                    } else {
+                        var args = {
+                            'collapsed': myBlock.collapsed,
+                            'xcor': turtle.x,
+                            'ycor': turtle.y,
+                            'heading': turtle.orientation,
+                            'color': turtle.color,
+                            'shade': turtle.value,
+                            'pensize': turtle.stroke,
+                            'grey': turtle.chroma
+                        };
+                    }
                 } else if (myBlock.name === 'action') {
                     var args = {
                         'collapsed': myBlock.collapsed
