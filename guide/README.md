@@ -93,7 +93,7 @@ and, to some degree, [timbre and texture](#VOICES).
 </a>
 
 At the heart of Music Blocks is the *Note value* block. The *Note
-value* block is a container for a [pitch block](#PITCH) that specifies the duration
+value* block is a container for a [*Pitch* block](#PITCH) that specifies the duration
 (note value) of the pitch. 
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'/>
@@ -126,7 +126,7 @@ that in combination determines the frequency (and therefore pitch) at which the 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'/>
 
 There are many systems you can use to specify a *pitch* block's name and octave. Some examples are
-shown above. The top pitch block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
+shown above. The top *Pitch* block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
 the notes `Do Re Me Fa Sol La Ti `. The middle block is specified using a *Pitch-name* block (`B flat` in `Octave 4`),
 which contains the notes `C D E F G A B`. The last block is specified using the *Hertz* block in conjunction
 with a *Number* block (`440` Hertz) , which corresponds to the frequency of the sound made.
@@ -263,7 +263,7 @@ The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
 *Note value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by one
 half step. A flat will lower by one half step. In the example, on the
 left, just the *Pitch* block `Mi` is lowered by one half step; on the
-right, both pitch blocks are raised by one half step.
+right, both *Pitch* blocks are raised by one half step.
 
 <a name="ADJUST-TRANSPOSITION">
 #### 3.2.3 Adjust-Transposition
@@ -487,7 +487,7 @@ And even more interesting if we bring the various voices offset in time.
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg'/>
 
 A special "drum" version of the *Start* block is available for laying
-down a drum track. Any pitch blocks encounted while starting from a
+down a drum track. Any *Pitch* blocks encounted while starting from a
 drum will be played as `C2` with the default drum sample. In the
 example above, all of the notes in `chunk` will be played with a kick
 drum.
