@@ -252,7 +252,7 @@ The *Step Pitch* block will move up or down notes in a scale from the
 last played note. In the example above, *Step Pitch* blocks are used inside
 of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
 <a name="SHARPS-AND-FLATS">
 #### 3.2.2 Sharps And Flats
@@ -416,7 +416,7 @@ The *Backward* block will play the contained notes in reverse order
 stack.
 
 [RUN
-LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
+LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
 
 Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
@@ -445,7 +445,7 @@ depending on the user's specified tonality.
 
 In the above example, the sequence of [drum](#DRUMS) beats is increased over time.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
 
 <a name= "VIBRATO">
 #### 3.2.14 Vibrato
@@ -482,7 +482,7 @@ It gets more interesting if we shift up and down octaves.
 
 And even more interesting if we bring the various voices offset in time.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg'/>
 
@@ -513,7 +513,7 @@ the inner repeat loop.
 In this example, the graphics are synchronized to the music by placing
 the graphics commands inside of *Note value* blocks.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg'/>
 
@@ -538,7 +538,7 @@ the mouse is in the lower-left quadrant, `chunk` is played;
 lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
 upper-right quadrant, `chunk3`.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'/>
 
@@ -546,7 +546,7 @@ In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
 make an 8-key piano?
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg'/>
 
@@ -1061,4 +1061,4 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/hotdog.png'/>
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_hotdog.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_hotdog.tb)
