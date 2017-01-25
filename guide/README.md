@@ -17,45 +17,45 @@ TABLE OF CONTENTS
 1. [Getting Started](#GETTING-STARTED)
 2. [Making a Sound](#NOTES)
   1. [Note Value Blocks](#NOTE-VALUE)
-  2. [Pitch Blocks] (#PITCH)
-  3. [Chords] (#CHORDS)
-  4. [Rests] (#RESTS)
-  5. [Drums] (#DRUMS)
-3. [Programming with Music] (#PROGRAMMING-WITH-MUSIC)
-  1. [Chunks] (#CHUNKS)
-  2. [Musical Transformation] (#TRANSFORMATION)
-    1. [Step Pitch Block] (#STEP-PITCH)
-    2. [Sharps and Flats] (#SHARPS-AND-FLATS)
-    3. [Adjust-Transposition Block] (#ADJUST-TRANSPOSITION)
-    4. [Dotted Notes] (#DOTTED)
-    5. [Speeding Up and Slowing Down Notes via Mathematical Operations] (#MULTIPLY-AND-DIVIDE)
-    6. [Repeating Notes] (#REPETITION)
-    7. [Swinging Notes and Tied Notes] (#SWINGING)
-    8. [Set Volume, Crescendo, Staccato, and Slur Blocks] (#MORE-TRANSFORMATIONS)
-    9. [Intervals and Articulation] (#INTERVALS-AND-ARTICULATION)
-    10. [Absolute Intervals] (#ABSOLUTE-INTERVALS)
-    11. [Inversion] (#INVERSION)
-    12. [Backwards] (#BACKWARDS)
-    13. [Setting Voice and Keys] (#SETTING)
-    14. [Vibrato] (#VIBRATO)
-  3. [Voices] (#VOICES)
-  4. [Graphics] (#GRAPHICS)
-  5. [Interactions] (#INTERACTIONS)
-4. [Widgets] (#WIDGETS)
+  2. [Pitch Blocks](#PITCH)
+  3. [Chords](#CHORDS)
+  4. [Rests](#RESTS)
+  5. [Drums](#DRUMS)
+3. [Programming with Music](#PROGRAMMING-WITH-MUSIC)
+  1. [Chunks](#CHUNKS)
+  2. [Musical Transformation](#TRANSFORMATION)
+    1. [Step Pitch Block](#STEP-PITCH)
+    2. [Sharps and Flats](#SHARPS-AND-FLATS)
+    3. [Adjust-Transposition Block](#ADJUST-TRANSPOSITION)
+    4. [Dotted Notes](#DOTTED)
+    5. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
+    6. [Repeating Notes](#REPETITION)
+    7. [Swinging Notes and Tied Notes](#SWINGING)
+    8. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
+    9. [Intervals and Articulation](#INTERVALS-AND-ARTICULATION)
+    10. [Absolute Intervals](#ABSOLUTE-INTERVALS)
+    11. [Inversion](#INVERSION)
+    12. [Backwards](#BACKWARDS)
+    13. [Setting Voice and Keys](#SETTING)
+    14. [Vibrato](#VIBRATO)
+  3. [Voices](#VOICES)
+  4. [Graphics](#GRAPHICS)
+  5. [Interactions](#INTERACTIONS)
+4. [Widgets](#WIDGETS)
   1. [Monitoring status](#status)
   2. [Generating chunks of notes](#pitch-time)
-    1. [Pitch-Time Matrix] (#pitch-time) 
-    2. [The Rhythm Block] (#THE-RHYTHM-BLOCK) 
-    3. [Creating Tuplets] (#CREATING-TUPLETS)
-    4. [What is a Tuplet?] (#WHAT-IS-TUPLET)
-    5. [Using Individual Notes in the Matrix] (#INDIVIDUAL-NOTES)
+    1. [Pitch-Time Matrix](#pitch-time) 
+    2. [The Rhythm Block](#THE-RHYTHM-BLOCK) 
+    3. [Creating Tuplets](#CREATING-TUPLETS)
+    4. [What is a Tuplet?](#WHAT-IS-TUPLET)
+    5. [Using Individual Notes in the Matrix](#INDIVIDUAL-NOTES)
   3. [Generating rhythms](#rhythms)
   4. [Musical Modes](#modes)
   5. [The Pitch-Drum Matrix](#pitch-drum)
   6. [Exploring musical proportions](#stairs)
   7. [Generating arbitrary pitches](#slider)
   8. [Changing tempo](#tempo)
-5. [Beyond Music Blocks] (#BEYOND-MUSIC-BLOCKS)
+5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
 run. Look for RUN LIVE links.
@@ -119,7 +119,7 @@ Please refer to the above picture for a visual representation of note values.
 ### 2.2 Pitch Blocks
 </a>
 
-As we have seen, *Pitch* blocks are used inside the [*Note value*] (#NOTE-VALUE)
+As we have seen, *Pitch* blocks are used inside the [*Note value*](#NOTE-VALUE)
 blocks. The *Pitch* block specifies the pitch name and pitch octave of a note
 that in combination determines the frequency (and therefore pitch) at which the note is played.
 
@@ -884,7 +884,7 @@ counter-clockwise, transforming it into *Locrian*.
 In the above example, the *Major* mode has been inverted, transforming
 it into *Phrygian*.
 
-Note: The build-in modes in Music Blocks can be found in [musicutils.js] (https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
+Note: The build-in modes in Music Blocks can be found in [musicutils.js](https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg'/>
 
