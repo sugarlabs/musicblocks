@@ -2962,11 +2962,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             } else {
                 logo.errorMsg(_('Rhythm Block: Did you mean to use a Matrix block?'), blk);
             }
-
-            break;
-        case 'timeSign':
-            // FIXME: What is this supposed to do?
-            console.log('Time Signatature' + args[0]);
             break;
 
             // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
@@ -2992,7 +2987,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             logo._processNote(64, blk, turtle);
             break;
         case 'meter':
-            // FIXME: What is this supposed to do?
+            // See Issue #337
             break;
         case 'osctime':
         case 'newnote':
