@@ -30,7 +30,8 @@ const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 
-function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitchslider,
+function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
+              pitchstaircase, tempo, pitchslider,
               canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
