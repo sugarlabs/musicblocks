@@ -154,6 +154,15 @@ function RhythmRuler () {
         this._calculateZebraStripes(this._rulerSelected);
     };
 
+    this._clear = function() {
+        for (r = 0; r < this.Rulers.length; r++) {
+	    this._rulerSelected = r;
+            while(this.Rulers[r][1].length > 0) {
+                this._undo();
+            }
+	}
+    };
+
     this.__playNote = function(i) {
         var noteValues = this.Rulers[i][0];
         var noteValue = noteValues[0];
@@ -532,11 +541,6 @@ function RhythmRuler () {
             that._saveDrumMachine(0);
         };
 
-        var cell = this._addButton(row, 2, 'restore-button.svg', iconSize, _('undo'));
-        cell.onclick=function() {
-            that._undo();
-        };
-
         // An input for setting the dissect number
         var cell = row.insertCell(2);
         cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dussectNumber" value="' + 2 + '" />';
@@ -548,7 +552,17 @@ function RhythmRuler () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        var cell = this._addButton(row, 4, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 3, 'restore-button.svg', iconSize, _('undo'));
+        cell.onclick=function() {
+            that._undo();
+        };
+
+        var cell = this._addButton(row, 4, 'erase-button.svg', iconSize, _('clear'));
+        cell.onclick=function() {
+            that._clear();
+        };
+
+        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             // Save the new dissect history
             var dissectHistory = [];
