@@ -251,6 +251,12 @@ define(function (require) {
 
         pluginsImages = {};
 
+        window.onblur = function() {
+            console.log("blur");
+            logo.stopTurtle = true;
+            logo.synth.stop();
+        };
+
         function _findBlocks() {
             logo.showBlocks();
             blocksContainer.x = 0;
