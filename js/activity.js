@@ -255,6 +255,7 @@ define(function (require) {
             console.log("blur");
             logo.stopTurtle = true;
             logo.synth.stop();
+            this.onStopTurtle();
         };
 
         function _findBlocks() {
