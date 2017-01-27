@@ -17,45 +17,45 @@ TABLE OF CONTENTS
 1. [Getting Started](#GETTING-STARTED)
 2. [Making a Sound](#NOTES)
   1. [Note Value Blocks](#NOTE-VALUE)
-  2. [Pitch Blocks] (#PITCH)
-  3. [Chords] (#CHORDS)
-  4. [Rests] (#RESTS)
-  5. [Drums] (#DRUMS)
-3. [Programming with Music] (#PROGRAMMING-WITH-MUSIC)
-  1. [Chunks] (#CHUNKS)
-  2. [Musical Transformation] (#TRANSFORMATION)
-    1. [Step Pitch Block] (#STEP-PITCH)
-    2. [Sharps and Flats] (#SHARPS-AND-FLATS)
-    3. [Adjust-Transposition Block] (#ADJUST-TRANSPOSITION)
-    4. [Dotted Notes] (#DOTTED)
-    5. [Speeding Up and Slowing Down Notes via Mathematical Operations] (#MULTIPLY-AND-DIVIDE)
-    6. [Repeating Notes] (#REPETITION)
-    7. [Swinging Notes and Tied Notes] (#SWINGING)
-    8. [Set Volume, Crescendo, Staccato, and Slur Blocks] (#MORE-TRANSFORMATIONS)
-    9. [Intervals and Articulation] (#INTERVALS-AND-ARTICULATION)
-    10. [Absolute Intervals] (#ABSOLUTE-INTERVALS)
-    11. [Inversion] (#INVERSION)
-    12. [Backwards] (#BACKWARDS)
-    13. [Setting Voice and Keys] (#SETTING)
-    14. [Vibrato] (#VIBRATO)
-  3. [Voices] (#VOICES)
-  4. [Graphics] (#GRAPHICS)
-  5. [Interactions] (#INTERACTIONS)
-4. [Widgets] (#WIDGETS)
+  2. [Pitch Blocks](#PITCH)
+  3. [Chords](#CHORDS)
+  4. [Rests](#RESTS)
+  5. [Drums](#DRUMS)
+3. [Programming with Music](#PROGRAMMING-WITH-MUSIC)
+  1. [Chunks](#CHUNKS)
+  2. [Musical Transformation](#TRANSFORMATION)
+    1. [Step Pitch Block](#STEP-PITCH)
+    2. [Sharps and Flats](#SHARPS-AND-FLATS)
+    3. [Adjust-Transposition Block](#ADJUST-TRANSPOSITION)
+    4. [Dotted Notes](#DOTTED)
+    5. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
+    6. [Repeating Notes](#REPETITION)
+    7. [Swinging Notes and Tied Notes](#SWINGING)
+    8. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
+    9. [Intervals and Articulation](#INTERVALS-AND-ARTICULATION)
+    10. [Absolute Intervals](#ABSOLUTE-INTERVALS)
+    11. [Inversion](#INVERSION)
+    12. [Backwards](#BACKWARDS)
+    13. [Setting Voice and Keys](#SETTING)
+    14. [Vibrato](#VIBRATO)
+  3. [Voices](#VOICES)
+  4. [Graphics](#GRAPHICS)
+  5. [Interactions](#INTERACTIONS)
+4. [Widgets](#WIDGETS)
   1. [Monitoring status](#status)
   2. [Generating chunks of notes](#pitch-time)
-    1. [Pitch-Time Matrix] (#pitch-time) 
-    2. [The Rhythm Block] (#THE-RHYTHM-BLOCK) 
-    3. [Creating Tuplets] (#CREATING-TUPLETS)
-    4. [What is a Tuplet?] (#WHAT-IS-TUPLET)
-    5. [Using Individual Notes in the Matrix] (#INDIVIDUAL-NOTES)
+    1. [Pitch-Time Matrix](#pitch-time) 
+    2. [The Rhythm Block](#THE-RHYTHM-BLOCK) 
+    3. [Creating Tuplets](#CREATING-TUPLETS)
+    4. [What is a Tuplet?](#WHAT-IS-TUPLET)
+    5. [Using Individual Notes in the Matrix](#INDIVIDUAL-NOTES)
   3. [Generating rhythms](#rhythms)
   4. [Musical Modes](#modes)
   5. [The Pitch-Drum Matrix](#pitch-drum)
   6. [Exploring musical proportions](#stairs)
   7. [Generating arbitrary pitches](#slider)
   8. [Changing tempo](#tempo)
-5. [Beyond Music Blocks] (#BEYOND-MUSIC-BLOCKS)
+5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
 run. Look for RUN LIVE links.
@@ -93,7 +93,7 @@ and, to some degree, [timbre and texture](#VOICES).
 </a>
 
 At the heart of Music Blocks is the *Note value* block. The *Note
-value* block is a container for a [pitch block](#PITCH) that specifies the duration
+value* block is a container for a [*Pitch* block](#PITCH) that specifies the duration
 (note value) of the pitch. 
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg'/>
@@ -119,14 +119,14 @@ Please refer to the above picture for a visual representation of note values.
 ### 2.2 Pitch Blocks
 </a>
 
-As we have seen, *Pitch* blocks are used inside the [*Note value*] (#NOTE-VALUE)
+As we have seen, *Pitch* blocks are used inside the [*Note value*](#NOTE-VALUE)
 blocks. The *Pitch* block specifies the pitch name and pitch octave of a note
 that in combination determines the frequency (and therefore pitch) at which the note is played.
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg'/>
 
 There are many systems you can use to specify a *pitch* block's name and octave. Some examples are
-shown above. The top pitch block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
+shown above. The top *Pitch* block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
 the notes `Do Re Me Fa Sol La Ti `. The middle block is specified using a *Pitch-name* block (`B flat` in `Octave 4`),
 which contains the notes `C D E F G A B`. The last block is specified using the *Hertz* block in conjunction
 with a *Number* block (`440` Hertz) , which corresponds to the frequency of the sound made.
@@ -252,7 +252,7 @@ The *Step Pitch* block will move up or down notes in a scale from the
 last played note. In the example above, *Step Pitch* blocks are used inside
 of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
 <a name="SHARPS-AND-FLATS">
 #### 3.2.2 Sharps And Flats
@@ -263,7 +263,7 @@ The *Sharp* and *Flat* blocks can be wrapped around *Pitch* blocks,
 *Note value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by one
 half step. A flat will lower by one half step. In the example, on the
 left, just the *Pitch* block `Mi` is lowered by one half step; on the
-right, both pitch blocks are raised by one half step.
+right, both *Pitch* blocks are raised by one half step.
 
 <a name="ADJUST-TRANSPOSITION">
 #### 3.2.3 Adjust-Transposition
@@ -416,7 +416,7 @@ The *Backward* block will play the contained notes in reverse order
 stack.
 
 [RUN
-LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb&run=true)
+LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_crab_canon.tb)
 
 Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
@@ -445,7 +445,7 @@ depending on the user's specified tonality.
 
 In the above example, the sequence of [drum](#DRUMS) beats is increased over time.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_drumexample.tb)
 
 <a name= "VIBRATO">
 #### 3.2.14 Vibrato
@@ -482,12 +482,12 @@ It gets more interesting if we shift up and down octaves.
 
 And even more interesting if we bring the various voices offset in time.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg'/>
 
 A special "drum" version of the *Start* block is available for laying
-down a drum track. Any pitch blocks encounted while starting from a
+down a drum track. Any *Pitch* blocks encounted while starting from a
 drum will be played as `C2` with the default drum sample. In the
 example above, all of the notes in `chunk` will be played with a kick
 drum.
@@ -513,7 +513,7 @@ the inner repeat loop.
 In this example, the graphics are synchronized to the music by placing
 the graphics commands inside of *Note value* blocks.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_sync_graphics.tb)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/fibonacci3.svg'/>
 
@@ -538,7 +538,7 @@ the mouse is in the lower-left quadrant, `chunk` is played;
 lower-right quadrant, `chunk1`; upper-left quadrant, `chunk2`; and
 upper-right quadrant, `chunk3`.
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_interactivefrerejacques.tb)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive2.svg'/>
 
@@ -546,7 +546,7 @@ In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
 make an 8-key piano?
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_twokey_piano.tb)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/interactive3.svg'/>
 
@@ -884,7 +884,7 @@ counter-clockwise, transforming it into *Locrian*.
 In the above example, the *Major* mode has been inverted, transforming
 it into *Phrygian*.
 
-Note: The build-in modes in Music Blocks can be found in [musicutils.js] (https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
+Note: The build-in modes in Music Blocks can be found in [musicutils.js](https://github.com/walterbender/musicblocks/blob/master/js/musicutils.js#L68).
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/mode6.svg'/>
 
@@ -1061,4 +1061,4 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/hotdog.png'/>
 
-[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_hotdog.tb&run=true)
+[RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_hotdog.tb)
