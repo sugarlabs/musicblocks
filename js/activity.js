@@ -253,9 +253,7 @@ define(function (require) {
 
         window.onblur = function() {
             console.log("blur");
-            logo.stopTurtle = true;
-            logo.synth.stop();
-            onStopTurtle();
+            logo.doStopTurtle();
         };
 
         function _findBlocks() {
