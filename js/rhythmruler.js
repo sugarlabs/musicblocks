@@ -56,7 +56,7 @@ function RhythmRuler () {
                     newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                 }
             }
-
+		
             if (evenColor === MATRIXNOTECELLCOLORHOVER) {
                 if (i % 2 === 0) {
                     newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
@@ -71,13 +71,13 @@ function RhythmRuler () {
         var inputNum = docById('dissectNumber').value;
         if (isNaN(inputNum)) {
             inputNum = 2;
-        } else {
-            inputNum = Math.abs(Math.floor(inputNum));
-        }
+        } else {											
+            inputNum = Math.abs(Math.floor(inputNum));		
+        }													
 
         docById('dissectNumber').value = inputNum;
 
-        var cell = event.target;
+        var cell = event.target;							
         this._rulerSelected = cell.parentNode.id[5];
         this.__dissect(cell, inputNum);
     };
@@ -85,12 +85,12 @@ function RhythmRuler () {
     this.__dissect = function (cell, inputNum) {
         var that = this;
 
-        var ruler = docById('ruler' + this._rulerSelected);
-        var newCellIndex = cell.cellIndex;
-        var noteValues = this.Rulers[this._rulerSelected][0];
-        var divisionHistory = this.Rulers[this._rulerSelected][1];
-
-        divisionHistory.push([newCellIndex, inputNum]);
+        var ruler = docById('ruler' + this._rulerSelected);	
+        var newCellIndex = cell.cellIndex;					
+        var noteValues = this.Rulers[this._rulerSelected][0]; 
+        var divisionHistory = this.Rulers[this._rulerSelected][1]; 
+		
+        divisionHistory.push([newCellIndex, inputNum]);     
         ruler.deleteCell(newCellIndex);
 
         var noteValue = noteValues[newCellIndex];
@@ -422,6 +422,10 @@ function RhythmRuler () {
         docById('drumDiv').style.display = 'inline';
         docById('drumDiv').style.visibility = 'visible';
         docById('drumDiv').style.border = 2;
+		
+		docById('recordRhythm').style.display = 'inline';		
+		docById('recordRhythm').style.visibility = 'visible';
+		docById('recordRhythm').style.border = 2;
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -433,6 +437,9 @@ function RhythmRuler () {
         docById('drumDiv').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
         docById('drumDiv').style.overflowX = 'auto';
 
+		docById('recordRhythm').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
+		docById('recordRhythm').style.overflowX = 'auto';
+		
         var that = this;
         var table = docById('buttonTable');
 
@@ -445,14 +452,49 @@ function RhythmRuler () {
         if (table !== null) {
             table.remove();
         }
-
+		
+		/* 
+		var table = docById('rhythm');
+		
+		if (table !== null) {
+			table.remove();
+		}
+		*/
+		
         this._runningTimes = [];
         for (var i = 0; i < this.Rulers.length; i++) {
             var rulertable = docById('rulerTable' + i);
             var rulerdrum = docById('rulerdrum' + i);
             this._runningTimes.push(0);
         }
-
+		// create record-rhythm button
+		var x = document.createElement('TABLE'); 
+		x.setAttribute('id', 'rhythm');
+		x.style.textAlign = 'center';
+		x.style.borderCollapse = 'collapse';
+		x.cellSpacing = 0;
+		x.cellPadding = 0;
+		
+		var recordRhythm = docById('recordRhythm');		
+		recordRhythm.style.paddingTop = 0 + 'px';
+		recordRhythm.style.paddingLeft = 0 + 'px';
+		recordRhythm.appendChild(x);
+		recordRhythmPosition = recordRhythm.getBoundingClientRect();
+		
+		var table = docById('rhythm');		// insert a play-all button (blank part)
+		var row = table.insertRow(0);
+		row.setAttribute('id', 'blank');
+		row.style.left = Math.floor(recordRhythmPosition.left) + 'px';
+		row.style.top = Math.floor(recordRhythmPosition.top) + 'px';
+		
+		var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('')); // just add a blank button
+		this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('blank') + '" alt="' + _('blank') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+		
+		for (var i = 0; i < this.Rulers.length; i++) {
+            var row = table.insertRow(i + 1);
+            row.setAttribute('id', 'rhythm' + i);
+        }
+		
         // The play all button
         var x = document.createElement('TABLE');
         x.setAttribute('id', 'drum');
@@ -474,6 +516,7 @@ function RhythmRuler () {
         row.style.top = Math.floor(drumDivPosition.top) + 'px';
 
         var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play all'));
+		
 
         cell.onclick=function() {
             if (that._playing) {
@@ -602,8 +645,10 @@ function RhythmRuler () {
 
             docById('rulerBody').style.visibility = 'hidden';
             docById('drumDiv').style.visibility = 'hidden';
+			docById('recordRhythm').style.visibility = 'hidden';
             docById('rulerBody').style.border = 0;
             docById('drumDiv').style.border = 0;
+			docById('recordRhythm').style.border = 0;
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
@@ -611,6 +656,7 @@ function RhythmRuler () {
 
         // Create a play button for each ruler
         var table = docById('drum');
+		var table2 = docById('rhythm');
         for (var i = 0; i < this.Rulers.length; i++) {
             var row = table.rows[i + 1];
             var drumcell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play'));
@@ -684,6 +730,11 @@ function RhythmRuler () {
 
             // Match the play button height to the ruler height.
             table.rows[i + 1].cells[0].style.height = row.offsetHeight + 'px';
+			
+			// record rhythm buttons
+			var row = table2.rows[i + 1];
+			var rhythmcell = this._addButton(row, -1, 'play-button.svg', iconSize, _('record'));
+			this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         }
 
         // Restore dissect history.
