@@ -279,7 +279,7 @@ function RhythmRuler () {
                 }
             }
         }, this._logo.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]);
-        console.log(rulerNo + ': ' + this._offsets[rulerNo]);
+
         that._runningTimes[rulerNo] += that._logo.defaultBPMFactor * 1000 * noteTime;
     };
 
