@@ -3616,8 +3616,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (myBlock.name === 'start' || myBlock.name === 'drum') {
             turtle = myBlock.value;
             var turtleNotInTrash = 0;
-            for(var i = 0; i < this.turtles.turtleList.length; i++) {
-                if(!blocks.turtles.turtleList[i].trash) {
+            for (var i = 0; i < this.turtles.turtleList.length; i++) {
+                if (!this.turtles.turtleList[i].trash) {
                     turtleNotInTrash += 1;
                 }
             }
@@ -3626,7 +3626,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 this.turtles.turtleList[turtle].trash = true;
                 this.turtles.turtleList[turtle].container.visible = false;
             } else {
+                this.errorMsg("You can't remove the only start block");
                 console.log('null turtle');
+                return;
             }
         } else if (myBlock.name === 'action') {
             this.deleteActionBlock(myBlock);
