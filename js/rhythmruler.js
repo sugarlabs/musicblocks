@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016-17 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -31,7 +31,7 @@ function RhythmRuler () {
     this._runningTimes = [];
     // Starting time from which we measure for sync.
     this._startingTime = null;
-    this._offset = 0;
+    this._offsets = [];
     this._rulerSelected = 0;
     this._rulerPlaying = -1;
 
@@ -179,10 +179,10 @@ function RhythmRuler () {
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
-            this._offset = 0;
         }
 
         for (var i = 0; i < this.Rulers.length; i++) {
+            this._offsets[i] = 0;
             this.__playNote(i);
             this.__loop(0, 0, i, 1);
         }
@@ -193,25 +193,21 @@ function RhythmRuler () {
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
-            this._offset = 0;
         }
 
+        this._offsets[this._rulerSelected] = 0;
         this.__playNote(this._rulerSelected);
         this.__loop(0, 0, this._rulerSelected, 1);
     };
 
-    this.__loop = function(time, notesCounter, rulerNo, colIndex) {
-        if (docById('rulerBody').style.visibility === 'hidden') {
-            return;
-        }
-
-        if (docById('drumDiv').style.visibility === 'hidden') {
+    this.__loop = function(noteTime, notesCounter, rulerNo, colIndex) {
+        if (docById('rulerBody').style.visibility === 'hidden' || docById('drumDiv').style.visibility === 'hidden') {
             return;
         }
 
         var noteValues = this.Rulers[rulerNo][0];
         var noteValue = noteValues[notesCounter];
-        time = 1 / noteValue;
+        noteTime = 1 / noteValue;
         var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
         var drum = this._logo.blocks.blockList[drumblockno].value;
 
@@ -224,10 +220,11 @@ function RhythmRuler () {
             }
 
             if (notesCounter === noteValues.length - 1) {
-                // When we get to the end of the rulers, reset the background color.
+                // When we get to the end of the rulers, reset the
+                // background color.
                 for (var i = 0; i < ruler.cells.length; i++) {
                     var cell = ruler.cells[i];
-                    cell.style.backgroundColor =  MATRIXNOTECELLCOLOR;
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 }
             } else {
                 // Mark the current cell.
@@ -246,13 +243,13 @@ function RhythmRuler () {
             colIndex += 1;
             if (that._playing) {
                 var d = new Date();
-                that._offset = d.getTime() - that._startingTime - that._runningTimes[rulerNo];
+                that._offsets[rulerNo] = d.getTime() - that._startingTime - that._runningTimes[rulerNo];
                 that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum);
             }
 
             if (notesCounter < noteValues.length) {
                 if (that._playing) {
-                    that.__loop(time, notesCounter, rulerNo, colIndex);
+                    that.__loop(noteTime, notesCounter, rulerNo, colIndex);
                 }
             } else {
                 that._cellCounter += 1;
@@ -281,9 +278,9 @@ function RhythmRuler () {
                     that._playOne();
                 }
             }
-        }, this._logo.defaultBPMFactor * 1000 * time - this._offset);
-
-        that._runningTimes[rulerNo] += that._logo.defaultBPMFactor * 1000 * time;
+        }, this._logo.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]);
+        console.log(rulerNo + ': ' + this._offsets[rulerNo]);
+        that._runningTimes[rulerNo] += that._logo.defaultBPMFactor * 1000 * noteTime;
     };
 
     this._save = function(selectedRuler) {
@@ -459,10 +456,12 @@ function RhythmRuler () {
         }
 
         this._runningTimes = [];
+        this._offsets = [];
         for (var i = 0; i < this.Rulers.length; i++) {
             var rulertable = docById('rulerTable' + i);
             var rulerdrum = docById('rulerdrum' + i);
             this._runningTimes.push(0);
+            this._offsets.push(0);
         }
 
         // The play all button
