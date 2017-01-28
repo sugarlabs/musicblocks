@@ -27,8 +27,8 @@ function RhythmRuler () {
     this._playingAll = false;
     this._cellCounter = 0;
 
-    // Keep a running time for each ruler to maintain sync.
-    this._runningTimes = [];
+    // Keep a elapsed time for each ruler to maintain sync.
+    this._elapsedTimes = [];
     // Starting time from which we measure for sync.
     this._startingTime = null;
     this._offsets = [];
@@ -68,6 +68,11 @@ function RhythmRuler () {
     };
 
     this._dissectRuler = function (event) {
+        if (this._playing) {
+            console.log('You cannot dissect while widget is playing.');
+            return;
+	}
+
         var inputNum = docById('dissectNumber').value;
         if (isNaN(inputNum)) {
             inputNum = 2;
@@ -156,11 +161,11 @@ function RhythmRuler () {
 
     this._clear = function() {
         for (r = 0; r < this.Rulers.length; r++) {
-	    this._rulerSelected = r;
+            this._rulerSelected = r;
             while(this.Rulers[r][1].length > 0) {
                 this._undo();
             }
-	}
+        }
     };
 
     this.__playNote = function(i) {
@@ -179,10 +184,13 @@ function RhythmRuler () {
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
+            for (var i = 0; i < this.Rulers.length; i++) {
+                this._offsets[i] = 0;
+                this._elapsedTimes[i] = 0;
+            }
         }
 
         for (var i = 0; i < this.Rulers.length; i++) {
-            this._offsets[i] = 0;
             this.__playNote(i);
             this.__loop(0, 0, i, 1);
         }
@@ -193,9 +201,10 @@ function RhythmRuler () {
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
+            this._elapsedTimes[this._rulerSelected] = 0;
+            this._offsets[this._rulerSelected] = 0;
         }
 
-        this._offsets[this._rulerSelected] = 0;
         this.__playNote(this._rulerSelected);
         this.__loop(0, 0, this._rulerSelected, 1);
     };
@@ -243,7 +252,7 @@ function RhythmRuler () {
             colIndex += 1;
             if (that._playing) {
                 var d = new Date();
-                that._offsets[rulerNo] = d.getTime() - that._startingTime - that._runningTimes[rulerNo];
+                that._offsets[rulerNo] = d.getTime() - that._startingTime - that._elapsedTimes[rulerNo];
                 that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum);
             }
 
@@ -280,7 +289,7 @@ function RhythmRuler () {
             }
         }, this._logo.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]);
 
-        that._runningTimes[rulerNo] += that._logo.defaultBPMFactor * 1000 * noteTime;
+        this._elapsedTimes[rulerNo] += this._logo.defaultBPMFactor * 1000 * noteTime;
     };
 
     this._save = function(selectedRuler) {
@@ -429,6 +438,9 @@ function RhythmRuler () {
         docById('drumDiv').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
         docById('drumDiv').style.overflowX = 'auto';
 
+        docById('rulerBody').innerHTML = '';
+        docById('drumDiv').innerHTML = '';
+
         // Remove the rhythm ruler before adding it again.
         Element.prototype.remove = function() {
             this.parentElement.removeChild(this);
@@ -455,12 +467,12 @@ function RhythmRuler () {
             table.remove();
         }
 
-        this._runningTimes = [];
+        this._elapsedTimes = [];
         this._offsets = [];
         for (var i = 0; i < this.Rulers.length; i++) {
             var rulertable = docById('rulerTable' + i);
             var rulerdrum = docById('rulerdrum' + i);
-            this._runningTimes.push(0);
+            this._elapsedTimes.push(0);
             this._offsets.push(0);
         }
 
@@ -510,7 +522,7 @@ function RhythmRuler () {
                     that._cellCounter = 0;
                     that._rulerPlaying = -1;
                     for (var i = 0; i < that.Rulers.length; i++) {
-                        that._runningTimes[i] = 0;
+                        that._elapsedTimes[i] = 0;
                     }
 
                     that._playAll();
@@ -634,6 +646,8 @@ function RhythmRuler () {
                         that._playingAll = false;
                         that._rulerPlaying = -1;
                         that._startingTime = null;
+                        that._offsets[i] = 0;
+                        that._elapsedTimes[i] = 0;
                         setTimeout(that._calculateZebraStripes(this.parentNode.id[4]),1000);
                     }
                 }
@@ -645,9 +659,10 @@ function RhythmRuler () {
                         that._playingOne = true;
                         that._playingAll = false;
                         that._cellCounter = 0;
+                        that._startingTime = null;
                         that._rulerPlaying = this.parentNode.id[4];
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                        that._runningTimes[i] = 0;
+                        that._elapsedTimes[i] = 0;
                         that._playOne();
                     }
                 }
