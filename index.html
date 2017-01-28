@@ -83,6 +83,7 @@
     });
         
     $(function() {
+        <!-- drag rhythm ruler when dragging drum play buttons -->
         $('#drumDiv').draggable({
             drag: function() {
                 jQuery('#rulerBody').css('top',jQuery(this).position().top);
@@ -96,6 +97,7 @@
     });
         
     $(function() {
+        <!-- drag drum play buttons when dragging rhythm ruler -->
         $('#rulerBody').draggable({
             drag: function() {
                 jQuery('#drumDiv').css('top',jQuery(this).position().top);
