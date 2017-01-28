@@ -3626,7 +3626,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 this.turtles.turtleList[turtle].trash = true;
                 this.turtles.turtleList[turtle].container.visible = false;
             } else {
-                this.errorMsg("You can't remove the only start block");
+                this.errorMsg("You must always have at least one start block");
                 console.log('null turtle');
                 return;
             }
