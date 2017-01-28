@@ -433,6 +433,19 @@ function RhythmRuler () {
         docById('drumDiv').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
         docById('drumDiv').style.overflowX = 'auto';
 
+        // Remove the rhythm ruler before adding it again.
+        Element.prototype.remove = function() {
+            this.parentElement.removeChild(this);
+        };
+
+        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+            for (var i = 0, len = this.length; i < len; i++) {
+                if (this[i] && this[i].parentElement) {
+                    this[i].parentElement.removeChild(this[i]);
+                }
+            }
+        };
+
         var that = this;
         var table = docById('buttonTable');
 
