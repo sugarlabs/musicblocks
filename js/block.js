@@ -22,20 +22,21 @@ function Block(protoblock, blocks, overrideName) {
         console.log('null protoblock sent to Block');
         return;
     }
+
     this.protoblock = protoblock;
     this.name = protoblock.name;
     this.overrideName = overrideName;
     this.blocks = blocks;
-    this.collapsed = false; // Is this block in a collapsed stack?
-    this.trash = false; // Is this block in the trash?
-    this.loadComplete = false; // Has the block finished loading?
-    this.label = null; // Editable textview in DOM.
-    this.text = null; // A dynamically generated text label on block itself.
-    this.value = null; // Value for number, text, and media blocks.
-    this.privateData = null; // A block may have some private data,
-                             // e.g., nameboxes use this field to store
-                             // the box name associated with the block.
-    this.image = protoblock.image; // The file path of the image.
+    this.collapsed = false;  // Is this block in a collapsed stack?
+    this.trash = false;  // Is this block in the trash?
+    this.loadComplete = false;  // Has the block finished loading?
+    this.label = null;  // Editable textview in DOM.
+    this.text = null;  // A dynamically generated text label on block itself.
+    this.value = null;  // Value for number, text, and media blocks.
+    this.privateData = null;  // A block may have some private data,
+                              // e.g., nameboxes use this field to store
+                              // the box name associated with the block.
+    this.image = protoblock.image;  // The file path of the image.
     this.imageBitmap = null;
  
     // All blocks have at a container and least one bitmap.
@@ -57,10 +58,11 @@ function Block(protoblock, blocks, overrideName) {
     this.highlightCollapseBlockBitmap = null;
     this.collapseText = null;
  
-    this.size = 1; // Proto size is copied here.
-    this.docks = []; // Proto dock is copied here.
+    this.size = 1;  // Proto size is copied here.
+    this.docks = [];  // Proto dock is copied here.
     this.connections = [];
-    // Keep track of clamp count for blocks with clamps
+
+    // Keep track of clamp count for blocks with clamps.
     this.clampCount = [1, 1];
     this.argClampSlots = [1];
  
@@ -78,7 +80,6 @@ function Block(protoblock, blocks, overrideName) {
         myBlock.bounds = myBlock.container.getBounds();
  
         if (myBlock.bounds == null) {
-            // console.log('Block container for ' + myBlock.name + ' not yet ready.');
             setTimeout(function() {
                 myBlock._createCache();
             }, 200);
@@ -93,7 +94,6 @@ function Block(protoblock, blocks, overrideName) {
         var myBlock = this;
  
         if (myBlock.bounds == null) {
-            // console.log('Block container for ' + myBlock.name + ' not yet ready.');
             setTimeout(function() {
                 myBlock.updateCache();
             }, 300);
@@ -304,9 +304,9 @@ function Block(protoblock, blocks, overrideName) {
         case 'hollowline':
         case 'if':
         case 'interval':
-      //  case 'invert':
-      //  case 'invert2':
+        case 'invert':
         case 'invert1':
+        case 'invert2':
         case 'kick':
         case 'major':
         case 'minor':
@@ -477,7 +477,7 @@ function Block(protoblock, blocks, overrideName) {
     };
  
     this.generateArtwork = function(firstTime) {
-        // Get the block labels from the protoblock
+        // Get the block labels from the protoblock.
         var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         var block_label = '';
@@ -494,7 +494,7 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.highlightBitmap.y = 0;
             myBlock.highlightBitmap.name = 'bmp_highlight_' + thisBlock;
             myBlock.highlightBitmap.cursor = 'pointer';
-            // Hide it to start
+            // Hide highlight bitmap to start.
             myBlock.highlightBitmap.visible = false;
  
             // At me point, it should be safe to calculate the
@@ -599,7 +599,7 @@ function Block(protoblock, blocks, overrideName) {
     this._finishImageLoad = function() {
         var thisBlock = this.blocks.blockList.indexOf(this);
  
-        // Value blocks get a modifiable text label
+        // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             if (this.value == null) {
                 switch(this.name) {
@@ -659,7 +659,7 @@ function Block(protoblock, blocks, overrideName) {
             this.container.addChild(this.text);
             this._positionText(this.protoblock.scale);
         } else if (this.protoblock.parameter) {
-            // Parameter blocks get a text label to show their current value
+            // Parameter blocks get a text label to show their current value.
             this.container.addChild(this.text);
             this._positionText(this.protoblock.scale);
         }
@@ -675,7 +675,7 @@ function Block(protoblock, blocks, overrideName) {
             this.blocks.cleanupAfterLoad(this.name);
         } else {
             // Start blocks and Action blocks can collapse, so add an
-            // event handler
+            // event handler.
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
@@ -867,8 +867,8 @@ function Block(protoblock, blocks, overrideName) {
         return this.protoblock.expandable;
     };
  
-    // Based on the block index into the blockList.
     this.getBlockId = function() {
+        // Generate a UID based on the block index into the blockList.
         var number = blockBlocks.blockList.indexOf(this);
         return '_' + number.toString();
     };
@@ -887,7 +887,6 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
         var myBlock = this;
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
-            // console.log('loadThumbnail: no image to load?');
             return;
         }
         var image = new Image();
@@ -1148,7 +1147,6 @@ function Block(protoblock, blocks, overrideName) {
  
         this.collapseContainer.on('pressup', function(event) {
             if (!mousedown) {
-                // console.log('pressup w/o mouse down?');
                 return;
             }
             mousedown = false;
@@ -1167,7 +1165,6 @@ function Block(protoblock, blocks, overrideName) {
  
         this.collapseContainer.on('mouseout', function(event) {
             if (!mousedown) {
-                // console.log('mouseout w/o mouse down?');
                 return;
             }
             mousedown = false;
@@ -1177,8 +1174,6 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 // Maybe restrict to Android?
                 var d = new Date();
-                // var diff = (d.getTime() - blocks.mouseDownTime);
-                // console.log(diff);
                 if ((d.getTime() - blocks.mouseDownTime) < 200) {
                     var d = new Date();
                     blocks.mouseDownTime = d.getTime();
@@ -1189,7 +1184,6 @@ function Block(protoblock, blocks, overrideName) {
  
         this.collapseContainer.on('pressmove', function(event) {
             if (!mousedown) {
-                // console.log('pressmove w/o mouse down?');
                 return;
             }
             moved = true;
@@ -1257,7 +1251,9 @@ function Block(protoblock, blocks, overrideName) {
             bounds = this.bounds;
         }
  
-        // Only detect hits on top section of block.
+        // Since hitarea is concave, we only detect hits on top
+        // section of block. Otherwise we would not be able to grab
+        // blocks placed inside of clamps.
         if (this.isClampBlock() || this.isArgClamp()) {
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT);
         } else if (this.isNoHitBlock()) {
@@ -1292,7 +1288,6 @@ function Block(protoblock, blocks, overrideName) {
         var getInput = window.hasMouse;
  
         this.container.on('click', function(event) {
-            // console.log('CLICK');
             blocks.activeBlock = thisBlock;
             haveClick = true;
  
@@ -1332,11 +1327,8 @@ function Block(protoblock, blocks, overrideName) {
         });
  
         this.container.on('mousedown', function(event) {
-            // console.log('MOUSEDOWN');
-            // hideDOMLabel();
- 
             // Track time for detecting long pause...
-            // but only for top block in stack
+            // but only for top block in stack.
             if (myBlock.connections[0] == null) {
                 var d = new Date();
                 blocks.mouseDownTime = d.getTime();
@@ -1367,7 +1359,6 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
  
-                // console.log('MOUSEOUT');
                 if (!blocks.inLongPress) {
                     myBlock._mouseoutCallback(event, moved, haveClick, true);
                 }
@@ -1379,7 +1370,6 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
  
-                // console.log('PRESSUP');
                 if (!blocks.inLongPress) {
                     myBlock._mouseoutCallback(event, moved, haveClick, true);
                 }
@@ -1387,8 +1377,8 @@ function Block(protoblock, blocks, overrideName) {
             });
  
             var original = {x: event.stageX / scale, y: event.stageY / scale};
+
             myBlock.container.on('pressmove', function(event) {
-                // console.log('PRESSMOVE');
                 // FIXME: More voodoo
                 event.nativeEvent.preventDefault();
  
@@ -1404,7 +1394,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (window.hasMouse) {
                     moved = true;
                 } else {
-                    // Make it eaiser to select text on mobile
+                    // Make it eaiser to select text on mobile.
                     setTimeout(function () {
                         moved = Math.abs((event.stageX / scale) - original.x) + Math.abs((event.stageY / scale) - original.y) > 20 && !window.hasMouse;
                         getInput = !moved;
@@ -1419,10 +1409,10 @@ function Block(protoblock, blocks, overrideName) {
                 var finalPos = oldY + dy;
                 
                 if (blocks.stage.y === 0 && finalPos < (45 * scale)){
-                	dy += (45 * scale) - finalPos;
+                        dy += (45 * scale) - finalPos;
                 }
+
                 blocks.moveBlockRelative(thisBlock, dx, dy);
-                
 
                 // If we are over the trash, warn the user.
                 if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale))
@@ -1455,7 +1445,6 @@ function Block(protoblock, blocks, overrideName) {
  
         this.container.on('mouseout', function(event) {
             if (!blocks.inLongPress) {
-                // console.log('MOUSEOUT (OUT)');
                 myBlock._mouseoutCallback(event, moved, haveClick, true);
             }
             moved = false;
@@ -1463,7 +1452,6 @@ function Block(protoblock, blocks, overrideName) {
  
         this.container.on('pressup', function(event) {
             if (!blocks.inLongPress) {
-                // console.log('PRESSUP (OUT)');
                 myBlock._mouseoutCallback(event, moved, haveClick, false);
             }
             moved = false;
@@ -1490,7 +1478,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             } else {
                 // Otherwise, process move.
-                // Keep track of time of last move
+                // Also, keep track of the time of the last move.
                 var d = new Date();
                 blocks.mouseDownTime = d.getTime();
                 this.blocks.blockMoved(thisBlock);
@@ -1589,7 +1577,7 @@ function Block(protoblock, blocks, overrideName) {
             var selectednote = obj[0];
             var selectedattr = obj[1];
  
-            // solfnotes_ is used in the interface for i18n
+            // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
  
@@ -1777,6 +1765,7 @@ function Block(protoblock, blocks, overrideName) {
         }
  
         var focused = false;
+
         var __blur = function (event) {
             // Not sure why the change in the input is not available
             // immediately in FireFox. We need a workaround if hardware
@@ -1853,7 +1842,6 @@ function Block(protoblock, blocks, overrideName) {
         // Update the block values as they change in the DOM label.
         if (this == null) {
             console.log('cannot find block associated with label change');
-            // console.log('unlock');
             this._label_lock = false;
             return;
         }
@@ -1861,7 +1849,6 @@ function Block(protoblock, blocks, overrideName) {
         if (this._label_lock) {
             console.log('changing label lock already set');
         } else {
-            // console.log('lock');
             this._label_lock = true;
         }
  
@@ -1889,7 +1876,6 @@ function Block(protoblock, blocks, overrideName) {
  
         if (oldValue === newValue) {
             // Nothing to do in this case.
-            // console.log('unlock');
             this._label_lock = false;
             return;
         }
@@ -1903,6 +1889,7 @@ function Block(protoblock, blocks, overrideName) {
                 setTimeout(function () {
                     that.blocks.palettes.removeActionPrototype(oldValue);
                 }, 1000);
+
                 // Ensure new name is unique.
                 var uniqueValue = this.blocks.findUniqueActionName(newValue);
                 if (uniqueValue !== newValue) {
@@ -2014,7 +2001,7 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             case 'storein':
                 // If the label was the name of a storein, update the
-                //associated box this.blocks and the palette buttons
+                // associated box this.blocks and the palette buttons.
                 if (this.value !== 'box') {
                     this.blocks.newStoreinBlock(this.value);
                     this.blocks.newNamedboxBlock(this.value);
@@ -2038,7 +2025,6 @@ function Block(protoblock, blocks, overrideName) {
         }
  
         // We are done changing the label, so unlock.
-        // console.log('unlock');
         this._label_lock = false;
  
         // Load the synth for the selected drum.
@@ -2075,8 +2061,8 @@ document.addEventListener('mousemove', function (e) {
  
  
 function _makeBitmap(data, name, callback, args) {
-    // Async creation of bitmap from SVG data
-    // Works with Chrome, Safari, Firefox (untested on IE)
+    // Async creation of bitmap from SVG data.
+    // Works with Chrome, Safari, Firefox (untested on IE).
     var img = new Image();
     img.onload = function() {
         var bitmap = new createjs.Bitmap(img);
@@ -2084,4 +2070,4 @@ function _makeBitmap(data, name, callback, args) {
     };
  
     img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
-}
+};
