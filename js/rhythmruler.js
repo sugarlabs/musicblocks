@@ -172,9 +172,6 @@ function RhythmRuler () {
         var cell = ruler.cells[0];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);
-        if (this._playingAll || this._playingOne) {
-            this.__loop(0, 0, i, 1);
-        }
     }
 
     this._playAll = function() {
@@ -187,6 +184,7 @@ function RhythmRuler () {
 
         for (var i = 0; i < this.Rulers.length; i++) {
             this.__playNote(i);
+            this.__loop(0, 0, i, 1);
         }
     };
 
@@ -199,6 +197,7 @@ function RhythmRuler () {
         }
 
         this.__playNote(this._rulerSelected);
+        this.__loop(0, 0, this._rulerSelected, 1);
     };
 
     this.__loop = function(time, notesCounter, rulerNo, colIndex) {
