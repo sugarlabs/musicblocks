@@ -242,14 +242,14 @@ function Matrix() {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i];
+                cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = this.rowLabels[i] + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
+                cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.backgroundImage = "url('images/turtle2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
