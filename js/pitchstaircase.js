@@ -105,9 +105,14 @@ function PitchStairCase () {
             var solfegetonote = this._logo.getNote(solfege, octave, 0, this._logo.keySignature[this.logoturtle])[0];
             var frequency = this.Stairs[i][2];
 
+            var input1 = docById('musicratio1').value;
+            var input2 = docById('musicratio2').value;
+            var ratio = parseFloat(input2/input1);
+            var starting_frequency = Number((frequency * ratio).toFixed(2));
+
             var cell = row.insertCell(-1);
             cell.style.width = (stairDivPosition.width) * parseFloat(DEFUALTFREQUENCY/frequency) * this._cellScale / 3 + 'px';
-            cell.innerHTML = frequency.toFixed(2) + '<br>' + that.Stairs[i][0] + that.Stairs[i][1];
+            cell.innerHTML = starting_frequency + ' * (' + input1 + '/' + input2 + ') : ' + frequency.toFixed(2) + '<br>' + that.Stairs[i][0] + that.Stairs[i][1];
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = playrow.offsetHeight + 'px';
@@ -118,7 +123,7 @@ function PitchStairCase () {
             var svgStrokeWidth = (3 * 55 / cellWidth).toString();
             console.log(svgWidth + ' ' + svgScale + ' ' + svgStrokeWidth);
             var svgData = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SYNTHSVG.replace(/SVGWIDTH/g, svgWidth).replace(/XSCALE/g, svgScale).replace(/STOKEWIDTH/g, svgStrokeWidth))));
-	    cell.style.backgroundImage = 'url(' + svgData + ')';
+	        cell.style.backgroundImage = 'url(' + svgData + ')';
             cell.style.backgroundRepeat = 'no-repeat';
             cell.style.backgroundPosition = 'center center';
 
