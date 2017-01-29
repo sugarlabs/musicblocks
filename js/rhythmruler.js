@@ -140,9 +140,9 @@ function RhythmRuler () {
         newCell.style.minWidth = newCell.style.width;
         newCell.style.maxWidth = newCell.style.width;
         newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue/inputNum, 1);
+        newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
 
-        noteValues[newCellIndex] = oldCellNoteValue/inputNum;
+        noteValues[newCellIndex] = oldCellNoteValue / inputNum;
         noteValues.splice(newCellIndex + 1, inputNum - 1);
 
         var that = this;
@@ -303,7 +303,9 @@ function RhythmRuler () {
         setTimeout(function() {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(" ")[0] + "_rhythm"; //get first word of drum's name (skip "drum" word itself) and add "rhythm"
+	    // Get the first word of drum's name (ignore the word 'drum' itself)
+	    // and add 'rhythm'.
+            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('rhythm');
             var delta = selectedRuler * 42;
             var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
             var previousBlock = 0;
@@ -369,7 +371,7 @@ function RhythmRuler () {
                     var drum = that._logo.blocks.blockList[drumBlockNo].value;
 
                     if (sameNoteValue === 1) {
-                        // Add a note block
+                        // Add a note block.
                         newStack.push([idx, 'newnote', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 7]]);
                         newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
                         newStack.push([idx + 2, ['number', {'value': 1}], 0, 0, [idx + 1]]);
@@ -384,7 +386,7 @@ function RhythmRuler () {
                             previousBlock = idx + 7;
                         }
                     } else {
-                        // Add a note block inside a repeat block
+                        // Add a note block inside a repeat block.
                         if (i == ruler.cells.length - 1) {
                             newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, null]]);
                         } else {
@@ -587,7 +589,7 @@ function RhythmRuler () {
 
         var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
-            // Save the new dissect history
+            // Save the new dissect history.
             var dissectHistory = [];
             var drums = [];
             for (var i = 0; i < that.Rulers.length; i++) {
@@ -720,10 +722,11 @@ function RhythmRuler () {
                 }
 
                 var rulerTable = docById('rulerTable' + drum);
-                for (var j = 0; j < this._dissectHistory[i].length; j++) {
+                for (var j = 0; j < this._dissectHistory[i][0].length; j++) {
                     if (this._dissectHistory[i][0][j] == undefined) {
                         continue;
                     }
+
                     this._rulerSelected = drum;
 
                     var cell = rulerTable.rows[0].cells[this._dissectHistory[i][0][j][0]];
