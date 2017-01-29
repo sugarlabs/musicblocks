@@ -1,4 +1,4 @@
-// Copyright (c) 2014-16 Walter Bender
+// Copyright (c) 2014-17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -736,12 +736,17 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // (3) Look for a new connection;
         //     Is it potentially an arg inside an arg clamp?
         // (4) Is it an arg block connected to a 2-arg block?
-        // (5) Recheck if it inside of a expandable block.
+        // (5) Is it a pitch block being inserted or removed from
+        //     a Note clamp? In which case, we may have to remove
+        //     or add a silence block.
+        // (6) Is it the name of an action block? In which case we
+        //     need to check to see if we need to rename it.
+        // (7) And we need to recheck if it inside of a expandable block.
  
         // Find any containing expandable blocks.
         this._clampBlocksToCheck = [];
         if (thisBlock == null) {
-            console.log('block moved called with null block.');
+            console.log('blockMoved called with null block.');
             return;
         }
  
@@ -756,7 +761,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         while (blk != null) {
             expandableLoopCounter += 1;
             if (expandableLoopCounter > 2 * this.blockList.length) {
-                console.log('Inifinite loop encountered checking for expandables?');
+                console.log('Infinite loop encountered checking for expandables?');
                 break;
             }
  
@@ -794,7 +799,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
         // Disconnect from connection[0] (both sides of the connection).
         if (c != null) {
-            // disconnect both ends of the connection
+            // Disconnect both ends of the connection.
             for (var i = 1; i < cBlock.connections.length; i++) {
                 if (cBlock.connections[i] === thisBlock) {
                     cBlock.connections[i] = null;
@@ -809,8 +814,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         var x1 = myBlock.container.x + myBlock.docks[0][0];
         var y1 = myBlock.container.y + myBlock.docks[0][1];
  
-        // Find the nearest dock; if it is close
-        // enough, connect;
+        // Find the nearest dock; if it is close enough, make the
+        // connection.
         var newBlock = null;
         var newConnection = null;
  
@@ -818,8 +823,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
        
         var blkType = myBlock.docks[0][2];
  
-        //Is the added block above the silence block or below ?
-        var insertAfterDefault  = true;
+        // Is the added block above the silence block or below?
+        var insertAfterDefault = true;
  
         for (var b = 0; b < this.blockList.length; b++) {
             // Don't connect to yourself.
@@ -904,8 +909,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     }
                 }
             } else {
-                // Three scenarios in which we may be overriding an existing connection:
-                // (1) if it is an argClamp, add a new slot below the current block;
+                // Three scenarios in which we may be overriding an
+                // existing connection:
+                // (1) if it is an argClamp, add a new slot below the
+                //     current block;
                 // (2) if it is an arg block, replace it; and
                 // (3) if it is a flow block, insert it into the flow.
                 insertAfterDefault = false;
@@ -1000,6 +1007,32 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
  
+            // If we attached a name to an action block, check to see
+            // if we need to rename it.
+            if (this.blockList[newBlock].name === 'action') {
+                // Is there already another action block with this name?
+                for (var b = 0; b < this.blockList.length; b++) {
+                    if (b === newBlock) continue;
+                    if (this.blockList[b].name === 'action') {
+                        if (this.blockList[b].connections[1] != null) {
+                            console.log(this.blockList[this.blockList[b].connections[1]].value);
+                            if (this.blockList[this.blockList[b].connections[1]].value === this.blockList[thisBlock].value) {
+                                console.log('We need to rename the action.');
+                                this.blockList[thisBlock].value = this.findUniqueActionName(this.blockList[thisBlock].value);
+                                var label = this.blockList[thisBlock].value;
+                                if (label.length > 8) {
+                                    label = label.substr(0, 7) + '...';
+                                }
+                                this.blockList[thisBlock].text.text = label;
+                                this.blockList[thisBlock].container.updateCache();
+                                this.newNameddoBlock(this.blockList[thisBlock].value, this.actionHasReturn(b), this.actionHasArgs(b));
+                                this.setActionProtoVisiblity(false);
+                            }
+                        }
+                    }
+                }
+            }
+
             // console.log('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
@@ -1832,7 +1865,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
                 value = this.findUniqueActionName(_('action'));
-               //  console.log('renaming action block to ' + value);
+                //  console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
                     // console.log('calling newNameddoBlock with value ' + value);
                     // TODO: are there return or arg blocks?
@@ -2126,6 +2159,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (oldName === newName) {
             return;
         }
+
         // Update the blocks, do->oldName should be do->newName
         // Named dos are modified in a separate function below.
         for (var blk = 0; blk < this.blockList.length; blk++) {
