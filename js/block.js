@@ -1225,7 +1225,7 @@ function Block(protoblock, blocks, overrideName) {
         if (moved) {
             // Check if block is in the trash.
             if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
-                if(trashcan.isVisible)
+                if (trashcan.isVisible)
                     blocks.sendStackToTrash(this);
             } else {
                 // Otherwise, process move.
@@ -1312,7 +1312,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else if (myBlock.name === 'loadFile') {
                     myBlock._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(myBlock.name) !== -1) {
-                    if(!myBlock.trash)
+                    if (!myBlock.trash)
                     {
                         myBlock._changeLabel();
                     }
@@ -1978,7 +1978,7 @@ function Block(protoblock, blocks, overrideName) {
                 var blockPalette = blocks.palettes.dict['action'];
                 for (var blk = 0; blk < blockPalette.protoList.length; blk++) {
                     var block = blockPalette.protoList[blk];
-                    if(oldValue === _('action')) {
+                    if (oldValue === _('action')) {
                         if (block.name === 'nameddo' && block.defaults.length === 0) {
                             block.hidden = true;
                         }
