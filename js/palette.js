@@ -39,7 +39,7 @@ function paletteBlockButtonPush(name, arg) {
 // (1) A palette button (in the Palettes.buttons dictionary) is a
 // button that envokes a palette; The buttons have artwork associated
 // with them: a bitmap and a highlighted bitmap that is shown when the
-// mouse is over the button.
+// mouse is over the button. (The artwork is found in artwork.js.)
 //
 // loadPaletteButtonHandler is the event handler for palette buttons.
 //
@@ -60,7 +60,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.halfCellSize = Math.floor(cellSize / 2);
     this.scrollDiff = 0;
     this.refreshCanvas = refreshCanvas;
-    this.originalSize = 55; // this is the original svg size
+    this.originalSize = 55;  // this is the original svg size
     this.trashcan = trashcan;
     this.initial_x = 55;
     this.initial_y = 55;
@@ -79,7 +79,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
     // The collection of palettes.
     this.dict = {};
-    this.buttons = {}; // The toolbar button for each palette.
+    this.buttons = {};  // The toolbar button for each palette.
 
     this.visible = true;
     this.scale = 1.0;
@@ -335,7 +335,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.visible = false;
         } else {
             this._showMenus();
-	    this.visible = true;
+            this.visible = true;
         }
     };
 
@@ -415,7 +415,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
             palettes.buttons[name].on('pressup', function(event) {
                 scrolling = false;
-            }, null, true); // once = true
+            }, null, true);  // once = true
         });
 
         // A palette button opens or closes a palette.
@@ -489,13 +489,13 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             if (this.mobile) {
                 this.hide();
             } else {
-		this.show();
-	    }
+                this.show();
+            }
         }
     };
 
     return this;
-}
+};
 
 
 // Kind of a model, but it only keeps a list of SVGs
@@ -537,7 +537,7 @@ function PaletteModel(palette, palettes, name) {
                     var arg = block.defaults[0];
                 }
                 break;
-	    case 'namedarg':
+            case 'namedarg':
                 if (block.defaults[0] === undefined) {
                     modname = 'namedarg';
                     var arg = '1';
@@ -710,7 +710,7 @@ function PaletteModel(palette, palettes, name) {
             });
         }
     };
-}
+};
 
 
 function PopdownPalette(palettes) {
@@ -729,7 +729,7 @@ function PopdownPalette(palettes) {
             html += '<div class="palette">';
             var icon = PALETTEICONS[name]
                 .replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
-	    //.TRANS: popout: to detach as a separate window
+            //.TRANS: popout: to detach as a separate window
             html += format('<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
                                 <img class="hide-button" src="header-icons/hide.svg" \
@@ -812,7 +812,7 @@ function PopdownPalette(palettes) {
     this.popup = function () {
         document.querySelector('#popdown-palette').classList.remove('show');
     };
-}
+};
 
 
 // Define objects for individual palettes.
@@ -939,7 +939,7 @@ function Palette(palettes, name) {
 
         if (!createHeader) {
             return;
-        };
+        }
 
         var paletteWidth = MENUWIDTH + (this.columns * 160);
         this.menuContainer.removeAllChildren();
@@ -1160,7 +1160,7 @@ function Palette(palettes, name) {
     };
 
     this.show = function() {
-	if (this.palettes.mobile) {
+        if (this.palettes.mobile) {
             this.hideMenu();
         } else {
             this.showMenu();
@@ -1185,7 +1185,7 @@ function Palette(palettes, name) {
     };
 
     this.showMenu = function() {
-	if (this.palettes.mobile) {
+        if (this.palettes.mobile) {
             this.menuContainer.visible = false;
         } else {
             this.menuContainer.visible = true;
@@ -1358,7 +1358,7 @@ function Palette(palettes, name) {
             returnString += ' ' + this.protoList[thisBlock].name;
         }
         return returnString;
-    };;
+    };
 
     this.remove = function(protoblock, name) {
         // Remove the protoblock and its associated artwork container.
@@ -1421,7 +1421,7 @@ function Palette(palettes, name) {
             palette.background.on('pressup', function(event) {
                 palette.palettes.activePalette = null;
                 scrolling = false;
-            }, null, true); // once = true
+            }, null, true);  // once = true
         });
     };
 
@@ -1797,7 +1797,7 @@ function Palette(palettes, name) {
     };
 
     this.cleanup = function() {
-	this._resetLayout();
+        this._resetLayout();
         this._updateBlockMasks();
         this.palettes.refreshCanvas();
     };
@@ -2132,7 +2132,7 @@ function Palette(palettes, name) {
             }
 
             // Put the protoblock back on the palette...
-	    this.cleanup();
+            this.cleanup();
         }
     };
 
