@@ -123,7 +123,7 @@ function PitchStairCase () {
             var svgStrokeWidth = (3 * 55 / cellWidth).toString();
             console.log(svgWidth + ' ' + svgScale + ' ' + svgStrokeWidth);
             var svgData = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SYNTHSVG.replace(/SVGWIDTH/g, svgWidth).replace(/XSCALE/g, svgScale).replace(/STOKEWIDTH/g, svgStrokeWidth))));
-	        cell.style.backgroundImage = 'url(' + svgData + ')';
+            cell.style.backgroundImage = 'url(' + svgData + ')';
             cell.style.backgroundRepeat = 'no-repeat';
             cell.style.backgroundPosition = 'center center';
 
