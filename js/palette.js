@@ -1796,6 +1796,12 @@ function Palette(palettes, name) {
         }
     };
 
+    this.cleanup = function() {
+	this._resetLayout();
+        this._updateBlockMasks();
+        this.palettes.refreshCanvas();
+    };
+
     this._makeBlockFromProtoblock = function(protoblk, moved, blkname, event, saveX, saveY) {
         var palette = this;
 
@@ -2126,10 +2132,7 @@ function Palette(palettes, name) {
             }
 
             // Put the protoblock back on the palette...
-            this._resetLayout();
-
-            this._updateBlockMasks();
-            this.palettes.refreshCanvas();
+	    this.cleanup();
         }
     };
 
