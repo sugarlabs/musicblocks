@@ -2043,14 +2043,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
         }
- 
+
         // Force an update if the name has changed.
         if (stateChanged) {
             this.palettes.hide();
             this.palettes.updatePalettes('action');
             this.palettes.show();
         }
-    }
+    };
  
     this.findUniqueActionName = function (name) {
         // If we have a stack named 'action', make the protoblock visible.
