@@ -99,7 +99,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         if (mobile) {
             this._hideMenus();
         }
-    }
+    };
 
     this.setScale = function(scale) {
         this.scale = scale;
@@ -163,7 +163,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
      
     this.hidePaletteIconCircles = function(){
         hideButtonHighlight(circles, this.stage);
-    }
+    };
 
     this.makePalettes = function(hide) {
         function __processUpIcon(palettes, name, bitmap, args) {
@@ -747,7 +747,8 @@ function PopdownPalette(palettes) {
             this.models[name].update();
             
             var blocks = this.models[name].blocks;
-            blocks.reverse();
+            if (BUILTINPALETTES.indexOf(name) > -1)
+                blocks.reverse();
             
             for (var blk in blocks) {
                 html += format('<li title="{label}" \
@@ -1112,8 +1113,13 @@ function Palette(palettes, name) {
 
         this.y = 0;
         this.model.update();
-        for (var blk in this.model.blocks) {
-            var b = this.model.blocks[blk];
+
+        var blocks = this.model.blocks;
+        if (BUILTINPALETTES.indexOf(name) == -1)
+            blocks.reverse();
+
+        for (var blk in blocks) {
+            var b = blocks[blk];
             if (!this.protoContainers[b.modname]) {
                 // create graphics for the palette entry for this block
                 this.protoContainers[b.modname] = new createjs.Container();
