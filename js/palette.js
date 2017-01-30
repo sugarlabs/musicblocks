@@ -1,4 +1,4 @@
-// Copyright (c) 2014-16 Walter Bender
+// Copyright (c) 2014-17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -1033,6 +1033,10 @@ function Palette(palettes, name) {
             if (bounds != null) {
                 // Pack them in a bit tighter
                 this.y += bounds.height - (STANDARDBLOCKHEIGHT * 0.1);
+            } else {
+                // If artwork isn't ready, assume it is of standard
+                // size, e.g., and action block.
+                this.y += STANDARDBLOCKHEIGHT * 0.9;
             }
         }
 
@@ -2154,10 +2158,11 @@ function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, tra
     blocks = b;
 
     // Give the palettes time to load.
+    // We are in no hurry since we are waiting on the splash screen.
     setTimeout(function() {
         palettes.show();
         palettes.bringToTop();
-    }, 2000);
+    }, 6000);
     return palettes;
 };
 
