@@ -291,7 +291,7 @@ function Matrix() {
         var table = docById('drumTable');
         var cell = row.insertCell();
         cell.className = 'matrixButton';
-        cell.style.position = 'static';
+        cell.style.position = 'fixed';
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
