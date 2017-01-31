@@ -635,7 +635,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             this.duplicateFactor[turtle] = 1;
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
-            this.keySignature[turtle] = 'C ' + _('Major');
+            this.keySignature[turtle] = 'C ' + _('major');
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
@@ -2172,7 +2172,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             break;
         case 'setkey2':
             if (args.length === 2) {
-                var modename = 'MAJOR';
+                var modename = 'major';
                 for (var i = 0; i < MODENAMES.length; i++) {
                     if (MODENAMES[i][0] === args[1]) {
                         modename = MODENAMES[i][1];

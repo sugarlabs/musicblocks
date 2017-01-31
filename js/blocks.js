@@ -116,7 +116,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
     // Change the scale of the blocks (and the protoblocks on the palette).
     this.setBlockScale = function (scale) {
-        console.log('new block scale is ' + scale);
+        console.log('New block scale is ' + scale);
         this.blockScale = scale;
  
         // Regenerate all of the artwork at the new scale.
@@ -1251,7 +1251,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
             this.checkBounds();
         } else {
-            console.log('no container yet');
+            console.log('No container yet for block ' + myBlock.name);
         }
     };
  
@@ -1275,7 +1275,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
             this.checkBounds();
         } else {
-            console.log('no container yet');
+            console.log('No container yet for block ' + myBlock.name);
         }
     };
  
@@ -1337,7 +1337,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (myBlock.loadComplete) {
             myBlock.container.updateCache();
         } else {
-            console.log('load not yet complete for (' + blk + ') ' + myBlock.name);
+            console.log('Load not yet complete for (' + blk + ') ' + myBlock.name);
         }
     };
  
