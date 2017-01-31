@@ -183,7 +183,7 @@ function StatusMatrix() {
                 var value = this._logo.noteStatus[turtle][1];
                 if (value > 1) {
                     // FIXME: Do proper conversion of rational to fraction.
-                    note += '1 / ';  // Show note value as fraction.
+                    note += '1/';  // Show note value as fraction.
                     note += value;
                 } else {
                     note += 1 / value;
