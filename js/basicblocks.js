@@ -2296,7 +2296,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var getyTurtleBlock = new ProtoBlock('yturtle');
     getyTurtleBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['yturtle'] = getyTurtleBlock;
-    getyTurtleBlock.staticLabels.push(_('turtle y'));
+    getyTurtleBlock.staticLabels.push(_('mouse y'));
     getyTurtleBlock.adjustWidthToLabel();
     getyTurtleBlock.oneArgMathBlock();
     getyTurtleBlock.dockTypes[1] = 'anyin';
@@ -2305,7 +2305,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var getxTurtleBlock = new ProtoBlock('xturtle');
     getxTurtleBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['xturtle'] = getxTurtleBlock;
-    getxTurtleBlock.staticLabels.push(_('turtle x'));
+    getxTurtleBlock.staticLabels.push(_('mouse x'));
     getxTurtleBlock.adjustWidthToLabel();
     getxTurtleBlock.oneArgMathBlock();
     getxTurtleBlock.dockTypes[1] = 'anyin';
@@ -2464,21 +2464,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     timeBlock.adjustWidthToLabel();
     timeBlock.parameterBlock();
 
-    var mousexBlock = new ProtoBlock('mousex');
-    mousexBlock.palette = palettes.dict['sensors'];
-    blocks.protoBlockDict['mousex'] = mousexBlock;
-    mousexBlock.staticLabels.push(_('mouse x'));
-    mousexBlock.extraWidth = 15;
-    mousexBlock.adjustWidthToLabel();
-    mousexBlock.parameterBlock();
-
     var mouseyBlock = new ProtoBlock('mousey');
     mouseyBlock.palette = palettes.dict['sensors'];
     blocks.protoBlockDict['mousey'] = mouseyBlock;
-    mouseyBlock.staticLabels.push(_('mouse y'));
+    mouseyBlock.staticLabels.push(_('cursor y'));
     mouseyBlock.extraWidth = 15;
     mouseyBlock.adjustWidthToLabel();
     mouseyBlock.parameterBlock();
+
+    var mousexBlock = new ProtoBlock('mousex');
+    mousexBlock.palette = palettes.dict['sensors'];
+    blocks.protoBlockDict['mousex'] = mousexBlock;
+    mousexBlock.staticLabels.push(_('cursor x'));
+    mousexBlock.extraWidth = 15;
+    mousexBlock.adjustWidthToLabel();
+    mousexBlock.parameterBlock();
 
     var mousebuttonBlock = new ProtoBlock('mousebutton');
     mousebuttonBlock.palette = palettes.dict['sensors'];
