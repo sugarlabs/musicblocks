@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016-17 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -27,11 +27,11 @@ function RhythmRuler () {
     this._playingAll = false;
     this._cellCounter = 0;
 
-    // Keep a running time for each ruler to maintain sync.
-    this._runningTimes = [];
+    // Keep a elapsed time for each ruler to maintain sync.
+    this._elapsedTimes = [];
     // Starting time from which we measure for sync.
     this._startingTime = null;
-    this._offset = 0;
+    this._offsets = [];
     this._rulerSelected = 0;
     this._rulerPlaying = -1;
 
@@ -68,6 +68,11 @@ function RhythmRuler () {
     };
 
     this._dissectRuler = function (event) {
+        if (this._playing) {
+            console.log('You cannot dissect while widget is playing.');
+            return;
+	}
+
         var inputNum = docById('dissectNumber').value;
         if (isNaN(inputNum)) {
             inputNum = 2;
@@ -135,9 +140,9 @@ function RhythmRuler () {
         newCell.style.minWidth = newCell.style.width;
         newCell.style.maxWidth = newCell.style.width;
         newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue/inputNum, 1);
+        newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
 
-        noteValues[newCellIndex] = oldCellNoteValue/inputNum;
+        noteValues[newCellIndex] = oldCellNoteValue / inputNum;
         noteValues.splice(newCellIndex + 1, inputNum - 1);
 
         var that = this;
@@ -154,6 +159,15 @@ function RhythmRuler () {
         this._calculateZebraStripes(this._rulerSelected);
     };
 
+    this._clear = function() {
+        for (r = 0; r < this.Rulers.length; r++) {
+            this._rulerSelected = r;
+            while(this.Rulers[r][1].length > 0) {
+                this._undo();
+            }
+        }
+    };
+
     this.__playNote = function(i) {
         var noteValues = this.Rulers[i][0];
         var noteValue = noteValues[0];
@@ -163,9 +177,6 @@ function RhythmRuler () {
         var cell = ruler.cells[0];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);
-        if (this._playingAll || this._playingOne) {
-            this.__loop(0, 0, i, 1);
-        }
     }
 
     this._playAll = function() {
@@ -173,11 +184,15 @@ function RhythmRuler () {
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
-            this._offset = 0;
+            for (var i = 0; i < this.Rulers.length; i++) {
+                this._offsets[i] = 0;
+                this._elapsedTimes[i] = 0;
+            }
         }
 
         for (var i = 0; i < this.Rulers.length; i++) {
             this.__playNote(i);
+            this.__loop(0, 0, i, 1);
         }
     };
 
@@ -186,24 +201,22 @@ function RhythmRuler () {
         if (this._startingTime == null) {
             var d = new Date();
             this._startingTime = d.getTime();
-            this._offset = 0;
+            this._elapsedTimes[this._rulerSelected] = 0;
+            this._offsets[this._rulerSelected] = 0;
         }
 
         this.__playNote(this._rulerSelected);
+        this.__loop(0, 0, this._rulerSelected, 1);
     };
 
-    this.__loop = function(time, notesCounter, rulerNo, colIndex) {
-        if (docById('rulerBody').style.visibility === 'hidden') {
-            return;
-        }
-
-        if (docById('drumDiv').style.visibility === 'hidden') {
+    this.__loop = function(noteTime, notesCounter, rulerNo, colIndex) {
+        if (docById('rulerBody').style.visibility === 'hidden' || docById('drumDiv').style.visibility === 'hidden') {
             return;
         }
 
         var noteValues = this.Rulers[rulerNo][0];
         var noteValue = noteValues[notesCounter];
-        time = 1 / noteValue;
+        noteTime = 1 / noteValue;
         var drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
         var drum = this._logo.blocks.blockList[drumblockno].value;
 
@@ -216,10 +229,11 @@ function RhythmRuler () {
             }
 
             if (notesCounter === noteValues.length - 1) {
-                // When we get to the end of the rulers, reset the background color.
+                // When we get to the end of the rulers, reset the
+                // background color.
                 for (var i = 0; i < ruler.cells.length; i++) {
                     var cell = ruler.cells[i];
-                    cell.style.backgroundColor =  MATRIXNOTECELLCOLOR;
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 }
             } else {
                 // Mark the current cell.
@@ -238,13 +252,13 @@ function RhythmRuler () {
             colIndex += 1;
             if (that._playing) {
                 var d = new Date();
-                that._offset = d.getTime() - that._startingTime - that._runningTimes[rulerNo];
+                that._offsets[rulerNo] = d.getTime() - that._startingTime - that._elapsedTimes[rulerNo];
                 that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum);
             }
 
             if (notesCounter < noteValues.length) {
                 if (that._playing) {
-                    that.__loop(time, notesCounter, rulerNo, colIndex);
+                    that.__loop(noteTime, notesCounter, rulerNo, colIndex);
                 }
             } else {
                 that._cellCounter += 1;
@@ -273,9 +287,9 @@ function RhythmRuler () {
                     that._playOne();
                 }
             }
-        }, this._logo.defaultBPMFactor * 1000 * time - this._offset);
+        }, this._logo.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]);
 
-        that._runningTimes[rulerNo] += that._logo.defaultBPMFactor * 1000 * time;
+        this._elapsedTimes[rulerNo] += this._logo.defaultBPMFactor * 1000 * noteTime;
     };
 
     this._save = function(selectedRuler) {
@@ -289,7 +303,9 @@ function RhythmRuler () {
         setTimeout(function() {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(" ")[0] + "_rhythm"; //get first word of drum's name (skip "drum" word itself) and add "rhythm"
+	    // Get the first word of drum's name (ignore the word 'drum' itself)
+	    // and add 'rhythm'.
+            var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('rhythm');
             var delta = selectedRuler * 42;
             var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
             var previousBlock = 0;
@@ -355,7 +371,7 @@ function RhythmRuler () {
                     var drum = that._logo.blocks.blockList[drumBlockNo].value;
 
                     if (sameNoteValue === 1) {
-                        // Add a note block
+                        // Add a note block.
                         newStack.push([idx, 'newnote', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 7]]);
                         newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
                         newStack.push([idx + 2, ['number', {'value': 1}], 0, 0, [idx + 1]]);
@@ -370,7 +386,7 @@ function RhythmRuler () {
                             previousBlock = idx + 7;
                         }
                     } else {
-                        // Add a note block inside a repeat block
+                        // Add a note block inside a repeat block.
                         if (i == ruler.cells.length - 1) {
                             newStack.push([idx, 'repeat', 0, 0, [previousBlock, idx + 1, idx + 2, null]]);
                         } else {
@@ -424,6 +440,22 @@ function RhythmRuler () {
         docById('drumDiv').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
         docById('drumDiv').style.overflowX = 'auto';
 
+        docById('rulerBody').innerHTML = '';
+        docById('drumDiv').innerHTML = '';
+
+        // Remove the rhythm ruler before adding it again.
+        Element.prototype.remove = function() {
+            this.parentElement.removeChild(this);
+        };
+
+        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+            for (var i = 0, len = this.length; i < len; i++) {
+                if (this[i] && this[i].parentElement) {
+                    this[i].parentElement.removeChild(this[i]);
+                }
+            }
+        };
+
         var that = this;
         var table = docById('buttonTable');
 
@@ -437,11 +469,13 @@ function RhythmRuler () {
             table.remove();
         }
 
-        this._runningTimes = [];
+        this._elapsedTimes = [];
+        this._offsets = [];
         for (var i = 0; i < this.Rulers.length; i++) {
             var rulertable = docById('rulerTable' + i);
             var rulerdrum = docById('rulerdrum' + i);
-            this._runningTimes.push(0);
+            this._elapsedTimes.push(0);
+            this._offsets.push(0);
         }
 
         // The play all button
@@ -490,7 +524,7 @@ function RhythmRuler () {
                     that._cellCounter = 0;
                     that._rulerPlaying = -1;
                     for (var i = 0; i < that.Rulers.length; i++) {
-                        that._runningTimes[i] = 0;
+                        that._elapsedTimes[i] = 0;
                     }
 
                     that._playAll();
@@ -532,11 +566,6 @@ function RhythmRuler () {
             that._saveDrumMachine(0);
         };
 
-        var cell = this._addButton(row, 2, 'restore-button.svg', iconSize, _('undo'));
-        cell.onclick=function() {
-            that._undo();
-        };
-
         // An input for setting the dissect number
         var cell = row.insertCell(2);
         cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dussectNumber" value="' + 2 + '" />';
@@ -548,9 +577,19 @@ function RhythmRuler () {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        var cell = this._addButton(row, 4, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 3, 'restore-button.svg', iconSize, _('undo'));
         cell.onclick=function() {
-            // Save the new dissect history
+            that._undo();
+        };
+
+        var cell = this._addButton(row, 4, 'erase-button.svg', iconSize, _('clear'));
+        cell.onclick=function() {
+            that._clear();
+        };
+
+        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));
+        cell.onclick=function() {
+            // Save the new dissect history.
             var dissectHistory = [];
             var drums = [];
             for (var i = 0; i < that.Rulers.length; i++) {
@@ -609,6 +648,8 @@ function RhythmRuler () {
                         that._playingAll = false;
                         that._rulerPlaying = -1;
                         that._startingTime = null;
+                        that._offsets[i] = 0;
+                        that._elapsedTimes[i] = 0;
                         setTimeout(that._calculateZebraStripes(this.parentNode.id[4]),1000);
                     }
                 }
@@ -620,9 +661,10 @@ function RhythmRuler () {
                         that._playingOne = true;
                         that._playingAll = false;
                         that._cellCounter = 0;
+                        that._startingTime = null;
                         that._rulerPlaying = this.parentNode.id[4];
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                        that._runningTimes[i] = 0;
+                        that._elapsedTimes[i] = 0;
                         that._playOne();
                     }
                 }
@@ -680,10 +722,11 @@ function RhythmRuler () {
                 }
 
                 var rulerTable = docById('rulerTable' + drum);
-                for (var j = 0; j < this._dissectHistory[i].length; j++) {
+                for (var j = 0; j < this._dissectHistory[i][0].length; j++) {
                     if (this._dissectHistory[i][0][j] == undefined) {
                         continue;
                     }
+
                     this._rulerSelected = drum;
 
                     var cell = rulerTable.rows[0].cells[this._dissectHistory[i][0][j][0]];

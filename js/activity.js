@@ -251,8 +251,15 @@ define(function (require) {
 
         pluginsImages = {};
 
+        // Sometimes (race condition?) Firefox does not properly
+        // initialize strings in musicutils. These methods ensure that
+        // the names are never null.
+        console.log('initing i18n for music terms');
+        initDrumI18N();
+        initModeI18N();
+        initVoiceI18N();
+
         window.onblur = function() {
-            console.log("blur");
             logo.doStopTurtle();
         };
 
@@ -1466,11 +1473,6 @@ define(function (require) {
                 console.log('calling toggleCollapsibles');
                 blocks.toggleCollapsibles();
             }
-        };
-
-        function stop() {
-            // FIXME: who calls this???
-            createjs.Ticker.removeEventListener('tick', __tick);
         };
 
         function onStopTurtle() {

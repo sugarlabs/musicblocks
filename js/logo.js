@@ -29,8 +29,10 @@ const NOSQRTERRORMSG = 'Cannot take square root of negative number.';
 const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
+const POSNUMBER = 'Argument must be a positive number';
 
-function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitchslider,
+function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
+              pitchstaircase, tempo, pitchslider,
               canvas, blocks, turtles, stage,
               refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
               onRunTurtle, getStageX, getStageY,
@@ -634,7 +636,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             this.duplicateFactor[turtle] = 1;
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
-            this.keySignature[turtle] = 'C ' + _('Major');
+            this.keySignature[turtle] = 'C ' + _('major');
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
@@ -1218,6 +1220,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
+                } else if (args[0] <= 0) {
+                    logo.errorMsg(POSNUMBER,blk);
                 } else {
                     childFlow = args[1];
                     childFlowCount = Math.floor(args[0]);
@@ -2171,7 +2175,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler, pitchstaircase, tem
             break;
         case 'setkey2':
             if (args.length === 2) {
-                var modename = 'MAJOR';
+                var modename = 'major';
                 for (var i = 0; i < MODENAMES.length; i++) {
                     if (MODENAMES[i][0] === args[1]) {
                         modename = MODENAMES[i][1];

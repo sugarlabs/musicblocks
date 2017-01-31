@@ -198,10 +198,10 @@ function ProtoBlock(name) {
     // E.g., wait for
     this.oneBooleanArgBlock = function() {
         this.args = 1;
-        this.size = 3;
-        this.dockTypes.push('in');
-        this.dockTypes.push('booleanin');
+        this.size = 2.6;
         this.dockTypes.push('out');
+        this.dockTypes.push('booleanin');
+        this.dockTypes.push('in');
         this.generator = this.oneBooleanArgBlockGenerator;
     };
 
@@ -213,7 +213,6 @@ function ProtoBlock(name) {
         svg.setSlot(true);
         svg.setBoolean(true);
         svg.setClampCount(0);
-        svg.setExpand(0, 0, 0, 0);
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
