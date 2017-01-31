@@ -668,3 +668,54 @@ function displayMsg(blocks, text) {
     */
     return;
 };
+
+
+function rationalToFraction (d) {
+    /*
+    Convert float to its approximate fractional representation. '''
+
+    This code was translated to JavaScript from the answers at
+    http://stackoverflow.com/questions/95727/how-to-convert-floats-to-human-\
+readable-fractions/681534#681534
+
+    For example:
+    >>> 3./5
+    0.59999999999999998
+
+    >>> rationalToFraction(3./5)
+    "3/5"
+
+    */
+
+    if (d > 1) {
+        var invert = true;
+        d = 1 / d;
+    } else {
+        var invert = false;
+    }
+
+    var df = 1.0;
+    var top = 1;
+    var bot = 1;
+
+    while (Math.abs(df - d) > 0.00000001) {
+        if (df < d) {
+            top += 1;
+        } else {
+            bot += 1;
+            top = Math.floor(d * bot);
+        }
+
+        df = top / bot;
+    }
+
+    if (bot === 0 || top === 0) {
+        return [0, 1];
+    }
+
+    if (invert) {
+        return [bot, top];
+    } else {
+        return [top, bot];
+    }
+};
