@@ -1858,6 +1858,10 @@ function Block(protoblock, blocks, overrideName) {
         }
  
         var oldValue = this.value;
+
+        if (this.label.value === '') {
+            this.label.value = '_';
+        }
         var newValue = this.label.value;
  
         if (this.labelattr != null) {
