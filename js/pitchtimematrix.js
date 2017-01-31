@@ -266,7 +266,7 @@ function Matrix() {
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.maxWidth = cell.style.minWidth;
-            cell.style.position = 'static';
+            cell.style.position = 'fixed';
             cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
             cell.style.top = (matrixDivPosition.top + MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale + (i+3) * borderSpacingV) + 'px';
             j += 1;
@@ -277,7 +277,7 @@ function Matrix() {
         var cell = row.insertCell(0);
         cell.style.fontSize = this._cellScale * 75 + '%';
         cell.innerHTML = _('note value');
-        cell.style.position = 'static';
+        cell.style.position = 'fixed';
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
