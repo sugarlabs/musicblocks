@@ -102,6 +102,7 @@ function Matrix() {
     this.init = function(logo) {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
+	this._noteStored = [];
         this._sorted = false;
         this._rests = 0;
         this._logo = logo;
@@ -165,8 +166,8 @@ function Matrix() {
         // Add the buttons to the top row.
         var that = this;
         var iconSize = Math.floor(this._cellScale * 24);
-        var borderSpacingH = parseInt(tableStyle.borderSpacing.split(" ")[0]);
-        var borderSpacingV = parseInt(tableStyle.borderSpacing.split(" ")[1]);
+        var borderSpacingH = parseInt(tableStyle.borderSpacing.split(' ')[0]);
+        var borderSpacingV = parseInt(tableStyle.borderSpacing.split(' ')[1]);
         var leftMargin = matrixDivPosition.left + borderSpacingH;
         var topMargin = matrixDivPosition.top + borderSpacingV;
 
@@ -243,14 +244,14 @@ function Matrix() {
                 this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
-                cell.style.backgroundImage = "url('images/turtle2.svg')";
+                cell.style.backgroundImage = "url('images/mouse2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
-                cell.style.backgroundImage = "url('images/turtle2.svg')";
+                cell.style.backgroundImage = "url('images/mouse2.svg')";
                 cell.style.backgroundRepeat = 'no-repeat';
                 cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
@@ -1061,7 +1062,7 @@ function Matrix() {
                 } else if (graphicsBlock !== true) {
                     this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
                 } else {
-                    console.log('???');
+                    console.log('Cannot parse note object: ' + obj);
                 }
             }
         } else if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
