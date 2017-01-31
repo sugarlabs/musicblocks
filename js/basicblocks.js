@@ -153,7 +153,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtlePitchBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['turtlepitch'] = turtlePitchBlock;
     //.TRANS: convert current note for this turtle to piano key (1-88)
-    turtlePitchBlock.staticLabels.push(_('turtle pitch number'));
+    turtlePitchBlock.staticLabels.push(_('mouse pitch number'));
     turtlePitchBlock.oneArgMathBlock();
     turtlePitchBlock.adjustWidthToLabel();
     turtlePitchBlock.dockTypes[1] = 'anyin';
@@ -483,7 +483,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var turtleNoteBlock = new ProtoBlock('turtlenote');
     turtleNoteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['turtlenote'] = turtleNoteBlock;
-    turtleNoteBlock.staticLabels.push(_('turtle note value'));
+    turtleNoteBlock.staticLabels.push(_('mouse note value'));
     turtleNoteBlock.oneArgMathBlock();
     turtleNoteBlock.adjustWidthToLabel();
     turtleNoteBlock.dockTypes[1] = 'anyin';
