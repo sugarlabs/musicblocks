@@ -131,7 +131,7 @@ function StatusMatrix() {
             var cell = row.insertCell(0);
             cell.style.backgroundColor = MATRIXLABELCOLOR;
 
-            cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
+            cell.innerHTML = '&nbsp;&nbsp;<img src="images/mouse.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
 
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
 
