@@ -260,7 +260,6 @@ define(function (require) {
         initVoiceI18N();
 
         window.onblur = function() {
-            console.log("blur");
             logo.doStopTurtle();
         };
 
