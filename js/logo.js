@@ -29,7 +29,7 @@ const NOSQRTERRORMSG = 'Cannot take square root of negative number.';
 const ZERODIVIDEERRORMSG = 'Cannot divide by zero.';
 const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
-const NEGNUMBER = 'Argument cannot be negative number';
+const POSNUMBER = 'Argument must be a positive number';
 
 function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
               pitchstaircase, tempo, pitchslider,
@@ -1220,9 +1220,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 if (typeof(args[0]) === 'string') {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
-                } else if (args[0] < 0) {
-                    logo.errorMsg(NEGNUMBER,blk);
-                    logo.stopTurtle = true;
+                } else if (args[0] <= 0) {
+                    logo.errorMsg(POSNUMBER,blk);
                 } else {
                     childFlow = args[1];
                     childFlowCount = Math.floor(args[0]);
