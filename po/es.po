@@ -495,7 +495,7 @@ msgstr "guardar caja de ritmos"
 #: js/lilypond.js:16
 #.TRANS:  Animal names used in Lilypond output
 msgid "mouse"
-msgstr "raton"
+msgstr "ratón"
 
 #: js/lilypond.js:16
 msgid "brown rat"
@@ -1221,6 +1221,9 @@ msgstr "consonante paso adelante"
 msgid "turtle pitch number"
 msgstr "número de tono de tortugas"
 
+msgid "mouse pitch number"
+msgstr "número de tono de ratón"
+
 #: js/basicblocks.js:161
 msgid "number to pitch"
 msgstr "número a tono"
@@ -1330,6 +1333,9 @@ msgstr "matriz de tono en tiempo"
 #: js/basicblocks.js:425
 msgid "turtle note value"
 msgstr "valor de la nota de la tortuga"
+
+msgid "mouse note value"
+msgstr "valor de la nota del ratón"
 
 #: js/basicblocks.js:433
 msgid "duplicate factor"
@@ -1932,10 +1938,16 @@ msgstr "guardar como SVG"
 msgid "turtle y"
 msgstr "tortuga y"
 
+msgid "mouse y"
+msgstr "ratón y"
+
 #: js/basicblocks.js:2199
 #: plugins/turtle.rtp:42
 msgid "turtle x"
 msgstr "tortuga x"
+
+msgid "mouse x"
+msgstr "ratón x"
 
 #: js/basicblocks.js:2208
 #: plugins/turtle.rtp:62
@@ -1976,6 +1988,9 @@ msgstr "imprimir"
 #: plugins/turtle.rtp:82
 msgid "turtle name"
 msgstr "renombrar tortuga"
+
+msgid "mouse name"
+msgstr "renombrar ratón"
 
 #: js/basicblocks.js:2296
 #: plugins/translate.rtp:95
@@ -2022,11 +2037,11 @@ msgid "time"
 msgstr "tiempo"
 
 #: js/basicblocks.js:2361
-msgid "mouse x"
+msgid "cursor x"
 msgstr "cursor x"
 
 #: js/basicblocks.js:2369
-msgid "mouse y"
+msgid "cursor y"
 msgstr "cursor y"
 
 #: js/basicblocks.js:2377
@@ -2047,165 +2062,165 @@ msgstr "evaluar"
 
 #: js/musicutils.js:197
 #.TRANS: : twelve semi-tone scale for music
-msgid "Chromatic"
-msgstr "Cromático"
+msgid "chromatic"
+msgstr "cromático"
 
 #: js/musicutils.js:198
-msgid "Algerian"
-msgstr "Argelino"
+msgid "algerian"
+msgstr "argelino"
 
 #: js/musicutils.js:200
 #.TRANS: : modal scale for music
-msgid "Diminished"
-msgstr "Disminuido"
+msgid "diminished"
+msgstr "disminuido"
 
 #: js/musicutils.js:201
-msgid "Spanish"
-msgstr "Español"
+msgid "spanish"
+msgstr "español"
 
 #: js/musicutils.js:203
 #.TRANS: : modal scale for music
-msgid "Octatonic"
+msgid "octatonic"
 msgstr ""
 
 #: js/musicutils.js:207
 #.TRANS: : modal scale for music
-msgid "Ionian"
+msgid "ionian"
 msgstr ""
 
 #: js/musicutils.js:209
 #.TRANS: : modal scale for music
-msgid "Dorian"
+msgid "dorian"
 msgstr ""
 
 #: js/musicutils.js:211
 #.TRANS: : modal scale for music
-msgid "Phrygian"
+msgid "phrygian"
 msgstr ""
 
 #: js/musicutils.js:213
 #.TRANS: : modal scale for music
-msgid "Lydian"
+msgid "lydian"
 msgstr ""
 
 #: js/musicutils.js:215
 #.TRANS: : modal scale for music
-msgid "Mixolydian"
+msgid "mixolydian"
 msgstr ""
 
 #: js/musicutils.js:217
 #.TRANS: : natural minor scales in music
-msgid "Minor"
-msgstr "Menor"
+msgid "minor"
+msgstr "menor"
 
 #: js/musicutils.js:219
 #.TRANS: : modal scale for music
-msgid "Aeolian"
+msgid "aeolian"
 msgstr ""
 
 #: js/musicutils.js:221
 #.TRANS: : modal scale for music
-msgid "Locrian"
+msgid "locrian"
 msgstr ""
 
 #: js/musicutils.js:223
 #.TRANS: : minor jazz scale for music
-msgid "Jazz Minor"
-msgstr "Jazz Menor"
+msgid "jazz minor"
+msgstr "jazz menor"
 
 #: js/musicutils.js:225
 #.TRANS: : bebop scale for music
-msgid "Bebop"
+msgid "bebop"
 msgstr ""
 
 #: js/musicutils.js:226
-msgid "Arabic"
-msgstr "Arábica"
+msgid "arabic"
+msgstr "arábica"
 
 #: js/musicutils.js:227
-msgid "Byzantine"
-msgstr "Bizantino"
+msgid "byzantine"
+msgstr "bizantino"
 
 #: js/musicutils.js:229
 #.TRANS: : musical scale for music by Verdi
-msgid "Enigmatic"
-msgstr "Enigmático"
+msgid "enigmatic"
+msgstr "enigmático"
 
 #: js/musicutils.js:230
-msgid "Ethiopian"
-msgstr "Etíope"
+msgid "ethiopian"
+msgstr "etíope"
 
 #: js/musicutils.js:232
 #.TRANS: : Ethiopic scale for music
-msgid "Geez"
+msgid "geez"
 msgstr ""
 
 #: js/musicutils.js:233
-msgid "Hindu"
-msgstr "Hindú"
+msgid "hindu"
+msgstr "hindú"
 
 #: js/musicutils.js:234
-msgid "Hungarian"
-msgstr "Húngaro"
+msgid "hungarian"
+msgstr "húngaro"
 
 #: js/musicutils.js:236
 #.TRANS: : minor Romanian scale for music
-msgid "Romanian Minor"
-msgstr "Romano Menor"
+msgid "romanian minor"
+msgstr "romano menor"
 
 #: js/musicutils.js:237
-msgid "Spanish Gypsy"
-msgstr "Gitana española"
+msgid "spanish gypsy"
+msgstr "gitana española"
 
 #: js/musicutils.js:239
 #.TRANS: : musical scale for Mid-Eastern music
-msgid "Maqam"
+msgid "maqam"
 msgstr ""
 
 #: js/musicutils.js:241
 #.TRANS: : minor blues scale for music
-msgid "Blues"
+msgid "blues"
 msgstr ""
 
 #: js/musicutils.js:243
 #.TRANS: : major blues scale for music
-msgid "Major Blues"
-msgstr "Blues mayor"
+msgid "major blues"
+msgstr "blues mayor"
 
 #: js/musicutils.js:244
-msgid "Whole Tone"
+msgid "whole tone"
 msgstr ""
 
 #: js/musicutils.js:246
 #.TRANS: : pentatonic scale in music
-msgid "Pentatonic"
-msgstr "Pentatónica"
+msgid "pentatonic"
+msgstr "pentatónica"
 
 #: js/musicutils.js:247
-msgid "Chinese"
-msgstr "Chino"
+msgid "chinese"
+msgstr "chino"
 
 #: js/musicutils.js:248
-msgid "Egyptian"
-msgstr "Egipcio"
+msgid "egyptian"
+msgstr "egipcio"
 
 #: js/musicutils.js:250
 #.TRANS: : Japanese pentatonic scale for music
-msgid "Hirajoshi"
+msgid "hirajoshi"
 msgstr ""
 
 #: js/musicutils.js:251
-msgid "Japanese"
+msgid "japanese"
 msgstr "Japonés"
 
 #: js/musicutils.js:253
 #.TRANS: : Italian mathematician
-msgid "Fibonacci"
+msgid "fibonacci"
 msgstr ""
 
 #: js/musicutils.js:254
-msgid "Custom"
-msgstr "Personalizado"
+msgid "custom"
+msgstr "personalizado"
 
 #: js/musicutils.js:261
 #.TRANS: : musical instrument
