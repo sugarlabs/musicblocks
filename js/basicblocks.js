@@ -2314,7 +2314,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var startTurtleBlock = new ProtoBlock('startTurtle');
     startTurtleBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['startTurtle'] = startTurtleBlock;
-    startTurtleBlock.staticLabels.push(_('start turtle'));
+    startTurtleBlock.staticLabels.push(_('start mouse'));
     startTurtleBlock.adjustWidthToLabel();
     startTurtleBlock.oneArgBlock();
     startTurtleBlock.dockTypes[1] = 'anyin';
@@ -2323,7 +2323,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var stopTurtleBlock = new ProtoBlock('stopTurtle');
     stopTurtleBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['stopTurtle'] = stopTurtleBlock;
-    stopTurtleBlock.staticLabels.push(_('stop turtle'));
+    stopTurtleBlock.staticLabels.push(_('stop mouse'));
     stopTurtleBlock.adjustWidthToLabel();
     stopTurtleBlock.oneArgBlock();
     stopTurtleBlock.dockTypes[1] = 'anyin';
