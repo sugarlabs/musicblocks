@@ -132,131 +132,129 @@ const NOTESYMBOLS = {1: wholeNoteImg, 2: halfNoteImg, 4: quarterNoteImg, 8: eigh
 // See http://www.pianoscales.org
 const MUSICALMODES = {
      // 12 notes in an octave
-    'CHROMATIC': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    'chromatic': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 
      // 8 notes in an octave
-    'ALGERIAN': [2, 1, 2, 1, 1, 1, 3, 1],
-    'DIMINISHED': [2, 1, 2, 1, 2, 1, 2, 1],
-    'SPANISH': [1, 2, 1, 1, 1, 2, 2, 2],
-    'OCATONIC': [1, 2, 1, 2, 1, 2, 1, 2],
+    'algerian': [2, 1, 2, 1, 1, 1, 3, 1],
+    'diminished': [2, 1, 2, 1, 2, 1, 2, 1],
+    'spanish': [1, 2, 1, 1, 1, 2, 2, 2],
+    'ocatonic': [1, 2, 1, 2, 1, 2, 1, 2],
 
      // 7 notes in an octave
-    'MAJOR': [2, 2, 1, 2, 2, 2, 1],
-    'IONIAN': [2, 2, 1, 2, 2, 2, 1],
-    'DORIAN': [2, 1, 2, 2, 2, 1, 2],
-    'PHRYGIAN': [1, 2, 2, 2, 1, 2, 2],
-    'LYDIAN': [2, 2, 2, 1, 2, 2, 1],
-    'MIXOLYDIAN': [2, 2, 1, 2, 2, 1, 2],
-    'MINOR': [2, 1, 2, 2, 1, 2, 2],
-    'AEOLIAN': [2, 1, 2, 2, 1, 2, 2],
-    'LOCRIAN': [1, 2, 2, 1, 2, 2, 2],
+    'major': [2, 2, 1, 2, 2, 2, 1],
+    'ionian': [2, 2, 1, 2, 2, 2, 1],
+    'dorian': [2, 1, 2, 2, 2, 1, 2],
+    'phrygian': [1, 2, 2, 2, 1, 2, 2],
+    'lydian': [2, 2, 2, 1, 2, 2, 1],
+    'mixolydian': [2, 2, 1, 2, 2, 1, 2],
+    'minor': [2, 1, 2, 2, 1, 2, 2],
+    'aeolian': [2, 1, 2, 2, 1, 2, 2],
+    'locrian': [1, 2, 2, 1, 2, 2, 2],
 
-    'JAZZ MINOR': [2, 1, 2, 2, 2, 2, 1],
-    'BEBOP': [1, 1, 1, 2, 2, 1, 2],
+    'jazz minor': [2, 1, 2, 2, 2, 2, 1],
+    'bebop': [1, 1, 1, 2, 2, 1, 2],
 
-    'ARABIC': [2, 2, 1, 1, 2, 2, 2],
-    'BYZANTINE': [1, 3, 1, 2, 1, 3, 1],
-    'ENIGMATIC': [1, 3, 2, 2, 2, 1, 1],
-    'ETHIOPIAN': [2, 1, 2, 2, 1, 2, 2],
-    'GEEZ': [2, 1, 2, 2, 1, 2, 2],
-    'HINDU': [2, 2, 1, 2, 1, 2, 2],
-    'HUNGARIAN': [2, 1, 3, 1, 1, 3, 1],
-    'ROMANIAN MINOR': [2, 1, 3, 1, 2, 1, 2],
-    'SPANISH GYPSY': [1, 3, 1, 2, 1, 2, 2],
-    'MAQAM': [1, 3, 1, 2, 1, 3, 1],
+    'arabic': [2, 2, 1, 1, 2, 2, 2],
+    'byzantine': [1, 3, 1, 2, 1, 3, 1],
+    'enigmatic': [1, 3, 2, 2, 2, 1, 1],
+    'ethiopian': [2, 1, 2, 2, 1, 2, 2],
+    'geez': [2, 1, 2, 2, 1, 2, 2],
+    'hindu': [2, 2, 1, 2, 1, 2, 2],
+    'hungarian': [2, 1, 3, 1, 1, 3, 1],
+    'maqam': [1, 3, 1, 2, 1, 3, 1],
+    'romanian minor': [2, 1, 3, 1, 2, 1, 2],
+    'spanish gypsy': [1, 3, 1, 2, 1, 2, 2],
 
     // 6 notes in an octave
-    'BLUES': [3, 2, 1, 1, 3, 2],
-    'MAJOR BLUES': [2, 1, 1, 3, 2, 2],
-    'WHOLE TONE': [2, 2, 2, 2, 2, 2],
+    'blues': [3, 2, 1, 1, 3, 2],
+    'major blues': [2, 1, 1, 3, 2, 2],
+    'whole tone': [2, 2, 2, 2, 2, 2],
 
     // 5 notes in an octave
-    'PENTATONIC': [3, 2, 2, 3, 2],
-    'CHINESE': [4, 2, 1, 4, 1],
-    'EGYPTIAN': [2, 3, 2, 3, 2],
-    'HIRAJOSHI': [1, 4, 1, 4, 2],
-    'JAPANESE': [1, 4, 2, 3, 2],
-    'FIBONACCI': [1, 1, 2, 3, 5],
+    'pentatonic': [3, 2, 2, 3, 2],
+    'chinese': [4, 2, 1, 4, 1],
+    'egyptian': [2, 3, 2, 3, 2],
+    'hirajoshi': [1, 4, 1, 4, 2],
+    'japanese': [1, 4, 2, 3, 2],
+    'fibonacci': [1, 1, 2, 3, 5],
 
     // User definition overrides this constant
-    'CUSTOM': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    'custom': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 };
 
 const MAQAMTABLE = {
-    'HIJAZ KAR': 'C MAQAM',
-    'HIJAZ KAR MAQAM': 'C MAQAM',
-    'SHAHNAZ': 'D MAQAM',
-    'MAQAM MUSTAR': 'Eb MAQAM',
-    'MAQAM JIHARKAH': 'F MAQAM',
-    'SHADD ARABAN': 'G MAQAM',
-    'SUZIDIL': 'A MAQAM',
-    'AJAM': 'Bb MAQAM',
-    'AJAM MAQAM': 'Bb MAQAM',
+    'hijaz kar': 'C maqam',
+    'hijaz kar maqam': 'C maqam',
+    'shahnaz': 'D maqam',
+    'maqam mustar': 'Eb maqam',
+    'maqam jiharkah': 'F maqam',
+    'shadd araban': 'G maqam',
+    'suzidil': 'A maqam',
+    'ajam': 'Bb maqam',
+    'ajam maqam': 'Bb maqam',
 };
 
 var MODENAMES = [
     //.TRANS: twelve semi-tone scale for music
-    [_('Chromatic'), 'CHROMATIC'],
-    [_('Algerian'), 'ALGERIAN'],
+    [_('chromatic'), 'chromatic'],
+    [_('algerian'), 'algerian'],
     //.TRANS: modal scale for music
-    [_('Diminished'), 'DIMINISHED'],
-    [_('Spanish'), 'SPANISH'],
+    [_('diminished'), 'diminished'],
+    [_('spanish'), 'spanish'],
     //.TRANS: modal scale for music
-    [_('Octatonic'), 'OCTATONIC'],
+    [_('octatonic'), 'octatonic'],
     //.TRANS: major scales in music
-    [_('Major'), 'MAJOR'],
+    [_('major'), 'major'],
     //.TRANS: modal scale for music
-    [_('Ionian'), 'IONIAN'],
+    [_('ionian'), 'ionian'],
     //.TRANS: modal scale for music
-    [_('Dorian'), 'DORIAN'],
+    [_('dorian'), 'dorian'],
     //.TRANS: modal scale for music
-    [_('Phrygian'), 'PHRYGIAN'],
+    [_('phrygian'), 'phrygian'],
     //.TRANS: modal scale for music
-    [_('Lydian'), 'LYDIAN'],
+    [_('lydian'), 'lydian'],
     //.TRANS: modal scale for music
-    [_('Mixolydian'), 'MIXOLYDIAN'],
+    [_('mixolydian'), 'mixolydian'],
     //.TRANS: natural minor scales in music
-    [_('Minor'), 'MINOR'],
+    [_('minor'), 'minor'],
     //.TRANS: modal scale for music
-    [_('Aeolian'), 'AEOLIAN'],
+    [_('aeolian'), 'aeolian'],
     //.TRANS: modal scale for music
-    [_('Locrian'), 'LOCRIAN'],
+    [_('locrian'), 'locrian'],
     //.TRANS: minor jazz scale for music
-    [_('Jazz Minor'), 'JAZZ MINOR'],
+    [_('jazz minor'), 'jazz minor'],
     //.TRANS: bebop scale for music
-    [_('Bebop'), 'BEBOP'],
-    [_('Arabic'), 'ARABIC'],
-    [_('Byzantine'), 'BYZANTINE'],
+    [_('bebop'), 'bebop'],
+    [_('arabic'), 'arabic'],
+    [_('byzantine'), 'byzantine'],
     //.TRANS: musical scale for music by Verdi
-    [_('Enigmatic'), 'ENIGMATIC'],
-    [_('Ethiopian'), 'ETHIOPIAN'],
+    [_('enigmatic'), 'enigmatic'],
+    [_('ethiopian'), 'ethiopian'],
     //.TRANS: Ethiopic scale for music
-    [_('Geez'), 'GEEZ'],
-    [_('Hindu'), 'HINDU'],
-    [_('Hungarian'), 'HUNGARIAN'],
+    [_('geez'), 'geez'],
+    [_('hindu'), 'hindu'],
+    [_('hungarian'), 'hungarian'],
     //.TRANS: minor Romanian scale for music
-    [_('Romanian Minor'), 'ROMANIAN MINOR'],
-    [_('Spanish Gypsy'), 'SPANISH GYPSY'],
+    [_('romanian minor'), 'romanian minor'],
+    [_('spanish gypsy'), 'spanish gypsy'],
     //.TRANS: musical scale for Mid-Eastern music
-    [_('Maqam'), 'MAQAM'],
+    [_('maqam'), 'maqam'],
     //.TRANS: minor blues scale for music
-    [_('Blues'), 'BLUES'],
+    [_('blues'), 'blues'],
     //.TRANS: major blues scale for music
-    [_('Major Blues'), 'MAJOR BLUES'],
-    [_('Whole Tone'), 'WHOLE TONE'],
+    [_('major blues'), 'major blues'],
+    [_('whole tone'), 'whole tone'],
     //.TRANS: pentatonic scale in music
-    [_('Pentatonic'), 'PENTATONIC'],
-    [_('Chinese'), 'CHINESE'],
-    [_('Egyptian'), 'EGYPTIAN'],
+    [_('pentatonic'), 'pentatonic'],
+    [_('chinese'), 'chinese'],
+    [_('egyptian'), 'egyptian'],
     //.TRANS: Japanese pentatonic scale for music
-    [_('Hirajoshi'), 'HIRAJOSHI'],
-    [_('Japanese'), 'JAPANESE'],
+    [_('hirajoshi'), 'hirajoshi'],
+    [_('japanese'), 'japanese'],
     //.TRANS: Italian mathematician
-    [_('Fibonacci'), 'FIBONACCI'],
-    [_('Custom'), 'CUSTOM'],
+    [_('fibonacci'), 'fibonacci'],
+    [_('custom'), 'custom'],
 ];
-
-// console.log(MODENAMES);
 
 var VOICENAMES = [
     //.TRANS: musical instrument
@@ -277,31 +275,29 @@ var VOICENAMES = [
     [_('triangle'), 'triangle', 'images/synth.svg'],
 ];
 
-// console.log(VOICENAMES);
-
 var DRUMNAMES = [
     //.TRANS: musical instrument
-    [_('snare drum'), 'snaredrum', 'images/snaredrum.svg'],
+    [_('snare drum'), 'snare drum', 'images/snaredrum.svg'],
     //.TRANS: musical instrument
-    [_('kick drum'), 'kick', 'images/kick.svg'],
+    [_('kick drum'), 'kick drum', 'images/kick.svg'],
     //.TRANS: musical instrument
-    [_('tom tom'), 'tom', 'images/tom.svg'],
+    [_('tom tom'), 'tom tom', 'images/tom.svg'],
     //.TRANS: musical instrument
-    [_('floor tom tom'), 'floortom', 'images/floortom.svg'],
+    [_('floor tom tom'), 'floor tom tom', 'images/floortom.svg'],
     //.TRANS: a drum made from an inverted cup
-    [_('cup drum'), 'cup', 'images/cup.svg'],
+    [_('cup drum'), 'cup drum', 'images/cup.svg'],
     //.TRANS: musical instrument
-    [_('darbuka drum'), 'darbuka', 'images/darbuka.svg'],
+    [_('darbuka drum'), 'darbuka drum', 'images/darbuka.svg'],
     //.TRANS: musical instrument
-    [_('hi hat'), 'hihat', 'images/hihat.svg'],
+    [_('hi hat'), 'hi hat', 'images/hihat.svg'],
     //.TRANS: a small metal bell
-    [_('ride bell'), 'ridebell', 'images/ridebell.svg'],
+    [_('ride bell'), 'ride bell', 'images/ridebell.svg'],
     //.TRANS: musical instrument
-    [_('cow bell'), 'cowbell', 'images/cowbell.svg'],
+    [_('cow bell'), 'cow bell', 'images/cowbell.svg'],
     //.TRANS: musical instrument
     [_('triangle bell'), 'trianglebell', 'images/trianglebell.svg'],
     //.TRANS: musical instrument
-    [_('finger cymbals'), 'fingercymbals', 'images/fingercymbals.svg'],
+    [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg'],
     //.TRANS: a musically tuned set of bells
     [_('chine'), 'chine', 'images/chine.svg'],
     //.TRANS: sound effect
@@ -328,13 +324,11 @@ var DRUMNAMES = [
     [_('duck'), 'duck', 'images/duck.svg'],
 ];
 
-// console.log(DRUMNAMES);
-
 const DEFAULTVOICE = 'sine';
-const DEFAULTDRUM = 'kick';
-const DEFAULTMODE = 'Major';
+const DEFAULTDRUM = 'kick drum';
+const DEFAULTMODE = 'major';
 
-var customMode = MUSICALMODES['CUSTOM'];
+var customMode = MUSICALMODES['custom'];
 
 // The sample has a pitch which is subsequently transposed. This
 // number is that starting pitch.
@@ -343,13 +337,12 @@ const SAMPLECENTERNO = {'violin': 63, 'cello': 39, 'basse': 15};
 
 function getModeName(name) {
     for (var mode in MODENAMES) {
-        // console.log(MODENAMES[mode]);
-        if (MODENAMES[mode][0] === name || MODENAMES[mode][1] === name.toUpperCase()) {
+        if (MODENAMES[mode][0] === name || MODENAMES[mode][1].toLowerCase() === name.toLowerCase()) {
             if (MODENAMES[mode][0] != '') {
                 return MODENAMES[mode][0];
             } else {
-                console.log('i18n is misbehaving?');
-                console.log(name + ' ' + name.toUpperCase() + ' ' + MODENAMES[mode][0] + ' ' + MODENAMES[mode][1]);
+                console.log('I18n for mode name is misbehaving.');
+                console.log(name + ' ' + name.toLowerCase() + ' ' + MODENAMES[mode][0].toLowerCase + ' ' + MODENAMES[mode][1].toLowerCase);
                 return MODENAMES[mode][1];
             }
         }
@@ -360,28 +353,64 @@ function getModeName(name) {
 };
 
 
+function initModeI18N() {
+    for (var i = 0; i < MODENAMES.length; i++) {
+      if (MODENAMES[i][0] == null) {
+            MODENAMES[i][0] = _(MODENAMES[i][1]);
+          }
+
+        if (MODENAMES[i][0] == null) {
+            MODENAMES[i][0] = MODENAMES[i][1];
+        }
+    }
+};
+
+
+function initVoiceI18N() {
+    for (var i = 0; i < VOICENAMES.length; i++) {
+        if (VOICENAMES[i][0] == null) {
+            VOICENAMES[i][0] = _(VOICENAMES[i][1]);
+        }
+
+        if (VOICENAMES[i][0] == null) {
+            VOICENAMES[i][0] = VOICENAMES[i][1];
+        }
+    }
+};
+
+
+function initDrumI18N() {
+    for (var i = 0; i < DRUMNAMES.length; i++) {
+        if (DRUMNAMES[i][0] == null || DRUMNAMES[i][0] === '') {
+            DRUMNAMES[i][0] = _(DRUMNAMES[i][1]);
+        }
+
+        if (DRUMNAMES[i][0] == null) {
+            DRUMNAMES[i][0] = DRUMNAMES[i][1];
+        }
+    }
+};
+
+
 function getDrumName(name) {
     if (name === '') {
         console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) == 'http') {
-        // console.log('drum name is URL');
         return null;
     }
 
     for (var drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0] === name || DRUMNAMES[drum][1] === name.toLowerCase()) {
+	if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() || DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
             if (DRUMNAMES[drum][0] != '') {
                 return DRUMNAMES[drum][0];
             } else {
-                console.log('i18n is misbehaving?');
-                console.log(name + ' ' + name.toUpperCase() + ' ' + DRUMNAMES[drum][0] + ' ' + DRUMNAMES[drum][1]);
+                console.log('I18n is misbehaving when parsing drum name: ' + name);
                 return DRUMNAMES[drum][1];
             }
         }
     }
 
-    // console.log(name + ' not found in DRUMAMES');
     return null;
 };
 
@@ -391,13 +420,12 @@ function getDrumIcon(name) {
         console.log('getDrumIcon passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) == 'http') {
-        // console.log('drum name is URL');
         return 'images/drum.svg';
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name.toLowerCase()) {
+        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
             return DRUMNAMES[i][2];
         }
     }
@@ -413,13 +441,12 @@ function getDrumSynthName(name) {
         console.log('getDrumSynthName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) == 'http') {
-        // console.log('drum name is URL');
         return name;
     }
 
     for (var i = 0; i < DRUMNAMES.length; i++) {
         // if (DRUMNAMES[i].indexOf(name) !== -1) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name.toLowerCase()) {
+        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
             return DRUMNAMES[i][1];
         }
     }
@@ -432,7 +459,6 @@ function getVoiceName(name) {
         console.log('getVoiceName passed blank name. Returning ' + DEFAULTVOICE);
         name = DEFAULTVOICE;
     } else if (name.slice(0, 4) == 'http') {
-        // console.log('voice name is URL');
         return null;
     }
 
@@ -441,7 +467,7 @@ function getVoiceName(name) {
             if (VOICENAMES[i][0] != '') {
                 return VOICENAMES[i][0];
             } else {
-                console.log('i18n is misbehaving?');
+                console.log('I18n is misbehaving when parsing voice name: ' + name);
                 return VOICENAMES[i][1];
             }
         }
@@ -490,13 +516,13 @@ function getVoiceSynthName(name) {
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
     if (keySignature === '') {
-        console.log('no key signature provided; reverting to C MAJOR');
-       return ['C', 'MAJOR'];
+        console.log('No key signature provided; reverting to C major.');
+       return ['C', 'major'];
     }
 
     // Maqams have special names for certain keys.
-    if (keySignature.toUpperCase() in MAQAMTABLE) {
-        keySignature = MAQAMTABLE[keySignature.toUpperCase()];
+    if (keySignature.toLowerCase() in MAQAMTABLE) {
+        keySignature = MAQAMTABLE[keySignature.toLowerCase()];
     }
 
     var parts = keySignature.split(' ');
@@ -517,7 +543,7 @@ function keySignatureToMode(keySignature) {
     }
 
     if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
-        console.log('invalid key or missing name; reverting to C.');
+        console.log('Invalid key or missing name; reverting to C.');
         // Is is possible that the key was left out?
         var keySignature = 'C ' + keySignature;
         var parts = keySignature.split(' ');
@@ -525,7 +551,7 @@ function keySignatureToMode(keySignature) {
     }
 
     if (minorMode) {
-        return [key, 'MINOR'];
+        return [key, 'minor'];
     }
 
     // Reassemble remaining parts to get mode name
@@ -541,16 +567,25 @@ function keySignatureToMode(keySignature) {
     }
 
     if (mode === '') {
-        mode = 'MAJOR';
+        mode = 'major';
     } else {
-        mode = mode.toUpperCase();
+        mode = mode.toLowerCase();
+    }
+
+    mode = getModeName(mode);
+
+    for (var i = 0; i < MODENAMES.length; i++) {
+        if (MODENAMES[i][0] === mode) {
+            mode = MODENAMES[i][1];
+            break;
+        }
     }
 
     if (mode in MUSICALMODES) {
         return [key, mode];
     } else {
-        console.log('invalid mode name: ' + mode + ' reverting to MAJOR');
-        return [key, 'MAJOR'];
+        console.log('Invalid mode name: ' + mode + ' reverting to major.');
+        return [key, 'major'];
     }
 };
 
@@ -876,7 +911,7 @@ function frequencyToPitch(hz) {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12), cents];
         }
     }
-    console.log('could not find note/octave for ' + hz);
+    console.log('Could not find note/octave for ' + hz);
     return ['?', -1, 0];
 };
 
@@ -967,7 +1002,7 @@ function pitchToNumber(pitch, octave, keySignature) {
         if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
-            console.log('pitch ' + pitch + ' not found');
+            console.log('pitch ' + pitch + ' not found.');
             pitchNumber = 0;
         }
     }
@@ -996,7 +1031,7 @@ function i18nSolfege(note) {
     if (i !== -1) {
         return solfnotes_[i];
     } else {
-        console.log(note + ' NOT FOUND');
+        console.log(note + ' not found.');
         return note;
     }
 }
@@ -1128,27 +1163,27 @@ function Synth () {
         // drum samples
         'bottle': [BOTTLESOUNDSAMPLE, null],
         'clap': [CLAPSOUNDSAMPLE, null],
-        'darbuka': [DARBUKASOUNDSAMPLE, null],
-        'hihat': [HIHATSOUNDSAMPLE, null],
+        'darbuka drum': [DARBUKASOUNDSAMPLE, null],
+        'hi hat': [HIHATSOUNDSAMPLE, null],
         'splash': [SPLASHSOUNDSAMPLE, null],
         'bubbles': [BUBBLESSOUNDSAMPLE, null],
-        'cowbell': [COWBELLSOUNDSAMPLE, null],
+        'cow bell': [COWBELLSOUNDSAMPLE, null],
         'dog': [DOGSOUNDSAMPLE, null],
-        'kick': [KICKSOUNDSAMPLE, null],
-        'tom': [TOMSOUNDSAMPLE, null],
+        'kick drum': [KICKSOUNDSAMPLE, null],
+        'tom tom': [TOMSOUNDSAMPLE, null],
         'cat': [CATSOUNDSAMPLE, null],
         'crash': [CRASHSOUNDSAMPLE, null],
         'duck': [DUCKSOUNDSAMPLE, null],
-        'ridebell': [RIDEBELLSOUNDSAMPLE, null],
-        'trianglebell': [TRIANGLESOUNDSAMPLE, null],
+        'ride bell': [RIDEBELLSOUNDSAMPLE, null],
+        'triangle bell': [TRIANGLESOUNDSAMPLE, null],
         'chine': [CHINESOUNDSAMPLE, null],
         'cricket': [CRICKETSOUNDSAMPLE, null],
-        'fingercymbals': [FINGERCYMBALSSOUNDSAMPLE, null],
+        'finger cymbals': [FINGERCYMBALSSOUNDSAMPLE, null],
         'slap': [SLAPSOUNDSAMPLE, null],
         'clang': [CLANGSOUNDSAMPLE, null],
-        'cup': [CUPSOUNDSAMPLE, null],
-        'floortom': [FLOORTOMSOUNDSAMPLE, null],
-        'snaredrum': [SNARESOUNDSAMPLE, null],
+        'cup drum': [CUPSOUNDSAMPLE, null],
+        'floor tom tom': [FLOORTOMSOUNDSAMPLE, null],
+        'snare drum': [SNARESOUNDSAMPLE, null],
     };
 
     Tone.Buffer.onload = function(){
@@ -1180,9 +1215,7 @@ function Synth () {
         default:
             var drumName = getDrumSynthName(name);
             if (name.slice(0, 4) == 'http') {
-                // console.log('drum name is URL');
                 if (name in this.synthset) {
-                    // console.log('returning URL synth');
                     return this.synthset[name][1];
                 } else {
                     console.log('no synth by that name');
@@ -1308,7 +1341,7 @@ function Synth () {
                     this.synthset[name][1].triggerAttack(0, beatValue);
                 } else if (drumName in this.synthset) {
                     if (this.synthset[drumName][1] == null) {
-                        console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
+                        console.log('Something has gone terribly wrong: ' + name + ', ' + drumName);
                     } else {
                         this.synthset[drumName][1].triggerAttack(0);
                     }
@@ -1317,7 +1350,7 @@ function Synth () {
                 } else if (name.slice(0, 4) == 'file') {
                     this.synthset[name][1].triggerAttack(0, beatValue);
                 } else {
-                    console.log('something has gone terribly wrong: ' + name + ', ' + drumName);
+                    console.log('Something has gone terribly wrong: ' + name + ', ' + drumName);
                 }
             } else if (name === 'drum') {
                 this.synthset[DEFAULTDRUM][1].triggerAttack(0, beatValue, 1);
