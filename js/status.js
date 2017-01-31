@@ -178,7 +178,11 @@ function StatusMatrix() {
                 var notes = this._logo.noteStatus[turtle][0];
                 for (var j = 0; j < notes.length; j++) {
                     note += notes[j];
-                    note += ' ';
+                    if (typeof(notes[j]) === 'number') {
+                        note += 'Hz ';
+                    } else {
+                        note += ' ';
+                    }
                 }
                 var value = this._logo.noteStatus[turtle][1];
 
