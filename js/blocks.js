@@ -3484,6 +3484,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         if (['start', 'action', 'nameddo', 'namedarg', 'nameddoArg', 'calc', 'calcArg', 'namedcalcArg', 'storein'].indexOf(name) != -1) {
             this.checkPaletteEntries(name);
         }
+        console.log("Finished block loading");
+        var myCustomEvent = new Event('finishedLoading');
+        document.dispatchEvent(myCustomEvent);
     };
  
     this._cleanupStacks = function() {
