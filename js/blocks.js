@@ -673,6 +673,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     that.setActionProtoVisiblity(false);
                     that.adjustDocks(parentblk, true);
                     that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
+                    that.renameDos(that.blockList[oldBlock].value, that.blockList[blk].value);
                     setTimeout(function () {
 			that.palettes.removeActionPrototype(that.blockList[oldBlock].value);
                     }, 1000);
