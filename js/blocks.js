@@ -683,18 +683,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return;
         }
 
-        // Deprecated
-        if (this.blockList[parentblk].name === 'note') {
-            if (this.blockList[parentblk].connections[2] == null) {
-                var blkname = 'rest2';
-                var newblock = this.makeBlock(blkname, '__NOARG__');
-                this.blockList[parentblk].connections[2] = newblock;
-                this.blockList[newblock].connections[0] = parentblk;
-                this.blockList[newblock].connections[1] = null;
-            }
-            return;
-        }
- 
         if (['newnote', 'osctime'].indexOf(this.blockList[parentblk].name) !== -1) {
             var cblk = this.blockList[parentblk].connections[2];
             if (cblk == null) {
@@ -1028,7 +1016,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
             // Remove the silence block (if it is present) after
             // adding a new block inside of a note block.
-            if (this._insideExpandableBlock(thisBlock) != null && ['note', 'newnote', 'osctime'].indexOf(this.blockList[this._insideExpandableBlock(thisBlock)].name) !== -1) {
+            if (this._insideNoteBlock(thisBlock) != null) {
                 // If blocks are inserted above the silence block.
                 if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
@@ -2482,6 +2470,31 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             } else {
                 return this._insideExpandableBlock(cblk);
+            }
+        }
+    };
+ 
+    this._insideNoteBlock = function (blk) {
+        // Returns a containing note block or null
+        if (this.blockList[blk] == null) {
+            console.log('null block in blockList? ' + blk);
+            return null;
+        } else if (this.blockList[blk].connections[0] == null) {
+            return null;
+        } else {
+            var cblk = this.blockList[blk].connections[0];
+            if (this.blockList[cblk].isExpandableBlock()) {
+                // If it is the last connection, keep searching.
+                if (blk === last(this.blockList[cblk].connections)) {
+                    return this._insideNoteBlock(cblk);
+                } else if (blk === this.blockList[cblk].connections[1]) {
+                    // Connection 1 of a note block is not inside the clamp.
+		    return null;
+                } else {
+                    return cblk;
+                }
+            } else {
+                return this._insideNoteBlock(cblk);
             }
         }
     };
