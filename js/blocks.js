@@ -646,13 +646,40 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
  
-    this.addDefaultBlock = function(parentblk) {
+    this.addDefaultBlock = function(parentblk, oldBlock) {
+        // Add an action name whenever the user removes the name from
+        // an action block.
         // Add a Silence block whenever the user removes all the
         // blocks from a Note block.
         if (parentblk == null) {
             return;
         }
  
+        if (this.blockList[parentblk].name === 'action') {
+            var cblk = this.blockList[parentblk].connections[1];
+            if (cblk == null) {
+                var that = this;
+                postProcess = function() {
+                    var blk = that.blockList.length - 1;
+                    that.blockList[parentblk].connections[1] = blk;
+                    that.blockList[blk].value = that.findUniqueActionName(_('action'));
+                    var label = that.blockList[blk].value;
+                    if (label.length > 8) {
+                        label = label.substr(0, 7) + '...';
+                    }
+                    that.blockList[blk].text.text = label;
+                    that.blockList[blk].container.updateCache();
+                    that.newNameddoBlock(that.blockList[blk].value, that.actionHasReturn(parentblk), that.actionHasArgs(parentblk));
+                    that.setActionProtoVisiblity(false);
+                    that.adjustDocks(parentblk, true);
+                    that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
+                };
+
+                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [], false);
+            }
+            return;
+        }
+
         // Deprecated
         if (this.blockList[parentblk].name === 'note') {
             if (this.blockList[parentblk].connections[2] == null) {
@@ -1067,7 +1094,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             }
         }
  
-        this.addDefaultBlock(parentblk);
+        this.addDefaultBlock(parentblk, thisBlock);
  
         // Put block adjustments inside a slight delay to make the
         // addition/substraction of vspace and changes of block shape
@@ -1670,7 +1697,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // Make a new block from a proto block.
         // Called from palettes.
  
-        // console.log('makeBlock ' + name + ' ' + arg);
+        if (name === 'text') {
+            console.log('makeBlock ' + name + ' ' + arg);
+        }
         var postProcess = null;
         var postProcessArg = null;
         var me = this;
@@ -2214,7 +2243,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         var nameChanged = false;
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
-            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] !== _('action') && block.defaults[0] === oldName) {
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 /* && block.defaults[0] !== _('action') */ && block.defaults[0] === oldName) {
                 console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
@@ -2765,7 +2794,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 var name = blkData[1][1]['value'];
             }
  
-            // If we have a stack named 'action', make te protoblock visible.
+            // If we have a stack named 'action', make the protoblock visible.
             if (name === _('action')) {
                 this.setActionProtoVisiblity(true);
             }
@@ -3644,7 +3673,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             myBlock.connections[0] = null;
  
             // Add default block if user deletes all blocks from inside the note block
-            this.addDefaultBlock(parentBlock);
+            this.addDefaultBlock(parentBlock, thisBlock);
         }
  
         if (myBlock.name === 'start' || myBlock.name === 'drum') {
