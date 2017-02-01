@@ -1628,6 +1628,15 @@ define(function (require) {
             }
         };
 
+        function runProject(env){
+            console.log("Running Project from Event");
+            setTimeout(function () {
+                console.log("Run");
+                _changeBlockVisibility();
+                _doFastButton(env);
+            }, 1000);
+        }
+
         function loadProject(projectName, run, env) {
             //set default value of run
             run = typeof run !== 'undefined' ? run : false;
@@ -1674,10 +1683,11 @@ define(function (require) {
             }, 200);
 
             if (run) {
-                setTimeout(function () {
-                    _changeBlockVisibility();
-                    _doFastButton(env);
-                }, 2000);
+                if (document.addEventListener) {
+                    document.addEventListener('finishedLoading', function(){runProject(env);}, false);
+                } else {
+                    document.attachEvent('finishedLoading', function(){runProject(env);});
+                }
             }
         };
 
