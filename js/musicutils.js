@@ -883,7 +883,7 @@ function toFraction(d) {
 
 function frequencyToPitch(hz) {
     // Calculate the pitch and octave based on frequency, rounding to
-    // the nearest note.
+    // the nearest cent.
 
     if (hz < A0) {
         return ['A', 0];
@@ -898,20 +898,12 @@ function frequencyToPitch(hz) {
         var f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
             var cents = i % 100;
-            if (cents > 50) {
-                cents = 100 - cents;
-            }
-            break;
+            var j = Math.floor(i / 100);
+            return [PITCHES[(j + PITCHES.indexOf('A')) % 12], Math.floor((j + PITCHES.indexOf('A')) / 12), cents];
         }
     }
 
-    for (var i = 0; i < 88; i++) {
-        var f = A0 * Math.pow(TWELTHROOT2, i);
-        if (hz < f * 1.03 && hz > f * 0.97) {
-            return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12), cents];
-        }
-    }
-    console.log('Could not find note/octave for ' + hz);
+    console.log('Could not find note/octave/cents for ' + hz);
     return ['?', -1, 0];
 };
 

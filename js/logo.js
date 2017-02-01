@@ -4733,7 +4733,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.parameterQueue[turtle].push(blk);
                 }
             } else {
-                console.log('turtle ' + turtle + ' has no parameterQueue');
+                // console.log('turtle ' + turtle + ' has no parameterQueue');
             }
         }
 

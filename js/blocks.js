@@ -646,25 +646,43 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
  
-    this.addDefaultBlock = function(parentblk) {
+    this.addDefaultBlock = function(parentblk, oldBlock) {
+        // Add an action name whenever the user removes the name from
+        // an action block.
         // Add a Silence block whenever the user removes all the
         // blocks from a Note block.
         if (parentblk == null) {
             return;
         }
  
-        // Deprecated
-        if (this.blockList[parentblk].name === 'note') {
-            if (this.blockList[parentblk].connections[2] == null) {
-                var blkname = 'rest2';
-                var newblock = this.makeBlock(blkname, '__NOARG__');
-                this.blockList[parentblk].connections[2] = newblock;
-                this.blockList[newblock].connections[0] = parentblk;
-                this.blockList[newblock].connections[1] = null;
+        if (this.blockList[parentblk].name === 'action') {
+            var cblk = this.blockList[parentblk].connections[1];
+            if (cblk == null) {
+                var that = this;
+                postProcess = function() {
+                    var blk = that.blockList.length - 1;
+                    that.blockList[parentblk].connections[1] = blk;
+                    that.blockList[blk].value = that.findUniqueActionName(_('action'));
+                    var label = that.blockList[blk].value;
+                    if (label.length > 8) {
+                        label = label.substr(0, 7) + '...';
+                    }
+                    that.blockList[blk].text.text = label;
+                    that.blockList[blk].container.updateCache();
+                    that.newNameddoBlock(that.blockList[blk].value, that.actionHasReturn(parentblk), that.actionHasArgs(parentblk));
+                    that.setActionProtoVisiblity(false);
+                    that.adjustDocks(parentblk, true);
+                    that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
+                    setTimeout(function () {
+			that.palettes.removeActionPrototype(that.blockList[oldBlock].value);
+                    }, 1000);
+                };
+
+                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [], false);
             }
             return;
         }
- 
+
         if (['newnote', 'osctime'].indexOf(this.blockList[parentblk].name) !== -1) {
             var cblk = this.blockList[parentblk].connections[2];
             if (cblk == null) {
@@ -998,7 +1016,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
             // Remove the silence block (if it is present) after
             // adding a new block inside of a note block.
-            if (this._insideExpandableBlock(thisBlock) != null && ['note', 'newnote', 'osctime'].indexOf(this.blockList[this._insideExpandableBlock(thisBlock)].name) !== -1) {
+            if (this._insideNoteBlock(thisBlock) != null) {
                 // If blocks are inserted above the silence block.
                 if (insertAfterDefault) {
                     newBlock = this.deletePreviousDefault(thisBlock);
@@ -1067,7 +1085,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             }
         }
  
-        this.addDefaultBlock(parentblk);
+        this.addDefaultBlock(parentblk, thisBlock);
  
         // Put block adjustments inside a slight delay to make the
         // addition/substraction of vspace and changes of block shape
@@ -1670,7 +1688,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // Make a new block from a proto block.
         // Called from palettes.
  
-        // console.log('makeBlock ' + name + ' ' + arg);
+        if (name === 'text') {
+            console.log('makeBlock ' + name + ' ' + arg);
+        }
         var postProcess = null;
         var postProcessArg = null;
         var me = this;
@@ -2214,7 +2234,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         var nameChanged = false;
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
-            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && block.defaults[0] !== _('action') && block.defaults[0] === oldName) {
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 /* && block.defaults[0] !== _('action') */ && block.defaults[0] === oldName) {
                 console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
@@ -2450,6 +2470,31 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             } else {
                 return this._insideExpandableBlock(cblk);
+            }
+        }
+    };
+ 
+    this._insideNoteBlock = function (blk) {
+        // Returns a containing note block or null
+        if (this.blockList[blk] == null) {
+            console.log('null block in blockList? ' + blk);
+            return null;
+        } else if (this.blockList[blk].connections[0] == null) {
+            return null;
+        } else {
+            var cblk = this.blockList[blk].connections[0];
+            if (this.blockList[cblk].isExpandableBlock()) {
+                // If it is the last connection, keep searching.
+                if (blk === last(this.blockList[cblk].connections)) {
+                    return this._insideNoteBlock(cblk);
+                } else if (blk === this.blockList[cblk].connections[1]) {
+                    // Connection 1 of a note block is not inside the clamp.
+		    return null;
+                } else {
+                    return cblk;
+                }
+            } else {
+                return this._insideNoteBlock(cblk);
             }
         }
     };
@@ -2765,7 +2810,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 var name = blkData[1][1]['value'];
             }
  
-            // If we have a stack named 'action', make te protoblock visible.
+            // If we have a stack named 'action', make the protoblock visible.
             if (name === _('action')) {
                 this.setActionProtoVisiblity(true);
             }
@@ -3647,7 +3692,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             myBlock.connections[0] = null;
  
             // Add default block if user deletes all blocks from inside the note block
-            this.addDefaultBlock(parentBlock);
+            this.addDefaultBlock(parentBlock, thisBlock);
         }
  
         if (myBlock.name === 'start' || myBlock.name === 'drum') {
