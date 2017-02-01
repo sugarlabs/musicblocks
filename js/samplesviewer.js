@@ -448,7 +448,7 @@ function PlanetView(model, controller) {
             planet.model.publish(ele.attributes.title.value,
                              ele.attributes.data.value,
                              ele.querySelector('img').src);
-            var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
+            var url = SHAREURL.replace(NAMESUBTEXT, 'MusicBlocks_'+planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
             console.log(url);
             var n = i.toString();
             document.getElementById('shareurldiv'+n).style.visibility = 'visible';
@@ -463,7 +463,7 @@ function PlanetView(model, controller) {
     this.planetshare = function (ele,i) {
         return function () {
             console.log(ele);
-            var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
+            var url = SHAREURL.replace(NAMESUBTEXT, 'MusicBlocks_'+planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
             console.log(url);
             var n = i.toString();
             document.getElementById('plshareurldiv'+n).style.visibility = 'visible';
