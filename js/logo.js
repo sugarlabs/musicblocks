@@ -126,6 +126,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.notePitches = {};
     this.noteOctaves = {};
     this.noteCents = {};
+    this.noteHertz = {};
     this.noteTranspositions = {};
     this.noteBeatValues = {};
 
@@ -618,6 +619,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             this.transposition[turtle] = 0;
             this.noteBeat[turtle] = [];
             this.noteCents[turtle] = [];
+            this.noteHertz[turtle] = [];
             this.lastNotePlayed[turtle] = null;
             this.noteStatus[turtle] = null;
             this.noteDrums[turtle] = [];
@@ -2450,6 +2452,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo.notePitches[turtle].push('rest');
             logo.noteOctaves[turtle].push(4);
             logo.noteCents[turtle].push(0);
+            logo.noteHertz[turtle].push(0);
             logo.noteBeatValues[turtle].push(1);
             logo.pushedNote[turtle] = true;
             break;
@@ -2482,6 +2485,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo.notePitches[turtle].push(note);
                 logo.noteOctaves[turtle].push(octave);
                 logo.noteCents[turtle].push(cents);
+                if (cents !== 0) {
+                    logo.noteHertz[turtle].push(pitchToFrequency(note, octave, cents, logo.keySignature[turtle]));
+		} else {
+                    logo.noteHertz[turtle].push(0);
+                }
             }
 
             var len = logo.lastNotePlayed[turtle][0].length;
@@ -2840,6 +2848,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
                     logo.noteCents[turtle].push(cents);
+                    if (cents !== 0) {
+                        logo.noteHertz[turtle].push(pitchToFrequency(note, octave, cents, logo.keySignature[turtle]));
+	            } else {
+                        logo.noteHertz[turtle].push(0);
+                    }
                 }
 
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -3014,6 +3027,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo.notePitches[turtle] = [];
             logo.noteOctaves[turtle] = [];
             logo.noteCents[turtle] = [];
+            logo.noteHertz[turtle] = [];
             logo.noteTranspositions[turtle] = [];
             logo.noteBeatValues[turtle] = [];
             logo.noteDrums[turtle] = [];
@@ -3734,6 +3748,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
                     logo.noteCents[turtle].push(cents);
+                    logo.noteHertz[turtle].push(args[0]);
                 }
 
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -3853,6 +3868,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.notePitches[turtle].push(obj[0]);
                     logo.noteOctaves[turtle].push(obj[1]);
                     logo.noteCents[turtle].push(obj[2]);
+                    if (obj[2] !== 0) {
+                        logo.noteHertz[turtle].push(pitchToFrequency(obj[0], obj[1], obj[2], logo.keySignature[turtle]));
+	            } else {
+                        logo.noteHertz[turtle].push(0);
+                    }
 
                     if (turtle in logo.transposition) {
                         logo.noteTranspositions[turtle].push(logo.transposition[turtle]);
@@ -4246,17 +4266,19 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         // Save the current note.
                         var saveNote = [];
                         for (var i = 0; i < this.notePitches[turtle].length; i++) {
-                            saveNote.push([this.notePitches[turtle][i], this.noteOctaves[turtle][i], this.noteCents[turtle][i]]);
+                            saveNote.push([this.notePitches[turtle][i], this.noteOctaves[turtle][i], this.noteCents[turtle][i], this.noteHertz[turtle][i]]);
                         }
 
                         // Swap in the previous note.
                         this.notePitches[turtle] = [];
                         this.noteOctaves[turtle] = [];
                         this.noteCents[turtle] = [];
+                        this.noteHertz[turtle] = [];
                         for (var i = 0; i < this.tieNote[turtle].length; i++) {
                             this.notePitches[turtle].push(this.tieNote[turtle][i][0]);
                             this.noteOctaves[turtle].push(this.tieNote[turtle][i][1]);
                             this.noteCents[turtle].push(this.tieNote[turtle][i][2]);
+                            this.noteHertz[turtle].push(this.tieNote[turtle][i][3]);
                         }
                         this.tieNote[turtle] = [];
                         // Remove the note from the Lilypond list.
@@ -4271,10 +4293,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         this.notePitches[turtle] = [];
                         this.noteOctaves[turtle] = [];
                         this.noteCents[turtle] = [];
+                        this.noteHertz[turtle] = [];
                         for (var i = 0; i < saveNote.length; i++) {
                             this.notePitches[turtle].push(saveNote[i][0]);
                             this.noteOctaves[turtle].push(saveNote[i][1]);
                             this.noteCents[turtle].push(saveNote[i][2]);
+                            this.noteHertz[turtle].push(saveNote[i][3]);
                         }
                     }
                 }
@@ -4283,7 +4307,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     this.tieNote[turtle] = [];
                     this.tieCarryOver[turtle] = noteBeatValue;
                     for (var i = 0; i < this.notePitches[turtle].length; i++) {
-                        this.tieNote[turtle].push([this.notePitches[turtle][i], this.noteOctaves[turtle][i], this.noteCents[turtle][i]]);
+                        this.tieNote[turtle].push([this.notePitches[turtle][i], this.noteOctaves[turtle][i], this.noteCents[turtle][i], this.noteHertz[turtle][i]]);
                     }
                     noteBeatValue = 0;
                 } else {
@@ -4421,7 +4445,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                                 // we need to convert to frequency and add
                                 // in the cents.
                                 if (logo.noteCents[turtle][i] !== 0) {
-                                    var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
+                                    if (logo.noteHertz[turtle][i] !== 0) {
+                                        var note = logo.noteHertz[turtle][i];
+                                    } else {
+                                        var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
+                                    }
                                 } else {
                                     var note = noteObj[0] + noteObj[1];
                                 }
