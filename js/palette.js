@@ -454,19 +454,12 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
 
     this.removeActionPrototype = function(actionName) {
-        /*
-        if (actionName === _('action')) {
-            console.log('skipping removal of action');
-            return;
-        }
-        */
         var blockRemoved = false;
         for (var blk = 0; blk < this.dict['action'].protoList.length; blk++) {
-            var block = this.dict['action'].protoList[blk];
-            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && (block.defaults[0] === actionName || blocks.defaults == undefined)) {
+            var actionBlock = this.dict['action'].protoList[blk];
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(actionBlock.name) !== -1 && (actionBlock.defaults[0] === actionName)) {
                 // Remove the palette protoList entry for this block.
-                this.dict['action'].remove(block, actionName);
-                console.log('deleting protoblocks for ' + actionName);
+                this.dict['action'].remove(actionBlock, actionName);
 
                 // And remove it from the protoBlock dictionary.
                 if (paletteBlocks.protoBlockDict['myDo_' + actionName]) {
@@ -1390,8 +1383,7 @@ function Palette(palettes, name) {
         }
 
         for (var i = 0; i < this.model.blocks.length; i++) {
-            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.model.blocks[i].name) !== -1 && this.model.blocks[i].label === name) {
-                console.log(this.model.blocks[i]);
+            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.model.blocks[i].blkname) !== -1 && this.model.blocks[i].modname === name) {
                 this.model.blocks.splice(i, 1);
                 break;
             }
