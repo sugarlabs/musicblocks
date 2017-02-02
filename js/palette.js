@@ -454,6 +454,12 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
 
     this.removeActionPrototype = function(actionName) {
+        /*
+        if (actionName === _('action')) {
+            console.log('skipping removal of action');
+            return;
+        }
+        */
         var blockRemoved = false;
         for (var blk = 0; blk < this.dict['action'].protoList.length; blk++) {
             var block = this.dict['action'].protoList[blk];
@@ -1066,6 +1072,11 @@ function Palette(palettes, name) {
         function __processBitmap(palette, modname, bitmap, args) {
             var b = args[0];
             var blk = args[1];
+
+            if (palette.protoContainers[modname] == undefined) {
+                console.log('no protoContainer for ' + modname);
+                return;
+            }
 
             palette.protoContainers[modname].addChild(bitmap);
             bitmap.x = PALETTELEFTMARGIN;
@@ -1702,6 +1713,10 @@ function Palette(palettes, name) {
 
     this._makeBlockFromPalette = function(protoblk, blkname, callback) {
         const BUILTINMACROS= ['newswing2', 'newswing', 'newslur', 'newstaccato', 'newnote', 'note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm', 'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2', 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff', 'articulation', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'pitchstaircase', 'tempo', 'pitchslider', 'turtlepitch', 'turtlenote', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote', 'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline', 'note1', 'note2', 'note3', 'note4', 'octave', 'minor', 'major', 'diminished', 'perfect', 'augmented', 'minor2', 'major2', 'diminished1', 'perfect1', 'augmented1', 'minor3', 'major3', 'diminished5', 'perfect4', 'augmented4', 'minor6', 'major6', 'diminished5', 'perfect5', 'augmented5', 'minor7', 'major7', 'diminished8', 'perfect8', 'augmented8', 'steppitch', 'sine', 'triangle', 'square', 'sawtooth', 'setkey2', 'snare', 'hihat', 'kick', 'tom', 'pluck', 'triangle1', 'slap', 'fingercymbals', 'cup', 'cowbell', 'splash', 'ridebell', 'floortom', 'crash', 'chine', 'dog', 'cat', 'clap', 'bubbles', 'cricket', 'duck', 'bottle', 'clang', 'darbuka', 'setdrum', 'playdrum', 'backward', 'status', 'setvoice', 'rhythm2', 'vibrato', 'invert1'];
+        if (protoblk == null) {
+            console.log('null protoblk?');
+            return;
+        }
         switch (protoblk.name) {
         case 'do':
             blkname = 'do ' + protoblk.defaults[0];
