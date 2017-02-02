@@ -678,9 +678,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     that.adjustDocks(parentblk, true);
                     that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
                     that.renameDos(that.blockList[oldBlock].value, that.blockList[blk].value);
-                    setTimeout(function () {
-                        that.palettes.removeActionPrototype(that.blockList[oldBlock].value);
-                    }, 1000);
+                    if (that.blockList[blk].value !== that.blockList[oldBlock].value) {
+                        setTimeout(function () {
+                            that.palettes.removeActionPrototype(that.blockList[oldBlock].value);
+                        }, 1000);
+                    }
                 };
 
                 this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [], false);
@@ -2212,7 +2214,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
  
     this.renameNameddos = function (oldName, newName) {
-        console.log(oldName + ' ' + newName);
         if (oldName === newName) {
             return;
         }
