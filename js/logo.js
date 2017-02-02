@@ -1350,6 +1350,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         }
                     }
                 }
+                console.log('childFlow: ' + childFlow);
+                console.log('parentFlow: ' + last(logo.parentFlowQueue[turtle]));
             }
             break;
         case 'storein':
@@ -2929,21 +2931,22 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 var note = logo.getNote(args[0], args[1], 0, logo.keySignature[turtle]);
                 var flag = 0;
 
-                for (var i=0 ; i < pitchstaircase.Stairs.length; i++) {
+                for (var i = 0 ; i < pitchstaircase.Stairs.length; i++) {
                     if (pitchstaircase.Stairs[i][2] < parseFloat(frequency)) {
-                        pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency)]);
+                        pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency), 1, 1]);
                         flag = 1;
                         break;
                     }
+
                     if (pitchstaircase.Stairs[i][2] === parseFloat(frequency)) {
-                        pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency)]);
+                        pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency), 1, 1]);
                         flag = 1;
                         break;
                     }
                 }
 
                 if (flag === 0) {
-                    pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
+                    pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency), 1, 1]);
                 }
             }
             else {
@@ -3739,7 +3742,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 pitchtimematrix.rowArgs.push(args[0]);
             } else if (logo.inNoteBlock[turtle] > 0) {
 
-                function addPitch(note, octave, cents) {
+                function addPitch(note, octave, cents, frequency) {
                     if (logo.drumStyle[turtle].length > 0) {
                         var drumname = last(logo.drumStyle[turtle]);
                         var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
@@ -3748,7 +3751,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.notePitches[turtle].push(note);
                     logo.noteOctaves[turtle].push(octave);
                     logo.noteCents[turtle].push(cents);
-                    logo.noteHertz[turtle].push(args[0]);
+                    logo.noteHertz[turtle].push(frequency);
                 }
 
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -3768,39 +3771,39 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     }
                 }
 
-                addPitch(note, octave, cents);
+                addPitch(note, octave, cents, args[0]);
 
                 if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
                     for (var i = 0; i < logo.intervals[turtle].length; i++) {
                         var ii = getInterval(logo.intervals[turtle][i], logo.keySignature[turtle], note);
                         var noteObj = logo.getNote(note, octave, ii, logo.keySignature[turtle]);
-                        addPitch(noteObj[0], noteObj[1], cents);
+                        addPitch(noteObj[0], noteObj[1], cents, 0);
                     }
                 }
 
                 if (turtle in logo.perfect && logo.perfect[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, calcPerfect(last(logo.perfect[turtle])), logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    addPitch(noteObj[0], noteObj[1], cents, 0);
                 }
 
                 if (turtle in logo.diminished && logo.diminished[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, calcDiminished(last(logo.diminished[turtle])), logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    addPitch(noteObj[0], noteObj[1], cents, 0);
                 }
 
                 if (turtle in logo.augmented && logo.augmented[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, calcAugmented(last(logo.augmented[turtle])), logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    addPitch(noteObj[0], noteObj[1], cents, 0);
                 }
 
                 if (turtle in logo.major && logo.major[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, calcMajor(last(logo.major[turtle])), logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    addPitch(noteObj[0], noteObj[1], cents, 0);
                 }
 
                 if (turtle in logo.minor && logo.minor[turtle].length > 0) {
                     var noteObj = logo.getNote(note, octave, calcMinor(last(logo.minor[turtle])), logo.keySignature[turtle]);
-                    addPitch(noteObj[0], noteObj[1], cents);
+                    addPitch(noteObj[0], noteObj[1], cents, 0);
                 }
 
                 if (turtle in logo.transposition) {
@@ -4407,7 +4410,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                     logo.noteBeat[turtle] = noteBeatValue;
                     
-                    // do not process a note if its duration is equal to infinity or NaN
+                    // Do not process a note if its duration is equal
+                    // to infinity or NaN.
                     if (!isFinite(duration)) {
                         return;
                     }
@@ -4445,7 +4449,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                                 // we need to convert to frequency and add
                                 // in the cents.
                                 if (logo.noteCents[turtle][i] !== 0) {
-                                    if (logo.noteHertz[turtle][i] !== 0) {
+                                    if (logo.noteHertz[turtle][i] !== 0 && logo.noteTranspositions[turtle][i] === 0) {
                                         var note = logo.noteHertz[turtle][i];
                                     } else {
                                         var note = Math.floor(pitchToFrequency(noteObj[0], noteObj[1], logo.noteCents[turtle][i], logo.keySignature[turtle]));
