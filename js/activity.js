@@ -1421,20 +1421,23 @@ define(function (require) {
                     blocks.trashStacks.push(blk);
                 }
 
-                blocks.blockList[blk].trash = true;
-                blocks.moveBlockRelative(blk, dx, dy);
-                blocks.blockList[blk].hide();
                 if (blocks.blockList[blk].name === 'start' || blocks.blockList[blk].name === 'drum') {
                     console.log('start blk ' + blk + ' value is ' + blocks.blockList[blk].value)
                     var turtle = blocks.blockList[blk].value;
-                    if (turtle != null) {
+                    if (!blocks.blockList[blk].trash && turtle != null) {
                         console.log('sending turtle ' + turtle + ' to trash');
                         turtles.turtleList[turtle].trash = true;
                         turtles.turtleList[turtle].container.visible = false;
                     }
                 } else if (blocks.blockList[blk].name === 'action') {
-                    blocks.deleteActionBlock(blocks.blockList[blk]);
+                    if (!blocks.blockList[blk].trash) {
+                        blocks.deleteActionBlock(blocks.blockList[blk]);
+                    }
                 }
+
+                blocks.blockList[blk].trash = true;
+                blocks.moveBlockRelative(blk, dx, dy);
+                blocks.blockList[blk].hide();
             }
 
             if (addStartBlock) {

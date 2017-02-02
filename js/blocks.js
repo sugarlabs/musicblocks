@@ -113,6 +113,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
     // We need to know if we are processing a copy or save stack command.
     this.inLongPress = false;
+
+    // We stage deletion of prototype action blocks on the palette so
+    // as to avoid palette refresh race conditions.
+    this.deleteActionTimeout = 0;
  
     // Change the scale of the blocks (and the protoblocks on the palette).
     this.setBlockScale = function (scale) {
@@ -675,7 +679,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
                     that.renameDos(that.blockList[oldBlock].value, that.blockList[blk].value);
                     setTimeout(function () {
-			that.palettes.removeActionPrototype(that.blockList[oldBlock].value);
+                        that.palettes.removeActionPrototype(that.blockList[oldBlock].value);
                     }, 1000);
                 };
 
@@ -2490,7 +2494,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     return this._insideNoteBlock(cblk);
                 } else if (blk === this.blockList[cblk].connections[1]) {
                     // Connection 1 of a note block is not inside the clamp.
-		    return null;
+                    return null;
                 } else {
                     return cblk;
                 }
@@ -3661,7 +3665,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
  
-            this.palettes.removeActionPrototype(actionName);
+            // Avoid palette refreash race condition.
+            this.deleteActionTimeout += 500;
+            var timeout = this.deleteActionTimeout;
+            var that = this;
+            setTimeout(function() {
+                that.deleteActionTimeout -= 500;
+                that.palettes.removeActionPrototype(actionName);
+            }, timeout);
         }
     };
  
@@ -3711,7 +3722,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 return;
             }
         } else if (myBlock.name === 'action') {
-            this.deleteActionBlock(myBlock);
+            if (!myBlock.trash) {
+                this.deleteActionBlock(myBlock);
+            }
         }
  
         // put drag group in trash
