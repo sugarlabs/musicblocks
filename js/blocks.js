@@ -1040,9 +1040,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     if (b === newBlock) continue;
                     if (this.blockList[b].name === 'action') {
                         if (this.blockList[b].connections[1] != null) {
-                            console.log(this.blockList[this.blockList[b].connections[1]].value);
                             if (this.blockList[this.blockList[b].connections[1]].value === this.blockList[thisBlock].value) {
-                                console.log('We need to rename the action.');
                                 this.blockList[thisBlock].value = this.findUniqueActionName(this.blockList[thisBlock].value);
                                 var label = this.blockList[thisBlock].value;
                                 if (label.length > 8) {
