@@ -2870,6 +2870,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
         if (updatePalettes) {
             this.palettes.hide();
+            console.log('updating action palette');
             this.palettes.updatePalettes('action');
             this.palettes.show();
         }
@@ -3517,7 +3518,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         this._cleanupStacks();
  
         for (var i = 0; i < this.blocksToCollapse.length; i++) {
-            // console.log('collapse ' + this.blockList[this.blocksToCollapse[i]].name);
             this.blockList[this.blocksToCollapse[i]].collapseToggle();
         }
  
@@ -3532,10 +3532,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
         this.refreshCanvas();
  
-        if (['start', 'action', 'nameddo', 'namedarg', 'nameddoArg', 'calc', 'calcArg', 'namedcalcArg', 'storein'].indexOf(name) != -1) {
-            this.checkPaletteEntries(name);
-        }
-    };
+        // Do a final check on the action and boxes palettes.
+        this.checkPaletteEntries('action');
+        this.checkPaletteEntries('storein');
+   };
  
     this._cleanupStacks = function() {
         if (this._checkArgClampBlocks.length > 0) {
@@ -3584,8 +3584,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
         }
+
         if (updatePalettes) {
-            // console.log('in checkPaletteEntries');
             this.palettes.hide();
             if (name === 'storein') {
                 this.palettes.updatePalettes('boxes');
