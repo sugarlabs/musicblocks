@@ -576,7 +576,13 @@ function RhythmRuler () {
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
+        //FIXME: rough workaround for #508, investigate reasons why the backspace press doesn't work by default
+        var numberInput = docById('dissectNumber');
+        numberInput.addEventListener('keydown', function(event) {
+           if (event.keyCode == 8)
+               numberInput.value = numberInput.value.substring(0, numberInput.value.length-1);
+        });
+        
         var cell = this._addButton(row, 3, 'restore-button.svg', iconSize, _('undo'));
         cell.onclick=function() {
             that._undo();
