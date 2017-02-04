@@ -300,8 +300,11 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             var myPalettes = this;
             setTimeout(function() {
                 myPalettes.dict[showPalette]._resetLayout();
-                myPalettes.dict[showPalette].showMenu();
-                myPalettes.dict[showPalette]._showMenuItems();
+                // Show the action palette after adding/deleting new nameddo blocks.
+                if (showPalette === 'action') {
+                    myPalettes.dict[showPalette].showMenu();
+                    myPalettes.dict[showPalette]._showMenuItems();
+                }
                 myPalettes.refreshCanvas();
             }, 100);
         } else {
@@ -463,7 +466,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
                 // And remove it from the protoBlock dictionary.
                 if (paletteBlocks.protoBlockDict['myDo_' + actionName]) {
-                    // console.log('deleting protoblocks for action ' + actionName);
+                    console.log('DELETING PROTOBLOCKS FOR ACTION ' + actionName);
                     delete paletteBlocks.protoBlockDict['myDo_' + actionName];
                 } else if (paletteBlocks.protoBlockDict['myCalc_' + actionName]) {
                     // console.log('deleting protoblocks for action ' + actionName);

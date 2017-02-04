@@ -679,7 +679,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     that.blockList[blk].container.updateCache();
 
                     that.newNameddoBlock(that.blockList[blk].value, that.actionHasReturn(parentblk), that.actionHasArgs(parentblk));
-                    var blockPalette = blocks.palettes.dict['action'];
+                    var blockPalette = that.palettes.dict['action'];
                     for (var b = 0; b < blockPalette.protoList.length; b++) {
                         var protoblock = blockPalette.protoList[b];
                         if (protoblock.name === 'nameddo' && protoblock.defaults[0] === that.blockList[oldBlock].value) {
@@ -699,7 +699,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     that.adjustDocks(parentblk, true);
                 };
 
-                console.log(parentblk);
                 this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [parentblk, oldBlock], false);
             }
             return;
@@ -798,6 +797,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             parentblk = blk;
         }
  
+        var actionCheck = false;
+
         while (blk != null) {
             expandableLoopCounter += 1;
             if (expandableLoopCounter > 2 * this.blockList.length) {
@@ -1027,6 +1028,32 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     for (var c = 0; c < this.dragGroup.length; c++) {
                         this.moveBlockRelative(this.dragGroup[c], 40, 40);
                     }
+                    // We need to rename the action stack.
+                    if (this.blockList[newBlock].name === 'action') {
+                        // To do: need to ensure label is unique.
+			actionCheck = true;
+                        var that = this;
+                        setTimeout(function () {
+                            that.newNameddoBlock(myBlock.value, that.actionHasReturn(newBlock), that.actionHasArgs(newBlock));
+                            var blockPalette = that.palettes.dict['action'];
+                            for (var b = 0; b < blockPalette.protoList.length; b++) {
+				var protoblock = blockPalette.protoList[b];
+				if (protoblock.name === 'nameddo' && protoblock.staticLabels[0] === that.blockList[connection].value) {
+                                    setTimeout(function () {
+					blockPalette.remove(protoblock, that.blockList[connection].value);
+					that.palettes.hide();
+					that.palettes.updatePalettes('action');
+					that.palettes.show();
+                                    }, 500);
+
+                                    break;
+				}
+                            }
+
+                            that.renameNameddos(that.blockList[connection].value, myBlock.value);
+                            that.renameDos(that.blockList[connection].value, myBlock.value);
+                        }, 500);
+                    }
                 } else {
                     var bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
@@ -1049,7 +1076,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
             // If we attached a name to an action block, check to see
             // if we need to rename it.
-            if (this.blockList[newBlock].name === 'action') {
+            if (this.blockList[newBlock].name === 'action' && !actionCheck) {
                 // Is there already another action block with this name?
                 for (var b = 0; b < this.blockList.length; b++) {
                     if (b === newBlock) continue;
@@ -1907,7 +1934,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 value = this.findUniqueActionName(_('action'));
                 //  console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
-                    // console.log('calling newNameddoBlock with value ' + value);
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
                     this.palettes.hide();
@@ -2242,7 +2268,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     }
  
                     this.blockList[blk].overrideName = label;
-                    console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
+                    // console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
                     this.blockList[blk].regenerateArtwork();
                 }
             }
@@ -2254,7 +2280,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
             if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 /* && block.defaults[0] !== _('action') */ && block.defaults[0] === oldName) {
-                console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
+                // console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
             }
@@ -2378,6 +2404,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return;
         }
  
+        // Is there an old block with this name still around?
+        if (paletteBlocks.protoBlockDict['myDo_' + name]) {
+            // console.log('DELETING PROTOBLOCKS FOR ACTION ' + name);
+            delete paletteBlocks.protoBlockDict['myDo_' + name];
+            this.palettes.dict['action'].hideMenu(true);
+	}
+
         if (hasReturn && hasArgs) {
             this.newNamedcalcArgBlock(name);
             return true;
@@ -2392,16 +2425,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var myDoBlock = new ProtoBlock('nameddo');
             this.protoBlockDict['myDo_' + name] = myDoBlock;
             myDoBlock.palette = this.palettes.dict['action'];
+            // console.log('newNamedDo: ' + name);
             myDoBlock.defaults.push(name);
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
             // console.log('calling palette.add');
             myDoBlock.palette.add(myDoBlock, true);
             return true;
-        } else {
-            // console.log('myDo_' + name + ' already exists.');
-            return false;
         }
+
+        return false;
     };
  
     this.newNamedcalcBlock = function (name) {
@@ -3546,8 +3579,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         this.refreshCanvas();
  
         // Do a final check on the action and boxes palettes.
-        this.checkPaletteEntries('action');
-        this.checkPaletteEntries('storein');
+        this.palettes.updatePalettes('boxes');
+        this.palettes.dict['boxes'].hide();
+        this.palettes.updatePalettes('action');
+        this.palettes.dict['action'].hide();
    };
  
     this._cleanupStacks = function() {
@@ -3580,32 +3615,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         for (var blk = 0; blk < this._adjustTheseStacks.length; blk++) {
             // console.log('Adjust Stack: ' + this.blockList[this._adjustTheseStacks[blk]].name);
             this.raiseStackToTop(this._adjustTheseStacks[blk]);
-        }
-    };
- 
-    this.checkPaletteEntries = function (name) {
-        var updatePalettes = false;
-        for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (!this.blockList[blk].trash && this.blockList[blk].name === 'action') {
-                var myBlock = this.blockList[blk];
-                var arg = null;
-                var c = myBlock.connections[1];
-                if (c != null && this.blockList[c].value !== _('action')) {
-                    if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
-                        updatePalettes = true;
-                    }
-                }
-            }
-        }
-
-        if (updatePalettes) {
-            this.palettes.hide();
-            if (name === 'storein') {
-                this.palettes.updatePalettes('boxes');
-            } else {
-                this.palettes.updatePalettes('action');
-            }
-            this.palettes.show();
         }
     };
  
