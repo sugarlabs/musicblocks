@@ -3579,10 +3579,43 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         this.refreshCanvas();
  
         // Do a final check on the action and boxes palettes.
-        this.palettes.updatePalettes('boxes');
-        this.palettes.dict['boxes'].hide();
-        this.palettes.updatePalettes('action');
-        this.palettes.dict['action'].hide();
+        var updatePalettes = false;
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (!this.blockList[blk].trash && this.blockList[blk].name === 'action') {
+                var myBlock = this.blockList[blk];
+                var arg = null;
+                var c = myBlock.connections[1];
+                if (c != null && this.blockList[c].value !== _('action')) {
+                    if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
+                        updatePalettes = true;
+                    }
+                }
+            }
+        }
+
+        if (updatePalettes) {
+            this.palettes.updatePalettes('action');
+            this.palettes.dict['action'].hide();
+	}
+
+        var updatePalettes = false;
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (!this.blockList[blk].trash && this.blockList[blk].name === 'storein') {
+                var myBlock = this.blockList[blk];
+                var arg = null;
+                var c = myBlock.connections[1];
+                if (c != null && this.blockList[c].value !== _('box')) {
+                    this.newStoreinBlock(this.blockList[c].value);
+                    this.newNamedboxBlock(this.blockList[c].value);
+                    updatePalettes = true;
+                }
+            }
+        }
+
+        if (updatePalettes) {
+            this.palettes.updatePalettes('boxes');
+            this.palettes.dict['boxes'].hide();
+        }
    };
  
     this._cleanupStacks = function() {
