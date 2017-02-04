@@ -1890,6 +1890,7 @@ function Block(protoblock, blocks, overrideName) {
             switch (cblock.name) {
             case 'action':
                 var that = this;
+
                 setTimeout(function () {
                     that.blocks.palettes.removeActionPrototype(oldValue);
                 }, 1000);
