@@ -663,29 +663,44 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 var that = this;
-                postProcess = function() {
+                postProcess = function(args) {
+                    var parentblk = args[0];
+                    var oldBlock = args[1];
+
                     var blk = that.blockList.length - 1;
                     that.blockList[parentblk].connections[1] = blk;
                     that.blockList[blk].value = that.findUniqueActionName(_('action'));
+
                     var label = that.blockList[blk].value;
                     if (label.length > 8) {
                         label = label.substr(0, 7) + '...';
                     }
                     that.blockList[blk].text.text = label;
                     that.blockList[blk].container.updateCache();
+
                     that.newNameddoBlock(that.blockList[blk].value, that.actionHasReturn(parentblk), that.actionHasArgs(parentblk));
-                    that.setActionProtoVisiblity(false);
-                    that.adjustDocks(parentblk, true);
+                    var blockPalette = blocks.palettes.dict['action'];
+                    for (var b = 0; b < blockPalette.protoList.length; b++) {
+                        var protoblock = blockPalette.protoList[b];
+                        if (protoblock.name === 'nameddo' && protoblock.defaults[0] === that.blockList[oldBlock].value) {
+                            setTimeout(function () {
+                                blockPalette.remove(protoblock, that.blockList[oldBlock].value);
+                                that.palettes.hide();
+                                that.palettes.updatePalettes('action');
+                                that.palettes.show();
+                            }, 500);
+
+                            break;
+                        }
+                    }
+
                     that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
                     that.renameDos(that.blockList[oldBlock].value, that.blockList[blk].value);
-                    if (that.blockList[blk].value !== that.blockList[oldBlock].value) {
-                        setTimeout(function () {
-                            that.palettes.removeActionPrototype(that.blockList[oldBlock].value);
-                        }, 1000);
-                    }
+                    that.adjustDocks(parentblk, true);
                 };
 
-                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [], false);
+                console.log(parentblk);
+                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [parentblk, oldBlock], false);
             }
             return;
         }
