@@ -3605,8 +3605,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 var arg = null;
                 var c = myBlock.connections[1];
                 if (c != null && this.blockList[c].value !== _('box')) {
-                    this.newStoreinBlock(this.blockList[c].value);
                     this.newNamedboxBlock(this.blockList[c].value);
+                    this.newStoreinBlock(this.blockList[c].value);
                     updatePalettes = true;
                 }
             }
