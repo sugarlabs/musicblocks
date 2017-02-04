@@ -302,8 +302,8 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 myPalettes.dict[showPalette]._resetLayout();
                 // Show the action palette after adding/deleting new nameddo blocks.
                 if (showPalette === 'action') {
-                    myPalettes.dict[showPalette].showMenu();
-                    myPalettes.dict[showPalette]._showMenuItems();
+                    // myPalettes.dict[showPalette].showMenu();
+                    // myPalettes.dict[showPalette]._showMenuItems();
                 }
                 myPalettes.refreshCanvas();
             }, 100);
