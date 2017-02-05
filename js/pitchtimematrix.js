@@ -11,14 +11,14 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 // FIXME: i18n for graphics blocks
-const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
-const MATRIXGRAPHICS2 = ['arc', 'setxy'];
+const MATRIXGRAPHICS = [_('forward'), _('back'), _('right'), _('left'), _('setcolor'), _('setshade'), _('sethue'), _('setgrey'), _('settranslucency'), _('setpensize'), _('setheading')];
+const MATRIXGRAPHICS2 = [_('arc'), _('setxy')];
 // Deprecated
-const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
+const MATRIXSYNTHS = [_('sine'), _('triangle'), _('sawtooth'), _('square'), _('hertz')];
 
 
 function Matrix() {
-    // rowLabels can contain either a pitch, a drum, or a grphics command
+    // rowLabels can contain either a pitch, a drum, or a graphics command
     this.rowLabels = [];
     // rowArgs can contain an octave or the arg(s) to a graphics command
     this.rowArgs = [];
@@ -1029,7 +1029,7 @@ function Matrix() {
 
     this._setNoteCell = function(j, colIndex, cell, playNote) {
         var note = this._noteStored[j - 1];
-        if (this.rowLabels[j - 1] === 'hertz') {
+        if (this.rowLabels[j - 1] === _('hertz')) {
             var drumName = null;
             var graphicsBlock = false;
             var obj = [note];
@@ -1057,7 +1057,7 @@ function Matrix() {
             if (playNote) {
                 if (drumName != null) {
                     this._logo.synth.trigger('C2', noteValue, drumName);
-                } else if (this.rowLabels[j - 1] === 'hertz') {
+                } else if (this.rowLabels[j - 1] === _('hertz')) {
                     this._logo.synth.trigger(Number(note), noteValue, 'poly');
                 } else if (graphicsBlock !== true) {
                     this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
