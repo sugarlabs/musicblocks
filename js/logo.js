@@ -2780,12 +2780,16 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         transposition += logo.transposition[turtle];
                     }
 
-                    note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                    var nnote = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                    if (noteIsSolfege(note)) {
+                        nnote[0] = getSolfege([nnote[0]]);
+                    }
+
                     if (logo.drumStyle[turtle].length > 0) {
                         pitchdrummatrix.drums.push(last(logo.drumStyle[turtle]));
                     } else {
-                        pitchdrummatrix.rowLabels.push(getSolfege(note));
-                        pitchdrummatrix.rowArgs.push(octave);
+                        pitchdrummatrix.rowLabels.push(nnote[0]);
+                        pitchdrummatrix.rowArgs.push(nnote[1]);
                     }
                 }
             } else if (logo.inMatrix) {
@@ -2829,14 +2833,18 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         transposition += logo.transposition[turtle];
                     }
 
-                    note = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                    var nnote = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                    if (noteIsSolfege(note)) {
+                        nnote[0] = getSolfege([nnote[0]]);
+                    }
+
                     // If we are in a setdrum clamp, override the pitch.
                     if (logo.drumStyle[turtle].length > 0) {
                         pitchtimematrix.rowLabels.push(last(logo.drumStyle[turtle]));
                         pitchtimematrix.rowArgs.push(-1);
                     } else {
-                        pitchtimematrix.rowLabels.push(getSolfege(note));
-                        pitchtimematrix.rowArgs.push(octave);
+                        pitchtimematrix.rowLabels.push(nnote[0]);
+                        pitchtimematrix.rowArgs.push(nnote[1]);
                     }
                 }
             } else if (logo.inNoteBlock[turtle] > 0) {

@@ -1004,6 +1004,21 @@ function pitchToNumber(pitch, octave, keySignature) {
 };
 
 
+function noteIsSolfege(note) {
+    var len = note.length;
+    if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
+        var nnote = note.slice(0, len - 2);
+    } else if (['♯', '♭'].indexOf(note[0][1]) !== -1) {
+        var nnote = note.slice(0, len - 1);
+    } else {
+        var nnote = note;
+    }
+
+    console.log(nnote);
+    return (SOLFNOTES.indexOf(nnote) !== -1);
+}
+
+
 function getSolfege(note) {
     if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
         return SOLFEGECONVERSIONTABLE[note[0][0]] + note[0][1] + note[0][2];
