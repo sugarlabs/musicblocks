@@ -1004,6 +1004,21 @@ function pitchToNumber(pitch, octave, keySignature) {
 };
 
 
+function noteIsSolfege(note) {
+    var len = note.length;
+    if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
+        var nnote = note.slice(0, len - 2);
+    } else if (['♯', '♭'].indexOf(note[0][1]) !== -1) {
+        var nnote = note.slice(0, len - 1);
+    } else {
+        var nnote = note;
+    }
+
+    console.log(nnote);
+    return (SOLFNOTES.indexOf(nnote) !== -1);
+}
+
+
 function getSolfege(note) {
     if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
         return SOLFEGECONVERSIONTABLE[note[0][0]] + note[0][1] + note[0][2];
@@ -1019,9 +1034,11 @@ function i18nSolfege(note) {
     // solfnotes_ is used in the interface for i18n
     //.TRANS: the note names must be separated by single spaces 
     var solfnotes_ = _('ti la sol fa mi re do').split(' ');
-    var i = SOLFNOTES.indexOf(note);
+    var obj = splitSolfege(note);
+
+    var i = SOLFNOTES.indexOf(obj[0]);
     if (i !== -1) {
-        return solfnotes_[i];
+        return solfnotes_[i] + obj[1];
     } else {
         console.log(note + ' not found.');
         return note;
@@ -1029,10 +1046,11 @@ function i18nSolfege(note) {
 }
 
 function splitSolfege(value) {
+    // Separate the pitch from any attributes, e.g., # or b
     if (value != null) {
         if (SOLFNOTES.indexOf(value) !== -1) {
             var note = value;
-            var attr = '♮';
+            var attr = '';
         } else if (value.slice(0, 3) === 'sol') {
             var note = 'sol';
             if (value.length === 4) {
@@ -1050,7 +1068,7 @@ function splitSolfege(value) {
         }
     } else {
         var note = 'la';
-        var attr = '♮'
+        var attr = ''
     }
 
     return [note, attr];

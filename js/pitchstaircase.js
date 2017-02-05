@@ -52,7 +52,7 @@ function PitchStairCase () {
         if (!isStepDeleted) {
             var stairsLength = this.Stairs.length;
         } else {
-            var stairsLength = this.Stairs.length-1;
+            var stairsLength = this.Stairs.length - 1;
         }
 
         if (start === -1) {
@@ -116,9 +116,9 @@ function PitchStairCase () {
             var svgWidth = cellWidth.toString();
             var svgScale = (cellWidth / 55).toString();
             var svgStrokeWidth = (3 * 55 / cellWidth).toString();
-            console.log(svgWidth + ' ' + svgScale + ' ' + svgStrokeWidth);
+            // console.log(svgWidth + ' ' + svgScale + ' ' + svgStrokeWidth);
             var svgData = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SYNTHSVG.replace(/SVGWIDTH/g, svgWidth).replace(/XSCALE/g, svgScale).replace(/STOKEWIDTH/g, svgStrokeWidth))));
-	    cell.style.backgroundImage = 'url(' + svgData + ')';
+            cell.style.backgroundImage = 'url(' + svgData + ')';
             cell.style.backgroundRepeat = 'no-repeat';
             cell.style.backgroundPosition = 'center center';
 
@@ -157,13 +157,13 @@ function PitchStairCase () {
 
         for (var i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum]);
+                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[oldcell.parentNode.id[5]][3] * parseFloat(inputNum2), this.Stairs[oldcell.parentNode.id[5]][4] * parseFloat(inputNum1)]);
                 foundStep = true;
                 break;
             }
 
             if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum]);
+                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[oldcell.parentNode.id[5]][3] * parseFloat(inputNum2), this.Stairs[oldcell.parentNode.id[5]][4] * parseFloat(inputNum1)]);
                 foundStep = true;
                 isStepDeleted = false;
                 break;
@@ -171,7 +171,7 @@ function PitchStairCase () {
         }
 
         if (!foundStep) {
-            this.Stairs.push([obj[0], obj[1], parseFloat(frequency)/inputNum]);
+            this.Stairs.push([obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[oldcell.parentNode.id[5]][3] * parseFloat(inputNum2), this.Stairs[oldcell.parentNode.id[5]][4] * parseFloat(inputNum1)]);
         }
 
         this._makeStairs(i, isStepDeleted);
@@ -212,7 +212,7 @@ function PitchStairCase () {
         }, 1000);
     };
 
-    this._PlayUpandDown = function () {
+    this._playUpandDown = function () {
         var that = this;
         var pitchnotes = [];
         var note = this.Stairs[this.Stairs.length-1][0] + this.Stairs[this.Stairs.length-1][1];
@@ -221,10 +221,10 @@ function PitchStairCase () {
         var row = docById('stair' + last);
         row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
         this._logo.synth.trigger(pitchnotes, 1, 'poly');
-        this._Playnext(this.Stairs.length-2, -1);
+        this._playNext(this.Stairs.length-2, -1);
     };
 
-    this._Playnext = function (index, next) {
+    this._playNext = function (index, next) {
         var that = this;
         if (index === this.Stairs.length) {
             setTimeout(function () {
@@ -245,8 +245,9 @@ function PitchStairCase () {
             }, 1000);
 
             setTimeout(function () {
-                that._Playnext(0,1);
+                that._playNext(0, 1);
             }, 200);
+
             return;
         }
 
@@ -254,8 +255,9 @@ function PitchStairCase () {
         var note = this.Stairs[index][0] + this.Stairs[index][1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var row = docById('stair' + index);
-        var previousrownumber = index-next;
+        var previousrownumber = index - next;
         var previousrow = docById('stair' + previousrownumber);
+
         setTimeout(function () {
             if(previousrow != null) {
                 previousrow.cells[0].style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -264,13 +266,12 @@ function PitchStairCase () {
             row.cells[0].style.backgroundColor = MATRIXBUTTONCOLOR;
             that._logo.synth.trigger(pitchnotes, 1, 'poly');
             if(index < that.Stairs.length || index > -1) {
-                that._Playnext(index+next,next);
+                that._playNext(index + next, next);
             }
         }, 1000);
     };
 
     this._save = function (stairno) {
-        var that = this;
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -280,45 +281,68 @@ function PitchStairCase () {
         var endOfStackIdx = 0;
         var previousBlock = 0;
 
-        for (var i = 0; i < that.Stairs.length; i++) {
-            var noteobj = frequencyToPitch(that.Stairs[i][2]);
-            var note  = that.Stairs[i][0];
-            var octave = that.Stairs[i][1];
-            var frequency = that.Stairs[i][2];
+        for (var i = 0; i < this.Stairs.length; i++) {
+            console.log(this._initialFrequency + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
+
+            var noteobj = frequencyToPitch(this.Stairs[i][2]);
+            var note  = this.Stairs[i][0];
+            var octave = this.Stairs[i][1];
+            var frequency = this.Stairs[i][2];
             var pitch = frequencyToPitch(frequency);
-            var hertzBlockIdx = newStack.length;
-            var frequencyIdx = hertzBlockIdx + 1;
-            var hiddenIdx = hertzBlockIdx + 2;
+
+            // If cents === 0, then output a pitch block; otherwise,
+            // output a hertz block <-- initial frequency x numerator
+            // / denominator, followed by two vspace blocks.
             if (pitch[2] === 0) {
-                var pitchblockidx = newStack.length;
-                var noteidx = pitchblockidx + 1;
-                var octaveidx = pitchblockidx + 2;
-                var hiddenIdx = pitchblockidx + 3;
+                var pitchBlockIdx = newStack.length;
+                var hertzBlockIdx = pitchBlockIdx;
+                var noteIdx = pitchBlockIdx + 1;
+                var octaveIdx = pitchBlockIdx + 2;
+                var hiddenIdx = pitchBlockIdx + 3;
+                var hiddenBlockName = 'hidden';
 
-                newStack.push([hertzBlockIdx, 'pitch', 0, 0, [previousBlock, noteidx, octaveidx, hiddenIdx]]);
-                newStack.push([noteidx, ['text', {'value': pitch[0]}], 0, 0, [pitchblockidx]]);
-                newStack.push([octaveidx, ['number', {'value': pitch[1]}], 0, 0, [pitchblockidx]])
-                } else {
-                    newStack.push([hertzBlockIdx, 'hertz', 0, 0, [previousBlock, frequencyIdx, hiddenIdx]]);
-                    newStack.push([frequencyIdx, ['number', {'value': frequency.toFixed(2)}], 0, 0, [hertzBlockIdx]]);
-                }
+                newStack.push([hertzBlockIdx, 'pitch', 0, 0, [previousBlock, noteIdx, octaveIdx, hiddenIdx]]);
+                newStack.push([noteIdx, ['text', {'value': pitch[0]}], 0, 0, [pitchBlockIdx]]);
+                newStack.push([octaveIdx, ['number', {'value': pitch[1]}], 0, 0, [pitchBlockIdx]])
+            } else {
+                var hertzBlockIdx = newStack.length;
+                var multiplyIdx = hertzBlockIdx + 1;
+                var frequencyIdx = hertzBlockIdx + 2;
+                var divideIdx = hertzBlockIdx + 3;
+                var numeratorIdx = hertzBlockIdx + 4;
+                var denominatorIdx = hertzBlockIdx + 5;
+                var vspaceIdx = hertzBlockIdx + 6;
+                var hiddenIdx = hertzBlockIdx + 7;
+                var hiddenBlockName = 'vspace';
+                newStack.push([hertzBlockIdx, 'hertz', 0, 0, [previousBlock, multiplyIdx, vspaceIdx]]);
+                newStack.push([multiplyIdx, 'multiply', 0, 0, [hertzBlockIdx, frequencyIdx, divideIdx]]);
+                newStack.push([frequencyIdx, ['number', {'value': this._initialFrequency.toFixed(2)}], 0, 0, [multiplyIdx]]);
+                newStack.push([divideIdx, 'divide', 0, 0, [multiplyIdx, numeratorIdx, denominatorIdx]]);
+                newStack.push([numeratorIdx, ['number', {'value': this.Stairs[i][4]}], 0, 0, [divideIdx]]);
+                newStack.push([denominatorIdx, ['number', {'value': this.Stairs[i][3]}], 0, 0, [divideIdx]]);
+                newStack.push([vspaceIdx, 'vspace', 0, 0, [hertzBlockIdx, hiddenIdx]]);
+                hertzBlockIdx = vspaceIdx;  // The hidden block will connect here.
+            }
 
-                if (i === that.Stairs.length - 1) {
-                    newStack.push([hiddenIdx, 'hidden', 0, 0, [hertzBlockIdx, null]]);
-                }
-                else {
-                    newStack.push([hiddenIdx, 'hidden', 0, 0, [hertzBlockIdx, hiddenIdx + 1]]);
-                }
+            if (i === this.Stairs.length - 1) {
+                newStack.push([hiddenIdx, hiddenBlockName, 0, 0, [hertzBlockIdx, null]]);
+            }
+            else {
+                newStack.push([hiddenIdx, hiddenBlockName, 0, 0, [hertzBlockIdx, hiddenIdx + 1]]);
+            }
 
-                previousBlock = hiddenIdx;
+            previousBlock = hiddenIdx;
         }
-        that._logo.blocks.loadNewBlocks(newStack);
+
+        this._logo.blocks.loadNewBlocks(newStack);
     };
 
     this.init = function (logo) {
         this._logo = logo;
+        this._initialFrequency = this.Stairs[0][2];
         var that = this;
         console.log('init PitchStairCase');
+        console.log(this.Stairs);
         docById('pitchstaircase').style.display = 'inline';
         console.log('setting PitchStairCase visible');
         docById('pitchstaircase').style.visibility = 'visible';
@@ -337,9 +361,8 @@ function PitchStairCase () {
         docById('playPitch').style.overflowY = 'hidden';
 
         var tables = document.getElementsByTagName('TABLE');
-        var noofTables = tables.length
-
-        for (var i = 0; i < noofTables; i++) {
+        var noOfTables = tables.length
+        for (var i = 0; i < noOfTables; i++) {
             tables[0].parentNode.removeChild(tables[0]);
         }
 
@@ -403,7 +426,7 @@ function PitchStairCase () {
 
         var cell = this._addButton(row, 1, 'play-scale.svg', iconSize, _('play scale'));
         cell.onclick=function() {
-            that._PlayUpandDown();
+            that._playUpandDown();
         };
 
         cell.onmouseover=function() {

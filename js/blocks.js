@@ -113,6 +113,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
     // We need to know if we are processing a copy or save stack command.
     this.inLongPress = false;
+
+    // We stage deletion of prototype action blocks on the palette so
+    // as to avoid palette refresh race conditions.
+    this.deleteActionTimeout = 0;
  
     // Change the scale of the blocks (and the protoblocks on the palette).
     this.setBlockScale = function (scale) {
@@ -659,7 +663,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 var that = this;
-                postProcess = function() {
+                postProcess = function(args) {
+                    var parentblk = args[0];
+                    var oldBlock = args[1];
+
                     var blk = that.blockList.length - 1;
                     that.blockList[parentblk].connections[1] = blk;
                     that.blockList[blk].value = that.findUniqueActionName(_('action'));
@@ -669,16 +676,35 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     }
                     that.blockList[blk].text.text = label;
                     that.blockList[blk].container.updateCache();
-                    that.newNameddoBlock(that.blockList[blk].value, that.actionHasReturn(parentblk), that.actionHasArgs(parentblk));
-                    that.setActionProtoVisiblity(false);
+
+                    if (that.blockList[blk].value !== that.blockList[oldBlock].value) {
+
+                        that.newNameddoBlock(that.blockList[blk].value, that.actionHasReturn(parentblk), that.actionHasArgs(parentblk));
+
+                        var blockPalette = that.palettes.dict['action'];
+                        for (var b = 0; b < blockPalette.protoList.length; b++) {
+                            var protoblock = blockPalette.protoList[b];
+                            if (protoblock.name === 'nameddo' && protoblock.defaults[0] === that.blockList[oldBlock].value) {
+                                setTimeout(function () {
+                                    blockPalette.remove(protoblock, that.blockList[oldBlock].value);
+                                    delete that.protoBlockDict['myDo_' + that.blockList[oldBlock].value];
+                                    that.palettes.hide();
+                                    that.palettes.updatePalettes('action');
+                                    that.palettes.show();
+                                }, 500);
+
+                                break;
+                            }
+                        }
+
+                        that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
+                        that.renameDos(that.blockList[oldBlock].value, that.blockList[blk].value);
+                    }
+
                     that.adjustDocks(parentblk, true);
-                    that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
-                    setTimeout(function () {
-			that.palettes.removeActionPrototype(that.blockList[oldBlock].value);
-                    }, 1000);
                 };
 
-                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [], false);
+                this._makeNewBlockWithConnections('text', 0, [parentblk], postProcess, [parentblk, oldBlock], false);
             }
             return;
         }
@@ -776,6 +802,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             parentblk = blk;
         }
  
+        var actionCheck = false;
+
         while (blk != null) {
             expandableLoopCounter += 1;
             if (expandableLoopCounter > 2 * this.blockList.length) {
@@ -1005,6 +1033,62 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     for (var c = 0; c < this.dragGroup.length; c++) {
                         this.moveBlockRelative(this.dragGroup[c], 40, 40);
                     }
+
+                    // We need to rename the action stack.
+                    if (this.blockList[newBlock].name === 'action') {
+                        actionCheck = true;
+
+                        if (myBlock.value !== this.blockList[connection].value) {
+
+                            // Temporarily disconnect to ensure we don't
+			    // find myBlock when looking for a unique name.
+                            var c = myBlock.connections[0];
+                            myBlock.connections[0] = null;
+                            var name = this.findUniqueActionName(myBlock.value);
+                            myBlock.connections[0] = c;
+
+                            if (name !== myBlock.value) {
+                                myBlock.value = name;
+                                var label = name;
+                                if (label.length > 8) {
+                                    label = label.substr(0, 7) + '...';
+                                }
+                                myBlock.text.text = label;
+                                myBlock.container.updateCache();
+                            }
+
+                            var that = this;
+                            setTimeout(function () {
+                                // A previously disconnected name may have left
+                                // an entry in the palette we need to remove.
+                                var name = that.blockList[connection].value;
+                                if (paletteBlocks.protoBlockDict['myDo_' + name] != undefined) {
+                                    delete that.protoBlockDict['myDo_' + name];
+                                    that.palettes.dict['action'].hideMenu(true);
+                                }
+
+                                that.newNameddoBlock(myBlock.value, that.actionHasReturn(newBlock), that.actionHasArgs(newBlock));
+                                var blockPalette = that.palettes.dict['action'];
+                                for (var b = 0; b < blockPalette.protoList.length; b++) {
+                                    var protoblock = blockPalette.protoList[b];
+                                    if (protoblock.name === 'nameddo' && protoblock.staticLabels[0] === that.blockList[connection].value) {
+                                        setTimeout(function () {
+                                            blockPalette.remove(protoblock, that.blockList[connection].value);
+                                            delete that.protoBlockDict['myDo_' + that.blockList[connection].value];
+                                            that.palettes.hide();
+                                            that.palettes.updatePalettes('action');
+                                            that.palettes.show();
+                                        }, 500);
+
+                                        break;
+                                    }
+                                }
+
+                                that.renameNameddos(that.blockList[connection].value, myBlock.value);
+                                that.renameDos(that.blockList[connection].value, myBlock.value);
+                            }, 500);
+                        }
+                    }
                 } else {
                     var bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
@@ -1027,15 +1111,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
             // If we attached a name to an action block, check to see
             // if we need to rename it.
-            if (this.blockList[newBlock].name === 'action') {
+            if (this.blockList[newBlock].name === 'action' && !actionCheck) {
                 // Is there already another action block with this name?
                 for (var b = 0; b < this.blockList.length; b++) {
                     if (b === newBlock) continue;
                     if (this.blockList[b].name === 'action') {
                         if (this.blockList[b].connections[1] != null) {
-                            console.log(this.blockList[this.blockList[b].connections[1]].value);
                             if (this.blockList[this.blockList[b].connections[1]].value === this.blockList[thisBlock].value) {
-                                console.log('We need to rename the action.');
                                 this.blockList[thisBlock].value = this.findUniqueActionName(this.blockList[thisBlock].value);
                                 var label = this.blockList[thisBlock].value;
                                 if (label.length > 8) {
@@ -1887,7 +1969,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 value = this.findUniqueActionName(_('action'));
                 //  console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
-                    // console.log('calling newNameddoBlock with value ' + value);
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
                     this.palettes.hide();
@@ -2207,7 +2288,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
  
     this.renameNameddos = function (oldName, newName) {
-        console.log(oldName + ' ' + newName);
         if (oldName === newName) {
             return;
         }
@@ -2223,7 +2303,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     }
  
                     this.blockList[blk].overrideName = label;
-                    console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
+                    // console.log('regenerating artwork for ' + this.blockList[blk].name + ' block[' + blk + ']: ' + oldName + ' -> ' + label);
                     this.blockList[blk].regenerateArtwork();
                 }
             }
@@ -2235,7 +2315,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         for (var blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             var block = actionsPalette.protoList[blockId];
             if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 /* && block.defaults[0] !== _('action') */ && block.defaults[0] === oldName) {
-                console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
+                // console.log('renaming ' + block.name + ': ' + block.defaults[0] + ' to ' + newName);
                 block.defaults[0] = newName;
                 nameChanged = true;
             }
@@ -2356,7 +2436,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
         if (name === _('action')) {
             // 'action' already has its associated palette entries.
-            return;
+            return false;
         }
  
         if (hasReturn && hasArgs) {
@@ -2373,16 +2453,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var myDoBlock = new ProtoBlock('nameddo');
             this.protoBlockDict['myDo_' + name] = myDoBlock;
             myDoBlock.palette = this.palettes.dict['action'];
+            // console.log('newNamedDo: ' + name);
             myDoBlock.defaults.push(name);
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
             // console.log('calling palette.add');
             myDoBlock.palette.add(myDoBlock, true);
             return true;
-        } else {
-            // console.log('myDo_' + name + ' already exists.');
-            return false;
         }
+
+        return false;
     };
  
     this.newNamedcalcBlock = function (name) {
@@ -2489,7 +2569,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     return this._insideNoteBlock(cblk);
                 } else if (blk === this.blockList[cblk].connections[1]) {
                     // Connection 1 of a note block is not inside the clamp.
-		    return null;
+                    return null;
                 } else {
                     return cblk;
                 }
@@ -3511,7 +3591,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         this._cleanupStacks();
  
         for (var i = 0; i < this.blocksToCollapse.length; i++) {
-            // console.log('collapse ' + this.blockList[this.blocksToCollapse[i]].name);
             this.blockList[this.blocksToCollapse[i]].collapseToggle();
         }
  
@@ -3526,14 +3605,62 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
  
         this.refreshCanvas();
  
-        if (['start', 'action', 'nameddo', 'namedarg', 'nameddoArg', 'calc', 'calcArg', 'namedcalcArg', 'storein'].indexOf(name) != -1) {
-            this.checkPaletteEntries(name);
+        // Do a final check on the action and boxes palettes.
+        var updatePalettes = false;
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (!this.blockList[blk].trash && this.blockList[blk].name === 'action') {
+                var myBlock = this.blockList[blk];
+                var arg = null;
+                var c = myBlock.connections[1];
+                if (c != null && this.blockList[c].value !== _('action')) {
+                    if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
+                        updatePalettes = true;
+                    }
+                }
+            }
+        }
+        if (updatePalettes) {
+            this.palettes.hide();
+            this.palettes.updatePalettes('action');
+            // this.palettes.dict['action'].hide();
+            this.palettes.show();
+        }
+
+        var updatePalettes = false;
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (!this.blockList[blk].trash && this.blockList[blk].name === 'storein') {
+                var myBlock = this.blockList[blk];
+                var arg = null;
+                var c = myBlock.connections[1];
+                if (c != null && this.blockList[c].value !== _('box')) {
+                    var name = this.blockList[c].value;
+                    // Is there an old block with this name still around?
+                    if (paletteBlocks.protoBlockDict['myStorein_' + name] == undefined) {
+                        console.log('adding new storein block ' + name);
+                        this.newNamedboxBlock(this.blockList[c].value);
+                        this.newStoreinBlock(this.blockList[c].value);
+                        updatePalettes = true;
+                    }
+                }
+            }
+        }
+
+        if (updatePalettes) {
+            // Do this update on a slight delay so as not to collide with
+            // the actions update.
+            var that = this;
+            setTimeout(function () {
+                that.palettes.hide();
+                that.palettes.updatePalettes('boxes');
+                // that.palettes.dict['boxes'].hide();
+                that.palettes.show();
+            }, 1500);
         }
         console.log("Finished block loading");
         var myCustomEvent = new Event('finishedLoading');
         document.dispatchEvent(myCustomEvent);
     };
- 
+
     this._cleanupStacks = function() {
         if (this._checkArgClampBlocks.length > 0) {
             // We make multiple passes because we need to account for nesting.
@@ -3564,32 +3691,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         for (var blk = 0; blk < this._adjustTheseStacks.length; blk++) {
             // console.log('Adjust Stack: ' + this.blockList[this._adjustTheseStacks[blk]].name);
             this.raiseStackToTop(this._adjustTheseStacks[blk]);
-        }
-    };
- 
-    this.checkPaletteEntries = function (name) {
-        var updatePalettes = false;
-        for (var blk = 0; blk < this.blockList.length; blk++) {
-            if (!this.blockList[blk].trash && this.blockList[blk].name === 'action') {
-                var myBlock = this.blockList[blk];
-                var arg = null;
-                var c = myBlock.connections[1];
-                if (c != null && this.blockList[c].value !== _('action')) {
-                    if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
-                        updatePalettes = true;
-                    }
-                }
-            }
-        }
-        if (updatePalettes) {
-            // console.log('in checkPaletteEntries');
-            this.palettes.hide();
-            if (name === 'storein') {
-                this.palettes.updatePalettes('boxes');
-            } else {
-                this.palettes.updatePalettes('action');
-            }
-            this.palettes.show();
         }
     };
  
@@ -3663,7 +3764,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
  
-            this.palettes.removeActionPrototype(actionName);
+            // Avoid palette refreash race condition.
+            this.deleteActionTimeout += 500;
+            var timeout = this.deleteActionTimeout;
+            var that = this;
+            setTimeout(function() {
+                that.deleteActionTimeout -= 500;
+                that.palettes.removeActionPrototype(actionName);
+            }, timeout);
         }
     };
  
@@ -3713,7 +3821,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 return;
             }
         } else if (myBlock.name === 'action') {
-            this.deleteActionBlock(myBlock);
+            if (!myBlock.trash) {
+                this.deleteActionBlock(myBlock);
+            }
         }
  
         // put drag group in trash
