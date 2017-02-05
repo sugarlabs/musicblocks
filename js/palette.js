@@ -300,8 +300,11 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             var myPalettes = this;
             setTimeout(function() {
                 myPalettes.dict[showPalette]._resetLayout();
+                // Show the action palette after adding/deleting new nameddo blocks.
+                // if (showPalette === 'action') {
                 myPalettes.dict[showPalette].showMenu();
                 myPalettes.dict[showPalette]._showMenuItems();
+                // }
                 myPalettes.refreshCanvas();
             }, 100);
         } else {
@@ -456,15 +459,14 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.removeActionPrototype = function(actionName) {
         var blockRemoved = false;
         for (var blk = 0; blk < this.dict['action'].protoList.length; blk++) {
-            var block = this.dict['action'].protoList[blk];
-            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(block.name) !== -1 && (block.defaults[0] === actionName || blocks.defaults == undefined)) {
+            var actionBlock = this.dict['action'].protoList[blk];
+            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(actionBlock.name) !== -1 && (actionBlock.defaults[0] === actionName)) {
                 // Remove the palette protoList entry for this block.
-                this.dict['action'].remove(block, actionName);
-                console.log('deleting protoblocks for ' + actionName);
+                this.dict['action'].remove(actionBlock, actionName);
 
                 // And remove it from the protoBlock dictionary.
                 if (paletteBlocks.protoBlockDict['myDo_' + actionName]) {
-                    // console.log('deleting protoblocks for action ' + actionName);
+                    // console.log('DELETING PROTOBLOCKS FOR ACTION ' + actionName);
                     delete paletteBlocks.protoBlockDict['myDo_' + actionName];
                 } else if (paletteBlocks.protoBlockDict['myCalc_' + actionName]) {
                     // console.log('deleting protoblocks for action ' + actionName);
@@ -1067,6 +1069,11 @@ function Palette(palettes, name) {
             var b = args[0];
             var blk = args[1];
 
+            if (palette.protoContainers[modname] == undefined) {
+                console.log('no protoContainer for ' + modname);
+                return;
+            }
+
             palette.protoContainers[modname].addChild(bitmap);
             bitmap.x = PALETTELEFTMARGIN;
             bitmap.y = 0;
@@ -1372,15 +1379,14 @@ function Palette(palettes, name) {
 
     this.remove = function(protoblock, name) {
         // Remove the protoblock and its associated artwork container.
-        console.log('removing action ' + name);
+        // console.log('removing action ' + name);
         var i = this.protoList.indexOf(protoblock);
         if (i !== -1) {
             this.protoList.splice(i, 1);
         }
 
         for (var i = 0; i < this.model.blocks.length; i++) {
-            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.model.blocks[i].name) !== -1 && this.model.blocks[i].label === name) {
-                console.log(this.model.blocks[i]);
+            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.model.blocks[i].blkname) !== -1 && this.model.blocks[i].modname === name) {
                 this.model.blocks.splice(i, 1);
                 break;
             }
@@ -1702,6 +1708,10 @@ function Palette(palettes, name) {
 
     this._makeBlockFromPalette = function(protoblk, blkname, callback) {
         const BUILTINMACROS= ['newswing2', 'newswing', 'newslur', 'newstaccato', 'newnote', 'note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm', 'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2', 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff', 'articulation', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'pitchstaircase', 'tempo', 'pitchslider', 'turtlepitch', 'turtlenote', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote', 'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet2', 'fill', 'hollowline', 'note1', 'note2', 'note3', 'note4', 'octave', 'minor', 'major', 'diminished', 'perfect', 'augmented', 'minor2', 'major2', 'diminished1', 'perfect1', 'augmented1', 'minor3', 'major3', 'diminished5', 'perfect4', 'augmented4', 'minor6', 'major6', 'diminished5', 'perfect5', 'augmented5', 'minor7', 'major7', 'diminished8', 'perfect8', 'augmented8', 'steppitch', 'sine', 'triangle', 'square', 'sawtooth', 'setkey2', 'snare', 'hihat', 'kick', 'tom', 'pluck', 'triangle1', 'slap', 'fingercymbals', 'cup', 'cowbell', 'splash', 'ridebell', 'floortom', 'crash', 'chine', 'dog', 'cat', 'clap', 'bubbles', 'cricket', 'duck', 'bottle', 'clang', 'darbuka', 'setdrum', 'playdrum', 'backward', 'status', 'setvoice', 'rhythm2', 'vibrato', 'invert1'];
+        if (protoblk == null) {
+            console.log('null protoblk?');
+            return;
+        }
         switch (protoblk.name) {
         case 'do':
             blkname = 'do ' + protoblk.defaults[0];
