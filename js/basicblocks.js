@@ -1638,6 +1638,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     divideBlock.twoArgMathBlock();
     divideBlock.defaults.push(1, 4)
 
+    var powerBlock = new ProtoBlock('power');
+    powerBlock.palette = palettes.dict['number'];
+    blocks.protoBlockDict['power'] = powerBlock;
+    powerBlock.fontsize = 14;
+    powerBlock.staticLabels.push('^');
+    powerBlock.twoArgMathBlock();
+    powerBlock.defaults.push(2,4)
+
     var multiplyBlock = new ProtoBlock('multiply');
     multiplyBlock.palette = palettes.dict['number'];
     blocks.protoBlockDict['multiply'] = multiplyBlock;
