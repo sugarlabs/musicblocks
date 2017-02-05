@@ -19,7 +19,7 @@ const SERVER = 'https://turtle.sugarlabs.org/server/';
 window.server = SERVER; 'https://turtle.sugarlabs.org/server/'; // '/server/';
 
 //{NAME} will be replaced with project name
-const SHAREURL = 'https://walterbender.github.io/musicblocks/?file={name}&run=True';
+const SHAREURL = 'https://walterbender.github.io/musicblocks/index.html?file={name}&run=True';
 const NAMESUBTEXT = '{name}';
 
 const LOCAL_PROJECT_STYLE ='\

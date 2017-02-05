@@ -3619,7 +3619,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
         }
-
         if (updatePalettes) {
             this.palettes.hide();
             this.palettes.updatePalettes('action');
@@ -3657,8 +3656,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 that.palettes.show();
             }, 1500);
         }
-   };
- 
+        console.log("Finished block loading");
+        var myCustomEvent = new Event('finishedLoading');
+        document.dispatchEvent(myCustomEvent);
+    };
+
     this._cleanupStacks = function() {
         if (this._checkArgClampBlocks.length > 0) {
             // We make multiple passes because we need to account for nesting.
