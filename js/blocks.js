@@ -677,7 +677,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     that.blockList[blk].text.text = label;
                     that.blockList[blk].container.updateCache();
 
-                    console.log(that.blockList[blk].value + ' <-- ' + that.blockList[oldBlock].value);
                     if (that.blockList[blk].value !== that.blockList[oldBlock].value) {
 
                         that.newNameddoBlock(that.blockList[blk].value, that.actionHasReturn(parentblk), that.actionHasArgs(parentblk));
@@ -1039,10 +1038,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     if (this.blockList[newBlock].name === 'action') {
                         actionCheck = true;
 
-                        console.log(myBlock.value + ' <== ' + this.blockList[connection].value);
                         if (myBlock.value !== this.blockList[connection].value) {
 
-                             var name = this.findUniqueActionName(myBlock.value);
+                            // Temporarily disconnect to ensure we don't
+			    // find myBlock when looking for a unique name.
+                            var c = myBlock.connections[0];
+                            myBlock.connections[0] = null;
+                            var name = this.findUniqueActionName(myBlock.value);
+                            myBlock.connections[0] = c;
+
                             if (name !== myBlock.value) {
                                 myBlock.value = name;
                                 var label = name;
