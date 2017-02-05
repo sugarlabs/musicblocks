@@ -1406,6 +1406,7 @@ define(function (require) {
         };
 
         function sendAllToTrash(addStartBlock, doNotSave) {
+            console.log('Caller: ',arguments.callee.caller);
             // First, hide the palettes as they will need updating.
             for (var name in blocks.palettes.dict) {
                 blocks.palettes.dict[name].hideMenu(true);
@@ -1637,7 +1638,7 @@ define(function (require) {
                 console.log("Run");
                 _changeBlockVisibility();
                 _doFastButton(env);
-            }, 1000);
+            }, 5000);
         }
 
         function loadProject(projectName, run, env) {
