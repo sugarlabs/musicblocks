@@ -2782,7 +2782,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                     var nnote = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                     if (noteIsSolfege(note)) {
-                        nnote[0] = getSolfege([nnote[0]]);
+                        nnote[0] = getSolfege(nnote[0]);
                     }
 
                     if (logo.drumStyle[turtle].length > 0) {
@@ -2835,7 +2835,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                     var nnote = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                     if (noteIsSolfege(note)) {
-                        nnote[0] = getSolfege([nnote[0]]);
+                        nnote[0] = getSolfege(nnote[0]);
                     }
 
                     // If we are in a setdrum clamp, override the pitch.

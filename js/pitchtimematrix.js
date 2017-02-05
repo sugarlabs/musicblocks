@@ -10,7 +10,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// FIXME: i18n for graphics blocks
 const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 // Deprecated
@@ -257,8 +256,13 @@ function Matrix() {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 this._noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
-                cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
-                var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
+                if (noteIsSolfege(this.rowLabels[i])) {
+                    cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
+                    var noteObj = this._logo.getNote(cell.innerHTML, -1, 0, this._logo.keySignature[0]);
+                } else {
+                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                    var noteObj = [this.rowLabels[i], this.rowArgs[i]];
+                }
                 this._noteStored.push(noteObj[0] + noteObj[1]);
             }
 
