@@ -1031,10 +1031,11 @@ function i18nSolfege(note) {
 }
 
 function splitSolfege(value) {
+    // Separate the pitch from any attributes, e.g., # or b
     if (value != null) {
         if (SOLFNOTES.indexOf(value) !== -1) {
             var note = value;
-            var attr = '♮';
+            var attr = '';
         } else if (value.slice(0, 3) === 'sol') {
             var note = 'sol';
             if (value.length === 4) {
@@ -1052,7 +1053,7 @@ function splitSolfege(value) {
         }
     } else {
         var note = 'la';
-        var attr = '♮'
+        var attr = ''
     }
 
     return [note, attr];
