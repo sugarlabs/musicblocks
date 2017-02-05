@@ -1406,7 +1406,6 @@ define(function (require) {
         };
 
         function sendAllToTrash(addStartBlock, doNotSave) {
-            console.log('Caller: ',arguments.callee.caller);
             // First, hide the palettes as they will need updating.
             for (var name in blocks.palettes.dict) {
                 blocks.palettes.dict[name].hideMenu(true);
