@@ -1019,9 +1019,11 @@ function i18nSolfege(note) {
     // solfnotes_ is used in the interface for i18n
     //.TRANS: the note names must be separated by single spaces 
     var solfnotes_ = _('ti la sol fa mi re do').split(' ');
-    var i = SOLFNOTES.indexOf(note);
+    var obj = splitSolfege(note);
+
+    var i = SOLFNOTES.indexOf(obj[0]);
     if (i !== -1) {
-        return solfnotes_[i];
+        return solfnotes_[i] + obj[1];
     } else {
         console.log(note + ' not found.');
         return note;
