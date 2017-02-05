@@ -5537,7 +5537,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         return Math.pow(a,b);
     };
     
-
     this._doDivide = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             this.errorMsg(NANERRORMSG);
