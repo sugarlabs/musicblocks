@@ -407,6 +407,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             case 'plus':
             case 'minus':
             case 'multiply':
+            case 'power':
             case 'divide':
                 value = this.blocks.blockList[blk].value;
                 break;
@@ -4955,6 +4956,17 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.blocks.blockList[blk].value = logo._doMultiply(a, b);
                 }
                 break;
+            case 'power':
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push([blk, 'power']);
+                } else {
+                    var cblk1 = logo.blocks.blockList[blk].connections[1];
+                    var cblk2 = logo.blocks.blockList[blk].connections[2];
+                    var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    logo.blocks.blockList[blk].value = logo._doPower(a, b);
+                }
+                break;   
             case 'divide':
                 if (logo.inStatusMatrix) {
                     logo.statusFields.push([blk, 'divide']);
@@ -5523,6 +5535,16 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         return Number(a) * Number(b);
     };
 
+    this._doPower = function(a, b) {
+        if (typeof(a) === 'string' || typeof(b) === 'string') {
+            this.errorMsg(NANERRORMSG);
+            this.stopTurtle = true;
+            return 0;
+        }
+
+        return Math.pow(a,b);
+    };
+    
     this._doDivide = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             this.errorMsg(NANERRORMSG);

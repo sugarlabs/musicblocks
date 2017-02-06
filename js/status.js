@@ -98,6 +98,7 @@ function StatusMatrix() {
             case 'minus':
             case 'neg':
             case 'divide':
+            case 'power':
             case 'multiply':
             case 'sqrt':
             case 'int':

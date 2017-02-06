@@ -141,6 +141,7 @@ const TACAT = {
     'int': 'number',
     'sqrt': 'number',
     'identity': 'number',
+    'power': 'number',
 
     'and': 'boolean',
     'or': 'boolean',
