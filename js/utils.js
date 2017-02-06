@@ -236,12 +236,12 @@ function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict,
 
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
-    //try {
+    try {
         var obj = processPluginData(cleanData.replace(/\n/g,''), palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList);
-    //} catch (e) {
-    //    var obj = null;
-    //    errorMsg('Error loading plugin: ' + e);
-    //}
+    } catch (e) {
+        var obj = null;
+        errorMsg('Error loading plugin: ' + e);
+    }
     return obj;
 };
 

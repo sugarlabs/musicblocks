@@ -789,11 +789,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;
-    voiceBlock.staticLabels.push(_('set voice'));
+    voiceBlock.staticLabels.push(_('set synth'));
     voiceBlock.adjustWidthToLabel();
     voiceBlock.flowClampOneArgBlock();
     voiceBlock.dockTypes[1] = 'textin';
-    voiceBlock.defaults.push(_('sine'));
+    voiceBlock.defaults.push(_('violin'));
 
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];
@@ -1646,7 +1646,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sqrtBlock.staticLabels.push(_('sqrt'));
     sqrtBlock.adjustWidthToLabel();
     sqrtBlock.oneArgMathBlock();
-    sqrtBlock.defaults.push(16)
+    sqrtBlock.defaults.push(64)
 
     var divideBlock = new ProtoBlock('divide');
     divideBlock.palette = palettes.dict['number'];
@@ -1662,7 +1662,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     multiplyBlock.fontsize = 14;
     multiplyBlock.staticLabels.push('×');
     multiplyBlock.twoArgMathBlock();
-    multiplyBlock.defaults.push(1, 1)
+    multiplyBlock.defaults.push(1, 12)
 
     var negBlock = new ProtoBlock('neg');
     negBlock.palette = palettes.dict['number'];
@@ -2074,7 +2074,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['tone'] = toneBlock;
     toneBlock.staticLabels.push(_('tone'),  _('frequency'), _('duration (ms)'));
     toneBlock.adjustWidthToLabel();
-    toneBlock.defaults.push(440, 200);
+    toneBlock.defaults.push(392, 1000 / 3);
     toneBlock.twoArgBlock();
     toneBlock.dockTypes[1] = 'numberin';
     toneBlock.dockTypes[2] = 'numberin';
