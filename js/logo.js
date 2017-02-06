@@ -3912,9 +3912,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             pitchtimematrix.playDirection = -1;
             logo._runFromBlock(logo, turtle, args[0]);
             break;
-        case 'tuplet2':
+        case 'tuplet3':
             if (logo.inMatrix) {
-                logo.tupletParams.push([args[0], args[1] * logo.beatFactor[turtle]]);
+                logo.tupletParams.push([args[0], (1 / args[1]) * logo.beatFactor[turtle]]);
                 logo.tuplet = true;
                 logo.addingNotesToTuplet = false;
             } else {
