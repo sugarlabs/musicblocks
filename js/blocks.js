@@ -650,7 +650,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
  
-    this.addDefaultBlock = function(parentblk, oldBlock) {
+    this.addDefaultBlock = function(parentblk, oldBlock, skipOldBlock) {
         // Add an action name whenever the user removes the name from
         // an action block.
         // Add a Silence block whenever the user removes all the
@@ -680,7 +680,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     if (that.blockList[blk].value !== that.blockList[oldBlock].value) {
 
                         that.newNameddoBlock(that.blockList[blk].value, that.actionHasReturn(parentblk), that.actionHasArgs(parentblk));
-
                         var blockPalette = that.palettes.dict['action'];
                         for (var b = 0; b < blockPalette.protoList.length; b++) {
                             var protoblock = blockPalette.protoList[b];
@@ -698,7 +697,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         }
 
                         that.renameNameddos(that.blockList[oldBlock].value, that.blockList[blk].value);
-                        that.renameDos(that.blockList[oldBlock].value, that.blockList[blk].value);
+                        if (skipOldBlock) {
+                            that.renameDos(that.blockList[oldBlock].value, that.blockList[blk].value, oldBlock);
+                        } else {
+                            that.renameDos(that.blockList[oldBlock].value, that.blockList[blk].value);
+                        }
                     }
 
                     that.adjustDocks(parentblk, true);
@@ -961,6 +964,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 //     current block;
                 // (2) if it is an arg block, replace it; and
                 // (3) if it is a flow block, insert it into the flow.
+                // A few corner cases: Whenever we connect (or disconnect)
+		// from an action block (c[1] arg), we need to ensure we have
+		// a unique action name; Whenever we connect to a newnote
+		// block (c[2] flow), we need to ensure we have either a silence
+		// block or a pitch block.
                 insertAfterDefault = false;
                 if (this.blockList[newBlock].isArgClamp()) {
                     if ((this.blockList[newBlock].name === 'doArg' || this.blockList[newBlock].name === 'calcArg') && newConnection === 1) {
@@ -1086,7 +1094,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
 
                                 that.renameNameddos(that.blockList[connection].value, myBlock.value);
                                 that.renameDos(that.blockList[connection].value, myBlock.value);
-                            }, 500);
+                            }, 750);
                         }
                     }
                 } else {
@@ -1167,7 +1175,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             }
         }
  
-        this.addDefaultBlock(parentblk, thisBlock);
+        this.addDefaultBlock(parentblk, thisBlock, actionCheck);
  
         // Put block adjustments inside a slight delay to make the
         // addition/substraction of vspace and changes of block shape
@@ -2256,7 +2264,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
  
-    this.renameDos = function (oldName, newName) {
+    this.renameDos = function (oldName, newName, skipBlock) {
         if (oldName === newName) {
             return;
         }
@@ -2264,6 +2272,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // Update the blocks, do->oldName should be do->newName
         // Named dos are modified in a separate function below.
         for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (blk === skipBlock) {
+                continue;
+            }
+
             var myBlock = this.blockList[blk];
             var blkParent = this.blockList[myBlock.connections[0]];
             if (blkParent == null) {
@@ -2432,8 +2444,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // Depending upon the form of the associated action block, we
         // want to add a named do, a named calc, a named do w/args, or
         // a named calc w/args.
-        // console.log('NEW DO: ' + name + ' ' + hasReturn + ' ' + hasArgs);
- 
         if (name === _('action')) {
             // 'action' already has its associated palette entries.
             return false;
@@ -2449,16 +2459,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             this.newNamedcalcBlock(name);
             return true;
         } else if (this.protoBlockDict['myDo_' + name] === undefined) {
-            // console.log('creating myDo_' + name);
             var myDoBlock = new ProtoBlock('nameddo');
             this.protoBlockDict['myDo_' + name] = myDoBlock;
             myDoBlock.palette = this.palettes.dict['action'];
-            // console.log('newNamedDo: ' + name);
             myDoBlock.defaults.push(name);
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
-            // console.log('calling palette.add');
             myDoBlock.palette.add(myDoBlock, true);
+            this.palettes.updatePalettes();
             return true;
         }
 
