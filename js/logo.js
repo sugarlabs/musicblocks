@@ -3874,7 +3874,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 } else if (logo.inPitchSlider) {
                     pitchslider.Sliders.push([args[0], 0, 0]);
                 } else {
-                    logo.oscList[turtle].push(blocks.blockList[blk].name);
+                    logo.oscList[turtle].push(logo.blocks.blockList[blk].name);
 
                     // We keep track of pitch and octave for notation purposes.
                     logo.notePitches[turtle].push(obj[0]);
@@ -3912,9 +3912,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             pitchtimematrix.playDirection = -1;
             logo._runFromBlock(logo, turtle, args[0]);
             break;
+        case 'tuplet2':
         case 'tuplet3':
             if (logo.inMatrix) {
-                logo.tupletParams.push([args[0], (1 / args[1]) * logo.beatFactor[turtle]]);
+                if (logo.blocks.blockList[blk].name === 'tuplet3') {
+                    logo.tupletParams.push([args[0], (1 / args[1]) * logo.beatFactor[turtle]]);
+                } else {
+                    logo.tupletParams.push([args[0], args[1] * logo.beatFactor[turtle]]);
+                }
                 logo.tuplet = true;
                 logo.addingNotesToTuplet = false;
             } else {
