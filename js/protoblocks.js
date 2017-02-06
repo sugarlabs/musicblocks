@@ -313,7 +313,7 @@ function ProtoBlock(name) {
         return [artwork, svg.docks];
     };
 
-    // E.g., plus, minus, multiply, divide. These are also expandable.
+    // E.g., plus, minus, multiply, divide, power. These are also expandable.
     this.twoArgMathBlock = function() {
         this.expandable = true;
         this.style = 'arg';
