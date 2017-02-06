@@ -248,6 +248,7 @@ define(function (require) {
 
         var helpContainer = null;
         var helpIdx = 0;
+        var firstrun = true;
 
         pluginsImages = {};
 
@@ -1686,13 +1687,14 @@ define(function (require) {
                 update = true;
             }, 200);
 
-            if (run) {
+            if (run&&firstrun) {
                 if (document.addEventListener) {
                     document.addEventListener('finishedLoading', function(){runProject(env);}, false);
                 } else {
                     document.attachEvent('finishedLoading', function(){runProject(env);});
                 }
             }
+            firstrun = false;
         };
 
         function loadRawProject(data) {
