@@ -347,6 +347,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'triangle1':
         case 'tuplet':
         case 'tuplet2':
+        case 'tuplet3':
         case 'until':
         case 'vibrato':
         case 'while':
@@ -1898,7 +1899,6 @@ function Block(protoblock, blocks, overrideName) {
                 // Ensure new name is unique.
                 var uniqueValue = this.blocks.findUniqueActionName(newValue);
                 if (uniqueValue !== newValue) {
-                    console.log('old name: ' + oldValue + ' new name: ' + newValue + ' unique name: ' + uniqueValue);
                     newValue = uniqueValue;
                     this.value = newValue;
                     var label = this.value.toString();
@@ -1925,7 +1925,6 @@ function Block(protoblock, blocks, overrideName) {
                 this.value = oldValue;
             }
         } else {
-            console.log('assigning new value ' + newValue);
             this.value = newValue;
         }
  
@@ -1974,7 +1973,6 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.renameDos(oldValue, newValue);
  
                 if (oldValue === _('action')) {
-                    console.log('newNameddoBlock: ' + newValue);
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
                 }
@@ -1995,7 +1993,6 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }  
                 if (oldValue === _('action')) {
-                    console.log('newNameddoBlock: ' + newValue);
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
                 }

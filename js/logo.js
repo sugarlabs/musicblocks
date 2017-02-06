@@ -407,6 +407,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             case 'plus':
             case 'minus':
             case 'multiply':
+            case 'power':
             case 'divide':
                 value = this.blocks.blockList[blk].value;
                 break;
@@ -2489,7 +2490,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo.noteCents[turtle].push(cents);
                 if (cents !== 0) {
                     logo.noteHertz[turtle].push(pitchToFrequency(note, octave, cents, logo.keySignature[turtle]));
-		} else {
+                } else {
                     logo.noteHertz[turtle].push(0);
                 }
             }
@@ -2860,7 +2861,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.noteCents[turtle].push(cents);
                     if (cents !== 0) {
                         logo.noteHertz[turtle].push(pitchToFrequency(note, octave, cents, logo.keySignature[turtle]));
-	            } else {
+                    } else {
                         logo.noteHertz[turtle].push(0);
                     }
                 }
@@ -3873,7 +3874,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 } else if (logo.inPitchSlider) {
                     pitchslider.Sliders.push([args[0], 0, 0]);
                 } else {
-                    logo.oscList[turtle].push(blocks.blockList[blk].name);
+                    logo.oscList[turtle].push(logo.blocks.blockList[blk].name);
 
                     // We keep track of pitch and octave for notation purposes.
                     logo.notePitches[turtle].push(obj[0]);
@@ -3881,7 +3882,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.noteCents[turtle].push(obj[2]);
                     if (obj[2] !== 0) {
                         logo.noteHertz[turtle].push(pitchToFrequency(obj[0], obj[1], obj[2], logo.keySignature[turtle]));
-	            } else {
+                    } else {
                         logo.noteHertz[turtle].push(0);
                     }
 
@@ -3912,8 +3913,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo._runFromBlock(logo, turtle, args[0]);
             break;
         case 'tuplet2':
+        case 'tuplet3':
             if (logo.inMatrix) {
-                logo.tupletParams.push([args[0], args[1] * logo.beatFactor[turtle]]);
+                if (logo.blocks.blockList[blk].name === 'tuplet3') {
+                    logo.tupletParams.push([args[0], (1 / args[1]) * logo.beatFactor[turtle]]);
+                } else {
+                    logo.tupletParams.push([args[0], args[1] * logo.beatFactor[turtle]]);
+                }
                 logo.tuplet = true;
                 logo.addingNotesToTuplet = false;
             } else {
@@ -4955,6 +4961,17 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.blocks.blockList[blk].value = logo._doMultiply(a, b);
                 }
                 break;
+            case 'power':
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push([blk, 'power']);
+                } else {
+                    var cblk1 = logo.blocks.blockList[blk].connections[1];
+                    var cblk2 = logo.blocks.blockList[blk].connections[2];
+                    var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    logo.blocks.blockList[blk].value = logo._doPower(a, b);
+                }
+                break;   
             case 'divide':
                 if (logo.inStatusMatrix) {
                     logo.statusFields.push([blk, 'divide']);
@@ -5523,6 +5540,16 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         return Number(a) * Number(b);
     };
 
+    this._doPower = function(a, b) {
+        if (typeof(a) === 'string' || typeof(b) === 'string') {
+            this.errorMsg(NANERRORMSG);
+            this.stopTurtle = true;
+            return 0;
+        }
+
+        return Math.pow(a, b);
+    };
+    
     this._doDivide = function(a, b) {
         if (typeof(a) === 'string' || typeof(b) === 'string') {
             this.errorMsg(NANERRORMSG);

@@ -385,13 +385,23 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tuplet2Block = new ProtoBlock('tuplet2');
     tuplet2Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['tuplet2'] = tuplet2Block;
-    // FIXME: Add extra labels to basicClamp blocks when present.
     tuplet2Block.staticLabels.push(_('tuplet'), _('number of notes'), _('note value'));
     tuplet2Block.extraWidth = 20;
     tuplet2Block.adjustWidthToLabel();
     tuplet2Block.flowClampTwoArgBlock();
     tuplet2Block.defaults.push(1);
     tuplet2Block.defaults.push(4);
+    tuplet2Block.hidden = true;
+
+    var tuplet3Block = new ProtoBlock('tuplet3');
+    tuplet3Block.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['tuplet3'] = tuplet3Block;
+    tuplet3Block.staticLabels.push(_('tuplet'), _('number of notes'), _('note value'));
+    tuplet3Block.extraWidth = 20;
+    tuplet3Block.adjustWidthToLabel();
+    tuplet3Block.flowClampTwoArgBlock();
+    tuplet3Block.defaults.push(1);
+    tuplet3Block.defaults.push(4);
 
     // deprecated
     var rhythm = new ProtoBlock('rhythm');
@@ -667,7 +677,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.staticLabels.push('deprecated ' + _('note value'));
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
-    noteBlock.defaults.push(8);
+    noteBlock.defaults.push(4);
 
     var newnoteBlock = new ProtoBlock('newnote');
     newnoteBlock.palette = palettes.dict['rhythm'];
@@ -675,7 +685,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     newnoteBlock.staticLabels.push(_('note value'));
     newnoteBlock.adjustWidthToLabel();
     newnoteBlock.flowClampOneArgBlock();
-    newnoteBlock.defaults.push(1 / 8);
+    newnoteBlock.defaults.push(1 / 4);
 
     // TONE (ARTICULATION) PALETTE
 
@@ -1622,13 +1632,21 @@ function initBasicProtoBlocks(palettes, blocks) {
     modBlock.twoArgMathBlock();
     modBlock.defaults.push(100, 10)
 
+    var powerBlock = new ProtoBlock('power');
+    powerBlock.palette = palettes.dict['number'];
+    blocks.protoBlockDict['power'] = powerBlock;
+    powerBlock.fontsize = 14;
+    powerBlock.staticLabels.push('^');
+    powerBlock.twoArgMathBlock();
+    powerBlock.defaults.push(2, 4)
+
     var sqrtBlock = new ProtoBlock('sqrt');
     sqrtBlock.palette = palettes.dict['number'];
     blocks.protoBlockDict['sqrt'] = sqrtBlock;
     sqrtBlock.staticLabels.push(_('sqrt'));
     sqrtBlock.adjustWidthToLabel();
     sqrtBlock.oneArgMathBlock();
-    sqrtBlock.defaults.push(100)
+    sqrtBlock.defaults.push(64)
 
     var divideBlock = new ProtoBlock('divide');
     divideBlock.palette = palettes.dict['number'];
@@ -1644,7 +1662,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     multiplyBlock.fontsize = 14;
     multiplyBlock.staticLabels.push('×');
     multiplyBlock.twoArgMathBlock();
-    multiplyBlock.defaults.push(10, 10)
+    multiplyBlock.defaults.push(1, 12)
 
     var negBlock = new ProtoBlock('neg');
     negBlock.palette = palettes.dict['number'];
@@ -1659,7 +1677,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     minusBlock.fontsize = 14;
     minusBlock.staticLabels.push('–');
     minusBlock.twoArgMathBlock();
-    minusBlock.defaults.push(100, 50)
+    minusBlock.defaults.push(8, 4)
 
     var plusBlock = new ProtoBlock('plus');
     plusBlock.palette = palettes.dict['number'];
@@ -1670,7 +1688,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     plusBlock.dockTypes[0] = 'anyout';
     plusBlock.dockTypes[1] = 'anyin';
     plusBlock.dockTypes[2] = 'anyin';
-    plusBlock.defaults.push(100, 100)
+    plusBlock.defaults.push(2, 2)
 
     var oneOfBlock = new ProtoBlock('oneOf');
     oneOfBlock.palette = palettes.dict['number'];
@@ -1689,7 +1707,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     randomBlock.staticLabels.push(_('random'), _('min'), _('max'));
     randomBlock.adjustWidthToLabel();
     randomBlock.twoArgMathBlock();
-    randomBlock.defaults.push(0, 100);
+    randomBlock.defaults.push(0, 12);
 
     var numberBlock = new ProtoBlock('number');
     numberBlock.palette = palettes.dict['number'];
@@ -2056,7 +2074,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['tone'] = toneBlock;
     toneBlock.staticLabels.push(_('tone'),  _('frequency'), _('duration (ms)'));
     toneBlock.adjustWidthToLabel();
-    toneBlock.defaults.push(440, 200);
+    toneBlock.defaults.push(392, 1000 / 3);
     toneBlock.twoArgBlock();
     toneBlock.dockTypes[1] = 'numberin';
     toneBlock.dockTypes[2] = 'numberin';
