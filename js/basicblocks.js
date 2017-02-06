@@ -789,11 +789,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;
-    voiceBlock.staticLabels.push(_('set voice'));
+    voiceBlock.staticLabels.push(_('set synth'));
     voiceBlock.adjustWidthToLabel();
     voiceBlock.flowClampOneArgBlock();
     voiceBlock.dockTypes[1] = 'textin';
-    voiceBlock.defaults.push(_('sine'));
+    voiceBlock.defaults.push(_('violin'));
 
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];
