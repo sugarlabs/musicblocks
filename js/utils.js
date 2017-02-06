@@ -218,7 +218,7 @@ function toTitleCase(str) {
 }
 
 function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
-    console.log(rawData);
+    // console.log(rawData);
     var lineData = rawData.split('\n');
     var cleanData = '';
 
@@ -248,7 +248,7 @@ function processRawPluginData(rawData, palettes, blocks, errorMsg, evalFlowDict,
 
 function processPluginData(pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList) {
     // Plugins are JSON-encoded dictionaries.
-    console.log(pluginData);
+    // console.log(pluginData);
     var obj = JSON.parse(pluginData);
 
     // Create a palette entry.
