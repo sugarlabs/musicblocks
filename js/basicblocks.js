@@ -1636,7 +1636,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sqrtBlock.staticLabels.push(_('sqrt'));
     sqrtBlock.adjustWidthToLabel();
     sqrtBlock.oneArgMathBlock();
-    sqrtBlock.defaults.push(100)
+    sqrtBlock.defaults.push(16)
 
     var divideBlock = new ProtoBlock('divide');
     divideBlock.palette = palettes.dict['number'];
@@ -1652,7 +1652,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     multiplyBlock.fontsize = 14;
     multiplyBlock.staticLabels.push('×');
     multiplyBlock.twoArgMathBlock();
-    multiplyBlock.defaults.push(10, 10)
+    multiplyBlock.defaults.push(1, 1)
 
     var negBlock = new ProtoBlock('neg');
     negBlock.palette = palettes.dict['number'];
@@ -1667,7 +1667,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     minusBlock.fontsize = 14;
     minusBlock.staticLabels.push('–');
     minusBlock.twoArgMathBlock();
-    minusBlock.defaults.push(100, 50)
+    minusBlock.defaults.push(8, 4)
 
     var plusBlock = new ProtoBlock('plus');
     plusBlock.palette = palettes.dict['number'];
@@ -1678,7 +1678,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     plusBlock.dockTypes[0] = 'anyout';
     plusBlock.dockTypes[1] = 'anyin';
     plusBlock.dockTypes[2] = 'anyin';
-    plusBlock.defaults.push(100, 100)
+    plusBlock.defaults.push(2, 2)
 
     var oneOfBlock = new ProtoBlock('oneOf');
     oneOfBlock.palette = palettes.dict['number'];
@@ -1697,7 +1697,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     randomBlock.staticLabels.push(_('random'), _('min'), _('max'));
     randomBlock.adjustWidthToLabel();
     randomBlock.twoArgMathBlock();
-    randomBlock.defaults.push(0, 100);
+    randomBlock.defaults.push(0, 12);
 
     var numberBlock = new ProtoBlock('number');
     numberBlock.palette = palettes.dict['number'];
