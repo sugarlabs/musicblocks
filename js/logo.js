@@ -2490,7 +2490,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo.noteCents[turtle].push(cents);
                 if (cents !== 0) {
                     logo.noteHertz[turtle].push(pitchToFrequency(note, octave, cents, logo.keySignature[turtle]));
-		} else {
+                } else {
                     logo.noteHertz[turtle].push(0);
                 }
             }
@@ -2861,7 +2861,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.noteCents[turtle].push(cents);
                     if (cents !== 0) {
                         logo.noteHertz[turtle].push(pitchToFrequency(note, octave, cents, logo.keySignature[turtle]));
-	            } else {
+                    } else {
                         logo.noteHertz[turtle].push(0);
                     }
                 }
@@ -3882,7 +3882,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.noteCents[turtle].push(obj[2]);
                     if (obj[2] !== 0) {
                         logo.noteHertz[turtle].push(pitchToFrequency(obj[0], obj[1], obj[2], logo.keySignature[turtle]));
-	            } else {
+                    } else {
                         logo.noteHertz[turtle].push(0);
                     }
 
@@ -5542,7 +5542,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             return 0;
         }
 
-        return Math.pow(a,b);
+        return Math.pow(a, b);
     };
     
     this._doDivide = function(a, b) {
