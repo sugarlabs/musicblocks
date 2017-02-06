@@ -385,13 +385,23 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tuplet2Block = new ProtoBlock('tuplet2');
     tuplet2Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['tuplet2'] = tuplet2Block;
-    // FIXME: Add extra labels to basicClamp blocks when present.
     tuplet2Block.staticLabels.push(_('tuplet'), _('number of notes'), _('note value'));
     tuplet2Block.extraWidth = 20;
     tuplet2Block.adjustWidthToLabel();
     tuplet2Block.flowClampTwoArgBlock();
     tuplet2Block.defaults.push(1);
     tuplet2Block.defaults.push(4);
+    tuplet2Block.hidden = true;
+
+    var tuplet3Block = new ProtoBlock('tuplet3');
+    tuplet3Block.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['tuplet3'] = tuplet3Block;
+    tuplet3Block.staticLabels.push(_('tuplet'), _('number of notes'), _('note value'));
+    tuplet3Block.extraWidth = 20;
+    tuplet3Block.adjustWidthToLabel();
+    tuplet3Block.flowClampTwoArgBlock();
+    tuplet3Block.defaults.push(1);
+    tuplet3Block.defaults.push(4);
 
     // deprecated
     var rhythm = new ProtoBlock('rhythm');
@@ -667,7 +677,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.staticLabels.push('deprecated ' + _('note value'));
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
-    noteBlock.defaults.push(8);
+    noteBlock.defaults.push(4);
 
     var newnoteBlock = new ProtoBlock('newnote');
     newnoteBlock.palette = palettes.dict['rhythm'];
@@ -675,7 +685,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     newnoteBlock.staticLabels.push(_('note value'));
     newnoteBlock.adjustWidthToLabel();
     newnoteBlock.flowClampOneArgBlock();
-    newnoteBlock.defaults.push(1 / 8);
+    newnoteBlock.defaults.push(1 / 4);
 
     // TONE (ARTICULATION) PALETTE
 
