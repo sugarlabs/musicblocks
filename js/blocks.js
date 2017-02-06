@@ -965,10 +965,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 // (2) if it is an arg block, replace it; and
                 // (3) if it is a flow block, insert it into the flow.
                 // A few corner cases: Whenever we connect (or disconnect)
-		// from an action block (c[1] arg), we need to ensure we have
-		// a unique action name; Whenever we connect to a newnote
-		// block (c[2] flow), we need to ensure we have either a silence
-		// block or a pitch block.
+                // from an action block (c[1] arg), we need to ensure we have
+                // a unique action name; Whenever we connect to a newnote
+                // block (c[2] flow), we need to ensure we have either a silence
+                // block or a pitch block.
                 insertAfterDefault = false;
                 if (this.blockList[newBlock].isArgClamp()) {
                     if ((this.blockList[newBlock].name === 'doArg' || this.blockList[newBlock].name === 'calcArg') && newConnection === 1) {
@@ -1047,9 +1047,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                         actionCheck = true;
 
                         if (myBlock.value !== this.blockList[connection].value) {
-
                             // Temporarily disconnect to ensure we don't
-			    // find myBlock when looking for a unique name.
+                            // find myBlock when looking for a unique name.
                             var c = myBlock.connections[0];
                             myBlock.connections[0] = null;
                             var name = this.findUniqueActionName(myBlock.value);
