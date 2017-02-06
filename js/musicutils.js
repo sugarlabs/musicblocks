@@ -694,6 +694,7 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
     return (scale[scaleDegree]);
 };
 
+
 function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
     var obj = keySignatureToMode(keySignature);
@@ -724,6 +725,7 @@ function getScaleAndHalfSteps(keySignature) {
 
     return [thisScale, solfege, myKeySignature, obj[1]];
 };
+
 
 // Relative interval (used by the Interval Block) is based on the
 // steps within the current key and mode.
@@ -776,6 +778,7 @@ function getInterval (interval, keySignature, pitch) {
         return j + myOctave * SEMITONES;
     }
 };
+
 
 function calcNoteValueToDisplay(a, b) {
     var noteValue = a / b;
@@ -1005,27 +1008,20 @@ function pitchToNumber(pitch, octave, keySignature) {
 
 
 function noteIsSolfege(note) {
-    var len = note.length;
-    if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
-        var nnote = note.slice(0, len - 2);
-    } else if (['♯', '♭'].indexOf(note[0][1]) !== -1) {
-        var nnote = note.slice(0, len - 1);
+    if (SOLFEGECONVERSIONTABLE[note] == undefined) {
+        return true;
     } else {
-        var nnote = note;
+        return false;
     }
-
-    console.log(nnote);
-    return (SOLFNOTES.indexOf(nnote) !== -1);
-}
+};
 
 
 function getSolfege(note) {
-    if(['♯♯', '♭♭'].indexOf(note[0][1]) !== -1) {
-        return SOLFEGECONVERSIONTABLE[note[0][0]] + note[0][1] + note[0][2];
-    } else if(['♯', '♭'].indexOf(note[0][1]) !== -1) {
-        return SOLFEGECONVERSIONTABLE[note[0][0]] + note[0][1];
+    // FIXME: Use mode-specific conversion.
+    if (noteIsSolfege(note)) {
+        return note;
     } else {
-        return SOLFEGECONVERSIONTABLE[note[0][0]];
+        return SOLFEGECONVERSIONTABLE[note];
     }
 };
 
@@ -1043,7 +1039,8 @@ function i18nSolfege(note) {
         console.log(note + ' not found.');
         return note;
     }
-}
+};
+
 
 function splitSolfege(value) {
     // Separate the pitch from any attributes, e.g., # or b
@@ -1072,7 +1069,7 @@ function splitSolfege(value) {
     }
 
     return [note, attr];
-}
+};
 
 
 function getNumber(notename, octave) {
@@ -1133,7 +1130,7 @@ function isInt(value) {
     return !isNaN(value) && 
     parseInt(Number(value)) == value && 
     !isNaN(parseInt(value, 10));
-}
+};
 
 
 function reducedFraction(a, b) {
