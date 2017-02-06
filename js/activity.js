@@ -1633,6 +1633,7 @@ define(function (require) {
 
         function runProject(env){
             console.log("Running Project from Event");
+            document.removeEventListener("finishedLoading", runProject);
             setTimeout(function () {
                 console.log("Run");
                 _changeBlockVisibility();
