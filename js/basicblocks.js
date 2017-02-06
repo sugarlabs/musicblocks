@@ -222,7 +222,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     invertBlock.adjustWidthToLabel();
     invertBlock.defaults.push('sol');
     invertBlock.defaults.push(4);
-    invertBlock.defaults.push('even');
+    invertBlock.defaults.push(_('even'));
     invertBlock.dockTypes[1] = 'solfegein';
     invertBlock.dockTypes[2] = 'anyin';
     invertBlock.dockTypes[3] = 'anyin';
