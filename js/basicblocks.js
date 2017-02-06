@@ -1646,7 +1646,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sqrtBlock.staticLabels.push(_('sqrt'));
     sqrtBlock.adjustWidthToLabel();
     sqrtBlock.oneArgMathBlock();
-    sqrtBlock.defaults.push(16)
+    sqrtBlock.defaults.push(64)
 
     var divideBlock = new ProtoBlock('divide');
     divideBlock.palette = palettes.dict['number'];
@@ -1662,7 +1662,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     multiplyBlock.fontsize = 14;
     multiplyBlock.staticLabels.push('×');
     multiplyBlock.twoArgMathBlock();
-    multiplyBlock.defaults.push(1, 1)
+    multiplyBlock.defaults.push(1, 12)
 
     var negBlock = new ProtoBlock('neg');
     negBlock.palette = palettes.dict['number'];
@@ -2074,7 +2074,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['tone'] = toneBlock;
     toneBlock.staticLabels.push(_('tone'),  _('frequency'), _('duration (ms)'));
     toneBlock.adjustWidthToLabel();
-    toneBlock.defaults.push(440, 200);
+    toneBlock.defaults.push(392, 1000 / 3);
     toneBlock.twoArgBlock();
     toneBlock.dockTypes[1] = 'numberin';
     toneBlock.dockTypes[2] = 'numberin';
