@@ -1688,22 +1688,14 @@ define(function (require) {
                 update = true;
             }, 200);
 
-<<<<<<< HEAD
             if (run && firstRun) {
-=======
-            if (run&&firstrun) {
->>>>>>> Small bugfixes
                 if (document.addEventListener) {
                     document.addEventListener('finishedLoading', function(){runProject(env);}, false);
                 } else {
                     document.attachEvent('finishedLoading', function(){runProject(env);});
                 }
             }
-<<<<<<< HEAD
             firstRun = false;
-=======
-            firstrun = false;
->>>>>>> Small bugfixes
         };
 
         function loadRawProject(data) {
