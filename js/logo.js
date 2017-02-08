@@ -1074,10 +1074,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
             break;
         case 'nameddo':
-            // FIXME: Add backward support to other instances of 'do'
             var name = logo.blocks.blockList[blk].privateData;
             if (name in logo.actions) {
                 lilypondLineBreak(logo, turtle);
+
                 if (logo.backward[turtle].length > 0) {
                     childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
                     var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
@@ -1136,7 +1136,30 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
             if (name in logo.actions) {
                 lilypondLineBreak(logo, turtle);
-                childFlow = logo.actions[name]
+
+                if (logo.backward[turtle].length > 0) {
+                    childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
+                    var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+                    logo.backward[turtle].push(actionBlk);
+
+                    var listenerName = '_backward_action_' + turtle + '_' + blk;
+
+                    var nextBlock = this.blocks.blockList[actionBlk].connections[2];
+                    if (nextBlock == null) {
+                        logo.backward[turtle].pop();
+                    } else {
+                        logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    }
+
+                    var __listener = function(event) {
+                        logo.backward[turtle].pop();
+                    };
+
+                    logo._setListener(turtle, listenerName, __listener);
+                } else {
+                    childFlow = logo.actions[name]
+                }
+
                 childFlowCount = 1;
             } else{
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
