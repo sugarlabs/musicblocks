@@ -2716,21 +2716,31 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         break;
                     }
                 } else if (typeof(args[0]) === 'number' && logo.blocks.blockList[blk].name == 'scaledegree') {
-                    if (args[0] < 1) {
+                    if (args[0] < 0) {
+                        var neg = true;
+                        args[0] = -args[0];
+                    } else {
+                        var neg = false;
+                    }
+
+                    if (args[0] == 0) {
                         note = '?'; // throws an error
                     } else {
-			// Assumes args[1] > 0. What is the best way to
-                        // handle neg. numbers? Should -1 be the same
-                        // as 7 - one octave? Should we skip 0
-                        // altogether?
-			var obj = keySignatureToMode(logo.keySignature[turtle]);
-			var modeLength = MUSICALMODES[obj[1]].length;
-			var deltaOctave = Math.floor((args[0] - 1) / modeLength);
-			var scaleDegree = Math.floor(args[0] - 1) % modeLength;
-			scaleDegree += 1;
+                        var obj = keySignatureToMode(logo.keySignature[turtle]);
+                        var modeLength = MUSICALMODES[obj[1]].length;
+                        var scaleDegree = Math.floor(args[0] - 1) % modeLength;
+                        scaleDegree += 1;
 
                         note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
-			var octave = Math.floor(args[1]) + deltaOctave;
+                        if (neg) {
+                            // -1, 4 --> do 4; -2, 4 --> ti 3; -8, 4 --> do 3
+                            var deltaOctave = Math.floor((args[0] + modeLength - 2) / modeLength);
+                            var octave = Math.floor(args[1]) - deltaOctave;
+                        } else {
+                            //  1, 4 --> do 4;  2, 4 --> ti 4;  8, 4 --> do 5
+                            var deltaOctave = Math.floor((args[0] - 1) / modeLength);
+                            var octave = Math.floor(args[1]) + deltaOctave;
+                        }
                         var cents = 0;
                     }
 
