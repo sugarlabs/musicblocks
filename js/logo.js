@@ -2689,7 +2689,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     break;
                 }
 
-                if (typeof(args[0]) === 'number') {
+                if (typeof(args[0]) === 'number' && logo.blocks.blockList[blk].name == 'pitch') {
                     // We interpret numbers two different ways:
                     // (1) a positive integer between 1 and 12 is taken to be
                     // a moveable solfege, e.g., 1 == do; 2 == re...
@@ -2708,6 +2708,30 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         var note = obj[0];
                         var octave = obj[1];
                         var cents = obj[2];
+                    }
+
+                    if (note === '?') {
+                        logo.errorMsg(INVALIDPITCH, blk);
+                        logo.stopTurtle = true;
+                        break;
+                    }
+                } else if (typeof(args[0]) === 'number' && logo.blocks.blockList[blk].name == 'scaledegree') {
+                    if (args[0] < 1) {
+                        note = '?'; // throws an error
+                    } else {
+			// Assumes args[1] > 0. What is the best way to
+                        // handle neg. numbers? Should -1 be the same
+                        // as 7 - one octave? Should we skip 0
+                        // altogether?
+			var obj = keySignatureToMode(logo.keySignature[turtle]);
+			var modeLength = MUSICALMODES[obj[1]].length;
+			var deltaOctave = Math.floor((args[0] - 1) / modeLength);
+			var scaleDegree = Math.floor(args[0] - 1) % modeLength;
+			scaleDegree += 1;
+
+                        note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
+			var octave = Math.floor(args[1]) + deltaOctave;
+                        var cents = 0;
                     }
 
                     if (note === '?') {
