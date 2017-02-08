@@ -304,7 +304,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['scaledegree'] = scaleDegree;
     scaleDegree.staticLabels.push(_('scale degree'), _('number'), _('octave'));
     scaleDegree.adjustWidthToLabel();
-    scaleDegree.defaults.push(6); // A in C Major
+    scaleDegree.defaults.push(5); // A in C Major
     scaleDegree.defaults.push(4);
     scaleDegree.twoArgBlock();
     scaleDegree.dockTypes[1] = 'numberin';
