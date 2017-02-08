@@ -573,7 +573,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
  
         this._loopCounter += 1;
-        // FIXME: race condition when rescaling blocks?
         if (this._loopCounter > this.blockList.length * 2) {
             console.log('Infinite loop encountered while adjusting docks: ' + blk + ' ' + this.blockList);
             return;
@@ -1463,9 +1462,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return blk;
         }
  
-        // Test for corrupted connection scenario
-        // FIXME: How does this happen?
-        // FIXME: Should we try to correct it?
+        // Test for corrupted-connection scenario.
         if (myBlock.connections.length > 1 && myBlock.connections[0] != null && myBlock.connections[0] === last(myBlock.connections)) {
             console.log('WARNING: CORRUPTED BLOCK DATA. Block ' + myBlock.name + ' (' + blk + ') is connected to the same block ' + this.blockList[myBlock.connections[0]].name + ' (' + myBlock.connections[0] + ') twice.');
             return blk;
@@ -1602,7 +1599,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     this._searchForExpandables(this.blockList[blk].connections[c]);
                 }
             } else if (this.blockList[blk].isArgClamp()) {
-                // FIXME: We need to do something with ArgClampArg blocks too.
                 this._expandablesList.push(blk);
             }
             blk = last(this.blockList[blk].connections);
