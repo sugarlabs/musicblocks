@@ -120,6 +120,8 @@ function Matrix() {
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
 
+        docById('pitchtimematrix').innerHTML = '';
+
         // Used to remove the matrix table
         Element.prototype.remove = function() {
             this.parentElement.removeChild(this);
