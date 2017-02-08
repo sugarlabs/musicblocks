@@ -1577,7 +1577,7 @@ function Block(protoblock, blocks, overrideName) {
             var obj = splitSolfege(this.value);
             var selectednote = obj[0];
             var selectedattr = obj[1];
- 
+
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
@@ -1594,6 +1594,9 @@ function Block(protoblock, blocks, overrideName) {
             }
  
             labelHTML += '</select>';
+            if (selectedattr === '') {
+                selectedattr = '♮';
+            }
             labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
             for (var i = 0; i < SOLFATTRS.length; i++) {
                 if (selectedattr === SOLFATTRS[i]) {
@@ -1628,6 +1631,9 @@ function Block(protoblock, blocks, overrideName) {
             }
  
             labelHTML += '</select>';
+            if (selectedattr === '') {
+                selectedattr = '♮';
+            }
             labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
             for (var i = 0; i < SOLFATTRS.length; i++) {
                 if (selectedattr === SOLFATTRS[i]) {
@@ -1669,6 +1675,9 @@ function Block(protoblock, blocks, overrideName) {
             }
  
             labelHTML += '</select>';
+            if (selectedattr === '') {
+                selectedattr = '♮';
+            }
             labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
  
             for (var i = 0; i < NOTEATTRS.length; i++) {
