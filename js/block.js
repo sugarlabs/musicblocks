@@ -609,10 +609,10 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'solfege':
                 case 'eastindiansolfege':
-                    this.value = 'la';
+                    this.value = 'sol';
                     break;
                 case 'notename':
-                    this.value = 'A';
+                    this.value = 'G';
                     break;
                 case 'rest':
                     this.value = _('rest');

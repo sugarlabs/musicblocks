@@ -605,7 +605,7 @@ function PaletteModel(palette, palettes, name) {
                 label = 'sargam';
                 break;
             case 'notename':
-                label = 'A';
+                label = 'G';
                 break;
             case 'number':
                 label = NUMBERBLOCKDEFAULT.toString();
