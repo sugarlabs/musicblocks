@@ -1802,15 +1802,12 @@ function Palette(palettes, name) {
             break;
         }
 
-        if(BUILTINMACROS.indexOf(blkname) > -1)
-        {
+        if (protoblk.name !== 'namedbox' && BUILTINMACROS.indexOf(blkname) > -1) {
             moved = true;
             saveX = this.protoContainers[blkname].x;
             saveY = this.protoContainers[blkname].y;
             this._makeBlockFromProtoblock(protoblk, moved, blkname, null, saveX, saveY);
-        }
-        else
-        {
+        } else {
             var newBlock = paletteBlockButtonPush(newBlk, arg);
             callback(newBlock);
         }
@@ -2094,7 +2091,7 @@ function Palette(palettes, name) {
             moved = false;
             this.draggingProtoBlock = false;
 
-            if (blkname in BUILTINMACROS) {
+            if (protoblk.name !== 'namedbox' && blkname in BUILTINMACROS) {
                 paletteBlocks.loadNewBlocks(BUILTINMACROS[blkname]);
                 var thisBlock = paletteBlocks.blockList.length - 1;
                 var topBlk = paletteBlocks.findTopBlock(thisBlock);
