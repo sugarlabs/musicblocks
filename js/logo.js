@@ -4644,7 +4644,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     var len = this.crescendoVolume[turtle].length
                     this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
                     this._setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
-                    // FIXME: Do we need to track crescendoVolume separately?
                     var len2 = this.polyVolume[turtle].length;
                     this.polyVolume[turtle][len2 - 1] = this.crescendoVolume[turtle][len - 1];
                 }

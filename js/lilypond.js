@@ -48,9 +48,6 @@ updateLilypondNotation = function (logo, note, duration, turtle, insideChord) {
 
 
 processLilypondNotes = function (logo, turtle) {
-    // TODO: process all the notes together rather than one at a
-    // time so that you can generate tuplets.
-    
     // obj = [instructions] or
     // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato, tie]
     

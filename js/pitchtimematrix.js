@@ -1153,7 +1153,6 @@ function Matrix() {
 
             var delta = 5;
 
-            // FIXME: Does the undefined case ever occur?
             if (note[0][0] === 'R' || note[0][0] == undefined) {
                 // The last connection in last pitch block is null.
                 var lastConnection = null;
