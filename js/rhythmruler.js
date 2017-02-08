@@ -448,6 +448,12 @@ function RhythmRuler () {
             this.parentElement.removeChild(this);
         };
 
+        this.backspaceListenerAction = function(e) {
+            if (e.keyCode == 8)
+                that._undo();
+        };
+        addEventListener("keydown", this.backspaceListenerAction)
+        
         NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
             for (var i = 0, len = this.length; i < len; i++) {
                 if (this[i] && this[i].parentElement) {
@@ -625,6 +631,7 @@ function RhythmRuler () {
                 }
             }
 
+            removeEventListener('keydown', that.backspaceListenerAction);
             docById('rulerBody').style.visibility = 'hidden';
             docById('drumDiv').style.visibility = 'hidden';
             docById('rulerBody').style.border = 0;
