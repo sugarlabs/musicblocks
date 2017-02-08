@@ -71,7 +71,7 @@ function RhythmRuler () {
         if (this._playing) {
             console.log('You cannot dissect while widget is playing.');
             return;
-	}
+        }
 
         var inputNum = docById('dissectNumber').value;
         if (isNaN(inputNum)) {
@@ -303,8 +303,8 @@ function RhythmRuler () {
         setTimeout(function() {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
-	    // Get the first word of drum's name (ignore the word 'drum' itself)
-	    // and add 'rhythm'.
+            // Get the first word of drum's name (ignore the word 'drum' itself)
+            // and add 'rhythm'.
             var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('rhythm');
             var delta = selectedRuler * 42;
             var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
@@ -576,10 +576,12 @@ function RhythmRuler () {
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        //FIXME: rough workaround for #508, investigate reasons why the backspace press doesn't work by default
+        // FIXME: rough workaround for #508, investigate reasons why
+        // the backspace press doesn't work by default
         var numberInput = docById('dissectNumber');
+        const BACKSPACE = 8;
         numberInput.addEventListener('keydown', function(event) {
-           if (event.keyCode == 8)
+           if (event.keyCode === BACKSPACE)
                numberInput.value = numberInput.value.substring(0, numberInput.value.length-1);
         });
         
