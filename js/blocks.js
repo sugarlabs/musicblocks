@@ -1817,7 +1817,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
  
-            postProcessArg = [thisBlock, 'la'];
+            postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'eastindiansolfege') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1827,7 +1827,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
  
-            postProcessArg = [thisBlock, 'la'];
+            postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'notename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1837,7 +1837,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
  
-            postProcessArg = [thisBlock, 'A'];
+            postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
             postProcess = function (args) {
                 var thisBlock = args[0];
