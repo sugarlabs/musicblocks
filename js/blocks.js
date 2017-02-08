@@ -735,7 +735,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
  
-    this.deleteNextDefault= function(thisBlock) {
+    this.deleteNextDefault = function(thisBlock) {
         // Remove the Silence block from a Note block if another block
         // is inserted above the silence block.
         var thisBlockobj = this.blockList[thisBlock];
@@ -2578,7 +2578,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     // Connection 1 of a note block is not inside the clamp.
                     return null;
                 } else {
-                    return cblk;
+                    if (['newnote', 'osctime'].indexOf(this.blockList[cblk].name) !== -1) {
+                        return cblk;
+                    } else {
+                        return null;
+                    }
                 }
             } else {
                 return this._insideNoteBlock(cblk);
