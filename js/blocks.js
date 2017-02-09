@@ -54,7 +54,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this.selectingStack = false;
     // and what did we select?
     this.selectedStack = null;
- 
+    // and a copy of the selected stack for pasting.
+    this.selectedBlocksObj = null;
+
     // If we somehow have a malformed block database (for example,
     // from importing a corrupted datafile, we need to avoid infinite
     // loops while crawling the block list.
@@ -2595,6 +2597,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // the copy button.
         var topBlock = this.findTopBlock(this.activeBlock);
         this.selectedStack = topBlock;
+
+        // Copy the selectedStack.
+        this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj()));
+
         this.updatePasteButton();
  
         if (myBlock.name === 'action') {
@@ -2623,8 +2629,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             this.palettes.dict[name].hideMenu(true);
         }
  
-        var blockObjs = this._copyBlocksToObj();
-        this.loadNewBlocks(blockObjs);
+        // var blockObjs = this._copyBlocksToObj();
+        // this.loadNewBlocks(blockObjs);
+        console.log(blocks.selectedBlocksObj);
+        this.loadNewBlocks(blocks.selectedBlocksObj);
     };
  
     this.saveStack = function () {
