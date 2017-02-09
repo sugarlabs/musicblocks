@@ -21,6 +21,7 @@ function RhythmRuler () {
     this.Rulers = [];
     // Save the history of divisions so as to be able to restore them.
     this._dissectHistory = [];
+    this._undoList = [];
 
     this._playing = false;
     this._playingOne = false;
@@ -84,16 +85,19 @@ function RhythmRuler () {
 
         var cell = event.target;
         this._rulerSelected = cell.parentNode.id[5];
-        this.__dissect(cell, inputNum);
+        this.__dissect(cell, inputNum, true);
     };
 
-    this.__dissect = function (cell, inputNum) {
+    this.__dissect = function (cell, inputNum, addToUndoList) {
         var that = this;
 
         var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
         var noteValues = this.Rulers[this._rulerSelected][0];
         var divisionHistory = this.Rulers[this._rulerSelected][1];
+        if (addToUndoList) {
+            this._undoList.push(this._rulerSelected);
+        }
 
         divisionHistory.push([newCellIndex, inputNum]);
         ruler.deleteCell(newCellIndex);
@@ -121,13 +125,18 @@ function RhythmRuler () {
     };
 
     this._undo = function() {
-        var divisionHistory = this.Rulers[this._rulerSelected][1];
-        if (divisionHistory.length === 0) {
-            // FIXME: Cycle through other rulers if necessary.
+        if (this._undoList.length === 0) {
             return;
         }
-        var ruler = docById('ruler' + this._rulerSelected);
-        var noteValues = this.Rulers[this._rulerSelected][0];
+
+        var lastRuler = this._undoList.pop();
+
+        var divisionHistory = this.Rulers[lastRuler][1];
+        if (divisionHistory.length === 0) {
+            return;
+        }
+        var ruler = docById('ruler' + lastRuler);
+        var noteValues = this.Rulers[lastRuler][0];
         var inputNum = divisionHistory[divisionHistory.length - 1][1];
         var newCellIndex = divisionHistory[divisionHistory.length - 1][0];
         var cellWidth = ruler.cells[newCellIndex].style.width;
@@ -156,7 +165,7 @@ function RhythmRuler () {
         }
 
         divisionHistory.pop();
-        this._calculateZebraStripes(this._rulerSelected);
+        this._calculateZebraStripes(lastRuler);
     };
 
     this._clear = function() {
@@ -739,7 +748,7 @@ function RhythmRuler () {
 
                     var cell = rulerTable.rows[0].cells[this._dissectHistory[i][0][j][0]];
                     if (cell != undefined) {
-                        this.__dissect(cell, this._dissectHistory[i][0][j][1]);
+                        this.__dissect(cell, this._dissectHistory[i][0][j][1], false);
                     } else {
                         console.log('Could not find cell to divide. Did the order of the rhythm blocks change?');
                     }
