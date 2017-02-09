@@ -226,12 +226,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.svgOutput = '';
     this.svgBackground = true;
 
-    
-
     this.mic = new Tone.UserMedia();
     
-
-
     // Used to pause between each block as the program executes.
     this.setTurtleDelay = function(turtleDelay) {
         this.turtleDelay = turtleDelay;
