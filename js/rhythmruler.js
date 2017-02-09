@@ -431,7 +431,6 @@ function RhythmRuler () {
         this._logo = logo;
 
         docById('rulerBody').style.display = 'inline';
-        console.log('setting RhythmRuler visible');
         docById('rulerBody').style.visibility = 'visible';
         docById('rulerBody').style.border = 2;
 
@@ -443,14 +442,14 @@ function RhythmRuler () {
         this._cellScale = w / 1200;
         var iconSize = Math.floor(this._cellScale * 24);
 
+        docById('rulerBody').innerHTML = '';
+        docById('drumDiv').innerHTML = '';
+
         docById('rulerBody').style.width = Math.floor(w / 2) + 'px';
         docById('rulerBody').style.overflowX = 'auto';
 
         docById('drumDiv').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
         docById('drumDiv').style.overflowX = 'auto';
-
-        docById('rulerBody').innerHTML = '';
-        docById('drumDiv').innerHTML = '';
 
         // Remove the rhythm ruler before adding it again.
         Element.prototype.remove = function() {
@@ -562,6 +561,8 @@ function RhythmRuler () {
         rulerBodyDivPosition = rulerBodyDiv.getBoundingClientRect();
 
         var table = docById('buttonTable');
+        docById('buttonTable').innerHTML = '';
+
         var header = table.createTHead();
         var row = header.insertRow(0);
 
