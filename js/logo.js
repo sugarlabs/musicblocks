@@ -227,7 +227,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.svgBackground = true;
 
     this.mic = new Tone.UserMedia();
-    
+    this.limit = 1024;
+    this.analyser = new Tone.Analyser({
+                        "type" : "waveform",
+                        "size" : this.limit
+                    });
+    this.mic.connect(this.analyser);
+                    
+
     // Used to pause between each block as the program executes.
     this.setTurtleDelay = function(turtleDelay) {
         this.turtleDelay = turtleDelay;
@@ -459,7 +466,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 if (logo.mic == null) {
                     logo.errorMsg(NOMICERRORMSG);
                     value = 0;
-                } else {
+                } else { 
+                    var values = logo.analyser.analyse();
+                    var sum = 0;
+                    for(var k=0; k<logo.limit; k++){
+                            sum += (values[k] * values[k]);
+                    }
+                    var rms = Math.sqrt(sum/logo.limit);
                     value = Math.round(rms * 1000);
                 }
                 break;
@@ -4844,22 +4857,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         } else if (logo.blocks.blockList[blk].isArgBlock() || logo.blocks.blockList[blk].isArgClamp()) {
             switch (logo.blocks.blockList[blk].name) {
             case 'loudness':
-                try {  
-                    var analyser = new Tone.Analyser({
-                        "type" : "waveform",
-                        "size" : 256
-                    });
-
-                    logo.mic.connect(analyser);
-                    var values = analyser.analyse();
+                    var values = logo.analyser.analyse();
                     var sum = 0;
-                    for(var k=0; k<1024; k++){
-                        var m = 0;
-                        m = values[k] * values[k];
-                        sum += m;
+                    for(var k=0; k<logo.limit; k++){
+                            sum += (values[k] * values[k]);
                     }
-                    var rms = Math.sqrt(sum/1024);
-        
+                    var rms = Math.sqrt(sum/logo.limit);
+                try {   
                     if (!logo.mic.open()) {
                         logo.mic.open();
                         logo.blocks.blockList[blk].value = 0;
