@@ -444,7 +444,7 @@ function RhythmRuler () {
 
         var w = window.innerWidth;
         this._cellScale = 1.0; //  w / 1200;
-        var iconSize = Math.floor(this._cellScale * 24);
+        var iconSize = Math.floor(this._cellScale * 32);
 
         // The widget buttons
 	var widgetButtonsDiv = docById('drumDiv');
