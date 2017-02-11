@@ -350,7 +350,7 @@ table {
     left: 30%;
     border-style: solid;
     border: 0 !important;
-    background: rgba(255, 225, 255, 0.85);
+    background: rgba(255, 255, 255, 0.85);
     -webkit-user-select: none;
     overflow-x: scroll !important;
 }
@@ -361,7 +361,7 @@ table {
     left: 20%;
     border-style: solid;
     border: 0 !important;
-    background: rgba(255, 225, 255, 0.85);
+    background: rgba(255, 255, 255, 0.85);
     -webkit-user-select: none;
     overflow-x: scroll !important;
 }
@@ -372,7 +372,7 @@ table {
     left: 20%;
     border-style: solid;
     border: 0 !important;
-    background: rgba(255, 225, 255, 0.85);
+    background: rgba(255, 255, 255, 0.85);
     -webkit-user-select: none;
 }
 
@@ -382,7 +382,7 @@ table {
     left: 30%;
     border-style: solid;
     border: 0 !important;
-    background: rgba(255, 225, 255, 0.85);
+    background: rgba(255, 255, 255, 0.85);
     -webkit-user-select: none;
     overflow-x: scroll !important;
 }
@@ -393,25 +393,52 @@ table {
     left: 200px;
 }
 
-#rulerBody {
+#rulerDiv {
     position: absolute;
     top: 20%;
     left: 30%;
-    border-style: solid;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#rulerBpdy {
+    position: relative;
     border: 0 !important;
-    background: rgba(255, 225, 255, 0.85);
-    -webkit-user-select: none;
-    overflow-x: scroll !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
 }
 
 #drumDiv {
-    position: absolute;
-    top: 20%;
-    left: 26%;
-    border-style: solid;
+    position: relative;
+    width: 400px;
+    left: 0px;
+    top: 0px;
     border: 0 !important;
-    background: rgba(255, 225, 255, 0.85);
-    -webkit-user-select: none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#outerdiv {
+    position: absolute;
+    left: 0px;
+    top: 55px;
+    right: 5em;
+    width: 675px;
+    height: 300px;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#innerdiv {
+    width: 600px;
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
+.headcol {
+    position:absolute;
+    left:2px;
+    top:auto;
+    vertical-align: middle;
 }
 
 #pitchstaircase {
@@ -420,7 +447,7 @@ table {
   left: 30%;
   border-style: solid;
   border: 0 !important;
-  background: rgba(255, 225, 255, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   -webkit-user-select: none;
   overflow-y: scroll !important;
 }
@@ -432,7 +459,7 @@ table {
   left: 25%;
   border-style: solid;
   border: 0 !important;
-  background: rgba(255, 225, 255, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   -webkit-user-select: none;
   overflow-y: scroll !important;
 }
@@ -443,7 +470,7 @@ table {
   left: 30%;
   border-style: solid;
   border: 0 !important;
-  background: rgba(255, 225, 255, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   -webkit-user-select: none;
   overflow-y: scroll !important;
 }
@@ -454,7 +481,7 @@ table {
   left: 30%;
   border-style: solid;
   border: 0 !important;
-  background: rgba(255, 225, 255, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   -webkit-user-select: none;
 }
 
@@ -474,7 +501,7 @@ table {
   left: 20%;
   border-style: solid;
   border: 0 !important;
-  background: rgba(255, 225, 255, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   -webkit-user-select: none;
 }
 

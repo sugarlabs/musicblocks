@@ -14,6 +14,9 @@
 // notes.
 
 
+// drumDiv is for the widget buttons
+// rulerBody is for the drum buttons (fixed first col) and the ruler cells
+
 function RhythmRuler () {
     // There is one ruler per drum.
     this.Drums = [];
@@ -32,12 +35,13 @@ function RhythmRuler () {
     this._elapsedTimes = [];
     // Starting time from which we measure for sync.
     this._startingTime = null;
+
     this._offsets = [];
     this._rulerSelected = 0;
     this._rulerPlaying = -1;
 
     this._noteWidth = function (noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale * 3) + 'px';
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale * 3);
     };
 
     this._calculateZebraStripes = function(rulerno) {
@@ -84,6 +88,7 @@ function RhythmRuler () {
         docById('dissectNumber').value = inputNum;
 
         var cell = event.target;
+	// Does this work if there are more than 10 rulers?
         this._rulerSelected = cell.parentNode.id[5];
         this.__dissect(cell, inputNum, true);
     };
@@ -145,7 +150,7 @@ function RhythmRuler () {
         var newNoteValue = oldCellNoteValue/inputNum;
 
         var newCell = ruler.insertCell(newCellIndex);
-        newCell.style.width = this._noteWidth(newNoteValue);
+        newCell.style.width = this._noteWidth(newNoteValue) + 'px';
         newCell.style.minWidth = newCell.style.width;
         newCell.style.maxWidth = newCell.style.width;
         newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -430,83 +435,33 @@ function RhythmRuler () {
         console.log('init RhythmRuler');
         this._logo = logo;
 
-        docById('rulerBody').style.display = 'inline';
-        docById('rulerBody').style.visibility = 'visible';
-        docById('rulerBody').style.border = 2;
-
-        docById('drumDiv').style.display = 'inline';
-        docById('drumDiv').style.visibility = 'visible';
-        docById('drumDiv').style.border = 2;
-
-        var w = window.innerWidth;
-        this._cellScale = w / 1200;
-        var iconSize = Math.floor(this._cellScale * 24);
-
-        docById('rulerBody').innerHTML = '';
-        docById('drumDiv').innerHTML = '';
-
-        docById('rulerBody').style.width = Math.floor(w / 2) + 'px';
-        docById('rulerBody').style.overflowX = 'auto';
-
-        docById('drumDiv').style.width = Math.max(iconSize, Math.floor(w / 24)) + 'px';
-        docById('drumDiv').style.overflowX = 'auto';
-
-        // Remove the rhythm ruler before adding it again.
-        Element.prototype.remove = function() {
-            this.parentElement.removeChild(this);
-        };
-
-        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-            for (var i = 0, len = this.length; i < len; i++) {
-                if (this[i] && this[i].parentElement) {
-                    this[i].parentElement.removeChild(this[i]);
-                }
-            }
-        };
-
-        var that = this;
-        var table = docById('buttonTable');
-
-        if (table !== null) {
-            table.remove();
-        }
-
-        var table = docById('drum');
-
-        if (table !== null) {
-            table.remove();
-        }
-
         this._elapsedTimes = [];
         this._offsets = [];
         for (var i = 0; i < this.Rulers.length; i++) {
-            var rulertable = docById('rulerTable' + i);
-            var rulerdrum = docById('rulerdrum' + i);
             this._elapsedTimes.push(0);
             this._offsets.push(0);
         }
 
-        // The play all button
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'drum');
-        x.style.textAlign = 'center';
-        x.style.borderCollapse = 'collapse';
-        x.cellSpacing = 0;
-        x.cellPadding = 0;
+        var w = window.innerWidth;
+        this._cellScale = 1.0; //  w / 1200;
+        var iconSize = Math.floor(this._cellScale * 24);
 
-        var drumDiv = docById('drumDiv');
-        drumDiv.style.paddingTop = 0 + 'px';
-        drumDiv.style.paddingLeft = 0 + 'px';
-        drumDiv.appendChild(x);
-        drumDivPosition = drumDiv.getBoundingClientRect();
+        // The widget buttons
+	var widgetButtonsDiv = docById('drumDiv');
+        widgetButtonsDiv.style.display = 'inline';
+        widgetButtonsDiv.style.visibility = 'visible';
+        widgetButtonsDiv.style.border = 0;
+        widgetButtonsDiv.innerHTML = '<table id="widgetButtonTable"></table>';
 
-        var table = docById('drum');
-        var row = table.insertRow(0);
-        row.setAttribute('id', 'playalldrums');
-        row.style.left = Math.floor(drumDivPosition.left) + 'px';
-        row.style.top = Math.floor(drumDivPosition.top) + 'px';
+        var buttonTable = docById('widgetButtonTable');
+        buttonTable.width = '400px';
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
 
-        var cell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play all'));
+        // For the button callbacks
+        var that = this;
+
+        var cell = this._addButton(row, 'play-button.svg', iconSize, _('play all'));
 
         cell.onclick=function() {
             if (that._playing) {
@@ -540,44 +495,18 @@ function RhythmRuler () {
             }
         };
 
-        // Add rows for drum play buttons.
-        for (var i = 0; i < this.Rulers.length; i++) {
-            var row = table.insertRow(i + 1);
-            row.setAttribute('id', 'drum' + i);
-        }
-
-        // Add tool buttons to top row
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'buttonTable');
-        x.style.textAlign = 'center';
-        x.style.borderCollapse = 'collapse';
-        x.cellSpacing = 0;
-        x.cellPadding = 0;
-
-        var rulerBodyDiv = docById('rulerBody');
-        rulerBodyDiv.style.paddingTop = 0 + 'px';
-        rulerBodyDiv.style.paddingLeft = 0 + 'px';
-        rulerBodyDiv.appendChild(x);
-        rulerBodyDivPosition = rulerBodyDiv.getBoundingClientRect();
-
-        var table = docById('buttonTable');
-        docById('buttonTable').innerHTML = '';
-
-        var header = table.createTHead();
-        var row = header.insertRow(0);
-
-        var cell = this._addButton(row, -1, 'export-chunk.svg', iconSize, _('save rhythms'));
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'));
         cell.onclick=function() {
             that._save(0);
         };
 
-        var cell = this._addButton(row, 1, 'export-drums.svg', iconSize, _('save drum machine'));
+        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'));
         cell.onclick=function() {
             that._saveDrumMachine(0);
         };
 
         // An input for setting the dissect number
-        var cell = row.insertCell(2);
+        var cell = row.insertCell();
         cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dussectNumber" value="' + 2 + '" />';
         cell.style.top = 0;
         cell.style.left = 0;
@@ -595,17 +524,18 @@ function RhythmRuler () {
                numberInput.value = numberInput.value.substring(0, numberInput.value.length-1);
         });
         
-        var cell = this._addButton(row, 3, 'restore-button.svg', iconSize, _('undo'));
+        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'));
         cell.onclick=function() {
             that._undo();
         };
 
-        var cell = this._addButton(row, 4, 'erase-button.svg', iconSize, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'));
         cell.onclick=function() {
             that._clear();
         };
 
-        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
+
         cell.onclick=function() {
             // Save the new dissect history.
             var dissectHistory = [];
@@ -632,104 +562,120 @@ function RhythmRuler () {
 
             that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
 
-            for (var i = 0; i < that.Rulers.length; i++) {
-                var rulertable = docById('rulerTable' + i);
-                var rulerdrum = docById('rulerdrum' + i);
-                if (rulertable !== null) {
-                    rulertable.remove();
-                }
-                if (rulerdrum !== null) {
-                    rulerdrum.remove();
-                }
-            }
+            rulerTableDiv.style.visibility = 'hidden';
+            widgetButtonsDiv.style.visibility = 'hidden';
+            docById('rulerDiv').style.visibility = 'hidden';
 
-            docById('rulerBody').style.visibility = 'hidden';
-            docById('drumDiv').style.visibility = 'hidden';
-            docById('rulerBody').style.border = 0;
-            docById('drumDiv').style.border = 0;
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
         };
 
-        // Create a play button for each ruler
-        var table = docById('drum');
+        // The ruler table
+	var rulerTableDiv = docById('rulerBody');
+        rulerTableDiv.style.display = 'inline';
+        rulerTableDiv.style.visibility = 'visible';
+        rulerTableDiv.style.border = '2px';
+        rulerTableDiv.innerHTML = '';
+        // rulerTableDiv.style.width = Math.floor(w / 2) + 'px';
+	
+	// We use an outerdiv to scroll vertically and an innerdiv to
+	// scroll horizontally.
+        rulerTableDiv.innerHTML = '<div id="outerdiv"><div id="innerdiv"><table id="rhythmRulerTable"></table></div></div>';
+        // rulerTableDiv.style.background = "rgba(255, 255, 255, 0.85)";
+
+        // Each row in the ruler table contains a play button in the
+        // first column and a ruler table in the second column.
+        var rhythmRulerTable = docById('rhythmRulerTable');
         for (var i = 0; i < this.Rulers.length; i++) {
-            var row = table.rows[i + 1];
-            var drumcell = this._addButton(row, -1, 'play-button.svg', iconSize, _('play'));
+            var rhythmRulerTableRow = rhythmRulerTable.insertRow();
+            var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('play'));
+            drumcell.setAttribute('id', i);
+            drumcell.className = "headcol";  // Position fixed when scrolling horizontally
+
             drumcell.onclick=function() {
+                var id = Number(this.getAttribute('id'));
                 if (that._playing) {
-                    if (this.parentNode.id[4] === that._rulerPlaying) {
+                    if (that._rulerPlaying === id) {
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._playing = false;
                         that._playingOne = false;
                         that._playingAll = false;
                         that._rulerPlaying = -1;
                         that._startingTime = null;
-                        that._offsets[i] = 0;
-                        that._elapsedTimes[i] = 0;
-                        setTimeout(that._calculateZebraStripes(this.parentNode.id[4]),1000);
+                        that._offsets[id] = 0;
+                        that._elapsedTimes[id] = 0;
+                        setTimeout(that._calculateZebraStripes(id), 1000);
                     }
                 }
                 else {
                     if (that._playingOne === false) {
-                        that._rulerSelected = this.parentNode.id[4];
+                        that._rulerSelected = id;
                         that._logo.setTurtleDelay(0);
                         that._playing = true;
                         that._playingOne = true;
                         that._playingAll = false;
                         that._cellCounter = 0;
                         that._startingTime = null;
-                        that._rulerPlaying = this.parentNode.id[4];
+                        that._rulerPlaying = id;
                         this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                        that._elapsedTimes[i] = 0;
+                        that._elapsedTimes[id] = 0;
                         that._playOne();
                     }
                 }
             };
 
+            var rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
-            var rulerTable = document.createElement('TABLE');
-            rulerTable.setAttribute('id', 'rulerTable' + i);
-            rulerTable.style.textAlign = 'center';
-            rulerTable.style.borderCollapse = 'collapse';
-            rulerTable.cellSpacing = 0;
-            rulerTable.cellPadding = 0;
-            rulerBodyDiv.appendChild(rulerTable);
+            rulerCell.innerHTML = '<table id="rulerCellTable' + i + '"></table>';
 
-            var row = rulerTable.insertRow(-1);
-            row.style.left = Math.floor(rulerBodyDivPosition.left) + 'px';
-            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            row.setAttribute('id', 'ruler' + i);
-            for (var j = 0; j < that.Rulers[i][0].length; j++) {
-                var noteValue = that.Rulers[i][0][j];
-                var rulercell = row.insertCell(j);
-                rulercell.innerHTML = calcNoteValueToDisplay(noteValue, 1);
-                rulercell.style.width = that._noteWidth(noteValue);
-                rulercell.minWidth = rulercell.style.width;
-                rulercell.maxWidth = rulercell.style.width;
-                rulercell.style.lineHeight = 60 + ' % ';
+	    var rulerCellTable = docById('rulerCellTable' + i);
+            rulerCellTable.style.textAlign = 'center';
+            rulerCellTable.style.border = '0px';
+            rulerCellTable.style.borderCollapse = 'collapse';
+            rulerCellTable.cellSpacing = '0px';
+            rulerCellTable.cellPadding = '0px';
+            var rulerRow = rulerCellTable.insertRow();
+            rulerRow.setAttribute('id', 'ruler' + i);
+            for (var j = 0; j < this.Rulers[i][0].length; j++) {
+                var noteValue = this.Rulers[i][0][j];
+                var rulerSubCell = rulerRow.insertCell(-1);
+                rulerSubCell.innerHTML = calcNoteValueToDisplay(noteValue, 1);
+                rulerSubCell.style.width = this._noteWidth(noteValue) + 'px';
+                rulerSubCell.minWidth = rulerSubCell.style.width;
+                rulerSubCell.maxWidth = rulerSubCell.style.width;
+                rulerSubCell.style.border = '0px';
+                rulerSubCell.border = '0px';
+                rulerSubCell.padding = '0px';
+                rulerSubCell.style.padding = '0px';
+                rulerSubCell.style.lineHeight = 60 + ' % ';
                 if (i % 2 === 0) {
                     if (j % 2 === 0) {
-                        rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     } else {
-                        rulercell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                     }
                 } else {
                     if (j % 2 === 0) {
-                        rulercell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                     } else {
-                        rulercell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     }
                 }
 
-                rulercell.addEventListener('click', function(event) {
+                rulerSubCell.addEventListener('click', function(event) {
                     that._dissectRuler(event);
                 });
             }
 
             // Match the play button height to the ruler height.
-            table.rows[i + 1].cells[0].style.height = row.offsetHeight + 'px';
+            rhythmRulerTableRow.cells[0].style.width = '51px';
+            rhythmRulerTableRow.cells[0].style.minWidth = '51px';
+            rhythmRulerTableRow.cells[0].style.maxWidth = '51px';
+            rhythmRulerTableRow.cells[0].style.height = rulerRow.offsetHeight + 'px';
+            rhythmRulerTableRow.cells[0].style.minHeight = rulerRow.offsetHeight + 'px';
+            rhythmRulerTableRow.cells[0].style.maxHeight = rulerRow.offsetHeight + 'px';
+            rhythmRulerTableRow.cells[0].style.verticalAlign = 'middle';
         }
 
         // Restore dissect history.
@@ -739,7 +685,7 @@ function RhythmRuler () {
                     continue;
                 }
 
-                var rulerTable = docById('rulerTable' + drum);
+                var rhythmRulerTableRow = docById('ruler' + drum);
                 for (var j = 0; j < this._dissectHistory[i][0].length; j++) {
                     if (this._dissectHistory[i][0][j] == undefined) {
                         continue;
@@ -747,7 +693,7 @@ function RhythmRuler () {
 
                     this._rulerSelected = drum;
 
-                    var cell = rulerTable.rows[0].cells[this._dissectHistory[i][0][j][0]];
+                    var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
                     if (cell != undefined) {
                         this.__dissect(cell, this._dissectHistory[i][0][j][1], false);
                     } else {
@@ -758,13 +704,15 @@ function RhythmRuler () {
         }
     };
 
-    this._addButton = function(row, colIndex, icon, iconSize, label) {
-        var cell = row.insertCell();
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" -webkit-vertical-align="middle" vertical-align="middle" -webkit-align-content="center" align-content="center">&nbsp;&nbsp;';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.height = cell.style.width; 
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         cell.onmouseover=function() {
