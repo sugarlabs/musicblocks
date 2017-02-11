@@ -34,7 +34,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this._animationInterval = null;
     this._highlightPower = 255;
     this._animationLevel = 0;
-    this.animationTime = 1000;
+    this.animationTime = 150;
 
     this._makeBorderHighlight = function(isRed = false) {
         var img = new Image();
