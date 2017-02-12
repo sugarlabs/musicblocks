@@ -120,14 +120,19 @@ function RhythmRuler () {
         var tempwidth = this._noteWidth(newNoteValue);
         var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
         var difference = parseFloat(this._noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
-        var newCellWidth = parseFloat(this._noteWidth(newNoteValue)) + parseFloat(difference) / inputNum + 'px';
+        var newCellWidth = parseFloat(this._noteWidth(newNoteValue)) + parseFloat(difference) / inputNum;
         noteValues.splice(newCellIndex, 1);
 
         for (var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
             noteValues.splice(newCellIndex + i, 0, newNoteValue);
-            newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
-            newCell.style.width = newCellWidth;
+            if (newCellWidth > 10) {
+                newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
+            } else {
+                newCell.innerHTML = '';
+            }
+
+            newCell.style.width = newCellWidth + 'px';
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
             newCell.addEventListener('click', function(event) {
