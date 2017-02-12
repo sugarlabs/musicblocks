@@ -14,8 +14,8 @@
 // notes.
 
 
-// drumDiv is for the widget buttons
-// rulerBody is for the drum buttons (fixed first col) and the ruler cells
+// rulerButtonsDiv is for the widget buttons
+// rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
 function RhythmRuler () {
     // There is one ruler per drum.
@@ -224,7 +224,7 @@ function RhythmRuler () {
     };
 
     this.__loop = function(noteTime, notesCounter, rulerNo, colIndex) {
-        if (docById('rulerBody').style.visibility === 'hidden' || docById('drumDiv').style.visibility === 'hidden') {
+        if (docById('rulerDiv').style.visibility === 'hidden' || docById('rulerButtonsDiv').style.visibility === 'hidden' || docById('rulerTableDiv').style.visibility === 'hidden') {
             return;
         }
 
@@ -447,7 +447,7 @@ function RhythmRuler () {
         var iconSize = Math.floor(this._cellScale * 32);
 
         // The widget buttons
-	var widgetButtonsDiv = docById('drumDiv');
+	var widgetButtonsDiv = docById('rulerButtonsDiv');
         widgetButtonsDiv.style.display = 'inline';
         widgetButtonsDiv.style.visibility = 'visible';
         widgetButtonsDiv.style.border = 0;
@@ -572,17 +572,15 @@ function RhythmRuler () {
         };
 
         // The ruler table
-	var rulerTableDiv = docById('rulerBody');
+	var rulerTableDiv = docById('rulerTableDiv');
         rulerTableDiv.style.display = 'inline';
         rulerTableDiv.style.visibility = 'visible';
         rulerTableDiv.style.border = '2px';
         rulerTableDiv.innerHTML = '';
-        // rulerTableDiv.style.width = Math.floor(w / 2) + 'px';
 	
 	// We use an outerdiv to scroll vertically and an innerdiv to
 	// scroll horizontally.
         rulerTableDiv.innerHTML = '<div id="outerdiv"><div id="innerdiv"><table id="rhythmRulerTable"></table></div></div>';
-        // rulerTableDiv.style.background = "rgba(255, 255, 255, 0.85)";
 
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.

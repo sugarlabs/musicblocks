@@ -400,14 +400,14 @@ table {
     background: rgba(255, 255, 255, 0.85) !important;
 }
 
-#rulerBpdy {
+#rulerTableDiv {
     position: relative;
     border: 0 !important;
     background: rgba(255, 255, 255, 0.85) !important;
     width: 680px;
 }
 
-#drumDiv {
+#rulerButtonsDiv {
     position: relative;
     width: 400px;
     left: 0px;
