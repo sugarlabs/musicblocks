@@ -2752,15 +2752,17 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         var obj = keySignatureToMode(logo.keySignature[turtle]);
                         var modeLength = MUSICALMODES[obj[1]].length;
                         var scaleDegree = Math.floor(args[0] - 1) % modeLength;
-                        scaleDegree += 1;
 
-                        note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
                         if (neg) {
                             // -1, 4 --> do 4; -2, 4 --> ti 3; -8, 4 --> do 3
+                            scaleDegree = modeLength - scaleDegree + 1;
+                            note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
                             var deltaOctave = Math.floor((args[0] + modeLength - 2) / modeLength);
                             var octave = Math.floor(args[1]) - deltaOctave;
                         } else {
-                            //  1, 4 --> do 4;  2, 4 --> ti 4;  8, 4 --> do 5
+                            //  1, 4 --> do 4;  2, 4 --> re 4;  8, 4 --> do 5
+                            scaleDegree += 1;
+                            note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
                             var deltaOctave = Math.floor((args[0] - 1) / modeLength);
                             var octave = Math.floor(args[1]) + deltaOctave;
                         }
