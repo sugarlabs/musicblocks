@@ -226,15 +226,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.svgOutput = '';
     this.svgBackground = true;
 
-    /*
-    try {
-        this.mic = new p5.AudioIn()
-    } catch (e) {
-        console.log(NOMICERRORMSG);
-        this.mic = null;
-    }
-    */
-    this.mic = null;
+    this.mic = new Tone.UserMedia();
+    this.limit = 1024;
+    this.analyser = new Tone.Analyser({
+                        "type" : "waveform",
+                        "size" : this.limit
+                    });
+    this.mic.connect(this.analyser);
+                    
 
     // Used to pause between each block as the program executes.
     this.setTurtleDelay = function(turtleDelay) {
@@ -467,8 +466,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 if (logo.mic == null) {
                     logo.errorMsg(NOMICERRORMSG);
                     value = 0;
-                } else {
-                    value = Math.round(logo.mic.getLevel() * 1000);
+                } else { 
+                    var values = logo.analyser.analyse();
+                    var sum = 0;
+                    for(var k=0; k<logo.limit; k++){
+                            sum += (values[k] * values[k]);
+                    }
+                    var rms = Math.sqrt(sum/logo.limit);
+                    value = Math.round(rms * 1000);
                 }
                 break;
             case 'consonantstepsizeup':
@@ -4853,17 +4858,23 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         } else if (logo.blocks.blockList[blk].isArgBlock() || logo.blocks.blockList[blk].isArgClamp()) {
             switch (logo.blocks.blockList[blk].name) {
             case 'loudness':
-                try {  // DEBUGGING P5 MIC
-                    if (!logo.mic.enabled) {
-                        logo.mic.start();
+                    var values = logo.analyser.analyse();
+                    var sum = 0;
+                    for(var k=0; k<logo.limit; k++){
+                            sum += (values[k] * values[k]);
+                    }
+                    var rms = Math.sqrt(sum/logo.limit);
+                try {   
+                    if (!logo.mic.open()) {
+                        logo.mic.open();
                         logo.blocks.blockList[blk].value = 0;
                     } else {
-                        logo.blocks.blockList[blk].value = Math.round(logo.mic.getLevel() * 1000);
+                        logo.blocks.blockList[blk].value = Math.round(rms * 1000);
                     }
                 } catch (e) {  // MORE DEBUGGING
                     console.log(e);
-                    logo.mic.start();
-                    logo.blocks.blockList[blk].value = Math.round(logo.mic.getLevel() * 1000);
+                    logo.mic.open();
+                    logo.blocks.blockList[blk].value = Math.round(rms * 1000);
                 }
                 break;
             case 'eval':
