@@ -371,7 +371,7 @@ The *Interval* block calculates a relative interval, e.g., a fifth,
 and adds the additional pitches to a note's playback. In the figure,
 we add `La` to `Re` and `Ti` to `Mi`.
 
-The *Set Relative Voice Volume* block modifies the clamped note's volume by the input value to the block in an added (or subtracted when negative) percentage, relative to the original volume of the note.
+The *Set Relative Voice Volume* block modifies the clamped note's volume according to the input value of the block in an added (or subtracted when negative) percentage with respect to the original volume.For example,100 would mean doubling the current volume.
 
 <a name= "ABSOLUTE-INTERVALS">
 #### 3.2.10 Absolute Intervals
