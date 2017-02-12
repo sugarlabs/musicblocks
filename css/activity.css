@@ -411,7 +411,6 @@ table {
 
 #rulerButtonsDiv {
     position: relative;
-    width: 456px;
     left: 0px;
     top: 0px;
     border: 0 !important;
@@ -423,15 +422,12 @@ table {
     left: 0px;
     top: 0px;
     right: 5em;
-    width: 675px;
-    height: 300px;
     overflow-y:auto;
     overflow-x:none;
     background: rgba(255, 255, 255, 0.85);
 }
 
 #innerdiv {
-    width: 600px;
     overflow-x:auto;
     margin-left: 53px;
 }

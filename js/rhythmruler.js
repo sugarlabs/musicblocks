@@ -18,6 +18,14 @@
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
 function RhythmRuler () {
+    const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
+    const OUTERWINDOWWIDTH = 675;
+    const INNERWINDOWWIDTH = 600;
+    const RULERHEIGHT = 82;  // A little extra than we need for FF.
+    const BUTTONSIZE = 51;
+    const ICONSIZE = 32;
+    const BACKSPACE = 8;
+
     // There is one ruler per drum.
     this.Drums = [];
     // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
@@ -41,7 +49,7 @@ function RhythmRuler () {
     this._rulerPlaying = -1;
 
     this._noteWidth = function (noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale * 3);
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * 3);
     };
 
     this._calculateZebraStripes = function(rulerno) {
@@ -443,25 +451,25 @@ function RhythmRuler () {
         }
 
         var w = window.innerWidth;
-        this._cellScale = 1.0; //  w / 1200;
-        var iconSize = Math.floor(this._cellScale * 32);
+        this._cellScale = 1.0;
+        var iconSize = ICONSIZE;
 
         // The widget buttons
 	var widgetButtonsDiv = docById('rulerButtonsDiv');
         widgetButtonsDiv.style.display = 'inline';
         widgetButtonsDiv.style.visibility = 'visible';
-        // widgetButtonsDiv.style.border = 0;
+        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
         widgetButtonsDiv.innerHTML = '<table id="widgetButtonTable"></table>';
 
         var buttonTable = docById('widgetButtonTable');
-        // buttonTable.width = '456px';
+        // buttonTable.style.
         var header = buttonTable.createTHead();
         var row = header.insertRow(0);
 
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', iconSize, _('play all'));
+        var cell = this._addButton(row, 'play-button.svg', iconSize, _('play all'), '');
 
         cell.onclick=function() {
             if (that._playing) {
@@ -495,12 +503,12 @@ function RhythmRuler () {
             }
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'));
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
         cell.onclick=function() {
             that._save(0);
         };
 
-        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'));
+        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'), '');
         cell.onclick=function() {
             that._saveDrumMachine(0);
         };
@@ -510,32 +518,31 @@ function RhythmRuler () {
         cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dussectNumber" value="' + 2 + '" />';
         cell.style.top = 0;
         cell.style.left = 0;
-        cell.style.width = "51px"; // Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         // FIXME: rough workaround for #508, investigate reasons why
         // the backspace press doesn't work by default
         var numberInput = docById('dissectNumber');
-        const BACKSPACE = 8;
         numberInput.addEventListener('keydown', function(event) {
             console.log(event.keyCode);
            if (event.keyCode === BACKSPACE)
                numberInput.value = numberInput.value.substring(0, numberInput.value.length-1);
         });
 
-        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'));
+        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'), '');
         cell.onclick=function() {
             that._undo();
         };
 
-        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
         cell.onclick=function() {
             that._clear();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'), '');
 
         cell.onclick=function() {
             // Save the new dissect history.
@@ -572,7 +579,7 @@ function RhythmRuler () {
             that._playingAll = false;
         };
 
-        var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'));
+        var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
 
         // The ruler table
 	var rulerTableDiv = docById('rulerTableDiv');
@@ -585,12 +592,26 @@ function RhythmRuler () {
 	// scroll horizontally.
         rulerTableDiv.innerHTML = '<div id="outerdiv"><div id="innerdiv"><table id="rhythmRulerTable"></table></div></div>';
 
+        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 2);
+        if (this.Rulers.length > n) {
+            docById('outerdiv').style.height = 82 * n + 'px';
+            var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
+            docById('outerdiv').style.width = w + 'px';
+        } else {
+            docById('outerdiv').style.height = 82 * this.Rulers.length + 'px';
+            var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
+            docById('outerdiv').style.width = w + 'px';
+        }
+
+        var w = Math.max(Math.min(window.innerWidth, INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
+	docById('innerdiv').style.width = w + 'px';
+
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.
         var rhythmRulerTable = docById('rhythmRulerTable');
         for (var i = 0; i < this.Rulers.length; i++) {
             var rhythmRulerTableRow = rhythmRulerTable.insertRow();
-            var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('play'));
+            var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('play'), '<br>');
             drumcell.setAttribute('id', i);
             drumcell.className = "headcol";  // Position fixed when scrolling horizontally
 
@@ -598,7 +619,7 @@ function RhythmRuler () {
                 var id = Number(this.getAttribute('id'));
                 if (that._playing) {
                     if (that._rulerPlaying === id) {
-                        this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._playing = false;
                         that._playingOne = false;
                         that._playingAll = false;
@@ -619,7 +640,7 @@ function RhythmRuler () {
                         that._cellCounter = 0;
                         that._startingTime = null;
                         that._rulerPlaying = id;
-                        this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._elapsedTimes[id] = 0;
                         that._playOne();
                     }
@@ -670,9 +691,9 @@ function RhythmRuler () {
             }
 
             // Match the play button height to the ruler height.
-            rhythmRulerTableRow.cells[0].style.width = '51px';
-            rhythmRulerTableRow.cells[0].style.minWidth = '51px';
-            rhythmRulerTableRow.cells[0].style.maxWidth = '51px';
+            rhythmRulerTableRow.cells[0].style.width = BUTTONSIZE + 'px';
+            rhythmRulerTableRow.cells[0].style.minWidth = BUTTONSIZE + 'px';
+            rhythmRulerTableRow.cells[0].style.maxWidth = BUTTONSIZE + 'px';
             rhythmRulerTableRow.cells[0].style.height = rulerRow.offsetHeight + 'px';
             rhythmRulerTableRow.cells[0].style.minHeight = rulerRow.offsetHeight + 'px';
             rhythmRulerTableRow.cells[0].style.maxHeight = rulerRow.offsetHeight + 'px';
@@ -705,10 +726,10 @@ function RhythmRuler () {
         }
     };
 
-    this._addButton = function(row, icon, iconSize, label) {
+    this._addButton = function(row, icon, iconSize, label, extras) {
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = "51px";  // Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.innerHTML = extras + '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width; 
