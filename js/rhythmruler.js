@@ -96,7 +96,7 @@ function RhythmRuler () {
         docById('dissectNumber').value = inputNum;
 
         var cell = event.target;
-	// Does this work if there are more than 10 rulers?
+        // Does this work if there are more than 10 rulers?
         this._rulerSelected = cell.parentNode.id[5];
         this.__dissect(cell, inputNum, true);
     };
@@ -455,7 +455,7 @@ function RhythmRuler () {
         var iconSize = ICONSIZE;
 
         // The widget buttons
-	var widgetButtonsDiv = docById('rulerButtonsDiv');
+        var widgetButtonsDiv = docById('rulerButtonsDiv');
         widgetButtonsDiv.style.display = 'inline';
         widgetButtonsDiv.style.visibility = 'visible';
         widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
@@ -527,7 +527,6 @@ function RhythmRuler () {
         // the backspace press doesn't work by default
         var numberInput = docById('dissectNumber');
         numberInput.addEventListener('keydown', function(event) {
-            console.log(event.keyCode);
            if (event.keyCode === BACKSPACE)
                numberInput.value = numberInput.value.substring(0, numberInput.value.length-1);
         });
@@ -582,14 +581,14 @@ function RhythmRuler () {
         var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
 
         // The ruler table
-	var rulerTableDiv = docById('rulerTableDiv');
+        var rulerTableDiv = docById('rulerTableDiv');
         rulerTableDiv.style.display = 'inline';
         rulerTableDiv.style.visibility = 'visible';
         rulerTableDiv.style.border = '2px';
         rulerTableDiv.innerHTML = '';
-	
-	// We use an outerdiv to scroll vertically and an innerdiv to
-	// scroll horizontally.
+        
+        // We use an outerdiv to scroll vertically and an innerdiv to
+        // scroll horizontally.
         rulerTableDiv.innerHTML = '<div id="outerdiv"><div id="innerdiv"><table id="rhythmRulerTable"></table></div></div>';
 
         var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 2);
@@ -604,7 +603,7 @@ function RhythmRuler () {
         }
 
         var w = Math.max(Math.min(window.innerWidth, INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
-	docById('innerdiv').style.width = w + 'px';
+        docById('innerdiv').style.width = w + 'px';
 
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.
@@ -651,7 +650,7 @@ function RhythmRuler () {
             // Create individual rulers as tables.
             rulerCell.innerHTML = '<table id="rulerCellTable' + i + '"></table>';
 
-	    var rulerCellTable = docById('rulerCellTable' + i);
+            var rulerCellTable = docById('rulerCellTable' + i);
             rulerCellTable.style.textAlign = 'center';
             rulerCellTable.style.border = '0px';
             rulerCellTable.style.borderCollapse = 'collapse';
