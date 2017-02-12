@@ -138,6 +138,9 @@ function RhythmRuler () {
     };
 
     this._undo = function() {
+        this._logo.synth.stop();
+        this._startingTime = null;
+
         if (this._undoList.length === 0) {
             return;
         }
@@ -169,7 +172,6 @@ function RhythmRuler () {
 
         var that = this;
         newCell.addEventListener('click', function(event) {
-            console.log('adding DISSECT event too');
             that._dissectRuler(event);
         });
 
@@ -243,6 +245,7 @@ function RhythmRuler () {
         var drum = this._logo.blocks.blockList[drumblockno].value;
 
         var that = this;
+
         setTimeout(function() {
             var ruler = docById('ruler' + rulerNo);
             if (ruler == null) {
@@ -453,6 +456,8 @@ function RhythmRuler () {
         var w = window.innerWidth;
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
+
+        docById('rulerDiv').style.visibility = 'visible';
 
         // The widget buttons
         var widgetButtonsDiv = docById('rulerButtonsDiv');
