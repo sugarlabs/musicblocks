@@ -79,7 +79,7 @@ function RhythmRuler () {
         }
 
         var inputNum = docById('dissectNumber').value;
-        if (isNaN(inputNum)) {
+        if (inputNum === '' || isNaN(inputNum)) {
             inputNum = 2;
         } else {
             inputNum = Math.abs(Math.floor(inputNum));
@@ -450,11 +450,11 @@ function RhythmRuler () {
 	var widgetButtonsDiv = docById('rulerButtonsDiv');
         widgetButtonsDiv.style.display = 'inline';
         widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.border = 0;
+        // widgetButtonsDiv.style.border = 0;
         widgetButtonsDiv.innerHTML = '<table id="widgetButtonTable"></table>';
 
         var buttonTable = docById('widgetButtonTable');
-        buttonTable.width = '400px';
+        // buttonTable.width = '456px';
         var header = buttonTable.createTHead();
         var row = header.insertRow(0);
 
@@ -510,7 +510,7 @@ function RhythmRuler () {
         cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dussectNumber" value="' + 2 + '" />';
         cell.style.top = 0;
         cell.style.left = 0;
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.width = "51px"; // Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
@@ -520,10 +520,11 @@ function RhythmRuler () {
         var numberInput = docById('dissectNumber');
         const BACKSPACE = 8;
         numberInput.addEventListener('keydown', function(event) {
+            console.log(event.keyCode);
            if (event.keyCode === BACKSPACE)
                numberInput.value = numberInput.value.substring(0, numberInput.value.length-1);
         });
-        
+
         var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'));
         cell.onclick=function() {
             that._undo();
@@ -570,6 +571,8 @@ function RhythmRuler () {
             that._playingOne = false;
             that._playingAll = false;
         };
+
+        var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'));
 
         // The ruler table
 	var rulerTableDiv = docById('rulerTableDiv');
@@ -704,8 +707,8 @@ function RhythmRuler () {
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" -webkit-vertical-align="middle" vertical-align="middle" -webkit-align-content="center" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = "51px";  // Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width; 

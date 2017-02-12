@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
+  <!ENTITY fill_color "#FFFFFF">
+  <!ENTITY stroke_color "#FFFFFF">
+]>
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+<path d="M11,18 Q13,16 15,19 L15,31 Q16,33 17,31 L17,7 Q19,5 21,7 L21,25 Q22,27 23,25 L23,7 Q25,5 27,7 L27,25 Q28,27 29,25 L29,7 Q31,5 33,7 L33,25 Q34,27 35,25 L35,12 Q37,10 39,12 L39,37 Q39,44 33,45 L17,45 Q11,45 11,37" style="fill:&fill_color;;stroke:&stroke_color;;stroke-width:.3"/></svg>
