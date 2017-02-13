@@ -403,6 +403,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     tuplet3Block.defaults.push(1);
     tuplet3Block.defaults.push(4);
 
+    var simpleTupletBlock = new ProtoBlock('stuplet');
+    simpleTupletBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['stuplet'] = simpleTupletBlock;
+    simpleTupletBlock.staticLabels.push(_('simple tuplet'), _('number of notes'), _('note value'));
+    simpleTupletBlock.adjustWidthToLabel();
+    simpleTupletBlock.twoArgBlock();
+    simpleTupletBlock.defaults.push(1);
+    simpleTupletBlock.defaults.push(1 / 2);
+
     // deprecated
     var rhythm = new ProtoBlock('rhythm');
     rhythm.palette = palettes.dict['widgets'];
