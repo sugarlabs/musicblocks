@@ -719,17 +719,29 @@ notes.
 #### 4.2.3 Creating Tuplets
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'/>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.5.svg'/>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix10.svg'/>
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
-are not based on a power of 2. In the example above, three quarter
-notes&mdash;defined in the *Rhythm* block&mdash;are played in the time of a
-single quarter note. The result is three twelfth notes.
+are not based on a power of 2.
 
-You can mix and match *Rhythm* blocks and *Tuplet* blocks when
+In the example above, three quarter notes&mdash;defined in the *Simple
+Tuplet* block&mdash;are played in the time of a single quarter
+note. The result is three twelfth notes. (This form, which is quite
+common in music, is called a *triplet*. Other common tuplets include a
+*quintuplet* and a *septuplet*.)
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'/>
+
+In the example above, the three quarter notes are defined in the
+*Rhythm* block embedded in the *Tuplet* block. As with the *Simple
+Tuplet* example, they are played in the time of a single quarter
+note. The result is three twelfth notes. This more complex form allows
+for intermixing multiple rhythms within single tuplet.
+
+Note: You can mix and match *Rhythm* blocks and *Tuplet* blocks when
 defining your matrix.
 
 <a name= "WHAT-IS-TUPLET">
