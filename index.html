@@ -73,7 +73,7 @@
             }(document, 'script', 'facebook-jssdk'));
         } catch (e) {}
     -->
-    
+
     $(function() {
         $("#pitchtimematrix").draggable();
     });
@@ -81,57 +81,33 @@
     $(function() {
         $("#pitchdrummatrix").draggable();
     });
-        
+
     $(function() {
-        <!-- drag rhythm ruler when dragging drum play buttons -->
-        $('#drumDiv').draggable({
-            drag: function() {
-                jQuery('#rulerBody').css('top',jQuery(this).position().top);
-                jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25);
-            },
-            stop: function(){
-                jQuery('#rulerBody').css('top',jQuery(this).position().top);                     
-                jQuery('#rulerBody').css('left',jQuery(this).position().left + $(window).innerWidth/25);                                        
-            }
-        });
+        $("#rulerDiv").draggable();
     });
-        
-    $(function() {
-        <!-- drag drum play buttons when dragging rhythm ruler -->
-        $('#rulerBody').draggable({
-            drag: function() {
-                jQuery('#drumDiv').css('top',jQuery(this).position().top);
-                jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/25);
-            },
-            stop: function(){
-                jQuery('#drumDiv').css('top',jQuery(this).position().top);                     
-                jQuery('#drumDiv').css('left',jQuery(this).position().left - $(window).innerWidth/25);                                        
-            }
-        });
-    });
-        
+
     $(function() {
         $('#pitchstaircase').draggable({
             drag: function() {
-                jQuery('#playPitch').css('top',jQuery(this).position().top);
-                jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);
+                jQuery('#playPitch').css('top', jQuery(this).position().top);
+                jQuery('#playPitch').css('left', jQuery(this).position().left - $(window).innerWidth/25);
             },
             stop: function(){
-                jQuery('#playPitch').css('top',jQuery(this).position().top);                     
-                jQuery('#playPitch').css('left',jQuery(this).position().left - $(window).innerWidth/25);                                        
+                jQuery('#playPitch').css('top', jQuery(this).position().top);
+                jQuery('#playPitch').css('left', jQuery(this).position().left - $(window).innerWidth/25);
             }
         });
     });
-        
+
     $(function() {
         $('#playPitch').draggable({
             drag: function() {
-                jQuery('#pitchstaircase').css('top',jQuery(this).position().top);
-                jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);
+                jQuery('#pitchstaircase').css('top', jQuery(this).position().top);
+                jQuery('#pitchstaircase').css('left', jQuery(this).position().left + $(window).innerWidth/25);
             },
             stop: function(){
-                jQuery('#pitchstaircase').css('top',jQuery(this).position().top);                     
-                jQuery('#pitchstaircase').css('left',jQuery(this).position().left + $(window).innerWidth/25);                                        
+                jQuery('#pitchstaircase').css('top', jQuery(this).position().top);
+                jQuery('#pitchstaircase').css('left', jQuery(this).position().left + $(window).innerWidth/25);
             }
         });
     });
@@ -139,25 +115,25 @@
     $(function() {
         $('#tempoCanvas').draggable({
             drag: function() {
-                jQuery('#tempoDiv').css('left',jQuery(this).position().left);
-                jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);
+                jQuery('#tempoDiv').css('left', jQuery(this).position().left);
+                jQuery('#tempoDiv').css('top', jQuery(this).position().top - $(window).innerWidth/30);
             },
             stop: function(){
-                jQuery('#tempoDiv').css('left',jQuery(this).position().left);                     
-                jQuery('#tempoDiv').css('top',jQuery(this).position().top - $(window).innerWidth/30);                                        
+                jQuery('#tempoDiv').css('left', jQuery(this).position().left);
+                jQuery('#tempoDiv').css('top', jQuery(this).position().top - $(window).innerWidth/30);
             }
         });
     });
-        
+
     $(function() {
         $('#tempoDiv').draggable({
             drag: function() {
-                jQuery('#tempoCanvas').css('left',jQuery(this).position().left);
-                jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);
+                jQuery('#tempoCanvas').css('left', jQuery(this).position().left);
+                jQuery('#tempoCanvas').css('top', jQuery(this).position().top + $(window).innerWidth/30);
             },
             stop: function(){
-                jQuery('#tempoCanvas').css('left',jQuery(this).position().left);                     
-                jQuery('#tempoCanvas').css('top',jQuery(this).position().top + $(window).innerWidth/30);                                        
+                jQuery('#tempoCanvas').css('left', jQuery(this).position().left);
+                jQuery('#tempoCanvas').css('top', jQuery(this).position().top + $(window).innerWidth/30);
             }
         });
     });
@@ -165,20 +141,20 @@
     $(function() {
         $('#pitchSliderDiv').draggable({
             drag: function() {
-                jQuery('#moveUpSliderDiv').css('left',jQuery(this).position().left);
-                jQuery('#moveUpSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4.4);
-                jQuery('#moveDownSliderDiv').css('left',jQuery(this).position().left);
-                jQuery('#moveDownSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/3.8);
+                jQuery('#moveUpSliderDiv').css('left', jQuery(this).position().left);
+                jQuery('#moveUpSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/4.4);
+                jQuery('#moveDownSliderDiv').css('left', jQuery(this).position().left);
+                jQuery('#moveDownSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/3.8);
             },
             stop: function(){
-                jQuery('#moveUpSliderDiv').css('left',jQuery(this).position().left);                     
-                jQuery('#moveUpSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/4.4);
-                jQuery('#moveDownSliderDiv').css('left',jQuery(this).position().left);                     
-                jQuery('#moveDownSliderDiv').css('top',jQuery(this).position().top + $(window).innerWidth/3.8);
+                jQuery('#moveUpSliderDiv').css('left', jQuery(this).position().left);
+                jQuery('#moveUpSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/4.4);
+                jQuery('#moveDownSliderDiv').css('left', jQuery(this).position().left);
+                jQuery('#moveDownSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/3.8);
             }
         });
     });
-        
+
     $(function() {
         $("#statusmatrix").draggable();
     });
@@ -355,9 +331,10 @@
 
     <div id="pitchtimematrix" overflow-x="auto" draggable="true" ondrag="moveMatrix(event)" onmouseup="if (isDragging) moveMatrix(event); isDragging = false;"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
-    <div id="rulerBody" overflow-x="auto"></div>
-    <div id="dissectNumber"></div>
-    <div id="drumDiv"></div>
+    <div id="rulerDiv" draggable="true">
+      <div id="rulerButtonsDiv"></div>
+      <div id="rulerTableDiv"></div>
+    </div>
     <div id="pitchstaircase" style="visibility:hidden"></div>
     <div id="pitchSliderDiv" style="visibility:hidden"></div>
     <div id="playPitch" style="visibility:hidden"></div>
