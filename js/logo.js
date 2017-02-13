@@ -4027,6 +4027,30 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
             logo._setListener(turtle, listenerName, __listener);
             break;
+        case 'tuplet4':
+            if (logo.inMatrix) {
+                logo.tupletParams.push([1, (1 / args[0]) * logo.beatFactor[turtle]]);
+                logo.tuplet = true;
+                logo.addingNotesToTuplet = false;
+            } else {
+                logo.errorMsg(_('Tuplet Block: Did you mean to use a Matrix block?'), blk);
+            }
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_tuplet_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                if (logo.inMatrix) {
+                    logo.tuplet = false;
+                    logo.addingNotesToTuplet = false;
+                } else {
+                }
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
         default:
             if (logo.blocks.blockList[blk].name in logo.evalFlowDict) {
                 eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
