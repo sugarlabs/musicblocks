@@ -487,7 +487,9 @@ function PlanetView(model, controller) {
             document.getElementById('pitchtimematrix').style.visibility = localStorage.getItem('isMatrixHidden');
             document.getElementById('statusmatrix').style.visibility = localStorage.getItem('isStatusHidden');
             document.getElementById('pitchdrummatrix').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
-            document.getElementById('rulerBody').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+            document.getElementById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+            document.getElementById('rulerButtonsDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+            document.getElementById('rulerTableDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
             document.getElementById('modewidget').style.visibility = localStorage.getItem('isModeWidgetHidden');
 
             if (ele.attributes.current.value === 'true') {

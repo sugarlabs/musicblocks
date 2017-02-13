@@ -42,7 +42,6 @@ function PitchStairCase () {
     };
 
     this._makeStairs = function (start, isStepDeleted) {
-        var that = this;
         var iconSize = Math.floor(this._cellScale * 24);
         var stairDiv = docById('pitchstaircase');
         var stairDivPosition = stairDiv.getBoundingClientRect();
@@ -66,6 +65,8 @@ function PitchStairCase () {
             playPitchDiv.appendChild(playTable);
         } else {
             for (var j = start; j < stairsLength; j++) {
+                docById('playStair' + j).innerHTML = '';
+                docById('stairTable' + j).innerHTML = '';
                 docById('playStair' + j).remove();
                 docById('stairTable' + j).remove();
             }
@@ -73,7 +74,9 @@ function PitchStairCase () {
 
         var playTable = docById('playStairTable');
 
-        for (var i = start; i < that.Stairs.length; i++) {
+        var that = this;
+
+        for (var i = start; i < this.Stairs.length; i++) {
             var header = playTable.createTHead();
             var playrow = header.insertRow(i);
             playrow.style.left = Math.floor(playPitchDivPosition.left) + 'px';
@@ -107,7 +110,7 @@ function PitchStairCase () {
 
             var cell = row.insertCell(-1);
             cell.style.width = (stairDivPosition.width) * parseFloat(DEFUALTFREQUENCY/frequency) * this._cellScale / 3 + 'px';
-            cell.innerHTML = frequency.toFixed(2) + '<br>' + that.Stairs[i][0] + that.Stairs[i][1];
+            cell.innerHTML = frequency.toFixed(2) + '<br>' + this.Stairs[i][0] + this.Stairs[i][1];
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = playrow.offsetHeight + 'px';
@@ -116,7 +119,6 @@ function PitchStairCase () {
             var svgWidth = cellWidth.toString();
             var svgScale = (cellWidth / 55).toString();
             var svgStrokeWidth = (3 * 55 / cellWidth).toString();
-            // console.log(svgWidth + ' ' + svgScale + ' ' + svgStrokeWidth);
             var svgData = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SYNTHSVG.replace(/SVGWIDTH/g, svgWidth).replace(/XSCALE/g, svgScale).replace(/STOKEWIDTH/g, svgStrokeWidth))));
             cell.style.backgroundImage = 'url(' + svgData + ')';
             cell.style.backgroundRepeat = 'no-repeat';
@@ -126,6 +128,20 @@ function PitchStairCase () {
                 that._dissectStair(event);
             });
         }
+    };
+
+    this._undo = function () {
+        if (this._history.length === 0) {
+            console.log('nothing for undo to undo');
+            return;
+        }
+
+        // Remove the last entry...
+        var i = this._history.pop();
+        this.Stairs.splice(i, 1);
+
+        // And rebuild the stairs.
+        this._refresh();
     };
 
     this._dissectStair = function (event) {
@@ -172,6 +188,9 @@ function PitchStairCase () {
 
         if (!foundStep) {
             this.Stairs.push([obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[oldcell.parentNode.id[5]][3] * parseFloat(inputNum2), this.Stairs[oldcell.parentNode.id[5]][4] * parseFloat(inputNum1)]);
+            this._history.push(this.Stairs.length - 1);
+        } else {
+            this._history.push(i);
         }
 
         this._makeStairs(i, isStepDeleted);
@@ -340,7 +359,8 @@ function PitchStairCase () {
     this.init = function (logo) {
         this._logo = logo;
         this._initialFrequency = this.Stairs[0][2];
-        var that = this;
+        this._history = [];
+
         console.log('init PitchStairCase');
         console.log(this.Stairs);
         docById('pitchstaircase').style.display = 'inline';
@@ -359,6 +379,12 @@ function PitchStairCase () {
         docById('pitchstaircase').style.overflowY = 'auto';
         docById('playPitch').style.height = Math.floor(w / 4) + 'px';
         docById('playPitch').style.overflowY = 'hidden';
+
+        this._refresh();
+    };
+
+    this._refresh = function() {
+        var that = this;
 
         var tables = document.getElementsByTagName('TABLE');
         var noOfTables = tables.length
@@ -463,7 +489,12 @@ function PitchStairCase () {
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         docById('musicratio2').classList.add('hasKeyboard');
 
-        var cell = this._addButton(row, 5, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 5, 'restore-button.svg', iconSize, _('undo'));
+        cell.onclick=function() {
+            that._undo();
+        };
+
+        var cell = this._addButton(row, 6, 'close-button.svg', iconSize, _('close'));
         cell.onclick=function() {
             docById('pitchstaircase').style.visibility = 'hidden';
             docById('playPitch').style.visibility = 'hidden';
@@ -479,6 +510,6 @@ function PitchStairCase () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        this._makeStairs(-1, 1);
-        };
+        this._makeStairs(-1, true);
+    };
 };

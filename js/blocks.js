@@ -54,7 +54,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this.selectingStack = false;
     // and what did we select?
     this.selectedStack = null;
- 
+    // and a copy of the selected stack for pasting.
+    this.selectedBlocksObj = null;
+
     // If we somehow have a malformed block database (for example,
     // from importing a corrupted datafile, we need to avoid infinite
     // loops while crawling the block list.
@@ -573,7 +575,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
  
         this._loopCounter += 1;
-        // FIXME: race condition when rescaling blocks?
         if (this._loopCounter > this.blockList.length * 2) {
             console.log('Infinite loop encountered while adjusting docks: ' + blk + ' ' + this.blockList);
             return;
@@ -735,7 +736,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
  
-    this.deleteNextDefault= function(thisBlock) {
+    this.deleteNextDefault = function(thisBlock) {
         // Remove the Silence block from a Note block if another block
         // is inserted above the silence block.
         var thisBlockobj = this.blockList[thisBlock];
@@ -1463,9 +1464,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             return blk;
         }
  
-        // Test for corrupted connection scenario
-        // FIXME: How does this happen?
-        // FIXME: Should we try to correct it?
+        // Test for corrupted-connection scenario.
         if (myBlock.connections.length > 1 && myBlock.connections[0] != null && myBlock.connections[0] === last(myBlock.connections)) {
             console.log('WARNING: CORRUPTED BLOCK DATA. Block ' + myBlock.name + ' (' + blk + ') is connected to the same block ' + this.blockList[myBlock.connections[0]].name + ' (' + myBlock.connections[0] + ') twice.');
             return blk;
@@ -1602,7 +1601,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     this._searchForExpandables(this.blockList[blk].connections[c]);
                 }
             } else if (this.blockList[blk].isArgClamp()) {
-                // FIXME: We need to do something with ArgClampArg blocks too.
                 this._expandablesList.push(blk);
             }
             blk = last(this.blockList[blk].connections);
@@ -1817,7 +1815,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
  
-            postProcessArg = [thisBlock, 'la'];
+            postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'eastindiansolfege') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1827,7 +1825,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
  
-            postProcessArg = [thisBlock, 'la'];
+            postProcessArg = [thisBlock, 'sol'];
         } else if (name === 'notename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -1837,7 +1835,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 me.blockList[thisBlock].container.updateCache();
             };
  
-            postProcessArg = [thisBlock, 'A'];
+            postProcessArg = [thisBlock, 'G'];
         } else if (name === 'drumname') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -2578,7 +2576,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     // Connection 1 of a note block is not inside the clamp.
                     return null;
                 } else {
-                    return cblk;
+                    if (['newnote', 'osctime'].indexOf(this.blockList[cblk].name) !== -1) {
+                        return cblk;
+                    } else {
+                        return null;
+                    }
                 }
             } else {
                 return this._insideNoteBlock(cblk);
@@ -2595,6 +2597,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // the copy button.
         var topBlock = this.findTopBlock(this.activeBlock);
         this.selectedStack = topBlock;
+
+        // Copy the selectedStack.
+        this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj()));
+
         this.updatePasteButton();
  
         if (myBlock.name === 'action') {
@@ -2623,8 +2629,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             this.palettes.dict[name].hideMenu(true);
         }
  
-        var blockObjs = this._copyBlocksToObj();
-        this.loadNewBlocks(blockObjs);
+        // var blockObjs = this._copyBlocksToObj();
+        // this.loadNewBlocks(blockObjs);
+        console.log(blocks.selectedBlocksObj);
+        this.loadNewBlocks(blocks.selectedBlocksObj);
     };
  
     this.saveStack = function () {

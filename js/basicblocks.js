@@ -222,7 +222,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     invertBlock.adjustWidthToLabel();
     invertBlock.defaults.push('sol');
     invertBlock.defaults.push(4);
-    invertBlock.defaults.push('odd');
+    invertBlock.defaults.push(_('even'));
     invertBlock.dockTypes[1] = 'solfegein';
     invertBlock.dockTypes[2] = 'anyin';
     invertBlock.dockTypes[3] = 'anyin';
@@ -304,7 +304,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['scaledegree'] = scaleDegree;
     scaleDegree.staticLabels.push(_('scale degree'), _('number'), _('octave'));
     scaleDegree.adjustWidthToLabel();
-    scaleDegree.defaults.push(6); // A in C Major
+    scaleDegree.defaults.push(5); // G in C Major
     scaleDegree.defaults.push(4);
     scaleDegree.twoArgBlock();
     scaleDegree.dockTypes[1] = 'numberin';
@@ -789,11 +789,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;
-    voiceBlock.staticLabels.push(_('set voice'));
+    voiceBlock.staticLabels.push(_('set synth'));
     voiceBlock.adjustWidthToLabel();
     voiceBlock.flowClampOneArgBlock();
     voiceBlock.dockTypes[1] = 'textin';
-    voiceBlock.defaults.push(_('sine'));
+    voiceBlock.defaults.push(_('violin'));
 
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];

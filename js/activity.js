@@ -1510,7 +1510,7 @@ define(function (require) {
         function _doOpenSamples() {
             localStorage.setItem('isMatrixHidden', document.getElementById('pitchtimematrix').style.visibility);
             localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
-            localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerBody').style.visibility);
+            localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerDiv').style.visibility);
             localStorage.setItem('isStatusHidden', document.getElementById('statusmatrix').style.visibility);
             localStorage.setItem('isModeWidgetHidden', document.getElementById('modewidget').style.visibility);
 
@@ -1524,9 +1524,10 @@ define(function (require) {
                 document.getElementById('pitchdrummatrix').style.border = 0;
             }
 
-            if(document.getElementById('rulerBody').style.visibility !== 'hidden') {
-                document.getElementById('rulerBody').style.visibility = 'hidden';
-                document.getElementById('rulerBody').style.border = 0;
+            if(document.getElementById('rulerDiv').style.visibility !== 'hidden') {
+                document.getElementById('rulerDiv').style.visibility = 'hidden';
+                document.getElementById('rulerTableDiv').style.visibility = 'hidden';
+                document.getElementById('rulerButtonsDiv').style.visibility = 'hidden';
             }
 
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {

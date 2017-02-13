@@ -495,10 +495,8 @@ function PitchDrumMatrix() {
     };
 
     this._save = function() {
-        /* Saves the current matrix as an action stack consisting of
-         * set drum and pitch blocks. */
-
-        // FIXME: Consolidate pitches into drum blocks.
+        // Saves the current matrix as an action stack consisting of a
+        // set drum and pitch blocks.
 
         // First, hide the palettes as they will need updating.
         for (var name in this._logo.blocks.palettes.dict) {

@@ -1064,7 +1064,7 @@ function splitSolfege(value) {
             }
         }
     } else {
-        var note = 'la';
+        var note = 'sol';
         var attr = ''
     }
 

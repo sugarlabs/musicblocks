@@ -120,6 +120,8 @@ function Matrix() {
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
 
+        docById('pitchtimematrix').innerHTML = '';
+
         // Used to remove the matrix table
         Element.prototype.remove = function() {
             this.parentElement.removeChild(this);
@@ -1153,7 +1155,6 @@ function Matrix() {
 
             var delta = 5;
 
-            // FIXME: Does the undefined case ever occur?
             if (note[0][0] === 'R' || note[0][0] == undefined) {
                 // The last connection in last pitch block is null.
                 var lastConnection = null;

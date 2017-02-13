@@ -226,15 +226,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.svgOutput = '';
     this.svgBackground = true;
 
-    /*
-    try {
-        this.mic = new p5.AudioIn()
-    } catch (e) {
-        console.log(NOMICERRORMSG);
-        this.mic = null;
-    }
-    */
-    this.mic = null;
+    this.mic = new Tone.UserMedia();
+    this.limit = 1024;
+    this.analyser = new Tone.Analyser({
+                        "type" : "waveform",
+                        "size" : this.limit
+                    });
+    this.mic.connect(this.analyser);
+                    
 
     // Used to pause between each block as the program executes.
     this.setTurtleDelay = function(turtleDelay) {
@@ -467,8 +466,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 if (logo.mic == null) {
                     logo.errorMsg(NOMICERRORMSG);
                     value = 0;
-                } else {
-                    value = Math.round(logo.mic.getLevel() * 1000);
+                } else { 
+                    var values = logo.analyser.analyse();
+                    var sum = 0;
+                    for(var k=0; k<logo.limit; k++){
+                            sum += (values[k] * values[k]);
+                    }
+                    var rms = Math.sqrt(sum/logo.limit);
+                    value = Math.round(rms * 1000);
                 }
                 break;
             case 'consonantstepsizeup':
@@ -1074,10 +1079,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
             break;
         case 'nameddo':
-            // FIXME: Add backward support to other instances of 'do'
             var name = logo.blocks.blockList[blk].privateData;
             if (name in logo.actions) {
                 lilypondLineBreak(logo, turtle);
+
                 if (logo.backward[turtle].length > 0) {
                     childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
                     var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
@@ -1136,7 +1141,30 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
             if (name in logo.actions) {
                 lilypondLineBreak(logo, turtle);
-                childFlow = logo.actions[name]
+
+                if (logo.backward[turtle].length > 0) {
+                    childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
+                    var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+                    logo.backward[turtle].push(actionBlk);
+
+                    var listenerName = '_backward_action_' + turtle + '_' + blk;
+
+                    var nextBlock = this.blocks.blockList[actionBlk].connections[2];
+                    if (nextBlock == null) {
+                        logo.backward[turtle].pop();
+                    } else {
+                        logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    }
+
+                    var __listener = function(event) {
+                        logo.backward[turtle].pop();
+                    };
+
+                    logo._setListener(turtle, listenerName, __listener);
+                } else {
+                    childFlow = logo.actions[name]
+                }
+
                 childFlowCount = 1;
             } else{
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
@@ -2689,7 +2717,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     break;
                 }
 
-                if (typeof(args[0]) === 'number') {
+                if (typeof(args[0]) === 'number' && logo.blocks.blockList[blk].name == 'pitch') {
                     // We interpret numbers two different ways:
                     // (1) a positive integer between 1 and 12 is taken to be
                     // a moveable solfege, e.g., 1 == do; 2 == re...
@@ -2708,6 +2736,44 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         var note = obj[0];
                         var octave = obj[1];
                         var cents = obj[2];
+                    }
+
+                    if (note === '?') {
+                        logo.errorMsg(INVALIDPITCH, blk);
+                        logo.stopTurtle = true;
+                        break;
+                    }
+                } else if (typeof(args[0]) === 'number' && logo.blocks.blockList[blk].name == 'scaledegree') {
+                    if (args[0] < 0) {
+                        var neg = true;
+                        args[0] = -args[0];
+                    } else {
+                        var neg = false;
+                    }
+
+                    if (args[0] == 0) {
+                        note = '?'; // throws an error
+                    } else {
+                        var obj = keySignatureToMode(logo.keySignature[turtle]);
+                        var modeLength = MUSICALMODES[obj[1]].length;
+                        var scaleDegree = Math.floor(args[0] - 1) % modeLength;
+                        scaleDegree += 1;
+
+                        if (neg) {
+                            // -1, 4 --> do 4; -2, 4 --> ti 3; -8, 4 --> do 3
+                            if (scaleDegree > 1) {
+                                scaleDegree = modeLength - scaleDegree + 2;
+                            }
+                            note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
+                            var deltaOctave = Math.floor((args[0] + modeLength - 2) / modeLength);
+                            var octave = Math.floor(args[1]) - deltaOctave;
+                        } else {
+                            //  1, 4 --> do 4;  2, 4 --> re 4;  8, 4 --> do 5
+                            note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
+                            var deltaOctave = Math.floor((args[0] - 1) / modeLength);
+                            var octave = Math.floor(args[1]) + deltaOctave;
+                        }
+                        var cents = 0;
                     }
 
                     if (note === '?') {
@@ -4587,7 +4653,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     var len = this.crescendoVolume[turtle].length
                     this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
                     this._setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
-                    // FIXME: Do we need to track crescendoVolume separately?
                     var len2 = this.polyVolume[turtle].length;
                     this.polyVolume[turtle][len2 - 1] = this.crescendoVolume[turtle][len - 1];
                 }
@@ -4795,17 +4860,23 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         } else if (logo.blocks.blockList[blk].isArgBlock() || logo.blocks.blockList[blk].isArgClamp()) {
             switch (logo.blocks.blockList[blk].name) {
             case 'loudness':
-                try {  // DEBUGGING P5 MIC
-                    if (!logo.mic.enabled) {
-                        logo.mic.start();
+                    var values = logo.analyser.analyse();
+                    var sum = 0;
+                    for(var k=0; k<logo.limit; k++){
+                            sum += (values[k] * values[k]);
+                    }
+                    var rms = Math.sqrt(sum/logo.limit);
+                try {   
+                    if (!logo.mic.open()) {
+                        logo.mic.open();
                         logo.blocks.blockList[blk].value = 0;
                     } else {
-                        logo.blocks.blockList[blk].value = Math.round(logo.mic.getLevel() * 1000);
+                        logo.blocks.blockList[blk].value = Math.round(rms * 1000);
                     }
                 } catch (e) {  // MORE DEBUGGING
                     console.log(e);
-                    logo.mic.start();
-                    logo.blocks.blockList[blk].value = Math.round(logo.mic.getLevel() * 1000);
+                    logo.mic.open();
+                    logo.blocks.blockList[blk].value = Math.round(rms * 1000);
                 }
                 break;
             case 'eval':
