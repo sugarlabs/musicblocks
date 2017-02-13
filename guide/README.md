@@ -719,7 +719,7 @@ notes.
 #### 4.2.3 Creating Tuplets
 </a>
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.5.svg'/>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'/>
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix10.svg'/>
 
@@ -733,13 +733,20 @@ note. The result is three twelfth notes. (This form, which is quite
 common in music, is called a *triplet*. Other common tuplets include a
 *quintuplet* and a *septuplet*.)
 
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'/>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg'/>
 
 In the example above, the three quarter notes are defined in the
 *Rhythm* block embedded in the *Tuplet* block. As with the *Simple
 Tuplet* example, they are played in the time of a single quarter
 note. The result is three twelfth notes. This more complex form allows
 for intermixing multiple rhythms within single tuplet.
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix12.svg'/>
+
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix13.svg'/>
+
+In the example above, the two *Rhythm* blocks are embedded in the
+*Tuplet* block, resulting in a more complex rhythm.
 
 Note: You can mix and match *Rhythm* blocks and *Tuplet* blocks when
 defining your matrix.
@@ -754,7 +761,7 @@ defining your matrix.
 <a name= "INDIVIDUAL-NOTES">
 #### 4.2.5 Using individual notes in the matrix
 </a>
-<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix11.svg'/>
+<img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix14.svg'/>
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
