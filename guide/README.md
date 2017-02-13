@@ -32,7 +32,7 @@ TABLE OF CONTENTS
     6. [Repeating Notes](#REPETITION)
     7. [Swinging Notes and Tied Notes](#SWINGING)
     8. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
-    9. [Intervals and Articulation](#INTERVALS-AND-ARTICULATION)
+    9. [Intervals and Set Relative Volume](#INTERVALS-AND-ARTICULATION)
     10. [Absolute Intervals](#ABSOLUTE-INTERVALS)
     11. [Inversion](#INVERSION)
     12. [Backwards](#BACKWARDS)
@@ -363,7 +363,7 @@ the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
 <a name="INTERVALS-AND-ARTICULATION">
-#### 3.2.9 Intervals and Articulation
+#### 3.2.9 Intervals and Set Relative Volume
 </a>
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/transform9.svg'/>
 
@@ -371,7 +371,7 @@ The *Interval* block calculates a relative interval, e.g., a fifth,
 and adds the additional pitches to a note's playback. In the figure,
 we add `La` to `Re` and `Ti` to `Mi`.
 
-The *Articulation* block changes the volume of a group of notes without affecting the master volume for the rest of the user's Music Blocks code.
+The *Set Relative Volume* block modifies the clamped note's volume according to the input value of the block in an added (or subtracted when negative) percentage with respect to the original volume.For example,100 would mean doubling the current volume.
 
 <a name= "ABSOLUTE-INTERVALS">
 #### 3.2.10 Absolute Intervals
