@@ -403,13 +403,34 @@ function initBasicProtoBlocks(palettes, blocks) {
     tuplet3Block.defaults.push(1);
     tuplet3Block.defaults.push(4);
 
+    var simpleTuplet7Block = new ProtoBlock('stuplet7');
+    simpleTuplet7Block.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['stuplet7'] = simpleTuplet7Block;
+    simpleTuplet7Block.staticLabels.push(_('septuplet'));
+    simpleTuplet7Block.adjustWidthToLabel();
+    simpleTuplet7Block.zeroArgBlock();
+
+    var simpleTuplet5Block = new ProtoBlock('stuplet5');
+    simpleTuplet5Block.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['stuplet5'] = simpleTuplet5Block;
+    simpleTuplet5Block.staticLabels.push(_('quintuplet'));
+    simpleTuplet5Block.adjustWidthToLabel();
+    simpleTuplet5Block.zeroArgBlock();
+
+    var simpleTuplet3Block = new ProtoBlock('stuplet3');
+    simpleTuplet3Block.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['stuplet3'] = simpleTuplet3Block;
+    simpleTuplet3Block.staticLabels.push(_('triplet'));
+    simpleTuplet3Block.adjustWidthToLabel();
+    simpleTuplet3Block.zeroArgBlock();
+
     var simpleTupletBlock = new ProtoBlock('stuplet');
     simpleTupletBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['stuplet'] = simpleTupletBlock;
     simpleTupletBlock.staticLabels.push(_('simple tuplet'), _('number of notes'), _('note value'));
     simpleTupletBlock.adjustWidthToLabel();
     simpleTupletBlock.twoArgBlock();
-    simpleTupletBlock.defaults.push(1);
+    simpleTupletBlock.defaults.push(3);
     simpleTupletBlock.defaults.push(1 / 2);
 
     // deprecated

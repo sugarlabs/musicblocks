@@ -727,9 +727,11 @@ Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
 are not based on a power of 2.
 
-In the example above, three quarter
-notes&mdash;defined in the *Simple Tuplet* block&mdash;are played in the time of a
-single quarter note. The result is three twelfth notes.
+In the example above, three quarter notes&mdash;defined in the *Simple
+Tuplet* block&mdash;are played in the time of a single quarter
+note. The result is three twelfth notes. (This form, which is quite
+common in music, is called a *triplet*. Other common tuplets include a
+*quintuplet* and a *septuplet*.)
 
 <img src='https://rawgithub.com/walterbender/musicblocks/master/guide/matrix9.svg'/>
 
