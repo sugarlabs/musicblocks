@@ -2388,11 +2388,20 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                             }
                             pitchtimematrix.addTuplet(tupletParam);
                             break;
+                        case 'simple':
+                            var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
+                            tupletParam.push([]);
+                            for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
+                                tupletParam[1].push(logo.tupletRhythms[i][j]);
+                            }
+                            pitchtimematrix.addTuplet(tupletParam);
+                            break;
                         default:
                             pitchtimematrix.addNotes(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
                             break;
                         }
                     }
+
                     pitchtimematrix.makeClickable();
                 }
             };
@@ -3977,6 +3986,17 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         case 'playbwd':
             pitchtimematrix.playDirection = -1;
             logo._runFromBlock(logo, turtle, args[0]);
+            break;
+        case 'stuplet':
+            if (logo.inMatrix) {
+                logo.tupletParams.push([1, (1 / args[1]) * logo.beatFactor[turtle]]);
+                pitchtimematrix.addColBlock(blk, args[0]);
+                var obj = ['simple', 0];
+                for (var i = 0; i < args[0]; i++) {
+                    obj.push((1 / args[1]) * logo.beatFactor[turtle]);
+		}
+		logo.tupletRhythms.push(obj);
+            }
             break;
         case 'tuplet2':
         case 'tuplet3':
