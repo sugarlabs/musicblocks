@@ -798,7 +798,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['articulation'] = articulationBlock;
-    articulationBlock.staticLabels.push(_('set relative voice volume'));
+    articulationBlock.staticLabels.push(_('set relative volume'));
     articulationBlock.adjustWidthToLabel();
     articulationBlock.flowClampOneArgBlock();
     articulationBlock.defaults.push(25);
