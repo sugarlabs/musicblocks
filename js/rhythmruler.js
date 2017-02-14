@@ -451,6 +451,11 @@ function RhythmRuler () {
         console.log('init RhythmRuler');
         this._logo = logo;
 
+	this._playing = false;
+        this._playingOne = false;
+        this._playingAll = false;
+        this._rulerPlaying = -1;
+        this._startingTime = null;
         this._elapsedTimes = [];
         this._offsets = [];
         for (var i = 0; i < this.Rulers.length; i++) {
@@ -506,6 +511,7 @@ function RhythmRuler () {
                     that._rulerPlaying = -1;
                     for (var i = 0; i < that.Rulers.length; i++) {
                         that._elapsedTimes[i] = 0;
+                        that._offsets[i] = 0;
                     }
 
                     that._playAll();
@@ -634,8 +640,8 @@ function RhythmRuler () {
                         that._playingAll = false;
                         that._rulerPlaying = -1;
                         that._startingTime = null;
-                        that._offsets[id] = 0;
                         that._elapsedTimes[id] = 0;
+                        that._offsets[id] = 0;
                         setTimeout(that._calculateZebraStripes(id), 1000);
                     }
                 }
@@ -651,6 +657,7 @@ function RhythmRuler () {
                         that._rulerPlaying = id;
                         this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                         that._elapsedTimes[id] = 0;
+                        that._offsets[id] = 0;
                         that._playOne();
                     }
                 }
