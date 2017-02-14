@@ -542,6 +542,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     skipFactor.adjustWidthToLabel();
     skipFactor.parameterBlock();
 
+    var elapsedNotes = new ProtoBlock('elapsednotes');
+    elapsedNotes.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['elapsednotes'] = elapsedNotes;
+    //.TRANS: number of whole notes that have been played
+    elapsedNotes.staticLabels.push(_('notes played'));
+    elapsedNotes.adjustWidthToLabel();
+    elapsedNotes.parameterBlock();
+
     var beatfactor = new ProtoBlock('beatfactor');
     beatfactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['beatfactor'] = beatfactor;
