@@ -4282,7 +4282,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         }
 
         // How best to expose this in the UI? What units?
-        this.notessPlayed[turtle] += (1 / noteValue);
+        this.notesPlayed[turtle] += (1 / noteValue);
 
         var vibratoRate = 0;
         var vibratoValue = 0;
