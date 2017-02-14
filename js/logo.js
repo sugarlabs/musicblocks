@@ -505,6 +505,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             case 'beatfactor':
                 value = this.beatFactor[turtle];
                 break;
+            case 'elapsednotes':
+                value = this.notesPlayed[turtle];
             case 'duplicatefactor':
                 value = this.duplicateFactor[turtle];
                 break;
@@ -5220,6 +5222,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.statusFields.push([blk, 'volume']);
                 } else {
                     logo.blocks.blockList[blk].value = last(logo.polyVolume[turtle]);
+                }
+                break;
+            case 'elapsednotes':
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push([blk, 'elapsednotes']);
+                } else {
+                    logo.blocks.blockList[blk].value = logo.notesPlayed[turtle];
                 }
                 break;
             case 'beatfactor':
