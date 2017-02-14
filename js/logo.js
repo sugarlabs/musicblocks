@@ -85,6 +85,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.saveTimeout = 0;
 
     // Music-related attributes
+    this.notesPlayed = {};
 
     // pitch-drum matrix
     this.showPitchDrumMatrix = false;
@@ -644,6 +645,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             this.duplicateFactor[turtle] = 1;
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
+            this.notesPlayed[turtle] = 0;
             this.keySignature[turtle] = 'C ' + _('major');
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = [DEFAULTVOLUME];
@@ -4278,6 +4280,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         } else {
             var noteBeatValue = noteValue;
         }
+
+        // How best to expose this in the UI? What units?
+        this.notessPlayed[turtle] += (1 / noteValue);
 
         var vibratoRate = 0;
         var vibratoValue = 0;
