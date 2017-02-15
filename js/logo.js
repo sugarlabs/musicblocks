@@ -507,6 +507,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'elapsednotes':
                 value = this.notesPlayed[turtle];
+                break;
             case 'duplicatefactor':
                 value = this.duplicateFactor[turtle];
                 break;
@@ -556,7 +557,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
                 this.blocks.blockList[blk].text.text = value;
             } else {
-                this.blocks.blockList[blk].text.text = Math.round(value).toString();
+                this.blocks.blockList[blk].text.text = mixedNumber(value);
             }
             this.blocks.blockList[blk].container.updateCache();
             this.refreshCanvas();

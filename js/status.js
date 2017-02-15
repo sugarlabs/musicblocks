@@ -166,16 +166,7 @@ function StatusMatrix() {
                 this._logo.parseArg(this._logo, turtle, this._logo.statusFields[i][0]);
                 switch (this._logo.blocks.blockList[this._logo.statusFields[i][0]].name) {
 		case 'elapsednotes':
-                    var value = this._logo.blocks.blockList[this._logo.statusFields[i][0]].value;
-                    var floor = Math.floor(value);
-                    if (value > floor) {
-			var obj = rationalToFraction(value - floor);
-                        if (floor === 0) {
-                            value = obj[0] + '/' + obj[1];
-                        } else {
-                            value = floor + ' ' + obj[0] + '/' + obj[1];
-                        }
-                    }
+                    var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value);
                     break;
                 default:
                     var value = this._logo.blocks.blockList[this._logo.statusFields[i][0]].value;
