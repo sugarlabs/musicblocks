@@ -670,6 +670,17 @@ function displayMsg(blocks, text) {
 };
 
 
+function toFixed2 (d) {
+    // Return number as fixed 2 precision
+    var floor = Math.floor(d);
+    if (d !== floor) {
+        return d.toFixed(2).toString();
+    } else {
+        return d.toString();
+    }
+};
+
+
 function mixedNumber (d) {
     // Return number as a mixed fraction string, e.g., "2 1/4"
     var floor = Math.floor(d);
