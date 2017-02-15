@@ -429,36 +429,36 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
                 break;
             case 'x':
-                value = this.turtles.turtleList[turtle].x;
+                value = toFixed2(this.turtles.turtleList[turtle].x.toFixed(2));
                 break;
             case 'y':
-                value = this.turtles.turtleList[turtle].y;
+                value = toFixed2(this.turtles.turtleList[turtle].y);
                 break;
             case 'heading':
-                value = this.turtles.turtleList[turtle].orientation;
+                value = toFixed2(this.turtles.turtleList[turtle].orientation);
                 break;
             case 'color':
             case 'hue':
-                value = this.turtles.turtleList[turtle].color;
+                value = toFixed2(this.turtles.turtleList[turtle].color);
                 break;
             case 'shade':
-                value = this.turtles.turtleList[turtle].value;
+                value = toFixed2(this.turtles.turtleList[turtle].value);
                 break;
             case 'grey':
-                value = this.turtles.turtleList[turtle].chroma;
+                value = toFixed2(this.turtles.turtleList[turtle].chroma);
                 break;
             case 'pensize':
-                value = this.turtles.turtleList[turtle].stroke;
+                value = toFixed2(this.turtles.turtleList[turtle].stroke);
                 break;
             case 'time':
                 var d = new Date();
                 value = (d.getTime() - this.time) / 1000;
                 break;
             case 'mousex':
-                value = this.getStageX();
+                value = toFixed2(this.getStageX());
                 break;
             case 'mousey':
-                value = this.getStageY();
+                value = toFixed2(this.getStageY());
                 break;
             case 'keyboard':
                 value = this.lastKeyCode;
