@@ -670,6 +670,22 @@ function displayMsg(blocks, text) {
 };
 
 
+function mixedNumber (d) {
+    // Return number as a mixed fraction string, e.g., "2 1/4"
+    var floor = Math.floor(d);
+    if (d > floor) {
+	var obj = rationalToFraction(d - floor);
+        if (floor === 0) {
+            return obj[0] + '/' + obj[1];
+        } else {
+            return floor + ' ' + obj[0] + '/' + obj[1];
+        }
+    } else {
+	return d.toString();
+    }
+};
+
+
 function rationalToFraction (d) {
     /*
     Convert float to its approximate fractional representation. '''
