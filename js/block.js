@@ -348,6 +348,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'tuplet':
         case 'tuplet2':
         case 'tuplet3':
+        case 'tuplet4':
         case 'until':
         case 'vibrato':
         case 'while':

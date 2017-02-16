@@ -402,6 +402,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     tuplet3Block.flowClampTwoArgBlock();
     tuplet3Block.defaults.push(1);
     tuplet3Block.defaults.push(4);
+    tuplet3Block.hidden = true;
+
+    var tuplet4Block = new ProtoBlock('tuplet4');
+    tuplet4Block.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['tuplet4'] = tuplet4Block;
+    tuplet4Block.staticLabels.push(_('tuplet'), _('note value'));
+    tuplet4Block.extraWidth = 20;
+    tuplet4Block.adjustWidthToLabel();
+    tuplet4Block.flowClampOneArgBlock();
+    tuplet4Block.defaults.push(1 / 4);
 
     var simpleTuplet7Block = new ProtoBlock('stuplet7');
     simpleTuplet7Block.palette = palettes.dict['widgets'];
