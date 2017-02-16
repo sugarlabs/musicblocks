@@ -283,6 +283,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'clamp':
         case 'clang':
         case 'clap':
+        case 'countnotes':
         case 'cowbell':
         case 'crash':
         case 'crescendo':

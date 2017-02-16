@@ -1707,7 +1707,7 @@ function Palette(palettes, name) {
     };
 
     this._makeBlockFromPalette = function(protoblk, blkname, callback) {
-        const BUILTINMACROS= ['newswing2', 'newswing', 'newslur', 'newstaccato', 'newnote', 'note', 'rhythmicdot', 'tie', 'dividebeatfactor', 'multiplybeatfactor', 'duplicatenotes', 'skipnotes', 'setbpm', 'drift', 'osctime', 'sharp', 'flat', 'settransposition', 'invert', 'staccato', 'slur', 'swing', 'crescendo', 'setnotevolume2', 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff', 'articulation', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'pitchstaircase', 'tempo', 'pitchslider', 'turtlepitch', 'turtlenote', 'setturtlename', 'wholeNote', 'halfNote', 'quarterNote', 'eighthNote', 'sixteenthNote', 'thirtysecondNote', 'sixtyfourthNote', 'tone', 'rest2', 'tuplet3', 'fill', 'hollowline', 'note1', 'note2', 'note3', 'note4', 'octave', 'minor', 'major', 'diminished', 'perfect', 'augmented', 'minor2', 'major2', 'diminished1', 'perfect1', 'augmented1', 'minor3', 'major3', 'diminished5', 'perfect4', 'augmented4', 'minor6', 'major6', 'diminished5', 'perfect5', 'augmented5', 'minor7', 'major7', 'diminished8', 'perfect8', 'augmented8', 'steppitch', 'sine', 'triangle', 'square', 'sawtooth', 'setkey2', 'snare', 'hihat', 'kick', 'tom', 'pluck', 'triangle1', 'slap', 'fingercymbals', 'cup', 'cowbell', 'splash', 'ridebell', 'floortom', 'crash', 'chine', 'dog', 'cat', 'clap', 'bubbles', 'cricket', 'duck', 'bottle', 'clang', 'darbuka', 'setdrum', 'playdrum', 'backward', 'status', 'setvoice', 'rhythm2', 'vibrato', 'invert1', 'oneOf', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'tuplet4'];
+        const BUILTINMACROS= ['articulation', 'augmented', 'augmented1', 'augmented4', 'augmented5', 'augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished', 'diminished1', 'diminished5', 'diminished5', 'diminished8', 'dividebeatfactor', 'dog', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'flat', 'floortom', 'halfNote', 'hihat', 'hollowline', 'invert', 'invert1', 'kick', 'major', 'major2', 'major3', 'major6', 'major7', 'matrix', 'mf', 'minor', 'minor2', 'minor3', 'minor6', 'minor7', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'octave', 'oneOf', 'osctime', 'p', 'perfect', 'perfect1', 'perfect4', 'perfect5', 'perfect8', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pluck', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'ridebell', 'sawtooth', 'setbpm', 'setdrum', 'setkey2', 'setnotevolume2', 'settransposition', 'setturtlename', 'setvoice', 'sharp', 'sine', 'sixteenthNote', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'steppitch', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'tempo', 'thirtysecondNote', 'tie', 'tom', 'tone', 'triangle', 'triangle1', 'tuplet3', 'tuplet4','turtlenote', 'turtlepitch', 'vibrato', 'wholeNote'];
         if (protoblk == null) {
             console.log('null protoblk?');
             return;
@@ -2106,6 +2106,7 @@ function Palette(palettes, name) {
                 var thisBlock = paletteBlocks.blockList.length - 1;
                 var topBlk = paletteBlocks.findTopBlock(thisBlock);
             } else if (this.name === 'myblocks') {
+                console.log(this.name + ' ' + protoblk.name);
                 // If we are on the myblocks palette, it is a macro.
                 var macroName = blkname.replace('macro_', '');
 
@@ -2157,6 +2158,7 @@ function Palette(palettes, name) {
                     paletteBlocks.blockList[topBlk].collapseToggle();
                 }, 500);
             } else {
+                console.log(this.name + ' ' + protoblk.name);
                 var newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback, newBlock);
             }
 

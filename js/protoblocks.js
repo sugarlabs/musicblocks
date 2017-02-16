@@ -833,6 +833,37 @@ function ProtoBlock(name) {
         return [artwork, svg.docks];
     };
 
+    // E.g., count clamp: math block with interior slots
+    this.argFlowClampBlock = function() {
+        this.style = 'argflowclamp';
+        this.expandable = true;
+        this.size = 3;
+        this.args = 2;
+        this.dockTypes.push('anyout');
+        this.dockTypes.push('in');
+        this.generator = this.argFlowClampGenerator;
+    };
+
+    this.argFlowClampGenerator = function(slots) {
+        console.log(slots);
+        var svg = new SVG();
+        svg.init();
+        svg.setScale(this.scale);
+        svg.setSlot(false);
+        svg.setOutie(true);
+        svg.setExpand(20 + this.extraWidth, 0, 0, 0);
+        if (slots) {
+            svg.setClampSlots(0, slots);
+        } else {
+            svg.setClampSlots(0, [1]);
+        }
+        if (this.fontsize) {
+            svg.setFontSize(this.fontsize);
+        }
+        var artwork = svg.basicClamp();
+        return [artwork, svg.docks];
+    };
+
     // E.g., action. A "child" flow is docked in an expandable clamp.
     // The additional argument is a name. Again, no flow above or below.
     this.stackClampOneArgBlock = function() {
