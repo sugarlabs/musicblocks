@@ -918,7 +918,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var crescendoBlock = new ProtoBlock('crescendo');
     crescendoBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['crescendo'] = crescendoBlock;
-    crescendoBlock.staticLabels.push(_('crescendo'));
+    crescendoBlock.staticLabels.push(_('crescendo')+" +/-");
     crescendoBlock.adjustWidthToLabel();
     crescendoBlock.flowClampOneArgBlock();
     crescendoBlock.defaults.push(5);
