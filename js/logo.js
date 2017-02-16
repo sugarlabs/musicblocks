@@ -3994,13 +3994,25 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             break;
         case 'stuplet':
             if (logo.inMatrix) {
-                logo.tupletParams.push([1, (1 / args[1]) * logo.beatFactor[turtle]]);
                 pitchtimematrix.addColBlock(blk, args[0]);
-                var obj = ['simple', 0];
-                for (var i = 0; i < args[0]; i++) {
-                    obj.push((1 / args[1]) * logo.beatFactor[turtle]);
-		}
-		logo.tupletRhythms.push(obj);
+                var noteBeatValue = (1 / args[1]) * logo.beatFactor[turtle];
+                if (logo.tuplet === true) {
+                    // The simple-tuplet block is inside.
+                    for (var i = 0; i < args[0]; i++) {
+                        if (!logo.addingNotesToTuplet) {
+                            logo.tupletRhythms.push(['notes', 0]);
+                            logo.addingNotesToTuplet = true;
+                        }
+                        logo._processNote(noteBeatValue, blk, turtle);
+                    }
+                } else {
+                    logo.tupletParams.push([1, noteBeatValue]);
+                    var obj = ['simple', 0];
+                    for (var i = 0; i < args[0]; i++) {
+                        obj.push((1 / args[1]) * logo.beatFactor[turtle]);
+                    }
+                    logo.tupletRhythms.push(obj);
+	        }
             }
             break;
         case 'tuplet2':
@@ -4315,7 +4327,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
             noteBeatValue *= this.beatFactor[turtle];
             if (this.tuplet === true) {
-                if(this.addingNotesToTuplet) {
+                if (this.addingNotesToTuplet) {
                     var i = this.tupletRhythms.length - 1;
                     this.tupletRhythms[i].push(noteBeatValue);
                 } else {
