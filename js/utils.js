@@ -697,6 +697,25 @@ function mixedNumber (d) {
 };
 
 
+function LCD(a, b) {
+    return Math.abs((a * b) / GCD(a, b));
+};
+
+
+function GCD(a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+
+    while(b) {
+        var n = b;
+        b = a % b;
+        a = n;
+    }
+
+    return a;
+};
+
+
 function rationalToFraction (d) {
     /*
     Convert float to its approximate fractional representation. '''

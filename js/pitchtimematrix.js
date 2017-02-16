@@ -528,8 +528,20 @@ function Matrix() {
         var matrixDivPosition = matrixDiv.getBoundingClientRect();
 
         for (var i = 0; i < numberOfNotes; i++) {
+            if (i === 0) {
+                var lcd = param[1][0];
+            } else {
+                lcd = LCD(lcd, param[1][i]);
+            }
             totalNoteInterval += 32 / param[1][i];
         }
+
+        var tupletValue = 0;
+        for (var i = 0; i < numberOfNotes; i++) {
+            if (param[1][i] > 0) {
+                tupletValue += lcd / param[1][i];
+            }
+	}
 
         // Add the cells for each tuplet note
         if (this._matrixHasTuplets) {
@@ -612,7 +624,7 @@ function Matrix() {
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 if (i === tupletCol) {
                     cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
-                    cell.innerHTML = numberOfNotes.toString();
+                    cell.innerHTML = tupletValue.toString(); // numberOfNotes.toString();
                     cell.colSpan = numberOfNotes;
                 }
             }
