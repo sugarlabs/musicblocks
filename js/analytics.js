@@ -92,7 +92,7 @@ const TACAT = {
     'newstaccato': 'tone',
     'newslur': 'tone',
     'swing': 'tone',
-    'crescendo': 'tone',
+    'crescendo +/-': 'tone',
 
     'clear': 'forward',
     'forward': 'forward',
@@ -350,7 +350,7 @@ function analyzeProject(blocks) {
         case 'staccato':
         case 'slur':
         case 'swing':
-        case 'crescendo':
+        case 'crescendo +/-':
         case 'setnotevolume2':
         case 'action':
             if (blocks.blockList[blk].connections[2] == null) {
