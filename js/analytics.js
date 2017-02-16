@@ -314,7 +314,7 @@ const TASCORE = {
 // The list of palettes.
 const PALS = ['notesp', 'pitchp', 'tonep', 'turtlep', 'penp', 'numberp', 'flowp', 'boxp', 'sensorp', 'mediap', 'extrasp'];
 
-const PALLABELS = [_('rhythm'), _('pitch'), _('tone'), _('turtle'), _('pen'), _('number'), _('flow'), _('action'), _('sensors'), _('media'), _('extras')];
+const PALLABELS = [_('rhythm'), _('pitch'), _('tone'), _('mouse'), _('pen'), _('number'), _('flow'), _('action'), _('sensors'), _('media'), _('extras')];
 
 
 function analyzeProject(blocks) {
