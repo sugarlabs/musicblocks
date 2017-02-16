@@ -286,7 +286,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'countnotes':
         case 'cowbell':
         case 'crash':
-        case 'crescendo':
+        case 'crescendo +/-':
         case 'cricket':
         case 'cup':
         case 'darbuka':

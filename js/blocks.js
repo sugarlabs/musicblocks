@@ -2980,7 +2980,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'articulation':
             case 'augmented':
             case 'backward':
-            case 'crescendo':
+            case 'crescendo +/-':
             case 'diminished':
             case 'dividebeatfactor':
             case 'drift':

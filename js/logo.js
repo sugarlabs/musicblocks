@@ -3178,7 +3178,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
             logo._setListener(turtle, listenerName, __listener);
             break;
-        case 'crescendo':
+        case 'crescendo +/-':
             if (args.length > 1 && args[0] !== 0) {
                 logo.crescendoDelta[turtle].push(args[0]);
                 logo.crescendoVolume[turtle].push(last(logo.polyVolume[turtle]));

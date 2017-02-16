@@ -915,10 +915,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteVolumeBlock2.flowClampOneArgBlock();
     noteVolumeBlock2.defaults.push(50);
 
-    var crescendoBlock = new ProtoBlock('crescendo');
+    var crescendoBlock = new ProtoBlock('crescendo +/-');
     crescendoBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['crescendo'] = crescendoBlock;
-    crescendoBlock.staticLabels.push(_('crescendo'));
+    blocks.protoBlockDict['crescendo +/-'] = crescendoBlock;
+    crescendoBlock.staticLabels.push(_('crescendo +/-'));
     crescendoBlock.adjustWidthToLabel();
     crescendoBlock.flowClampOneArgBlock();
     crescendoBlock.defaults.push(5);
