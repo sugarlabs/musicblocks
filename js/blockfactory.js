@@ -868,7 +868,11 @@ function SVG() {
         var save_cap = this._cap;
         var save_slot = this._slot;
         this._resetMinMax();
-        var x = this._strokeWidth / 2.0;
+        if (this._outie) {
+            var x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
+        } else {
+            var x = this._strokeWidth / 2.0;
+        }
         if (this._cap) {
             var y = this._strokeWidth / 2.0 + this._radius + this._slotY * 3.0;
         } else {
@@ -924,7 +928,10 @@ function SVG() {
             }
             svg += this._corner(-1, 1, 90, 0, 1, true, true, false);
             svg += this._lineTo(xx, this._y);
+            var saveOutie = this._outie;
+            this._outie = false;
             svg += this._doTab();
+            this._outie = saveOutie;
             svg += this._iCorner(-1, 1, 90, 0, 0, true, true);
             svg += this._rLineTo(0, this._padding);
             if (this._clampSlots[clamp] > 1) {
@@ -933,7 +940,10 @@ function SVG() {
             }
             svg += this._rLineTo(0, this._expandY2);
             svg += this._iCorner(1, 1, 90, 0, 0, true, true);
+            var saveSlot = this._slot;
+            this._slot = true;
             svg += this._doSlot();
+            this._slot = saveSlot;
             this.docks.pop();  // We don't need this dock.
             svg += this._rLineTo(this._radius, 0);
         }
@@ -960,12 +970,20 @@ function SVG() {
         this._slot = save_slot;
 
         svg += this._corner(-1, -1, 90, 0, 1, true, true, false);
+        if (this._outie) {
+            svg += this._lineTo(x, this._radius + this._innieY2 + this._strokeWidth / 2.0);
+            svg += this._doOutie();
+        }
         svg += this._closePath();
         this._calculateWH(true);
         svg += this._style();
 
         // Add a block label
-        var tx = 8 * this._strokeWidth;
+        if (this._outie) {
+            var tx = 10 * this._strokeWidth + this._innieX1 + this._innieX2;
+        } else {
+            var tx = 8 * this._strokeWidth;
+        }
         if (this._cap) {
             var ty = (this._strokeWidth / 2.0 + this._radius + this._slotY) * this._scale;
         } else if (this._innies.length > 1) {
