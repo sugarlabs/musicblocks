@@ -173,14 +173,14 @@ function Block(protoblock, blocks, overrideName) {
     this.updateArgSlots = function(slotList) {
         // Resize and update number of slots in argClamp
         this.argClampSlots = slotList;
-        this.newArtwork();
+        this._newArtwork();
         this.regenerateArtwork(false);
     };
  
     this.updateSlots = function(clamp, plusMinus) {
         // Resize an expandable block.
         this.clampCount[clamp] += plusMinus;
-        this.newArtwork(plusMinus);
+        this._newArtwork(plusMinus);
         this.regenerateArtwork(false);
     };
  
@@ -218,7 +218,7 @@ function Block(protoblock, blocks, overrideName) {
         this.postProcessArg = null;
  
         this.protoblock.scale = scale;
-        this.newArtwork(0);
+        this._newArtwork(0);
         this.regenerateArtwork(true, []);
  
         if (this.text !== null) {
@@ -244,7 +244,7 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
  
-    this.newArtwork = function(plusMinus) {
+    this._newArtwork = function(plusMinus) {
         switch (this.name) {
         case 'start':
         case 'drum':
@@ -283,7 +283,6 @@ function Block(protoblock, blocks, overrideName) {
         case 'clamp':
         case 'clang':
         case 'clap':
-        case 'countnotes':
         case 'cowbell':
         case 'crash':
         case 'crescendo':
@@ -320,6 +319,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'newswing2':
         case 'notation':
         case 'note':
+        case 'notecounter':
         case 'osctime':
         case 'perfect':
         case 'pitchslider':
@@ -851,9 +851,13 @@ function Block(protoblock, blocks, overrideName) {
     };
  
     this.isClampBlock = function() {
-        return this.protoblock.style === 'clamp' || this.isDoubleClampBlock();
+        return this.protoblock.style === 'clamp' || this.isDoubleClampBlock() || this.isArgFlowClampBlock();
     };
  
+    this.isArgFlowClampBlock = function() {
+        return this.protoblock.style === 'argflowclamp';
+    };
+
     this.isDoubleClampBlock = function() {
         return this.protoblock.style === 'doubleclamp';
     };

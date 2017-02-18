@@ -2158,7 +2158,6 @@ function Palette(palettes, name) {
                     paletteBlocks.blockList[topBlk].collapseToggle();
                 }, 500);
             } else {
-                console.log(this.name + ' ' + protoblk.name);
                 var newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback, newBlock);
             }
 
