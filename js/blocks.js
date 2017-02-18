@@ -238,6 +238,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (this.protoBlockDict[proto].style === 'argclamp') {
                 this.argClampBlocks.push(this.protoBlockDict[proto].name);
             }
+            if (this.protoBlockDict[proto].style === 'argflowclamp') {
+                this.clampBlocks.push(this.protoBlockDict[proto].name);
+            }
             if (this.protoBlockDict[proto].style === 'argclamparg') {
                 this.argClampBlocks.push(this.protoBlockDict[proto].name);
                 this.argBlocks.push(this.protoBlockDict[proto].name);
@@ -304,11 +307,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
-            if (clamp === 0) {
+
+            if (myBlock.isArgFlowClampBlock()) {
+                var c = 1;  // 0: outie; and 1: child flow
+            } else if (clamp === 0) {
                 var c = myBlock.connections.length - 2;
             } else { // e.g., Bottom clamp in if-then-else
                 var c = myBlock.connections.length - 3;
             }
+
             blocks._sizeCounter = 0;
             var childFlowSize = 1;
             if (c > 0 && myBlock.connections[c] != null) {
@@ -1218,10 +1225,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     blocks._clampBlocksToCheck.push([blk, 0]);
                     blocks._clampBlocksToCheck.push([blk, 1]);
                 } else {
+                    console.log('clamp block to check ' + blocks.blockList[blk].name);
                     blocks._clampBlocksToCheck.push([blk, 0]);
                 }
+		console.log('INSIDE EXPANDABLE');
+
                 blk = blocks._insideExpandableBlock(blk);
             }
+
             blocks._adjustExpandableClampBlock();
             blocks.refreshCanvas();
         }, 250);
@@ -2548,7 +2559,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             var cblk = this.blockList[blk].connections[0];
             if (this.blockList[cblk].isExpandableBlock()) {
                 // If it is the last connection, keep searching.
-                if (blk === last(this.blockList[cblk].connections)) {
+                if (this.blockList[cblk].isArgFlowClampBlock()) {
+                    return cblk;
+                } else if (blk === last(this.blockList[cblk].connections)) {
                     return this._insideExpandableBlock(cblk);
                 } else {
                     return cblk;
@@ -2815,7 +2828,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
  
-            if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp'].indexOf(this.protoBlockDict[name].style) !== -1) {
+            if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp', 'argflowclamp'].indexOf(this.protoBlockDict[name].style) !== -1) {
                 this._checkArgClampBlocks.push(this.blockList.length + b);
             }
  
@@ -3869,7 +3882,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     this._checkTwoArgBlocks.push(blk);
                 } else if (myBlock.isArgBlock() && myBlock.isExpandableBlock() || myBlock.isArgClamp()) {
                     this._checkTwoArgBlocks.push(blk);
-                } else if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp'].indexOf(myBlock.protoblock.style) !== -1) {
+                } else if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp', 'argflowclamp'].indexOf(myBlock.protoblock.style) !== -1) {
                     this._checkArgClampBlocks.push(blk);
                 }
             }
