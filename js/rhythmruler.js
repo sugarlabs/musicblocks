@@ -126,18 +126,18 @@ function RhythmRuler () {
         for (var i = 0; i < inputNum; i++) {
             var newCell = ruler.insertCell(newCellIndex+i);
             noteValues.splice(newCellIndex + i, 0, newNoteValue);
-            if (newCellWidth > 10) {
+            if (newCellWidth > 12) {
                 newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
             } else {
-            	newCell.innerHTML = '';
-             	newCell.addEventListener('mouseover',function(){
-            		newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
-            		newCell.style.fontSize = 'large';
-            		newCell.style.fontWeight = 'bolder';
-            	});
-            	newCell.addEventListener('mouseout',function(){
-            		newCell.innerHTML = '';
-            	});
+                newCell.innerHTML = '';
+
+                newCell.addEventListener('mouseover', function() {
+                    newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
+                });
+
+                newCell.addEventListener('mouseout', function() {
+                    newCell.innerHTML = '';
+                });
             }
 
             newCell.style.width = newCellWidth + 'px';
@@ -459,7 +459,7 @@ function RhythmRuler () {
         console.log('init RhythmRuler');
         this._logo = logo;
 
-	this._playing = false;
+        this._playing = false;
         this._playingOne = false;
         this._playingAll = false;
         this._rulerPlaying = -1;
