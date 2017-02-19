@@ -2845,7 +2845,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'action':
             case 'hat':
                 if (blkData[4][1] != null) {
-                    console.log('found action name: ' + blkData[4][1]);
                     actionNames[b] = blkData[4][1];
                 }
                 break;
@@ -2953,7 +2952,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
                 if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(blkName) !== -1) {
                     if (thisBlkData[1][1]['value'] === oldName) {
-                        console.log('renaming ' + oldName + ' to ' + name);
                         thisBlkData[1][1] = {'value': name};
                     }
                 } else {
@@ -3181,7 +3179,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'hat':
                 blkData[4][0] = null;
                 blkData[4][3] = null;
-                console.log('makeNewBlockWithConnection action ' + blkData[4]);
                 this._makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
                 break;
  

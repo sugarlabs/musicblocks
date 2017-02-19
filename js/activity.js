@@ -1566,7 +1566,9 @@ define(function (require) {
             document.body.style.cursor = 'wait';
 
             console.log('Saving .ly file');
-            logo.lilypondSaveOnly = true;
+            // Suppress music and turtle output when generating
+            // Lilypond output.
+            logo.runningLilypond = true;
             logo.lilypondOutput = LILYPONDHEADER;
             logo.lilypondNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {

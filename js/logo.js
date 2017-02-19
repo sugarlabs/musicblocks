@@ -178,8 +178,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.drumStyle = {};
     this.voices = {};
     this.backward = {};
-    this.vibratoIntensity = {}
-    this.vibratoRate = {}
+    this.vibratoIntensity = {};
+    this.vibratoRate = {};
+    this.justCounting = {};
+    // When counting notes or generating lilypond output...
+    this.suppressOutput = {};
 
     // scale factor for turtle graphics embedded in notes
     this.dispatchFactor = {};
@@ -193,10 +196,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
     // parameters used by notations
     this.checkingLilypond = false;
-    this.lilypondSaveOnly = false;
+    this.checkingLilypond = false;
     this.lilypondNotes = {};
     this.lilypondStaging = {};
     this.lilypondOutput = getLilypondHeader();
+    this.runningLilypond = false;
     this.numerator = 3;
     this.denominator = 4;
 
@@ -678,11 +682,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             this.vibratoIntensity[turtle] = [];
             this.vibratoRate[turtle] = [];
             this.dispatchFactor[turtle] = 1;
+            this.justCounting[turtle] = false;
+	    this.suppressOutput[turtle] = this.runningLilypond;
         }
 
         this.pitchNumberOffset = 39;  // C4
 
-        if (!this.lilypondSaveOnly) {
+        if (!this.suppressOutput[turtle]) {
             this._setSynthVolume(DEFAULTVOLUME, Math.max(this.turtles.turtleList.length - 1), 0);
         }
 
@@ -814,9 +820,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
         } else {
             // console.log('nothing to run');
-            if (this.lilypondSaveOnly) {
+            if (this.suppressOutput[turtle]) {
                 this.errorMsg(NOACTIONERRORMSG, null, _('start'));
-                this.lilypondSaveOnly = false;
+                this.suppressOutput[turtle] = false;
                 this.checkingLilypond = false;
                 // Reset cursor.
                 document.body.style.cursor = 'default';
@@ -1086,7 +1092,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         case 'nameddo':
             var name = logo.blocks.blockList[blk].privateData;
             if (name in logo.actions) {
-                lilypondLineBreak(logo, turtle);
+                if (!logo.justCounting[turtle]) {
+                    lilypondLineBreak(logo, turtle);
+                }
 
                 if (logo.backward[turtle].length > 0) {
                     childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
@@ -1123,7 +1131,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         case 'do':
             if (args.length > 0) {
                 if (args[0] in logo.actions) {
-                    lilypondLineBreak(logo, turtle);
+                    if (!logo.justCounting[turtle]) {
+                        lilypondLineBreak(logo, turtle);
+                    }
                     childFlow = logo.actions[args[0]];
                     childFlowCount = 1;
                 } else {
@@ -1145,7 +1155,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
             }
             if (name in logo.actions) {
-                lilypondLineBreak(logo, turtle);
+                if (!logo.justCounting[turtle]) {
+                    lilypondLineBreak(logo, turtle);
+                }
 
                 if (logo.backward[turtle].length > 0) {
                     childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
@@ -1188,7 +1200,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
             if (args.length >= 1) {
                 if (args[0] in logo.actions) {
-                    lilypondLineBreak(logo, turtle);
+                    if (!logo.justCounting[turtle]) {
+                        lilypondLineBreak(logo, turtle);
+                    }
                     actionName = args[0];
                     childFlow = logo.actions[args[0]];
                     childFlowCount = 1;
@@ -1203,7 +1217,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 childFlow = args[0];
                 // If we are running in non-interactive mode, we
                 // need to put a bounds on "forever".
-                if (logo.lilypondSaveOnly) {
+                if (logo.suppressOutput[turtle]) {
                     childFlowCount = 10;
                 } else {
                     childFlowCount = -1;
@@ -1440,7 +1454,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push([args[0], args[1]]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    if (!logo.lilypondSaveOnly) {
+                    if (!logo.suppressOutput[turtle]) {
                         var delta = args[0] / NOTEDIV;
                         var listenerName = '_arc_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
@@ -1547,7 +1561,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    if (!logo.lilypondSaveOnly) {
+                    if (!logo.suppressOutput[turtle]) {
                         var dist = args[0] / NOTEDIV;
                         var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
@@ -1581,7 +1595,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    if (!logo.lilypondSaveOnly) {
+                    if (!logo.suppressOutput[turtle]) {
                         var dist = -args[0] / NOTEDIV;
                         var listenerName = '_forward_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
@@ -1615,7 +1629,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    if (!logo.lilypondSaveOnly) {
+                    if (!logo.suppressOutput[turtle]) {
                         var delta = args[0] / NOTEDIV;
                         var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
@@ -1649,7 +1663,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
                     pitchtimematrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
-                    if (!logo.lilypondSaveOnly) {
+                    if (!logo.suppressOutput[turtle]) {
                         var delta = -args[0] / NOTEDIV;
                         var listenerName = '_right_' + turtle + '_' + logo.whichNoteBlock[turtle];
 
@@ -3196,7 +3210,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.crescendoVolume[turtle].pop();
                     logo.polyVolume[turtle].pop();
                     logo.crescendoInitialVolume[turtle].pop();
-                    lilypondEndCrescendo(logo, turtle);
+                    if (!logo.justCounting[turtle]) {
+                        lilypondEndCrescendo(logo, turtle);
+                    }
                 };
 
                 logo._setListener(turtle, listenerName, __listener);
@@ -3501,7 +3517,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.staccato[turtle].push(-args[0]);
                 }
 
-                lilypondBeginSlur(logo, turtle);
+                if (!logo.justCounting[turtle]) {
+                    lilypondBeginSlur(logo, turtle);
+                }
+
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -3510,7 +3529,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                 var __listener = function (event) {
                     logo.staccato[turtle].pop();
-                    lilypondEndSlur(logo, turtle);
+                    if (!logo.justCounting[turtle]) {
+                        lilypondEndSlur(logo, turtle);
+                    }
                 };
 
                 logo._setListener(turtle, listenerName, __listener);
@@ -3546,9 +3567,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 // If tieCarryOver > 0, we have one more note to
                 // play.
                 if (logo.tieCarryOver[turtle] > 0) {
-                    // Remove the note from the Lilypond list.
-                    for (var i = 0; i < logo.notePitches[turtle].length; i++) {
-                        lilypondRemoveTie(logo, turtle);
+                    if (!logo.justCounting[turtle]) {
+                        // Remove the note from the Lilypond list.
+                        for (var i = 0; i < logo.notePitches[turtle].length; i++) {
+                            lilypondRemoveTie(logo, turtle);
+                        }
                     }
                     var noteValue = logo.tieCarryOver[turtle];
                     logo.tieCarryOver[turtle] = 0;
@@ -3751,7 +3774,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
                 logo.polyVolume[turtle].push(newVolume);
                 logo._setSynthVolume(newVolume, turtle);
-                lilypondBeginArticulation(logo, turtle);
+                if (!logo.justCounting[turtle]) {
+                    lilypondBeginArticulation(logo, turtle);
+                }
 
                 childFlow = args[1];
                 childFlowCount = 1;
@@ -3761,7 +3786,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                 var __listener = function(event) {
                     logo.polyVolume[turtle].pop();
-                    lilypondEndArticulation(logo, turtle);
+                    if (!logo.justCounting[turtle]) {
+                        lilypondEndArticulation(logo, turtle);
+                    }
                 };
 
                 logo._setListener(turtle, listenerName, __listener);
@@ -4236,21 +4263,21 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             // ensured that the turtle is really finished running
             // yet. Hence the timeout.
             __checkLilypond = function() {
-                if (!logo.turtles.running() && queueStart === 0 && logo.lilypondSaveOnly) {
-                    console.log('saving lilypond output: ' + this.lilypondStaging);
+                if (!logo.turtles.running() && queueStart === 0 && logo.suppressOutput[turtle] && !logo.justCounting[turtle]) {
+                    console.log('saving lilypond output: ' + logo.lilypondStaging);
                     saveLilypondOutput(logo, _('My Project') + '.ly');
-                    logo.lilypondSaveOnly = false;
+                    logo.suppressOutput[turtle] = false;
                     logo.checkingLilypond = false;
                     // Reset cursor.
                     document.body.style.cursor = 'default';
-                } else if (logo.lilypondSaveOnly) {
+                } else if (logo.suppressOutput[turtle]) {
                     setTimeout(function() {
                         __checkLilypond();
                     }, 250);
                 }
             };
 
-            if (!logo.turtles.running() && queueStart === 0 && logo.lilypondSaveOnly) {
+            if (!logo.turtles.running() && queueStart === 0 && logo.suppressOutput[turtle] && !logo.justCounting[turtle]) {
                 if (!logo.checkingLilypond) {
                     logo.checkingLilypond = true;
                     setTimeout(function() {
@@ -4364,7 +4391,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         } else {
             // We start the music clock as the first note is being
             // played.
-            if (this.firstNoteTime == null) {
+            if (this.firstNoteTime == null && !this.suppressOutput[turtle]) {
                 var d = new Date();
                 this.firstNoteTime = d.getTime();
             }
@@ -4380,7 +4407,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 // When we are "drifting", we don't bother with lag.
                 var turtleLag = 0;
             }
-
             // If we are in a tie, depending upon parity, we either
             // add the duration from the previous note to the current
             // note, or we cache the duration and set the wait to
@@ -4428,9 +4454,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                             this.noteHertz[turtle].push(this.tieNote[turtle][i][3]);
                         }
                         this.tieNote[turtle] = [];
-                        // Remove the note from the Lilypond list.
-                        for (var i = 0; i < this.notePitches[turtle].length; i++) {
-                            lilypondRemoveTie(this, turtle);
+
+			if (!this.justCounting[turtle]) {
+                            // Remove the note from the Lilypond list.
+                            for (var i = 0; i < this.notePitches[turtle].length; i++) {
+                                lilypondRemoveTie(this, turtle);
+                            }
                         }
 
                         this._processNote(tmpBeatValue, blk, turtle);
@@ -4507,11 +4536,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             // played. doWait sets the wait time for the turtle before
             // the next block is executed.
             var duration = noteBeatValue * this.beatFactor[turtle];  // beat value
-            if (duration > 0) {
+            if (duration > 0 && !this.suppressOutput[turtle]) {
                 this.turtleTime[turtle] += ((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle];
             }
 
-            if (!this.lilypondSaveOnly) {
+            if (!this.suppressOutput[turtle]) {
                 if (duration > 0) {
                     this._doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) * this.duplicateFactor[turtle] - turtleLag, 0));
                 }
@@ -4531,13 +4560,19 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     }
                     continue;
                 }
+
                 if (this.skipFactor[turtle] > 1) {
                     this.skipIndex[turtle] += 1;
                 }
-                if (j > 0) {
-                    if (duration > 0) {
-                        waitTime += (bpmFactor * 1000 / duration);
+
+                if (!this.suppressOutput[turtle]) {
+                    if (j > 0) {
+                        if (duration > 0) {
+                            waitTime += (bpmFactor * 1000 / duration);
+                        }
                     }
+                } else {
+                    waitTime = 0;
                 }
 
                 __playnote = function(logo) {
@@ -4545,8 +4580,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     var drums = [];
                     var insideChord = -1;
                     if ((logo.notePitches[turtle].length + logo.oscList[turtle].length) > 1) {
-                        if (turtle in logo.lilypondStaging) {
-                            var insideChord = logo.lilypondStaging[turtle].length + 1;
+                        if (turtle in logo.lilypondStaging && !this.justCounting[turtle]) {
+                            var insideChord = this.lilypondStaging[turtle].length + 1;
                         } else {
                             var insideChord = 1;
                         }
@@ -4609,25 +4644,35 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                             if (duration > 0) {
                                 if (carry > 0) {
-                                    if (i === 0) {
+                                    if (i === 0 && !logo.justCounting[turtle]) {
                                         lilypondInsertTie(logo, turtle);
                                     }
                                     originalDuration = 1 / ((1 / duration) - (1 / carry));
                                 } else {
                                     originalDuration = duration;
                                 }
-                                updateLilypondNotation(logo, note, originalDuration, turtle, insideChord);
+                                if (!logo.justCounting[turtle]) {
+                                    updateLilypondNotation(logo, note, originalDuration, turtle, insideChord);
+                                }
                             } else if (logo.tieCarryOver[turtle] > 0) {
-                                updateLilypondNotation(logo, note, logo.tieCarryOver[turtle], turtle, insideChord);
+                                if (!logo.justCounting[turtle]) {
+                                    updateLilypondNotation(logo, note, logo.tieCarryOver[turtle], turtle, insideChord);
+                                }
                             } else {
                                 // console.log('duration == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
                             }
                         }
 
-                        console.log("notes to play " + notes + ' ' + noteBeatValue);
-                        if (!logo.lilypondSaveOnly) {
+                        if (!logo.justCounting[turtle]) {
+                            console.log("notes to play " + notes + ' ' + noteBeatValue);
+                        } else {
+                            console.log("notes to count " + notes + ' ' + noteBeatValue);
+                        }
+
+                        if (!logo.suppressOutput[turtle]) {
                             logo.turtles.turtleList[turtle].blink(duration,last(logo.polyVolume[turtle]));
                         }
+
                         if (notes.length > 0) {
                             var len = notes[0].length;
 
@@ -4650,7 +4695,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                                 }
                             }
 
-                            if (!logo.lilypondSaveOnly && duration > 0) {
+                            if (!logo.suppressOutput[turtle] && duration > 0) {
                                 if (logo.oscList[turtle].length > 0) {
                                     if (notes.length > 1) {
                                         logo.errorMsg(last(logo.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
@@ -4689,7 +4734,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                         // console.log("drums to play " + drums + ' ' + noteBeatValue);
 
-                        if (!logo.lilypondSaveOnly && duration > 0) {
+                        if (!logo.suppressOutput[turtle] && duration > 0) {
                             for (var i = 0; i < drums.length; i++) {
                                 if (logo.drumStyle[turtle].length > 0) {
                                     logo.synth.trigger(['C2'], beatValue, last(logo.drumStyle[turtle]));
@@ -4701,7 +4746,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     }
                 };
 
-                if (waitTime === 0 || this.lilypondSaveOnly) {
+                if (waitTime === 0 || this.suppressOutput[turtle]) {
                     __playnote(this);
                 } else {
                     var logo = this;
@@ -4711,7 +4756,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
 
                 if (this.crescendoDelta[turtle].length > 0) {
-                    if (last(this.crescendoVolume[turtle]) === last(this.crescendoInitialVolume[turtle])) {
+                    if (last(this.crescendoVolume[turtle]) === last(this.crescendoInitialVolume[turtle]) && !this.justCounting[turtle]) {
                         lilypondBeginCrescendo(this, turtle, last(this.crescendoDelta[turtle]));
                     }
                     var len = this.crescendoVolume[turtle].length
@@ -4921,7 +4966,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
             }
             return logo.blocks.blockList[blk].value;
-        } else if (logo.blocks.blockList[blk].isArgBlock() || logo.blocks.blockList[blk].isArgClamp()) {
+        } else if (logo.blocks.blockList[blk].isArgBlock() || logo.blocks.blockList[blk].isArgClamp() || logo.blocks.blockList[blk].isArgFlowClampBlock()) {
             switch (logo.blocks.blockList[blk].name) {
             case 'loudness':
                     var values = logo.analyser.analyse();
@@ -5501,6 +5546,25 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 } else {
                     block.value = true;
                 }
+                break;
+            case 'notecounter':
+                var saveCountingStatus = logo.justCounting[turtle];
+                var saveSuppressStatus = logo.suppressOutput[turtle];
+                logo.suppressOutput[turtle] = true;
+                logo.justCounting[turtle] = true;
+                var actionArgs = [];
+                var saveNoteCount = logo.notesPlayed[turtle];
+                var cblk = logo.blocks.blockList[blk].connections[1];
+                if (cblk == null) {
+                    logo.blocks.blockList[blk].value = 0;
+                } else {
+                    logo.turtles.turtleList[turtle].running = true;
+                    logo._runFromBlockNow(logo, turtle, cblk, true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
+                    logo.blocks.blockList[blk].value = logo.notesPlayed[turtle] - saveNoteCount;
+                    logo.notesPlayed[turtle] = saveNoteCount;
+                }
+                logo.justCounting[turtle] = saveCountingStatus;
+                logo.suppressOutput[turtle] = saveSuppressStatus;
                 break;
             case 'calc':
                 var actionArgs = [];
