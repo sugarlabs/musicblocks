@@ -129,7 +129,15 @@ function RhythmRuler () {
             if (newCellWidth > 10) {
                 newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
             } else {
-                newCell.innerHTML = '';
+            	newCell.innerHTML = '';
+             	newCell.addEventListener('mouseover',function(){
+            		newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
+            		newCell.style.fontSize = 'large';
+            		newCell.style.fontWeight = 'bolder';
+            	});
+            	newCell.addEventListener('mouseout',function(){
+            		newCell.innerHTML = '';
+            	});
             }
 
             newCell.style.width = newCellWidth + 'px';
