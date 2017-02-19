@@ -1225,10 +1225,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     blocks._clampBlocksToCheck.push([blk, 0]);
                     blocks._clampBlocksToCheck.push([blk, 1]);
                 } else {
-                    console.log('clamp block to check ' + blocks.blockList[blk].name);
                     blocks._clampBlocksToCheck.push([blk, 0]);
                 }
-		console.log('INSIDE EXPANDABLE');
 
                 blk = blocks._insideExpandableBlock(blk);
             }
@@ -1785,7 +1783,9 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this.makeBlock = function (name, arg) {
         // Make a new block from a proto block.
         // Called from palettes.
- 
+
+        console.log(name + ' ' + arg);
+
         if (name === 'text') {
             console.log('makeBlock ' + name + ' ' + arg);
         }
@@ -1946,12 +1946,12 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         for (var proto in me.protoBlockDict) {
             if (me.protoBlockDict[proto].name === name) {
                 if (arg === '__NOARG__') {
-                    // console.log('creating ' + name + ' block with no args');
+                    console.log('creating ' + name + ' block with no args');
                     me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
                 } else if (me.protoBlockDict[proto].defaults[0] === arg) {
-                    // console.log('creating ' + name + ' block with default arg ' + arg);
+                    console.log('creating ' + name + ' block with default arg ' + arg);
                     me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
@@ -1983,7 +1983,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
                 value = this.findUniqueActionName(_('action'));
-                //  console.log('renaming action block to ' + value);
+                console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
@@ -2766,9 +2766,11 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // We'll need a list of existing storein and action names.
         var currentActionNames = [];
         var currentStoreinNames = [];
+        console.log('current Action Names');
         for (var b = 0; b < this.blockList.length; b++) {
             if (this.blockList[b].name === 'action') {
                 if (this.blockList[b].connections[1] != null) {
+                    console.log(this.blockList[this.blockList[b].connections[1]].value);
                     currentActionNames.push(this.blockList[this.blockList[b].connections[1]].value);
                 }
             } else if (this.blockList[b].name === 'storein') {
@@ -2843,6 +2845,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'action':
             case 'hat':
                 if (blkData[4][1] != null) {
+                    console.log('found action name: ' + blkData[4][1]);
                     actionNames[b] = blkData[4][1];
                 }
                 break;
@@ -2950,7 +2953,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
                 if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(blkName) !== -1) {
                     if (thisBlkData[1][1]['value'] === oldName) {
-                        // console.log('renaming ' + oldName + ' to ' + name);
+                        console.log('renaming ' + oldName + ' to ' + name);
                         thisBlkData[1][1] = {'value': name};
                     }
                 } else {
@@ -3178,6 +3181,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             case 'hat':
                 blkData[4][0] = null;
                 blkData[4][3] = null;
+                console.log('makeNewBlockWithConnection action ' + blkData[4]);
                 this._makeNewBlockWithConnections('action', blockOffset, blkData[4], null, null, collapsed);
                 break;
  

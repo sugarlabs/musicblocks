@@ -5140,6 +5140,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo.blocks.blockList[blk].value = String.fromCharCode(a);
                 break;
             case 'myclick':
+                console.log('[click' + logo.turtles.turtleList[turtle].name + ']');
                 logo.blocks.blockList[blk].value = 'click' + logo.turtles.turtleList[turtle].name;
                 break;
             case 'heading':
