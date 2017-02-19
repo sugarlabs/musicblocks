@@ -845,7 +845,6 @@ function ProtoBlock(name) {
     };
 
     this.argFlowClampGenerator = function(slots) {
-        console.log(slots);
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);

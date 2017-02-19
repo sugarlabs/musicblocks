@@ -793,7 +793,7 @@ function PopdownPalette(palettes) {
                 var palette = me.palettes.dict[e.dataset.palettename];
                 var container = palette.protoContainers[e.dataset.modname];
 
-                console.log(e.dataset.blk + ' ' + e.dataset.modname);
+                // console.log(e.dataset.blk + ' ' + e.dataset.modname);
                 var newBlock = palette._makeBlockFromPalette(palette.protoList[e.dataset.blk], e.dataset.modname, function (newBlock) {
                     // Move the drag group under the cursor.
                     paletteBlocks.findDragGroup(newBlock);
@@ -1051,7 +1051,7 @@ function Palette(palettes, name) {
     this._updateMenu = function(hide) {
         var palette = this;
 
-        function __calculateBounds(palette, blk, modname) {
+        function __calculateBounds(palette, blk, modname, protoListBlk) {
             var bounds = palette.protoContainers[modname].getBounds();
             palette.protoContainers[modname].cache(bounds.x, bounds.y, Math.ceil(bounds.width), Math.ceil(bounds.height));
 
@@ -1060,14 +1060,14 @@ function Palette(palettes, name) {
             // select single-height blocks below double-height blocks.
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, Math.ceil(bounds.width), Math.ceil(bounds.height * 0.75));
             palette.protoContainers[modname].hitArea = hitArea;
-
-            palette._loadPaletteMenuItemHandler(palette.protoList[blk], modname);
+            palette._loadPaletteMenuItemHandler(protoListBlk, modname);
             palette.palettes.refreshCanvas();
         };
 
         function __processBitmap(palette, modname, bitmap, args) {
             var b = args[0];
             var blk = args[1];
+            var protoListBlk = args[2];
 
             if (palette.protoContainers[modname] == undefined) {
                 console.log('no protoContainer for ' + modname);
@@ -1093,12 +1093,12 @@ function Palette(palettes, name) {
                     palette.protoContainers[modname].addChild(bitmap);
                     bitmap.x = MEDIASAFEAREA[0] * (b.scale / 2);
                     bitmap.y = MEDIASAFEAREA[1] * (b.scale / 2);
-                    __calculateBounds(palette, blk, modname);
+                    __calculateBounds(palette, blk, modname, protoListBlk);
                 };
 
                 image.src = b.image;
             } else {
-                __calculateBounds(palette, blk, modname);
+                __calculateBounds(palette, blk, modname, protoListBlk);
             }
         };
 
@@ -1141,7 +1141,11 @@ function Palette(palettes, name) {
                 this.y += Math.ceil(b.height * PROTOBLOCKSCALE);
                 this._updateBackground();
 
-                makePaletteBitmap(this, PALETTEFILLER.replace(/filler_height/g, b.height.toString()), b.modname, __processFiller, [b, blk]);
+                // Since the protoList might change while this block
+                // is being created, we cannot rely on blk to be the
+                // proper index, so pass the entry itself as an
+                // argument.
+                makePaletteBitmap(this, PALETTEFILLER.replace(/filler_height/g, b.height.toString()), b.modname, __processFiller, [b, blk, this.protoList[blk]]);
             } else {
                 this.protoContainers[b.modname].x = this.menuContainer.x;
                 this.protoContainers[b.modname].y = this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT;
@@ -2101,12 +2105,11 @@ function Palette(palettes, name) {
             moved = false;
             this.draggingProtoBlock = false;
 
-            if (protoblk.name !== 'namedbox' && blkname in BUILTINMACROS) {
+            if (['namedbox', 'nameddo', 'namedcalc', 'namedarg', 'nameddoArg'].indexOf(protoblk.name) === -1 && blkname in BUILTINMACROS) {
                 paletteBlocks.loadNewBlocks(BUILTINMACROS[blkname]);
                 var thisBlock = paletteBlocks.blockList.length - 1;
                 var topBlk = paletteBlocks.findTopBlock(thisBlock);
             } else if (this.name === 'myblocks') {
-                console.log(this.name + ' ' + protoblk.name);
                 // If we are on the myblocks palette, it is a macro.
                 var macroName = blkname.replace('macro_', '');
 
@@ -2159,6 +2162,7 @@ function Palette(palettes, name) {
                 }, 500);
             } else {
                 var newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback, newBlock);
+
             }
 
             // Put the protoblock back on the palette...

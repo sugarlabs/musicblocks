@@ -530,6 +530,13 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // RHYTHM PALETTE
 
+    var noteCounter = new ProtoBlock('notecounter');
+    noteCounter.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['notecounter'] = noteCounter;
+    noteCounter.staticLabels.push(_('note counter'));
+    noteCounter.argFlowClampBlock();
+    noteCounter.adjustWidthToLabel();
+
     var turtleNoteBlock = new ProtoBlock('turtlenote');
     turtleNoteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['turtlenote'] = turtleNoteBlock;

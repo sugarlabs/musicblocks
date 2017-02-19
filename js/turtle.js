@@ -1235,6 +1235,7 @@ function Turtles(canvas, stage, refreshCanvas) {
 
         myTurtle.container.on('click', function(event) {
             // If turtles listen for clicks then they can be used as buttons.
+            console.log('--> [click' + myTurtle.name + ']');
             turtles.stage.dispatchEvent('click' + myTurtle.name);
         });
 
