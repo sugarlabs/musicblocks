@@ -4268,6 +4268,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     saveLilypondOutput(logo, _('My Project') + '.ly');
                     logo.suppressOutput[turtle] = false;
                     logo.checkingLilypond = false;
+                    logo.runningLilypond = false;
                     // Reset cursor.
                     document.body.style.cursor = 'default';
                 } else if (logo.suppressOutput[turtle]) {
