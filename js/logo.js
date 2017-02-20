@@ -478,7 +478,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                             sum += (values[k] * values[k]);
                     }
                     var rms = Math.sqrt(sum/logo.limit);
-                    value = Math.round(rms * 1000);
+                    value = Math.round(rms);
                 }
                 break;
             case 'consonantstepsizeup':
@@ -4981,12 +4981,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         logo.mic.open();
                         logo.blocks.blockList[blk].value = 0;
                     } else {
-                        logo.blocks.blockList[blk].value = Math.round(rms * 1000);
+                        logo.blocks.blockList[blk].value = Math.round(rms);
                     }
                 } catch (e) {  // MORE DEBUGGING
                     console.log(e);
                     logo.mic.open();
-                    logo.blocks.blockList[blk].value = Math.round(rms * 1000);
+                    logo.blocks.blockList[blk].value = Math.round(rms);
                 }
                 break;
             case 'eval':
