@@ -1221,6 +1221,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     console.log(blocks.blockList);
                     break;
                 }
+
                 if (blocks.blockList[blk].name === 'ifthenelse') {
                     blocks._clampBlocksToCheck.push([blk, 0]);
                     blocks._clampBlocksToCheck.push([blk, 1]);
@@ -1576,6 +1577,8 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             this._searchCounter = 0;
             this._searchForExpandables(this.stackList[i]);
         }
+
+        this._searchForArgFlow();
     };
  
     this._findTwoArgs = function () {
@@ -1590,6 +1593,14 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         }
     };
  
+    this._searchForArgFlow = function () {
+        for (var blk = 0; blk < this.blockList.length; blk++) {
+            if (this.blockList[blk].isArgFlowClampBlock()) {
+                this._expandablesList.push(blk);
+            }
+        }
+    };
+
     this._searchForExpandables = function (blk) {
         // Find the expandable blocks below blk in a stack.
         while (blk != null && this.blockList[blk] != null && !this.blockList[blk].isValueBlock()) {
@@ -1600,6 +1611,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 console.log(blk + ' ' + this.blockList[blk].name);
                 break;
             }
+
             if (this.blockList[blk].isClampBlock()) {
                 this._expandablesList.push(blk);
                 var c = this.blockList[blk].connections.length - 2;
@@ -1612,6 +1624,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             } else if (this.blockList[blk].isArgClamp()) {
                 this._expandablesList.push(blk);
             }
+
             blk = last(this.blockList[blk].connections);
         }
     };
@@ -1784,8 +1797,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // Make a new block from a proto block.
         // Called from palettes.
 
-        console.log(name + ' ' + arg);
-
         if (name === 'text') {
             console.log('makeBlock ' + name + ' ' + arg);
         }
@@ -1946,12 +1957,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         for (var proto in me.protoBlockDict) {
             if (me.protoBlockDict[proto].name === name) {
                 if (arg === '__NOARG__') {
-                    console.log('creating ' + name + ' block with no args');
                     me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
                 } else if (me.protoBlockDict[proto].defaults[0] === arg) {
-                    console.log('creating ' + name + ' block with default arg ' + arg);
                     me.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
@@ -1983,7 +1992,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
                 value = this.findUniqueActionName(_('action'));
-                console.log('renaming action block to ' + value);
                 if (value !== _('action')) {
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
@@ -2766,7 +2774,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         // We'll need a list of existing storein and action names.
         var currentActionNames = [];
         var currentStoreinNames = [];
-        console.log('current Action Names');
         for (var b = 0; b < this.blockList.length; b++) {
             if (this.blockList[b].name === 'action') {
                 if (this.blockList[b].connections[1] != null) {
@@ -2830,6 +2837,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 }
             }
  
+            // FIXME: Use tests in block.js 
             if (['clamp', 'argclamp', 'argclamparg', 'doubleclamp', 'argflowclamp'].indexOf(this.protoBlockDict[name].style) !== -1) {
                 this._checkArgClampBlocks.push(this.blockList.length + b);
             }
