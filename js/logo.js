@@ -474,11 +474,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 } else { 
                     var values = logo.analyser.analyse();
                     var sum = 0;
-                    for(var k=0; k<logo.limit; k++){
-                            sum += (values[k] * values[k]);
+                    for (var k = 0; k < logo.limit; k++){
+                        sum += (values[k] * values[k]);
                     }
-                    var rms = Math.sqrt(sum/logo.limit);
-                    value = Math.round(rms);
+                    value = Math.round(Math.sqrt(sum / logo.limit));
                 }
                 break;
             case 'consonantstepsizeup':
@@ -683,7 +682,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             this.vibratoRate[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.justCounting[turtle] = false;
-	    this.suppressOutput[turtle] = this.runningLilypond;
+            this.suppressOutput[turtle] = this.runningLilypond;
         }
 
         this.pitchNumberOffset = 39;  // C4
@@ -4039,7 +4038,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         obj.push((1 / args[1]) * logo.beatFactor[turtle]);
                     }
                     logo.tupletRhythms.push(obj);
-	        }
+                }
             }
             break;
         case 'tuplet2':
@@ -4456,7 +4455,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         }
                         this.tieNote[turtle] = [];
 
-			if (!this.justCounting[turtle]) {
+                        if (!this.justCounting[turtle]) {
                             // Remove the note from the Lilypond list.
                             for (var i = 0; i < this.notePitches[turtle].length; i++) {
                                 lilypondRemoveTie(this, turtle);
