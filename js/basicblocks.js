@@ -308,7 +308,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     scaleDegree.defaults.push(4);
     scaleDegree.twoArgBlock();
     scaleDegree.dockTypes[1] = 'numberin';
-    scaleDegree.dockTypes[2] = 'numberin';
+    scaleDegree.dockTypes[2] = 'anyin';
 
     var pitchStepBlock = new ProtoBlock('steppitch');
     pitchStepBlock.palette = palettes.dict['pitch'];
@@ -329,7 +329,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitch.defaults.push(4);
     pitch.twoArgBlock();
     pitch.dockTypes[1] = 'solfegein';
-    pitch.dockTypes[2] = 'numberin';
+    pitch.dockTypes[2] = 'anyin';
 
     // MATRIX PALETTE
 
