@@ -584,7 +584,7 @@ function Matrix() {
             var row = table.insertRow(table.rows.length - 1);
             var cell = row.insertCell(-1);
             cell.style.fontSize = this._cellScale * 75 + '%';
-            cell.style.position = 'fixed';
+            cell.style.position = 'static';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.minWidth;
@@ -636,7 +636,7 @@ function Matrix() {
             // Add row for tuplet note values
             var row = table.insertRow(table.rows.length - 2);
             var cell = row.insertCell(-1);
-            cell.style.position = 'fixed';
+            cell.style.position = 'static';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
