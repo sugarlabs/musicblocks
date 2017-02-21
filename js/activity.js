@@ -172,6 +172,7 @@ define(function (require) {
         var currentKeyCode = 0;
         var lastKeyCode = 0;
         var pasteContainer = null;
+        var pasteImage = null;
         var chartBitmap = null;
 
         // Calculate the palette colors.
@@ -2105,26 +2106,41 @@ define(function (require) {
             stopTurtleContainer.visible = true;
         };
 
-        function updatePasteButton() {
-            pasteContainer.removeChild(pasteContainer.children[0]);
-            var img = new Image();
-
-            img.onload = function () {
-                var originalSize = 55; // this is the original svg size
-                var halfSize = Math.floor(cellSize / 2);
-
-                var bitmap = new createjs.Bitmap(img);
-                if (cellSize !== originalSize) {
-                    bitmap.scaleX = cellSize / originalSize;
-                    bitmap.scaleY = cellSize / originalSize;
-                }
-                bitmap.regX = halfSize / bitmap.scaleX;
-                bitmap.regY = halfSize / bitmap.scaleY;
-                pasteContainer.addChild(bitmap)
-                update = true;
+        function blinkPasteButton(bitmap) {
+            function handleComplete() {
+                createjs.Tween.get(bitmap).to({alpha:1, visible:true}, 500);
             };
 
-            img.src = 'header-icons/paste-button.svg';
+            createjs.Tween.get(bitmap).to({alpha:0, visible:false}, 1000).call(
+handleComplete);
+        };
+
+        function updatePasteButton() {
+            if (pasteImage === null) {
+
+                var img = new Image();
+
+                img.onload = function () {
+                    var originalSize = 55; // this is the original svg size
+                    var halfSize = Math.floor(cellSize / 2);
+
+                    var bitmap = new createjs.Bitmap(img);
+                    if (cellSize !== originalSize) {
+                        bitmap.scaleX = cellSize / originalSize;
+                        bitmap.scaleY = cellSize / originalSize;
+                    }
+                    bitmap.regX = halfSize / bitmap.scaleX;
+                    bitmap.regY = halfSize / bitmap.scaleY;
+                    pasteContainer.addChild(bitmap);
+                    pasteImage = bitmap;
+
+                    update = true;
+                };
+
+                img.src = 'header-icons/paste-button.svg';
+            } else {
+                blinkPasteButton(pasteImage);
+            }
         };
 
         function _setupAndroidToolbar(showPalettesPopover) {
