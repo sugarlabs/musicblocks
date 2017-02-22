@@ -618,13 +618,19 @@ function RhythmRuler () {
         this._dy = cell.getBoundingClientRect().top - rulerDiv.getBoundingClientRect().top;
         this._dragging = false;
         this._target = false;
-        this._innerHTML = cell.innerHTML;
+        this._dragCellHTML = cell.innerHTML;
 
         cell.onmouseover = function(e) {
             // In order to prevent the dragged item from triggering a
             // browser reload in Firefox, we empty the cell contents
             // before dragging.
             cell.innerHTML = '';
+        };
+
+        cell.onmouseout = function(e) {
+            if (!that._dragging) {
+                cell.innerHTML = that._dragCellHTML;
+            }
         };
 
         canvas.ondragover = function(e) {
@@ -638,7 +644,7 @@ function RhythmRuler () {
                 rulerDiv.style.left = x + 'px';
                 var y = e.clientY - that._dy;
                 rulerDiv.style.top = y + 'px';
-                cell.innerHTML = that._innerHTML;
+                cell.innerHTML = that._dragCellHTML;
             }
         };
 
