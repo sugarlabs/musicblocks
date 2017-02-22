@@ -475,7 +475,14 @@ function RhythmRuler () {
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
 
-        docById('rulerDiv').style.visibility = 'visible';
+        var canvas = document.getElementById('myCanvas');
+
+        // Position the widget and make it visible.
+        var rulerDiv = docById('rulerDiv');
+        rulerDiv.style.visibility = 'visible';
+        rulerDiv.setAttribute('draggable', 'true');
+        rulerDiv.style.left = '200px';
+        rulerDiv.style.top = '150px';
 
         // The widget buttons
         var widgetButtonsDiv = docById('rulerButtonsDiv');
@@ -595,14 +602,90 @@ function RhythmRuler () {
 
             rulerTableDiv.style.visibility = 'hidden';
             widgetButtonsDiv.style.visibility = 'hidden';
-            docById('rulerDiv').style.visibility = 'hidden';
+            rulerDiv.style.visibility = 'hidden';
 
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
+
+            canvas.addEventListener('mousemove', dragIt, false);
+            rulerDiv.addEventListener('mousemove', dragIt, false);
         };
 
+        // We use this cell as a handle for dragging.
         var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
+
+        this.dragging = false;
+        this.draggingTimeout = null;
+        this.draggingListener = null;
+        this.left = Number(rulerDiv.style.left.replace('px', ''));
+        this.top = Number(rulerDiv.style.top.replace('px', ''));
+        this.x = 0;
+        this.y = 0;
+        this.mousePos = {x: 0, y: 0};
+
+        function getMousePos(canvas, evt) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        };
+
+        function dragIt (event) {
+            if (that.dragging) {
+                that.mousePos = getMousePos(canvas, event);
+                var dx = that.mousePos.x - that.x;
+                var dy = that.mousePos.y - that.y;
+
+                if ((that.left + dx) > 50) {
+                    that.left += dx;
+                      that.x = that.mousePos.x;
+                } else {
+                    console.log('edge');
+                }
+
+                // TODO: check right and bottom edges.
+                if ((that.left + dx) > 50) {
+                    // Slow down the drag a bit.
+                    that.left += dx / 2;
+                    that.x = that.mousePos.x;
+                }
+
+                if ((that.top + dy) > 50) {
+                      that.top += dy;
+                    that.y = that.mousePos.y;
+                }
+
+                rulerDiv.style.left = that.left + 'px';
+                rulerDiv.style.top = that.top + 'px';
+            }
+        };
+
+        // While we are dragging, we don't care where the mouse
+        // events come from.
+        canvas.addEventListener('mousemove', dragIt, false);
+        rulerDiv.addEventListener('mousemove', dragIt, false);
+
+        cell.onmousedown = function(event) {
+            that.mousePos = getMousePos(canvas, event);
+            that.left = Number(rulerDiv.style.left.replace('px', ''));
+            that.top = Number(rulerDiv.style.top.replace('px', ''));
+            that.x = that.mousePos.x;
+            that.y = that.mousePos.y;
+            that.dragging = true;
+
+            cell.onmouseout = function(event) {
+                if (that.dragging && that.draggingTimeout == null) {
+                    // Use a slight delay in ending drag as the mouse
+                    // may get a but ahead of the cell when dragging.
+                    that.draggingTimeout = setTimeout(function() {
+                          that.dragging = false;
+                        that.draggingTimeout = null;
+                    }, 250);
+                }
+            };
+        };
 
         // The ruler table
         var rulerTableDiv = docById('rulerTableDiv');
@@ -610,7 +693,7 @@ function RhythmRuler () {
         rulerTableDiv.style.visibility = 'visible';
         rulerTableDiv.style.border = '2px';
         rulerTableDiv.innerHTML = '';
-        
+
         // We use an outerdiv to scroll vertically and an innerdiv to
         // scroll horizontally.
         rulerTableDiv.innerHTML = '<div id="outerdiv"><div id="innerdiv"><table id="rhythmRulerTable"></table></div></div>';
