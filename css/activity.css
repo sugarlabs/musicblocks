@@ -417,7 +417,7 @@ table {
     background: rgba(255, 255, 255, 0.85);
 }
 
-#outerdiv {
+#rulerOuterDiv {
     position: absolute;
     left: 0px;
     top: 0px;
@@ -427,7 +427,7 @@ table {
     background: rgba(255, 255, 255, 0.85);
 }
 
-#innerdiv {
+#rulerInnerDiv {
     overflow-x:auto;
     margin-left: 53px;
 }

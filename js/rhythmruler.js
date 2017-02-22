@@ -668,23 +668,24 @@ function RhythmRuler () {
         rulerTableDiv.style.border = '2px';
         rulerTableDiv.innerHTML = '';
 
-        // We use an outerdiv to scroll vertically and an innerdiv to
+        // We use an outer div to scroll vertically and an inner div to
         // scroll horizontally.
-        rulerTableDiv.innerHTML = '<div id="outerdiv"><div id="innerdiv"><table id="rhythmRulerTable"></table></div></div>';
+        rulerTableDiv.innerHTML = '<div id="rulerOuterDiv"><div id="rulerInnerDiv"><table id="rhythmRulerTable"></table></div></div>';
 
         var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 2);
+        var outerDiv = docById('rulerOuterDiv');
         if (this.Rulers.length > n) {
-            docById('outerdiv').style.height = 82 * n + 'px';
+            outerDiv.style.height = 82 * n + 'px';
             var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
-            docById('outerdiv').style.width = w + 'px';
+            outerDiv.style.width = w + 'px';
         } else {
-            docById('outerdiv').style.height = 82 * this.Rulers.length + 'px';
+            outerDiv.style.height = 82 * this.Rulers.length + 'px';
             var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
-            docById('outerdiv').style.width = w + 'px';
+            outerDiv.style.width = w + 'px';
         }
 
         var w = Math.max(Math.min(window.innerWidth, INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
-        docById('innerdiv').style.width = w + 'px';
+        docById('rulerInnerDiv').style.width = w + 'px';
 
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.
