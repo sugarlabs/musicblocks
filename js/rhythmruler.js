@@ -612,77 +612,47 @@ function RhythmRuler () {
         // We use this cell as a handle for dragging.
         var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
 
-        this.dragging = false;
-        this.draggingTimeout = null;
-        this.draggingListener = null;
-        this.left = Number(rulerDiv.style.left.replace('px', ''));
-        this.top = Number(rulerDiv.style.top.replace('px', ''));
-        this.x = 0;
-        this.y = 0;
-        this.mousePos = {x: 0, y: 0};
+        cell.style.cursor = 'move';
 
-        function getMousePos(canvas, evt) {
-            var rect = canvas.getBoundingClientRect();
-            return {
-                x: evt.clientX - rect.left,
-                y: evt.clientY - rect.top
-            };
+        this._dx = cell.getBoundingClientRect().left - rulerDiv.getBoundingClientRect().left;
+        this._dy = cell.getBoundingClientRect().top - rulerDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._innerHTML = cell.innerHTML;
+
+        cell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            cell.innerHTML = '';
         };
 
-        function dragIt (event) {
-            if (that.dragging) {
-                that.mousePos = getMousePos(canvas, event);
-                var dx = that.mousePos.x - that.x;
-                var dy = that.mousePos.y - that.y;
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
 
-                if ((that.left + dx) > 50) {
-                    that.left += dx;
-                      that.x = that.mousePos.x;
-                } else {
-                    console.log('edge');
-                }
-
-                // TODO: check right and bottom edges.
-                if ((that.left + dx) > 50) {
-                    // Slow down the drag a bit.
-                    that.left += dx / 2;
-                    that.x = that.mousePos.x;
-                }
-
-                if ((that.top + dy) > 50) {
-                      that.top += dy;
-                    that.y = that.mousePos.y;
-                }
-
-                rulerDiv.style.left = that.left + 'px';
-                rulerDiv.style.top = that.top + 'px';
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                rulerDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                rulerDiv.style.top = y + 'px';
+                cell.innerHTML = that._innerHTML;
             }
         };
 
-        cell.onmousedown = function(event) {
-            // While we are dragging, we don't care where the mouse
-            // events come from.
-            canvas.addEventListener('mousemove', dragIt, false);
-            rulerDiv.addEventListener('mousemove', dragIt, false);
-            that.mousePos = getMousePos(canvas, event);
-            that.left = Number(rulerDiv.style.left.replace('px', ''));
-            that.top = Number(rulerDiv.style.top.replace('px', ''));
-            that.x = that.mousePos.x;
-            that.y = that.mousePos.y;
-            that.dragging = true;
+        rulerDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
 
-            cell.onmouseout = function(event) {
-                if (that.dragging && that.draggingTimeout == null) {
-                    // Use a slight delay in ending drag as the mouse
-                    // may get a but ahead of the cell when dragging.
-                    that.draggingTimeout = setTimeout(function() {
-                          that.dragging = false;
-                        that.draggingTimeout = null;
-                        canvas.removeEventListener('mousemove', dragIt, false);
-                        rulerDiv.removeEventListener('mousemove', dragIt, false);
-                    }, 250);
-                }
-            };
+        rulerDiv.ondragstart = function(e) {
+            if (cell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
         };
 
         // The ruler table
