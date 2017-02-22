@@ -567,7 +567,14 @@ function Block(protoblock, blocks, overrideName) {
         };
  
         if (this.overrideName) {
-            block_label = this.overrideName;
+            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
+                block_label = this.overrideName;
+                if (block_label.length > 8) {
+                    block_label = block_label.substr(0, 7) + '...';
+                }
+            } else {
+                block_label = this.overrideName;
+            }
         } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
             // Label should be defined inside _().
             block_label = this.protoblock.staticLabels[0];
