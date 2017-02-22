@@ -630,7 +630,6 @@ function RhythmRuler () {
         };
 
         function dragIt (event) {
-            console.log('foo');
             if (that.dragging) {
                 that.mousePos = getMousePos(canvas, event);
                 var dx = that.mousePos.x - that.x;
