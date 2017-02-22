@@ -607,9 +607,6 @@ function RhythmRuler () {
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
-
-            canvas.addEventListener('mousemove', dragIt, false);
-            rulerDiv.addEventListener('mousemove', dragIt, false);
         };
 
         // We use this cell as a handle for dragging.
@@ -633,6 +630,7 @@ function RhythmRuler () {
         };
 
         function dragIt (event) {
+            console.log('foo');
             if (that.dragging) {
                 that.mousePos = getMousePos(canvas, event);
                 var dx = that.mousePos.x - that.x;
@@ -662,12 +660,11 @@ function RhythmRuler () {
             }
         };
 
-        // While we are dragging, we don't care where the mouse
-        // events come from.
-        canvas.addEventListener('mousemove', dragIt, false);
-        rulerDiv.addEventListener('mousemove', dragIt, false);
-
         cell.onmousedown = function(event) {
+            // While we are dragging, we don't care where the mouse
+            // events come from.
+            canvas.addEventListener('mousemove', dragIt, false);
+            rulerDiv.addEventListener('mousemove', dragIt, false);
             that.mousePos = getMousePos(canvas, event);
             that.left = Number(rulerDiv.style.left.replace('px', ''));
             that.top = Number(rulerDiv.style.top.replace('px', ''));
@@ -682,6 +679,8 @@ function RhythmRuler () {
                     that.draggingTimeout = setTimeout(function() {
                           that.dragging = false;
                         that.draggingTimeout = null;
+                        canvas.removeEventListener('mousemove', dragIt, false);
+                        rulerDiv.removeEventListener('mousemove', dragIt, false);
                     }, 250);
                 }
             };
