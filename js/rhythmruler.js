@@ -694,7 +694,7 @@ function RhythmRuler () {
             var rhythmRulerTableRow = rhythmRulerTable.insertRow();
             var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('play'), '<br>');
             drumcell.setAttribute('id', i);
-            drumcell.className = "headcol";  // Position fixed when scrolling horizontally
+            drumcell.className = 'headcol';  // Position fixed when scrolling horizontally
 
             drumcell.onclick=function() {
                 var id = Number(this.getAttribute('id'));

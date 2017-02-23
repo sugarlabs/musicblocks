@@ -387,6 +387,45 @@ table {
     overflow-x: scroll !important;
 }
 
+#ptmDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#ptmTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#ptmButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#ptmOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#ptmInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
 #download {
     position: absolute;
     top :100px;
@@ -436,6 +475,7 @@ table {
     position:absolute;
     left:2px;
     top:auto;
+    text-align: center;
     vertical-align: middle;
 }
 
