@@ -17,6 +17,14 @@ const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
 
 
 function Matrix() {
+    const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
+    const OUTERWINDOWWIDTH = 675;
+    const INNERWINDOWWIDTH = 600;
+    const RULERHEIGHT = 82;  // A little extra than we need for FF.
+    const BUTTONSIZE = 51;
+    const ICONSIZE = 32;
+    const BACKSPACE = 8;
+
     // rowLabels can contain either a pitch, a drum, or a grphics command
     this.rowLabels = [];
     // rowArgs can contain an octave or the arg(s) to a graphics command
@@ -106,114 +114,161 @@ function Matrix() {
         this._rests = 0;
         this._logo = logo;
 
-        docById('pitchtimematrix').style.display = 'inline';
-        docById('pitchtimematrix').style.visibility = 'visible';
-        docById('pitchtimematrix').style.border = 2;
-
         var w = window.innerWidth;
-        this._cellScale = w / 1200;
-        docById('pitchtimematrix').style.width = Math.floor(w / 2) + 'px';
-        docById('pitchtimematrix').style.overflowX = 'auto';
+        this._cellScale = 1.0;
+        var iconSize = ICONSIZE;
+
+        var canvas = document.getElementById('myCanvas');
+
+        // Position the widget and make it visible.
+        var ptmDiv = docById('ptmDiv');
+        ptmDiv.style.visibility = 'visible';
+        ptmDiv.setAttribute('draggable', 'true');
+        ptmDiv.style.left = '200px';
+        ptmDiv.style.top = '150px';
+
+        // The widget buttons
+        var widgetButtonsDiv = docById('ptmButtonsDiv');
+        widgetButtonsDiv.style.display = 'inline';
+        widgetButtonsDiv.style.visibility = 'visible';
+        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
+        widgetButtonsDiv.innerHTML = '<table id="ptmButtonTable"></table>';
+
+        var buttonTable = docById('ptmButtonTable');
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
+
+        // For the button callbacks
+        var that = this;
 
         console.log('notes ' + this.rowLabels + ' octave ' + this.rowArgs);
 
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
 
-        docById('pitchtimematrix').innerHTML = '';
-
-        // Used to remove the matrix table
-        Element.prototype.remove = function() {
-            this.parentElement.removeChild(this);
-        }
-
-        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-            for (var i = 0, len = this.length; i < len; i++) {
-                if (this[i] && this[i].parentElement) {
-                    this[i].parentElement.removeChild(this[i]);
-                }
-            }
-        };
-
-        var table = docById('pitchTimeTable');
-
-        if (table !== null) {
-            table.remove();
-        }
-
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'pitchTimeTable');
-        x.style.textAlign = 'center';
-
-        var matrixDiv = docById('pitchtimematrix');
-        matrixDiv.style.paddingTop = 0 + 'px';
-        matrixDiv.style.paddingLeft = 0 + 'px';
-        matrixDiv.appendChild(x);
-        var matrixDivPosition = matrixDiv.getBoundingClientRect();
-
-        var table = docById('pitchTimeTable');
-        var tableStyle = window.getComputedStyle(table);
-        var header = table.createTHead();
-        var row = header.insertRow(0);
-        row.style.left = Math.floor(matrixDivPosition.left) + 'px';
-        row.style.top = Math.floor(matrixDivPosition.top) + 'px';
-
-        var blankCell = row.insertCell(-1);
-        blankCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        blankCell.style.minWidth = blankCell.style.width;
-        blankCell.style.maxWidth = blankCell.style.width;
-        blankCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-
         // Add the buttons to the top row.
         var that = this;
-        var iconSize = Math.floor(this._cellScale * 24);
-        var borderSpacingH = parseInt(tableStyle.borderSpacing.split(' ')[0]);
-        var borderSpacingV = parseInt(tableStyle.borderSpacing.split(' ')[1]);
-        var leftMargin = matrixDivPosition.left + borderSpacingH;
-        var topMargin = matrixDivPosition.top + borderSpacingV;
 
-        var cell = this._addButton(row, leftMargin, topMargin, 'play-button.svg', iconSize, _('play'));
+        var cell = this._addButton(row, 'play-button.svg', iconSize, _('play'), '');
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
-        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, leftMargin, topMargin, 'export-chunk.svg', iconSize, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save'), '');
         cell.onclick=function() {
             that._save();
         }
-        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, leftMargin, topMargin, 'erase-button.svg', iconSize, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
         cell.onclick=function() {
             that._clear();
         }
-        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, leftMargin, topMargin, 'export-button.svg', iconSize, _('export'));
+        var cell = this._addButton(row, 'export-button.svg', iconSize, _('export'), '');
         cell.onclick=function() {
             that._export();
         }
-        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, leftMargin, topMargin, 'sort.svg', iconSize, _('sort'));
+        var cell = this._addButton(row, 'sort.svg', iconSize, _('sort'), '');
         cell.onclick=function() {
             that._sort();
         }
-        leftMargin += parseInt(cell.getBoundingClientRect().width) + borderSpacingH;
 
-        var cell = this._addButton(row, leftMargin, topMargin, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'), '');
         cell.onclick=function() {
-            docById('pitchtimematrix').style.visibility = 'hidden';
-            docById('pitchtimematrix').style.border = 0;
             that._rowOffset = [];
             for (var i = 0; i < that._rowMap.length; i++) {
                 that._rowMap[i] = i;
             }
             that._logo.synth.stopSound('default');
             that._logo.synth.stop();
+
+            ptmTableDiv.style.visibility = 'hidden';
+            ptmButtonsDiv.style.visibility = 'hidden';
+            ptmDiv.style.visibility = 'hidden';
         }
+
+        // We use this cell as a handle for dragging.
+        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
+        dragCell.style.cursor = 'move';
+
+        this._dx = dragCell.getBoundingClientRect().left - ptmDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - ptmDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = dragCell.innerHTML;
+
+        dragCell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            dragCell.innerHTML = '';
+        };
+
+        dragCell.onmouseout = function(e) {
+            if (!that._dragging) {
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                ptmDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                ptmDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        ptmDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
+
+        ptmDiv.ondragstart = function(e) {
+            if (dragCell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
+
+        // The ptm table
+        var ptmTableDiv = docById('ptmTableDiv');
+        ptmTableDiv.style.display = 'inline';
+        ptmTableDiv.style.visibility = 'visible';
+        ptmTableDiv.style.border = '0px';
+        ptmTableDiv.innerHTML = '';
+
+        // We use an outer div to scroll vertically and an inner div to
+        // scroll horizontally.
+        ptmTableDiv.innerHTML = '<div id="ptmOuterDiv"><div id="ptmInnerDiv"><table id="ptmTable"></table></div></div>';
+
+        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 2);
+        var outerDiv = docById('ptmOuterDiv');
+        if (this.rowLabels.length > n) {
+            outerDiv.style.height = 82 * n + 'px';
+            var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
+            outerDiv.style.width = w + 'px';
+        } else {
+            outerDiv.style.height = 82 * this.rowLabels.length + 'px';
+            var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
+            outerDiv.style.width = w + 'px';
+        }
+
+        var w = Math.max(Math.min(window.innerWidth, INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
+        docById('ptmInnerDiv').style.width = w + 'px';
+
+        // Each row in the ptm table contains a note label in the
+        // first column and a table of buttons in the second column.
+        var ptmTable = docById('ptmTable');
 
         var j = 0;
         for (var i = 0; i < this.rowLabels.length; i++) {
@@ -222,11 +277,17 @@ function Matrix() {
                 continue;
             }
 
-            var row = header.insertRow(i + 1);
-            row.style.top = (matrixDivPosition.top + MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale + (i+2) * borderSpacingV) + 'px';
-            var cell = row.insertCell(0);
+            var ptmTableRow = ptmTable.insertRow();
+
+            // A cell for the row label
+            var cell = ptmTableRow.insertCell();
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             cell.style.fontSize = this._cellScale * 100 + '%';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            cell.style.maxWidth = cell.style.minWidth;
+            cell.className = 'headcol';  // This cell is fixed horizontally.
 
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
@@ -268,44 +329,61 @@ function Matrix() {
                 this._noteStored.push(noteObj[0] + noteObj[1]);
             }
 
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-            cell.style.maxWidth = cell.style.minWidth;
-            cell.style.position = 'fixed';
-            cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
-            cell.style.top = (matrixDivPosition.top + MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale + (i+3) * borderSpacingV) + 'px';
+            var ptmCell = ptmTableRow.insertCell();
+            // Create tables to store individual notes.
+            ptmCell.innerHTML = '<table id="ptmCellTable' + j + '"></table>';
+
+            var ptmCellTable = docById('ptmCellTable' + j);
+            ptmCellTable.style.textAlign = 'center';
+            ptmCellTable.style.border = '0px';
+            ptmCellTable.style.borderCollapse = 'collapse';
+            ptmCellTable.cellSpacing = '1px';
+            ptmCellTable.cellPadding = '1px';
+
+            // We'll use this element to put the clickable notes for this row.
+            var ptmRow = ptmCellTable.insertRow();
+            ptmRow.setAttribute('id', 'ptm' + j);
+
             j += 1;
         }
 
-        var row = header.insertRow(this.rowLabels.length - this._rests + 1);
-        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-        var cell = row.insertCell(0);
-        cell.style.fontSize = this._cellScale * 75 + '%';
+        // An extra row for the note values
+        var ptmTableRow = ptmTable.insertRow();
+        var cell = ptmTableRow.insertCell();
         cell.innerHTML = _('note value');
-        cell.style.position = 'fixed';
+        cell.style.fontSize = this._cellScale * 75 + '%';
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
         cell.style.backgroundColor = MATRIXLABELCOLOR;
-        moveMatrix();
+        cell.className = 'headcol';  // This cell is fixed horizontally.
+
+        var ptmCell = ptmTableRow.insertCell();
+        // Create tables to store individual note values.
+        ptmCell.innerHTML = '<table id="ptmCellTable' + j + '"></table>';
+
+        var ptmCellTable = docById('ptmCellTable' + j);
+        ptmCellTable.style.textAlign = 'center';
+        ptmCellTable.style.border = '0px';
+        ptmCellTable.style.borderCollapse = 'collapse';
+        ptmCellTable.cellSpacing = '1px';
+        ptmCellTable.cellPadding = '1px';
+
+        var ptmRow = ptmCellTable.insertRow();
+        ptmRow.setAttribute('id', 'ptm' + j);
     };
 
-    this._addButton = function(row, leftM, topM, icon, iconSize, label) {
-        var table = docById('drumTable');
-        var cell = row.insertCell();
-        cell.className = 'matrixButton';
-        cell.style.position = 'fixed';
-        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+    this._addButton = function(row, icon, iconSize, label, extras) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = extras + '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.left = leftM + 'px';
-        cell.style.top = topM + 'px';
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.height = cell.style.width; 
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" style="margin-top: ' + (parseInt(cell.style.height) - iconSize) / 2 + 'px' + '">&nbsp;&nbsp;';
 
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
@@ -319,18 +397,6 @@ function Matrix() {
     };
 
     this._generateDataURI = function(file) {
-        // Deprecated since we now use SVG for note artwork.  Using
-        // HTML chars failed on some browsers since font was not
-        // always available.
-        /*
-        file = file.replace(/𝅝/g,"&#x1D15D;");
-        file = file.replace(/𝅗𝅥/g,"&#x1D15E;");
-        file = file.replace(/𝅘𝅥/g,"&#x1D15F;");
-        file = file.replace(/𝅘𝅥𝅮/g,"&#x1D160;");
-        file = file.replace(/𝅘𝅥𝅯/g,"&#x1D161;");
-        file = file.replace(/𝅘𝅥𝅰/g,"&#x1D162;");
-        file = file.replace(/𝅘𝅥𝅱/g,"&#x1D163;");
-        */
         var data = "data:text/html;charset=utf-8," + encodeURIComponent(file);
         return data;
     };
@@ -520,12 +586,10 @@ function Matrix() {
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
 
-        var table = docById('pitchTimeTable');
         var tupletTimeFactor = param[0][0] / param[0][1];
         var numberOfNotes = param[1].length;
         var totalNoteInterval = 0;
-        var matrixDiv = docById('pitchtimematrix');
-        var matrixDivPosition = matrixDiv.getBoundingClientRect();
+        var ptmTable = docById('ptmTable');
 
         for (var i = 0; i < numberOfNotes; i++) {
             if (i === 0) {
@@ -543,19 +607,13 @@ function Matrix() {
             }
 	}
 
-        // Add the cells for each tuplet note
-        if (this._matrixHasTuplets) {
-            // Extra rows for tuplets have already been added.
-            var rowCount = table.rows.length - 3;
-        } else {
-            var rowCount = table.rows.length - 1;
-        }
+        var rowCount = this.rowLabels.length;
 
-        for (var i = 1; i < rowCount; i++) {
-            row = table.rows[i];
+        for (var i = 0; i < rowCount; i++) {
+            var row = docById('ptm' + i);
             for (var j = 0; j < numberOfNotes; j++) {
-                cell = row.insertCell(-1);
-                cell.setAttribute('id', table.rows[i].cells.length - 1);
+                cell = row.insertCell();
+                cell.setAttribute('id', 'tuplet');
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 cell.onmouseover=function() {
@@ -579,27 +637,44 @@ function Matrix() {
         }
 
         if (this._matrixHasTuplets) {
-            var row = table.rows[table.rows.length - 2];
+            var row = docById('ptm' + this.rowLabels.length);
         } else {
-            var row = table.insertRow(table.rows.length - 1);
-            var cell = row.insertCell(-1);
+            console.log('inserting new row at position ' + this.rowLabels.length);
+            var ptmTableRow = ptmTable.insertRow(this.rowLabels.length);
+
+            var cell = row.insertCell();
             cell.style.fontSize = this._cellScale * 75 + '%';
-            cell.style.position = 'fixed';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.minWidth;
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
-            // cell.style.top = matrixDivPosition.top + (table.rows.length - 1) * cell.style.height + 'px';
             cell.innerHTML = _('tuplet value');
             cell.style.backgroundColor = MATRIXLABELCOLOR;
+            cell.className = 'headcol';  // This cell is fixed horizontally.
+
+            var ptmCell = ptmTableRow.insertCell();
+            // Create tables to store individual tuplet values.
+            ptmCell.innerHTML = '<table id="ptmCellTable' + this.rowLabels.length + '"></table>';
+
+            var ptmCellTable = docById('ptmCellTable' + this.rowLabels.length);
+            ptmCellTable.style.textAlign = 'center';
+            ptmCellTable.style.border = '0px';
+            ptmCellTable.style.borderCollapse = 'collapse';
+            ptmCellTable.cellSpacing = '1px';
+            ptmCellTable.cellPadding = '1px';
+
+            // We'll use this element to put the tuplet values notes.
+            var ptmRow = ptmCellTable.insertRow();
+            ptmRow.setAttribute('id', 'ptm' + this.rowLabels.length);
         }
 
+        /*
         var w = window.innerWidth;
         w = (2 * w) / 5;
 
         cell = table.rows[table.rows.length - 1].insertCell(-1);
         cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        */
 
         var noteValue = param[0][1] / param[0][0];
         var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0]);
@@ -662,7 +737,7 @@ function Matrix() {
 
         for (var i = firstCell; i < cellCount; i++) {
             // Add cell for tuplet note values
-            cell = row.insertCell(-1);
+            var cell = row.insertCell(-1);
             cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             // Add tuplet note values
@@ -673,9 +748,9 @@ function Matrix() {
                 cell.style.fontSize = this._cellScale * 75 + '%';
                 var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
                 if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
-                       cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this._cellScale + '>';
+                    cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this._cellScale + '>';
                 } else {
-                       cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
+                    cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
                 }
             }
         }
@@ -688,7 +763,7 @@ function Matrix() {
     };
 
     this.addNotes = function(numBeats, noteValue) {
-        var table = docById('pitchTimeTable');
+        var ptmTable = docById('ptmTable');
         var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
         if (this._noteValue > noteValue) {
@@ -706,15 +781,17 @@ function Matrix() {
         }
 
         for (var j = 0; j < numBeats; j++) {
-            for (var i = 1; i <= rowCount; i++) {
-                var row = table.rows[i];
-                var cell = row.insertCell(-1);
+            /* for (var i = 1; i <= rowCount; i++) { */
+	    for (var i = 0; i < rowCount; i++) {
+                // the buttons get add to the embedded table
+                var row = docById('ptm' + i);
+                var cell = row.insertCell();
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.width = this._noteWidth(noteValue);
                 cell.style.width = cell.width;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                if (i === rowCount) {
+                if (i === rowCount - 1) {
                     cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                     cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                     cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
@@ -738,8 +815,6 @@ function Matrix() {
                         }
                     }
                 }
-
-                cell.setAttribute('id', table.rows[1].cells.length - 1);
             }
         }
     };
@@ -747,40 +822,45 @@ function Matrix() {
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
-        var table = docById('pitchTimeTable');
-        if (this._matrixHasTuplets) {
-            var leaveRowsFromBottom = 3;
-        } else {
-            var leaveRowsFromBottom = 1;
-        }
+	var rowCount = this.rowLabels.length;
+        console.log('in makeClickable: ' + rowCount);
 
-        for (var i = 1; i < table.rows[1].cells.length; i++) {
-            for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
-                cell = table.rows[j].cells[i];
+	for (var i = 0; i < rowCount; i++) {
+            var row = docById('ptm' + i);
+            for (var j = 0; j < row.cells.length; j++) {
+                var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    cell.style.backgroundColor = 'black';
-                    this._setNotes(i, cell.parentNode.rowIndex, false);
+                    // cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    // cell.style.backgroundColor = 'black';
+                    this._setNotes(j, i, false);
                 }
             }
-        }
+	}	    
 
-        for (var i = 1; i < table.rows[1].cells.length; i++) {
-            for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
-                var cell = table.rows[j].cells[i];
+	for (var i = 0; i < rowCount; i++) {
+            // The buttons get added to the embedded table.
+            var row = docById('ptm' + i);
+            for (var j = 0; j < row.cells.length; j++) {
+                var cell = row.cells[j];
+                // Give each clickable cell a unique id
+                cell.setAttribute('id', i + ':' + j);
+
                 var that = this;
                 cell.onclick = function() {
+                    var obj = this.id.split(':');
+                    var i = Number(obj[0]);
+                    var j = Number(obj[1]);
                     if (this.style.backgroundColor === 'black') {
                         this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        that._notesToPlay[this.id - 1][0] = ['R'];
-                        that._setNotes(this.id, this.parentNode.rowIndex, false);
+                        that._notesToPlay[j][0] = ['R'];
+                        that._setNotes(j, i, false);
                     } else {
                         this.style.backgroundColor = 'black';
-                        that._setNotes(this.id, this.parentNode.rowIndex, true);
+                        that._setNotes(j, i, true);
                     }
                 }
             }
-        }
+	}	    
 
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
@@ -788,28 +868,29 @@ function Matrix() {
             var obj = this._blockMap[i];
             if (obj[0] !== -1) {
                 // Look for this note in the pitch and rhythm blocks.
-                var row = this._rowMap[this._rowBlocks.indexOf(obj[0])] + this._rowOffset[this._rowMap[this._rowBlocks.indexOf(obj[0])]];
-                var col = -1;
+                var r = this._rowMap[this._rowBlocks.indexOf(obj[0])] + this._rowOffset[this._rowMap[this._rowBlocks.indexOf(obj[0])]];
+                var c = -1;
                 for (var j = 0; j < this._colBlocks.length; j++) {
                     if (this._colBlocks[j][0] === obj[1][0] && this._colBlocks[j][1] === obj[1][1]) {
-                        col = j;
+                        c = j;
                         break;
                     }
                 }
 
-                if (col == -1) {
+                if (c == -1) {
                     continue;
                 }
 
                 // If we found a match, mark this cell and add this
                 // note to the play list.
-                var cell = table.rows[row + 1].cells[col + 1];
+                var row = docById('ptm' + r);
+                var cell = row.cells[c];
                 if (cell != undefined) {
                     cell.style.backgroundColor = 'black';
-                    if (this._notesToPlay[col][0][0] === 'R') {
-                        this._notesToPlay[col][0] = [];
+                    if (this._notesToPlay[c][0][0] === 'R') {
+                        this._notesToPlay[c][0] = [];
                     }
-                    this._setNoteCell(row + 1, col + 1, cell, false, null);
+                    this._setNoteCell(r, c, cell, false, null);
                 }
             }
         }
@@ -828,7 +909,6 @@ function Matrix() {
         this._notesToPlay = notes;
 
         this._notesCounter = 0;
-        var table = docById('pitchTimeTable');
 
         // We have an array of pitches and note values.
         var note = this._notesToPlay[this._notesCounter][0];
@@ -868,19 +948,26 @@ function Matrix() {
 
         this._notesCounter += 1;
 
-        // Notes begin in Column 1.
-        this._colIndex = 1;
+        this._colIndex = 0;
         // We highlight the note-value cells (bottom row).
-        this._rowIndex = table.rows.length - 1;
+        if (this._matrixHasTuplets) {
+            this._rowIndex = this.rowLabels.length + 2;
+            var row = docById('ptm' + this._rowIndex);
+        } else {
+            this._rowIndex = this.rowLabels.length;
+            var row = docById('ptm' + this._rowIndex);
+        }
+
         // Highlight first note.
-        var cell = table.rows[this._rowIndex].cells[this._colIndex];
+        var cell = row.cells[this._colIndex];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         // If we are in a tuplet, we don't update the column until
-        // we've played all of the notes in the column span.
+       // we've played all of the notes in the column span.
         if (cell.colSpan > 1) {
             this._spanCounter = 1;
-            var tupletCell = table.rows[this._rowIndex - 2].cells[this._colIndex];
+	    var row = docById('ptm' + this.rowLabels.length);
+            var tupletCell = row.cells[this._colIndex];
             tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
         } else {
             this._spanCounter = 0;
@@ -903,7 +990,8 @@ function Matrix() {
     };
 
     this.__playNote = function(time, noteCounter) {
-        if (docById('pitchtimematrix').style.visibility === 'hidden') {
+        // If the widget it closed, stop playing.
+        if (docById('ptmDiv').style.visibility === 'hidden') {
             return;
         }
 
@@ -912,26 +1000,30 @@ function Matrix() {
         var that = this;
 
         setTimeout(function() {
-            var table = docById('pitchTimeTable');
             // Did we just play the last note?
             if (noteCounter === that._notesToPlay.length - 1) {
-                for (var i = 1; i < table.rows[that._rowIndex].cells.length; i++) {
-                    var cell = table.rows[that._rowIndex].cells[i];
+		var row = docById('ptm' + that._rowIndex);
+                for (var i = 0; i < row.cells.length; i++) {
+                    var cell = row.cells[i];
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                 }
                 if (that._matrixHasTuplets) {
-                    for (var i = 1; i < table.rows[that._rowIndex - 2].cells.length; i++) {
-                    var cell = table.rows[that._rowIndex - 2].cells[i];
-                    cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+		    var row = docById('ptm' + that._rowIndex - 2);
+                    for (var i = 0; i < row.cells.length; i++) {
+			var cell = row.cells[i];
+			cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                     }
                 }
             } else {
-                var cell = table.rows[that._rowIndex].cells[that._colIndex];
+                console.log('ptm' + that._rowIndex);
+		var row = docById('ptm' + that._rowIndex);
+                var cell = row.cells[that._colIndex];
 
                 if (cell != undefined) {
                     cell.style.backgroundColor = MATRIXBUTTONCOLOR;
                     if (cell.colSpan > 1) {
-                        var tupletCell = table.rows[that._rowIndex - 2].cells[that._notesCounter + 1];
+			var row = docById('ptm' + that.rowLabels.length + 2);
+                        var tupletCell = row.cells[that._notesCounter + 1];
                         tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
                     }
                 }
@@ -993,7 +1085,8 @@ function Matrix() {
 
             }
 
-            var cell = table.rows[that._rowIndex].cells[that._colIndex];
+            var row = docById('ptm' + that._rowIndex);
+	    var cell = row.cells[that._colIndex];
             if (cell != undefined) {
                 if (cell.colSpan > 1) {
                     that._spanCounter += 1;
@@ -1017,8 +1110,8 @@ function Matrix() {
     this._setNotes = function(colIndex, rowIndex, playNote) {
         // Sets corresponding note when user clicks on any cell and
         // plays that note
-        var rowBlock = this._rowBlocks[this._rowMap.indexOf(rowIndex - 1 - this._rowOffset[rowIndex - 1])];
-        var rhythmBlockObj = this._colBlocks[colIndex - 1];
+        var rowBlock = this._rowBlocks[this._rowMap.indexOf(rowIndex - this._rowOffset[rowIndex])];
+        var rhythmBlockObj = this._colBlocks[colIndex ];
 
         if (playNote) {
             this.addNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
@@ -1026,28 +1119,22 @@ function Matrix() {
             this.removeNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         }
 
-        if (this._matrixHasTuplets) {
-            var leaveRowsFromBottom = 3;
-        } else {
-            var leaveRowsFromBottom = 1;
-        }
-
-        var table = docById('pitchTimeTable');
-        this._notesToPlay[colIndex - 1][0] = [];
-        if (table !== null) {
-            for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
-                var table = docById('pitchTimeTable');
-                cell = table.rows[j].cells[colIndex];
-                if (cell.style.backgroundColor === 'black') {
-                    this._setNoteCell(j, colIndex, cell, playNote);
-                }
+        console.log(this._notesToPlay);
+        console.log(colIndex + ' ' + rowIndex);
+        this._notesToPlay[colIndex][0] = [];
+        for (var j = 0; j < this.rowLabels.length; j++) {
+            var row = docById('ptm' + j);
+            var cell = row.cells[colIndex];
+            if (cell.style.backgroundColor === 'black') {
+                this._setNoteCell(j, colIndex, cell, playNote);
             }
         }
     };
 
     this._setNoteCell = function(j, colIndex, cell, playNote) {
-        var note = this._noteStored[j - 1];
-        if (this.rowLabels[j - 1] === 'hertz') {
+        var note = this._noteStored[j];
+        console.log(j + ' ' + note);
+        if (this.rowLabels[j] === 'hertz') {
             var drumName = null;
             var graphicsBlock = false;
             var obj = [note];
@@ -1061,10 +1148,17 @@ function Matrix() {
             var obj = note.split(':');
         }
             
-        this._notesToPlay[parseInt(colIndex) - 1][0].push(note);
+        this._notesToPlay[parseInt(colIndex)][0].push(note);
 
-        var table = docById('pitchTimeTable');
-        var noteValue = table.rows[table.rows.length - 1].cells[1].innerHTML;
+        if (this._matrixHasTuplets) {
+            var j = this.rowLabels.length + 2;
+        } else {
+            var j = this.rowLabels.length;
+        }
+        var row = docById('ptm' + j);
+        var cell = row.cells[colIndex];
+
+        var noteValue = cell.innerHTML;
 
         // innerHTML looks something like: 1<br>&mdash;<br>4<br>&#x1D15F;
         noteParts = noteValue.split('<br>');
@@ -1090,23 +1184,14 @@ function Matrix() {
 
     this._clear = function() {
         // "Unclick" every entry in the matrix.
-        var table = docById('pitchTimeTable');
-
-        if (this._matrixHasTuplets) {
-            var leaveRowsFromBottom = 3;
-        } else {
-            var leaveRowsFromBottom = 1;
-        }
-
-        if (table !== null) {
-            for (var i = 1; i < table.rows[1].cells.length; i++) {
-                for (var j = 1; j < table.rows.length - leaveRowsFromBottom; j++) {
-                    var cell = table.rows[j].cells[i];
-                    if (cell.style.backgroundColor === 'black') {
-                        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        this._notesToPlay[cell.id - 1][0] = ['R'];
-                        this._setNotes(cell.id, cell.parentNode.rowIndex, false);
-                    }
+        for (var i = 0; i < this.rowLabels.length; i++) {
+            var row = docById('ptm' + i);
+            for (var j = 0; j < row.cells.length; j++) {
+                var cell = row.cells[j];
+                if (cell.style.backgroundColor === 'black') {
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    this._notesToPlay[j][0] = ['R'];
+                    this._setNotes(j, i, false);
                 }
             }
         }
@@ -1156,7 +1241,7 @@ function Matrix() {
                 var obj = toFraction(note[1]);
                 newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
                 newStack.push([idx + 4, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
-            } else {
+           } else {
                 newStack.push([idx + 3, ['number', {'value': 1}], 0, 0, [idx + 2]]);
                 newStack.push([idx + 4, ['number', {'value': note[1]}], 0, 0, [idx + 2]]);
             }
