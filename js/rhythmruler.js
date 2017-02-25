@@ -124,7 +124,7 @@ function RhythmRuler () {
         noteValues.splice(newCellIndex, 1);
 
         for (var i = 0; i < inputNum; i++) {
-            var newCell = ruler.insertCell(newCellIndex+i);
+            var newCell = ruler.insertCell(newCellIndex + i);
             noteValues.splice(newCellIndex + i, 0, newNoteValue);
             if (newCellWidth > 12) {
                 newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
