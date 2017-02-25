@@ -342,7 +342,7 @@ function getModeName(name) {
                 return MODENAMES[mode][0];
             } else {
                 console.log('I18n for mode name is misbehaving.');
-                console.log(name + ' ' + name.toLowerCase() + ' ' + MODENAMES[mode][0].toLowerCase + ' ' + MODENAMES[mode][1].toLowerCase);
+                console.log(name + ' ' + name.toLowerCase() + ' ' + MODENAMES[mode][0].toLowerCase() + ' ' + MODENAMES[mode][1].toLowerCase());
                 return MODENAMES[mode][1];
             }
         }
