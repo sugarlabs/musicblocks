@@ -331,6 +331,9 @@ input.musicratio1, input.musicratio2   {
 
 
 table {
+    cellpadding: 0px !important;
+    border-collapse: separate;
+    border-spacing: 1px 1px;
 }
 
 .helpDiv {
@@ -374,17 +377,6 @@ table {
     border: 0 !important;
     background: rgba(255, 255, 255, 0.85);
     -webkit-user-select: none;
-}
-
-#pitchtimematrix {
-    position: absolute;
-    top: 20%;
-    left: 30%;
-    border-style: solid;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
-    -webkit-user-select: none;
-    overflow-x: scroll !important;
 }
 
 #ptmDiv {
@@ -473,8 +465,8 @@ table {
 
 .headcol {
     position:absolute;
-    left:2px;
-    top:auto;
+    left: 1px;
+    top: auto;
     text-align: center;
     vertical-align: middle;
 }
