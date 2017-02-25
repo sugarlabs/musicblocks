@@ -517,8 +517,6 @@ function Matrix() {
     };
 
     this._export = function() {
-        var table = docById('pitchTimeTable');
-
         var exportWindow = window.open('');
         var exportDocument = exportWindow.document;
         var title = exportDocument.createElement('title');
@@ -540,7 +538,7 @@ function Matrix() {
 
         var header = exportTable.createTHead();
 
-        for (var i = 1, row; row = table.rows[i]; i++) {
+        for (var i = 1, row; row = docById('ptm' + i); i++) {
             var exportRow = header.insertRow(i - 1);
             for (var j = 0, col; col=row.cells[j]; j++) {
                 var exportCell = exportRow.insertCell(j);
@@ -962,7 +960,7 @@ function Matrix() {
         // we've played all of the notes in the column span.
         if (cell.colSpan > 1) {
             this._spanCounter = 1;
-            var row = docById('ptm' + this.rowLabels.length);
+            var row = docById('ptmTupletNoteValueRow');
             var tupletCell = row.cells[this._colIndex];
             tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
         } else {
