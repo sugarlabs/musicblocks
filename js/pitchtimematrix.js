@@ -224,6 +224,21 @@ function Matrix() {
             }
         };
 
+        ptmDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        ptmDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                ptmDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                ptmDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
         ptmDiv.onmousedown = function(e) {
             that._dragging = true;
             that._target = e.target;
