@@ -33,7 +33,6 @@ function Matrix() {
     this._sorted = false;
     this._notesToPlay = [];
     this._matrixHasTuplets = false;
-    this._noteValue = 4;
     this._notesCounter = 0;
     this._noteStored = [];
 
@@ -332,13 +331,7 @@ function Matrix() {
             var ptmCell = ptmTableRow.insertCell();
             // Create tables to store individual notes.
             ptmCell.innerHTML = '<table id="ptmCellTable' + j + '"></table>';
-
             var ptmCellTable = docById('ptmCellTable' + j);
-            ptmCellTable.style.textAlign = 'center';
-            ptmCellTable.style.border = '0px';
-            ptmCellTable.style.borderCollapse = 'collapse';
-            ptmCellTable.cellSpacing = '1px';
-            ptmCellTable.cellPadding = '1px';
 
             // We'll use this element to put the clickable notes for this row.
             var ptmRow = ptmCellTable.insertRow();
@@ -347,31 +340,26 @@ function Matrix() {
             j += 1;
         }
 
-        // An extra row for the note values
+        // An extra row for the note and tuplet values
         var ptmTableRow = ptmTable.insertRow();
-        var cell = ptmTableRow.insertCell();
-        cell.innerHTML = _('note value');
-        cell.style.fontSize = this._cellScale * 75 + '%';
-        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXLABELCOLOR;
-        cell.className = 'headcol';  // This cell is fixed horizontally.
+        var ptmCell = ptmTableRow.insertCell();
+        ptmCell.className = 'headcol';  // This cell is fixed horizontally.
+        ptmCell.innerHTML = '<table><tr></tr><td id="ptmTupletNoteLabel"></td><tr><td id="ptmTupletValueLabel"></td></tr><tr><td id="ptmNoteValueLabel"></td></tr></table>';
+
+        var labelCell = docById('ptmNoteValueLabel');
+        labelCell.innerHTML = _('note value');
+        labelCell.style.fontSize = this._cellScale * 75 + '%';
+        labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        labelCell.style.minWidth = labelCell.style.width;
+        labelCell.style.maxWidth = labelCell.style.width;
+        labelCell.style.backgroundColor = MATRIXLABELCOLOR;
 
         var ptmCell = ptmTableRow.insertCell();
         // Create tables to store individual note values.
-        ptmCell.innerHTML = '<table id="ptmCellTable' + j + '"></table>';
+        ptmCell.innerHTML = '<table><tr id="ptmTupletNoteValueRow"></tr><tr id="ptmTupletValueRow"></tr><tr id="ptmNoteValueRow"></tr></table>';
 
-        var ptmCellTable = docById('ptmCellTable' + j);
-        ptmCellTable.style.textAlign = 'center';
-        ptmCellTable.style.border = '0px';
-        ptmCellTable.style.borderCollapse = 'collapse';
-        ptmCellTable.cellSpacing = '1px';
-        ptmCellTable.cellPadding = '1px';
-
-        var ptmRow = ptmCellTable.insertRow();
-        ptmRow.setAttribute('id', 'ptm' + j);
+        console.log(ptmTableRow.innerHTML);
     };
 
     this._addButton = function(row, icon, iconSize, label, extras) {
@@ -595,7 +583,7 @@ function Matrix() {
             if (i === 0) {
                 var lcd = param[1][0];
             } else {
-                lcd = LCD(lcd, param[1][i]);
+                var lcd = LCD(lcd, param[1][i]);
             }
             totalNoteInterval += 32 / param[1][i];
         }
@@ -608,13 +596,79 @@ function Matrix() {
 	}
 
         var rowCount = this.rowLabels.length;
+        var firstRow = docById('ptm' + 0);
+        var colCount = firstRow.cells.length;
 
-        for (var i = 0; i < rowCount; i++) {
-            var row = docById('ptm' + i);
-            for (var j = 0; j < numberOfNotes; j++) {
-                cell = row.insertCell();
-                cell.setAttribute('id', 'tuplet');
+        var noteValue = param[0][1] / param[0][0];
+        var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0]);
+
+        // Set the cells to "rest"
+        for (var j = 0; j < numberOfNotes; j++) {
+            // The tuplet time factor * percentage of the tuplet that
+            // is dedicated to this note
+            this._notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])]);
+        }
+
+        // First, ensure that the matrix is set up for tuplets.
+        if (!this._matrixHasTuplets) {
+            var firstRow = docById('ptm' + 0);
+
+            // Load the labels
+            var labelCell = docById('ptmTupletNoteLabel');
+            labelCell.innerHTML = _('note value');
+            labelCell.style.fontSize = this._cellScale * 75 + '%';
+            labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            labelCell.style.minWidth = labelCell.style.width;
+            labelCell.style.maxWidth = labelCell.style.width;
+            labelCell.style.backgroundColor = MATRIXLABELCOLOR;
+
+	    var labelCell = docById('ptmTupletValueLabel');
+            labelCell.innerHTML = _('tuplet value');
+            labelCell.style.fontSize = this._cellScale * 75 + '%';
+            labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            labelCell.style.minWidth = labelCell.style.width;
+            labelCell.style.maxWidth = labelCell.style.width;
+            labelCell.style.backgroundColor = MATRIXLABELCOLOR;
+
+            // Fill in the columns in the tuplet note value row up to
+            // where the tuplet begins.
+	    var noteRow = docById('ptmTupletNoteValueRow');
+	    var valueRow = docById('ptmTupletValueRow');
+            for (var i = 0; i < firstRow.cells.length; i++) {
+                var cell = noteRow.insertCell();
+                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+                console.log(firstRow.cells[i].style.width);
+                cell.style.width = firstRow.cells[i].style.width;
+                cell.style.minWidth = firstRow.cells[i].style.minWidth;
+                cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
+		cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+
+                var cell = valueRow.insertCell();
+                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+                cell.style.width = firstRow.cells[i].style.width;
+                cell.style.minWidth = firstRow.cells[i].style.minWidth;
+                cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
+		cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            }
+        }
+
+        // Now add the tuplet to the matrix.
+        var tupletNoteValue = noteValue * tupletValue;
+
+        // Add the tuplet notes
+        for (var i = 0; i < numberOfNotes; i++) {
+            // Add the notes to the matrix a la addNote.
+            for (var j = 0; j < this.rowLabels.length; j++) {
+		var ptmRow = docById('ptm' + j);
+                var cell = ptmRow.insertCell();
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                console.log(noteValue + ' ' +  this._noteWidth(tupletNoteValue));
+                cell.setAttribute('alt', 1 / tupletNoteValue);
+                cell.style.width = this._noteWidth(tupletNoteValue);
+                cell.style.minWidth = cell.style.width;
+                cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
@@ -627,134 +681,57 @@ function Matrix() {
                     }
                 }
             }
-        }
 
-        // Set the cells to "rest"
-        for (var j = 0; j < numberOfNotes; j++) {
-            // The tuplet time factor * percentage of the tuplet that
-            // is dedicated to this note
-            this._notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])]);
-        }
-
-        if (this._matrixHasTuplets) {
-            var row = docById('ptm' + this.rowLabels.length);
-        } else {
-            console.log('inserting new row at position ' + this.rowLabels.length);
-            var ptmTableRow = ptmTable.insertRow(this.rowLabels.length);
-
-            var cell = row.insertCell();
-            cell.style.fontSize = this._cellScale * 75 + '%';
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            // Add the notes to the tuplet notes row too.
+            // Add cell for tuplet note values
+	    var noteRow = docById('ptmTupletNoteValueRow');
+            var cell = noteRow.insertCell(-1);
+            cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+            cell.style.width = this._noteWidth(tupletNoteValue);
             cell.style.minWidth = cell.style.width;
-            cell.style.maxWidth = cell.style.minWidth;
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            cell.innerHTML = _('tuplet value');
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
-            cell.className = 'headcol';  // This cell is fixed horizontally.
-
-            var ptmCell = ptmTableRow.insertCell();
-            // Create tables to store individual tuplet values.
-            ptmCell.innerHTML = '<table id="ptmCellTable' + this.rowLabels.length + '"></table>';
-
-            var ptmCellTable = docById('ptmCellTable' + this.rowLabels.length);
-            ptmCellTable.style.textAlign = 'center';
-            ptmCellTable.style.border = '0px';
-            ptmCellTable.style.borderCollapse = 'collapse';
-            ptmCellTable.cellSpacing = '1px';
-            ptmCellTable.cellPadding = '1px';
-
-            // We'll use this element to put the tuplet values notes.
-            var ptmRow = ptmCellTable.insertRow();
-            ptmRow.setAttribute('id', 'ptm' + this.rowLabels.length);
+            cell.style.maxWidth = cell.style.width;
+            cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            console.log(tupletNoteValue);
+	    cell.setAttribute('id', 1 / tupletNoteValue);
+            var numerator = 32 / param[1][0];
+            cell.style.lineHeight = 60 + '%';
+            cell.style.fontSize = this._cellScale * 75 + '%';
+            cell.style.textAlign = 'center';
+            var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
+            if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
+                cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this._cellScale + '>';
+            } else {
+                cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
+            }
         }
 
-        /*
-        var w = window.innerWidth;
-        w = (2 * w) / 5;
-
-        cell = table.rows[table.rows.length - 1].insertCell(-1);
-        cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-        */
-
-        var noteValue = param[0][1] / param[0][0];
-        var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0]);
-
+        // Add the tuplet value as a span
+	var valueRow = docById('ptmTupletValueRow');
+        var cell = valueRow.insertCell();
         cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
         cell.style.lineHeight = 60 + '%';
         cell.style.width = this._noteWidth(noteValue);
         cell.style.minWidth = this._noteWidth(noteValue);
         cell.style.maxWidth = this._noteWidth(noteValue);
+        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        cell.style.textAlign = 'center';
+        cell.innerHTML = tupletValue;
+        cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+
+        // And a span in the note value column too.
+	var noteValueRow = docById('ptmNoteValueRow');
+        var cell = noteValueRow.insertCell();
+        cell.colSpan = numberOfNotes;
+        cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
+        cell.style.lineHeight = 60 + '%';
+        cell.style.width = this._noteWidth(noteValue);
+        cell.style.minWidth = this._noteWidth(noteValue);
+        cell.style.maxWidth = this._noteWidth(noteValue);
+        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        cell.style.textAlign = 'center';
         cell.innerHTML = noteValueToDisplay;
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-
-        var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
-        for (var i = 0; i < table.rows[table.rows.length - 1].cells.length - 1; i++) {
-            // Add an entry for the tuplet value in any rhythm
-            // columns. If we already have tuplets, just add a cell to
-            // the new tuplet column.
-            if (!this._matrixHasTuplets || i === tupletCol) {
-                cell = row.insertCell(i + 1);
-                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                if (i === tupletCol) {
-                    cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
-                    cell.innerHTML = tupletValue.toString(); // numberOfNotes.toString();
-                    cell.colSpan = numberOfNotes;
-                }
-            }
-        }
-
-        if (this._matrixHasTuplets) {
-            var row = table.rows[table.rows.length - 3];
-        } else {
-            // Add row for tuplet note values
-            var row = table.insertRow(table.rows.length - 2);
-            var cell = row.insertCell(-1);
-            cell.style.position = 'fixed';
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-            cell.style.minWidth = cell.style.width;
-            cell.style.maxWidth = cell.style.width;
-            cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            cell.style.left = matrixDivPosition.left + 2 + 'px';
-            // cell.style.top = matrixDivPosition.top + (table.rows.length - 2) * cell.style.height + 'px';
-            cell.style.fontSize = this._cellScale * 75 + '%';
-            cell.innerHTML = _('note value');
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
-        }
-
-        if (this._matrixHasTuplets) {
-            // Just add the new tuplet note values
-            var tupletCol = 0;
-            var cellCount = param[1].length;
-            var firstCell = 0;
-        } else {
-            // Add cells across all of tuplet note values row.
-            var tupletCol = table.rows[table.rows.length - 1].cells.length - 2;
-            var cellCount = table.rows[table.rows.length - 4].cells.length - 1;
-            var firstCell = 0;
-        }
-
-        for (var i = firstCell; i < cellCount; i++) {
-            // Add cell for tuplet note values
-            var cell = row.insertCell(-1);
-            cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            // Add tuplet note values
-            if (i >= tupletCol) {
-                var j = i - tupletCol;
-                var numerator = 32 / param[1][j];
-                cell.style.lineHeight = 60 + '%';
-                cell.style.fontSize = this._cellScale * 75 + '%';
-                var obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
-                if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
-                    cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br>' + '<img src="' + NOTESYMBOLS[obj[1]] + '" height=' + (MATRIXSOLFEHEIGHT / 2) * this._cellScale + '>';
-                } else {
-                    cell.innerHTML = obj[0] + '<br>&mdash;<br>' + obj[1] + '<br><br>';
-                }
-            }
-        }
-
         this._matrixHasTuplets = true;
     };
 
@@ -766,19 +743,17 @@ function Matrix() {
         var ptmTable = docById('ptmTable');
         var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
+        /*
         if (this._noteValue > noteValue) {
             this._noteValue = noteValue;
         }
+        */
 
         for (var i = 0; i < numBeats; i++) {
             this._notesToPlay.push([['R'], noteValue]);
         }
 
-        if (this._matrixHasTuplets) {
-            var rowCount = this.rowLabels.length + 3 - this._rests;
-        } else {
-            var rowCount = this.rowLabels.length + 1 - this._rests;
-        }
+        var rowCount = this.rowLabels.length - this._rests;
 
         for (var j = 0; j < numBeats; j++) {
             /* for (var i = 1; i <= rowCount; i++) { */
@@ -787,34 +762,61 @@ function Matrix() {
                 var row = docById('ptm' + i);
                 var cell = row.insertCell();
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                cell.width = this._noteWidth(noteValue);
-                cell.style.width = cell.width;
+                // cell.width = this._noteWidth(noteValue);
+                cell.style.width = this._noteWidth(noteValue);
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                if (i === rowCount - 1) {
-                    cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                    cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                    cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
-                    cell.style.lineHeight = 60 + '%';
-                    cell.innerHTML = noteValueToDisplay;
-                    cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-                } else if (this._matrixHasTuplets && i > this.rowLabels.length - this._rests) {
-                    // We may need to insert some blank cells in the extra rows
-                    // added by tuplets.
-                    cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-                } else {
-                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    cell.onmouseover=function() {
-                        if (this.style.backgroundColor !== 'black'){
-                            this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-                        }
-                    }
-                    cell.onmouseout=function() {
-                        if (this.style.backgroundColor !== 'black'){
-                            this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        }
+                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                cell.setAttribute('alt', 1 / noteValue);
+                cell.onmouseover=function() {
+                    if (this.style.backgroundColor !== 'black'){
+                        this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                     }
                 }
+                cell.onmouseout=function() {
+                    if (this.style.backgroundColor !== 'black'){
+                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    }
+                }
+            }
+
+            // Add a note value.
+	    var row = docById('ptmNoteValueRow');
+            var cell = row.insertCell();
+            // cell.width = this._noteWidth(noteValue);
+            cell.style.width = this._noteWidth(noteValue);
+            cell.style.minWidth = cell.style.width;
+            cell.style.maxWidth = cell.style.width;
+            // cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
+            cell.style.lineHeight = 60 + '%';
+            cell.style.textAlign = 'center';
+            cell.innerHTML = noteValueToDisplay;
+            cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+
+            if (this._matrixHasTuplets) {
+                // We may need to insert some blank cells in the extra rows
+                // added by tuplets.
+		var row = docById('ptmTupletNoteValueRow');
+		var cell = row.insertCell();
+		// cell.width = this._noteWidth(noteValue);
+		cell.style.width = this._noteWidth(noteValue);
+		cell.style.minWidth = cell.style.width;
+		cell.style.maxWidth = cell.style.width;
+		cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+		cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+
+		var row = docById('ptmTupletValueRow');
+		var cell = row.insertCell();
+		// cell.width = this._noteWidth(noteValue);
+		cell.style.width = this._noteWidth(noteValue);
+		cell.style.minWidth = cell.style.width;
+		cell.style.maxWidth = cell.style.width;
+		cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+		cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
             }
         }
     };
@@ -830,8 +832,7 @@ function Matrix() {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    // cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    // cell.style.backgroundColor = 'black';
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                     this._setNotes(j, i, false);
                 }
             }
@@ -944,26 +945,22 @@ function Matrix() {
                 }
             }
         }
+
         var noteValue = this._notesToPlay[this._notesCounter][1];
 
         this._notesCounter += 1;
 
         this._colIndex = 0;
+
         // We highlight the note-value cells (bottom row).
-        if (this._matrixHasTuplets) {
-            this._rowIndex = this.rowLabels.length + 2;
-            var row = docById('ptm' + this._rowIndex);
-        } else {
-            this._rowIndex = this.rowLabels.length;
-            var row = docById('ptm' + this._rowIndex);
-        }
+	var row = docById('ptmNoteValueRow');
 
         // Highlight first note.
         var cell = row.cells[this._colIndex];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         // If we are in a tuplet, we don't update the column until
-       // we've played all of the notes in the column span.
+	// we've played all of the notes in the column span.
         if (cell.colSpan > 1) {
             this._spanCounter = 1;
 	    var row = docById('ptm' + this.rowLabels.length);
@@ -1002,28 +999,27 @@ function Matrix() {
         setTimeout(function() {
             // Did we just play the last note?
             if (noteCounter === that._notesToPlay.length - 1) {
-		var row = docById('ptm' + that._rowIndex);
+		var row = docById('ptmNoteValueRow');
                 for (var i = 0; i < row.cells.length; i++) {
                     var cell = row.cells[i];
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                 }
                 if (that._matrixHasTuplets) {
-		    var row = docById('ptm' + that._rowIndex - 2);
+		    var row = docById('ptmTupletNoteValueRow');
                     for (var i = 0; i < row.cells.length; i++) {
 			var cell = row.cells[i];
 			cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
                     }
                 }
             } else {
-                console.log('ptm' + that._rowIndex);
-		var row = docById('ptm' + that._rowIndex);
+		var row = docById('ptmNoteValueRow');
                 var cell = row.cells[that._colIndex];
 
                 if (cell != undefined) {
                     cell.style.backgroundColor = MATRIXBUTTONCOLOR;
                     if (cell.colSpan > 1) {
-			var row = docById('ptm' + that.rowLabels.length + 2);
-                        var tupletCell = row.cells[that._notesCounter + 1];
+			var row = docById('ptmTupletNoteValueRow');
+                        var tupletCell = row.cells[that._notesCounter];
                         tupletCell.style.backgroundColor = MATRIXBUTTONCOLOR;
                     }
                 }
@@ -1085,7 +1081,7 @@ function Matrix() {
 
             }
 
-            var row = docById('ptm' + that._rowIndex);
+	    var row = docById('ptmNoteValueRow');
 	    var cell = row.cells[that._colIndex];
             if (cell != undefined) {
                 if (cell.colSpan > 1) {
@@ -1148,22 +1144,12 @@ function Matrix() {
             var obj = note.split(':');
         }
             
-        this._notesToPlay[parseInt(colIndex)][0].push(note);
-
-        if (this._matrixHasTuplets) {
-            var j = this.rowLabels.length + 2;
-        } else {
-            var j = this.rowLabels.length;
-        }
-        var row = docById('ptm' + j);
+	var row = docById('ptm' + j);
         var cell = row.cells[colIndex];
+        var noteValue = cell.getAttribute('alt');
+        console.log(noteValue);
 
-        var noteValue = cell.innerHTML;
-
-        // innerHTML looks something like: 1<br>&mdash;<br>4<br>&#x1D15F;
-        noteParts = noteValue.split('<br>');
-        noteValue = Number(noteParts[0]) / Number(noteParts[2]);
-        noteValue = noteValue.toString();
+        this._notesToPlay[parseInt(colIndex)][0].push(note);
 
         if (obj.length === 1) {
             if (playNote) {
