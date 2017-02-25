@@ -4601,8 +4601,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     var drums = [];
                     var insideChord = -1;
                     if ((logo.notePitches[turtle].length + logo.oscList[turtle].length) > 1) {
-                        if (turtle in logo.lilypondStaging && !this.justCounting[turtle]) {
-                            var insideChord = this.lilypondStaging[turtle].length + 1;
+                        if (turtle in logo.lilypondStaging && !logo.justCounting[turtle]) {
+                            var insideChord = logo.lilypondStaging[turtle].length + 1;
                         } else {
                             var insideChord = 1;
                         }
