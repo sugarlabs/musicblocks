@@ -648,6 +648,21 @@ function RhythmRuler () {
             }
         };
 
+        rulerDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        rulerDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                rulerDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                rulerDiv.style.top = y + 'px';
+                cell.innerHTML = that._dragCellHTML;
+            }
+        };
+
         rulerDiv.onmousedown = function(e) {
             that._dragging = true;
             that._target = e.target;
