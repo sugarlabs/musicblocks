@@ -1161,6 +1161,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     majorBlock.adjustWidthToLabel();
     majorBlock.flowClampOneArgBlock();
     majorBlock.defaults.push(3);
+    majorBlock.hidden = true;
+
+    var majorxBlock = new ProtoBlock('majorx');
+    majorxBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['majorx'] = majorxBlock;
+    majorxBlock.staticLabels.push(_('major'), _('interval'), _('octave') + '+/-');
+    majorxBlock.extraWidth = 20;
+    majorxBlock.adjustWidthToLabel();
+    majorxBlock.flowClampTwoArgBlock();
+    majorxBlock.dockTypes[2] = 'anyin';
+    majorxBlock.defaults.push(3);
+    majorxBlock.defaults.push(0);
 
     var intervalBlock = new ProtoBlock('interval');
     intervalBlock.palette = palettes.dict['intervals'];
