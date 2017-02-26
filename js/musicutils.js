@@ -47,7 +47,7 @@ const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 // Halfsteps used in calculating absolute intervals
 const AUGMENTED = {1: 1, 2: 2, 3: 5, 4: 6, 5: 8, 6: 9, 7: 11, 8: 13};
 const PERFECT = {1: 0, 4: 5, 5: 7, 8: 12};
-const DIMINISHED = {1: -1, 4: 4, 5: 6, 8: 11, 2: 0, 3: 2, 6: 7, 7: 9};
+const DIMINISHED = {1: -1, 2: 0, 3: 2, 4: 4, 5: 6, 6: 7, 7: 9, 8: 11};
 const MAJOR = {2: 2, 3: 4, 6: 9, 7: 11};
 const MINOR = {2: 1, 3: 3, 6: 8, 7: 10};
 
@@ -65,18 +65,36 @@ function mod12(a) {
 }
 
 
-function calcAugmented(a) {
-    return AUGMENTED[mod12(a)] + Math.floor(a / 12) * 12;
+function calcAugmented(obj) {
+    var interval = obj[0];
+    var deltaOctave = obj[1];
+    if (interval < 0) {
+	return -AUGMENTED[-interval] + (12 * deltaOctave);
+    } else {
+	return AUGMENTED[interval] + (12 * deltaOctave);
+    }
 }
 
 
-function calcPerfect(a) {
-    return PERFECT[mod12(a)] + Math.floor(a / 12) * 12;
+function calcPerfect(obj) {
+    var interval = obj[0];
+    var deltaOctave = obj[1];
+    if (interval < 0) {
+	return -PERFECT[-interval] + (12 * deltaOctave);
+    } else {
+	return PERFECT[interval] + (12 * deltaOctave);
+    }
 }
 
 
-function calcDiminished(a) {
-    return DIMINISHED[mod12(a)] + Math.floor(a / 12) * 12;
+function calcDiminished(obj) {
+    var interval = obj[0];
+    var deltaOctave = obj[1];
+    if (interval < 0) {
+	return -DIMINISHED[-interval] + (12 * deltaOctave);
+    } else {
+	return DIMINISHED[interval] + (12 * deltaOctave);
+    }
 }
 
 

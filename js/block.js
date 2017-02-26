@@ -275,6 +275,7 @@ function Block(protoblock, blocks, overrideName) {
             break;
         case 'articulation':
         case 'augmented':
+        case 'augmentedx':
         case 'backward':
         case 'bottle':
         case 'bubbles':
@@ -290,6 +291,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'cup':
         case 'darbuka':
         case 'diminished':
+        case 'diminishedx':
         case 'dividebeatfactor':
         case 'dog':
         case 'drift':
@@ -324,6 +326,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'notecounter':
         case 'osctime':
         case 'perfect':
+        case 'perfectx':
         case 'pitchslider':
         case 'pitchstaircase':
         case 'pluck':

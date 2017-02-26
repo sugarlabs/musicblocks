@@ -3402,12 +3402,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             childFlow = args[1];
             childFlowCount = 1;
             break;
-        case 'perfect':
-            var mod12Arg = mod12(args[0]);
-            if ([1, 4, 5, 8].indexOf(mod12Arg) !== -1) {
-                logo.perfect[turtle].push(args[0]);
-                childFlow = args[1];
-                childFlowCount = 1;
+        case 'perfectx':
+            if (args[0] < 0) {
+                var interval = mod12(-args[0]);
+            } else {
+                var interval = mod12(args[0]);
+            }
+            var deltaOctave = calcOctaveInterval(args[1]);
+            if ([1, 4, 5, 8].indexOf(interval) !== -1) {
+                logo.perfect[turtle].push([args[0], deltaOctave]);
 
                 var listenerName = '_perfect_' + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
@@ -3419,16 +3422,41 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo._setListener(turtle, listenerName, __listener);
             } else {
                 logo.errorMsg(_('Input to Perfect Block must be 1, 4, 5, or 8'), blk);
-                childFlow = args[1];
-                childFlowCount = 1;
             }
+
+            childFlow = args[2];
+            childFlowCount = 1;
             break;
-        case 'diminished':
+        case 'perfect':
+            // Deprecated
             var mod12Arg = mod12(args[0]);
-            if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(mod12Arg) !== -1) {
-                logo.diminished[turtle].push(args[0]);
-                childFlow = args[1];
-                childFlowCount = 1;
+            if ([1, 4, 5, 8].indexOf(mod12Arg) !== -1) {
+                logo.perfect[turtle].push([args[0], 0]);
+
+                var listenerName = '_perfect_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    logo.perfect[turtle].pop();
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Perfect Block must be 1, 4, 5, or 8'), blk);
+            }
+
+            childFlow = args[1];
+            childFlowCount = 1;
+            break;
+        case 'diminishedx':
+            if (args[0] < 0) {
+                var interval = mod12(-args[0]);
+            } else {
+                var interval = mod12(args[0]);
+            }
+            var deltaOctave = calcOctaveInterval(args[1]);
+            if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(interval) !== -1) {
+                logo.diminished[turtle].push([args[0], deltaOctave]);
 
                 var listenerName = '_diminished_' + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
@@ -3440,16 +3468,62 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo._setListener(turtle, listenerName, __listener);
             } else {
                 logo.errorMsg(_('Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8'), blk);
-                childFlow = args[1];
-                childFlowCount = 1;
             }
+
+            childFlow = args[2];
+            childFlowCount = 1;
             break;
-        case 'augmented':
+        case 'diminished':
+            // Deprecated
             var mod12Arg = mod12(args[0]);
             if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(mod12Arg) !== -1) {
-            logo.augmented[turtle].push(args[0]);
-                childFlow = args[1];
-                childFlowCount = 1;
+                logo.diminished[turtle].push([args[0], 0]);
+
+                var listenerName = '_diminished_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    logo.diminished[turtle].pop();
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8'), blk);
+            }
+
+            childFlow = args[1];
+            childFlowCount = 1;
+            break;
+        case 'augmentedx':
+            if (args[0] < 0) {
+                var interval = mod12(-args[0]);
+            } else {
+                var interval = mod12(args[0]);
+            }
+            var deltaOctave = calcOctaveInterval(args[1]);
+            if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(interval) !== -1) {
+                logo.augmented[turtle].push([args[0], deltaOctave]);
+
+                var listenerName = '_augmented_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    logo.augmented[turtle].pop();
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8'), blk);
+            }
+
+            childFlow = args[2];
+            childFlowCount = 1;
+            break;
+        case 'augmented':
+            // Deprecated
+            var mod12Arg = mod12(args[0]);
+            if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(mod12Arg) !== -1) {
+		logo.augmented[turtle].push([args[0], 0]);
 
                 var listenerName = '_tritone_' + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
@@ -3461,9 +3535,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo._setListener(turtle, listenerName, __listener);
             } else {
                 logo.errorMsg(_('Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8'), blk);
-                childFlow = args[1];
-                childFlowCount = 1;
             }
+
+            childFlow = args[1];
+            childFlowCount = 1;
             break;
         case 'majorx':
             if (args[0] < 0) {
@@ -3486,6 +3561,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             } else {
                 logo.errorMsg(_('Input to Major Block must be 2, 3, 6, or 7'), blk);
             }
+
             childFlow = args[2];
             childFlowCount = 1;
             break;
@@ -3507,6 +3583,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             } else {
                 logo.errorMsg(_('Input to Major Block must be 2, 3, 6, or 7'), blk);
             }
+
             childFlow = args[1];
             childFlowCount = 1;
             break;
@@ -3531,6 +3608,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             } else {
                 logo.errorMsg(_('Input to Minor Block must be 2, 3, 6, or 7'), blk);
             }
+
             childFlow = args[2];
             childFlowCount = 1;
             break;
@@ -3551,6 +3629,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             } else {
                 logo.errorMsg(_('Input to Minor Block must be 2, 3, 6, or 7'), blk);
             }
+
             childFlow = args[1];
             childFlowCount = 1;
             break;
