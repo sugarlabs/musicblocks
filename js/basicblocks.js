@@ -296,7 +296,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitchNumberBlock.staticLabels.push(_('pitch number'));
     pitchNumberBlock.adjustWidthToLabel();
     pitchNumberBlock.oneArgBlock();
-    pitchNumberBlock.defaults.push(9);  // A4
+    pitchNumberBlock.defaults.push(7);  
     pitchNumberBlock.dockTypes[1] = 'numberin';
 
     var scaleDegree = new ProtoBlock('scaledegree');
