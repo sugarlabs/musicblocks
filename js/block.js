@@ -309,6 +309,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'invert2':
         case 'kick':
         case 'major':
+        case 'majorx':
         case 'minor':
         case 'modewidget':
         case 'multiplybeatfactor':

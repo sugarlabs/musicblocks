@@ -80,8 +80,14 @@ function calcDiminished(a) {
 }
 
 
-function calcMajor(a) {
-    return MAJOR[mod12(a)] + Math.floor(a / 12) * 12;
+function calcMajor(obj) {
+    var interval = obj[0];
+    var deltaOctave = obj[1];
+    if (interval < 0) {
+	return -MAJOR[-interval] + (12 * deltaOctave);
+    } else {
+	return MAJOR[interval] + (12 * deltaOctave);
+    }
 }
 
 
@@ -1123,6 +1129,41 @@ function getNumNote(value, delta) {
         octave -= 1;
     }
     return [note, octave + 1];
+};
+
+
+calcOctaveInterval = function(arg) {
+    // Used by intervals to determine octave to use in an interval.
+    var value = 0;
+    switch(arg) {
+    case 1:
+    case _('next'):
+    case 'next':
+        value = 1;
+        break;
+    case -1:
+    case _('previous'):
+    case 'previous':
+        value = -1;
+        break;
+    case _('current'):
+    case 'current':
+    case 0:
+        value = 0;
+        break;
+    case 2:
+	value = 2;
+        break;
+    case -2:
+	value = -2;
+        break;
+    default:
+        console.log('Interval octave must be between -2 and 2.');
+        value = 0;
+        break;
+    }
+
+    return value;
 };
 
 
