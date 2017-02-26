@@ -91,8 +91,14 @@ function calcMajor(obj) {
 }
 
 
-function calcMinor(a) {
-    return MINOR[mod12(a)] + Math.floor(a / 12) * 12;
+function calcMinor(obj) {
+    var interval = obj[0];
+    var deltaOctave = obj[1];
+    if (interval < 0) {
+	return -MINOR[-interval] + (12 * deltaOctave);
+    } else {
+	return MINOR[interval] + (12 * deltaOctave);
+    }
 }
 
 

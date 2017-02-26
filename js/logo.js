@@ -3467,9 +3467,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             break;
         case 'majorx':
             if (args[0] < 0) {
-		var interval = mod12(-args[0]);
+                var interval = mod12(-args[0]);
             } else {
-		var interval = mod12(args[0]);
+                var interval = mod12(args[0]);
             }
             var deltaOctave = calcOctaveInterval(args[1]);
             if ([2, 3, 6, 7].indexOf(interval) !== -1) {
@@ -3510,12 +3510,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             childFlow = args[1];
             childFlowCount = 1;
             break;
-        case 'minor':
-            var mod12Arg = mod12(args[0]);
-            if ([2, 3, 6, 7].indexOf(mod12Arg) !== -1) {
-                logo.minor[turtle].push(args[0]);
-                childFlow = args[1];
-                childFlowCount = 1;
+        case 'minorx':
+            if (args[0] < 0) {
+                var interval = mod12(-args[0]);
+            } else {
+                var interval = mod12(args[0]);
+            }
+            var deltaOctave = calcOctaveInterval(args[1]);
+            if ([2, 3, 6, 7].indexOf(interval) !== -1) {
+                logo.minor[turtle].push([args[0], deltaOctave]);
 
                 var listenerName = '_minor_' + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
@@ -3527,9 +3530,29 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo._setListener(turtle, listenerName, __listener);
             } else {
                 logo.errorMsg(_('Input to Minor Block must be 2, 3, 6, or 7'), blk);
-                childFlow = args[1];
-                childFlowCount = 1;
             }
+            childFlow = args[2];
+            childFlowCount = 1;
+            break;
+        case 'minor':
+            // Deprecated
+            var mod12Arg = mod12(args[0]);
+            if ([2, 3, 6, 7].indexOf(mod12Arg) !== -1) {
+                logo.minor[turtle].push([args[0], 0]);
+
+                var listenerName = '_minor_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    logo.minor[turtle].pop();
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                logo.errorMsg(_('Input to Minor Block must be 2, 3, 6, or 7'), blk);
+            }
+            childFlow = args[1];
+            childFlowCount = 1;
             break;
         case 'newstaccato':
         case 'staccato':
