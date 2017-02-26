@@ -1003,6 +1003,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     diminishedBlock.adjustWidthToLabel();
     diminishedBlock.flowClampOneArgBlock();
     diminishedBlock.defaults.push(5);
+    diminishedBlock.hidden = true;
+
+    var diminishedxBlock = new ProtoBlock('diminishedx');
+    diminishedxBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['diminishedx'] = diminishedxBlock;
+    diminishedxBlock.staticLabels.push(_('diminished'), _('interval'), _('octave') + '+/-');
+    diminishedxBlock.extraWidth = 20;
+    diminishedxBlock.adjustWidthToLabel();
+    diminishedxBlock.flowClampTwoArgBlock();
+    diminishedxBlock.dockTypes[2] = 'anyin';
+    diminishedxBlock.defaults.push(5);
+    diminishedxBlock.defaults.push(0);
 
     var augmented8Block = new ProtoBlock('augmented8');
     augmented8Block.palette = palettes.dict['intervals'];
@@ -1053,6 +1065,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     augmentedBlock.adjustWidthToLabel();
     augmentedBlock.flowClampOneArgBlock();
     augmentedBlock.defaults.push(5);
+    augmentedBlock.hidden = true;
+
+    var augmentedxBlock = new ProtoBlock('augmentedx');
+    augmentedxBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['augmentedx'] = augmentedxBlock;
+    augmentedxBlock.staticLabels.push(_('augmented'), _('interval'), _('octave') + '+/-');
+    augmentedxBlock.extraWidth = 20;
+    augmentedxBlock.adjustWidthToLabel();
+    augmentedxBlock.flowClampTwoArgBlock();
+    augmentedxBlock.dockTypes[2] = 'anyin';
+    augmentedxBlock.defaults.push(5);
+    augmentedxBlock.defaults.push(0);
 
     var perfect8Block = new ProtoBlock('perfect8');
     perfect8Block.palette = palettes.dict['intervals'];
@@ -1089,6 +1113,18 @@ function initBasicProtoBlocks(palettes, blocks) {
     perfectBlock.adjustWidthToLabel();
     perfectBlock.flowClampOneArgBlock();
     perfectBlock.defaults.push(5);
+    perfectBlock.hidden = true;
+
+    var perfectxBlock = new ProtoBlock('perfectx');
+    perfectxBlock.palette = palettes.dict['intervals'];
+    blocks.protoBlockDict['perfectx'] = perfectxBlock;
+    perfectxBlock.staticLabels.push(_('perfect'), _('interval'), _('octave') + '+/-');
+    perfectxBlock.extraWidth = 20;
+    perfectxBlock.adjustWidthToLabel();
+    perfectxBlock.flowClampTwoArgBlock();
+    perfectxBlock.dockTypes[2] = 'anyin';
+    perfectxBlock.defaults.push(5);
+    perfectxBlock.defaults.push(0);
 
     var minor7Block = new ProtoBlock('minor7');
     minor7Block.palette = palettes.dict['intervals'];
