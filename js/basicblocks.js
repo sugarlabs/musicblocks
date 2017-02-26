@@ -216,7 +216,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var invertBlock = new ProtoBlock('invert1');
     invertBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invert1'] = invertBlock;
-    invertBlock.staticLabels.push(_('invert'), _('note'), _('octave'), _('even') + '/' + _('odd'));
+    invertBlock.staticLabels.push(_('invert'), _('name'), _('octave'), _('even') + '/' + _('odd'));
     invertBlock.adjustWidthToLabel();
     invertBlock.flowClampThreeArgBlock();
     invertBlock.adjustWidthToLabel();
