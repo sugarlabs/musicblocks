@@ -311,6 +311,7 @@ function Block(protoblock, blocks, overrideName) {
         case 'major':
         case 'majorx':
         case 'minor':
+        case 'minorx':
         case 'modewidget':
         case 'multiplybeatfactor':
         case 'newnote':
