@@ -1156,6 +1156,26 @@ function getNumNote(value, delta) {
 };
 
 
+calcOctave = function(current, arg) {
+    switch(arg) {
+    case 1:
+    case _('next'):
+    case 'next':
+        return Math.min(current + 1, 10);
+    case -1:
+    case _('previous'):
+    case 'previous':
+        return Math.max(current - 1, 1);
+    case _('current'):
+    case 'current':
+    case 0:
+        return current;
+    default:
+        return arg;
+    }
+};
+
+
 calcOctaveInterval = function(arg) {
     // Used by intervals to determine octave to use in an interval.
     var value = 0;

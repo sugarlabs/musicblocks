@@ -2446,7 +2446,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
 
             if (args[2] === 'even' || args[2] === 'odd'){
-                logo.invertList[turtle].push([args[0], args[1], args[2]]);
+		var octave = calcOctave(logo.currentOctaves[turtle], args[1]);
+                logo.invertList[turtle].push([args[0], octave, args[2]]);
             } else {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
@@ -2709,30 +2710,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             }
 
-            logo.pitchNumberOffset = pitchToNumber(args[0], args[1], logo.keySignature[turtle]);
+            var octave = Math.floor(calcOctave(logo.currentOctaves[turtle], args[1]));
+            logo.pitchNumberOffset = pitchToNumber(args[0], octave, logo.keySignature[turtle]);
             break;
         case 'pitchnumber':
         case 'scaledegree':
         case 'pitch':
-            calcOctave = function(arg) {
-                switch(arg) {
-                case 1:
-                case _('next'):
-                case 'next':
-                    return Math.min(logo.currentOctaves[turtle] + 1, 10);
-                case -1:
-                case _('previous'):
-                case 'previous':
-                    return Math.max(logo.currentOctaves[turtle] - 1, 1);
-                case _('current'):
-                case 'current':
-                case 0:
-                    return logo.currentOctaves[turtle];
-                default:
-                    return arg;
-                }
-            };
-
             if (logo.blocks.blockList[blk].name == 'pitchnumber') {
                 if (args.length !== 1 || args[0] == null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -2777,7 +2760,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         note = '?'; // throws an error
                     } else if (args[0] < 13) { // moveable solfege
                         note = scaleDegreeToPitch(logo.keySignature[turtle], Math.floor(args[0]));
-                        var octave = Math.floor(calcOctave(args[1]));
+                        var octave = Math.floor(calcOctave(logo.currentOctaves[turtle], args[1]));
                         var cents = 0;
                     } else if (args[0] < A0 || args[0] > C8) {
                         note = '?'; // throws an error
@@ -2816,12 +2799,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                             }
                             note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
                             var deltaOctave = Math.floor((args[0] + modeLength - 2) / modeLength);
-                            var octave = Math.floor(calcOctave(args[1])) - deltaOctave;
+                            var octave = Math.floor(calcOctave(logo.currentOctaves[turtle], args[1])) - deltaOctave;
                         } else {
                             //  1, 4 --> do 4;  2, 4 --> re 4;  8, 4 --> do 5
                             note = scaleDegreeToPitch(logo.keySignature[turtle], scaleDegree);
                             var deltaOctave = Math.floor((args[0] - 1) / modeLength);
-                            var octave = Math.floor(calcOctave(args[1])) + deltaOctave;
+                            var octave = Math.floor(calcOctave(logo.currentOctaves[turtle], args[1])) + deltaOctave;
                         }
                         var cents = 0;
                     }
@@ -2834,16 +2817,16 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 } else {
                     var cents = 0;
                     var note = args[0];
-                    if (calcOctave(args[1]) < 1) {
+                    if (calcOctave(logo.currentOctaves[turtle], args[1]) < 1) {
                         console.log('minimum allowable octave is 1');
                         var octave = 1;
-                    } else if (calcOctave(args[1]) > 10) {
+                    } else if (calcOctave(logo.currentOctaves[turtle], args[1]) > 10) {
                         // Humans can only hear 10 octaves.
                         console.log('clipping octave at 10');
                         var octave = 10;
                     } else {
                         // Octave must be a whole number.
-                        var octave = Math.floor(calcOctave(args[1]));
+                        var octave = Math.floor(calcOctave(logo.currentOctaves[turtle], args[1]));
                     }
 
                     logo.getNote(note, octave, 0, logo.keySignature[turtle]);
@@ -3052,8 +3035,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                 logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
             } else if (logo.inPitchStairCase) {
-                var frequency = pitchToFrequency(args[0], calcOctave(args[1]), 0, logo.keySignature[turtle]);
-                var note = logo.getNote(args[0], calcOctave(args[1]), 0, logo.keySignature[turtle]);
+                var frequency = pitchToFrequency(args[0], calcOctave(logo.currentOctaves[turtle], args[1]), 0, logo.keySignature[turtle]);
+                var note = logo.getNote(args[0], calcOctave(logo.currentOctaves[turtle], args[1]), 0, logo.keySignature[turtle]);
                 var flag = 0;
 
                 for (var i = 0 ; i < pitchstaircase.Stairs.length; i++) {
@@ -5662,9 +5645,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 var block = logo.blocks.blockList[blk];
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
                 var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                block.value = Math.round(pitchToFrequency(a, b, 0, logo.keySignature[turtle]));
+                var note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var octave = Math.floor(calcOctave(logo.currentOctaves[turtle], logo.parseArg(logo, turtle, cblk2, blk, receivedArg)));
+                block.value = Math.round(pitchToFrequency(note, octave, 0, logo.keySignature[turtle]));
                 break;
             case 'pop':
                 var block = logo.blocks.blockList[blk];
