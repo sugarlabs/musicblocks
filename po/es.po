@@ -521,7 +521,7 @@ msgstr "vaciar pila"
 
 #: js/pitchdrummatrix.js:141
 msgid "Solfa"
-msgstr ""
+msgstr "Solfeo"
 
 #: js/pitchdrummatrix.js:152
 #: js/ptm.js:175
