@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="71.684448mm"
-   height="53.939468mm"
-   viewBox="0 0 254.00001 191.1241"
+   version="1.1"
    id="svg4602"
-   version="1.1">
+   viewBox="0 0 254.00001 191.1241"
+   height="53.939468mm"
+   width="71.684448mm">
   <defs
      id="defs4604" />
   <metadata
@@ -25,117 +25,117 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="g3423"
-     transform="translate(18,53.1241)">
+     transform="translate(18,53.1241)"
+     id="g3423">
     <path
-       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z"
        id="path3194"
-       d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 Z" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
-       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
-       id="text3196">
+       id="text3196"
+       style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000">
       <tspan
-         id="tspan3198"
+         x="94"
          y="49"
-         x="94">pitch</tspan>
+         id="tspan3198">pitch</tspan>
     </text>
     <text
-       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
-       id="text3200">
+       id="text3200"
+       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
       <tspan
-         id="tspan3202"
+         x="94"
          y="22.5"
-         x="94">note</tspan>
+         id="tspan3202">name</tspan>
     </text>
     <text
-       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
-       id="text3204">
+       id="text3204"
+       style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
       <tspan
-         id="tspan3206"
+         x="94"
          y="64.5"
-         x="94">octave</tspan>
+         id="tspan3206">octave</tspan>
     </text>
   </g>
   <g
-     id="g3710"
-     transform="translate(-165.83636,149.94834)">
+     transform="translate(-165.83636,149.94834)"
+     id="g3710">
     <path
-       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z"
        id="path21-6"
-       d="m 298.83636,-53.824242 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+       style="fill:#EE97A8;fill-opacity:1;stroke:#A75862;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
-       y="-54.824242"
-       x="333.83636"
+       id="text23-9"
        style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text23-9">
+       x="333.83636"
+       y="-54.824242">
       <tspan
-         id="tspan25-8"
+         x="353.83636"
          y="-28.824242"
-         x="353.83636">3</tspan>
+         id="tspan25-8">3</tspan>
     </text>
   </g>
   <g
-     transform="matrix(2,0,0,2,116,53.1241)"
-     id="g4-2">
+     id="g4-2"
+     transform="matrix(2,0,0,2,116,53.1241)">
     <filter
-       height="1.3"
+       style="color-interpolation-filters:sRGB"
        id="dropshadow-6"
-       style="color-interpolation-filters:sRGB">
+       height="1.3">
       <feGaussianBlur
-         in="SourceAlpha"
+         id="feGaussianBlur7-6"
          stdDeviation="3"
-         id="feGaussianBlur7-6" />
+         in="SourceAlpha" />
       <feOffset
-         dx="2"
-         dy="2"
+         id="feOffset9-0"
          result="offsetblur"
-         id="feOffset9-0" />
+         dy="2"
+         dx="2" />
       <feComponentTransfer
          id="feComponentTransfer11-7">
         <feFuncA
-           type="linear"
+           id="feFuncA13-7"
            slope="0.2"
-           id="feFuncA13-7" />
+           type="linear" />
       </feComponentTransfer>
       <feMerge
          id="feMerge15-19">
         <feMergeNode
            id="feMergeNode17-1" />
         <feMergeNode
-           in="SourceGraphic"
-           id="feMergeNode19-3" />
+           id="feMergeNode19-3"
+           in="SourceGraphic" />
       </feMerge>
     </filter>
     <path
-       d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
        id="path21-3"
-       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+       d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
     <text
-       id="text23-6"
+       x="25"
        style="font-size:10px;font-family:Sans;text-anchor:start;fill:#000000"
-       x="25">
+       id="text23-6">
       <tspan
-         x="35"
+         id="tspan25-9"
          y="13"
-         id="tspan25-9">la</tspan>
+         x="35">la</tspan>
     </text>
   </g>
   <g
-     id="g3990"
-     transform="translate(0,1.1240999)">
+     transform="translate(0,1.1240999)"
+     id="g3990">
     <path
-       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       d="m 1,28.43795 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 L 27,0.43795006 37,12.43795 l 18,0 92,0 8,0 c 4.18879,0 6.98407,3.936277 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -92,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.077731 -7.07107,2.928932 C 18.07773,57.218083 17,59.819956 17,62.43795 l 0,8 0,48 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.531247,3.56389 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.936277,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81121 -8,-8 l 0,-8 z"
        id="path3660"
-       d="m 1,28.43795 0,-8 c 0,-4.18879 3.81121,-8 8,-8 l 8,0 L 27,0.43795006 37,12.43795 l 18,0 92,0 8,0 c 4.18879,0 6.98407,3.936277 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -92,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.077731 -7.07107,2.928932 C 18.07773,57.218083 17,59.819956 17,62.43795 l 0,8 0,48 0,8 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.531247,3.56389 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.936277,9.01593 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8,0 c -4.18879,0 -8,-3.81121 -8,-8 l 0,-8 z" />
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
     <text
-       y="-4"
-       x="1.1454468"
+       id="text3662"
        style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
-       id="text3662">
+       x="1.1454468"
+       y="-4">
       <tspan
-         id="tspan3664"
+         x="9.1454468"
          y="39"
-         x="9.1454468">pitch staircase</tspan>
+         id="tspan3664">pitch staircase</tspan>
     </text>
   </g>
 </svg>
