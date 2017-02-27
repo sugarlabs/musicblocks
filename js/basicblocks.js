@@ -167,7 +167,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setPitchNumberOffsetBlock.defaults.push('C');
     setPitchNumberOffsetBlock.defaults.push('4');
     setPitchNumberOffsetBlock.dockTypes[1] = 'notein';
-    setPitchNumberOffsetBlock.dockTypes[2] = 'numberin';
+    setPitchNumberOffsetBlock.dockTypes[2] = 'anyin';
 
     var numberToPitchBlock = new ProtoBlock('number2pitch');
     numberToPitchBlock.palette = palettes.dict['pitch'];
@@ -2214,11 +2214,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     //.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
     toFrequencyBlock.staticLabels.push(_('note to frequency'), _('note'), _('octave'));
     toFrequencyBlock.adjustWidthToLabel();
-    toFrequencyBlock.defaults.push('A');
+    toFrequencyBlock.defaults.push('G');
     toFrequencyBlock.defaults.push('4');
     toFrequencyBlock.twoArgMathBlock();
     toFrequencyBlock.dockTypes[1] = 'notein';
-    toFrequencyBlock.dockTypes[2] = 'numberin';
+    toFrequencyBlock.dockTypes[2] = 'anyin';
 
     var shellBlock = new ProtoBlock('turtleshell');
     shellBlock.palette = palettes.dict['media'];
