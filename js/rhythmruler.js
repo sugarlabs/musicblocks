@@ -106,7 +106,13 @@ function RhythmRuler () {
 
         var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
-        var noteValues = this.Rulers[this._rulerSelected][0];
+        try {
+            var noteValues = this.Rulers[this._rulerSelected][0];
+        } catch(e) {
+            console.log(e);
+            console.log(this._rulerSelected);
+            return;
+        }
         var divisionHistory = this.Rulers[this._rulerSelected][1];
         if (addToUndoList) {
             this._undoList.push(this._rulerSelected);
