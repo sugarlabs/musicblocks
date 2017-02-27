@@ -93,6 +93,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
     //rhythm-ruler
     this.inRhythmRuler = false;
+    this.rhythmRulerMeasure = null;
 
     this.inPitchStairCase = false;
 
@@ -694,6 +695,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
         this.inRhythmRuler = false;
+	this.rhythmRulerMeasure = null;
         this._currentDrumBlock = null;
         this.inStatusMatrix = false;
         this.pitchBlocks = [];
@@ -3096,6 +3098,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo._processNote(noteBeatValue, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
+                // Temporary work-around to #272.
+                if (logo.rhythmRulerMeasure === null) {
+                    logo.rhythmRulerMeasure = args[0] * args[1];
+                } else if (logo.rhythmRulerMeasure != (args[0] * args[1])) {
+                    logo.errorMsg('Rhythm Ruler imbalance.', blk);
+                    logo.stopTurtle = true;
+                }
+
                 var drumIndex = rhythmruler.Drums.indexOf(logo._currentDrumBlock);
                 if (drumIndex !== -1) {
                     for (var i = 0; i < args[0]; i++) {
