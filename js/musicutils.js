@@ -943,12 +943,13 @@ function frequencyToPitch(hz) {
 
 function numberToPitch(i) {
     // Calculate the pitch and octave based on index
+    /*
     if (i < 0) {
         return ['A', 0];
     } else if (i > 87) {
         return ['C', 8];
     }
-
+    */
     // We start at A0.
     return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
 };
@@ -1033,7 +1034,7 @@ function pitchToNumber(pitch, octave, keySignature) {
     }
 
     // We start at A0.
-    return Math.max(octave, 0) * 12 + pitchNumber - PITCHES.indexOf('A') + transposition;
+    return octave * 12 + pitchNumber - PITCHES.indexOf('A') + transposition;
 };
 
 
@@ -1104,8 +1105,7 @@ function splitSolfege(value) {
 
 function getNumber(notename, octave) {
     // Converts a note, e.g., C, and octave to a number
-
-    if (octave < 1) {
+    if (octave < 0) {
         var num = 0;
     } else if (octave > 10) {
         var num = 9 * 12;
@@ -1136,6 +1136,7 @@ function getNumber(notename, octave) {
 function getNumNote(value, delta) {
     // Converts from number to note
     var num = value + delta;
+    /*
     if (num < 0) {
         num = 1;
         var octave = 1;
@@ -1146,12 +1147,16 @@ function getNumNote(value, delta) {
         var octave = Math.floor(num / 12);
         num = num % 12;
     }
+    */
+    var octave = Math.floor(num / 12);
+    num = num % 12;
 
     var note = NOTESTABLE[num];
 
     if (note[num] === "ti") {
         octave -= 1;
     }
+
     return [note, octave + 1];
 };
 
