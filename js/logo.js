@@ -3089,7 +3089,20 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.stopTurtle = true;
                 }
 
-                var drumIndex = rhythmruler.Drums.indexOf(logo._currentDrumBlock);
+                // Since there maybe more than one instance of the
+                // same drum, e.g., if a repeat is used, we look from
+                // end of the list instead of the beginning of the
+                // list.
+
+                var drumIndex = -1;
+                for (var i = 0; i < rhythmruler.Drums.length; i++) {
+                    var j = rhythmruler.Drums.length - i - 1;
+                    if (rhythmruler.Drums[j] === logo._currentDrumBlock) {
+                        drumIndex = j;
+                        break;
+                    }
+                }
+
                 if (drumIndex !== -1) {
                     for (var i = 0; i < args[0]; i++) {
                         rhythmruler.Rulers[drumIndex][0].push(noteBeatValue);
