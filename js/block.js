@@ -14,7 +14,7 @@
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'octaveSelector', 'drumname'];
  
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -637,6 +637,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'modename':
                     this.value = getModeName(DEFAULTMODE);
                     break;
+                case 'octaveSelector':
+                    this.value = _('current');    
+                    break;    
                 case 'voicename':
                     this.value = DEFAULTVOICE;
                     break;
@@ -1735,6 +1738,31 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('modenameLabel');
+        } else if (this.name === 'octaveSelector') {
+            var type = 'octaveSelector';
+            if (this.value != null) {
+                var selectedOctave = this.value[0];
+            } else {
+                var selectedOctave = _('current');
+            }
+ 
+            var labelHTML = '<select name="octaveSelector" id="octaveSelectorLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            for (var i = 0; i < OCTAVESELECTORS.length; i++) {
+                if (OCTAVESELECTORS[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + OCTAVESELECTORS[i][1] + '">' + OCTAVESELECTORS[i][1] + '</option>';
+                } else if (selectednote === OCTAVESELECTORS[i][0]) {
+                    labelHTML += '<option value="' + selectedOctave + '" selected>' + selectedOctave + '</option>';
+                } else if (selectednote === OCTAVESELECTORS[i][1]) {
+                    labelHTML += '<option value="' + selectedOctave + '" selected>' + selectedOctave + '</option>';
+                } else {
+                    labelHTML += '<option value="' + OCTAVESELECTORS[i][0] + '">' + OCTAVESELECTORS[i][0] + '</option>';
+                }
+            }
+ 
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('octaveSelectorLabel');
         } else if (this.name === 'drumname') {
             var type = 'drumname';
             if (this.value != null) {

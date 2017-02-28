@@ -286,6 +286,24 @@ var MODENAMES = [
     [_('custom'), 'custom'],
 ];
 
+var OCTAVESELECTORS = [
+    [-1,-1],
+    [0,0],
+    [1,1],
+    [_('previous'),'previous'],
+    [_('current'),'current'],
+    [_('next'),'next'],
+    [_('sub-contra octave'),''],
+    [_('contra octave'),''],
+    [_('great octave'),''],
+    [_('small octave'),''],
+    [_('one-accented octave'),'one-accented octave'],
+    [_('two-accented octave'),'one-accented octave'],
+    [_('three-accented octave'),'one-accented octave'],
+    [_('four-accented octave'),'one-accented octave'],
+    [_('five-accented octave'),'one-accented octave'],
+];
+
 var VOICENAMES = [
     //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg'],

@@ -1888,6 +1888,16 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
             };
  
             postProcessArg = [thisBlock, 'Major'];
+        } else if (name === 'octaveSelector') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                me.blockList[thisBlock].value = value;
+                me.blockList[thisBlock].text.text = value;
+                me.blockList[thisBlock].container.updateCache();
+            };
+ 
+            postProcessArg = [thisBlock, 'Current']; 
         } else if (name === 'number') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -3399,6 +3409,15 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 };
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
+            case 'octaveSelector':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    me.blockList[thisBlock].value = value;
+                    me.updateBlockText(thisBlock);
+                };
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;     
             case 'drumname':
                 postProcess = function (args) {
                     var thisBlock = args[0];
