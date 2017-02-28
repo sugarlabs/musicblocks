@@ -695,7 +695,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
         this.inRhythmRuler = false;
-	this.rhythmRulerMeasure = null;
+        this.rhythmRulerMeasure = null;
         this._currentDrumBlock = null;
         this.inStatusMatrix = false;
         this.pitchBlocks = [];
@@ -2446,7 +2446,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
 
             if (args[2] === 'even' || args[2] === 'odd'){
-		var octave = calcOctave(logo.currentOctaves[turtle], args[1]);
+                var octave = calcOctave(logo.currentOctaves[turtle], args[1]);
                 logo.invertList[turtle].push([args[0], octave, args[2]]);
             } else {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -2817,9 +2817,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 } else {
                     var cents = 0;
                     var note = args[0];
-                    if (calcOctave(logo.currentOctaves[turtle], args[1]) < 1) {
-                        console.log('minimum allowable octave is 1');
-                        var octave = 1;
+                    if (calcOctave(logo.currentOctaves[turtle], args[1]) < 0) {
+                        console.log('minimum allowable octave is 0');
+                        var octave = 0;
                     } else if (calcOctave(logo.currentOctaves[turtle], args[1]) > 10) {
                         // Humans can only hear 10 octaves.
                         console.log('clipping octave at 10');
@@ -3529,7 +3529,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             // Deprecated
             var mod12Arg = mod12(args[0]);
             if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(mod12Arg) !== -1) {
-		logo.augmented[turtle].push([args[0], 0]);
+                logo.augmented[turtle].push([args[0], 0]);
 
                 var listenerName = '_tritone_' + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
@@ -6115,8 +6115,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
         }
 
-        if (octave < 1) {
-            return [note, 1];
+        if (octave < 0) {
+            return [note, 0];
         } else if (octave > 10) {
             return [note, 10];
         } else {
