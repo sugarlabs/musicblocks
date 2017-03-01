@@ -2212,7 +2212,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     toFrequencyBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['tofrequency'] = toFrequencyBlock;
     //.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
-    toFrequencyBlock.staticLabels.push(_('note to frequency'), _('note'), _('octave'));
+    toFrequencyBlock.staticLabels.push(_('note to frequency'), _('name'), _('octave'));
     toFrequencyBlock.adjustWidthToLabel();
     toFrequencyBlock.defaults.push('G');
     toFrequencyBlock.defaults.push('4');
