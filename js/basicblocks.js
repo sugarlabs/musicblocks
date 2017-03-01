@@ -544,6 +544,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleNoteBlock.oneArgMathBlock();
     turtleNoteBlock.adjustWidthToLabel();
     turtleNoteBlock.dockTypes[1] = 'anyin';
+    turtleNoteBlock.hidden = true;
+
+    var turtleNoteBlock2 = new ProtoBlock('turtlenote2');
+    turtleNoteBlock2.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['turtlenote2'] = turtleNoteBlock2;
+    turtleNoteBlock2.staticLabels.push(_('mouse note value'));
+    turtleNoteBlock2.oneArgMathBlock();
+    turtleNoteBlock2.adjustWidthToLabel();
+    turtleNoteBlock2.dockTypes[1] = 'anyin';
 
     var duplicateFactor = new ProtoBlock('duplicatefactor');
     duplicateFactor.palette = palettes.dict['rhythm'];
