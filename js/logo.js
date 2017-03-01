@@ -5515,6 +5515,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
                 break;
             case 'turtlenote':
+            case 'turtlenote2':
                 var value = null;
                 var cblk = logo.blocks.blockList[blk].connections[1];
                 var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -5529,7 +5530,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                             console.log('Could not find a note for turtle ' + turtle);
                             value = -1;
                         }
-                        logo.blocks.blockList[blk].value = value;
+                        if (logo.blocks.blockList[blk].name === 'turtlenote') {
+                            logo.blocks.blockList[blk].value = value;
+                        } else if (value !== 0) {
+                            logo.blocks.blockList[blk].value = 1 / value;
+                        } else {
+                            logo.blocks.blockList[blk].value = 0;
+                        }
                     }
                 }
                 if (value == null) {
