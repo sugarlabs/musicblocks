@@ -1625,7 +1625,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 this._expandablesList.push(blk);
             }
 
-            blk = last(this.blockList[blk].connections);
+            if (this.blockList[blk].connections.length > 1) {
+                blk = last(this.blockList[blk].connections);
+            } else {
+                // A value block only connects back to its parent, so
+                // end the search here.
+                blk = null;
+            }
         }
     };
  
