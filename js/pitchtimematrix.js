@@ -18,7 +18,7 @@ const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
 
 function Matrix() {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
-    const OUTERWINDOWWIDTH = 675;
+    const OUTERWINDOWWIDTH = 728;  // 675;
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
@@ -277,6 +277,7 @@ function Matrix() {
 
         var w = Math.max(Math.min(window.innerWidth, INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
         docById('ptmInnerDiv').style.width = w + 'px';
+        docById('ptmInnerDiv').style.marginLeft = 105 + 'px';
 
         // Each row in the ptm table contains a note label in the
         // first column and a table of buttons in the second column.
@@ -291,7 +292,7 @@ function Matrix() {
 
             var ptmTableRow = ptmTable.insertRow();
 
-            // A cell for the row label
+            // A cell for the row label graphic
             var cell = ptmTableRow.insertCell();
             cell.style.backgroundColor = MATRIXLABELCOLOR;
             cell.style.fontSize = this._cellScale * 100 + '%';
@@ -300,34 +301,50 @@ function Matrix() {
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'headcol';  // This cell is fixed horizontally.
+            cell.innerHTML = '';
 
             var drumName = getDrumName(this.rowLabels[i]);
+
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + drumName + '" alt="' + drumName + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                this._noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(this.rowLabels[i]) + '" title="' + this.rowLabels[i] + '" alt="' + this.rowLabels[i] + '" height="' + iconSize / 2 + '" width="' + iconSize / 2 + '" vertical-align="middle"/>&nbsp;&nbsp;';
-                this._noteStored.push(this.rowLabels[i].replace(/ /g,':'));
-                // Deprecated
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = '&nbsp;&nbsp;' + this.rowArgs[i] + '&nbsp;&nbsp;';
-                cell.style.backgroundImage = "url('images/synth2.svg')";
-                cell.style.backgroundRepeat = 'no-repeat';
-                cell.style.backgroundPosition = 'center center';
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/synth2.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/mouse.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + "images/mouse.svg" + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            }
+
+            // A cell for the row label
+            var cell = ptmTableRow.insertCell();
+            cell.style.backgroundColor = MATRIXLABELCOLOR;
+            cell.style.fontSize = this._cellScale * 100 + '%';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
+            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            cell.style.maxWidth = cell.style.minWidth;
+            cell.className = 'labelcol';  // This cell is fixed horizontally.
+
+            if (drumName != null) {
+                cell.innerHTML = drumName;
+                cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+                this._noteStored.push(drumName);
+            } else if (this.rowLabels[i].slice(0, 4) === 'http') {
+                cell.innerHTML = this.rowLabels[i];
+                cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+                this._noteStored.push(this.rowLabels[i].replace(/ /g,':'));
+            } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
+                cell.innerHTML = this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
-                cell.style.backgroundImage = "url('images/mouse2.svg')";
-                cell.style.backgroundRepeat = 'no-repeat';
-                cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
-                cell.style.backgroundImage = "url('images/mouse2.svg')";
-                cell.style.backgroundRepeat = 'no-repeat';
-                cell.style.backgroundPosition = 'center center';
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 this._noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
@@ -363,7 +380,7 @@ function Matrix() {
         labelCell.innerHTML = _('note value');
         labelCell.style.fontSize = this._cellScale * 75 + '%';
         labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-        labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         labelCell.style.minWidth = labelCell.style.width;
         labelCell.style.maxWidth = labelCell.style.width;
         labelCell.style.backgroundColor = MATRIXLABELCOLOR;
@@ -437,7 +454,7 @@ function Matrix() {
         for (var i = 0; i < this.rowLabels.length; i++) {
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                sortableList.push([-2, this.rowLabels[i], this.rowArgs[i], i], this._noteStored[i]);
+                sortableList.push([-2, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
 
@@ -494,6 +511,7 @@ function Matrix() {
             this.rowArgs.push(Number(obj[2]));
         }
 
+        this._matrixHasTuplets = false;  // Force regenration of tuplet rows.
         this.init(this._logo);
         this._sorted = true;
 
@@ -627,7 +645,7 @@ function Matrix() {
             labelCell.innerHTML = _('note value');
             labelCell.style.fontSize = this._cellScale * 75 + '%';
             labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
             labelCell.style.backgroundColor = MATRIXLABELCOLOR;
@@ -636,7 +654,7 @@ function Matrix() {
             labelCell.innerHTML = _('tuplet value');
             labelCell.style.fontSize = this._cellScale * 75 + '%';
             labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
             labelCell.style.backgroundColor = MATRIXLABELCOLOR;
