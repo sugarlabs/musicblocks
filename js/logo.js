@@ -2401,13 +2401,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         // converted to notes.
                         switch (logo.tupletRhythms[i][0]) {
                         case 'notes':
-                            var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
-                            tupletParam.push([]);
-                            for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
-                                tupletParam[1].push(logo.tupletRhythms[i][j]);
-                            }
-                            pitchtimematrix.addTuplet(tupletParam);
-                            break;
                         case 'simple':
                             var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                             tupletParam.push([]);

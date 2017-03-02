@@ -517,6 +517,7 @@ function Matrix() {
 
         for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
             switch (this._logo.tupletRhythms[i][0]) {
+            case 'simple':
             case 'notes':
                 var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
                 tupletParam.push([]);
