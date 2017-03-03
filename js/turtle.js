@@ -246,8 +246,9 @@ function Turtle (name, turtles, drum) {
             this.x = x2;
             this.y = y2;
             ctx.stroke();
-            ctx.closePath();
-
+            if (!this.fillState) {
+                ctx.closePath();
+            }
         } else {
             this.x = x2;
             this.y = y2;
@@ -377,7 +378,9 @@ function Turtle (name, turtles, drum) {
             var nyScaled = ny * this.turtles.scale;
             this.svgOutput += nxScaled + ',' + nyScaled + ' ';
             ctx.stroke();
-            ctx.closePath();
+            if (!this.fillState) {
+                ctx.closePath();
+            }
         } else {
             ctx.moveTo(nx, ny);
         }
@@ -496,7 +499,6 @@ function Turtle (name, turtles, drum) {
             ctx.lineWidth = this.stroke;
             ctx.lineCap = "round";
             ctx.moveTo(nx,ny);
-            
         } else if (this.penState) {
             ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
             if (!this.svgPath) {
@@ -515,7 +517,9 @@ function Turtle (name, turtles, drum) {
             var radiusScaled = radius * this.turtles.scale;
             this.svgOutput += 'A ' + radiusScaled + ',' + radiusScaled + ' 0 0 ' + sweep + ' ' + nxScaled + ',' + nyScaled + ' ';
             ctx.stroke();
-            ctx.closePath();
+            if (!this.fillState) {
+                ctx.closePath();
+            }
         } else {
             ctx.moveTo(nx, ny);
         }
@@ -892,7 +896,7 @@ function Turtle (name, turtles, drum) {
         // We cannot update the cache during the 'tween'.
         if (this.blinkFinished) {
             this.updateCache();
-	}
+        }
     };
 
     this.doSetFont = function(font) {
@@ -986,6 +990,7 @@ function Turtle (name, turtles, drum) {
     this.doEndFill = function() {
         /// redraw the points with fill enabled
         ctx.fill();
+        ctx.closePath();
         this.closeSVG();
         this.fillState = false;
     };
