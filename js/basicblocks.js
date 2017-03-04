@@ -525,7 +525,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     statusBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['status'] = statusBlock;
     statusBlock.staticLabels.push(_('status'));
-	statusBlock.extraWidth = 10;
+    statusBlock.extraWidth = 10;
     statusBlock.adjustWidthToLabel();
     statusBlock.stackClampZeroArgBlock();
 
