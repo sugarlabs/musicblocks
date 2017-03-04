@@ -296,14 +296,6 @@ define(function (require) {
                             y += 100 * turlteBlocksScale;
                         }
                     }
-                    /*
-                    // Collapse collapsible stacks.
-                    if (['start', 'action', 'drum', 'matrix'].indexOf(myBlock.name) !== -1 && !myBlock.trash) {
-                        if (!myBlock.collapsed) {
-                            myBlock.collapseToggle();
-                        }
-                    }
-                    */
                 }
             }
 
