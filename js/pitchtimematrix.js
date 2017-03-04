@@ -631,10 +631,10 @@ function Matrix() {
         var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0]);
 
         // Set the cells to "rest"
-        for (var j = 0; j < numberOfNotes; j++) {
+        for (var i = 0; i < numberOfNotes; i++) {
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
-            this._notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][j])]);
+            this._notesToPlay.push([['R'], (totalNoteInterval * param[0][1]) / (32 / param[1][i])]);
         }
 
         // First, ensure that the matrix is set up for tuplets.
@@ -690,13 +690,14 @@ function Matrix() {
             // Add cell for tuplet note values
             var noteRow = docById('ptmTupletNoteValueRow');
             var cell = noteRow.insertCell(-1);
+            var numerator = 32 / param[1][i];
+            var thisNoteValue = 1 / (numerator / (totalNoteInterval / tupletTimeFactor));
             cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
-            cell.style.width = this._noteWidth(tupletNoteValue)  + 'px';
+            cell.style.width = this._noteWidth(thisNoteValue) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             cell.setAttribute('id', 1 / tupletNoteValue);
-            var numerator = 32 / param[1][0];
             cell.style.lineHeight = 60 + '%';
             cell.style.fontSize = this._cellScale * 75 + '%';
             cell.style.textAlign = 'center';
