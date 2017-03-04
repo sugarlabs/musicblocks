@@ -2364,7 +2364,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
  
     this.newStoreinBlock = function (name) {
-        if ('myStorein_' + name in this.protoBlockDict) {
+        if (name == null) {
+            console.log('null name passed to newStoreinBlock');
+            return;
+        } else if (name == undefined) {
+            console.log('undefined name passed to newStoreinBlock');
+            return;
+        } else if ('myStorein_' + name in this.protoBlockDict) {
             return;
         }
  
@@ -2388,7 +2394,13 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     };
  
     this.newNamedboxBlock = function (name) {
-        if ('myBox_' + name in this.protoBlockDict) {
+        if (name == null) {
+            console.log('null name passed to newNamedboxBlock');
+            return;
+        } else if (name == undefined) {
+            console.log('undefined name passed to newNamedboxBlock');
+            return;
+        } else if ('myBox_' + name in this.protoBlockDict) {
             return;
         }
  
