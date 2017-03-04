@@ -4494,7 +4494,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         }
 
         // How best to expose this in the UI? What units?
-        this.notesPlayed[turtle] += (1 / noteValue);
+        this.notesPlayed[turtle] += (1 / (noteValue * this.beatFactor[turtle]));
 
         var vibratoRate = 0;
         var vibratoValue = 0;
@@ -4758,8 +4758,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         var beatValue = bpmFactor / (noteBeatValue * logo.noteBeatValues[turtle][0]);
                     }
 
-                    if (doVibrato)
+                    if (doVibrato) {
                         vibratoValue = beatValue * (duration / vibratoRate);
+                    }
 
                     logo._dispatchTurtleSignals(turtle, beatValue, blk, noteBeatValue);
                     // Process pitches
