@@ -560,10 +560,36 @@ function Matrix() {
         var header = exportTable.createTHead();
 
         for (var i = 0, row; row = docById('ptm' + i); i++) {
-            var exportRow = header.insertRow(i);
+            var exportRow = header.insertRow();
+            // Add the row label...
             var exportLabel = exportRow.insertCell();
-            exportLabel.innerHTML = this.rowLabels[i];
-            for (var j = 0, col; col=row.cells[j]; j++) {
+
+            var drumName = getDrumName(this.rowLabels[i]);
+            if (drumName != null) {
+                exportLabel.innerHTML = drumName;
+                exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+            } else if (this.rowLabels[i].slice(0, 4) === 'http') {
+                exportLabel.innerHTML = this.rowLabels[i];
+                exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+            } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
+                exportLabel.innerHTML = this.rowArgs[i];
+                exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+            } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
+                exportLabel.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
+                exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
+            } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
+                exportLabel.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
+                exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
+            } else {
+                if (noteIsSolfege(this.rowLabels[i])) {
+                    exportLabel.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
+                } else {
+                    exportLabel.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                }
+            }
+
+            // Add then the note cells.
+            for (var j = 0, col; col = row.cells[j]; j++) {
                 var exportCell = exportRow.insertCell();
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.innerHTML = col.innerHTML;
@@ -578,6 +604,71 @@ function Matrix() {
                 exportCell.style.fontSize = 14 + 'px';
                 exportCell.style.padding = 1 + 'px';
             }
+        }
+
+        if (this._matrixHasTuplets) {
+            // Add the tuplet note value row.
+            var exportRow = header.insertRow();
+            var exportLabel = exportRow.insertCell();
+            exportLabel.innerHTML = _('note value');
+            var noteValueRow = docById('ptmTupletNoteValueRow');
+            for (var i = 0; i < noteValueRow.cells.length; i++) {
+                var exportCell = exportRow.insertCell();
+                var col = noteValueRow.cells[i];
+                exportCell.style.backgroundColor = col.style.backgroundColor;
+                exportCell.innerHTML = col.innerHTML;
+                exportCell.width = col.width;
+                if (exportCell.width == '') {
+                    exportCell.width = col.style.width;
+                }
+                exportCell.colSpan = col.colSpan;
+                exportCell.style.minWidth = col.style.width;
+                exportCell.style.maxWidth = col.style.width;
+                exportCell.style.fontSize = 14 + 'px';
+                exportCell.style.padding = 1 + 'px';
+            }
+
+            // Add the tuplet value row.
+            var exportRow = header.insertRow();
+            var exportLabel = exportRow.insertCell();
+            exportLabel.innerHTML = _('tuplet value');
+            var noteValueRow = docById('ptmTupletValueRow');
+            for (var i = 0; i < noteValueRow.cells.length; i++) {
+                var exportCell = exportRow.insertCell();
+                var col = noteValueRow.cells[i];
+                exportCell.style.backgroundColor = col.style.backgroundColor;
+                exportCell.innerHTML = col.innerHTML;
+                exportCell.width = col.width;
+                if (exportCell.width == '') {
+                    exportCell.width = col.style.width;
+                }
+                exportCell.colSpan = col.colSpan;
+                exportCell.style.minWidth = col.style.width;
+                exportCell.style.maxWidth = col.style.width;
+                exportCell.style.fontSize = 14 + 'px';
+                exportCell.style.padding = 1 + 'px';
+            }
+        }
+
+        // Add the note value row.
+        var exportRow = header.insertRow();
+        var exportLabel = exportRow.insertCell();
+        exportLabel.innerHTML = _('note value');
+        var noteValueRow = docById('ptmNoteValueRow');
+        for (var i = 0; i < noteValueRow.cells.length; i++) {
+            var exportCell = exportRow.insertCell();
+            var col = noteValueRow.cells[i];
+            exportCell.style.backgroundColor = col.style.backgroundColor;
+            exportCell.innerHTML = col.innerHTML;
+            exportCell.width = col.width;
+            if (exportCell.width == '') {
+                exportCell.width = col.style.width;
+            }
+            exportCell.colSpan = col.colSpan;
+            exportCell.style.minWidth = col.style.width;
+            exportCell.style.maxWidth = col.style.width;
+            exportCell.style.fontSize = 14 + 'px';
+            exportCell.style.padding = 1 + 'px';
         }
 
         var saveDocument = exportDocument;
