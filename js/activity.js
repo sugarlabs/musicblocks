@@ -634,13 +634,7 @@ define(function (require) {
             blocks.setErrorMsg(errorMsg);
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
-            // TODO: clean up this mess.
-            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitchslider, canvas,
-                blocks, turtles, turtleContainer, refreshCanvas,
-                textMsg, errorMsg, hideMsgs, onStopTurtle,
-                onRunTurtle, getStageX, getStageY,
-                getStageMouseDown, getCurrentKeyCode,
-                clearCurrentKeyCode, meSpeak, saveLocally);
+            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitchslider, canvas, blocks, turtles, turtleContainer, refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle, onRunTurtle, getStageX, getStageY, getStageMouseDown, getCurrentKeyCode, clearCurrentKeyCode, meSpeak, saveLocally);
             blocks.setLogo(logo);
 
             // Set the default background color...
