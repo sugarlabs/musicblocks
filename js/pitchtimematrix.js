@@ -20,7 +20,7 @@ function Matrix() {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 728;  // 675;
     const INNERWINDOWWIDTH = 600;
-    const BUTTONSIZE = 51;
+    const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
     // rowLabels can contain either a pitch, a drum, or a grphics command
@@ -112,8 +112,8 @@ function Matrix() {
         this._logo = logo;
 
         var w = window.innerWidth;
-        this._cellScale = 1.0;
-        var iconSize = ICONSIZE;
+        this._cellScale = w / 1200;
+        var iconSize = ICONSIZE * this._cellScale;
 
         var canvas = document.getElementById('myCanvas');
 
@@ -146,33 +146,33 @@ function Matrix() {
         // Add the buttons to the top row.
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', iconSize, _('play'), '');
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'), '');
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save'), '');
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'), '');
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'), '');
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 'export-button.svg', iconSize, _('export'), '');
+        var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('export'), '');
         cell.onclick=function() {
             that._export();
         }
 
-        var cell = this._addButton(row, 'sort.svg', iconSize, _('sort'), '');
+        var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('sort'), '');
         cell.onclick=function() {
             that._sort();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'), '');
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'), '');
         cell.onclick=function() {
             that._rowOffset = [];
             for (var i = 0; i < that._rowMap.length; i++) {
@@ -187,7 +187,7 @@ function Matrix() {
         }
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'), '');
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - ptmDiv.getBoundingClientRect().left;
@@ -266,18 +266,19 @@ function Matrix() {
         var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
         var outerDiv = docById('ptmOuterDiv');
         if (this.rowLabels.length > n) {
-            outerDiv.style.height = MATRIXSOLFEHEIGHT * (n + 6) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
+            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 6) + 'px';
+            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 'px';
         } else {
-            outerDiv.style.height = MATRIXSOLFEHEIGHT * (this.rowLabels.length + 6) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
+            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 3) + 'px';
+            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 'px';
         }
 
-        var w = Math.max(Math.min(window.innerWidth, INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
-        docById('ptmInnerDiv').style.width = w + 'px';
-        docById('ptmInnerDiv').style.marginLeft = 105 + 'px';
+        var w = Math.max(Math.min(window.innerWidth, this._cellScale * INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
+        var innerDiv = docById('ptmInnerDiv');
+        innerDiv.style.width = w + 'px';
+        innerDiv.style.marginLeft = (BUTTONSIZE * 2 * this._cellScale) + 'px';
 
         // Each row in the ptm table contains a note label in the
         // first column and a table of buttons in the second column.
@@ -326,6 +327,7 @@ function Matrix() {
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'labelcol';  // This cell is fixed horizontally.
+            cell.style.left = (BUTTONSIZE * this._cellScale) + 'px';
 
             if (drumName != null) {
                 cell.innerHTML = drumName;
@@ -639,6 +641,19 @@ function Matrix() {
 
         // First, ensure that the matrix is set up for tuplets.
         if (!this._matrixHasTuplets) {
+            // Add more room to the outerDiv to hold the extra rows.
+            var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
+            var outerDiv = docById('ptmOuterDiv');
+            if (this.rowLabels.length > n) {
+                outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 6) + 'px';
+                var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
+                outerDiv.style.width = w + 'px';
+            } else {
+                outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 6) + 'px';
+                var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
+                outerDiv.style.width = w + 'px';
+            }
+
             var firstRow = docById('ptm' + 0);
 
             // Load the labels
