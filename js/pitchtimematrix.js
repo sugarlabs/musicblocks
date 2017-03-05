@@ -559,14 +559,16 @@ function Matrix() {
 
         var header = exportTable.createTHead();
 
-        for (var i = 1, row; row = docById('ptm' + i); i++) {
-            var exportRow = header.insertRow(i - 1);
+        for (var i = 0, row; row = docById('ptm' + i); i++) {
+            var exportRow = header.insertRow(i);
+            var exportLabel = exportRow.insertCell();
+            exportLabel.innerHTML = this.rowLabels[i];
             for (var j = 0, col; col=row.cells[j]; j++) {
-                var exportCell = exportRow.insertCell(j);
+                var exportCell = exportRow.insertCell();
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.innerHTML = col.innerHTML;
                 exportCell.width = col.width;
-                if(exportCell.width == ""){
+                if (exportCell.width == '') {
                     exportCell.width = col.style.width;
                 }
                 exportCell.colSpan = col.colSpan;
