@@ -62,6 +62,14 @@
     display: none;
 }
 
+#palette_bckg {
+    width:65px;
+    height:1200px;
+    float: left;
+    position: relative;
+    background-color: white; 
+}
+
 div.back {
     display: block;
     position: fixed;
