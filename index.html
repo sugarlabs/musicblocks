@@ -277,7 +277,9 @@
   </canvas>
   <!--hidden at the beginning whilst everything loads-->
   <div id = "hideContents" style="display: none;">
+  
     <div class="canvasHolder">
+      <div id="palette_bckg">
       <canvas id="myCanvas" width="1200" height="900"></canvas>
       <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute;pointer-events:none;left:0;top:0;z-index:-100;visibility:hidden;"></canvas>
       <canvas id="myChart" width="600" height="600"></canvas>
@@ -292,9 +294,9 @@
         <input tabindex="-1" class="file" type="file" id="myOpenAll"></input>
       </div>
       <div id="audio"></div>
-      <div id="tourData"></div>
-    </div>
-
+      <div id="tourData"></div></div>
+    </div> 
+   
     <div id="popdown-palette"></div>
 
     <div id="main-toolbar" class="toolbar"></div>
@@ -302,6 +304,7 @@
     <div id="loader"></div>
 
     <div id="header" class="EaselJS"></div>
+    
 
     <div class="planet" style="display: none;">
       <nav>
@@ -316,7 +319,7 @@
         </div>
       </nav>
 
-      <div class="nav-spacer"></div>
+     <div class="nav-spacer"></div>
       <div class="planet-content">
         <h2 id="planetMyDevice"></h2>
         <ul class="content l"></ul>
@@ -349,6 +352,7 @@
     <div id="dissectNumber"></div>
     <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>
     <div id="helpElem"></div>
+   
   </div>
 </body>
 </html>
