@@ -5193,7 +5193,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'sqrt':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
+                    }
                 } else {
                     var cblk = logo.blocks.blockList[blk].connections[1];
                     var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -5207,7 +5209,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'int':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'int']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'int']);
+                    }
                 } else {
                     var cblk = logo.blocks.blockList[blk].connections[1];
                     var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -5216,7 +5220,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'mod':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'mod']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'mod']);
+                    }
                 } else {
                     var cblk1 = logo.blocks.blockList[blk].connections[1];
                     var cblk2 = logo.blocks.blockList[blk].connections[2];
@@ -5268,7 +5274,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'plus':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'plus']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'plus']);
+                    }
                 } else {
                     var cblk1 = logo.blocks.blockList[blk].connections[1];
                     var cblk2 = logo.blocks.blockList[blk].connections[2];
@@ -5279,7 +5287,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'multiply':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'multiply']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'multiply']);
+                    }
                 } else {
                     var cblk1 = logo.blocks.blockList[blk].connections[1];
                     var cblk2 = logo.blocks.blockList[blk].connections[2];
@@ -5290,7 +5300,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'power':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'power']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'power']);
+                    }
                 } else {
                     var cblk1 = logo.blocks.blockList[blk].connections[1];
                     var cblk2 = logo.blocks.blockList[blk].connections[2];
@@ -5301,7 +5313,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;   
             case 'divide':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'divide']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'divide']);
+                    }
                 } else {
                     var cblk1 = logo.blocks.blockList[blk].connections[1];
                     var cblk2 = logo.blocks.blockList[blk].connections[2];
@@ -5312,7 +5326,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'minus':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'minus']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'minus']);
+                    }
                 } else {
                     var cblk1 = logo.blocks.blockList[blk].connections[1];
                     var cblk2 = logo.blocks.blockList[blk].connections[2];
@@ -5322,14 +5338,26 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
                 break;
             case 'neg':
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                logo.blocks.blockList[blk].value = logo._doMinus(0, a);
+                if (logo.inStatusMatrix) {
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'neg']);
+                    }
+                } else {
+                    var cblk1 = logo.blocks.blockList[blk].connections[1];
+                    var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    logo.blocks.blockList[blk].value = logo._doMinus(0, a);
+                }
                 break;
             case 'toascii':
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                logo.blocks.blockList[blk].value = String.fromCharCode(a);
+                if (logo.inStatusMatrix) {
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'toascii']);
+                    }
+                } else {
+                    var cblk1 = logo.blocks.blockList[blk].connections[1];
+                    var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    logo.blocks.blockList[blk].value = String.fromCharCode(a);
+                }
                 break;
             case 'myclick':
                 console.log('[click' + logo.turtles.turtleList[turtle].name + ']');
@@ -5337,21 +5365,27 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'heading':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'heading']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'heading']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = logo.turtles.turtleList[turtle].orientation;
                 }
                 break;
             case 'x':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'x']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'x']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = logo.turtles.screenX2turtleX(logo.turtles.turtleList[turtle].container.x);
                 }
                 break;
             case 'y':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'y']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'y']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = logo.turtles.screenY2turtleY(logo.turtles.turtleList[turtle].container.y);
                 }
@@ -5378,7 +5412,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'bpmfactor':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'bpm']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'bpm']);
+                    }
                 } else if (logo.bpm[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = last(logo.bpm[turtle]);
                 } else {
@@ -5387,7 +5423,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'staccatofactor':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'staccato']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'staccato']);
+                    }
                 } else if (logo.staccato[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = last(logo.staccato[turtle]);
                 } else {
@@ -5396,7 +5434,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'slurfactor':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'slur']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'slur']);
+                    }
                 } else if (logo.staccato[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = -last(logo.staccato[turtle]);
                 } else {
@@ -5405,7 +5445,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'key':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'key']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'key']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = logo.keySignature[turtle];
                 }
@@ -5428,41 +5470,57 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             case 'transpositionfactor':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'transposition']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'transposition']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = logo.transposition[turtle];
                 }
                 break;
             case 'duplicatefactor':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'duplicate']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'duplicate']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = logo.duplicateFactor[turtle];
                 }
                 break;
             case 'skipfactor':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'skip']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'skip']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = logo.skipFactor[turtle];
                 }
                 break;
             case 'notevolumefactor':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'volume']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'volume']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = last(logo.polyVolume[turtle]);
                 }
                 break;
             case 'elapsednotes':
                 if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, 'elapsednotes']);
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'elapsednotes']);
+                    }
                 } else {
                     logo.blocks.blockList[blk].value = logo.notesPlayed[turtle];
                 }
                 break;
             case 'beatfactor':
-                logo.blocks.blockList[blk].value = logo.beatFactor[turtle];
+                if (logo.inStatusMatrix) {
+                    if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                        logo.statusFields.push([blk, 'beatfactor']);
+                    }
+                } else {
+                    logo.blocks.blockList[blk].value = logo.beatFactor[turtle];
+                }
                 break;
             case 'number2pitch':
             case 'number2octave':
