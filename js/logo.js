@@ -1038,9 +1038,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         var childFlowCount = 0;
         var actionArgs = [];
 
-        if (logo.turtleDelay !== 0) {
-            logo.blocks.highlight(blk, false);
-        }
+        logo.blocks.highlight(blk, false);
 
         switch (logo.blocks.blockList[blk].name) {
         case 'dispatch':
@@ -4325,7 +4323,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 // blocks before it is unhighlighted.
                 if (logo.turtleDelay === TURTLESTEP) {
                     logo.unhighlightStepQueue[turtle] = blk;
-                } else if (logo.turtleDelay > 0) {
+                } else {
                     setTimeout(function() {
                         logo.blocks.unhighlight(blk);
                     }, logo.turtleDelay + logo.waitTimes[turtle]);
@@ -4341,14 +4339,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     // logo.unhightlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
                 } else if (logo.unhightlightQueue[turtle].length > 0) {
                     // The child flow is finally complete, so unhighlight.
-                    if (logo.turtleDelay !== 0) {
-                        setTimeout(function() {
-                            logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
-                        }, logo.turtleDelay);
-                    }
+                    setTimeout(function() {
+                        logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
+                    }, logo.turtleDelay);
                 }
             }
 
+            // We don't update parameter blocks when running full speed.
             if (logo.turtleDelay !== 0) {
                 for (var pblk in logo.parameterQueue[turtle]) {
                     logo._updateParameterBlock(logo, turtle, logo.parameterQueue[turtle][pblk]);
