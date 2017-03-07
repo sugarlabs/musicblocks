@@ -4335,12 +4335,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 // unhighlighting of the parent block to the flow.
                 if (logo.parentFlowQueue[turtle].length > 0 && logo.turtles.turtleList[turtle].queue.length > 0 && last(logo.turtles.turtleList[turtle].queue).parentBlk !== last(logo.parentFlowQueue[turtle])) {
                     logo.unhightlightQueue[turtle].push(last(logo.parentFlowQueue[turtle]));
-
                     // logo.unhightlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
                 } else if (logo.unhightlightQueue[turtle].length > 0) {
                     // The child flow is finally complete, so unhighlight.
                     setTimeout(function() {
-                        logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
+			logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
                     }, logo.turtleDelay);
                 }
             }
@@ -4888,6 +4887,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                             }
                         }
                     }
+
+                    // Ensure note value block unhighlights after note plays.
+                    setTimeout(function() {
+                        logo.blocks.unhighlight(blk);
+                    }, beatValue * 1000);
                 };
 
                 if (waitTime === 0 || this.suppressOutput[turtle]) {
