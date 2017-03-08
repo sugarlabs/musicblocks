@@ -75,37 +75,7 @@
     -->
 
     $(function() {
-        $("#pitchtimematrix").draggable();
-    });
-
-    $(function() {
         $("#pitchdrummatrix").draggable();
-    });
-
-    $(function() {
-        $('#pitchstaircase').draggable({
-            drag: function() {
-                jQuery('#playPitch').css('top', jQuery(this).position().top);
-                jQuery('#playPitch').css('left', jQuery(this).position().left - $(window).innerWidth/25);
-            },
-            stop: function(){
-                jQuery('#playPitch').css('top', jQuery(this).position().top);
-                jQuery('#playPitch').css('left', jQuery(this).position().left - $(window).innerWidth/25);
-            }
-        });
-    });
-
-    $(function() {
-        $('#playPitch').draggable({
-            drag: function() {
-                jQuery('#pitchstaircase').css('top', jQuery(this).position().top);
-                jQuery('#pitchstaircase').css('left', jQuery(this).position().left + $(window).innerWidth/25);
-            },
-            stop: function(){
-                jQuery('#pitchstaircase').css('top', jQuery(this).position().top);
-                jQuery('#pitchstaircase').css('left', jQuery(this).position().left + $(window).innerWidth/25);
-            }
-        });
     });
 
     $(function() {
@@ -153,18 +123,6 @@
 
     $(function() {
         $("#statusmatrix").draggable();
-    });
-
-    $(function() {
-        $('#pitchstaircase').on('scroll', function () {
-            jQuery('#playPitch').scrollTop(jQuery(this).scrollTop());
-        });
-    });
-
-    $(function() {
-        $('#playPitch').on('scroll', function () {
-            jQuery('#pitchstaircase').scrollTop(jQuery(this).scrollTop());
-        });
     });
 
     $(function() {
@@ -216,31 +174,6 @@
     });
 
     var isDragging = false;
-    function moveMatrix(event) {
-        isDragging = true;
-        var table = document.getElementById('pitchTimeTable');
-        var tableStyle = window.getComputedStyle(table);
-        var matrixPosition = docById('pitchtimematrix').getBoundingClientRect();
-        var matrixButtons = document.getElementsByClassName('matrixButton');
-        var borderSpacingH = parseInt(tableStyle.borderSpacing.split(" ")[0]);
-        var borderSpacingV = parseInt(tableStyle.borderSpacing.split(" ")[1]);
-
-        var row = table.rows.item(0);
-        var marginTemp = matrixPosition.top + matrixButtons[0].getBoundingClientRect().height + borderSpacingV * 2;
-        for (var i = 1, row; row = table.rows[i]; i++) {
-            cell = row.cells[0];
-            cell.style.left = matrixPosition.left + borderSpacingH + 'px';
-            cell.style.top = marginTemp + 'px';
-            marginTemp += cell.getBoundingClientRect().height + borderSpacingV;
-        }
-
-        marginTemp = matrixPosition.left + borderSpacingH;
-        for (var i = 0; i < matrixButtons.length; i++) {
-            matrixButtons[i].style.left = marginTemp + 'px';
-            matrixButtons[i].style.top = matrixPosition.top + borderSpacingV + 'px';
-            marginTemp += matrixButtons[i].getBoundingClientRect().width + borderSpacingH;
-        }
-    };
 
     function movePitchDrumMatrix(event) {
         var myDiv = document.getElementById('pitchdrummatrix');
@@ -325,17 +258,19 @@
       </div>
     </div>
 
-    <div id="pitchtimematrix" overflow-x="auto" draggable="true" ondrag="moveMatrix(event)" onmouseup="if (isDragging) moveMatrix(event); isDragging = false;"></div>
     <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
     <div id="ptmDiv" draggable="false">
       <div id="ptmButtonsDiv"></div>
       <div id="ptmTableDiv"></div>
     </div>
+    <div id="pscDiv" draggable="false">
+      <div id="pscButtonsDiv"></div>
+      <div id="pscTableDiv"></div>
+    </div>
     <div id="rulerDiv" draggable="false">
       <div id="rulerButtonsDiv"></div>
       <div id="rulerTableDiv"></div>
     </div>
-    <div id="pitchstaircase" style="visibility:hidden"></div>
     <div id="pitchSliderDiv" style="visibility:hidden"></div>
     <div id="playPitch" style="visibility:hidden"></div>
     <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>
