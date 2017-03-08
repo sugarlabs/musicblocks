@@ -157,7 +157,7 @@ function Tempo () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.fillStyle = '';
-        ctx.ellipse(x, this.cellScale * 36, this._xradius, this._yradius, 0, 0, Math.PI * 2);
+        ctx.ellipse(x, this.cellScale * 36, Math.max(this._xradius, 0), Math.max(this._yradius, 0), 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
     };
