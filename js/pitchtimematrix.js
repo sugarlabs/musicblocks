@@ -146,33 +146,33 @@ function Matrix() {
         // Add the buttons to the top row.
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'), '');
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'), '');
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'), '');
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('export'), '');
+        var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('export'));
         cell.onclick=function() {
             that._export();
         }
 
-        var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('sort'), '');
+        var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('sort'));
         cell.onclick=function() {
             that._sort();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'), '');
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
         cell.onclick=function() {
             that._rowOffset = [];
             for (var i = 0; i < that._rowMap.length; i++) {
@@ -187,7 +187,7 @@ function Matrix() {
         }
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'), '');
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
         dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - ptmDiv.getBoundingClientRect().left;
@@ -392,9 +392,9 @@ function Matrix() {
         ptmCell.innerHTML = '<table  class="ptmTable" cellpadding="0px"><tr id="ptmTupletNoteValueRow"></tr><tr id="ptmTupletValueRow"></tr><tr id="ptmNoteValueRow"></tr></table>';
     };
 
-    this._addButton = function(row, icon, iconSize, label, extras) {
+    this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
-        cell.innerHTML = extras + '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
