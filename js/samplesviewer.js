@@ -485,12 +485,22 @@ function PlanetView(model, controller) {
     this.open = function (ele) {
         return function () {
             document.getElementById('ptmDiv').style.visibility = localStorage.getItem('isMatrixHidden');
+            document.getElementById('ptmButtonsDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
+            document.getElementById('ptmTableDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
+            document.getElementById('pscDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
+            document.getElementById('pscButtonsDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
+            document.getElementById('pscTableDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
             document.getElementById('statusmatrix').style.visibility = localStorage.getItem('isStatusHidden');
+            document.getElementById('pitchSliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
+            document.getElementById('moveUpSliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
+            document.getElementById('moveDownSliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
             document.getElementById('pitchdrummatrix').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
             document.getElementById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
             document.getElementById('rulerButtonsDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
             document.getElementById('rulerTableDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
             document.getElementById('modewidget').style.visibility = localStorage.getItem('isModeWidgetHidden');
+            document.getElementById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
+            document.getElementById('tempoCanvas').style.visibility = localStorage.getItem('isTempoHidden');
 
             if (ele.attributes.current.value === 'true') {
                 planet.controller.hide();
