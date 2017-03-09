@@ -378,7 +378,7 @@ define(function (require) {
 
         function _doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
-            if (docById('pitchtimematrix').style.visibility === 'visible') {
+            if (docById('ptmDiv').style.visibility === 'visible') {
                 matrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
@@ -411,7 +411,7 @@ define(function (require) {
         function _doSlowMusicButton() {
             logo.setNoteDelay(DEFAULTDELAY);
 
-            if (docById('pitchtimematrix').style.visibility === 'visible') {
+            if (docById('ptmDiv').style.visibility === 'visible') {
                 matrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
