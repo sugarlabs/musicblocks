@@ -352,10 +352,37 @@ define(function (require) {
 
         function _doFastButton(env) {
             var currentDelay = logo.turtleDelay;
+            var playingWidget = false;
             logo.setTurtleDelay(0);
             if (docById('ptmDiv').style.visibility === 'visible') {
+                playingWidget = true;
                 matrix.playAll();
-            } else if (!turtles.running()) {
+            }
+
+            if (docById('pscDiv').style.visibility === 'visible') {
+                playingWidget = true;
+                pitchstaircase.playUpAndDown();
+            }
+
+            if (docById('rulerDiv').style.visibility === 'visible') {
+                playingWidget = true;
+                rhythmruler.playAll();
+            }
+
+            // We were using the run button to play a widget, not the turtles.
+            if (playingWidget) {
+                return;
+            }
+
+            // Restart tempo widget and run blocks.
+            if (docById('tempoDiv').style.visibility === 'visible') {
+                if (tempo.isMoving) {
+                    tempo.pause();
+                }
+                tempo.resume();
+            }
+
+            if (!turtles.running()) {
                 console.log('running');
                 logo.runLogoCommands(null, env);
             } else {
@@ -1262,10 +1289,10 @@ define(function (require) {
 
             // Hide palette icons on mobile
             if (mobileSize) {
-		palettes.setMobile(true);
+                palettes.setMobile(true);
                 palettes.hide();
             } else {
-		palettes.setMobile(false);
+                palettes.setMobile(false);
                 palettes.show();
                 palettes.bringToTop();
             }
@@ -1861,7 +1888,7 @@ define(function (require) {
         };
 
         function errorMsg(msg, blk, text) {
-	     _hideStopButton(); //Hide the button, as the program is going to be terminated
+             _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
                 return;
@@ -1930,14 +1957,14 @@ define(function (require) {
                 errorArtwork['zerodivide'].visible = true;
                 stage.setChildIndex(errorArtwork['zerodivide'], stage.getNumChildren() - 1);
                 break;
-  	    case NANERRORMSG:
+              case NANERRORMSG:
                 errorArtwork['notanumber'].visible = true;
                 stage.setChildIndex(errorArtwork['notanumber'], stage.getNumChildren() - 1);
                 break;
-	    case NOINPUTERRORMSG:
+            case NOINPUTERRORMSG:
                 errorArtwork['noinput'].visible = true;
                 stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
-                break;			    
+                break;    
             default:
                 var errorMsgContainer = errorMsgText.parent;
                 errorMsgContainer.visible = true;

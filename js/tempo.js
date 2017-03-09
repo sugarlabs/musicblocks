@@ -21,7 +21,7 @@ function Tempo () {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
-    this._isMoving = true;
+    this.isMoving = true;
     this._direction = 1;
     this._widgetFirstTime = null;
     this._widgetNextTime = 0;
@@ -48,11 +48,11 @@ function Tempo () {
         }
     };
 
-    this._pause = function () {
+    this.pause = function () {
         clearInterval(this._intervalID);
     };
 
-    this._resume = function () {
+    this.resume = function () {
         // Reset widget time since we are restarting.
         // We will no longer keep synch with the turtles.
         var d = new Date();
@@ -231,14 +231,14 @@ function Tempo () {
 
         var cell = this._addButton(row, -1, 'pause-button.svg', iconSize, _('pause'));
         cell.onclick=function() {
-            if (that._isMoving) {
-                that._pause();
+            if (that.isMoving) {
+                that.pause();
                 this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                that._isMoving = false;
+                that.isMoving = false;
             } else {
-                that._resume();
+                that.resume();
                 this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                that._isMoving = true;
+                that.isMoving = true;
             }
         };
 

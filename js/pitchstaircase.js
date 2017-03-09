@@ -206,7 +206,7 @@ function PitchStairCase () {
         }, 1000)
     };
 
-    this.playAll = function () {
+    this._playAll = function () {
         var that = this;
         var pitchnotes = [];
 
@@ -228,7 +228,7 @@ function PitchStairCase () {
         }, 1000);
     };
 
-    this._playUpandDown = function () {
+    this.playUpAndDown = function () {
         var that = this;
         var pitchnotes = [];
         var note = this.Stairs[this.Stairs.length-1][0] + this.Stairs[this.Stairs.length-1][1];
@@ -395,12 +395,12 @@ function PitchStairCase () {
 
         var cell = this._addButton(row, 'play-chord.svg', ICONSIZE, _('play chord'));
         cell.onclick=function() {
-            that.playAll();
+            that._playAll();
         }
 
         var cell = this._addButton(row, 'play-scale.svg', ICONSIZE, _('play scale'));
         cell.onclick=function() {
-            that._playUpandDown();
+            that.playUpAndDown();
         };
 
         cell.onmouseover=function() {
