@@ -353,7 +353,7 @@ define(function (require) {
         function _doFastButton(env) {
             var currentDelay = logo.turtleDelay;
             logo.setTurtleDelay(0);
-            if (docById('pitchtimematrix').style.visibility === 'visible') {
+            if (docById('ptmDiv').style.visibility === 'visible') {
                 matrix.playAll();
             } else if (!turtles.running()) {
                 console.log('running');
@@ -1501,15 +1501,15 @@ define(function (require) {
         };
 
         function _doOpenSamples() {
-            localStorage.setItem('isMatrixHidden', document.getElementById('pitchtimematrix').style.visibility);
+            localStorage.setItem('isMatrixHidden', document.getElementById('ptmDiv').style.visibility);
             localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
             localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerDiv').style.visibility);
             localStorage.setItem('isStatusHidden', document.getElementById('statusmatrix').style.visibility);
             localStorage.setItem('isModeWidgetHidden', document.getElementById('modewidget').style.visibility);
 
-            if (document.getElementById('pitchtimematrix').style.visibility !== 'hidden') {
-                document.getElementById('pitchtimematrix').style.visibility = 'hidden';
-                document.getElementById('pitchtimematrix').style.border = 0;
+            if (document.getElementById('ptmDiv').style.visibility !== 'hidden') {
+                document.getElementById('ptmDiv').style.visibility = 'hidden';
+                document.getElementById('ptmDiv').style.border = 0;
             }
 
             if (document.getElementById('pitchdrummatrix').style.visibility !== 'hidden') {

@@ -484,7 +484,7 @@ function PlanetView(model, controller) {
 
     this.open = function (ele) {
         return function () {
-            document.getElementById('pitchtimematrix').style.visibility = localStorage.getItem('isMatrixHidden');
+            document.getElementById('ptmDiv').style.visibility = localStorage.getItem('isMatrixHidden');
             document.getElementById('statusmatrix').style.visibility = localStorage.getItem('isStatusHidden');
             document.getElementById('pitchdrummatrix').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
             document.getElementById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
