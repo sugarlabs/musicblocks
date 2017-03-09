@@ -222,7 +222,7 @@ function RhythmRuler () {
         this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);
     }
 
-    this._playAll = function() {
+    this.playAll = function() {
         this._logo.synth.stop();
         if (this._startingTime == null) {
             var d = new Date();
@@ -318,7 +318,7 @@ function RhythmRuler () {
                         that._calculateZebraStripes(i);
                     }
 
-                    that._playAll();
+                    that.playAll();
                 }
             } else if (that._playingOne) {
                 if (that._cellCounter === 1) {
