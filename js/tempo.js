@@ -15,6 +15,12 @@
 const TEMPOINTERVAL = 5;
 
 function Tempo () {
+    const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
+    const OUTERWINDOWWIDTH = 685;
+    const INNERWINDOWWIDTH = 600;
+    const BUTTONSIZE = 53;
+    const ICONSIZE = 32;
+
     this._isMoving = true;
     this._direction = 1;
     this._widgetFirstTime = null;

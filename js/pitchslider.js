@@ -201,7 +201,9 @@ function PitchSlider () {
         var noofTables = tables.length
 
         for (var i = 0; i < noofTables; i++) {
-            tables[0].parentNode.removeChild(tables[0]);
+            if (tables[0] != undefined) {
+                tables[0].parentNode.removeChild(tables[0]);
+            }
         }
 
         var x = document.createElement('TABLE');

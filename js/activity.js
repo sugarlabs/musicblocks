@@ -1502,14 +1502,18 @@ define(function (require) {
 
         function _doOpenSamples() {
             localStorage.setItem('isMatrixHidden', document.getElementById('ptmDiv').style.visibility);
+            localStorage.setItem('isStaircaseHidden', document.getElementById('pscDiv').style.visibility);
             localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
             localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerDiv').style.visibility);
             localStorage.setItem('isStatusHidden', document.getElementById('statusmatrix').style.visibility);
             localStorage.setItem('isModeWidgetHidden', document.getElementById('modewidget').style.visibility);
+            localStorage.setItem('isSliderHidden', document.getElementById('pitchSliderDiv').style.visibility);
+            localStorage.setItem('isTempoHidden', document.getElementById('tempoDiv').style.visibility);
 
             if (document.getElementById('ptmDiv').style.visibility !== 'hidden') {
                 document.getElementById('ptmDiv').style.visibility = 'hidden';
-                document.getElementById('ptmDiv').style.border = 0;
+                document.getElementById('ptmTableDiv').style.visibility = 'hidden';
+                document.getElementById('ptmButtonsDiv').style.visibility = 'hidden';
             }
 
             if (document.getElementById('pitchdrummatrix').style.visibility !== 'hidden') {
@@ -1517,10 +1521,16 @@ define(function (require) {
                 document.getElementById('pitchdrummatrix').style.border = 0;
             }
 
-            if(document.getElementById('rulerDiv').style.visibility !== 'hidden') {
+            if (document.getElementById('rulerDiv').style.visibility !== 'hidden') {
                 document.getElementById('rulerDiv').style.visibility = 'hidden';
                 document.getElementById('rulerTableDiv').style.visibility = 'hidden';
                 document.getElementById('rulerButtonsDiv').style.visibility = 'hidden';
+            }
+
+            if (document.getElementById('pscDiv').style.visibility !== 'hidden') {
+                document.getElementById('pscDiv').style.visibility = 'hidden';
+                document.getElementById('pscTableDiv').style.visibility = 'hidden';
+                document.getElementById('pscButtonsDiv').style.visibility = 'hidden';
             }
 
             if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
@@ -1528,9 +1538,22 @@ define(function (require) {
                 document.getElementById('statusmatrix').style.border = 0;
             }
 
+            if (document.getElementById('pitchSliderDiv').style.visibility !== 'hidden') {
+                document.getElementById('pitchSliderDiv').style.visibility = 'hidden';
+                document.getElementById('moveUpSliderDiv').style.visibility = 'hidden';
+                document.getElementById('moveDownSliderDiv').style.visibility = 'hidden';
+                document.getElementById('pitchSliderDiv').style.border = 0;
+            }
+
             if (document.getElementById('modewidget').style.visibility !== 'hidden') {
                 document.getElementById('modewidget').style.visibility = 'hidden';
                 document.getElementById('modewidget').style.border = 0;
+            }
+
+            if (document.getElementById('tempoDiv').style.visibility !== 'hidden') {
+                document.getElementById('tempoDiv').style.visibility = 'hidden';
+                document.getElementById('tempoCanvas').style.visibility = 'hidden';
+                document.getElementById('tempoDiv').style.border = 0;
             }
 
             logo.doStopTurtle();

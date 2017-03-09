@@ -418,6 +418,45 @@ table {
     margin-left: 53px;
 }
 
+#tempoDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#tempoTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#tempoButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#tempoOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#tempoInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
 #pscDiv {
     position: absolute;
     top: 20%;
