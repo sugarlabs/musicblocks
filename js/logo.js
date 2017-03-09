@@ -1397,8 +1397,6 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         }
                     }
                 }
-                console.log('childFlow: ' + childFlow);
-                console.log('parentFlow: ' + last(logo.parentFlowQueue[turtle]));
             }
             break;
         case 'storein':
@@ -5352,7 +5350,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
                 break;
             case 'x':
-                if (logoinStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+                if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
                     logo.statusFields.push([blk, 'x']);
                 } else {
                     logo.blocks.blockList[blk].value = logo.turtles.screenX2turtleX(logo.turtles.turtleList[turtle].container.x);
