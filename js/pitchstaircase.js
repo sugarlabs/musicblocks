@@ -206,7 +206,7 @@ function PitchStairCase () {
         }, 1000)
     };
 
-    this._playAll = function () {
+    this.playAll = function () {
         var that = this;
         var pitchnotes = [];
 
@@ -242,6 +242,10 @@ function PitchStairCase () {
     };
 
     this._playNext = function (index, next) {
+        if (docById('pscDiv').style.visibility === 'hidden') {
+            return;
+        }
+
         var that = this;
         if (index === this.Stairs.length) {
             setTimeout(function () {
@@ -391,7 +395,7 @@ function PitchStairCase () {
 
         var cell = this._addButton(row, 'play-chord.svg', ICONSIZE, _('play chord'));
         cell.onclick=function() {
-            that._playAll();
+            that.playAll();
         }
 
         var cell = this._addButton(row, 'play-scale.svg', ICONSIZE, _('play scale'));
