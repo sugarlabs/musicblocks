@@ -63,11 +63,12 @@
 }
 
 #palette_bckg {
-    width:65px;
+    width:68px;
     height:1200px;
     float: left;
     position: relative;
-    background-color: white; 
+   /* background-color: #3183af; */
+    background-color: white;
 }
 
 div.back {

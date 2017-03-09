@@ -50,6 +50,16 @@ function windowHeight() {
 };
 
 
+function windowWidth() {
+    var onAndroid = /Android/i.test(navigator.userAgent);
+    if (onAndroid) {
+        return window.outerWidth;
+    } else {
+        return window.innerWidth;
+    }
+};
+
+
 function httpGet(projectName) {
     var xmlHttp = null;
 
