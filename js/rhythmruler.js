@@ -223,6 +223,39 @@ function RhythmRuler () {
     }
 
     this.playAll = function() {
+        // External call from run button.
+        var iconSize = ICONSIZE;
+
+        if (this._playing) {
+            if (this._playingAll) {
+                this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                this._playing = false;
+                this._playingAll = false;
+                this._playingOne = false;
+                this._rulerPlaying = -1;
+                this._startingTime = null;
+                for (var i = 0; i < this.Rulers.length; i++) {
+                    this._calculateZebraStripes(i);
+                }
+	    }
+        }
+
+        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._logo.setTurtleDelay(0);
+        this._playingAll = true;
+        this._playing = true;
+        this._playingOne = false;
+        this._cellCounter = 0;
+        this._rulerPlaying = -1;
+        for (var i = 0; i < this.Rulers.length; i++) {
+            this._elapsedTimes[i] = 0;
+            this._offsets[i] = 0;
+        }
+
+        this._playAll();
+    }
+
+    this._playAll = function() {
         this._logo.synth.stop();
         if (this._startingTime == null) {
             var d = new Date();
@@ -318,7 +351,7 @@ function RhythmRuler () {
                         that._calculateZebraStripes(i);
                     }
 
-                    that.playAll();
+                    that._playAll();
                 }
             } else if (that._playingOne) {
                 if (that._cellCounter === 1) {
@@ -505,9 +538,9 @@ function RhythmRuler () {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', iconSize, _('play all'), '');
+        this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('play all'), '');
 
-        cell.onclick=function() {
+        this._playAllCell.onclick=function() {
             if (that._playing) {
                 if (that._playingAll) {
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
