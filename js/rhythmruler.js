@@ -220,26 +220,41 @@ function RhythmRuler () {
         var cell = ruler.cells[0];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);
-    }
+    };
+
+    this.__pause = function() {
+        var iconSize = ICONSIZE;
+        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._playing = false;
+        this._playingAll = false;
+        this._playingOne = false;
+        this._rulerPlaying = -1;
+        this._startingTime = null;
+        for (var i = 0; i < this.Rulers.length; i++) {
+            this._calculateZebraStripes(i);
+        }
+    };
 
     this.playAll = function() {
         // External call from run button.
-        var iconSize = ICONSIZE;
-
         if (this._playing) {
             if (this._playingAll) {
-                this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                this._playing = false;
-                this._playingAll = false;
-                this._playingOne = false;
-                this._rulerPlaying = -1;
-                this._startingTime = null;
-                for (var i = 0; i < this.Rulers.length; i++) {
-                    this._calculateZebraStripes(i);
-                }
-	    }
+                this.__pause();
+                // Wait for pause to complete before restarting.
+                var that = this;
+                setTimeout(function() {
+		    if (!that._playingAll) {
+			that.__resume();
+                    }
+                }, 1000);
+            }
+	} else if (!this._playingAll) {
+            this.__resume();
         }
+    };
 
+    this.__resume = function() {
+        var iconSize = ICONSIZE;
         this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         this._logo.setTurtleDelay(0);
         this._playingAll = true;
@@ -253,7 +268,7 @@ function RhythmRuler () {
         }
 
         this._playAll();
-    }
+    };
 
     this._playAll = function() {
         this._logo.synth.stop();
@@ -542,34 +557,10 @@ function RhythmRuler () {
 
         this._playAllCell.onclick=function() {
             if (that._playing) {
-                if (that._playingAll) {
-                    this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                    that._playing = false;
-                    that._playingAll = false;
-                    that._playingOne = false;
-                    that._rulerPlaying = -1;
-                    that._startingTime = null;
-                    for (var i = 0; i < that.Rulers.length; i++) {
-                        that._calculateZebraStripes(i);
-                    }
-                }
+                that.__pause();
             }
-            else {
-                if (!that._playingAll) {
-                    this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                    that._logo.setTurtleDelay(0);
-                    that._playingAll = true;
-                    that._playing = true;
-                    that._playingOne = false;
-                    that._cellCounter = 0;
-                    that._rulerPlaying = -1;
-                    for (var i = 0; i < that.Rulers.length; i++) {
-                        that._elapsedTimes[i] = 0;
-                        that._offsets[i] = 0;
-                    }
-
-                    that._playAll();
-                }
+            else if (!that._playingAll) {
+                that.__resume();
             }
         };
 
