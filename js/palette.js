@@ -264,7 +264,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
         /*display the color strip when palette menu is made visible*/
         var color_strip = document.getElementById('palette_bckg');
-        color_strip.style.backgroundColor = 'white' ;
+        color_strip.style.backgroundColor = '#92b5c8'; /* 'white' ; */
 
         // Show the menu buttons, but not the palettes.
         if (this.mobile) {
@@ -829,7 +829,7 @@ function PopdownPalette(palettes) {
         this.update();
         /*remove the color strip when popdown-palette button is clicked*/
         var color_strip = document.getElementById('palette_bckg');
-        color_strip.style.backgroundColor = '#92b5c8' ;
+        color_strip.style.backgroundColor = '#92b5c8';
         document.querySelector('#popdown-palette').classList.add('show');
     };
 
