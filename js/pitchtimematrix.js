@@ -149,7 +149,7 @@ function Matrix() {
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
-            that._playAll();
+            that.playAll();
         }
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
@@ -1022,7 +1022,7 @@ function Matrix() {
         }
     };
 
-    this._playAll = function() {
+    this.playAll = function() {
         // Play all of the notes in the matrix.
         this._logo.synth.stop();
 
