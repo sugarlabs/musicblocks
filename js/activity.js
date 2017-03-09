@@ -365,6 +365,14 @@ define(function (require) {
             }
 
             if (docById('rulerDiv').style.visibility === 'visible') {
+                // If the tempo widget is open, sync it up with the
+                // rhythm ruler.
+                if (docById('tempoDiv').style.visibility === 'visible') {
+                    if (tempo.isMoving) {
+                        tempo.pause();
+                    }
+                    tempo.resume();
+                }
                 playingWidget = true;
                 rhythmruler.playAll();
             }
