@@ -241,11 +241,10 @@ function RhythmRuler () {
             if (this._playingAll) {
                 this.__pause();
                 // Wait for pause to complete before restarting.
+                this._playingAll = true;
                 var that = this;
                 setTimeout(function() {
-		    if (!that._playingAll) {
-			that.__resume();
-                    }
+		    that.__resume();
                 }, 1000);
             }
 	} else if (!this._playingAll) {
