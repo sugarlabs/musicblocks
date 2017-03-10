@@ -5940,15 +5940,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
     this.setBackgroundColor = function(turtle) {
         /// Change body background in DOM to current color.
-        var body = document.body;
         if (turtle === -1) {
             var c = platformColor.background;
         } else {
             var c = this.turtles.turtleList[turtle].canvasColor;
         }
-
-        body.style.background = c;
-        document.querySelector('.canvasHolder').style.background = c;
+        docById('myCanvas').style.background = c;
         this.svgOutput = '';
     };
 

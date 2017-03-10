@@ -65,6 +65,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.initial_x = 55;
     this.initial_y = 55;
     this.firstTime = true;
+    this.background = null;
     this.upIndicator = null;
     this.downIndicator = null;
     this.circles = {};
@@ -152,13 +153,6 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
 
     this._updateButtonMasks = function() {
-
-        /*scaling the color strip as per the browser window scale*/
-        var color_strip = document.getElementById('palette_bckg');
-        var st1 = (((windowWidth()* canvasPixelRatio())/1366)*68).toString();
-        var st2 = st1.concat("px"); 
-        console.log(st2); 
-
         for (var name in this.buttons) {
             var s = new createjs.Shape();
             s.graphics.r(0, 0, this.cellSize, windowHeight() / this.scale);
@@ -173,6 +167,15 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
 
     this.makePalettes = function(hide) {
+        if (this.firstTime) {
+            var shape = new createjs.Shape();
+            shape.graphics.f('#a2c5d8').r(0, 0, 55, windowHeight()).ef();
+            shape.width = 55;
+            shape.height = windowHeight();
+            this.stage.addChild(shape);
+            this.background = shape;
+	}
+
         function __processUpIcon(palettes, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
             palettes.stage.addChild(bitmap);
@@ -261,11 +264,6 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
 
     this._showMenus = function() {
-
-        /*display the color strip when palette menu is made visible*/
-        var color_strip = document.getElementById('palette_bckg');
-        color_strip.style.backgroundColor = '#92b5c8'; /* 'white' ; */
-
         // Show the menu buttons, but not the palettes.
         if (this.mobile) {
             return;
@@ -279,15 +277,14 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             // this.dict[name].showMenu(true);
         }
 
+        if (this.background != null) {
+            this.background.visible = true;
+	}
+
         this.refreshCanvas();
     };
 
     this._hideMenus = function() {
-
-        /*remove the color strip when palette menu is made hidden*/
-        var color_strip = document.getElementById('palette_bckg');
-        color_strip.style.backgroundColor = '#92b5c8' ;
-
         // Hide the menu buttons and the palettes themselves.
         for (var name in this.buttons) {
             this.buttons[name].visible = false;
@@ -300,6 +297,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         if (this.upIndicator != null) {
             this.upIndicator.visible = false;
             this.downIndicator.visible = false;
+            this.background.visible = false;
         }
 
         this.refreshCanvas();
@@ -744,7 +742,6 @@ function PopdownPalette(palettes) {
 
     this.update = function () {
         var html = '<div class="back"><h2>' + _('back') + '</h2></div>';
-       // html+= '<div id="palette_bckg"></div>';
         for (var name in this.models) {
             html += '<div class="palette">';
             var icon = PALETTEICONS[name]
@@ -827,16 +824,10 @@ function PopdownPalette(palettes) {
 
     this.popdown = function () {
         this.update();
-        /*remove the color strip when popdown-palette button is clicked*/
-        var color_strip = document.getElementById('palette_bckg');
-        color_strip.style.backgroundColor = '#92b5c8';
         document.querySelector('#popdown-palette').classList.add('show');
     };
 
     this.popup = function () {
-        /*bring back the color strip when popdown-palette button is clicked*/
-        var color_strip = document.getElementById('palette_bckg');
-        color_strip.style.backgroundColor = 'white' ;
         document.querySelector('#popdown-palette').classList.remove('show');
     };
 };
