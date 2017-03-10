@@ -575,9 +575,7 @@ function RhythmRuler () {
 
         // An input for setting the dissect number
         var cell = row.insertCell();
-        cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dussectNumber" value="' + 2 + '" />';
-        cell.style.top = 0;
-        cell.style.left = 0;
+        cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dissectNumber" value="' + 2 + '" />';
         cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;

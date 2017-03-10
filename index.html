@@ -105,32 +105,6 @@
       });
 
       $(function() {
-        $('#tempoCanvas').draggable({
-            drag: function() {
-                jQuery('#tempoDiv').css('left', jQuery(this).position().left);
-                jQuery('#tempoDiv').css('top', jQuery(this).position().top - $(window).innerWidth/30);
-            },
-            stop: function(){
-                jQuery('#tempoDiv').css('left', jQuery(this).position().left);
-                jQuery('#tempoDiv').css('top', jQuery(this).position().top - $(window).innerWidth/30);
-            }
-        });
-      });
-
-      $(function() {
-        $('#tempoDiv').draggable({
-            drag: function() {
-                jQuery('#tempoCanvas').css('left', jQuery(this).position().left);
-                jQuery('#tempoCanvas').css('top', jQuery(this).position().top + $(window).innerWidth/30);
-            },
-            stop: function(){
-                jQuery('#tempoCanvas').css('left', jQuery(this).position().left);
-                jQuery('#tempoCanvas').css('top', jQuery(this).position().top + $(window).innerWidth/30);
-            }
-        });
-      });
-
-      $(function() {
         $('#pitchSliderDiv').draggable({
             drag: function() {
                 jQuery('#moveUpSliderDiv').css('left', jQuery(this).position().left);
@@ -250,7 +224,7 @@
 	<video id="camVideo" style="visibility:hidden;">
 	</video>
 
-	<canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;">
+	<canvas id="tempoCanvas" width="700" height="100" style="visibility:hidden;">
 	</canvas>
 
 	<canvas id="camCanvas" style="visibility:hidden;">
@@ -265,120 +239,117 @@
           <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json"></input>
           <input tabindex="-1" class="file" type="file" id="myOpenAll"></input>
 	</div>
-	</div>
+      </div>
 
-	<div id="audio">
-	</div>
+      <div id="audio">
+      </div>
 
-	<div id="tourData">
-	</div>
+      <div id="tourData">
+      </div>
 
-	<div id="popdown-palette">
-	</div>
+      <div id="popdown-palette">
+      </div>
 
-	<div id="main-toolbar" class="toolbar">
-	</div>
+      <div id="main-toolbar" class="toolbar">
+      </div>
 
-	<div id="loader">
-	</div>
+      <div id="loader">
+      </div>
 
-	<div id="header" class="EaselJS">
-	</div>
+      <div id="header" class="EaselJS">
+      </div>
 
-	<div class="planet" style="display: none;">
-	  <nav>
-	    <div class="nav-container">
-              <img src="header-icons/planet-button.svg" class="logo" />
-              <h1 id="planetTitle"></h1>
-              <ul>
-		<li class="back"><img src="header-icons/cancel-button.svg" /></li>
-		<li class="new"><img src="header-icons/add.svg" /></li>
-		<li class="open"><img src="header-icons/folder-open.svg" /></li>
-              </ul>
-	    </div>
-	  </nav>
-
-	  <div class="nav-spacer">
+      <div class="planet" style="display: none;">
+	<nav>
+	  <div class="nav-container">
+            <img src="header-icons/planet-button.svg" class="logo" />
+            <h1 id="planetTitle"></h1>
+            <ul>
+	      <li class="back"><img src="header-icons/cancel-button.svg" /></li>
+	      <li class="new"><img src="header-icons/add.svg" /></li>
+	      <li class="open"><img src="header-icons/folder-open.svg" /></li>
+            </ul>
 	  </div>
+	</nav>
 
-	  <div class="planet-content">
-	    <h2 id="planetMyDevice"></h2>
-	    <ul class="content l"></ul>
-	    <h2 id="planetWorldwide"></h2>
-	    <ul class="content w"></ul>
-	  </div>
+	<div class="nav-spacer">
 	</div>
 
-	<div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)">
+	<div class="planet-content">
+	  <h2 id="planetMyDevice"></h2>
+	  <ul class="content l"></ul>
+	  <h2 id="planetWorldwide"></h2>
+	  <ul class="content w"></ul>
+	</div>
+      </div>
+
+      <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)">
+      </div>
+
+      <div id="ptmDiv" draggable="false">
+	<div id="ptmButtonsDiv">
 	</div>
 
-	<div id="ptmDiv" draggable="false">
-	  <div id="ptmButtonsDiv">
-	  </div>
+	<div id="ptmTableDiv">
+	</div>
+      </div>
 
-	  <div id="ptmTableDiv">
-	  </div>
+      <div id="pscDiv" draggable="false">
+	<div id="pscButtonsDiv">
 	</div>
 
-	<div id="pscDiv" draggable="false">
-	  <div id="pscButtonsDiv">
-	  </div>
+	<div id="pscTableDiv">
+	</div>
+      </div>
 
-	  <div id="pscTableDiv">
-	  </div>
+      <div id="tempoDiv" draggable="false">
+	<div id="tempoButtonsDiv">
+	</div>
+      </div>
+
+      <div id="rulerDiv" draggable="false">
+	<div id="rulerButtonsDiv">
 	</div>
 
-	<div id="tempoDiv" draggable="false">
-	  <div id="tempoButtonsDiv">
-	  </div>
-
-	  <div id="tempoTableDiv">
-	  </div>
+	<div id="rulerTableDiv">
 	</div>
+      </div>
 
-	<div id="rulerDiv" draggable="false">
-	  <div id="rulerButtonsDiv">
-	  </div>
+      <div id="pitchSliderDiv" style="visibility:hidden">
+      </div>
 
-	  <div id="rulerTableDiv">
-	  </div>
-	</div>
+      <div id="playPitch" style="visibility:hidden">
+      </div>
 
-	<div id="pitchSliderDiv" style="visibility:hidden">
-	</div>
+      <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)">
+      </div>
 
-	<div id="playPitch" style="visibility:hidden">
-	</div>
+      <div id="moveUpSliderDiv">
+      </div>
 
-	<div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)">
-	</div>
+      <div id="moveDownSliderDiv">
+      </div>
 
-	<div id="moveUpSliderDiv">
-	</div>
+      <div id="sliderInCell">
+      </div>
 
-	<div id="moveDownSliderDiv">
-	</div>
+      <div id="BPMInput">
+      </div>
 
-	<div id="sliderInCell">
-	</div>
+      <div id="musicratio1">
+      </div>
 
-	<div id="BPMInput">
-	</div>
+      <div id="musicratio2">
+      </div>
 
-	<div id="musicratio1">
-	</div>
+      <div id="dissectNumber">
+      </div>
 
-	<div id="musicratio2">
-	</div>
+      <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)">
+      </div>
 
-	<div id="dissectNumber">
-	</div>
-
-	<div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)">
-	</div>
-
-	<div id="helpElem">
-	</div>
+      <div id="helpElem">
+      </div>
     </div>
   </body>
 </html>
