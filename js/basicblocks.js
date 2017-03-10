@@ -288,7 +288,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     hertzBlock.staticLabels.push(_('hertz'));
     hertzBlock.adjustWidthToLabel();
     hertzBlock.oneArgBlock();
-    hertzBlock.defaults.push(440);
+    hertzBlock.defaults.push(392);
 
     var pitchNumberBlock = new ProtoBlock('pitchnumber');
     pitchNumberBlock.palette = palettes.dict['pitch'];
