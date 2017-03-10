@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016-17 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -12,12 +12,10 @@
 // This widget enable us to manipulate the beats per minute. It
 // behaves like a metronome and updates the master BPM block.
 
-const TEMPOINTERVAL = 5;
 
 function Tempo () {
+    const TEMPOINTERVAL = 5;
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
-    const OUTERWINDOWWIDTH = 685;
-    const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
@@ -26,6 +24,7 @@ function Tempo () {
     this._widgetFirstTime = null;
     this._widgetNextTime = 0;
     this._interval = 0;
+    this._intervalID = null;
     this._yradius = 25;
     this._xradius = 25;
     this._firstClickTime = null;
@@ -102,7 +101,7 @@ function Tempo () {
     this._draw = function() {
         // First thing to do is figure out where we are supposed to be
         // based on the elapsed time.
-        var canvas = docById('tempoCanvas');
+        var tempoCanvas = docById('tempoCanvas');
         var d = new Date();
 
         // We start the music clock as the first note is being
@@ -130,12 +129,12 @@ function Tempo () {
         } else {
             // Determine new x position based on delta time.
             if (this._interval !== 0) {
-                var dx = (canvas.width) * (deltaTime / this._interval);
+                var dx = (tempoCanvas.width) * (deltaTime / this._interval);
             }
 
             //Set this._xradius based on the dx to achieve the compressing effect
-            if (canvas.width - dx <= this._yradius) {
-                this._xradius =  canvas.width - dx;
+            if (tempoCanvas.width - dx <= this._yradius) {
+                this._xradius =  tempoCanvas.width - dx;
             } else if (dx <= this._yradius) {
                 this._xradius = dx;
             } else {
@@ -144,7 +143,7 @@ function Tempo () {
 
             //Set x based on dx and direction
             if (this._direction === -1) {
-                var x = canvas.width - dx;
+                var x = tempoCanvas.width - dx;
             } else {
                 var x = dx;
             }
@@ -155,89 +154,63 @@ function Tempo () {
             if (this._direction === -1) {
                 x = 0;
             } else {
-                x = canvas.width;
+                x = tempoCanvas.width;
             }
         }
 
-        var ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        var ctx = tempoCanvas.getContext('2d');
+        ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
         ctx.beginPath();
-        ctx.fillStyle = '';
-        ctx.ellipse(x, this.cellScale * 36, Math.max(this._xradius, 0), Math.max(this._yradius, 0), 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,1)';
+        ctx.ellipse(x, 50, Math.max(this._xradius, 1), this._yradius, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
     };
 
-    this._addButton = function(row, colIndex, icon, iconSize, label) {
-        var cell = row.insertCell();
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        }
-
-        return cell;
-    };
-
     this.init = function (logo) {
-        var that = this;
         this._logo = logo;
-        console.log("init tempo");
-        docById('tempoDiv').style.visibility = 'visible';
-        docById('tempoCanvas').style.visibility = 'visible';
-        docById('tempoCanvas').style.backgroundColor = 'white';
+
+        if (this._intervalID != null) {
+            clearInterval(this._intervalID);
+        }
 
         var w = window.innerWidth;
-        docById('tempoDiv').style.width = Math.floor(w / 2) + 'px';
-        docById('tempoDiv').style.top = 100 + 'px';
-        docById('tempoCanvas').style.width = Math.floor(w / 2) + 'px';
-        docById('tempoCanvas').style.height = Math.floor(w / 12) + 'px';
+        this._cellScale = w / 1200;
+        var iconSize = ICONSIZE * this._cellScale;
 
-        this.cellScale = w / 1200;
-        var iconSize = Math.floor(this.cellScale * 24);
-        // FIXME: What is the proper offset from the top?
-        var top = 100 + iconSize * 1.5;
-        docById('tempoCanvas').style.top = top + 'px';
-        docById('tempoCanvas').style.left = docById('tempoDiv').style.left;
+        var canvas = document.getElementById('myCanvas');
 
-        var tables = document.getElementsByTagName('TABLE');
-        for (var i = 0; i < tables.length; i++) {
-            tables[0].parentNode.removeChild(tables[0]);
-        }
+        // Position the widget and make it visible.
+        var tempoDiv = docById('tempoDiv');
+        tempoDiv.style.visibility = 'visible';
+        tempoDiv.setAttribute('draggable', 'true');
+        tempoDiv.style.left = '200px';
+        tempoDiv.style.top = '150px';
 
-        var t = document.createElement('TABLE');
-        t.setAttribute('id', 'buttonDiv');
-        t.style.textAlign = 'center';
-        t.style.borderCollapse = 'collapse';
-        t.cellSpacing = 0;
-        t.cellPadding = 0;
+        // The widget buttons
+        var widgetButtonsDiv = docById('tempoButtonsDiv');
+        widgetButtonsDiv.style.display = 'inline';
+        widgetButtonsDiv.style.visibility = 'visible';
+        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
+        widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="tempoButtonTable"></table>';
 
-        docById('tempoDiv').style.paddingTop = 0 + 'px';
-        docById('tempoDiv').style.paddingLeft = 0 + 'px';
-        docById('tempoDiv').appendChild(t);
+        var buttonTable = docById('tempoButtonTable');
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
 
-        var table = docById('buttonDiv');
-        var header = table.createTHead();
-        var row = header.insertRow(-1);
+        // For the button callbacks
+        var that = this;
 
-        var cell = this._addButton(row, -1, 'pause-button.svg', iconSize, _('pause'));
+        var cell = this._addButton(row, 'pause-button.svg', ICONSIZE, _('pause'));
+
         cell.onclick=function() {
             if (that.isMoving) {
                 that.pause();
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
                 that.isMoving = false;
             } else {
                 that.resume();
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('play') + '" alt="' + _('play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
                 that.isMoving = true;
             }
         };
@@ -250,7 +223,7 @@ function Tempo () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        var cell = this._addButton(row, 1, 'up.svg', iconSize, _('speed up'));
+        var cell = this._addButton(row, 'up.svg', ICONSIZE, _('speed up'));
         cell.onclick=function() {
             that._speedUp();
         };
@@ -263,7 +236,7 @@ function Tempo () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        var cell = this._addButton(row, 2, 'down.svg', iconSize, _('slow down'));
+        var cell = this._addButton(row, 'down.svg', ICONSIZE, _('slow down'));
         cell.onclick=function() {
             that._slowDown();
         };
@@ -276,17 +249,24 @@ function Tempo () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        var cell = row.insertCell(3);
-        cell.style.top = 0;
-        cell.style.left = 0;
+        var cell = row.insertCell();
         cell.innerHTML = '<input id="BPMInput" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="BPMInput" type="BPMInput" value="' + this.BPM + '" />';
-        cell.style.width = Math.floor(RHYTHMRULERHEIGHT * this.cellScale) + 'px';
+        cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this.cellScale) + 'px';
+        cell.style.height = BUTTONSIZE + 'px';
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        docById('tempoCanvas').addEventListener('click', function() {
+        var tempoCanvas = docById('tempoCanvas');
+        tempoCanvas.style.visibility = 'visible';
+        tempoCanvas.style.left = widgetButtonsDiv.getBoundingClientRect().left + 'px';
+        tempoCanvas.style.top = widgetButtonsDiv.getBoundingClientRect().top + BUTTONSIZE + 'px';
+
+        var BPMInput = docById('BPMInput');
+
+        tempoCanvas.addEventListener('click', function() {
             // The tempo can be set from the interval between
             // successive clicks on the canvas.
             var d = new Date();
@@ -297,7 +277,7 @@ function Tempo () {
                 if (newBPM > 29 && newBPM < 1001) {
                     that.BPM = newBPM;
                     that._updateBPM();
-                    docById('BPMInput').value = that.BPM;
+                    BPMInput.value = that.BPM;
                     that._firstClickTime = null;
                 } else {
                     that._firstClickTime = d.getTime();
@@ -305,18 +285,21 @@ function Tempo () {
             }
         });
 
-        docById('BPMInput').classList.add('hasKeyboard');
-        docById('BPMInput').addEventListener('keyup', function(e) {
+        BPMInput.classList.add('hasKeyboard');
+        BPMInput.addEventListener('keyup', function(e) {
             if (e.keyCode === 13) {
                 that._useBPM();
             }
         });
 
-        var cell = this._addButton(row, 4, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
         cell.onclick=function() {
-            docById('tempoDiv').style.visibility = 'hidden';
-            docById('tempoCanvas').style.visibility = 'hidden';
-            clearInterval(that._intervalID);
+            tempoDiv.style.visibility = 'hidden';
+            tempoCanvas.style.visibility = 'hidden';
+            tempoButtonsDiv.style.visibility = 'hidden';
+            if (that._intervalID != null) {
+                clearInterval(that._intervalID);
+            }
         };
 
         cell.onmouseover=function() {
@@ -325,6 +308,76 @@ function Tempo () {
 
         cell.onmouseout=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        };
+
+        // We use this cell as a handle for dragging.
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        dragCell.style.cursor = 'move';
+
+        this._dx = dragCell.getBoundingClientRect().left - tempoDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - tempoDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = dragCell.innerHTML;
+
+        dragCell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            dragCell.innerHTML = '';
+        };
+
+        dragCell.onmouseout = function(e) {
+            if (!that._dragging) {
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                tempoDiv.style.left = x + 'px';
+                tempoCanvas.style.left = tempoDiv.style.left;
+                var y = e.clientY - that._dy;
+                tempoDiv.style.top = y + 'px';
+                tempoCanvas.style.top = y + BUTTONSIZE + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        tempoDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        tempoDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                tempoDiv.style.left = x + 'px';
+                tempoCanvas.style.left = tempoDiv.style.left;
+                var y = e.clientY - that._dy;
+                tempoDiv.style.top = y + 'px';
+                tempoCanvas.style.top = y + BUTTONSIZE + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        tempoDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
+
+        tempoDiv.ondragstart = function(e) {
+            if (dragCell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
         };
 
         this._direction = 1;
@@ -339,4 +392,25 @@ function Tempo () {
         }, TEMPOINTERVAL);
     };
 
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = cell.style.width; 
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
+
+        return cell;
+    };
 };

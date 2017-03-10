@@ -317,18 +317,28 @@ input.dissectNumber {
 }
 
 input.musicratio1, input.musicratio2   {
-  background-color: #c374e9 !important;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold !important;
-  resize: none !important;
-  padding: 0 !important;
-  border: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
+    background-color: #c374e9 !important;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold !important;
+    resize: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
-
+input.BPMInput {
+    background-color: #c374e9 !important;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold !important;
+    resize: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
 
 table {
     cellpadding: 0px !important;
@@ -423,15 +433,7 @@ table {
     top: 20%;
     left: 20%;
     background: rgba(255, 255, 255, 0.85) !important;
-}
-
-#tempoTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+    -webkit-user-select: none;
 }
 
 #tempoButtonsDiv {
@@ -442,19 +444,11 @@ table {
     background: rgba(255, 255, 255, 0.85);
 }
 
-#tempoOuterDiv {
+#tempoCanvas {
+    visibility: hidden;
     position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y:auto;
-    overflow-x:none;
+    border: 1 !important;
     background: rgba(255, 255, 255, 0.85);
-}
-
-#tempoInnerDiv {
-    overflow-x:auto;
-    margin-left: 53px;
 }
 
 #pscDiv {
@@ -557,47 +551,47 @@ table {
 }
 
 #pitchstaircase {
-  position: absolute;
-  top: 20%;
-  left: 30%;
-  border-style: solid;
-  border: 0 !important;
-  background: rgba(255, 255, 255, 0.85);
-  -webkit-user-select: none;
-  overflow-y: scroll !important;
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    border-style: solid;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-user-select: none;
+    overflow-y: scroll !important;
 }
 
 #playPitch {
-  position: absolute;
-  direction: rtl;
-  top: 20%;
-  left: 25%;
-  border-style: solid;
-  border: 0 !important;
-  background: rgba(255, 255, 255, 0.85);
-  -webkit-user-select: none;
-  overflow-y: scroll !important;
+    position: absolute;
+    direction: rtl;
+    top: 20%;
+    left: 25%;
+    border-style: solid;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-user-select: none;
+    overflow-y: scroll !important;
 }
 
 #pitchSliderDiv {
-  position: absolute;
-  top: 20%;
-  left: 30%;
-  border-style: solid;
-  border: 0 !important;
-  background: rgba(255, 255, 255, 0.85);
-  -webkit-user-select: none;
-  overflow-y: scroll !important;
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    border-style: solid;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-user-select: none;
+    overflow-y: scroll !important;
 }
 
 #moveUpSliderDiv {
-  position: absolute;
-  top: 66%;
-  left: 30%;
-  border-style: solid;
-  border: 0 !important;
-  background: rgba(255, 255, 255, 0.85);
-  -webkit-user-select: none;
+    position: absolute;
+    top: 66%;
+    left: 30%;
+    border-style: solid;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-user-select: none;
 }
 
 #moveDownSliderDiv {
@@ -610,35 +604,6 @@ table {
     -webkit-user-select: none;
 }
 
-#tempoDiv {
-  position: absolute;
-  top: 30%;
-  left: 20%;
-  border-style: solid;
-  border: 0 !important;
-  background: rgba(255, 255, 255, 0.85);
-  -webkit-user-select: none;
-}
-
-#tempoCanvas {
-  visibility: hidden;
-  position: absolute;
-  top : 30%;
-  left : 20%;  
-}
-
 #sliderInCell {
     position: absolute;
-}
-
-input.BPMInput {
-    background-color: #c374e9 !important;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold !important;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
 }
