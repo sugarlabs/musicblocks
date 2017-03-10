@@ -1,65 +1,91 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>Music Blocks - a collection of tools for exploring musical concepts</title>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Music Blocks - a collection of tools for exploring musical concepts
+    </title>
 
-  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
-  <link rel="stylesheet" href="css/activity.css">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+    <link rel="stylesheet" href="css/activity.css">
 
-  <script src="js/detectIE.js"></script>
-  <script src="lib/mespeak.js"></script>
-  <script src="lib/reqwest.js"></script>
-  <script src="lib/jquery-2.1.4.js"></script>
-  <script src="lib/jquery-ui.js"></script>
-  <script src="lib/webL10n.js"></script>
-  <script src="lib/tone.min.js"></script>
-  <script src="lib/jquery.ruler.js"></script>
-  <script src="lib/modernizr-2.6.2.min.js"></script>
+    <script src="js/detectIE.js">
+    </script>
 
-  <link rel="prefetch" type="application/l10n" href="./localization.ini" />
-  <script data-main="js/loader" src="lib/require.js"></script>
+    <script src="lib/mespeak.js">
+    </script>
 
-  <link rel="manifest" href="android_chrome_manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <link rel="icon" sizes="192x192" href="favicon.ico">
-  <meta id="theme-color" name="theme-color" content="#2196F3">
+    <script src="lib/reqwest.js">
+    </script>
 
-  <!--animation scripts -->
-  <script src="lib/easeljs-0.7.1.min.js"></script>
-  <script src="lib/tweenjs-0.5.1.min.js"></script>
-  <script src="lib/movieclip-0.7.1.min.js"></script>
-  <script src="activity/SugarAnimation.js"></script>
+    <script src="lib/jquery-2.1.4.js">
+    </script>
 
-  <script>
-  var canvas, stage, exportRoot;
+    <script src="lib/jquery-ui.js">
+    </script>
 
-  function init() {
-      canvas = document.getElementById("canvas");
-      exportRoot = new lib.SugarAnimation();
+    <script src="lib/webL10n.js">
+    </script>
 
-      stage = new createjs.Stage(canvas);
-      stage.addChild(exportRoot);
-      stage.update();
+    <script src="lib/tone.min.js">
+    </script>
 
-      createjs.Ticker.setFPS(lib.properties.fps);
-      createjs.Ticker.addEventListener("tick", stage);
-  }
-  </script>
+    <script src="lib/jquery.ruler.js">
+    </script>
 
-</head>
+    <script src="lib/modernizr-2.6.2.min.js">
+    </script>
 
-<body onload="init();" data-title="index" id="body" style="background: #96D3F3;">
-  <script>
-    window.fbAsyncInit = function() {
+    <link rel="prefetch" type="application/l10n" href="./localization.ini" />
+
+    <script data-main="js/loader" src="lib/require.js">
+    </script>
+
+    <link rel="manifest" href="android_chrome_manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="favicon.ico">
+    <meta id="theme-color" name="theme-color" content="#2196F3">
+
+    <!--animation scripts -->
+    <script src="lib/easeljs-0.7.1.min.js">
+    </script>
+
+    <script src="lib/tweenjs-0.5.1.min.js">
+    </script>
+
+    <script src="lib/movieclip-0.7.1.min.js">
+    </script>
+
+    <script src="activity/SugarAnimation.js">
+    </script>
+
+    <script>
+      var canvas, stage, exportRoot;
+
+      function init() {
+        canvas = document.getElementById("canvas");
+        exportRoot = new lib.SugarAnimation();
+
+        stage = new createjs.Stage(canvas);
+        stage.addChild(exportRoot);
+        stage.update();
+
+        createjs.Ticker.setFPS(lib.properties.fps);
+        createjs.Ticker.addEventListener("tick", stage);
+      }
+    </script>
+  </head>
+
+  <body onload="init();" data-title="index" id="body" style="background: #96D3F3;">
+    <script>
+      window.fbAsyncInit = function() {
         FB.init({
             appId: '1496189893985945',
             xfbml: true,
             version: 'v2.1'
         });
-    };
+      };
 
-    <!--
+      <!--
         try {
             (function(d, s, id) {
                 var js, fjs = d.getElementsByTagName(s)[0];
@@ -72,13 +98,13 @@
                 fjs.parentNode.insertBefore(js, fjs);
             }(document, 'script', 'facebook-jssdk'));
         } catch (e) {}
-    -->
+      -->
 
-    $(function() {
+      $(function() {
         $("#pitchdrummatrix").draggable();
-    });
+      });
 
-    $(function() {
+      $(function() {
         $('#tempoCanvas').draggable({
             drag: function() {
                 jQuery('#tempoDiv').css('left', jQuery(this).position().left);
@@ -89,9 +115,9 @@
                 jQuery('#tempoDiv').css('top', jQuery(this).position().top - $(window).innerWidth/30);
             }
         });
-    });
+      });
 
-    $(function() {
+      $(function() {
         $('#tempoDiv').draggable({
             drag: function() {
                 jQuery('#tempoCanvas').css('left', jQuery(this).position().left);
@@ -102,9 +128,9 @@
                 jQuery('#tempoCanvas').css('top', jQuery(this).position().top + $(window).innerWidth/30);
             }
         });
-    });
+      });
 
-    $(function() {
+      $(function() {
         $('#pitchSliderDiv').draggable({
             drag: function() {
                 jQuery('#moveUpSliderDiv').css('left', jQuery(this).position().left);
@@ -119,17 +145,17 @@
                 jQuery('#moveDownSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/3.8);
             }
         });
-    });
+      });
 
-    $(function() {
+      $(function() {
         $("#statusmatrix").draggable();
-    });
+      });
 
-    $(function() {
+      $(function() {
         $("#modewidget").draggable();
-    });
+      });
 
-    (function($) {
+      (function($) {
         $.fn.fixMe = function() {
             return this.each(function() {
                 var $this = $(this), $t_fixed;
@@ -162,20 +188,20 @@
                 init();
 	    });
         };
-    })(jQuery);
+      })(jQuery);
 
-    $(document).ready(function() {
+      $(document).ready(function() {
 	$("solfa").fixMe();
         $(".up").click(function() {
             $('html, body').animate({
                 scrollTop: 0
             }, 2000);
         });
-    });
+      });
 
-    var isDragging = false;
+      var isDragging = false;
 
-    function movePitchDrumMatrix(event) {
+      function movePitchDrumMatrix(event) {
         var myDiv = document.getElementById('pitchdrummatrix');
         var myDivPosition = myDiv.getBoundingClientRect();
 
@@ -183,9 +209,9 @@
         var row = table.rows.item(0);
         row.style.left = myDivPosition.left + 'px';
         row.style.top = myDivPosition.top + 'px';
-    };
+      };
 
-    function moveStatusMatrix(event) {
+      function moveStatusMatrix(event) {
         var myDiv = document.getElementById('statusmatrix');
         var myDivPosition = myDiv.getBoundingClientRect();
 
@@ -193,9 +219,9 @@
         var row = table.rows.item(0);
         row.style.left = myDivPosition.left + 'px';
         row.style.top = myDivPosition.top + 'px';
-    };
+      };
 
-    function moveModeWidget(event) {
+      function moveModeWidget(event) {
         var modeDiv = document.getElementById('modewidget');
         var modeDivPosition = modeDiv.getBoundingClientRect();
 
@@ -203,97 +229,156 @@
         var row = table.rows.item(0);
         row.style.left = modeDivPosition.left + 'px';
         row.style.top = modeDivPosition.top + 'px';
-    };
-  </script>
+      };
+    </script>
 
-  <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
-  </canvas>
-  <!--hidden at the beginning whilst everything loads-->
-  <div id = "hideContents" style="display: none;">
-    <div class="canvasHolder">
-      <div id="palette_bckg">
-      <canvas id="myCanvas" width="1200" height="900"></canvas>
-      <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute;pointer-events:none;left:0;top:0;z-index:-100;visibility:hidden;"></canvas>
-      <canvas id="myChart" width="600" height="600"></canvas>
-      <video id="camVideo" style="visibility:hidden;"></video>
-      <canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;"></canvas>
-      <canvas id="camCanvas" style="visibility:hidden;"></canvas>
-      <div id="labelDiv"></div>
-      <div id="ioDiv">
-        <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*"></input>
-        <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb"></input>
-        <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json"></input>
-        <input tabindex="-1" class="file" type="file" id="myOpenAll"></input>
-      </div>
-      <div id="audio"></div>
-      <div id="tourData"></div>
-      </div>
+    <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
+    </canvas>
+
+    <!--hidden at the beginning whilst everything loads-->
+    <div id="hideContents" style="display: none;">
+      <div class="canvasHolder" id="canvasHolder">
+	<canvas id="myCanvas" width="1200" height="900">
+	</canvas>
+
+	<canvas id="overlayCanvas" width="1200" height="900" style="position:absolute;pointer-events:none;left:0;top:0;z-index:-100;visibility:hidden;">
+	</canvas>
+
+	<canvas id="myChart" width="600" height="600">
+	</canvas>
+
+	<video id="camVideo" style="visibility:hidden;">
+	</video>
+
+	<canvas id="tempoCanvas" width="700" height="100" style="border: 1px solid black; visibility:hidden;">
+	</canvas>
+
+	<canvas id="camCanvas" style="visibility:hidden;">
+	</canvas>
+
+	<div id="labelDiv">
+	</div>
+
+	<div id="ioDiv">
+          <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*"></input>
+          <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb"></input>
+          <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json"></input>
+          <input tabindex="-1" class="file" type="file" id="myOpenAll"></input>
+	</div>
+	</div>
+
+	<div id="audio">
+	</div>
+
+	<div id="tourData">
+	</div>
+
+	<div id="popdown-palette">
+	</div>
+
+	<div id="main-toolbar" class="toolbar">
+	</div>
+
+	<div id="loader">
+	</div>
+
+	<div id="header" class="EaselJS">
+	</div>
+
+	<div class="planet" style="display: none;">
+	  <nav>
+	    <div class="nav-container">
+              <img src="header-icons/planet-button.svg" class="logo" />
+              <h1 id="planetTitle"></h1>
+              <ul>
+		<li class="back"><img src="header-icons/cancel-button.svg" /></li>
+		<li class="new"><img src="header-icons/add.svg" /></li>
+		<li class="open"><img src="header-icons/folder-open.svg" /></li>
+              </ul>
+	    </div>
+	  </nav>
+
+	  <div class="nav-spacer">
+	  </div>
+
+	  <div class="planet-content">
+	    <h2 id="planetMyDevice"></h2>
+	    <ul class="content l"></ul>
+	    <h2 id="planetWorldwide"></h2>
+	    <ul class="content w"></ul>
+	  </div>
+	</div>
+
+	<div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)">
+	</div>
+
+	<div id="ptmDiv" draggable="false">
+	  <div id="ptmButtonsDiv">
+	  </div>
+
+	  <div id="ptmTableDiv">
+	  </div>
+	</div>
+
+	<div id="pscDiv" draggable="false">
+	  <div id="pscButtonsDiv">
+	  </div>
+
+	  <div id="pscTableDiv">
+	  </div>
+	</div>
+
+	<div id="tempoDiv" draggable="false">
+	  <div id="tempoButtonsDiv">
+	  </div>
+
+	  <div id="tempoTableDiv">
+	  </div>
+	</div>
+
+	<div id="rulerDiv" draggable="false">
+	  <div id="rulerButtonsDiv">
+	  </div>
+
+	  <div id="rulerTableDiv">
+	  </div>
+	</div>
+
+	<div id="pitchSliderDiv" style="visibility:hidden">
+	</div>
+
+	<div id="playPitch" style="visibility:hidden">
+	</div>
+
+	<div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)">
+	</div>
+
+	<div id="moveUpSliderDiv">
+	</div>
+
+	<div id="moveDownSliderDiv">
+	</div>
+
+	<div id="sliderInCell">
+	</div>
+
+	<div id="BPMInput">
+	</div>
+
+	<div id="musicratio1">
+	</div>
+
+	<div id="musicratio2">
+	</div>
+
+	<div id="dissectNumber">
+	</div>
+
+	<div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)">
+	</div>
+
+	<div id="helpElem">
+	</div>
     </div>
-
-    <div id="popdown-palette"></div>
-
-    <div id="main-toolbar" class="toolbar"></div>
-
-    <div id="loader"></div>
-
-    <div id="header" class="EaselJS"></div>
-
-    <div class="planet" style="display: none;">
-      <nav>
-        <div class="nav-container">
-          <img src="header-icons/planet-button.svg" class="logo" />
-          <h1 id="planetTitle"></h1>
-          <ul>
-            <li class="back"><img src="header-icons/cancel-button.svg" /></li>
-            <li class="new"><img src="header-icons/add.svg" /></li>
-            <li class="open"><img src="header-icons/folder-open.svg" /></li>
-          </ul>
-        </div>
-      </nav>
-
-      <div class="nav-spacer"></div>
-      <div class="planet-content">
-        <h2 id="planetMyDevice"></h2>
-        <ul class="content l"></ul>
-        <h2 id="planetWorldwide"></h2>
-        <ul class="content w"></ul>
-      </div>
-    </div>
-
-    <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)"></div>
-
-    <div id="ptmDiv" draggable="false">
-      <div id="ptmButtonsDiv"></div>
-      <div id="ptmTableDiv"></div>
-    </div>
-
-    <div id="pscDiv" draggable="false">
-      <div id="pscButtonsDiv"></div>
-      <div id="pscTableDiv"></div>
-    </div>
-
-    <div id="tempoDiv" draggable="false">
-      <div id="tempoButtonsDiv"></div>
-      <div id="tempoTableDiv"></div>
-    </div>
-
-    <div id="rulerDiv" draggable="false">
-      <div id="rulerButtonsDiv"></div>
-      <div id="rulerTableDiv"></div>
-    </div>
-
-    <div id="pitchSliderDiv" style="visibility:hidden"></div>
-    <div id="playPitch" style="visibility:hidden"></div>
-    <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)"></div>
-    <div id="moveUpSliderDiv"></div>
-    <div id="moveDownSliderDiv"></div>
-    <div id="sliderInCell"></div>
-    <div id="BPMInput"></div>
-    <div id="musicratio1"></div>
-    <div id="musicratio2"></div>
-    <div id="dissectNumber"></div>
-    <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)"></div>
-    <div id="helpElem"></div>
-  </div>
-</body>
+  </body>
 </html>

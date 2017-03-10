@@ -62,15 +62,6 @@
     display: none;
 }
 
-#palette_bckg {
-    width:68px;
-    height:1200px;
-    float: left;
-    position: relative;
-    /* background-color: #3183af; */
-    background-color: #92b5c8; /* white; */
-}
-
 div.back {
     display: block;
     position: fixed;
