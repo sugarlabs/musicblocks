@@ -535,6 +535,44 @@ table {
     margin-left: 53px;
 }
 
+#sliderDiv {
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#sliderTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#sliderButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#sliderOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#sliderInnerDiv {
+    overflow-x:auto;
+}
+
 .headcol {
     position:absolute;
     left: 1px;
@@ -571,37 +609,6 @@ table {
     background: rgba(255, 255, 255, 0.85);
     -webkit-user-select: none;
     overflow-y: scroll !important;
-}
-
-#pitchSliderDiv {
-    position: absolute;
-    top: 20%;
-    left: 30%;
-    border-style: solid;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
-    -webkit-user-select: none;
-    overflow-y: scroll !important;
-}
-
-#moveUpSliderDiv {
-    position: absolute;
-    top: 66%;
-    left: 30%;
-    border-style: solid;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
-    -webkit-user-select: none;
-}
-
-#moveDownSliderDiv {
-    position: absolute;
-    top: 74%;
-    left: 30%;
-    border-style: solid;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
-    -webkit-user-select: none;
 }
 
 #sliderInCell {
