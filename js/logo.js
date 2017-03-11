@@ -2503,7 +2503,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo.noteOctaves[turtle].push(4);
             logo.noteCents[turtle].push(0);
             logo.noteHertz[turtle].push(0);
-            logo.noteBeatValues[turtle].push(1);
+            if (turtle in logo.beatFactor) {
+                logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+            } else {
+                logo.noteBeatValues[turtle].push(1);
+            }
             logo.pushedNote[turtle] = true;
             break;
         case 'steppitch':
@@ -3832,7 +3836,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
                 var __listener = function (event) {
-                    logo.beatFactor[turtle] /= factor;
+                    logo.beatFactor[turtle] *= factor;
                 };
 
                 logo._setListener(turtle, listenerName, __listener);
