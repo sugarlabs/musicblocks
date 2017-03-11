@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016-17 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,29 +13,33 @@
 // from given frequency to nextoctave frequency(two times the given frequency)
 // in continuous manner.
 
-const SEMITONE = Math.pow(2, 1 / 12);
+function PitchSlider() {
+    const BUTTONDIVWIDTH = 118;  // 2 buttons (55 + 4) * 2
+    const BUTTONSIZE = 51;
+    const ICONSIZE = 32;
+    const SEMITONE = Math.pow(2, 1 / 12);
 
-function PitchSlider () {
     this.Sliders = [];
-    this._initialTop;
     this._focusedCellIndex = 0;
     this._isKeyPressed = 0;
     this._delta = 0;
 
-    this._addButton = function(row, colIndex, icon, iconSize, label) {
-        var cell = row.insertCell();
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.height = cell.style.width; 
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        cell.onmouseover = function() {
+        cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
         }
 
-        cell.onmouseout = function() {
+        cell.onmouseout=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
@@ -53,33 +57,28 @@ function PitchSlider () {
         this._logo.synth.trigger(pitchnotes, 1, 'poly');
     };
 
-    this._moveslider = function (cell, upordown) {
+    this._moveSlider = function (cell, upDown) {
         var cellIndex = cell.cellIndex;
         var sliderrow = docById('slider');
         var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
         var frequencyDiv = cellDiv.childNodes[0];
-        var sliderDiv = docById('pitchSliderDiv');
-        var w = window.innerWidth;
-        var moveValue = parseFloat(Math.floor(SLIDERWIDTH * this._cellScale))/3;
-        var nextoctavefrequency = 2 * this.Sliders[cellIndex][0];
-        var divMoved =  jQuery(sliderDiv).position().top - this._initialTop;
+        var moveValue = parseFloat(Math.floor(SLIDERWIDTH * this._cellScale)) / 3;
+        var nextOctave = 2 * this.Sliders[cellIndex][0];
+
+        var idx = this.Sliders[cellIndex][1] + (1 * upDown);
+        var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, idx);
+
+        if (frequency > nextOctave) {
+            return;
+        } else if (frequency < this.Sliders[cellIndex][0]) {
+            return;
+        }
 
         this.Sliders[cellIndex][2] = 0;
-        this.Sliders[cellIndex][1] += 1 * upordown;
-        jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved - this.Sliders[cellIndex][1] * moveValue);
-        var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
+        this.Sliders[cellIndex][1] = idx; // += 1 * upDown;
 
-        if (frequency > nextoctavefrequency) {
-            this.Sliders[cellIndex][1] = 0;
-            var frequency = this.Sliders[cellIndex][0];
-            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved);
-        }
-
-        if (frequency < this.Sliders[cellIndex][0]) {
-            this.Sliders[cellIndex][1] = 11;
-            var frequency = nextoctavefrequency;
-            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9 - divMoved - 12 * moveValue);
-        }
+        var top = Number(cellDiv.style.top.replace('px', ''));
+        cellDiv.style.top = (top - (upDown * SLIDERHEIGHT / 12)) + 'px';
 
         frequencyDiv.innerHTML = frequency.toFixed(2);
         this._logo.synth.stop();
@@ -129,11 +128,11 @@ function PitchSlider () {
                 that._isKeyPressed = 0;
 
                 if (event.keyCode === 38) {
-                    that._moveslider(cell, 1);
+                    that._moveSlider(cell, 1);
                 }
 
                 if (event.keyCode === 40) {
-                    that._moveslider(cell, -1);
+                    that._moveSlider(cell, -1);
                 }
 
                 if (event.keyCode === 37) {
@@ -168,77 +167,41 @@ function PitchSlider () {
 
     this.init = function (logo) {
         this._logo = logo;
-        var that = this;
-
-        docById('pitchSliderDiv').style.display = 'inline';
-        console.log('setting PitchSlider visible');
-        docById('pitchSliderDiv').style.visibility = 'visible';
-        docById('pitchSliderDiv').style.border = 2;
-
-        docById('moveUpSliderDiv').style.display = 'inline';
-        docById('moveUpSliderDiv').style.visibility = 'visible';
-        docById('moveUpSliderDiv').style.border = 2;
-
-        docById('moveDownSliderDiv').style.display = 'inline';
-        docById('moveDownSliderDiv').style.visibility = 'visible';
-        docById('moveDownSliderDiv').style.border = 2;
 
         var w = window.innerWidth;
-        this._cellScale = w / 1200;
-        var iconSize = Math.floor(this._cellScale * 24);
+        this._cellScale = 1.0;
+        var iconSize = ICONSIZE;
 
-        jQuery('#pitchSliderDiv').css('top', '20%');
-        jQuery('#moveUpSliderDiv').css('top', '66%');
-        jQuery('#moveDownSliderDiv').css('top', '74%');
-        this._initialTop = jQuery('#pitchSliderDiv').position().top;
+        var canvas = document.getElementById('myCanvas');
 
-        docById('pitchSliderDiv').style.width = Math.floor(SLIDERWIDTH * this._cellScale) * (this.Sliders.length + 1) + 'px';
-        docById('pitchSliderDiv').style.overflowX = 'auto';
-        docById('pitchSliderDiv').style.height = Math.floor(parseFloat(w) / 3.2) + 'px';
-        docById('pitchSliderDiv').style.overflowY = 'auto';
+        // Position the widget and make it visible.
+        var sliderDiv = docById('sliderDiv');
 
-        var tables = document.getElementsByTagName('TABLE');
-        var noofTables = tables.length
+        sliderDiv.style.visibility = 'visible';
+        sliderDiv.setAttribute('draggable', 'true');
+        sliderDiv.style.left = '200px';
+        sliderDiv.style.top = '150px';
 
-        for (var i = 0; i < noofTables; i++) {
-            if (tables[0] != undefined) {
-                tables[0].parentNode.removeChild(tables[0]);
-            }
-        }
+        // The widget buttons
+        var widgetButtonsDiv = docById('sliderButtonsDiv');
+        widgetButtonsDiv.style.display = 'inline';
+        widgetButtonsDiv.style.visibility = 'visible';
+        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
+        widgetButtonsDiv.innerHTML = '<table id="widgetButtonTable"></table>';
 
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'buttonTable');
-        x.style.textAlign = 'center';
-        x.cellSpacing = this._cellScale * 5 + 'px';
-        x.cellPadding = 0;
+        var buttonTable = docById('widgetButtonTable');
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
 
-        var sliderDiv = docById('pitchSliderDiv');
-        sliderDiv.style.paddingTop = 0 + 'px';
-        sliderDiv.style.paddingLeft = 0 + 'px';
-        sliderDiv.appendChild(x);
-        sliderDivPosition = sliderDiv.getBoundingClientRect();
+        // For the button callbacks
+        var that = this;
 
-        var moveUpsliderDiv = docById('moveUpSliderDiv');
-        moveUpsliderDiv.style.paddingTop = 0 + 'px';
-        moveUpsliderDiv.style.paddingLeft = 0 + 'px';
-        moveUpsliderDivPosition = moveUpsliderDiv.getBoundingClientRect();
-
-        var moveDownsliderDiv = docById('moveDownSliderDiv');
-        moveDownsliderDiv.style.paddingTop = 0 + 'px';
-        moveDownsliderDiv.style.paddingLeft = 0 + 'px';
-        moveDownsliderDivPosition = moveDownsliderDiv.getBoundingClientRect();
-
-        var table = docById('buttonTable');
-        var row = table.insertRow(0);
-        row.style.left = Math.floor(sliderDivPosition.left) + 'px';
-        row.style.top = Math.floor(sliderDivPosition.top) + 'px';
-
-        var cell = this._addButton(row, -1, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'));
 
         cell.onclick = function() {
-            docById('pitchSliderDiv').style.visibility = 'hidden';
-            docById('moveUpSliderDiv').style.visibility = 'hidden';
-            docById('moveDownSliderDiv').style.visibility = 'hidden';
+            sliderDiv.style.visibility = 'hidden';
+            widgetButtonsDiv.style.visibility = 'hidden';
+            sliderTableDiv.style.visibility = 'hidden';
         };
 
         cell.onmouseover = function() {
@@ -249,97 +212,153 @@ function PitchSlider () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'pitchslider');
-        x.style.textAlign = 'center';
-        x.cellSpacing = this._cellScale * 5 + 'px';
-        x.cellPadding = 0;
-        sliderDiv.appendChild(x);
+        // We use this cell as a handle for dragging.
+        var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'));
 
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'moveUppitch');
-        x.style.textAlign = 'center';
-        x.cellSpacing = this._cellScale * 5 + 'px';
-        x.cellPadding = 0;
-        moveUpsliderDiv.appendChild(x);
+        cell.style.cursor = 'move';
 
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'moveDownpitch');
-        x.style.textAlign = 'center';
-        x.cellSpacing = this._cellScale * 5 + 'px';
-        x.cellPadding = 0;
-        moveDownsliderDiv.appendChild(x);
+        this._dx = cell.getBoundingClientRect().left - sliderDiv.getBoundingClientRect().left;
+        this._dy = cell.getBoundingClientRect().top - sliderDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = cell.innerHTML;
 
-        var table = docById('pitchslider');
-        var row = table.insertRow(0);
-        row.style.left = Math.floor(sliderDivPosition.left) + 'px';
-        row.style.top = Math.floor(sliderDivPosition.top) + 'px';
-        row.setAttribute('id', 'slider');
+        cell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            cell.innerHTML = '';
+        };
 
-        var table = docById('moveUppitch');
-        var moveuprow = table.insertRow(0);
-        moveuprow.style.left = Math.floor(moveUpsliderDivPosition.left) + 'px';
-        moveuprow.style.top = Math.floor(moveUpsliderDivPosition.top) + 'px';
-        moveuprow.setAttribute('id', 'moveUpslider');
+        cell.onmouseout = function(e) {
+            if (!that._dragging) {
+                cell.innerHTML = that._dragCellHTML;
+            }
+        };
 
-        var table = docById('moveDownpitch');
-        var movedownrow = table.insertRow(0);
-        movedownrow.style.left = Math.floor(moveDownsliderDivPosition.left) + 'px';
-        movedownrow.style.top = Math.floor(moveDownsliderDivPosition.top) + 'px';
-        movedownrow.setAttribute('id', 'moveDownslider');
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                sliderDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                sliderDiv.style.top = y + 'px';
+                cell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        sliderDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        sliderDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                sliderDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                sliderDiv.style.top = y + 'px';
+                cell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        sliderDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
+
+        sliderDiv.ondragstart = function(e) {
+            if (cell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
+
+        // The slider table
+        var sliderTableDiv = docById('sliderTableDiv');
+        sliderTableDiv.style.display = 'inline';
+        sliderTableDiv.style.visibility = 'visible';
+        sliderTableDiv.style.border = '2px';
+        sliderTableDiv.innerHTML = '';
+
+        // We use an outer div to scroll vertically and an inner div to
+        // scroll horizontally.
+        sliderTableDiv.innerHTML = '<div id="sliderOuterDiv"><div id="sliderInnerDiv"><table id="sliderSliderTable"></table></div></div>';
+
+        var sliderOuterDiv = docById('sliderOuterDiv');
+        sliderOuterDiv.style.width = Math.min((11 + this.Sliders.length * SLIDERWIDTH), w / 2) + 'px';
+        sliderOuterDiv.style.height = (11 + SLIDERHEIGHT + 3 * BUTTONSIZE) + 'px';
+
+        var sliderInnerDiv = docById('sliderInnerDiv');
+        sliderInnerDiv.style.width = (10 + this.Sliders.length * SLIDERWIDTH)+ 'px';
+        sliderInnerDiv.style.height = (10 + SLIDERHEIGHT + 3 * BUTTONSIZE) + 'px';
+
+        // Each column in the table has a slider row, and up row, and a down row.
+        var sliderTable = docById('sliderSliderTable');
+        var sliderRow = sliderTable.insertRow();
+        sliderRow.setAttribute('id', 'slider');
+        var upRow = sliderTable.insertRow();
+        var downRow = sliderTable.insertRow();
 
         for (var i = 0; i < this.Sliders.length; i++) {
-            console.log(this.Sliders[i]);
-            var cell = row.insertCell(i);
-            cell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-            cell.style.minWidth = cell.style.width;
-            cell.style.maxWidth = cell.style.width;
-            cell.style.height = Math.floor(SLIDERHEIGHT * this._cellScale) + 'px';
-            cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            cell.setAttribute('tabIndex', 1);
+            var sliderCell = sliderRow.insertCell();
 
+            sliderCell.style.width = SLIDERWIDTH * this._cellScale + 'px';
+            sliderCell.style.minWidth = sliderCell.style.width;
+            sliderCell.style.maxWidth = sliderCell.style.width;
+            sliderCell.style.height = (BUTTONSIZE + SLIDERHEIGHT) * this._cellScale + 'px';
+            sliderCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            sliderCell.setAttribute('tabIndex', 1);
+
+            // Add a div to hold the slider.
             var cellDiv = document.createElement('div');
             cellDiv.setAttribute('id', 'sliderInCell');
             cellDiv.setAttribute('position', 'absolute');
-            cellDiv.style.height = Math.floor(w / 200) + 'px';
+            cellDiv.style.height = Math.floor(w / SLIDERHEIGHT) + 'px';
             cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-            jQuery(cellDiv).css('top',jQuery(sliderDiv).position().top + w / 9);
+            cellDiv.style.top = SLIDERHEIGHT + 'px';
             cellDiv.style.backgroundColor = MATRIXBUTTONCOLOR;
-            cell.appendChild(cellDiv);
+            sliderCell.appendChild(cellDiv);
+
+            // Add a paragraph element for the slider value.
             var slider = document.createElement('P');
-            slider.innerHTML = this.Sliders[i][0];
+            slider.innerHTML = this.Sliders[i][0].toFixed(2);
             cellDiv.appendChild(slider);
 
-            cell.onmouseover = function() {
+            sliderCell.onmouseover = function(event) {
                 that._addKeyboardInput(this);
             };
 
-            cell.onmouseout = function() {
+            sliderCell.onmouseout = function() {
                 this.blur();
             };
 
-            cell.onmousemove = function(event) {
+            sliderCell.onmousemove = function(event) {
                 var cellDiv = this.childNodes[0];
-                var moveValue = parseFloat(Math.floor(SLIDERWIDTH * that._cellScale)) / 3;
-                var divMoved = jQuery(sliderDiv).position().top - that._initialTop;
-
-                if (event.pageY - w / 10 - divMoved <= jQuery(sliderDiv).position().top + w / 9 - divMoved && event.pageY - w / 10 - divMoved >= jQuery(sliderDiv).position().top + w / 9 - divMoved - 12 * moveValue) {
-                    jQuery(cellDiv).css('top', event.pageY - w / 10 - divMoved);
-                } else {
-                    if (event.pageY - w / 10 - divMoved > jQuery(sliderDiv).position().top + w / 9 - divMoved) {
-                        jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9 - divMoved);
-                    } else {
-                        jQuery(cellDiv).css('top', jQuery(sliderDiv).position().top + w / 9 - divMoved - 12 * moveValue);
-                    }
+                
+                // Using event.offsetY was too noisy. This is more robust.
+                var offset = event.pageY - this.getBoundingClientRect().top;
+                if (offset > SLIDERHEIGHT) {
+                    var offset = SLIDERHEIGHT;
+                } else if (offset < 0) {
+                    var offset = 0;
                 }
 
                 var cellIndex = this.cellIndex;
-                var slidingAreaHeight = jQuery(sliderDiv).position().top + w / 9 - jQuery(sliderDiv).position().top - w / 9 + 12 * moveValue;
-                var distanceFromBottom =  jQuery(sliderDiv).position().top + w / 9 - divMoved - jQuery(cellDiv).position().top;
-                var frequencyOffSet = parseFloat(that.Sliders[cellIndex][0]) / slidingAreaHeight * distanceFromBottom;
+                var sliderrow = docById('slider');
+                var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
+                cellDiv.style.top = offset + 'px';
 
-                that.Sliders[cellIndex][1] = parseInt(Math.log2(parseFloat(that.Sliders[cellIndex][0] + frequencyOffSet) / that.Sliders[cellIndex][0]) * 12);
-                that.Sliders[cellIndex][2] = frequencyOffSet - that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
+                var distanceFromBottom = Math.max(SLIDERHEIGHT - offset, 0);
+                var frequencyOffset = parseFloat(that.Sliders[cellIndex][0]) / SLIDERHEIGHT * distanceFromBottom;
+
+                that.Sliders[cellIndex][1] = parseInt(Math.log2(parseFloat(that.Sliders[cellIndex][0] + frequencyOffset) / that.Sliders[cellIndex][0]) * 12);
+                that.Sliders[cellIndex][2] = frequencyOffset - that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
 
                 var frequencyDiv = cellDiv.childNodes[0];
                 var frequency = that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
@@ -347,47 +366,35 @@ function PitchSlider () {
                 that._play(this);
             };
 
-            cell.onclick = function() {
+            sliderCell.onclick = function() {
                 that._save(this);
             };
 
-            var moveupcell = moveuprow.insertCell(i);
-            moveupcell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/up.svg" title="' + _('move up') + '" alt="' + _('move up') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-            moveupcell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-            moveupcell.style.minWidth = moveupcell.style.width;
-            moveupcell.style.maxWidth = moveupcell.style.width;
-            moveupcell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            moveupcell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            var upCell = this._addButton(upRow, 'up.svg', iconSize, _('move up'));
 
-            moveupcell.onclick = function() {
-                that._moveslider(this, 1);
+            upCell.onclick = function() {
+                that._moveSlider(this, 1);
             };
 
-            moveupcell.onmouseover = function() {
+            upCell.onmouseover = function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
             };
 
-            moveupcell.onmouseout = function() {
+            upCell.onmouseout = function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLOR;
             };
 
-            var movedowncell = movedownrow.insertCell(i);
-            movedowncell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/down.svg" title="' + _('move down') + '" alt="' + _('move down') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-            movedowncell.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-            movedowncell.style.minWidth = movedowncell.style.width;
-            movedowncell.style.maxWidth = movedowncell.style.width;
-            movedowncell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-            movedowncell.style.backgroundColor = MATRIXBUTTONCOLOR;
+            var downCell = this._addButton(downRow, 'down.svg', iconSize, _('move down'));
 
-            movedowncell.onclick = function() {
-                that._moveslider(this, -1);
+            downCell.onclick = function() {
+                that._moveSlider(this, -1);
             };
 
-            movedowncell.onmouseover = function() {
+            downCell.onmouseover = function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
             };
 
-            movedowncell.onmouseout = function() {
+            downCell.onmouseout = function() {
                 this.style.backgroundColor = MATRIXBUTTONCOLOR;
             };
         }

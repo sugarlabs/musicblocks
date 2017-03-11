@@ -105,23 +105,6 @@
       });
 
       $(function() {
-        $('#pitchSliderDiv').draggable({
-            drag: function() {
-                jQuery('#moveUpSliderDiv').css('left', jQuery(this).position().left);
-                jQuery('#moveUpSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/4.4);
-                jQuery('#moveDownSliderDiv').css('left', jQuery(this).position().left);
-                jQuery('#moveDownSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/3.8);
-            },
-            stop: function(){
-                jQuery('#moveUpSliderDiv').css('left', jQuery(this).position().left);
-                jQuery('#moveUpSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/4.4);
-                jQuery('#moveDownSliderDiv').css('left', jQuery(this).position().left);
-                jQuery('#moveDownSliderDiv').css('top', jQuery(this).position().top + $(window).innerWidth/3.8);
-            }
-        });
-      });
-
-      $(function() {
         $("#statusmatrix").draggable();
       });
 
@@ -312,6 +295,14 @@
 	</div>
 
 	<div id="rulerTableDiv">
+	</div>
+      </div>
+
+      <div id="sliderDiv" draggable="false">
+	<div id="sliderButtonsDiv">
+	</div>
+
+	<div id="sliderTableDiv">
 	</div>
       </div>
 
