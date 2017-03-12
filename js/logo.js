@@ -2184,9 +2184,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo.defaultBPMFactor = TONEBPM / this._masterBPM;
             }
             if (this.inTempo) {
-                tempo.BPMBlock = blk;
+                tempo.BPMBlocks.push(blk);
                 var bpmnumberblock = blocks.blockList[blk].connections[1]
-                tempo.BPM = blocks.blockList[bpmnumberblock].text.text;
+                tempo.BPMs.push(blocks.blockList[bpmnumberblock].text.text);
             }
             break;
         case 'setbpm':
@@ -2276,6 +2276,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             childFlow = args[0];
             childFlowCount = 1;
             logo.inTempo = true;
+            tempo.BPMblocks = [];
+            tempo.BPMs = [];
 
             var listenerName = '_tempo_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);

@@ -444,13 +444,6 @@ table {
     background: rgba(255, 255, 255, 0.85);
 }
 
-#tempoCanvas {
-    visibility: hidden;
-    position: absolute;
-    border: 1 !important;
-    background: rgba(255, 255, 255, 0.85);
-}
-
 #pscDiv {
     position: absolute;
     top: 20%;
