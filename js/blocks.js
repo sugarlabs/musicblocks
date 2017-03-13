@@ -3854,7 +3854,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                 if (this.blockList[parentBlock].connections[c] === thisBlock) {
                     this.blockList[parentBlock].connections[c] = null;
                     break;
-<<<<<<< HEAD
                 }
             }
             myBlock.connections[0] = null;
@@ -3871,24 +3870,6 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
                     turtleNotInTrash += 1;
                 }
             }
-=======
-                }
-            }
-            myBlock.connections[0] = null;
- 
-            // Add default block if user deletes all blocks from inside the note block
-            this.addDefaultBlock(parentBlock, thisBlock);
-        }
- 
-        if (myBlock.name === 'start' || myBlock.name === 'drum') {
-            turtle = myBlock.value;
-            var turtleNotInTrash = 0;
-            for (var i = 0; i < this.turtles.turtleList.length; i++) {
-                if (!this.turtles.turtleList[i].trash) {
-                    turtleNotInTrash += 1;
-                }
-            }
->>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             if (turtle != null && turtleNotInTrash > 1) {
                 console.log('putting turtle ' + turtle + ' in the trash');
                 this.turtles.turtleList[turtle].trash = true;
