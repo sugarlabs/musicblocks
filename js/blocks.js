@@ -2793,6 +2793,10 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
         var currentActionNames = [];
         var currentStoreinNames = [];
         for (var b = 0; b < this.blockList.length; b++) {
+            if (this.blockList[b].trash) {
+                continue;
+            }
+
             if (this.blockList[b].name === 'action') {
                 if (this.blockList[b].connections[1] != null) {
                     console.log(this.blockList[this.blockList[b].connections[1]].value);
