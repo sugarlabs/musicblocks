@@ -356,6 +356,7 @@ table {
 #canvas {
     overflow-y: visible;
 }
+<<<<<<< HEAD
 
 #pitchdrummatrix {
     position: absolute;
@@ -372,10 +373,53 @@ table {
     position: absolute;
     top: 10%;
     left: 20%;
+=======
+
+#pitchdrummatrix {
+    position: absolute;
+    top: 20%;
+    left: 30%;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     border-style: solid;
     border: 0 !important;
     background: rgba(255, 255, 255, 0.85);
     -webkit-user-select: none;
+    overflow-x: scroll !important;
+}
+
+<<<<<<< HEAD
+#modewidget {
+=======
+#statusmatrix {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
+    position: absolute;
+    top: 10%;
+    left: 20%;
+    border-style: solid;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-user-select: none;
+<<<<<<< HEAD
+}
+
+#ptmDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#ptmTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#ptmButtonsDiv {
+=======
     overflow-x: scroll !important;
 }
 
@@ -397,19 +441,12 @@ table {
 }
 
 #ptmTableDiv {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     position: relative;
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
-}
-
-#ptmButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
+<<<<<<< HEAD
     background: rgba(255, 255, 255, 0.85);
 }
 
@@ -497,10 +534,80 @@ table {
 }
 
 #rulerTableDiv {
+=======
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#ptmButtonsDiv {
     position: relative;
     left: 0px;
     top: 0px;
     border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#ptmOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#ptmInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
+#tempoDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+    -webkit-user-select: none;
+}
+
+#tempoButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#tempoCanvas {
+    visibility: hidden;
+    position: absolute;
+    border: 1 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#pscDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#pscTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#pscButtonsDiv {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+<<<<<<< HEAD
     background: rgba(255, 255, 255, 0.85) !important;
     width: 680px;
 }
@@ -523,6 +630,116 @@ table {
     background: rgba(255, 255, 255, 0.85);
 }
 
+#rulerInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
+#sliderDiv {
+=======
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#pscOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#pscInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
+#download {
+    position: absolute;
+    top :100px;
+    left: 200px;
+}
+
+#rulerDiv {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+<<<<<<< HEAD
+#sliderTableDiv {
+=======
+#rulerTableDiv {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+<<<<<<< HEAD
+#sliderButtonsDiv {
+=======
+#rulerButtonsDiv {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+<<<<<<< HEAD
+#sliderOuterDiv {
+=======
+#rulerOuterDiv {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+<<<<<<< HEAD
+#sliderInnerDiv {
+    overflow-x:auto;
+}
+
+.headcol {
+    position:absolute;
+    left: 1px;
+    top: auto;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.labelcol {
+    position:absolute;
+    top: auto;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#pitchstaircase {
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    border-style: solid;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-user-select: none;
+    overflow-y: scroll !important;
+}
+
+=======
 #rulerInnerDiv {
     overflow-x:auto;
     margin-left: 53px;
@@ -592,6 +809,7 @@ table {
     overflow-y: scroll !important;
 }
 
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 #playPitch {
     position: absolute;
     direction: rtl;

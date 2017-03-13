@@ -1130,7 +1130,12 @@ function Block(protoblock, blocks, overrideName) {
         var locked = false;
         var mousedown = false;
         var offset = {x:0, y:0};
+<<<<<<< HEAD
 
+=======
+        var scale = blocks.getStageScale();
+ 
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         function handleClick () {
             if (locked) {
                 return;
@@ -1158,8 +1163,13 @@ function Block(protoblock, blocks, overrideName) {
             var d = new Date();
             blocks.mouseDownTime = d.getTime();
             offset = {
+<<<<<<< HEAD
                 x: myBlock.collapseContainer.x - Math.round(event.stageX / blocks.blockScale),
                 y: myBlock.collapseContainer.y - Math.round(event.stageY / blocks.blockScale)
+=======
+                x: myBlock.collapseContainer.x - Math.round(event.stageX / scale),
+                y: myBlock.collapseContainer.y - Math.round(event.stageY / scale)
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             };
         });
  
@@ -1178,6 +1188,7 @@ function Block(protoblock, blocks, overrideName) {
                     blocks.mouseDownTime = d.getTime();
                     handleClick();
                 }
+<<<<<<< HEAD
             }
         });
  
@@ -1220,6 +1231,49 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 trashcan.stopHighlightAnimation();
             }
+=======
+            }
+        });
+ 
+        this.collapseContainer.on('mouseout', function(event) {
+            if (!mousedown) {
+                return;
+            }
+            mousedown = false;
+            if (moved) {
+                myBlock._collapseOut(blocks, thisBlock, moved, event);
+                moved = false;
+            } else {
+                // Maybe restrict to Android?
+                var d = new Date();
+                if ((d.getTime() - blocks.mouseDownTime) < 200) {
+                    var d = new Date();
+                    blocks.mouseDownTime = d.getTime();
+                    handleClick();
+                }
+            }
+        });
+ 
+        this.collapseContainer.on('pressmove', function(event) {
+            if (!mousedown) {
+                return;
+            }
+            moved = true;
+            var oldX = myBlock.collapseContainer.x;
+            var oldY = myBlock.collapseContainer.y;
+            myBlock.collapseContainer.x = Math.round(event.stageX / scale) + offset.x;
+            myBlock.collapseContainer.y = Math.round(event.stageY / scale) + offset.y;
+            var dx = myBlock.collapseContainer.x - oldX;
+            var dy = myBlock.collapseContainer.y - oldY;
+            myBlock.container.x += dx;
+            myBlock.container.y += dy;
+ 
+            // If we are over the trash, warn the user.
+            if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale))
+                trashcan.startHighlightAnimation();
+            else
+                trashcan.stopHighlightAnimation();
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
             myBlock.blocks.findDragGroup(thisBlock)
             if (myBlock.blocks.dragGroup.length > 0) {
@@ -1237,12 +1291,20 @@ function Block(protoblock, blocks, overrideName) {
  
     this._collapseOut = function(blocks, thisBlock, moved, event) {
         // Always hide the trash when there is no block selected.
+<<<<<<< HEAD
+=======
+        var scale = blocks.getStageScale();
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
  
         trashcan.hide();
         blocks.unhighlight(thisBlock);
         if (moved) {
             // Check if block is in the trash.
+<<<<<<< HEAD
             if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+=======
+            if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 if (trashcan.isVisible)
                     blocks.sendStackToTrash(this);
             } else {
@@ -1290,7 +1352,12 @@ function Block(protoblock, blocks, overrideName) {
         var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         var blocks = this.blocks;
+<<<<<<< HEAD
 
+=======
+        var scale = blocks.getStageScale();
+ 
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         this._calculateBlockHitArea();
  
         this.container.on('mouseover', function(event) {
@@ -1339,6 +1406,7 @@ function Block(protoblock, blocks, overrideName) {
                         console.log('running from ' + blocks.blockList[topBlock].name);
                         blocks.logo.runLogoCommands(topBlock);
                     }
+<<<<<<< HEAD
                 }
             }
         });
@@ -1403,6 +1471,72 @@ function Block(protoblock, blocks, overrideName) {
                     clearTimeout(blocks.longPressTimeout);
                     blocks.longPressTimeout = null;
                 }
+=======
+                }
+            }
+        });
+ 
+        this.container.on('mousedown', function(event) {
+            // Track time for detecting long pause...
+            // but only for top block in stack.
+            if (myBlock.connections[0] == null) {
+                var d = new Date();
+                blocks.mouseDownTime = d.getTime();
+                blocks.longPressTimeout = setTimeout(function() {
+                    blocks.triggerLongPress(myBlock);
+                }, LONGPRESSTIME);
+            }
+ 
+            // Always show the trash when there is a block selected,
+            trashcan.show();
+
+            // Raise entire stack to the top.
+            blocks.raiseStackToTop(thisBlock);
+ 
+            // And possibly the collapse button.
+            if (myBlock.collapseContainer != null) {
+                blocks.stage.setChildIndex(myBlock.collapseContainer, blocks.stage.getNumChildren() - 1);
+            }
+ 
+            moved = false;
+            var offset = {
+                x: myBlock.container.x - Math.round(event.stageX / scale),
+                y: myBlock.container.y - Math.round(event.stageY / scale)
+            };
+ 
+            myBlock.container.on('mouseout', function(event) {
+                if (haveClick) {
+                    return;
+                }
+ 
+                if (!blocks.inLongPress) {
+                    myBlock._mouseoutCallback(event, moved, haveClick, true);
+                }
+                moved = false;
+            });
+ 
+            myBlock.container.on('pressup', function(event) {
+                if (haveClick) {
+                    return;
+                }
+ 
+                if (!blocks.inLongPress) {
+                    myBlock._mouseoutCallback(event, moved, haveClick, true);
+                }
+                moved = false;
+            });
+ 
+            var original = {x: event.stageX / scale, y: event.stageY / scale};
+
+            myBlock.container.on('pressmove', function(event) {
+                // FIXME: More voodoo
+                event.nativeEvent.preventDefault();
+ 
+                if (blocks.longPressTimeout != null) {
+                    clearTimeout(blocks.longPressTimeout);
+                    blocks.longPressTimeout = null;
+                }
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
                 if (!moved && myBlock.label != null) {
                     myBlock.label.style.display = 'none';
@@ -1413,7 +1547,11 @@ function Block(protoblock, blocks, overrideName) {
                 } else {
                     // Make it eaiser to select text on mobile.
                     setTimeout(function () {
+<<<<<<< HEAD
                         moved = Math.abs((event.stageX / blocks.blockScale) - original.x) + Math.abs((event.stageY / blocks.blockScale) - original.y) > 20 && !window.hasMouse;
+=======
+                        moved = Math.abs((event.stageX / scale) - original.x) + Math.abs((event.stageY / scale) - original.y) > 20 && !window.hasMouse;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                         getInput = !moved;
                     }, 200);
                 }
@@ -1421,22 +1559,38 @@ function Block(protoblock, blocks, overrideName) {
                 var oldX = myBlock.container.x;
                 var oldY = myBlock.container.y;
 
+<<<<<<< HEAD
                 var dx = Math.round(Math.round(event.stageX / blocks.blockScale) + offset.x - oldX);
                 var dy = Math.round(Math.round(event.stageY / blocks.blockScale) + offset.y - oldY);
                 var finalPos = oldY + dy;
                 
                 if (blocks.stage.y === 0 && finalPos < (45 * blocks.blockScale)) {
                     dy += (45 * blocks.blockScale) - finalPos;
+=======
+                var dx = Math.round(Math.round(event.stageX / scale) + offset.x - oldX);
+                var dy = Math.round(Math.round(event.stageY / scale) + offset.y - oldY);
+                var finalPos = oldY + dy;
+                
+                if (blocks.stage.y === 0 && finalPos < (45 * scale)){
+                        dy += (45 * scale) - finalPos;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 }
 
                 blocks.moveBlockRelative(thisBlock, dx, dy);
 
                 // If we are over the trash, warn the user.
+<<<<<<< HEAD
                 if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
                     trashcan.startHighlightAnimation();
                 } else {
                     trashcan.stopHighlightAnimation();
                 }
+=======
+                if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale))
+                        trashcan.startHighlightAnimation();
+                else
+                        trashcan.stopHighlightAnimation();
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
                 if (myBlock.isValueBlock() && myBlock.name !== 'media') {
                     // Ensure text is on top
@@ -1478,6 +1632,7 @@ function Block(protoblock, blocks, overrideName) {
  
     this._mouseoutCallback = function(event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
+<<<<<<< HEAD
 
         // Always hide the trash when there is no block selected.
         trashcan.hide();
@@ -1490,6 +1645,21 @@ function Block(protoblock, blocks, overrideName) {
         if (moved) {
             // Check if block is in the trash.
             if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+=======
+        var scale = blocks.getStageScale();
+ 
+        // Always hide the trash when there is no block selected.
+        trashcan.hide();
+ 
+        if (this.blocks.longPressTimeout != null) {
+            clearTimeout(this.blocks.longPressTimeout);
+            this.blocks.longPressTimeout = null;
+        }
+
+        if (moved) {
+            // Check if block is in the trash.
+            if (trashcan.overTrashcan(event.stageX / scale, event.stageY / scale)) {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 if (trashcan.isVisible) {
                     blocks.sendStackToTrash(this);
                 }
@@ -1566,9 +1736,16 @@ function Block(protoblock, blocks, overrideName) {
         var blocks = this.blocks;
         var x = this.container.x;
         var y = this.container.y;
+<<<<<<< HEAD
  
         var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.blockScale;
         var canvasTop = blocks.canvas.offsetTop + 6 * blocks.blockScale;
+=======
+        var scale = blocks.getStageScale();
+ 
+        var canvasLeft = blocks.canvas.offsetLeft + 28 * scale;
+        var canvasTop = blocks.canvas.offsetTop + 6 * scale;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
  
         var movedStage = false;
         if (!window.hasMouse && blocks.stage.y + y > 75) {
@@ -1653,6 +1830,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < SOLFATTRS.length; i++) {
                 if (selectedattr === SOLFATTRS[i]) {
                     labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
+<<<<<<< HEAD
                 } else {
                     labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
                 }
@@ -1673,6 +1851,28 @@ function Block(protoblock, blocks, overrideName) {
                 } else if (this.value.length === 2) {
                     var selectedattr = this.value[1];
                 } else {
+=======
+                } else {
+                    labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
+                }
+            }
+ 
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('solfegeLabel');
+            this.labelattr = docById('noteattrLabel');
+        } else if (this.name === 'notename') {
+            var type = 'notename';
+            const NOTENOTES = ['B', 'A', 'G', 'F', 'E', 'D', 'C'];
+            const NOTEATTRS = ['♯♯', '♯', '♮', '♭', '♭♭'];
+            if (this.value != null) {
+                var selectednote = this.value[0];
+                if (this.value.length === 1) {
+                    var selectedattr = '♮';
+                } else if (this.value.length === 2) {
+                    var selectedattr = this.value[1];
+                } else {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                     var selectedattr = this.value[1] + this.value[1];
                 }
             } else {
@@ -1711,6 +1911,7 @@ function Block(protoblock, blocks, overrideName) {
             var type = 'modename';
             if (this.value != null) {
                 var selectedmode = this.value[0];
+<<<<<<< HEAD
             } else {
                 var selectedmode = getModeName(DEFAULTMODE);
             }
@@ -1740,6 +1941,37 @@ function Block(protoblock, blocks, overrideName) {
                 var selecteddrum = getDrumName(DEFAULTDRUM);
             }
  
+=======
+            } else {
+                var selectedmode = getModeName(DEFAULTMODE);
+            }
+ 
+            var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
+            for (var i = 0; i < MODENAMES.length; i++) {
+                if (MODENAMES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + MODENAMES[i][1] + '">' + MODENAMES[i][1] + '</option>';
+                } else if (selectednote === MODENAMES[i][0]) {
+                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
+                } else if (selectednote === MODENAMES[i][1]) {
+                    labelHTML += '<option value="' + selectedmode + '" selected>' + selectedmode + '</option>';
+                } else {
+                    labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
+                }
+            }
+ 
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('modenameLabel');
+        } else if (this.name === 'drumname') {
+            var type = 'drumname';
+            if (this.value != null) {
+                var selecteddrum = getDrumName(this.value);
+            } else {
+                var selecteddrum = getDrumName(DEFAULTDRUM);
+            }
+ 
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (DRUMNAMES[i][0].length === 0) {
@@ -1798,6 +2030,7 @@ function Block(protoblock, blocks, overrideName) {
  
             if (!focused) {
                 return;
+<<<<<<< HEAD
             }
  
             myBlock._labelChanged();
@@ -1813,6 +2046,23 @@ function Block(protoblock, blocks, overrideName) {
                 blocks.stage.y = fromY;
                 blocks.updateStage();
             }
+=======
+            }
+ 
+            myBlock._labelChanged();
+ 
+            event.preventDefault();
+ 
+            labelElem.classList.remove('hasKeyboard');
+ 
+            window.scroll(0, 0);
+            myBlock.label.removeEventListener('keypress', __keypress);
+ 
+            if (movedStage) {
+                blocks.stage.y = fromY;
+                blocks.updateStage();
+            }
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         };
  
         if (this.name === 'text' || this.name === 'number') {
@@ -1837,6 +2087,7 @@ function Block(protoblock, blocks, overrideName) {
             });
         }
  
+<<<<<<< HEAD
         this.label.style.left = Math.round((x + blocks.stage.x) * blocks.blockScale + canvasLeft) + 'px';
         this.label.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
  
@@ -1852,6 +2103,23 @@ function Block(protoblock, blocks, overrideName) {
         }
  
         this.label.style.fontSize = Math.round(20 * blocks.blockScale * this.protoblock.scale / 2) + 'px';
+=======
+        this.label.style.left = Math.round((x + blocks.stage.x) * scale + canvasLeft) + 'px';
+        this.label.style.top = Math.round((y + blocks.stage.y) * scale + canvasTop) + 'px';
+ 
+        // There may be a second select used for # and b.
+        if (this.labelattr != null) {
+            this.label.style.width = Math.round(60 * scale) * this.protoblock.scale / 2 + 'px';
+            this.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * scale + canvasLeft) + 'px';
+            this.labelattr.style.top = Math.round((y + blocks.stage.y) * scale + canvasTop) + 'px';
+            this.labelattr.style.width = Math.round(60 * scale) * this.protoblock.scale / 2 + 'px';
+            this.labelattr.style.fontSize = Math.round(20 * scale * this.protoblock.scale / 2) + 'px';
+        } else {
+            this.label.style.width = Math.round(100 * scale) * this.protoblock.scale / 2 + 'px';
+        }
+ 
+        this.label.style.fontSize = Math.round(20 * scale * this.protoblock.scale / 2) + 'px';
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         this.label.style.display = '';
         this.label.focus();
  
@@ -1996,6 +2264,8 @@ function Block(protoblock, blocks, overrideName) {
                 // Rename both do <- name and nameddo blocks.
                 this.blocks.renameDos(oldValue, newValue);
  
+<<<<<<< HEAD
+=======
                 if (oldValue === _('action')) {
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
@@ -2016,10 +2286,34 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 }  
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 if (oldValue === _('action')) {
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
                 }
+<<<<<<< HEAD
+               
+                this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+                var blockPalette = blocks.palettes.dict['action'];
+                for (var blk = 0; blk < blockPalette.protoList.length; blk++) {
+                    var block = blockPalette.protoList[blk];
+                    if (oldValue === _('action')) {
+                        if (block.name === 'nameddo' && block.defaults.length === 0) {
+                            block.hidden = true;
+                        }
+                    }
+                    else {
+                        if (block.name === 'nameddo' && block.defaults[0] === oldValue) {
+                            blockPalette.remove(block,oldValue);
+                        }
+                    }
+                }  
+                if (oldValue === _('action')) {
+                    this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
+                    this.blocks.setActionProtoVisiblity(false);
+                }
+=======
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 this.blocks.renameNameddos(oldValue, newValue);
                 this.blocks.palettes.hide();
                 this.blocks.palettes.updatePalettes('action');

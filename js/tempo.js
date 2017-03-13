@@ -18,6 +18,7 @@ function Tempo () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
+<<<<<<< HEAD
     const TEMPOWIDTH = 700;
     const TEMPOHEIGHT = 100;
     const YRADIUS = 75;
@@ -35,6 +36,30 @@ function Tempo () {
             if (blockNumber != null) {
                 this._logo.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
                 this._logo.blocks.blockList[blockNumber].text.text = this.BPMs[i];
+=======
+
+    this.isMoving = true;
+    this._direction = 1;
+    this._widgetFirstTime = null;
+    this._widgetNextTime = 0;
+    this._interval = 0;
+    this._intervalID = null;
+    this._yradius = 25;
+    this._xradius = 25;
+    this._firstClickTime = null;
+
+    this.BPM;
+    this.BPMBlock = null;  // set-master-BPM block contained in Tempo clamp
+
+    this._updateBPM = function(event) {
+        this._interval = (60 / this.BPM) * 1000;
+
+        if (this.BPMBlock != null) {
+            var blockNumber = blocks.blockList[this.BPMBlock].connections[1];
+            if (blockNumber != null) {
+                this._logo.blocks.blockList[blockNumber].value = parseFloat(this.BPM);
+                this._logo.blocks.blockList[blockNumber].text.text = this.BPM;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 this._logo.blocks.blockList[blockNumber].updateCache();
                 this._logo.refreshCanvas();
                 saveLocally();
@@ -50,11 +75,17 @@ function Tempo () {
         // Reset widget time since we are restarting.
         // We will no longer keep synch with the turtles.
         var d = new Date();
+<<<<<<< HEAD
         for (var i = 0; i < this.BPMs.length; i++) {
             this._widgetFirstTimes[i] = d.getTime();
             this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
             this._directions[i] = 1;
         }
+=======
+        this._widgetFirstTime = d.getTime();
+        this._widgetNextTime = this._widgetFirstTime + this._interval;
+        this._direction = 1;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
         // Restart the interval.
         var that = this;
@@ -63,6 +94,7 @@ function Tempo () {
         }, TEMPOINTERVAL);
     };
 
+<<<<<<< HEAD
     this._useBPM = function (i) {
         this.BPMs[i] = docById('BPMInput' + i).value
         if (this.BPMs[i] > 1000) {
@@ -93,11 +125,44 @@ function Tempo () {
 
         this._updateBPM(i);
         docById('BPMInput' + i).value = this.BPMs[i];
+=======
+    this._useBPM = function () {
+        this.BPM = docById('BPMInput').value
+        if (this.BPM > 1000) {
+            this.BPM = 1000;
+        } else if (this.BPM < 30) {
+            this.BPM = 30;
+        }
+
+        this._updateBPM();
+    };
+
+    this._speedUp = function () {
+        this.BPM = parseFloat(this.BPM) + 5;
+
+        if (this.BPM > 1000) {
+            this.BPM = 1000;
+        }
+
+        this._updateBPM();
+        docById('BPMInput').value = this.BPM;
+    };
+
+    this._slowDown = function () {
+        this.BPM = parseFloat(this.BPM) - 5;
+        if (this.BPM < 30) {
+            this.BPM = 30;
+        }
+
+        this._updateBPM();
+        docById('BPMInput').value = this.BPM;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     };
 
     this._draw = function() {
         // First thing to do is figure out where we are supposed to be
         // based on the elapsed time.
+<<<<<<< HEAD
         var d = new Date();
 
         for (var i = 0; i < this.BPMs.length; i++) {
@@ -167,10 +232,77 @@ function Tempo () {
             ctx.fill();
             ctx.closePath();
         }
+=======
+        var tempoCanvas = docById('tempoCanvas');
+        var d = new Date();
+
+        // We start the music clock as the first note is being
+        // played.
+        if (this._widgetFirstTime == null) {
+            this._widgetFirstTime = d.getTime();
+            this._widgetNextTime = this._widgetFirstTime + this._interval;
+        }
+
+        // How much time has gone by?
+        var deltaTime = this._widgetNextTime - d.getTime();
+
+        // Are we done yet?
+        if (d.getTime() > this._widgetNextTime) {
+            // Play a tone.
+            this._logo.synth.trigger('C4', 0.125, 'poly');
+            this._widgetNextTime += this._interval;
+
+            // Ensure we are at the edge.
+            if (this._direction === -1) {
+                this._direction = 1;
+            } else {
+                this._direction = -1;
+            }
+        } else {
+            // Determine new x position based on delta time.
+            if (this._interval !== 0) {
+                var dx = (tempoCanvas.width) * (deltaTime / this._interval);
+            }
+
+            //Set this._xradius based on the dx to achieve the compressing effect
+            if (tempoCanvas.width - dx <= this._yradius) {
+                this._xradius =  tempoCanvas.width - dx;
+            } else if (dx <= this._yradius) {
+                this._xradius = dx;
+            } else {
+                this._xradius = this._yradius;
+            }
+
+            //Set x based on dx and direction
+            if (this._direction === -1) {
+                var x = tempoCanvas.width - dx;
+            } else {
+                var x = dx;
+            }
+        }
+
+        //Set x value if it is undefined
+        if (x === undefined) {
+            if (this._direction === -1) {
+                x = 0;
+            } else {
+                x = tempoCanvas.width;
+            }
+        }
+
+        var ctx = tempoCanvas.getContext('2d');
+        ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(0,0,0,1)';
+        ctx.ellipse(x, 50, Math.max(this._xradius, 1), this._yradius, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     };
 
     this.init = function (logo) {
         this._logo = logo;
+<<<<<<< HEAD
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
@@ -178,13 +310,20 @@ function Tempo () {
         this._intervals = [];
         this.isMoving = true;
         this._intervalID = null;
+=======
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
         }
 
         var w = window.innerWidth;
+<<<<<<< HEAD
         var iconSize = ICONSIZE;
+=======
+        this._cellScale = w / 1200;
+        var iconSize = ICONSIZE * this._cellScale;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
         var canvas = document.getElementById('myCanvas');
 
@@ -231,6 +370,7 @@ function Tempo () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
+<<<<<<< HEAD
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
         cell.onclick=function() {
             tempoDiv.style.visibility = 'hidden';
@@ -240,6 +380,82 @@ function Tempo () {
                 docById('tempoCanvas' + i).style.visibility = 'hidden';
             }
 
+=======
+        var cell = this._addButton(row, 'up.svg', ICONSIZE, _('speed up'));
+        cell.onclick=function() {
+            that._speedUp();
+        };
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        };
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        };
+
+        var cell = this._addButton(row, 'down.svg', ICONSIZE, _('slow down'));
+        cell.onclick=function() {
+            that._slowDown();
+        };
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        };
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
+        };
+
+        var cell = row.insertCell();
+        cell.innerHTML = '<input id="BPMInput" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="BPMInput" type="BPMInput" value="' + this.BPM + '" />';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = BUTTONSIZE + 'px';
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
+        var tempoCanvas = docById('tempoCanvas');
+        tempoCanvas.style.visibility = 'visible';
+        tempoCanvas.style.left = widgetButtonsDiv.getBoundingClientRect().left + 'px';
+        tempoCanvas.style.top = widgetButtonsDiv.getBoundingClientRect().top + BUTTONSIZE + 'px';
+
+        var BPMInput = docById('BPMInput');
+
+        tempoCanvas.addEventListener('click', function() {
+            // The tempo can be set from the interval between
+            // successive clicks on the canvas.
+            var d = new Date();
+            if (that._firstClickTime == null) {
+                that._firstClickTime = d.getTime();
+            } else {
+                var newBPM = parseInt((60 * 1000) / (d.getTime() - that._firstClickTime));
+                if (newBPM > 29 && newBPM < 1001) {
+                    that.BPM = newBPM;
+                    that._updateBPM();
+                    BPMInput.value = that.BPM;
+                    that._firstClickTime = null;
+                } else {
+                    that._firstClickTime = d.getTime();
+                }
+            }
+        });
+
+        BPMInput.classList.add('hasKeyboard');
+        BPMInput.addEventListener('keyup', function(e) {
+            if (e.keyCode === 13) {
+                that._useBPM();
+            }
+        });
+
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        cell.onclick=function() {
+            tempoDiv.style.visibility = 'hidden';
+            tempoCanvas.style.visibility = 'hidden';
+            tempoButtonsDiv.style.visibility = 'hidden';
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             if (that._intervalID != null) {
                 clearInterval(that._intervalID);
             }
@@ -285,8 +501,15 @@ function Tempo () {
                 that._dragging = false;
                 var x = e.clientX - that._dx;
                 tempoDiv.style.left = x + 'px';
+<<<<<<< HEAD
                 var y = e.clientY - that._dy;
                 tempoDiv.style.top = y + 'px';
+=======
+                tempoCanvas.style.left = tempoDiv.style.left;
+                var y = e.clientY - that._dy;
+                tempoDiv.style.top = y + 'px';
+                tempoCanvas.style.top = y + BUTTONSIZE + 'px';
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
@@ -300,8 +523,15 @@ function Tempo () {
                 that._dragging = false;
                 var x = e.clientX - that._dx;
                 tempoDiv.style.left = x + 'px';
+<<<<<<< HEAD
                 var y = e.clientY - that._dy;
                 tempoDiv.style.top = y + 'px';
+=======
+                tempoCanvas.style.left = tempoDiv.style.left;
+                var y = e.clientY - that._dy;
+                tempoDiv.style.top = y + 'px';
+                tempoCanvas.style.top = y + BUTTONSIZE + 'px';
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
@@ -319,6 +549,7 @@ function Tempo () {
             }
         };
 
+<<<<<<< HEAD
         var canvasCells = [];
         var tempoCanvases = [];
 
@@ -422,6 +653,18 @@ function Tempo () {
         }
 
         this.resume();
+=======
+        this._direction = 1;
+
+        // When we start, we try to synch with the turtles.
+        this._widgetFirstTime = this._logo.firstNoteTime;
+        this._interval = (60 / this.BPM) * 1000;
+        this._widgetNextTime = this._widgetFirstTime + this._interval;
+
+        this._intervalID = setInterval(function() {
+            that._draw();
+        }, TEMPOINTERVAL);
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     };
 
     this._addButton = function(row, icon, iconSize, label) {

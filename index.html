@@ -13,6 +13,7 @@
 
     <script src="lib/mespeak.js">
     </script>
+<<<<<<< HEAD
 
     <script src="lib/reqwest.js">
     </script>
@@ -32,6 +33,27 @@
     <script src="lib/jquery.ruler.js">
     </script>
 
+=======
+
+    <script src="lib/reqwest.js">
+    </script>
+
+    <script src="lib/jquery-2.1.4.js">
+    </script>
+
+    <script src="lib/jquery-ui.js">
+    </script>
+
+    <script src="lib/webL10n.js">
+    </script>
+
+    <script src="lib/tone.min.js">
+    </script>
+
+    <script src="lib/jquery.ruler.js">
+    </script>
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     <script src="lib/modernizr-2.6.2.min.js">
     </script>
 
@@ -64,6 +86,7 @@
       function init() {
         canvas = document.getElementById("canvas");
         exportRoot = new lib.SugarAnimation();
+<<<<<<< HEAD
 
         stage = new createjs.Stage(canvas);
         stage.addChild(exportRoot);
@@ -85,6 +108,29 @@
         });
       };
 
+=======
+
+        stage = new createjs.Stage(canvas);
+        stage.addChild(exportRoot);
+        stage.update();
+
+        createjs.Ticker.setFPS(lib.properties.fps);
+        createjs.Ticker.addEventListener("tick", stage);
+      }
+    </script>
+  </head>
+
+  <body onload="init();" data-title="index" id="body" style="background: #96D3F3;">
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+            appId: '1496189893985945',
+            xfbml: true,
+            version: 'v2.1'
+        });
+      };
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
       <!--
         try {
             (function(d, s, id) {
@@ -116,6 +162,7 @@
         $.fn.fixMe = function() {
             return this.each(function() {
                 var $this = $(this), $t_fixed;
+<<<<<<< HEAD
 
                 function init() {
                     $this.wrap('<div class="container" />');
@@ -124,6 +171,16 @@
                     resizeFixed();
                 };
 
+=======
+
+                function init() {
+                    $this.wrap('<div class="container" />');
+                    $t_fixed = $this.clone();
+                    $t_fixed.find("tbody").remove().end().addClass("fixed").insertBefore($this);
+                    resizeFixed();
+                };
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 function resizeFixed() {
                     $t_fixed.find("th").each(function(index) {
                         $(this).css("width", $this.find("th").eq(index).outerWidth() + "px");
@@ -157,6 +214,7 @@
       });
 
       var isDragging = false;
+<<<<<<< HEAD
 
       function movePitchDrumMatrix(event) {
         var myDiv = document.getElementById('pitchdrummatrix');
@@ -192,6 +250,43 @@
     <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
     </canvas>
 
+=======
+
+      function movePitchDrumMatrix(event) {
+        var myDiv = document.getElementById('pitchdrummatrix');
+        var myDivPosition = myDiv.getBoundingClientRect();
+
+        var table = document.getElementById('drumTable');
+        var row = table.rows.item(0);
+        row.style.left = myDivPosition.left + 'px';
+        row.style.top = myDivPosition.top + 'px';
+      };
+
+      function moveStatusMatrix(event) {
+        var myDiv = document.getElementById('statusmatrix');
+        var myDivPosition = myDiv.getBoundingClientRect();
+
+        var table = document.getElementById('statusTable');
+        var row = table.rows.item(0);
+        row.style.left = myDivPosition.left + 'px';
+        row.style.top = myDivPosition.top + 'px';
+      };
+
+      function moveModeWidget(event) {
+        var modeDiv = document.getElementById('modewidget');
+        var modeDivPosition = modeDiv.getBoundingClientRect();
+
+        var table = document.getElementById('modeTable');
+        var row = table.rows.item(0);
+        row.style.left = modeDivPosition.left + 'px';
+        row.style.top = modeDivPosition.top + 'px';
+      };
+    </script>
+
+    <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
+    </canvas>
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     <!--hidden at the beginning whilst everything loads-->
     <div id="hideContents" style="display: none;">
       <div class="canvasHolder" id="canvasHolder">
@@ -207,6 +302,12 @@
 	<video id="camVideo" style="visibility:hidden;">
 	</video>
 
+<<<<<<< HEAD
+=======
+	<canvas id="tempoCanvas" width="700" height="100" style="visibility:hidden;">
+	</canvas>
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 	<canvas id="camCanvas" style="visibility:hidden;">
 	</canvas>
 

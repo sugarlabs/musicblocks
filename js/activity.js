@@ -153,7 +153,11 @@ define(function (require) {
 
         // Are we running off of a server?
         var server = true;
+<<<<<<< HEAD
         var turtleBlocksScale = 1;
+=======
+        var turlteBlocksScale = 1;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         var stage;
         var turtles;
         var palettes;
@@ -272,8 +276,13 @@ define(function (require) {
             palettes.initial_x = 55;
             palettes.initial_y = 55;
             palettes.updatePalettes();
+<<<<<<< HEAD
             var x = 100 * turtleBlocksScale;
             var y = 100 * turtleBlocksScale;
+=======
+            var x = 100 * turlteBlocksScale;
+            var y = 100 * turlteBlocksScale;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             for (var blk in blocks.blockList) {
                 if (!blocks.blockList[blk].trash) {
                     var myBlock = blocks.blockList[blk];
@@ -290,10 +299,17 @@ define(function (require) {
                                 }
                             }
                         }
+<<<<<<< HEAD
                         x += 200 * turtleBlocksScale;
                         if (x > (canvas.width - 100) / (turtleBlocksScale)) {
                             x = 100 * turtleBlocksScale;
                             y += 100 * turtleBlocksScale;
+=======
+                        x += 200 * turlteBlocksScale;
+                        if (x > (canvas.width - 100) / (turlteBlocksScale)) {
+                            x = 100 * turlteBlocksScale;
+                            y += 100 * turlteBlocksScale;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                         }
                     }
                 }
@@ -512,7 +528,11 @@ define(function (require) {
 
         function closeAnalytics(chartBitmap, ctx) {
             var button = this;
+<<<<<<< HEAD
             button.x = (canvas.width / (2 * turtleBlocksScale))  + (300 / Math.sqrt(2));
+=======
+            button.x = (canvas.width / (2 * turlteBlocksScale))  + (300 / Math.sqrt(2));
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             button.y = 300.00 - (300.00 / Math.sqrt(2));
             this.closeButton = _makeButton('cancel-button', _('Close'), button.x, button.y, 55, 0);
             this.closeButton.on('click', function(event) {
@@ -554,7 +574,11 @@ define(function (require) {
                 img.onload = function () {
                     var chartBitmap = new createjs.Bitmap(img);
                     stage.addChild(chartBitmap);
+<<<<<<< HEAD
                     chartBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (300);
+=======
+                    chartBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (300);
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                     chartBitmap.y = 0;
                     chartBitmap.scaleX = chartBitmap.scaleY = chartBitmap.scale = 600 / chartBitmap.image.width;
                     logo.hideBlocks();
@@ -948,7 +972,11 @@ define(function (require) {
                 palettes.menuScrollEvent(delta, scrollSpeed);
                 palettes.hidePaletteIconCircles();
             } else {
+<<<<<<< HEAD
                 palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
+=======
+                palette = palettes.findPalette(event.clientX / turlteBlocksScale, event.clientY / turlteBlocksScale);
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 if (palette) {
                     palette.scrollEvent(delta, scrollSpeed);
                 }
@@ -956,6 +984,7 @@ define(function (require) {
         };
 
         function getStageScale() {
+<<<<<<< HEAD
             return turtleBlocksScale;
         };
 
@@ -965,6 +994,17 @@ define(function (require) {
 
         function getStageY() {
             return turtles.screenY2turtleY(stageY / turtleBlocksScale);
+=======
+            return turlteBlocksScale;
+        };
+
+        function getStageX() {
+            return turtles.screenX2turtleX(stageX / turlteBlocksScale);
+        };
+
+        function getStageY() {
+            return turtles.screenY2turtleY(stageY / turlteBlocksScale);
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         };
 
         function getStageMouseDown() {
@@ -1254,13 +1294,20 @@ define(function (require) {
             if (smallSide < cellSize * 11) {
                 var mobileSize = true;
                 if (w < cellSize * 10) {
+<<<<<<< HEAD
                     turtleBlocksScale = smallSide / (cellSize * 11);
                 } else {
                     turtleBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
+=======
+                    turlteBlocksScale = smallSide / (cellSize * 11);
+                } else {
+                    turlteBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 }
             } else {
                 var mobileSize = false;
                 if (w / 1200 > h / 900) {
+<<<<<<< HEAD
                     turtleBlocksScale = w / 1200;
                 } else {
                     turtleBlocksScale = h / 900;
@@ -1269,15 +1316,30 @@ define(function (require) {
 
             stage.scaleX = turtleBlocksScale;
             stage.scaleY = turtleBlocksScale;
+=======
+                    turlteBlocksScale = w / 1200;
+                } else {
+                    turlteBlocksScale = h / 900;
+                }
+            }
+
+            stage.scaleX = turlteBlocksScale;
+            stage.scaleY = turlteBlocksScale;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
             stage.canvas.width = w;
             stage.canvas.height = h;
 
+<<<<<<< HEAD
             console.log('Resize: scale ' + turtleBlocksScale +
+=======
+            console.log('Resize: scale ' + turlteBlocksScale +
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             ', windowW ' + w + ', windowH ' + h +
             ', canvasW ' + canvas.width + ', canvasH ' + canvas.height +
             ', screenW ' + screen.width + ', screenH ' + screen.height);
 
+<<<<<<< HEAD
             turtles.setScale(turtleBlocksScale);
             blocks.setScale(turtleBlocksScale);
             boundary.setScale(w, h, turtleBlocksScale);
@@ -1293,6 +1355,23 @@ define(function (require) {
             update = true;
 
             // Setup help now that we have calculated turtleBlocksScale.
+=======
+            turtles.setScale(turlteBlocksScale);
+            blocks.setScale(turlteBlocksScale);
+            boundary.setScale(w, h, turlteBlocksScale);
+            palettes.setScale(turlteBlocksScale);
+            trashcan.resizeEvent(turlteBlocksScale);
+            _setupAndroidToolbar(mobileSize);
+
+            // Reposition coordinate grids.
+            cartesianBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (600);
+            cartesianBitmap.y = (canvas.height / (2 * turlteBlocksScale)) - (450);
+            polarBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (600);
+            polarBitmap.y = (canvas.height / (2 * turlteBlocksScale)) - (450);
+            update = true;
+
+            // Setup help now that we have calculated turlteBlocksScale.
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             _showHelp(true);
 
             // Hide palette icons on mobile
@@ -1418,8 +1497,12 @@ define(function (require) {
 
                     var actionName = actionArg.value;
                     if (actionName !== _('action')) {
+<<<<<<< HEAD
                         // blocks.checkPaletteEntries('action');
                         console.log('FIXME: Check for unique action name here');
+=======
+                        blocks.checkPaletteEntries('action');
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                     }
                 }
             }
@@ -1428,11 +1511,19 @@ define(function (require) {
         };
 
         function _deleteBlocksBox() {
+<<<<<<< HEAD
             clearBox.show(turtleBlocksScale);
         };
 
         function _doUtilityBox() {
             utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
+=======
+            clearBox.show(turlteBlocksScale);
+        };
+
+        function _doUtilityBox() {
+            utilityBox.init(turlteBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         };
 
         function sendAllToTrash(addStartBlock, doNotSave) {
@@ -2203,7 +2294,11 @@ handleComplete);
             }
 
             headerContainer = new createjs.Shape();
+<<<<<<< HEAD
             headerContainer.graphics.f(platformColor.header).r(0, 0, screen.width / turtleBlocksScale, cellSize);
+=======
+            headerContainer.graphics.f(platformColor.header).r(0, 0, screen.width / turlteBlocksScale, cellSize);
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
@@ -2278,10 +2373,17 @@ handleComplete);
                 y += dy;
             }
 
+<<<<<<< HEAD
             _setupRightMenu(turtleBlocksScale);
         };
 
         function _setupRightMenu(turtleBlocksScale) {
+=======
+            _setupRightMenu(turlteBlocksScale);
+        };
+
+        function _setupRightMenu(turlteBlocksScale) {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
                 for (var i in onscreenMenu) {
@@ -2309,7 +2411,11 @@ handleComplete);
             });
 
             var btnSize = cellSize;
+<<<<<<< HEAD
             var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
+=======
+            var x = Math.floor(canvas.width / turlteBlocksScale) - btnSize / 2;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             var y = Math.floor(btnSize / 2);
 
             var dx = 0;
@@ -2367,7 +2473,11 @@ handleComplete);
                             if (helpIdx >= HELPCONTENT.length) {
                                 helpIdx = 0;
                             }
+<<<<<<< HEAD
                             var imageScale = 55 * turtleBlocksScale;
+=======
+                            var imageScale = 55 * turlteBlocksScale;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                             helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
                         }
                         update = true;
@@ -2375,11 +2485,19 @@ handleComplete);
 
                     var img = new Image();
                     img.onload = function () {
+<<<<<<< HEAD
                         console.log(turtleBlocksScale);
                         var bitmap = new createjs.Bitmap(img);
                         /*
                         if (turtleBlocksScale > 1) {
                             bitmap.scaleX = bitmap.scaleY = bitmap.scale = turtleBlocksScale;
+=======
+                        console.log(turlteBlocksScale);
+                        var bitmap = new createjs.Bitmap(img);
+                        /*
+                        if (turlteBlocksScale > 1) {
+                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = turlteBlocksScale;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                         } else {
                             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1.125;
                         }
@@ -2410,6 +2528,7 @@ handleComplete);
                 var helpElem = docById('helpElem');
                 helpElem.style.position = 'absolute';
                 helpElem.style.display = 'block';
+<<<<<<< HEAD
                 helpElem.style.paddingLeft = 20 * turtleBlocksScale + 'px';
                 helpElem.style.paddingRight = 20 * turtleBlocksScale + 'px';
                 helpElem.style.paddingTop = '0px';
@@ -2427,6 +2546,25 @@ handleComplete);
                     var bitmap = helpContainer.children[0];
                     if (bitmap != undefined) {
                         // bitmap.scaleX = bitmap.scaleY = bitmap.scale = turtleBlocksScale;
+=======
+                helpElem.style.paddingLeft = 20 * turlteBlocksScale + 'px';
+                helpElem.style.paddingRight = 20 * turlteBlocksScale + 'px';
+                helpElem.style.paddingTop = '0px';
+                helpElem.style.paddingBottom = 20 * turlteBlocksScale + 'px';
+                helpElem.style.fontSize = 20 + 'px'; //  * turlteBlocksScale + 'px';
+                helpElem.style.color = '#000000';  // '#ffffff';
+                helpElem.style.left = 65 * turlteBlocksScale + 'px';
+                helpElem.style.top = 105 * turlteBlocksScale + 'px';
+                var w = Math.min(300, 300); //  * turlteBlocksScale);
+                var h = Math.min(300, 300); //  * turlteBlocksScale);
+                helpElem.style.width = w + 'px';
+                helpElem.style.height = h + 'px';
+
+                if (turlteBlocksScale > 1) {
+                    var bitmap = helpContainer.children[0];
+                    if (bitmap != undefined) {
+                        // bitmap.scaleX = bitmap.scaleY = bitmap.scale = turlteBlocksScale;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                     }
                 }
 
@@ -2610,8 +2748,13 @@ handleComplete);
             container.on('mousedown', function (event) {
                 var moved = true;
                 var offset = {
+<<<<<<< HEAD
                     x: container.x - Math.round(event.stageX / turtleBlocksScale),
                     y: container.y - Math.round(event.stageY / turtleBlocksScale)
+=======
+                    x: container.x - Math.round(event.stageX / turlteBlocksScale),
+                    y: container.y - Math.round(event.stageY / turlteBlocksScale)
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 };
 
                 pressTimer = setTimeout(function() {
@@ -2630,7 +2773,11 @@ handleComplete);
                     }
                 }, 1000);
 
+<<<<<<< HEAD
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
+=======
+                var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turlteBlocksScale, stage);
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
                 container.on('pressup', function (event) {
                     hideButtonHighlight(circles, stage);

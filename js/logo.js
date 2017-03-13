@@ -2184,9 +2184,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo.defaultBPMFactor = TONEBPM / this._masterBPM;
             }
             if (this.inTempo) {
+<<<<<<< HEAD
                 tempo.BPMBlocks.push(blk);
                 var bpmnumberblock = blocks.blockList[blk].connections[1]
                 tempo.BPMs.push(blocks.blockList[bpmnumberblock].text.text);
+=======
+                tempo.BPMBlock = blk;
+                var bpmnumberblock = blocks.blockList[blk].connections[1]
+                tempo.BPM = blocks.blockList[bpmnumberblock].text.text;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             }
             break;
         case 'setbpm':
@@ -2276,8 +2282,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             childFlow = args[0];
             childFlowCount = 1;
             logo.inTempo = true;
+<<<<<<< HEAD
             tempo.BPMblocks = [];
             tempo.BPMs = [];
+=======
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
             var listenerName = '_tempo_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
@@ -2326,6 +2335,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     // Process queued up rhythms.
                     pitchdrummatrix.init(logo);
                     pitchdrummatrix.makeClickable();
+<<<<<<< HEAD
+=======
                 }
             };
 
@@ -2414,11 +2425,137 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     }
 
                     pitchtimematrix.makeClickable();
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 }
             };
 
             logo._setListener(turtle, listenerName, __listener);
             break;
+<<<<<<< HEAD
+        case 'modewidget':
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+
+            var listenerName = '_modewidget_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                console.log(logo.keySignature[turtle]);
+                logo.modeWidget.init(logo, logo._modeBlock);
+            }
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'status':
+            logo.statusMatrix.init(logo);
+            logo.statusFields = [];
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+
+            logo.inStatusMatrix = true;
+
+            var listenerName = '_status_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                logo.statusMatrix.init(logo);
+                logo.inStatusMatrix = false;
+            }
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'matrix':
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+            logo.inMatrix = true;
+            pitchtimematrix.rowLabels = [];
+            pitchtimematrix.rowArgs = [];
+            pitchtimematrix.graphicsBlocks = [];
+            pitchtimematrix.clearBlocks();
+
+            logo.tupletRhythms = [];
+            logo.tupletParams = [];
+            logo.addingNotesToTuplet = false;
+
+            var listenerName = '_matrix_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                if (logo.tupletRhythms.length === 0 || pitchtimematrix.rowLabels.length === 0) {
+                    logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
+                } else {
+                    // Process queued up rhythms.
+                    pitchtimematrix.init(logo);
+
+                    for (var i = 0; i < logo.tupletRhythms.length; i++) {
+                        // We have two cases: (1) notes in a tuplet;
+                        // and (2) rhythm block outside of a
+                        // tuplet. Rhythm blocks in a tuplet are
+                        // converted to notes.
+                        switch (logo.tupletRhythms[i][0]) {
+                        case 'notes':
+                        case 'simple':
+                            var tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
+                            tupletParam.push([]);
+                            for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
+                                tupletParam[1].push(logo.tupletRhythms[i][j]);
+                            }
+                            pitchtimematrix.addTuplet(tupletParam);
+                            break;
+                        default:
+                            pitchtimematrix.addNotes(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
+                            break;
+                        }
+                    }
+
+                    pitchtimematrix.makeClickable();
+                }
+=======
+        case 'invert1':
+            if (typeof(args[2]) === 'number') {
+                if (args[2] % 2 === 0){
+                    args[2] = 'even';
+                } else {
+                    args[2] = 'odd';
+                }
+            } 
+            
+            if (args[2] === _('even')) {
+                args2 = 'even';
+            }
+
+            if (args[2] === _('odd')) {
+                args2 = 'odd';
+            }
+
+            if (args[2] === 'even' || args[2] === 'odd'){
+                var octave = calcOctave(logo.currentOctaves[turtle], args[1]);
+                logo.invertList[turtle].push([args[0], octave, args[2]]);
+            } else {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            childFlow = args[3];
+            childFlowCount = 1;
+            var listenerName = '_invert_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function(event) {
+                logo.invertList[turtle].pop();
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+<<<<<<< HEAD
         case 'invert1':
             if (typeof(args[2]) === 'number') {
                 if (args[2] % 2 === 0){
@@ -2690,6 +2827,238 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 break;
             }
 
+=======
+        case 'invert2':
+        case 'invert':
+            // Deprecated
+            if (logo.blocks.blockList[blk].name === 'invert') {
+                logo.invertList[turtle].push([args[0], args[1], 'even']);
+            } else {
+                logo.invertList[turtle].push([args[0], args[1], 'odd']);
+            }
+            childFlow = args[2];
+            childFlowCount = 1;
+
+            var listenerName = '_invert_' + turtle;
+            logo._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function(event) {
+                logo.invertList[turtle].pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'backward':
+            logo.backward[turtle].push(blk);
+            // Set child to bottom block inside clamp
+            childFlow = logo.blocks.findBottomBlock(args[0]);
+            childFlowCount = 1;
+
+            var listenerName = '_backward_' + turtle + '_' + blk;
+
+            var nextBlock = this.blocks.blockList[blk].connections[1];
+            if (nextBlock == null) {
+                logo.backward[turtle].pop();
+            } else {
+                logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+            }
+
+            var __listener = function(event) {
+                logo.backward[turtle].pop();
+                // Since a backward block was requeued each
+                // time, we need to flush it from the queue.
+                // logo.turtles.turtleList[turtle].queue.pop();
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'rest2':
+            logo.notePitches[turtle].push('rest');
+            logo.noteOctaves[turtle].push(4);
+            logo.noteCents[turtle].push(0);
+            logo.noteHertz[turtle].push(0);
+            logo.noteBeatValues[turtle].push(1);
+            logo.pushedNote[turtle] = true;
+            break;
+        case 'steppitch':
+            // Similar to pitch but calculated from previous note played.
+            if (logo.inNoteBlock[turtle] === 0) {
+                logo.errorMsg(_('The Step Pitch Block must be used inside of a Note Block.'), blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            if (typeof(args[0]) !== 'number') {
+                logo.errorMsg(NANERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            if (logo.lastNotePlayed[turtle] == null) {
+                logo.errorMsg('The Step Pitch Block must be preceded by a Pitch Block.', blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            function addPitch(note, octave, cents) {
+                if (logo.drumStyle[turtle].length > 0) {
+                    var drumname = last(logo.drumStyle[turtle]);
+                    var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
+                    logo.pitchDrumTable[turtle][note2[0] + note2[1]] = drumname;
+                }
+                logo.notePitches[turtle].push(note);
+                logo.noteOctaves[turtle].push(octave);
+                logo.noteCents[turtle].push(cents);
+                if (cents !== 0) {
+                    logo.noteHertz[turtle].push(pitchToFrequency(note, octave, cents, logo.keySignature[turtle]));
+                } else {
+                    logo.noteHertz[turtle].push(0);
+                }
+            }
+
+            var len = logo.lastNotePlayed[turtle][0].length;
+            if (args[0] >= 1) {
+                var n = Math.floor(args[0]);
+                var value = getStepSizeUp(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), value, logo.keySignature[turtle]);
+                for (var i = 1; i < n; i++) {
+                    var value = getStepSizeUp(logo.keySignature[turtle], noteObj[0]);
+                    noteObj = logo.getNote(noteObj[0], noteObj[1], value, logo.keySignature[turtle]);
+                }
+            } else if (args[0] <= -1) {
+                var n = -Math.ceil(args[0]);
+                value = getStepSizeDown(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
+                var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), value, logo.keySignature[turtle]);
+                for (var i = 1; i < n; i++) {
+                    var value = getStepSizeDown(logo.keySignature[turtle], noteObj[0]);
+                    noteObj = logo.getNote(noteObj[0], noteObj[1], value, logo.keySignature[turtle]);
+                }
+            } else {  // Repeat last pitch played.
+                var noteObj = logo.getNote(logo.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)), 0, logo.keySignature[turtle]);
+            }
+
+            var delta = 0;
+            if (!(logo.invertList[turtle].length === 0)) {
+                var len = logo.invertList[turtle].length;
+                var note1 = logo.getNote(noteObj[0], noteObj[1], 0, logo.keySignature[turtle]);
+                var num1 = getNumber(note1[0], note1[1]);
+                for (var i = len - 1; i > -1; i--) {
+                    var note2 = logo.getNote(logo.invertList[turtle][i][0], logo.invertList[turtle][i][1], 0, logo.keySignature[turtle]);
+                    var num2 = getNumber(note2[0], note2[1]);
+                    // var a = getNumNote(num1, 0);
+                    if (logo.invertList[turtle][i][2] === 'even') {
+                        delta += num2 - num1;
+                    } else {  // odd
+                        delta += num2 - num1 + 0.5;
+                    }
+                    num1 += 2 * delta;
+                }
+            }
+
+            addPitch(noteObj[0], noteObj[1], 0);
+
+            if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
+                for (var i = 0; i < logo.intervals[turtle].length; i++) {
+                    var ii = getInterval(logo.intervals[turtle][i], logo.keySignature[turtle], noteObj[0]);
+                    var noteObj2 = logo.getNote(noteObj[0], noteObj[1], ii, logo.keySignature[turtle]);
+                    addPitch(noteObj2[0], noteObj2[1], 0);
+                }
+            }
+
+            if (turtle in logo.perfect && logo.perfect[turtle].length > 0) {
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcPerfect(last(logo.perfect[turtle])), logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.diminished && logo.diminished[turtle].length > 0) {
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcDiminished(last(logo.diminished[turtle])), logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.augmented && logo.augmented[turtle].length > 0) {
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcAugmented(last(logo.augmented[turtle])), logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.major && logo.major[turtle].length > 0) {
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcMajor(last(logo.major[turtle])), logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.minor && logo.minor[turtle].length > 0) {
+                var noteObj2 = logo.getNote(noteObj[0], noteObj[1], calcMinor(last(logo.minor[turtle])), logo.keySignature[turtle]);
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            if (turtle in logo.transposition) {
+                logo.noteTranspositions[turtle].push(logo.transposition[turtle] + 2 * delta);
+            } else {
+                logo.noteTranspositions[turtle].push(2 * delta);
+            }
+
+            if (turtle in logo.beatFactor) {
+                logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
+            } else {
+                logo.noteBeatValues[turtle].push(1);
+            }
+
+            logo.pushedNote[turtle] = true;
+            break;
+        case 'playdrum':
+            if (args.length !== 1 || args[0] == null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            if (typeof(args[0]) !== 'string') {
+                logo.errorMsg(NANERRORMSG, blk);
+                logo.stopTurtle = true;
+                break;
+            }
+
+            var drumname = 'kick';
+            if (args[0].slice(0, 4) === 'http') {
+                drumname = args[0];
+            } else {
+                for (var drum in DRUMNAMES) {
+                    if (DRUMNAMES[drum][0] === args[0]) {
+                        drumname = DRUMNAMES[drum][1];
+                        break;
+                    } else if (DRUMNAMES[drum][1] === args[0]) {
+                        drumname = args[0];
+                        break;
+                    }
+                }
+            }
+
+            // If we are in a setdrum clamp, override the drum name.
+            if (logo.drumStyle[turtle].length > 0) {
+                drumname = last(logo.drumStyle[turtle]);
+            }
+
+            if (logo.inPitchDrumMatrix) {
+                pitchdrummatrix.drums.push(drumname);
+                pitchdrummatrix.addColBlock(blk);
+                if (logo.drumBlocks.indexOf(blk) === -1) {
+                    logo.drumBlocks.push(blk);
+                }
+            } else if (logo.inMatrix) {
+                pitchtimematrix.rowLabels.push(drumname);
+                pitchtimematrix.rowArgs.push(-1);
+
+                pitchtimematrix.addRowBlock(blk);
+                if (logo.drumBlocks.indexOf(blk) === -1) {
+                    logo.drumBlocks.push(blk);
+                }
+            } else if (logo.inNoteBlock[turtle] > 0) {
+                logo.noteDrums[turtle].push(drumname);
+            } else {
+                logo.errorMsg(_('Drum Block: Did you mean to use a Note block?'), blk);
+                break;
+            }
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             if (turtle in logo.beatFactor) {
                 logo.noteBeatValues[turtle].push(logo.beatFactor[turtle]);
             } else {
@@ -3773,11 +4142,19 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                 var listenerName = '_duplicate_' + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
+<<<<<<< HEAD
 
                 var __listener = function (event) {
                     logo.duplicateFactor[turtle] /= factor;
                 };
 
+=======
+
+                var __listener = function (event) {
+                    logo.duplicateFactor[turtle] /= factor;
+                };
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 logo._setListener(turtle, listenerName, __listener);
             }
             break;
@@ -3838,7 +4215,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
                 var __listener = function (event) {
+<<<<<<< HEAD
                     logo.beatFactor[turtle] *= factor;
+=======
+                    logo.beatFactor[turtle] /= factor;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 };
 
                 logo._setListener(turtle, listenerName, __listener);
@@ -3851,10 +4232,17 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             } else {
                 logo.transposition[turtle] += transValue;
             }
+<<<<<<< HEAD
 
             childFlow = args[1];
             childFlowCount = 1;
 
+=======
+
+            childFlow = args[1];
+            childFlowCount = 1;
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             var listenerName = '_transposition_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
@@ -3901,6 +4289,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
             var listenerName = '_flat_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
+<<<<<<< HEAD
 
             var __listener = function(event) {
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -3949,6 +4338,56 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 childFlow = args[1];
                 childFlowCount = 1;
 
+=======
+
+            var __listener = function(event) {
+                if (!(logo.invertList[turtle].length === 0)) {
+                    logo.transposition[turtle] -= 1;
+                } else {
+                    logo.transposition[turtle] += 1;
+                }
+            };
+
+            logo._setListener(turtle, listenerName, __listener);
+            break;
+        case 'articulation':
+            if (args.length === 2 && typeof(args[0]) === 'number' && args[0] > 0) {
+                var newVolume = last(logo.polyVolume[turtle]) * (100 + args[0]) / 100;
+                if (newVolume > 100) {
+                    console.log('articulated volume exceeds 100%. clipping');
+                    newVolume = 100;
+                }
+                logo.polyVolume[turtle].push(newVolume);
+                logo._setSynthVolume(newVolume, turtle);
+                if (!logo.justCounting[turtle]) {
+                    lilypondBeginArticulation(logo, turtle);
+                }
+
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                var listenerName = '_articulation_' + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function(event) {
+                    logo.polyVolume[turtle].pop();
+                    if (!logo.justCounting[turtle]) {
+                        lilypondEndArticulation(logo, turtle);
+                    }
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            }
+            break;
+        case 'setnotevolume2':
+            if (args.length === 2 && typeof(args[0]) === 'number') {
+                logo.polyVolume[turtle].push(args[0]);
+                logo._setSynthVolume(args[0], turtle);
+
+                childFlow = args[1];
+                childFlowCount = 1;
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
                 var listenerName = '_volume_' + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 

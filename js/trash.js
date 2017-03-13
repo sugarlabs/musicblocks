@@ -23,7 +23,10 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this.stage = stage;
     this.refreshCanvas = refreshCanvas;
     this.size = size;
+<<<<<<< HEAD
     this.scale = 1;
+=======
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     this.isVisible = false;
 
     this.iconsize = 55;  // default value
@@ -37,7 +40,11 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     this._animationLevel = 0;
     this.animationTime = 500;
 
+<<<<<<< HEAD
     this._makeBorderHighlight = function(isActive = false) {
+=======
+    this._makeBorderHighlight = function(isRed = false) {
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         var img = new Image();
         var trash = this;
 
@@ -49,14 +56,20 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
                 trash.container.visible = false;
                 trash._isHighlightInitialized = true;
             } else {
+<<<<<<< HEAD
                trash.container.removeChildAt(trash.container.children.length - 1);
             }
 
+=======
+               trash.container.removeChildAt(trash.container.children.length-1);
+            }
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             trash.container.addChild(trash._borderHighlightBitmap);
             trash._borderHighlightBitmap.visible = true;
         };
 
         var highlightString = 'rgb(' + this._highlightPower + ',' + this._highlightPower + ',' + this._highlightPower + ')';
+<<<<<<< HEAD
         if (isActive) {
 	    // When trash is activated, warn the user with red highlight.
             highlightString = 'rgb(255, 0, 0)';
@@ -65,6 +78,14 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', highlightString))));
     };
 
+=======
+        if (isRed) {
+            highlightString = 'rgb(255, 0, 0)'; // when trash is activated, highlight should be red (warn)
+        }
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', highlightString))));
+    };
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     this._makeBorder = function() {
         var img = new Image();
         var trash = this;
@@ -99,6 +120,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     };
 
     this.resizeEvent = function(scale) {
+<<<<<<< HEAD
         this.scale = scale;
         console.log(scale + ' ' + this.size + ' ' + this.canvas.width.toFixed(2) + ' ' + this.iconsize);
 	console.log('BEFORE: ' + this.container.x);
@@ -106,6 +128,10 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
 	this.container.x = ((this.canvas.width / scale) - TRASHWIDTH) / 2;
 	console.log('AFTER: ' + this.container.x + ' ' + xxx);
         this.container.y = (this.canvas.height / scale) - TRASHHEIGHT;
+=======
+        this.container.x = (this.canvas.width * 1 / scale / 2) - ((TRASHWIDTH / 2) * (this.size / this.iconsize));
+        this.container.y = (this.canvas.height * 1 / scale) - (TRASHHEIGHT * (this.size / this.iconsize));
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
     };
 
     this.stage.addChild(this.container);
@@ -123,6 +149,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
     };
 
     this.startHighlightAnimation = function() {
+<<<<<<< HEAD
         if (this._inAnimation) {
             return;
         }
@@ -140,19 +167,42 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
                 return;
             }
 
+=======
+        if(this._inAnimation)
+            return;
+        this._inAnimation = true;
+        var that = this;
+        this._animationInterval = setInterval(function() {
+            that._animationLevel += 20;
+            if(that._animationLevel >= that.animationTime) {
+                that.isVisible = true;
+                that._makeBorderHighlight(true); // make it red
+                that.refreshCanvas();
+                clearInterval(that._animationInterval); // autostop animation
+                return;
+            }
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
             that._highlightPower = parseInt(255 - (255 * (that._animationLevel / that.animationTime)), 10);
             that._makeBorderHighlight();
             that.refreshCanvas();
         }, 20);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         this._switchHighlightVisibility(true);
     };
 
     this.stopHighlightAnimation = function() {
+<<<<<<< HEAD
         if (!this._inAnimation) {
             return;
         }
 
+=======
+        if(!this._inAnimation)
+            return;
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
         clearInterval(this._animationInterval);
         this._inAnimation = false;
         this.isVisible = false;
@@ -168,6 +218,10 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
         this.container.visible = true;
         this.refreshCanvas();
     };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 66903550bedf84b9e809240168e80ec846e35616
 
     this.overTrashcan = function(x, y) {
         var tx = this.container.x;
