@@ -52,7 +52,6 @@ const MEDIASAFEAREA = [40, 4, 108, 80];
 const HIGHLIGHTCOLOR = '#FFFFFF';
 const ACTIVECOLOR = '#212121';
 
-
 function showMaterialHighlight(x, y, r, event, scale, stage) {
     var circles = {
         highlight: new createjs.Shape(),
@@ -89,6 +88,12 @@ function hideButtonHighlight(circles, stage) {
     }, 650);
 }
 
+function hidePaletteNameDisplay(palette_text, stage){
+    
+    setTimeout(function(){
+        stage.removeChild(palette_text);
+    }, 150);
+}
 
 const MENUWIDTH = 200;
 
