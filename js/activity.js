@@ -153,7 +153,7 @@ define(function (require) {
 
         // Are we running off of a server?
         var server = true;
-        var turlteBlocksScale = 1;
+        var turtleBlocksScale = 1;
         var stage;
         var turtles;
         var palettes;
@@ -272,8 +272,8 @@ define(function (require) {
             palettes.initial_x = 55;
             palettes.initial_y = 55;
             palettes.updatePalettes();
-            var x = 100 * turlteBlocksScale;
-            var y = 100 * turlteBlocksScale;
+            var x = 100 * turtleBlocksScale;
+            var y = 100 * turtleBlocksScale;
             for (var blk in blocks.blockList) {
                 if (!blocks.blockList[blk].trash) {
                     var myBlock = blocks.blockList[blk];
@@ -290,10 +290,10 @@ define(function (require) {
                                 }
                             }
                         }
-                        x += 200 * turlteBlocksScale;
-                        if (x > (canvas.width - 100) / (turlteBlocksScale)) {
-                            x = 100 * turlteBlocksScale;
-                            y += 100 * turlteBlocksScale;
+                        x += 200 * turtleBlocksScale;
+                        if (x > (canvas.width - 100) / (turtleBlocksScale)) {
+                            x = 100 * turtleBlocksScale;
+                            y += 100 * turtleBlocksScale;
                         }
                     }
                 }
@@ -512,7 +512,7 @@ define(function (require) {
 
         function closeAnalytics(chartBitmap, ctx) {
             var button = this;
-            button.x = (canvas.width / (2 * turlteBlocksScale))  + (300 / Math.sqrt(2));
+            button.x = (canvas.width / (2 * turtleBlocksScale))  + (300 / Math.sqrt(2));
             button.y = 300.00 - (300.00 / Math.sqrt(2));
             this.closeButton = _makeButton('cancel-button', _('Close'), button.x, button.y, 55, 0);
             this.closeButton.on('click', function(event) {
@@ -554,7 +554,7 @@ define(function (require) {
                 img.onload = function () {
                     var chartBitmap = new createjs.Bitmap(img);
                     stage.addChild(chartBitmap);
-                    chartBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (300);
+                    chartBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (300);
                     chartBitmap.y = 0;
                     chartBitmap.scaleX = chartBitmap.scaleY = chartBitmap.scale = 600 / chartBitmap.image.width;
                     logo.hideBlocks();
@@ -948,7 +948,7 @@ define(function (require) {
                 palettes.menuScrollEvent(delta, scrollSpeed);
                 palettes.hidePaletteIconCircles();
             } else {
-                palette = palettes.findPalette(event.clientX / turlteBlocksScale, event.clientY / turlteBlocksScale);
+                palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
                 if (palette) {
                     palette.scrollEvent(delta, scrollSpeed);
                 }
@@ -956,15 +956,15 @@ define(function (require) {
         };
 
         function getStageScale() {
-            return turlteBlocksScale;
+            return turtleBlocksScale;
         };
 
         function getStageX() {
-            return turtles.screenX2turtleX(stageX / turlteBlocksScale);
+            return turtles.screenX2turtleX(stageX / turtleBlocksScale);
         };
 
         function getStageY() {
-            return turtles.screenY2turtleY(stageY / turlteBlocksScale);
+            return turtles.screenY2turtleY(stageY / turtleBlocksScale);
         };
 
         function getStageMouseDown() {
@@ -1254,45 +1254,45 @@ define(function (require) {
             if (smallSide < cellSize * 11) {
                 var mobileSize = true;
                 if (w < cellSize * 10) {
-                    turlteBlocksScale = smallSide / (cellSize * 11);
+                    turtleBlocksScale = smallSide / (cellSize * 11);
                 } else {
-                    turlteBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
+                    turtleBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
                 }
             } else {
                 var mobileSize = false;
                 if (w / 1200 > h / 900) {
-                    turlteBlocksScale = w / 1200;
+                    turtleBlocksScale = w / 1200;
                 } else {
-                    turlteBlocksScale = h / 900;
+                    turtleBlocksScale = h / 900;
                 }
             }
 
-            stage.scaleX = turlteBlocksScale;
-            stage.scaleY = turlteBlocksScale;
+            stage.scaleX = turtleBlocksScale;
+            stage.scaleY = turtleBlocksScale;
 
             stage.canvas.width = w;
             stage.canvas.height = h;
 
-            console.log('Resize: scale ' + turlteBlocksScale +
+            console.log('Resize: scale ' + turtleBlocksScale +
             ', windowW ' + w + ', windowH ' + h +
             ', canvasW ' + canvas.width + ', canvasH ' + canvas.height +
             ', screenW ' + screen.width + ', screenH ' + screen.height);
 
-            turtles.setScale(turlteBlocksScale);
-            blocks.setScale(turlteBlocksScale);
-            boundary.setScale(w, h, turlteBlocksScale);
-            palettes.setScale(turlteBlocksScale);
-            trashcan.resizeEvent(turlteBlocksScale);
+            turtles.setScale(turtleBlocksScale);
+            blocks.setScale(turtleBlocksScale);
+            boundary.setScale(w, h, turtleBlocksScale);
+            palettes.setScale(turtleBlocksScale);
+            trashcan.resizeEvent(turtleBlocksScale);
             _setupAndroidToolbar(mobileSize);
 
             // Reposition coordinate grids.
-            cartesianBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (600);
-            cartesianBitmap.y = (canvas.height / (2 * turlteBlocksScale)) - (450);
-            polarBitmap.x = (canvas.width / (2 * turlteBlocksScale)) - (600);
-            polarBitmap.y = (canvas.height / (2 * turlteBlocksScale)) - (450);
+            cartesianBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (600);
+            cartesianBitmap.y = (canvas.height / (2 * turtleBlocksScale)) - (450);
+            polarBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (600);
+            polarBitmap.y = (canvas.height / (2 * turtleBlocksScale)) - (450);
             update = true;
 
-            // Setup help now that we have calculated turlteBlocksScale.
+            // Setup help now that we have calculated turtleBlocksScale.
             _showHelp(true);
 
             // Hide palette icons on mobile
@@ -1418,7 +1418,8 @@ define(function (require) {
 
                     var actionName = actionArg.value;
                     if (actionName !== _('action')) {
-                        blocks.checkPaletteEntries('action');
+                        // blocks.checkPaletteEntries('action');
+                        console.log('FIXME: Check for unique action name here');
                     }
                 }
             }
@@ -1427,11 +1428,11 @@ define(function (require) {
         };
 
         function _deleteBlocksBox() {
-            clearBox.show(turlteBlocksScale);
+            clearBox.show(turtleBlocksScale);
         };
 
         function _doUtilityBox() {
-            utilityBox.init(turlteBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
+            utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
         };
 
         function sendAllToTrash(addStartBlock, doNotSave) {
@@ -2202,7 +2203,7 @@ handleComplete);
             }
 
             headerContainer = new createjs.Shape();
-            headerContainer.graphics.f(platformColor.header).r(0, 0, screen.width / turlteBlocksScale, cellSize);
+            headerContainer.graphics.f(platformColor.header).r(0, 0, screen.width / turtleBlocksScale, cellSize);
 
             if (platformColor.doHeaderShadow) {
                 headerContainer.shadow = new createjs.Shadow('#777', 0, 2, 2);
@@ -2277,10 +2278,10 @@ handleComplete);
                 y += dy;
             }
 
-            _setupRightMenu(turlteBlocksScale);
+            _setupRightMenu(turtleBlocksScale);
         };
 
-        function _setupRightMenu(turlteBlocksScale) {
+        function _setupRightMenu(turtleBlocksScale) {
             if (menuContainer !== undefined) {
                 stage.removeChild(menuContainer);
                 for (var i in onscreenMenu) {
@@ -2308,7 +2309,7 @@ handleComplete);
             });
 
             var btnSize = cellSize;
-            var x = Math.floor(canvas.width / turlteBlocksScale) - btnSize / 2;
+            var x = Math.floor(canvas.width / turtleBlocksScale) - btnSize / 2;
             var y = Math.floor(btnSize / 2);
 
             var dx = 0;
@@ -2366,7 +2367,7 @@ handleComplete);
                             if (helpIdx >= HELPCONTENT.length) {
                                 helpIdx = 0;
                             }
-                            var imageScale = 55 * turlteBlocksScale;
+                            var imageScale = 55 * turtleBlocksScale;
                             helpElem.innerHTML = '<img src ="' + HELPCONTENT[helpIdx][2] + '" style="height:' + imageScale + 'px; width: auto"></img> <h2>' + HELPCONTENT[helpIdx][0] + '</h2><p>' + HELPCONTENT[helpIdx][1] + '</p>';
                         }
                         update = true;
@@ -2374,11 +2375,11 @@ handleComplete);
 
                     var img = new Image();
                     img.onload = function () {
-                        console.log(turlteBlocksScale);
+                        console.log(turtleBlocksScale);
                         var bitmap = new createjs.Bitmap(img);
                         /*
-                        if (turlteBlocksScale > 1) {
-                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = turlteBlocksScale;
+                        if (turtleBlocksScale > 1) {
+                            bitmap.scaleX = bitmap.scaleY = bitmap.scale = turtleBlocksScale;
                         } else {
                             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1.125;
                         }
@@ -2409,23 +2410,23 @@ handleComplete);
                 var helpElem = docById('helpElem');
                 helpElem.style.position = 'absolute';
                 helpElem.style.display = 'block';
-                helpElem.style.paddingLeft = 20 * turlteBlocksScale + 'px';
-                helpElem.style.paddingRight = 20 * turlteBlocksScale + 'px';
+                helpElem.style.paddingLeft = 20 * turtleBlocksScale + 'px';
+                helpElem.style.paddingRight = 20 * turtleBlocksScale + 'px';
                 helpElem.style.paddingTop = '0px';
-                helpElem.style.paddingBottom = 20 * turlteBlocksScale + 'px';
-                helpElem.style.fontSize = 20 + 'px'; //  * turlteBlocksScale + 'px';
+                helpElem.style.paddingBottom = 20 * turtleBlocksScale + 'px';
+                helpElem.style.fontSize = 20 + 'px'; //  * turtleBlocksScale + 'px';
                 helpElem.style.color = '#000000';  // '#ffffff';
-                helpElem.style.left = 65 * turlteBlocksScale + 'px';
-                helpElem.style.top = 105 * turlteBlocksScale + 'px';
-                var w = Math.min(300, 300); //  * turlteBlocksScale);
-                var h = Math.min(300, 300); //  * turlteBlocksScale);
+                helpElem.style.left = 65 * turtleBlocksScale + 'px';
+                helpElem.style.top = 105 * turtleBlocksScale + 'px';
+                var w = Math.min(300, 300); //  * turtleBlocksScale);
+                var h = Math.min(300, 300); //  * turtleBlocksScale);
                 helpElem.style.width = w + 'px';
                 helpElem.style.height = h + 'px';
 
-                if (turlteBlocksScale > 1) {
+                if (turtleBlocksScale > 1) {
                     var bitmap = helpContainer.children[0];
                     if (bitmap != undefined) {
-                        // bitmap.scaleX = bitmap.scaleY = bitmap.scale = turlteBlocksScale;
+                        // bitmap.scaleX = bitmap.scaleY = bitmap.scale = turtleBlocksScale;
                     }
                 }
 
@@ -2609,8 +2610,8 @@ handleComplete);
             container.on('mousedown', function (event) {
                 var moved = true;
                 var offset = {
-                    x: container.x - Math.round(event.stageX / turlteBlocksScale),
-                    y: container.y - Math.round(event.stageY / turlteBlocksScale)
+                    x: container.x - Math.round(event.stageX / turtleBlocksScale),
+                    y: container.y - Math.round(event.stageY / turtleBlocksScale)
                 };
 
                 pressTimer = setTimeout(function() {
@@ -2629,7 +2630,7 @@ handleComplete);
                     }
                 }, 1000);
 
-                var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turlteBlocksScale, stage);
+                var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
 
                 container.on('pressup', function (event) {
                     hideButtonHighlight(circles, stage);
