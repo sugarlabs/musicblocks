@@ -69,6 +69,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.upIndicator = null;
     this.downIndicator = null;
     this.circles = {};
+    this.palette_text = new createjs.Text("", "20px Arial", "#ff7700");
     this.mouseOver = false;
     this.activePalette = null;
     
@@ -163,6 +164,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
      
     this.hidePaletteIconCircles = function(){
+        hidePaletteNameDisplay(palette_text, palettes.stage);
         hideButtonHighlight(circles, this.stage);
     };
 
@@ -443,15 +445,25 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             circles = showButtonHighlight(
                 palettes.buttons[name].x + r, palettes.buttons[name].y + r, r,
                 event, palettes.scale, palettes.stage);
+            
+            /*add tooltip for palette buttons*/
+            console.log("r: " + r);
+            palette_text = new createjs.Text(name, "20px Arial", "black");    
+            palette_text.x = palettes.buttons[name].x + (2.2)*r;
+            palette_text.y = palettes.buttons[name].y + (5*r/8);
+            palettes.stage.addChild(palette_text); 
+
         });
 
         this.buttons[name].on('pressup', function(event) {
             palettes.mouseOver = false;
+            hidePaletteNameDisplay(palette_text, palettes.stage);
             hideButtonHighlight(circles, palettes.stage);
         });
 
         this.buttons[name].on('mouseout', function(event) {
             palettes.mouseOver = false;
+            hidePaletteNameDisplay(palette_text, palettes.stage);
             hideButtonHighlight(circles, palettes.stage);
         });
 
