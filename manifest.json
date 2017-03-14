@@ -1,0 +1,14 @@
+{
+  "name": "TurtleJS",
+  "description": "Learn to program with snap-together blocks!",
+  "launch_path": "/index.html",
+  "icons": {
+    "512": "/activity/activity-icon-color-512.png",
+    "128": "/activity/activity-icon-color-128.png"
+  },
+  "developer": {
+    "name": "Sugarlabs",
+    "url": "https://sugarlabs.org"
+  },
+  "default_locale": "en"
+}
