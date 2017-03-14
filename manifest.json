@@ -1,18 +1,22 @@
 {
-    "name": "TurtleJS",
+    "name": "MusicBlocks",
     "version": "1.1",
     "manifest_version": 2,
-    "description": "Learn to program with snap-together blocks!",
-    "launch_path": "/index.html",
-    "browser_action": {
-	"default_icon": "/images/planetgraphic.png"
-    },
+    "author": "Sugar Labs",
+    "description": "Learn to program music with snap-together blocks.",
     "icons": {
 	"512": "/activity/activity-icon-color-512.png",
 	"128": "/activity/activity-icon-color-128.png"
     },
-    "developer": {
-	"name": "Sugarlabs",
-	"url": "https://sugarlabs.org"
-    }
+    "app": {
+	"background": {
+	    "scripts": ["js/launch.js"]
+	}
+    },
+    "permissions": [
+	"storage",
+	"unlimitedStorage",
+	"audioCapture",
+	"videoCapture"
+    ]
 }
