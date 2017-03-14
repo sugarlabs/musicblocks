@@ -942,7 +942,7 @@ define(function (require) {
         function scrollEvent(event) {
             var data = event.wheelDelta || -event.detail;
             var delta = Math.max(-1, Math.min(1, (data)));
-            var scrollSpeed = 3;
+            var scrollSpeed = 30;
 
             if (event.clientX < cellSize) {
                 palettes.menuScrollEvent(delta, scrollSpeed);
