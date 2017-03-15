@@ -183,6 +183,11 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             bitmap.y = 55;
             bitmap.visible = false;
             palettes.upIndicator = bitmap;
+		
+	    palettes.upIndicator.on('click', function(event) {
+                palettes.menuScrollEvent(1, 30);
+                palettes.hidePaletteIconCircles();
+            });
         };
 
         function __processDownIcon(palettes, name, bitmap, args) {
@@ -192,6 +197,11 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             bitmap.y = (windowHeight() * canvasPixelRatio()) / palettes.scale - 27;
             bitmap.visible = true;
             palettes.downIndicator = bitmap;
+		
+	    palettes.downIndicator.on('click', function(event) {
+                palettes.menuScrollEvent(-1, 30);
+                palettes.hidePaletteIconCircles();
+            });
         };
 
         if (this.upIndicator == null && this.firstTime) {
