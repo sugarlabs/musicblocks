@@ -100,11 +100,7 @@ function Trashcan (canvas, stage, size, refreshCanvas) {
 
     this.resizeEvent = function(scale) {
         this.scale = scale;
-        console.log(scale + ' ' + this.size + ' ' + this.canvas.width.toFixed(2) + ' ' + this.iconsize);
-	console.log('BEFORE: ' + this.container.x);
-        var xxx = ((this.canvas.width / scale) - TRASHWIDTH) / 2;
 	this.container.x = ((this.canvas.width / scale) - TRASHWIDTH) / 2;
-	console.log('AFTER: ' + this.container.x + ' ' + xxx);
         this.container.y = (this.canvas.height / scale) - TRASHHEIGHT;
     };
 
