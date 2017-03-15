@@ -67,7 +67,9 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.firstTime = true;
     this.background = null;
     this.upIndicator = null;
+    this.upIndicatorStatus = false;
     this.downIndicator = null;
+    this.downIndicatorStatus = false;
     this.circles = {};
     this.mouseOver = false;
     this.activePalette = null;
@@ -112,7 +114,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         }
 
         if (this.downIndicator != null) {
-            this.downIndicator.y = (windowHeight() * canvasPixelRatio()) / this.scale - 27;
+            this.downIndicator.y = (windowHeight() * canvasPixelRatio()) / this.scale - 137;
         }
     };
 
@@ -127,18 +129,22 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         var diff = direction * scrollSpeed;
         if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
             this.upIndicator.visible = false;
+            this.upIndicatorStatus = this.upIndicator.visible;
             this.refreshCanvas();
             return;
         } else {
+            this.upIndicatorStatus = this.upIndicator.visible;
             this.upIndicator.visible = true;
         }
 
         if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
             this.downIndicator.visible = false;
+            this.downIndicatorStatus = this.downIndicator.visible;
             this.refreshCanvas();
             return;
         } else {
             this.downIndicator.visible = true;
+            this.downIndicatorStatus = this.downIndicator.visible;
         }
 
         this.scrollDiff += diff;
@@ -163,7 +169,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
      
     this.hidePaletteIconCircles = function(){
-        hideButtonHighlight(circles, this.stage);
+        hideButtonHighlight(this.circles, this.stage);
     };
 
     this.makePalettes = function(hide) {
@@ -194,8 +200,9 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
             palettes.stage.addChild(bitmap);
             bitmap.x = 55;
-            bitmap.y = (windowHeight() * canvasPixelRatio()) / palettes.scale - 27;
-            bitmap.visible = true;
+            bitmap.y = (windowHeight() * canvasPixelRatio()) / palettes.scale - 137;
+
+	    bitmap.visible = true;
             palettes.downIndicator = bitmap;
 		
 	    palettes.downIndicator.on('click', function(event) {
@@ -283,12 +290,17 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             this.buttons[name].visible = true;
         }
 
-        for (var name in this.dict) {
-            // this.dict[name].showMenu(true);
-        }
-
         if (this.background != null) {
             this.background.visible = true;
+	}
+
+        // If the palette indicators were visible, restore them.
+        if (this.upIndicatorStatus) {
+            this.upIndicator.visible = true;
+        }
+
+        if (this.downIndicatorStatus) {
+            this.downIndicator.visible = true;
 	}
 
         this.refreshCanvas();
@@ -326,10 +338,8 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             setTimeout(function() {
                 myPalettes.dict[showPalette]._resetLayout();
                 // Show the action palette after adding/deleting new nameddo blocks.
-                // if (showPalette === 'action') {
                 myPalettes.dict[showPalette].showMenu();
                 myPalettes.dict[showPalette]._showMenuItems();
-                // }
                 myPalettes.refreshCanvas();
             }, 100);
         } else {
@@ -427,6 +437,8 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         var locked = false;
         var scrolling = false;
 
+        var that = this;
+
         this.buttons[name].on('mousedown', function(event) {
             scrolling = true;
             var lastY = event.stageY;
@@ -450,19 +462,17 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         this.buttons[name].on('mouseover', function(event) {
             palettes.mouseOver = true;
             var r = palettes.cellSize / 2;
-            circles = showButtonHighlight(
-                palettes.buttons[name].x + r, palettes.buttons[name].y + r, r,
-                event, palettes.scale, palettes.stage);
+            that.circles = showButtonHighlight(palettes.buttons[name].x + r, palettes.buttons[name].y + r, r, event, palettes.scale, palettes.stage);
         });
 
         this.buttons[name].on('pressup', function(event) {
             palettes.mouseOver = false;
-            hideButtonHighlight(circles, palettes.stage);
+            hideButtonHighlight(that.circles, palettes.stage);
         });
 
         this.buttons[name].on('mouseout', function(event) {
             palettes.mouseOver = false;
-            hideButtonHighlight(circles, palettes.stage);
+            hideButtonHighlight(that.circles, palettes.stage);
         });
 
         this.buttons[name].on('click', function(event) {
@@ -754,8 +764,7 @@ function PopdownPalette(palettes) {
         var html = '<div class="back"><h2>' + _('back') + '</h2></div>';
         for (var name in this.models) {
             html += '<div class="palette">';
-            var icon = PALETTEICONS[name]
-                .replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
+            var icon = PALETTEICONS[name].replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
             //.TRANS: popout: to detach as a separate window
             html += format('<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
@@ -789,8 +798,7 @@ function PopdownPalette(palettes) {
         }
         document.querySelector('#popdown-palette').innerHTML = html;
 
-        document.querySelector('#popdown-palette .back')
-                .addEventListener('click', function () {
+        document.querySelector('#popdown-palette .back').addEventListener('click', function () {
             me.popup();
         });
 
@@ -804,8 +812,7 @@ function PopdownPalette(palettes) {
                 }
             });
 
-            d.querySelector('.popout-button')
-             .addEventListener('click', function () {
+            d.querySelector('.popout-button').addEventListener('click', function () {
                 me.popup();
                 me.palettes.showPalette(d.querySelector('h2').dataset.name);
             });
