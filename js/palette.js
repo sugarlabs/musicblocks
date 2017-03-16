@@ -152,6 +152,22 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         this.refreshCanvas();
     };
 
+
+    this.setNavButtonsVisibility = function() {
+        var keys = Object.keys(this.buttons);
+	    
+        this.downIndicator.visible = false;
+        this.upIndicator.visible = true;
+
+        if (this.buttons[keys[0]].y >= this.cellSize ) {
+            this.upIndicator.visible = false;
+        }
+
+        if (this.buttons[last(keys)].y > (windowHeight() / this.scale - this.halfCellSize) ) {
+            this.downIndicator.visible = true;
+        }
+    };
+	
     this._updateButtonMasks = function() {
         for (var name in this.buttons) {
             var s = new createjs.Shape();
