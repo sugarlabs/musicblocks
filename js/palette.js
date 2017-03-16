@@ -112,7 +112,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         }
 
         if (this.downIndicator != null) {
-            this.downIndicator.y = (windowHeight() * canvasPixelRatio()) / this.scale - 27;
+            this.downIndicator.y = windowHeight()/scale - 27;
         }
     };
 
@@ -185,7 +185,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             palettes.upIndicator = bitmap;
 		
 	    palettes.upIndicator.on('click', function(event) {
-                palettes.menuScrollEvent(1, 30);
+                palettes.menuScrollEvent(1, 40);
                 palettes.hidePaletteIconCircles();
             });
         };
@@ -194,12 +194,12 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
             palettes.stage.addChild(bitmap);
             bitmap.x = 55;
-            bitmap.y = (windowHeight() * canvasPixelRatio()) / palettes.scale - 27;
+            bitmap.y = windowHeight() / palettes.scale - 27;
             bitmap.visible = true;
             palettes.downIndicator = bitmap;
 		
 	    palettes.downIndicator.on('click', function(event) {
-                palettes.menuScrollEvent(-1, 30);
+                palettes.menuScrollEvent(-1, 40);
                 palettes.hidePaletteIconCircles();
             });
         };
