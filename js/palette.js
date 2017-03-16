@@ -114,7 +114,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         }
 
         if (this.downIndicator != null) {
-            this.downIndicator.y = windowHeight()/scale - 27;
+            this.downIndicator.y = windowHeight() / scale - 27;
         }
     };
 
