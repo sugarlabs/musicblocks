@@ -1486,6 +1486,7 @@ define(function (require) {
             } else {
                 palettes.show();
                 palettes.bringToTop();
+                palettes.setNavButtonsVisibility();
             }
         };
 
