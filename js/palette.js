@@ -257,6 +257,12 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 this.y += this.cellSize;
 
                 makePaletteBitmap(this, PALETTEICONS[name], name, __processButtonIcon, null);
+
+                var text = new createjs.Text(toTitleCase(_(name)), '14px Sans', '#282828');
+                text.textAlign = 'left';
+                text.x = this.cellSize;
+                text.visible = false;
+                this.buttons[name].addChild(text.clone());
             }
         }
     };
@@ -463,7 +469,18 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             palettes.mouseOver = true;
             var r = palettes.cellSize / 2;
             that.circles = showButtonHighlight(palettes.buttons[name].x + r, palettes.buttons[name].y + r, r, event, palettes.scale, palettes.stage);
-        });
+        
+	    //show tool tip
+            for (var c = 0; c < this.children.length; c++){
+                if (this.children[c].text != undefined){
+                    var newText = this.children[c].clone();
+                    newText.visible = true;
+                    newText.y = event.target.y + r;
+                    palettes.stage.addChildAt(newText, palettes.stage.getNumChildren());
+                    break;
+                }
+            }
+	});
 
         this.buttons[name].on('pressup', function(event) {
             palettes.mouseOver = false;
@@ -473,6 +490,18 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         this.buttons[name].on('mouseout', function(event) {
             palettes.mouseOver = false;
             hideButtonHighlight(that.circles, palettes.stage);
+
+            //remove tool tip
+            for(var i=0; i < this.children.length; i++){
+                if (this.children[i].text != undefined){
+                    for (var c = palettes.stage.children.length - 1; c > -1; c--){
+                        if (palettes.stage.children[c].text != undefined && this.children[i].text == palettes.stage.children[c].text){
+                            palettes.stage.removeChildAt(c);
+                            break;
+                        }
+                    }
+                }
+            }
         });
 
         this.buttons[name].on('click', function(event) {
