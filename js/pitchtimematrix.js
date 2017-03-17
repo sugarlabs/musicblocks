@@ -124,12 +124,12 @@ function Matrix() {
         ptmDiv.style.left = '200px';
         ptmDiv.style.top = '150px';
 
-        // The widget buttons
-        var widgetButtonsDiv = docById('ptmButtonsDiv');
-        widgetButtonsDiv.style.display = 'inline';
-        widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="ptmButtonTable"></table>';
+        // The ptm buttons
+        var ptmButtonsDiv = docById('ptmButtonsDiv');
+        ptmButtonsDiv.style.display = 'inline';
+        ptmButtonsDiv.style.visibility = 'visible';
+        ptmButtonsDiv.style.width = BUTTONDIVWIDTH;
+        ptmButtonsDiv.innerHTML = '<table cellpadding="0px" id="ptmButtonTable"></table>';
 
         var buttonTable = docById('ptmButtonTable');
         var header = buttonTable.createTHead();
@@ -376,7 +376,7 @@ function Matrix() {
         var ptmTableRow = ptmTable.insertRow();
         var ptmCell = ptmTableRow.insertCell();
         ptmCell.className = 'headcol';  // This cell is fixed horizontally.
-        ptmCell.innerHTML = '<table cellpadding="0px"><tr></tr><td id="ptmTupletNoteLabel"></td><tr><td id="ptmTupletValueLabel"></td></tr><tr><td id="ptmNoteValueLabel"></td></tr></table>';
+        ptmCell.innerHTML = '<table cellpadding="0px"><tr><td id="ptmTupletNoteLabel"></td></tr><tr><td id="ptmTupletValueLabel"></td></tr><tr><td id="ptmNoteValueLabel"></td></tr></table>';
 
         var labelCell = docById('ptmNoteValueLabel');
         labelCell.innerHTML = _('note value');
