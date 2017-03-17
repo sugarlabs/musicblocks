@@ -71,6 +71,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.downIndicator = null;
     this.downIndicatorStatus = false;
     this.circles = {};
+    this.palette_text = new createjs.Text("", "20px Arial", "#ff7700");
     this.mouseOver = false;
     this.activePalette = null;
     
@@ -169,6 +170,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
      
     this.hidePaletteIconCircles = function(){
+        hidePaletteNameDisplay(palette_text, palettes.stage);
         hideButtonHighlight(this.circles, this.stage);
     };
 
@@ -462,17 +464,29 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         this.buttons[name].on('mouseover', function(event) {
             palettes.mouseOver = true;
             var r = palettes.cellSize / 2;
-            that.circles = showButtonHighlight(palettes.buttons[name].x + r, palettes.buttons[name].y + r, r, event, palettes.scale, palettes.stage);
+            circles = showButtonHighlight(
+                palettes.buttons[name].x + r, palettes.buttons[name].y + r, r,
+                event, palettes.scale, palettes.stage);
+            
+            /*add tooltip for palette buttons*/
+            console.log("r: " + r);
+            palette_text = new createjs.Text(_(name), "20px Arial", "black");   
+            palette_text.x = palettes.buttons[name].x + (2.2)*r;
+            palette_text.y = palettes.buttons[name].y + (5*r/8);
+            palettes.stage.addChild(palette_text); 
+
         });
 
         this.buttons[name].on('pressup', function(event) {
             palettes.mouseOver = false;
-            hideButtonHighlight(that.circles, palettes.stage);
+            hidePaletteNameDisplay(palette_text, palettes.stage);
+            hideButtonHighlight(circles, palettes.stage);
         });
 
         this.buttons[name].on('mouseout', function(event) {
             palettes.mouseOver = false;
-            hideButtonHighlight(that.circles, palettes.stage);
+            hidePaletteNameDisplay(palette_text, palettes.stage);
+            hideButtonHighlight(circles, palettes.stage);
         });
 
         this.buttons[name].on('click', function(event) {

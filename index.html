@@ -143,12 +143,12 @@
                 $(window).resize(resizeFixed);
                 $(window).scroll(scrollFixed);
                 init();
-	    });
+      });
         };
       })(jQuery);
 
       $(document).ready(function() {
-	$("solfa").fixMe();
+  $("solfa").fixMe();
         $(".up").click(function() {
             $('html, body').animate({
                 scrollTop: 0
@@ -195,30 +195,30 @@
     <!--hidden at the beginning whilst everything loads-->
     <div id="hideContents" style="display: none;">
       <div class="canvasHolder" id="canvasHolder">
-	<canvas id="myCanvas" width="1200" height="900">
-	</canvas>
+  <canvas id="myCanvas" width="1200" height="900">
+  </canvas>
 
-	<canvas id="overlayCanvas" width="1200" height="900" style="position:absolute;pointer-events:none;left:0;top:0;z-index:-100;visibility:hidden;">
-	</canvas>
+  <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute;pointer-events:none;left:0;top:0;z-index:-100;visibility:hidden;">
+  </canvas>
 
-	<canvas id="myChart" width="600" height="600">
-	</canvas>
+  <canvas id="myChart" width="600" height="600">
+  </canvas>
 
-	<video id="camVideo" style="visibility:hidden;">
-	</video>
+  <video id="camVideo" style="visibility:hidden;">
+  </video>
 
-	<canvas id="camCanvas" style="visibility:hidden;">
-	</canvas>
+  <canvas id="camCanvas" style="visibility:hidden;">
+  </canvas>
 
-	<div id="labelDiv">
-	</div>
+  <div id="labelDiv">
+  </div>
 
-	<div id="ioDiv">
+  <div id="ioDiv">
           <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*"></input>
           <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb"></input>
           <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json"></input>
           <input tabindex="-1" class="file" type="file" id="myOpenAll"></input>
-	</div>
+  </div>
       </div>
 
       <div id="audio">
@@ -240,67 +240,67 @@
       </div>
 
       <div class="planet" style="display: none;">
-	<nav>
-	  <div class="nav-container">
+  <nav>
+    <div class="nav-container">
             <img src="header-icons/planet-button.svg" class="logo" />
             <h1 id="planetTitle"></h1>
             <ul>
-	      <li class="back"><img src="header-icons/cancel-button.svg" /></li>
-	      <li class="new"><img src="header-icons/add.svg" /></li>
-	      <li class="open"><img src="header-icons/folder-open.svg" /></li>
+        <li class="back"><img src="header-icons/cancel-button.svg" /></li>
+        <li class="new"><img src="header-icons/add.svg" /></li>
+        <li class="open"><img src="header-icons/folder-open.svg" /></li>
             </ul>
-	  </div>
-	</nav>
+    </div>
+  </nav>
 
-	<div class="nav-spacer">
-	</div>
+  <div class="nav-spacer">
+  </div>
 
-	<div class="planet-content">
-	  <h2 id="planetMyDevice"></h2>
-	  <ul class="content l"></ul>
-	  <h2 id="planetWorldwide"></h2>
-	  <ul class="content w"></ul>
-	</div>
+  <div class="planet-content">
+    <h2 id="planetMyDevice"></h2>
+    <ul class="content l"></ul>
+    <h2 id="planetWorldwide"></h2>
+    <ul class="content w"></ul>
+  </div>
       </div>
 
       <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)">
       </div>
 
       <div id="ptmDiv" draggable="false">
-	<div id="ptmButtonsDiv">
-	</div>
+  <div id="ptmButtonsDiv">
+  </div>
 
-	<div id="ptmTableDiv">
-	</div>
+  <div id="ptmTableDiv">
+  </div>
       </div>
 
       <div id="pscDiv" draggable="false">
-	<div id="pscButtonsDiv">
-	</div>
+  <div id="pscButtonsDiv">
+  </div>
 
-	<div id="pscTableDiv">
-	</div>
+  <div id="pscTableDiv">
+  </div>
       </div>
 
       <div id="tempoDiv" draggable="false">
-	<div id="tempoButtonsDiv">
-	</div>
+  <div id="tempoButtonsDiv">
+  </div>
       </div>
 
       <div id="rulerDiv" draggable="false">
-	<div id="rulerButtonsDiv">
-	</div>
+  <div id="rulerButtonsDiv">
+  </div>
 
-	<div id="rulerTableDiv">
-	</div>
+  <div id="rulerTableDiv">
+  </div>
       </div>
 
       <div id="sliderDiv" draggable="false">
-	<div id="sliderButtonsDiv">
-	</div>
+  <div id="sliderButtonsDiv">
+  </div>
 
-	<div id="sliderTableDiv">
-	</div>
+  <div id="sliderTableDiv">
+  </div>
       </div>
 
       <div id="pitchSliderDiv" style="visibility:hidden">

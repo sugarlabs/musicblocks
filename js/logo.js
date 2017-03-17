@@ -4343,7 +4343,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 } else if (logo.unhightlightQueue[turtle].length > 0) {
                     // The child flow is finally complete, so unhighlight.
                     setTimeout(function() {
-			logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
+            logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
                     }, logo.turtleDelay);
                 }
             }
@@ -5392,7 +5392,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             case 'bpmfactor':
                 if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
                     logo.statusFields.push([blk, 'bpm']);
-		} else if (logo.bpm[turtle].length > 0) {
+        } else if (logo.bpm[turtle].length > 0) {
                     logo.blocks.blockList[blk].value = last(logo.bpm[turtle]);
                 } else {
                     logo.blocks.blockList[blk].value = logo._masterBPM;

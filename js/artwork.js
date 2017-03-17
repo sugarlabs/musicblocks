@@ -89,6 +89,12 @@ function hideButtonHighlight(circles, stage) {
     }, 650);
 }
 
+function hidePaletteNameDisplay(palette_text, stage){
+    
+    setTimeout(function(){
+        stage.removeChild(palette_text);
+    }, 150);
+}
 
 const MENUWIDTH = 200;
 
