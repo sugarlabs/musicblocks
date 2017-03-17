@@ -1,0 +1,22 @@
+{
+    "name": "MusicBlocks",
+    "version": "1.1",
+    "manifest_version": 2,
+    "author": "Sugar Labs",
+    "description": "Learn to program music with snap-together blocks.",
+    "icons": {
+	"512": "/activity/activity-icon-color-512.png",
+	"128": "/activity/activity-icon-color-128.png"
+    },
+    "app": {
+	"background": {
+	    "scripts": ["js/launch.js"]
+	}
+    },
+    "permissions": [
+	"storage",
+	"unlimitedStorage",
+	"audioCapture",
+	"videoCapture"
+    ]
+}
