@@ -470,7 +470,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             
             /*add tooltip for palette buttons*/
             console.log("r: " + r);
-            palette_text = new createjs.Text(name, "20px Arial", "black");    
+            palette_text = new createjs.Text(_(name), "20px Arial", "black");   
             palette_text.x = palettes.buttons[name].x + (2.2)*r;
             palette_text.y = palettes.buttons[name].y + (5*r/8);
             palettes.stage.addChild(palette_text); 
