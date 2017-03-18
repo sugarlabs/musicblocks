@@ -258,7 +258,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         for (var turtle in this.stepQueue) {
             if (this.stepQueue[turtle].length > 0) {
                 if (turtle in this.unhighlightStepQueue && this.unhighlightStepQueue[turtle] != null) {
-                    this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
+                    if (this.blocks.visible) {
+                        this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
+                    }
                     this.unhighlightStepQueue[turtle] = null;
                 }
                 var blk = this.stepQueue[turtle].pop();
@@ -286,7 +288,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
                 if (logo.stepQueue[turtle].length > 0) {
                     if (turtle in logo.unhighlightStepQueue && logo.unhighlightStepQueue[turtle] != null) {
-                        logo.blocks.unhighlight(logo.unhighlightStepQueue[turtle]);
+                        if (logo.blocks.visible) {
+                            logo.blocks.unhighlight(logo.unhighlightStepQueue[turtle]);
+                        }
                         logo.unhighlightStepQueue[turtle] = null;
                     }
                     var blk = logo.stepQueue[turtle].pop();
@@ -1038,7 +1042,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         var childFlowCount = 0;
         var actionArgs = [];
 
-        logo.blocks.highlight(blk, false);
+        if (logo.blocks.visible) {
+            logo.blocks.highlight(blk, false);
+        }
 
         switch (logo.blocks.blockList[blk].name) {
         case 'dispatch':
@@ -4329,7 +4335,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.unhighlightStepQueue[turtle] = blk;
                 } else {
                     setTimeout(function() {
-                        logo.blocks.unhighlight(blk);
+                        if (logo.blocks.visible) {
+                            logo.blocks.unhighlight(blk);
+                        }
                     }, logo.turtleDelay + logo.waitTimes[turtle]);
                 }
             }
@@ -4343,7 +4351,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 } else if (logo.unhightlightQueue[turtle].length > 0) {
                     // The child flow is finally complete, so unhighlight.
                     setTimeout(function() {
-            logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
+                        if (logo.blocks.visible) {
+                            logo.blocks.unhighlight(logo.unhightlightQueue[turtle].pop());
+                        } else {
+                            logo.unhightlightQueue[turtle].pop();
+                        }
                     }, logo.turtleDelay);
                 }
             }
@@ -4435,13 +4447,17 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             // Nothing else to do... so cleaning up.
             if (logo.turtles.turtleList[turtle].queue.length === 0 || blk !== last(logo.turtles.turtleList[turtle].queue).parentBlk) {
                 setTimeout(function() {
-                    logo.blocks.unhighlight(blk);
+                    if (logo.blocks.visible) {
+                        logo.blocks.unhighlight(blk);
+                    }
                 }, logo.turtleDelay);
             }
 
             // Unhighlight any parent blocks still highlighted.
             for (var b in logo.parentFlowQueue[turtle]) {
-                logo.blocks.unhighlight(logo.parentFlowQueue[turtle][b]);
+                if (logo.blocks.visible) {
+                    logo.blocks.unhighlight(logo.parentFlowQueue[turtle][b]);
+                }
             }
 
             // Make sure the turtles are on top.
@@ -4894,7 +4910,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                     // Ensure note value block unhighlights after note plays.
                     setTimeout(function() {
-                        logo.blocks.unhighlight(blk);
+                        if (logo.blocks.visible) {
+                            logo.blocks.unhighlight(blk);
+                        }
                     }, beatValue * 1000);
                 };
 
