@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016-17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -28,10 +28,15 @@ save() : Saves the Drum Matrix in an array of blocks: Set
 Drum and Pitch blocks.
 */
 
-const DRUMNAMEWIDTH = 50;
-
 
 function PitchDrumMatrix() {
+    const BUTTONDIVWIDTH = 300;  // 5 buttons
+    const OUTERWINDOWWIDTH = 358;
+    const INNERWINDOWWIDTH = 300;
+    const BUTTONSIZE = 53;
+    const ICONSIZE = 32;
+    const DRUMNAMEWIDTH = 50;
+
     this.rowLabels = [];
     this.rowArgs = [];
     this.drums = [];
@@ -85,95 +90,164 @@ function PitchDrumMatrix() {
     };
 
     this.init = function(logo) {
-        console.log('init pitchdrummatrix');
         // Initializes the pitch/drum matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
         this._logo = logo;
 
-        docById('pitchdrummatrix').style.display = 'inline';
-        console.log('setting pitchdrummatrix visible');
-        docById('pitchdrummatrix').style.visibility = 'visible';
-        docById('pitchdrummatrix').style.border = 2;
-
         var w = window.innerWidth;
         this._cellScale = w / 1200;
-        docById('pitchdrummatrix').style.width = Math.floor(w / 2) + 'px';
-        docById('pitchdrummatrix').style.overflowX = 'auto';
+        var iconSize = ICONSIZE * this._cellScale;
 
-        // Used to remove the matrix table
-        Element.prototype.remove = function() {
-            this.parentElement.removeChild(this);
-        }
+        var canvas = document.getElementById('myCanvas');
 
-        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-            for (var i = 0, len = this.length; i < len; i++) {
-                if (this[i] && this[i].parentElement) {
-                    this[i].parentElement.removeChild(this[i]);
-                }
-            }
-        };
+        // Position the widget and make it visible.
+        var pdmDiv = docById('pdmDiv');
+        pdmDiv.style.visibility = 'visible';
+        pdmDiv.setAttribute('draggable', 'true');
+        pdmDiv.style.left = '200px';
+        pdmDiv.style.top = '150px';
 
-        var table = docById('drumTable');
+        // The pdm buttons
+        var pdmButtonsDiv = docById('pdmButtonsDiv');
+        pdmButtonsDiv.style.display = 'inline';
+        pdmButtonsDiv.style.visibility = 'visible';
+        pdmButtonsDiv.style.width = BUTTONDIVWIDTH;
+        pdmButtonsDiv.innerHTML = '<table cellpadding="0px" id="pdmButtonTable"></table>';
 
-        if (table !== null) {
-            table.remove();
-        }
-
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'drumTable');
-        x.style.textAlign = 'center';
-
-        var matrixDiv = docById('pitchdrummatrix');
-        matrixDiv.style.paddingTop = 0 + 'px';
-        matrixDiv.style.paddingLeft = 0 + 'px';
-        matrixDiv.appendChild(x);
-        var matrixDivPosition = matrixDiv.getBoundingClientRect();
-
-        var table = docById('drumTable');
-        var header = table.createTHead();
+        var buttonTable = docById('pdmButtonTable');
+        var header = buttonTable.createTHead();
         var row = header.insertRow(0);
-        row.style.left = Math.floor(matrixDivPosition.left) + 'px';
-        row.style.top = Math.floor(matrixDivPosition.top) + 'px';
 
-        var solfaCell = row.insertCell(-1);
-        solfaCell.style.fontSize = this._cellScale * 100 + '%';
-        solfaCell.innerHTML = '<b>' + _('Solfa') + '</b>';
-        solfaCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        solfaCell.style.minWidth = solfaCell.style.width;
-        solfaCell.style.maxWidth = solfaCell.style.width;
-        solfaCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        solfaCell.style.backgroundColor = MATRIXLABELCOLOR;
-
-        // Add the buttons to the top row.
-        var iconSize = Math.floor(this._cellScale * 24);
+        // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
 
-        var cell = this._addButton(row, 2, 'export-chunk.svg', iconSize, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 3, 'erase-button.svg', iconSize, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 4, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('close'));
+
         cell.onclick=function() {
-            docById('pitchdrummatrix').style.visibility = 'hidden';
-            docById('pitchdrummatrix').style.border = 0;
+            pdmDiv.style.visibility = 'hidden';
+            pdmButtonsDiv.style.visibility = 'hidden';
+            pdmTableDiv.style.visibility = 'hidden';
         }
 
+        // We use this cell as a handle for dragging.
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        dragCell.style.cursor = 'move';
+
+        this._dx = dragCell.getBoundingClientRect().left - pdmDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - pdmDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = dragCell.innerHTML;
+
+        dragCell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            dragCell.innerHTML = '';
+        };
+
+        dragCell.onmouseout = function(e) {
+            if (!that._dragging) {
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                pdmDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                pdmDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        pdmDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        pdmDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                pdmDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                pdmDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        pdmDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
+
+        pdmDiv.ondragstart = function(e) {
+            if (dragCell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
+
+        // The pdm table
+        var pdmTableDiv = docById('pdmTableDiv');
+        pdmTableDiv.style.display = 'inline';
+        pdmTableDiv.style.visibility = 'visible';
+        pdmTableDiv.style.border = '0px';
+        pdmTableDiv.innerHTML = '';
+
+        // We use an outer div to scroll vertically and an inner div to
+        // scroll horizontally.
+        pdmTableDiv.innerHTML = '<div id="pdmOuterDiv"><div id="pdmInnerDiv"><table cellpadding="0px" id="pdmTable"></table></div></div>';
+
+        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 4);
+        var outerDiv = docById('pdmOuterDiv');
+        if (this.rowLabels.length > n) {
+            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 6) + 'px';
+            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
+            outerDiv.style.width = w + 'px';
+        } else {
+            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 3) + 'px';
+            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
+            outerDiv.style.width = w + 'px';
+        }
+
+        var w = Math.max(Math.min(window.innerWidth, this._cellScale * INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
+        var innerDiv = docById('pdmInnerDiv');
+        innerDiv.style.width = w + 'px';
+        innerDiv.style.marginLeft = (BUTTONSIZE * this._cellScale) + 'px';
+
+        // Each row in the pdm table contains a note label in the
+        // first column and a table of buttons in the second column.
+        var pdmTable = docById('pdmTable');
+
         var j = 0;
-        console.log('notes ' + this.rowLabels + ' octave ' + this.rowArgs + ' drums ' + this.drums);
-        var marginFromTop = Math.floor(matrixDivPosition.top + this._cellScale * 2 + parseInt(matrixDiv.style.paddingTop.replace('px', '')));
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (this.rowLabels[i].toLowerCase() === _('rest')) {
                 // In case there are rest notes included.
@@ -181,60 +255,77 @@ function PitchDrumMatrix() {
                 continue;
             }
 
-            var row = header.insertRow(i + 1);
-            row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            var cell = row.insertCell(0);
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
-            cell.style.fontSize = this._cellScale * 100 + '%';
-
             var drumName = getDrumName(this.rowLabels[i]);
+
             if (drumName != null) {
                 // if it is a drum, we'll make it a column below.
                 this.drums.push(drumName);
                 continue;
-            } else {
-                cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
             }
 
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-            cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-            cell.style.maxWidth = cell.style.minWidth;
-            cell.style.position = 'static';
-            cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
-            marginFromTop += parseInt(cell.style.height.replace('px', ''));
+            var pdmTableRow = pdmTable.insertRow();
+
+            // A cell for the row label
+            var labelCell = pdmTableRow.insertCell();
+            labelCell.style.backgroundColor = MATRIXLABELCOLOR;
+            labelCell.style.fontSize = this._cellScale * 100 + '%';
+            labelCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
+            labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            labelCell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            labelCell.style.maxWidth = labelCell.style.minWidth;
+            labelCell.style.textAlign = 'center';
+            labelCell.style.verticalAlign = 'middle';
+            labelCell.style.left = '1px';
+            labelCell.style.position = 'absolute';
+            labelCell.innerHTML = this.rowLabels[j] + this.rowArgs[j].toString().sub();
+
+            var pdmCell = pdmTableRow.insertCell();
+            // Create tables to store individual notes.
+            pdmCell.innerHTML = '<table cellpadding="0px" id="pdmCellTable' + j + '"><tr></tr></table>';
+            var pdmCellTable = docById('pdmCellTable' + j);
+
+            // We'll use this element to put the clickable notes for this row.
+            var pdmRow = pdmCellTable.insertRow();
+            pdmRow.setAttribute('id', 'pdm' + j);
+
             j += 1;
         }
 
-        var row = header.insertRow(this.rowLabels.length - this._rests + 1);
-        row.style.top = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale + i * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-        var cell = row.insertCell(0);
-        cell.style.fontSize = this._cellScale * 75 + '%';
-        cell.innerHTML = ''; // '<b>' + _('drum') + '</b>';
-        cell.style.position = 'static';
-        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-        cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        cell.style.maxWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        cell.style.left = Math.floor(matrixDivPosition.left + 2) + 'px';
-        cell.style.backgroundColor = MATRIXLABELCOLOR;
-        cell.style.verticalAlign = "middle";
+        // An extra row for the note and tuplet values
+        var pdmTableRow = pdmTable.insertRow();
+        var labelCell = pdmTableRow.insertCell();
+        labelCell.style.backgroundColor =  MATRIXRHYTHMCELLCOLOR;
+        labelCell.style.fontSize = this._cellScale * 100 + '%';
+        labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        labelCell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        labelCell.style.maxWidth = labelCell.style.minWidth;
+        labelCell.style.textAlign = 'center';
+        labelCell.style.verticalAlign = 'middle';
+        labelCell.style.left = '1px';
+        labelCell.style.position = 'absolute';
+        labelCell.innerHTML = '';
+
+        var pdmCell = pdmTableRow.insertCell();
+        // Create table to store drum names.
+        pdmCell.innerHTML = '<table cellpadding="0px" id="pdmDrumTable"><tr></tr></table>';
 
         // Add any drum blocks here.
         for (var i = 0; i < this.drums.length; i++) {
-            this._addDrum(this.drums[i]);
+            this._addDrum(i);
         }
 
     };
 
-    this._addButton = function(row, colIndex, icon, iconSize, label) {
-        var table = docById('drumTable');
-        var cell = row.insertCell();
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.height = cell.style.width; 
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         cell.onmouseover=function() {
@@ -248,81 +339,93 @@ function PitchDrumMatrix() {
         return cell;
     };
 
-    this._addDrum = function(drumname) {
-        var table = docById('drumTable');
-
-        var rowCount = this.rowLabels.length + 1 - this._rests;
-        var iconSize = Math.floor(this._cellScale * 24);
-
-        for (var i = 1; i <= rowCount; i++) {
-            var row = table.rows[i];
-            var cell = row.insertCell(-1);
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+    this._addDrum = function(drumIdx) {
+        var drumname = this.drums[drumIdx];
+        var pdmTable = docById('pdmTable');
+        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
+            var table = docById('pdmCellTable' + i);
+            var row = table.rows[0];
+            var cell = row.insertCell();
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.width = DRUMNAMEWIDTH;
             cell.style.width = cell.width;
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
-            if (i === rowCount) {
-                cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
-                cell.style.lineHeight = 100 + '%';
+            cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
-                // Work around i8n bug in Firefox.
-                var name = getDrumName(drumname);
-                if (name === '') {
-                    name = drumname;
+            cell.onmouseover=function() {
+                if (this.style.backgroundColor !== 'black'){
+                    this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
                 }
-                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(name) + '" title="' + name + '" alt="' + name + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                // cell.innerHTML = name;
-                cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
-            } else {
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                cell.onmouseover=function() {
-                    if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
-                    }
-                }
-                cell.onmouseout=function() {
-                    if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    }
+            }
+            cell.onmouseout=function() {
+                if (this.style.backgroundColor !== 'black'){
+                    this.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 }
             }
 
-            cell.setAttribute('id', table.rows[1].cells.length - 1);
+            cell.setAttribute('id', drumIdx);
         }
+
+        var drumTable = docById('pdmDrumTable');
+        var row = drumTable.rows[0];
+        var cell = row.insertCell();
+        cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
+        cell.width = DRUMNAMEWIDTH;
+        cell.style.width = cell.width;
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
+        cell.style.lineHeight = 100 + '%';
+        cell.setAttribute('id', row.cells.length - 1);
+
+        // Work around i8n bug in Firefox.
+        var name = getDrumName(drumname);
+        if (name === '') {
+            name = drumname;
+        }
+
+        cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(name) + '" title="' + name + '" alt="' + name + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
     };
 
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
-        var table = docById('drumTable');
+        var pdmTable = docById('pdmTable');
+        var drumTable = docById('pdmDrumTable');
 
-        for (var i = 1; i < table.rows[1].cells.length; i++) {
-            for (var j = 1; j < table.rows.length - 1; j++) {
-                cell = table.rows[j].cells[i];
-                if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    cell.style.backgroundColor = 'black';
-                    this._setCellPitchDrum(i, cell.parentNode.rowIndex, false);
-                }
-            }
-        }
+        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
+            var table = docById('pdmCellTable' + i);
+            var cellRow = table.rows[0];
+            var that = this;
 
-        for (var i = 1; i < table.rows[1].cells.length; i++) {
-            for (var j = 1; j < table.rows.length - 1; j++) {
-                var cell = table.rows[j].cells[i];
-                var that = this;
+            for (var j = 0; j < cellRow.cells.length; j++) {
+                cell = cellRow.cells[j];
+
+                var drumRow = drumTable.rows[0];
+                var drumCell = drumRow.cells[j];
+
                 cell.onclick = function() {
-                    if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        that._setCellPitchDrum(this.id, this.parentNode.rowIndex, false);
-                    } else {
-                        this.style.backgroundColor = 'black';
-                        that._setCellPitchDrum(this.id, this.parentNode.rowIndex, true);
+                    // Find the row and column associated with this cell.
+                    for (var row = 0; row < pdmTable.rows.length - 1; row++) {
+                        var pdmCellTable = docById('pdmCellTable' + row);
+                        for (var col = 0; col < pdmCellTable.rows[0].cells.length; col++) {
+                            if (this === pdmCellTable.rows[0].cells[col]) {
+                                if (this.style.backgroundColor === 'black') {
+                                    this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                                    that._setCellPitchDrum(col, row, false);
+                                } else {
+                                    this.style.backgroundColor = 'black';
+                                    that._setCellPitchDrum(col, row, true);
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
+
             }
         }
 
@@ -341,16 +444,20 @@ function PitchDrumMatrix() {
                     }
                 }
 
-                if (col == -1) {
+                if (col === -1) {
                     continue;
                 }
 
                 // If we found a match, mark this cell and add this
                 // note to the play list.
-                var cell = table.rows[row + 1].cells[col + 1];
+                var table = docById('pdmCellTable' + row);
+                var cellRow = table.rows[0];
+
+                var cell = cellRow.cells[col];
+
                 if (cell != undefined) {
                     cell.style.backgroundColor = 'black';
-                    this._setPairCell(row + 1, col + 1, cell, false, null);
+                    this._setPairCell(row, col, cell, false);
                 }
             }
         }
@@ -361,19 +468,21 @@ function PitchDrumMatrix() {
         this._logo.synth.stop();
 
         var pairs = [];
-        var table = docById('drumTable');
 
         // For each row (pitch), look for a drum.
-        for (var i = 1; i < table.rows.length - 1; i++) {
-            for (var j = 1; j < table.rows[i].cells.length; j++) {
-                var cell = table.rows[i].cells[j];
+        var pdmTable = docById('pdmTable');
+        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
+            var table = docById('pdmCellTable' + i);
+            var row = table.rows[0];
+            for (var j = 0; j < row.cells.length; j++) {
+                var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
                     pairs.push([i, j]);
                     break;
                 }
             }
 
-            if (j === table.rows[i].cells.length) {
+            if (j === row.cells.length) {
                 pairs.push([i, -1]);
             }
         }
@@ -385,9 +494,19 @@ function PitchDrumMatrix() {
     };
 
     this._playPitchDrum = function(i, pairs) {
-        var table = docById('drumTable');
-        var cell = table.rows[i + 1].cells[i];
-        var pitchCell = table.rows[i + 1].cells[0];
+        // Find the drum cell
+        var drumTable = docById('pdmDrumTable');
+        var row = drumTable.rows[0];
+        var drumCell = row.cells[i];
+
+        var pdmTable = docById('pdmTable');
+        var table = docById('pdmCellTable' + i);
+        var row = table.rows[0];
+        var cell = row.cells[i];
+
+        var pdmTable = docById('pdmTable');
+        var pdmTableRow = pdmTable.rows[i];
+        var pitchCell = pdmTableRow.cells[0];
         pitchCell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         if (pairs[i][1] !== -1) {
@@ -402,8 +521,9 @@ function PitchDrumMatrix() {
             }, 1000);
         } else {
             setTimeout(function() {
-                for (var i = 1; i < table.rows.length - 1; i++) {
-                    var pitchCell = table.rows[i].cells[0];
+                for (var i = 0; i < pdmTable.rows.length - 1; i++) {
+                    var pdmTableRow = pdmTable.rows[i];
+                    var pitchCell = pdmTableRow.cells[0];
                     pitchCell.style.backgroundColor = MATRIXLABELCOLOR;
                 }
             }, 1000);
@@ -413,30 +533,43 @@ function PitchDrumMatrix() {
     this._setCellPitchDrum = function(colIndex, rowIndex, playNote) {
         // Sets corresponding pitch/drum when user clicks on any cell and
         // plays them.
-        var table = docById('drumTable');
-
         var coli = Number(colIndex);
+        var rowi = Number(rowIndex);
+
+        // Find the drum cell
+        var drumTable = docById('pdmDrumTable');
+        var row = drumTable.rows[0];
+        var drumCell = row.cells[coli];
+
+        var pdmTable = docById('pdmTable');
+        var table = docById('pdmCellTable' + rowi);
+        var row = table.rows[0];
+
         // For the moment, we can only have one drum per pitch, so
         // clear the row.
         if (playNote) {
-            for (var i = 1; i < table.rows[1].cells.length; i++) {
+            for (var i = 0; i < row.cells.length; i++) {
                 if (i === coli) {
                     continue;
                 }
 
-                cell = table.rows[rowIndex].cells[i];
+                cell = row.cells[i];
+
+                var drumRow = drumTable.rows[0];
+                var drumCell = drumRow.cells[i];
+
                 if (cell.style.backgroundColor === 'black') {
-                     var pitchBlock = this._rowBlocks[rowIndex - 1];
-                    var drumBlock = this._colBlocks[i - 1];
+                    var pitchBlock = this._rowBlocks[rowi];
+                    var drumBlock = this._colBlocks[i];
                     this.removeNode(pitchBlock, drumBlock);
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    this._setCellPitchDrum(cell.id, cell.parentNode.rowIndex, false);
+                    this._setCellPitchDrum(cell.id, drumCell.id, false);
                 }
             }
         }
 
-        var pitchBlock = this._rowBlocks[rowIndex - 1];
-        var drumBlock = this._colBlocks[colIndex - 1];
+        var pitchBlock = this._rowBlocks[rowi];
+        var drumBlock = this._colBlocks[coli];
 
         if (playNote) {
             this.addNode(pitchBlock, drumBlock);
@@ -444,21 +577,28 @@ function PitchDrumMatrix() {
             this.removeNode(pitchBlock, drumBlock);
         }
 
-        if (table !== null) {
-            for (var i = 1; i < table.rows[1].cells.length; i++) {
-                cell = table.rows[rowIndex].cells[i];
-                if (cell.style.backgroundColor === 'black') {
-                    this._setPairCell(rowIndex, i, cell, playNote);
-                }
+        // if (table !== null) {
+        var table = docById('pdmCellTable' + rowi);
+        var row = table.rows[0];
+        for (var i = 0; i < row.cells.length; i++) {
+            cell = row.cells[i];
+            if (cell.style.backgroundColor === 'black') {
+                this._setPairCell(rowi, i, cell, playNote);
             }
         }
+        // }
     };
 
-    this._setPairCell = function(j, colIndex, cell, playNote) {
-        var table = docById('drumTable');
-        var solfegeHTML = table.rows[j].cells[0].innerHTML;
-        var drumHTML = table.rows[table.rows.length - 1].cells[colIndex].innerHTML.split('"');
+    this._setPairCell = function(rowIndex, colIndex, cell, playNote) {
+        var pdmTable = docById('pdmTable');
+        var row = pdmTable.rows[rowIndex];
+        var solfegeHTML = row.cells[0].innerHTML;
+
+        var drumTable = docById('pdmDrumTable');
+        var row = drumTable.rows[0];
+        var drumHTML = row.cells[colIndex].innerHTML.split('"');
         var drumName = getDrumSynthName(drumHTML[3]);
+
         // Both solfege and octave are extracted from HTML by getNote.
         var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
         var note = noteObj[0] + noteObj[1];
@@ -476,19 +616,16 @@ function PitchDrumMatrix() {
 
     this._clear = function() {
         // "Unclick" every entry in the matrix.
-        var table = docById('drumTable');
+        var pdmTable = docById('pdmTable');
 
-        var leaveRowsFromBottom = 1;
-
-        if (table !== null) {
-            for (var i = 1; i < table.rows[1].cells.length; i++) {
-                for (var j = 1; j < table.rows.length - 1; j++) {
-                    var cell = table.rows[j].cells[i];
-                    if (cell.style.backgroundColor === 'black') {
-                        cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                        this.pitchDrumToPlay[cell.id - 1][0] = ['R'];
-                        this._setCellPitchDrum(cell.id, cell.parentNode.rowIndex, false);
-                    }
+        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
+            var table = docById('pdmCellTable' + i);
+            var row = table.rows[0];
+            for (var j = 0; j < row.cells.length; j++) {
+                var cell = row.cells[j];
+                if (cell.style.backgroundColor === 'black') {
+                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    this._setCellPitchDrum(j, i, false);
                 }
             }
         }
@@ -505,12 +642,16 @@ function PitchDrumMatrix() {
         this._logo.refreshCanvas();
 
         var pairs = [];
-        var table = docById('drumTable');
+
+        var pdmTable = docById('pdmTable');
+        var drumTable = docById('pdmDrumTable');
 
         // For each row (pitch), look for a drum.
-        for (var i = 1; i < table.rows.length - 1; i++) {
-            for (var j = 1; j < table.rows[i].cells.length; j++) {
-                var cell = table.rows[i].cells[j];
+        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
+            var table = docById('pdmCellTable' + i);
+            var row = table.rows[0];
+            for (var j = 0; j < row.cells.length; j++) {
+                var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
                     pairs.push([i, j]);
                     continue;
@@ -530,8 +671,12 @@ function PitchDrumMatrix() {
         {
             var row = pairs[i][0];
             var col = pairs[i][1];
-            var solfegeHTML = table.rows[row].cells[0].innerHTML;
-            var drumHTML = table.rows[table.rows.length - 1].cells[col].innerHTML.split('"');
+
+            var cellRow = pdmTable.rows[row];
+            var solfegeHTML = cellRow.cells[0].innerHTML;
+
+            var drumRow = drumTable.rows[0];
+            var drumHTML = drumRow.cells[col].innerHTML.split('"');
             var drumName = getDrumSynthName(drumHTML[3]);
             // Both solfege and octave are extracted from HTML by getNote.
             var noteObj = this._logo.getNote(solfegeHTML, -1, 0, this._logo.keySignature[0]);
