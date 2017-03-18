@@ -357,17 +357,6 @@ table {
     overflow-y: visible;
 }
 
-#pitchdrummatrix {
-    position: absolute;
-    top: 20%;
-    left: 30%;
-    border-style: solid;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
-    -webkit-user-select: none;
-    overflow-x: scroll !important;
-}
-
 #statusmatrix {
     position: absolute;
     top: 10%;
@@ -424,6 +413,45 @@ table {
 }
 
 #ptmInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
+#pdmDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#pdmTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#pdmButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#pdmOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#pdmInnerDiv {
     overflow-x:auto;
     margin-left: 53px;
 }
@@ -567,7 +595,7 @@ table {
 }
 
 .headcol {
-    position:absolute;
+    position: absolute;
     left: 1px;
     top: auto;
     text-align: center;
