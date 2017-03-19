@@ -69,10 +69,9 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.upIndicator = null;
     this.upIndicatorStatus = false;
     this.downIndicator = null;
-    this.downIndicatorStatus = false;
+    this.downIndicatorStatus = true;
     this.circles = {};
-    this.tooltip_rect = new createjs.Shape();
-    this.palette_text = new createjs.Text('', '18px Arial', '#ff7700');
+    this.palette_text = new createjs.Text('', '20px Arial', '#ff7700');
     this.mouseOver = false;
     this.activePalette = null;
     
@@ -171,7 +170,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     };
      
     this.hidePaletteIconCircles = function() {
-        hidePaletteNameDisplay(tooltip_rect, palette_text, this.stage);
+        hidePaletteNameDisplay(palette_text, this.stage);
         hideButtonHighlight(this.circles, this.stage);
     };
 
@@ -183,7 +182,7 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             shape.height = windowHeight();
             this.stage.addChild(shape);
             this.background = shape;
-	}
+    }
 
         function __processUpIcon(palettes, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
@@ -192,8 +191,8 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             bitmap.y = 55;
             bitmap.visible = false;
             palettes.upIndicator = bitmap;
-		
-	    palettes.upIndicator.on('click', function(event) {
+        
+        palettes.upIndicator.on('click', function(event) {
                 palettes.menuScrollEvent(1, 40);
                 palettes.hidePaletteIconCircles();
             });
@@ -205,10 +204,10 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
             bitmap.x = 55;
             bitmap.y = (windowHeight() / palettes.scale) - 27;
 
-	    bitmap.visible = true;
+        bitmap.visible = true;
             palettes.downIndicator = bitmap;
-		
-	    palettes.downIndicator.on('click', function(event) {
+        
+        palettes.downIndicator.on('click', function(event) {
                 palettes.menuScrollEvent(-1, 40);
                 palettes.hidePaletteIconCircles();
             });
@@ -295,16 +294,16 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
         if (this.background != null) {
             this.background.visible = true;
-	}
+    }
 
         // If the palette indicators were visible, restore them.
         if (this.upIndicatorStatus) {
             this.upIndicator.visible = true;
         }
 
-        if (this.downIndicatorStatus) {
+        if (this.downIndicatorStatus && this.downIndicator != null) {
             this.downIndicator.visible = true;
-	}
+    }
 
         this.refreshCanvas();
     };
@@ -469,18 +468,9 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
                 palettes.buttons[name].x + r, palettes.buttons[name].y + r, r,
                 event, palettes.scale, palettes.stage);
             
-            /*create round rectangle as tooltip*/
-            tooltip_rect = new createjs.Shape();
-            gp = tooltip_rect.graphics;
-            gp.beginFill("#ffffff");
-            var len = name.length;
-            gp.drawRoundRect(palettes.buttons[name].x + 2.2 * r, palettes.buttons[name].y + 5 * r / 8, (len+1)*10-2, 20, r/3);
-            gp.endFill();
-            palettes.stage.addChild(tooltip_rect);
-
             /*add tooltip for palette buttons*/
-            palette_text = new createjs.Text(_(name), '18px Arial', 'black');   
-            palette_text.x = palettes.buttons[name].x + 2.4 * r;
+            palette_text = new createjs.Text(_(name), '20px Arial', 'black');   
+            palette_text.x = palettes.buttons[name].x + 2.2 * r;
             palette_text.y = palettes.buttons[name].y + 5 * r / 8;
             palettes.stage.addChild(palette_text); 
 
@@ -488,13 +478,13 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
         this.buttons[name].on('pressup', function(event) {
             palettes.mouseOver = false;
-            hidePaletteNameDisplay(tooltip_rect,  palette_text, palettes.stage);
+            hidePaletteNameDisplay(palette_text, palettes.stage);
             hideButtonHighlight(that.circles, palettes.stage);
         });
 
         this.buttons[name].on('mouseout', function(event) {
             palettes.mouseOver = false;
-            hidePaletteNameDisplay(tooltip_rect, palette_text, palettes.stage);
+            hidePaletteNameDisplay(palette_text, palettes.stage);
             hideButtonHighlight(that.circles, palettes.stage);
         });
 

@@ -101,10 +101,6 @@
       -->
 
       $(function() {
-        $("#pitchdrummatrix").draggable();
-      });
-
-      $(function() {
         $("#statusmatrix").draggable();
       });
 
@@ -157,16 +153,6 @@
       });
 
       var isDragging = false;
-
-      function movePitchDrumMatrix(event) {
-        var myDiv = document.getElementById('pitchdrummatrix');
-        var myDivPosition = myDiv.getBoundingClientRect();
-
-        var table = document.getElementById('drumTable');
-        var row = table.rows.item(0);
-        row.style.left = myDivPosition.left + 'px';
-        row.style.top = myDivPosition.top + 'px';
-      };
 
       function moveStatusMatrix(event) {
         var myDiv = document.getElementById('statusmatrix');
@@ -263,14 +249,19 @@
   </div>
       </div>
 
-      <div id="pitchdrummatrix" overflow-x="auto" ondrag="movePitchDrumMatrix(event)" onmouseup="movePitchDrumMatrix(event)">
-      </div>
-
       <div id="ptmDiv" draggable="false">
   <div id="ptmButtonsDiv">
   </div>
 
   <div id="ptmTableDiv">
+  </div>
+      </div>
+
+      <div id="pdmDiv" draggable="false">
+  <div id="pdmButtonsDiv">
+  </div>
+
+  <div id="pdmTableDiv">
   </div>
       </div>
 
