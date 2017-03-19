@@ -364,7 +364,7 @@ function PitchDrumMatrix() {
                 }
             }
 
-            cell.setAttribute('id', drumIdx);
+            cell.setAttribute('id', i + ',' + drumIdx);  // row,column
         }
 
         var drumTable = docById('pdmDrumTable');
@@ -378,7 +378,7 @@ function PitchDrumMatrix() {
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
         cell.style.lineHeight = 100 + '%';
-        cell.setAttribute('id', row.cells.length - 1);
+        cell.setAttribute('id', drumIdx); // Column // row.cells.length - 1);
 
         // Work around i8n bug in Firefox.
         var name = getDrumName(drumname);
@@ -408,21 +408,13 @@ function PitchDrumMatrix() {
                 var drumCell = drumRow.cells[j];
 
                 cell.onclick = function() {
-                    // Find the row and column associated with this cell.
-                    for (var row = 0; row < pdmTable.rows.length - 1; row++) {
-                        var pdmCellTable = docById('pdmCellTable' + row);
-                        for (var col = 0; col < pdmCellTable.rows[0].cells.length; col++) {
-                            if (this === pdmCellTable.rows[0].cells[col]) {
-                                if (this.style.backgroundColor === 'black') {
-                                    this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                                    that._setCellPitchDrum(col, row, false);
-                                } else {
-                                    this.style.backgroundColor = 'black';
-                                    that._setCellPitchDrum(col, row, true);
-                                }
-                                break;
-                            }
-                        }
+                    var rowcol = this.id.split(',');
+                    if (this.style.backgroundColor === 'black') {
+                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        that._setCellPitchDrum(rowcol[1], rowcol[0], false);
+                    } else {
+                        this.style.backgroundColor = 'black';
+                        that._setCellPitchDrum(rowcol[1], rowcol[0], true);
                     }
                 }
 
@@ -554,16 +546,13 @@ function PitchDrumMatrix() {
                 }
 
                 cell = row.cells[i];
-
-                var drumRow = drumTable.rows[0];
-                var drumCell = drumRow.cells[i];
-
                 if (cell.style.backgroundColor === 'black') {
                     var pitchBlock = this._rowBlocks[rowi];
                     var drumBlock = this._colBlocks[i];
                     this.removeNode(pitchBlock, drumBlock);
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    this._setCellPitchDrum(cell.id, drumCell.id, false);
+                    var obj = cell.id.split(',');  // row,column
+                    this._setCellPitchDrum(Number(obj[0]), Number(obj[1]), false);
                 }
             }
         }
