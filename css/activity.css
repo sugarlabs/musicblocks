@@ -597,7 +597,6 @@ table {
 .headcol {
     position: absolute;
     left: 1px;
-    top: auto;
     text-align: center;
     vertical-align: middle;
 }

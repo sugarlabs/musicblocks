@@ -30,12 +30,12 @@ Drum and Pitch blocks.
 
 
 function PitchDrumMatrix() {
-    const BUTTONDIVWIDTH = 300;  // 5 buttons
-    const OUTERWINDOWWIDTH = 358;
-    const INNERWINDOWWIDTH = 300;
+    const BUTTONDIVWIDTH = 295;  // 5 buttons
+    const DRUMNAMEWIDTH = 50;
+    const OUTERWINDOWWIDTH = 128;
+    const INNERWINDOWWIDTH = 50;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    const DRUMNAMEWIDTH = 50;
 
     this.rowLabels = [];
     this.rowArgs = [];
@@ -99,7 +99,7 @@ function PitchDrumMatrix() {
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
 
-        var canvas = document.getElementById('myCanvas');
+        var canvas = docById('myCanvas');
 
         // Position the widget and make it visible.
         var pdmDiv = docById('pdmDiv');
@@ -226,23 +226,6 @@ function PitchDrumMatrix() {
         // scroll horizontally.
         pdmTableDiv.innerHTML = '<div id="pdmOuterDiv"><div id="pdmInnerDiv"><table cellpadding="0px" id="pdmTable"></table></div></div>';
 
-        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 4);
-        var outerDiv = docById('pdmOuterDiv');
-        if (this.rowLabels.length > n) {
-            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 6) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 'px';
-        } else {
-            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 3) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 'px';
-        }
-
-        var w = Math.max(Math.min(window.innerWidth, this._cellScale * INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
-        var innerDiv = docById('pdmInnerDiv');
-        innerDiv.style.width = w + 'px';
-        innerDiv.style.marginLeft = (BUTTONSIZE * this._cellScale) + 'px';
-
         // Each row in the pdm table contains a note label in the
         // first column and a table of buttons in the second column.
         var pdmTable = docById('pdmTable');
@@ -271,12 +254,9 @@ function PitchDrumMatrix() {
             labelCell.style.fontSize = this._cellScale * 100 + '%';
             labelCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-            labelCell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+            labelCell.style.minWidth = labelCell.style.minWidth;
             labelCell.style.maxWidth = labelCell.style.minWidth;
-            labelCell.style.textAlign = 'center';
-            labelCell.style.verticalAlign = 'middle';
-            labelCell.style.left = '1px';
-            labelCell.style.position = 'absolute';
+            labelCell.className = 'headcol';
             labelCell.innerHTML = this.rowLabels[j] + this.rowArgs[j].toString().sub();
 
             var pdmCell = pdmTableRow.insertCell();
@@ -300,11 +280,25 @@ function PitchDrumMatrix() {
         labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         labelCell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         labelCell.style.maxWidth = labelCell.style.minWidth;
-        labelCell.style.textAlign = 'center';
-        labelCell.style.verticalAlign = 'middle';
-        labelCell.style.left = '1px';
-        labelCell.style.position = 'absolute';
+        labelCell.className = 'headcol';
         labelCell.innerHTML = '';
+
+        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
+        var outerDiv = docById('pdmOuterDiv');
+        if (pdmTable.rows.length + 2 > n) {
+            outerDiv.style.height = window.innerHeight / 2 + 'px';
+            var ow = Math.max(Math.min(window.innerWidth / 2, this._cellScale * (this.drums.length * (DRUMNAMEWIDTH + 2) + MATRIXSOLFEWIDTH + 24)), BUTTONDIVWIDTH);  // Add room for the vertical slider.
+        } else {
+            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (pdmTable.rows.length + 3) + 'px';
+            var ow = Math.max(Math.min(window.innerWidth / 2, this._cellScale * (this.drums.length * (DRUMNAMEWIDTH + 2) + MATRIXSOLFEWIDTH)), BUTTONDIVWIDTH);
+        }
+
+        outerDiv.style.width = ow + 'px';
+
+        var innerDiv = docById('pdmInnerDiv');
+        var iw = Math.min(ow - 100, this._cellScale * this.drums.length * (DRUMNAMEWIDTH + 2));
+        innerDiv.style.width = iw + 'px';
+        innerDiv.style.marginLeft = (BUTTONSIZE * this._cellScale) + 'px';
 
         var pdmCell = pdmTableRow.insertCell();
         // Create table to store drum names.
@@ -314,7 +308,6 @@ function PitchDrumMatrix() {
         for (var i = 0; i < this.drums.length; i++) {
             this._addDrum(i);
         }
-
     };
 
     this._addButton = function(row, icon, iconSize, label) {
@@ -364,7 +357,7 @@ function PitchDrumMatrix() {
                 }
             }
 
-            cell.setAttribute('id', drumIdx);
+            cell.setAttribute('id', i + ',' + drumIdx);  // row,column
         }
 
         var drumTable = docById('pdmDrumTable');
@@ -378,7 +371,7 @@ function PitchDrumMatrix() {
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
         cell.style.lineHeight = 100 + '%';
-        cell.setAttribute('id', row.cells.length - 1);
+        cell.setAttribute('id', drumIdx); // Column // row.cells.length - 1);
 
         // Work around i8n bug in Firefox.
         var name = getDrumName(drumname);
@@ -408,21 +401,13 @@ function PitchDrumMatrix() {
                 var drumCell = drumRow.cells[j];
 
                 cell.onclick = function() {
-                    // Find the row and column associated with this cell.
-                    for (var row = 0; row < pdmTable.rows.length - 1; row++) {
-                        var pdmCellTable = docById('pdmCellTable' + row);
-                        for (var col = 0; col < pdmCellTable.rows[0].cells.length; col++) {
-                            if (this === pdmCellTable.rows[0].cells[col]) {
-                                if (this.style.backgroundColor === 'black') {
-                                    this.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                                    that._setCellPitchDrum(col, row, false);
-                                } else {
-                                    this.style.backgroundColor = 'black';
-                                    that._setCellPitchDrum(col, row, true);
-                                }
-                                break;
-                            }
-                        }
+                    var rowcol = this.id.split(',');
+                    if (this.style.backgroundColor === 'black') {
+                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        that._setCellPitchDrum(rowcol[1], rowcol[0], false);
+                    } else {
+                        this.style.backgroundColor = 'black';
+                        that._setCellPitchDrum(rowcol[1], rowcol[0], true);
                     }
                 }
 
@@ -554,16 +539,13 @@ function PitchDrumMatrix() {
                 }
 
                 cell = row.cells[i];
-
-                var drumRow = drumTable.rows[0];
-                var drumCell = drumRow.cells[i];
-
                 if (cell.style.backgroundColor === 'black') {
                     var pitchBlock = this._rowBlocks[rowi];
                     var drumBlock = this._colBlocks[i];
                     this.removeNode(pitchBlock, drumBlock);
                     cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-                    this._setCellPitchDrum(cell.id, drumCell.id, false);
+                    var obj = cell.id.split(',');  // row,column
+                    this._setCellPitchDrum(Number(obj[0]), Number(obj[1]), false);
                 }
             }
         }

@@ -115,7 +115,7 @@ function Matrix() {
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
 
-        var canvas = document.getElementById('myCanvas');
+        var canvas = docById('myCanvas');
 
         // Position the widget and make it visible.
         var ptmDiv = docById('ptmDiv');
