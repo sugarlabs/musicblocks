@@ -186,7 +186,7 @@ function Tempo () {
         var w = window.innerWidth;
         var iconSize = ICONSIZE;
 
-        var canvas = document.getElementById('myCanvas');
+        var canvas = docById('myCanvas');
 
         // Position the widget and make it visible.
         var tempoDiv = docById('tempoDiv');

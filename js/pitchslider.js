@@ -172,7 +172,7 @@ function PitchSlider() {
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
 
-        var canvas = document.getElementById('myCanvas');
+        var canvas = docById('myCanvas');
 
         // Position the widget and make it visible.
         var sliderDiv = docById('sliderDiv');

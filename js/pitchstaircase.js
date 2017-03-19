@@ -221,9 +221,9 @@ function PitchStairCase () {
 
         setTimeout(function () {
             for (var i = 0; i < that.Stairs.length; i++) {
-		var pscTableCell = docById('stepTable' + i);
-		var stepCell = pscTableCell.rows[0].cells[1];
-		stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                var pscTableCell = docById('stepTable' + i);
+                var stepCell = pscTableCell.rows[0].cells[1];
+                stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
         }, 1000);
     };
@@ -234,8 +234,8 @@ function PitchStairCase () {
         var note = this.Stairs[this.Stairs.length-1][0] + this.Stairs[this.Stairs.length-1][1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var last = this.Stairs.length - 1;
-	var pscTableCell = docById('stepTable' + last);
-	var stepCell = pscTableCell.rows[0].cells[1];
+        var pscTableCell = docById('stepTable' + last);
+        var stepCell = pscTableCell.rows[0].cells[1];
         stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
         this._logo.synth.trigger(pitchnotes, 1, 'poly');
         this._playNext(this.Stairs.length - 2, -1);
@@ -250,9 +250,9 @@ function PitchStairCase () {
         if (index === this.Stairs.length) {
             setTimeout(function () {
                 for (var i = 0; i < that.Stairs.length; i++) {
-		    var pscTableCell = docById('stepTable' + i);
-		    var stepCell = pscTableCell.rows[0].cells[1];
-		    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    var pscTableCell = docById('stepTable' + i);
+                    var stepCell = pscTableCell.rows[0].cells[1];
+                    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 }
             }, 1000);
             return;
@@ -261,9 +261,9 @@ function PitchStairCase () {
         if (index === -1) {
             setTimeout(function () {
                 for (var i = 0; i < that.Stairs.length; i++) {
-		    var pscTableCell = docById('stepTable' + i);
-		    var stepCell = pscTableCell.rows[0].cells[1];
-		    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    var pscTableCell = docById('stepTable' + i);
+                    var stepCell = pscTableCell.rows[0].cells[1];
+                    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
                 }
             }, 1000);
 
@@ -278,19 +278,19 @@ function PitchStairCase () {
         var note = this.Stairs[index][0] + this.Stairs[index][1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var previousRowNumber = index - next;
-	var pscTableCell = docById('stepTable' + previousRowNumber);
+        var pscTableCell = docById('stepTable' + previousRowNumber);
 
         setTimeout(function () {
             if (pscTableCell != null) {
-		var stepCell = pscTableCell.rows[0].cells[1];
+                var stepCell = pscTableCell.rows[0].cells[1];
                 stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
             }
 
-	    var pscTableCell = docById('stepTable' + index);
-	    var stepCell = pscTableCell.rows[0].cells[1];
+            var pscTableCell = docById('stepTable' + index);
+            var stepCell = pscTableCell.rows[0].cells[1];
             stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
             that._logo.synth.trigger(pitchnotes, 1, 'poly');
-            if(index < that.Stairs.length || index > -1) {
+            if (index < that.Stairs.length || index > -1) {
                 that._playNext(index + next, next);
             }
         }, 1000);
@@ -385,7 +385,7 @@ function PitchStairCase () {
         widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
         widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="pscButtonTable"></table>';
 
-        var canvas = document.getElementById('myCanvas');
+        var canvas = docById('myCanvas');
 
         var buttonTable = docById('pscButtonTable');
         var header = buttonTable.createTHead();
@@ -401,6 +401,14 @@ function PitchStairCase () {
         var cell = this._addButton(row, 'play-scale.svg', ICONSIZE, _('play scale'));
         cell.onclick=function() {
             that.playUpAndDown();
+        };
+
+        cell.onmouseover=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
+        };
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 
         cell.onmouseover=function() {
