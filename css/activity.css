@@ -357,25 +357,43 @@ table {
     overflow-y: visible;
 }
 
-#statusmatrix {
+#statusDiv {
     position: absolute;
-    top: 10%;
+    top: 20%;
     left: 20%;
-    border-style: solid;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
-    -webkit-user-select: none;
-    overflow-x: scroll !important;
+    background: rgba(255, 255, 255, 0.85) !important;
 }
 
-#modewidget {
-    position: absolute;
-    top: 10%;
-    left: 20%;
-    border-style: solid;
+#statusTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#statusButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
     border: 0 !important;
     background: rgba(255, 255, 255, 0.85);
-    -webkit-user-select: none;
+}
+
+#statusOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#statusInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
 }
 
 #ptmDiv {

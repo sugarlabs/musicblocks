@@ -100,10 +100,6 @@
         } catch (e) {}
       -->
 
-      $(function() {
-        $("#statusmatrix").draggable();
-      });
-
       (function($) {
         $.fn.fixMe = function() {
             return this.each(function() {
@@ -149,16 +145,6 @@
       });
 
       var isDragging = false;
-
-      function moveStatusMatrix(event) {
-        var myDiv = document.getElementById('statusmatrix');
-        var myDivPosition = myDiv.getBoundingClientRect();
-
-        var table = document.getElementById('statusTable');
-        var row = table.rows.item(0);
-        row.style.left = myDivPosition.left + 'px';
-        row.style.top = myDivPosition.top + 'px';
-      };
     </script>
 
     <canvas id="canvas" width="3790" height="1743"style="background-color:#92B5C8; width:100%">
@@ -212,27 +198,27 @@
       </div>
 
       <div class="planet" style="display: none;">
-  <nav>
-    <div class="nav-container">
+	<nav>
+	  <div class="nav-container">
             <img src="header-icons/planet-button.svg" class="logo" />
             <h1 id="planetTitle"></h1>
             <ul>
-        <li class="back"><img src="header-icons/cancel-button.svg" /></li>
-        <li class="new"><img src="header-icons/add.svg" /></li>
-        <li class="open"><img src="header-icons/folder-open.svg" /></li>
+              <li class="back"><img src="header-icons/cancel-button.svg" /></li>
+              <li class="new"><img src="header-icons/add.svg" /></li>
+              <li class="open"><img src="header-icons/folder-open.svg" /></li>
             </ul>
-    </div>
-  </nav>
+	  </div>
+	</nav>
 
-  <div class="nav-spacer">
-  </div>
+	<div class="nav-spacer">
+	</div>
 
-  <div class="planet-content">
-    <h2 id="planetMyDevice"></h2>
-    <ul class="content l"></ul>
-    <h2 id="planetWorldwide"></h2>
-    <ul class="content w"></ul>
-  </div>
+	<div class="planet-content">
+	  <h2 id="planetMyDevice"></h2>
+	  <ul class="content l"></ul>
+	  <h2 id="planetWorldwide"></h2>
+	  <ul class="content w"></ul>
+	</div>
       </div>
 
       <div id="modeDiv" draggable="false">
@@ -240,6 +226,14 @@
 	</div>
 
 	<div id="modeTableDiv">
+	</div>
+      </div>
+
+      <div id="statusDiv" draggable="false">
+	<div id="statusButtonsDiv">
+	</div>
+
+	<div id="statusTableDiv">
 	</div>
       </div>
 
@@ -288,19 +282,7 @@
 	</div>
       </div>
 
-      <div id="pitchSliderDiv" style="visibility:hidden">
-      </div>
-
       <div id="playPitch" style="visibility:hidden">
-      </div>
-
-      <div id="statusmatrix" overflow-x="auto" ondrag="moveStatusMatrix(event)" onmouseup="moveStatusMatrix(event)">
-      </div>
-
-      <div id="moveUpSliderDiv">
-      </div>
-
-      <div id="moveDownSliderDiv">
       </div>
 
       <div id="sliderInCell">
@@ -316,9 +298,6 @@
       </div>
 
       <div id="dissectNumber">
-      </div>
-
-      <div id="modewidget" overflow-x="auto" ondrag="moveModeWidget(event)" onmouseup="moveModeWidget(event)">
       </div>
 
       <div id="helpElem">

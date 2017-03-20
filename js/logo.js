@@ -735,7 +735,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
         }
 
         // Set up status block
-        if (docById('statusmatrix').style.visibility === 'visible') {
+        if (docById('statusDiv').style.visibility === 'visible') {
             this.statusMatrix.init(this);
         }
 
@@ -4292,7 +4292,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo.endOfClampSignals[turtle][blk] = cleanSignals;
         }
 
-        if (docById('statusmatrix').style.visibility === 'visible') {
+        if (docById('statusDiv').style.visibility === 'visible') {
             logo.statusMatrix.updateAll();
         }
 

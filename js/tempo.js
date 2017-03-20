@@ -232,17 +232,9 @@ function Tempo () {
         };
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+
         cell.onclick=function() {
-            tempoDiv.style.visibility = 'hidden';
-            tempoButtonsDiv.style.visibility = 'hidden';
-
-            for (var i = 0; i < that.BPMs.length; i++) {
-                docById('tempoCanvas' + i).style.visibility = 'hidden';
-            }
-
-            if (that._intervalID != null) {
-                clearInterval(that._intervalID);
-            }
+            that.hide();
         };
 
         cell.onmouseover=function() {
@@ -445,4 +437,18 @@ function Tempo () {
 
         return cell;
     };
+
+    this.hide = function () {
+        docById('tempoDiv').style.visibility = 'hidden';
+        docById('tempoButtonsDiv').style.visibility = 'hidden';
+
+        for (var i = 0; i < this.BPMs.length; i++) {
+            docById('tempoCanvas' + i).style.visibility = 'hidden';
+        }
+
+        if (this._intervalID != null) {
+            clearInterval(this._intervalID);
+        }
+    }
 };
+

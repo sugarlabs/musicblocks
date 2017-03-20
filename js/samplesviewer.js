@@ -129,7 +129,7 @@ function PlanetModel(controller) {
         jQuery.ajax({
             url: SERVER,
             headers: {
-                'x-api-key' : APIKEY
+                'x-api-key': APIKEY
             }
         }).done(function (l) {
             model.globalProjects = [];
@@ -137,7 +137,7 @@ function PlanetModel(controller) {
 
             var todo = [];
             l.forEach(function (name, i) {
-                if (name.indexOf('.b64') !== -1) 	{
+                if (name.indexOf('.b64') !== -1) {
                     todo.push(name);
                 }
             });
@@ -173,7 +173,7 @@ function PlanetModel(controller) {
             model.getImages(todo);
         } else {
             jQuery.ajax({
-  	        url: SERVER + image,
+                  url: SERVER + image,
                 headers: {
                     'x-api-key' : '3tgTzMXbbw6xEKX7'
                 },
@@ -185,7 +185,7 @@ function PlanetModel(controller) {
 
                 if (mbcheck) {
                     d = 'images/planetgraphic.png';
-		}
+                }
 
                 model.globalImagesCache[image] = d;
                 model.globalProjects.push({title: name, img: d, url: image});
@@ -303,17 +303,17 @@ function PlanetModel(controller) {
                 'x-api-key' : '3tgTzMXbbw6xEKX7'
             },
             dataType: 'text',
-            error: function(XMLHttpRequest, textStatus, errorThrown){
-            	jQuery.ajax({
-		            url: SERVER + 'MusicBlocks_' + name + '.tb',
-		            headers: {
-		                'x-api-key' : '3tgTzMXbbw6xEKX7'
-		            },
-		            dataType: 'text',
-		        }).done(function (d) {
-		            model.controller.loadRawProject(d);
-		            model.stop = true;
-		        });
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    jQuery.ajax({
+                            url: SERVER + 'MusicBlocks_' + name + '.tb',
+                            headers: {
+                                'x-api-key' : '3tgTzMXbbw6xEKX7'
+                            },
+                            dataType: 'text',
+                        }).done(function (d) {
+                            model.controller.loadRawProject(d);
+                            model.stop = true;
+                        });
             }
         }).done(function (d) {
             model.controller.loadRawProject(d);
@@ -410,7 +410,7 @@ function PlanetView(model, controller) {
         }
     };
 
-    this.addGlobalElement = function(glob, i){
+    this.addGlobalElement = function (glob, i){
         var d = document.createElement('li');
         d.setAttribute('url', glob.url);
         d.setAttribute('title', glob.title);
@@ -451,12 +451,12 @@ function PlanetView(model, controller) {
             var url = SHAREURL.replace(NAMESUBTEXT, 'MusicBlocks_'+planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
             console.log(url);
             var n = i.toString();
-            document.getElementById('shareurldiv'+n).style.visibility = 'visible';
-            document.getElementById('shareurlbox'+n).style.visibility = 'visible';
-            document.getElementById('shareurltri'+n).style.visibility = 'visible';
-            document.getElementById('shareurlbox'+n).value = url;
-            document.getElementById('shareurlbox'+n).focus();
-            document.getElementById('shareurlbox'+n).select();
+            docById('shareurldiv'+n).style.visibility = 'visible';
+            docById('shareurlbox'+n).style.visibility = 'visible';
+            docById('shareurltri'+n).style.visibility = 'visible';
+            docById('shareurlbox'+n).value = url;
+            docById('shareurlbox'+n).focus();
+            docById('shareurlbox'+n).select();
         };
     };
 
@@ -466,12 +466,12 @@ function PlanetView(model, controller) {
             var url = SHAREURL.replace(NAMESUBTEXT, 'MusicBlocks_'+planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
             console.log(url);
             var n = i.toString();
-            document.getElementById('plshareurldiv'+n).style.visibility = 'visible';
-            document.getElementById('plshareurlbox'+n).style.visibility = 'visible';
-            document.getElementById('plshareurltri'+n).style.visibility = 'visible';
-            document.getElementById('plshareurlbox'+n).value = url;
-            document.getElementById('plshareurlbox'+n).focus();
-            document.getElementById('plshareurlbox'+n).select();
+            docById('plshareurldiv'+n).style.visibility = 'visible';
+            docById('plshareurlbox'+n).style.visibility = 'visible';
+            docById('plshareurltri'+n).style.visibility = 'visible';
+            docById('plshareurlbox'+n).value = url;
+            docById('plshareurlbox'+n).focus();
+            docById('plshareurlbox'+n).select();
         };
     };
 
@@ -484,31 +484,47 @@ function PlanetView(model, controller) {
 
     this.open = function (ele) {
         return function () {
-            document.getElementById('ptmDiv').style.visibility = localStorage.getItem('isMatrixHidden');
-            document.getElementById('ptmButtonsDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
-            document.getElementById('ptmTableDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
-            document.getElementById('pscDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
-            document.getElementById('pscButtonsDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
-            document.getElementById('pscTableDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
-            document.getElementById('statusmatrix').style.visibility = localStorage.getItem('isStatusHidden');
-            document.getElementById('pitchSliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
-            document.getElementById('moveUpSliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
-            document.getElementById('moveDownSliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
-            document.getElementById('pitchdrummatrix').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
-            document.getElementById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
-            document.getElementById('rulerButtonsDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
-            document.getElementById('rulerTableDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
-            document.getElementById('modewidget').style.visibility = localStorage.getItem('isModeWidgetHidden');
-            document.getElementById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
-            document.getElementById('tempoCanvas').style.visibility = localStorage.getItem('isTempoHidden');
+            /*
+            console.log(localStorage.getItem('isMatrixHidden'));
+            console.log(localStorage.getItem('isStaircaseHidden'));
+            console.log(localStorage.getItem('isPitchDrumMatrixHidden'));
+            console.log(localStorage.getItem('is RhythmRulerHidden'));
+            console.log(localStorage.getItem('isStatusHidden'));
+            console.log(localStorage.getItem('idModeWidgetHidden'));
+            console.log(localStorage.getItem('isSliderHidden'));
+            console.log(localStorage.getItem('isTempoHidden'));
+            */
+            docById('ptmDiv').style.visibility = localStorage.getItem('isMatrixHidden');
+            docById('ptmButtonsDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
+            docById('ptmTableDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
+            docById('pscDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
+            docById('pscButtonsDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
+            docById('pscTableDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
+            docById('statusDiv').style.visibility = localStorage.getItem('isStatusHidden');
+            docById('statusButtonsDiv').style.visibility = localStorage.getItem('isStatusHidden');
+            docById('statusTableDiv').style.visibility = localStorage.getItem('isStatusHidden');
+            docById('sliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
+            docById('sliderButtonsDiv').style.visibility = localStorage.getItem('isSliderHidden');
+            docById('sliderTableDiv').style.visibility = localStorage.getItem('isSliderHidden');
+            docById('pdmDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
+            docById('pdmButtonsDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
+            docById('pdmTableDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
+            docById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+            docById('rulerButtonsDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+            docById('rulerTableDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+            docById('modeDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
+            docById('modeButtonsDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
+            docById('modeTableDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
+            // Don't reopen the tempo widget since we didn't just hide it, but also closed it.
+            // docById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
+            // docById('tempoButtonsDiv').style.visibility = localStorage.getItem('isTempoHidden');
 
             if (ele.attributes.current.value === 'true') {
                 planet.controller.hide();
                 return;
             }
             
-            planet.model.open(ele.attributes.title.value,
-                          ele.attributes.data.value);
+            planet.model.open(ele.attributes.title.value, ele.attributes.data.value);
             planet.controller.hide();
         }
     };
@@ -548,11 +564,11 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
     this.model = new PlanetModel(this);
     this.view = new PlanetView(this.model, this);
 
-    this.setServer = function(server) {
+    this.setServer = function (server) {
         this.server = server;
     };
 
-    this.hide = function() {
+    this.hide = function () {
         document.querySelector('.planet').style.display = 'none';
         document.querySelector('body').classList.remove('samples-shown');
         document.querySelector('.canvasHolder').classList.remove('hide');
@@ -561,7 +577,7 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
         window.scroll(0, 0);
     };
 
-    this.show = function() {
+    this.show = function () {
         document.querySelector('.planet').style.display = '';
         document.querySelector('body').classList.add('samples-shown');
         document.querySelector('.canvasHolder').classList.add('hide');

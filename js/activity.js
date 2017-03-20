@@ -1537,59 +1537,69 @@ define(function (require) {
         };
 
         function _doOpenSamples() {
-            localStorage.setItem('isMatrixHidden', document.getElementById('ptmDiv').style.visibility);
-            localStorage.setItem('isStaircaseHidden', document.getElementById('pscDiv').style.visibility);
-            localStorage.setItem('isPitchDrumMatrixHidden', document.getElementById('pitchdrummatrix').style.visibility);
-            localStorage.setItem('isRhythmRulerHidden', document.getElementById('rulerDiv').style.visibility);
-            localStorage.setItem('isStatusHidden', document.getElementById('statusmatrix').style.visibility);
-            localStorage.setItem('isModeWidgetHidden', document.getElementById('modewidget').style.visibility);
-            localStorage.setItem('isSliderHidden', document.getElementById('pitchSliderDiv').style.visibility);
-            localStorage.setItem('isTempoHidden', document.getElementById('tempoDiv').style.visibility);
+            /*
+            console.log(docById('ptmDiv').style.visibility);
+            console.log(docById('pscDiv').style.visibility);
+            console.log(docById('pdmDiv').style.visibility);
+            console.log(docById('rulerDiv').style.visibility);
+            console.log(docById('statusDiv').style.visibility);
+            console.log(docById('modeDiv').style.visibility);
+            console.log(docById('sliderDiv').style.visibility);
+            console.log(docById('tempoDiv').style.visibility);
+            */
+            localStorage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
+            localStorage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
+            localStorage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
+            localStorage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
+            localStorage.setItem('isStatusHidden', docById('statusDiv').style.visibility);
+            localStorage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
+            localStorage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
+            localStorage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
-            if (document.getElementById('ptmDiv').style.visibility !== 'hidden') {
-                document.getElementById('ptmDiv').style.visibility = 'hidden';
-                document.getElementById('ptmTableDiv').style.visibility = 'hidden';
-                document.getElementById('ptmButtonsDiv').style.visibility = 'hidden';
+            if (docById('ptmDiv').style.visibility !== 'hidden') {
+                docById('ptmDiv').style.visibility = 'hidden';
+                docById('ptmTableDiv').style.visibility = 'hidden';
+                docById('ptmButtonsDiv').style.visibility = 'hidden';
             }
 
-            if (document.getElementById('pitchdrummatrix').style.visibility !== 'hidden') {
-                document.getElementById('pitchdrummatrix').style.visibility = 'hidden';
-                document.getElementById('pitchdrummatrix').style.border = 0;
+            if (docById('pdmDiv').style.visibility !== 'hidden') {
+                docById('pdmDiv').style.visibility = 'hidden';
+                docById('pdmButtonsDiv').style.visibility = 'hidden';
+                docById('pdmTableDiv').style.visibility = 'hidden';
             }
 
-            if (document.getElementById('rulerDiv').style.visibility !== 'hidden') {
-                document.getElementById('rulerDiv').style.visibility = 'hidden';
-                document.getElementById('rulerTableDiv').style.visibility = 'hidden';
-                document.getElementById('rulerButtonsDiv').style.visibility = 'hidden';
+            if (docById('rulerDiv').style.visibility !== 'hidden') {
+                docById('rulerDiv').style.visibility = 'hidden';
+                docById('rulerTableDiv').style.visibility = 'hidden';
+                docById('rulerButtonsDiv').style.visibility = 'hidden';
             }
 
-            if (document.getElementById('pscDiv').style.visibility !== 'hidden') {
-                document.getElementById('pscDiv').style.visibility = 'hidden';
-                document.getElementById('pscTableDiv').style.visibility = 'hidden';
-                document.getElementById('pscButtonsDiv').style.visibility = 'hidden';
+            if (docById('pscDiv').style.visibility !== 'hidden') {
+                docById('pscDiv').style.visibility = 'hidden';
+                docById('pscTableDiv').style.visibility = 'hidden';
+                docById('pscButtonsDiv').style.visibility = 'hidden';
             }
 
-            if (document.getElementById('statusmatrix').style.visibility !== 'hidden') {
-                document.getElementById('statusmatrix').style.visibility = 'hidden';
-                document.getElementById('statusmatrix').style.border = 0;
+            if (docById('statusDiv').style.visibility !== 'hidden') {
+                docById('statusDiv').style.visibility = 'hidden';
+                docById('statusButtonsDiv').style.visibility = 'hidden';
+                docById('statusTableDiv').style.visibility = 'hidden';
             }
 
-            if (document.getElementById('pitchSliderDiv').style.visibility !== 'hidden') {
-                document.getElementById('pitchSliderDiv').style.visibility = 'hidden';
-                document.getElementById('moveUpSliderDiv').style.visibility = 'hidden';
-                document.getElementById('moveDownSliderDiv').style.visibility = 'hidden';
-                document.getElementById('pitchSliderDiv').style.border = 0;
+            if (docById('sliderDiv').style.visibility !== 'hidden') {
+                docById('sliderDiv').style.visibility = 'hidden';
+                docById('sliderButtonsDiv').style.visibility = 'hidden';
+                docById('sliderTableDiv').style.visibility = 'hidden';
             }
 
-            if (document.getElementById('modewidget').style.visibility !== 'hidden') {
-                document.getElementById('modewidget').style.visibility = 'hidden';
-                document.getElementById('modewidget').style.border = 0;
+            if (docById('modeDiv').style.visibility !== 'hidden') {
+                docById('modeDiv').style.visibility = 'hidden';
+                docById('modeButtonsDiv').style.visibility = 'hidden';
+                docById('modeTableDiv').style.visibility = 'hidden';
             }
 
-            if (document.getElementById('tempoDiv').style.visibility !== 'hidden') {
-                document.getElementById('tempoDiv').style.visibility = 'hidden';
-                document.getElementById('tempoCanvas').style.visibility = 'hidden';
-                document.getElementById('tempoDiv').style.border = 0;
+            if (docById('tempoDiv').style.visibility !== 'hidden') {
+                tempo.hide();
             }
 
             logo.doStopTurtle();
