@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016-17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -9,17 +9,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// Row and column of each halfstep: Note that span cells are counted
-// only once.
-const MODEMAP = [[2, 7], [3, 6], [5, 10], [7, 11], [9, 10], [11, 8], [12, 5], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
-const ROTATESPEED = 125;
-const ORANGE = '#e37a00'; // 5YR
 
 function ModeWidget() {
+    // Row and column of each halfstep: Note that span cells are
+    // counted only once.
+    const MODEMAP = [[2, 7], [3, 6], [5, 10], [7, 11], [9, 10], [11, 8], [12, 5], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
+    const ROTATESPEED = 125;
+    const ORANGE = '#e37a00'; // 5YR
+    const BUTTONDIVWIDTH = 535;
+    const BUTTONSIZE = 53;
+    const ICONSIZE = 32;
 
     this.init = function(logo, modeBlock) {
-        // Initializes the mode widget. First removes the previous widget
-        // and them make another one in DOM (document object model)
         this._logo = logo;
         this._modeBlock = modeBlock;
         this._locked = false;
@@ -29,116 +30,167 @@ function ModeWidget() {
 
         this._undoStack = [];
 
-        docById('modewidget').style.display = 'inline';
-        docById('modewidget').style.visibility = 'visible';
-        docById('modewidget').style.border = 2;
+        var w = window.innerWidth;
+        this._cellScale = w / 1200;
+        var iconSize = ICONSIZE * this._cellScale;
 
-        this._cellScale = window.innerWidth / 1200;
-        docById('modewidget').style.overflowX = 'auto';
+        var canvas = docById('myCanvas');
 
-        // Used to remove the mode widget table
-        Element.prototype.remove = function() {
-            this.parentElement.removeChild(this);
-        }
+        // Position the widget and make it visible.
+        var modeDiv = docById('modeDiv');
+        modeDiv.style.visibility = 'visible';
+        modeDiv.setAttribute('draggable', 'true');
+        modeDiv.style.left = '200px';
+        modeDiv.style.top = '150px';
 
-        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-            for (var i = 0, len = this.length; i < len; i++) {
-                if (this[i] && this[i].parentElement) {
-                    this[i].parentElement.removeChild(this[i]);
-                }
-            }
-        };
+        // The mode buttons
+        var modeButtonsDiv = docById('modeButtonsDiv');
+        modeButtonsDiv.style.display = 'inline';
+        modeButtonsDiv.style.visibility = 'visible';
+        modeButtonsDiv.style.width = BUTTONDIVWIDTH;
+        modeButtonsDiv.innerHTML = '<table cellpadding="0px" id="modeButtonTable"></table>';
 
-        var table = docById('modeTable');
-
-        if (table !== null) {
-            table.remove();
-        }
-
-        var x = document.createElement('TABLE');
-        x.setAttribute('id', 'modeTable');
-        x.style.textAlign = 'center';
-
-        var modeDiv = docById('modewidget');
-        modeDiv.style.paddingTop = 0 + 'px';
-        modeDiv.style.paddingLeft = 0 + 'px';
-        modeDiv.appendChild(x);
-        var modeDivPosition = modeDiv.getBoundingClientRect();
-
-        var table = docById('modeTable');
-        var header = table.createTHead();
+        var buttonTable = docById('modeButtonTable');
+        var header = buttonTable.createTHead();
         var row = header.insertRow(0);
-        row.style.left = Math.floor(modeDivPosition.left) + 'px';
-        row.style.top = Math.floor(modeDivPosition.top) + 'px';
 
-        // Create blank rows.
-        for (var i = 0; i < 15; i++) {
-            table.insertRow(i);
-        }
-        
-        // Add a label to the widget in the upper-left cell.
-        var labelCell = table.rows[0].insertCell();
-        labelCell.rowSpan = 2;
-        labelCell.colSpan = 2;
-        labelCell.style.fontSize = this._cellScale * 100 + '%';
-        labelCell.innerHTML = '<b>' + _('mode') + '</b>';
-        labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        labelCell.style.minWidth = labelCell.style.width;
-        labelCell.style.maxWidth = labelCell.style.width;
-        labelCell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        labelCell.style.backgroundColor = MATRIXLABELCOLOR;
-
-        // Add the buttons to the top row for play all, save, clear,
-        // rotate (left and right, invert, and close.
-        var iconSize = Math.floor(this._cellScale * 24);
+        // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 1, 'play-button.svg', iconSize, _('play all'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
+
         cell.onclick=function() {
             that._playAll();
         }
 
-        var cell = this._addButton(row, 2, 'export-chunk.svg', iconSize, _('save'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+
         cell.onclick=function() {
             that._save();
         }
 
-        var cell = this._addButton(row, 3, 'erase-button.svg', iconSize, _('clear'));
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('clear'));
+
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 4, 'rotate-left.svg', iconSize, _('rotate counter clockwise'));
+        var cell = this._addButton(row, 'rotate-left.svg', ICONSIZE, _('rotate counter clockwise'));
+
         cell.onclick=function() {
             that._rotateLeft();
         }
 
-        var cell = this._addButton(row, 5, 'rotate-right.svg', iconSize, _('rotate clockwise'));
+        var cell = this._addButton(row, 'rotate-right.svg', ICONSIZE, _('rotate clockwise'));
+
         cell.onclick=function() {
             that._rotateRight();
         }
 
-        var cell = this._addButton(row, 6, 'invert.svg', iconSize, _('invert'));
+        var cell = this._addButton(row, 'invert.svg', ICONSIZE, _('invert'));
+
         cell.onclick=function() {
             that._invert();
         }
 
-        var cell = this._addButton(row, 7, 'restore-button.svg', iconSize, _('undo'));
+        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
+
         cell.onclick=function() {
             that._undo();
         }
 
-        var cell = this._addButton(row, 8, 'close-button.svg', iconSize, _('close'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+
         cell.onclick=function() {
-            docById('modewidget').style.visibility = 'hidden';
-            docById('modewidget').style.border = 0;
+            docById('modeDiv').style.visibility = 'hidden';
+            docById('modeButtonsDiv').style.visibility = 'hidden';
+            docById('modeTableDiv').style.visibility = 'hidden';
+        }
+
+        // We use this cell as a handle for dragging.
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        dragCell.style.cursor = 'move';
+
+        this._dx = dragCell.getBoundingClientRect().left - modeDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - modeDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = dragCell.innerHTML;
+
+        dragCell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            dragCell.innerHTML = '';
+        };
+
+        dragCell.onmouseout = function(e) {
+            if (!that._dragging) {
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                modeDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                modeDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        modeDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        modeDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                modeDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                modeDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        modeDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
+
+        modeDiv.ondragstart = function(e) {
+            if (dragCell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
+
+        // The mode table
+        var modeTableDiv = docById('modeTableDiv');
+        modeTableDiv.style.display = 'inline';
+        modeTableDiv.style.visibility = 'visible';
+        modeTableDiv.style.border = '0px';
+        modeTableDiv.innerHTML = '<table id="modeTable"></table>';
+
+        var table = docById('modeTable');
+        // Create blank rows.
+        for (var i = 0; i < 15; i++) {
+            table.insertRow();
         }
 
         this._addNotes();
 
         // A row for the current mode label
-        var row = table.insertRow(14);
-        var cell = row.insertCell(0);
+        var row = table.insertRow();
+        var cell = row.insertCell();
         cell.colSpan = 18;
         cell.innerHTML = '&nbsp;';
         cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
@@ -146,16 +198,15 @@ function ModeWidget() {
         this._makeClickable();
     };
 
-    this._addButton = function(row, colIndex, icon, iconSize, label) {
-        var table = docById('modeTable');
-        var cell = table.rows[0].insertCell();
-        cell.rowSpan = 2;
-        cell.colSpan = 2;
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+        cell.style.height = cell.style.width; 
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
         cell.onmouseover=function() {
@@ -380,7 +431,8 @@ function ModeWidget() {
         var currentMode = MUSICALMODES[currentModeName[1]];
 
         var table = docById('modeTable');
-        table.rows[14].cells[0].innerHTML = getModeName(currentModeName[1]);
+        var n = table.rows.length - 1;
+        table.rows[n].cells[0].innerHTML = getModeName(currentModeName[1]);
 
         var that = this;
         var k = 0;
@@ -719,11 +771,13 @@ function ModeWidget() {
     };
 
     this._setModeName = function() {
+        var table = docById('modeTable');
+	var n = table.rows.length - 1;
         var currentMode = JSON.stringify(this._calculateMode());
+
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
-                var table = docById('modeTable');
-                table.rows[14].cells[0].innerHTML = getModeName(mode);
+                table.rows[n].cells[0].innerHTML = getModeName(mode);
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
@@ -736,21 +790,22 @@ function ModeWidget() {
                 return;
             }
         }
-        var table = docById('modeTable');
-        table.rows[14].cells[0].innerHTML = '';
+
+        table.rows[n].cells[0].innerHTML = '';
     };
 
     this._save = function() {
         var table = docById('modeTable');
+	var n = table.rows.length - 1;
 
         // If the mode is not in the list, save it as the new custom mode.
-        if (table.rows[14].cells[0].innerHTML === '') {
+        if (table.rows[n].cells[0].innerHTML === '') {
             customMode = this._calculateMode();
             console.log('custom mode: ' + customMode);
             storage.custommode = JSON.stringify(customMode);
 	}
 
-        var modeName = table.rows[14].cells[0].innerHTML;
+        var modeName = table.rows[n].cells[0].innerHTML;
         if (modeName === '') {
             modeName = _('custom');
         }

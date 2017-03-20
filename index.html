@@ -104,10 +104,6 @@
         $("#statusmatrix").draggable();
       });
 
-      $(function() {
-        $("#modewidget").draggable();
-      });
-
       (function($) {
         $.fn.fixMe = function() {
             return this.each(function() {
@@ -162,16 +158,6 @@
         var row = table.rows.item(0);
         row.style.left = myDivPosition.left + 'px';
         row.style.top = myDivPosition.top + 'px';
-      };
-
-      function moveModeWidget(event) {
-        var modeDiv = document.getElementById('modewidget');
-        var modeDivPosition = modeDiv.getBoundingClientRect();
-
-        var table = document.getElementById('modeTable');
-        var row = table.rows.item(0);
-        row.style.left = modeDivPosition.left + 'px';
-        row.style.top = modeDivPosition.top + 'px';
       };
     </script>
 
@@ -247,6 +233,14 @@
     <h2 id="planetWorldwide"></h2>
     <ul class="content w"></ul>
   </div>
+      </div>
+
+      <div id="modeDiv" draggable="false">
+	<div id="modeButtonsDiv">
+	</div>
+
+	<div id="modeTableDiv">
+	</div>
       </div>
 
       <div id="ptmDiv" draggable="false">

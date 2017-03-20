@@ -417,6 +417,30 @@ table {
     margin-left: 53px;
 }
 
+#modeDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#modeTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#modeButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
 #pdmDiv {
     position: absolute;
     top: 20%;
