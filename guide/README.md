@@ -112,7 +112,7 @@ note.
 
 Note that any mathematical operations can be used as input to the *Note value*.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg "Note value chart")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/NotationRestChart.svg "A chart of note values and their corresponding note value blocks")
 Please refer to the above picture for a visual representation of note values.
 
 <a name="PITCH">
