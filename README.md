@@ -4,14 +4,13 @@ MUSIC BLOCKS
 Music Blocks is a collection of manipulative tools for exploring
 fundamental musical concepts in an integrative and fun way.
 
-<img
-src='https://rawgithub.com/walterbender/musicblocks/master/screenshots/Screenshot-1.png'</img>
+![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/screenshots/Screenshot-1.png)
 
 
 Using Music Blocks
 ------------------
 
-Music Blocks is designed to run in a browser. It is derived from
+Music Blocks is designed to run in the browser. It is derived from
 Turtle Blocks JS which can be found
 [here](https://github.com/walterbender/turtleblocksjs). You can run
 the software locally from the index.html file, from the
