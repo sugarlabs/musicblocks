@@ -995,7 +995,7 @@ function Palette(palettes, name) {
 
     this._getDownButtonY = function () {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
-        return h + STANDARDBLOCKHEIGHT;
+        return h + STANDARDBLOCKHEIGHT / 2;
     };
 
     this._resizeEvent = function () {
