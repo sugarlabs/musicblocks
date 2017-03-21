@@ -89,9 +89,10 @@ function hideButtonHighlight(circles, stage) {
     }, 650);
 }
 
-function hidePaletteNameDisplay(palette_text, stage){
+function hidePaletteNameDisplay(tooltip_rect, palette_text, stage){
     
     setTimeout(function(){
+        stage.removeChild(tooltip_rect);
         stage.removeChild(palette_text);
     }, 150);
 }
