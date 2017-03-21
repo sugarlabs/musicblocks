@@ -14,7 +14,7 @@
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname','midinumber'];
  
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -634,6 +634,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'number':
                     this.value = NUMBERBLOCKDEFAULT;
                     break;
+                case 'midinumber':
+                    this.value = getMidiNumber(DEFAULTMIDINUM);
+                    break;    
                 case 'modename':
                     this.value = getModeName(DEFAULTMODE);
                     break;
@@ -1707,6 +1710,26 @@ function Block(protoblock, blocks, overrideName) {
             labelElem.innerHTML = labelHTML;
             this.label = docById('notenameLabel');
             this.labelattr = docById('noteattrLabel');
+        } else if (this.name === 'midinumber') {
+            var type = 'midinumber';
+            if (this.value != null) {
+                var selectedMidiNum = getMidiNumber(this.value);
+            } else {
+                var selectedMidiNum = getMidiNumber(DEFAULTMIDINUM);
+            }
+ 
+            var labelHTML = '<select name="midinumber" id="midinumberLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            for (var i = 0; i < MIDINUMBERS.length; i++) {
+                if (selectedMidiNum === MIDINUMBERS[i][1]) {
+                    labelHTML += '<option value="' + selectedMidiNum + '" selected>' + MIDINUMBERS[i][0] + '</option>';
+                } else {
+                    labelHTML += '<option value="' + MIDINUMBERS[i][1] + '">' + MIDINUMBERS[i][0]+ '</option>';
+                }
+            }
+ 
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('midinumberLabel');    
         } else if (this.name === 'modename') {
             var type = 'modename';
             if (this.value != null) {

@@ -308,6 +308,60 @@ var VOICENAMES = [
     [_('triangle'), 'triangle', 'images/synth.svg'],
 ];
 
+var MIDINUMBERS = [
+    [_('A0'),21],
+    [_('B0'),23],
+    [_('C1'),24],
+    [_('D1'),26],
+    [_('E1'),28],
+    [_('F1'),29],
+    [_('G1'),31],
+    [_('A1'),33],
+    [_('B1'),35],
+    [_('C2'),36],
+    [_('D2'),38],
+    [_('E2'),40],
+    [_('F2'),41],
+    [_('G2'),43],
+    [_('A2'),45],
+    [_('B2'),47],
+    [_('C3'),48],
+    [_('D3'),50],
+    [_('E3'),52],
+    [_('F3'),53],
+    [_('G3'),55],
+    [_('A3'),57],
+    [_('B3'),59],
+    [_('C4'),60],
+    [_('D4'),62],
+    [_('E4'),64],
+    [_('F4'),65],
+    [_('G4'),67],
+    [_('A4'),69],
+    [_('B4'),71],
+    [_('C5'),72],
+    [_('D5'),74],
+    [_('E5'),76],
+    [_('F5'),77],
+    [_('G5'),79],
+    [_('A5'),81],
+    [_('B5'),83],
+    [_('C6'),84],
+    [_('D6'),86],
+    [_('E6'),88],
+    [_('F6'),89],
+    [_('G6'),91],
+    [_('A6'),93],
+    [_('B6'),95],
+    [_('C7'),96],
+    [_('D7'),98],
+    [_('E7'),100],
+    [_('F7'),101],
+    [_('G7'),103],
+    [_('A7'),105],
+    [_('B7'),107],
+    [_('C8'),108],
+];
 var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('snare drum'), 'snare drum', 'images/snaredrum.svg'],
@@ -360,6 +414,7 @@ var DRUMNAMES = [
 const DEFAULTVOICE = 'sine';
 const DEFAULTDRUM = 'kick drum';
 const DEFAULTMODE = 'major';
+const DEFAULTMIDINUM = 21;
 
 var customMode = MUSICALMODES['custom'];
 
@@ -424,6 +479,17 @@ function initDrumI18N() {
     }
 };
 
+function getMidiNumber(number) {
+    if (number === '') {
+        number = DEFAULTMIDINUM;
+    } 
+
+    for (var i = 0; i < MIDINUMBERS.length; i++) {
+        if(number === MIDINUMBERS[i][1]) {
+            return number;
+        }
+    }
+};
 
 function getDrumName(name) {
     if (name === '') {
