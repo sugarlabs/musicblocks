@@ -261,7 +261,7 @@ define(function (require) {
         initModeI18N();
         initVoiceI18N();
 
-        window.onblur = function() {
+        window.onblur = function () {
             logo.doStopTurtle();
         };
 
@@ -326,11 +326,11 @@ define(function (require) {
             blocksContainer.y = 0;
 
             // Code specific to cleaning up music blocks
-            Element.prototype.remove = function() {
+            Element.prototype.remove = function () {
                 this.parentElement.removeChild(this);
             };
 
-            NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+            NodeList.prototype.remove = HTMLCollection.prototype.remove = function () {
                 for (var i = 0, len = this.length; i < len; i++) {
                     if(this[i] && this[i].parentElement) {
                         this[i].parentElement.removeChild(this[i]);
@@ -515,7 +515,7 @@ define(function (require) {
             button.x = (canvas.width / (2 * turtleBlocksScale))  + (300 / Math.sqrt(2));
             button.y = 300.00 - (300.00 / Math.sqrt(2));
             this.closeButton = _makeButton('cancel-button', _('Close'), button.x, button.y, 55, 0);
-            this.closeButton.on('click', function(event) {
+            this.closeButton.on('click', function (event) {
                 console.log('Deleting Chart');
                 button.closeButton.visible = false;
                 stage.removeChild(chartBitmap);
@@ -1754,9 +1754,9 @@ define(function (require) {
 
             if (run && firstRun) {
                 if (document.addEventListener) {
-                    document.addEventListener('finishedLoading', function(){runProject(env);}, false);
+                    document.addEventListener('finishedLoading', function (){runProject(env);}, false);
                 } else {
-                    document.attachEvent('finishedLoading', function(){runProject(env);});
+                    document.attachEvent('finishedLoading', function (){runProject(env);});
                 }
             }
             firstRun = false;
@@ -1983,7 +1983,7 @@ define(function (require) {
             case NOINPUTERRORMSG:
                 errorArtwork['noinput'].visible = true;
                 stage.setChildIndex(errorArtwork['noinput'], stage.getNumChildren() - 1);
-                break;    
+                break;
             default:
                 var errorMsgContainer = errorMsgText.parent;
                 errorMsgContainer.visible = true;
@@ -2314,7 +2314,7 @@ handleComplete);
             ];
 
             document.querySelector('#myOpenFile')
-                    .addEventListener('change', function(event) {
+                    .addEventListener('change', function (event) {
                         thumbnails.model.controller.hide();
             });
 
@@ -2551,7 +2551,7 @@ handleComplete);
 
             text.visible = false;
 
-            container.on('mouseover', function(event) {
+            container.on('mouseover', function (event) {
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
                         container.children[c].visible = true;
@@ -2560,7 +2560,7 @@ handleComplete);
                 }
             });
 
-            container.on('mouseout', function(event) {
+            container.on('mouseout', function (event) {
                 for (var c = 0; c < container.children.length; c++) {
                     if (container.children[c].text != undefined) {
                         container.children[c].visible = false;
@@ -2624,7 +2624,7 @@ handleComplete);
                     y: container.y - Math.round(event.stageY / turtleBlocksScale)
                 };
 
-                pressTimer = setTimeout(function() {
+                pressTimer = setTimeout(function () {
                     isLong = true;
                     if (long_img !== null) {
                         container.visible = false;
@@ -2632,7 +2632,7 @@ handleComplete);
                     }
                 }, 500);
 
-                pressTimerExtra = setTimeout(function() {
+                pressTimerExtra = setTimeout(function () {
                     isExtraLong = true;
                     if (extra_long_img !== null) {
                         container.visible = false;
@@ -2672,10 +2672,10 @@ handleComplete);
                     }
                     moved = false;
                 });
+
                 isLong = false;
                 isExtraLong = false;
             });
         };
     };
 });
-    

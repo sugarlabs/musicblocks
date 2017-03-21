@@ -9,13 +9,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
- 
+
 // Length of a long touch
 const LONGPRESSTIME = 1500;
 const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
 const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname'];
- 
+
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
     if (protoblock === null) {
@@ -38,17 +38,17 @@ function Block(protoblock, blocks, overrideName) {
                               // the box name associated with the block.
     this.image = protoblock.image;  // The file path of the image.
     this.imageBitmap = null;
- 
+
     // All blocks have at a container and least one bitmap.
     this.container = null;
     this.bounds = null;
     this.bitmap = null;
     this.highlightBitmap = null;
- 
+
     // The svg from which the bitmaps are generated
     this.artwork = null;
     this.collapseArtwork = null;
- 
+
     // Start and Action blocks has a collapse button (in a separate
     // container).
     this.collapseContainer = null;
@@ -57,7 +57,7 @@ function Block(protoblock, blocks, overrideName) {
     this.collapseBlockBitmap = null;
     this.highlightCollapseBlockBitmap = null;
     this.collapseText = null;
- 
+
     this.size = 1;  // Proto size is copied here.
     this.docks = [];  // Proto dock is copied here.
     this.connections = [];
@@ -65,36 +65,36 @@ function Block(protoblock, blocks, overrideName) {
     // Keep track of clamp count for blocks with clamps.
     this.clampCount = [1, 1];
     this.argClampSlots = [1];
- 
+
     // Some blocks have some post process after they are first loaded.
     this.postProcess = null;
     this.postProcessArg = null;
- 
+
     // Lock on label change
     this._label_lock = false;
- 
+
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this._createCache = function() {
+    this._createCache = function () {
         var myBlock = this;
         myBlock.bounds = myBlock.container.getBounds();
- 
+
         if (myBlock.bounds == null) {
-            setTimeout(function() {
+            setTimeout(function () {
                 myBlock._createCache();
             }, 200);
         } else {
             myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
         }
     };
- 
+
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this.updateCache = function() {
+    this.updateCache = function () {
         var myBlock = this;
- 
+
         if (myBlock.bounds == null) {
-            setTimeout(function() {
+            setTimeout(function () {
                 myBlock.updateCache();
             }, 300);
         } else {
@@ -102,20 +102,20 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.blocks.refreshCanvas();
         }
     };
- 
+
     this.offScreen = function (boundary) {
         return !this.trash && boundary.offScreen(this.container.x, this.container.y);
     };
- 
-    this.copySize = function() {
+
+    this.copySize = function () {
         this.size = this.protoblock.size;
     };
- 
-    this.getInfo = function() {
+
+    this.getInfo = function () {
         return this.name + ' block';
     };
- 
-    this.highlight = function() {
+
+    this.highlight = function () {
         if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
             // We may have a race condition.
             if (this.highlightCollapseBlockBitmap) {
@@ -146,8 +146,8 @@ function Block(protoblock, blocks, overrideName) {
         }
         this.updateCache();
     };
- 
-    this.unhighlight = function() {
+
+    this.unhighlight = function () {
         if (this.collapsed && COLLAPSABLES.indexOf(this.name) !== -1) {
             if (this.highlightCollapseBlockBitmap) {
                 this.highlightCollapseBlockBitmap.visible = false;
@@ -169,33 +169,33 @@ function Block(protoblock, blocks, overrideName) {
         }
         this.updateCache();
     };
- 
-    this.updateArgSlots = function(slotList) {
+
+    this.updateArgSlots = function (slotList) {
         // Resize and update number of slots in argClamp
         this.argClampSlots = slotList;
         this._newArtwork();
         this.regenerateArtwork(false);
     };
- 
-    this.updateSlots = function(clamp, plusMinus) {
+
+    this.updateSlots = function (clamp, plusMinus) {
         // Resize an expandable block.
         this.clampCount[clamp] += plusMinus;
         this._newArtwork(plusMinus);
         this.regenerateArtwork(false);
     };
- 
-    this.resize = function(scale) {
+
+    this.resize = function (scale) {
         // If the block scale changes, we need to regenerate the
         // artwork and recalculate the hitarea.
         var myBlock = this;
- 
-        this.postProcess = function(args) {
+
+        this.postProcess = function (args) {
             if (myBlock.imageBitmap !== null) {
                 myBlock._positionMedia(myBlock.imageBitmap, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, scale);
                 z = myBlock.container.getNumChildren() - 1;
                 myBlock.container.setChildIndex(myBlock.imageBitmap, z);
             }
- 
+
             if (myBlock.name === 'start' || myBlock.name === 'drum') {
                 // Rescale the decoration on the start blocks.
                 for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
@@ -208,43 +208,43 @@ function Block(protoblock, blocks, overrideName) {
             }
             myBlock.updateCache();
             myBlock._calculateBlockHitArea();
- 
+
             // If it is in the trash, make sure it remains hidden.
             if (myBlock.trash) {
                 myBlock.hide();
             }
         };
- 
+
         this.postProcessArg = null;
- 
+
         this.protoblock.scale = scale;
         this._newArtwork(0);
         this.regenerateArtwork(true, []);
- 
+
         if (this.text !== null) {
             this._positionText(scale);
         }
- 
+
         if (this.collapseContainer !== null) {
             this.collapseContainer.uncache();
-            var postProcess = function(myBlock) {
+            var postProcess = function (myBlock) {
                 myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = scale / 2;
                 myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = scale / 2;
- 
+
                 var bounds = myBlock.collapseContainer.getBounds();
                 myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 myBlock._positionCollapseContainer(myBlock.protoblock.scale);
                 myBlock._calculateCollapseHitArea();
             };
- 
+
             this._generateCollapseArtwork(postProcess);
             var fontSize = 10 * scale;
             this.collapseText.font = fontSize + 'px Sans';
             this._positionCollapseLabel(scale);
         }
     };
- 
-    this._newArtwork = function(plusMinus) {
+
+    this._newArtwork = function (plusMinus) {
         switch (this.name) {
         case 'start':
         case 'drum':
@@ -391,13 +391,13 @@ function Block(protoblock, blocks, overrideName) {
             this.size += plusMinus;
             break;
         }
- 
+
         switch (this.name) {
         case 'nameddoArg':
             for (var i = 1; i < obj[1].length - 1; i++) {
                 this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
             }
- 
+
             this.docks.push([obj[1][2][0], obj[1][2][1], 'in']);
             break;
         case 'namedcalcArg':
@@ -410,7 +410,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 2; i < obj[1].length - 1; i++) {
                 this.docks.push([obj[1][i][0], obj[1][i][1], 'anyin']);
             }
- 
+
             this.docks.push([obj[1][3][0], obj[1][3][1], 'in']);
             break;
         case 'calcArg':
@@ -422,7 +422,7 @@ function Block(protoblock, blocks, overrideName) {
         default:
             break;
         }
- 
+
         // Save new artwork and dock positions.
         this.artwork = obj[0];
         for (var i = 0; i < this.docks.length; i++) {
@@ -430,26 +430,26 @@ function Block(protoblock, blocks, overrideName) {
             this.docks[i][1] = obj[1][i][1];
         }
     };
- 
-    this.imageLoad = function() {
+
+    this.imageLoad = function () {
         // Load any artwork associated with the block and create any
         // extra parts. Image components are loaded asynchronously so
         // most the work happens in callbacks.
- 
+
         // We need a text label for some blocks. For number and text
         // blocks, this is the primary label; for parameter blocks,
         // this is used to display the current block value.
         var fontSize = 10 * this.protoblock.scale;
         this.text = new createjs.Text('', fontSize + 'px Sans', '#000000');
- 
+
         this.generateArtwork(true, []);
     };
- 
-    this._addImage = function() {
+
+    this._addImage = function () {
         var image = new Image();
         var myBlock = this;
- 
-        image.onload = function() {
+
+        image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
             myBlock.container.addChild(bitmap);
@@ -459,43 +459,43 @@ function Block(protoblock, blocks, overrideName) {
         };
         image.src = this.image;
     };
- 
-    this.regenerateArtwork = function(collapse) {
+
+    this.regenerateArtwork = function (collapse) {
         // Sometimes (in the case of namedboxes and nameddos) we need
         // to regenerate the artwork associated with a block.
- 
+
         // First we need to remove the old artwork.
         if (this.bitmap != null) {
             this.container.removeChild(this.bitmap);
         }
- 
+
         if (this.highlightBitmap != null) {
             this.container.removeChild(this.highlightBitmap);
         }
- 
+
         if (collapse && this.collapseBitmap !== null) {
             this.collapseContainer.removeChild(this.collapseBitmap);
             this.collapseContainer.removeChild(this.expandBitmap);
             this.container.removeChild(this.collapseBlockBitmap);
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
- 
+
         // Then we generate new artwork.
         this.generateArtwork(false);
     };
- 
-    this.generateArtwork = function(firstTime) {
+
+    this.generateArtwork = function (firstTime) {
         // Get the block labels from the protoblock.
         var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         var block_label = '';
- 
+
         // Create the highlight bitmap for the block.
         function __processHighlightBitmap(name, bitmap, myBlock) {
             if (myBlock.highlightBitmap != null) {
                 myBlock.container.removeChild(myBlock.highlightBitmap);
             }
- 
+
             myBlock.highlightBitmap = bitmap;
             myBlock.container.addChild(myBlock.highlightBitmap);
             myBlock.highlightBitmap.x = 0;
@@ -504,16 +504,16 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.highlightBitmap.cursor = 'pointer';
             // Hide highlight bitmap to start.
             myBlock.highlightBitmap.visible = false;
- 
+
             // At me point, it should be safe to calculate the
             // bounds of the container and cache its contents.
             if (!firstTime) {
                 myBlock.container.uncache();
             }
- 
+
             myBlock._createCache();
             myBlock.blocks.refreshCanvas();
- 
+
             if (firstTime) {
                 myBlock._loadEventHandlers();
                 if (myBlock.image !== null) {
@@ -524,32 +524,32 @@ function Block(protoblock, blocks, overrideName) {
                 if (myBlock.name === 'start' || myBlock.name === 'drum') {
                     myBlock._ensureDecorationOnTop();
                 }
- 
+
                 // Adjust the docks.
                 myBlock.blocks.adjustDocks(thisBlock, true);
- 
+
                 // Adjust the text position.
                 myBlock._positionText(myBlock.protoblock.scale);
- 
+
                 if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
                     myBlock.bitmap.visible = !myBlock.collapsed;
                     myBlock.highlightBitmap.visible = false;
                     myBlock.updateCache();
                 }
- 
+
                 if (myBlock.postProcess != null) {
                     myBlock.postProcess(myBlock.postProcessArg);
                     myBlock.postProcess = null;
                 }
             }
         };
- 
+
         // Create the bitmap for the block.
         function __processBitmap(name, bitmap, myBlock) {
             if (myBlock.bitmap != null) {
                 myBlock.container.removeChild(myBlock.bitmap);
             }
- 
+
             myBlock.bitmap = bitmap;
             myBlock.container.addChild(myBlock.bitmap);
             myBlock.bitmap.x = 0;
@@ -557,20 +557,20 @@ function Block(protoblock, blocks, overrideName) {
             myBlock.bitmap.name = 'bmp_' + thisBlock;
             myBlock.bitmap.cursor = 'pointer';
             myBlock.blocks.refreshCanvas();
- 
+
             if (myBlock.protoblock.disabled) {
                 var artwork = myBlock.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', block_label);
             } else {
                 var artwork = myBlock.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', block_label);
             }
- 
+
             for (var i = 1; i < myBlock.protoblock.staticLabels.length; i++) {
                 artwork = artwork.replace('arg_label_' + i, myBlock.protoblock.staticLabels[i]);
             }
- 
+
             _makeBitmap(artwork, myBlock.name, __processHighlightBitmap, myBlock);
         };
- 
+
         if (this.overrideName) {
             if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
@@ -584,11 +584,11 @@ function Block(protoblock, blocks, overrideName) {
             // Label should be defined inside _().
             block_label = this.protoblock.staticLabels[0];
         }
- 
+
         while (this.protoblock.staticLabels.length < this.protoblock.args + 1) {
             this.protoblock.staticLabels.push('');
         }
- 
+
         if (firstTime) {
             // Create artwork and dock.
             var obj = this.protoblock.generator();
@@ -597,23 +597,23 @@ function Block(protoblock, blocks, overrideName) {
                 this.docks.push([obj[1][i][0], obj[1][i][1], this.protoblock.dockTypes[i]]);
             }
         }
- 
+
         if (this.protoblock.disabled) {
             var artwork = this.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', block_label);
         } else {
             var artwork = this.artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', block_label);
         }
- 
+
         for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
             artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
- 
+
         _makeBitmap(artwork, this.name, __processBitmap, this);
     };
- 
-    this._finishImageLoad = function() {
+
+    this._finishImageLoad = function () {
         var thisBlock = this.blocks.blockList.indexOf(this);
- 
+
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             if (this.value == null) {
@@ -645,12 +645,12 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 }
             }
- 
+
             if (this.name === 'solfege') {
                 var obj = splitSolfege(this.value);
                 var label = i18nSolfege(obj[0]);
                 var attr = obj[1];
- 
+
                 if (attr !== '♮') {
                     label += attr;
                 }
@@ -658,18 +658,18 @@ function Block(protoblock, blocks, overrideName) {
                 var obj = splitSolfege(this.value);
                 var label = WESTERN2EISOLFEGENAMES[obj[0]];
                 var attr = obj[1];
- 
+
                 if (attr !== '♮') {
                     label += attr;
                 }
             } else {
                 var label = this.value.toString();
             }
- 
+
             if (label.length > 8) {
                 label = label.substr(0, 7) + '...';
             }
- 
+
             this.text.text = label;
             this.container.addChild(this.text);
             this._positionText(this.protoblock.scale);
@@ -678,14 +678,14 @@ function Block(protoblock, blocks, overrideName) {
             this.container.addChild(this.text);
             this._positionText(this.protoblock.scale);
         }
- 
+
         if (COLLAPSABLES.indexOf(this.name) === -1) {
             this.loadComplete = true;
             if (this.postProcess !== null) {
                 this.postProcess(this.postProcessArg);
                 this.postProcess = null;
             }
- 
+
             this.blocks.refreshCanvas();
             this.blocks.cleanupAfterLoad(this.name);
         } else {
@@ -697,30 +697,30 @@ function Block(protoblock, blocks, overrideName) {
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
-            var postProcess = function(myBlock) {
+            var postProcess = function (myBlock) {
                 myBlock._loadCollapsibleEventHandlers();
                 myBlock.loadComplete = true;
- 
+
                 if (myBlock.postProcess !== null) {
                     myBlock.postProcess(myBlock.postProcessArg);
                     myBlock.postProcess = null;
                 }
             };
- 
+
             this._generateCollapseArtwork(postProcess);
         }
     };
- 
-    this._generateCollapseArtwork = function(postProcess) {
+
+    this._generateCollapseArtwork = function (postProcess) {
         var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
- 
+
         function __processHighlightCollapseBitmap(name, bitmap, myBlock) {
             myBlock.highlightCollapseBlockBitmap = bitmap;
             myBlock.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
             myBlock.container.addChild(myBlock.highlightCollapseBlockBitmap);
             myBlock.highlightCollapseBlockBitmap.visible = false;
- 
+
             if (myBlock.collapseText === null) {
                 var fontSize = 10 * myBlock.protoblock.scale;
                 switch (myBlock.name) {
@@ -763,72 +763,72 @@ function Block(protoblock, blocks, overrideName) {
             }
             myBlock._positionCollapseLabel(myBlock.protoblock.scale);
             myBlock.collapseText.visible = myBlock.collapsed;
- 
+
             myBlock._ensureDecorationOnTop();
- 
+
             myBlock.updateCache();
- 
+
             myBlock.collapseContainer = new createjs.Container();
             myBlock.collapseContainer.snapToPixelEnabled = true;
- 
+
             var image = new Image();
-            image.onload = function() {
+            image.onload = function () {
                 myBlock.collapseBitmap = new createjs.Bitmap(image);
                 myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = myBlock.protoblock.scale / 2;
                 myBlock.collapseContainer.addChild(myBlock.collapseBitmap);
                 myBlock.collapseBitmap.visible = !myBlock.collapsed;
                 finishCollapseButton(myBlock);
             };
- 
+
             image.src = 'images/collapse.svg';
- 
-            finishCollapseButton = function(myBlock) {
+
+            finishCollapseButton = function (myBlock) {
                 var image = new Image();
-                image.onload = function() {
+                image.onload = function () {
                     myBlock.expandBitmap = new createjs.Bitmap(image);
                     myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = myBlock.protoblock.scale / 2;
                     myBlock.collapseContainer.addChild(myBlock.expandBitmap);
                     myBlock.expandBitmap.visible = myBlock.collapsed;
- 
+
                     var bounds = myBlock.collapseContainer.getBounds();
                     myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                     myBlock.blocks.stage.addChild(myBlock.collapseContainer);
                     if (postProcess !== null) {
                         postProcess(myBlock);
                     }
- 
+
                     myBlock.blocks.refreshCanvas();
                     myBlock.blocks.cleanupAfterLoad(myBlock.name);
                 };
- 
+
                 image.src = 'images/expand.svg';
             }
         };
- 
+
         function __processCollapseBitmap(name, bitmap, myBlock) {
             myBlock.collapseBlockBitmap = bitmap;
             myBlock.collapseBlockBitmap.name = 'collapse_' + thisBlock;
             myBlock.container.addChild(myBlock.collapseBlockBitmap);
             myBlock.collapseBlockBitmap.visible = myBlock.collapsed;
             myBlock.blocks.refreshCanvas();
- 
+
             var artwork = myBlock.collapseArtwork;
             _makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', ''), '', __processHighlightCollapseBitmap, myBlock);
         };
- 
+
         var artwork = this.collapseArtwork;
         _makeBitmap(artwork.replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name]).replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name]).replace('block_label', ''), '', __processCollapseBitmap, this);
     };
- 
-    this.hide = function() {
+
+    this.hide = function () {
         this.container.visible = false;
         if (this.collapseContainer !== null) {
             this.collapseContainer.visible = false;
             this.collapseText.visible = false;
         }
     };
- 
-    this.show = function() {
+
+    this.show = function () {
         if (!this.trash) {
             // If it is an action block or it is not collapsed then show it.
             if (!(COLLAPSABLES.indexOf(this.name) === -1 && this.collapsed)) {
@@ -840,59 +840,59 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
- 
+
     // Utility functions
-    this.isValueBlock = function() {
+    this.isValueBlock = function () {
         return this.protoblock.style === 'value';
     };
- 
-    this.isNoHitBlock = function() {
+
+    this.isNoHitBlock = function () {
         return NOHIT.indexOf(this.name) !== -1;
     };
- 
-    this.isArgBlock = function() {
+
+    this.isArgBlock = function () {
         return this.protoblock.style === 'value' || this.protoblock.style === 'arg';
     };
- 
-    this.isTwoArgBlock = function() {
+
+    this.isTwoArgBlock = function () {
         return this.protoblock.style === 'twoarg';
     };
- 
-    this.isTwoArgBooleanBlock = function() {
+
+    this.isTwoArgBooleanBlock = function () {
         return ['equal', 'greater', 'less'].indexOf(this.name) !== -1;
     };
- 
-    this.isClampBlock = function() {
+
+    this.isClampBlock = function () {
         return this.protoblock.style === 'clamp' || this.isDoubleClampBlock() || this.isArgFlowClampBlock();
     };
- 
-    this.isArgFlowClampBlock = function() {
+
+    this.isArgFlowClampBlock = function () {
         return this.protoblock.style === 'argflowclamp';
     };
 
-    this.isDoubleClampBlock = function() {
+    this.isDoubleClampBlock = function () {
         return this.protoblock.style === 'doubleclamp';
     };
- 
-    this.isNoRunBlock = function() {
+
+    this.isNoRunBlock = function () {
         return this.name === 'action';
     };
- 
-    this.isArgClamp = function() {
+
+    this.isArgClamp = function () {
         return this.protoblock.style === 'argclamp' || this.protoblock.style === 'argclamparg';
     };
- 
-    this.isExpandableBlock = function() {
+
+    this.isExpandableBlock = function () {
         return this.protoblock.expandable;
     };
- 
-    this.getBlockId = function() {
+
+    this.getBlockId = function () {
         // Generate a UID based on the block index into the blockList.
         var number = blockBlocks.blockList.indexOf(this);
         return '_' + number.toString();
     };
- 
-    this.removeChildBitmap = function(name) {
+
+    this.removeChildBitmap = function (name) {
         for (var child = 0; child < this.container.getNumChildren(); child++) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
@@ -900,7 +900,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
- 
+
     this.loadThumbnail = function (imagePath) {
         // Load an image thumbnail onto block.
         var thisBlock = this.blocks.blockList.indexOf(this);
@@ -909,18 +909,18 @@ function Block(protoblock, blocks, overrideName) {
             return;
         }
         var image = new Image();
- 
-        image.onload = function() {
+
+        image.onload = function () {
             // Before adding new artwork, remove any old artwork.
             myBlock.removeChildBitmap('media');
- 
+
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
- 
- 
+
+
             var myContainer = new createjs.Container();
             myContainer.addChild(bitmap);
- 
+
             // Resize the image to a reasonable maximum.
             var MAXWIDTH = 600;
             var MAXHEIGHT = 450;
@@ -933,34 +933,34 @@ function Block(protoblock, blocks, overrideName) {
                     bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXHEIGHT / image.height;
                 }
             }
- 
+
             var bounds = myContainer.getBounds();
             myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             myBlock.value = myContainer.getCacheDataURL();
             myBlock.imageBitmap = bitmap;
- 
+
             // Next, scale the bitmap for the thumbnail.
             myBlock._positionMedia(bitmap, bitmap.image.width, bitmap.image.height, myBlock.protoblock.scale);
             myBlock.container.addChild(bitmap);
             myBlock.updateCache();
         };
- 
+
         if (imagePath === null) {
             image.src = this.value;
         } else {
             image.src = imagePath;
         }
     };
- 
+
     this._doOpenMedia = function (thisBlock) {
         var fileChooser = docById('myOpenAll');
         var myBlock = this;
- 
+
         readerAction = function (event) {
             window.scroll(0, 0);
- 
+
             var reader = new FileReader();
-            reader.onloadend = (function() {
+            reader.onloadend = (function () {
                 if (reader.result) {
                     if (myBlock.name === 'media') {
                         myBlock.value = reader.result;
@@ -979,19 +979,19 @@ function Block(protoblock, blocks, overrideName) {
             }
             fileChooser.removeEventListener('change', readerAction);
         };
- 
+
         fileChooser.addEventListener('change', readerAction, false);
         fileChooser.focus();
         fileChooser.click();
         window.scroll(0, 0)
     };
- 
+
     this.collapseToggle = function () {
         // Find the blocks to collapse/expand
         var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         this.blocks.findDragGroup(thisBlock);
- 
+
         function __toggle() {
             var collapse = myBlock.collapsed;
             if (myBlock.collapseBitmap === null) {
@@ -999,16 +999,16 @@ function Block(protoblock, blocks, overrideName) {
                 return;
             }
             myBlock.collapsed = !collapse;
- 
+
             // These are the buttons to collapse/expand the stack.
             myBlock.collapseBitmap.visible = collapse;
             myBlock.expandBitmap.visible = !collapse;
- 
+
             // These are the collpase-state bitmaps.
             myBlock.collapseBlockBitmap.visible = !collapse;
             myBlock.highlightCollapseBlockBitmap.visible = false;
             myBlock.collapseText.visible = !collapse;
- 
+
             if (collapse) {
                 myBlock.bitmap.visible = true;
             } else {
@@ -1016,7 +1016,7 @@ function Block(protoblock, blocks, overrideName) {
                 myBlock.updateCache();
             }
             myBlock.highlightBitmap.visible = false;
- 
+
             if (myBlock.name === 'action') {
                 // Label the collapsed block with the action label
                 if (myBlock.connections[1] !== null) {
@@ -1029,11 +1029,11 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.collapseText.text = '';
                 }
             }
- 
+
             // Make sure the text is on top.
             var z = myBlock.container.getNumChildren() - 1;
             myBlock.container.setChildIndex(myBlock.collapseText, z);
- 
+
             // Set collapsed state of blocks in drag group.
             if (myBlock.blocks.dragGroup.length > 0) {
                 for (var b = 1; b < myBlock.blocks.dragGroup.length; b++) {
@@ -1042,22 +1042,22 @@ function Block(protoblock, blocks, overrideName) {
                     myBlock.blocks.blockList[blk].container.visible = collapse;
                 }
             }
- 
+
             myBlock.collapseContainer.updateCache();
             myBlock.updateCache();
         }
- 
+
         __toggle();
     };
- 
-    this._positionText = function(blockScale) {
+
+    this._positionText = function (blockScale) {
         this.text.textBaseline = 'alphabetic';
         this.text.textAlign = 'right';
         var fontSize = 10 * blockScale;
         this.text.font = fontSize + 'px Sans';
         this.text.x = TEXTX * blockScale / 2.;
         this.text.y = TEXTY * blockScale / 2.;
- 
+
         // Some special cases
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = 'center';
@@ -1071,14 +1071,14 @@ function Block(protoblock, blocks, overrideName) {
                 this.text.y = this.docks[0][1];
             }
         }
- 
+
         // Ensure text is on top.
         z = this.container.getNumChildren() - 1;
         this.container.setChildIndex(this.text, z);
         this.updateCache();
     };
- 
-    this._positionMedia = function(bitmap, width, height, blockScale) {
+
+    this._positionMedia = function (bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / width * blockScale / 2;
         } else {
@@ -1087,45 +1087,45 @@ function Block(protoblock, blocks, overrideName) {
         bitmap.x = (MEDIASAFEAREA[0] - 10) * blockScale / 2;
         bitmap.y = MEDIASAFEAREA[1] * blockScale / 2;
     };
- 
-    this._calculateCollapseHitArea = function() {
+
+    this._calculateCollapseHitArea = function () {
         var bounds = this.collapseContainer.getBounds();
         var hitArea = new createjs.Shape();
         var w2 = bounds.width;
         var h2 = bounds.height;
- 
+
         hitArea.graphics.beginFill('#FFF').drawEllipse(-w2 / 2, -h2 / 2, w2, h2);
         hitArea.x = w2 / 2;
         hitArea.y = h2 / 2;
         this.collapseContainer.hitArea = hitArea;
     };
- 
-    this._positionCollapseLabel = function(blockScale) {
+
+    this._positionCollapseLabel = function (blockScale) {
         this.collapseText.x = COLLAPSETEXTX * blockScale / 2;
         this.collapseText.y = COLLAPSETEXTY * blockScale / 2;
- 
+
         // Ensure text is on top.
         z = this.container.getNumChildren() - 1;
         this.container.setChildIndex(this.collapseText, z);
     };
- 
-    this._positionCollapseContainer = function(blockScale) {
+
+    this._positionCollapseContainer = function (blockScale) {
         this.collapseContainer.x = this.container.x + (COLLAPSEBUTTONXOFF * blockScale / 2);
         this.collapseContainer.y = this.container.y + (COLLAPSEBUTTONYOFF * blockScale / 2);
     };
- 
+
     // These are the event handlers for collapsible blocks.
-    this._loadCollapsibleEventHandlers = function() {
+    this._loadCollapsibleEventHandlers = function () {
         var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         this._calculateCollapseHitArea();
- 
-        this.collapseContainer.on('mouseover', function(event) {
+
+        this.collapseContainer.on('mouseover', function (event) {
             myBlock.blocks.highlight(thisBlock, true);
             myBlock.blocks.activeBlock = thisBlock;
             myBlock.blocks.refreshCanvas();
         });
- 
+
         var moved = false;
         var locked = false;
         var mousedown = false;
@@ -1136,7 +1136,7 @@ function Block(protoblock, blocks, overrideName) {
                 return;
             }
             locked = true;
-            setTimeout(function() {
+            setTimeout(function () {
                 locked = false;
             }, 500);
             hideDOMLabel();
@@ -1144,12 +1144,12 @@ function Block(protoblock, blocks, overrideName) {
                 myBlock.collapseToggle();
             }
         }
- 
-        this.collapseContainer.on('click', function(event) {
+
+        this.collapseContainer.on('click', function (event) {
             handleClick();
         });
- 
-        this.collapseContainer.on('mousedown', function(event) {
+
+        this.collapseContainer.on('mousedown', function (event) {
             hideDOMLabel();
             // Always show the trash when there is a block selected.
             trashcan.show();
@@ -1162,8 +1162,8 @@ function Block(protoblock, blocks, overrideName) {
                 y: myBlock.collapseContainer.y - Math.round(event.stageY / blocks.blockScale)
             };
         });
- 
-        this.collapseContainer.on('pressup', function(event) {
+
+        this.collapseContainer.on('pressup', function (event) {
             if (!mousedown) {
                 return;
             }
@@ -1180,8 +1180,8 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         });
- 
-        this.collapseContainer.on('mouseout', function(event) {
+
+        this.collapseContainer.on('mouseout', function (event) {
             if (!mousedown) {
                 return;
             }
@@ -1199,8 +1199,8 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         });
- 
-        this.collapseContainer.on('pressmove', function(event) {
+
+        this.collapseContainer.on('pressmove', function (event) {
             if (!mousedown) {
                 return;
             }
@@ -1213,7 +1213,7 @@ function Block(protoblock, blocks, overrideName) {
             var dy = myBlock.collapseContainer.y - oldY;
             myBlock.container.x += dx;
             myBlock.container.y += dy;
- 
+
             // If we are over the trash, warn the user.
             if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
                 trashcan.startHighlightAnimation();
@@ -1230,14 +1230,14 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
             }
- 
+
             myBlock.blocks.refreshCanvas();
         });
     };
- 
-    this._collapseOut = function(blocks, thisBlock, moved, event) {
+
+    this._collapseOut = function (blocks, thisBlock, moved, event) {
         // Always hide the trash when there is no block selected.
- 
+
         trashcan.hide();
         blocks.unhighlight(thisBlock);
         if (moved) {
@@ -1250,25 +1250,25 @@ function Block(protoblock, blocks, overrideName) {
                 blocks.blockMoved(thisBlock);
             }
         }
- 
+
         if (blocks.activeBlock !== myBlock) {
             return;
         }
- 
+
         blocks.unhighlight(null);
         blocks.activeBlock = null;
         blocks.refreshCanvas();
     };
- 
-    this._calculateBlockHitArea = function() {
+
+    this._calculateBlockHitArea = function () {
         var hitArea = new createjs.Shape();
         var bounds = this.container.getBounds()
- 
+
         if (bounds === null) {
             this._createCache();
             bounds = this.bounds;
         }
- 
+
         // Since hitarea is concave, we only detect hits on top
         // section of block. Otherwise we would not be able to grab
         // blocks placed inside of clamps.
@@ -1284,41 +1284,41 @@ function Block(protoblock, blocks, overrideName) {
         }
         this.container.hitArea = hitArea;
     };
- 
+
     // These are the event handlers for block containers.
-    this._loadEventHandlers = function() {
+    this._loadEventHandlers = function () {
         var myBlock = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         var blocks = this.blocks;
 
         this._calculateBlockHitArea();
- 
-        this.container.on('mouseover', function(event) {
+
+        this.container.on('mouseover', function (event) {
             blocks.highlight(thisBlock, true);
             blocks.activeBlock = thisBlock;
             blocks.refreshCanvas();
         });
- 
+
         var haveClick = false;
         var moved = false;
         var locked = false;
         var getInput = window.hasMouse;
- 
-        this.container.on('click', function(event) {
+
+        this.container.on('click', function (event) {
             blocks.activeBlock = thisBlock;
             haveClick = true;
- 
+
             if (locked) {
                 return;
             }
 
             locked = true;
-            setTimeout(function() {
+            setTimeout(function () {
                 locked = false;
             }, 500);
- 
+
             hideDOMLabel();
- 
+
             if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (blocks.selectingStack) {
                     var topBlock = blocks.findTopBlock(thisBlock);
@@ -1342,63 +1342,63 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         });
- 
-        this.container.on('mousedown', function(event) {
+
+        this.container.on('mousedown', function (event) {
             // Track time for detecting long pause...
             // but only for top block in stack.
             if (myBlock.connections[0] == null) {
                 var d = new Date();
                 blocks.mouseDownTime = d.getTime();
-                blocks.longPressTimeout = setTimeout(function() {
+                blocks.longPressTimeout = setTimeout(function () {
                     blocks.triggerLongPress(myBlock);
                 }, LONGPRESSTIME);
             }
- 
+
             // Always show the trash when there is a block selected,
             trashcan.show();
 
             // Raise entire stack to the top.
             blocks.raiseStackToTop(thisBlock);
- 
+
             // And possibly the collapse button.
             if (myBlock.collapseContainer != null) {
                 blocks.stage.setChildIndex(myBlock.collapseContainer, blocks.stage.getNumChildren() - 1);
             }
- 
+
             moved = false;
             var offset = {
                 x: myBlock.container.x - Math.round(event.stageX / blocks.blockScale),
                 y: myBlock.container.y - Math.round(event.stageY / blocks.blockScale)
             };
- 
-            myBlock.container.on('mouseout', function(event) {
+
+            myBlock.container.on('mouseout', function (event) {
                 if (haveClick) {
                     return;
                 }
- 
+
                 if (!blocks.inLongPress) {
                     myBlock._mouseoutCallback(event, moved, haveClick, true);
                 }
                 moved = false;
             });
- 
-            myBlock.container.on('pressup', function(event) {
+
+            myBlock.container.on('pressup', function (event) {
                 if (haveClick) {
                     return;
                 }
- 
+
                 if (!blocks.inLongPress) {
                     myBlock._mouseoutCallback(event, moved, haveClick, true);
                 }
                 moved = false;
             });
- 
+
             var original = {x: event.stageX / blocks.blockScale, y: event.stageY / blocks.blockScale};
 
-            myBlock.container.on('pressmove', function(event) {
+            myBlock.container.on('pressmove', function (event) {
                 // FIXME: More voodoo
                 event.nativeEvent.preventDefault();
- 
+
                 if (blocks.longPressTimeout != null) {
                     clearTimeout(blocks.longPressTimeout);
                     blocks.longPressTimeout = null;
@@ -1407,7 +1407,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (!moved && myBlock.label != null) {
                     myBlock.label.style.display = 'none';
                 }
- 
+
                 if (window.hasMouse) {
                     moved = true;
                 } else {
@@ -1417,14 +1417,14 @@ function Block(protoblock, blocks, overrideName) {
                         getInput = !moved;
                     }, 200);
                 }
- 
+
                 var oldX = myBlock.container.x;
                 var oldY = myBlock.container.y;
 
                 var dx = Math.round(Math.round(event.stageX / blocks.blockScale) + offset.x - oldX);
                 var dy = Math.round(Math.round(event.stageY / blocks.blockScale) + offset.y - oldY);
                 var finalPos = oldY + dy;
-                
+
                 if (blocks.stage.y === 0 && finalPos < (45 * blocks.blockScale)) {
                     dy += (45 * blocks.blockScale) - finalPos;
                 }
@@ -1445,7 +1445,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else if (myBlock.collapseContainer != null) {
                     myBlock._positionCollapseContainer(myBlock.protoblock.scale);
                 }
- 
+
                 // ...and move any connected blocks.
                 blocks.findDragGroup(thisBlock)
                 if (blocks.dragGroup.length > 0) {
@@ -1456,32 +1456,32 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 }
- 
+
                 blocks.refreshCanvas();
             });
         });
- 
-        this.container.on('mouseout', function(event) {
+
+        this.container.on('mouseout', function (event) {
             if (!blocks.inLongPress) {
                 myBlock._mouseoutCallback(event, moved, haveClick, true);
             }
             moved = false;
         });
- 
-        this.container.on('pressup', function(event) {
+
+        this.container.on('pressup', function (event) {
             if (!blocks.inLongPress) {
                 myBlock._mouseoutCallback(event, moved, haveClick, false);
             }
             moved = false;
         });
     };
- 
-    this._mouseoutCallback = function(event, moved, haveClick, hideDOM) {
+
+    this._mouseoutCallback = function (event, moved, haveClick, hideDOM) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Always hide the trash when there is no block selected.
         trashcan.hide();
- 
+
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
             this.blocks.longPressTimeout = null;
@@ -1499,7 +1499,7 @@ function Block(protoblock, blocks, overrideName) {
                 var d = new Date();
                 blocks.mouseDownTime = d.getTime();
                 this.blocks.blockMoved(thisBlock);
- 
+
                 // Just in case the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
@@ -1523,7 +1523,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
- 
+
         if (hideDOM) {
             if (this.blocks.activeBlock !== thisBlock) {
                 hideDOMLabel();
@@ -1534,8 +1534,8 @@ function Block(protoblock, blocks, overrideName) {
             this.blocks.activeBlock = null;
         }
     };
- 
-    this._ensureDecorationOnTop = function() {
+
+    this._ensureDecorationOnTop = function () {
         // Find the turtle decoration and move it to the top.
         for (var child = 0; child < this.container.getNumChildren(); child++) {
             if (this.container.children[child].name === 'decoration') {
@@ -1554,33 +1554,33 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 }
- 
+
                 this.container.setChildIndex(this.container.children[child], this.container.getNumChildren() - 1);
                 break;
             }
         }
     };
- 
-    this._changeLabel = function() {
+
+    this._changeLabel = function () {
         var myBlock = this;
         var blocks = this.blocks;
         var x = this.container.x;
         var y = this.container.y;
- 
+
         var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.blockScale;
         var canvasTop = blocks.canvas.offsetTop + 6 * blocks.blockScale;
- 
+
         var movedStage = false;
         if (!window.hasMouse && blocks.stage.y + y > 75) {
             movedStage = true;
             var fromY = blocks.stage.y;
             blocks.stage.y = -y + 75;
         }
- 
+
         // A place in the DOM to put modifiable labels (textareas).
         var labelValue = (this.label)?this.label.value:this.value;
         var labelElem = docById('labelDiv');
- 
+
         if (this.name === 'text') {
             var type = 'text';
             labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
@@ -1588,7 +1588,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById('textLabel');
         } else if (this.name === 'solfege') {
             var type = 'solfege';
- 
+
             var obj = splitSolfege(this.value);
             var selectednote = obj[0];
             var selectedattr = obj[1];
@@ -1596,7 +1596,7 @@ function Block(protoblock, blocks, overrideName) {
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             var solfnotes_ = _('ti la sol fa mi re do').split(' ');
- 
+
             var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
             for (var i = 0; i < SOLFNOTES.length; i++) {
                 if (selectednote === solfnotes_[i]) {
@@ -1607,7 +1607,7 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + SOLFNOTES[i] + '">' + solfnotes_[i] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             if (selectedattr === '') {
                 selectedattr = '♮';
@@ -1620,20 +1620,20 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('solfegeLabel');
             this.labelattr = docById('noteattrLabel');
         } else if (this.name === 'eastindiansolfege') {
             var type = 'solfege';
- 
+
             var obj = splitSolfege(this.value);
             var selectednote = WESTERN2EISOLFEGENAMES[obj[0]];
             var selectedattr = obj[1];
- 
+
             var eisolfnotes_ = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa'];
- 
+
             var labelHTML = '<select name="solfege" id="solfegeLabel" style="position: absolute;  background-color: #88e20a; width: 100px;">'
             for (var i = 0; i < SOLFNOTES.length; i++) {
                 if (selectednote === eisolfnotes_[i]) {
@@ -1644,7 +1644,7 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + SOLFNOTES[i] + '">' + eisolfnotes_[i] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             if (selectedattr === '') {
                 selectedattr = '♮';
@@ -1657,7 +1657,7 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + SOLFATTRS[i] + '">' + SOLFATTRS[i] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('solfegeLabel');
@@ -1679,7 +1679,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectednote = 'G';
                 var selectedattr = '♮'
             }
- 
+
             var labelHTML = '<select name="notename" id="notenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
             for (var i = 0; i < NOTENOTES.length; i++) {
                 if (selectednote === NOTENOTES[i]) {
@@ -1688,13 +1688,13 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + NOTENOTES[i] + '">' + NOTENOTES[i] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             if (selectedattr === '') {
                 selectedattr = '♮';
             }
             labelHTML += '<select name="noteattr" id="noteattrLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">';
- 
+
             for (var i = 0; i < NOTEATTRS.length; i++) {
                 if (selectedattr === NOTEATTRS[i]) {
                     labelHTML += '<option value="' + selectedattr + '" selected>' + selectedattr + '</option>';
@@ -1702,7 +1702,7 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + NOTEATTRS[i] + '">' + NOTEATTRS[i] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('notenameLabel');
@@ -1714,7 +1714,7 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 var selectedmode = getModeName(DEFAULTMODE);
             }
- 
+
             var labelHTML = '<select name="modename" id="modenameLabel" style="position: absolute;  background-color: #88e20a; width: 60px;">'
             for (var i = 0; i < MODENAMES.length; i++) {
                 if (MODENAMES[i][0].length === 0) {
@@ -1728,7 +1728,7 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + MODENAMES[i][0] + '">' + MODENAMES[i][0] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('modenameLabel');
@@ -1739,7 +1739,7 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 var selecteddrum = getDrumName(DEFAULTDRUM);
             }
- 
+
             var labelHTML = '<select name="drumname" id="drumnameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
             for (var i = 0; i < DRUMNAMES.length; i++) {
                 if (DRUMNAMES[i][0].length === 0) {
@@ -1753,7 +1753,7 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + DRUMNAMES[i][0] + '">' + DRUMNAMES[i][0] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('drumnameLabel');
@@ -1764,7 +1764,7 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 var selectedvoice = getVoiceName(DEFAULTVOICE);
             }
- 
+
             var labelHTML = '<select name="voicename" id="voicenameLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
             for (var i = 0; i < VOICENAMES.length; i++) {
                 if (VOICENAMES[i][0].length === 0) {
@@ -1778,7 +1778,7 @@ function Block(protoblock, blocks, overrideName) {
                     labelHTML += '<option value="' + VOICENAMES[i][0] + '">' + VOICENAMES[i][0] + '</option>';
                 }
             }
- 
+
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('voicenameLabel');
@@ -1788,58 +1788,58 @@ function Block(protoblock, blocks, overrideName) {
             labelElem.classList.add('hasKeyboard');
             this.label = docById('numberLabel');
         }
- 
+
         var focused = false;
 
         var __blur = function (event) {
             // Not sure why the change in the input is not available
             // immediately in FireFox. We need a workaround if hardware
             // acceleration is enabled.
- 
+
             if (!focused) {
                 return;
             }
- 
+
             myBlock._labelChanged();
- 
+
             event.preventDefault();
- 
+
             labelElem.classList.remove('hasKeyboard');
- 
+
             window.scroll(0, 0);
             myBlock.label.removeEventListener('keypress', __keypress);
- 
+
             if (movedStage) {
                 blocks.stage.y = fromY;
                 blocks.updateStage();
             }
         };
- 
+
         if (this.name === 'text' || this.name === 'number') {
             this.label.addEventListener('blur', __blur);
         }
- 
+
         var __keypress = function (event) {
             if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
                 __blur(event);
             }
         };
- 
+
         this.label.addEventListener('keypress', __keypress);
- 
-        this.label.addEventListener('change', function() {
+
+        this.label.addEventListener('change', function () {
             myBlock._labelChanged();
         });
- 
+
         if (this.labelattr != null) {
-            this.labelattr.addEventListener('change', function() {
+            this.labelattr.addEventListener('change', function () {
                 myBlock._labelChanged();
             });
         }
- 
+
         this.label.style.left = Math.round((x + blocks.stage.x) * blocks.blockScale + canvasLeft) + 'px';
         this.label.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
- 
+
         // There may be a second select used for # and b.
         if (this.labelattr != null) {
             this.label.style.width = Math.round(60 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
@@ -1850,11 +1850,11 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.label.style.width = Math.round(100 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
         }
- 
+
         this.label.style.fontSize = Math.round(20 * blocks.blockScale * this.protoblock.scale / 2) + 'px';
         this.label.style.display = '';
         this.label.focus();
- 
+
         // Firefox fix
         setTimeout(function () {
             myBlock.label.style.display = '';
@@ -1862,33 +1862,33 @@ function Block(protoblock, blocks, overrideName) {
             focused = true;
         }, 100);
     };
- 
-    this._labelChanged = function() {
+
+    this._labelChanged = function () {
         // Update the block values as they change in the DOM label.
         if (this == null) {
             console.log('cannot find block associated with label change');
             this._label_lock = false;
             return;
         }
- 
+
         if (this._label_lock) {
             console.log('changing label lock already set');
         } else {
             this._label_lock = true;
         }
- 
+
         this.label.style.display = 'none';
         if (this.labelattr != null) {
             this.labelattr.style.display = 'none';
         }
- 
+
         var oldValue = this.value;
 
         if (this.label.value === '') {
             this.label.value = '_';
         }
         var newValue = this.label.value;
- 
+
         if (this.labelattr != null) {
             var attrValue = this.labelattr.value;
             switch (attrValue) {
@@ -1902,13 +1902,13 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
- 
+
         if (oldValue === newValue) {
             // Nothing to do in this case.
             this._label_lock = false;
             return;
         }
- 
+
         var c = this.connections[0];
         if (this.name === 'text' && c != null) {
             var cblock = this.blocks.blockList[c];
@@ -1938,7 +1938,7 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
- 
+
         // Update the block value and block text.
         if (this.name === 'number') {
             this.value = Number(newValue);
@@ -1951,12 +1951,12 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             this.value = newValue;
         }
- 
+
         if (this.name === 'solfege') {
             var obj = splitSolfege(this.value);
             var label = i18nSolfege(obj[0]);
             var attr = obj[1];
- 
+
             if (attr !== '♮') {
                 label += attr;
             }
@@ -1964,28 +1964,28 @@ function Block(protoblock, blocks, overrideName) {
             var obj = splitSolfege(this.value);
             var label = WESTERN2EISOLFEGENAMES[obj[0]];
             var attr = obj[1];
- 
+
             if (attr !== '♮') {
                 label += attr;
             }
         } else {
             var label = this.value.toString();
         }
- 
+
         if (label.length > 8) {
             label = label.substr(0, 7) + '...';
         }
- 
+
         this.text.text = label;
- 
+
         // and hide the DOM textview...
         this.label.style.display = 'none';
- 
+
         // Make sure text is on top.
         var z = this.container.getNumChildren() - 1;
         this.container.setChildIndex(this.text, z);
         this.updateCache();
- 
+
         var c = this.connections[0];
         if (this.name === 'text' && c != null) {
             var cblock = this.blocks.blockList[c];
@@ -1995,12 +1995,12 @@ function Block(protoblock, blocks, overrideName) {
                 // associated run this.blocks and the palette buttons
                 // Rename both do <- name and nameddo blocks.
                 this.blocks.renameDos(oldValue, newValue);
- 
+
                 if (oldValue === _('action')) {
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
                 }
-               
+
                 this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                 var blockPalette = blocks.palettes.dict['action'];
                 for (var blk = 0; blk < blockPalette.protoList.length; blk++) {
@@ -2015,8 +2015,9 @@ function Block(protoblock, blocks, overrideName) {
                             blockPalette.remove(block,oldValue);
                         }
                     }
-                }  
-                if (oldValue === _('action')) {
+                }
+
+		if (oldValue === _('action')) {
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
                 }
@@ -2049,10 +2050,10 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
         }
- 
+
         // We are done changing the label, so unlock.
         this._label_lock = false;
- 
+
         // Load the synth for the selected drum.
         if (this.name === 'drumname') {
             this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
@@ -2060,13 +2061,13 @@ function Block(protoblock, blocks, overrideName) {
             this.blocks.logo.synth.loadSynth(getVoiceSynthName(this.value));
         }
     };
- 
+
 };
- 
- 
+
+
 function $() {
     var elements = new Array();
- 
+
     for (var i = 0; i < arguments.length; i++) {
         var element = arguments[i];
         if (typeof element === 'string')
@@ -2077,23 +2078,23 @@ function $() {
     }
     return elements;
 }
- 
- 
+
+
 window.hasMouse = false;
 // Mousemove is not emulated for touch
 document.addEventListener('mousemove', function (e) {
     window.hasMouse = true;
 });
- 
- 
+
+
 function _makeBitmap(data, name, callback, args) {
     // Async creation of bitmap from SVG data.
     // Works with Chrome, Safari, Firefox (untested on IE).
     var img = new Image();
-    img.onload = function() {
+    img.onload = function () {
         var bitmap = new createjs.Bitmap(img);
         callback(name, bitmap, args);
     };
- 
+
     img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
 };
