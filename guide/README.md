@@ -96,7 +96,7 @@ At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [*Pitch* block](#PITCH) that specifies the duration
 (note value) of the pitch. 
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg  "Note value block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg  "A single note value block")
 
 At the top of the example above, a single (detached) *Note value* block is
 shown. The `1/8` is value of the note, which is, in this case, an eighth note. 
@@ -104,7 +104,7 @@ shown. The `1/8` is value of the note, which is, in this case, an eighth note.
 At the bottom, two notes that are played consecutively are
 shown. They are both `1/8` notes, making the duration of the entire sequence `1/4`. 
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg "Note value block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg "Two consecutive note value blocks")
 
 In this example, different note values are shown. From top to bottom, they are: 
 `1/4` for an quarter note, `1/16` for a sixteenth note, and `1/2` for a half
@@ -123,7 +123,7 @@ As we have seen, *Pitch* blocks are used inside the [*Note value*](#NOTE-VALUE)
 blocks. The *Pitch* block specifies the pitch name and pitch octave of a note
 that in combination determines the frequency (and therefore pitch) at which the note is played.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg)
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note3.svg "Specifying a pitch block's name and octave")
 
 There are many systems you can use to specify a *pitch* block's name and octave. Some examples are
 shown above. The top *Pitch* block is specified using a *Solfege* block (`Sol` in `Octave 6`), which contains
@@ -137,14 +137,15 @@ frequency, the octave is ignored.
 
 Note that the pitch name can also be specified using a *Text* block. 
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg)
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/MalletChart.svg)
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/KeyboardChart.svg "Note layout chart for keyboard")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/charts/MalletChart.svg "Note layout chart for mallet")
 Please refer to the above charts for a visual representation of where notes are located on a keyboard or staff.
 
 <a name="CHORDS">
 ### 2.3 Chords
 </a>
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg)
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note4.svg "Forming a chord")
 
 A chord (multiple, simultaneous pitches) can be specified by adding
 multiple *Pitch* blocks into a single *Note value* block, like the above example.
@@ -153,7 +154,7 @@ multiple *Pitch* blocks into a single *Note value* block, like the above example
 ### 2.4 Rests
 </a>
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg)
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/silence.svg "Silence blocks create rests")
 
 A rest of the specified note value duration can be constructed using a *Silence* block in place of a *pitch* block.
 
@@ -161,14 +162,14 @@ A rest of the specified note value duration can be constructed using a *Silence*
 ### 2.5 Drums
 </a>
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg)
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum1.svg "Using Drum Sample block")
 
 Anywhere  a *Pitch* block can be used&mdash;e.g., inside of the matrix or a
 *Note value* block&mdash;a *Drum Sample* block can also be used instead. Currently there
 about two dozen different samples from which to choose. The default
 drum is a kick drum.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg)
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note5.svg "Multiple Drum Sample blocks and combinations")
 
 Just as in the [chord](#CHORD) example above, you can use multiple *Drum* blocks
 within a single *Note value* blocks, and combine them with *Pitch*
