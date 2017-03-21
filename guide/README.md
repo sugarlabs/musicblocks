@@ -96,7 +96,7 @@ At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [*Pitch* block](#PITCH) that specifies the duration
 (note value) of the pitch. 
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg  "A single note value block")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note1.svg  "A single Note value block (top) and two consecutive Note value blocks (bottom)")
 
 At the top of the example above, a single (detached) *Note value* block is
 shown. The `1/8` is value of the note, which is, in this case, an eighth note. 
@@ -104,7 +104,7 @@ shown. The `1/8` is value of the note, which is, in this case, an eighth note.
 At the bottom, two notes that are played consecutively are
 shown. They are both `1/8` notes, making the duration of the entire sequence `1/4`. 
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg "Two consecutive note value blocks")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/note2.svg "A quarter note, a sixteenth note, and a half note Note value blocks")
 
 In this example, different note values are shown. From top to bottom, they are: 
 `1/4` for an quarter note, `1/16` for a sixteenth note, and `1/2` for a half
