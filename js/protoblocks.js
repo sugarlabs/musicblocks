@@ -54,6 +54,8 @@ function ProtoBlock(name) {
     this.hidden = false;
     // Disabled: use inactive colors
     this.disabled = false;
+    //Stores the width of the text component
+    this.textWidth = 0;
 
     this.adjustWidthToLabel = function () {
         if (this.staticLabels.length === 0) {
@@ -63,6 +65,7 @@ function ProtoBlock(name) {
         var text = new createjs.Text(this.staticLabels[0], this.fontSize + 'px Sans', '#000000');
         c.addChild(text);
         var b = c.getBounds();
+        this.textWidth = b.width;
         this.extraWidth += Math.max(b.width - 30, 0);
     };
 
