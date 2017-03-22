@@ -986,7 +986,7 @@ function Palette(palettes, name) {
             return;
         }
 
-        var paletteWidth = MENUWIDTH + (this.columns * 160);
+        var paletteWidth = MENUWIDTH + this._getOverflowWidth();
         this.menuContainer.removeAllChildren();
 
         // Create the menu button
@@ -1011,14 +1011,23 @@ function Palette(palettes, name) {
 
     this._updateBlockMasks = function () {
         var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
+	var w = MENUWIDTH + this._getOverflowWidth();
         for (var i in this.protoContainers) {
             var s = new createjs.Shape();
-            s.graphics.r(0, 0, MENUWIDTH, h);
+            s.graphics.r(0, 0, w, h);
             s.x = this.background.x;
             s.y = this.background.y;
             this.protoContainers[i].mask = s;
         }
     };
+	
+    this._getOverflowWidth = function() {
+        var maxWidth = 0;
+        for(var i in this.protoList) {
+            maxWidth = Math.max(maxWidth, this.protoList[i].textWidth);
+        }
+        return (maxWidth  > 100 ? maxWidth - 30 : 0);
+    }
 
     this._updateBackground = function () {
         if (this.menuContainer == null) {
@@ -1043,8 +1052,8 @@ function Palette(palettes, name) {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
 
         var shape = new createjs.Shape();
-        shape.graphics.f('#949494').r(0, 0, MENUWIDTH, h).ef();
-        shape.width = MENUWIDTH;
+        shape.graphics.f('#949494').r(0, 0, MENUWIDTH + this._getOverflowWidth(), h).ef();
+        shape.width = MENUWIDTH + this._getOverflowWidth();
         shape.height = h;
         this.background.addChild(shape);
 
@@ -1495,7 +1504,7 @@ function Palette(palettes, name) {
         var palette = this;
         var locked = false;
         var trashcan = this.palettes.trashcan;
-        var paletteWidth = MENUWIDTH + (this.columns * 160);
+        var paletteWidth = MENUWIDTH + this._getOverflowWidth();
 
         this.menuContainer.on('click', function (event) {
             if (Math.round(event.stageX / palette.palettes.scale) > palette.menuContainer.x + paletteWidth - STANDARDBLOCKHEIGHT) {
