@@ -16,24 +16,27 @@ Empezando
 Bloques de música está diseñado para ejecutarse en un navegador. La
 mayor parte del desarrollo se ha hecho en cromo, pero también debería
 funcionar en Fireqfox (aunque puede que tenga que desactivar la
-aceleración de hardware). Se puede ejecutar desde [github io]
-(http://walterbender.github.io/musicblocks) o por la descarga de una
+aceleración de hardware). Se puede ejecutar desde [github io](http://walterbender.github.io/musicblocks) o por la descarga de una
 copia del código y se ejecuta directamente desde el archivo sistema de
 su computadora.
 
 Para más detalles sobre el uso de Bloques de Música, ver [Uso de
-Música Bloques]
-(http://github.com/walterbender/musicblocks/tree/master/documentation)
+Música Bloques](http://github.com/walterbender/musicblocks/tree/master/documentation)
 y para más detalles sobre cómo utilizar los bloques de la tortuga, ver
 [Uso de la tortuga bloques
 
 ACERCA DE ESTA GUÍA
 -------------------
 
-Esta guía se divide en cuatro secciones: (i) una descripción general
-de la *Nota* estructura; (ii) una guía de programación; (iii) los
-widgets que proporcionan alguna andamio para el programador; y (iv)
-una sección sobre la exportación de tu trabajar en otros sistemas de
+Esta guía se divide en cuatro secciones:
+
+(i) una descripción general de la *Nota* estructura; 
+
+(ii) una guía de programación; 
+
+(iii) los widgets que proporcionan alguna andamio para el programador;
+
+(iv)una sección sobre la exportación de tu trabajar en otros sistemas de
 música.
 
 Muchos de los ejemplos dados en la guía tienen enlaces a código que puede
@@ -233,7 +236,7 @@ note value are unchanged.
 
 In the example, `re5` would be played as a `1/6` note and `me5` would
 be played as a `1/12` note (`1/8 + 1/24 === 1/6' and `1/8 - 1/24 ===
-1/12`). Observe that the total duration of the pair of notes is
+1/12). Observe that the total duration of the pair of notes is
 unchanged.
 
 Tie also works on pairs of notes, combining them into one note. (The
@@ -470,17 +473,13 @@ individual notes (or chords if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
-<img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg'
-height="36"</img>
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/play-button.svg)
 
 If you click on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `Re 4`,
 `Mi 4`, `Sol 4`.
 
-<img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg'
-height="36"</img>
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/export-chunk.svg)
 
 Once you have a group of notes (a "chunk") that you like, click on the
 *Save* button (just to the right of the *Play* button). This will
@@ -490,23 +489,17 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and safe other chunks
 as well.
 
-<img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/sort.svg'
-height="36"</img>
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/sort.svg)
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
-<img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg'
-height="36"</img>
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/close-button.svg)
 
 Or hide the matrix by clicking on the *Close* button (the right-most
 button in the top row of the grid.)
 
-<img
-src='https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg'
-height="36"</img>
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/header-icons/erase-button.svg)
 
 There is also an Erase button that will clear the grid.
 
