@@ -930,7 +930,7 @@ function Palette(palettes, name) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
             palette.palettes.stage.addChild(bitmap);
             bitmap.x = palette.menuContainer.x + paletteWidth;
-            bitmap.y = palette._getDownButtonY();
+            bitmap.y = palette._getDownButtonY() - STANDARDBLOCKHEIGHT;
             __calculateHitArea(bitmap);
             palette.downButton = bitmap;
 
