@@ -676,7 +676,7 @@ function _getStepSize(keySignature, pitch, direction) {
     }
 
     // current Note not in the consonant scale if this key.
-    console.log(pitch + ' not found in key of ' + myKeySignature);
+    console.log(pitch + ' not found in key of ' + keySignature);
     return 1;
 };
 
@@ -710,6 +710,7 @@ function _buildScale(keySignature) {
 
     return [scale, halfSteps];
 }
+
 
 function scaleDegreeToPitch(keySignature, scaleDegree) {
     // Returns note corresponding to scale degree in current key
@@ -945,18 +946,20 @@ function frequencyToPitch(hz) {
 
 
 function numberToPitch(i) {
-    // Calculate the pitch and octave based on index
-    /*
-    if (i < 0) {
-        return ['A', 0];
-    } else if (i > 87) {
-        return ['C', 8];
-    }
-    */
+    // Calculate the pitch and octave based on index.
     // We start at A0.
-    return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
-};
+    if (i < 0) {
+        var n = 0;
+        while (i < 0) {
+            i += 12;
+            n += 1;  // Count octave bump ups.
+        }
 
+	return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
+    } else {
+	return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
+    }
+};
 
 function noteToPitchOctave(note) {
     var len = note.length;

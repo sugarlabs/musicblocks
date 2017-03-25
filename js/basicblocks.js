@@ -172,7 +172,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setPitchNumberOffsetBlock.adjustWidthToLabel();
     setPitchNumberOffsetBlock.twoArgBlock();
     setPitchNumberOffsetBlock.defaults.push('C');
-    setPitchNumberOffsetBlock.defaults.push('4');
+    setPitchNumberOffsetBlock.defaults.push(4);
     setPitchNumberOffsetBlock.dockTypes[1] = 'notein';
     setPitchNumberOffsetBlock.dockTypes[2] = 'anyin';
 
