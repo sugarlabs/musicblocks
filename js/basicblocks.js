@@ -158,6 +158,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtlePitchBlock.adjustWidthToLabel();
     turtlePitchBlock.dockTypes[1] = 'anyin';
 
+    var midiBlock = new ProtoBlock('midi');
+    midiBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['midi'] = midiBlock;
+    midiBlock.staticLabels.push('MIDI');
+    midiBlock.adjustWidthToLabel();
+    midiBlock.zeroArgBlock();
+
     var setPitchNumberOffsetBlock = new ProtoBlock('setpitchnumberoffset');
     setPitchNumberOffsetBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['setpitchnumberoffset'] = setPitchNumberOffsetBlock;
