@@ -257,26 +257,26 @@ function Palettes () {
 
         // Make an icon/button for each palette
 
-        var palettes = this;
+        var that = this;
 
         function __processButtonIcon(palettes, name, bitmap, args) {
-            palettes.buttons[name].addChild(bitmap);
-            if (palettes.cellSize != palettes.originalSize) {
-                bitmap.scaleX = palettes.cellSize / palettes.originalSize;
-                bitmap.scaleY = palettes.cellSize / palettes.originalSize;
+            that.buttons[name].addChild(bitmap);
+            if (that.cellSize != that.originalSize) {
+                bitmap.scaleX = that.cellSize / that.originalSize;
+                bitmap.scaleY = that.cellSize / that.originalSize;
             }
 
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(-palettes.halfCellSize, -palettes.halfCellSize, palettes.cellSize, palettes.cellSize);
-            hitArea.x = palettes.halfCellSize;
-            hitArea.y = palettes.halfCellSize;
-            palettes.buttons[name].hitArea = hitArea;
-            palettes.buttons[name].visible = false;
+            hitArea.graphics.beginFill('#FFF').drawEllipse(-that.halfCellSize, -that.halfCellSize, that.cellSize, that.cellSize);
+            hitArea.x = that.halfCellSize;
+            hitArea.y = that.halfCellSize;
+            that.buttons[name].hitArea = hitArea;
+            that.buttons[name].visible = false;
 
-            palettes.dict[name].makeMenu(true);
-            palettes.dict[name]._moveMenu(palettes.cellSize, palettes.cellSize);
-            palettes.dict[name]._updateMenu(false);
-            palettes._loadPaletteButtonHandler(name);
+            that.dict[name].makeMenu(true);
+            that.dict[name]._moveMenu(that.cellSize, that.cellSize);
+            that.dict[name]._updateMenu(false);
+            that._loadPaletteButtonHandler(name);
         };
 
         for (var name in this.dict) {
@@ -1908,7 +1908,7 @@ function Palette(palettes, name) {
     };
 
     this._makeBlockFromProtoblock = function (protoblk, moved, blkname, event, saveX, saveY) {
-        var palette = this;
+        var that = this;
 
         function __myCallback (args) {
             var blocks = args[0];
@@ -1916,7 +1916,7 @@ function Palette(palettes, name) {
             // Move the drag group under the cursor.
             blocks.findDragGroup(newBlock);
             for (var i in blocks.dragGroup) {
-                blocks.moveBlockRelative(blocks.dragGroup[i], Math.round(event.stageX / palette.palettes.scale) - blocks.stage.x, Math.round(event.stageY / palette.palettes.scale) - blocks.stage.y);
+                blocks.moveBlockRelative(blocks.dragGroup[i], Math.round(event.stageX / that.palettes.scale) - blocks.stage.x, Math.round(event.stageY / that.palettes.scale) - blocks.stage.y);
             }
             // Dock with other blocks if needed
             blocks.blockMoved(newBlock);
