@@ -245,17 +245,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._newArtwork = function (plusMinus) {
-        switch (this.name) {
-        case 'start':
-        case 'drum':
-        case 'action':
-        case 'matrix':
-        case 'pitchdrummatrix':
-        case 'modewidget':
-        case 'rhythmruler':
-        case 'pitchstaircase':
-        case 'tempo':
-        case 'pitchslider':
+        if (COLLAPSABLES.indexOf(this.name) > -1) {
             var proto = new ProtoBlock('collapse');
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 10;
@@ -263,134 +253,41 @@ function Block(protoblock, blocks, overrideName) {
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
             var obj = this.protoblock.generator(this.clampCount[0]);
-            break;
-        case 'status':
-            var proto = new ProtoBlock('collapse');
-            proto.scale = this.protoblock.scale;
-            // proto.extraWidth = 10;
-            proto.basicBlockCollapsed();
-            var obj = proto.generator();
-            this.collapseArtwork = obj[0];
-            var obj = this.protoblock.generator(this.clampCount[0]);
-            break;
-        case 'articulation':
-        case 'augmented':
-        case 'augmentedx':
-        case 'backward':
-        case 'bottle':
-        case 'bubbles':
-        case 'cat':
-        case 'chine':
-        case 'clamp':
-        case 'clang':
-        case 'clap':
-        case 'cowbell':
-        case 'crash':
-        case 'crescendo':
-        case 'cricket':
-        case 'cup':
-        case 'darbuka':
-        case 'diminished':
-        case 'diminishedx':
-        case 'dividebeatfactor':
-        case 'dog':
-        case 'drift':
-        case 'duck':
-        case 'duplicatenotes':
-        case 'fill':
-        case 'fingercymbals':
-        case 'flat':
-        case 'floortom':
-        case 'forever':
-        case 'hihat':
-        case 'hollowline':
-        case 'if':
-        case 'interval':
-        case 'invert':
-        case 'invert1':
-        case 'invert2':
-        case 'kick':
-        case 'major':
-        case 'majorx':
-        case 'minor':
-        case 'minorx':
-        case 'modewidget':
-        case 'multiplybeatfactor':
-        case 'newnote':
-        case 'newslur':
-        case 'newstaccato':
-        case 'newswing':
-        case 'newswing2':
-        case 'notation':
-        case 'note':
-        case 'notecounter':
-        case 'osctime':
-        case 'perfect':
-        case 'perfectx':
-        case 'pitchslider':
-        case 'pitchstaircase':
-        case 'pluck':
-        case 'repeat':
-        case 'rhythmicdot':
-        case 'rhythmruler':
-        case 'ridebell':
-        case 'setbpm':
-        case 'setdrum':
-        case 'setnotevolume2':
-        case 'settransposition':
-        case 'setvoice':
-        case 'sharp':
-        case 'skipnotes':
-        case 'slap':
-        case 'slur':
-        case 'snare':
-        case 'splash':
-        case 'staccato':
-        case 'swing':
-        case 'tempo':
-        case 'tie':
-        case 'tom':
-        case 'triangle1':
-        case 'tuplet':
-        case 'tuplet2':
-        case 'tuplet3':
-        case 'tuplet4':
-        case 'until':
-        case 'vibrato':
-        case 'while':
-            var obj = this.protoblock.generator(this.clampCount[0]);
-            break;
-        case 'equal':
-        case 'greater':
-        case 'less':
-            var obj = this.protoblock.generator(this.clampCount[0]);
-            break;
-        case 'ifthenelse':
+        } else if (this.name === 'ifthenelse') {
             var obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
-            break;
-        case 'calcArg':
-        case 'doArg':
-        case 'namedcalcArg':
-        case 'nameddoArg':
-            var obj = this.protoblock.generator(this.argClampSlots);
-            this.size = 2;
-            for (var i = 0; i < this.argClampSlots.length; i++) {
-                this.size += this.argClampSlots[i];
+        } else if (this.protoblock.style === 'clamp') {
+            var obj = this.protoblock.generator(this.clampCount[0]);
+        } else {
+            switch (this.name) {
+            case 'equal':
+            case 'greater':
+            case 'less':
+		var obj = this.protoblock.generator(this.clampCount[0]);
+		break;
+            case 'calcArg':
+            case 'doArg':
+            case 'namedcalcArg':
+            case 'nameddoArg':
+		var obj = this.protoblock.generator(this.argClampSlots);
+		this.size = 2;
+		for (var i = 0; i < this.argClampSlots.length; i++) {
+                    this.size += this.argClampSlots[i];
+		}
+		this.docks = [];
+		this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
+		break;
+            default:
+		if (this.isArgBlock()) {
+                    var obj = this.protoblock.generator(this.clampCount[0]);
+		} else if (this.isTwoArgBlock()) {
+                    var obj = this.protoblock.generator(this.clampCount[0]);
+		} else {
+                    var obj = this.protoblock.generator();
+		}
+		this.size += plusMinus;
+		break;
             }
-            this.docks = [];
-            this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
-            break;
-        default:
-            if (this.isArgBlock()) {
-                var obj = this.protoblock.generator(this.clampCount[0]);
-            } else if (this.isTwoArgBlock()) {
-                var obj = this.protoblock.generator(this.clampCount[0]);
-            } else {
-                var obj = this.protoblock.generator();
-            }
-            this.size += plusMinus;
-            break;
-        }
+	}
 
         switch (this.name) {
         case 'nameddoArg':
