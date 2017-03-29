@@ -31,31 +31,33 @@ const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 const POSNUMBER = 'Argument must be a positive number';
 
-function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
-              pitchstaircase, tempo, pitchslider,
-              canvas, blocks, turtles, stage,
-              refreshCanvas, textMsg, errorMsg, hideMsgs, onStopTurtle,
-              onRunTurtle, getStageX, getStageY,
-              getStageMouseDown, getCurrentKeyCode,
-              clearCurrentKeyCode, meSpeak, saveLocally) {
+function Logo () {
+    this.canvas = null;
+    this.blocks = null;
+    this.turtles = null;
+    this.stage = null;
+    this.refreshCanvas = null;
+    this.textMsg = null;
+    this.errorMsg = null;
+    this.hideMsgs = null;
+    this.onStopTurtle = null;
+    this.onRunTurtle = null;
+    this.getStageX = null;
+    this.getStageY = null;
+    this.getStageMouseDown = null;
+    this.getCurrentKeyCode = null;
+    this.clearCurrentKeyCode = null;
+    this.meSpeak = null;
+    this.saveLocally = null;
 
-    this.canvas = canvas;
-    this.blocks = blocks;
-    this.turtles = turtles;
-    this.stage = stage;
-    this.refreshCanvas = refreshCanvas;
-    this.textMsg = textMsg;
-    this.errorMsg = errorMsg;
-    this.hideMsgs = hideMsgs;
-    this.onStopTurtle = onStopTurtle;
-    this.onRunTurtle = onRunTurtle;
-    this.getStageX = getStageX;
-    this.getStageY = getStageY;
-    this.getStageMouseDown = getStageMouseDown;
-    this.getCurrentKeyCode = getCurrentKeyCode;
-    this.clearCurrentKeyCode = clearCurrentKeyCode;
-    this.meSpeak = meSpeak;
-    this.saveLocally = saveLocally;
+    this.pitchTimeMatrix = null;
+    this.pitchDrumMatrix = null;
+    this.rhythmRuler = null;
+    this.pitchStaircase = null;
+    this.tempo = null;
+    this.pitchSlider = null;
+    this.modeWidget = null;
+    this.statusMatrix = null;
 
     this.evalFlowDict = {};
     this.evalArgDict = {};
@@ -95,7 +97,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.inRhythmRuler = false;
     this.rhythmRulerMeasure = null;
 
-    this.inPitchStairCase = false;
+    this.inPitchStaircase = false;
 
     this.inTempo = false;
 
@@ -209,12 +211,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
     this.synth = new Synth();
     this.synth.loadSynth('poly');
 
-    // Mide widget
-    this.modeWidget = new ModeWidget();
+    // Mode widget
     this._modeBlock = null;
 
     // Status matrix
-    this.statusMatrix = new StatusMatrix();
     this.inStatusMatrix = false;
     this.statusFields = [];
 
@@ -239,6 +239,91 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                         "size" : this.limit
                     });
     this.mic.connect(this.analyser);
+
+    this.setCanvas = function (canvas) {
+        this.canvas = canvas;
+        return this;
+    };
+
+    this.setBlocks = function (blocks) {
+        this.blocks = blocks;
+        return this;
+    };
+
+    this.setTurtles = function (turtles) {
+        this.turtles = turtles;
+        return this;
+    };
+
+    this.setStage = function (stage) {
+        this.stage = stage;
+        return this;
+    };
+
+    this.setRefreshCanvas = function (refreshCanvas) {
+        this.refreshCanvas = refreshCanvas;
+        return this;
+    };
+
+    this.setTextMsg = function (textMsg) {
+        this.textMsg = textMsg;
+        return this;
+    };
+
+    this.setHideMsgs = function (hideMsgs) {
+        this.hideMsgs = hideMsgs;
+        return this;
+    };
+
+    this.setErrorMsg = function (errorMsg) {
+        this.errorMsg = errorMsg;
+        return this;
+    };
+
+    this.setOnStopTurtle = function (onStopTurtle) {
+        this.onStopTurtle = onStopTurtle;
+        return this;
+    };
+
+    this.setOnRunTurtle = function (onRunTurtle) {
+        this.onRunTurtle = onRunTurtle;
+        return this;
+    };
+
+    this.setGetStageX = function (getStageX) {
+        this.getStageX = getStageX;
+        return this;
+    };
+
+    this.setGetStageY = function (getStageY) {
+        this.getStageY = getStageY;
+        return this;
+    };
+
+    this.setGetStageMouseDown = function (getStageMouseDown) {
+        this.getStageMouseDown = getStageMouseDown;
+        return this;
+    };
+
+    this.setGetCurrentKeyCode = function (getCurrentKeyCode) {
+        this.getCurrentKeyCode = getCurrentKeyCode;
+        return this;
+    };
+
+    this.setClearCurrentKeyCode = function (clearCurrentKeyCode) {
+        this.clearCurrentKeyCode = clearCurrentKeyCode;
+        return this;
+    };
+
+    this.setMeSpeak = function (meSpeak) {
+        this.meSpeak = meSpeak;
+        return this;
+    };
+
+    this.setSaveLocally = function (saveLocally) {
+        this.saveLocally = saveLocally;
+        return this;
+    };
 
     // Used to pause between each block as the program executes.
     this.setTurtleDelay = function (turtleDelay) {
@@ -1432,12 +1517,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push([args[0], args[1]]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetXY(args[0], args[1]);
                 }
@@ -1449,12 +1534,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push([args[0], args[1]]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     if (!logo.suppressOutput[turtle]) {
                         var delta = args[0] / NOTEDIV;
@@ -1556,12 +1641,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     if (!logo.suppressOutput[turtle]) {
                         var dist = args[0] / NOTEDIV;
@@ -1590,12 +1675,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     if (!logo.suppressOutput[turtle]) {
                         var dist = -args[0] / NOTEDIV;
@@ -1624,12 +1709,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     if (!logo.suppressOutput[turtle]) {
                         var delta = args[0] / NOTEDIV;
@@ -1658,12 +1743,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (logo.inNoteBlock[turtle] > 0) {
                     if (!logo.suppressOutput[turtle]) {
                         var delta = -args[0] / NOTEDIV;
@@ -1692,12 +1777,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetHeading(args[0]);
                 }
@@ -1805,12 +1890,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetColor(args[0]);
                 }
@@ -1832,12 +1917,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetHue(args[0]);
                 }
@@ -1849,12 +1934,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetValue(args[0]);
                 }
@@ -1866,12 +1951,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else {
                     args[0] %= 101;
                     var alpha = 1.0 - (args[0] / 100);
@@ -1885,12 +1970,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetChroma(args[0]);
                 }
@@ -1902,12 +1987,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else {
                     logo.turtles.turtleList[turtle].doSetPensize(args[0]);
                 }
@@ -2189,9 +2274,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo.defaultBPMFactor = TONEBPM / this._masterBPM;
             }
             if (this.inTempo) {
-                tempo.BPMBlocks.push(blk);
+                logo.tempo.BPMBlocks.push(blk);
                 var bpmnumberblock = blocks.blockList[blk].connections[1]
-                tempo.BPMs.push(blocks.blockList[bpmnumberblock].text.text);
+                logo.tempo.BPMs.push(blocks.blockList[bpmnumberblock].text.text);
             }
             break;
         case 'setbpm':
@@ -2246,32 +2331,41 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
             childFlow = args[1];
             childFlowCount = 1;
+
+            if (logo.rhythmRuler == null) {
+                logo.rhythmRuler = new RhythmRuler();
+            }
+
             // To do: restore previous state
-            rhythmruler.Rulers = [];
-            rhythmruler.Drums = [];
+            logo.rhythmRuler.Rulers = [];
+            logo.rhythmRuler.Drums = [];
             logo.inRhythmRuler = true;
 
             var listenerName = '_rhythmruler_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                rhythmruler.init(logo);
+                logo.rhythmRuler.init(logo);
             };
 
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'pitchstaircase':
-            pitchstaircase.Stairs = [];
+            if (logo.pitchStaircase == null) {
+                logo.pitchStaircase = new PitchStaircase();
+            }
+
+            logo.pitchStaircase.Stairs = [];
 
             childFlow = args[0];
             childFlowCount = 1;
-            logo.inPitchStairCase = true;
+            logo.inPitchStaircase = true;
 
             var listenerName = '_pitchstaircase_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                pitchstaircase.init(logo);
+                logo.pitchStaircase.init(logo);
             };
 
             logo._setListener(turtle, listenerName, __listener);
@@ -2280,21 +2374,30 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             console.log("running Tempo");
             childFlow = args[0];
             childFlowCount = 1;
+
+            if (logo.tempo == null) {
+                logo.tempo = new Tempo();
+            }
+
             logo.inTempo = true;
-            tempo.BPMblocks = [];
-            tempo.BPMs = [];
+            logo.tempo.BPMblocks = [];
+            logo.tempo.BPMs = [];
 
             var listenerName = '_tempo_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                tempo.init(logo);
+                logo.tempo.init(logo);
             };
 
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'pitchslider':
-            pitchslider.Sliders = [];
+            if (logo.pitchSlider == null) {
+                logo.pitchSlider = new PitchSlider();
+            }
+
+            logo.pitchSlider.Sliders = [];
 
             childFlow = args[0];
             childFlowCount = 1;
@@ -2304,7 +2407,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                pitchslider.init(logo);
+                logo.pitchSlider.init(logo);
                 logo.inPitchSlider = false;
             };
 
@@ -2315,11 +2418,16 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 childFlow = args[0];
                 childFlowCount = 1;
             }
+
+            if (logo.pitchDrumMatrix == null) {
+                logo.pitchDrumMatrix = new PitchDrumMatrix();
+            }
+
             logo.inPitchDrumMatrix = true;
-            pitchdrummatrix.rowLabels = [];
-            pitchdrummatrix.rowArgs = [];
-            pitchdrummatrix.drums = [];
-            pitchdrummatrix.clearBlocks();
+            logo.pitchDrumMatrix.rowLabels = [];
+            logo.pitchDrumMatrix.rowArgs = [];
+            logo.pitchDrumMatrix.drums = [];
+            logo.pitchDrumMatrix.clearBlocks();
 
             var listenerName = '_pitchdrummatrix_' + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
@@ -2329,8 +2437,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     logo.errorMsg(_('You must have at least one pitch block and one drum block in the matrix.'), blk);
                 } else {
                     // Process queued up rhythms.
-                    pitchdrummatrix.init(logo);
-                    pitchdrummatrix.makeClickable();
+                    logo.pitchDrumMatrix.init(logo);
+                    logo.pitchDrumMatrix.makeClickable();
                 }
             };
 
@@ -2340,6 +2448,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             if (args.length === 1) {
                 childFlow = args[0];
                 childFlowCount = 1;
+            }
+
+            if (logo.modeWidget == null) {
+                logo.modeWidget = new ModeWidget();
             }
 
             var listenerName = '_modewidget_' + turtle;
@@ -2353,6 +2465,10 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo._setListener(turtle, listenerName, __listener);
             break;
         case 'status':
+            if (logo.statusMatrix == null) {
+                logo.statusMatrix = new StatusMatrix();
+            }
+
             logo.statusMatrix.init(logo);
             logo.statusFields = [];
             if (args.length === 1) {
@@ -2377,11 +2493,17 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 childFlow = args[0];
                 childFlowCount = 1;
             }
+
             logo.inMatrix = true;
-            pitchtimematrix.rowLabels = [];
-            pitchtimematrix.rowArgs = [];
-            pitchtimematrix.graphicsBlocks = [];
-            pitchtimematrix.clearBlocks();
+
+            if (logo.pitchTimeMatrix == null) {
+                logo.pitchTimeMatrix = new PitchTimeMatrix();
+            }
+
+            logo.pitchTimeMatrix.rowLabels = [];
+            logo.pitchTimeMatrix.rowArgs = [];
+            logo.pitchTimeMatrix.graphicsBlocks = [];
+            logo.pitchTimeMatrix.clearBlocks();
 
             logo.tupletRhythms = [];
             logo.tupletParams = [];
@@ -2391,11 +2513,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                if (logo.tupletRhythms.length === 0 || pitchtimematrix.rowLabels.length === 0) {
+                if (logo.tupletRhythms.length === 0 || logo.pitchTimeMatrix.rowLabels.length === 0) {
                     logo.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
                 } else {
                     // Process queued up rhythms.
-                    pitchtimematrix.init(logo);
+                    logo.pitchTimeMatrix.init(logo);
 
                     for (var i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
@@ -2410,15 +2532,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                             for (var j = 2; j < logo.tupletRhythms[i].length; j++) {
                                 tupletParam[1].push(logo.tupletRhythms[i][j]);
                             }
-                            pitchtimematrix.addTuplet(tupletParam);
+                            logo.pitchTimeMatrix.addTuplet(tupletParam);
                             break;
                         default:
-                            pitchtimematrix.addNotes(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
+                            logo.pitchTimeMatrix.addNotes(logo.tupletRhythms[i][1], logo.tupletRhythms[i][2]);
                             break;
                         }
                     }
 
-                    pitchtimematrix.makeClickable();
+                    logo.pitchTimeMatrix.makeClickable();
                 }
             };
 
@@ -2675,16 +2797,16 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
 
             if (logo.inPitchDrumMatrix) {
-                pitchdrummatrix.drums.push(drumname);
-                pitchdrummatrix.addColBlock(blk);
+                logo.pitchDrumMatrix.drums.push(drumname);
+                logo.pitchDrumMatrix.addColBlock(blk);
                 if (logo.drumBlocks.indexOf(blk) === -1) {
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inMatrix) {
-                pitchtimematrix.rowLabels.push(drumname);
-                pitchtimematrix.rowArgs.push(-1);
+                logo.pitchTimeMatrix.rowLabels.push(drumname);
+                logo.pitchTimeMatrix.rowArgs.push(-1);
 
-                pitchtimematrix.addRowBlock(blk);
+                logo.pitchTimeMatrix.addRowBlock(blk);
                 if (logo.drumBlocks.indexOf(blk) === -1) {
                     logo.drumBlocks.push(blk);
                 }
@@ -2842,7 +2964,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
             if (logo.inPitchDrumMatrix) {
                 if (note.toLowerCase() !== 'rest') {
-                    pitchdrummatrix.addRowBlock(blk);
+                    logo.pitchDrumMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
@@ -2886,15 +3008,15 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                     }
 
                     if (logo.drumStyle[turtle].length > 0) {
-                        pitchdrummatrix.drums.push(last(logo.drumStyle[turtle]));
+                        logo.pitchDrumMatrix.drums.push(last(logo.drumStyle[turtle]));
                     } else {
-                        pitchdrummatrix.rowLabels.push(nnote[0]);
-                        pitchdrummatrix.rowArgs.push(nnote[1]);
+                        logo.pitchDrumMatrix.rowLabels.push(nnote[0]);
+                        logo.pitchDrumMatrix.rowArgs.push(nnote[1]);
                     }
                 }
             } else if (logo.inMatrix) {
                 if (note.toLowerCase() !== 'rest') {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
@@ -2940,11 +3062,11 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                     // If we are in a setdrum clamp, override the pitch.
                     if (logo.drumStyle[turtle].length > 0) {
-                        pitchtimematrix.rowLabels.push(last(logo.drumStyle[turtle]));
-                        pitchtimematrix.rowArgs.push(-1);
+                        logo.pitchTimeMatrix.rowLabels.push(last(logo.drumStyle[turtle]));
+                        logo.pitchTimeMatrix.rowArgs.push(-1);
                     } else {
-                        pitchtimematrix.rowLabels.push(nnote[0]);
-                        pitchtimematrix.rowArgs.push(nnote[1]);
+                        logo.pitchTimeMatrix.rowLabels.push(nnote[0]);
+                        logo.pitchTimeMatrix.rowArgs.push(nnote[1]);
                     }
                 }
             } else if (logo.inNoteBlock[turtle] > 0) {
@@ -3034,27 +3156,27 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 var drumname = last(logo.drumStyle[turtle]);
                 var note2 = logo.getNote(note, octave, transposition, logo.keySignature[turtle]);
                 logo.pitchDrumTable[turtle][note2[0]+note2[1]] = drumname;
-            } else if (logo.inPitchStairCase) {
+            } else if (logo.inPitchStaircase) {
                 var frequency = pitchToFrequency(args[0], calcOctave(logo.currentOctaves[turtle], args[1]), 0, logo.keySignature[turtle]);
                 var note = logo.getNote(args[0], calcOctave(logo.currentOctaves[turtle], args[1]), 0, logo.keySignature[turtle]);
                 var flag = 0;
 
-                for (var i = 0 ; i < pitchstaircase.Stairs.length; i++) {
-                    if (pitchstaircase.Stairs[i][2] < parseFloat(frequency)) {
-                        pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency), 1, 1]);
+                for (var i = 0 ; i < logo.pitchStaircase.Stairs.length; i++) {
+                    if (logo.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
+                        logo.pitchStaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency), 1, 1]);
                         flag = 1;
                         break;
                     }
 
-                    if (pitchstaircase.Stairs[i][2] === parseFloat(frequency)) {
-                        pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency), 1, 1]);
+                    if (logo.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
+                        logo.pitchStaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency), 1, 1]);
                         flag = 1;
                         break;
                     }
                 }
 
                 if (flag === 0) {
-                    pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency), 1, 1]);
+                    logo.pitchStaircase.Stairs.push([note[0], note[1], parseFloat(frequency), 1, 1]);
                 }
             }
             else {
@@ -3076,7 +3198,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             }
 
             if (logo.inMatrix) {
-                pitchtimematrix.addColBlock(blk, args[0]);
+                logo.pitchTimeMatrix.addColBlock(blk, args[0]);
                 for (var i = 0; i < args[0]; i++) {
                     logo._processNote(noteBeatValue, blk, turtle);
                 }
@@ -3095,9 +3217,9 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 // list.
 
                 var drumIndex = -1;
-                for (var i = 0; i < rhythmruler.Drums.length; i++) {
-                    var j = rhythmruler.Drums.length - i - 1;
-                    if (rhythmruler.Drums[j] === logo._currentDrumBlock) {
+                for (var i = 0; i < logo.rhythmRuler.Drums.length; i++) {
+                    var j = logo.rhythmRuler.Drums.length - i - 1;
+                    if (logo.rhythmRuler.Drums[j] === logo._currentDrumBlock) {
                         drumIndex = j;
                         break;
                     }
@@ -3105,7 +3227,7 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
                 if (drumIndex !== -1) {
                     for (var i = 0; i < args[0]; i++) {
-                        rhythmruler.Rulers[drumIndex][0].push(noteBeatValue);
+                        logo.rhythmRuler.Rulers[drumIndex][0].push(noteBeatValue);
                     }
                 }
             } else {
@@ -3306,8 +3428,8 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             logo._setListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
                 logo._currentDrumBlock = blk;
-                rhythmruler.Drums.push(blk);
-                rhythmruler.Rulers.push([[],[]]);
+                logo.rhythmRuler.Drums.push(blk);
+                logo.rhythmRuler.Rulers.push([[],[]]);
             }
             break;
         case 'setvoice':
@@ -4001,13 +4123,13 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 logo.errorMsg(INVALIDPITCH, blk);
                 logo.stopTurtle = true;
             } else if (logo.inMatrix) {
-                pitchtimematrix.addRowBlock(blk);
+                logo.pitchTimeMatrix.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                pitchtimematrix.rowArgs.push(args[0]);
+                logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                logo.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (logo.inNoteBlock[turtle] > 0) {
 
                 function addPitch(note, octave, cents, frequency) {
@@ -4087,30 +4209,30 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 }
 
                 logo.pushedNote[turtle] = true;
-            } else if (logo.inPitchStairCase) {
+            } else if (logo.inPitchStaircase) {
                 var frequency = args[0];
                 var note = frequencyToPitch(args[0]);
                 var flag = 0;
 
-                for (var i = 0 ; i < pitchstaircase.Stairs.length; i++) {
-                    if (pitchstaircase.Stairs[i][2] < parseFloat(frequency)) {
-                        pitchstaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency)]);
+                for (var i = 0 ; i < logo.pitchStaircase.Stairs.length; i++) {
+                    if (logo.pitchStaircase.Stairs[i][2] < parseFloat(frequency)) {
+                        logo.pitchStaircase.Stairs.splice(i, 0, [note[0], note[1], parseFloat(frequency)]);
                         flag = 1;
                         break;
                     }
-                    if (pitchstaircase.Stairs[i][2] === parseFloat(frequency)) {
-                        pitchstaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency)]);
+                    if (logo.pitchStaircase.Stairs[i][2] === parseFloat(frequency)) {
+                        logo.pitchStaircase.Stairs.splice(i, 1, [note[0], note[1], parseFloat(frequency)]);
                         flag = 1;
                         break;
                     }
                 }
 
                 if (flag === 0) {
-                    pitchstaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
+                    logo.pitchStaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
                 }
             } else if (logo.inPitchSlider) {
                 console.log('pushing ' + args[0]);
-                pitchslider.Sliders.push([args[0], 0, 0]);
+                logo.pitchSlider.Sliders.push([args[0], 0, 0]);
             } else {
                 logo.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
             }
@@ -4124,14 +4246,14 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
                 var obj = frequencyToPitch(args[0]);
                 // obj[2] is cents
                 if (logo.inMatrix) {
-                    pitchtimematrix.addRowBlock(blk);
+                    logo.pitchTimeMatrix.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    pitchtimematrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                    pitchtimematrix.rowArgs.push(args[0]);
+                    logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (logo.inPitchSlider) {
-                    pitchslider.Sliders.push([args[0], 0, 0]);
+                    logo.pitchSlider.Sliders.push([args[0], 0, 0]);
                 } else {
                     logo.oscList[turtle].push(logo.blocks.blockList[blk].name);
 
@@ -4163,17 +4285,17 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
             break;
             // Deprecated
         case 'playfwd':
-            pitchtimematrix.playDirection = 1;
+            logo.pitchTimeMatrix.playDirection = 1;
             logo._runFromBlock(logo, turtle, args[0]);
             break;
             // Deprecated
         case 'playbwd':
-            pitchtimematrix.playDirection = -1;
+            logo.pitchTimeMatrix.playDirection = -1;
             logo._runFromBlock(logo, turtle, args[0]);
             break;
         case 'stuplet':
             if (logo.inMatrix) {
-                pitchtimematrix.addColBlock(blk, args[0]);
+                logo.pitchTimeMatrix.addColBlock(blk, args[0]);
                 var noteBeatValue = (1 / args[1]) * logo.beatFactor[turtle];
                 if (logo.tuplet === true) {
                     // The simple-tuplet block is inside.
@@ -4529,12 +4651,12 @@ function Logo(pitchtimematrix, pitchdrummatrix, rhythmruler,
 
         if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
-                pitchtimematrix.addColBlock(blk, 1);
+                this.pitchTimeMatrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
-                    pitchtimematrix.addNode(this.pitchBlocks[i], blk, 0);
+                    this.pitchTimeMatrix.addNode(this.pitchBlocks[i], blk, 0);
                 }
                 for (var i = 0; i < this.drumBlocks.length; i++) {
-                    pitchtimematrix.addNode(this.drumBlocks[i], blk, 0);
+                    this.pitchTimeMatrix.addNode(this.drumBlocks[i], blk, 0);
                 }
             }
             noteBeatValue *= this.beatFactor[turtle];

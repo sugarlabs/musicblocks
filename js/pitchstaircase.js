@@ -12,7 +12,7 @@
 // This widget enable us to create new pitches with help of a initial
 // pitch value by applying music ratios.
 
-function PitchStairCase () {
+function PitchStaircase () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 685;
     const INNERWINDOWWIDTH = 600;

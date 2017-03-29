@@ -16,7 +16,7 @@ const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
 
 
-function Matrix() {
+function PitchTimeMatrix () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 728;  // 675;
     const INNERWINDOWWIDTH = 600;

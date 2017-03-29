@@ -549,20 +549,49 @@ function PlanetView(model, controller) {
 
 
 // A viewer for sample projects
-function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash) {
-    this.stage = stage;
-    this.sendAllToTrash = trash;
-    this.loadProject = load;
-    this.loadRawProject = loadRawProject;
-    var samples = this;  // for future reference
+function SamplesViewer () {
+    this.stage = null;
+    this.sendAllToTrash = null;
+    this.loadProject = null;
+    this.loadRawProject = null;
 
-    // i18n for section titles
-    document.querySelector('#planetTitle').innerHTML = _('Planet');
-    document.querySelector('#planetMyDevice').innerHTML = _('On my device');
-    document.querySelector('#planetWorldwide').innerHTML = _('Worldwide');
+    this.init = function () {
+        this.samples = this;  // for future reference
 
-    this.model = new PlanetModel(this);
-    this.view = new PlanetView(this.model, this);
+        // i18n for section titles
+        document.querySelector('#planetTitle').innerHTML = _('Planet');
+        document.querySelector('#planetMyDevice').innerHTML = _('On my device');
+        document.querySelector('#planetWorldwide').innerHTML = _('Worldwide');
+
+        this.model = new PlanetModel(this);
+        this.view = new PlanetView(this.model, this);
+    }
+
+    this.setClear = function (trash) {
+        this.sendAllToTrash = trash;
+        return this;
+    }
+
+    this.setLoad = function (load) {
+	this.loadProject = load;
+        return this;
+    };
+
+    this.setStage = function (stage) {
+        this._stage = stage;
+        return this;
+    };
+
+    this.setLoadRaw = function (loadRawProject) {
+        this.loadRawProject = loadRawProject;
+        return this;
+    };
+
+    this.setRefreshCanvas = function (refreshCanvas) {
+        this._refreshCanvas = refreshCanvas;
+        return this;
+    };
+
 
     this.setServer = function (server) {
         this.server = server;
@@ -573,7 +602,7 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
         document.querySelector('body').classList.remove('samples-shown');
         document.querySelector('.canvasHolder').classList.remove('hide');
         document.querySelector('#theme-color').content = platformColor.header;
-        samples.stage.enableDOMEvents(true);
+        this.samples._stage.enableDOMEvents(true);
         window.scroll(0, 0);
     };
 
@@ -582,10 +611,13 @@ function SamplesViewer(canvas, stage, refreshCanvas, load, loadRawProject, trash
         document.querySelector('body').classList.add('samples-shown');
         document.querySelector('.canvasHolder').classList.add('hide');
         document.querySelector('#theme-color').content = '#8bc34a';
+        var that = this;
+
         setTimeout(function () {
             // Time to release the mouse
-            samples.stage.enableDOMEvents(false);
+            that.samples._stage.enableDOMEvents(false);
         }, 250);
+
         window.scroll(0, 0);
 
         this.model.start(this.view.update,this.view.addGlobalElement);

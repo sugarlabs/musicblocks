@@ -52,16 +52,14 @@ function paletteBlockButtonPush(name, arg) {
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
 
 
-function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan) {
-    this.canvas = canvas;
-    this.refreshCanvas = refreshCanvas;
-    this.stage = stage;
-    this.cellSize = cellSize;
-    this.halfCellSize = Math.floor(cellSize / 2);
+function Palettes () {
+    this.canvas = null;
+    this.refreshCanvas = null;
+    this.stage = null;
+    this.cellSize = null;
     this.scrollDiff = 0;
-    this.refreshCanvas = refreshCanvas;
     this.originalSize = 55;  // this is the original svg size
-    this.trashcan = trashcan;
+    this.trashcan = null;
     this.initial_x = 55;
     this.initial_y = 55;
     this.firstTime = true;
@@ -74,6 +72,13 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.palette_text = new createjs.Text('', '20px Arial', '#ff7700');
     this.mouseOver = false;
     this.activePalette = null;
+    this.visible = true;
+    this.scale = 1.0;
+    this.mobile = false;
+    this.current = DEFAULTPALETTE;
+    this.x = null;
+    this.y = null;
+    this.container = null;
 
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
@@ -85,24 +90,48 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
     this.dict = {};
     this.buttons = {};  // The toolbar button for each palette.
 
-    this.visible = true;
-    this.scale = 1.0;
-    this.x = 0;
-    this.y = this.cellSize;
+    this.init = function () {
+        this.halfCellSize = Math.floor(this.cellSize / 2);
+        this.x = 0;
+        this.y = this.cellSize;
 
-    this.current = DEFAULTPALETTE;
+        this.container = new createjs.Container();
+        this.container.snapToPixelEnabled = true;
+        this.stage.addChild(this.container);
+    };
 
-    this.container = new createjs.Container();
-    this.container.snapToPixelEnabled = true;
-    this.stage.addChild(this.container);
+    this.setCanvas = function (canvas) {
+        this.canvas = canvas;
+        return this;
+    };
 
-    this.mobile = false;
+    this.setStage = function (stage) {
+        this.stage = stage;
+        return this;
+    };
+
+    this.setRefreshCanvas = function (refreshCanvas) {
+        this.refreshCanvas = refreshCanvas;
+        return this;
+    };
+
+    this.setTrashcan = function (trashcan) {
+        this.trashcan = trashcan;
+        return this;
+    };
+
+    this.setSize = function (size) {
+        this.cellSize = size;
+        return this;
+    };
 
     this.setMobile = function (mobile) {
         this.mobile = mobile;
         if (mobile) {
             this._hideMenus();
         }
+
+        return this;
     };
 
     this.setScale = function (scale) {
@@ -117,11 +146,15 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
         if (this.downIndicator != null) {
             this.downIndicator.y = (windowHeight() / scale) - 27;
         }
+
+        return this;
     };
 
     // We need access to the macro dictionary because we load them.
     this.setMacroDictionary = function (obj) {
         this.macroDict = obj;
+
+        return this;
     };
 
     this.menuScrollEvent = function (direction, scrollSpeed) {
@@ -381,6 +414,8 @@ function Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashca
 
     this.setBlocks = function (blocks) {
         paletteBlocks = blocks;
+
+        return this;
     };
 
     this.add = function (name) {
@@ -2241,26 +2276,70 @@ function Palette(palettes, name) {
 };
 
 
+// FIXME: Globals are evil.
 var blocks = undefined;
 
-function initPalettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan, b) {
+function InitPalettes () {
     // Instantiate the palettes object on first load.
-    var palettes = new Palettes(canvas, refreshCanvas, stage, cellSize, refreshCanvas, trashcan);
-    for (var i = 0; i < BUILTINPALETTES.length; i++) {
-        palettes.add(BUILTINPALETTES[i]);
-    }
 
-    // Define some globals.
-    palettes.makePalettes(true);
-    blocks = b;
+    this.setCanvas = function (canvas) {
+        this._canvas = canvas;
+        return this;
+    };
 
-    // Give the palettes time to load.
-    // We are in no hurry since we are waiting on the splash screen.
-    setTimeout(function () {
-        palettes.show();
-        palettes.bringToTop();
-    }, 6000);
-    return palettes;
+    this.setStage = function (stage) {
+        this._stage = stage;
+        return this;
+    };
+
+    this.setRefreshCanvas = function (refreshCanvas) {
+        this._refreshCanvas = refreshCanvas;
+        return this;
+    };
+
+    this.setTrashcan = function (trashcan) {
+        this._trashcan = trashcan;
+        return this;
+    };
+
+    this.setSize = function (size) {
+        this._cellSize = size;
+        return this;
+    };
+
+    this.setBlocks = function (b) {
+        this._blocks = b;
+	// Define a global.
+	blocks = b;
+        return this;
+    };
+
+    this.init = function () {
+	var palettes = new Palettes ();
+	palettes
+            .setCanvas(this._canvas)
+	    .setStage(this._stage)
+            .setRefreshCanvas(this._refreshCanvas)
+            .setSize(this._cellSize)
+            .setTrashcan(this._trashcan)
+            .setBlocks(this._blocks)
+	    .init();
+
+	for (var i = 0; i < BUILTINPALETTES.length; i++) {
+            palettes.add(BUILTINPALETTES[i]);
+	}
+
+	palettes.makePalettes(true);
+
+	// Give the palettes time to load.
+	// We are in no hurry since we are waiting on the splash screen.
+	setTimeout(function () {
+            palettes.show();
+            palettes.bringToTop();
+	}, 6000);
+
+	return palettes;
+    };
 };
 
 

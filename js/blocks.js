@@ -22,21 +22,19 @@ const VIDEOVALUE = '##__VIDEO__##';
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
 
-function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageScale) {
-    // Things we need from outside include access to the canvas, the
-    // stage, and the trashcan.
+function Blocks () {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
         storage = localStorage;
     }
 
-    this.canvas = canvas;
-    this.stage = stage;
-    this.refreshCanvas = refreshCanvas;
-    this.trashcan = trashcan;
-    this.updateStage = updateStage;
-    this.getStageScale = getStageScale;
+    this.canvas = null;
+    this.stage = null;
+    this.refreshCanvas = null;
+    this.trashcan = null;
+    this.updateStage = null;
+    this.getStageScale = null;
 
     // We keep a list of stacks in the trash.
     this.trashStacks = [];
@@ -120,6 +118,36 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     // as to avoid palette refresh race conditions.
     this.deleteActionTimeout = 0;
 
+    this.setCanvas = function (canvas) {
+        this.canvas = canvas;
+        return this;
+    };
+
+    this.setStage = function (stage) {
+        this.stage = stage;
+        return this;
+    };
+
+    this.setRefreshCanvas = function (refreshCanvas) {
+        this.refreshCanvas = refreshCanvas;
+        return this;
+    };
+
+    this.setTrashcan = function (trashcan) {
+        this.trashcan = trashcan;
+        return this;
+    };
+
+    this.setUpdateStage = function (updateStage) {
+        this.updateStage = updateStage;
+        return this;
+    };
+
+    this.setGetStageScale = function (getStageScale) {
+        this.getStageScale = getStageScale;
+        return this;
+    };
+
     // Change the scale of the blocks (and the protoblocks on the palette).
     this.setBlockScale = function (scale) {
         console.log('New block scale is ' + scale);
@@ -155,28 +183,33 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     // and the Error msg function.
     this.setErrorMsg = function (errorMsg) {
         this.errorMsg = errorMsg;
+        return this;
     };
 
     // We need access to the macro dictionary because we add to it.
     this.setMacroDictionary = function (obj) {
         this.macroDict = obj;
+        return this;
     };
 
     // We need access to the turtles list because we associate a
     // turtle with each start block.
     this.setTurtles = function (turtles) {
         this.turtles = turtles;
+        return this;
     };
 
     // We need to access the "pseudo-Logo interpreter" when we click
     // on blocks.
     this.setLogo = function (logo) {
         this.logo = logo;
+        return this;
     };
 
     // The scale of the graphics is determined by screen size.
     this.setScale = function (scale) {
         this.blockScale = scale;
+        return this;
     };
 
     // Toggle state of collapsible blocks.
@@ -193,6 +226,7 @@ function Blocks(canvas, stage, refreshCanvas, trashcan, updateStage, getStageSca
     this.setHomeContainers = function (containers, boundary) {
         this._homeButtonContainers = containers;
         this.boundary = boundary;
+        return this;
     };
 
     // set up copy/paste, dismiss, and copy-stack buttons

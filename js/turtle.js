@@ -1087,36 +1087,53 @@ function Turtle (name, turtles, drum) {
 };
 
 
-function Turtles(canvas, stage, refreshCanvas) {
-    this.canvas = canvas;
-    this.stage = stage;
-    this.refreshCanvas = refreshCanvas;
+function Turtles () {
+    this.stage = null;
+    this.refreshCanvas = null;
     this.scale = 1.0;
-    this.rotating = false;
-    this.drum = false;
-
-    this.setScale = function(scale) {
-        this.scale = scale;
-    };
-
-    this.setBlocks = function(blocks) {
-        this.blocks = blocks;
-    };
+    this._canvas = null;
+    this._rotating = false;
+    this._drum = false;
 
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
 
-    this.addDrum = function(startBlock, infoDict) {
-        this.drum = true;
+    this.setCanvas = function (canvas) {
+        this._canvas = canvas;
+        return this;
+    };
+
+    this.setStage = function (stage) {
+        this.stage = stage;
+        return this;
+    };
+
+    this.setRefreshCanvas = function (refreshCanvas) {
+        this.refreshCanvas = refreshCanvas;
+        return this;
+    };
+
+    this.setScale = function (scale) {
+        this.scale = scale;
+        return this;
+    };
+
+    this.setBlocks = function (blocks) {
+        this.blocks = blocks;
+        return this;
+    };
+
+    this.addDrum = function (startBlock, infoDict) {
+        this._drum = true;
         this.add(startBlock, infoDict);
     };
 
-    this.addTurtle = function(startBlock, infoDict) {
-        this.drum = false;
+    this.addTurtle = function (startBlock, infoDict) {
+        this._drum = false;
         this.add(startBlock, infoDict);
     };
 
-    this.add = function(startBlock, infoDict) {
+    this.add = function (startBlock, infoDict) {
         // Add a new turtle for each start block
         if (startBlock != null) {
             console.log('adding a new turtle ' + startBlock.name);
@@ -1138,7 +1155,7 @@ function Turtles(canvas, stage, refreshCanvas) {
 
         var i = this.turtleList.length;
         var turtleName = i.toString();
-        var myTurtle = new Turtle(turtleName, this, this.drum);
+        var myTurtle = new Turtle(turtleName, this, this._drum);
 
         if (blkInfoAvailable) {
             myTurtle.x = infoDict['xcor'];
@@ -1200,7 +1217,7 @@ function Turtles(canvas, stage, refreshCanvas) {
             turtles.refreshCanvas();
         };
 
-        if (this.drum) {
+        if (this._drum) {
            var artwork = DRUMSVG;
         } else {
            var artwork = TURTLESVG;
@@ -1216,8 +1233,8 @@ function Turtles(canvas, stage, refreshCanvas) {
         myTurtle.canvasColor = getMunsellColor(myTurtle.color, DEFAULTVALUE, DEFAULTCHROMA);
         var turtles = this;
 
-        myTurtle.container.on('mousedown', function(event) {
-            if (turtles.rotating) {
+        myTurtle.container.on('mousedown', function (event) {
+            if (turtles._rotating) {
                 return;
             }
 
@@ -1226,7 +1243,7 @@ function Turtles(canvas, stage, refreshCanvas) {
                 y: myTurtle.container.y - (event.stageY / turtles.scale)
             }
 
-            myTurtle.container.on('pressmove', function(event) {
+            myTurtle.container.on('pressmove', function (event) {
                 if (myTurtle.running) {
                     return;
                 }
@@ -1238,20 +1255,20 @@ function Turtles(canvas, stage, refreshCanvas) {
             });
         });
 
-        myTurtle.container.on('click', function(event) {
+        myTurtle.container.on('click', function (event) {
             // If turtles listen for clicks then they can be used as buttons.
             console.log('--> [click' + myTurtle.name + ']');
             turtles.stage.dispatchEvent('click' + myTurtle.name);
         });
 
-        myTurtle.container.on('mouseover', function(event) {
+        myTurtle.container.on('mouseover', function (event) {
             myTurtle.bitmap.scaleX = 1.2;
             myTurtle.bitmap.scaleY = 1.2;
             myTurtle.bitmap.scale = 1.2;
             turtles.refreshCanvas();
         });
 
-        myTurtle.container.on('mouseout', function(event) {
+        myTurtle.container.on('mouseout', function (event) {
             myTurtle.bitmap.scaleX = 1;
             myTurtle.bitmap.scaleY = 1;
             myTurtle.bitmap.scale = 1;
@@ -1259,7 +1276,7 @@ function Turtles(canvas, stage, refreshCanvas) {
         });
 
         document.getElementById('loader').className = '';
-        setTimeout(function() {
+        setTimeout(function () {
             if (blkInfoAvailable) {
                 myTurtle.doSetHeading(infoDict['heading']);
                 myTurtle.doSetPensize(infoDict['pensize']);
@@ -1271,7 +1288,7 @@ function Turtles(canvas, stage, refreshCanvas) {
         this.refreshCanvas();
     };
 
-    this._makeTurtleBitmap = function(data, name, callback, extras) {
+    this._makeTurtleBitmap = function (data, name, callback, extras) {
         // Async creation of bitmap from SVG data
         // Works with Chrome, Safari, Firefox (untested on IE)
         var img = new Image();
@@ -1286,33 +1303,33 @@ function Turtles(canvas, stage, refreshCanvas) {
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
     };
 
-    this.screenX2turtleX = function(x) {
-        return x - (this.canvas.width / (2.0 * this.scale));
+    this.screenX2turtleX = function (x) {
+        return x - (this._canvas.width / (2.0 * this.scale));
     };
 
-    this.screenY2turtleY = function(y) {
+    this.screenY2turtleY = function (y) {
         return this.invertY(y);
     };
 
-    this.turtleX2screenX = function(x) {
-        return (this.canvas.width / (2.0 * this.scale)) + x;
+    this.turtleX2screenX = function (x) {
+        return (this._canvas.width / (2.0 * this.scale)) + x;
     };
 
-    this.turtleY2screenY = function(y) {
+    this.turtleY2screenY = function (y) {
         return this.invertY(y);
     };
 
-    this.invertY = function(y) {
-        return this.canvas.height / (2.0 * this.scale) - y;
+    this.invertY = function (y) {
+        return this._canvas.height / (2.0 * this.scale) - y;
     };
 
-    this.markAsStopped = function() {
+    this.markAsStopped = function () {
         for (var turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
         }
     };
 
-    this.running = function() {
+    this.running = function () {
         for (var turtle in this.turtleList) {
             if (this.turtleList[turtle].running) {
                 return true;
@@ -1332,7 +1349,7 @@ function Queue (blk, count, parentBlk, args) {
 };
 
 
-function hex2rgb(hex) {
+function hex2rgb (hex) {
     var bigint = parseInt(hex, 16);
     var r = (bigint >> 16) & 255;
     var g = (bigint >> 8) & 255;

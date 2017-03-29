@@ -1,4 +1,4 @@
-// Copyright (c) 2014-16 Walter Bender
+// Copyright (c) 2014-17 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 //
 // This program is free software; you can redistribute it and/or
@@ -118,13 +118,6 @@ define(function (require) {
         // facebookInit();
         window.scroll(0, 0);
 
-        var txt = "";
-        txt += "innerWidth: " + window.innerWidth + " ";
-        txt += "innerHeight: " + window.innerHeight + " ";
-        txt += "outerWidth: " + window.outerWidth + " ";
-        txt += "outerHeight: " + window.outerHeight + " ";
-        console.log(txt);
-
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
             meSpeak.loadVoice('lib/voices/en/en.json');
@@ -236,7 +229,6 @@ define(function (require) {
         var stageY = 0;
 
         var onXO = (screen.width === 1200 && screen.height === 900) || (screen.width === 900 && screen.height === 1200);
-        console.log('on XO? ' + onXO);
 
         var cellSize = 55;
         if (onXO) {
@@ -356,7 +348,7 @@ define(function (require) {
             logo.setTurtleDelay(0);
             if (docById('ptmDiv').style.visibility === 'visible') {
                 playingWidget = true;
-                matrix.playAll();
+                logo.pitchTimeMatrix.playAll();
             }
 
             if (docById('pscDiv').style.visibility === 'visible') {
@@ -414,7 +406,7 @@ define(function (require) {
         function _doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
             if (docById('ptmDiv').style.visibility === 'visible') {
-                matrix.playAll();
+                logo.pitchTimeMatrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
@@ -447,7 +439,7 @@ define(function (require) {
             logo.setNoteDelay(DEFAULTDELAY);
 
             if (docById('ptmDiv').style.visibility === 'visible') {
-                matrix.playAll();
+                logo.pitchTimeMatrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
             } else {
@@ -648,42 +640,102 @@ define(function (require) {
             stage.addChild(turtleContainer, trashContainer, blocksContainer, palettesContainer);
             _setupBlocksContainerEvents();
 
-            trashcan = new Trashcan(canvas, trashContainer, cellSize, refreshCanvas);
-            turtles = new Turtles(canvas, turtleContainer, refreshCanvas);
+            trashcan = new Trashcan();
+            trashcan
+                .setCanvas(canvas)
+                .setStage(trashContainer)
+                .setSize(cellSize)
+                .setRefreshCanvas(refreshCanvas)
+                .init();
+
+            turtles = new Turtles();
+            turtles
+                .setCanvas(canvas)
+                .setStage(turtleContainer)
+                .setRefreshCanvas(refreshCanvas);
+
             // Put the boundary in the blocks container so it scrolls
             // with the blocks.
-            boundary = new Boundary(canvas, blocksContainer, refreshCanvas);
-            blocks = new Blocks(canvas, blocksContainer, refreshCanvas, trashcan, stage.update, getStageScale);
-            palettes = initPalettes(canvas, refreshCanvas, palettesContainer, cellSize, refreshCanvas, trashcan, blocks);
+            boundary = new Boundary();
+            boundary
+		.setStage(blocksContainer)
+		.init();
 
-            matrix = new Matrix();
-            pitchdrummatrix = new PitchDrumMatrix();
-            rhythmruler = new RhythmRuler();
-            pitchstaircase = new PitchStairCase();
-            tempo = new Tempo();
-            pitchslider = new PitchSlider();
-
-            palettes.setBlocks(blocks);
-            turtles.setBlocks(blocks);
-            blocks.setTurtles(turtles);
-            blocks.setErrorMsg(errorMsg);
+            blocks = new Blocks();
+            blocks
+                .setCanvas(canvas)
+	    	.setStage(blocksContainer)
+                .setRefreshCanvas(refreshCanvas)
+                .setTrashcan(trashcan)
+                .setUpdateStage(stage.update)
+                .setGetStageScale(getStageScale)
+                .setTurtles(turtles)
+                .setErrorMsg(errorMsg);
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
-            // TODO: clean up this mess.
-            logo = new Logo(matrix, pitchdrummatrix, rhythmruler, pitchstaircase, tempo, pitchslider, canvas,
-                blocks, turtles, turtleContainer, refreshCanvas,
-                textMsg, errorMsg, hideMsgs, onStopTurtle,
-                onRunTurtle, getStageX, getStageY,
-                getStageMouseDown, getCurrentKeyCode,
-                clearCurrentKeyCode, meSpeak, saveLocally);
+            turtles.setBlocks(blocks);
+
+            var initPaletteObj = new InitPalettes();
+            palettes = initPaletteObj
+                .setCanvas(canvas)
+	    	.setStage(palettesContainer)
+                .setRefreshCanvas(refreshCanvas)
+                .setSize(cellSize)
+                .setTrashcan(trashcan)
+                .setBlocks(blocks)
+                .init();
+
+            logo = new Logo();
+            logo
+                .setCanvas(canvas)
+                .setBlocks(blocks)
+                .setTurtles(turtles)
+                .setStage(turtleContainer)
+                .setRefreshCanvas(refreshCanvas)
+                .setTextMsg(textMsg)
+                .setErrorMsg(errorMsg)
+                .setHideMsgs(hideMsgs)
+                .setOnStopTurtle(onStopTurtle)
+                .setOnRunTurtle(onRunTurtle)
+                .setGetStageX(getStageX)
+                .setGetStageY(getStageY)
+                .setGetStageMouseDown(getStageMouseDown)
+                .setGetCurrentKeyCode(getCurrentKeyCode)
+                .setClearCurrentKeyCode(clearCurrentKeyCode)
+                .setMeSpeak(meSpeak)
+                .setSaveLocally(saveLocally);
+
             blocks.setLogo(logo);
 
             // Set the default background color...
             logo.setBackgroundColor(-1);
 
-            clearBox = new ClearBox(canvas, stage, refreshCanvas, sendAllToTrash);
-            utilityBox = new UtilityBox(canvas, stage, refreshCanvas, doBiggerFont, doSmallerFont, doOpenPlugin, doAnalytics, toggleScroller);
-            thumbnails = new SamplesViewer(canvas, stage, refreshCanvas, loadProject, loadRawProject, sendAllToTrash);
+            clearBox = new ClearBox();
+            clearBox
+                .setCanvas(canvas)
+	    	.setStage(stage)
+                .setRefreshCanvas(refreshCanvas)
+                .setClear(sendAllToTrash);
+
+            utilityBox = new UtilityBox();
+            utilityBox
+	    	.setStage(stage)
+                .setRefreshCanvas(refreshCanvas)
+                .setBigger(doBiggerFont)
+                .setSmaller(doSmallerFont)
+                .setPlugins(doOpenPlugin)
+                .setStats(doAnalytics)
+                .setScroller(toggleScroller);
+
+            thumbnails = new SamplesViewer();
+            thumbnails
+	    	.setStage(stage)
+                .setRefreshCanvas(refreshCanvas)
+                .setClear(sendAllToTrash)
+                .setLoad(loadProject)
+                .setLoadRaw(loadRawProject)
+                .init();
+
             initBasicProtoBlocks(palettes, blocks);
 
             // Load any macros saved in local storage.
@@ -1316,14 +1368,6 @@ define(function (require) {
             var artcanvas = document.getElementById("overlayCanvas");
             artcanvas.width = w;
             artcanvas.height = h;
-
-            // Music stuff
-            if (matrix.isMatrix === 1) {
-                matrixTable = document.getElementById("myTable");
-                if (matrixTable) {
-                    matrixTable.setAttribute("width", w/2 + 'px');
-                }
-            }
         };
 
         window.onresize = function () {
@@ -1599,7 +1643,9 @@ define(function (require) {
             }
 
             if (docById('tempoDiv').style.visibility !== 'hidden') {
-                tempo.hide();
+                if (logo.tempo != null) {
+                    logo.tempo.hide();
+                }
             }
 
             logo.doStopTurtle();
