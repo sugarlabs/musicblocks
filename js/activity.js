@@ -77,6 +77,7 @@ define(function (require) {
     require('activity/trash');
     require('activity/boundary');
     require('activity/turtle');
+    require('activity/macros');
     require('activity/palette');
     require('activity/protoblocks');
     require('activity/blocks');
