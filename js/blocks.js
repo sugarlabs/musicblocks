@@ -3871,7 +3871,8 @@ function Blocks () {
         for (var name in this.palettes.dict) {
             this.palettes.dict[name].hideMenu(true);
         }
-        refreshCanvas();
+
+        this.refreshCanvas();
 
         var thisBlock = this.blockList.indexOf(myBlock);
 
