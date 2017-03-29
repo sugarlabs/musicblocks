@@ -1910,17 +1910,15 @@ function Palette(palettes, name) {
     this._makeBlockFromProtoblock = function (protoblk, moved, blkname, event, saveX, saveY) {
         var that = this;
 
-        function __myCallback (args) {
-            var blocks = args[0];
-	    var newBlock = args[1];
+        function __myCallback (newBlock) {
             // Move the drag group under the cursor.
-            blocks.findDragGroup(newBlock);
-            for (var i in blocks.dragGroup) {
-                blocks.moveBlockRelative(blocks.dragGroup[i], Math.round(event.stageX / that.palettes.scale) - blocks.stage.x, Math.round(event.stageY / that.palettes.scale) - blocks.stage.y);
+            that.palettes.blocks.findDragGroup(newBlock);
+            for (var i in that.palettes.blocks.dragGroup) {
+                that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], Math.round(event.stageX / that.palettes.scale) - that.palettes.blocks.stage.x, Math.round(event.stageY / that.palettes.scale) - that.palettes.blocks.stage.y);
             }
             // Dock with other blocks if needed
-            blocks.blockMoved(newBlock);
-            blocks.checkBounds();
+            that.palettes.blocks.blockMoved(newBlock);
+            that.palettes.blocks.checkBounds();
         };
 
         if (moved) {
@@ -1985,8 +1983,7 @@ function Palette(palettes, name) {
                     this.palettes.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
             } else {
-                var newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback, [this.palettes.blocks, newBlock]);
-
+                var newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback, newBlock);
             }
 
             // Put the protoblock back on the palette...
