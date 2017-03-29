@@ -1109,7 +1109,7 @@ function Blocks () {
                                 // A previously disconnected name may have left
                                 // an entry in the palette we need to remove.
                                 var name = that.blockList[connection].value;
-                                if (paletteBlocks.protoBlockDict['myDo_' + name] != undefined) {
+                                if (that.protoBlockDict['myDo_' + name] != undefined) {
                                     delete that.protoBlockDict['myDo_' + name];
                                     that.palettes.dict['action'].hideMenu(true);
                                 }
@@ -3726,7 +3726,7 @@ function Blocks () {
                 if (c != null && this.blockList[c].value !== _('box')) {
                     var name = this.blockList[c].value;
                     // Is there an old block with this name still around?
-                    if (paletteBlocks.protoBlockDict['myStorein_' + name] == undefined) {
+                    if (this.protoBlockDict['myStorein_' + name] == undefined) {
                         console.log('adding new storein block ' + name);
                         this.newNamedboxBlock(this.blockList[c].value);
                         this.newStoreinBlock(this.blockList[c].value);
