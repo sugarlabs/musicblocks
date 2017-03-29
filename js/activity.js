@@ -675,8 +675,8 @@ define(function (require) {
 
             turtles.setBlocks(blocks);
 
-            var initPaletteObj = new InitPalettes();
-            palettes = initPaletteObj
+            palettes = new Palettes();
+            palettes
                 .setCanvas(canvas)
 	    	.setStage(palettesContainer)
                 .setRefreshCanvas(refreshCanvas)
@@ -684,6 +684,8 @@ define(function (require) {
                 .setTrashcan(trashcan)
                 .setBlocks(blocks)
                 .init();
+
+            initPalettes(palettes);
 
             logo = new Logo();
             logo

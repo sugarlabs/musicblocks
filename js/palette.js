@@ -2277,65 +2277,21 @@ function Palette(palettes, name) {
 };
 
 
-function InitPalettes () {
+function initPalettes (palettes) {
     // Instantiate the palettes object on first load.
 
-    this.setCanvas = function (canvas) {
-        this._canvas = canvas;
-        return this;
-    };
+    for (var i = 0; i < BUILTINPALETTES.length; i++) {
+        palettes.add(BUILTINPALETTES[i]);
+    }
 
-    this.setStage = function (stage) {
-        this._stage = stage;
-        return this;
-    };
+    palettes.makePalettes(true);
 
-    this.setRefreshCanvas = function (refreshCanvas) {
-        this._refreshCanvas = refreshCanvas;
-        return this;
-    };
-
-    this.setTrashcan = function (trashcan) {
-        this._trashcan = trashcan;
-        return this;
-    };
-
-    this.setSize = function (size) {
-        this._cellSize = size;
-        return this;
-    };
-
-    this.setBlocks = function (blocks) {
-        this._blocks = blocks;
-        return this;
-    };
-
-    this.init = function () {
-	var palettes = new Palettes ();
-	palettes
-            .setCanvas(this._canvas)
-	    .setStage(this._stage)
-            .setRefreshCanvas(this._refreshCanvas)
-            .setSize(this._cellSize)
-            .setTrashcan(this._trashcan)
-            .setBlocks(this._blocks)
-	    .init();
-
-	for (var i = 0; i < BUILTINPALETTES.length; i++) {
-            palettes.add(BUILTINPALETTES[i]);
-	}
-
-	palettes.makePalettes(true);
-
-	// Give the palettes time to load.
-	// We are in no hurry since we are waiting on the splash screen.
-	setTimeout(function () {
-            palettes.show();
-            palettes.bringToTop();
-	}, 6000);
-
-	return palettes;
-    };
+    // Give the palettes time to load.
+    // We are in no hurry since we are waiting on the splash screen.
+    setTimeout(function () {
+        palettes.show();
+        palettes.bringToTop();
+    }, 6000);
 };
 
 
