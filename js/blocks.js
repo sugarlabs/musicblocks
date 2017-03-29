@@ -9,8 +9,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-var blockBlocks = null;
-
 // Minimum distance (squared) between two docks required before
 // connecting them.
 const MINIMUMDOCKDISTANCE = 400;
@@ -231,7 +229,7 @@ function Blocks () {
 
     // set up copy/paste, dismiss, and copy-stack buttons
     this.makeCopyPasteButtons = function (makeButton, updatePasteButton) {
-        var blocks = this;
+        var that = this;
         this.updatePasteButton = updatePasteButton;
 
         this.dismissButton = makeButton('cancel-button', '', 0, 0, 55, 0, this.stage);
@@ -241,21 +239,21 @@ function Blocks () {
         this.saveStackButton.visible = false;
 
         this.dismissButton.on('click', function (event) {
-            blocks.saveStackButton.visible = false;
-            blocks.dismissButton.visible = false;
-            blocks.inLongPress = false;
-            blocks.refreshCanvas();
+            that.saveStackButton.visible = false;
+            that.dismissButton.visible = false;
+            that.inLongPress = false;
+            that.refreshCanvas();
         });
 
         this.saveStackButton.on('click', function (event) {
             // Only invoked from action blocks.
-            var topBlock = blocks.findTopBlock(blocks.activeBlock);
-            blocks.inLongPress = false;
-            blocks.selectedStack = topBlock;
-            blocks.saveStackButton.visible = false;
-            blocks.dismissButton.visible = false;
-            blocks.saveStack();
-            blocks.refreshCanvas();
+            var topBlock = that.findTopBlock(that.activeBlock);
+            that.inLongPress = false;
+            that.selectedStack = topBlock;
+            that.saveStackButton.visible = false;
+            that.dismissButton.visible = false;
+            that.saveStack();
+            that.refreshCanvas();
         });
     };
 
@@ -447,7 +445,7 @@ function Blocks () {
     };
 
     this._addRemoveVspaceBlock = function (blk) {
-        var myBlock = blockBlocks.blockList[blk];
+        var myBlock = this.blocks.blockList[blk];
 
         var c = myBlock.connections[myBlock.connections.length - 2];
         var secondArgumentSize = 1;
@@ -476,7 +474,9 @@ function Blocks () {
             var n = secondArgumentSize - vSpaceCount - 1;
             var nextBlock = last(myBlock.connections);
             var thisBlock = myBlock;
-            var newPos = blockBlocks.blockList.length;
+            var newPos = this.blockList.length;
+
+            var that = this;
 
             function vspaceAdjuster(args) { // nextBlock, vspace, i, n
                 var thisBlock = args[0];
@@ -484,34 +484,34 @@ function Blocks () {
                 var vspace = args[2];
                 var i = args[3];
                 var n = args[4];
-                var vspaceBlock = blockBlocks.blockList[vspace];
+                var vspaceBlock = that.blockList[vspace];
                 var lastDock = last(thisBlock.docks);
                 var dx = lastDock[0] - vspaceBlock.docks[0][0];
                 var dy = lastDock[1] - vspaceBlock.docks[0][1];
                 vspaceBlock.container.x = thisBlock.container.x + dx;
                 vspaceBlock.container.y = thisBlock.container.y + dy;
-                vspaceBlock.connections[0] = blockBlocks.blockList.indexOf(thisBlock);
+                vspaceBlock.connections[0] = that.blockList.indexOf(thisBlock);
                 vspaceBlock.connections[1] = nextBlock;
                 thisBlock.connections[thisBlock.connections.length - 1] = vspace;
                 if (nextBlock) {
-                    blockBlocks.blockList[nextBlock].connections[0] = vspace;
+                    that.blockList[nextBlock].connections[0] = vspace;
                 }
                 if (i + 1 < n) {
-                    var newPos = blockBlocks.blockList.length;
-                    thisBlock = last(blockBlocks.blockList);
+                    var newPos = that.blockList.length;
+                    thisBlock = last(that.blockList);
                     nextBlock = last(thisBlock.connections);
-                    blockBlocks._makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, i + 1, n]);
+                    that._makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, i + 1, n]);
                 }
             };
 
-            blockBlocks._makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, 0, n]);
+            this._makeNewBlockWithConnections('vspace', newPos, [null, null], vspaceAdjuster, [thisBlock, nextBlock, newPos, 0, n]);
         };
 
         function howManyVSpaceBlocksBelow(blk) {
             // Need to know how many vspace blocks are below the block
             // we're checking against.
-            var nextBlock = last(blockBlocks.blockList[blk].connections);
-            if (nextBlock && blockBlocks.blockList[nextBlock].name === 'vspace') {
+            var nextBlock = last(that.blockList[blk].connections);
+            if (nextBlock && that.blockList[nextBlock].name === 'vspace') {
                 return 1 + howManyVSpaceBlocksBelow(nextBlock);
                 // Recurse until it isn't a vspace
             }
@@ -551,14 +551,16 @@ function Blocks () {
                     size = csize;
                 }
             }
+
             if (myBlock.isDoubleClampBlock()) {
                 var c = myBlock.connections.length - 3;
                 var csize = 0;
                 if (c > 0) {
                     var cblk = myBlock.connections[c];
                     if (cblk != null) {
-                        var csize = this._getStackSize(cblk);
+                        csize = this._getStackSize(cblk);
                     }
+
                     if (csize === 0) {
                         size += 1; // minimum of 1 slot in clamp
                     } else {
@@ -566,6 +568,7 @@ function Blocks () {
                     }
                 }
             }
+
             // add top and bottom of clamp
             size += myBlock.size;
         } else {
@@ -1219,53 +1222,53 @@ function Blocks () {
         // Put block adjustments inside a slight delay to make the
         // addition/substraction of vspace and changes of block shape
         // appear less abrupt (and it can be a little racy).
-        var blocks = this;
+        var that = this;
         setTimeout(function () {
             // If we changed the contents of a arg block, we may need a vspace.
             if (checkArgBlocks.length > 0) {
                 for (var i = 0; i < checkArgBlocks.length; i++) {
-                    blocks._addRemoveVspaceBlock(checkArgBlocks[i]);
+                    that._addRemoveVspaceBlock(checkArgBlocks[i]);
                 }
             }
 
             // If we changed the contents of a two-arg block, we need to
             // adjust it.
-            if (blocks._checkTwoArgBlocks.length > 0) {
-                blocks._adjustExpandableTwoArgBlock(blocks._checkTwoArgBlocks);
+            if (that._checkTwoArgBlocks.length > 0) {
+                that._adjustExpandableTwoArgBlock(that._checkTwoArgBlocks);
             }
 
             // First, adjust the docks for any blocks that may have
             // had a vspace added.
             for (var i = 0; i < checkArgBlocks.length; i++) {
                 // console.log('Adjust Docks: ' + this.blockList[checkArgBlocks[i]].name);
-                blocks.adjustDocks(checkArgBlocks[i], true);
+                that.adjustDocks(checkArgBlocks[i], true);
             }
 
             // Next, recheck if the connection is inside of a
             // expandable block.
-            var blk = blocks._insideExpandableBlock(thisBlock);
+            var blk = that._insideExpandableBlock(thisBlock);
             var expandableLoopCounter = 0;
             while (blk != null) {
                 // Extra check for malformed data.
                 expandableLoopCounter += 1;
-                if (expandableLoopCounter > 2 * blocks.blockList.length) {
+                if (expandableLoopCounter > 2 * that.blockList.length) {
                     console.log('Infinite loop checking for expandables?');
-                    console.log(blocks.blockList);
+                    console.log(that.blockList);
                     break;
                 }
 
-                if (blocks.blockList[blk].name === 'ifthenelse') {
-                    blocks._clampBlocksToCheck.push([blk, 0]);
-                    blocks._clampBlocksToCheck.push([blk, 1]);
+                if (that.blockList[blk].name === 'ifthenelse') {
+                    that._clampBlocksToCheck.push([blk, 0]);
+                    that._clampBlocksToCheck.push([blk, 1]);
                 } else {
-                    blocks._clampBlocksToCheck.push([blk, 0]);
+                    that._clampBlocksToCheck.push([blk, 0]);
                 }
 
-                blk = blocks._insideExpandableBlock(blk);
+                blk = that._insideExpandableBlock(blk);
             }
 
-            blocks._adjustExpandableClampBlock();
-            blocks.refreshCanvas();
+            that._adjustExpandableClampBlock();
+            that.refreshCanvas();
         }, 250);
     };
 
@@ -1840,19 +1843,19 @@ function Blocks () {
         }
         var postProcess = null;
         var postProcessArg = null;
-        var me = this;
+        var that = this;
         var thisBlock = this.blockList.length;
         if (name === 'start') {
             postProcess = function (thisBlock) {
-                me.blockList[thisBlock].value = me.turtles.turtleList.length;
-                me.turtles.addTurtle(me.blockList[thisBlock]);
+                that.blockList[thisBlock].value = that.turtles.turtleList.length;
+                that.turtles.addTurtle(that.blockList[thisBlock]);
             };
 
             postProcessArg = thisBlock;
         } else if (name === 'drum') {
             postProcess = function (thisBlock) {
-                me.blockList[thisBlock].value = me.turtles.turtleList.length;
-                me.turtles.addDrum(me.blockList[thisBlock]);
+                that.blockList[thisBlock].value = that.turtles.turtleList.length;
+                that.turtles.addDrum(that.blockList[thisBlock]);
             };
 
             postProcessArg = thisBlock;
@@ -1860,9 +1863,9 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = value;
-                me.blockList[thisBlock].text.text = value;
-                me.blockList[thisBlock].container.updateCache();
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
             };
 
             postProcessArg = [thisBlock, _('text')];
@@ -1870,9 +1873,9 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = value;
-                me.blockList[thisBlock].text.text = value;
-                me.blockList[thisBlock].container.updateCache();
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
             };
 
             postProcessArg = [thisBlock, 'sol'];
@@ -1880,9 +1883,9 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = value;
-                me.blockList[thisBlock].text.text = WESTERN2EISOLFEGENAMES[value];
-                me.blockList[thisBlock].container.updateCache();
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = WESTERN2EISOLFEGENAMES[value];
+                that.blockList[thisBlock].container.updateCache();
             };
 
             postProcessArg = [thisBlock, 'sol'];
@@ -1890,9 +1893,9 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = value;
-                me.blockList[thisBlock].text.text = value;
-                me.blockList[thisBlock].container.updateCache();
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
             };
 
             postProcessArg = [thisBlock, 'G'];
@@ -1900,9 +1903,9 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = value;
-                me.blockList[thisBlock].text.text = value;
-                me.blockList[thisBlock].container.updateCache();
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
             };
 
             postProcessArg = [thisBlock, 'kick'];
@@ -1910,9 +1913,9 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = value;
-                me.blockList[thisBlock].text.text = value;
-                me.blockList[thisBlock].container.updateCache();
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
             };
 
             postProcessArg = [thisBlock, 'sine'];
@@ -1920,9 +1923,9 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = value;
-                me.blockList[thisBlock].text.text = value;
-                me.blockList[thisBlock].container.updateCache();
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
             };
 
             postProcessArg = [thisBlock, 'Major'];
@@ -1930,9 +1933,9 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = Number(args[1]);
-                me.blockList[thisBlock].value = value;
-                me.blockList[thisBlock].text.text = value.toString();
-                me.blockList[thisBlock].container.updateCache();
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value.toString();
+                that.blockList[thisBlock].container.updateCache();
             };
 
             postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
@@ -1940,11 +1943,11 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].value = value;
                 if (value == null) {
-                    me.blockList[thisBlock].image = 'images/load-media.svg';
+                    that.blockList[thisBlock].image = 'images/load-media.svg';
                 } else {
-                    me.blockList[thisBlock].image = null;
+                    that.blockList[thisBlock].image = null;
                 }
             };
 
@@ -1954,11 +1957,11 @@ function Blocks () {
                 console.log('post process camera ' + args[1]);
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = CAMERAVALUE;
+                that.blockList[thisBlock].value = CAMERAVALUE;
                 if (value == null) {
-                    me.blockList[thisBlock].image = 'images/camera.svg';
+                    that.blockList[thisBlock].image = 'images/camera.svg';
                 } else {
-                    me.blockList[thisBlock].image = null;
+                    that.blockList[thisBlock].image = null;
                 }
             };
 
@@ -1967,44 +1970,44 @@ function Blocks () {
             postProcess = function (args) {
                 var thisBlock = args[0];
                 var value = args[1];
-                me.blockList[thisBlock].value = VIDEOVALUE;
+                that.blockList[thisBlock].value = VIDEOVALUE;
                 if (value == null) {
-                    me.blockList[thisBlock].image = 'images/video.svg';
+                    that.blockList[thisBlock].image = 'images/video.svg';
                 } else {
-                    me.blockList[thisBlock].image = null;
+                    that.blockList[thisBlock].image = null;
                 }
             };
 
             postProcessArg = [thisBlock, null];
         } else if (name === 'loadFile') {
             postProcess = function (args) {
-                me.updateBlockText(args[0]);
+                that.updateBlockText(args[0]);
             };
 
             postProcessArg = [thisBlock, null];
         } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
             postProcess = function (args) {
-                me.blockList[thisBlock].value = null;
-                me.blockList[thisBlock].privateData = args[1];
+                that.blockList[thisBlock].value = null;
+                that.blockList[thisBlock].privateData = args[1];
             };
 
             postProcessArg = [thisBlock, arg];
         }
 
         var protoFound = false;
-        for (var proto in me.protoBlockDict) {
-            if (me.protoBlockDict[proto].name === name) {
+        for (var proto in that.protoBlockDict) {
+            if (that.protoBlockDict[proto].name === name) {
                 if (arg === '__NOARG__') {
-                    me.makeNewBlock(proto, postProcess, postProcessArg);
+                    that.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
-                } else if (me.protoBlockDict[proto].defaults[0] === arg) {
-                    me.makeNewBlock(proto, postProcess, postProcessArg);
+                } else if (that.protoBlockDict[proto].defaults[0] === arg) {
+                    that.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
                 } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(name) !== -1) {
-                    if (me.protoBlockDict[proto].defaults[0] === undefined) {
-                        me.makeNewBlock(proto, postProcess, postProcessArg);
+                    if (that.protoBlockDict[proto].defaults[0] === undefined) {
+                        that.makeNewBlock(proto, postProcess, postProcessArg);
                         protoFound = true;
                         break;
                     }
@@ -2039,7 +2042,7 @@ function Blocks () {
                 }
             }
 
-            var me = this;
+            var that = this;
             var thisBlock = this.blockList.length;
             if (myBlock.docks.length > i && myBlock.docks[i + 1][2] === 'anyin') {
                 if (value == null) {
@@ -2048,13 +2051,13 @@ function Blocks () {
                     postProcess = function (args) {
                         var thisBlock = args[0];
                         var value = args[1];
-                        me.blockList[thisBlock].value = value;
+                        that.blockList[thisBlock].value = value;
                         var label = value.toString();
                         if (label.length > 8) {
                             label = label.substr(0, 7) + '...';
                         }
-                        me.blockList[thisBlock].text.text = label;
-                        me.blockList[thisBlock].container.updateCache();
+                        that.blockList[thisBlock].text.text = label;
+                        that.blockList[thisBlock].container.updateCache();
                     };
 
                     this.makeNewBlock('text', postProcess, [thisBlock, value]);
@@ -2062,8 +2065,8 @@ function Blocks () {
                     postProcess = function (args) {
                         var thisBlock = args[0];
                         var value = Number(args[1]);
-                        me.blockList[thisBlock].value = value;
-                        me.blockList[thisBlock].text.text = value.toString();
+                        that.blockList[thisBlock].value = value;
+                        that.blockList[thisBlock].text.text = value.toString();
                     };
 
                     this.makeNewBlock('number', postProcess, [thisBlock, value]);
@@ -2072,12 +2075,12 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
+                    that.blockList[thisBlock].value = value;
                     var label = value.toString();
                     if (label.length > 8) {
                         label = label.substr(0, 7) + '...';
                     }
-                    me.blockList[thisBlock].text.text = label;
+                    that.blockList[thisBlock].text.text = label;
                 };
 
                 this.makeNewBlock('text', postProcess, [thisBlock, value]);
@@ -2085,9 +2088,9 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
+                    that.blockList[thisBlock].value = value;
                     var label = value.toString();
-                    me.blockList[thisBlock].text.text = label;
+                    that.blockList[thisBlock].text.text = label;
                 };
 
                 this.makeNewBlock('solfege', postProcess, [thisBlock, value]);
@@ -2095,9 +2098,9 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
+                    that.blockList[thisBlock].value = value;
                     var label = value.toString();
-                    me.blockList[thisBlock].text.text = label;
+                    that.blockList[thisBlock].text.text = label;
                 };
 
                 this.makeNewBlock('notename', postProcess, [thisBlock, value]);
@@ -2105,24 +2108,24 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
+                    that.blockList[thisBlock].value = value;
                     if (value != null) {
-                        // loadThumbnail(me, thisBlock, null);
+                        // loadThumbnail(that, thisBlock, null);
                     }
                 };
 
                 this.makeNewBlock('media', postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === 'filein') {
                 postProcess = function (blk) {
-                    me.updateBlockText(blk);
+                    that.updateBlockText(blk);
                 }
                 this.makeNewBlock('loadFile', postProcess, thisBlock);
             } else {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.blockList[thisBlock].text.text = value.toString();
+                    that.blockList[thisBlock].value = value;
+                    that.blockList[thisBlock].text.text = value.toString();
                 };
 
                 this.makeNewBlock('number', postProcess, [thisBlock, value]);
@@ -2702,8 +2705,8 @@ function Blocks () {
 
         // var blockObjs = this._copyBlocksToObj();
         // this.loadNewBlocks(blockObjs);
-        console.log(blocks.selectedBlocksObj);
-        this.loadNewBlocks(blocks.selectedBlocksObj);
+        // console.log(this.selectedBlocksObj);
+        this.loadNewBlocks(this.selectedBlocksObj);
     };
 
     this.saveStack = function () {
@@ -3205,7 +3208,7 @@ function Blocks () {
                 name = NAMEDICT[name];
             }
 
-            var me = this;
+            var that = this;
 
             // A few special cases.
             switch (name) {
@@ -3216,8 +3219,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var blkInfo = args[1];
-                    me.blockList[thisBlock].value = me.turtles.turtleList.length;
-                    me.turtles.addTurtle(me.blockList[thisBlock], blkInfo);
+                    that.blockList[thisBlock].value = that.turtles.turtleList.length;
+                    that.turtles.addTurtle(that.blockList[thisBlock], blkInfo);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
@@ -3228,8 +3231,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var blkInfo = args[1];
-                    me.blockList[thisBlock].value = me.turtles.turtleList.length;
-                    me.turtles.addDrum(me.blockList[thisBlock], blkInfo);
+                    that.blockList[thisBlock].value = that.turtles.turtleList.length;
+                    that.turtles.addDrum(that.blockList[thisBlock], blkInfo);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
@@ -3249,8 +3252,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].privateData = value;
-                    me.blockList[thisBlock].value = null;
+                    that.blockList[thisBlock].privateData = value;
+                    that.blockList[thisBlock].value = null;
                 };
 
                 this._makeNewBlockWithConnections('namedbox', blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3259,8 +3262,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].privateData = value;
-                    me.blockList[thisBlock].value = null;
+                    that.blockList[thisBlock].privateData = value;
+                    that.blockList[thisBlock].value = null;
                 };
 
                 this._makeNewBlockWithConnections('namedarg', blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3269,8 +3272,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].privateData = value;
-                    me.blockList[thisBlock].value = null;
+                    that.blockList[thisBlock].privateData = value;
+                    that.blockList[thisBlock].value = null;
                 };
 
                 this._makeNewBlockWithConnections('namedcalc', blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3279,8 +3282,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].privateData = value;
-                    me.blockList[thisBlock].value = null;
+                    that.blockList[thisBlock].privateData = value;
+                    that.blockList[thisBlock].value = null;
                 };
 
                 this._makeNewBlockWithConnections('nameddo', blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3292,22 +3295,22 @@ function Blocks () {
                     var thisBlock = args[0];
                     var extraSlots = args[1].length - 4;
                     if (extraSlots > 0) {
-                        var slotList = me.blockList[thisBlock].argClampSlots;
+                        var slotList = that.blockList[thisBlock].argClampSlots;
                         for (var i = 0; i < extraSlots; i++) {
                             slotList.push(1);
-                            me._newLocalArgBlock(slotList.length);
-                            me.blockList[thisBlock].connections.push(null);
+                            that._newLocalArgBlock(slotList.length);
+                            that.blockList[thisBlock].connections.push(null);
                         }
-                        me.blockList[thisBlock].updateArgSlots(slotList);
+                        that.blockList[thisBlock].updateArgSlots(slotList);
                         for (var i = 0; i < args[1].length; i++) {
                             if (args[1][i] != null) {
-                                me.blockList[thisBlock].connections[i] = args[1][i] + firstBlock;
+                                that.blockList[thisBlock].connections[i] = args[1][i] + firstBlock;
                             } else {
-                                me.blockList[thisBlock].connections[i] = args[1][i];
+                                that.blockList[thisBlock].connections[i] = args[1][i];
                             }
                         }
                     }
-                    me._checkArgClampBlocks.push(thisBlock);
+                    that._checkArgClampBlocks.push(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('doArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
@@ -3316,26 +3319,26 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].privateData = value;
-                    me.blockList[thisBlock].value = null;
+                    that.blockList[thisBlock].privateData = value;
+                    that.blockList[thisBlock].value = null;
                     var extraSlots = args[2].length - 3;
                     if (extraSlots > 0) {
-                        var slotList = me.blockList[thisBlock].argClampSlots;
+                        var slotList = that.blockList[thisBlock].argClampSlots;
                         for (var i = 0; i < extraSlots; i++) {
                             slotList.push(1);
-                            me._newLocalArgBlock(slotList.length);
-                            me.blockList[thisBlock].connections.push(null);
+                            that._newLocalArgBlock(slotList.length);
+                            that.blockList[thisBlock].connections.push(null);
                         }
-                        me.blockList[thisBlock].updateArgSlots(slotList);
+                        that.blockList[thisBlock].updateArgSlots(slotList);
                         for (var i = 0; i < args[2].length; i++) {
                             if (args[2][i] != null) {
-                                me.blockList[thisBlock].connections[i] = args[2][i] + firstBlock;
+                                that.blockList[thisBlock].connections[i] = args[2][i] + firstBlock;
                             } else {
-                                me.blockList[thisBlock].connections[i] = args[2][i];
+                                that.blockList[thisBlock].connections[i] = args[2][i];
                             }
                         }
                     }
-                    me._checkArgClampBlocks.push(thisBlock);
+                    that._checkArgClampBlocks.push(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('nameddoArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
@@ -3345,22 +3348,22 @@ function Blocks () {
                     var thisBlock = args[0];
                     var extraSlots = args[1].length - 3;
                     if (extraSlots > 0) {
-                        var slotList = me.blockList[thisBlock].argClampSlots;
+                        var slotList = that.blockList[thisBlock].argClampSlots;
                         for (var i = 0; i < extraSlots; i++) {
                             slotList.push(1);
-                            me._newLocalArgBlock(slotList.length);
-                            me.blockList[thisBlock].connections.push(null);
+                            that._newLocalArgBlock(slotList.length);
+                            that.blockList[thisBlock].connections.push(null);
                         }
-                        me.blockList[thisBlock].updateArgSlots(slotList);
+                        that.blockList[thisBlock].updateArgSlots(slotList);
                         for (var i = 0; i < args[1].length; i++) {
                             if (args[1][i] != null) {
-                                me.blockList[thisBlock].connections[i] = args[1][i] + firstBlock;
+                                that.blockList[thisBlock].connections[i] = args[1][i] + firstBlock;
                             } else {
-                                me.blockList[thisBlock].connections[i] = args[1][i];
+                                that.blockList[thisBlock].connections[i] = args[1][i];
                             }
                         }
                     }
-                    me._checkArgClampBlocks.push(thisBlock);
+                    that._checkArgClampBlocks.push(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('calcArg', blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
@@ -3369,26 +3372,26 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].privateData = value;
-                    me.blockList[thisBlock].value = null;
+                    that.blockList[thisBlock].privateData = value;
+                    that.blockList[thisBlock].value = null;
                     var extraSlots = args[2].length - 2;
                     if (extraSlots > 0) {
-                        var slotList = me.blockList[thisBlock].argClampSlots;
+                        var slotList = that.blockList[thisBlock].argClampSlots;
                         for (var i = 0; i < extraSlots; i++) {
                             slotList.push(1);
-                            me._newLocalArgBlock(slotList.length);
-                            me.blockList[thisBlock].connections.push(null);
+                            that._newLocalArgBlock(slotList.length);
+                            that.blockList[thisBlock].connections.push(null);
                         }
-                        me.blockList[thisBlock].updateArgSlots(slotList);
+                        that.blockList[thisBlock].updateArgSlots(slotList);
                         for (var i = 0; i < args[2].length; i++) {
                             if (args[2][i] != null) {
-                                me.blockList[thisBlock].connections[i] = args[2][i] + firstBlock;
+                                that.blockList[thisBlock].connections[i] = args[2][i] + firstBlock;
                             } else {
-                                me.blockList[thisBlock].connections[i] = args[2][i];
+                                that.blockList[thisBlock].connections[i] = args[2][i];
                             }
                         }
                     }
-                    me._checkArgClampBlocks.push(thisBlock);
+                    that._checkArgClampBlocks.push(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('namedcalcArg', blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
@@ -3399,8 +3402,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = Number(value);
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = Number(value);
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3409,8 +3412,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3419,8 +3422,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3429,8 +3432,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3439,8 +3442,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
                 };
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
@@ -3448,8 +3451,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
                 };
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
@@ -3457,8 +3460,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3470,8 +3473,8 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3484,10 +3487,10 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = value;
+                    that.blockList[thisBlock].value = value;
                     if (value != null) {
                         // Load artwork onto media block.
-                        me.blockList[thisBlock].loadThumbnail(null);
+                        that.blockList[thisBlock].loadThumbnail(null);
                     }
                 };
 
@@ -3497,7 +3500,7 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = CAMERAVALUE;
+                    that.blockList[thisBlock].value = CAMERAVALUE;
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3506,7 +3509,7 @@ function Blocks () {
                 postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
-                    me.blockList[thisBlock].value = VIDEOVALUE;
+                    that.blockList[thisBlock].value = VIDEOVALUE;
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3517,72 +3520,72 @@ function Blocks () {
             case 'red':
             case 'black':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = 0;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = 0;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'white':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = 100;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = 100;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'orange':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = 10;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = 10;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'yellow':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = 20;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = 20;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'green':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = 40;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = 40;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'blue':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = 70;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = 70;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'leftpos':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = -(canvas.width / 2);
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = -(canvas.width / 2);
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'rightpos':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = (canvas.width / 2);
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = (canvas.width / 2);
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'toppos':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = (canvas.height / 2);
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = (canvas.height / 2);
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
@@ -3590,32 +3593,32 @@ function Blocks () {
             case 'botpos':
             case 'bottompos':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = -(canvas.height / 2);
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = -(canvas.height / 2);
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'width':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = canvas.width;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = canvas.width;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'height':
                 postProcess = function (thisBlock) {
-                    me.blockList[thisBlock].value = canvas.height;
-                    me.updateBlockText(thisBlock);
+                    that.blockList[thisBlock].value = canvas.height;
+                    that.updateBlockText(thisBlock);
                 };
 
                 this._makeNewBlockWithConnections('number', blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case 'loadFile':
                 postProcess = function (args) {
-                    me.blockList[args[0]].value = args[1];
-                    me.updateBlockText(args[0]);
+                    that.blockList[args[0]].value = args[1];
+                    that.updateBlockText(args[0]);
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
@@ -3776,7 +3779,7 @@ function Blocks () {
             // console.log('Adjust Docks: ' + this.blockList[this._adjustTheseDocks[blk]].name);
             this.adjustDocks(this._adjustTheseDocks[blk], true);
             // blockBlocks._expandTwoArgs();
-            blockBlocks._expandClamps();
+            this._expandClamps();
         }
 
         for (var blk = 0; blk < this._adjustTheseStacks.length; blk++) {
@@ -3955,6 +3958,5 @@ function Blocks () {
         }
     };
 
-    blockBlocks = this;
     return this;
 };
