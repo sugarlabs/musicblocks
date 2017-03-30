@@ -1546,6 +1546,9 @@ define(function (require) {
                 }
                 logo.showBlocks();
             }
+
+            // Combine block and palette visibility into one button.
+            _changePaletteVisibility();
         };
 
         function _toggleCollapsibleStacks() {
@@ -2273,12 +2276,12 @@ handleComplete);
             // Buttons used when running turtle programs
             // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
             var buttonNames = [
-                ['run', _doFastButton, _('Run fast / long press to run slow / extra-long press to run music slow'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
+                ['run', _doFastButton, _('Run fast / long press to run slowly / extra-long press to run music slowly'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
                 ['step', _doStepButton, _('Run step by step'), null, null, null, null],
                 ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
                 ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
                 ['clear', _allClear, _('Clean'), null, null, null, null],
-                ['palette', _changePaletteVisibility, _('Show/hide palettes'), null, null, null, null],
+                // ['palette', _changePaletteVisibility, _('Show/hide palettes'), null, null, null, null],
                 ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
                 ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
                 ['go-home', _findBlocks, _('Home'), null, null, null, null],

@@ -162,7 +162,7 @@ msgid "Close"
 msgstr ""
 
 #: js/activity.js:2166
-msgid "Run fast / long press to run slow / extra-long press to run music slow"
+msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 msgstr ""
 
 #: js/activity.js:2167
