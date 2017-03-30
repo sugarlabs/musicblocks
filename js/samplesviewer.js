@@ -1,5 +1,5 @@
 // Copyright (C) 2015 Sam Parkinson
-// Copyright (C) 2016 Walter Bender
+// Copyright (C) 2016-17 Walter Bender
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,6 +10,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+const MUSICBLOCKSPREFIX = 'MusicBlocks_';
+
 const APIKEY = '3tgTzMXbbw6xEKX7';
 const EMPTYIMAGE = 'data:image/svg+xml;base64,' + btoa('<svg \
               xmlns="http://www.w3.org/2000/svg" width="320" height="240" \
@@ -19,7 +21,11 @@ const SERVER = 'https://turtle.sugarlabs.org/server/';
 window.server = SERVER; 'https://turtle.sugarlabs.org/server/'; // '/server/';
 
 //{NAME} will be replaced with project name
-const SHAREURL = 'https://walterbender.github.io/musicblocks/index.html?file={name}&run=True';
+if (_THIS_IS_MUSIC_BLOCKS_) {
+    const SHAREURL = 'https://walterbender.github.io/musicblocks/index.html?file={name}&run=True';
+} else {
+    const SHAREURL = 'https://walterbender.github.io/turtleblocksjs/index.html?file={name}&run=True';
+}
 const NAMESUBTEXT = '{name}';
 
 const LOCAL_PROJECT_STYLE ='\
@@ -138,11 +144,14 @@ function PlanetModel(controller) {
             var todo = [];
             l.forEach(function (name, i) {
                 if (name.indexOf('.b64') !== -1) {
-                    todo.push(name);
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        todo.push(name);
+                    } else if (!(name.slice(0, MUSICBLOCKSPREFIX.length) == MUSICBLOCKSPREFIX)) {
+                        todo.push(name);
+                    }
                 }
             });
-            // console.log('todo');
-            // console.log(todo);
+
             model.count = 0;
             model.getImages(todo);
         });
@@ -159,16 +168,18 @@ function PlanetModel(controller) {
         }
 
         var name = image.replace('.b64', '');
+
         var mbcheck = false;
-        if(name.slice(0, 'MusicBlocks_'.length) === 'MusicBlocks_'){
-            name = name.substring('MusicBlocks_'.length);
-            mbcheck = true;
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (name.slice(0, MUSICBLOCKSPREFIX.length) === MUSICBLOCKSPREFIX){
+                name = name.substring(MUSICBLOCKSPREFIX.length);
+                mbcheck = true;
+            }
         }
 
         if (model.globalImagesCache[image] !== undefined) {
-            model.globalProjects.push({title: name,
-                                       img: model.globalImagesCache[image]});
-            model.addGlobalElement(model.globalProjects[model.globalProjects.length-1],model.count);
+            model.globalProjects.push({title: name, img: model.globalImagesCache[image]});
+            model.addGlobalElement(model.globalProjects[model.globalProjects.length-1], model.count);
             model.count++;
             model.getImages(todo);
         } else {
@@ -189,7 +200,7 @@ function PlanetModel(controller) {
 
                 model.globalImagesCache[image] = d;
                 model.globalProjects.push({title: name, img: d, url: image});
-                model.addGlobalElement(model.globalProjects[model.globalProjects.length-1],model.count);
+                model.addGlobalElement(model.globalProjects[model.globalProjects.length-1], model.count);
                 model.count++;
                 model.getImages(todo);
             });
@@ -253,8 +264,7 @@ function PlanetModel(controller) {
         l[l.indexOf(oldName)] = newName;
         localStorage.allProjects = JSON.stringify(l);
 
-        localStorage['SESSIONIMAGE' + newName] =
-            localStorage['SESSIONIMAGE' + oldName];
+        localStorage['SESSIONIMAGE' + newName] = localStorage['SESSIONIMAGE' + oldName];
         localStorage['SESSION' + newName] = localStorage['SESSION' + oldName];
 
         localStorage['SESSIONIMAGE' + oldName] = undefined;
@@ -304,16 +314,16 @@ function PlanetModel(controller) {
             },
             dataType: 'text',
             error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    jQuery.ajax({
-                            url: SERVER + 'MusicBlocks_' + name + '.tb',
-                            headers: {
-                                'x-api-key' : '3tgTzMXbbw6xEKX7'
-                            },
-                            dataType: 'text',
-                        }).done(function (d) {
-                            model.controller.loadRawProject(d);
-                            model.stop = true;
-                        });
+                jQuery.ajax({
+                    url: SERVER + MUSICBLOCKSPREFIX + name + '.tb',
+                    headers: {
+                        'x-api-key' : '3tgTzMXbbw6xEKX7'
+                    },
+                    dataType: 'text',
+                }).done(function (d) {
+                    model.controller.loadRawProject(d);
+                    model.stop = true;
+                });
             }
         }).done(function (d) {
             model.controller.loadRawProject(d);
@@ -331,7 +341,9 @@ function PlanetModel(controller) {
 
         setTimeout(function () {
             name = model.getPublishableName(name);
-            name = 'MusicBlocks_'+name;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                name = MUSICBLOCKSPREFIX + name;
+            }
             httpPost(name + '.tb', data);
             httpPost(name + '.b64', image);
             //TODO: append project at beginning
@@ -448,7 +460,7 @@ function PlanetView(model, controller) {
             planet.model.publish(ele.attributes.title.value,
                              ele.attributes.data.value,
                              ele.querySelector('img').src);
-            var url = SHAREURL.replace(NAMESUBTEXT, 'MusicBlocks_'+planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
+            var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
             console.log(url);
             var n = i.toString();
             docById('shareurldiv'+n).style.visibility = 'visible';
@@ -463,7 +475,7 @@ function PlanetView(model, controller) {
     this.planetshare = function (ele,i) {
         return function () {
             console.log(ele);
-            var url = SHAREURL.replace(NAMESUBTEXT, 'MusicBlocks_'+planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
+            var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
             console.log(url);
             var n = i.toString();
             docById('plshareurldiv'+n).style.visibility = 'visible';
@@ -484,40 +496,33 @@ function PlanetView(model, controller) {
 
     this.open = function (ele) {
         return function () {
-            /*
-            console.log(localStorage.getItem('isMatrixHidden'));
-            console.log(localStorage.getItem('isStaircaseHidden'));
-            console.log(localStorage.getItem('isPitchDrumMatrixHidden'));
-            console.log(localStorage.getItem('is RhythmRulerHidden'));
-            console.log(localStorage.getItem('isStatusHidden'));
-            console.log(localStorage.getItem('idModeWidgetHidden'));
-            console.log(localStorage.getItem('isSliderHidden'));
-            console.log(localStorage.getItem('isTempoHidden'));
-            */
-            docById('ptmDiv').style.visibility = localStorage.getItem('isMatrixHidden');
-            docById('ptmButtonsDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
-            docById('ptmTableDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
-            docById('pscDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
-            docById('pscButtonsDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
-            docById('pscTableDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
             docById('statusDiv').style.visibility = localStorage.getItem('isStatusHidden');
             docById('statusButtonsDiv').style.visibility = localStorage.getItem('isStatusHidden');
             docById('statusTableDiv').style.visibility = localStorage.getItem('isStatusHidden');
-            docById('sliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
-            docById('sliderButtonsDiv').style.visibility = localStorage.getItem('isSliderHidden');
-            docById('sliderTableDiv').style.visibility = localStorage.getItem('isSliderHidden');
-            docById('pdmDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
-            docById('pdmButtonsDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
-            docById('pdmTableDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
-            docById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
-            docById('rulerButtonsDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
-            docById('rulerTableDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
-            docById('modeDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
-            docById('modeButtonsDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
-            docById('modeTableDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
-            // Don't reopen the tempo widget since we didn't just hide it, but also closed it.
-            // docById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
-            // docById('tempoButtonsDiv').style.visibility = localStorage.getItem('isTempoHidden');
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                docById('ptmDiv').style.visibility = localStorage.getItem('isMatrixHidden');
+                docById('ptmButtonsDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
+                docById('ptmTableDiv').style.visibility = localStorage.getItem('isMatrixHidden'); 
+                docById('pscDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
+                docById('pscButtonsDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
+                docById('pscTableDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
+                docById('sliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
+                docById('sliderButtonsDiv').style.visibility = localStorage.getItem('isSliderHidden');
+                docById('sliderTableDiv').style.visibility = localStorage.getItem('isSliderHidden');
+                docById('pdmDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
+                docById('pdmButtonsDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
+                docById('pdmTableDiv').style.visibility = localStorage.getItem('isPitchDrumMatrixHidden');
+                docById('rulerDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+                docById('rulerButtonsDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+                docById('rulerTableDiv').style.visibility = localStorage.getItem('isRhythmRulerHidden'); 
+                docById('modeDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
+                docById('modeButtonsDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
+                docById('modeTableDiv').style.visibility = localStorage.getItem('isModeWidgetHidden');
+                // Don't reopen the tempo widget since we didn't just hide it, but also closed it.
+                // docById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
+                // docById('tempoButtonsDiv').style.visibility = localStorage.getItem('isTempoHidden');
+            }
 
             if (ele.attributes.current.value === 'true') {
                 planet.controller.hide();
@@ -573,7 +578,7 @@ function SamplesViewer () {
     }
 
     this.setLoad = function (load) {
-	this.loadProject = load;
+        this.loadProject = load;
         return this;
     };
 

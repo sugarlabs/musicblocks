@@ -1797,7 +1797,9 @@ function Blocks () {
         // Deprecated
         // If we drag in a synth block, we need to load the synth.
         if (['sine', 'sawtooth', 'triangle', 'square'].indexOf(name) !== -1) {
-            this.logo.synth.loadSynth(name);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.logo.synth.loadSynth(name);
+            }
         }
 
         if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(name) !== -1) {
@@ -2251,7 +2253,9 @@ function Blocks () {
                 var c = this.blockList[blk].connections[0];
                 if (c != null && ['playdrum', 'setdrum', 'setvoice'].indexOf(this.blockList[c].name) !== -1) {
                     if (this.blockList[blk].value.slice(0, 4) === 'http') {
-                        this.logo.synth.loadSynth(this.blockList[blk].value);
+                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                            this.logo.synth.loadSynth(this.blockList[blk].value);
+                        }
                     }
                 }
             }
@@ -3237,8 +3241,10 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]], collapsed);
 
-                // Load the synth for this drum
-                this.logo.synth.loadSynth('kick');
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    // Load the synth for this drum
+                    this.logo.synth.loadSynth('kick');
+                }
                 break;
             case 'action':
             case 'hat':
@@ -3466,8 +3472,10 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
-                // Load the synth for this drum
-                this.logo.synth.loadSynth(getDrumSynthName(value));
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    // Load the synth for this drum
+                    this.logo.synth.loadSynth(getDrumSynthName(value));
+                }
                 break;
             case 'voicename':
                 postProcess = function (args) {
@@ -3479,8 +3487,10 @@ function Blocks () {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
-                // Load the synth for this voice
-                this.logo.synth.loadSynth(getVoiceSynthName(value));
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    // Load the synth for this voice
+                    this.logo.synth.loadSynth(getVoiceSynthName(value));
+                }
                 break;
             case 'media':
                 // Load a thumbnail into a media blocks.

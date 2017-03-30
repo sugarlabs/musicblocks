@@ -207,9 +207,13 @@ function Logo () {
     this.numerator = 3;
     this.denominator = 4;
 
-    // Load the default synthesizer
-    this.synth = new Synth();
-    this.synth.loadSynth('poly');
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        // Load the default synthesizer
+        this.synth = new Synth();
+        this.synth.loadSynth('poly');
+    } else {
+        this.turtleOscs = {};
+    }
 
     // Mode widget
     this._modeBlock = null;
@@ -451,8 +455,10 @@ function Logo () {
         }
         this.sounds = [];
 
-        this.synth.stopSound('default');
-        this.synth.stop();
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.synth.stopSound('default');
+            this.synth.stop();
+        }
 
         if (this.cameraID != null) {
             doStopVideoCam(this.cameraID, this.setCameraID);
@@ -4048,6 +4054,7 @@ function Logo () {
                 }
                 that.polyVolume[turtle].push(newVolume);
                 that._setSynthVolume(newVolume, turtle);
+
                 if (!that.justCounting[turtle]) {
                     lilypondBeginArticulation(that, turtle);
                 }
@@ -4099,6 +4106,25 @@ function Logo () {
             break;
             // Deprecated P5 tone generator replaced by macro.
         case 'tone':
+            break;
+        case 'tone2':
+            if (!_THIS_IS_MUSIC_BLOCKS_) {
+                if (typeof(logo.turtleOscs[turtle]) === 'undefined') {
+                    logo.turtleOscs[turtle] = new p5.TriOsc();
+                }
+
+                osc = logo.turtleOscs[turtle];
+                osc.stop();
+                osc.start();
+                osc.amp(0);
+
+                osc.freq(args[0]);
+                osc.fade(0.5, 0.2);
+
+                setTimeout(function(osc) {
+                    osc.fade(0, 0.2);
+                }, args[1], osc);
+            }
             break;
         case 'hertz':
             if (args.length !== 1 || args[0] == null) {
@@ -4609,7 +4635,9 @@ function Logo () {
             vol = 0;
         }
 
-        this.synth.setVolume(vol);
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.synth.setVolume(vol);
+        }
     };
 
     this._processNote = function (noteValue, blk, turtle) {
@@ -4980,29 +5008,32 @@ function Logo () {
                             }
 
                             if (!that.suppressOutput[turtle] && duration > 0) {
-                                if (that.oscList[turtle].length > 0) {
-                                    if (notes.length > 1) {
-                                        that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
-                                    }
-                                    that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue]);
-                                } else if (that.drumStyle[turtle].length > 0) {
-                                    that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]));
-                                } else if (that.turtles.turtleList[turtle].drum) {
-                                    that.synth.trigger(notes, beatValue, 'drum');
-                                } else {
-                                    // Look for any notes in the chord that might be in the pitchDrumTable.
-                                    for (var d = 0; d < notes.length; d++) {
-                                        if (notes[d] in that.pitchDrumTable[turtle]) {
-                                            that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]]);
-                                        } else if (turtle in that.voices && last(that.voices[turtle])) {
-                                            that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue]);
-                                        } else {
-                                            that.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue]);
+                                if (_THIS_IS_MUSIC_BLOCKS_) {
+                                    if (that.oscList[turtle].length > 0) {
+                                        if (notes.length > 1) {
+                                            that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
+                                        }
+
+                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue]);
+                                    } else if (that.drumStyle[turtle].length > 0) {
+                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]));
+                                    } else if (that.turtles.turtleList[turtle].drum) {
+                                        that.synth.trigger(notes, beatValue, 'drum');
+                                    } else {
+                                        // Look for any notes in the chord that might be in the pitchDrumTable.
+                                        for (var d = 0; d < notes.length; d++) {
+                                            if (notes[d] in that.pitchDrumTable[turtle]) {
+                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]]);
+                                            } else if (turtle in that.voices && last(that.voices[turtle])) {
+                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue]);
+                                            } else {
+                                                that.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue]);
+                                            }
                                         }
                                     }
-                                }
 
-                                that.synth.start();
+                                    that.synth.start();
+                                }
                             }
 
                             that.lastNotePlayed[turtle] = [notes[0], noteBeatValue];
@@ -5019,11 +5050,13 @@ function Logo () {
                         // console.log("drums to play " + drums + ' ' + noteBeatValue);
 
                         if (!that.suppressOutput[turtle] && duration > 0) {
-                            for (var i = 0; i < drums.length; i++) {
-                                if (that.drumStyle[turtle].length > 0) {
-                                    that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]));
-                                } else {
-                                    that.synth.trigger(['C2'], beatValue, drums[i]);
+                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                                for (var i = 0; i < drums.length; i++) {
+                                    if (that.drumStyle[turtle].length > 0) {
+                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]));
+                                    } else {
+                                        that.synth.trigger(['C2'], beatValue, drums[i]);
+                                    }
                                 }
                             }
                         }
@@ -5050,6 +5083,7 @@ function Logo () {
                     if (last(this.crescendoVolume[turtle]) === last(this.crescendoInitialVolume[turtle]) && !this.justCounting[turtle]) {
                         lilypondBeginCrescendo(this, turtle, last(this.crescendoDelta[turtle]));
                     }
+
                     var len = this.crescendoVolume[turtle].length
                     this.crescendoVolume[turtle][len - 1] += this.crescendoDelta[turtle][len - 1];
                     this._setSynthVolume(this.crescendoVolume[turtle][len - 1], turtle);
@@ -5057,6 +5091,7 @@ function Logo () {
                     this.polyVolume[turtle][len2 - 1] = this.crescendoVolume[turtle][len - 1];
                 }
             }
+
             this.pushedNote[turtle] = false;
         }
     };
@@ -5812,12 +5847,48 @@ function Logo () {
                 // No need to do anything here.
                 break;
             case 'tofrequency':
-                var block = that.blocks.blockList[blk];
-                var cblk1 = that.blocks.blockList[blk].connections[1];
-                var cblk2 = that.blocks.blockList[blk].connections[2];
-                var note = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                var octave = Math.floor(calcOctave(that.currentOctaves[turtle], that.parseArg(that, turtle, cblk2, blk, receivedArg)));
-                block.value = Math.round(pitchToFrequency(note, octave, 0, that.keySignature[turtle]));
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    var block = that.blocks.blockList[blk];
+                    var cblk1 = that.blocks.blockList[blk].connections[1];
+                    var cblk2 = that.blocks.blockList[blk].connections[2];
+                    var note = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                    var octave = Math.floor(calcOctave(that.currentOctaves[turtle], that.parseArg(that, turtle, cblk2, blk, receivedArg)));
+                    block.value = Math.round(pitchToFrequency(note, octave, 0, that.keySignature[turtle]));
+                } else {
+                    const NOTENAMES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
+                    const NOTECONVERSION = {'A♯': 'B♭', 'C♯': 'D♭', 'D♯': 'E♭', 'F♯': 'G♭', 'G♯': 'A♭'};
+                    var block = that.blocks.blockList[blk];
+                    var cblk = block.connections[1];
+                    var noteName = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                    if (typeof(noteName) === 'string') {
+                        noteName = noteName.replace('b', '♭');
+                        noteName = noteName.replace('#', '♯');
+                        if (noteName in NOTECONVERSION) {
+                            noteName = NOTECONVERSION[noteName];
+                        }
+
+                        var idx = NOTENAMES.indexOf(noteName);
+                        if (idx === -1) {
+                            this.errorMsg(_('Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭.'));
+                            block.value = 440;
+                        } else {
+                            var cblk = block.connections[2];
+                            var octave = Math.floor(that.parseArg(that, turtle, cblk, blk, receivedArg));
+                            if (octave < 1) {
+                                octave = 1;
+                            }
+
+                            if (idx > 2) {
+                                octave -= 1;  // New octave starts on C
+                            }
+
+                            var i = octave * 12 + idx;
+                            block.value = 27.5 * Math.pow(1.05946309435929, i);
+                        }
+                    } else {
+                        block.value = 440 * Math.pow(2, (noteName - 69) / 12);
+                    }
+                }
                 break;
             case 'pop':
                 var block = that.blocks.blockList[blk];

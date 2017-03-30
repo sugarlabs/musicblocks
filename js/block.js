@@ -262,32 +262,32 @@ function Block(protoblock, blocks, overrideName) {
             case 'equal':
             case 'greater':
             case 'less':
-		var obj = this.protoblock.generator(this.clampCount[0]);
-		break;
+                var obj = this.protoblock.generator(this.clampCount[0]);
+                break;
             case 'calcArg':
             case 'doArg':
             case 'namedcalcArg':
             case 'nameddoArg':
-		var obj = this.protoblock.generator(this.argClampSlots);
-		this.size = 2;
-		for (var i = 0; i < this.argClampSlots.length; i++) {
+                var obj = this.protoblock.generator(this.argClampSlots);
+                this.size = 2;
+                for (var i = 0; i < this.argClampSlots.length; i++) {
                     this.size += this.argClampSlots[i];
-		}
-		this.docks = [];
-		this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
-		break;
+                }
+                this.docks = [];
+                this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
+                break;
             default:
-		if (this.isArgBlock()) {
+                if (this.isArgBlock()) {
                     var obj = this.protoblock.generator(this.clampCount[0]);
-		} else if (this.isTwoArgBlock()) {
+                } else if (this.isTwoArgBlock()) {
                     var obj = this.protoblock.generator(this.clampCount[0]);
-		} else {
+                } else {
                     var obj = this.protoblock.generator();
-		}
-		this.size += plusMinus;
-		break;
+                }
+                this.size += plusMinus;
+                break;
             }
-	}
+        }
 
         switch (this.name) {
         case 'nameddoArg':
@@ -1914,7 +1914,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
 
-		if (oldValue === _('action')) {
+                if (oldValue === _('action')) {
                     this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
                     this.blocks.setActionProtoVisiblity(false);
                 }
@@ -1939,8 +1939,10 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             case 'setdrum':
             case 'playdrum':
-                if (newValue.slice(0, 4) === 'http') {
-                    this.blocks.logo.synth.loadSynth(newValue);
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (newValue.slice(0, 4) === 'http') {
+                        this.blocks.logo.synth.loadSynth(newValue);
+                    }
                 }
                 break;
             default:
@@ -1951,11 +1953,13 @@ function Block(protoblock, blocks, overrideName) {
         // We are done changing the label, so unlock.
         this._label_lock = false;
 
-        // Load the synth for the selected drum.
-        if (this.name === 'drumname') {
-            this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
-        } else if (this.name === 'voicename') {
-            this.blocks.logo.synth.loadSynth(getVoiceSynthName(this.value));
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            // Load the synth for the selected drum.
+            if (this.name === 'drumname') {
+                this.blocks.logo.synth.loadSynth(getDrumSynthName(this.value));
+            } else if (this.name === 'voicename') {
+                this.blocks.logo.synth.loadSynth(getVoiceSynthName(this.value));
+            }
         }
     };
 

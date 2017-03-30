@@ -15,6 +15,9 @@
 // scratch. -- Walter Bender, October 2014.
 
 
+const _THIS_IS_MUSIC_BLOCKS_ = true;
+
+
 function facebookInit() {
     window.fbAsyncInit = function () {
         FB.init({
@@ -68,10 +71,11 @@ define(function (require) {
     require('modernizr-2.6.2.min');
 
     require('activity/utils');
-
-    // Constants used by both Turtle and Music Blocks
     require('activity/artwork');
-    require('activity/musicutils');
+    require('activity/turtledefs');
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        require('activity/musicutils');
+    }
 
     require('activity/munsell');
     require('activity/trash');
@@ -86,22 +90,23 @@ define(function (require) {
     require('activity/utilitybox');
     require('activity/samplesviewer');
     require('activity/blockfactory');
-
-    // Music Block-specific modules
-    require('activity/turtledefs');
-    require('activity/lilypond');
     require('activity/status');
-    require('activity/modewidget');
     require('activity/logo');
     require('activity/basicblocks');
     require('activity/analytics');
-    require('activity/soundsamples');
-    require('activity/pitchtimematrix');
-    require('activity/pitchdrummatrix');
-    require('activity/rhythmruler');
-    require('activity/pitchstaircase');
-    require('activity/tempo');
-    require('activity/pitchslider');
+
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        require('activity/lilypond');
+        require('activity/modewidget');
+        require('activity/soundsamples');
+        require('activity/pitchtimematrix');
+        require('activity/pitchdrummatrix');
+        require('activity/rhythmruler');
+        require('activity/pitchstaircase');
+        require('activity/tempo');
+        require('activity/pitchslider');
+    }
+
     // Manipulate the DOM only when it is ready.
     require(['domReady!'], function (doc) {
         if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -347,40 +352,45 @@ define(function (require) {
             var currentDelay = logo.turtleDelay;
             var playingWidget = false;
             logo.setTurtleDelay(0);
-            if (docById('ptmDiv').style.visibility === 'visible') {
-                playingWidget = true;
-                logo.pitchTimeMatrix.playAll();
-            }
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (docById('ptmDiv').style.visibility === 'visible') {
+                    playingWidget = true;
+                    logo.pitchTimeMatrix.playAll();
+                }
 
-            if (docById('pscDiv').style.visibility === 'visible') {
-                playingWidget = true;
-                pitchstaircase.playUpAndDown();
-            }
+                if (docById('pscDiv').style.visibility === 'visible') {
+                    playingWidget = true;
+                    pitchstaircase.playUpAndDown();
+                }
 
-            if (docById('rulerDiv').style.visibility === 'visible') {
-                // If the tempo widget is open, sync it up with the
-                // rhythm ruler.
+                if (docById('rulerDiv').style.visibility === 'visible') {
+                    // If the tempo widget is open, sync it up with the
+                    // rhythm ruler.
+                    if (docById('tempoDiv').style.visibility === 'visible') {
+                        if (tempo.isMoving) {
+                            tempo.pause();
+                        }
+                        tempo.resume();
+                    }
+
+                    playingWidget = true;
+                    rhythmruler.playAll();
+                }
+
+                // We were using the run button to play a widget, not
+                // the turtles.
+                if (playingWidget) {
+                    return;
+                }
+
+                // Restart tempo widget and run blocks.
                 if (docById('tempoDiv').style.visibility === 'visible') {
                     if (tempo.isMoving) {
                         tempo.pause();
                     }
+
                     tempo.resume();
                 }
-                playingWidget = true;
-                rhythmruler.playAll();
-            }
-
-            // We were using the run button to play a widget, not the turtles.
-            if (playingWidget) {
-                return;
-            }
-
-            // Restart tempo widget and run blocks.
-            if (docById('tempoDiv').style.visibility === 'visible') {
-                if (tempo.isMoving) {
-                    tempo.pause();
-                }
-                tempo.resume();
             }
 
             if (!turtles.running()) {
@@ -1147,24 +1157,26 @@ define(function (require) {
         };
 
         function __keyPressed(event) {
-            if (docById('labelDiv').classList.contains('hasKeyboard')) {
-                return;
-            }
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (docById('labelDiv').classList.contains('hasKeyboard')) {
+                    return;
+                }
 
-            if (docById('BPMInput').classList.contains('hasKeyboard')) {
-                return ;
-            }
+                if (docById('BPMInput').classList.contains('hasKeyboard')) {
+                    return;
+                }
 
-            if (docById('musicratio1').classList.contains('hasKeyboard')) {
-                return;
-            }
+                if (docById('musicratio1').classList.contains('hasKeyboard')) {
+                    return;
+                }
 
-            if (docById('musicratio2').classList.contains('hasKeyboard')) {
-                return;
-            }
+                if (docById('musicratio2').classList.contains('hasKeyboard')) {
+                    return;
+                }
 
-            if (docById('dissectNumber').classList.contains('hasKeyboard')) {
-                return;
+                if (docById('dissectNumber').classList.contains('hasKeyboard')) {
+                    return;
+                }
             }
 
             const BACKSPACE = 8;
@@ -1328,11 +1340,12 @@ define(function (require) {
             stage.canvas.width = w;
             stage.canvas.height = h;
 
+            /*
             console.log('Resize: scale ' + turtleBlocksScale +
             ', windowW ' + w + ', windowH ' + h +
             ', canvasW ' + canvas.width + ', canvasH ' + canvas.height +
             ', screenW ' + screen.width + ', screenH ' + screen.height);
-
+            */
             turtles.setScale(turtleBlocksScale);
             blocks.setScale(turtleBlocksScale);
             boundary.setScale(w, h, turtleBlocksScale);
@@ -1587,72 +1600,65 @@ define(function (require) {
         };
 
         function _doOpenSamples() {
-            /*
-            console.log(docById('ptmDiv').style.visibility);
-            console.log(docById('pscDiv').style.visibility);
-            console.log(docById('pdmDiv').style.visibility);
-            console.log(docById('rulerDiv').style.visibility);
-            console.log(docById('statusDiv').style.visibility);
-            console.log(docById('modeDiv').style.visibility);
-            console.log(docById('sliderDiv').style.visibility);
-            console.log(docById('tempoDiv').style.visibility);
-            */
-            localStorage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
-            localStorage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
-            localStorage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
-            localStorage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
-            localStorage.setItem('isStatusHidden', docById('statusDiv').style.visibility);
-            localStorage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
-            localStorage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
-            localStorage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                localStorage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
+                localStorage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
+                localStorage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
+                localStorage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
+                localStorage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
+                localStorage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
+                localStorage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
-            if (docById('ptmDiv').style.visibility !== 'hidden') {
-                docById('ptmDiv').style.visibility = 'hidden';
-                docById('ptmTableDiv').style.visibility = 'hidden';
-                docById('ptmButtonsDiv').style.visibility = 'hidden';
-            }
+                if (docById('ptmDiv').style.visibility !== 'hidden') {
+                    docById('ptmDiv').style.visibility = 'hidden';
+                    docById('ptmTableDiv').style.visibility = 'hidden';
+                    docById('ptmButtonsDiv').style.visibility = 'hidden';
+                }
 
-            if (docById('pdmDiv').style.visibility !== 'hidden') {
-                docById('pdmDiv').style.visibility = 'hidden';
-                docById('pdmButtonsDiv').style.visibility = 'hidden';
-                docById('pdmTableDiv').style.visibility = 'hidden';
-            }
+                if (docById('pdmDiv').style.visibility !== 'hidden') {
+                    docById('pdmDiv').style.visibility = 'hidden';
+                    docById('pdmButtonsDiv').style.visibility = 'hidden';
+                    docById('pdmTableDiv').style.visibility = 'hidden';
+                }
 
-            if (docById('rulerDiv').style.visibility !== 'hidden') {
-                docById('rulerDiv').style.visibility = 'hidden';
-                docById('rulerTableDiv').style.visibility = 'hidden';
-                docById('rulerButtonsDiv').style.visibility = 'hidden';
-            }
+                if (docById('rulerDiv').style.visibility !== 'hidden') {
+                    docById('rulerDiv').style.visibility = 'hidden';
+                    docById('rulerTableDiv').style.visibility = 'hidden';
+                    docById('rulerButtonsDiv').style.visibility = 'hidden';
+                }
 
-            if (docById('pscDiv').style.visibility !== 'hidden') {
-                docById('pscDiv').style.visibility = 'hidden';
-                docById('pscTableDiv').style.visibility = 'hidden';
-                docById('pscButtonsDiv').style.visibility = 'hidden';
-            }
+                if (docById('pscDiv').style.visibility !== 'hidden') {
+                    docById('pscDiv').style.visibility = 'hidden';
+                    docById('pscTableDiv').style.visibility = 'hidden';
+                    docById('pscButtonsDiv').style.visibility = 'hidden';
+                }
 
-            if (docById('statusDiv').style.visibility !== 'hidden') {
-                docById('statusDiv').style.visibility = 'hidden';
-                docById('statusButtonsDiv').style.visibility = 'hidden';
-                docById('statusTableDiv').style.visibility = 'hidden';
-            }
+                if (docById('statusDiv').style.visibility !== 'hidden') {
+                    docById('statusDiv').style.visibility = 'hidden';
+                    docById('statusButtonsDiv').style.visibility = 'hidden';
+                    docById('statusTableDiv').style.visibility = 'hidden';
+                }
 
-            if (docById('sliderDiv').style.visibility !== 'hidden') {
-                docById('sliderDiv').style.visibility = 'hidden';
-                docById('sliderButtonsDiv').style.visibility = 'hidden';
-                docById('sliderTableDiv').style.visibility = 'hidden';
-            }
+                if (docById('sliderDiv').style.visibility !== 'hidden') {
+                    docById('sliderDiv').style.visibility = 'hidden';
+                    docById('sliderButtonsDiv').style.visibility = 'hidden';
+                    docById('sliderTableDiv').style.visibility = 'hidden';
+                }
 
-            if (docById('modeDiv').style.visibility !== 'hidden') {
-                docById('modeDiv').style.visibility = 'hidden';
-                docById('modeButtonsDiv').style.visibility = 'hidden';
-                docById('modeTableDiv').style.visibility = 'hidden';
-            }
+                if (docById('modeDiv').style.visibility !== 'hidden') {
+                    docById('modeDiv').style.visibility = 'hidden';
+                    docById('modeButtonsDiv').style.visibility = 'hidden';
+                    docById('modeTableDiv').style.visibility = 'hidden';
+                }
 
-            if (docById('tempoDiv').style.visibility !== 'hidden') {
-                if (logo.tempo != null) {
-                    logo.tempo.hide();
+                if (docById('tempoDiv').style.visibility !== 'hidden') {
+                    if (logo.tempo != null) {
+                        logo.tempo.hide();
+                    }
                 }
             }
+
+            localStorage.setItem('isStatusHidden', docById('statusDiv').style.visibility);
 
             logo.doStopTurtle();
             helpContainer.visible = false;
@@ -1696,7 +1702,6 @@ define(function (require) {
         window.saveLocally = saveLocally;
 
         function saveLocally() {
-
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 //sugarizerCompatibility.data.blocks = prepareExport();
                 storage = sugarizerCompatibility.data;
@@ -2275,18 +2280,31 @@ handleComplete);
 
             // Buttons used when running turtle programs
             // name / onpress function / label / onlongpress function / onextralongpress function / onlongpress icon / onextralongpress icon
-            var buttonNames = [
-                ['run', _doFastButton, _('Run fast / long press to run slowly / extra-long press to run music slowly'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
-                ['step', _doStepButton, _('Run step by step'), null, null, null, null],
-                ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
-                ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
-                ['clear', _allClear, _('Clean'), null, null, null, null],
-                // ['palette', _changePaletteVisibility, _('Show/hide palettes'), null, null, null, null],
-                ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
-                ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
-                ['go-home', _findBlocks, _('Home'), null, null, null, null],
-                ['help', _showHelp, _('Help'), null, null, null, null]
-            ];
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                var buttonNames = [
+                    ['run', _doFastButton, _('Run fast / long press to run slowly / extra-long press to run music slowly'), _doSlowButton, _doSlowMusicButton, 'slow-button', 'slow-music-button'],
+                    ['step', _doStepButton, _('Run step by step'), null, null, null, null],
+                    ['step-music', _doStepMusicButton, _('Run note by note'), null, null, null, null],
+                    ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
+                    ['clear', _allClear, _('Clean'), null, null, null, null],
+                    // ['palette', _changePaletteVisibility, _('Show/hide palettes'), null, null, null, null],
+                    ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+                    ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+                    ['go-home', _findBlocks, _('Home'), null, null, null, null],
+                    ['help', _showHelp, _('Help'), null, null, null, null]
+                ];
+            } else {
+                var buttonNames = [
+                    ['run', _doFastButton, _('Run fast / long press to run slowly'), _doSlowButton, null, 'slow-button', null],
+                    ['step', _doStepButton, _('Run step by step'), null, null, null, null],
+                    ['stop-turtle', doStopButton, _('Stop'), null, null, null, null],
+                    ['clear', _allClear, _('Clean'), null, null, null, null],
+                    ['hide-blocks', _changeBlockVisibility, _('Show/hide blocks'), null, null, null, null],
+                    ['collapse-blocks', _toggleCollapsibleStacks, _('Expand/collapse collapsable blocks'), null, null, null, null],
+                    ['go-home', _findBlocks, _('Home'), null, null, null, null],
+                    ['help', _showHelp, _('Help'), null, null, null, null]
+                ];
+            }
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
                 buttonNames.push(['sugarizer-stop', function () {
@@ -2352,18 +2370,32 @@ handleComplete);
             }
 
             // Misc. other buttons
-            var menuNames = [
-                ['planet', _doOpenSamples, _('Load samples from server')],
-                ['open', doLoad, _('Load project from files')],
-                ['save', doSave, _('Save project')],
-                ['lilypond', _doLilypond, _('Save sheet music')],
-                ['paste-disabled', pasteStack, _('Paste')],
-                ['Cartesian', _doCartesian, _('Cartesian')],
-                ['polar', _doPolar, _('Polar')],
-                ['utility', _doUtilityBox, _('Settings')],
-                ['empty-trash', _deleteBlocksBox, _('Delete all')],
-                ['restore-trash', _restoreTrash, _('Undo')]
-            ];
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                var menuNames = [
+                    ['planet', _doOpenSamples, _('Load samples from server')],
+                    ['open', doLoad, _('Load project from files')],
+                    ['save', doSave, _('Save project')],
+                    ['lilypond', _doLilypond, _('Save sheet music')],
+                    ['paste-disabled', pasteStack, _('Paste')],
+                    ['Cartesian', _doCartesian, _('Cartesian')],
+                    ['polar', _doPolar, _('Polar')],
+                    ['utility', _doUtilityBox, _('Settings')],
+                    ['empty-trash', _deleteBlocksBox, _('Delete all')],
+                    ['restore-trash', _restoreTrash, _('Undo')]
+                ];
+            } else {
+                var menuNames = [
+                    ['planet', _doOpenSamples, _('Load samples from server')],
+                    ['open', doLoad, _('Load project from files')],
+                    ['save', doSave, _('Save project')],
+                    ['paste-disabled', pasteStack, _('Paste')],
+                    ['Cartesian', _doCartesian, _('Cartesian')],
+                    ['polar', _doPolar, _('Polar')],
+                    ['utility', _doUtilityBox, _('Settings')],
+                    ['empty-trash', _deleteBlocksBox, _('Delete all')],
+                    ['restore-trash', _restoreTrash, _('Undo')]
+                ];
+            }
 
             document.querySelector('#myOpenFile')
                     .addEventListener('change', function (event) {
