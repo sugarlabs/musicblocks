@@ -2363,7 +2363,7 @@ handleComplete);
                     homeButtonContainersX = x;
                     homeButtonContainersY = y;
                     var container2 = _makeButton('go-home-faded-button', _('Home'), x, y, btnSize, 0);
-                    _loadButtonDragHandler(container2, x, y, buttonNames[i][1]);
+                    _loadButtonDragHandler(container2, x, y, buttonNames[i][1], null, null, null, null);
                     homeButtonContainers.push(container2);
                     onscreenButtons.push(container2);
                     homeButtonContainers[0].visible = false;
@@ -2428,7 +2428,7 @@ handleComplete);
             var dy = btnSize;
 
             menuContainer = _makeButton('menu-button', '', x, y, btnSize, menuButtonsVisible ? 90 : undefined);
-            _loadButtonDragHandler(menuContainer, x, y, _doMenuButton);
+            _loadButtonDragHandler(menuContainer, x, y, _doMenuButton, null, null, null, null);
 
             for (var i = 0; i < menuNames.length; i++) {
                 if (!getAuxToolbarButtonNames(menuNames[i][0])) {
@@ -2438,7 +2438,7 @@ handleComplete);
                 x += dx;
                 y += dy;
                 var container = _makeButton(menuNames[i][0] + '-button', menuNames[i][2], x, y, btnSize, 0);
-                _loadButtonDragHandler(container, x, y, menuNames[i][1]);
+                _loadButtonDragHandler(container, x, y, menuNames[i][1], null, null, null, null);
                 onscreenMenu.push(container);
                 if (menuNames[i][0] === 'utility') {
                     utilityButton = container;
@@ -2709,14 +2709,17 @@ handleComplete);
             return container;
         };
 
-        function _loadButtonDragHandler(container, ox, oy, action, long_action = action, extra_long_action = long_action, long_img = null, extra_long_img = null) {
+        function _loadButtonDragHandler(container, ox, oy, action, longAction, extraLongAction, longImg, extraLongImg) {
             // Prevent multiple button presses (i.e., debounce).
             var locked = false;
 
-            if (long_action === null)
-                long_action = action;
-            if (extra_long_action === null)
-                extra_long_action = long_action;
+            if (longAction === null) {
+                longAction = action;
+            }
+
+            if (extraLongAction === null) {
+                extraLongAction = longAction;
+            }
 
             // Long and extra-long press variables declaration
             var pressTimer, pressTimerExtra, isLong = false, isExtraLong = false;
@@ -2731,17 +2734,17 @@ handleComplete);
 
                 pressTimer = setTimeout(function () {
                     isLong = true;
-                    if (long_img !== null) {
+                    if (longImg !== null) {
                         container.visible = false;
-                        container = _makeButton(long_img, "", ox, oy, cellSize, 0);
+                        container = _makeButton(longImg, '', ox, oy, cellSize, 0);
                     }
                 }, 500);
 
                 pressTimerExtra = setTimeout(function () {
                     isExtraLong = true;
-                    if (extra_long_img !== null) {
+                    if (extraLongImg !== null) {
                         container.visible = false;
-                        container = _makeButton(extra_long_img, "", ox, oy, cellSize, 0);
+                        container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
                     }
                 }, 1000);
 
@@ -2752,7 +2755,7 @@ handleComplete);
                     container.x = ox;
                     container.y = oy;
 
-                    if (long_img !== null || extra_long_img !== null) {
+                    if (longImg !== null || extraLongImg !== null) {
                         container.visible = false;
                         container = formerContainer;
                         container.visible = true;
@@ -2768,12 +2771,13 @@ handleComplete);
                         clearTimeout(pressTimer);
                         clearTimeout(pressTimerExtra);
 
-                        if (!isLong)
+                        if (!isLong) {
                             action();
-                        else if (!isExtraLong)
-                            long_action();
-                        else
-                            extra_long_action();
+                        } else if (!isExtraLong) {
+                            longAction();
+                        } else {
+                            extraLongAction();
+                        }
                     }
                     moved = false;
                 });
@@ -2781,6 +2785,7 @@ handleComplete);
                 isLong = false;
                 isExtraLong = false;
             });
+
         };
     };
 });
