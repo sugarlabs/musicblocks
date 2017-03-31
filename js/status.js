@@ -147,9 +147,9 @@ function StatusMatrix() {
             outerDiv.style.width = w + 'px';
         } else {
             if (this._logo.statusFields.length > 4) { // Assume we need a horizontal slider
-                outerDiv.style.height = this._cellScale * (MATRIXBUTTONHEIGHT + (2 + MATRIXSOLFEHEIGHT) * this._logo.turtles.turtleList.length) + 30 + 'px';
+                outerDiv.style.height = this._cellScale * (MATRIXBUTTONHEIGHT2 + (2 + MATRIXSOLFEHEIGHT) * this._logo.turtles.turtleList.length) + 30 + 'px';
             } else {
-                outerDiv.style.height = this._cellScale * (MATRIXBUTTONHEIGHT + (2 + MATRIXSOLFEHEIGHT) * this._logo.turtles.turtleList.length) + 'px';
+                outerDiv.style.height = this._cellScale * (MATRIXBUTTONHEIGHT2 + (2 + MATRIXSOLFEHEIGHT) * this._logo.turtles.turtleList.length) + 'px';
             }
             var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 'px';
@@ -203,11 +203,13 @@ function StatusMatrix() {
             cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 
-        var cell = row.insertCell();
-        cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
-        cell.innerHTML = '&nbsp;<b>' + _('note') + '</b>&nbsp;'
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            var cell = row.insertCell();
+            cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
+            cell.innerHTML = '&nbsp;<b>' + _('note') + '</b>&nbsp;'
+            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
+            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+        }
 
         // One row per voice (turtle)
         var activeTurtles = 0;
@@ -220,25 +222,34 @@ function StatusMatrix() {
             var cell = row.insertCell();
             cell.style.backgroundColor = MATRIXLABELCOLOR;
 
-	    if (_THIS_IS_MUSIC_BLOCKS_) {
-		cell.innerHTML = '&nbsp;&nbsp;<img src="images/mouse.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-	    } else {
-		cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-	    }
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="images/mouse.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
+            } else {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
+            }
+
             cell.style.width = (BUTTONSIZE * this._cellScale) + 'px';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
             cell.className = 'headcol';
 
-	    if (_THIS_IS_MUSIC_BLOCKS_) {
-		// + 1 is for the note column
-		for (var i = 0; i < this._logo.statusFields.length + 1; i++) {
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                // + 1 is for the note column
+                for (var i = 0; i < this._logo.statusFields.length + 1; i++) {
                     var cell = row.insertCell();
                     cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
                     cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
                     cell.innerHTML = '';
                     cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-		}
-	    }
+                }
+            } else {
+                for (var i = 0; i < this._logo.statusFields.length; i++) {
+                    var cell = row.insertCell();
+                    cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+                    cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
+                    cell.innerHTML = '';
+                    cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                }
+            }
 
             activeTurtles += 1;
         }
@@ -260,6 +271,11 @@ function StatusMatrix() {
 
                 this._logo.parseArg(this._logo, turtle, this._logo.statusFields[i][0]);
                 switch (this._logo.blocks.blockList[this._logo.statusFields[i][0]].name) {
+                case 'x':
+                case 'y':
+                case 'heading':
+                    var value = this._logo.blocks.blockList[this._logo.statusFields[i][0]].value.toFixed(2);
+                    break;
                 case 'elapsednotes':
                     var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value);
                     break;
@@ -278,30 +294,30 @@ function StatusMatrix() {
                 }
             }
 
-	    if (_THIS_IS_MUSIC_BLOCKS_) {
-		var note = '';
-		var value = '';
-		if (this._logo.noteStatus[turtle] != null) {
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                var note = '';
+                var value = '';
+                if (this._logo.noteStatus[turtle] != null) {
                     var notes = this._logo.noteStatus[turtle][0];
                     for (var j = 0; j < notes.length; j++) {
-			note += notes[j];
-			if (typeof(notes[j]) === 'number') {
+                        note += notes[j];
+                        if (typeof(notes[j]) === 'number') {
                             note += 'Hz ';
-			} else {
+                        } else {
                             note += ' ';
-			}
+                        }
                     }
                     var value = this._logo.noteStatus[turtle][1];
 
                     var obj = rationalToFraction(value);
                     note += obj[1] + '/' + obj[0];
-		}
+                }
 
-		var cell = table.rows[activeTurtles + 1].cells[i + 1];
-		if (cell != null) {
+                var cell = table.rows[activeTurtles + 1].cells[i + 1];
+                if (cell != null) {
                     cell.innerHTML = note.replace(/#/g, '♯').replace(/b/, '♭');
-		}
-	    }
+                }
+            }
 
             activeTurtles += 1;
         }

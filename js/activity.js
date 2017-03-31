@@ -1,5 +1,6 @@
 // Copyright (c) 2014-17 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
+// Copyright (c) 2016 Tymon Radzik
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -54,61 +55,16 @@ if (lang.indexOf("-") !== -1) {
 }
 
 
-// sugarizerCompatibility.ifInsideSugarizerHideLoading();
+if (_THIS_IS_MUSIC_BLOCKS_) {
+    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs', 'tweenjs', 'preloadjs', 'tone', 'howler', 'p5.sound', 'p5.dom', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
+} else {
+    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs', 'tweenjs', 'preloadjs', 'howler', 'p5.sound', 'p5.dom', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
+}
 
-define(function (require) {
-    require("activity/sugarizer-compatibility");
-    require('activity/platformstyle');
-
-    require('easeljs');
-    require('tweenjs');
-    require('preloadjs');
-    require('prefixfree.min');
-    require('howler');
-    require('mespeak');
-    require('Chart');
-    require('jquery.ruler');
-    require('modernizr-2.6.2.min');
-
-    require('activity/utils');
-    require('activity/artwork');
-    require('activity/turtledefs');
-    if (_THIS_IS_MUSIC_BLOCKS_) {
-        require('activity/musicutils');
-    }
-
-    require('activity/munsell');
-    require('activity/trash');
-    require('activity/boundary');
-    require('activity/turtle');
-    require('activity/macros');
-    require('activity/palette');
-    require('activity/protoblocks');
-    require('activity/blocks');
-    require('activity/block');
-    require('activity/clearbox');
-    require('activity/utilitybox');
-    require('activity/samplesviewer');
-    require('activity/blockfactory');
-    require('activity/status');
-    require('activity/logo');
-    require('activity/basicblocks');
-    require('activity/analytics');
-
-    if (_THIS_IS_MUSIC_BLOCKS_) {
-        require('activity/lilypond');
-        require('activity/modewidget');
-        require('activity/soundsamples');
-        require('activity/pitchtimematrix');
-        require('activity/pitchdrummatrix');
-        require('activity/rhythmruler');
-        require('activity/pitchstaircase');
-        require('activity/tempo');
-        require('activity/pitchslider');
-    }
+define(MYDEFINES, function (compatibility) {
 
     // Manipulate the DOM only when it is ready.
-    require(['domReady!'], function (doc) {
+    require(['domReady!','activity/sugarizer-compatibility'], function (doc) {
         if (sugarizerCompatibility.isInsideSugarizer()) {
             sugarizerCompatibility.loadData(function () {
                 domReady(doc);
@@ -173,6 +129,9 @@ define(function (require) {
         var pasteContainer = null;
         var pasteImage = null;
         var chartBitmap = null;
+        if (!_THIS_IS_MUSIC_BLOCKS_) {
+            var saveBox;
+        }
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -244,6 +203,7 @@ define(function (require) {
         var onscreenButtons = [];
         var onscreenMenu = [];
         var utilityButton = null;
+        var saveButton = null;
 
         var helpContainer = null;
         var helpIdx = 0;
@@ -669,13 +629,13 @@ define(function (require) {
             // with the blocks.
             boundary = new Boundary();
             boundary
-		.setStage(blocksContainer)
-		.init();
+                .setStage(blocksContainer)
+                .init();
 
             blocks = new Blocks();
             blocks
                 .setCanvas(canvas)
-	    	.setStage(blocksContainer)
+                .setStage(blocksContainer)
                 .setRefreshCanvas(refreshCanvas)
                 .setTrashcan(trashcan)
                 .setUpdateStage(stage.update)
@@ -689,7 +649,7 @@ define(function (require) {
             palettes = new Palettes();
             palettes
                 .setCanvas(canvas)
-	    	.setStage(palettesContainer)
+                .setStage(palettesContainer)
                 .setRefreshCanvas(refreshCanvas)
                 .setSize(cellSize)
                 .setTrashcan(trashcan)
@@ -726,13 +686,26 @@ define(function (require) {
             clearBox = new ClearBox();
             clearBox
                 .setCanvas(canvas)
-	    	.setStage(stage)
+                .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
                 .setClear(sendAllToTrash);
 
-            utilityBox = new UtilityBox();
+            if (!_THIS_IS_MUSIC_BLOCKS_) {
+		saveBox = new SaveBox();
+		saveBox
+                    .setCanvas(canvas)
+                    .setStage(stage)
+                    .setRefreshCanvas(refreshCanvas)
+                    .setSaveTB(doSaveTB)
+                    .setSaveSVG(doSaveSVG)
+                    .setSavePNG(doSavePNG)
+                    .setSavePlanet(doUploadToPlanet)
+                    .setSaveFB(doShareOnFacebook);
+            }
+
+	    utilityBox = new UtilityBox();
             utilityBox
-	    	.setStage(stage)
+                .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
                 .setBigger(doBiggerFont)
                 .setSmaller(doSmallerFont)
@@ -742,7 +715,7 @@ define(function (require) {
 
             thumbnails = new SamplesViewer();
             thumbnails
-	    	.setStage(stage)
+                .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
                 .setClear(sendAllToTrash)
                 .setLoad(loadProject)
@@ -1669,9 +1642,53 @@ define(function (require) {
         };
 
         function doSave() {
-            console.log('Saving .tb file');
-            var name = 'My Project';
-            download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                console.log('Saving .tb file');
+                var name = 'My Project';
+                download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
+            } else {
+                saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
+            }
+        };
+
+        function doSaveTB() {
+            var filename = prompt('Filename:', 'untitled.tb');  // default filename = untitled
+            if (filename != null) {
+                if (fileExt(filename) !== 'tb') {
+                    filename += '.tb';
+                }
+                download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
+            }
+        };
+
+        function doSaveSVG() {
+            var filename = prompt('Filename:', 'untitled.svg');
+            if (filename != null) {
+                if (fileExt(filename) !== 'svg') {
+                    filename += '.svg';
+                }
+                var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
+                download(filename, 'data:image/svg+xml;utf8,' + svg, filename, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
+            }
+        };
+
+        function doSavePNG() {
+            alert("Unavailable at the moment");
+            //var filename = prompt('Filename:', 'untitled.png');
+            //if (fileExt(filename) !== 'png') {
+            //    filename += '.png';
+            //}
+            //download(filename, 'data:text/plain;charset=utf-8,' + encodeURIComponent(prepareExport()));
+        };
+
+        function doUploadToPlanet() {
+            saveLocally();
+            thumbnails.show()
+        };
+
+        function doShareOnFacebook() {
+            alert("Facebook Sharing : disabled");    // remove when add fb share link
+            // add code for facebook share link
         };
 
         function doLoad() {
@@ -1888,6 +1905,10 @@ define(function (require) {
 
         // Hides the loading animation and unhides the background.
         function showContents(){
+            if (!_THIS_IS_MUSIC_BLOCKS_) {
+                docById('loading-image-container').style.display = 'none';
+            }
+
             docById('canvas').style.display = 'none';
             docById('hideContents').style.display = 'block';
         };
@@ -2424,7 +2445,10 @@ handleComplete);
                 onscreenMenu.push(container);
                 if (menuNames[i][0] === 'utility') {
                     utilityButton = container;
+                } else if (menuNames[i][0] === 'save') {
+                    saveButton = container;
                 }
+
                 container.visible = false;
             }
 

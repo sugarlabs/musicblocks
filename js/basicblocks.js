@@ -2281,6 +2281,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['hiddennoflow'] = hiddenNoFlowBlock;
     hiddenNoFlowBlock.hiddenNoFlow = true;
     hiddenNoFlowBlock.hiddenBlockNoFlow();
+    hiddenNoFlowBlock.hidden = true;
 
     var hiddenBlock = new ProtoBlock('hidden');
     hiddenBlock.palette = palettes.dict['flow'];

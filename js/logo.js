@@ -236,13 +236,17 @@ function Logo () {
     this.svgOutput = '';
     this.svgBackground = true;
 
-    this.mic = new Tone.UserMedia();
-    this.limit = 1024;
-    this.analyser = new Tone.Analyser({
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        this.mic = new Tone.UserMedia();
+        this.limit = 1024;
+        this.analyser = new Tone.Analyser({
                         "type" : "waveform",
                         "size" : this.limit
-                    });
-    this.mic.connect(this.analyser);
+        });
+        this.mic.connect(this.analyser);
+    } else {
+        this.mic = null;
+    }
 
     this.setCanvas = function (canvas) {
         this.canvas = canvas;
