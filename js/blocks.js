@@ -445,7 +445,7 @@ function Blocks () {
     };
 
     this._addRemoveVspaceBlock = function (blk) {
-        var myBlock = this.blocks.blockList[blk];
+        var myBlock = this.blockList[blk];
 
         var c = myBlock.connections[myBlock.connections.length - 2];
         var secondArgumentSize = 1;
