@@ -1905,9 +1905,9 @@ define(MYDEFINES, function (compatibility) {
 
         // Hides the loading animation and unhides the background.
         function showContents(){
-            if (!_THIS_IS_MUSIC_BLOCKS_) {
+            // if (!_THIS_IS_MUSIC_BLOCKS_) {
                 docById('loading-image-container').style.display = 'none';
-            }
+            // }
 
             docById('canvas').style.display = 'none';
             docById('hideContents').style.display = 'block';

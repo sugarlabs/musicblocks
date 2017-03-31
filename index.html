@@ -54,10 +54,10 @@
 
     <script src="lib/movieclip-0.7.1.min.js">
     </script>
-
+    <!--
     <script src="activity/SugarAnimation.js">
     </script>
-
+    -->
     <script>
       var canvas, stage, exportRoot;
 
@@ -76,6 +76,10 @@
   </head>
 
   <body onload="init();" data-title="index" id="body" style="background: #96D3F3;">
+    <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
+      <img src='loading-animation.gif' style="max-width:90%; width: 1024px; margin: auto; display: block;"/>
+    </div>
+
     <script>
       window.fbAsyncInit = function() {
         FB.init({
