@@ -453,6 +453,8 @@ function Blocks () {
             var secondArgumentSize = Math.max(this._getBlockSize(c), 1);
         }
 
+        var that = this;
+
         var vSpaceCount = howManyVSpaceBlocksBelow(blk);
         if (secondArgumentSize < vSpaceCount + 1) {
             // Remove a vspace block
