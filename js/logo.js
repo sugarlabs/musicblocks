@@ -4112,7 +4112,7 @@ function Logo () {
         case 'tone':
             break;
         case 'tone2':
-            if (!_THIS_IS_MUSIC_BLOCKS_) {
+            if (_THIS_IS_TURTLE_BLOCKS_) {
                 if (typeof(logo.turtleOscs[turtle]) === 'undefined') {
                     logo.turtleOscs[turtle] = new p5.TriOsc();
                 }
