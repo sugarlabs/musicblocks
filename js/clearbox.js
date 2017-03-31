@@ -93,6 +93,7 @@ function ClearBox () {
             }
 
             locked = true;
+
             setTimeout(function () {
                 locked = false;
             }, 500);
@@ -107,6 +108,7 @@ function ClearBox () {
                 that._hide();
             }
         });
+
     };
 
     this._makeBoxBitmap = function (data, name, callback, extras) {
@@ -116,7 +118,7 @@ function ClearBox () {
         var that = this;
 
         img.onload = function() {
-            bitmap = new createjs.Bitmap(img);
+            var bitmap = new createjs.Bitmap(img);
             callback(that, name, bitmap, extras);
         };
 
