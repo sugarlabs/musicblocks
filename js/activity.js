@@ -277,7 +277,7 @@ define(MYDEFINES, function (compatibility) {
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
                 logo.lilypondStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear();
+                turtles.turtleList[turtle].doClear(true, true);
             }
 
             blocksContainer.x = 0;
@@ -1347,11 +1347,14 @@ define(MYDEFINES, function (compatibility) {
             }
 
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                turtles.turtleList[turtle].doClear(false, false);
+                /*
                 var tur = turtles.turtleList[turtle];
                 tur.clearPenStrokes();
                 tur.container.x = tur.turtles.turtleX2screenX(tur.x);
                 tur.container.y = tur.turtles.turtleY2screenY(tur.y);
                 tur.turtles.refreshCanvas();
+                */
             }
 
             var artcanvas = document.getElementById("overlayCanvas");
@@ -1710,7 +1713,7 @@ define(MYDEFINES, function (compatibility) {
             logo.lilypondNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.lilypondStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear();
+                turtles.turtleList[turtle].doClear(true, true);
             }
             logo.runLogoCommands();
         };

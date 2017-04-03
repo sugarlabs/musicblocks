@@ -1519,7 +1519,7 @@ function Logo () {
             break;
         case 'clear':
             that.svgBackground = true;
-            that.turtles.turtleList[turtle].doClear();
+            that.turtles.turtleList[turtle].doClear(true, true);
             break;
         case 'setxy':
             if (args.length === 2) {

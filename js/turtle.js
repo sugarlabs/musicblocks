@@ -536,32 +536,38 @@ function Turtle (name, turtles, drum) {
     };
 
     // Turtle functions
-    this.doClear = function() {
+    this.doClear = function(resetPen, resetSkin) {
         // Reset turtle.
         this.x = 0;
         this.y = 0;
         this.orientation = 0.0;
-        var i = this.turtles.turtleList.indexOf(this) % 10;
-        this.color = i * 10;
-        this.value = DEFAULTVALUE;
-        this.chroma = DEFAULTCHROMA;
-        this.stroke = DEFAULTSTROKE;
-        this.font = DEFAULTFONT;
-        this.container.x = this.turtles.turtleX2screenX(this.x);
-        this.container.y = this.turtles.turtleY2screenY(this.y);
-        if (this.drum) {
-            if (this.name !== _('start drum')) {
-                this.rename(_('start drum'));
-            }
-        } else {
-            if (this.name !== _('start')) {
-                this.rename(_('start'));
-            }
+        if (resetPen) {
+            var i = this.turtles.turtleList.indexOf(this) % 10;
+            this.color = i * 10;
+            this.value = DEFAULTVALUE;
+            this.chroma = DEFAULTCHROMA;
+            this.stroke = DEFAULTSTROKE;
+            this.font = DEFAULTFONT;
         }
 
-        if (this.skinChanged) {
-            this.doTurtleShell(55, TURTLEBASEPATH + 'turtle-' + i.toString() + '.svg');
-            this.skinChanged = false;
+        this.container.x = this.turtles.turtleX2screenX(this.x);
+        this.container.y = this.turtles.turtleY2screenY(this.y);
+
+        if (resetSkin) {
+            if (this.drum) {
+                if (this.name !== _('start drum')) {
+                    this.rename(_('start drum'));
+                }
+            } else {
+                if (this.name !== _('start')) {
+                    this.rename(_('start'));
+                }
+            }
+
+            if (this.skinChanged) {
+                this.doTurtleShell(55, TURTLEBASEPATH + 'turtle-' + i.toString() + '.svg');
+                this.skinChanged = false;
+            }
         }
 
         this.bitmap.rotation = this.orientation;
@@ -574,6 +580,7 @@ function Turtle (name, turtles, drum) {
             this.turtles.stage.removeChild(this.media[i]);
             delete this.media[i];
         }
+
         this.media = [];
 
         // Clear all graphics.
