@@ -1348,13 +1348,6 @@ define(MYDEFINES, function (compatibility) {
 
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 turtles.turtleList[turtle].doClear(false, false);
-                /*
-                var tur = turtles.turtleList[turtle];
-                tur.clearPenStrokes();
-                tur.container.x = tur.turtles.turtleX2screenX(tur.x);
-                tur.container.y = tur.turtles.turtleY2screenY(tur.y);
-                tur.turtles.refreshCanvas();
-                */
             }
 
             var artcanvas = document.getElementById("overlayCanvas");
