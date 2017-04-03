@@ -2443,7 +2443,7 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                if (pitchdrummatrix.drums.length === 0 || pitchdrummatrix.rowLabels.length === 0) {
+                if (that.pitchDrumMatrix.drums.length === 0 || that.pitchDrumMatrix.rowLabels.length === 0) {
                     that.errorMsg(_('You must have at least one pitch block and one drum block in the matrix.'), blk);
                 } else {
                     // Process queued up rhythms.
