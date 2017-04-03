@@ -187,9 +187,9 @@ function PitchSlider() {
         widgetButtonsDiv.style.display = 'inline';
         widgetButtonsDiv.style.visibility = 'visible';
         widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table id="widgetButtonTable"></table>';
+        widgetButtonsDiv.innerHTML = '<table id="sliderButtonTable"></table>';
 
-        var buttonTable = docById('widgetButtonTable');
+        var buttonTable = docById('sliderButtonTable');
         var header = buttonTable.createTHead();
         var row = header.insertRow(0);
 

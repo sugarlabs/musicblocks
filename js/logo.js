@@ -2376,6 +2376,7 @@ function Logo () {
 
             var __listener = function (event) {
                 that.pitchStaircase.init(that);
+		that.inPitchStaircase = false;
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -4261,7 +4262,6 @@ function Logo () {
                     that.pitchStaircase.Stairs.push([note[0], note[1], parseFloat(frequency)]);
                 }
             } else if (that.inPitchSlider) {
-                console.log('pushing ' + args[0]);
                 that.pitchSlider.Sliders.push([args[0], 0, 0]);
             } else {
                 that.errorMsg(_('Hertz Block: Did you mean to use a Note block?'), blk);
