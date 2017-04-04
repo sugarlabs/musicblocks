@@ -22,10 +22,11 @@ window.server = SERVER; 'https://turtle.sugarlabs.org/server/'; // '/server/';
 
 //{NAME} will be replaced with project name
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    const SHAREURL = 'https://walterbender.github.io/musicblocks/index.html?file={name}&run=True';
+    var SHAREURL = 'https://walterbender.github.io/musicblocks/index.html?file={name}&run=True';
 } else {
-    const SHAREURL = 'https://walterbender.github.io/turtleblocksjs/index.html?file={name}&run=True';
+    var SHAREURL = 'https://walterbender.github.io/turtleblocksjs/index.html?file={name}&run=True';
 }
+
 const NAMESUBTEXT = '{name}';
 
 const LOCAL_PROJECT_STYLE ='\
@@ -455,13 +456,14 @@ function PlanetView(model, controller) {
         }
     };
 
-    this.share = function (ele,i) {
+    this.share = function (ele, i) {
         return function () {
-            planet.model.publish(ele.attributes.title.value,
-                             ele.attributes.data.value,
-                             ele.querySelector('img').src);
-            var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
-            console.log(url);
+            planet.model.publish(ele.attributes.title.value, ele.attributes.data.value, ele.querySelector('img').src);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
+            } else {
+                var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
+            }
             var n = i.toString();
             docById('shareurldiv'+n).style.visibility = 'visible';
             docById('shareurlbox'+n).style.visibility = 'visible';
@@ -472,11 +474,13 @@ function PlanetView(model, controller) {
         };
     };
 
-    this.planetshare = function (ele,i) {
+    this.planetshare = function (ele, i) {
         return function () {
-            console.log(ele);
-            var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value)+'.tb');
-            console.log(url);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
+            } else {
+                var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
+            }
             var n = i.toString();
             docById('plshareurldiv'+n).style.visibility = 'visible';
             docById('plshareurlbox'+n).style.visibility = 'visible';
