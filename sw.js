@@ -1,13 +1,13 @@
-var CACHE_NAME = 'music-blocks-site-cache-v1';
+var CACHE_NAME = 'music-blocks-site-precache';
 var urlsToCache = [
-    './index.html',
-    './loading-animatoon.gif',
-    './header-icons',
-    './images',
-    './lib',
-    './sounds',
-    './css',
-    './js'
+    'index.html',
+    'loading-animatoon.gif',
+    'header-icons/*',
+    'images/*',
+    'lib/*',
+    'sounds/*',
+    'css/*',
+    'js/*'
 ];
 
 self.addEventListener('install', function(event) {
