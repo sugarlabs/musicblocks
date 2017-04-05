@@ -1,7 +1,7 @@
 var CACHE_NAME = 'music-blocks-site-precache';
 var urlsToCache = [
     'index.html',
-    'loading-animatoon.gif',
+    'loading-animation.gif',
     'manifest.json',
     'favicon.ico',
 
@@ -179,7 +179,7 @@ var urlsToCache = [
     'js/utils.js',
     'js/clearbox.js',
     'js/palette.js',
-    'js/savebox.js',
+    // 'js/savebox.js',
 
     'lib/sugar-web/env.js',
     'lib/sugar-web/activity/activity.js',
