@@ -49,11 +49,10 @@ try {
 
 
 var lang = document.webL10n.getLanguage();
-if (lang.indexOf("-") !== -1) {
+if (lang.indexOf('-') !== -1) {
     lang = lang.slice(0, lang.indexOf("-"));
     document.webL10n.setLanguage(lang);
 }
-
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
     MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
@@ -82,7 +81,12 @@ define(MYDEFINES, function (compatibility) {
 
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
-            meSpeak.loadVoice('lib/voices/en/en.json');
+	    var lang = document.webL10n.getLanguage();
+            if (['es', 'ca', 'de', 'el', 'eo', 'fi', 'fr', 'hu', 'it', 'kn', 'la', 'lv', 'nl', 'pl', 'pt', 'ro', 'sk', 'sv', 'tr', 'zh'].indexOf(lang) !== -1) {
+                meSpeak.loadVoice('lib/voices/' + lang + '.json');
+            } else {
+                meSpeak.loadVoice('lib/voices/en/en.json');
+            }
         } catch (e) {
             console.log(e);
         }
