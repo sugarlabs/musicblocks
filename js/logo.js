@@ -2194,12 +2194,12 @@ function Logo () {
                 var oldHeap = [];
             }
             var c = block.connections[1];
-            if (c != null && blocks.blockList[c].name === 'loadFile') {
+            if (c != null && that.blocks.blockList[c].name === 'loadFile') {
                 if (args.length !== 1) {
                     that.errorMsg(_('You must select a file.'));
                 } else {
                     try {
-                        that.turtleHeaps[turtle] = JSON.parse(blocks.blockList[c].value[1]);
+                        that.turtleHeaps[turtle] = JSON.parse(that.blocks.blockList[c].value[1]);
                         if (!Array.isArray(that.turtleHeaps[turtle])) {
                             throw 'is not array';
                         }
@@ -2293,10 +2293,11 @@ function Logo () {
                 }
                 that.defaultBPMFactor = TONEBPM / this._masterBPM;
             }
+
             if (this.inTempo) {
                 that.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = blocks.blockList[blk].connections[1]
-                that.tempo.BPMs.push(blocks.blockList[bpmnumberblock].text.text);
+                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
+                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
             }
             break;
         case 'setbpm':
@@ -3412,7 +3413,7 @@ function Logo () {
         case 'clap':
         case 'bubbles':
         case 'cricket':
-            that.drumStyle[turtle].push(blocks.blockList[blk].name);
+            that.drumStyle[turtle].push(that.blocks.blockList[blk].name);
             childFlow = args[0];
             childFlowCount = 1;
 
