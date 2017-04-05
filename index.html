@@ -70,7 +70,7 @@
     <script>
       if ('serviceWorker' in navigator) {
           window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js').then(function(registration) {
+              navigator.serviceWorker.register('./sw.js').then(function(registration) {
                   // Registration was successful
                   console.log('ServiceWorker registration successful with scope: ', registration.scope);
               }).catch(function(err) {
@@ -83,7 +83,7 @@
 
   </head>
 
-  <body onload="init(); register()" data-title="index" id="body" style="background: #96D3F3;">
+  <body onload="init();" data-title="index" id="body" style="background: #96D3F3;">
     <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
       <img src='loading-animation.gif' style="max-width:90%; width: 1024px; margin: auto; display: block;"/>
     </div>
