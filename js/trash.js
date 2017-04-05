@@ -62,7 +62,7 @@ function Trashcan () {
         return this;
     };
 
-    this._makeBorderHighlight = function (isActive = false) {
+    this._makeBorderHighlight = function (isActive) {
         var img = new Image();
         var that = this;
 
@@ -99,7 +99,7 @@ function Trashcan () {
             bitmap.scaleX = that._size / that._iconsize;
             bitmap.scaleY = that._size / that._iconsize;
             that._container.addChild(border);
-            that._makeBorderHighlight();
+            that._makeBorderHighlight(false);
         };
 
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BORDER.replace('stroke_color', '#e0e0e0'))));
@@ -157,7 +157,7 @@ function Trashcan () {
             }
 
             that._highlightPower = parseInt(255 - (255 * (that._animationLevel / that.animationTime)), 10);
-            that._makeBorderHighlight();
+            that._makeBorderHighlight(false);
             that._refreshCanvas();
         }, 20);
 
@@ -174,7 +174,7 @@ function Trashcan () {
         this.isVisible = false;
         this._animationLevel = 0;
         this._highlightPower = 255;
-        this._makeBorderHighlight();
+        this._makeBorderHighlight(false);
         this._switchHighlightVisibility(false);
     };
 
