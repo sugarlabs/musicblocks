@@ -1,14 +1,19 @@
 {
-  "name": "TurtleJS",
-  "description": "Learn to program with snap-together blocks!",
+  "name": "Music Blocks",
+  "description": "Learn to program music with snap-together blocks!",
   "launch_path": "/index.html",
   "icons": {
     "512": "/activity/activity-icon-color-512.png",
     "128": "/activity/activity-icon-color-128.png"
   },
   "developer": {
-    "name": "Sugarlabs",
+    "name": "Walter Bender",
     "url": "https://sugarlabs.org"
   },
   "default_locale": "en"
+  "screenshots": [{
+      "src": "screenshots/Screenshot-1.png",
+      "sizes": "1440x715",
+      "type": "image/png"
+  }]
 }
