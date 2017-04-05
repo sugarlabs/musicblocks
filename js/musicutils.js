@@ -1167,7 +1167,7 @@ function getNumNote(value, delta) {
 };
 
 
-calcOctave = function(current, arg) {
+calcOctave = function (current, arg) {
     switch(arg) {
     case _('next'):
     case 'next':
@@ -1184,7 +1184,7 @@ calcOctave = function(current, arg) {
 };
 
 
-calcOctaveInterval = function(arg) {
+calcOctaveInterval = function (arg) {
     // Used by intervals to determine octave to use in an interval.
     var value = 0;
     switch(arg) {
@@ -1227,7 +1227,7 @@ function isInt(value) {
 
 
 function reducedFraction(a, b) {
-    greatestCommonMultiple = function(a, b) {
+    greatestCommonMultiple = function (a, b) {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     }
 
@@ -1286,11 +1286,11 @@ function Synth () {
         'snare drum': [SNARESOUNDSAMPLE, null],
     };
 
-    Tone.Buffer.onload = function(){
+    Tone.Buffer.onload = function (){
         console.log('drum loaded');
     };
 
-    this.getSynthByName = function(name) {
+    this.getSynthByName = function (name) {
         if (name == null || name == undefined) {
             return this.synthset['poly'][1];
         }
@@ -1333,7 +1333,7 @@ function Synth () {
         return this.synthset['poly'][1];
     };
 
-    this.loadSynth = function(name) {
+    this.loadSynth = function (name) {
         var thisSynth = this.getSynthByName(name);
         if (thisSynth == null) {
             console.log('loading synth for ' + name);
@@ -1382,20 +1382,20 @@ function Synth () {
         this.getSynthByName(name).toMaster();
     };
 
-    this.performNotes = function(synth, notes, beatValue, doVibrato = false, vibratoIntensity = 0, vibratoFrequency = 0) {
+    this.performNotes = function (synth, notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency) {
         if (doVibrato) {
-            var vibrato = new Tone.Vibrato(1/vibratoFrequency, vibratoIntensity);
+            var vibrato = new Tone.Vibrato(1 / vibratoFrequency, vibratoIntensity);
             synth.chain(vibrato, Tone.Master);
             synth.triggerAttackRelease(notes, beatValue);
-            setTimeout(function() {
+            setTimeout(function () {
                 vibrato.dispose();
-            }, beatValue*1000); //disable vibrato effect when beat is over
+            }, beatValue * 1000);  //disable vibrato effect when beat is over
         } else {
             synth.triggerAttackRelease(notes, beatValue);
         }
     }
 
-    this.trigger = function(notes, beatValue, name, vibratoArgs = []) {
+    this.trigger = function (notes, beatValue, name, vibratoArgs = []) {
         var doVibrato = false;
         var vibratoIntensity = 0;
         var vibratoFrequency = 0;
@@ -1465,24 +1465,24 @@ function Synth () {
         }
     };
 
-    this.stopSound = function(name) {
+    this.stopSound = function (name) {
         this.getSynthByName(name).triggerRelease();
     };
 
-    this.start = function() {
+    this.start = function () {
         Tone.Transport.start();
     };
 
-    this.stop = function() {
+    this.stop = function () {
         Tone.Transport.stop();
     };
 
-    this.setVolume = function(vol) {
+    this.setVolume = function (vol) {
         var db = this.tone.gainToDb(vol / 100);
         Tone.Master.volume.rampTo(db, 0.01);
     };
 
-    this.getOscillator = function(oscillatorName, frequency) {
+    this.getOscillator = function (oscillatorName, frequency) {
         return new Tone.Oscillator(oscillatorName, frequency).toMaster();
     };
 };
