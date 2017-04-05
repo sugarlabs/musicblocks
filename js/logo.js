@@ -245,7 +245,13 @@ function Logo () {
         });
         this.mic.connect(this.analyser);
     } else {
-        this.mic = null;
+        try {
+            this.mic = new p5.AudioIn()
+        } catch (e) {
+            console.log(e);
+            console.log(NOMICERRORMSG);
+            this.mic = null;
+        }
     }
 
     this.setCanvas = function (canvas) {
@@ -571,12 +577,16 @@ function Logo () {
                     that.errorMsg(NOMICERRORMSG);
                     value = 0;
                 } else {
-                    var values = that.analyser.analyse();
-                    var sum = 0;
-                    for (var k = 0; k < that.limit; k++){
-                        sum += (values[k] * values[k]);
+                    if (_THIS_IS_TURTLE_BLOCKS) {
+                        value = Math.round(that.mic.getLevel() * 1000);
+                    } else {
+                        var values = that.analyser.analyse();
+                        var sum = 0;
+                        for (var k = 0; k < that.limit; k++){
+                            sum += (values[k] * values[k]);
+                        }
+                        value = Math.round(Math.sqrt(sum / that.limit));
                     }
-                    value = Math.round(Math.sqrt(sum / that.limit));
                 }
                 break;
             case 'consonantstepsizeup':
@@ -4114,11 +4124,11 @@ function Logo () {
             break;
         case 'tone2':
             if (_THIS_IS_TURTLE_BLOCKS_) {
-                if (typeof(logo.turtleOscs[turtle]) === 'undefined') {
-                    logo.turtleOscs[turtle] = new p5.TriOsc();
+                if (typeof(that.turtleOscs[turtle]) === 'undefined') {
+                    that.turtleOscs[turtle] = new p5.TriOsc();
                 }
 
-                osc = logo.turtleOscs[turtle];
+                osc = that.turtleOscs[turtle];
                 osc.stop();
                 osc.start();
                 osc.amp(0);
@@ -5299,23 +5309,38 @@ function Logo () {
         } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock()) {
             switch (that.blocks.blockList[blk].name) {
             case 'loudness':
+                if (_THIS_IS_TURTLE_BLOCKS_) {
+                    try {  // DEBUGGING P5 MIC
+                        if (!that.mic.enabled) {
+                            that.mic.start();
+                            that.blocks.blockList[blk].value = 0;
+                        } else {
+                            that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
+                        }
+                    } catch (e) {  // MORE DEBUGGING
+                        console.log(e);
+                        that.mic.start();
+                        that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
+                    }
+                } else {
                     var values = that.analyser.analyse();
                     var sum = 0;
                     for(var k=0; k<that.limit; k++){
                             sum += (values[k] * values[k]);
                     }
                     var rms = Math.sqrt(sum/that.limit);
-                try {
-                    if (!that.mic.open()) {
+                    try {
+                        if (!that.mic.open()) {
+                            that.mic.open();
+                            that.blocks.blockList[blk].value = 0;
+                        } else {
+                            that.blocks.blockList[blk].value = Math.round(rms);
+                        }
+                    } catch (e) {  // MORE DEBUGGING
+                        console.log(e);
                         that.mic.open();
-                        that.blocks.blockList[blk].value = 0;
-                    } else {
                         that.blocks.blockList[blk].value = Math.round(rms);
                     }
-                } catch (e) {  // MORE DEBUGGING
-                    console.log(e);
-                    that.mic.open();
-                    that.blocks.blockList[blk].value = Math.round(rms);
                 }
                 break;
             case 'eval':
