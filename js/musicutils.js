@@ -1395,7 +1395,7 @@ function Synth () {
         }
     }
 
-    this.trigger = function (notes, beatValue, name, vibratoArgs = []) {
+    this.trigger = function (notes, beatValue, name, vibratoArgs) {
         var doVibrato = false;
         var vibratoIntensity = 0;
         var vibratoFrequency = 0;

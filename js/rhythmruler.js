@@ -219,7 +219,7 @@ function RhythmRuler () {
         var ruler = docById('ruler' + i);
         var cell = ruler.cells[0];
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum);
+        this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum, []);
     };
 
     this.__pause = function() {
@@ -344,7 +344,7 @@ function RhythmRuler () {
             if (that._playing) {
                 var d = new Date();
                 that._offsets[rulerNo] = d.getTime() - that._startingTime - that._elapsedTimes[rulerNo];
-                that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum);
+                that._logo.synth.trigger([0], that._logo.defaultBPMFactor / noteValue, drum, []);
             }
 
             if (notesCounter < noteValues.length) {

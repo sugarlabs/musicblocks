@@ -684,7 +684,7 @@ function ModeWidget() {
             that._lastNotePlayed = cell;
 
             var noteToPlay = that._logo.getNote(that._pitch, 4, that.cells[i]);
-            that._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, 'poly');
+            that._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, 'poly', []);
             that.__playNextNote(time, noteCounter + 1);
         }, 1000 * time);
     };
@@ -698,7 +698,7 @@ function ModeWidget() {
         var cell = table.rows[MODEMAP[idx][0]].cells[MODEMAP[idx][1]];
         if (cell.style.backgroundColor === 'black') {
             var noteToPlay = this._logo.getNote(this._pitch, 4, idx);
-            this._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, 'poly');
+            this._logo.synth.trigger(noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, 'poly', []);
         }
     };
 

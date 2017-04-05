@@ -200,7 +200,7 @@ function PitchStaircase () {
         // The frequency is stored in the stepCell.
         stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
         var frequency = Number(stepCell.getAttribute('id'));
-        this._logo.synth.trigger(frequency, 1, 'poly');
+        this._logo.synth.trigger(frequency, 1, 'poly', []);
         setTimeout(function () {
             stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
         }, 1000)
@@ -216,7 +216,7 @@ function PitchStaircase () {
             var pscTableCell = docById('stepTable' + i);
             var stepCell = pscTableCell.rows[0].cells[1];
             stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
-            this._logo.synth.trigger(pitchnotes, 1, 'poly');
+            this._logo.synth.trigger(pitchnotes, 1, 'poly', []);
         }
 
         setTimeout(function () {
@@ -237,7 +237,7 @@ function PitchStaircase () {
         var pscTableCell = docById('stepTable' + last);
         var stepCell = pscTableCell.rows[0].cells[1];
         stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        this._logo.synth.trigger(pitchnotes, 1, 'poly');
+        this._logo.synth.trigger(pitchnotes, 1, 'poly', []);
         this._playNext(this.Stairs.length - 2, -1);
     };
 
@@ -289,7 +289,7 @@ function PitchStaircase () {
             var pscTableCell = docById('stepTable' + index);
             var stepCell = pscTableCell.rows[0].cells[1];
             stepCell.style.backgroundColor = MATRIXBUTTONCOLOR;
-            that._logo.synth.trigger(pitchnotes, 1, 'poly');
+            that._logo.synth.trigger(pitchnotes, 1, 'poly', []);
             if (index < that.Stairs.length || index > -1) {
                 that._playNext(index + next, next);
             }

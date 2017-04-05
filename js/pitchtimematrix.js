@@ -1097,15 +1097,15 @@ function PitchTimeMatrix () {
         }
 
         if (note[0] !== 'R' && pitchNotes.length > 0) {
-            this._logo.synth.trigger(pitchNotes, this._logo.defaultBPMFactor / noteValue, 'poly');
+            this._logo.synth.trigger(pitchNotes, this._logo.defaultBPMFactor / noteValue, 'poly', []);
         }
 
         for (var i = 0; i < synthNotes.length; i++) {
-            this._logo.synth.trigger([Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, 'poly');
+            this._logo.synth.trigger([Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, 'poly', []);
         }
 
         for (var i = 0; i < drumNotes.length; i++) {
-            this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i]);
+            this._logo.synth.trigger('C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i], []);
         }
 
         this.__playNote(0, 0);
@@ -1193,15 +1193,15 @@ function PitchTimeMatrix () {
                 }
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    that._logo.synth.trigger(pitchNotes, that._logo.defaultBPMFactor / noteValue, 'poly');
+                    that._logo.synth.trigger(pitchNotes, that._logo.defaultBPMFactor / noteValue, 'poly', []);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
-                    that._logo.synth.trigger([Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, 'poly');
+                    that._logo.synth.trigger([Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, 'poly', []);
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
-                    that._logo.synth.trigger(['C2'], that._logo.defaultBPMFactor / noteValue, drumNotes[i]);
+                    that._logo.synth.trigger(['C2'], that._logo.defaultBPMFactor / noteValue, drumNotes[i], []);
                 }
 
             }
@@ -1276,17 +1276,17 @@ function PitchTimeMatrix () {
         if (obj.length === 1) {
             if (playNote) {
                 if (drumName != null) {
-                    this._logo.synth.trigger('C2', noteValue, drumName);
+                    this._logo.synth.trigger('C2', noteValue, drumName, []);
                 } else if (this.rowLabels[j - 1] === 'hertz') {
-                    this._logo.synth.trigger(Number(note), noteValue, 'poly');
+                    this._logo.synth.trigger(Number(note), noteValue, 'poly', []);
                 } else if (graphicsBlock !== true) {
-                    this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly');
+                    this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'poly', []);
                 } else {
                     console.log('Cannot parse note object: ' + obj);
                 }
             }
         } else if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
-            this._logo.synth.trigger([Number(obj[1])], noteValue, obj[0]);
+            this._logo.synth.trigger([Number(obj[1])], noteValue, obj[0], []);
         }
     };
 
