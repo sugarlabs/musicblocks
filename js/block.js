@@ -1,4 +1,4 @@
-// Copyright (c) 2014-16 Walter Bender
+// Copyright (c) 2014-17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -1032,10 +1032,13 @@ function Block(protoblock, blocks, overrideName) {
             if (locked) {
                 return;
             }
+
             locked = true;
+
             setTimeout(function () {
                 locked = false;
             }, 500);
+
             hideDOMLabel();
             if (!moved) {
                 myBlock.collapseToggle();
@@ -1064,6 +1067,7 @@ function Block(protoblock, blocks, overrideName) {
             if (!mousedown) {
                 return;
             }
+
             mousedown = false;
             if (moved) {
                 myBlock._collapseOut(blocks, thisBlock, moved, event);
@@ -1226,8 +1230,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else if (myBlock.name === 'loadFile') {
                     myBlock._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(myBlock.name) !== -1) {
-                    if (!myBlock.trash)
-                    {
+                    if (!myBlock.trash) {
                         myBlock._changeLabel();
                     }
                 } else {
@@ -1276,6 +1279,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (!blocks.inLongPress) {
                     myBlock._mouseoutCallback(event, moved, haveClick, true);
                 }
+
                 moved = false;
             });
 
@@ -1287,6 +1291,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (!blocks.inLongPress) {
                     myBlock._mouseoutCallback(event, moved, haveClick, true);
                 }
+
                 moved = false;
             });
 
@@ -1362,6 +1367,7 @@ function Block(protoblock, blocks, overrideName) {
             if (!blocks.inLongPress) {
                 myBlock._mouseoutCallback(event, moved, haveClick, true);
             }
+
             moved = false;
         });
 
@@ -1369,6 +1375,7 @@ function Block(protoblock, blocks, overrideName) {
             if (!blocks.inLongPress) {
                 myBlock._mouseoutCallback(event, moved, haveClick, false);
             }
+
             moved = false;
         });
     };
@@ -1422,12 +1429,23 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (hideDOM) {
-            if (this.blocks.activeBlock !== thisBlock) {
+            // Did the mouse move out off the block? If so, hide the
+            // label DOM element.
+            if (this.bounds != null && (event.stageX / blocks.blockScale < this.container.x || event.stageX / blocks.blockScale > this.container.x + this.bounds.width || event.stageY / blocks.blockScale < this.container.y || event.stageY / blocks.blockScale > this.container.y + this.bounds.height)) {
+                this._labelChanged();
                 hideDOMLabel();
-            } else {
                 this.blocks.unhighlight(null);
                 this.blocks.refreshCanvas();
+            } else if (this.blocks.activeBlock !== thisBlock) {
+                // Are we in a different block altogether?
+                hideDOMLabel();
+                this.blocks.unhighlight(null);
+                this.blocks.refreshCanvas();
+            } else {
+                // this.blocks.unhighlight(null);
+                // this.blocks.refreshCanvas();
             }
+
             this.blocks.activeBlock = null;
         }
     };
@@ -1762,17 +1780,13 @@ function Block(protoblock, blocks, overrideName) {
 
     this._labelChanged = function () {
         // Update the block values as they change in the DOM label.
-        if (this == null) {
-            console.log('cannot find block associated with label change');
+        if (this == null || this.label == null) {
+            // console.log('cannot find block associated with label change');
             this._label_lock = false;
             return;
         }
 
-        if (this._label_lock) {
-            console.log('changing label lock already set');
-        } else {
-            this._label_lock = true;
-        }
+        this._label_lock = true;
 
         this.label.style.display = 'none';
         if (this.labelattr != null) {
