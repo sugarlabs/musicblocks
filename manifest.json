@@ -17,6 +17,6 @@
 	"storage",
 	"unlimitedStorage",
 	"audioCapture",
-	"videoCapture",
+	"videoCapture"
     ]
 }
