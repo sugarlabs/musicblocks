@@ -4,7 +4,7 @@ Music Blocks software is Free/Libre Software designed for teachers and learners 
 
 You can watch the [video here](https://musicblocks.net/) to check out what Music Blocks is.
 
-This is a beginner's Guide that introduces the very basics of Music Blocks which are:- note, pitch, stacks, and simple transformations.
+This is a beginner's Guide that introduces the very basics of Music Blocks and simple transformations.
 
 ## <a name="TOC"></a> Table of Contents
 1. [Basic Keywords](#BasicKeywords)
@@ -72,7 +72,7 @@ In everyday use by musical ensembles such as bands and orchestras, the three or 
 A crescendo is a way for composers to indicate that a passage of music should gradually increase in loudness over time.
 
 
-### <a name="Staccato "></a>7. Staccato 
+### <a name="Staccato"></a>7. Staccato 
 Staccato is a form of musical articulation.
 In modern notation it signifies a note of shortened duration, separated from the note that may follow by silence.
 
@@ -126,7 +126,7 @@ thus, speeding up or slowing down the notes respectively.
 Repetition is used to play a sequence of notes multiple times; duplication is used to repeat each note in a sequence.
 
 
-### <a name="Set"></a> 6. Set Volume, Crescendo, Staccato, and Slur
+### <a name="Volume"></a> 6. Set Volume, Crescendo, Staccato, and Slur
 It involves setting the volume, crescendo, staccato, and slur os the notes.
 
 ### <a name="Inversion"></a>7. Inversion 
