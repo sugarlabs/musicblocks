@@ -1134,11 +1134,11 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function __keyPressed(event) {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                if (docById('labelDiv').classList.contains('hasKeyboard')) {
-                    return;
-                }
+            if (docById('labelDiv').classList.contains('hasKeyboard')) {
+                return;
+            }
 
+            if (_THIS_IS_MUSIC_BLOCKS_) {
                 if (docById('BPMInput').classList.contains('hasKeyboard')) {
                     return;
                 }
