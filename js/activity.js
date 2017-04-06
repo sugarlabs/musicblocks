@@ -380,7 +380,7 @@ define(MYDEFINES, function (compatibility) {
 
         function _doSlowButton() {
             logo.setTurtleDelay(DEFAULTDELAY);
-            if (docById('ptmDiv').style.visibility === 'visible') {
+            if (_THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
                 logo.pitchTimeMatrix.playAll();
             } else if (!turtles.running()) {
                 logo.runLogoCommands();
