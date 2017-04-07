@@ -228,8 +228,9 @@ of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
 Another way to move up and down notes in a scale is to use the
 *Consonant Step Up* and *Consonant Step Down* blocks. These blocks
 calculate the number of half-steps to the next note in the current
-mode. (You can read more about [Musical Modes](#modes) below.) Note that the *Mouse Pitch Number* block returns the pitch
-number of the most recent note played.
+mode. (You can read more about [Musical Modes](#modes) below.) Note
+that the *Mouse Pitch Number* block returns the pitch number of the
+most recent note played.
 
 #### <a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats
 
