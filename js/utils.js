@@ -699,7 +699,15 @@ function mixedNumber (d) {
         if (floor === 0) {
             return obj[0] + '/' + obj[1];
         } else {
-            return floor + ' ' + obj[0] + '/' + obj[1];
+            if (obj[0] === 1 && obj[1] === 1) {
+                return floor + 1;
+            } else {
+                if (obj[1] > 99) {
+                    return d.toFixed(2);
+                } else {
+                    return floor + ' ' + obj[0] + '/' + obj[1];
+                }
+            }
         }
     } else {
 	return d.toString();
