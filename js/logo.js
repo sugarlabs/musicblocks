@@ -517,6 +517,8 @@ function Logo () {
             case 'minus':
             case 'multiply':
             case 'power':
+                value = toFixed2(this.blocks.blockList[blk].value);
+                break;
             case 'divide':
                 value = this.blocks.blockList[blk].value;
                 break;
@@ -538,7 +540,7 @@ function Logo () {
                 }
                 break;
             case 'x':
-                value = toFixed2(this.turtles.turtleList[turtle].x.toFixed(2));
+                value = toFixed2(this.turtles.turtleList[turtle].x);
                 break;
             case 'y':
                 value = toFixed2(this.turtles.turtleList[turtle].y);
@@ -668,9 +670,10 @@ function Logo () {
                     value = value.substr(0, 5) + '...';
                 }
                 this.blocks.blockList[blk].text.text = value;
-            } else {
+            } else if (name === 'divide') {
                 this.blocks.blockList[blk].text.text = mixedNumber(value);
             }
+
             this.blocks.blockList[blk].container.updateCache();
             this.refreshCanvas();
         }
@@ -5392,12 +5395,23 @@ function Logo () {
             case 'namedarg' :
                 var name = that.blocks.blockList[blk].privateData;
                 var action_args = receivedArg;
-                if(action_args.length >= Number(name)){
+
+                // If an action block with an arg is clicked,
+		// the arg will have no value.
+                if (action_args == null) {
+                    that.errorMsg('Invalid argument', blk);
+                    that.stopTurtle = true;
+                    that.blocks.blockList[blk].value = null;
+                    return;
+                }
+
+                if (action_args.length >= Number(name)) {
                     var value = action_args[Number(name)-1];
                     that.blocks.blockList[blk].value = value;
-                }else {
-                    that.errorMsg('Invalid argument',blk);
+                } else {
+                    that.errorMsg('Invalid argument', blk);
                 }
+
                 return that.blocks.blockList[blk].value;
                 break;
             case 'sqrt':
