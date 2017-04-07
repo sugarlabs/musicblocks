@@ -223,6 +223,14 @@ of *Repeat* blocks to repeat the code 7 times, playing up and down a scale.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_scales.tb)
 
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform16.svg "Using the Consonant Step Up and Down blocks")
+
+Another way to move up and down notes in a scale is to use the
+*Consonant Step Up* and *Consonant Step Down* blocks. These blocks
+calculate the number of half-steps to the next note in the current
+mode. (You can read more about [Musical Modes](#modes) below.) Note that the *Mouse Pitch Number* block returns the pitch
+number of the most recent note played.
+
 #### <a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/transform1.svg "Using Sharp and Flat blocks")
