@@ -179,7 +179,7 @@ function PlanetModel(controller) {
         }
 
         if (model.globalImagesCache[image] !== undefined) {
-            model.globalProjects.push({title: name, img: model.globalImagesCache[image]});
+            model.globalProjects.push({title: name, img: model.globalImagesCache[image], musicblocks: mbcheck});
             model.addGlobalElement(model.globalProjects[model.globalProjects.length-1], model.count);
             model.count++;
             model.getImages(todo);
@@ -200,7 +200,7 @@ function PlanetModel(controller) {
                 }
 
                 model.globalImagesCache[image] = d;
-                model.globalProjects.push({title: name, img: d, url: image});
+                model.globalProjects.push({title: name, img: d, url: image, musicblocks: mbcheck});
                 model.addGlobalElement(model.globalProjects[model.globalProjects.length-1], model.count);
                 model.count++;
                 model.getImages(todo);
@@ -427,6 +427,7 @@ function PlanetView(model, controller) {
         var d = document.createElement('li');
         d.setAttribute('url', glob.url);
         d.setAttribute('title', glob.title);
+        d.setAttribute('data-ismb', glob.musicblocks.toString());
         html = '';
         html += format(GLOBAL_PROJECT_TEMPLATE, glob).replace(new RegExp('_NUM_', 'g'), i.toString());
         d.innerHTML = html;
@@ -476,7 +477,7 @@ function PlanetView(model, controller) {
 
     this.planetshare = function (ele, i) {
         return function () {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (_THIS_IS_MUSIC_BLOCKS_&&ele.attributes["data-ismb"].value=="true") {
                 var url = SHAREURL.replace(NAMESUBTEXT, MUSICBLOCKSPREFIX + planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
             } else {
                 var url = SHAREURL.replace(NAMESUBTEXT, planet.model.getPublishableName(ele.attributes.title.value) + '.tb');
