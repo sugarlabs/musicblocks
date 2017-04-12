@@ -1,6 +1,8 @@
 MUSIC BLOCKS
 ============
 
+“All musicians are subconsciously mathematicians” – Monk
+
 Music Blocks is a collection of manipulative tools for exploring
 fundamental musical concepts in an integrative and fun way.
 
