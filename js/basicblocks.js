@@ -493,7 +493,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitchDrumMatrixBlock = new ProtoBlock('pitchdrummatrix');
     pitchDrumMatrixBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['pitchdrummatrix'] = pitchDrumMatrixBlock;
-    pitchDrumMatrixBlock.staticLabels.push(_('pitch-drum matrix'));
+    pitchDrumMatrixBlock.staticLabels.push(_('pitch-drum mapper'));
     pitchDrumMatrixBlock.adjustWidthToLabel();
     pitchDrumMatrixBlock.stackClampZeroArgBlock();
 
