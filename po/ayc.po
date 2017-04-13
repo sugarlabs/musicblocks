@@ -1756,7 +1756,7 @@ msgstr "sapachjata uñanaqa"
 
 #: js/basicblocks.js:489
 #.TRANS: matriz de tono en tambor
-msgid "pitch-drum matrix"
+msgid "pitch-drum mapper"
 msgstr "tarularu arkiri tunu wakichata"
 
 #: js/basicblocks.js:497

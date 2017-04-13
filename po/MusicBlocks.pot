@@ -1469,7 +1469,7 @@ msgid "custom mode"
 msgstr ""
 
 #: js/basicblocks.js:489
-msgid "pitch-drum matrix"
+msgid "pitch-drum mapper"
 msgstr ""
 
 #: js/basicblocks.js:497

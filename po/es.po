@@ -1470,7 +1470,7 @@ msgid "custom mode"
 msgstr "modo personalizado"
 
 #: js/basicblocks.js:489
-msgid "pitch-drum matrix"
+msgid "pitch-drum mapper"
 msgstr "matriz de tono en tambor"
 
 #: js/basicblocks.js:497

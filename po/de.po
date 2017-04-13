@@ -1475,7 +1475,7 @@ msgid "custom mode"
 msgstr "Bearbeitungsmodus"
 
 #: js/basicblocks.js:489
-msgid "pitch-drum matrix"
+msgid "pitch-drum mapper"
 msgstr "Tonlage-Trommel-Matrix"
 
 #: js/basicblocks.js:497
