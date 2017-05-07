@@ -206,12 +206,7 @@ function Turtle (name, turtles, drum) {
             this.x = x2;
             this.y = y2;
         } else if (this.penState) {
-            if (this.canvasColor[0] === '#') {
-                this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
-            }
-            var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-            ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-            ctx.fillStyle = subrgb + this.canvasAlpha + ')';
+            this.processColor();
             ctx.lineWidth = this.stroke;
             ctx.lineCap = 'round';
             ctx.beginPath();
@@ -611,11 +606,10 @@ function Turtle (name, turtles, drum) {
         if (this.canvasColor[0] === '#') {
             this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
         }
+
         ctx.beginPath();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-        ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-        ctx.fillStyle = subrgb + this.canvasAlpha + ')';
+        this.processColor();
         ctx.lineWidth = this.stroke;
         ctx.lineCap = 'round';
         ctx.beginPath();
@@ -626,13 +620,8 @@ function Turtle (name, turtles, drum) {
     };
 
     this.doForward = function(steps) {
+        this.processColor();
         if (!this.fillState) {
-            if (this.canvasColor[0] === '#') {
-                this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
-            }
-            var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-            ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-            ctx.fillStyle = subrgb + this.canvasAlpha + ')';
             ctx.lineWidth = this.stroke;
             ctx.lineCap = 'round';
             ctx.beginPath();
@@ -653,13 +642,8 @@ function Turtle (name, turtles, drum) {
     };
 
     this.doSetXY = function(x, y) {
+        this.processColor();
         if (!this.fillState) {
-            if (this.canvasColor[0] === '#') {
-                this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
-            }
-            var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-            ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-            ctx.fillStyle = subrgb + this.canvasAlpha + ')';
             ctx.lineWidth = this.stroke;
             ctx.lineCap = 'round';
             ctx.beginPath();
@@ -702,13 +686,8 @@ function Turtle (name, turtles, drum) {
     };
 
     this._doArcPart = function(angle, radius) {
+        this.processColor();
         if (!this.fillState) {
-            if (this.canvasColor[0] === '#') {
-                this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
-            }
-            var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-            ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-            ctx.fillStyle = subrgb + this.canvasAlpha + ')';
             ctx.lineWidth = this.stroke;
             ctx.lineCap = 'round';
             ctx.beginPath();
@@ -911,7 +890,6 @@ function Turtle (name, turtles, drum) {
         this.updateCache();
     };
 
-
     this.doSetColor = function(color) {
         // Color sets hue but also selects maximum chroma.
         this.closeSVG();
@@ -920,23 +898,14 @@ function Turtle (name, turtles, drum) {
         this.canvasValue = results[0];
         this.canvasChroma = results[1];
         this.canvasColor = results[2];
-        if (this.canvasColor[0] === '#') {
-            this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
-        }
-
-        var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-        ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-        ctx.fillStyle = subrgb + this.canvasAlpha + ')';
+        this.processColor();
     };
 
     this.doSetPenAlpha = function(alpha) {
         this.canvasAlpha = alpha;
     };
 
-    this.doSetHue = function(hue) {
-        this.closeSVG();
-        this.color = Number(hue);
-        this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
+    this.processColor = function() {
         if (this.canvasColor[0] === '#') {
             this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
         }
@@ -944,33 +913,27 @@ function Turtle (name, turtles, drum) {
         var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
         ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
         ctx.fillStyle = subrgb + this.canvasAlpha + ')';
+    };
+
+    this.doSetHue = function(hue) {
+        this.closeSVG();
+        this.color = Number(hue);
+        this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
+        this.processColor();
     };
 
     this.doSetValue = function(shade) {
         this.closeSVG();
         this.value = Number(shade);
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        if (this.canvasColor[0] === '#') {
-            this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
-        }
-
-        var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-        ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-        ctx.fillStyle = subrgb + this.canvasAlpha + ')';
+        this.processColor();
     };
 
     this.doSetChroma = function(chroma) {
         this.closeSVG();
         this.chroma = Number(chroma);
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        if (this.canvasColor[0] === '#') {
-            this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
-        }
-
-        var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-        ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-        ctx.fillStyle = subrgb + this.canvasAlpha + ')';
+        this.processColor();
     };
 
     this.doSetPensize = function(size) {
