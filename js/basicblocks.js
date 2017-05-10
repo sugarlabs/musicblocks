@@ -867,6 +867,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     voiceBlock.dockTypes[1] = 'textin';
     voiceBlock.defaults.push(_('violin'));
 
+    var stereoBlock = new ProtoBlock('stereoblock');
+    stereoBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['stereoblock'] = stereoBlock;
+    stereoBlock.staticLabels.push(_('stereo'));
+    stereoBlock.adjustWidthToLabel();
+    stereoBlock.flowClampOneArgBlock();
+    stereoBlock.dockTypes[1] = 'numberin';
+    stereoBlock.defaults.push(0);
+
     var articulationBlock = new ProtoBlock('articulation');
     articulationBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['articulation'] = articulationBlock;

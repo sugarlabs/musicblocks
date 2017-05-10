@@ -3498,6 +3498,24 @@ function Logo () {
                 that._setListener(turtle, listenerName, __listener);
             }
             break;
+        case 'stereoblock':
+            if (args.length === 2 && typeof(args[0]) === 'number') {
+                that.polyVolume[turtle].push(args[0]);
+                that._increaseStereo(args[0], turtle);
+
+                childFlow = args[1];
+                childFlowCount = 1;
+
+                var listenerName = '_stereo_' + turtle;
+                that._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    that.polyVolume[turtle].pop();
+                };
+
+                that._setListener(turtle, listenerName, __listener);
+            }
+            break; 
         case 'vibrato':
             var intensity = args[0];
             var rate = args[1];
@@ -4655,6 +4673,15 @@ function Logo () {
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.synth.setVolume(vol);
+        }
+    };
+
+    this._increaseStereo = function (inc, turtle) {
+        if (inc < -100 || inc > 100) {
+            this.errorMsg("Not a valid input");
+            this.stopTurtle = true;
+        } else if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.synth.setStereo(inc);
         }
     };
 
