@@ -2945,6 +2945,7 @@ function Blocks () {
             case 'pitchdrummatrix':
             case 'rhythmruler':
             case 'pitchstaircase':
+            case 'timbre':
             case 'tempo':
             case 'pitchslider':
             case 'matrix':

@@ -53,6 +53,7 @@ function Logo () {
     this.pitchTimeMatrix = null;
     this.pitchDrumMatrix = null;
     this.rhythmRuler = null;
+    this.timbre = null;
     this.pitchStaircase = null;
     this.tempo = null;
     this.pitchSlider = null;
