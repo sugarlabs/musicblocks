@@ -257,6 +257,8 @@ function Block(protoblock, blocks, overrideName) {
             var obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
         } else if (this.protoblock.style === 'clamp') {
             var obj = this.protoblock.generator(this.clampCount[0]);
+        } else if (this.protoblock.style === 'argflowclamp') {
+            var obj = this.protoblock.generator(this.clampCount[0]);
         } else {
             switch (this.name) {
             case 'equal':

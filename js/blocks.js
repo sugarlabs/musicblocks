@@ -320,14 +320,16 @@ function Blocks () {
         if (this._clampBlocksToCheck.length === 0) {
             return;
         }
+
         var obj = this._clampBlocksToCheck.pop();
         var blk = obj[0];
         var clamp = obj[1];
 
         var myBlock = this.blockList[blk];
 
+        if (myBlock.isArgFlowClampBlock()) {
         // Make sure myBlock is a clamp block.
-        if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
+        } else if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
             return;
         } else if (myBlock.isArgClamp()) {
             // We handle ArgClamp blocks elsewhere.
@@ -1007,7 +1009,7 @@ function Blocks () {
                 // existing connection:
                 // (1) if it is an argClamp, add a new slot below the
                 //     current block;
-                // (2) if it is an arg block, replace it; and
+                // (2) if it is an arg block, replace it; or
                 // (3) if it is a flow block, insert it into the flow.
                 // A few corner cases: Whenever we connect (or disconnect)
                 // from an action block (c[1] arg), we need to ensure we have
@@ -1141,7 +1143,7 @@ function Blocks () {
                             }, 750);
                         }
                     }
-                } else {
+                } else if (!this.blockList[thisBlock].isArgFlowClampBlock()) {
                     var bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
                     this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
@@ -1691,6 +1693,7 @@ function Blocks () {
                 this._clampBlocksToCheck.push([this._expandablesList[i], 0]);
             }
         }
+
         this._adjustExpandableClampBlock();
         this.refreshCanvas();
     };

@@ -4418,11 +4418,8 @@ function Logo () {
                 eval(that.evalFlowDict[that.blocks.blockList[blk].name]);
             } else {
                 // Could be an arg block, so we need to print its value.
-                if (that.blocks.blockList[blk].isArgBlock()) {
+                if (that.blocks.blockList[blk].isArgBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
                     args.push(that.parseArg(that, turtle, blk));
-                    console.log('block: ' + blk + ' turtle: ' + turtle);
-                    console.log('block name: ' + that.blocks.blockList[blk].name);
-                    console.log('block value: ' + that.blocks.blockList[blk].value);
                     if (that.blocks.blockList[blk].value == null) {
                         that.textMsg('null block value');
                     } else {
@@ -5286,7 +5283,8 @@ function Logo () {
     this.parseArg = function (that, turtle, blk, parentBlk, receivedArg) {
         // Retrieve the value of a block.
         if (blk == null) {
-            that.errorMsg('Missing argument.', parentBlk);
+            console.log('NO INPUT');
+            that.errorMsg(NOINPUTERRORMSG, parentBlk);
             that.stopTurtle = true;
             return null
         }
@@ -5310,7 +5308,7 @@ function Logo () {
                 }
             }
             return that.blocks.blockList[blk].value;
-        } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock()) {
+        } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
             switch (that.blocks.blockList[blk].name) {
             case 'loudness':
                 if (_THIS_IS_TURTLE_BLOCKS_) {
@@ -5973,23 +5971,23 @@ function Logo () {
                 }
                 break;
             case 'notecounter':
-                var saveCountingStatus = that.justCounting[turtle];
-                var saveSuppressStatus = that.suppressOutput[turtle];
-                that.suppressOutput[turtle] = true;
-                that.justCounting[turtle] = true;
-                var actionArgs = [];
-                var saveNoteCount = that.notesPlayed[turtle];
                 var cblk = that.blocks.blockList[blk].connections[1];
                 if (cblk == null) {
                     that.blocks.blockList[blk].value = 0;
                 } else {
+                    var saveCountingStatus = that.justCounting[turtle];
+                    var saveSuppressStatus = that.suppressOutput[turtle];
+                    that.suppressOutput[turtle] = true;
+                    that.justCounting[turtle] = true;
+                    var actionArgs = [];
+                    var saveNoteCount = that.notesPlayed[turtle];
                     that.turtles.turtleList[turtle].running = true;
                     that._runFromBlockNow(that, turtle, cblk, true, actionArgs, that.turtles.turtleList[turtle].queue.length);
                     that.blocks.blockList[blk].value = that.notesPlayed[turtle] - saveNoteCount;
                     that.notesPlayed[turtle] = saveNoteCount;
+                    that.justCounting[turtle] = saveCountingStatus;
+                    that.suppressOutput[turtle] = saveSuppressStatus;
                 }
-                that.justCounting[turtle] = saveCountingStatus;
-                that.suppressOutput[turtle] = saveSuppressStatus;
                 break;
             case 'calc':
                 var actionArgs = [];
