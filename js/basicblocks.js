@@ -487,6 +487,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     tempoBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['tempo'] = tempoBlock;
     tempoBlock.staticLabels.push(_('tempo'));
+    tempoBlock.extraWidth = 20;
     tempoBlock.adjustWidthToLabel();
     tempoBlock.stackClampZeroArgBlock();
 
