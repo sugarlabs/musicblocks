@@ -859,6 +859,52 @@ function initBasicProtoBlocks(palettes, blocks) {
     vibratoBlock.defaults.push(10);
     vibratoBlock.defaults.push(1 / 16);
 
+    var distortionBlock = new ProtoBlock('dis');
+    distortionBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['dis'] = distortionBlock;
+    distortionBlock.staticLabels.push(_('distortion'));
+    distortionBlock.adjustWidthToLabel();
+    distortionBlock.flowClampOneArgBlock();
+    distortionBlock.dockTypes[1] = 'numberin';
+    distortionBlock.defaults.push(40);
+
+    var tremoloBlock = new ProtoBlock('tremolo');
+    tremoloBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['tremolo'] = tremoloBlock;
+    tremoloBlock.staticLabels.push(_('tremolo'),_('frequency'),_('depth'));
+    tremoloBlock.adjustWidthToLabel();
+    tremoloBlock.flowClampTwoArgBlock();
+    tremoloBlock.dockTypes[1] = 'numberin';
+    tremoloBlock.dockTypes[2] = 'numberin';
+    tremoloBlock.defaults.push(10);
+    tremoloBlock.defaults.push(50);
+
+    var phaserBlock = new ProtoBlock('phaser');
+    phaserBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['phaser'] = phaserBlock;
+    phaserBlock.staticLabels.push(_('phaser'),_('rate'),_('octaves'),_('baseFrequency'));
+    phaserBlock.adjustWidthToLabel();
+    phaserBlock.flowClampThreeArgBlock();
+    phaserBlock.dockTypes[1] = 'numberin';
+    phaserBlock.dockTypes[2] = 'numberin';
+    phaserBlock.dockTypes[3] = 'numberin';
+    phaserBlock.defaults.push(0.5);
+    phaserBlock.defaults.push(3);
+    phaserBlock.defaults.push(350);
+
+    var chorusBlock = new ProtoBlock('chorus');
+    chorusBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['chorus'] = chorusBlock;
+    chorusBlock.staticLabels.push(_('chorus'),_('rate'),_('delay(MS)'),_('depth'));
+    chorusBlock.adjustWidthToLabel();
+    chorusBlock.flowClampThreeArgBlock();
+    chorusBlock.dockTypes[1] = 'numberin';
+    chorusBlock.dockTypes[2] = 'numberin';
+    chorusBlock.dockTypes[3] = 'numberin';
+    chorusBlock.defaults.push(1.5);
+    chorusBlock.defaults.push(3.5);
+    chorusBlock.defaults.push(70);
+
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;
