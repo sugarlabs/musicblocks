@@ -646,6 +646,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'tempo':
                     myBlock.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', '#000000');
+                    break;
                 case 'modewidget':
                     myBlock.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', '#000000');
                     break;
