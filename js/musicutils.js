@@ -1382,27 +1382,44 @@ function Synth () {
         this.getSynthByName(name).toMaster();
     };
 
-    this.performNotes = function (synth, notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency) {
+    this.performNotes = function (synth, notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency, doDistortion , distortionAmount) {
         if (doVibrato) {
             var vibrato = new Tone.Vibrato(1 / vibratoFrequency, vibratoIntensity);
             synth.chain(vibrato, Tone.Master);
             synth.triggerAttackRelease(notes, beatValue);
             setTimeout(function () {
                 vibrato.dispose();
-            }, beatValue * 1000);  //disable vibrato effect when beat is over
+            }, beatValue * 1000);
+              //disable vibrato effect when beat is over
+        } else if (doDistortion) {
+            var distort = new Tone.Distortion(distortionAmount).toMaster();
+            synth.chain(distort, Tone.Master);
+            console.log("notes:",notes);
+            synth.triggerAttackRelease("A1", beatValue);
+            setTimeout(function () {
+                distort.dispose();
+            }, beatValue * 1000);
         } else {
+           // console.log("ssup");
             synth.triggerAttackRelease(notes, beatValue);
         }
     }
 
-    this.trigger = function (notes, beatValue, name, vibratoArgs) {
+    this.trigger = function (notes, beatValue, name, vibratoArgs, distortionArgs) {
         var doVibrato = false;
+        var doDistortion = false;
         var vibratoIntensity = 0;
         var vibratoFrequency = 0;
+        var distortionAmount = 0;
         if (vibratoArgs.length == 2 && vibratoArgs[0] != 0) {
             doVibrato = true;
             vibratoIntensity = vibratoArgs[0];
             vibratoFrequency = vibratoArgs[1];
+        }
+        if (distortionArgs.length == 1 && distortionArgs[0] != 0) {
+            doDistortion = true;
+            distortionAmount = distortionArgs[0];
+            console.log("Hi, triggered distortion",distortionAmount);
         }
 
         switch (name) {
@@ -1416,7 +1433,9 @@ function Synth () {
             } else {
                 var noteToPlay = notes;
             }
-            this.performNotes(this.synthset[name][1], noteToPlay, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+            if(doVibrato || doDistortion){
+                this.performNotes(this.synthset[name][1], noteToPlay, beatValue, doVibrato, vibratoIntensity, vibratoFrequency,doDistortion,distortionAmount);
+                console.log("hey sine");}
             break;
         case 'violin':
         case 'cello':
@@ -1427,11 +1446,16 @@ function Synth () {
             var centerNo = SAMPLECENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
-            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+            if(doVibrato || doDistortion){
+            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, doVibrato, vibratoIntensity, vibratoFrequency, doDistortion,distortionAmount);
+             console.log("hey basse");}
             break;
+        
         case 'default':
         case 'poly':
-            this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+            
+            this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency , doDistortion,distortionAmount);
+            console.log("hey default");
             break;
         default:
             var drumName = getDrumSynthName(name);
@@ -1459,8 +1483,11 @@ function Synth () {
             } else if (name.slice(0, 4) == 'file') {
                 this.synthset[name][1].triggerAttack(0, beatValue, 1);
             } else {
-                this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+                
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency,doDistortion, distortionAmount);
+                console.log("hey life");
             }
+
             break;
         }
     };

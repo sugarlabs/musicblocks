@@ -859,6 +859,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     vibratoBlock.defaults.push(10);
     vibratoBlock.defaults.push(1 / 16);
 
+    //distortion block
+    var distortionBlock = new ProtoBlock('dist');
+    distortionBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['dist'] = distortionBlock;
+    distortionBlock.staticLabels.push(_('distortion'));
+    distortionBlock.adjustWidthToLabel();
+    distortionBlock.flowClampOneArgBlock();
+    distortionBlock.dockTypes[1] = 'numberin';
+    distortionBlock.defaults.push(0.4);
+   
+
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;

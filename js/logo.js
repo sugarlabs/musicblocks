@@ -184,6 +184,7 @@ function Logo () {
     this.vibratoIntensity = {};
     this.vibratoRate = {};
     this.justCounting = {};
+    this.distortionAmount = {};
     // When counting notes or generating lilypond output...
     this.suppressOutput = {};
 
@@ -792,6 +793,7 @@ function Logo () {
             this.backward[turtle] = [];
             this.vibratoIntensity[turtle] = [];
             this.vibratoRate[turtle] = [];
+            this.distortionAmount[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.justCounting[turtle] = false;
             this.suppressOutput[turtle] = this.runningLilypond;
@@ -3526,6 +3528,25 @@ function Logo () {
             };
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'dist':
+            var distortion = args[0];
+            if (distortion < 0 || distortion > 1) {
+                that.errorMsg(_('Distortion not in range'), blk);
+                that.stopTurtle = true;
+            } 
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            that.distortionAmount[turtle].push(distortion);
+            
+            var listenerName = '_distortion_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+            var __listener = function (event) {
+               that.distortionAmount[turtle].pop();
+            };
+            that._setListener(turtle, listenerName, __listener);
+            break;   
+
         case 'interval':
             if (typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -4679,11 +4700,19 @@ function Logo () {
         var vibratoRate = 0;
         var vibratoValue = 0;
         var vibratoIntensity = 0;
+        var distortionAmount = 0; //dis
         var doVibrato = false;
+        var doDistortion = false;
         if (this.vibratoRate[turtle].length > 0) {
             vibratoRate = last(this.vibratoRate[turtle]);
             vibratoIntensity = last(this.vibratoIntensity[turtle]);
             doVibrato = true;
+        }
+
+        if(this.distortionAmount[turtle].length > 0) {
+            distortionAmount = last(this.distortionAmount[turtle]);
+            console.log(distortionAmount);
+            doDistortion = true;
         }
 
         var carry = 0;
@@ -5029,20 +5058,20 @@ function Logo () {
                                             that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                         }
 
-                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue]);
+                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount]);
                                     } else if (that.drumStyle[turtle].length > 0) {
-                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), []);
+                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), [],[]);
                                     } else if (that.turtles.turtleList[turtle].drum) {
-                                        that.synth.trigger(notes, beatValue, 'drum', []);
+                                        that.synth.trigger(notes, beatValue, 'drum', [],[]);
                                     } else {
                                         // Look for any notes in the chord that might be in the pitchDrumTable.
                                         for (var d = 0; d < notes.length; d++) {
                                             if (notes[d] in that.pitchDrumTable[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], []);
+                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], [],[]);
                                             } else if (turtle in that.voices && last(that.voices[turtle])) {
-                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue]);
+                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue],[distortionAmount]);
                                             } else {
-                                                that.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue]);
+                                                that.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue],[distortionAmount]);
                                             }
                                         }
                                     }
@@ -5068,9 +5097,9 @@ function Logo () {
                             if (_THIS_IS_MUSIC_BLOCKS_) {
                                 for (var i = 0; i < drums.length; i++) {
                                     if (that.drumStyle[turtle].length > 0) {
-                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), []);
+                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), [], []);
                                     } else {
-                                        that.synth.trigger(['C2'], beatValue, drums[i], []);
+                                        that.synth.trigger(['C2'], beatValue, drums[i], [], []);
                                     }
                                 }
                             }
