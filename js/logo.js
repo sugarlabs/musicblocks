@@ -185,6 +185,8 @@ function Logo () {
     this.vibratoRate = {};
     this.justCounting = {};
     this.distortionAmount = {};
+    this.tremoloFrequency = {};
+    this.tremoloDepth = {};
     // When counting notes or generating lilypond output...
     this.suppressOutput = {};
 
@@ -793,6 +795,8 @@ function Logo () {
             this.backward[turtle] = [];
             this.vibratoIntensity[turtle] = [];
             this.vibratoRate[turtle] = [];
+            this.tremoloDepth[turtle] = [];
+            this.tremoloFrequency[turtle] = [];
             this.distortionAmount[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.justCounting[turtle] = false;
@@ -3546,7 +3550,29 @@ function Logo () {
             };
             that._setListener(turtle, listenerName, __listener);
             break;   
+        case 'tremolo':
+            var frequency = args[0];
+            var depth = args[1];
 
+            if (depth < 0 || intensity > 1) {
+                that.errorMsg(_('Depth entered is out of range'), blk);
+                that.stopTurtle = true;
+            }
+
+            childFlow = args[2];
+            childFlowCount = 1;
+
+            that.tremoloFrequency[turtle].push(frequency);
+            that.tremoloDepth[turtle].push(depth);
+
+            var listenerName = '_tremolo_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+            var __listener = function (event) {
+               that.tremoloFrequency[turtle].pop();
+               that.tremoloDepth[turtle].pop();
+            };
+            that._setListener(turtle, listenerName, __listener);
+            break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -4701,8 +4727,11 @@ function Logo () {
         var vibratoValue = 0;
         var vibratoIntensity = 0;
         var distortionAmount = 0; //dis
+        var tremoloFrequency = 0;
+        var tremoloDepth = 0;
         var doVibrato = false;
         var doDistortion = false;
+        var doTremolo = false;
         if (this.vibratoRate[turtle].length > 0) {
             vibratoRate = last(this.vibratoRate[turtle]);
             vibratoIntensity = last(this.vibratoIntensity[turtle]);
@@ -4713,6 +4742,12 @@ function Logo () {
             distortionAmount = last(this.distortionAmount[turtle]);
             console.log(distortionAmount);
             doDistortion = true;
+        }
+
+        if (this.tremoloDepth[turtle].length > 0) {
+            tremoloFrequency = last(this.tremoloFrequency[turtle]);
+            tremoloDepth = last(this.tremoloDepth[turtle]);
+            doTremolo = true;
         }
 
         var carry = 0;
@@ -5058,20 +5093,20 @@ function Logo () {
                                             that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                         }
 
-                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount]);
+                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount],[tremoloFrequency, tremoloDepth]);
                                     } else if (that.drumStyle[turtle].length > 0) {
-                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), [],[]);
+                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), [],[], []);
                                     } else if (that.turtles.turtleList[turtle].drum) {
-                                        that.synth.trigger(notes, beatValue, 'drum', [],[]);
+                                        that.synth.trigger(notes, beatValue, 'drum', [],[], []);
                                     } else {
                                         // Look for any notes in the chord that might be in the pitchDrumTable.
                                         for (var d = 0; d < notes.length; d++) {
                                             if (notes[d] in that.pitchDrumTable[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], [],[]);
+                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], [],[],[]);
                                             } else if (turtle in that.voices && last(that.voices[turtle])) {
-                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue],[distortionAmount]);
+                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue],[distortionAmount],[tremoloFrequency, tremoloDepth]);
                                             } else {
-                                                that.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue],[distortionAmount]);
+                                                that.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue],[distortionAmount],[tremoloFrequency, tremoloDepth]);
                                             }
                                         }
                                     }
@@ -5097,9 +5132,9 @@ function Logo () {
                             if (_THIS_IS_MUSIC_BLOCKS_) {
                                 for (var i = 0; i < drums.length; i++) {
                                     if (that.drumStyle[turtle].length > 0) {
-                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), [], []);
+                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), [], [], []);
                                     } else {
-                                        that.synth.trigger(['C2'], beatValue, drums[i], [], []);
+                                        that.synth.trigger(['C2'], beatValue, drums[i], [], [], []);
                                     }
                                 }
                             }

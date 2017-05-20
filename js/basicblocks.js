@@ -868,7 +868,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     distortionBlock.flowClampOneArgBlock();
     distortionBlock.dockTypes[1] = 'numberin';
     distortionBlock.defaults.push(0.4);
-   
+
+    var tremoloBlock = new ProtoBlock('tremolo');
+    tremoloBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['tremolo'] = tremoloBlock;
+    tremoloBlock.staticLabels.push(_('tremolo'),_('frequency'),_('depth'));
+    tremoloBlock.adjustWidthToLabel();
+    tremoloBlock.flowClampTwoArgBlock();
+    tremoloBlock.dockTypes[1] = 'numberin';
+    tremoloBlock.dockTypes[2] = 'numberin';
+    tremoloBlock.defaults.push(10);
+    tremoloBlock.defaults.push(0.5);
 
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
