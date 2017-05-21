@@ -766,7 +766,13 @@ define(MYDEFINES, function (compatibility) {
                     setTimeout(function () {
                         var rawData = reader.result;
                         var cleanData = rawData.replace('\n', ' ');
-                        var obj = JSON.parse(cleanData);
+                        try {
+                            var obj = JSON.parse(cleanData);
+                        } catch (e) {
+                            alert("Failed to load JSON data");
+                            return;
+                        }
+
                         // First, hide the palettes as they will need updating.
                         for (var name in blocks.palettes.dict) {
                             blocks.palettes.dict[name].hideMenu(true);
