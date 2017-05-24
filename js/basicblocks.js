@@ -880,6 +880,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     tremoloBlock.defaults.push(10);
     tremoloBlock.defaults.push(0.5);
 
+    var phaserBlock = new ProtoBlock('phaser');
+    phaserBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['phaser'] = phaserBlock;
+    phaserBlock.staticLabels.push(_('phaser'),_('rate'),_('octaves'),_('baseFrequency'));
+    phaserBlock.adjustWidthToLabel();
+    phaserBlock.flowClampThreeArgBlock();
+    phaserBlock.dockTypes[1] = 'numberin';
+    phaserBlock.dockTypes[2] = 'numberin';
+    phaserBlock.dockTypes[3] = 'numberin';
+    phaserBlock.defaults.push(0.5);
+    phaserBlock.defaults.push(3);
+    phaserBlock.defaults.push(350);
+
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;

@@ -1382,7 +1382,7 @@ function Synth () {
         this.getSynthByName(name).toMaster();
     };
 
-    this.performNotes = function (synth, notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency, doDistortion , distortionAmount, doTremolo, tremoloFrequency,tremoloDepth) {
+    this.performNotes = function (synth, notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency, doDistortion , distortionAmount, doTremolo, tremoloFrequency,tremoloDepth, doPhaser,rate,octaves,baseFrequency) {
         if (doVibrato) {
             var vibrato = new Tone.Vibrato(1 / vibratoFrequency, vibratoIntensity);
             synth.chain(vibrato, Tone.Master);
@@ -1411,21 +1411,37 @@ function Synth () {
                 tremolo.dispose();
             }, beatValue * 1000);
             //disable tremolo effect after beat
+        } else if (doPhaser) {
+            var phaser = new Tone.Phaser({
+                "frequency" : rate, 
+                "octaves" : octaves, 
+                "baseFrequency" : baseFrequency
+            }).toMaster();
+            synth.chain(phaser, Tone.Master);
+            console.log("hey");
+            synth.triggerAttackRelease(notes, beatValue);
+             setTimeout(function () {
+                phaser.dispose();
+            }, beatValue * 1000);
         } else {
            // console.log("ssup");
             synth.triggerAttackRelease(notes, beatValue);
         }
     }
 
-    this.trigger = function (notes, beatValue, name, vibratoArgs, distortionArgs,tremoloArgs) {
+    this.trigger = function (notes, beatValue, name, vibratoArgs, distortionArgs, tremoloArgs, phaserArgs) {
         var doVibrato = false;
         var doDistortion = false;
         var doTremolo = false;
+        var doPhaser = false;
         var vibratoIntensity = 0;
         var vibratoFrequency = 0;
         var distortionAmount = 0;
         var tremoloFrequency = 0;
         var tremoloDepth = 0;
+        var rate = 0;
+        var octaves = 0;
+        var baseFrequency = 0;
         if (vibratoArgs.length == 2 && vibratoArgs[0] != 0) {
             doVibrato = true;
             vibratoIntensity = vibratoArgs[0];
@@ -1441,6 +1457,13 @@ function Synth () {
             tremoloFrequency = tremoloArgs[0];
             tremoloDepth = tremoloArgs[1];
         }
+        if (phaserArgs.length == 3 && phaserArgs[0] != 0) {
+            doPhaser = true;
+            rate = phaserArgs[0];
+            octaves = phaserArgs[1];
+            baseFrequency = phaserArgs[2];
+            console.log("Hi, triggered phaser");
+        }
 
         switch (name) {
         case 'pluck':
@@ -1453,9 +1476,9 @@ function Synth () {
             } else {
                 var noteToPlay = notes;
             }
-            if(doVibrato || doDistortion){
-                this.performNotes(this.synthset[name][1], noteToPlay, beatValue, doVibrato, vibratoIntensity, vibratoFrequency,doDistortion,distortionAmount, doTremolo, tremoloFrequency,tremoloDepth);
-                console.log("hey sine");}
+            
+                this.performNotes(this.synthset[name][1], noteToPlay, beatValue, doVibrato, vibratoIntensity, vibratoFrequency,doDistortion,distortionAmount, doTremolo, tremoloFrequency,tremoloDepth, doPhaser, rate, octaves, baseFrequency);
+                console.log("hey sine");
             break;
         case 'violin':
         case 'cello':
@@ -1466,15 +1489,15 @@ function Synth () {
             var centerNo = SAMPLECENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
-            if(doVibrato || doDistortion){
-            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, doVibrato, vibratoIntensity, vibratoFrequency, doDistortion,distortionAmount,doTremolo, tremoloFrequency,tremoloDepth);
-             console.log("hey basse");}
+            
+            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, doVibrato, vibratoIntensity, vibratoFrequency, doDistortion,distortionAmount,doTremolo, tremoloFrequency,tremoloDepth, doPhaser,rate,octaves,baseFrequency);
+             console.log("hey basse");
             break;
         
         case 'default':
         case 'poly':
             
-            this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency , doDistortion,distortionAmount,doTremolo, tremoloFrequency,tremoloDepth);
+            this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency , doDistortion,distortionAmount,doTremolo, tremoloFrequency,tremoloDepth,doPhaser,rate,octaves,baseFrequency);
             console.log("hey default");
             break;
         default:
@@ -1504,7 +1527,7 @@ function Synth () {
                 this.synthset[name][1].triggerAttack(0, beatValue, 1);
             } else {
                 
-                this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency,doDistortion, distortionAmount,doTremolo, tremoloFrequency,tremoloDepth);
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency,doDistortion, distortionAmount,doTremolo, tremoloFrequency,tremoloDepth,doPhaser,rate,octaves,baseFrequency);
                 console.log("hey life");
             }
 
