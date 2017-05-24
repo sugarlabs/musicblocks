@@ -819,6 +819,7 @@ function Logo () {
             for (var listener in this.turtles.turtleList[turtle].listeners) {
                 this.stage.removeEventListener(listener, this.turtles.turtleList[turtle].listeners[listener], false);
             }
+
             this.turtles.turtleList[turtle].listeners = {};
         }
 
@@ -1116,10 +1117,12 @@ function Logo () {
                 } else {
                     var c = 2;
                 }
+
                 if (!that.blocks.sameGeneration(that.blocks.blockList[last(that.backward[turtle])].connections[c], blk)) {
                     var nextFlow = last(that.blocks.blockList[blk].connections);
                 } else {
                     var nextFlow = that.blocks.blockList[blk].connections[0];
+
                     if (that.blocks.blockList[nextFlow].name === 'action' || that.blocks.blockList[nextFlow].name === 'backward') {
                         nextFlow = null;
                     } else {
@@ -2390,7 +2393,7 @@ function Logo () {
 
             var __listener = function (event) {
                 that.pitchStaircase.init(that);
-		that.inPitchStaircase = false;
+                that.inPitchStaircase = false;
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -2635,8 +2638,9 @@ function Logo () {
             childFlowCount = 1;
 
             var listenerName = '_backward_' + turtle + '_' + blk;
+            that._setDispatchBlock(blk, turtle, listenerName);
 
-            var nextBlock = this.blocks.blockList[blk].connections[1];
+            var nextBlock = this.blocks.blockList[blk].connections[2];
             if (nextBlock == null) {
                 that.backward[turtle].pop();
             } else {
@@ -2645,9 +2649,6 @@ function Logo () {
 
             var __listener = function (event) {
                 that.backward[turtle].pop();
-                // Since a backward block was requeued each
-                // time, we need to flush it from the queue.
-                // that.turtles.turtleList[turtle].queue.pop();
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -4445,6 +4446,7 @@ function Logo () {
                     that.endOfClampSignals[turtle][blk][i] = null;
                 }
             }
+
             var cleanSignals = [];
             for (var i = 0; i < that.endOfClampSignals[turtle][blk].length; i++) {
                 if (that.endOfClampSignals[turtle][blk][i] != null) {
@@ -5138,9 +5140,11 @@ function Logo () {
                 if (turtle in that.forwardListener && blk in that.forwardListener[turtle]) {
                     that.stage.dispatchEvent('_forward_' + turtle + '_' + blk);
                 }
+
                 if (turtle in that.rightListener && blk in that.rightListener[turtle]) {
                     that.stage.dispatchEvent('_right_' + turtle + '_' + blk);
                 }
+
                 if (turtle in that.arcListener && blk in that.arcListener[turtle]) {
                     that.stage.dispatchEvent('_arc_' + turtle + '_' + blk);
                 }
@@ -5156,6 +5160,7 @@ function Logo () {
                 for (var i = 0; i < that.forwardListener[turtle][blk].length; i++) {
                     that.stage.removeEventListener('_forward_' + turtle + '_' + blk, that.forwardListener[turtle][blk][i], false);
                 }
+
                 delete that.forwardListener[turtle][blk];
             }
 
@@ -5163,6 +5168,7 @@ function Logo () {
                 for (var i = 0; i < that.rightListener[turtle][blk].length; i++) {
                     that.stage.removeEventListener('_right_' + turtle + '_' + blk, that.rightListener[turtle][blk][i], false);
                 }
+
                 delete that.rightListener[turtle][blk];
             }
 
@@ -5170,6 +5176,7 @@ function Logo () {
                 for (var i = 0; i < that.arcListener[turtle][blk].length; i++) {
                     that.stage.removeEventListener('_arc_' + turtle + '_' + blk, that.arcListener[turtle][blk][i], false);
                 }
+
                 delete that.arcListener[turtle][blk];
             }
 
@@ -5180,6 +5187,7 @@ function Logo () {
         if (listenerName in this.turtles.turtleList[turtle].listeners) {
             this.stage.removeEventListener(listenerName, this.turtles.turtleList[turtle].listeners[listenerName], false);
         }
+
         this.turtles.turtleList[turtle].listeners[listenerName] = listener;
         this.stage.addEventListener(listenerName, listener, false);
     };
@@ -5191,6 +5199,7 @@ function Logo () {
             } else {
                 var c = 2;
             }
+
             if (this.blocks.sameGeneration(this.blocks.blockList[last(this.backward[turtle])].connections[c], blk)) {
                 var nextBlock = this.blocks.blockList[blk].connections[0];
                 this.endOfClampSignals[turtle][nextBlock] = [listenerName];
@@ -5395,7 +5404,7 @@ function Logo () {
                 var action_args = receivedArg;
 
                 // If an action block with an arg is clicked,
-		// the arg will have no value.
+                // the arg will have no value.
                 if (action_args == null) {
                     that.errorMsg('Invalid argument', blk);
                     that.stopTurtle = true;
