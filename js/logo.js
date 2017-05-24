@@ -3554,7 +3554,7 @@ function Logo () {
             var frequency = args[0];
             var depth = args[1];
 
-            if (depth < 0 || intensity > 1) {
+            if (depth < 0 || depth > 1) {
                 that.errorMsg(_('Depth entered is out of range'), blk);
                 that.stopTurtle = true;
             }

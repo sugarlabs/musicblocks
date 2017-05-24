@@ -1401,12 +1401,12 @@ function Synth () {
             }, beatValue * 1000);
             //disable distortion effect after beat
         } else if (doTremolo) {
-            var tremolo = new Tone.Tremolo(1 / tremoloFrequency, tremoloDepth).toMaster().start();
-            var k = synth.connect(tremolo);            
+            var tremolo = new Tone.Tremolo(tremoloFrequency, tremoloDepth).toMaster();
+            synth.chain(tremolo, Tone.Master);           
             //console.log("tremolo notes:",notes);
             //console.log("f",tremoloFrequency);
             //console.log("d",tremoloDepth);
-            k.triggerAttackRelease(notes, beatValue);
+            synth.triggerAttackRelease(notes, beatValue);
             setTimeout(function () {
                 tremolo.dispose();
             }, beatValue * 1000);
