@@ -1382,7 +1382,7 @@ function Synth () {
         this.getSynthByName(name).toMaster();
     };
 
-    this.performNotes = function (synth, notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency, doDistortion , distortionAmount, doTremolo, tremoloFrequency,tremoloDepth, doPhaser,rate,octaves,baseFrequency) {
+    this.performNotes = function (synth, notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency, doDistortion, distortionAmount, doTremolo, tremoloFrequency, tremoloDepth, doPhaser, rate, octaves, baseFrequency) {
         if (doVibrato) {
             var vibrato = new Tone.Vibrato(1 / vibratoFrequency, vibratoIntensity);
             synth.chain(vibrato, Tone.Master);
@@ -1401,7 +1401,10 @@ function Synth () {
             }, beatValue * 1000);
             //disable distortion effect after beat
         } else if (doTremolo) {
-            var tremolo = new Tone.Tremolo(tremoloFrequency, tremoloDepth).toMaster();
+            var tremolo = new Tone.Tremolo({
+                "frequency" : tremoloFrequency,
+                "depth" : tremoloDepth
+            }).toMaster();
             synth.chain(tremolo, Tone.Master);           
             //console.log("tremolo notes:",notes);
             //console.log("f",tremoloFrequency);

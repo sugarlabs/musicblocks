@@ -5140,7 +5140,7 @@ function Logo () {
                                         // Look for any notes in the chord that might be in the pitchDrumTable.
                                         for (var d = 0; d < notes.length; d++) {
                                             if (notes[d] in that.pitchDrumTable[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], [],[],[]);
+                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], [],[],[],[]);
                                             } else if (turtle in that.voices && last(that.voices[turtle])) {
                                                 that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue],[distortionAmount],[tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency]);
                                             } else {
