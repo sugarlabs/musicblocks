@@ -859,15 +859,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     vibratoBlock.defaults.push(10);
     vibratoBlock.defaults.push(1 / 16);
 
-    //distortion block
-    var distortionBlock = new ProtoBlock('dist');
+    var distortionBlock = new ProtoBlock('dis');
     distortionBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['dist'] = distortionBlock;
+    blocks.protoBlockDict['dis'] = distortionBlock;
     distortionBlock.staticLabels.push(_('distortion'));
     distortionBlock.adjustWidthToLabel();
     distortionBlock.flowClampOneArgBlock();
     distortionBlock.dockTypes[1] = 'numberin';
-    distortionBlock.defaults.push(0.4);
+    distortionBlock.defaults.push(40);
 
     var tremoloBlock = new ProtoBlock('tremolo');
     tremoloBlock.palette = palettes.dict['tone'];
@@ -878,7 +877,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     tremoloBlock.dockTypes[1] = 'numberin';
     tremoloBlock.dockTypes[2] = 'numberin';
     tremoloBlock.defaults.push(10);
-    tremoloBlock.defaults.push(0.5);
+    tremoloBlock.defaults.push(50);
 
     var phaserBlock = new ProtoBlock('phaser');
     phaserBlock.palette = palettes.dict['tone'];
@@ -896,7 +895,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var chorusBlock = new ProtoBlock('chorus');
     chorusBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['chorus'] = chorusBlock;
-    chorusBlock.staticLabels.push(_('chorus'),_('rate'),_('delayTime'),_('depth'));
+    chorusBlock.staticLabels.push(_('chorus'),_('rate'),_('delay(MS)'),_('depth'));
     chorusBlock.adjustWidthToLabel();
     chorusBlock.flowClampThreeArgBlock();
     chorusBlock.dockTypes[1] = 'numberin';
@@ -904,7 +903,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     chorusBlock.dockTypes[3] = 'numberin';
     chorusBlock.defaults.push(1.5);
     chorusBlock.defaults.push(3.5);
-    chorusBlock.defaults.push(0.7);
+    chorusBlock.defaults.push(70);
 
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];

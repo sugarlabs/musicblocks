@@ -3544,8 +3544,8 @@ function Logo () {
             };
             that._setListener(turtle, listenerName, __listener);
             break;
-        case 'dist':
-            var distortion = args[0];
+        case 'dis':
+            var distortion = (args[0]/100);
             if (distortion < 0 || distortion > 1) {
                 that.errorMsg(_('Distortion not in range'), blk);
                 that.stopTurtle = true;
@@ -3564,7 +3564,7 @@ function Logo () {
             break;   
         case 'tremolo':
             var frequency = args[0];
-            var depth = args[1];
+            var depth = (args[1]/100);
 
             if (depth < 0 || depth > 1) {
                 that.errorMsg(_('Depth entered is out of range'), blk);
@@ -3609,7 +3609,12 @@ function Logo () {
         case 'chorus':
         	var chorusRate = args[0];
         	var delayTime = args[1];
-        	var chorusDepth = args[2];
+        	var chorusDepth = (args[2]/100);
+
+            if (chorusDepth < 0 || chorusDepth > 1) {
+                that.errorMsg(_('Depth entered is out of range'), blk);
+                that.stopTurtle = true;
+            }
 
         	childFlow = args[3];
         	childFlowCount = 1;
@@ -5169,20 +5174,20 @@ function Logo () {
                                             that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                         }
 
-                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount],[tremoloFrequency, tremoloDepth],[rate, octaves, baseFrequency],[chorusRate, delayTime,chorusDepth]);
+                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
                                     } else if (that.drumStyle[turtle].length > 0) {
-                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), [],[], [], [],[]);
+                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
                                     } else if (that.turtles.turtleList[turtle].drum) {
-                                        that.synth.trigger(notes, beatValue, 'drum', [],[], [], [],[]);
+                                        that.synth.trigger(notes, beatValue, 'drum', [], [], [], [], []);
                                     } else {
                                         // Look for any notes in the chord that might be in the pitchDrumTable.
                                         for (var d = 0; d < notes.length; d++) {
                                             if (notes[d] in that.pitchDrumTable[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], [],[],[],[],[]);
+                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], [], [], [], [], []);
                                             } else if (turtle in that.voices && last(that.voices[turtle])) {
-                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue],[distortionAmount],[tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency],[chorusRate, delayTime, chorusDepth]);
+                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
                                             } else {
-                                                that.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue],[distortionAmount],[tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
+                                                that.synth.trigger(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
                                             }
                                         }
                                     }
@@ -5210,7 +5215,7 @@ function Logo () {
                                     if (that.drumStyle[turtle].length > 0) {
                                         that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
                                     } else {
-                                        that.synth.trigger(['C2'], beatValue, drums[i], [], [], [], [],[]);
+                                        that.synth.trigger(['C2'], beatValue, drums[i], [], [], [], [], []);
                                     }
                                 }
                             }
