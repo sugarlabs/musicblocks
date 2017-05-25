@@ -893,6 +893,19 @@ function initBasicProtoBlocks(palettes, blocks) {
     phaserBlock.defaults.push(3);
     phaserBlock.defaults.push(350);
 
+    var chorusBlock = new ProtoBlock('chorus');
+    chorusBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['chorus'] = chorusBlock;
+    chorusBlock.staticLabels.push(_('chorus'),_('rate'),_('delayTime'),_('depth'));
+    chorusBlock.adjustWidthToLabel();
+    chorusBlock.flowClampThreeArgBlock();
+    chorusBlock.dockTypes[1] = 'numberin';
+    chorusBlock.dockTypes[2] = 'numberin';
+    chorusBlock.dockTypes[3] = 'numberin';
+    chorusBlock.defaults.push(1.5);
+    chorusBlock.defaults.push(3.5);
+    chorusBlock.defaults.push(0.7);
+
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;
