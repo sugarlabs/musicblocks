@@ -3545,7 +3545,7 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'dis':
-            var distortion = (args[0]/100);
+            var distortion = (args[0] / 100);
             if (distortion < 0 || distortion > 1) {
                 that.errorMsg(_('Distortion not in range'), blk);
                 that.stopTurtle = true;
@@ -3564,7 +3564,7 @@ function Logo () {
             break;   
         case 'tremolo':
             var frequency = args[0];
-            var depth = (args[1]/100);
+            var depth = (args[1] / 100);
 
             if (depth < 0 || depth > 1) {
                 that.errorMsg(_('Depth entered is out of range'), blk);
@@ -3609,7 +3609,7 @@ function Logo () {
         case 'chorus':
         	var chorusRate = args[0];
         	var delayTime = args[1];
-        	var chorusDepth = (args[2]/100);
+        	var chorusDepth = (args[2] / 100);
 
             if (chorusDepth < 0 || chorusDepth > 1) {
                 that.errorMsg(_('Depth entered is out of range'), blk);

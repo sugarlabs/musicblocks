@@ -1391,11 +1391,10 @@ function Synth () {
                 vibrato.dispose();
             }, beatValue * 1000);
               //disable vibrato effect when beat is over
-        } else if (doDistortion) {
+          } else if (doDistortion) {
             var distort = new Tone.Distortion(distortionAmount).toMaster();
-            synth.chain(distort, Tone.Master);
-            console.log("notes:",notes);
-            synth.triggerAttackRelease("A1", beatValue);
+            synth.connect(distort, Tone.Master);
+            synth.triggerAttackRelease(notes, beatValue);
             setTimeout(function () {
                 distort.dispose();
             }, beatValue * 1000);
@@ -1404,11 +1403,8 @@ function Synth () {
             var tremolo = new Tone.Tremolo({
                 "frequency" : tremoloFrequency,
                 "depth" : tremoloDepth
-            }).toMaster();
-            synth.chain(tremolo, Tone.Master);           
-            //console.log("tremolo notes:",notes);
-            //console.log("f",tremoloFrequency);
-            //console.log("d",tremoloDepth);
+            }).toMaster().start();
+            synth.chain(tremolo);
             synth.triggerAttackRelease(notes, beatValue);
             setTimeout(function () {
                 tremolo.dispose();
