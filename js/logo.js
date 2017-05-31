@@ -1140,7 +1140,6 @@ function Logo () {
                     var nextFlow = last(that.blocks.blockList[blk].connections);
                 } else {
                     var nextFlow = that.blocks.blockList[blk].connections[0];
-
                     if (that.blocks.blockList[nextFlow].name === 'action' || that.blocks.blockList[nextFlow].name === 'backward') {
                         nextFlow = null;
                     } else {
@@ -1235,12 +1234,17 @@ function Logo () {
                     that.backward[turtle].push(actionBlk);
 
                     var listenerName = '_backward_action_' + turtle + '_' + blk;
+                    that._setDispatchBlock(blk, turtle, listenerName);
 
-                    var nextBlock = this.blocks.blockList[actionBlk].connections[2];
+                    var nextBlock = that.blocks.blockList[actionBlk].connections[2];
                     if (nextBlock == null) {
                         that.backward[turtle].pop();
                     } else {
-                        that.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                        if (nextBlock in that.endOfClampSignals[turtle]) {
+                            that.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                        } else {
+                            that.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                        }
                     }
 
                     var __listener = function (event) {
@@ -1298,12 +1302,17 @@ function Logo () {
                     that.backward[turtle].push(actionBlk);
 
                     var listenerName = '_backward_action_' + turtle + '_' + blk;
+                    that._setDispatchBlock(blk, turtle, listenerName);
 
-                    var nextBlock = this.blocks.blockList[actionBlk].connections[2];
+                    var nextBlock = that.blocks.blockList[actionBlk].connections[2];
                     if (nextBlock == null) {
                         that.backward[turtle].pop();
                     } else {
-                        that.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                        if (nextBlock in that.endOfClampSignals[turtle]) {
+                            that.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                        } else {
+                            that.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                        }
                     }
 
                     var __listener = function (event) {
@@ -2174,7 +2183,7 @@ function Logo () {
         case 'savesvg':
             if (args.length === 1) {
                 if (that.svgBackground) {
-                    that.svgOutput = '<rect x="0" y="0" height="' + this.canvas.height + '" width="' + this.canvas.width + '" fill="' + body.style.background + '"/> ' + that.svgOutput;
+                    that.svgOutput = '<rect x="0" y="0" height="' + that.canvas.height + '" width="' + that.canvas.width + '" fill="' + body.style.background + '"/> ' + that.svgOutput;
                 }
                 doSaveSVG(that, args[0]);
             }
@@ -2315,10 +2324,10 @@ function Logo () {
                 } else {
                     that._masterBPM = args[0];
                 }
-                that.defaultBPMFactor = TONEBPM / this._masterBPM;
+                that.defaultBPMFactor = TONEBPM / that._masterBPM;
             }
 
-            if (this.inTempo) {
+            if (that.inTempo) {
                 that.tempo.BPMBlocks.push(blk);
                 var bpmnumberblock = that.blocks.blockList[blk].connections[1]
                 that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
@@ -2658,11 +2667,15 @@ function Logo () {
             var listenerName = '_backward_' + turtle + '_' + blk;
             that._setDispatchBlock(blk, turtle, listenerName);
 
-            var nextBlock = this.blocks.blockList[blk].connections[2];
+            var nextBlock = that.blocks.blockList[blk].connections[2];
             if (nextBlock == null) {
                 that.backward[turtle].pop();
             } else {
-                that.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                if (nextBlock in that.endOfClampSignals[turtle]) {
+                    that.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                } else {
+                    that.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                }
             }
 
             var __listener = function (event) {
@@ -3587,18 +3600,18 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'phaser':
-        	var rate = args[0];
-        	var octaves = args[1];
-        	var baseFrequency = args[2];
+                var rate = args[0];
+                var octaves = args[1];
+                var baseFrequency = args[2];
 
-        	childFlow = args[3];
-        	childFlowCount = 1;
+                childFlow = args[3];
+                childFlowCount = 1;
 
-        	that.rate[turtle].push(rate);
-        	that.octaves[turtle].push(octaves);
-        	that.baseFrequency[turtle].push(baseFrequency);
+                that.rate[turtle].push(rate);
+                that.octaves[turtle].push(octaves);
+                that.baseFrequency[turtle].push(baseFrequency);
 
-        	var listenerName = '_phaser_' + turtle;
+                var listenerName = '_phaser_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
                that.rate[turtle].pop();
@@ -3608,23 +3621,23 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;  
         case 'chorus':
-        	var chorusRate = args[0];
-        	var delayTime = args[1];
-        	var chorusDepth = (args[2] / 100);
+                var chorusRate = args[0];
+                var delayTime = args[1];
+                var chorusDepth = (args[2] / 100);
 
             if (chorusDepth < 0 || chorusDepth > 1) {
                 that.errorMsg(_('Depth entered is out of range'), blk);
                 that.stopTurtle = true;
             }
 
-        	childFlow = args[3];
-        	childFlowCount = 1;
+                childFlow = args[3];
+                childFlowCount = 1;
 
-        	that.chorusRate[turtle].push(chorusRate);
-        	that.delayTime[turtle].push(delayTime);
-        	that.chorusDepth[turtle].push(chorusDepth);
+                that.chorusRate[turtle].push(chorusRate);
+                that.delayTime[turtle].push(delayTime);
+                that.chorusDepth[turtle].push(chorusDepth);
 
-        	var listenerName = '_chorus_' + turtle;
+                var listenerName = '_chorus_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
                that.chorusRate[turtle].pop();
@@ -4544,22 +4557,13 @@ function Logo () {
 
         // Is the block in a queued clamp?
         if (blk in that.endOfClampSignals[turtle]) {
-            for (var i = that.endOfClampSignals[turtle][blk].length - 1; i >= 0; i--) {
-                var signal = that.endOfClampSignals[turtle][blk][i];
+            var n = that.endOfClampSignals[turtle][blk].length;
+            for (var i = 0; i < n; i++) {
+                var signal = that.endOfClampSignals[turtle][blk].pop();
                 if (signal != null) {
-                    that.stage.dispatchEvent(that.endOfClampSignals[turtle][blk][i]);
-                    // Mark issued signals as null
-                    that.endOfClampSignals[turtle][blk][i] = null;
+                    that.stage.dispatchEvent(signal);
                 }
             }
-
-            var cleanSignals = [];
-            for (var i = 0; i < that.endOfClampSignals[turtle][blk].length; i++) {
-                if (that.endOfClampSignals[turtle][blk][i] != null) {
-                    cleanSignals.push(that.endOfClampSignals[turtle][blk][i]);
-                }
-            }
-            that.endOfClampSignals[turtle][blk] = cleanSignals;
         }
 
         if (docById('statusDiv').style.visibility === 'visible') {
@@ -4655,7 +4659,7 @@ function Logo () {
 
             if (turtle in that.forwardListener) {
                 for (var b in that.forwardListener[turtle]) {
-                    for (var i = 0; i < this.forwardListener[turtle][b].length; i++) {
+                    for (var i = 0; i < that.forwardListener[turtle][b].length; i++) {
                         that.stage.removeEventListener('_forward_' + turtle, that.forwardListener[turtle][b][i], false);
                     }
                 }
@@ -4663,7 +4667,7 @@ function Logo () {
 
             if (turtle in that.rightListener) {
                 for (var b in that.rightListener[turtle]) {
-                    for (var i = 0; i < this.rightListener[turtle][b].length; i++) {
+                    for (var i = 0; i < that.rightListener[turtle][b].length; i++) {
                         that.stage.removeEventListener('_right_' + turtle, that.rightListener[turtle][b][i], false);
                     }
                 }
@@ -4671,7 +4675,7 @@ function Logo () {
 
             if (turtle in that.arcListener) {
                 for (var b in that.arcListener[turtle]) {
-                    for (var i = 0; i < this.arcListener[turtle][b].length; i++) {
+                    for (var i = 0; i < that.arcListener[turtle][b].length; i++) {
                         that.stage.removeEventListener('_arc_' + turtle, that.arcListener[turtle][b][i], false);
                     }
                 }
@@ -4743,11 +4747,11 @@ function Logo () {
 
         clearTimeout(this.saveTimeout);
 
-        var me = this;
+        var that = this;
         this.saveTimeout = setTimeout(function () {
             // Save at the end to save an image
             // console.log('in saveTimeout');
-            me.saveLocally();
+            that.saveLocally();
         }, DEFAULTDELAY * 1.5);
     };
 
@@ -5347,19 +5351,22 @@ function Logo () {
 
             if (this.blocks.sameGeneration(this.blocks.blockList[last(this.backward[turtle])].connections[c], blk)) {
                 var nextBlock = this.blocks.blockList[blk].connections[0];
-                this.endOfClampSignals[turtle][nextBlock] = [listenerName];
-            } else {
-                var nextBlock = null;
+                if (nextBlock in this.endOfClampSignals[turtle]) {
+                    this.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                } else {
+                    this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                }
             }
         } else {
             var nextBlock = last(this.blocks.blockList[blk].connections);
+            if (nextBlock != null) {
+                if (nextBlock in this.endOfClampSignals[turtle]) {
+                    this.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                } else {
+                    this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                }
+            }
         }
-
-        if (nextBlock == null) {
-            return;
-        }
-
-        this.endOfClampSignals[turtle][nextBlock] = [listenerName];
     };
 
     this._getTargetTurtle = function (args) {
@@ -6113,7 +6120,6 @@ function Logo () {
                 if (!(turtle in that.turtleHeaps)) {
                     that.turtleHeaps[turtle] = [];
                 }
-                // console.log(that.turtleHeaps[turtle].length);
                 block.value = that.turtleHeaps[turtle].length;
                 break;
             case 'heapEmpty':
