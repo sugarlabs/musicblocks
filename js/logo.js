@@ -3563,19 +3563,19 @@ function Logo () {
             if (distortion < 0 || distortion > 1) {
                 that.errorMsg(_('Distortion not in range'), blk);
                 that.stopTurtle = true;
-            } 
+            }
             childFlow = args[1];
             childFlowCount = 1;
 
             that.distortionAmount[turtle].push(distortion);
-            
+
             var listenerName = '_distortion_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
             var __listener = function (event) {
                that.distortionAmount[turtle].pop();
             };
             that._setListener(turtle, listenerName, __listener);
-            break;   
+            break;
         case 'tremolo':
             var frequency = args[0];
             var depth = (args[1] / 100);
@@ -3593,60 +3593,65 @@ function Logo () {
 
             var listenerName = '_tremolo_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
+
             var __listener = function (event) {
                that.tremoloFrequency[turtle].pop();
                that.tremoloDepth[turtle].pop();
             };
+
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'phaser':
             var rate = args[0];
-        	  var octaves = args[1];
-        	  var baseFrequency = args[2];
+            var octaves = args[1];
+            var baseFrequency = args[2];
 
-        	  childFlow = args[3];
-        	  childFlowCount = 1;
+            childFlow = args[3];
+            childFlowCount = 1;
 
-        	  that.rate[turtle].push(rate);
-        	  that.octaves[turtle].push(octaves);
-        	  that.baseFrequency[turtle].push(baseFrequency);
+            that.rate[turtle].push(rate);
+            that.octaves[turtle].push(octaves);
+            that.baseFrequency[turtle].push(baseFrequency);
 
-        	  var listenerName = '_phaser_' + turtle;
+            var listenerName = '_phaser_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
+
             var __listener = function (event) {
-               that.rate[turtle].pop();
-               that.octaves[turtle].pop();
-               that.baseFrequency[turtle].pop();
+                that.rate[turtle].pop();
+                that.octaves[turtle].pop();
+                that.baseFrequency[turtle].pop();
             };
+
             that._setListener(turtle, listenerName, __listener);
-            break;  
+            break;
         case 'chorus':
             var chorusRate = args[0];
-        	  var delayTime = args[1];
-        	  var chorusDepth = (args[2] / 100);
+            var delayTime = args[1];
+            var chorusDepth = (args[2] / 100);
 
             if (chorusDepth < 0 || chorusDepth > 1) {
                 that.errorMsg(_('Depth entered is out of range'), blk);
                 that.stopTurtle = true;
             }
 
-        	  childFlow = args[3];
-        	  childFlowCount = 1;
+            childFlow = args[3];
+            childFlowCount = 1;
 
-        	  that.chorusRate[turtle].push(chorusRate);
-        	  that.delayTime[turtle].push(delayTime);
-        	  that.chorusDepth[turtle].push(chorusDepth);
+            that.chorusRate[turtle].push(chorusRate);
+            that.delayTime[turtle].push(delayTime);
+            that.chorusDepth[turtle].push(chorusDepth);
 
-        	  var listenerName = '_chorus_' + turtle;
-
+            var listenerName = '_chorus_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
+
             var __listener = function (event) {
-               that.chorusRate[turtle].pop();
-               that.delayTime[turtle].pop();
-               that.chorusDepth[turtle].pop();
+                that.chorusRate[turtle].pop();
+                that.delayTime[turtle].pop();
+                that.chorusDepth[turtle].pop();
             };
+
             that._setListener(turtle, listenerName, __listener);
-            break;      
+            break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -3682,6 +3687,7 @@ function Logo () {
             } else {
                 var interval = mod12(args[0]);
             }
+
             var deltaOctave = calcOctaveInterval(args[1]);
             if ([1, 4, 5, 8].indexOf(interval) !== -1) {
                 that.perfect[turtle].push([args[0], deltaOctave]);

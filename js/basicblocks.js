@@ -850,15 +850,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     voicenameBlock.valueBlock();
     voicenameBlock.dockTypes[0] = 'textout';
 
-    var vibratoBlock = new ProtoBlock('vibrato');
-    vibratoBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['vibrato'] = vibratoBlock;
-    vibratoBlock.staticLabels.push(_('vibrato'), _('intensity'), _('rate'));
-    vibratoBlock.adjustWidthToLabel();
-    vibratoBlock.flowClampTwoArgBlock();
-    vibratoBlock.defaults.push(10);
-    vibratoBlock.defaults.push(1 / 16);
-
     var distortionBlock = new ProtoBlock('dis');
     distortionBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['dis'] = distortionBlock;
@@ -871,8 +862,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tremoloBlock = new ProtoBlock('tremolo');
     tremoloBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['tremolo'] = tremoloBlock;
-
-    tremoloBlock.staticLabels.push(_('elec-tremolo'),_('rate'),_('depth'));
+    tremoloBlock.staticLabels.push(_('tremolo'), _('rate'), _('depth'));
     tremoloBlock.adjustWidthToLabel();
     tremoloBlock.flowClampTwoArgBlock();
     tremoloBlock.dockTypes[1] = 'numberin';
@@ -883,7 +873,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var phaserBlock = new ProtoBlock('phaser');
     phaserBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['phaser'] = phaserBlock;
-    phaserBlock.staticLabels.push(_('phaser'),_('rate'),_('octaves'),_('baseFrequency'));
+    phaserBlock.staticLabels.push(_('phaser'), _('rate'), _('octaves'), _('base frequency'));
     phaserBlock.adjustWidthToLabel();
     phaserBlock.flowClampThreeArgBlock();
     phaserBlock.dockTypes[1] = 'numberin';
@@ -896,7 +886,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var chorusBlock = new ProtoBlock('chorus');
     chorusBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['chorus'] = chorusBlock;
-    chorusBlock.staticLabels.push(_('chorus'),_('rate'),_('delay(MS)'),_('depth'));
+    chorusBlock.staticLabels.push(_('chorus'), _('rate'), _('delay') + ' (MS)', _('depth'));
     chorusBlock.adjustWidthToLabel();
     chorusBlock.flowClampThreeArgBlock();
     chorusBlock.dockTypes[1] = 'numberin';
@@ -905,6 +895,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     chorusBlock.defaults.push(1.5);
     chorusBlock.defaults.push(3.5);
     chorusBlock.defaults.push(70);
+
+    var vibratoBlock = new ProtoBlock('vibrato');
+    vibratoBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['vibrato'] = vibratoBlock;
+    vibratoBlock.staticLabels.push(_('vibrato'), _('intensity'), _('rate'));
+    vibratoBlock.adjustWidthToLabel();
+    vibratoBlock.flowClampTwoArgBlock();
+    vibratoBlock.defaults.push(10);
+    vibratoBlock.defaults.push(1 / 16);
 
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
