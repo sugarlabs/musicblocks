@@ -243,6 +243,14 @@ var MODENAMES = [
     [_('octatonic'), 'octatonic'],
     //.TRANS: major scales in music
     [_('major'), 'major'],
+    //.TRANS: harmonic major scale in music
+    [_('harmonic major'), 'harmonic major'],
+    //.TRANS: natural minor scales in music
+    [_('natural minor'), 'natural minor'],
+    //.TRANS: harmonic minor scale in music
+    [_('harmonic minor'), 'harmonic minor'],
+    //.TRANS: melodic minor scale in music
+    [_('melodic minor'), 'melodic minor'],
     //.TRANS: modal scale for music
     [_('ionian'), 'ionian'],
     //.TRANS: modal scale for music
@@ -253,8 +261,6 @@ var MODENAMES = [
     [_('lydian'), 'lydian'],
     //.TRANS: modal scale for music
     [_('mixolydian'), 'mixolydian'],
-    //.TRANS: natural minor scales in music
-    [_('minor'), 'minor'],
     //.TRANS: modal scale for music
     [_('aeolian'), 'aeolian'],
     //.TRANS: modal scale for music
@@ -589,7 +595,7 @@ function keySignatureToMode(keySignature) {
     }
 
     if (minorMode) {
-        return [key, 'minor'];
+        return [key, 'natural minor'];
     }
 
     // Reassemble remaining parts to get mode name
