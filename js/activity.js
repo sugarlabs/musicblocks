@@ -766,7 +766,13 @@ define(MYDEFINES, function (compatibility) {
                     setTimeout(function () {
                         var rawData = reader.result;
                         var cleanData = rawData.replace('\n', ' ');
-                        var obj = JSON.parse(cleanData);
+                        try {
+                            var obj = JSON.parse(cleanData);
+                        } catch (e) {
+                            alert("Failed to load JSON data");
+                            return;
+                        }
+
                         // First, hide the palettes as they will need updating.
                         for (var name in blocks.palettes.dict) {
                             blocks.palettes.dict[name].hideMenu(true);
@@ -1840,6 +1846,12 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function loadRawProject(data) {
+            if (data == undefined) {
+                console.log('loadRawProject: data is undefined... punting');
+                errorMsg('loadRawProject: project undefined');
+                return;
+            }
+
             console.log('loadRawProject ' + data);
             document.body.style.cursor = 'wait';
             _allClear();
@@ -1849,8 +1861,14 @@ define(MYDEFINES, function (compatibility) {
                 blocks.palettes.dict[name].hideMenu(true);
             }
 
-            var obj = JSON.parse(data);
-            blocks.loadNewBlocks(obj);
+            try {
+		var obj = JSON.parse(data);
+                blocks.loadNewBlocks(obj);
+            } catch (e) {
+                console.log('loadRawProject: could not parse project data');
+                errorMsg(e);
+            }
+
             document.body.style.cursor = 'default';
         };
 

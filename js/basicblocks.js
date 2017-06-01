@@ -871,6 +871,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tremoloBlock = new ProtoBlock('tremolo');
     tremoloBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['tremolo'] = tremoloBlock;
+
     tremoloBlock.staticLabels.push(_('elec-tremolo'),_('rate'),_('depth'));
     tremoloBlock.adjustWidthToLabel();
     tremoloBlock.flowClampTwoArgBlock();
@@ -1945,7 +1946,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     storeinBlock.adjustWidthToLabel();
     storeinBlock.twoArgBlock();
     storeinBlock.defaults.push(_('box'));
-    storeinBlock.defaults.push(100);
+    storeinBlock.defaults.push(4);
     storeinBlock.dockTypes[1] = 'anyin';
     storeinBlock.dockTypes[2] = 'anyin';
 
@@ -2601,6 +2602,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     printBlock.adjustWidthToLabel();
     printBlock.oneArgBlock();
     printBlock.dockTypes[1] = 'anyin';
+    printBlock.defaults.push(_("Music Blocks"));
 
     var turtleNameBlock = new ProtoBlock('turtlename');
     turtleNameBlock.palette = palettes.dict['extras'];

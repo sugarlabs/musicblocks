@@ -1382,8 +1382,10 @@ function Synth () {
         this.getSynthByName(name).toMaster();
     };
 
+
     this.performNotes = function (synth, notes, beatValue, params) {
         if (params === null) {
+
             synth.triggerAttackRelease(notes, beatValue);
         }
         else {
@@ -1423,12 +1425,12 @@ function Synth () {
             }).toMaster();
             synth.chain(chorusEffect, Tone.Master);
         }
-
-        synth.triggerAttackRelease(notes, beatValue);
+       synth.triggerAttackRelease(notes, beatValue);
         
         setTimeout(function () {
             if (params.doVibrato) {
                 vibrato.dispose();
+
             }
             if (params.doDistortion) {
                 distort.dispose();
@@ -1529,6 +1531,7 @@ function Synth () {
                 chorusDepth : 0
             };
        
+
         if (vibratoArgs.length == 2 && vibratoArgs[0] != 0) {
             params.doVibrato = true;
             params.vibratoIntensity = vibratoArgs[0];
@@ -1555,6 +1558,30 @@ function Synth () {
             params.delayTime = chorusArgs[1];
             params.chorusDepth = chorusArgs[2];
         }
+        if (distortionArgs.length == 1 && distortionArgs[0] != 0) {
+            doDistortion = true;
+            distortionAmount = distortionArgs[0];
+            console.log("Hi, triggered distortion", distortionAmount);
+        }
+        if (tremoloArgs.length == 2 && tremoloArgs[0] != 0) {
+            doTremolo = true;
+            tremoloFrequency = tremoloArgs[0];
+            tremoloDepth = tremoloArgs[1];
+        }
+        if (phaserArgs.length == 3 && phaserArgs[0] != 0) {
+            doPhaser = true;
+            rate = phaserArgs[0];
+            octaves = phaserArgs[1];
+            baseFrequency = phaserArgs[2];
+            console.log("Hi, triggered phaser");
+        }
+        if (chorusArgs.length == 3 && chorusArgs[0] != 0) {
+            doChorus = true;
+            chorusRate = chorusArgs[0];
+            delayTime = chorusArgs[1];
+            chorusDepth = chorusArgs[2];
+            console.log("Hi, triggered chorus");
+        }
 
         switch (name) {
         case 'pluck':
@@ -1567,8 +1594,10 @@ function Synth () {
             } else {
                 var noteToPlay = notes;
             }
+
         
                 this.performNotes(this.synthset[name][1], noteToPlay, beatValue, params);
+
             break;
         case 'violin':
         case 'cello':
@@ -1579,12 +1608,17 @@ function Synth () {
             var centerNo = SAMPLECENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
+
                 
                 this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, params);
+
             break;
+        
         case 'default':
         case 'poly':
+
                 this.performNotes(this.synthset['poly'][1], notes, beatValue, params);
+
             break;
         default:
             var drumName = getDrumSynthName(name);
@@ -1612,8 +1646,11 @@ function Synth () {
             } else if (name.slice(0, 4) == 'file') {
                 this.synthset[name][1].triggerAttack(0, beatValue, 1);
             } else {
+
                 this.performNotes(this.synthset['poly'][1], notes, beatValue, params);
+
             }
+
             break;
         }
     };

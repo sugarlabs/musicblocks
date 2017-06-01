@@ -954,6 +954,10 @@ function Blocks () {
                     // Don't break the connection betweem a backward
                     // block and a hidden block attached to its clamp.
                     continue;
+                } else if (this.blockList[b].name === 'action' && (i === 2) && (this.blockList[b].connections[2] != null) && (this.blockList[this.blockList[b].connections[2]].isNoHitBlock())) {
+                    // Don't break the connection betweem an action
+                    // block and a hidden block attached to its clamp.
+                    continue;
                 }
 
                 // Look for available connections.
