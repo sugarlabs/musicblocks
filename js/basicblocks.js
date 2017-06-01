@@ -871,7 +871,8 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tremoloBlock = new ProtoBlock('tremolo');
     tremoloBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['tremolo'] = tremoloBlock;
-    tremoloBlock.staticLabels.push(_('tremolo'),_('frequency'),_('depth'));
+
+    tremoloBlock.staticLabels.push(_('elec-tremolo'),_('rate'),_('depth'));
     tremoloBlock.adjustWidthToLabel();
     tremoloBlock.flowClampTwoArgBlock();
     tremoloBlock.dockTypes[1] = 'numberin';
