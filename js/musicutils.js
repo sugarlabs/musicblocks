@@ -173,17 +173,22 @@ const MUSICALMODES = {
     'spanish': [1, 2, 1, 1, 1, 2, 2, 2],
     'ocatonic': [1, 2, 1, 2, 1, 2, 1, 2],
 
-     // 7 notes in an octave
+    // 7 notes in an octave
+
     'major': [2, 2, 1, 2, 2, 2, 1],
+    'harmonic major': [2, 2, 1, 2, 1, 3, 1],
+    'natural minor': [2, 1, 2, 2, 1, 2, 2],
+    'harmonic minor': [2, 1, 2, 2, 1, 3, 1],
+    'melodic minor': [2, 1, 2, 2, 2, 2, 1],
+
     'ionian': [2, 2, 1, 2, 2, 2, 1],
     'dorian': [2, 1, 2, 2, 2, 1, 2],
     'phrygian': [1, 2, 2, 2, 1, 2, 2],
     'lydian': [2, 2, 2, 1, 2, 2, 1],
     'mixolydian': [2, 2, 1, 2, 2, 1, 2],
-    'minor': [2, 1, 2, 2, 1, 2, 2],
     'aeolian': [2, 1, 2, 2, 1, 2, 2],
     'locrian': [1, 2, 2, 1, 2, 2, 2],
-
+    
     'jazz minor': [2, 1, 2, 2, 2, 2, 1],
     'bebop': [1, 1, 1, 2, 2, 1, 2],
 
