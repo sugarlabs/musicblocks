@@ -1383,6 +1383,10 @@ function Synth () {
     };
 
     this.performNotes = function (synth, notes, beatValue, params) {
+        if (params === null) {
+            synth.triggerAttackRelease(notes, beatValue);
+        }
+        else {
         if (params.doVibrato) {
             var vibrato = new Tone.Vibrato(1 / params.vibratoFrequency, params.vibratoIntensity);
             synth.chain(vibrato, Tone.Master);
@@ -1439,9 +1443,73 @@ function Synth () {
                 chorusEffect.dispose();
             }
             }, beatValue * 1000);
+        }
     }
 
-    this.trigger = function (notes, beatValue, name, vibratoArgs, distortionArgs, tremoloArgs, phaserArgs, chorusArgs) {
+    this.trigger = function (notes, beatValue, name) {
+        switch (name) {
+        case 'pluck':
+        case 'triangle':
+        case 'square':
+        case 'sawtooth':
+        case 'sine':
+            if (typeof(notes) === 'object') {
+                var noteToPlay = notes[0];
+            } else {
+                var noteToPlay = notes;
+            }
+        
+                this.performNotes(this.synthset[name][1], noteToPlay, beatValue, null);
+            break;
+        case 'violin':
+        case 'cello':
+        case 'basse':
+            // The violin sample is tuned to C
+            // The cello sample is tuned to C4???
+            // The basse sample is tuned to C2???
+            var centerNo = SAMPLECENTERNO[name];
+            var obj = noteToPitchOctave(notes);
+            var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
+                
+                this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, null);
+            break;
+        case 'default':
+        case 'poly':
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, null);
+            break;
+        default:
+            var drumName = getDrumSynthName(name);
+            if (drumName != null) {
+                // Work around i8n bug in Firefox.
+                if (drumName === '' && name in this.synthset) {
+                    this.synthset[name][1].triggerAttack(0, beatValue);
+                } else if (drumName in this.synthset) {
+                    if (this.synthset[drumName][1] == null) {
+                        console.log('Something has gone terribly wrong: ' + name + ', ' + drumName);
+                    } else {
+                        this.synthset[drumName][1].triggerAttack(0);
+                    }
+                } else if (name.slice(0, 4) == 'http') {
+                    this.synthset[name][1].triggerAttack(0, beatValue);
+                } else if (name.slice(0, 4) == 'file') {
+                    this.synthset[name][1].triggerAttack(0, beatValue);
+                } else {
+                    console.log('Something has gone terribly wrong: ' + name + ', ' + drumName);
+                }
+            } else if (name === 'drum') {
+                this.synthset[DEFAULTDRUM][1].triggerAttack(0, beatValue, 1);
+            } else if (name.slice(0, 4) == 'http') {
+                this.synthset[name][1].triggerAttack(0, beatValue, 1);
+            } else if (name.slice(0, 4) == 'file') {
+                this.synthset[name][1].triggerAttack(0, beatValue, 1);
+            } else {
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, null);
+            }
+            break;
+        }
+    };
+
+    this.triggerWithEffects = function (notes, beatValue, name, vibratoArgs, distortionArgs, tremoloArgs, phaserArgs, chorusArgs) {
         var params = {
                 doVibrato : false,
                 doDistortion : false,
