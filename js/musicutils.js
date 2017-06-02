@@ -173,17 +173,22 @@ const MUSICALMODES = {
     'spanish': [1, 2, 1, 1, 1, 2, 2, 2],
     'ocatonic': [1, 2, 1, 2, 1, 2, 1, 2],
 
-     // 7 notes in an octave
+    // 7 notes in an octave
+
     'major': [2, 2, 1, 2, 2, 2, 1],
+    'harmonic major': [2, 2, 1, 2, 1, 3, 1],
+    'natural minor': [2, 1, 2, 2, 1, 2, 2],
+    'harmonic minor': [2, 1, 2, 2, 1, 3, 1],
+    'melodic minor': [2, 1, 2, 2, 2, 2, 1],
+
     'ionian': [2, 2, 1, 2, 2, 2, 1],
     'dorian': [2, 1, 2, 2, 2, 1, 2],
     'phrygian': [1, 2, 2, 2, 1, 2, 2],
     'lydian': [2, 2, 2, 1, 2, 2, 1],
     'mixolydian': [2, 2, 1, 2, 2, 1, 2],
-    'minor': [2, 1, 2, 2, 1, 2, 2],
     'aeolian': [2, 1, 2, 2, 1, 2, 2],
     'locrian': [1, 2, 2, 1, 2, 2, 2],
-
+    
     'jazz minor': [2, 1, 2, 2, 2, 2, 1],
     'bebop': [1, 1, 1, 2, 2, 1, 2],
 
@@ -238,6 +243,14 @@ var MODENAMES = [
     [_('octatonic'), 'octatonic'],
     //.TRANS: major scales in music
     [_('major'), 'major'],
+    //.TRANS: harmonic major scale in music
+    [_('harmonic major'), 'harmonic major'],
+    //.TRANS: natural minor scales in music
+    [_('natural minor'), 'natural minor'],
+    //.TRANS: harmonic minor scale in music
+    [_('harmonic minor'), 'harmonic minor'],
+    //.TRANS: melodic minor scale in music
+    [_('melodic minor'), 'melodic minor'],
     //.TRANS: modal scale for music
     [_('ionian'), 'ionian'],
     //.TRANS: modal scale for music
@@ -248,8 +261,6 @@ var MODENAMES = [
     [_('lydian'), 'lydian'],
     //.TRANS: modal scale for music
     [_('mixolydian'), 'mixolydian'],
-    //.TRANS: natural minor scales in music
-    [_('minor'), 'minor'],
     //.TRANS: modal scale for music
     [_('aeolian'), 'aeolian'],
     //.TRANS: modal scale for music
@@ -584,7 +595,7 @@ function keySignatureToMode(keySignature) {
     }
 
     if (minorMode) {
-        return [key, 'minor'];
+        return [key, 'natural minor'];
     }
 
     // Reassemble remaining parts to get mode name
