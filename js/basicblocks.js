@@ -529,6 +529,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     tempoBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['tempo'] = tempoBlock;
     tempoBlock.staticLabels.push(_('tempo'));
+    tempoBlock.extraWidth = 20;
     tempoBlock.adjustWidthToLabel();
     tempoBlock.stackClampZeroArgBlock();
 
@@ -900,6 +901,52 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['voicename'] = voicenameBlock;
     voicenameBlock.valueBlock();
     voicenameBlock.dockTypes[0] = 'textout';
+
+    var distortionBlock = new ProtoBlock('dis');
+    distortionBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['dis'] = distortionBlock;
+    distortionBlock.staticLabels.push(_('distortion'));
+    distortionBlock.adjustWidthToLabel();
+    distortionBlock.flowClampOneArgBlock();
+    distortionBlock.dockTypes[1] = 'numberin';
+    distortionBlock.defaults.push(40);
+
+    var tremoloBlock = new ProtoBlock('tremolo');
+    tremoloBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['tremolo'] = tremoloBlock;
+    tremoloBlock.staticLabels.push(_('tremolo'), _('rate'), _('depth'));
+    tremoloBlock.adjustWidthToLabel();
+    tremoloBlock.flowClampTwoArgBlock();
+    tremoloBlock.dockTypes[1] = 'numberin';
+    tremoloBlock.dockTypes[2] = 'numberin';
+    tremoloBlock.defaults.push(10);
+    tremoloBlock.defaults.push(50);
+
+    var phaserBlock = new ProtoBlock('phaser');
+    phaserBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['phaser'] = phaserBlock;
+    phaserBlock.staticLabels.push(_('phaser'), _('rate'), _('octaves'), _('base frequency'));
+    phaserBlock.adjustWidthToLabel();
+    phaserBlock.flowClampThreeArgBlock();
+    phaserBlock.dockTypes[1] = 'numberin';
+    phaserBlock.dockTypes[2] = 'numberin';
+    phaserBlock.dockTypes[3] = 'numberin';
+    phaserBlock.defaults.push(0.5);
+    phaserBlock.defaults.push(3);
+    phaserBlock.defaults.push(350);
+
+    var chorusBlock = new ProtoBlock('chorus');
+    chorusBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['chorus'] = chorusBlock;
+    chorusBlock.staticLabels.push(_('chorus'), _('rate'), _('delay') + ' (MS)', _('depth'));
+    chorusBlock.adjustWidthToLabel();
+    chorusBlock.flowClampThreeArgBlock();
+    chorusBlock.dockTypes[1] = 'numberin';
+    chorusBlock.dockTypes[2] = 'numberin';
+    chorusBlock.dockTypes[3] = 'numberin';
+    chorusBlock.defaults.push(1.5);
+    chorusBlock.defaults.push(3.5);
+    chorusBlock.defaults.push(70);
 
     var vibratoBlock = new ProtoBlock('vibrato');
     vibratoBlock.palette = palettes.dict['tone'];
@@ -1959,7 +2006,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     storeinBlock.adjustWidthToLabel();
     storeinBlock.twoArgBlock();
     storeinBlock.defaults.push(_('box'));
-    storeinBlock.defaults.push(100);
+    storeinBlock.defaults.push(4);
     storeinBlock.dockTypes[1] = 'anyin';
     storeinBlock.dockTypes[2] = 'anyin';
 
@@ -2615,6 +2662,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     printBlock.adjustWidthToLabel();
     printBlock.oneArgBlock();
     printBlock.dockTypes[1] = 'anyin';
+    printBlock.defaults.push(_("Music Blocks"));
 
     var turtleNameBlock = new ProtoBlock('turtlename');
     turtleNameBlock.palette = palettes.dict['extras'];

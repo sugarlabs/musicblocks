@@ -44,7 +44,7 @@ const PITCHES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', '
 const PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 const PITCHES2 = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const NOTESTABLE = {1: "do", 2: "do♯", 3: "re", 4: "re♯", 5: "mi", 6: "fa", 7: "fa♯", 8: "sol", 9: "sol♯", 10: "la", 11: "la♯", 0: "ti"};
+const NOTESTABLE = {1: 'do', 2: 'do♯', 3: 're', 4: 're♯', 5: 'mi', 6: 'fa', 7: 'fa♯', 8: 'sol', 9: 'sol♯', 10: 'la', 11: 'la♯', 0: 'ti'};
 const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 // Halfsteps used in calculating absolute intervals
@@ -72,9 +72,9 @@ function calcAugmented(obj) {
     var interval = obj[0];
     var deltaOctave = obj[1];
     if (interval < 0) {
-	return -AUGMENTED[-interval] + (12 * deltaOctave);
+        return -AUGMENTED[-interval] + (12 * deltaOctave);
     } else {
-	return AUGMENTED[interval] + (12 * deltaOctave);
+        return AUGMENTED[interval] + (12 * deltaOctave);
     }
 }
 
@@ -83,9 +83,9 @@ function calcPerfect(obj) {
     var interval = obj[0];
     var deltaOctave = obj[1];
     if (interval < 0) {
-	return -PERFECT[-interval] + (12 * deltaOctave);
+        return -PERFECT[-interval] + (12 * deltaOctave);
     } else {
-	return PERFECT[interval] + (12 * deltaOctave);
+        return PERFECT[interval] + (12 * deltaOctave);
     }
 }
 
@@ -94,9 +94,9 @@ function calcDiminished(obj) {
     var interval = obj[0];
     var deltaOctave = obj[1];
     if (interval < 0) {
-	return -DIMINISHED[-interval] + (12 * deltaOctave);
+        return -DIMINISHED[-interval] + (12 * deltaOctave);
     } else {
-	return DIMINISHED[interval] + (12 * deltaOctave);
+        return DIMINISHED[interval] + (12 * deltaOctave);
     }
 }
 
@@ -105,9 +105,9 @@ function calcMajor(obj) {
     var interval = obj[0];
     var deltaOctave = obj[1];
     if (interval < 0) {
-	return -MAJOR[-interval] + (12 * deltaOctave);
+        return -MAJOR[-interval] + (12 * deltaOctave);
     } else {
-	return MAJOR[interval] + (12 * deltaOctave);
+        return MAJOR[interval] + (12 * deltaOctave);
     }
 }
 
@@ -116,9 +116,9 @@ function calcMinor(obj) {
     var interval = obj[0];
     var deltaOctave = obj[1];
     if (interval < 0) {
-	return -MINOR[-interval] + (12 * deltaOctave);
+        return -MINOR[-interval] + (12 * deltaOctave);
     } else {
-	return MINOR[interval] + (12 * deltaOctave);
+        return MINOR[interval] + (12 * deltaOctave);
     }
 }
 
@@ -173,17 +173,22 @@ const MUSICALMODES = {
     'spanish': [1, 2, 1, 1, 1, 2, 2, 2],
     'ocatonic': [1, 2, 1, 2, 1, 2, 1, 2],
 
-     // 7 notes in an octave
+    // 7 notes in an octave
+
     'major': [2, 2, 1, 2, 2, 2, 1],
+    'harmonic major': [2, 2, 1, 2, 1, 3, 1],
+    'natural minor': [2, 1, 2, 2, 1, 2, 2],
+    'harmonic minor': [2, 1, 2, 2, 1, 3, 1],
+    'melodic minor': [2, 1, 2, 2, 2, 2, 1],
+
     'ionian': [2, 2, 1, 2, 2, 2, 1],
     'dorian': [2, 1, 2, 2, 2, 1, 2],
     'phrygian': [1, 2, 2, 2, 1, 2, 2],
     'lydian': [2, 2, 2, 1, 2, 2, 1],
     'mixolydian': [2, 2, 1, 2, 2, 1, 2],
-    'minor': [2, 1, 2, 2, 1, 2, 2],
     'aeolian': [2, 1, 2, 2, 1, 2, 2],
     'locrian': [1, 2, 2, 1, 2, 2, 2],
-
+    
     'jazz minor': [2, 1, 2, 2, 2, 2, 1],
     'bebop': [1, 1, 1, 2, 2, 1, 2],
 
@@ -238,6 +243,14 @@ var MODENAMES = [
     [_('octatonic'), 'octatonic'],
     //.TRANS: major scales in music
     [_('major'), 'major'],
+    //.TRANS: harmonic major scale in music
+    [_('harmonic major'), 'harmonic major'],
+    //.TRANS: natural minor scales in music
+    [_('natural minor'), 'natural minor'],
+    //.TRANS: harmonic minor scale in music
+    [_('harmonic minor'), 'harmonic minor'],
+    //.TRANS: melodic minor scale in music
+    [_('melodic minor'), 'melodic minor'],
     //.TRANS: modal scale for music
     [_('ionian'), 'ionian'],
     //.TRANS: modal scale for music
@@ -248,8 +261,6 @@ var MODENAMES = [
     [_('lydian'), 'lydian'],
     //.TRANS: modal scale for music
     [_('mixolydian'), 'mixolydian'],
-    //.TRANS: natural minor scales in music
-    [_('minor'), 'minor'],
     //.TRANS: modal scale for music
     [_('aeolian'), 'aeolian'],
     //.TRANS: modal scale for music
@@ -434,7 +445,7 @@ function getDrumName(name) {
     }
 
     for (var drum = 0; drum < DRUMNAMES.length; drum++) {
-	if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() || DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() || DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
             if (DRUMNAMES[drum][0] != '') {
                 return DRUMNAMES[drum][0];
             } else {
@@ -584,7 +595,7 @@ function keySignatureToMode(keySignature) {
     }
 
     if (minorMode) {
-        return [key, 'minor'];
+        return [key, 'natural minor'];
     }
 
     // Reassemble remaining parts to get mode name
@@ -746,7 +757,7 @@ function getScaleAndHalfSteps(keySignature) {
             solfege.push('');
         }
     }
-    
+
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
         var thisScale = NOTESFLAT;
     } else {
@@ -768,7 +779,7 @@ function getInterval (interval, keySignature, pitch) {
     var obj = _buildScale(keySignature);
     var scale = obj[0];
     var halfSteps = obj[1];
- 
+
     if (pitch in BTOFLAT) {
         pitch = BTOFLAT[pitch];
         ii = scale.indexOf(pitch);
@@ -955,9 +966,9 @@ function numberToPitch(i) {
             n += 1;  // Count octave bump ups.
         }
 
-	return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
+        return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12) - n];
     } else {
-	return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
+        return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
     }
 };
 
@@ -1011,7 +1022,7 @@ function pitchToNumber(pitch, octave, keySignature) {
                 // Not sure this could occur... but just in case.
                 pitch = pitch.slice(0, len - 2);
             }
-	}
+        }
 
         if (pitch.length > 1) {
             var lastOne = pitch.slice(len - 1);
@@ -1065,7 +1076,7 @@ function getSolfege(note) {
 
 function i18nSolfege(note) {
     // solfnotes_ is used in the interface for i18n
-    //.TRANS: the note names must be separated by single spaces 
+    //.TRANS: the note names must be separated by single spaces
     var solfnotes_ = _('ti la sol fa mi re do').split(' ');
     var obj = splitSolfege(note);
 
@@ -1159,7 +1170,7 @@ function getNumNote(value, delta) {
 
     var note = NOTESTABLE[num];
 
-    if (note[num] === "ti") {
+    if (note[num] === 'ti') {
         octave -= 1;
     }
 
@@ -1204,10 +1215,10 @@ calcOctaveInterval = function (arg) {
         value = 0;
         break;
     case 2:
-	value = 2;
+        value = 2;
         break;
     case -2:
-	value = -2;
+        value = -2;
         break;
     default:
         console.log('Interval octave must be between -2 and 2.');
@@ -1220,9 +1231,7 @@ calcOctaveInterval = function (arg) {
 
 
 function isInt(value) {
-    return !isNaN(value) && 
-    parseInt(Number(value)) == value && 
-    !isNaN(parseInt(value, 10));
+    return !isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10));
 };
 
 
@@ -1295,7 +1304,7 @@ function Synth () {
             return this.synthset['poly'][1];
         }
 
-        switch (name) {    
+        switch (name) {
         case 'pluck':
         case 'triangle':
         case 'square':
@@ -1382,29 +1391,76 @@ function Synth () {
         this.getSynthByName(name).toMaster();
     };
 
-    this.performNotes = function (synth, notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency) {
-        if (doVibrato) {
-            var vibrato = new Tone.Vibrato(1 / vibratoFrequency, vibratoIntensity);
-            synth.chain(vibrato, Tone.Master);
+
+    this.performNotes = function (synth, notes, beatValue, params) {
+        if (params === null) {
+
             synth.triggerAttackRelease(notes, beatValue);
+        }
+        else {
+            if (params.doVibrato) {
+                var vibrato = new Tone.Vibrato(1 / params.vibratoFrequency, params.vibratoIntensity);
+                synth.chain(vibrato, Tone.Master);
+            }
+
+            if (params.doDistortion) {
+                var distort = new Tone.Distortion(params.distortionAmount).toMaster();
+                synth.connect(distort, Tone.Master);
+            }
+
+            if (params.doTremolo) {
+                var tremolo = new Tone.Tremolo({
+                    'frequency' : params.tremoloFrequency,
+                    'depth' : params.tremoloDepth
+                }).toMaster().start();
+                synth.chain(tremolo);
+            }
+
+            if (params.doPhaser) {
+                var phaser = new Tone.Phaser({
+                    'frequency' : params.rate,
+                    'octaves' : params.octaves,
+                    'baseFrequency' : params.baseFrequency
+                }).toMaster();
+                synth.chain(phaser, Tone.Master);
+            }
+
+            if (params.doChorus) {
+                var chorusEffect = new Tone.Chorus({
+                    'frequency' : params.chorusRate,
+                    'delayTime' : params.delayTime,
+                    'depth' : params.chorusDepth
+                }).toMaster();
+                synth.chain(chorusEffect, Tone.Master);
+            }
+
+            synth.triggerAttackRelease(notes, beatValue);
+
             setTimeout(function () {
-                vibrato.dispose();
-            }, beatValue * 1000);  //disable vibrato effect when beat is over
-        } else {
-            synth.triggerAttackRelease(notes, beatValue);
+                if (params.doVibrato) {
+                    vibrato.dispose();
+                }
+
+                if (params.doDistortion) {
+                    distort.dispose();
+                }
+
+                if (params.doTremolo) {
+                    tremolo.dispose();
+                }
+
+                if (params.doPhaser) {
+                    phaser.dispose();
+                }
+
+                if (params.doChorus) {
+                    chorusEffect.dispose();
+                }
+            }, beatValue * 1000);
         }
     }
 
-    this.trigger = function (notes, beatValue, name, vibratoArgs) {
-        var doVibrato = false;
-        var vibratoIntensity = 0;
-        var vibratoFrequency = 0;
-        if (vibratoArgs.length == 2 && vibratoArgs[0] != 0) {
-            doVibrato = true;
-            vibratoIntensity = vibratoArgs[0];
-            vibratoFrequency = vibratoArgs[1];
-        }
-
+    this.trigger = function (notes, beatValue, name) {
         switch (name) {
         case 'pluck':
         case 'triangle':
@@ -1416,22 +1472,24 @@ function Synth () {
             } else {
                 var noteToPlay = notes;
             }
-            this.performNotes(this.synthset[name][1], noteToPlay, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+
+            this.performNotes(this.synthset[name][1], noteToPlay, beatValue, null);
             break;
         case 'violin':
         case 'cello':
         case 'basse':
-            // The violin sample is tuned to C6
+            // The violin sample is tuned to C
             // The cello sample is tuned to C4???
             // The basse sample is tuned to C2???
             var centerNo = SAMPLECENTERNO[name];
             var obj = noteToPitchOctave(notes);
             var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
-            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+
+            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, null);
             break;
         case 'default':
         case 'poly':
-            this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, null);
             break;
         default:
             var drumName = getDrumSynthName(name);
@@ -1459,8 +1517,143 @@ function Synth () {
             } else if (name.slice(0, 4) == 'file') {
                 this.synthset[name][1].triggerAttack(0, beatValue, 1);
             } else {
-                this.performNotes(this.synthset['poly'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, null);
             }
+            break;
+        }
+    };
+
+    this.triggerWithEffects = function (notes, beatValue, name, vibratoArgs, distortionArgs, tremoloArgs, phaserArgs, chorusArgs) {
+        var params = {
+                doVibrato : false,
+                doDistortion : false,
+                doTremolo : false,
+                doPhaser : false,
+                doChorus : false,
+                vibratoIntensity : 0,
+                vibratoFrequency : 0,
+                distortionAmount : 0,
+                tremoloFrequency : 0,
+                tremoloDepth : 0,
+                rate : 0,
+                octaves : 0,
+                baseFrequency : 0,
+                chorusRate : 0,
+                delayTime : 0,
+                chorusDepth : 0
+            };
+
+        if (vibratoArgs.length == 2 && vibratoArgs[0] != 0) {
+            params.doVibrato = true;
+            params.vibratoIntensity = vibratoArgs[0];
+            params.vibratoFrequency = vibratoArgs[1];
+        }
+        if (distortionArgs.length == 1 && distortionArgs[0] != 0) {
+            params.doDistortion = true;
+            params.distortionAmount = distortionArgs[0];
+        }
+        if (tremoloArgs.length == 2 && tremoloArgs[0] != 0) {
+            params.doTremolo = true;
+            params.tremoloFrequency = tremoloArgs[0];
+            params.tremoloDepth = tremoloArgs[1];
+        }
+        if (phaserArgs.length == 3 && phaserArgs[0] != 0) {
+            params.doPhaser = true;
+            params.rate = phaserArgs[0];
+            params.octaves = phaserArgs[1];
+            params.baseFrequency = phaserArgs[2];
+        }
+        if (chorusArgs.length == 3 && chorusArgs[0] != 0) {
+            params.doChorus = true;
+            params.chorusRate = chorusArgs[0];
+            params.delayTime = chorusArgs[1];
+            params.chorusDepth = chorusArgs[2];
+        }
+        if (distortionArgs.length == 1 && distortionArgs[0] != 0) {
+            doDistortion = true;
+            distortionAmount = distortionArgs[0];
+        }
+        if (tremoloArgs.length == 2 && tremoloArgs[0] != 0) {
+            doTremolo = true;
+            tremoloFrequency = tremoloArgs[0];
+            tremoloDepth = tremoloArgs[1];
+        }
+        if (phaserArgs.length == 3 && phaserArgs[0] != 0) {
+            doPhaser = true;
+            rate = phaserArgs[0];
+            octaves = phaserArgs[1];
+            baseFrequency = phaserArgs[2];
+        }
+        if (chorusArgs.length == 3 && chorusArgs[0] != 0) {
+            doChorus = true;
+            chorusRate = chorusArgs[0];
+            delayTime = chorusArgs[1];
+            chorusDepth = chorusArgs[2];
+        }
+
+        switch (name) {
+        case 'pluck':
+        case 'triangle':
+        case 'square':
+        case 'sawtooth':
+        case 'sine':
+            if (typeof(notes) === 'object') {
+                var noteToPlay = notes[0];
+            } else {
+                var noteToPlay = notes;
+            }
+
+            this.performNotes(this.synthset[name][1], noteToPlay, beatValue, params);
+            break;
+        case 'violin':
+        case 'cello':
+        case 'basse':
+            // The violin sample is tuned to C
+            // The cello sample is tuned to C4???
+            // The basse sample is tuned to C2???
+            var centerNo = SAMPLECENTERNO[name];
+            var obj = noteToPitchOctave(notes);
+            var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
+
+            this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, params);
+            break;
+        case 'default':
+        case 'poly':
+
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, params);
+
+            break;
+        default:
+            var drumName = getDrumSynthName(name);
+            if (drumName != null) {
+                // Work around i8n bug in Firefox.
+                if (drumName === '' && name in this.synthset) {
+                    this.synthset[name][1].triggerAttack(0, beatValue);
+                } else if (drumName in this.synthset) {
+                    if (this.synthset[drumName][1] == null) {
+                        console.log('Something has gone terribly wrong: ' + name + ', ' + drumName);
+                    } else {
+                        this.synthset[drumName][1].triggerAttack(0);
+                    }
+                } else if (name.slice(0, 4) == 'http') {
+                    this.synthset[name][1].triggerAttack(0, beatValue);
+                } else if (name.slice(0, 4) == 'file') {
+                    this.synthset[name][1].triggerAttack(0, beatValue);
+                } else {
+                    console.log('Something has gone terribly wrong: ' + name + ', ' + drumName);
+                }
+            } else if (name === 'drum') {
+                this.synthset[DEFAULTDRUM][1].triggerAttack(0, beatValue, 1);
+            } else if (name.slice(0, 4) == 'http') {
+                this.synthset[name][1].triggerAttack(0, beatValue, 1);
+            } else if (name.slice(0, 4) == 'file') {
+                this.synthset[name][1].triggerAttack(0, beatValue, 1);
+            } else {
+
+                this.performNotes(this.synthset['poly'][1], notes, beatValue, params);
+
+            }
+
             break;
         }
     };

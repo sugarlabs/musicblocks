@@ -320,14 +320,16 @@ function Blocks () {
         if (this._clampBlocksToCheck.length === 0) {
             return;
         }
+
         var obj = this._clampBlocksToCheck.pop();
         var blk = obj[0];
         var clamp = obj[1];
 
         var myBlock = this.blockList[blk];
 
+        if (myBlock.isArgFlowClampBlock()) {
         // Make sure myBlock is a clamp block.
-        if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
+        } else if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
             return;
         } else if (myBlock.isArgClamp()) {
             // We handle ArgClamp blocks elsewhere.
@@ -952,6 +954,10 @@ function Blocks () {
                     // Don't break the connection betweem a backward
                     // block and a hidden block attached to its clamp.
                     continue;
+                } else if (this.blockList[b].name === 'action' && (i === 2) && (this.blockList[b].connections[2] != null) && (this.blockList[this.blockList[b].connections[2]].isNoHitBlock())) {
+                    // Don't break the connection betweem an action
+                    // block and a hidden block attached to its clamp.
+                    continue;
                 }
 
                 // Look for available connections.
@@ -1007,7 +1013,7 @@ function Blocks () {
                 // existing connection:
                 // (1) if it is an argClamp, add a new slot below the
                 //     current block;
-                // (2) if it is an arg block, replace it; and
+                // (2) if it is an arg block, replace it; or
                 // (3) if it is a flow block, insert it into the flow.
                 // A few corner cases: Whenever we connect (or disconnect)
                 // from an action block (c[1] arg), we need to ensure we have
@@ -1141,7 +1147,7 @@ function Blocks () {
                             }, 750);
                         }
                     }
-                } else {
+                } else if (!this.blockList[thisBlock].isArgFlowClampBlock()) {
                     var bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
                     this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
@@ -1691,6 +1697,7 @@ function Blocks () {
                 this._clampBlocksToCheck.push([this._expandablesList[i], 0]);
             }
         }
+
         this._adjustExpandableClampBlock();
         this.refreshCanvas();
     };
@@ -3050,8 +3057,9 @@ function Blocks () {
         }
 
 
-        // Add missing hidden blocks and convert old notes to new
-        // notes.
+        // This section of the code attempts to repair imported
+        // code. For example, it adds missing hidden blocks and
+        // convert old-style notes to new-style notes.
         blockObjsLength = blockObjs.length;
         var extraBlocksLength = 0;
 
@@ -3163,6 +3171,39 @@ function Blocks () {
                         blockObjs[b][1] = 'new' + name;
                     }
                 }
+                break;
+            case 'action':
+                // Ensure that there is a hidden block as the first
+                // block in the child flow (connection 2) of an action
+                // block (required to make the backward block function
+                // propperly).
+                var len = blockObjs[b][4].length;
+                if (blockObjs[b][4][2] == null) {
+                    // If there is no child flow block, add a hidden block;
+                    console.log('last connection of ' + name + ' is null: adding hidden block');
+                    blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
+                    blockObjs.push([blockObjsLength + extraBlocksLength, 'hidden', 0, 0, [b, null]]);
+                    extraBlocksLength += 1;
+                } else {
+                    var nextBlock = blockObjs[b][4][2];
+
+                    if (typeof(blockObjs[nextBlock][1]) === 'object') {
+                        var nextName = blockObjs[nextBlock][1][0];
+                    } else {
+                        var nextName = blockObjs[nextBlock][1];
+                    }
+
+                    if (nextName !== 'hidden') {
+                        console.log('last connection of ' + name + ' is ' + nextName + ': adding hidden block');
+                        // If the next block is not a hidden block, add one.
+                        blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
+                        blockObjs[nextBlock][4][0] = blockObjsLength + extraBlocksLength;
+                        blockObjs.push([blockObjsLength + extraBlocksLength, 'hidden', 0, 0, [b, nextBlock]]);
+                        extraBlocksLength += 1;
+                    }
+                }
+                break;
+            default:
                 break;
             }
         }

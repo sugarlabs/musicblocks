@@ -874,7 +874,7 @@ function ProtoBlock(name) {
         this.style = 'argflowclamp';
         this.expandable = true;
         this.size = 3;
-        this.args = 2;
+        this.args = 1;
         this.dockTypes.push('anyout');
         this.dockTypes.push('in');
         this.generator = this.argFlowClampGenerator;

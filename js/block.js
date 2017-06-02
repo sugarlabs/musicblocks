@@ -257,6 +257,8 @@ function Block(protoblock, blocks, overrideName) {
             var obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
         } else if (this.protoblock.style === 'clamp') {
             var obj = this.protoblock.generator(this.clampCount[0]);
+        } else if (this.protoblock.style === 'argflowclamp') {
+            var obj = this.protoblock.generator(this.clampCount[0]);
         } else {
             switch (this.name) {
             case 'equal':
@@ -647,6 +649,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'tempo':
                     myBlock.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', '#000000');
+                    break;
                 case 'modewidget':
                     myBlock.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', '#000000');
                     break;
