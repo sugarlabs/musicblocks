@@ -93,16 +93,6 @@ define(MYDEFINES, function (compatibility) {
 
         var canvas = docById('myCanvas');
 
-        var queue = new createjs.LoadQueue(false);
-
-        // Check for the various File API support.
-        if (window.File && window.FileReader && window.FileList && window.Blob) {
-            var files = true;
-        } else {
-            alert('The File APIs are not fully supported in this browser.');
-            var files = false;
-        }
-
         // Set up a file chooser for the doOpen function.
         var fileChooser = docById('myOpenFile');
         // Set up a file chooser for the doOpenPlugin function.
@@ -123,13 +113,10 @@ define(MYDEFINES, function (compatibility) {
         var thumbnails;
         var buttonsVisible = true;
         var headerContainer = null;
-        var toolbarButtonsVisible = true;
         var menuButtonsVisible = true;
         var menuContainer = null;
         var scrollBlockContainer = false;
-        var currentKey = '';
         var currentKeyCode = 0;
-        var lastKeyCode = 0;
         var pasteContainer = null;
         var pasteImage = null;
         var chartBitmap = null;
@@ -162,19 +149,9 @@ define(MYDEFINES, function (compatibility) {
         var macroDict = {};
 
         var stopTurtleContainer = null;
-        var stopTurtleContainerX = 0;
-        var stopTurtleContainerY = 0;
         var homeButtonContainers = [];
-        var homeButtonContainersX = 0;
-        var homeButtonContainersY = 0;
 
         var cameraID = null;
-        var toLang = null;
-        var fromLang = null;
-
-        // initial scroll position
-        var scrollX = 0;
-        var scrollY = 0;
 
         // default values
         const DEFAULTDELAY = 500; // milleseconds
@@ -185,12 +162,6 @@ define(MYDEFINES, function (compatibility) {
         if (blockscale === -1) {
             blockscale = 1;
         }
-
-        // Time when we hit run
-        var time = 0;
-
-        // Used by pause block
-        var waitTime = {};
 
         // Used to track mouse state for mouse button block
         var stageMouseDown = false;
@@ -390,10 +361,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepButton() {
-            var turtleCount = 0;
-            for (var turtle in logo.stepQueue) {
-                turtleCount += 1;
-            }
+            var turtleCount = Object.keys(logo.stepQueue).length;
 
             if (turtleCount === 0 || logo.turtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -423,10 +391,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepMusicButton() {
-            var turtleCount = 0;
-            for (var turtle in logo.stepQueue) {
-                turtleCount += 1;
-            }
+            var turtleCount = Object.keys(logo.stepQueue).length;
 
             if (turtleCount === 0 || logo.TurtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -443,7 +408,6 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        var stopTurtle = false;
 
         function doStopButton() {
             logo.doStopTurtle();
@@ -553,12 +517,6 @@ define(MYDEFINES, function (compatibility) {
 
         // Do we need to update the stage?
         var update = true;
-
-        // The dictionary of action name: block
-        var actions = {};
-
-        // The dictionary of box name: value
-        var boxes = {};
 
         // Coordinate grid
         var cartesianBitmap = null;
@@ -1266,13 +1224,10 @@ define(MYDEFINES, function (compatibility) {
                     logo.runLogoCommands();
                     break;
                 default:
-                    // currentKey = String.fromCharCode(event.keyCode);
-                    // currentKeyCode = event.keyCode;
                     break;
                 }
                 // Always store current key so as not to mask it from
                 // the keyboard block.
-                currentKey = String.fromCharCode(event.keyCode);
                 currentKeyCode = event.keyCode;
             }
         };
@@ -2252,8 +2207,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _hideStopButton() {
-            // stopTurtleContainer.x = stopTurtleContainerX;
-            // stopTurtleContainer.y = stopTurtleContainerY;
             stopTurtleContainer.visible = false;
         };
 
@@ -2376,13 +2329,9 @@ handleComplete);
 
                 if (buttonNames[i][0] === 'stop-turtle') {
                     stopTurtleContainer = container;
-                    stopTurtleContainerX = x;
-                    stopTurtleContainerY = y;
                 } else if (buttonNames[i][0] === 'go-home') {
                     homeButtonContainers = [];
                     homeButtonContainers.push(container);
-                    homeButtonContainersX = x;
-                    homeButtonContainersY = y;
                     var container2 = _makeButton('go-home-faded-button', _('Home'), x, y, btnSize, 0);
                     _loadButtonDragHandler(container2, x, y, buttonNames[i][1], null, null, null, null);
                     homeButtonContainers.push(container2);
