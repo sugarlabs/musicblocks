@@ -106,6 +106,8 @@ function Logo () {
 
     this._currentDrumBlock = null;
 
+    this.inTimbre = false;
+
     // pitch-rhythm matrix
     this.inMatrix = false;
     this.keySignature = {};
@@ -2497,6 +2499,25 @@ function Logo () {
                     that.pitchDrumMatrix.makeClickable();
                 }
             };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
+        case 'timbre':
+            if (that.timbre == null) {
+                that.timbre = new TimbreWidget();
+            }
+            //console.log("running timbre widget");
+            childFlow = args[1];
+            childFlowCount =1;
+            //that.inTimbre = true;
+
+            var listenerName = '_timbre_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+            
+            var __listener = function (event) {
+                console.log("hello");
+                that.timbre.init(that);
+            }
 
             that._setListener(turtle, listenerName, __listener);
             break;

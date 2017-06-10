@@ -149,6 +149,7 @@ var urlsToCache = [
     'js/analytics.js',
     'js/lilypond.js',
     'js/pitchstaircase.js',
+    'js/timbrewidget.js',
     'js/sugarizer-compatibility.js',
     'js/artwork.js',
     'js/loader.js',
