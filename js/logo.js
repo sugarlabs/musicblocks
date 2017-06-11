@@ -2503,21 +2503,22 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'timbre':
+            childFlow = args[1];
+            childFlowCount = 1;
+
             if (that.timbre == null) {
                 that.timbre = new TimbreWidget();
             }
             //console.log("running timbre widget");
-            childFlow = args[1];
-            childFlowCount =1;
-            //that.inTimbre = true;
+            that.inTimbre = true;
 
             var listenerName = '_timbre_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
             
             var __listener = function (event) {
-                console.log("hello");
+                //console.log("hello");
                 that.timbre.init(that);
-            }
+            };
 
             that._setListener(turtle, listenerName, __listener);
             break;

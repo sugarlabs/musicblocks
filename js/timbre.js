@@ -27,7 +27,7 @@ function TimbreWidget () {
         return cell;
     };
 
-    this.init = function (logo) {
+    this.init = function(logo) {
     	this._logo = logo;
 
     	var w = window.innerWidth;
