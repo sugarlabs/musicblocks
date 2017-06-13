@@ -56,6 +56,11 @@ function TimbreWidget () {
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
+        var cell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
+        var cell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
+        var cell = this._addButton(row, 'filter.svg', ICONSIZE, _('filter'));
+        var cell = this._addButton(row, 'effects.svg', ICONSIZE, _('effects'));
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
         /*cell.onclick=function() {
             that._undo();
