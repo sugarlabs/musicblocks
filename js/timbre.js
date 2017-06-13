@@ -15,7 +15,7 @@ function TimbreWidget () {
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
-        console.log("nothing works");
+        
         cell.onmouseover=function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
         }
@@ -54,7 +54,81 @@ function TimbreWidget () {
 
         var that = this;
 
-        var cell = this._addButton(row, 'play-chord.svg', ICONSIZE, _('play chord'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
+        /*cell.onclick=function() {
+            that._undo();
+        }*/
+
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+        cell.onclick=function() {
+            docById('timbreDiv').style.visibility = 'hidden';
+            docById('timbreButtonsDiv').style.visibility = 'hidden';
+            docById('timbreTableDiv').style.visibility = 'hidden';
+        };
+
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('drag'));
+        dragCell.style.cursor = 'move';
+
+        this._dx = dragCell.getBoundingClientRect().left - timbreDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - timbreDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = dragCell.innerHTML;
+
+        dragCell.onmouseover = function(e) {
+           	dragCell.innerHTML = '';
+        };
+
+        dragCell.onmouseout = function(e) {
+            if (!that._dragging) {
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        canvas.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                timbreDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+               	timbreDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        timbreDiv.ondragover = function(e) {
+            e.preventDefault();
+        };
+
+        timbreDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                timbreDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                timbreDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        timbreDiv.onmousedown = function(e) {
+            that._dragging = true;
+            that._target = e.target;
+        };
+
+        timbreDiv.ondragstart = function(e) {
+            if (dragCell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
 
     };
 };

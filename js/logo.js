@@ -2516,7 +2516,7 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
             
             var __listener = function (event) {
-                //console.log("hello");
+                console.log("hello");
                 that.timbre.init(that);
             };
 
