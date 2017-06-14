@@ -135,5 +135,14 @@ function TimbreWidget () {
             }
         };
 
+        var timbreTableDiv = docById('timbreTableDiv');
+        timbreTableDiv.style.display = 'inline';
+        timbreTableDiv.style.visibility = 'visible';
+        timbreTableDiv.style.border = '0px';
+        timbreTableDiv.innerHTML = '<div id="timbreTable" style="color:white;height:300px"></div>';
+        // timbreTableDiv.createElement('<input type="range" id="myRange" value="90" orient="vertical">');
+
+        var table = docById('timbreTable');
+        //table.innerHTML='<input type="range" id="myRange" value="90" style="position:absolute;transform:rotate(270deg)">';
     };
 };
