@@ -229,6 +229,7 @@ function Logo () {
 
     // Status matrix
     this.inStatusMatrix = false;
+    this.updatingStatusMatrix = false;
     this.statusFields = [];
 
     // When running in step-by-step mode, the next command to run is
@@ -4546,6 +4547,7 @@ function Logo () {
             } else {
                 // Could be an arg block, so we need to print its value.
                 if (that.blocks.blockList[blk].isArgBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
+                    console.log('push');
                     args.push(that.parseArg(that, turtle, blk));
                     if (that.blocks.blockList[blk].value == null) {
                         that.textMsg('null block value');
@@ -4574,7 +4576,9 @@ function Logo () {
         }
 
         if (docById('statusDiv').style.visibility === 'visible') {
-            that.statusMatrix.updateAll();
+            if (!that.inStatusMatrix) {
+                that.statusMatrix.updateAll();
+            }
         }
 
         // If there is a child flow, queue it.
@@ -5555,12 +5559,16 @@ function Logo () {
                 break;
             case 'namedbox':
                 var name = that.blocks.blockList[blk].privateData;
-                if (name in that.boxes) {
-                    that.blocks.blockList[blk].value = that.boxes[name];
-                } else {
-                    that.errorMsg(NOBOXERRORMSG, blk, name);
-                    that.stopTurtle = true;
-                    that.blocks.blockList[blk].value = null;
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, that.blocks.blockList[blk].name]);
+                } else if (!that.updatingStatusMatrix) {
+                    if (name in that.boxes) {
+                        that.blocks.blockList[blk].value = that.boxes[name];
+                    } else {
+                        that.errorMsg(NOBOXERRORMSG, blk, name);
+                        that.stopTurtle = true;
+                        that.blocks.blockList[blk].value = null;
+                    }
                 }
                 break;
             case 'namedarg' :
