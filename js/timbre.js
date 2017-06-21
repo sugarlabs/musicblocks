@@ -4,6 +4,7 @@ function TimbreWidget () {
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
+    var timbreTableDiv = docById('timbreTableDiv');
     console.log('timbre initialised');
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -38,8 +39,7 @@ function TimbreWidget () {
         timbreDiv.setAttribute('draggable', 'true');
         timbreDiv.style.left = '200px';
         timbreDiv.style.top = '150px';
-        console.log("div initialised");
-
+        
         var widgetButtonsDiv = docById('timbreButtonsDiv');
         widgetButtonsDiv.style.display = 'inline';
         widgetButtonsDiv.style.visibility = 'visible';
@@ -58,9 +58,20 @@ function TimbreWidget () {
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
         var cell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
         var cell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
-        var cell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
+        cell.onclick=function(){
+        	that._oscillator();
+        }
+        var cell1 = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
+        cell1.onclick=function(){
+        	
+        	cell1.setAttribute("id","cell1");
+        	that._envelope();
+        }
         var cell = this._addButton(row, 'filter.svg', ICONSIZE, _('filter'));
         var cell = this._addButton(row, 'effects.svg', ICONSIZE, _('effects'));
+        cell.onclick=function(){
+        	that._effects();
+        }
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
         /*cell.onclick=function() {
             that._undo();
@@ -135,14 +146,70 @@ function TimbreWidget () {
             }
         };
 
-        var timbreTableDiv = docById('timbreTableDiv');
-        timbreTableDiv.style.display = 'inline';
+    };
+
+    this._envelope = function() {
+    	var slider = [];
+    	var val = [];
+    	timbreTableDiv.style.display = 'inline';
         timbreTableDiv.style.visibility = 'visible';
         timbreTableDiv.style.border = '0px';
-        timbreTableDiv.innerHTML = '<div id="timbreTable" style="color:white;height:300px"></div>';
-        // timbreTableDiv.createElement('<input type="range" id="myRange" value="90" orient="vertical">');
+        timbreTableDiv.style.overflow = 'auto';
+        timbreTableDiv.style.backgroundColor = 'white';
+        timbreTableDiv.style.height = '300px';
+        timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
 
-        var table = docById('timbreTable');
-        //table.innerHTML='<input type="range" id="myRange" value="90" style="position:absolute;transform:rotate(270deg)">';
+        var env = docById('timbreTable');
+      	var htmlElements = "";
+		for (var i = 0; i < 4; i++) {
+   			htmlElements += '<div id="wrapper"><div class="circle">'+("ADSR").charAt(i)+'</div><div id="insideDiv"><input type="range" id="myRange'+i+'"style="margin-top:20px" value="50"> <span id="myspan'+i+'"class="rangeslidervalue">50</span></div></div>';
+			slider.push("myRange"+i);
+			val.push("myspan"+i);
+		};
+
+		env.innerHTML = htmlElements;
+		var envAppend = document.createElement("div");
+		envAppend.id = "envAppend";
+		envAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+		envAppend.style.height = "30px";
+		envAppend.style.marginTop = "40px";
+		envAppend.style.overflow = "auto";
+    	env.append(envAppend);
+
+    	callOnchange = function(i) {
+    		docById(slider[i]).onchange = function(){
+    			docById(val[i]).textContent = docById(slider[i]).value;
+			}
+		};
+
+		for(i=0;i<slider.length;i++){
+			callOnchange(i);
+		};
+    	
+    	docById("envAppend").innerHTML = '<button id="green"><b>DONE</b></button>';
+
+        var btn = docById("green");
+        btn.style.backgroundColor = MATRIXLABELCOLOR;
+        btn.style.marginLeft = '240px';
+        btn.style.marginTop = '6px';
+        btn.style.height ='24px';
+        btn.style.width = '60px';
+        btn.style.borderColor = MATRIXLABELCOLOR;
+        btn.onclick = function() {
+        	docById("cell1").style.backgroundColor = "#C8C8C8";
+        	docById("cell1").onmouseout = function() {};
+        	docById("cell1").onmouseover = function() {};
+
+        }
+        
+	};
+
+    this._effects = function(){
+    	//document.getElementById("timbreTable").style.backgroundColor = 'blue' ;
+
+    };
+
+    this._oscillator = function(){
+    	//document.getElementById("timbreTable").style.backgroundColor = 'yellow' ;
     };
 };
