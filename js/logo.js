@@ -59,6 +59,11 @@ function Logo () {
     this.pitchSlider = null;
     this.modeWidget = null;
     this.statusMatrix = null;
+    this.attack = {};
+    this.decay = {};
+    this.sustain = {};
+    this.release = {};
+
 
     this.evalFlowDict = {};
     this.evalArgDict = {};
@@ -781,6 +786,10 @@ function Logo () {
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
+            this.attack[turtle] = [];
+            this.sustain[turtle] = [];
+            this.decay[turtle] = [];
+            this.release[turtle] = [];
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
@@ -2624,6 +2633,28 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'envelope':
+            if (args.length === 4 ) {
+                that.attack[turtle].push(args[0]);
+                that.decay[turtle].push(args[1]);
+                that.sustain[turtle].push(args[2]);
+                that.release[turtle].push(args[3]);
+            }  
+                childFlow = args[4];
+                childFlowCount = 1;
+
+                var listenerName = '_envelope_' + turtle;
+                that._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    that.attack[turtle].pop();
+                    that.decay[turtle].pop();
+                    that.sustain[turtle].pop();
+                    that.release[turtle].pop();
+                };
+
+                that._setListener(turtle, listenerName, __listener);
+            break;  
         case 'invert1':
             if (typeof(args[2]) === 'number') {
                 if (args[2] % 2 === 0){
