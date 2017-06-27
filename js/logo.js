@@ -2517,9 +2517,13 @@ function Logo () {
 
             if (that.timbre == null) {
                 that.timbre = new TimbreWidget();
+                that.inTimbre = true;  
             }
             //console.log("running timbre widget");
-            that.inTimbre = true;
+             
+            that.timbre.env = [];
+            that.timbre.ENVs = [];
+
 
             var listenerName = '_timbre_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
@@ -2654,6 +2658,18 @@ function Logo () {
                 };
 
                 that._setListener(turtle, listenerName, __listener);
+
+                if(that.inTimbre) {
+                    that.timbre.env.push(blk);
+                    var envattack = that.blocks.blockList[blk].connections[1];
+                    var envdecay = that.blocks.blockList[blk].connections[2];
+                    var envsustain = that.blocks.blockList[blk].connections[3];
+                    var envrelease = that.blocks.blockList[blk].connections[4];
+                    that.timbre.ENVs.push(that.blocks.blockList[envattack].text.text);
+                    that.timbre.ENVs.push(that.blocks.blockList[envdecay].text.text);
+                    that.timbre.ENVs.push(that.blocks.blockList[envsustain].text.text);
+                    that.timbre.ENVs.push(that.blocks.blockList[envrelease].text.text);
+                }
             break;  
         case 'invert1':
             if (typeof(args[2]) === 'number') {

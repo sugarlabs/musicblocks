@@ -5,6 +5,8 @@ function TimbreWidget () {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
     var timbreTableDiv = docById('timbreTableDiv');
+    this.env = [];
+    this.ENVs = [];
     console.log('timbre initialised');
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -26,6 +28,20 @@ function TimbreWidget () {
         }
 
         return cell;
+    };
+
+    this._updateEnvelope = function(i) {
+        console.log("checking envelope...");
+        if (this.env[i] != null) {
+            var blockNumber = blocks.blockList[this.env[i]].connections[1];
+            if (blockNumber != null) {
+                this._logo.blocks.blockList[blockNumber].value = parseFloat(this.ENVs[i]);
+                this._logo.blocks.blockList[blockNumber].text.text = this.ENVs[i];
+                this._logo.blocks.blockList[blockNumber].updateCache();
+                this._logo.refreshCanvas();
+                saveLocally();
+            }
+        }
     };
 
     this.init = function(logo) {
@@ -199,8 +215,10 @@ function TimbreWidget () {
         	docById("cell1").style.backgroundColor = "#C8C8C8";
         	docById("cell1").onmouseout = function() {};
         	docById("cell1").onmouseover = function() {};
-
-        }
+            //var id = Number(this.getAttribute('id').replace('myRange1', ''));
+            //console.log(id);
+            that._updateEnvelope(1);
+        };
         
 	};
 
