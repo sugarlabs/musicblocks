@@ -786,10 +786,10 @@ function Logo () {
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
-            this.attack[turtle] = [];
-            this.sustain[turtle] = [];
-            this.decay[turtle] = [];
-            this.release[turtle] = [];
+            //this.attack[turtle] = [];
+           //this.sustain[turtle] = [];
+            //this.decay[turtle] = [];
+            //this.release[turtle] = [];
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
@@ -2638,26 +2638,27 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'envelope':
-            if (args.length === 4 ) {
-                that.attack[turtle].push(args[0]);
-                that.decay[turtle].push(args[1]);
-                that.sustain[turtle].push(args[2]);
-                that.release[turtle].push(args[3]);
-            }  
-                childFlow = args[4];
-                childFlowCount = 1;
+           
+                if (args.length === 4 && typeof(args[0] === 'number')) {
+                if (args[0] < 0 || args[0] > 100) {
+                    that.errorMsg(_('Attack value should be between 0-100'));
+                } 
+                if (args[1] < 0 || args[1] > 100) {
+                    that.errorMsg(_('Decay value should be between 0-100'));
+                } 
+                if (args[2] < 0 || args[2] > 100) {
+                    that.errorMsg(_('Sustain value should be between 0-100'));
+                } 
+                if (args[3] < 0 || args[3] > 100) {
+                    that.errorMsg(_('Release value should be between 0-100'));
+                } 
 
-                var listenerName = '_envelope_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
+                that.attack = args[0] / 100;
+                that.decay = args[1] / 100;
+                that.sustain = args[2] / 100;
+                that.release = args[3] / 100;
 
-                var __listener = function (event) {
-                    that.attack[turtle].pop();
-                    that.decay[turtle].pop();
-                    that.sustain[turtle].pop();
-                    that.release[turtle].pop();
-                };
-
-                that._setListener(turtle, listenerName, __listener);
+            }
 
                 if(that.inTimbre) {
                     that.timbre.env.push(blk);

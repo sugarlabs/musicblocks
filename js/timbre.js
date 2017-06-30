@@ -7,6 +7,7 @@ function TimbreWidget () {
     var timbreTableDiv = docById('timbreTableDiv');
     this.env = [];
     this.ENVs = [];
+    var that = this;
     console.log('timbre initialised');
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -30,14 +31,18 @@ function TimbreWidget () {
         return cell;
     };
 
-    this._updateEnvelope = function(i) {
+    this._updateEnvelope = function(i,m,k) {
         console.log("checking envelope...");
         if (this.env[i] != null) {
-            var blockNumber = blocks.blockList[this.env[i]].connections[1];
-            if (blockNumber != null) {
-                this._logo.blocks.blockList[blockNumber].value = parseFloat(this.ENVs[i]);
-                this._logo.blocks.blockList[blockNumber].text.text = this.ENVs[i];
-                this._logo.blocks.blockList[blockNumber].updateCache();
+            var updateEnv = [];
+            for(j=0; j<4; j++){
+                updateEnv[j] = this._logo.blocks.blockList[this.env[i]].connections[j+1];
+            }
+            
+            if (updateEnv[0] != null) {
+                this._logo.blocks.blockList[updateEnv[k]].value = m;
+                this._logo.blocks.blockList[updateEnv[k]].text.text = m.toString();
+                this._logo.blocks.blockList[updateEnv[k]].updateCache();
                 this._logo.refreshCanvas();
                 saveLocally();
             }
@@ -178,12 +183,12 @@ function TimbreWidget () {
         var env = docById('timbreTable');
       	var htmlElements = "";
 		for (var i = 0; i < 4; i++) {
-   			htmlElements += '<div id="wrapper"><div class="circle">'+("ADSR").charAt(i)+'</div><div id="insideDiv"><input type="range" id="myRange'+i+'"style="margin-top:20px" value="50"> <span id="myspan'+i+'"class="rangeslidervalue">50</span></div></div>';
+   			htmlElements += '<div id="wrapper"><div class="circle">'+("ADSR").charAt(i)+'</div><div id="insideDiv"><input type="range" id="myRange'+i+'"style="margin-top:20px" value="10"><span id="myspan'+i+'"class="rangeslidervalue">50</span></div></div>';
 			slider.push("myRange"+i);
-			val.push("myspan"+i);
+            val.push("myspan"+i);
 		};
 
-		env.innerHTML = htmlElements;
+        env.innerHTML = htmlElements;
 		var envAppend = document.createElement("div");
 		envAppend.id = "envAppend";
 		envAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -194,7 +199,10 @@ function TimbreWidget () {
 
     	callOnchange = function(i) {
     		docById(slider[i]).onchange = function(){
-    			docById(val[i]).textContent = docById(slider[i]).value;
+                var m = docById(slider[i]).value;
+    			docById(val[i]).textContent = m;
+                that._updateEnvelope(0,m,i);
+
 			}
 		};
 
@@ -215,9 +223,6 @@ function TimbreWidget () {
         	docById("cell1").style.backgroundColor = "#C8C8C8";
         	docById("cell1").onmouseout = function() {};
         	docById("cell1").onmouseover = function() {};
-            //var id = Number(this.getAttribute('id').replace('myRange1', ''));
-            //console.log(id);
-            that._updateEnvelope(1);
         };
         
 	};
