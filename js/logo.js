@@ -5345,7 +5345,7 @@ function Logo () {
                 delete that.arcListener[turtle][blk];
             }
 
-        }, beatValue * 1000);
+        }, beatValue * stepTime * 1000);
     };
 
     this._setListener = function (turtle, listenerName, listener) {
