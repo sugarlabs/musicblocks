@@ -5282,6 +5282,9 @@ function Logo () {
         // When turtle commands (forward, right, arc) are inside of Notes,
         // they are progressive.
         var that = this;
+        // (NOTEDIV + 4) is a workaround so that the graphics finish a
+        // bit ahead of the note in order to minimize the risk that
+        // there is overlap with the next note scheduled to trigger.
         var stepTime = beatValue * 1000 / (NOTEDIV + 4);
 
         // We want to update the turtle graphics every 50ms with a note.
@@ -5313,10 +5316,6 @@ function Logo () {
                 if (turtle in that.arcListener && blk in that.arcListener[turtle]) {
                     that.stage.dispatchEvent('_arc_' + turtle + '_' + blk);
                 }
-            // (NOTEDIV + 4) is a workaround so that the graphics
-            // finish a bit ahead of the note in order t minimize the
-            // risk that there is overlap with the next note scheduled
-            // to trigger.
             }, t * stepTime * that.dispatchFactor[turtle]);
         }
 
@@ -5344,8 +5343,7 @@ function Logo () {
 
                 delete that.arcListener[turtle][blk];
             }
-
-        }, beatValue * stepTime * 1000);
+        }, beatValue * this.duplicateFactor[turtle] * 1000);
     };
 
     this._setListener = function (turtle, listenerName, listener) {
