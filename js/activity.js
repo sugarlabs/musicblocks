@@ -81,7 +81,7 @@ define(MYDEFINES, function (compatibility) {
 
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
-	    var lang = document.webL10n.getLanguage();
+            var lang = document.webL10n.getLanguage();
             if (['es', 'ca', 'de', 'el', 'eo', 'fi', 'fr', 'hu', 'it', 'kn', 'la', 'lv', 'nl', 'pl', 'pt', 'ro', 'sk', 'sv', 'tr', 'zh'].indexOf(lang) !== -1) {
                 meSpeak.loadVoice('lib/voices/' + lang + '.json');
             } else {
@@ -237,6 +237,76 @@ define(MYDEFINES, function (compatibility) {
             homeButtonContainers[1].visible = true;
             boundary.hide();
         };
+
+        function _printBlockSVG() {
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + logo.canvas.width + '" height="' + logo.canvas.height + '">';
+            for (var i = 0; i < blocks.blockList.length; i++) {
+                if (blocks.blockList[i].name === 'hidden') {
+                    continue;
+                }
+                if (blocks.blockList[i].name === 'hiddennoflow') {
+                    continue;
+                }
+                if (blocks.blockList[i].trash) {
+                    continue;
+                }
+                var parts = blocks.blockArt[i].split('><');
+                svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
+                switch(blocks.blockList[i].name) {
+                case 'text':
+                case 'solfege':
+                case 'eastindiansolfege':
+                case 'notename':
+                case 'rest':
+                case 'number':
+                case 'modename':
+                case 'voicename':
+                case 'drumname':
+                    for (var p = 1; p < parts.length; p++) {
+                        // FIXME: This is fragile.
+                        if (p === 1) {
+                            svg += '<' +  parts[p] + '><';
+                        } else if (p === 2) {
+                            // skip filter
+                        } else if (p === 3) {
+			    svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
+                        } else if (p === 5) {
+                            // Add block value to SVG between tspans
+                            svg += parts[p] + '>' + blocks.blockList[i].value + '<';
+                        } else if (p === parts.length - 2) {
+                            svg += parts[p] + '>';
+                        } else if (p === parts.length - 1) {
+                            // skip final </svg>
+                        } else {
+                            svg += parts[p] + '><';
+                        }
+                    }
+                    break;
+                default:
+                    for (var p = 1; p < parts.length; p++) {
+                        // FIXME: This is fragile.
+                        if (p === 1) {
+                            svg += '<' +  parts[p] + '><';
+                        } else if (p === 2) {
+                            // skip filter
+                        } else if (p === 3) {
+			    svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
+                        } else if (p === parts.length - 2) {
+                            svg += parts[p] + '>';
+                        } else if (p === parts.length - 1) {
+                            // skip final </svg>
+                        } else {
+                            svg += parts[p] + '><';
+                        }
+                    }
+                    break;
+                }
+                svg += '</g>';
+            }
+            svg += '</svg>';
+            download('blockArtwork.svg', 'data:image/svg+xml;utf8,' + svg, 'blockArtwork.svg', '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
+
+        }
 
         function _allClear() {
             if (chartBitmap != null) {
@@ -653,8 +723,8 @@ define(MYDEFINES, function (compatibility) {
                 .setClear(sendAllToTrash);
 
             if (_THIS_IS_TURTLE_BLOCKS_) {
-		saveBox = new SaveBox();
-		saveBox
+                saveBox = new SaveBox();
+                saveBox
                     .setCanvas(canvas)
                     .setStage(stage)
                     .setRefreshCanvas(refreshCanvas)
@@ -665,7 +735,7 @@ define(MYDEFINES, function (compatibility) {
                     .setSaveFB(doShareOnFacebook);
             }
 
-	    utilityBox = new UtilityBox();
+            utilityBox = new UtilityBox();
             utilityBox
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
@@ -1143,6 +1213,9 @@ define(MYDEFINES, function (compatibility) {
 
             if (event.altKey) {
                 switch (event.keyCode) {
+                case 66: // 'B'
+                    _printBlockSVG();
+                    break;
                 case 69: // 'E'
                     _allClear();
                     break;
@@ -1817,7 +1890,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             try {
-		var obj = JSON.parse(data);
+                var obj = JSON.parse(data);
                 blocks.loadNewBlocks(obj);
             } catch (e) {
                 console.log('loadRawProject: could not parse project data');
