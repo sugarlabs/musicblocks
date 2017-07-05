@@ -42,6 +42,8 @@ function Blocks () {
     // and a list of the blocks we create.
     this.blockList = [];
 
+    this.blockArt = {};
+
     // Track the time with mouse down.
     this.mouseDownTime = 0;
     this.longPressTimeout = null;
@@ -3841,6 +3843,7 @@ function Blocks () {
             }, 1500);
         }
         console.log("Finished block loading");
+
         var myCustomEvent = new Event('finishedLoading');
         document.dispatchEvent(myCustomEvent);
     };

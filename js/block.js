@@ -467,6 +467,7 @@ function Block(protoblock, blocks, overrideName) {
                 artwork = artwork.replace('arg_label_' + i, myBlock.protoblock.staticLabels[i]);
             }
 
+            myBlock.blocks.blockArt[myBlock.blocks.blockList.indexOf(myBlock)] = artwork;
             _makeBitmap(artwork, myBlock.name, __processHighlightBitmap, myBlock);
         };
 
