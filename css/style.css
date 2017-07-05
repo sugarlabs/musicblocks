@@ -131,4 +131,12 @@ input[type=range]:focus::-ms-fill-upper {
   height:50px;
   margin-left:40px;
 }
-
+.btn {
+ 
+        background-color: #90c100;
+        
+        margin-top: 6px;
+        height: 24px;
+        width: 60px;
+        border-color: #90c100;
+}

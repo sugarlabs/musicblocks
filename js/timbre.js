@@ -31,7 +31,7 @@ function TimbreWidget () {
         return cell;
     };
 
-    this._updateEnvelope = function(i,m,k) {
+    this._updateEnvelope = function(i,m,k,state) {
         console.log("checking envelope...");
         if (this.env[i] != null) {
             var updateEnv = [];
@@ -40,11 +40,20 @@ function TimbreWidget () {
             }
             
             if (updateEnv[0] != null) {
-                this._logo.blocks.blockList[updateEnv[k]].value = m;
-                this._logo.blocks.blockList[updateEnv[k]].text.text = m.toString();
-                this._logo.blocks.blockList[updateEnv[k]].updateCache();
-                this._logo.refreshCanvas();
-                saveLocally();
+                if(state === 'update') {
+                    this._logo.blocks.blockList[updateEnv[k]].value = m;
+                    this._logo.blocks.blockList[updateEnv[k]].text.text = m.toString();
+                    this._logo.blocks.blockList[updateEnv[k]].updateCache();
+                    this._logo.refreshCanvas();
+                    saveLocally();
+                }
+                else if (state === 'reset'){
+                    this._logo.blocks.blockList[updateEnv[k]].value = parseFloat(this.ENVs[k]);
+                    this._logo.blocks.blockList[updateEnv[k]].text.text = this.ENVs[k];
+                    this._logo.blocks.blockList[updateEnv[k]].updateCache();
+                    this._logo.refreshCanvas();
+                    saveLocally();
+                }
             }
         }
     };
@@ -74,6 +83,7 @@ function TimbreWidget () {
         var row = header.insertRow(0);
 
         var that = this;
+        that._envelope();
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
@@ -183,10 +193,21 @@ function TimbreWidget () {
         var env = docById('timbreTable');
       	var htmlElements = "";
 		for (var i = 0; i < 4; i++) {
-   			htmlElements += '<div id="wrapper"><div class="circle">'+("ADSR").charAt(i)+'</div><div id="insideDiv"><input type="range" id="myRange'+i+'"style="margin-top:20px" value="10"><span id="myspan'+i+'"class="rangeslidervalue">50</span></div></div>';
+   			htmlElements += '<div id="wrapper"><div class="circle">'+("ADSR").charAt(i)+'</div><div id="insideDiv"><input type="range" id="myRange'+i+'"style="margin-top:20px" value="2"><span id="myspan'+i+'"class="rangeslidervalue">2</span></div></div>';
 			slider.push("myRange"+i);
             val.push("myspan"+i);
 		};
+
+        setDefault = function() {
+            docById(slider[0]).value = "1";
+            docById(val[0]).textContent = "1";
+            docById(slider[1]).value = "50";
+            docById(val[1]).textContent = "50";
+            docById(slider[2]).value = "60";
+            docById(val[2]).textContent = "60";
+            docById(slider[3]).value = "1";
+            docById(val[3]).textContent = "1";
+        }
 
         env.innerHTML = htmlElements;
 		var envAppend = document.createElement("div");
@@ -197,35 +218,52 @@ function TimbreWidget () {
 		envAppend.style.overflow = "auto";
     	env.append(envAppend);
 
-    	callOnchange = function(i) {
+        setDefault();
+
+    	callOnchange = function(i,state) {
     		docById(slider[i]).onchange = function(){
                 var m = docById(slider[i]).value;
     			docById(val[i]).textContent = m;
-                that._updateEnvelope(0,m,i);
+                if(state === 'update'){
+                that._updateEnvelope(0,m,i,state);
+            }else {
+                setDefault();
+                 that._updateEnvelope(0,m,i,state);
 
-			}
-		};
+            }
+            }
+        };
+
+		
 
 		for(i=0;i<slider.length;i++){
-			callOnchange(i);
+			callOnchange(i,'update');
 		};
     	
-    	docById("envAppend").innerHTML = '<button id="green"><b>DONE</b></button>';
+    	docById("envAppend").innerHTML = '<button class="btn" id="done"><b>DONE</b></button><button class="btn" id="reset"><b>RESET</b></button>';
 
-        var btn = docById("green");
-        btn.style.backgroundColor = MATRIXLABELCOLOR;
-        btn.style.marginLeft = '240px';
-        btn.style.marginTop = '6px';
-        btn.style.height ='24px';
-        btn.style.width = '60px';
-        btn.style.borderColor = MATRIXLABELCOLOR;
-        btn.onclick = function() {
+        var btnDone = docById("done");
+        var btnReset = docById("reset");
+
+        btnDone.style.marginLeft = '230px';
+        btnReset.style.marginLeft = '5px';
+       
+        btnDone.onclick = function() {
         	docById("cell1").style.backgroundColor = "#C8C8C8";
         	docById("cell1").onmouseout = function() {};
         	docById("cell1").onmouseover = function() {};
         };
-        
-	};
+        btnReset.onclick = function(i) {
+            
+        console.log(docById(slider[0]).value);
+           // setDefault();
+            callOnchange(i,'reset');
+            //var m = docById(slider[i]).value;
+           // docById(val[i]).textContent = m;
+           // that._updateEnvelope(0,10,i,'reset');
+        };
+
+    };
 
     this._effects = function(){
     	//document.getElementById("timbreTable").style.backgroundColor = 'blue' ;
