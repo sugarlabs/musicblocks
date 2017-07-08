@@ -141,6 +141,9 @@ function Logo () {
 
     // graphics listeners during note play
     this.setcolorListener = {};
+    this.setshadeListener = {};
+    this.setgreyListener = {};
+    this.setpensizeListener = {};
     this.forwardListener = {};
     this.rightListener = {};
     this.arcListener = {};
@@ -722,6 +725,30 @@ function Logo () {
             }
         }
 
+        for (var turtle in this.setshadeListener) {
+            for (var b in this.setshadeListener[turtle]) {
+                for (var i = 0; i < this.setshadeListener[turtle][b].length; i++) {
+                    this.stage.removeEventListener('_setshade_' + turtle, this.setshadeListener[turtle][b][i], false);
+                }
+            }
+        }
+
+        for (var turtle in this.setgreyListener) {
+            for (var b in this.setgreyListener[turtle]) {
+                for (var i = 0; i < this.setgreyListener[turtle][b].length; i++) {
+                    this.stage.removeEventListener('_setgrey_' + turtle, this.setgreyListener[turtle][b][i], false);
+                }
+            }
+        }
+
+        for (var turtle in this.setpensizeListener) {
+            for (var b in this.setpensizeListener[turtle]) {
+                for (var i = 0; i < this.setpensizeListener[turtle][b].length; i++) {
+                    this.stage.removeEventListener('_setpensize_' + turtle, this.setpensizeListener[turtle][b][i], false);
+                }
+            }
+        }
+
         for (var turtle in this.forwardListener) {
             for (var b in this.forwardListener[turtle]) {
                 for (var i = 0; i < this.forwardListener[turtle][b].length; i++) {
@@ -774,6 +801,9 @@ function Logo () {
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.setcolorListener[turtle] = {};
+            this.setshadeListener[turtle] = {};
+            this.setgreyListener[turtle] = {};
+            this.setpensizeListener[turtle] = {};
             this.forwardListener[turtle] = {};
             this.rightListener[turtle] = {};
             this.arcListener[turtle] = {};
@@ -2023,6 +2053,25 @@ function Logo () {
                     }
                     that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
+                } else if (that.inNoteBlock[turtle] > 0) {
+                    if (!that.suppressOutput[turtle]) {
+                        var listenerName = '_setshade_' + turtle + '_' + that.whichNoteBlock[turtle];
+
+                        var __listener = function (event) {
+                            // Reparse arg in case it changed while we
+                            // were waiting.
+                            var c = that.parseArg(that, turtle, that.blocks.blockList[blk].connections[1], blk, receivedArg);
+			    that.turtles.turtleList[turtle].doSetValue(c);
+                        };
+
+                        if (that.whichNoteBlock[turtle] in that.setshadeListener[turtle]) {
+                            that.setshadeListener[turtle][that.whichNoteBlock[turtle]].push(__listener);
+                        } else {
+                            that.setshadeListener[turtle][that.whichNoteBlock[turtle]] = [__listener];
+                        }
+
+                        that.stage.addEventListener(listenerName, __listener, false);
+                    }
                 } else {
                     that.turtles.turtleList[turtle].doSetValue(args[0]);
                 }
@@ -2059,6 +2108,25 @@ function Logo () {
                     }
                     that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
+                } else if (that.inNoteBlock[turtle] > 0) {
+                    if (!that.suppressOutput[turtle]) {
+                        var listenerName = '_setgrey_' + turtle + '_' + that.whichNoteBlock[turtle];
+
+                        var __listener = function (event) {
+                            // Reparse arg in case it changed while we
+                            // were waiting.
+                            var c = that.parseArg(that, turtle, that.blocks.blockList[blk].connections[1], blk, receivedArg);
+			    that.turtles.turtleList[turtle].doSetChroma(c);
+                        };
+
+                        if (that.whichNoteBlock[turtle] in that.setgreyListener[turtle]) {
+                            that.setgreyListener[turtle][that.whichNoteBlock[turtle]].push(__listener);
+                        } else {
+                            that.setgreyListener[turtle][that.whichNoteBlock[turtle]] = [__listener];
+                        }
+
+                        that.stage.addEventListener(listenerName, __listener, false);
+                    }
                 } else {
                     that.turtles.turtleList[turtle].doSetChroma(args[0]);
                 }
@@ -2076,6 +2144,25 @@ function Logo () {
                     }
                     that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
+                } else if (that.inNoteBlock[turtle] > 0) {
+                    if (!that.suppressOutput[turtle]) {
+                        var listenerName = '_setpensize_' + turtle + '_' + that.whichNoteBlock[turtle];
+
+                        var __listener = function (event) {
+                            // Reparse arg in case it changed while we
+                            // were waiting.
+                            var c = that.parseArg(that, turtle, that.blocks.blockList[blk].connections[1], blk, receivedArg);
+			    that.turtles.turtleList[turtle].doSetPensize(c);
+                        };
+
+                        if (that.whichNoteBlock[turtle] in that.setpensizeListener[turtle]) {
+                            that.setpensizeListener[turtle][that.whichNoteBlock[turtle]].push(__listener);
+                        } else {
+                            that.setpensizeListener[turtle][that.whichNoteBlock[turtle]] = [__listener];
+                        }
+
+                        that.stage.addEventListener(listenerName, __listener, false);
+                    }
                 } else {
                     that.turtles.turtleList[turtle].doSetPensize(args[0]);
                 }
@@ -4705,6 +4792,30 @@ function Logo () {
                 }
             }
 
+            if (turtle in that.setshadeListener) {
+                for (var b in that.setshadeListener[turtle]) {
+                    for (var i = 0; i < that.setshadeListener[turtle][b].length; i++) {
+                        that.stage.removeEventListener('_setshade_' + turtle, that.setshadeListener[turtle][b][i], false);
+                    }
+                }
+            }
+
+            if (turtle in that.setgreyListener) {
+                for (var b in that.setgreyListener[turtle]) {
+                    for (var i = 0; i < that.setgreyListener[turtle][b].length; i++) {
+                        that.stage.removeEventListener('_setgrey_' + turtle, that.setgreyListener[turtle][b][i], false);
+                    }
+                }
+            }
+
+            if (turtle in that.setpensizeListener) {
+                for (var b in that.setpensizeListener[turtle]) {
+                    for (var i = 0; i < that.setpensizeListener[turtle][b].length; i++) {
+                        that.stage.removeEventListener('_setpensize_' + turtle, that.setpensizeListener[turtle][b][i], false);
+                    }
+                }
+            }
+
             if (turtle in that.forwardListener) {
                 for (var b in that.forwardListener[turtle]) {
                     for (var i = 0; i < that.forwardListener[turtle][b].length; i++) {
@@ -5311,6 +5422,30 @@ function Logo () {
                             delete that.setcolorListener[turtle][blk];
                         }
 
+                        if (turtle in that.setshadeListener && blk in that.setshadeListener[turtle]) {
+                            for (var i = 0; i < that.setshadeListener[turtle][blk].length; i++) {
+                                that.stage.removeEventListener('_setshade_' + turtle + '_' + blk, that.setshadeListener[turtle][blk][i], false);
+                            }
+
+                            delete that.setshadeListener[turtle][blk];
+                        }
+
+                        if (turtle in that.setgreyListener && blk in that.setgreyListener[turtle]) {
+                            for (var i = 0; i < that.setgreyListener[turtle][blk].length; i++) {
+                                that.stage.removeEventListener('_setgrey_' + turtle + '_' + blk, that.setgreyListener[turtle][blk][i], false);
+                            }
+
+                            delete that.setgreyListener[turtle][blk];
+                        }
+
+                        if (turtle in that.setpensizeListener && blk in that.setpensizeListener[turtle]) {
+                            for (var i = 0; i < that.setpensizeListener[turtle][blk].length; i++) {
+                                that.stage.removeEventListener('_setpensize_' + turtle + '_' + blk, that.setpensizeListener[turtle][blk][i], false);
+                            }
+
+                            delete that.setpensizeListener[turtle][blk];
+                        }
+
                         if (turtle in that.forwardListener && blk in that.forwardListener[turtle]) {
                             for (var i = 0; i < that.forwardListener[turtle][blk].length; i++) {
                                 that.stage.removeEventListener('_forward_' + turtle + '_' + blk, that.forwardListener[turtle][blk][i], false);
@@ -5321,6 +5456,7 @@ function Logo () {
 
                         if (turtle in that.rightListener && blk in that.rightListener[turtle]) {
                             for (var i = 0; i < that.rightListener[turtle][blk].length; i++) {
+
                                 that.stage.removeEventListener('_right_' + turtle + '_' + blk, that.rightListener[turtle][blk][i], false);
                             }
 
@@ -5383,6 +5519,18 @@ function Logo () {
             that.stage.dispatchEvent('_setcolor_' + turtle + '_' + blk);
         }
 
+        if (turtle in that.setshadeListener && blk in that.setshadeListener[turtle]) {
+            that.stage.dispatchEvent('_setshade_' + turtle + '_' + blk);
+        }
+
+        if (turtle in that.setgreyListener && blk in that.setgreyListener[turtle]) {
+            that.stage.dispatchEvent('_setgrey_' + turtle + '_' + blk);
+        }
+
+        if (turtle in that.setpensizeListener && blk in that.setpensizeListener[turtle]) {
+            that.stage.dispatchEvent('_setpensize_' + turtle + '_' + blk);
+        }
+	
         for (var t = 0; t < (NOTEDIV / that.dispatchFactor[turtle]); t++) {
             setTimeout(function () {
                 if (turtle in that.forwardListener && blk in that.forwardListener[turtle]) {
