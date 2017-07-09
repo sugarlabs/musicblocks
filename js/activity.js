@@ -1192,10 +1192,12 @@ define(MYDEFINES, function (compatibility) {
 
             const BACKSPACE = 8;
             const TAB = 9;
+			/*
             if (event.keyCode === TAB || event.keyCode === BACKSPACE) {
                 // Prevent browser from grabbing TAB key
                 event.preventDefault();
             }
+			*/
 
             const ESC = 27;
             const ALT = 18;
