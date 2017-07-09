@@ -5470,7 +5470,9 @@ function Logo () {
 
                             delete that.arcListener[turtle][blk];
                         }
-                    }, waitTime + this.noteDelay + (bpmFactor * 1000 / duration));
+                        // Trim the timeout slightly (5%) so as not to
+                        // collide with the next note.
+                    }, waitTime + this.noteDelay + .95 * (bpmFactor * 1000 / duration));
                 }
 
                 if (this.crescendoDelta[turtle].length > 0) {
