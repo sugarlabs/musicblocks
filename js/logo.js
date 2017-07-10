@@ -125,6 +125,7 @@ function Logo () {
     this.beatFactor = {};
     this.dotCount = {};
     this.noteBeat = {};
+    this.noteValue = {};
     this.oscList = {};
     this.noteDrums = {};
     this.notePitches = {};
@@ -789,6 +790,7 @@ function Logo () {
             this.inNoteBlock[turtle] = 0;
             this.transposition[turtle] = 0;
             this.noteBeat[turtle] = [];
+            this.noteValue[turtle] = null;
             this.noteCents[turtle] = [];
             this.noteHertz[turtle] = [];
             this.lastNotePlayed[turtle] = null;
@@ -3452,6 +3454,7 @@ function Logo () {
             // which are used when we play the note.
             that.oscList[turtle] = [];
             that.noteBeat[turtle] = [];
+            that.noteValue[turtle] = null;
             that.notePitches[turtle] = [];
             that.noteOctaves[turtle] = [];
             that.noteCents[turtle] = [];
@@ -3470,6 +3473,12 @@ function Logo () {
                 } else {
                     var noteBeatValue = args[0];
                 }
+            }
+
+            if (turtle in that.dotCount) {
+		that.noteValue[turtle] = (1 / noteBeatValue) * (2 - (1 / Math.pow(2, that.dotCount[turtle])));
+            } else {
+		that.noteValue[turtle] = 1 / noteBeatValue;
             }
 
             that.inNoteBlock[turtle] += 1;
@@ -5472,7 +5481,7 @@ function Logo () {
                         }
                         // Trim the timeout slightly (5%) so as not to
                         // collide with the next note.
-                    }, waitTime + this.noteDelay + .95 * (bpmFactor * 1000 / duration));
+                    }, waitTime + this.noteDelay + .90 * (bpmFactor * 1000 / duration));
                 }
 
                 if (this.crescendoDelta[turtle].length > 0) {
@@ -6132,7 +6141,9 @@ function Logo () {
                 for (var i = 0; i < that.turtles.turtleList.length; i++) {
                     var thisTurtle = that.turtles.turtleList[i];
                     if (targetTurtle === thisTurtle.name) {
-                        if (that.lastNotePlayed[turtle] !== null) {
+                        if (that.noteValue[turtle] !== null) {
+                            value = 1 / that.noteValue[turtle];
+                        } else if (that.lastNotePlayed[turtle] !== null) {
                             value = that.lastNotePlayed[turtle][1];
                         } else if(that.notePitches[i].length > 0) {
                             value = that.noteBeat[i];
