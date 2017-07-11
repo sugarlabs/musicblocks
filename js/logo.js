@@ -66,6 +66,7 @@ function Logo () {
     this.evalOnStartList = {};
     this.evalOnStopList = {};
     this.eventList = {};
+    this.receivedArg = null;
 
     this.boxes = {};
     this.actions = {};
@@ -410,7 +411,7 @@ function Logo () {
                             }
                             // that.playedNote[turtle] = true;
                             that.playedNoteTimes[turtle] = that.playedNoteTimes[turtle] || 0;
-                            thisNote[turtle] = Math.pow(that.parseArg(that, turtle, block.connections[1], blk, null), -1);
+                            thisNote[turtle] = Math.pow(that.parseArg(that, turtle, block.connections[1], blk, that.receivedArg), -1);
                             that.playedNoteTimes[turtle] += thisNote[turtle];
                             // Keep track of how long the note played for, so we can go back and play it again if needed
                         }
@@ -539,7 +540,7 @@ function Logo () {
                 break;
             case 'box':
                 var cblk = this.blocks.blockList[blk].connections[1];
-                var boxname = this.parseArg(that, turtle, cblk, blk);
+                var boxname = this.parseArg(that, turtle, cblk, blk, this.receivedArg);
                 if (boxname in this.boxes) {
                     value = this.boxes[boxname];
                 } else {
@@ -940,6 +941,8 @@ function Logo () {
             return;
         }
 
+	this.receivedArg = receivedArg;
+
         var delay = that.turtleDelay + that.waitTimes[turtle];
         that.waitTimes[turtle] = 0;
 
@@ -993,7 +996,7 @@ function Logo () {
             break;
         case 'box':
             var cblk = this.blocks.blockList[blk].connections[1];
-            var name = this.parseArg(this, turtle, cblk, blk);
+            var name = this.parseArg(this, turtle, cblk, blk, this.receivedArg);
             if (name in this.boxes) {
                 this.boxes[name] = value;
             } else {
@@ -1077,6 +1080,8 @@ function Logo () {
 
     this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
+
+	this.receivedArg = receivedArg;
 
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) {
@@ -4486,8 +4491,7 @@ function Logo () {
             } else {
                 // Could be an arg block, so we need to print its value.
                 if (that.blocks.blockList[blk].isArgBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
-                    console.log('push');
-                    args.push(that.parseArg(that, turtle, blk));
+                    args.push(that.parseArg(that, turtle, blk, that.receievedArg));
                     if (that.blocks.blockList[blk].value == null) {
                         that.textMsg('null block value');
                     } else {
@@ -5232,31 +5236,31 @@ function Logo () {
             var b = this.embeddedGraphics[turtle][i];
             switch(this.blocks.blockList[b].name) {
             case 'setcolor':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 that.turtles.turtleList[turtle].doSetColor(arg);
                 break;
             case 'sethue':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 that.turtles.turtleList[turtle].doSetHue(arg);
                 break;
             case 'setshade':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 that.turtles.turtleList[turtle].doSetValue(arg);
                 break;
             case 'settranslucency':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 that.turtles.turtleList[turtle].doSetPenAlpha(arg);
                 break;
             case 'setgrey':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 that.turtles.turtleList[turtle].doSetChroma(arg);
                 break;
             case 'setpensize':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 that.turtles.turtleList[turtle].doSetPensize(arg);
                 break;
             case 'right':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     setTimeout(function () {
                         that.turtles.turtleList[turtle].doRight(arg / (NOTEDIV / that.dispatchFactor[turtle]));
@@ -5264,7 +5268,7 @@ function Logo () {
                 }
                 break;
             case 'left':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     setTimeout(function () {
                         that.turtles.turtleList[turtle].doRight(-arg / (NOTEDIV / that.dispatchFactor[turtle]));
@@ -5272,7 +5276,7 @@ function Logo () {
                 }
                 break;
             case 'forward':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     setTimeout(function () {
                         that.turtles.turtleList[turtle].doForward(arg / (NOTEDIV / that.dispatchFactor[turtle]));
@@ -5280,7 +5284,7 @@ function Logo () {
                 }
                 break;
             case 'back':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     setTimeout(function () {
                         that.turtles.turtleList[turtle].doForward(-arg / (NOTEDIV / that.dispatchFactor[turtle]));
@@ -5288,8 +5292,8 @@ function Logo () {
                 }
                 break;
             case 'arc':
-                var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, null);
-                var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, null);
+                var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
+                var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     setTimeout(function () {
                         that.turtles.turtleList[turtle].doArc(arg1 / (NOTEDIV  / that.dispatchFactor[turtle]), arg2);
