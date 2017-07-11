@@ -4979,6 +4979,11 @@ function Logo () {
                 }
 
                 __playnote = function (that, lastNote) {
+                    // Stop playing duplicate notes is the stop button is pressed.
+                    if (that.stopTurtle) {
+                        return;
+                    }
+
                     var notes = [];
                     var drums = [];
                     var insideChord = -1;
