@@ -136,7 +136,7 @@ function Logo () {
     this.noteTranspositions = {};
     this.noteBeatValues = {};
     this.embeddedGraphics = {};
-
+    this.embeddedGraphicsExtended = {};
     this.lastNotePlayed = {};
     this.noteStatus = {};
 
@@ -740,6 +740,7 @@ function Logo () {
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.embeddedGraphics[turtle] = [];
+            this.embeddedGraphicsExtended[turtle] = [];
             this.beatFactor[turtle] = 1;
             this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
@@ -1573,7 +1574,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphics[turtle].push(blk);
+                        that.embeddedGraphicsExtended[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doArc(args[0] * that.duplicateFactor[turtle], args[1]);
@@ -1667,7 +1668,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphics[turtle].push(blk);
+                        that.embeddedGraphicsExtended[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doForward(args[0] * that.duplicateFactor[turtle]);
@@ -1688,7 +1689,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphics[turtle].push(blk);
+                        that.embeddedGraphicsExtended[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doForward(-args[0] * that.duplicateFactor[turtle]);
@@ -1709,7 +1710,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphics[turtle].push(blk);
+                        that.embeddedGraphicsExtended[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doRight(args[0] * that.duplicateFactor[turtle]);
@@ -1730,7 +1731,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphics[turtle].push(blk);
+                        that.embeddedGraphicsExtended[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doRight(-args[0] * that.duplicateFactor[turtle]);
@@ -3281,6 +3282,7 @@ function Logo () {
             that.noteBeatValues[turtle] = [];
             that.noteDrums[turtle] = [];
             that.embeddedGraphics[turtle] = [];
+            that.embeddedGraphicsExtended[turtle] = [];
 
             // Ensure that note duration is positive.
             if (args[0] < 0) {
@@ -5032,6 +5034,7 @@ function Logo () {
                     // After the last note, clear the embedded graphics queue.
                     if (lastNote) {
                         that.embeddedGraphics[turtle] = [];
+                        that.embeddedGraphicsExtended[turtle] = [];
                     }
 
                     // Process pitches
@@ -5210,33 +5213,6 @@ function Logo () {
     this._dispatchTurtleSignals = function (turtle, beatValue, blk, noteBeatValue) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
-	if (this.embeddedGraphics[turtle].length === 0) {
-            return;
-        }
-
-        var stepTime = beatValue * 1000 / NOTEDIV;
-
-        // We do each graphics action sequentially, so we need to
-        // divide stepTime by the length of the embedded graphics
-        // array.
-        var stepTime = stepTime / this.embeddedGraphics[turtle].length;
-        var waitTime = 0;
-
-        // We want to update the turtle graphics every 50ms within a note.
-        if (stepTime > 200) {
-            this.dispatchFactor[turtle] = 0.25;
-        } else if (stepTime > 100) {
-            this.dispatchFactor[turtle] = 0.5;
-        } else if (stepTime > 50) {
-            this.dispatchFactor[turtle] = 1;
-        } else if (stepTime > 25) {
-            this.dispatchFactor[turtle] = 2;
-        } else if (stepTime > 12.5) {
-            this.dispatchFactor[turtle] = 4;
-        } else {
-            this.dispatchFactor[turtle] = 8;
-        }
-
         var that = this;
 
         function __right(turtle, arg, timeout) {
@@ -5284,6 +5260,42 @@ function Logo () {
                 var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 this.turtles.turtleList[turtle].doSetPensize(arg);
                 break;
+            default:
+                console.log(name + ' is not supported inside of Note Blocks');
+                break;
+            }
+        }
+
+	if (this.embeddedGraphicsExtended[turtle].length === 0) {
+            return;
+        }
+
+        var stepTime = beatValue * 1000 / NOTEDIV;
+
+        // We do each graphics action sequentially, so we need to
+        // divide stepTime by the length of the embedded graphics
+        // array.
+        var stepTime = stepTime / this.embeddedGraphicsExtended[turtle].length;
+        var waitTime = 0;
+
+        // We want to update the turtle graphics every 50ms within a note.
+        if (stepTime > 200) {
+            this.dispatchFactor[turtle] = 0.25;
+        } else if (stepTime > 100) {
+            this.dispatchFactor[turtle] = 0.5;
+        } else if (stepTime > 50) {
+            this.dispatchFactor[turtle] = 1;
+        } else if (stepTime > 25) {
+            this.dispatchFactor[turtle] = 2;
+        } else if (stepTime > 12.5) {
+            this.dispatchFactor[turtle] = 4;
+        } else {
+            this.dispatchFactor[turtle] = 8;
+        }
+
+        for (var i = 0; i < this.embeddedGraphicsExtended[turtle].length; i++) {
+            var b = this.embeddedGraphicsExtended[turtle][i];
+            switch(this.blocks.blockList[b].name) {
             case 'right':
 		var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
