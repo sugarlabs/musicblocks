@@ -3174,7 +3174,6 @@ function Blocks () {
                 if (['note', 'slur', 'staccato', 'swing'].indexOf(name) !== -1) {
                     // We need to convert to newnote style:
                     // (1) add a vspace to the start of the clamp of a note block.
-                    console.log('note: ' + b);
                     var clampBlock = blockObjs[b][4][2];
                     blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
                     if (clampBlock == null) {
