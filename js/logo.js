@@ -1576,7 +1576,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doArc(args[0], args[1]);
+                    that.turtles.turtleList[turtle].doArc(args[0] * that.duplicateFactor[turtle], args[1]);
                 }
             }
             break;
@@ -1670,7 +1670,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doForward(args[0]);
+                    that.turtles.turtleList[turtle].doForward(args[0] * that.duplicateFactor[turtle]);
                 }
             }
             break;
@@ -1691,7 +1691,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doForward(-args[0]);
+                    that.turtles.turtleList[turtle].doForward(-args[0] * that.duplicateFactor[turtle]);
                 }
             }
             break;
@@ -1712,7 +1712,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doRight(args[0]);
+                    that.turtles.turtleList[turtle].doRight(args[0] * that.duplicateFactor[turtle]);
                 }
             }
             break;
@@ -1733,7 +1733,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doRight(-args[0]);
+                    that.turtles.turtleList[turtle].doRight(-args[0] * that.duplicateFactor[turtle]);
                 }
             }
             break;
