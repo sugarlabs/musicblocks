@@ -336,7 +336,6 @@ function Blocks () {
         } else if (myBlock.isArgClamp()) {
             // We handle ArgClamp blocks elsewhere.
             this._adjustArgClampBlock([blk]);
-            return;
         }
 
         function clampAdjuster(blocks, blk, myBlock, clamp) {
