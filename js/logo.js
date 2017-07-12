@@ -136,7 +136,6 @@ function Logo () {
     this.noteTranspositions = {};
     this.noteBeatValues = {};
     this.embeddedGraphics = {};
-    this.embeddedGraphicsExtended = {};
     this.lastNotePlayed = {};
     this.noteStatus = {};
 
@@ -740,7 +739,6 @@ function Logo () {
             this.noteTranspositions[turtle] = [];
             this.noteBeatValues[turtle] = [];
             this.embeddedGraphics[turtle] = [];
-            this.embeddedGraphicsExtended[turtle] = [];
             this.beatFactor[turtle] = 1;
             this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
@@ -942,7 +940,7 @@ function Logo () {
             return;
         }
 
-	this.receivedArg = receivedArg;
+        this.receivedArg = receivedArg;
 
         var delay = that.turtleDelay + that.waitTimes[turtle];
         that.waitTimes[turtle] = 0;
@@ -1082,7 +1080,7 @@ function Logo () {
     this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
 
-	this.receivedArg = receivedArg;
+        this.receivedArg = receivedArg;
 
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) {
@@ -1574,7 +1572,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphicsExtended[turtle].push(blk);
+                        that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doArc(args[0] * that.duplicateFactor[turtle], args[1]);
@@ -1668,7 +1666,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphicsExtended[turtle].push(blk);
+                        that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doForward(args[0] * that.duplicateFactor[turtle]);
@@ -1689,7 +1687,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphicsExtended[turtle].push(blk);
+                        that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doForward(-args[0] * that.duplicateFactor[turtle]);
@@ -1710,7 +1708,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphicsExtended[turtle].push(blk);
+                        that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doRight(args[0] * that.duplicateFactor[turtle]);
@@ -1731,7 +1729,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle] > 0) {
                     if (!that.suppressOutput[turtle]) {
-                        that.embeddedGraphicsExtended[turtle].push(blk);
+                        that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
                     that.turtles.turtleList[turtle].doRight(-args[0] * that.duplicateFactor[turtle]);
@@ -3282,7 +3280,6 @@ function Logo () {
             that.noteBeatValues[turtle] = [];
             that.noteDrums[turtle] = [];
             that.embeddedGraphics[turtle] = [];
-            that.embeddedGraphicsExtended[turtle] = [];
 
             // Ensure that note duration is positive.
             if (args[0] < 0) {
@@ -5034,7 +5031,6 @@ function Logo () {
                     // After the last note, clear the embedded graphics queue.
                     if (lastNote) {
                         that.embeddedGraphics[turtle] = [];
-                        that.embeddedGraphicsExtended[turtle] = [];
                     }
 
                     // Process pitches
@@ -5213,13 +5209,42 @@ function Logo () {
     this._dispatchTurtleSignals = function (turtle, beatValue, blk, noteBeatValue) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
+        if (this.embeddedGraphics[turtle].length === 0) {
+            return;
+        }
+
         var that = this;
+
+        function __pen(turtle, name, arg, timeout) {
+            setTimeout(function () {
+                switch(name) {
+                case 'setcolor':
+                    that.turtles.turtleList[turtle].doSetColor(arg);
+                    break;
+                case 'sethue':
+                    that.turtles.turtleList[turtle].doSetHue(arg);
+                    break;
+                case 'setshade':
+                    that.turtles.turtleList[turtle].doSetValue(arg);
+                    break;
+                case 'settranslucency':
+                    that.turtles.turtleList[turtle].doSetPenAlpha(arg);
+                    break;
+                case 'setgrey':
+                    that.turtles.turtleList[turtle].doSetChroma(arg);
+                    break;
+                case 'setpensize':
+                    that.turtles.turtleList[turtle].doSetPensize(arg);
+                    break;
+                }
+            }, timeout);
+        };
 
         function __right(turtle, arg, timeout) {
             setTimeout(function () {
                 that.turtles.turtleList[turtle].doRight(arg);
             }, timeout);
-	};
+        };
 
         function __forward(turtle, arg, timeout) {
             setTimeout(function () {
@@ -5233,41 +5258,20 @@ function Logo () {
             }, timeout);
         };
 
+        var extendedGraphicsCounter = 0;
         for (var i = 0; i < this.embeddedGraphics[turtle].length; i++) {
             var b = this.embeddedGraphics[turtle][i];
-            switch(this.blocks.blockList[b].name) {
-            case 'setcolor':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
-                this.turtles.turtleList[turtle].doSetColor(arg);
-                break;
-            case 'sethue':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
-                this.turtles.turtleList[turtle].doSetHue(arg);
-                break;
-            case 'setshade':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
-                this.turtles.turtleList[turtle].doSetValue(arg);
-                break;
-            case 'settranslucency':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
-                this.turtles.turtleList[turtle].doSetPenAlpha(arg);
-                break;
-            case 'setgrey':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
-                this.turtles.turtleList[turtle].doSetChroma(arg);
-                break;
-            case 'setpensize':
-                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
-                this.turtles.turtleList[turtle].doSetPensize(arg);
+            switch (this.blocks.blockList[b].name) {
+            case 'forward':
+            case 'back':
+            case 'right':
+            case 'left':
+            case 'arc':
+                extendedGraphicsCounter += 1;
                 break;
             default:
-                console.log(name + ' is not supported inside of Note Blocks');
                 break;
             }
-        }
-
-	if (this.embeddedGraphicsExtended[turtle].length === 0) {
-            return;
         }
 
         var stepTime = beatValue * 1000 / NOTEDIV;
@@ -5275,7 +5279,10 @@ function Logo () {
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
         // array.
-        var stepTime = stepTime / this.embeddedGraphicsExtended[turtle].length;
+        if (extendedGraphicsCounter > 0) {
+            var stepTime = stepTime / extendedGraphicsCounter;
+        }
+
         var waitTime = 0;
 
         // We want to update the turtle graphics every 50ms within a note.
@@ -5293,32 +5300,50 @@ function Logo () {
             this.dispatchFactor[turtle] = 8;
         }
 
-        for (var i = 0; i < this.embeddedGraphicsExtended[turtle].length; i++) {
-            var b = this.embeddedGraphicsExtended[turtle][i];
-            switch(this.blocks.blockList[b].name) {
+        for (var i = 0; i < this.embeddedGraphics[turtle].length; i++) {
+            var b = this.embeddedGraphics[turtle][i];
+            var name = this.blocks.blockList[b].name;
+            switch(name) {
+            case 'setcolor':
+            case 'sethue':
+            case 'setshade':
+            case 'settranslucency':
+            case 'setgrey':
+            case 'setpensize':
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
+                __pen(turtle, name, arg, waitTime);
+                break;
             case 'right':
-		var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     __right(turtle, arg / (NOTEDIV / that.dispatchFactor[turtle]), waitTime + t * stepTime * this.dispatchFactor[turtle]);
                 }
+
+                waitTime += NOTEDIV * stepTime;
                 break;
             case 'left':
-		var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     __right(turtle, -arg / (NOTEDIV / that.dispatchFactor[turtle]), waitTime + t * stepTime * this.dispatchFactor[turtle]);
                 }
+
+                waitTime += NOTEDIV * stepTime;
                 break;
             case 'forward':
-		var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     __forward(turtle, arg / (NOTEDIV / that.dispatchFactor[turtle]), waitTime + t * stepTime * this.dispatchFactor[turtle]);
                 }
+
+                waitTime += NOTEDIV * stepTime;
                 break;
             case 'back':
-		var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     __forward(turtle, -arg / (NOTEDIV / that.dispatchFactor[turtle]), waitTime + t * stepTime * this.dispatchFactor[turtle]);
                 }
+
+                waitTime += NOTEDIV * stepTime;
                 break;
             case 'arc':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
@@ -5326,13 +5351,13 @@ function Logo () {
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     __arc(turtle, arg1 / (NOTEDIV / that.dispatchFactor[turtle]), arg2, waitTime + t * stepTime * this.dispatchFactor[turtle]);
                 }
+
+                waitTime += NOTEDIV * stepTime;
                 break;
             default:
                 console.log(name + ' is not supported inside of Note Blocks');
                 break;
             }
-
-            waitTime += NOTEDIV * stepTime;
         }
     };
 
