@@ -611,6 +611,7 @@ function SamplesViewer () {
         document.querySelector('.planet').style.display = 'none';
         document.querySelector('body').classList.remove('samples-shown');
         document.querySelector('.canvasHolder').classList.remove('hide');
+        document.querySelector('#canvas').style.display = '';
         document.querySelector('#theme-color').content = platformColor.header;
         this.samples._stage.enableDOMEvents(true);
         window.scroll(0, 0);
@@ -620,6 +621,7 @@ function SamplesViewer () {
         document.querySelector('.planet').style.display = '';
         document.querySelector('body').classList.add('samples-shown');
         document.querySelector('.canvasHolder').classList.add('hide');
+        document.querySelector('#canvas').style.display = 'none';
         document.querySelector('#theme-color').content = '#8bc34a';
         var that = this;
 
