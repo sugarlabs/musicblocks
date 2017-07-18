@@ -2519,17 +2519,18 @@ function Logo () {
                 that.timbre = new TimbreWidget();
                 that.inTimbre = true;  
             }
-            //console.log("running timbre widget");
-             
+            
             that.timbre.env = [];
             that.timbre.ENVs = [];
-
+            that.timbre.fil = [];
+            that.timbre.filterParams = [];
+            that.timbre.osc = [];
+            that.timbre.oscParams = [];
 
             var listenerName = '_timbre_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
             
             var __listener = function (event) {
-                console.log("hello");
                 that.timbre.init(that);
             };
 
@@ -2638,8 +2639,7 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'envelope':
-           
-                if (args.length === 4 && typeof(args[0] === 'number')) {
+            if (args.length === 4 && typeof(args[0] === 'number')) {
                 if (args[0] < 0 || args[0] > 100) {
                     that.errorMsg(_('Attack value should be between 0-100'));
                 } 
@@ -2671,7 +2671,61 @@ function Logo () {
                     that.timbre.ENVs.push(that.blocks.blockList[envsustain].text.text);
                     that.timbre.ENVs.push(that.blocks.blockList[envrelease].text.text);
                 }
-            break;  
+            break; 
+        case 'filter':
+            var filtertype = 'highpass';
+            var freq ;
+            var rollOff ;
+
+            if (args.length === 3 && typeof(args[1] === 'number')) {
+                for (var typo in TYPES) {
+                    if (TYPES[typo][0] === args[0]) {
+                        filtertype = TYPES[typo][1];
+                    } else if (TYPES[typo][1] === args[0]) {
+                        filtertype = args[0];
+                    }
+
+                }
+
+                if ([-12, -24, -48, -96].indexOf(args[1]) === -1) {
+                    that.errorMsg(_("Value should be either -12,-24,-48 or -96 db"));
+                }
+                rollOff = args[1];
+                freq = args[2];
+            } 
+            if(that.inTimbre) {
+                    that.timbre.fil.push(blk);
+                    var filterType = that.blocks.blockList[blk].connections[1];
+                    var filterRolloff = that.blocks.blockList[blk].connections[2];
+                    var filterFrequency = that.blocks.blockList[blk].connections[3];
+                    that.timbre.filterParams.push(that.blocks.blockList[filterType].text.text);
+                    that.timbre.filterParams.push(that.blocks.blockList[filterRolloff].text.text);
+                    that.timbre.filterParams.push(that.blocks.blockList[filterFrequency].text.text);
+                }  
+            break;
+        case 'oscillator':
+            var oscillatortype = 'triangle';
+            var partials ;
+            
+            if (args.length === 2 && typeof(args[1] === 'number')) {
+                for (var typo in OSCTYPES) {
+                    if (TYPES[typo][0] === args[0]) {
+                        oscillatortype = TYPES[typo][1];
+                    } else if (TYPES[typo][1] === args[0]) {
+                        oscillatortype = args[0];
+                    }
+                }
+
+                partials = args[1];
+            } 
+            if(that.inTimbre) {
+                    that.timbre.osc.push(blk);
+                    var oscillatorType = that.blocks.blockList[blk].connections[1];
+                    var oscillatorPartials = that.blocks.blockList[blk].connections[2];
+                    that.timbre.oscParams.push(that.blocks.blockList[oscillatorType].text.text);
+                    that.timbre.oscParams.push(that.blocks.blockList[oscillatorPartials].text.text);
+                }  
+            break;    
         case 'invert1':
             if (typeof(args[2]) === 'number') {
                 if (args[2] % 2 === 0){

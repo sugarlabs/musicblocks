@@ -665,6 +665,11 @@ function hideDOMLabel() {
     if (modenameLabel !== null) {
         modenameLabel.style.display = 'none';
     }
+
+    var filtertypeLabel = docById('filtertypeLabel');
+    if (filtertypeLabel !== null) {
+        filtertypeLabel.style.display = 'none';
+    }
 };
 
 

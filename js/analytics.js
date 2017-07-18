@@ -54,6 +54,8 @@ const TACAT = {
     'drumname': 'ignore',
     'voicename': 'ignore',
     'modename': 'ignore',
+    'filtertype':'ignore',
+    'oscillatortype':'ignore',
 
     'hertz': 'pitch',
     'pitch': 'pitch',

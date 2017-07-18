@@ -368,9 +368,28 @@ var DRUMNAMES = [
     [_('duck'), 'duck', 'images/duck.svg'],
 ];
 
+var TYPES = [
+    [_('highpass'), 'highpass'],
+    [_('lowpass'), 'lowpass'],
+    [_('bandpass'), 'bandpass'],
+    [_('highshelf'), 'highshelf'],
+    [_('lowshelf'), 'lowshelf'],
+    [_('notch'), 'notch'],
+    [_('allpass'), 'allpass'],
+    [_('peaking'), 'peaking'],
+];
+
+var OSCTYPES = [
+    [_('sine'), 'sine'],
+    [_('square'), 'square'],
+    [_('triangle'), 'triangle'],
+    [_('sawtooth'), 'sawtooth'],
+];
 const DEFAULTVOICE = 'sine';
 const DEFAULTDRUM = 'kick drum';
 const DEFAULTMODE = 'major';
+const DEFAULTFILTERTYPE = 'highpass';
+const DEFAULTOSCILLATORTYPE = 'sine';
 
 var customMode = MUSICALMODES['custom'];
 
@@ -457,6 +476,45 @@ function getDrumName(name) {
 
     return null;
 };
+
+function getFilterTypes(name) {
+    if (name === '') {
+        console.log('getFiterType passed blank name. Returning ' + DEFAULTFILTERTYPE);
+        name = DEFAULTFILTERTYPE;
+    } 
+    for (var type = 0; type < TYPES.length; type++) {
+        if (TYPES[type][0].toLowerCase() === name.toLowerCase() || TYPES[type][1].toLowerCase() === name.toLowerCase()) {
+            if (TYPES[type][0] != '') {
+                return TYPES[type][0];
+            } else {
+                console.log('I18n is misbehaving when parsing filter type: ' + name);
+                return TYPES[type][1];
+            }
+        }
+    }
+
+    return null;
+};
+
+function getOscillatorTypes(name) {
+    if (name === '') {
+        console.log('getOscillatorType passed blank name. Returning ' + DEFAULTOSCILLATORTYPE);
+        name = DEFAULTOSCILLATORTYPE;
+    } 
+    for (var type = 0; type < OSCTYPES.length; type++) {
+        if (OSCTYPES[type][0].toLowerCase() === name.toLowerCase() || OSCTYPES[type][1].toLowerCase() === name.toLowerCase()) {
+            if (OSCTYPES[type][0] != '') {
+                return OSCTYPES[type][0];
+            } else {
+                console.log('I18n is misbehaving when parsing oscillator type: ' + name);
+                return OSCTYPES[type][1];
+            }
+        }
+    }
+
+    return null;
+};
+
 
 
 function getDrumIcon(name) {

@@ -1482,7 +1482,12 @@ function Blocks () {
                 label += attr;
             }
         } else {
-            var label = myBlock.value.toString();
+            if(typeof myBlock.value !== 'string'){
+               var label = myBlock.value.toString(); 
+            } else {
+                var label = myBlock.value;  
+            }
+            
         }
 
         if (label.length > maxLength) {
@@ -1920,6 +1925,26 @@ function Blocks () {
             };
 
             postProcessArg = [thisBlock, 'kick'];
+         } else if (name === 'filtertype') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'highpass'];    
+        } else if (name === 'oscillatortype') {
+            postProcess = function (args) {
+                var thisBlock = args[0];
+                var value = args[1];
+                that.blockList[thisBlock].value = value;
+                that.blockList[thisBlock].text.text = value;
+                that.blockList[thisBlock].container.updateCache();
+            };
+
+            postProcessArg = [thisBlock, 'sine']; 
         } else if (name === 'voicename') {
             postProcess = function (args) {
                 var thisBlock = args[0];
@@ -3521,6 +3546,24 @@ function Blocks () {
                     this.logo.synth.loadSynth(getDrumSynthName(value));
                 }
                 break;
+            case 'filtertype':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break; 
+            case 'oscillatortype':
+                postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].value = value;
+                    that.updateBlockText(thisBlock);
+                };
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;        
             case 'voicename':
                 postProcess = function (args) {
                     var thisBlock = args[0];

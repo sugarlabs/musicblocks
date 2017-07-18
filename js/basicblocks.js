@@ -488,6 +488,31 @@ function initBasicProtoBlocks(palettes, blocks) {
     sourceBlock.dockTypes[1] = 'textin';
     sourceBlock.dockTypes[2] = 'numberin';
 
+    var oscillatorBlock = new ProtoBlock('oscillator');
+    oscillatorBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['oscillator'] = oscillatorBlock;
+    oscillatorBlock.staticLabels.push(_('oscillator'), _('oscillatorType'), _('partials'));
+    oscillatorBlock.extraWidth = 10;
+    oscillatorBlock.adjustWidthToLabel();
+    oscillatorBlock.defaults.push(_('Triangle'));
+    oscillatorBlock.defaults.push(6);
+    oscillatorBlock.twoArgBlock();
+    oscillatorBlock.dockTypes[1] = 'textin';
+    oscillatorBlock.dockTypes[2] = 'numberin';
+
+
+    var filtertypeBlock = new ProtoBlock('filtertype');
+    filtertypeBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['filtertype'] = filtertypeBlock;
+    filtertypeBlock.valueBlock();
+    filtertypeBlock.dockTypes[0] = 'textout';
+
+    var oscillatortypeBlock = new ProtoBlock('oscillatortype');
+    oscillatortypeBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['oscillatortype'] = oscillatortypeBlock;
+    oscillatortypeBlock.valueBlock();
+    oscillatortypeBlock.dockTypes[0] = 'textout';
+
     var envelopeBlock = new ProtoBlock('envelope');
     envelopeBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['envelope'] = envelopeBlock;
@@ -507,14 +532,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     var filterBlock = new ProtoBlock('filter');
     filterBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['filter'] = filterBlock;
-    filterBlock.staticLabels.push(_('filter'), _('type'), _('frequency'), _('rolloff'));
+    filterBlock.staticLabels.push(_('filter'), _('type'), _('rolloff'), _('frequency'));
     filterBlock.extraWidth = 10;
     filterBlock.adjustWidthToLabel();
-    filterBlock.defaults.push(_('HighPass'));
-    filterBlock.defaults.push(200);
+    filterBlock.defaults.push(_('highpass'));
     filterBlock.defaults.push(-12);
+    filterBlock.defaults.push(200);
     filterBlock.threeArgBlock();
-    filterBlock.dockTypes[1] = 'textin';
+    filterBlock.dockTypes[1] = 'anyin';
     filterBlock.dockTypes[2] = 'numberin';
     filterBlock.dockTypes[3] = 'numberin';
     
