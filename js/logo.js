@@ -2520,6 +2520,7 @@ function Logo () {
                 that.inTimbre = true;  
             }
             
+            that.timbre.blockNo = blk;
             that.timbre.env = [];
             that.timbre.ENVs = [];
             that.timbre.fil = [];

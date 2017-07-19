@@ -16,6 +16,7 @@ function TimbreWidget () {
     this.oscillatorActive = false;
     this.filterActive = false;
     this.effectsActive = false;
+    this.blockNo = null;
 
     var that = this;
     console.log('timbre initialised');
@@ -114,8 +115,43 @@ function TimbreWidget () {
             that.envelopeActive = false;
             
             oscillatorButtonCell.id = "oscillatorButtonCell";
+            // Look to see if there is a filter block in the clamp. If
+            // there isn't one, add one. If there is more than one, we
+            // should ignore all but the last one.
+            if (that.osc.length === 0) {
+                // Find the last block in the clamp, where we will add
+                // a filter block.
+                //console.log(that.blockNo);
+                var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+                //console.log(bottomOfClamp);
+
+                const OSCILLATOROBJ = [[0,["oscillator",{}],0,0,[null,2,1,null]],[1,["number",{"value":6}],466.68701171875,544.5,[0]],[2,["oscillatortype",{"value":"sine"}],466.68701171875,513,[0]]];
+                that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
+
+                var n = that._logo.blocks.blockList.length - 3;
+                that.osc.push(n);
+                //console.log(n);
+                that.oscParams.push('sine');
+                that.oscParams.push(6);
+                
+                setTimeout(function () {
+                    var n = that._logo.blocks.blockList.length - 3;
+                   // Connect the new blocks to the bottom of the clamp.
+                    if (bottomOfClamp == null) {
+                        that._logo.blocks.blockList[that.blockNo].connections[2] = n;
+                        that._logo.blocks.blockList[n].connections[0] = that.blockNo;
+                    } else {
+                        var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+                       that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
+                        that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
+                    }
+                   that._logo.blocks.adjustDocks(that.blockNo, true);
+                }, 500);
+            }
             that._oscillator();
         }
+
         var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
         envelopeButtonCell.onclick = function() {
             that.envelopeActive = true;
@@ -123,21 +159,77 @@ function TimbreWidget () {
             that.oscillatorActive = false;
 
             envelopeButtonCell.id = "envelopeButtonCell";
+            if (that.env.length === 0) {
+                var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+                
+                const ENVOBJ = [[0,["envelope",{}],401,226,[null,1,2,3,4,null]],[1,["number",{"value":1}],505.38623046875,226,[0]],[2,["number",{"value":50}],505.38623046875,257.5,[0]],[3,["number",{"value":60}],505.38623046875,289,[0]],[4,["number",{"value":1}],505.38623046875,320.5,[0]]];
+                that._logo.blocks.loadNewBlocks(ENVOBJ);
+
+                var n = that._logo.blocks.blockList.length - 5;
+                that.env.push(n);
+                that.ENVs.push(1);
+                that.ENVs.push(50);
+                that.ENVs.push(60);
+                that.ENVs.push(1);
+
+                setTimeout(function () {
+                    var n = that._logo.blocks.blockList.length - 5;
+                    if (bottomOfClamp == null) {
+                        that._logo.blocks.blockList[that.blockNo].connections[2] = n;
+                        that._logo.blocks.blockList[n].connections[0] = that.blockNo;
+                    } else {
+                        var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+                       that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
+                        that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
+                    }
+                   that._logo.blocks.adjustDocks(that.blockNo, true);
+                }, 500);
+            }
             that._envelope();
         }
+
         var filterButtonCell = this._addButton(row, 'filter.svg', ICONSIZE, _('filter'));
         filterButtonCell.onclick = function() {
             that.filterActive = true;
             that.envelopeActive = false;
             that.oscillatorActive = false;
-
             filterButtonCell.id = "filterButtonCell";
+
+            if (that.fil.length === 0) {
+                var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+                
+                const FILTEROBJ = [[0,['filter',{}],0,0,[null,3,1,2,null]],[1,["number",{"value":-12}],512.5,289.5,[0]],[2,["number",{"value":200}],512.5,321,[0]],[3,["filtertype",{"value":"highpass"}],512.5,258,[0]]];
+                that._logo.blocks.loadNewBlocks(FILTEROBJ);
+
+                var n = that._logo.blocks.blockList.length - 4;
+                that.fil.push(n);
+                that.filterParams.push('highpass');
+                that.filterParams.push(-12);
+                that.filterParams.push(200);
+
+                setTimeout(function () {
+                    var n = that._logo.blocks.blockList.length - 4;
+                    if (bottomOfClamp == null) {
+                        that._logo.blocks.blockList[that.blockNo].connections[2] = n;
+                        that._logo.blocks.blockList[n].connections[0] = that.blockNo;
+                    } else {
+                        var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+                        that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
+                        that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
+                    }
+                    that._logo.blocks.adjustDocks(that.blockNo, true);
+                }, 500);
+            }
             that._filter();
         }
+
         var cell = this._addButton(row, 'effects.svg', ICONSIZE, _('effects'));
         cell.onclick=function() {
         	that._effects();
         }
+
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
         /*cell.onclick=function() {
             that._undo();
@@ -211,7 +303,6 @@ function TimbreWidget () {
                 e.preventDefault();
             }
         };
-
     };
 
     this._envelope = function() {
