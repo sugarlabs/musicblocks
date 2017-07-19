@@ -670,6 +670,11 @@ function hideDOMLabel() {
     if (filtertypeLabel !== null) {
         filtertypeLabel.style.display = 'none';
     }
+
+    var oscillatortypeLabel = docById('oscillatortypeLabel');
+    if (oscillatortypeLabel !== null) {
+        oscillatortypeLabel.style.display = 'none';
+    }
 };
 
 

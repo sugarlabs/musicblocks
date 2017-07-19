@@ -537,7 +537,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     filterBlock.adjustWidthToLabel();
     filterBlock.defaults.push(_('highpass'));
     filterBlock.defaults.push(-12);
-    filterBlock.defaults.push(200);
+    filterBlock.defaults.push(392);
     filterBlock.threeArgBlock();
     filterBlock.dockTypes[1] = 'anyin';
     filterBlock.dockTypes[2] = 'numberin';

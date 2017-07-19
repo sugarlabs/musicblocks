@@ -254,7 +254,7 @@ function TimbreWidget () {
             that._update(0, that.ENVs[i], i);
         }
         
-        for(var i = 0; i < 4; i++){
+        for(var i = 0; i < 4; i++) {
             document.getElementById("wrapperEnv"+i).addEventListener('change', function(event){
                 docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
                 var elem = event.target;
@@ -296,6 +296,7 @@ function TimbreWidget () {
         for (var i = 0; i < 2; i++) {
             htmlElements += '<div id="wrapper'+(i+1)+'"><div id="s'+(i+1)+'" class="rectangle"><span></span></div><div id="insideDivFilter"><input type="range" id="myRangeF'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanF'+i+'"class="rangeslidervalue">2</span></div></div>';
         };
+           // htmlElements+='<p><input type="radio" name="rolloff" />-12<input type="radio" name="rolloff" />-24<input type="radio" name="rolloff" />-48<input type="radio" name="rolloff" />-96</p>';
 
         env.innerHTML = htmlElements;
         var envAppend = document.createElement("div");
@@ -325,7 +326,7 @@ function TimbreWidget () {
                 that._update(0, elem.value, 0);
             });
 
-        for(var i = 1; i < 3; i++){
+        for(var i = 1; i < 3; i++) {
             document.getElementById("wrapper"+i).addEventListener('change', function(event){
                 docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
                 var elem = event.target;
@@ -336,17 +337,30 @@ function TimbreWidget () {
             });
         }
 
+       /* var rates = document.getElementsByName("rolloff");
+        console.log(rates);
+        
+        for(var i = 0; i < rates.length; i++){
+            var rate_value;
+            if(rates[i].checked){
+                rate_value = rates[i].value;
+                console.log(rate_value);
+                that._update(0, rate_value, 1);
+            }
+
+        }*/
+
         var sliderRolloff = docById('myRangeF0');
         sliderRolloff.min = -50;
         sliderRolloff.max = 0;
 
         var sliderFrequency = docById('myRangeF1');
-        sliderFrequency.max = 200;
+        sliderFrequency.max = 7050;
         
         docById("s1").textContent = "RollOff";
         docById("s2").textContent = "Frequency";
         docById("myspanF0").textContent = "-12";
-        docById("myspanF1").textContent = "200";
+        docById("myspanF1").textContent = "392";
 
         docById('sel1').value = that.filterParams[0];
         that._update(0, that.filterParams[0], 0);
@@ -369,8 +383,7 @@ function TimbreWidget () {
     };
 
     this._effects = function(){
-    	//document.getElementById("timbreTable").style.backgroundColor = 'blue' ;
-
+    	console.log('hey effects');
     };
 
     this._oscillator = function(){
