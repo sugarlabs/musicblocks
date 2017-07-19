@@ -2640,6 +2640,11 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'envelope':
+            that.timbre.ENVs = [];
+            if(that.timbre.env.length != 0) {
+                that.errorMsg(_("You are adding a second envelope block"));
+            }
+
             if (args.length === 4 && typeof(args[0] === 'number')) {
                 if (args[0] < 0 || args[0] > 100) {
                     that.errorMsg(_('Attack value should be between 0-100'));
@@ -2658,9 +2663,7 @@ function Logo () {
                 that.decay = args[1] / 100;
                 that.sustain = args[2] / 100;
                 that.release = args[3] / 100;
-
             }
-
                 if(that.inTimbre) {
                     that.timbre.env.push(blk);
                     var envattack = that.blocks.blockList[blk].connections[1];
@@ -2677,6 +2680,11 @@ function Logo () {
             var filtertype = 'highpass';
             var freq ;
             var rollOff ;
+            that.timbre.filterParams = [];
+
+            if(that.timbre.fil.length != 0) {
+                that.errorMsg(_("You are adding a second filter block"));
+            }
 
             if (args.length === 3 && typeof(args[1] === 'number')) {
                 for (var typo in TYPES) {
@@ -2685,7 +2693,6 @@ function Logo () {
                     } else if (TYPES[typo][1] === args[0]) {
                         filtertype = args[0];
                     }
-
                 }
 
                 if ([-12, -24, -48, -96].indexOf(args[1]) === -1) {
@@ -2707,7 +2714,12 @@ function Logo () {
         case 'oscillator':
             var oscillatortype = 'triangle';
             var partials ;
-            
+            that.timbre.oscParams = [];
+
+            if(that.timbre.osc.length != 0) {
+                that.errorMsg(_("You are adding a second oscillator block"));
+            }
+
             if (args.length === 2 && typeof(args[1] === 'number')) {
                 for (var typo in OSCTYPES) {
                     if (TYPES[typo][0] === args[0]) {
@@ -2716,7 +2728,6 @@ function Logo () {
                         oscillatortype = args[0];
                     }
                 }
-
                 partials = args[1];
             } 
             if(that.inTimbre) {

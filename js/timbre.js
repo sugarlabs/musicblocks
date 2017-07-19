@@ -45,24 +45,24 @@ function TimbreWidget () {
 
     this._update = function(i, value, k){
         var updateParams = [];
-        if(this.envelopeActive === true && this.env[i] != null) {
-            for(j = 0; j < 4; j++){
+        if (this.envelopeActive === true && this.env[i] != null) {
+            for (j = 0; j < 4; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.env[i]].connections[j+1];
             }
         }
-        if(this.filterActive === true && this.fil[i] != null) {
-            for(j = 0; j < 3; j++){
+        if (this.filterActive === true && this.fil[i] != null) {
+            for (j = 0; j < 3; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.fil[i]].connections[j+1];
             }
         }
-        if(this.oscillatorActive === true && this.osc[i] != null) {
-            for(j = 0; j < 2; j++){
+        if (this.oscillatorActive === true && this.osc[i] != null) {
+            for (j = 0; j < 2; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.osc[i]].connections[j+1];
             }
         }
         
         if (updateParams[0] != null) {
-            if(typeof value === 'string'){
+            if (typeof value === 'string') {
                 this._logo.blocks.blockList[updateParams[k]].value = value;
             } else {
                 this._logo.blocks.blockList[updateParams[k]].value = parseFloat(value);
@@ -108,6 +108,7 @@ function TimbreWidget () {
             synthButtonCell.id = "synthButtonCell";
             that._synth();
         }
+
         var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
         oscillatorButtonCell.onclick=function() {
         	that.oscillatorActive = true;
@@ -135,19 +136,7 @@ function TimbreWidget () {
                 that.oscParams.push('sine');
                 that.oscParams.push(6);
                 
-                setTimeout(function () {
-                    var n = that._logo.blocks.blockList.length - 3;
-                   // Connect the new blocks to the bottom of the clamp.
-                    if (bottomOfClamp == null) {
-                        that._logo.blocks.blockList[that.blockNo].connections[2] = n;
-                        that._logo.blocks.blockList[n].connections[0] = that.blockNo;
-                    } else {
-                        var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
-                       that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
-                        that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
-                    }
-                   that._logo.blocks.adjustDocks(that.blockNo, true);
-                }, 500);
+                setTimeout(that.blockConnection(3, bottomOfClamp), 500);
             }
             that._oscillator();
         }
@@ -173,18 +162,7 @@ function TimbreWidget () {
                 that.ENVs.push(60);
                 that.ENVs.push(1);
 
-                setTimeout(function () {
-                    var n = that._logo.blocks.blockList.length - 5;
-                    if (bottomOfClamp == null) {
-                        that._logo.blocks.blockList[that.blockNo].connections[2] = n;
-                        that._logo.blocks.blockList[n].connections[0] = that.blockNo;
-                    } else {
-                        var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
-                       that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
-                        that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
-                    }
-                   that._logo.blocks.adjustDocks(that.blockNo, true);
-                }, 500);
+                setTimeout(that.blockConnection(5, bottomOfClamp), 500);
             }
             that._envelope();
         }
@@ -200,7 +178,7 @@ function TimbreWidget () {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
-                const FILTEROBJ = [[0,['filter',{}],0,0,[null,3,1,2,null]],[1,["number",{"value":-12}],512.5,289.5,[0]],[2,["number",{"value":200}],512.5,321,[0]],[3,["filtertype",{"value":"highpass"}],512.5,258,[0]]];
+                const FILTEROBJ = [[0,['filter',{}],0,0,[null,3,1,2,null]],[1,["number",{"value":-12}],512.5,289.5,[0]],[2,["number",{"value":392}],512.5,321,[0]],[3,["filtertype",{"value":"highpass"}],512.5,258,[0]]];
                 that._logo.blocks.loadNewBlocks(FILTEROBJ);
 
                 var n = that._logo.blocks.blockList.length - 4;
@@ -209,18 +187,7 @@ function TimbreWidget () {
                 that.filterParams.push(-12);
                 that.filterParams.push(200);
 
-                setTimeout(function () {
-                    var n = that._logo.blocks.blockList.length - 4;
-                    if (bottomOfClamp == null) {
-                        that._logo.blocks.blockList[that.blockNo].connections[2] = n;
-                        that._logo.blocks.blockList[n].connections[0] = that.blockNo;
-                    } else {
-                        var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
-                        that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
-                        that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
-                    }
-                    that._logo.blocks.adjustDocks(that.blockNo, true);
-                }, 500);
+                setTimeout(that.blockConnection(4, bottomOfClamp), 500);
             }
             that._filter();
         }
@@ -305,8 +272,27 @@ function TimbreWidget () {
         };
     };
 
+    this.blockConnection = function (len, bottomOfClamp) {
+        var n = that._logo.blocks.blockList.length - len;
+        if (bottomOfClamp == null) {
+            that._logo.blocks.blockList[that.blockNo].connections[2] = n;
+            that._logo.blocks.blockList[n].connections[0] = that.blockNo;
+        } else {
+            var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+            that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
+            that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
+        }
+        that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
+        that._logo.blocks.adjustDocks(that.blockNo, true);
+    };
+    
     this._envelope = function() {
         var that = this;
+        var blockValue = 0;
+
+        if(this.env.length != 1) {
+            blockValue = this.env.length - 1;
+        }
        
         docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
         docById("envelopeButtonCell").onmouseover = function(){};
@@ -342,7 +328,7 @@ function TimbreWidget () {
         for(var i = 0; i < 4; i++) {
             docById("myRange"+i).value = parseFloat(that.ENVs[i]);
             docById("myspan"+i).textContent = that.ENVs[i];
-            that._update(0, that.ENVs[i], i);
+            that._update(blockValue, that.ENVs[i], i);
         }
         
         for(var i = 0; i < 4; i++) {
@@ -352,23 +338,27 @@ function TimbreWidget () {
                 var m = elem.id.slice(-1);
                 docById("myRange"+m).value = parseFloat(elem.value);
                 docById("myspan"+m).textContent = elem.value;
-                that._update(0, parseFloat(elem.value), m);
+                that._update(blockValue, parseFloat(elem.value), m);
             }); 
         }
 
-       
         btnReset.onclick = function() {
             docById("envelopeButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             for(var i = 0; i < 4; i++) {
                 docById("myRange"+i).value = parseFloat(that.ENVs[i]);
                 docById("myspan"+i).textContent = that.ENVs[i];
-                that._update(0, parseFloat(that.ENVs[i]), i);
+                that._update(blockValue, parseFloat(that.ENVs[i]), i);
             }
         }
     };
 
     this._filter = function() {
         var that = this;
+        var blockValue = 0;
+
+        if(this.fil.length != 1) {
+            blockValue = this.fil.length - 1;
+        }
 
         docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
         docById("filterButtonCell").onmouseover = function(){};
@@ -405,7 +395,7 @@ function TimbreWidget () {
         var myDiv = docById("sel");
         
         var selectOpt = '<select id="sel1">';
-        for(var i = 0; i < TYPES.length; i++){
+        for (var i = 0; i < TYPES.length; i++) {
             selectOpt += '<option value="'+TYPES[i][0]+'">'+TYPES[i][0]+'</option>';
         }
         selectOpt += '</select>';
@@ -414,17 +404,17 @@ function TimbreWidget () {
         document.getElementById("wrapper0").addEventListener('change', function(event){
                 docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
                 var elem = event.target;
-                that._update(0, elem.value, 0);
+                that._update(blockValue, elem.value, 0);
             });
 
-        for(var i = 1; i < 3; i++) {
+        for (var i = 1; i < 3; i++) {
             document.getElementById("wrapper"+i).addEventListener('change', function(event){
                 docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
                 var elem = event.target;
                 var m = elem.id.slice(-1);
                 docById("myRangeF"+m).value = parseFloat(elem.value);
                 docById("myspanF"+m).textContent = elem.value;
-                that._update(0, elem.value, Number(m)+1);
+                that._update(blockValue, elem.value, Number(m)+1);
             });
         }
 
@@ -454,21 +444,21 @@ function TimbreWidget () {
         docById("myspanF1").textContent = "392";
 
         docById('sel1').value = that.filterParams[0];
-        that._update(0, that.filterParams[0], 0);
+        that._update(blockValue, that.filterParams[0], 0);
         for(var i = 1; i < 3; i++) {
             docById("myRangeF"+(i-1)).value = parseFloat(that.filterParams[i]);
             docById("myspanF"+(i-1)).textContent = that.filterParams[i];
-            that._update(0, that.filterParams[i], i);
+            that._update(blockValue, that.filterParams[i], i);
         }
 
         btnReset.onclick = function() {
             docById("filterButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             docById('sel1').value = that.filterParams[0];
-            that._update(0, that.filterParams[0], 0);
-            for(var i=1; i < 3; i++) {
+            that._update(blockValue, that.filterParams[0], 0);
+            for (var i=1; i < 3; i++) {
                 docById("myRangeF"+(i-1)).value = parseFloat(that.filterParams[i]);
                 docById("myspanF"+(i-1)).textContent = that.filterParams[i];
-                that._update(0, that.filterParams[i], i);
+                that._update(blockValue, that.filterParams[i], i);
             }
         }
     };
@@ -479,6 +469,11 @@ function TimbreWidget () {
 
     this._oscillator = function(){
         var that = this;
+        var blockValue = 0;
+
+        if(this.osc.length != 1) {
+            blockValue = this.osc.length - 1;
+        }
 
         docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
         docById("oscillatorButtonCell").onmouseover = function(){};
@@ -512,7 +507,7 @@ function TimbreWidget () {
         var myDiv = docById("selOsc");
         
         var selectOpt = '<select id="selOsc1">';
-        for(var i = 0; i < OSCTYPES.length; i++){
+        for (var i = 0; i < OSCTYPES.length; i++) {
             selectOpt += '<option value="'+OSCTYPES[i][0]+'">'+OSCTYPES[i][0]+'</option>';
         }
         selectOpt += '</select>';
@@ -521,7 +516,7 @@ function TimbreWidget () {
         document.getElementById("wrapperOsc0").addEventListener('change', function(event){
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
             var elem = event.target;
-            that._update(0, elem.value, 0);
+            that._update(blockValue, elem.value, 0);
         });
 
         document.getElementById("wrapperOsc1").addEventListener('change', function(event){
@@ -529,7 +524,7 @@ function TimbreWidget () {
             var elem = event.target;
             docById("myRangeO0").value = parseFloat(elem.value);
             docById("myspanO0").textContent = elem.value;
-            that._update(0, elem.value, 1);
+            that._update(blockValue, elem.value, 1);
         });
         
         var sliderPartials = docById('myRangeO0');
@@ -541,19 +536,19 @@ function TimbreWidget () {
         docById("myspanO0").textContent = "6";
        
         docById('selOsc1').value = that.oscParams[0];
-        that._update(0, that.oscParams[0], 0);
+        that._update(blockValue, that.oscParams[0], 0);
         docById("myRangeO0").value = parseFloat(that.oscParams[1]);
         docById("myspanO0").textContent = that.oscParams[1];
-        that._update(0, that.oscParams[1], 1);
+        that._update(blockValue, that.oscParams[1], 1);
 
         btnReset.onclick = function() {
             docById("oscillatorButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             docById('selOsc1').value = that.oscParams[0];
-            that._update(0, that.oscParams[0], 0);
+            that._update(blockValue, that.oscParams[0], 0);
             
             docById("myRangeO0").value = parseFloat(that.oscParams[1]);
             docById("myspanO0").textContent = that.oscParams[1];
-            that._update(0, that.oscParams[1], 1);
+            that._update(blockValue, that.oscParams[1], 1);
         }
     };
 
