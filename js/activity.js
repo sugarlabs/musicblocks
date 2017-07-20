@@ -1738,6 +1738,7 @@ define(MYDEFINES, function (compatibility) {
 
         function doLoad() {
             console.log('Loading .tb file');
+	    sendAllToTrash(false, false);
             document.querySelector('#myOpenFile').focus();
             document.querySelector('#myOpenFile').click();
             window.scroll(0, 0);
