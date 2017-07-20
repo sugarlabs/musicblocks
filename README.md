@@ -8,6 +8,7 @@ fundamental musical concepts in an integrative and fun way.
 
 ![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/screenshots/Screenshot-1.png)
 
+![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/screenshots/Screenshot-2.png)
 
 Using Music Blocks
 ------------------
