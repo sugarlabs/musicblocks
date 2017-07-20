@@ -120,9 +120,7 @@ define(MYDEFINES, function (compatibility) {
         var pasteContainer = null;
         var pasteImage = null;
         var chartBitmap = null;
-        // if (_THIS_IS_TURTLE_BLOCKS_) {
-            var saveBox;
-        // }
+        var saveBox;
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -731,8 +729,13 @@ define(MYDEFINES, function (compatibility) {
                 .setSaveSVG(doSaveSVG)
                 .setSavePNG(doSavePNG)
                 .setSavePlanet(doUploadToPlanet)
-                // .setSaveFB(doShareOnFacebook)
                 .setSaveBlockArtwork(doSaveBlockArtwork);
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                saveBox.setSaveLilypond(doSaveLilypond);
+            } else {
+                saveBox.setSaveFB(doShareOnFacebook);
+            }
 
             utilityBox = new UtilityBox();
             utilityBox
@@ -1740,6 +1743,10 @@ define(MYDEFINES, function (compatibility) {
             window.scroll(0, 0);
         };
 
+        function doSaveLilypond() {
+            _doLilypond();
+        };
+
         function _doLilypond() {
             // Show busy cursor.
             document.body.style.cursor = 'wait';
@@ -2441,7 +2448,7 @@ handleComplete);
                     ['planet', _doOpenSamples, _('Load samples from server')],
                     ['open', doLoad, _('Load project from files')],
                     ['save', doSave, _('Save project')],
-                    ['lilypond', _doLilypond, _('Save sheet music')],
+                    // ['lilypond', _doLilypond, _('Save sheet music')],
                     ['paste-disabled', pasteStack, _('Paste')],
                     ['Cartesian', _doCartesian, _('Cartesian')],
                     ['polar', _doPolar, _('Polar')],
