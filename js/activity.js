@@ -55,7 +55,7 @@ if (lang.indexOf('-') !== -1) {
 }
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
+    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
 } else {
     MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
 }
@@ -120,9 +120,9 @@ define(MYDEFINES, function (compatibility) {
         var pasteContainer = null;
         var pasteImage = null;
         var chartBitmap = null;
-        if (_THIS_IS_TURTLE_BLOCKS_) {
+        // if (_THIS_IS_TURTLE_BLOCKS_) {
             var saveBox;
-        }
+        // }
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -722,18 +722,17 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas)
                 .setClear(sendAllToTrash);
 
-            if (_THIS_IS_TURTLE_BLOCKS_) {
-                saveBox = new SaveBox();
-                saveBox
-                    .setCanvas(canvas)
-                    .setStage(stage)
-                    .setRefreshCanvas(refreshCanvas)
-                    .setSaveTB(doSaveTB)
-                    .setSaveSVG(doSaveSVG)
-                    .setSavePNG(doSavePNG)
-                    .setSavePlanet(doUploadToPlanet)
-                    .setSaveFB(doShareOnFacebook);
-            }
+            saveBox = new SaveBox();
+            saveBox
+                .setCanvas(canvas)
+                .setStage(stage)
+                .setRefreshCanvas(refreshCanvas)
+                .setSaveTB(doSaveTB)
+                .setSaveSVG(doSaveSVG)
+                .setSavePNG(doSavePNG)
+                .setSavePlanet(doUploadToPlanet)
+                // .setSaveFB(doShareOnFacebook)
+                .setSaveBlockArtwork(doSaveBlockArtwork);
 
             utilityBox = new UtilityBox();
             utilityBox
@@ -1192,12 +1191,12 @@ define(MYDEFINES, function (compatibility) {
 
             const BACKSPACE = 8;
             const TAB = 9;
-			/*
+                        /*
             if (event.keyCode === TAB || event.keyCode === BACKSPACE) {
                 // Prevent browser from grabbing TAB key
                 event.preventDefault();
             }
-			*/
+                        */
 
             const ESC = 27;
             const ALT = 18;
@@ -1681,13 +1680,13 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSave() {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                console.log('Saving .tb file');
-                var name = 'My Project';
-                download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
-            } else {
+            // if (_THIS_IS_MUSIC_BLOCKS_) {
+            //     console.log('Saving .tb file');
+            //     var name = 'My Project';
+            //     download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
+            // } else {
                 saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
-            }
+            // }
         };
 
         function doSaveTB() {
@@ -1709,6 +1708,10 @@ define(MYDEFINES, function (compatibility) {
                 var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
                 download(filename, 'data:image/svg+xml;utf8,' + svg, filename, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
             }
+        };
+
+        function doSaveBlockArtwork() {
+            _printBlockSVG();
         };
 
         function doSavePNG() {
