@@ -204,14 +204,12 @@ function Logo () {
     this.pitchDrumTable = {};
 
     // parameters used by notations
+    this.notationStaging = {};
     this.checkingLilypond = false;
     this.checkingLilypond = false;
     this.lilypondNotes = {};
-    this.lilypondStaging = {};
     this.lilypondOutput = getLilypondHeader();
     this.runningLilypond = false;
-    this.numerator = 3;
-    this.denominator = 4;
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
@@ -4624,7 +4622,8 @@ function Logo () {
             // yet. Hence the timeout.
             __checkLilypond = function () {
                 if (!that.turtles.running() && queueStart === 0 && that.suppressOutput[turtle] && !that.justCounting[turtle]) {
-                    console.log('saving lilypond output: ' + that.lilypondStaging);
+                    console.log('saving lilypond output:');
+                    console.log(that.notationStaging);
                     saveLilypondOutput(that, _('My Project') + '.ly');
                     that.suppressOutput[turtle] = false;
                     that.checkingLilypond = false;
@@ -4991,8 +4990,8 @@ function Logo () {
                     var drums = [];
                     var insideChord = -1;
                     if ((that.notePitches[turtle].length + that.oscList[turtle].length) > 1) {
-                        if (turtle in that.lilypondStaging && !that.justCounting[turtle]) {
-                            var insideChord = that.lilypondStaging[turtle].length + 1;
+                        if (turtle in that.notationStaging && !that.justCounting[turtle]) {
+                            var insideChord = that.notationStaging[turtle].length + 1;
                         } else {
                             var insideChord = 1;
                         }
@@ -5069,11 +5068,11 @@ function Logo () {
                                     originalDuration = duration;
                                 }
                                 if (!that.justCounting[turtle]) {
-                                    updateLilypondNotation(that, note, originalDuration, turtle, insideChord);
+                                    that.updateNotation(note, originalDuration, turtle, insideChord);
                                 }
                             } else if (that.tieCarryOver[turtle] > 0) {
                                 if (!that.justCounting[turtle]) {
-                                    updateLilypondNotation(that, note, that.tieCarryOver[turtle], turtle, insideChord);
+                                    that.updateNotation(note, that.tieCarryOver[turtle], turtle, insideChord);
                                 }
                             } else {
                                 // console.log('duration == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
@@ -6586,4 +6585,16 @@ function Logo () {
         }
     };
 
+    this.updateNotation = function (note, duration, turtle, insideChord) {
+        var obj = durationToNoteValue(duration);
+        if (!(turtle in this.notationStaging)) {
+            this.notationStaging[turtle] = [];
+        }
+
+        if (this.turtles.turtleList[turtle].drum) {
+            note = "c'";
+        }
+
+        this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
+    };
 };

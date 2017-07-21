@@ -808,6 +808,7 @@ define(MYDEFINES, function (compatibility) {
                             blocks.palettes.dict[name].hideMenu(true);
                         }
 
+                        sendAllToTrash(false, false);
                         refreshCanvas();
 
                         blocks.loadNewBlocks(obj);
@@ -1738,7 +1739,6 @@ define(MYDEFINES, function (compatibility) {
 
         function doLoad() {
             console.log('Loading .tb file');
-	    sendAllToTrash(false, false);
             document.querySelector('#myOpenFile').focus();
             document.querySelector('#myOpenFile').click();
             window.scroll(0, 0);
@@ -1759,7 +1759,7 @@ define(MYDEFINES, function (compatibility) {
             logo.lilypondOutput = LILYPONDHEADER;
             logo.lilypondNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                logo.lilypondStaging[turtle] = [];
+                logo.notationStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear(true, true);
             }
             logo.runLogoCommands();
