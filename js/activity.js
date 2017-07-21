@@ -319,7 +319,7 @@ define(MYDEFINES, function (compatibility) {
             logo.lilypondOutput = LILYPONDHEADER;
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
-                logo.lilypondStaging[turtle] = [];
+                logo.notationStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear(true, true);
             }
 
@@ -1762,6 +1762,7 @@ define(MYDEFINES, function (compatibility) {
                 logo.notationStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear(true, true);
             }
+
             logo.runLogoCommands();
         };
 
