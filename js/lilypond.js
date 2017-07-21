@@ -30,7 +30,7 @@ const CLEFS = ['treble', 'bass', 'bass_8', 'percussion'];
 
 getLilypondHeader = function () {
     return LILYPONDHEADER;
-}
+};
 
 
 updateLilypondNotation = function (logo, note, duration, turtle, insideChord) {
