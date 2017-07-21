@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2016 Walter Bender
+// Copyright (c) 2014-2017 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -36,24 +36,24 @@ getLilypondHeader = function () {
 processLilypondNotes = function (logo, turtle) {
     // obj = [instructions] or
     // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
-    
+
     logo.lilypondNotes[turtle] = '';
-    
+
     function __toLilynote (note) {
         // Lilypond notes use is for sharp, es for flat,
         // , and ' for shifts in octave.
         // Also, notes must be lowercase.
         // And the octave bounday is at C, not A.
-	
+
         // Convert frequencies here.
         if (typeof(note) === 'number') {
             var pitchObj = frequencyToPitch(note);
             note = pitchObj[0] + pitchObj[1];
         }
-	
+
         return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
     };
-    
+
     var counter = 0;
     var queueSlur = false;
     var articulation = false;
@@ -62,32 +62,51 @@ processLilypondNotes = function (logo, turtle) {
     for (var i = 0; i < logo.notationStaging[turtle].length; i++) {
         obj = logo.notationStaging[turtle][i];
         if (typeof(obj) === 'string') {
-            if (obj === 'break') {
+            switch (obj) {
+            case 'break':
                 if (i > 0) {
                     logo.lilypondNotes[turtle] += '\n';
                 }
                 counter = 0;
-            } else {
-                if (obj === '(') {
-                    // The ( is added after the first note.
-                    queueSlur = true;
-                } else if (obj === 'begin articulation') {
-                    articulation = true;
-                } else if (obj === 'end articulation') {
-                    articulation = false;
-                } else {
-                    logo.lilypondNotes[turtle] += obj;
-                }
+                break;
+            case 'begin articulation':
+                articulation = true;
+                break;
+            case 'end articulation':
+                articulation = false;
+                break;
+            case 'begin crescendo':
+                logo.lilypondNotes[turtle] += '\\< ';
+                break;
+            case 'begin decrescendo':
+                logo.lilypondNotes[turtle] += '\\> ';
+                break;
+            case 'end crescendo':
+                logo.lilypondNotes[turtle] += '\\! ';
+                break;
+            case 'begin slur':
+                // The ( is added after the first note.
+                queueSlur = true;
+                break;
+            case 'end slur':
+                logo.lilypondNotes[turtle] += ') ';
+                break;
+            case 'tie':
+                logo.lilypondNotes[turtle] += '~';
+                break;
+            default:
+                logo.lilypondNotes[turtle] += obj;
+                break;
             }
         } else {
             if (counter % 8 === 0 && counter > 0) {
                 logo.lilypondNotes[turtle] += '\n';
             }
             counter += 1;
-	    
+
             var note = __toLilynote(obj[LYNOTE]);
             var incompleteTuplet = 0;  // An incomplete tuplet
-	    
+
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
             if (obj[LYTUPLETVALUE] != null) {
@@ -100,7 +119,7 @@ processLilypondNotes = function (logo, turtle) {
                         incompleteTuplet = j;
                         break;
                     }
-		    
+
                     if (logo.notationStaging[turtle][i + j][LYINSIDECHORD] > 0 && logo.notationStaging[turtle][i + j][LYINSIDECHORD] === logo.notationStaging[turtle][i + j - 1][LYINSIDECHORD]) {
                         // In a chord, so jump to next note.
                         j++;
@@ -115,11 +134,11 @@ processLilypondNotes = function (logo, turtle) {
                     }
                 }
             }
-	    
+
             function __processTuplet(logo, turtle, i, count) {
                 var j = 0;
                 var k = 0;
-		
+
                 while (k < count) {
                     var tupletDuration = 2 * logo.notationStaging[turtle][i + j][LYDURATION];
                     // Are we in a chord?
@@ -128,14 +147,14 @@ processLilypondNotes = function (logo, turtle) {
                         if ((i === 0 && j === 0) || logo.notationStaging[turtle][i + j - 1][LYINSIDECHORD] !== logo.notationStaging[turtle][i + j][LYINSIDECHORD]) {
                             logo.lilypondNotes[turtle] += '<';
                         }
-			
+
                         logo.lilypondNotes[turtle] += __toLilynote(logo.notationStaging[turtle][i + j][LYNOTE]);
                         if (obj[LYSTACCATO]) {
                             logo.lilypondNotes[turtle] += '\\staccato';
                         }
-			
+
                         logo.lilypondNotes[turtle] += ' ';
-			
+
                         // Is logo the last note in the chord?
                         if (i + j === logo.notationStaging[turtle].length - 1 || logo.notationStaging[turtle][i + j + 1][LYINSIDECHORD] !== logo.notationStaging[turtle][i + j][LYINSIDECHORD]) {
                             logo.lilypondNotes[turtle] += '>' + logo.notationStaging[turtle][i + j + 1][LYROUNDDOWN] + ' ';
@@ -147,13 +166,13 @@ processLilypondNotes = function (logo, turtle) {
                         if (obj[LYSTACCATO]) {
                             logo.lilypondNotes[turtle] += '\\staccato';
                         }
-			
+
                         logo.lilypondNotes[turtle] += ' ';
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
                 }
-		
+
                 // Workaround to a Lilypond "feature": if a slur
                 // ends on a tuplet, the closing ) must be inside
                 // the closing } of the tuplet.
@@ -168,28 +187,28 @@ processLilypondNotes = function (logo, turtle) {
                 } else {
                     logo.lilypondNotes[turtle] += '} ';
                 }
-		
+
                 return j;
             };
-	    
+
             if (obj[LYTUPLETVALUE] > 0) {
                 // lilypond tuplets look like logo: \tuplet 3/2 { f8 g a }
                 // multiplier = tupletDuration / targetDuration
                 // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
                 // There may be chords embedded.
-		
+
                 if (incompleteTuplet === 0) {
                     var tupletFraction = toFraction(tupletDuration / targetDuration);
                     logo.lilypondNotes[turtle] += '\\tuplet ' + tupletFraction[0] + '/' + tupletFraction[1] + ' { ';
-		    
+
                     i += __processTuplet(logo, turtle, i, obj[LYTUPLETVALUE]) - 1;
                 } else {
                     var tupletFraction = toFraction(obj[LYTUPLETVALUE] / incompleteTuplet);
                     logo.lilypondNotes[turtle] += '\\tuplet ' + tupletFraction[0] + '/' + tupletFraction[1] + ' { ';
-		    
+
                     i += __processTuplet(logo, turtle, i, incompleteTuplet) - 1;
                 }
-		
+
                 targetDuration = 0;
                 tupletDuration = 0;
             } else {
@@ -199,9 +218,9 @@ processLilypondNotes = function (logo, turtle) {
                         // Open the chord.
                         logo.lilypondNotes[turtle] += '<';
                     }
-		    
+
                     logo.lilypondNotes[turtle] += (note);
-		    
+
                     // Is logo the last note in the chord?
                     if (i === logo.notationStaging[turtle].length - 1 || logo.notationStaging[turtle][i + 1][LYINSIDECHORD] !== obj[LYINSIDECHORD]) {
                         // Close the chord and add note duration.
@@ -210,11 +229,11 @@ processLilypondNotes = function (logo, turtle) {
                         for (var d = 0; d < obj[LYDOTCOUNT]; d++) {
                             logo.lilypondNotes[turtle] += '.';
                         }
-			
+
                         if (articulation) {
                             logo.lilypondNotes[turtle] += '->';
                         }
-			
+
                         logo.lilypondNotes[turtle] += ' ';
                     }
                 } else {
@@ -222,97 +241,28 @@ processLilypondNotes = function (logo, turtle) {
                     for (var d = 0; d < obj[LYDOTCOUNT]; d++) {
                         logo.lilypondNotes[turtle] += '.';
                     }
-		    
+
                     if (articulation) {
                         logo.lilypondNotes[turtle] += '->';
                     }
                 }
-		
+
                 if (obj[LYSTACCATO]) {
                     logo.lilypondNotes[turtle] += '\\staccato';
                 }
-		
+
                 targetDuration = 0;
                 tupletDuration = 0;
             }
-	    
+
             logo.lilypondNotes[turtle] += ' ';
-	    
+
             if (queueSlur) {
                 queueSlur = false;
                 logo.lilypondNotes[turtle] += '(';
             }
         }
     }
-};
-
-
-lilypondLineBreak = function(logo, turtle) {
-    if (logo.notationStaging[turtle] == undefined) {
-        logo.notationStaging[turtle] = [];
-    }
-    
-    logo.notationStaging[turtle].push('break');
-};
-
-
-lilypondBeginArticulation = function(logo, turtle) {
-    if (logo.notationStaging[turtle] == undefined) {
-        logo.notationStaging[turtle] = [];
-    }
-    
-    logo.notationStaging[turtle].push('begin articulation');
-};
-
-
-lilypondEndArticulation = function(logo, turtle) {
-    logo.notationStaging[turtle].push('end articulation');
-};
-
-
-lilypondBeginCrescendo = function(logo, turtle, factor) {
-    if (logo.notationStaging[turtle] == undefined) {
-        logo.notationStaging[turtle] = [];
-    }
-    
-    if (factor > 0) {
-        logo.notationStaging[turtle].push('\\< ');
-    } else {
-        logo.notationStaging[turtle].push('\\> ');
-    }
-};
-
-
-lilypondEndCrescendo = function(logo, turtle) {
-    logo.notationStaging[turtle].push('\\! ');
-};
-
-
-lilypondBeginSlur = function(logo, turtle) {
-    if (logo.notationStaging[turtle] == undefined) {
-        logo.notationStaging[turtle] = [];
-    }
-    
-    logo.notationStaging[turtle].push('(');
-};
-
-
-lilypondEndSlur = function(logo, turtle) {
-    logo.notationStaging[turtle].push(') ');
-};
-
-
-lilypondInsertTie = function(logo, turtle) {
-    if (logo.notationStaging[turtle] == undefined) {
-        logo.notationStaging[turtle] = [];
-    }
-    
-    logo.notationStaging[turtle].push('~');
-};
-
-
-lilypondRemoveTie = function(logo, turtle) {
-    logo.notationStaging[turtle].pop();
 };
 
 
@@ -323,9 +273,9 @@ saveLilypondOutput = function(logo, saveName) {
         turtleCount += 1;
     }
     console.log('saving as lilypond: ' + turtleCount);
-    
+
     logo.lilypondOutput += '% You can change the MIDI instruments below to anything on logo list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n';
-    
+
     var c = 0;
     for (var t in logo.notationStaging) {
         if (logo.notationStaging[t].length > 0) {
@@ -367,9 +317,9 @@ saveLilypondOutput = function(logo, saveName) {
             } else {
                 clef.push('treble');
             }
-	    
+
             processLilypondNotes(logo, t);
-	    
+
             var instrumentName = logo.turtles.turtleList[t].name;
             if (instrumentName === _('start') || instrumentName === _('start drum')) {
                 instrumentName = RODENTS[t % 12];
@@ -378,25 +328,25 @@ saveLilypondOutput = function(logo, saveName) {
             }
 
             if (instrumentName === "") {
-            	instrumentName = RODENTSEN[t % 12];
+                instrumentName = RODENTSEN[t % 12];
             }
 
             instrumentName = instrumentName.replace(/ /g, '_');
-	    
+
             logo.lilypondOutput += instrumentName + ' = {\n';
             logo.lilypondOutput += '% \\meter\n';
             logo.lilypondOutput += logo.lilypondNotes[t];
-	    
+
             // Add bar to last turtle's output.
             if (c === turtleCount - 1) {
                 logo.lilypondOutput += ' \\bar "|."'
             }
             logo.lilypondOutput += '\n}\n\n';
-	    
+
             var shortInstrumentName = RODENTSSHORT[t % 12];
 
-            if (shortInstrumentName === "") {
-            	shortInstrumentName = RODENTSSHORTEN[t % 12];
+            if (shortInstrumentName === '') {
+                shortInstrumentName = RODENTSSHORTEN[t % 12];
             }
 
             logo.lilypondOutput += instrumentName.replace(/ /g, '_') + 'Voice = ';
@@ -412,16 +362,16 @@ saveLilypondOutput = function(logo, saveName) {
             logo.lilypondOutput += '   midiInstrument = "acoustic grand"\n';
             // Automatic note splitting
             logo.lilypondOutput += '\n   \\remove "Note_heads_engraver"\n   \\consists "Completion_heads_engraver"\n   \\remove "Rest_engraver"\n   \\consists "Completion_rest_engraver"\n'
-	    
+
             logo.lilypondOutput += '} { \\clef "' + last(clef) + '" \\' + instrumentName.replace(/ /g, '_') + ' }\n\n';
         }
         c += 1;
     }
-    
+
     // Begin the SCORE section.
     logo.lilypondOutput += '\n\\score {\n';
     logo.lilypondOutput += '   <<\n';
-    
+
     // Sort the staffs, treble on top, bass_8 on the bottom.
     for (var c = 0; c < CLEFS.length; c++) {
         var i = 0;
@@ -440,7 +390,7 @@ saveLilypondOutput = function(logo, saveName) {
             }
         }
     }
-    
+
     // Add GUITAR TAB in comments.
     logo.lilypondOutput += '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
     for (var c = 0; c < CLEFS.length; c++) {
@@ -460,14 +410,14 @@ saveLilypondOutput = function(logo, saveName) {
             }
         }
     }
-    
+
     // Close the SCORE sections.
     logo.lilypondOutput += '      >>\n%}\n';
     logo.lilypondOutput += '\n   >>\n   \\layout {}\n\n';
-    
+
     // Add MIDI OUTPUT in comments.
     logo.lilypondOutput += '% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n';
-    
+
     // ADD TURTLE BLOCKS CODE HERE
     logo.lilypondOutput += '% MUSIC BLOCKS CODE\n';
     logo.lilypondOutput += '% Below is the code for the Music Blocks project that generated logo Lilypond file.\n%{\n\n';
@@ -475,6 +425,6 @@ saveLilypondOutput = function(logo, saveName) {
     var projectData = prepareExport();
     logo.lilypondOutput += projectData.replace(/]],/g, ']],\n');
     logo.lilypondOutput += '\n%}\n\n';
-    
+
     doSaveLilypond(logo, saveName);
 };

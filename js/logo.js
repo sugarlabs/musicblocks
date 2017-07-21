@@ -206,9 +206,8 @@ function Logo () {
     // parameters used by notations
     this.notationStaging = {};
     this.checkingLilypond = false;
-    this.checkingLilypond = false;
-    this.lilypondNotes = {};
     this.lilypondOutput = getLilypondHeader();
+    this.lilypondNotes = {};
     this.runningLilypond = false;
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -1200,7 +1199,7 @@ function Logo () {
             var name = that.blocks.blockList[blk].privateData;
             if (name in that.actions) {
                 if (!that.justCounting[turtle]) {
-                    lilypondLineBreak(that, turtle);
+                    that.notationLineBreak(turtle);
                 }
 
                 if (that.backward[turtle].length > 0) {
@@ -1244,7 +1243,7 @@ function Logo () {
             if (args.length > 0) {
                 if (args[0] in that.actions) {
                     if (!that.justCounting[turtle]) {
-                        lilypondLineBreak(that, turtle);
+                        that.notationLineBreak(turtle);
                     }
                     childFlow = that.actions[args[0]];
                     childFlowCount = 1;
@@ -1268,7 +1267,7 @@ function Logo () {
             }
             if (name in that.actions) {
                 if (!that.justCounting[turtle]) {
-                    lilypondLineBreak(that, turtle);
+                    that.notationLineBreak(turtle);
                 }
 
                 if (that.backward[turtle].length > 0) {
@@ -1318,7 +1317,7 @@ function Logo () {
             if (args.length >= 1) {
                 if (args[0] in that.actions) {
                     if (!that.justCounting[turtle]) {
-                        lilypondLineBreak(that, turtle);
+                        that.notationLineBreak(turtle);
                     }
                     actionName = args[0];
                     childFlow = that.actions[args[0]];
@@ -3358,7 +3357,7 @@ function Logo () {
                     that.polyVolume[turtle].pop();
                     that.crescendoInitialVolume[turtle].pop();
                     if (!that.justCounting[turtle]) {
-                        lilypondEndCrescendo(that, turtle);
+                        that.notationEndCrescendo(turtle);
                     }
                 };
 
@@ -3886,7 +3885,7 @@ function Logo () {
                 }
 
                 if (!that.justCounting[turtle]) {
-                    lilypondBeginSlur(that, turtle);
+                    that.notationBeginSlur(turtle);
                 }
 
                 childFlow = args[1];
@@ -3898,7 +3897,7 @@ function Logo () {
                 var __listener = function (event) {
                     that.staccato[turtle].pop();
                     if (!that.justCounting[turtle]) {
-                        lilypondEndSlur(that, turtle);
+                        that.notationEndSlur(turtle);
                     }
                 };
 
@@ -3938,7 +3937,7 @@ function Logo () {
                     if (!that.justCounting[turtle]) {
                         // Remove the note from the Lilypond list.
                         for (var i = 0; i < that.notePitches[turtle].length; i++) {
-                            lilypondRemoveTie(that, turtle);
+                            that.notationRemoveTie(turtle);
                         }
                     }
                     var noteValue = that.tieCarryOver[turtle];
@@ -4144,7 +4143,7 @@ function Logo () {
                 that._setSynthVolume(newVolume, turtle);
 
                 if (!that.justCounting[turtle]) {
-                    lilypondBeginArticulation(that, turtle);
+                    that.notationBeginArticulation(turtle);
                 }
 
                 childFlow = args[1];
@@ -4156,7 +4155,7 @@ function Logo () {
                 var __listener = function (event) {
                     that.polyVolume[turtle].pop();
                     if (!that.justCounting[turtle]) {
-                        lilypondEndArticulation(that, turtle);
+                        that.notationEndArticulation(turtle);
                     }
                 };
 
@@ -4863,7 +4862,7 @@ function Logo () {
                         if (!this.justCounting[turtle]) {
                             // Remove the note from the Lilypond list.
                             for (var i = 0; i < this.notePitches[turtle].length; i++) {
-                                lilypondRemoveTie(this, turtle);
+                                this.notationRemoveTie(turtle);
                             }
                         }
 
@@ -5061,7 +5060,7 @@ function Logo () {
                             if (duration > 0) {
                                 if (carry > 0) {
                                     if (i === 0 && !that.justCounting[turtle]) {
-                                        lilypondInsertTie(that, turtle);
+                                        that.notationInsertTie(turtle);
                                     }
                                     originalDuration = 1 / ((1 / duration) - (1 / carry));
                                 } else {
@@ -5190,7 +5189,7 @@ function Logo () {
 
                 if (this.crescendoDelta[turtle].length > 0) {
                     if (last(this.crescendoVolume[turtle]) === last(this.crescendoInitialVolume[turtle]) && !this.justCounting[turtle]) {
-                        lilypondBeginCrescendo(this, turtle, last(this.crescendoDelta[turtle]));
+                        this.notationBeginCrescendo(turtle, last(this.crescendoDelta[turtle]));
                     }
 
                     var len = this.crescendoVolume[turtle].length
@@ -6596,5 +6595,65 @@ function Logo () {
         }
 
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
+    };
+
+    this.notationLineBreak = function (turtle) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('break');
+    };
+
+    this.notationBeginArticulation = function (turtle) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('begin articulation');
+    };
+
+    this.notationEndArticulation = function (turtle) {
+        this.notationStaging[turtle].push('end articulation');
+    };
+
+    this.notationBeginCrescendo = function (turtle, factor) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        if (factor > 0) {
+            this.notationStaging[turtle].push('begin crescendo');
+        } else {
+            this.notationStaging[turtle].push('begin descrescendo');
+        }
+    };
+
+    this.notationEndCrescendo = function (turtle) {
+        this.notationStaging[turtle].push('end crescendo');
+    };
+
+    this.notationBeginSlur = function (turtle) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('begin slur');
+    };
+
+    this.notationEndSlur = function (turtle) {
+        this.notationStaging[turtle].push('end slur');
+    };
+
+    this.notationInsertTie = function (turtle) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('tie');
+    };
+
+    this.notationRemoveTie = function (turtle) {
+        this.notationStaging[turtle].pop();
     };
 };
