@@ -3365,13 +3365,13 @@ function Logo () {
                 that._setDispatchBlock(blk, turtle, listenerName);
 
                 var __listener = function (event) {
+                    if (!that.justCounting[turtle]) {
+                        that.notationEndCrescendo(turtle, last(that.crescendoDelta[turtle]));
+                    }
                     that.crescendoDelta[turtle].pop();
                     that.crescendoVolume[turtle].pop();
                     that.polyVolume[turtle].pop();
                     that.crescendoInitialVolume[turtle].pop();
-                    if (!that.justCounting[turtle]) {
-                        that.notationEndCrescendo(turtle);
-                    }
                 };
 
                 that._setListener(turtle, listenerName, __listener);
@@ -6642,8 +6642,12 @@ function Logo () {
         }
     };
 
-    this.notationEndCrescendo = function (turtle) {
-        this.notationStaging[turtle].push('end crescendo');
+    this.notationEndCrescendo = function (turtle, factor) {
+        if (factor > 0) {
+            this.notationStaging[turtle].push('end crescendo');
+        } else {
+            this.notationStaging[turtle].push('end descrescendo');
+        }
     };
 
     this.notationBeginSlur = function (turtle) {

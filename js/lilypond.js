@@ -77,6 +77,9 @@ processLilypondNotes = function (logo, turtle) {
             case 'end crescendo':
                 logo.notationNotes[turtle] += '\\! ';
                 break;
+            case 'end decrescendo':
+                logo.notationNotes[turtle] += '\\! ';
+                break;
             case 'begin slur':
                 // The ( is added after the first note.
                 queueSlur = true;
