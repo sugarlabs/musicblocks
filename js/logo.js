@@ -2254,6 +2254,11 @@ function Logo () {
                 saveLilypondOutput(that, args[0]);
             }
             break;
+        case 'saveabc':
+            if (args.length === 1) {
+                saveAbcOutput(that, args[0]);
+            }
+            break;
         case 'setmasterbpm':
             if (args.length === 1 && typeof(args[0] === 'number')) {
                 if (args[0] < 30) {
