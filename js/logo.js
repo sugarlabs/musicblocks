@@ -31,6 +31,14 @@ const EMPTYHEAPERRORMSG = 'empty heap.';
 const INVALIDPITCH = 'Not a valid pitch name';
 const POSNUMBER = 'Argument must be a positive number';
 
+const NOTATIONNOTE = 0;
+const NOTATIONDURATION = 1;
+const NOTATIONDOTCOUNT = 2;
+const NOTATIONTUPLETVALUE = 3;
+const NOTATIONROUNDDOWN = 4;
+const NOTATIONINSIDECHORD = 5;
+const NOTATIONSTACCATO = 6;
+
 function Logo () {
     this.canvas = null;
     this.blocks = null;
@@ -206,8 +214,8 @@ function Logo () {
     // parameters used by notations
     this.notationStaging = {};
     this.checkingLilypond = false;
-    this.lilypondOutput = getLilypondHeader();
-    this.lilypondNotes = {};
+    this.notationOutput = getLilypondHeader();
+    this.notationNotes = {};
     this.runningLilypond = false;
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
