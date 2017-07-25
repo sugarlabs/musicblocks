@@ -144,6 +144,17 @@ input[type=range]:focus::-ms-fill-upper {
   height:50px;
   margin-left:40px;
 }
+#insideDivEffects {
+  margin-top: -30px;
+  height:50px;
+  margin-left:200px;
+}
+
+#insideDivSynth {
+  margin-top: -30px;
+  height:50px;
+  margin-left:200px;
+}
 .btn {
   background-color: #90c100;
   margin-top: 6px;
@@ -198,4 +209,36 @@ input[type=range]:focus::-ms-fill-upper {
   width: 150px;
   margin-left: 50px;
   margin-top: 20px;
+}
+#sFx0, #sFx1, #sFx2{
+  color: #222;
+  text-shadow: 0px 2px 3px #555;
+  font-weight: bold;
+  width: 100px;
+  text-align: center;
+  margin-left: 60px;
+  margin-top: 20px;
+  
+}
+#sS0, #sS1{
+  color: #222;
+  text-shadow: 0px 2px 3px #555;
+  font-weight: bold;
+  width: 100px;
+  text-align: center;
+  margin-left: 60px;
+  margin-top: 20px;
+}
+#synth0 {
+  margin-left: 40px;
+  font-weight: bold;
+}
+#chosen {
+  margin-left: 20px;
+  font-style: italic;
+  font-weight: bold;
+}
+#effect0 {
+  margin-left: 40px;
+  font-weight: bold;
 }

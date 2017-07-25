@@ -476,18 +476,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm2.dockTypes[1] = 'anyin';
     rhythm2.dockTypes[2] = 'anyin';
 
-    var sourceBlock = new ProtoBlock('source');
-    sourceBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['source'] = sourceBlock;
-    sourceBlock.staticLabels.push(_('source'), _('synth'), _('parameter'));
-    sourceBlock.extraWidth = 10;
-    sourceBlock.adjustWidthToLabel();
-    sourceBlock.defaults.push(_('AMSynth'));
-    sourceBlock.defaults.push(4);
-    sourceBlock.twoArgBlock();
-    sourceBlock.dockTypes[1] = 'textin';
-    sourceBlock.dockTypes[2] = 'numberin';
-
     var oscillatorBlock = new ProtoBlock('oscillator');
     oscillatorBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['oscillator'] = oscillatorBlock;
@@ -920,6 +908,38 @@ function initBasicProtoBlocks(palettes, blocks) {
     setMasterBPMBlock.adjustWidthToLabel();
     setMasterBPMBlock.oneArgBlock();
     setMasterBPMBlock.defaults.push(90);
+
+    var amSynthBlock = new ProtoBlock('amsynth');
+    amSynthBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['amsynth'] = amSynthBlock;
+    amSynthBlock.staticLabels.push(_('AMSynth'));
+    amSynthBlock.extraWidth = 10;
+    amSynthBlock.adjustWidthToLabel();
+    amSynthBlock.defaults.push(1);
+    amSynthBlock.oneArgBlock();
+    amSynthBlock.dockTypes[1] = 'numberin';
+
+    var fmSynthBlock = new ProtoBlock('fmsynth');
+    fmSynthBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['fmsynth'] = fmSynthBlock;
+    fmSynthBlock.staticLabels.push(_('FMSynth'));
+    fmSynthBlock.extraWidth = 10;
+    fmSynthBlock.adjustWidthToLabel();
+    fmSynthBlock.defaults.push(10);
+    fmSynthBlock.oneArgBlock();
+    fmSynthBlock.dockTypes[1] = 'numberin';
+
+    var duoSynthBlock = new ProtoBlock('duosynth');
+    duoSynthBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['duosynth'] = duoSynthBlock;
+    duoSynthBlock.staticLabels.push(_('Duo Synth'), _('vibratoRate'), _('vibratoAmount'));
+    duoSynthBlock.extraWidth = 10;
+    duoSynthBlock.adjustWidthToLabel();
+    duoSynthBlock.defaults.push(10);
+    duoSynthBlock.defaults.push(6);
+    duoSynthBlock.twoArgBlock();
+    duoSynthBlock.dockTypes[1] = 'numberin';
+    duoSynthBlock.dockTypes[2] = 'numberin';
 
     var voicenameBlock = new ProtoBlock('voicename');
     voicenameBlock.palette = palettes.dict['tone'];

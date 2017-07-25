@@ -2325,6 +2325,51 @@ function Logo () {
                 saveLilypondOutput(that, args[0]);
             }
             break;
+        case 'amsynth':
+            var harmonicity;
+            that.timbre.AMSynthParams = [];
+            if(args.length === 1 && typeof(args[0]) === 'number') {
+                if(args[0] < 0) {
+                    that.errorMsg(_('The input cannot be negative'));
+                }
+                harmonicity = args[0];
+            } 
+
+            if(that.inTimbre) {
+                    that.timbre.AMSynthesizer.push(blk);
+                    var AMSynthharmonicity = that.blocks.blockList[blk].connections[1];
+                    that.timbre.AMSynthParams.push(that.blocks.blockList[AMSynthharmonicity].text.text);
+            }  
+            break;
+        case 'fmsynth':
+            var modulationIndex;
+            if(args.length === 1 && typeof(args[0]) === 'number') {
+                if(args[0] < 0) {
+                    that.errorMsg(_('The input cannot be negative'));
+                }
+                modulationIndex = args[0];
+            }  
+            if(that.inTimbre) {
+                    that.timbre.FMSynthesizer.push(blk);
+                    var mi = that.blocks.blockList[blk].connections[1];
+                    that.timbre.FMSynthParams.push(that.blocks.blockList[mi].text.text);
+            }    
+            break;
+        case 'duosynth':
+            var synthVibratoRate;
+            var synthVibratoAmount;
+            if(args.length === 2 && typeof(args[0]) === 'number') {
+                synthVibratoRate = args[0];
+                synthVibratoAmount = args[1];
+            }   
+            if(that.inTimbre) {
+                    that.timbre.duoSynthesizer.push(blk);
+                    var duoSynthRate = that.blocks.blockList[blk].connections[1];
+                    var duoSynthAmount = that.blocks.blockList[blk].connections[2];
+                    that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthRate].text.text);
+                    that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthAmount].text.text);
+            }
+            break;
         case 'setmasterbpm':
             if (args.length === 1 && typeof(args[0] === 'number')) {
                 if (args[0] < 30) {
@@ -2527,6 +2572,22 @@ function Logo () {
             that.timbre.filterParams = [];
             that.timbre.osc = [];
             that.timbre.oscParams = [];
+            that.timbre.tremoloEffect = [];
+            that.timbre.tremoloParams = [];
+            that.timbre.vibratoEffect = [];
+            that.timbre.vibratoParams = [];
+            that.timbre.chorusEffect = [];
+            that.timbre.chorusParams = [];
+            that.timbre.phaserEffect = [];
+            that.timbre.phaserParams = [];
+            that.timbre.distortionEffect = [];
+            that.timbre.distortionParams = [];
+            that.timbre.AMSynthesizer = [];
+            that.timbre.AMSynthParams = [];
+            that.timbre.FMSynthesizer = [];
+            that.timbre.FMSynthParams = [];
+            that.timbre.duoSynthesizer = [];
+            that.timbre.duoSynthParams = [];
 
             var listenerName = '_timbre_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
@@ -3694,6 +3755,13 @@ function Logo () {
                that.vibratoRate[turtle].pop();
             };
             that._setListener(turtle, listenerName, __listener);
+            if(that.inTimbre) {
+                    that.timbre.vibratoEffect.push(blk);
+                    var vibratoEffectIntensity = that.blocks.blockList[blk].connections[1];
+                    var vibratoEffectRate = that.blocks.blockList[blk].connections[2];
+                    that.timbre.vibratoParams.push(that.blocks.blockList[vibratoEffectIntensity].text.text);
+                    that.timbre.vibratoParams.push(that.blocks.blockList[vibratoEffectRate].text.text);
+                }
             break;
         case 'dis':
             var distortion = (args[0] / 100);
@@ -3712,6 +3780,11 @@ function Logo () {
                that.distortionAmount[turtle].pop();
             };
             that._setListener(turtle, listenerName, __listener);
+            if(that.inTimbre) {
+                that.timbre.distortionEffect.push(blk);
+                    var distortionEffectAmount = that.blocks.blockList[blk].connections[1];
+                    that.timbre.distortionParams.push(that.blocks.blockList[distortionEffectAmount].text.text);
+                }
             break;
         case 'tremolo':
             var frequency = args[0];
@@ -3737,6 +3810,13 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
+            if(that.inTimbre) {
+                    that.timbre.tremoloEffect.push(blk);
+                    var tremoloEffectRate = that.blocks.blockList[blk].connections[1];
+                    var tremoloEffectDepth = that.blocks.blockList[blk].connections[2];
+                    that.timbre.tremoloParams.push(that.blocks.blockList[tremoloEffectRate].text.text);
+                    that.timbre.tremoloParams.push(that.blocks.blockList[tremoloEffectDepth].text.text);
+                } 
             break;
         case 'phaser':
             var rate = args[0];
@@ -3760,6 +3840,16 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
+            if(that.inTimbre) {
+                    that.timbre.phaserEffect.push(blk);
+                    var phaserEffectRate = that.blocks.blockList[blk].connections[1];
+                    var phaserEffectOctaves = that.blocks.blockList[blk].connections[2];
+                    var phaserEffectFrequency = that.blocks.blockList[blk].connections[3];
+                    that.timbre.phaserParams.push(that.blocks.blockList[phaserEffectRate].text.text);
+                    that.timbre.phaserParams.push(that.blocks.blockList[phaserEffectOctaves].text.text);
+                    that.timbre.phaserParams.push(that.blocks.blockList[phaserEffectFrequency].text.text);
+                } 
+            
             break;
         case 'chorus':
             var chorusRate = args[0];
@@ -3788,6 +3878,17 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
+
+            if(that.inTimbre) {
+                    that.timbre.chorusEffect.push(blk);
+                    var chorusEffectRate = that.blocks.blockList[blk].connections[1];
+                    var chorusEffectDelay = that.blocks.blockList[blk].connections[2];
+                    var chorusEffectDepth = that.blocks.blockList[blk].connections[3];
+                    that.timbre.chorusParams.push(that.blocks.blockList[chorusEffectRate].text.text);
+                    that.timbre.chorusParams.push(that.blocks.blockList[chorusEffectDelay].text.text);
+                    that.timbre.chorusParams.push(that.blocks.blockList[chorusEffectDepth].text.text);
+                } 
+
             break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
