@@ -1,5 +1,5 @@
 function TimbreWidget () {
-	const BUTTONDIVWIDTH = 476;   // 8 buttons 476 = (55 + 4) * 8
+    const BUTTONDIVWIDTH = 476;   // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 685;
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
@@ -133,7 +133,7 @@ function TimbreWidget () {
     };
 
     this.init = function(logo) {
-    	this._logo = logo;
+        this._logo = logo;
         
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -179,7 +179,7 @@ function TimbreWidget () {
 
         var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
         oscillatorButtonCell.onclick=function() {
-        	that.oscillatorActive = true;
+            that.oscillatorActive = true;
             that.filterActive = false;
             that.envelopeActive = false;
             that.effectsActive = false;
@@ -298,7 +298,7 @@ function TimbreWidget () {
             this.amsynthActive = false;
             this.fmsynthActive = false;
             this.duosynthActive = false;
-        	effectsButtonCell.id = "effectsButtonCell";
+            effectsButtonCell.id = "effectsButtonCell";
             that._effects();
         }
 
@@ -324,7 +324,7 @@ function TimbreWidget () {
         this._dragCellHTML = dragCell.innerHTML;
 
         dragCell.onmouseover = function(e) {
-           	dragCell.innerHTML = '';
+                   dragCell.innerHTML = '';
         };
 
         dragCell.onmouseout = function(e) {
@@ -343,7 +343,7 @@ function TimbreWidget () {
                 var x = e.clientX - that._dx;
                 timbreDiv.style.left = x + 'px';
                 var y = e.clientY - that._dy;
-               	timbreDiv.style.top = y + 'px';
+                timbreDiv.style.top = y + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
@@ -377,17 +377,14 @@ function TimbreWidget () {
         };
     };
 
-    this.clampConnection = function (len, topOfClamp) {
-        // Calculate the block number of the clamp.
-        var n = that._logo.blocks.blockList.length - len;
-
+    this.clampConnection = function (n, clamp, topOfClamp) {
         // Connect the clamp to the Widget block.
         that._logo.blocks.blockList[that.blockNo].connections[2] = n;
         that._logo.blocks.blockList[n].connections[0] = that.blockNo;
 
         // If there were blocks in the Widget, move them inside the clamp.
         if (topOfClamp != null) {
-            that._logo.blocks.blockList[n].connections[len] = topOfClamp;
+            that._logo.blocks.blockList[n].connections[clamp] = topOfClamp;
             that._logo.blocks.blockList[topOfClamp].connections[0] = n;
         }
 
@@ -712,7 +709,7 @@ function TimbreWidget () {
         docById("envelopeButtonCell").onmouseover = function(){};
         docById("envelopeButtonCell").onmouseout =  function(){};
 
-    	timbreTableDiv.style.display = 'inline';
+        timbreTableDiv.style.display = 'inline';
         timbreTableDiv.style.visibility = 'visible';
         timbreTableDiv.style.border = '0px';
         timbreTableDiv.style.overflow = 'auto';
@@ -721,19 +718,19 @@ function TimbreWidget () {
         timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
 
         var env = docById('timbreTable');
-      	var htmlElements = "";
-		for (var i = 0; i < 4; i++) {
-   			htmlElements += '<div id="wrapperEnv'+i+'"><div class="circle">'+("ADSR").charAt(i)+'</div><div id="insideDivEnv"><input type="range" id="myRange'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspan'+i+'"class="rangeslidervalue">2</span></div></div>';
-		};
+        var htmlElements = "";
+        for (var i = 0; i < 4; i++) {
+            htmlElements += '<div id="wrapperEnv'+i+'"><div class="circle">'+("ADSR").charAt(i)+'</div><div id="insideDivEnv"><input type="range" id="myRange'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspan'+i+'"class="rangeslidervalue">2</span></div></div>';
+        };
 
         env.innerHTML = htmlElements;
-		var envAppend = document.createElement("div");
-		envAppend.id = "envAppend";
-		envAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
-		envAppend.style.height = "30px";
-		envAppend.style.marginTop = "40px";
-		envAppend.style.overflow = "auto";
-    	env.append(envAppend);
+        var envAppend = document.createElement("div");
+        envAppend.id = "envAppend";
+        envAppend.style.backgroundColor = MATRIXBUTTONCOLOR;
+        envAppend.style.height = "30px";
+        envAppend.style.marginTop = "40px";
+        envAppend.style.overflow = "auto";
+        env.append(envAppend);
 
         docById("envAppend").innerHTML = '<button class="btn" id="reset"><b>RESET</b></button>';
         var btnReset = docById("reset");
@@ -864,7 +861,7 @@ function TimbreWidget () {
     };
 
     this._effects = function(){
-    	console.log('hey effects');
+        console.log('hey effects');
         var that = this;
         var blockValue = 0;
         
@@ -941,15 +938,15 @@ function TimbreWidget () {
                     // This is the first block in the child stack of the Timbre clamp.
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
-                        const TREMOLOOBJ = [[0,["tremolo",{}],0,0,[null,1,2,null,3]],[1,["number",{"value":10}],0,0,[0]],[2,["number",{"value":50}],0,0,[0]],[3,"hidden",0,0,[0,null]]];
+                        var n = that._logo.blocks.blockList.length;
+                        const TREMOLOOBJ = [[0,["tremolo",{}],0,0,[null,1,2,null,3]],[1,["number",{"value":10}],0,0,[0]],[2,["number",{"value":50}],0,0,[0]],[3,'hidden',0,0,[0,null]]];
                         that._logo.blocks.loadNewBlocks(TREMOLOOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 4; 
                         that.tremoloEffect.push(n);
                         that.tremoloParams.push(10);
                         that.tremoloParams.push(50);
                
-                        setTimeout(that.clampConnection(4, topOfClamp), 500);
+                        setTimeout(that.clampConnection(n, 3, topOfClamp), 500);
                     }
 
                     for(var i = 0; i < 2; i++){
@@ -993,15 +990,15 @@ function TimbreWidget () {
                     if (that.vibratoEffect.length === 0) {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
-                        const VIBRATOOBJ = [[0,["vibrato",{}],486,200,[null,1,3,null,2]],[1,["number",{"value":10}],558.02197265625,200,[0]],[2,["hidden",{}],486,326,[0,null]],[3,["number",{"value":60}],558.02197265625,231.5,[0]]];
+                        var n = that._logo.blocks.blockList.length;
+                        const VIBRATOOBJ = [[0,["vibrato",{}],0,0,[null,1,2,null,3]],[1,["number",{"value":10}],0,0,[0]],[2,["number",{"value":60}],0,0,[0]],[3,'hidden',0,0,[0,null]]];
                         that._logo.blocks.loadNewBlocks(VIBRATOOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 4; 
                         that.vibratoEffect.push(n);
                         that.vibratoParams.push(10);
                         that.vibratoParams.push(60);
                
-                        setTimeout(that.clampConnection(4, topOfClamp), 500);
+                        setTimeout(that.clampConnection(n, 3, topOfClamp), 500);
                     }
 
                     for(var i = 0; i < 2; i++){
@@ -1048,16 +1045,16 @@ function TimbreWidget () {
                     if (that.chorusEffect.length === 0) {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
-                        const CHORUSOBJ = [[0,["chorus",{}],415,305,[null,1,2,3,null,null]],[1,["number",{"value":2}],487.02197265625,305,[0]],[2,["number",{"value":4}],487.02197265625,336.5,[0]],[3,["number",{"value":70}],487.02197265625,368,[0]]];
+                        var n = that._logo.blocks.blockList.length;
+                        const CHORUSOBJ = [[0,["chorus",{}],415,305,[null,1,2,3,null,4]],[1,["number",{"value":2}],0,0,[0]],[2,["number",{"value":4}],0,0,[0]],[3,["number",{"value":70}],0,0,[0]],[4,'hidden',0,0,[0,null]]];
                         that._logo.blocks.loadNewBlocks(CHORUSOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 4; 
                         that.chorusEffect.push(n);
                         that.chorusParams.push(2);
                         that.chorusParams.push(4);
                         that.chorusParams.push(70);
                
-                        setTimeout(that.clampConnection(4, topOfClamp), 500);
+                        setTimeout(that.clampConnection(n, 4, topOfClamp), 500);
                     }
 
                     for(var i = 0; i < 3; i++){
@@ -1104,16 +1101,16 @@ function TimbreWidget () {
                     if (that.phaserEffect.length === 0) {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
-                        const PHASEROBJ = [[0,["phaser",{}],447,251,[null,1,2,3,null,null]],[1,["number",{"value":5}],519.8642578125,251,[0]],[2,["number",{"value":3}],519.8642578125,282.5,[0]],[3,["number",{"value":350}],519.8642578125,314,[0]]];
+                        var n = that._logo.blocks.blockList.length;
+                        const PHASEROBJ = [[0,["phaser",{}],447,251,[null,1,2,3,null,4]],[1,["number",{"value":5}],0,0,[0]],[2,["number",{"value":3}],0,0,[0]],[3,["number",{"value":350}],0,0,[0]],[4,'hidden',0,0,[0,null]]];
                         that._logo.blocks.loadNewBlocks(PHASEROBJ);
 
-                        var n = that._logo.blocks.blockList.length - 4; 
                         that.phaserEffect.push(n);
                         that.phaserParams.push(5);
                         that.phaserParams.push(3);
                         that.phaserParams.push(350);
                
-                        setTimeout(that.clampConnection(4, topOfClamp), 500);
+                        setTimeout(that.clampConnection(n, 4, topOfClamp), 500);
                     }
 
                     for(var i = 0; i < 3; i++){
@@ -1151,14 +1148,14 @@ function TimbreWidget () {
                     if (that.distortionEffect.length === 0) {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
-                        const DISTORTIONOBJ = [[0,["dis",{}],531,104,[null,1,null,null]],[1,["number",{"value":40}],618.8642578125,104,[0]]];
+                        var n = that._logo.blocks.blockList.length;
+                        const DISTORTIONOBJ = [[0,["dis",{}],0,0,[null,1,null,2]],[1,["number",{"value":40}],0,0,[0]],[2,'hidden',0,0,[0,null]]];
                         that._logo.blocks.loadNewBlocks(DISTORTIONOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 2; 
                         that.distortionEffect.push(n);
                         that.distortionParams.push(40);
                         
-                        setTimeout(that.clampConnection(2, topOfClamp), 500);
+                        setTimeout(that.clampConnection(n, 2, topOfClamp), 500);
                     }
                     document.getElementById("wrapperFx0").addEventListener('change', function(event){
                         console.log("bl"+blockValue);
@@ -1227,4 +1224,3 @@ function TimbreWidget () {
         }
     };
 };
-
