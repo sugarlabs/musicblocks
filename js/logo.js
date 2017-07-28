@@ -6638,7 +6638,7 @@ function Logo () {
         if (factor > 0) {
             this.notationStaging[turtle].push('begin crescendo');
         } else {
-            this.notationStaging[turtle].push('begin descrescendo');
+            this.notationStaging[turtle].push('begin decrescendo');
         }
     };
 
@@ -6646,7 +6646,7 @@ function Logo () {
         if (factor > 0) {
             this.notationStaging[turtle].push('end crescendo');
         } else {
-            this.notationStaging[turtle].push('end descrescendo');
+            this.notationStaging[turtle].push('end decrescendo');
         }
     };
 
