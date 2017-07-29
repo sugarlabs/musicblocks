@@ -309,6 +309,14 @@ var VOICENAMES = [
     // [_('basse'), 'basse', 'images/voices.svg'],
     //.TRANS: polytone synthesizer
     [_('poly'), 'poly', 'images/synth.svg'],
+    //.TRANS: Amplitude Modulation Synthesizer
+    [_('AMSynth'), 'AMSynth', 'images/synth.svg'],
+    //.TRANS: Frequency Modulation Synthesizer
+    [_('FMSynth'), 'FMSynth', 'images/synth.svg'],
+    //.TRANS:Duo Synthesizer
+    [_('duoSynth'), 'duoSynth', 'images/synth.svg'],
+    //.TRANS: Mono Synthesizer
+    [_('monoSynth'), 'monoSynth', 'images/synth.svg'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg'],
     //.TRANS: square wave
@@ -1258,6 +1266,10 @@ function Synth () {
     this.synthset = {
         // builtin synths
         'poly': [null, null],
+        'AMSynth': [null, null],
+        'FMSynth': [null, null],
+        'duoSynth': [null, null],
+        'monoSynth': [null, null],
         'sine': [null, null],
         'triangle': [null, null],
         'sawtooth': [null, null],
@@ -1317,6 +1329,18 @@ function Synth () {
         case 'basse':
             return this.synthset[name][1];
             break;
+        case 'AMSynth':
+            return this.synthset['AMSynth'][1];
+            break; 
+        case 'FMSynth':
+            return this.synthset['FMSynth'][1];
+            break; 
+        case 'duoSynth':
+            return this.synthset['duoSynth'][1];
+            break;    
+        case 'monoSynth':
+            return this.synthset['monoSynth'][1];
+            break;            
         case 'default':
         case 'poly':
             return this.synthset['poly'][1];
@@ -1371,6 +1395,59 @@ function Synth () {
             case 'default':
                 this.synthset['poly'][1] = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
+            case 'AMSynth':
+                var synthOpt = {
+                    oscillator: {
+                        type: "sine"
+                    },
+                    envelope: {
+                        attack: 0.03,
+                        decay: 0,
+                        sustain: 1,
+                        release: 0.03
+                    },
+                };
+                this.synthset['AMSynth'][1] = new Tone.AMSynth(synthOpt);
+                break;   
+            case 'FMSynth':
+                var synthOpts = {
+                    oscillator: {
+                        type: "sine"
+                    },
+                    envelope: {
+                        attack: 0.03,
+                        decay: 0,
+                        sustain: 1,
+                        release: 0.03
+                    },
+                };
+                this.synthset['FMSynth'][1] = new Tone.FMSynth(synthOpts);
+                break; 
+            case 'duoSynth':
+                var synthOpts = {
+                    oscillator: {
+                        type: "sine"
+                    },
+                    envelope: {
+                        attack: 0.03,
+                        decay: 0,
+                        sustain: 1,
+                        release: 0.03
+                    },
+                };
+                this.synthset['duoSynth'][1] = new Tone.DuoSynth(synthOpts);
+                break; 
+            case 'monoSynth':
+                var synthOpt = {
+                    oscillator: {
+                        type: "square"
+                    },
+                    envelope: {
+                        attack: 0.1
+                    },
+                };
+                this.synthset['monoSynth'][1] = new Tone.MonoSynth(synthOpt);
+                break;              
             case 'violin':
             case 'cello':
             case 'basse':
@@ -1617,6 +1694,18 @@ function Synth () {
 
             this.performNotes(this.synthset[name][1], noteNo - centerNo, beatValue, params);
             break;
+        case 'AMSynth':
+            this.performNotes(this.synthset['AMSynth'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);
+            break;
+        case 'FMSynth':
+            this.performNotes(this.synthset['FMSynth'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency);    
+            break;
+        case 'duoSynth':
+            this.performNotes(this.synthset['duoSynth'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency); 
+            break;
+        case 'monoSynth':
+            this.performNotes(this.synthset['monoSynth'][1], notes, beatValue, doVibrato, vibratoIntensity, vibratoFrequency); 
+            break;  
         case 'default':
         case 'poly':
 
