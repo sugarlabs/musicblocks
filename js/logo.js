@@ -3757,10 +3757,8 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             if(that.inTimbre) {
                     that.timbre.vibratoEffect.push(blk);
-                    var vibratoEffectIntensity = that.blocks.blockList[blk].connections[1];
-                    var vibratoEffectRate = that.blocks.blockList[blk].connections[2];
-                    that.timbre.vibratoParams.push(that.blocks.blockList[vibratoEffectIntensity].text.text);
-                    that.timbre.vibratoParams.push(that.blocks.blockList[vibratoEffectRate].text.text);
+                    that.timbre.vibratoParams.push(last(that.vibratoIntensity[turtle]) * 100);
+                    that.timbre.vibratoParams.push(last(that.vibratoRate[turtle]));
                 }
             break;
         case 'dis':
@@ -3782,9 +3780,8 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             if(that.inTimbre) {
                 that.timbre.distortionEffect.push(blk);
-                    var distortionEffectAmount = that.blocks.blockList[blk].connections[1];
-                    that.timbre.distortionParams.push(that.blocks.blockList[distortionEffectAmount].text.text);
-                }
+                that.timbre.distortionParams.push(last(that.distortionAmount[turtle]));
+            }
             break;
         case 'tremolo':
             var frequency = args[0];
@@ -3811,12 +3808,10 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             if(that.inTimbre) {
-                    that.timbre.tremoloEffect.push(blk);
-                    var tremoloEffectRate = that.blocks.blockList[blk].connections[1];
-                    var tremoloEffectDepth = that.blocks.blockList[blk].connections[2];
-                    that.timbre.tremoloParams.push(that.blocks.blockList[tremoloEffectRate].text.text);
-                    that.timbre.tremoloParams.push(that.blocks.blockList[tremoloEffectDepth].text.text);
-                } 
+                that.timbre.tremoloEffect.push(blk);
+                that.timbre.tremoloParams.push(last(that.tremoloFrequency[turtle]));
+                that.timbre.tremoloParams.push(last(that.tremoloDepth[turtle]) * 100);
+            } 
             break;
         case 'phaser':
             var rate = args[0];
@@ -3841,15 +3836,11 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             if(that.inTimbre) {
-                    that.timbre.phaserEffect.push(blk);
-                    var phaserEffectRate = that.blocks.blockList[blk].connections[1];
-                    var phaserEffectOctaves = that.blocks.blockList[blk].connections[2];
-                    var phaserEffectFrequency = that.blocks.blockList[blk].connections[3];
-                    that.timbre.phaserParams.push(that.blocks.blockList[phaserEffectRate].text.text);
-                    that.timbre.phaserParams.push(that.blocks.blockList[phaserEffectOctaves].text.text);
-                    that.timbre.phaserParams.push(that.blocks.blockList[phaserEffectFrequency].text.text);
-                } 
-            
+                that.timbre.phaserEffect.push(blk);
+                that.timbre.phaserParams.push(last(that.rate[turtle]));
+                that.timbre.phaserParams.push(last(that.octaves[turtle]));
+                that.timbre.phaserParams.push(last(that.baseFrequency[turtle]));
+            } 
             break;
         case 'chorus':
             var chorusRate = args[0];
@@ -3880,15 +3871,11 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
 
             if(that.inTimbre) {
-                    that.timbre.chorusEffect.push(blk);
-                    var chorusEffectRate = that.blocks.blockList[blk].connections[1];
-                    var chorusEffectDelay = that.blocks.blockList[blk].connections[2];
-                    var chorusEffectDepth = that.blocks.blockList[blk].connections[3];
-                    that.timbre.chorusParams.push(that.blocks.blockList[chorusEffectRate].text.text);
-                    that.timbre.chorusParams.push(that.blocks.blockList[chorusEffectDelay].text.text);
-                    that.timbre.chorusParams.push(that.blocks.blockList[chorusEffectDepth].text.text);
-                } 
-
+                that.timbre.chorusEffect.push(blk);
+                that.timbre.chorusParams.push(last(that.chorusRate[turtle]));
+                that.timbre.chorusParams.push(last(that.delayTime[turtle]));
+                that.timbre.chorusParams.push(last(that.chorusDepth[turtle]));
+            } 
             break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
