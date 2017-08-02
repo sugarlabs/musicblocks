@@ -100,12 +100,44 @@ function TimbreWidget () {
                 updateParams[j] = this._logo.blocks.blockList[this.tremoloEffect[i]].connections[j+1];
             }
         }
+
         if (this.vibratoActive === true && this.vibratoEffect[i] != null) {
             updateParams[0] = this._logo.blocks.blockList[this.vibratoEffect[i]].connections[1];
-            // The rate arg of the vibrato block is in the form: 1 / n
+            // The rate arg of the vibrato block must be in the form: a / b
             var divBlock = this._logo.blocks.blockList[this.vibratoEffect[i]].connections[2];
-            updateParams[1] = this._logo.blocks.blockList[divBlock].connections[2];
+            if (this._logo.blocks.blockList[divBlock].name === 'divide' && this._logo.blocks.blockList[divBlock].connections[1] != null && this._logo.blocks.blockList[this._logo.blocks.blockList[divBlock].connections[1]].name === 'number' && this._logo.blocks.blockList[divBlock].connections[2] != null && this._logo.blocks.blockList[this._logo.blocks.blockList[divBlock].connections[2]].name === 'number') {
+
+                var numBlock = this._logo.blocks.blockList[divBlock].connections[1];
+                var denomBlock = this._logo.blocks.blockList[divBlock].connections[2];
+                updateParams[1] = denomBlock;
+                updateParams[2] = numBlock;
+            } else {
+                // Convert to a / b format
+                var obj = rationalToFraction(this._logo.parseArg(this._logo, 0, divBlock, null, null));
+                var topOfClamp = this._logo.blocks.blockList[last(this.vibratoEffect)].connections[3];
+                var n = this._logo.blocks.blockList.length;
+                const DIVOBJ = [[0, ["divide", {}], 0, 0, [null, 1, 2]], [1, ["number", {"value": obj[0]}], 0, 0, [0]], [2, ["number", {"value": obj[1]}], 0, 0, [0]]];
+                this._logo.blocks.loadNewBlocks(DIVOBJ);
+
+                updateParams[1] = n + 2;  // Denom block
+                updateParams[2] = n + 1;  // Numerator block
+
+                that = this;
+                
+                __blockRefresher = function () {
+                    that._logo.blocks.blockList[last(that.vibratoEffect)].connections[2] = n;
+                    that._logo.blocks.blockList[n].connections[0] = last(that.vibratoEffect);
+                    that._logo.blocks.blockList[divBlock].connections[0] = null;
+                    that._logo.blocks._clampBlocksToCheck.push([n, 0]);
+                    that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
+                    that._logo.blocks.adjustDocks(that.blockNo, true);
+                };
+
+                setTimeout(__blockRefresher(), 250);
+
+            }
         }
+
         if (this.chorusActive === true && this.chorusEffect[i] != null) {
             for (j = 0; j < 3; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.chorusEffect[i]].connections[j+1];
@@ -859,12 +891,7 @@ function TimbreWidget () {
         docById('sel1').value = that.filterParams[0];
         that._update(blockValue, that.filterParams[0], 0);
 
-        for (var i = 0; i < rolloffValue.length; i++) {
-            if(rolloffValue[i].value === that.filterParams[1]){
-                rolloffValue[i].checked = true;
-                that._update(blockValue, that.filterParams[1], 1);
-            }
-        }
+        that._update(blockValue, that.filterParams[1], 1);
         
         docById("myRangeF2").value = parseFloat(that.filterParams[2]);
         docById("myspanF2").textContent = that.filterParams[2];
@@ -875,17 +902,11 @@ function TimbreWidget () {
             docById("filterButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             docById('sel1').value = that.filterParams[0];
             that._update(blockValue, that.filterParams[0], 0);
-
-            for (var i = 0; i < rolloffValue.length; i++) {
-                if (rolloffValue[i].value === that.filterParams[1]) {
-                    rolloffValue[i].checked = true;
-                    that._update(blockValue, that.filterParams[1], 1);
-                }
-            }
-
+            that._update(blockValue, that.filterParams[1], 1);
             docById("myRangeF2").value = parseFloat(that.filterParams[2]);
             docById("myspanF2").textContent = that.filterParams[2];
             that._update(blockValue, that.filterParams[2], 2);
+        
         }
     };
 
@@ -989,61 +1010,72 @@ function TimbreWidget () {
                             that._update(blockValue, elem.value, Number(m));
                         });    
                     }
-                } else if(effectChosen === "Vibrato") {
+                } else if (effectChosen === "Vibrato") {
                     that.tremoloActive = false;
                     that.chorusActive = false;
                     that.phaserActive = false;
                     that.vibratoActive = true;
                     that.distortionActive = false;
                     
-                    for(var i = 0; i < 2; i++) {
+                    for (var i = 0; i < 2; i++) {
                         subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
                     }
+
+                    // Set slider values
                     subDiv.innerHTML = subHtmlElements;
                     docById('sFx0').textContent = "Intensity";
-                    docById('myRangeFx0').value = 10;
-                    docById('myspanFx0').textContent = "10";
                     docById('sFx1').textContent = "Rate";
-                    docById('myRangeFx1').value = 16;
-                    docById('myspanFx1').textContent = "16";
 
-                    if (that.vibratoEffect.length === 0) {
-                        var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                    if (that.vibratoEffect.length > 0) {
+                        var vibratroBlock = last(that.vibratoEffect);
+                        docById("myRangeFx0").value = parseFloat(that.vibratoParams[0]);
+                        docById("myspanFx0").textContent = that.vibratoParams[0];
+                        // Scale of rate is 0 to 1, so we need to multiply by 100
+                        docById("myRangeFx1").value = 100 / parseFloat(that.vibratoParams[1]);
+                        var obj = rationalToFraction(1 / parseFloat(that.vibratoParams[1]));
+                        docById("myspanFx1").textContent = obj[0] + '/' + obj[1];  // that.vibratoParams[1];
+                    } else {
+                        // If necessary, add a vibrato block.
+                        var topOfTimbreClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
-                        var n = that._logo.blocks.blockList.length;
+                        var vibratoBlock = that._logo.blocks.blockList.length;
                         const VIBRATOOBJ = [[0, ["vibrato", {}], 0, 0, [null, 1, 3, 2, 6]], [1, ["number", {"value": 10}], 0, 0, [0]], [2, ["vspace", {}], 0, 0, [0, null]], [3, ["divide", {}], 0, 0, [0, 4, 5]], [4, ["number", {"value": 1}], 0, 0, [3]], [5, ["number", {"value": 16}], 0, 0, [3]], [6, ["hidden", {}], 0, 0, [0, null]]];
                         that._logo.blocks.loadNewBlocks(VIBRATOOBJ);
 
-                        that.vibratoEffect.push(n);
+                        that.vibratoEffect.push(vibratoBlock);
                         that.vibratoParams.push(10);
                         that.vibratoParams.push(16);
-                        
-                        setTimeout(that.clampConnectionVspace(n, n + 2, topOfClamp), 500);
-                    }
-                    console.log(that.vibratoParams);
-                    if(that.vibratoEffect.length != 0) {
-                        console.log("vibrato1"+that.vibratoParams[0]);
-                        console.log("vibrato2"+that.vibratoParams[1]);
-                        blockValue = that.vibratoEffect.length - 1;
-                        docById("myRangeFx0").value = parseFloat(that.vibratoParams[0]);
-                        docById("myspanFx0").textContent = that.vibratoParams[0];
-                        that._update(blockValue, that.vibratoParams[0], 0);  
-                        docById("myRangeFx1").value = parseFloat(that.vibratoParams[1]);
-                        docById("myspanFx1").textContent = that.vibratoParams[1];
-                        that._update(blockValue, that.vibratoParams[1], 1);  
+
+                        setTimeout(that.clampConnectionVspace(n, n + 2, topOfTimbreClamp), 500);
+
+                        docById('myRangeFx0').value = 10;
+                        docById('myspanFx0').textContent = "10";
+                        // Scale of rate is 0 to 1, so we need to multiply by 100
+                        docById('myRangeFx1').value = 100 / 16;
+                        docById('myspanFx1').textContent = "1/16";
                     }
 
-                    for(var i = 0; i < 2; i++){
-                        document.getElementById("wrapperFx"+i).addEventListener('change', function(event){
-                            docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
-                            var elem = event.target;
-                            var m = elem.id.slice(-1);
-                            docById("myRangeFx"+m).value = parseFloat(elem.value);
-                            docById("myspanFx"+m).textContent = elem.value;
-                            console.log(elem.value);
-                            that._update(blockValue, elem.value, Number(m));
-                        });    
-                    }    
+                    // Add the listeners for the sliders.
+                    document.getElementById("wrapperFx0").addEventListener('change', function(event){
+                        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
+                        var elem = event.target;
+                        var m = elem.id.slice(-1);
+                        docById("myRangeFx0").value = parseFloat(elem.value);
+                        docById("myspanFx0").textContent = elem.value;
+                        that._update(that.vibratoEffect.indexOf(vibratroBlock), elem.value, 0);
+                    });    
+
+                    document.getElementById("wrapperFx1").addEventListener('change', function(event){
+                        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
+                        var elem = event.target;
+                        docById("myRangeFx1").value = parseFloat(elem.value);
+
+                        var obj = rationalToFraction(elem.value / 100);
+                        docById("myspanFx1").textContent = obj[0] + '/' + obj[1];
+                        that._update(that.vibratoEffect.indexOf(vibratroBlock), obj[1], 1);
+                        that._update(that.vibratoEffect.indexOf(vibratroBlock), obj[0], 2);
+                    });    
+
                 } else if(effectChosen === "Chorus" ) {
                     that.tremoloActive = false;
                     that.chorusActive = true;

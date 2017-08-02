@@ -3780,7 +3780,7 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             if(that.inTimbre) {
                 that.timbre.distortionEffect.push(blk);
-                that.timbre.distortionParams.push(last(that.distortionAmount[turtle]));
+                that.timbre.distortionParams.push(last(that.distortionAmount[turtle]) * 100);
             }
             break;
         case 'tremolo':
@@ -3874,7 +3874,7 @@ function Logo () {
                 that.timbre.chorusEffect.push(blk);
                 that.timbre.chorusParams.push(last(that.chorusRate[turtle]));
                 that.timbre.chorusParams.push(last(that.delayTime[turtle]));
-                that.timbre.chorusParams.push(last(that.chorusDepth[turtle]));
+                that.timbre.chorusParams.push(last(that.chorusDepth[turtle]) * 100);
             } 
             break;
         case 'interval':
