@@ -1230,6 +1230,14 @@ define(MYDEFINES, function (compatibility) {
                 case 83: // 'S'
                     logo.doStopTurtle();
                     break;
+		case 81: // 'Q' //changing background color by assigning class 'jscolor' to newly created input button and then calling update() (refer: https://jscolor.com)
+		    {
+		     var colorinput = document.createElement("input");
+		     colorinput.value = "92b5c8";
+		     colorinput.visible = false;    
+	             colorinput.className = "jscolor {onChange:'update(this)'}";						
+		    }
+		     break;		
                 }
             } else if (event.ctrlKey) {
             } else {
@@ -1506,7 +1514,11 @@ define(MYDEFINES, function (compatibility) {
         function _doUtilityBox() {
             utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
         };
-
+	
+	function update(jscolor){
+	    window.platformColor.background = '#' + jscolor ; 
+	};
+	    
         function sendAllToTrash(addStartBlock, doNotSave) {
             // First, hide the palettes as they will need updating.
             for (var name in blocks.palettes.dict) {
