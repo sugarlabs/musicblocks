@@ -225,7 +225,6 @@ function Logo () {
         // Load the default synthesizer
         this.synth = new Synth();
         this.synth.createDefaultSynth();
-       
     }
     else {
         this.turtleOscs = {};
@@ -798,7 +797,7 @@ function Logo () {
             this.justCounting[turtle] = false;
             this.suppressOutput[turtle] = this.runningLilypond;
         }
-        
+
         this.pitchNumberOffset = 39;  // C4
 
         if (!this.suppressOutput[turtle]) {
@@ -5159,19 +5158,16 @@ function Logo () {
 
                                     //    that.synth.triggerWithEffects(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
                                         that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), params_effects);
-                                    }
-                                    else if (that.drumStyle[turtle].length > 0) {
+                                    } else if (that.drumStyle[turtle].length > 0) {
                                         //that.synth.triggerWithEffects(notes, beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
                                         that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null);
-                                    }
-                                    else if (that.turtles.turtleList[turtle].drum) {
+                                    } else if (that.turtles.turtleList[turtle].drum) {
                                        // that.synth.triggerWithEffects(notes, beatValue, 'drum', [], [], [], [], []);
                                         that.synth.trigger(notes, beatValue, 'drum', null);
 
-                                    }
-                                    else {
+                                    } else {
                                         // Look for any notes in the chord that might be in the pitchDrumTable.
-                                    
+
                                      /*   if (turtle in that.instrument_names){
                                             console.log('instrument_name : ' + last(that.instrument_names[turtle]));
                                         }
