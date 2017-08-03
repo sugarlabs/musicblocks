@@ -40,6 +40,7 @@ const NOTATIONINSIDECHORD = 5;
 const NOTATIONSTACCATO = 6;
 
 function Logo () {
+
     this.canvas = null;
     this.blocks = null;
     this.turtles = null;
@@ -66,6 +67,7 @@ function Logo () {
     this.pitchSlider = null;
     this.modeWidget = null;
     this.statusMatrix = null;
+    this.source_name = {};
 
     this.evalFlowDict = {};
     this.evalArgDict = {};
@@ -164,6 +166,7 @@ function Logo () {
     this.duplicateFactor = {};
     this.skipFactor = {};
     this.skipIndex = {};
+    this.instrument_names = {};
     this.crescendoDelta = {};
     this.crescendoVolume = {};
     this.crescendoInitialVolume = {};
@@ -221,8 +224,10 @@ function Logo () {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
         this.synth = new Synth();
-        this.synth.loadSynth('poly');
-    } else {
+        this.synth.createDefaultSynth();
+       
+    }
+    else {
         this.turtleOscs = {};
     }
 
@@ -756,6 +761,7 @@ function Logo () {
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
+            this.instrument_names[turtle] = [];
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
@@ -792,7 +798,7 @@ function Logo () {
             this.justCounting[turtle] = false;
             this.suppressOutput[turtle] = this.runningLilypond;
         }
-
+        
         this.pitchNumberOffset = 39;  // C4
 
         if (!this.suppressOutput[turtle]) {
@@ -5125,28 +5131,65 @@ function Logo () {
 
                             if (!that.suppressOutput[turtle] && duration > 0) {
                                 if (_THIS_IS_MUSIC_BLOCKS_) {
+
+                                     /*parameters related to effects*/
+                                     var params_effects = {
+                                         "doVibrato" : false,
+                                         "doDistortion" : false,
+                                         "doTremolo" : false,
+                                         "doPhaser" : false,
+                                         "doChorus" : false,
+                                         "vibratoIntensity" : vibratoIntensity,
+                                         "vibratoFrequency" : vibratoValue,
+                                         "distortionAmount" : distortionAmount,
+                                         "tremoloFrequency" : tremoloFrequency,
+                                         "tremoloDepth" : tremoloDepth,
+                                         "rate" : rate,
+                                         "octaves" : octaves,
+                                         "baseFrequency" : baseFrequency,
+                                         "chorusRate" : chorusRate,
+                                         "delayTime" : delayTime,
+                                         "chorusDepth" : chorusDepth
+                                    };
+
                                     if (that.oscList[turtle].length > 0) {
                                         if (notes.length > 1) {
                                             that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                         }
 
-                                        that.synth.triggerWithEffects(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
-                                    } else if (that.drumStyle[turtle].length > 0) {
-                                        that.synth.triggerWithEffects(notes, beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
-                                    } else if (that.turtles.turtleList[turtle].drum) {
-                                        that.synth.triggerWithEffects(notes, beatValue, 'drum', [], [], [], [], []);
+                                    //    that.synth.triggerWithEffects(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
+                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), params_effects);
+                                    }
+                                    else if (that.drumStyle[turtle].length > 0) {
+                                        //that.synth.triggerWithEffects(notes, beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
+                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null);
+                                    }
+                                    else if (that.turtles.turtleList[turtle].drum) {
+                                       // that.synth.triggerWithEffects(notes, beatValue, 'drum', [], [], [], [], []);
+                                        that.synth.trigger(notes, beatValue, 'drum', null);
 
-                                    } else {
+                                    }
+                                    else {
                                         // Look for any notes in the chord that might be in the pitchDrumTable.
+                                    
+                                     /*   if (turtle in that.instrument_names){
+                                            console.log('instrument_name : ' + last(that.instrument_names[turtle]));
+                                        }
+                                     */
+
                                         for (var d = 0; d < notes.length; d++) {
                                             if (notes[d] in that.pitchDrumTable[turtle]) {
-
-                                                that.synth.triggerWithEffects(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], [], [], [], [], []);
-                                            } else if (turtle in that.voices && last(that.voices[turtle])) {
-                                                that.synth.triggerWithEffects(notes[d], beatValue, last(that.voices[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
-                                            } else {
-                                                that.synth.triggerWithEffects(notes[d], beatValue, 'default', [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
-
+                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null);
+                                            }
+                                            else if (turtle in that.instrument_names && last(that.instrument_names[turtle])) {
+                                               // console.log('trying to access synth: ' + last(that.instrument_names[turtle]));
+                                                that.synth.trigger(notes[d], beatValue, last(that.instrument_names[turtle]), params_effects);
+                                            }
+                                            else if (turtle in that.voices && last(that.voices[turtle])) {
+                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), params_effects);
+                                            }
+                                             else {
+                                                that.synth.trigger(notes[d], beatValue, 'default', params_effects);
                                             }
                                         }
                                     }
@@ -5167,16 +5210,17 @@ function Logo () {
                         }
 
                         // console.log("drums to play " + drums + ' ' + noteBeatValue);
-
                         if (!that.suppressOutput[turtle] && duration > 0) {
                             if (_THIS_IS_MUSIC_BLOCKS_) {
                                 for (var i = 0; i < drums.length; i++) {
+
                                     if (that.drumStyle[turtle].length > 0) {
 
-                                        that.synth.triggerWithEffects(['C2'], beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
+                                       // that.synth.triggerWithEffects(['C2'], beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
+                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), null);
                                     } else {
-                                        that.synth.triggerWithEffects(['C2'], beatValue, drums[i], [], [], [], [], []);
-
+                                       // that.synth.triggerWithEffects(['C2'], beatValue, drums[i], [], [], [], [], []);
+                                        that.synth.trigger(['C2'], beatValue, drums[i], null);
                                     }
                                 }
                             }
