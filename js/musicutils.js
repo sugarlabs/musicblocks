@@ -1444,15 +1444,15 @@ function Synth() {
         instruments_source['custom'] = [0, 'custom'];
         instruments_source['default'] = [0, 'default'];
 
-        for (var blt in builtin_synths) {
+        for (var blt in BUILTIN_SYNTHS) {
             this.createSynth(blt, blt, null);
         }
 
-        for (var voice in voice_samples) {
+        for (var voice in VOICE_SAMPLES) {
             this.createSynth(voice, voice, null);
         }
 
-        for (var drm in drum_samples) {
+        for (var drm in DRUM_SAMPLES) {
             this.createSynth(drm, drm, null);
         }
     };
@@ -1460,18 +1460,18 @@ function Synth() {
     // Function reponsible for creating the synth using the existing
     // samples: drums and voices
     this.createSampleSynth = function (instrument_name, source_name, params) {
-        if (source_name in voice_samples) {
+        if (source_name in VOICE_SAMPLES) {
             instruments_source[instrument_name] = [2, source_name];
-            var temp_synth = new Tone.Sampler(voice_samples[source_name]);
+            var temp_synth = new Tone.Sampler(VOICE_SAMPLES[source_name]);
         }
-        else if (source_name in drum_samples) {
+        else if (source_name in DRUM_SAMPLES) {
             instruments_source[instrument_name] = [1, source_name];
-            var temp_synth = new Tone.Sampler(drum_samples[source_name]);
+            var temp_synth = new Tone.Sampler(DRUM_SAMPLES[source_name]);
         }
         else {
             // default drum sample
             instruments_source[instrument_name] = [1, 'drum'];
-            var temp_synth = new Tone.Sampler(drum_samples[DEFAULTDRUM]);
+            var temp_synth = new Tone.Sampler(DRUM_SAMPLES[DEFAULTDRUM]);
         }
 
         return temp_synth;
@@ -1479,7 +1479,7 @@ function Synth() {
 
     // Function using builtin synths from Tone.js
     this.createBuiltinSynth = function (instrument_name, source_name, params) {
-        if (source_name in builtin_synths) {
+        if (source_name in BUILTIN_SYNTHS) {
             var synthOptions = this.getDefaultParamValues(source_name);
             synthOptions = validateAndSetParams(synthOptions, params);
         }
@@ -1539,13 +1539,13 @@ function Synth() {
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (instrument_name, source_name, params) {
 
-        if ((source_name in voice_samples) || (source_name in drum_samples)) {
+        if ((source_name in VOICE_SAMPLES) || (source_name in DRUM_SAMPLES)) {
             instruments[instrument_name] = this.createSampleSynth(instrument_name, source_name, null).toMaster();
         }
-        else if (source_name in builtin_synths) {
+        else if (source_name in BUILTIN_SYNTHS) {
             instruments[instrument_name] = this.createBuiltinSynth(instrument_name, source_name, params).toMaster();
         }
-        else if (source_name in custom_synths) {
+        else if (source_name in CUSTOM_SYNTHS) {
             instruments[instrument_name] = this.createCustomSynth(source_name, params).toMaster();
             instruments_source[instrument_name] = [0, 'poly'];
         }
