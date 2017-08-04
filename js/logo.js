@@ -68,16 +68,13 @@ function Logo () {
     this.pitchSlider = null;
     this.modeWidget = null;
     this.statusMatrix = null;
-<<<<<<< HEAD
+
     this.attack = {};
     this.decay = {};
     this.sustain = {};
     this.release = {};
-
-=======
     this.source_name = {};
->>>>>>> upstream/master
-
+    
     this.evalFlowDict = {};
     this.evalArgDict = {};
     this.evalParameterDict = {};
@@ -771,14 +768,8 @@ function Logo () {
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
-<<<<<<< HEAD
-            //this.attack[turtle] = [];
-           //this.sustain[turtle] = [];
-            //this.decay[turtle] = [];
-            //this.release[turtle] = [];
-=======
+
             this.instrument_names[turtle] = [];
->>>>>>> upstream/master
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
@@ -2277,7 +2268,7 @@ function Logo () {
                 saveLilypondOutput(that, args[0]);
             }
             break;
-<<<<<<< HEAD
+
         case 'amsynth':
             var harmonicity;
             that.timbre.AMSynthParams = [];
@@ -2321,11 +2312,10 @@ function Logo () {
                     var duoSynthAmount = that.blocks.blockList[blk].connections[2];
                     that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthRate].text.text);
                     that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthAmount].text.text);
-=======
+
         case 'saveabc':
             if (args.length === 1) {
                 saveAbcOutput(that, args[0]);
->>>>>>> upstream/master
             }
             break;
         case 'setmasterbpm':
