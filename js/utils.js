@@ -705,7 +705,7 @@ function mixedNumber (d) {
     // Return number as a mixed fraction string, e.g., "2 1/4"
     var floor = Math.floor(d);
     if (d > floor) {
-	var obj = rationalToFraction(d - floor);
+    var obj = rationalToFraction(d - floor);
         if (floor === 0) {
             return obj[0] + '/' + obj[1];
         } else {
@@ -720,7 +720,7 @@ function mixedNumber (d) {
             }
         }
     } else {
-	return d.toString();
+    return d.toString();
     }
 };
 
@@ -791,5 +791,183 @@ readable-fractions/681534#681534
         return [bot, top];
     } else {
         return [top, bot];
+    }
+};
+
+
+function oneHundredToFraction (d) {
+   // Generate some simple fractions based on a scale of 1-100
+
+    if (d < 1) {
+        return [1, 64];
+    } else if (d > 99) {
+        return [1, 1];
+    }
+
+    switch(Math.floor(d)) {
+    case 1:
+        return [1, 64];
+        break;
+    case 2:
+        return [1, 48];
+        break;
+    case 3:
+    case 4:
+    case 5:
+        return [1, 32];
+        break;
+    case 6:
+    case 7:
+    case 8:
+        return [1, 16];
+        break;
+    case 9:
+    case 10:
+    case 11:
+        return [1, 12];
+        break;
+    case 12:
+    case 13:
+    case 14:
+        return [1, 8];
+        break;
+    case 15:
+    case 16:
+    case 17:
+        return [1, 6];
+        break;
+    case 18:
+    case 19:
+        return [3, 16];
+        break;
+    case 20:
+    case 21:
+    case 22:
+        return [1, 5];
+        break;
+    case 23:
+    case 24:
+    case 25:
+    case 26:
+    case 27:
+    case 28:
+    case 29:
+        return [1, 4];
+        break;
+    case 30:
+    case 31:
+        return [5, 16];
+        break;
+    case 32:
+    case 33:
+    case 34:
+    case 35:
+        return [1, 3];
+        break;
+    case 36:
+    case 37:
+    case 38:
+    case 39:
+        return [3, 8];
+        break;
+    case 40:
+    case 41:
+        return [2, 5];
+        break;
+    case 42:
+    case 43:
+    case 44:
+        return [7, 16];
+        break;
+    case 45:
+    case 46:
+    case 47:
+        return [15, 32];
+        break;
+    case 48:
+    case 49:
+    case 50:
+    case 51:
+    case 52:
+        return [1, 2];
+        break;
+    case 53:
+    case 54:
+        return [17, 32];
+        break;
+    case 56:
+    case 57:
+    case 58:
+        return [9, 16];
+        break;
+    case 59:
+    case 60:
+    case 61:
+        return [3, 5];
+        break;
+    case 62:
+    case 63:
+    case 64:
+    case 65:
+        return [5, 8];
+        break;
+    case 66:
+    case 67:
+        return [2, 3];
+        break;
+    case 68:
+    case 69:
+    case 70:
+        return [11, 16];
+        break;
+    case 71:
+    case 72:
+    case 73:
+    case 74:
+    return [23, 32];
+        break;
+    case 75:
+    case 76:
+    case 77:
+    case 78:
+    case 79:
+    case 80:
+        return [3, 4];
+        break;
+    case 81:
+    case 82:
+        return [13, 16];
+        break;
+    case 83:
+    case 84:
+    case 85:
+    case 86:
+        return [5, 6];
+        break;
+    case 87:
+    case 88:
+    case 89:
+    case 90:
+        return [7, 8];
+        break;
+    case 91:
+    case 92:
+        return [11, 12];
+        break;
+    case 93:
+    case 94:
+    case 95:
+        return [15, 16];
+        break;
+    case 96:
+    case 98:
+        return [31, 32];
+        break;
+    case 98:
+        return [63, 64];
+        break;
+    default:
+        return [d, 100];
+    break;
     }
 };

@@ -158,6 +158,9 @@ function TimbreWidget () {
             } else {
                 this._logo.blocks.blockList[updateParams[k]].value = parseFloat(value);
             }
+
+            console.log(this._logo.blocks.blockList[updateParams[k]].value);
+
             this._logo.blocks.blockList[updateParams[k]].text.text = value.toString();
             this._logo.blocks.blockList[updateParams[k]].updateCache();
             this._logo.refreshCanvas();
@@ -1046,7 +1049,7 @@ function TimbreWidget () {
                         that.vibratoParams.push(10);
                         that.vibratoParams.push(16);
 
-                        setTimeout(that.clampConnectionVspace(n, n + 2, topOfTimbreClamp), 500);
+                        setTimeout(that.clampConnectionVspace(vibratoBlock, vibratoBlock + 2, topOfTimbreClamp), 500);
 
                         docById('myRangeFx0').value = 10;
                         docById('myspanFx0').textContent = "10";
@@ -1059,10 +1062,9 @@ function TimbreWidget () {
                     document.getElementById("wrapperFx0").addEventListener('change', function(event){
                         docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                         var elem = event.target;
-                        var m = elem.id.slice(-1);
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
-                        that._update(that.vibratoEffect.indexOf(vibratroBlock), elem.value, 0);
+                        that._update(that.vibratoEffect.length - 1, elem.value, 0);
                     });    
 
                     document.getElementById("wrapperFx1").addEventListener('change', function(event){
@@ -1070,12 +1072,11 @@ function TimbreWidget () {
                         var elem = event.target;
                         docById("myRangeFx1").value = parseFloat(elem.value);
 
-                        var obj = rationalToFraction(elem.value / 100);
+                        var obj = oneHundredToFraction(elem.value);
                         docById("myspanFx1").textContent = obj[0] + '/' + obj[1];
-                        that._update(that.vibratoEffect.indexOf(vibratroBlock), obj[1], 1);
-                        that._update(that.vibratoEffect.indexOf(vibratroBlock), obj[0], 2);
+                        that._update(that.vibratoEffect.length - 1, obj[1], 1);
+                        that._update(that.vibratoEffect.length - 1, obj[0], 2);
                     });    
-
                 } else if(effectChosen === "Chorus" ) {
                     that.tremoloActive = false;
                     that.chorusActive = true;
