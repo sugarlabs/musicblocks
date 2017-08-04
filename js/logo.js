@@ -3287,6 +3287,37 @@ function Logo () {
                 that.pickup[turtle] = args[0];
             }
             break;
+        case 'onbeatdo':
+            // Set up a listner for this turtle/beat combo.
+            if (args.length === 2) {
+                if (!(args[1] in that.actions)) {
+                    that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                    that.stopTurtle = true;
+                } else {
+                    var __listener = function (event) {
+                        if (that.turtles.turtleList[turtle].running) {
+                            var queueBlock = new Queue(that.actions[args[1]], 1, blk);
+                            that.parentFlowQueue[turtle].push(blk);
+                            that.turtles.turtleList[turtle].queue.push(queueBlock);
+                        } else {
+                            // Since the turtle has stopped
+                            // running, we need to run the stack
+                            // from here.
+                            if (isflow) {
+                                that._runFromBlockNow(that, turtle, that.actions[args[1]], isflow, receivedArg);
+                            } else {
+                                that._runFromBlock(that, turtle, that.actions[args[1]], isflow, receivedArg);
+                            }
+                        }
+                    };
+
+                    // If there is already a listener, remove it
+                    // before adding the new one.
+		    var eventName = '__beat_' + args[0] + '_' + turtle + '__';
+                    that._setListener(turtle, eventName, __listener);
+                }
+            }
+            break;
         case 'meter':
             if (args.length !== 2 || typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -5039,6 +5070,15 @@ function Logo () {
                     }
 
                     that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
+                    if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+			var beatValue = 0;
+                    } else {
+                        var beatValue = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
+                    }
+
+                    // FIXME: Only dispatch if there is a signal enabled
+		    var eventName = '__beat_' + beatValue + '_' + turtle + '__';
+                    that.stage.dispatchEvent(eventName);
 
                     var notes = [];
                     var drums = [];

@@ -539,6 +539,17 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // RHYTHM PALETTE
 
+    var onBeatDoBlock = new ProtoBlock('onbeatdo');
+    onBeatDoBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['onbeatdo'] = onBeatDoBlock;
+    // #TRANS: 'on' musical 'beat' 'do' some action
+    onBeatDoBlock.staticLabels.push(_('on'), _('beat'), _('do'));
+    onBeatDoBlock.twoArgBlock();
+    onBeatDoBlock.defaults.push(1);
+    onBeatDoBlock.defaults.push(_('action'));
+    onBeatDoBlock.dockTypes[1] = 'numberin';
+    onBeatDoBlock.dockTypes[2] = 'textin';
+
     var pickupBlock = new ProtoBlock('pickup');
     pickupBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['pickup'] = pickupBlock;
