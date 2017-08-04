@@ -558,9 +558,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['meter'] = meter;
     // .TRANS: musical meter (time signature)
     meter.staticLabels.push(_('meter'), _('number of beats'), _('note value'));
+    meter.extraWidth = 15;
     meter.adjustWidthToLabel();
     meter.defaults.push(4);
-    meter.defaults.push(4);
+    meter.defaults.push(0.25);
     meter.twoArgBlock();
 
     var noteCounter = new ProtoBlock('notecounter');

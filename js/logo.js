@@ -3303,7 +3303,7 @@ function Logo () {
             if (args[1] <= 0) {
                 that.noteValuePerBeat[turtle] = 4;
             } else {
-                that.noteValuePerBeat[turtle] = args[1];
+                that.noteValuePerBeat[turtle] = 1 / args[1];
             }
             break;
         case 'osctime':
@@ -6025,9 +6025,11 @@ function Logo () {
                 break;
             case 'beatvalue':
                 if (that.notesPlayed[turtle] < that.pickup[turtle]) {
-                    that.blocks.blockList[blk].value = -1;
+                    // Beat count of 0 means we are still in the pickup.
+                    that.blocks.blockList[blk].value = 0;
                 } else {
-                    that.blocks.blockList[blk].value = ((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle];
+                    // Beat count starts at 1.
+                    that.blocks.blockList[blk].value = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
                 }
                 break;
             case 'turtlenote':
