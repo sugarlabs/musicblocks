@@ -539,6 +539,30 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // RHYTHM PALETTE
 
+    var pickupBlock = new ProtoBlock('pickup');
+    pickupBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['pickup'] = pickupBlock;
+    // .TRANS: anacrusis
+    pickupBlock.staticLabels.push(_('pickup'));
+    pickupBlock.oneArgBlock();
+    pickupBlock.defaults.push(0);
+
+    var beatValueBlock = new ProtoBlock('beatvalue');
+    beatValueBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['beatvalue'] = beatValueBlock;
+    beatValueBlock.staticLabels.push(_('beat value'));
+    beatValueBlock.parameterBlock();
+
+    var meter = new ProtoBlock('meter');
+    meter.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['meter'] = meter;
+    // .TRANS: musical meter (time signature)
+    meter.staticLabels.push(_('meter'), _('number of beats'), _('note value'));
+    meter.adjustWidthToLabel();
+    meter.defaults.push(4);
+    meter.defaults.push(4);
+    meter.twoArgBlock();
+
     var noteCounter = new ProtoBlock('notecounter');
     noteCounter.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['notecounter'] = noteCounter;
@@ -823,18 +847,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     setkey2Block.twoArgBlock();
     setkey2Block.dockTypes[1] = 'anyin';
     setkey2Block.dockTypes[2] = 'anyin';
-
-    var meter = new ProtoBlock('meter');
-    meter.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['meter'] = meter;
-    meter.hidden = true;
-    meter.staticLabels.push(_('meter'), _('numerator'), _('denominator'));
-    meter.adjustWidthToLabel();
-    meter.defaults.push(3);
-    meter.defaults.push(4);
-    meter.twoArgMathBlock();
-    meter.dockTypes[1] = 'number';
-    meter.dockTypes[2] = 'number';
 
     var setMasterBPMBlock = new ProtoBlock('setmasterbpm');
     setMasterBPMBlock.palette = palettes.dict['tone'];

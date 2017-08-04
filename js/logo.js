@@ -156,6 +156,11 @@ function Logo () {
     this.currentNotes = {};
     this.currentOctaves = {};
 
+    // parameters used in time signature
+    this.pickup = {};
+    this.beatsPerMeasure = {};
+    this.noteValuePerBeat = {};
+
     // parameters used by the note block
     this.bpm = {};
     this.turtleTime = [];
@@ -796,6 +801,10 @@ function Logo () {
             this.dispatchFactor[turtle] = 1;
             this.justCounting[turtle] = false;
             this.suppressOutput[turtle] = this.runningLilypond;
+            this.pickup[turtle] = 0;
+            // Default is 4/4 time.
+            this.beatsPerMeasure[turtle] = 4;
+            this.noteValuePerBeat[turtle] = 4;
         }
 
         this.pitchNumberOffset = 39;  // C4
@@ -3265,8 +3274,37 @@ function Logo () {
         case 'sixtyfourthNote':
             that._processNote(64, blk, turtle);
             break;
+        case 'pickup':
+            if (args.length !== 1 || typeof(args[0]) !== 'number') {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] < 0) {
+                that.pickup[turtle] = 0;
+            } else {
+                that.pickup[turtle] = args[0];
+            }
+            break;
         case 'meter':
-            // See Issue #337
+            if (args.length !== 2 || typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] <= 0) {
+                that.beatsPerMeasure[turtle] = 4;
+            } else {
+                that.beatsPerMeasure[turtle] = args[0];
+            }
+
+            if (args[1] <= 0) {
+                that.noteValuePerBeat[turtle] = 4;
+            } else {
+                that.noteValuePerBeat[turtle] = args[1];
+            }
             break;
         case 'osctime':
         case 'newnote':
@@ -4730,9 +4768,6 @@ function Logo () {
             var noteBeatValue = noteValue;
         }
 
-        // How best to expose this in the UI? What units?
-        this.notesPlayed[turtle] += (1 / (noteValue * this.beatFactor[turtle]));
-
         var vibratoRate = 0;
         var vibratoValue = 0;
         var vibratoIntensity = 0;
@@ -5002,6 +5037,8 @@ function Logo () {
                     if (that.stopTurtle) {
                         return;
                     }
+
+                    that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
 
                     var notes = [];
                     var drums = [];
@@ -5984,6 +6021,13 @@ function Logo () {
                 if (value == null) {
                     that.errorMsg('Could not find turtle ' + targetTurtle, blk);
                     that.blocks.blockList[blk].value = 0;
+                }
+                break;
+            case 'beatvalue':
+                if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+                    that.blocks.blockList[blk].value = -1;
+                } else {
+                    that.blocks.blockList[blk].value = ((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle];
                 }
                 break;
             case 'turtlenote':
