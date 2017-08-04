@@ -2312,7 +2312,8 @@ function Logo () {
                     var duoSynthAmount = that.blocks.blockList[blk].connections[2];
                     that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthRate].text.text);
                     that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthAmount].text.text);
-
+            }
+            break;
         case 'saveabc':
             if (args.length === 1) {
                 saveAbcOutput(that, args[0]);
