@@ -2593,6 +2593,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     audioStopBlock.adjustWidthToLabel();
     audioStopBlock.zeroArgBlock();
 
+    var abcBlock = new ProtoBlock('saveabc');
+    abcBlock.palette = palettes.dict['extras'];
+    blocks.protoBlockDict['saveabc'] = abcBlock;
+    abcBlock.staticLabels.push(_('save as ABC'));
+    abcBlock.adjustWidthToLabel();
+    abcBlock.oneArgBlock();
+    abcBlock.defaults.push(_('title') + '.abc');
+    abcBlock.dockTypes[1] = 'textin';
+
     var lilypondBlock = new ProtoBlock('savelilypond');
     lilypondBlock.palette = palettes.dict['extras'];
     blocks.protoBlockDict['savelilypond'] = lilypondBlock;

@@ -8,6 +8,7 @@ fundamental musical concepts in an integrative and fun way.
 
 ![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/screenshots/Screenshot-1.png)
 
+![alt tag](https://raw.githubusercontent.com/walterbender/musicblocks/master/screenshots/Screenshot-2.png)
 
 Using Music Blocks
 ------------------
@@ -49,10 +50,14 @@ worked at Affron Scripp & Associates, LLC.
 Some of the graphics were contributed by Chie Yasuda.
 
 Much of the initial coding of the fork from Turtle Blocks was done by
-Yash Khandelwal as part of Google Summer of Code (GSOC) 2015. Hemant
-Kasat contributed to additional widgets as part of GSOC 2016.
+Yash Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant
+Kasat contributed to additional widgets as part of GSoC
+2016. Additional contributions are being made by Tayba Wasim, Dinuka
+Tharangi Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi
+Patel as part of GSoC 2017.
 
-Many students contributed to the code as part of Google Code-in (2015-16)
+Many students contributed to the project as part of Google Code-in
+(2015-16 and 2016-17).
 
 Reporting Bugs
 --------------

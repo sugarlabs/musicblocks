@@ -55,7 +55,11 @@ if (lang.indexOf('-') !== -1) {
 }
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
+<<<<<<< HEAD
     MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/timbre', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
+=======
+    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'activity/abc', 'prefixfree.min'];
+>>>>>>> upstream/master
 } else {
     MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
 }
@@ -81,7 +85,7 @@ define(MYDEFINES, function (compatibility) {
 
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
-	    var lang = document.webL10n.getLanguage();
+            var lang = document.webL10n.getLanguage();
             if (['es', 'ca', 'de', 'el', 'eo', 'fi', 'fr', 'hu', 'it', 'kn', 'la', 'lv', 'nl', 'pl', 'pt', 'ro', 'sk', 'sv', 'tr', 'zh'].indexOf(lang) !== -1) {
                 meSpeak.loadVoice('lib/voices/' + lang + '.json');
             } else {
@@ -92,16 +96,6 @@ define(MYDEFINES, function (compatibility) {
         }
 
         var canvas = docById('myCanvas');
-
-        var queue = new createjs.LoadQueue(false);
-
-        // Check for the various File API support.
-        if (window.File && window.FileReader && window.FileList && window.Blob) {
-            var files = true;
-        } else {
-            alert('The File APIs are not fully supported in this browser.');
-            var files = false;
-        }
 
         // Set up a file chooser for the doOpen function.
         var fileChooser = docById('myOpenFile');
@@ -123,19 +117,14 @@ define(MYDEFINES, function (compatibility) {
         var thumbnails;
         var buttonsVisible = true;
         var headerContainer = null;
-        var toolbarButtonsVisible = true;
         var menuButtonsVisible = true;
         var menuContainer = null;
         var scrollBlockContainer = false;
-        var currentKey = '';
         var currentKeyCode = 0;
-        var lastKeyCode = 0;
         var pasteContainer = null;
         var pasteImage = null;
         var chartBitmap = null;
-        if (_THIS_IS_TURTLE_BLOCKS_) {
-            var saveBox;
-        }
+        var saveBox;
 
         // Calculate the palette colors.
         for (var p in PALETTECOLORS) {
@@ -162,19 +151,9 @@ define(MYDEFINES, function (compatibility) {
         var macroDict = {};
 
         var stopTurtleContainer = null;
-        var stopTurtleContainerX = 0;
-        var stopTurtleContainerY = 0;
         var homeButtonContainers = [];
-        var homeButtonContainersX = 0;
-        var homeButtonContainersY = 0;
 
         var cameraID = null;
-        var toLang = null;
-        var fromLang = null;
-
-        // initial scroll position
-        var scrollX = 0;
-        var scrollY = 0;
 
         // default values
         const DEFAULTDELAY = 500; // milleseconds
@@ -185,12 +164,6 @@ define(MYDEFINES, function (compatibility) {
         if (blockscale === -1) {
             blockscale = 1;
         }
-
-        // Time when we hit run
-        var time = 0;
-
-        // Used by pause block
-        var waitTime = {};
 
         // Used to track mouse state for mouse button block
         var stageMouseDown = false;
@@ -267,6 +240,76 @@ define(MYDEFINES, function (compatibility) {
             boundary.hide();
         };
 
+        function _printBlockSVG() {
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + logo.canvas.width + '" height="' + logo.canvas.height + '">';
+            for (var i = 0; i < blocks.blockList.length; i++) {
+                if (blocks.blockList[i].name === 'hidden') {
+                    continue;
+                }
+                if (blocks.blockList[i].name === 'hiddennoflow') {
+                    continue;
+                }
+                if (blocks.blockList[i].trash) {
+                    continue;
+                }
+                var parts = blocks.blockArt[i].split('><');
+                svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
+                switch(blocks.blockList[i].name) {
+                case 'text':
+                case 'solfege':
+                case 'eastindiansolfege':
+                case 'notename':
+                case 'rest':
+                case 'number':
+                case 'modename':
+                case 'voicename':
+                case 'drumname':
+                    for (var p = 1; p < parts.length; p++) {
+                        // FIXME: This is fragile.
+                        if (p === 1) {
+                            svg += '<' +  parts[p] + '><';
+                        } else if (p === 2) {
+                            // skip filter
+                        } else if (p === 3) {
+			    svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
+                        } else if (p === 5) {
+                            // Add block value to SVG between tspans
+                            svg += parts[p] + '>' + blocks.blockList[i].value + '<';
+                        } else if (p === parts.length - 2) {
+                            svg += parts[p] + '>';
+                        } else if (p === parts.length - 1) {
+                            // skip final </svg>
+                        } else {
+                            svg += parts[p] + '><';
+                        }
+                    }
+                    break;
+                default:
+                    for (var p = 1; p < parts.length; p++) {
+                        // FIXME: This is fragile.
+                        if (p === 1) {
+                            svg += '<' +  parts[p] + '><';
+                        } else if (p === 2) {
+                            // skip filter
+                        } else if (p === 3) {
+			    svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
+                        } else if (p === parts.length - 2) {
+                            svg += parts[p] + '>';
+                        } else if (p === parts.length - 1) {
+                            // skip final </svg>
+                        } else {
+                            svg += parts[p] + '><';
+                        }
+                    }
+                    break;
+                }
+                svg += '</g>';
+            }
+            svg += '</svg>';
+            download('blockArtwork.svg', 'data:image/svg+xml;utf8,' + svg, 'blockArtwork.svg', '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
+
+        }
+
         function _allClear() {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
@@ -277,10 +320,10 @@ define(MYDEFINES, function (compatibility) {
             logo.time = 0;
             hideMsgs();
             logo.setBackgroundColor(-1);
-            logo.lilypondOutput = LILYPONDHEADER;
+            logo.notationOutput = LILYPONDHEADER;
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
-                logo.lilypondStaging[turtle] = [];
+                logo.notationStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear(true, true);
             }
 
@@ -390,10 +433,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepButton() {
-            var turtleCount = 0;
-            for (var turtle in logo.stepQueue) {
-                turtleCount += 1;
-            }
+            var turtleCount = Object.keys(logo.stepQueue).length;
 
             if (turtleCount === 0 || logo.turtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -423,10 +463,7 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _doStepMusicButton() {
-            var turtleCount = 0;
-            for (var turtle in logo.stepQueue) {
-                turtleCount += 1;
-            }
+            var turtleCount = Object.keys(logo.stepQueue).length;
 
             if (turtleCount === 0 || logo.TurtleDelay !== TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -443,7 +480,6 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        var stopTurtle = false;
 
         function doStopButton() {
             logo.doStopTurtle();
@@ -553,12 +589,6 @@ define(MYDEFINES, function (compatibility) {
 
         // Do we need to update the stage?
         var update = true;
-
-        // The dictionary of action name: block
-        var actions = {};
-
-        // The dictionary of box name: value
-        var boxes = {};
 
         // Coordinate grid
         var cartesianBitmap = null;
@@ -694,20 +724,24 @@ define(MYDEFINES, function (compatibility) {
                 .setRefreshCanvas(refreshCanvas)
                 .setClear(sendAllToTrash);
 
-            if (_THIS_IS_TURTLE_BLOCKS_) {
-		saveBox = new SaveBox();
-		saveBox
-                    .setCanvas(canvas)
-                    .setStage(stage)
-                    .setRefreshCanvas(refreshCanvas)
-                    .setSaveTB(doSaveTB)
-                    .setSaveSVG(doSaveSVG)
-                    .setSavePNG(doSavePNG)
-                    .setSavePlanet(doUploadToPlanet)
-                    .setSaveFB(doShareOnFacebook);
+            saveBox = new SaveBox();
+            saveBox
+                .setCanvas(canvas)
+                .setStage(stage)
+                .setRefreshCanvas(refreshCanvas)
+                .setSaveTB(doSaveTB)
+                .setSaveSVG(doSaveSVG)
+                .setSavePNG(doSavePNG)
+                .setSavePlanet(doUploadToPlanet)
+                .setSaveBlockArtwork(doSaveBlockArtwork);
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                saveBox.setSaveLilypond(doSaveLilypond);
+            } else {
+                saveBox.setSaveFB(doShareOnFacebook);
             }
 
-	    utilityBox = new UtilityBox();
+            utilityBox = new UtilityBox();
             utilityBox
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
@@ -778,6 +812,7 @@ define(MYDEFINES, function (compatibility) {
                             blocks.palettes.dict[name].hideMenu(true);
                         }
 
+                        sendAllToTrash(false, false);
                         refreshCanvas();
 
                         blocks.loadNewBlocks(obj);
@@ -1164,10 +1199,12 @@ define(MYDEFINES, function (compatibility) {
 
             const BACKSPACE = 8;
             const TAB = 9;
+                        /*
             if (event.keyCode === TAB || event.keyCode === BACKSPACE) {
                 // Prevent browser from grabbing TAB key
                 event.preventDefault();
             }
+                        */
 
             const ESC = 27;
             const ALT = 18;
@@ -1185,6 +1222,9 @@ define(MYDEFINES, function (compatibility) {
 
             if (event.altKey) {
                 switch (event.keyCode) {
+                case 66: // 'B'
+                    _printBlockSVG();
+                    break;
                 case 69: // 'E'
                     _allClear();
                     break;
@@ -1266,13 +1306,10 @@ define(MYDEFINES, function (compatibility) {
                     logo.runLogoCommands();
                     break;
                 default:
-                    // currentKey = String.fromCharCode(event.keyCode);
-                    // currentKeyCode = event.keyCode;
                     break;
                 }
                 // Always store current key so as not to mask it from
                 // the keyboard block.
-                currentKey = String.fromCharCode(event.keyCode);
                 currentKeyCode = event.keyCode;
             }
         };
@@ -1658,13 +1695,13 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function doSave() {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                console.log('Saving .tb file');
-                var name = 'My Project';
-                download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
-            } else {
+            // if (_THIS_IS_MUSIC_BLOCKS_) {
+            //     console.log('Saving .tb file');
+            //     var name = 'My Project';
+            //     download(name + '.tb', 'data:text/plain;charset=utf-8,' + prepareExport());
+            // } else {
                 saveBox.init(turtleBlocksScale, saveButton.x - 27, saveButton.y - 97, _makeButton);
-            }
+            // }
         };
 
         function doSaveTB() {
@@ -1686,6 +1723,10 @@ define(MYDEFINES, function (compatibility) {
                 var svg = doSVG(logo.canvas, logo, logo.turtles, logo.canvas.width, logo.canvas.height, 1.0);
                 download(filename, 'data:image/svg+xml;utf8,' + svg, filename, '"width=' + logo.canvas.width + ', height=' + logo.canvas.height + '"');
             }
+        };
+
+        function doSaveBlockArtwork() {
+            _printBlockSVG();
         };
 
         function doSavePNG() {
@@ -1714,6 +1755,10 @@ define(MYDEFINES, function (compatibility) {
             window.scroll(0, 0);
         };
 
+        function doSaveLilypond() {
+            _doLilypond();
+        };
+
         function _doLilypond() {
             // Show busy cursor.
             document.body.style.cursor = 'wait';
@@ -1722,12 +1767,35 @@ define(MYDEFINES, function (compatibility) {
             // Suppress music and turtle output when generating
             // Lilypond output.
             logo.runningLilypond = true;
-            logo.lilypondOutput = LILYPONDHEADER;
-            logo.lilypondNotes = {};
+            logo.notationOutput = LILYPONDHEADER;
+            logo.notationNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                logo.lilypondStaging[turtle] = [];
+                logo.notationStaging[turtle] = [];
                 turtles.turtleList[turtle].doClear(true, true);
             }
+
+            logo.runLogoCommands();
+        };
+
+        function doSaveAbc() {
+            _doAbc();
+        };
+
+        function _doAbc() {
+            // Show busy cursor.
+            document.body.style.cursor = 'wait';
+
+            console.log('Saving .ly file');
+            // Suppress music and turtle output when generating
+            // Abc output.
+            logo.runningLilypond = true;
+            logo.notationOutput = ABCHEADER;
+            logo.notationNotes = {};
+            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                logo.notationStaging[turtle] = [];
+                turtles.turtleList[turtle].doClear(true, true);
+            }
+
             logo.runLogoCommands();
         };
 
@@ -1869,7 +1937,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             try {
-		var obj = JSON.parse(data);
+                var obj = JSON.parse(data);
                 blocks.loadNewBlocks(obj);
             } catch (e) {
                 console.log('loadRawProject: could not parse project data');
@@ -2259,8 +2327,6 @@ define(MYDEFINES, function (compatibility) {
         };
 
         function _hideStopButton() {
-            // stopTurtleContainer.x = stopTurtleContainerX;
-            // stopTurtleContainer.y = stopTurtleContainerY;
             stopTurtleContainer.visible = false;
         };
 
@@ -2383,13 +2449,9 @@ handleComplete);
 
                 if (buttonNames[i][0] === 'stop-turtle') {
                     stopTurtleContainer = container;
-                    stopTurtleContainerX = x;
-                    stopTurtleContainerY = y;
                 } else if (buttonNames[i][0] === 'go-home') {
                     homeButtonContainers = [];
                     homeButtonContainers.push(container);
-                    homeButtonContainersX = x;
-                    homeButtonContainersY = y;
                     var container2 = _makeButton('go-home-faded-button', _('Home'), x, y, btnSize, 0);
                     _loadButtonDragHandler(container2, x, y, buttonNames[i][1], null, null, null, null);
                     homeButtonContainers.push(container2);
@@ -2421,7 +2483,7 @@ handleComplete);
                     ['planet', _doOpenSamples, _('Load samples from server')],
                     ['open', doLoad, _('Load project from files')],
                     ['save', doSave, _('Save project')],
-                    ['lilypond', _doLilypond, _('Save sheet music')],
+                    // ['lilypond', _doLilypond, _('Save sheet music')],
                     ['paste-disabled', pasteStack, _('Paste')],
                     ['Cartesian', _doCartesian, _('Cartesian')],
                     ['polar', _doPolar, _('Polar')],

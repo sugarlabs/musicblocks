@@ -24,7 +24,6 @@ function getMunsellColor(hue, value, chroma) {
     while (h < 0) {
         h += 40;
     }
-
     var v1 = Math.floor(value / 10);
     var v2 = v1 + 1;
     if (v1 < 0) {
@@ -34,14 +33,12 @@ function getMunsellColor(hue, value, chroma) {
         v1 = 10;
         v2 = 10;
     }
-
     var p = (v2 * 10 - value) / 10.;
     if (p > 1) {
         p = 1;
     } else if (p < 0) {
         p = 0;
     }
-
     var c = Math.round((chroma * 14) / 100);
     if (c < 0) {
         c = 0;
@@ -49,7 +46,7 @@ function getMunsellColor(hue, value, chroma) {
         c = 14;
     }
     return interpColor(MUNSELL[h * 165 + v1 * 15 + c], MUNSELL[h * 165 + v2 * 15 + c], p);
-};
+}
 
 
 interpColor = function(hex1, hex2, p) {
@@ -92,7 +89,7 @@ function getcolor(color) {
     var v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
     var c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
     return [v * 10., c * 100. / 14, interpColor(COLORS40[h1][2], COLORS40[h2][2], p)];
-};
+}
 
 
 // Searches for nearest match to high chroma colors, scaled from 0-100
@@ -111,7 +108,7 @@ function searchColors(r, g, b) {
 	}
     }
     return nearestColor;
-};
+}
 
 
 // 40 high-chroma colors [value, chroma, RGB]
@@ -171,7 +168,7 @@ MUNSELL = [
     "#949494", "#a59193", "#b58b8f", "#c4848c", "#d17e8a", "#de7587", "#eb6c85", "#f76183", "#ff5281", "#ff417f", "#ff277f", "#ff007e", "#ff007e", "#ff007e", "#ff007e",
     "#aeaeae", "#beabad", "#cfa6aa", "#df9fa6", "#ee98a3", "#fc90a0", "#ff869d", "#ff7b9a", "#ff6e98", "#ff6095", "#ff5293", "#ff5293", "#ff5293", "#ff5293", "#ff5293",
     "#c8c8c8", "#d7c7c8", "#eac0c4", "#fbbac0", "#ffb2bc", "#ffa9b9", "#ff9db5", "#ff94b1", "#ff94b1", "#ff94b1", "#ff94b1", "#ff94b1", "#ff94b1", "#ff94b1", "#ff94b1",
-    "#c8c8c8", "#d7c7c8", "#eac0c4", "#fbbac0", "#ffb2bc", "#ffb2bc", "#ffb2bc", "#ffb2bc", "#ffb2bc", "#ffb2bc", "#ffb2bc", "#ffb2bc", "#ffb2bc", "#ffb2bc", "#ffb2bc",
+    "#e3e3e3", "#f2e2e3", "#ffdbde", "#ffd3da", "#ffccd6", "#ffccd6", "#ffccd6", "#ffccd6", "#ffccd6", "#ffccd6", "#ffccd6", "#ffccd6", "#ffccd6", "#ffccd6", "#ffccd6",
     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
     // 2.5R
     "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000",
@@ -183,7 +180,7 @@ MUNSELL = [
     "#949494", "#a59191", "#b68b8c", "#c68486", "#d37d81", "#e1757d", "#ee6b78", "#f96174", "#ff5270", "#ff416c", "#ff2a69", "#ff0067", "#ff0066", "#ff0066", "#ff0066",
     "#aeaeae", "#bfabab", "#d0a5a6", "#e09fa0", "#f0989b", "#fe9095", "#ff868f", "#ff7b8b", "#ff6e86", "#ff6282", "#ff6282", "#ff6282", "#ff6282", "#ff6282", "#ff6282",
     "#c8c8c8", "#d8c7c7", "#ecc0c0", "#fdb9ba", "#ffb1b3", "#ffa9ad", "#ff9ea6", "#ff9ea6", "#ff9ea6", "#ff9ea6", "#ff9ea6", "#ff9ea6", "#ff9ea6", "#ff9ea6", "#ff9ea6",
-    "#c8c8c8", "#d8c7c7", "#ecc0c0", "#fdb9ba", "#ffb1b3", "#ffb1b3", "#ffb1b3", "#ffb1b3", "#ffb1b3", "#ffb1b3", "#ffb1b3", "#ffb1b3", "#ffb1b3", "#ffb1b3", "#ffb1b3",
+    "#e3e3e3", "#f3e2e2", "#ffdbda", "#ffd3d3", "#ffcccd", "#ffcccd", "#ffcccd", "#ffcccd", "#ffcccd", "#ffcccd", "#ffcccd", "#ffcccd", "#ffcccd", "#ffcccd", "#ffcccd",
     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
     // 5R
     "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000",
@@ -278,7 +275,7 @@ MUNSELL = [
     "#7a7a7a", "#877a64", "#90784c", "#977731", "#9c7610", "#9f7500", "#a27400", "#a47300", "#a47300", "#a47300", "#a47300", "#a47300", "#a47300", "#a47300", "#a47300",
     "#949494", "#a1947c", "#aa9365", "#b2914b", "#b8902e", "#bd8f00", "#c08e00", "#c28d00", "#c48d00", "#c48d00", "#c48d00", "#c48d00", "#c48d00", "#c48d00", "#c48d00",
     "#aeaeae", "#bbaf96", "#c5ad7d", "#ceac64", "#d4aa49", "#daa926", "#dea800", "#e1a700", "#e3a700", "#e4a600", "#e5a600", "#e5a600", "#e5a600", "#e5a600", "#e5a600",
-    "#c8c8c8", "#d6caaf", "#e0c897", "#e8c77d", "#f0c662", "#f6c444", "#fbc312", "#ffc200", "#ffc100", "#ffc100", "#ffc000", "#ffc000", "#ffc000", "#ffc000", "#ffc000",
+    "#c8c8c8", "#d6caaf", "#e0c897", "#e8c77d", "#f0c662", "#f6c444", "#fbc312", "#ffc200", "#ffc100", "#ffc000", "#ffc000", "#ffc000", "#ffc000", "#ffc000", "#ffc000",
     "#e3e3e3", "#f2e5c8", "#fce4ad", "#ffe393", "#ffe178", "#ffe05c", "#ffdf37", "#ffdf37", "#ffdf37", "#ffdf37", "#ffdf37", "#ffdf37", "#ffdf37", "#ffdf37", "#ffdf37",
     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
     // 5Y
@@ -303,7 +300,7 @@ MUNSELL = [
     "#949494", "#9b967b", "#a09761", "#a49744", "#a79720", "#a99700", "#aa9700", "#ab9700", "#ac9600", "#ac9600", "#ac9600", "#ac9600", "#ac9600", "#ac9600", "#ac9600",
     "#aeaeae", "#b6b194", "#bab179", "#beb25e", "#c1b23f", "#c4b205", "#c6b200", "#c7b200", "#c8b200", "#c8b200", "#c8b200", "#c8b200", "#c8b200", "#c8b200", "#c8b200",
     "#c8c8c8", "#d1ccac", "#d5cc92", "#d9cd76", "#dccd58", "#dfcd33", "#e2cd00", "#e3cd00", "#e4cd00", "#e5cd00", "#e6cd00", "#e6cd00", "#e6cd00", "#e6cd00", "#e6cd00",
-    "#e3e3e3", "#ece7c5", "#f1e8a9", "#f5e88d", "#f8e96f", "#fbe94e", "#fee915", "#ffe900", "#ffe900", "#ffe900", "#ffe900", "#ffe800", "#ffe800", "#ffe800", "#ffe800",
+    "#e3e3e3", "#ece7c5", "#f1e8a9", "#f5e88d", "#f8e96f", "#fbe94e", "#fee915", "#ffe900", "#ffe800", "#ffe800", "#ffe800", "#ffe800", "#ffe800", "#ffe800", "#ffe800",
     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
     // 10Y (0GY)
     "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000",
@@ -312,10 +309,10 @@ MUNSELL = [
     "#484848", "#4b4a35", "#4d4b1e", "#4e4b00", "#4f4c00", "#4f4c00", "#4f4c00", "#4f4c00", "#4f4c00", "#4f4c00", "#4f4c00", "#4f4c00", "#4f4c00", "#4f4c00", "#4f4c00",
     "#616161", "#64634b", "#666431", "#686513", "#686500", "#696500", "#696500", "#696500", "#696500", "#696500", "#696500", "#696500", "#696500", "#696500", "#696500",
     "#7a7a7a", "#7e7d63", "#807e49", "#827f2b", "#837f00", "#847f00", "#848000", "#858000", "#858000", "#858000", "#858000", "#858000", "#858000", "#858000", "#858000",
-    "#949494", "#98977b", "#9b9862", "#9d9945", "#9e9a20", "#9f9a00", "#a09a00", "#a09a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00",
-    "#aeaeae", "#b3b294", "#b6b37a", "#b8b45f", "#b9b43f", "#bbb500", "#bbb500", "#bcb500", "#bcb600", "#bcb600", "#bcb600", "#bcb600", "#bcb600", "#bcb600", "#bcb600",
-    "#c8c8c8", "#ceccac", "#d1ce92", "#d3cf76", "#d5cf58", "#d6d032", "#d7d100", "#d8d100", "#d8d100", "#d8d100", "#d9d100", "#d9d100", "#d9d100", "#d9d100", "#d9d100",
-    "#e3e3e3", "#eae8c5", "#ece9a9", "#efea8d", "#f1eb6e", "#f2ec4d", "#f3ec0f", "#f4ed00", "#f5ed00", "#f5ed00", "#f5ed00", "#f6ee00", "#f6ee00", "#f6ee00", "#f6ee00",
+    "#949494", "#98977b", "#9b9862", "#9d9945", "#9e9a20", "#9f9a00", "#a09a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00", "#a19a00",
+    "#aeaeae", "#b3b294", "#b6b37a", "#b8b45f", "#b9b43f", "#bbb500", "#bcb500", "#bcb600", "#bcb600", "#bcb600", "#bcb600", "#bcb600", "#bcb600", "#bcb600", "#bcb600",
+    "#c8c8c8", "#ceccac", "#d1ce92", "#d3cf76", "#d5cf58", "#d6d032", "#d7d100", "#d8d100", "#d9d100", "#d9d100", "#d9d100", "#d9d100", "#d9d100", "#d9d100", "#d9d100",
+    "#e3e3e3", "#eae8c5", "#ece9a9", "#efea8d", "#f1eb6e", "#f2ec4d", "#f3ec0f", "#f4ed00", "#f5ed00", "#f5ee00", "#f6ee00", "#f6ee00", "#f6ee00", "#f6ee00", "#f6ee00",
     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
     // 2.5GY
     "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000",
@@ -326,8 +323,8 @@ MUNSELL = [
     "#7a7a7a", "#7a7e65", "#7a804d", "#798131", "#788204", "#778300", "#768400", "#748400", "#748400", "#748400", "#748400", "#748400", "#748400", "#748400", "#748400",
     "#949494", "#95987c", "#949a64", "#939c49", "#929d26", "#919e00", "#919f00", "#909f00", "#909f00", "#909f00", "#909f00", "#909f00", "#909f00", "#909f00", "#909f00",
     "#aeaeae", "#b0b295", "#afb57c", "#aeb663", "#adb844", "#acb911", "#acba00", "#abba00", "#abbb00", "#aabb00", "#aabb00", "#aabb00", "#aabb00", "#aabb00", "#aabb00",
-    "#c8c8c8", "#cbcdad", "#cacf94", "#cad17a", "#c9d35d", "#c8d438", "#c7d500", "#c6d600", "#c6d600", "#c6d700", "#c5d700", "#c5d700", "#c5d700", "#c5d700", "#c5d700",
-    "#e3e3e3", "#e7e9c6", "#e6ebaa", "#e6ed8f", "#e5ef71", "#e4f051", "#e3f117", "#e2f200", "#e1f300", "#e1f300", "#e1f300", "#e1f400", "#e1f400", "#e1f400", "#e1f400",
+    "#c8c8c8", "#cbcdad", "#cacf94", "#cad17a", "#c9d35d", "#c8d438", "#c7d500", "#c6d600", "#c6d700", "#c5d700", "#c5d700", "#c5d700", "#c5d700", "#c5d700", "#c5d700",
+    "#e3e3e3", "#e7e9c6", "#e6ebaa", "#e6ed8f", "#e5ef71", "#e4f051", "#e3f117", "#e2f200", "#e1f300", "#e1f400", "#e1f400", "#e1f400", "#e1f400", "#e1f400", "#e1f400",
     "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff",
     // 5GY
     "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000",
