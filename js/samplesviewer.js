@@ -512,6 +512,9 @@ function PlanetView(model, controller) {
                 docById('pscDiv').style.visibility = localStorage.getItem('isStaircaseHidden');
                 docById('pscButtonsDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
                 docById('pscTableDiv').style.visibility = localStorage.getItem('isStaircaseHidden'); 
+                docById('timbreDiv').style.visibility = localStorage.getItem('isTimbreHidden');
+                docById('timbreButtonsDiv').style.visibility = localStorage.getItem('isTimbreHidden'); 
+                docById('timbreTableDiv').style.visibility = localStorage.getItem('isTimbreHidden'); 
                 docById('sliderDiv').style.visibility = localStorage.getItem('isSliderHidden');
                 docById('sliderButtonsDiv').style.visibility = localStorage.getItem('isSliderHidden');
                 docById('sliderTableDiv').style.visibility = localStorage.getItem('isSliderHidden');

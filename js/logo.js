@@ -62,13 +62,19 @@ function Logo () {
     this.pitchTimeMatrix = null;
     this.pitchDrumMatrix = null;
     this.rhythmRuler = null;
+    this.timbre = null;
     this.pitchStaircase = null;
     this.tempo = null;
     this.pitchSlider = null;
     this.modeWidget = null;
     this.statusMatrix = null;
-    this.source_name = {};
 
+    this.attack = {};
+    this.decay = {};
+    this.sustain = {};
+    this.release = {};
+    this.source_name = {};
+    
     this.evalFlowDict = {};
     this.evalArgDict = {};
     this.evalParameterDict = {};
@@ -115,6 +121,8 @@ function Logo () {
     this.inPitchSlider = false;
 
     this._currentDrumBlock = null;
+
+    this.inTimbre = false;
 
     // pitch-rhythm matrix
     this.inMatrix = false;
@@ -760,6 +768,7 @@ function Logo () {
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
+
             this.instrument_names[turtle] = [];
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
@@ -2259,6 +2268,52 @@ function Logo () {
                 saveLilypondOutput(that, args[0]);
             }
             break;
+
+        case 'amsynth':
+            var harmonicity;
+            that.timbre.AMSynthParams = [];
+            if(args.length === 1 && typeof(args[0]) === 'number') {
+                if(args[0] < 0) {
+                    that.errorMsg(_('The input cannot be negative'));
+                }
+                harmonicity = args[0];
+            } 
+
+            if(that.inTimbre) {
+                    that.timbre.AMSynthesizer.push(blk);
+                    var AMSynthharmonicity = that.blocks.blockList[blk].connections[1];
+                    that.timbre.AMSynthParams.push(that.blocks.blockList[AMSynthharmonicity].text.text);
+            }  
+            break;
+        case 'fmsynth':
+            var modulationIndex;
+            if(args.length === 1 && typeof(args[0]) === 'number') {
+                if(args[0] < 0) {
+                    that.errorMsg(_('The input cannot be negative'));
+                }
+                modulationIndex = args[0];
+            }  
+            if(that.inTimbre) {
+                    that.timbre.FMSynthesizer.push(blk);
+                    var mi = that.blocks.blockList[blk].connections[1];
+                    that.timbre.FMSynthParams.push(that.blocks.blockList[mi].text.text);
+            }    
+            break;
+        case 'duosynth':
+            var synthVibratoRate;
+            var synthVibratoAmount;
+            if(args.length === 2 && typeof(args[0]) === 'number') {
+                synthVibratoRate = args[0];
+                synthVibratoAmount = args[1];
+            }   
+            if(that.inTimbre) {
+                    that.timbre.duoSynthesizer.push(blk);
+                    var duoSynthRate = that.blocks.blockList[blk].connections[1];
+                    var duoSynthAmount = that.blocks.blockList[blk].connections[2];
+                    that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthRate].text.text);
+                    that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthAmount].text.text);
+            }
+            break;
         case 'saveabc':
             if (args.length === 1) {
                 saveAbcOutput(that, args[0]);
@@ -2450,6 +2505,48 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'timbre':
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            if (that.timbre == null) {
+                that.timbre = new TimbreWidget();
+                that.inTimbre = true;  
+            }
+            
+            that.timbre.blockNo = blk;
+            that.timbre.env = [];
+            that.timbre.ENVs = [];
+            that.timbre.fil = [];
+            that.timbre.filterParams = [];
+            that.timbre.osc = [];
+            that.timbre.oscParams = [];
+            that.timbre.tremoloEffect = [];
+            that.timbre.tremoloParams = [];
+            that.timbre.vibratoEffect = [];
+            that.timbre.vibratoParams = [];
+            that.timbre.chorusEffect = [];
+            that.timbre.chorusParams = [];
+            that.timbre.phaserEffect = [];
+            that.timbre.phaserParams = [];
+            that.timbre.distortionEffect = [];
+            that.timbre.distortionParams = [];
+            that.timbre.AMSynthesizer = [];
+            that.timbre.AMSynthParams = [];
+            that.timbre.FMSynthesizer = [];
+            that.timbre.FMSynthParams = [];
+            that.timbre.duoSynthesizer = [];
+            that.timbre.duoSynthParams = [];
+
+            var listenerName = '_timbre_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+            
+            var __listener = function (event) {
+                that.timbre.init(that);
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
         case 'modewidget':
             if (args.length === 1) {
                 childFlow = args[0];
@@ -2552,6 +2649,105 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'envelope':
+            that.timbre.ENVs = [];
+            if(that.timbre.env.length != 0) {
+                that.errorMsg(_("You are adding a second envelope block"));
+            }
+
+            if (args.length === 4 && typeof(args[0] === 'number')) {
+                if (args[0] < 0 || args[0] > 100) {
+                    that.errorMsg(_('Attack value should be between 0-100'));
+                } 
+                if (args[1] < 0 || args[1] > 100) {
+                    that.errorMsg(_('Decay value should be between 0-100'));
+                } 
+                if (args[2] < 0 || args[2] > 100) {
+                    that.errorMsg(_('Sustain value should be between 0-100'));
+                } 
+                if (args[3] < 0 || args[3] > 100) {
+                    that.errorMsg(_('Release value should be between 0-100'));
+                } 
+
+                that.attack = args[0] / 100;
+                that.decay = args[1] / 100;
+                that.sustain = args[2] / 100;
+                that.release = args[3] / 100;
+            }
+                if(that.inTimbre) {
+                    that.timbre.env.push(blk);
+                    var envattack = that.blocks.blockList[blk].connections[1];
+                    var envdecay = that.blocks.blockList[blk].connections[2];
+                    var envsustain = that.blocks.blockList[blk].connections[3];
+                    var envrelease = that.blocks.blockList[blk].connections[4];
+                    that.timbre.ENVs.push(that.blocks.blockList[envattack].text.text);
+                    that.timbre.ENVs.push(that.blocks.blockList[envdecay].text.text);
+                    that.timbre.ENVs.push(that.blocks.blockList[envsustain].text.text);
+                    that.timbre.ENVs.push(that.blocks.blockList[envrelease].text.text);
+                }
+            break; 
+        case 'filter':
+            var filtertype = 'highpass';
+            var freq ;
+            var rollOff ;
+            that.timbre.filterParams = [];
+
+            if(that.timbre.fil.length != 0) {
+                that.errorMsg(_("You are adding a second filter block"));
+            }
+
+            if (args.length === 3 && typeof(args[1] === 'number')) {
+                for (var typo in TYPES) {
+                    if (TYPES[typo][0] === args[0]) {
+                        filtertype = TYPES[typo][1];
+                    } else if (TYPES[typo][1] === args[0]) {
+                        filtertype = args[0];
+                    }
+                }
+
+                if ([-12, -24, -48, -96].indexOf(args[1]) === -1) {
+                    that.errorMsg(_("Value should be either -12,-24,-48 or -96 db"));
+                }
+                rollOff = args[1];
+                freq = args[2];
+            } 
+            if(that.inTimbre) {
+                    that.timbre.fil.push(blk);
+                    var filterType = that.blocks.blockList[blk].connections[1];
+                    var filterRolloff = that.blocks.blockList[blk].connections[2];
+                    var filterFrequency = that.blocks.blockList[blk].connections[3];
+                    that.timbre.filterParams.push(that.blocks.blockList[filterType].text.text);
+                    that.timbre.filterParams.push(that.blocks.blockList[filterRolloff].text.text);
+                    that.timbre.filterParams.push(that.blocks.blockList[filterFrequency].text.text);
+                }  
+            break;
+        case 'oscillator':
+            var oscillatortype = 'triangle';
+            var partials ;
+            that.timbre.oscParams = [];
+
+            if(that.timbre.osc.length != 0) {
+                that.errorMsg(_("You are adding a second oscillator block"));
+            }
+
+            if (args.length === 2 && typeof(args[1] === 'number')) {
+                for (var typo in OSCTYPES) {
+                    if (TYPES[typo][0] === args[0]) {
+                        oscillatortype = TYPES[typo][1];
+                    } else if (TYPES[typo][1] === args[0]) {
+                        oscillatortype = args[0];
+                    }
+                }
+                partials = args[1];
+            } 
+            if(that.inTimbre) {
+                    that.timbre.osc.push(blk);
+                    var oscillatorType = that.blocks.blockList[blk].connections[1];
+                    var oscillatorPartials = that.blocks.blockList[blk].connections[2];
+                    that.timbre.oscParams.push(that.blocks.blockList[oscillatorType].text.text);
+                    that.timbre.oscParams.push(that.blocks.blockList[oscillatorPartials].text.text);
+                }  
+            break;    
         case 'invert1':
             if (typeof(args[2]) === 'number') {
                 if (args[2] % 2 === 0){
@@ -3516,6 +3712,11 @@ function Logo () {
                that.vibratoRate[turtle].pop();
             };
             that._setListener(turtle, listenerName, __listener);
+            if(that.inTimbre) {
+                    that.timbre.vibratoEffect.push(blk);
+                    that.timbre.vibratoParams.push(last(that.vibratoIntensity[turtle]) * 100);
+                    that.timbre.vibratoParams.push(last(that.vibratoRate[turtle]));
+                }
             break;
         case 'dis':
             var distortion = (args[0] / 100);
@@ -3534,6 +3735,10 @@ function Logo () {
                that.distortionAmount[turtle].pop();
             };
             that._setListener(turtle, listenerName, __listener);
+            if(that.inTimbre) {
+                that.timbre.distortionEffect.push(blk);
+                that.timbre.distortionParams.push(last(that.distortionAmount[turtle]) * 100);
+            }
             break;
         case 'tremolo':
             var frequency = args[0];
@@ -3559,6 +3764,11 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
+            if(that.inTimbre) {
+                that.timbre.tremoloEffect.push(blk);
+                that.timbre.tremoloParams.push(last(that.tremoloFrequency[turtle]));
+                that.timbre.tremoloParams.push(last(that.tremoloDepth[turtle]) * 100);
+            } 
             break;
         case 'phaser':
             var rate = args[0];
@@ -3582,6 +3792,12 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
+            if(that.inTimbre) {
+                that.timbre.phaserEffect.push(blk);
+                that.timbre.phaserParams.push(last(that.rate[turtle]));
+                that.timbre.phaserParams.push(last(that.octaves[turtle]));
+                that.timbre.phaserParams.push(last(that.baseFrequency[turtle]));
+            } 
             break;
         case 'chorus':
             var chorusRate = args[0];
@@ -3610,6 +3826,13 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
+
+            if(that.inTimbre) {
+                that.timbre.chorusEffect.push(blk);
+                that.timbre.chorusParams.push(last(that.chorusRate[turtle]));
+                that.timbre.chorusParams.push(last(that.delayTime[turtle]));
+                that.timbre.chorusParams.push(last(that.chorusDepth[turtle]) * 100);
+            } 
             break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
