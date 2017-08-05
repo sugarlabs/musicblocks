@@ -160,6 +160,7 @@ function Logo () {
     this.pickup = {};
     this.beatsPerMeasure = {};
     this.noteValuePerBeat = {};
+    this.currentBeat = {};
 
     // parameters used by the note block
     this.bpm = {};
@@ -677,6 +678,9 @@ function Logo () {
                     value = this._masterBPM;
                 }
                 break;
+            case 'beatvalue':
+                value = this.currentBeat[turtle];
+                break;
             default:
                 if (name in this.evalParameterDict) {
                     eval(this.evalParameterDict[name]);
@@ -805,6 +809,7 @@ function Logo () {
             // Default is 4/4 time.
             this.beatsPerMeasure[turtle] = 4;
             this.noteValuePerBeat[turtle] = 4;
+            this.currentBeat[turtle] = 0;
         }
 
         this.pitchNumberOffset = 39;  // C4
@@ -5069,12 +5074,14 @@ function Logo () {
                         return;
                     }
 
-                    that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
                     if (that.notesPlayed[turtle] < that.pickup[turtle]) {
 			var beatValue = 0;
                     } else {
                         var beatValue = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
                     }
+
+                    that.currentBeat[turtle] = beatValue;
+                    that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
 
                     // FIXME: Only dispatch if there is a signal enabled
 		    var eventName = '__beat_' + beatValue + '_' + turtle + '__';
@@ -6064,12 +6071,14 @@ function Logo () {
                 }
                 break;
             case 'beatvalue':
-                if (that.notesPlayed[turtle] < that.pickup[turtle]) {
-                    // Beat count of 0 means we are still in the pickup.
-                    that.blocks.blockList[blk].value = 0;
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'beatvalue']);
                 } else {
-                    // Beat count starts at 1.
-                    that.blocks.blockList[blk].value = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
+                    if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+			that.blocks.blockList[blk].value = 0;
+                    } else {
+                        that.blocks.blockList[blk].value = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
+                    }
                 }
                 break;
             case 'turtlenote':
