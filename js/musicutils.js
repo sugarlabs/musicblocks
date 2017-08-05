@@ -1597,6 +1597,12 @@ function Synth() {
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (instrument_name, source_name, params) {
 
+        console.log('instrument: ' + instrument_name);
+        console.log('params');
+        for (var key in params){
+            console.log(params[key]);
+        }
+
         if ((source_name in VOICE_SAMPLES) || (source_name in DRUM_SAMPLES)) {
             instruments[instrument_name] = this.createSampleSynth(instrument_name, source_name, null).toMaster();
         }
@@ -1729,6 +1735,7 @@ function Synth() {
         var flag = 0;
         var temp_synth = instruments['default'];
         if (instrument_name in instruments) {
+
             temp_synth = instruments[instrument_name];
             flag = instruments_source[instrument_name][0];
             if (flag==1 || flag==2) {

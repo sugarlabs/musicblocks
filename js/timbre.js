@@ -7,6 +7,16 @@ function TimbreWidget () {
     var timbreTableDiv = docById('timbreTableDiv');
     this.env = [];
     this.ENVs = [];
+    this.adsrVals = {        
+        "envelope": {
+            "attack": 0.01,
+            "decay": 0.5,
+            "sustain": 0.6,
+            "release": 0.01
+        },
+    };
+
+    this.adsrMap = ['attack', 'decay', 'sustain', 'release'];
     this.fil = [];              //Need to optimise further
     this.filterParams = [];
     this.osc = [];
@@ -41,6 +51,7 @@ function TimbreWidget () {
     this.phaserActive = false;
     this.distortionActive = false;
     this.blockNo = null;
+    this.instrument_name = 'custom';
 
     var that = this;
     console.log('timbre initialised');
@@ -159,12 +170,11 @@ function TimbreWidget () {
                 this._logo.blocks.blockList[updateParams[k]].value = parseFloat(value);
             }
 
-            console.log(this._logo.blocks.blockList[updateParams[k]].value);
-
             this._logo.blocks.blockList[updateParams[k]].text.text = value.toString();
             this._logo.blocks.blockList[updateParams[k]].updateCache();
             this._logo.refreshCanvas();
             saveLocally();
+
         }
     };
 
@@ -198,6 +208,7 @@ function TimbreWidget () {
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
         var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
         synthButtonCell.onclick = function() {
+            console.log('synth button cell');
             that.synthActive = true;
             that.oscillatorActive = false;
             that.filterActive = false;
@@ -790,29 +801,44 @@ function TimbreWidget () {
         btnReset.style.marginLeft = '230px';
 
         for (var i = 0; i < 4; i++) {
+
             docById("myRange"+i).value = parseFloat(that.ENVs[i]);
             docById("myspan"+i).textContent = that.ENVs[i];
             that._update(blockValue, that.ENVs[i], i);
         }
         
         for (var i = 0; i < 4; i++) {
+
             document.getElementById("wrapperEnv"+i).addEventListener('change', function(event){
                 docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
                 var elem = event.target;
                 var m = elem.id.slice(-1);
                 docById("myRange"+m).value = parseFloat(elem.value);
                 docById("myspan"+m).textContent = elem.value;
+                console.log('inside envelope');
+
+                that.adsrVals['envelope'][that.adsrMap[m]] = parseFloat(elem.value)/100;
+
+                var synth_source = "triangle";
+
+             //   console.log('creating synth with name ' + that.instrument_name + " ");
+                that._logo.synth.createSynth(that.instrument_name, synth_source, that.adsrVals);
                 that._update(blockValue, parseFloat(elem.value), m);
+
             }); 
         }
+       
 
         btnReset.onclick = function() {
             docById("envelopeButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             for(var i = 0; i < 4; i++) {
+                that.adsrVals['envelope'][that.adsrMap[i]] = parseFloat(that.ENVs[i])/100;
                 docById("myRange"+i).value = parseFloat(that.ENVs[i]);
                 docById("myspan"+i).textContent = that.ENVs[i];
                 that._update(blockValue, parseFloat(that.ENVs[i]), i);
             }
+            var synth_source = "triangle";
+            that._logo.synth.createSynth(that.instrument_name, synth_source, that.adsrVals);
         }
     };
 

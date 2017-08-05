@@ -2506,13 +2506,21 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'timbre':
-            childFlow = args[1];
-            childFlowCount = 1;
 
             if (that.timbre == null) {
                 that.timbre = new TimbreWidget();
                 that.inTimbre = true;  
             }
+
+            if (args.length >= 1 && typeof(args[0] === 'textin')){
+                that.timbre.instrument_name = args[0];
+                console.log('timbre args : ' + args);
+            }else{
+                console.log('no args provided');
+            }
+
+            childFlow = args[1];
+            childFlowCount = 1;
             
             that.timbre.blockNo = blk;
             that.timbre.env = [];
@@ -2674,17 +2682,23 @@ function Logo () {
                 that.sustain = args[2] / 100;
                 that.release = args[3] / 100;
             }
-                if(that.inTimbre) {
-                    that.timbre.env.push(blk);
-                    var envattack = that.blocks.blockList[blk].connections[1];
-                    var envdecay = that.blocks.blockList[blk].connections[2];
-                    var envsustain = that.blocks.blockList[blk].connections[3];
-                    var envrelease = that.blocks.blockList[blk].connections[4];
-                    that.timbre.ENVs.push(that.blocks.blockList[envattack].text.text);
-                    that.timbre.ENVs.push(that.blocks.blockList[envdecay].text.text);
-                    that.timbre.ENVs.push(that.blocks.blockList[envsustain].text.text);
-                    that.timbre.ENVs.push(that.blocks.blockList[envrelease].text.text);
-                }
+            if(that.inTimbre) {
+                that.timbre.env.push(blk);
+                var envattack = that.blocks.blockList[blk].connections[1];
+                var envdecay = that.blocks.blockList[blk].connections[2];
+                var envsustain = that.blocks.blockList[blk].connections[3];
+                var envrelease = that.blocks.blockList[blk].connections[4];
+                that.timbre.ENVs.push(that.blocks.blockList[envattack].text.text);
+                that.timbre.ENVs.push(that.blocks.blockList[envdecay].text.text);
+                that.timbre.ENVs.push(that.blocks.blockList[envsustain].text.text);
+                that.timbre.ENVs.push(that.blocks.blockList[envrelease].text.text);
+                var synth_source = "triangle";
+                that.timbre.adsrVals[0] = that.attack;
+                that.timbre.adsrVals[1] = that.decay;
+                that.timbre.adsrVals[2] = that.sustain;
+                that.timbre.adsrVals[3] = that.release;
+                this.synth.createSynth(that.timbre.instrument_name, synth_source, that.timbre.adsrVals);
+            }
             break; 
         case 'filter':
             var filtertype = 'highpass';
@@ -3552,6 +3566,40 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'settimbre':
+
+            console.log('inside set timbre');
+
+          //  var instrument_name = null;
+            if (args.length >= 1 && typeof(args[0] === 'textin')){
+
+                that.set_instrument_name  = args[0];
+                console.log('settimbre args: ' + args);
+            }      
+
+            if (that.set_instrument_name == null) {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+
+                childFlow = args[1];
+                childFlowCount = 1;
+            } else {
+                
+            //    console.log('pushing into instrument list: ' + that.set_instrument_name);
+                that.instrument_names[turtle].push(that.set_instrument_name);
+                childFlow = args[1];
+                childFlowCount = 1;
+
+         //       debugger;
+                var listenerName = '_settimbre_' + turtle;
+                that._setDispatchBlock(blk, turtle, listenerName);
+
+                var __listener = function (event) {
+                    that.instrument_names[turtle].pop();
+                };
+
+                that._setListener(turtle, listenerName, __listener);
+            }
+        break;
         case 'crescendo':
             if (args.length > 1 && args[0] !== 0) {
                 that.crescendoDelta[turtle].push(args[0]);
@@ -5402,6 +5450,7 @@ function Logo () {
                                             }
                                             else if (turtle in that.instrument_names && last(that.instrument_names[turtle])) {
                                                // console.log('trying to access synth: ' + last(that.instrument_names[turtle]));
+                                             //   console.log('instrument ' + last(that.instrument_names[turtle]) + " found");
                                                 that.synth.trigger(notes[d], beatValue, last(that.instrument_names[turtle]), params_effects);
                                             }
                                             else if (turtle in that.voices && last(that.voices[turtle])) {

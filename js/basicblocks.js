@@ -1117,8 +1117,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.staticLabels.push(_('set timbre'));
     setTimbreBlock.adjustWidthToLabel();
     setTimbreBlock.flowClampOneArgBlock();
+    setTimbreBlock.dockTypes[1] = 'textin';
     setTimbreBlock.defaults.push(_('custom'));
-   
+    
+    /*var setTimbreBlock = new ProtoBlock('settimbre');
+    setTimbreBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['settimbre'] = setTimbreBlock;
+    setTimbreBlock.staticLabels.push(_('set timbre'));
+    setTimbreBlock.adjustWidthToLabel();
+    setTimbreBlock.flowClampOneArgBlock();
+    setTimbreBlock.defaults.push(_('custom'));
+    */
 
     var newslurBlock = new ProtoBlock('newslur');
     newslurBlock.palette = palettes.dict['tone'];
