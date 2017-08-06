@@ -796,6 +796,10 @@ function Logo () {
             this.tremoloDepth[turtle] = [];
             this.tremoloFrequency[turtle] = [];
             this.distortionAmount[turtle] = [];
+            this.attack[turtle] = [];
+            this.decay[turtle] = [];
+            this.sustain[turtle] = [];
+            this.release[turtle] = [];
             this.rate[turtle] = [];
             this.octaves[turtle] = [];
             this.baseFrequency[turtle] = [];
@@ -2658,9 +2662,11 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'envelope':
-            that.timbre.ENVs = [];
+            var synth_source = "triangle";
+            //that.timbre.ENVs = [];
             if(that.timbre.env.length != 0) {
                 that.errorMsg(_("You are adding a second envelope block"));
+                that.timbre.ENVs = [];
             }
 
             if (args.length === 4 && typeof(args[0] === 'number')) {
@@ -2676,27 +2682,23 @@ function Logo () {
                 if (args[3] < 0 || args[3] > 100) {
                     that.errorMsg(_('Release value should be between 0-100'));
                 } 
-
-                that.attack = args[0] / 100;
-                that.decay = args[1] / 100;
-                that.sustain = args[2] / 100;
-                that.release = args[3] / 100;
+                
+                that.attack[turtle].push(args[0] / 100);
+                that.decay[turtle].push(args[1] / 100);
+                that.sustain[turtle].push(args[2] / 100);
+                that.release[turtle].push(args[3] / 100);
             }
             if(that.inTimbre) {
                 that.timbre.env.push(blk);
-                var envattack = that.blocks.blockList[blk].connections[1];
-                var envdecay = that.blocks.blockList[blk].connections[2];
-                var envsustain = that.blocks.blockList[blk].connections[3];
-                var envrelease = that.blocks.blockList[blk].connections[4];
-                that.timbre.ENVs.push(that.blocks.blockList[envattack].text.text);
-                that.timbre.ENVs.push(that.blocks.blockList[envdecay].text.text);
-                that.timbre.ENVs.push(that.blocks.blockList[envsustain].text.text);
-                that.timbre.ENVs.push(that.blocks.blockList[envrelease].text.text);
-                var synth_source = "triangle";
-                that.timbre.adsrVals[0] = that.attack;
-                that.timbre.adsrVals[1] = that.decay;
-                that.timbre.adsrVals[2] = that.sustain;
-                that.timbre.adsrVals[3] = that.release;
+                that.timbre.ENVs.push(Math.round(last(that.attack[turtle]) * 100));
+                that.timbre.ENVs.push(Math.round(last(that.decay[turtle]) * 100));
+                that.timbre.ENVs.push(Math.round(last(that.sustain[turtle]) * 100));
+                that.timbre.ENVs.push(Math.round(last(that.release[turtle]) * 100));
+
+                that.timbre.adsrVals[0] = last(that.attack[turtle]);
+                that.timbre.adsrVals[1] = last(that.decay[turtle]);
+                that.timbre.adsrVals[2] = last(that.sustain[turtle]);
+                that.timbre.adsrVals[3] = last(that.release[turtle]);
                 this.synth.createSynth(that.timbre.instrument_name, synth_source, that.timbre.adsrVals);
             }
             break; 
@@ -2755,12 +2757,12 @@ function Logo () {
                 partials = args[1];
             } 
             if(that.inTimbre) {
-                    that.timbre.osc.push(blk);
-                    var oscillatorType = that.blocks.blockList[blk].connections[1];
-                    var oscillatorPartials = that.blocks.blockList[blk].connections[2];
-                    that.timbre.oscParams.push(that.blocks.blockList[oscillatorType].text.text);
-                    that.timbre.oscParams.push(that.blocks.blockList[oscillatorPartials].text.text);
-                }  
+                that.timbre.osc.push(blk);
+                var oscillatorType = that.blocks.blockList[blk].connections[1];
+                var oscillatorPartials = that.blocks.blockList[blk].connections[2];
+                that.timbre.oscParams.push(that.blocks.blockList[oscillatorType].text.text);
+                that.timbre.oscParams.push(that.blocks.blockList[oscillatorPartials].text.text);
+            }  
             break;    
         case 'invert1':
             if (typeof(args[2]) === 'number') {
@@ -3567,12 +3569,8 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'settimbre':
-
             console.log('inside set timbre');
-
-          //  var instrument_name = null;
             if (args.length >= 1 && typeof(args[0] === 'textin')){
-
                 that.set_instrument_name  = args[0];
                 console.log('settimbre args: ' + args);
             }      
@@ -3589,7 +3587,6 @@ function Logo () {
                 childFlow = args[1];
                 childFlowCount = 1;
 
-         //       debugger;
                 var listenerName = '_settimbre_' + turtle;
                 that._setDispatchBlock(blk, turtle, listenerName);
 

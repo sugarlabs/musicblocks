@@ -1598,7 +1598,7 @@ function Synth() {
     this.createSynth = function (instrument_name, source_name, params) {
 
         console.log('instrument: ' + instrument_name);
-        console.log('params');
+       // console.log('params');
         for (var key in params){
             console.log(params[key]);
         }

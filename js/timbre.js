@@ -725,6 +725,9 @@ function TimbreWidget () {
         document.getElementById("wrapperOsc0").addEventListener('change', function(event){
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
             var elem = event.target;
+            //that.oscillatorVals['oscillator'][that.oscillatorMap[0]] = elem.value;
+            //var synth_source = "triangle";
+            //that._logo.synth.createSynth(that.instrument_name, synth_source, that.oscillatorVals);
             that._update(blockValue, elem.value, 0);
         });
 
@@ -733,6 +736,9 @@ function TimbreWidget () {
             var elem = event.target;
             docById("myRangeO0").value = parseFloat(elem.value);
             docById("myspanO0").textContent = elem.value;
+            //that.oscillatorVals['oscillator'][that.oscillatorMap[1]] = parseFloat(elem.value);
+            //var synth_source = "triangle";
+            //that._logo.synth.createSynth(that.instrument_name, synth_source, that.oscillatorVals);
             that._update(blockValue, elem.value, 1);
         });
         
@@ -753,17 +759,23 @@ function TimbreWidget () {
         btnReset.onclick = function() {
             docById("oscillatorButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             docById('selOsc1').value = that.oscParams[0];
+            //that.oscillatorVals['oscillator'][that.oscillatorMap[0]] = elem.value;
             that._update(blockValue, that.oscParams[0], 0);
             
             docById("myRangeO0").value = parseFloat(that.oscParams[1]);
             docById("myspanO0").textContent = that.oscParams[1];
+            //that.oscillatorVals['oscillator'][that.oscillatorMap[1]] = parseFloat(elem.value);
             that._update(blockValue, that.oscParams[1], 1);
+
+            //var synth_source = "triangle";
+            //that._logo.synth.createSynth(that.instrument_name, synth_source, that.oscillatorVals);
         }
     };
 
     this._envelope = function() {
         var that = this;
         var blockValue = 0;
+        var synth_source = "triangle";
 
         if(this.env.length != 1) {
             blockValue = this.env.length - 1;
@@ -801,43 +813,36 @@ function TimbreWidget () {
         btnReset.style.marginLeft = '230px';
 
         for (var i = 0; i < 4; i++) {
-
             docById("myRange"+i).value = parseFloat(that.ENVs[i]);
             docById("myspan"+i).textContent = that.ENVs[i];
+            that.adsrVals['envelope'][that.adsrMap[i]] = parseFloat(that.ENVs[i]) / 100;
             that._update(blockValue, that.ENVs[i], i);
         }
-        
-        for (var i = 0; i < 4; i++) {
 
+        for (var i = 0; i < 4; i++) {
             document.getElementById("wrapperEnv"+i).addEventListener('change', function(event){
                 docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
                 var elem = event.target;
                 var m = elem.id.slice(-1);
                 docById("myRange"+m).value = parseFloat(elem.value);
                 docById("myspan"+m).textContent = elem.value;
-                console.log('inside envelope');
+                //console.log('inside envelope');
 
-                that.adsrVals['envelope'][that.adsrMap[m]] = parseFloat(elem.value)/100;
-
-                var synth_source = "triangle";
-
-             //   console.log('creating synth with name ' + that.instrument_name + " ");
-                that._logo.synth.createSynth(that.instrument_name, synth_source, that.adsrVals);
+                that.adsrVals['envelope'][that.adsrMap[m]] = parseFloat(elem.value) / 100;
+                //console.log('creating synth with name ' + that.instrument_name + " ");
                 that._update(blockValue, parseFloat(elem.value), m);
-
+                that._logo.synth.createSynth(that.instrument_name, synth_source, that.adsrVals);
             }); 
         }
        
-
         btnReset.onclick = function() {
             docById("envelopeButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             for(var i = 0; i < 4; i++) {
-                that.adsrVals['envelope'][that.adsrMap[i]] = parseFloat(that.ENVs[i])/100;
+                that.adsrVals['envelope'][that.adsrMap[i]] = parseFloat(that.ENVs[i]) / 100;
                 docById("myRange"+i).value = parseFloat(that.ENVs[i]);
                 docById("myspan"+i).textContent = that.ENVs[i];
                 that._update(blockValue, parseFloat(that.ENVs[i]), i);
             }
-            var synth_source = "triangle";
             that._logo.synth.createSynth(that.instrument_name, synth_source, that.adsrVals);
         }
     };
