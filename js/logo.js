@@ -3291,6 +3291,8 @@ function Logo () {
             } else {
                 that.pickup[turtle] = args[0];
             }
+
+	    that.notationPickup(turtle, that.pickup[turtle]);
             break;
         case 'onbeatdo':
             // Set up a listner for this turtle/beat combo.
@@ -3341,6 +3343,8 @@ function Logo () {
             } else {
                 that.noteValuePerBeat[turtle] = 1 / args[1];
             }
+
+	    that.notationMeter(turtle, that.beatsPerMeasure[turtle], that.noteValuePerBeat[turtle]);
             break;
         case 'osctime':
         case 'newnote':
@@ -6745,6 +6749,22 @@ function Logo () {
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
     };
 
+    this.notationMeter = function (turtle, count, value) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('meter', count, value);
+    };
+
+    this.notationPickup = function (turtle, factor) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('pickup', 1 / factor);
+    };
+    
     this.notationLineBreak = function (turtle) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];
