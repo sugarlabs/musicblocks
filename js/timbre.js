@@ -180,7 +180,7 @@ function TimbreWidget () {
 
     this.init = function(logo) {
         this._logo = logo;
-        console.log("inside init");
+        //console.log("inside init");
         
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -318,7 +318,7 @@ function TimbreWidget () {
             that.distortionActive = false;
             filterButtonCell.id = "filterButtonCell";
 
-            if (that.fil.length === 0) {
+            if (that.fil.length < 2) {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 

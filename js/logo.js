@@ -2529,7 +2529,6 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'timbre':
-
             if (that.timbre == null) {
                 that.timbre = new TimbreWidget();
                 that.inTimbre = true;  
