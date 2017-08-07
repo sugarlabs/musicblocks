@@ -173,6 +173,14 @@ processAbcNotes = function (logo, turtle) {
             case 'tie':
                 logo.notationNotes[turtle] += '';
                 break;
+            case 'meter':
+                logo.notationNotes[turtle] += 'M:' + logo.notationStaging[turtle][i + 1] + '/' + logo.notationStaging[turtle][i + 2] + '\n';
+                i += 2;
+                break;
+            case 'pickup':
+                // FIXME: how does one define pickup in ABC notation?
+                i += 1;
+                break;
             default:
                 logo.notationNotes[turtle] += obj;
                 break;
