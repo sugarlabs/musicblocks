@@ -164,6 +164,13 @@ function Logo () {
     this.currentNotes = {};
     this.currentOctaves = {};
 
+    // parameters used in time signature
+    this.pickup = {};
+    this.beatsPerMeasure = {};
+    this.noteValuePerBeat = {};
+    this.currentBeat = {};
+    this.currentMeasure = {};
+
     // parameters used by the note block
     this.bpm = {};
     this.turtleTime = [];
@@ -680,6 +687,12 @@ function Logo () {
                     value = this._masterBPM;
                 }
                 break;
+            case 'beatvalue':
+                value = this.currentBeat[turtle];
+                break;
+            case 'measurevalue':
+                value = this.currentMeasure[turtle];
+                break;
             default:
                 if (name in this.evalParameterDict) {
                     eval(this.evalParameterDict[name]);
@@ -809,6 +822,12 @@ function Logo () {
             this.dispatchFactor[turtle] = 1;
             this.justCounting[turtle] = false;
             this.suppressOutput[turtle] = this.runningLilypond;
+            this.pickup[turtle] = 0;
+            // Default is 4/4 time.
+            this.beatsPerMeasure[turtle] = 4;
+            this.noteValuePerBeat[turtle] = 4;
+            this.currentBeat[turtle] = 0;
+            this.currentMeasure[turtle] = 0;
         }
 
         this.pitchNumberOffset = 39;  // C4
@@ -2554,6 +2573,7 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
             
             var __listener = function (event) {
+                console.log("inside listener");
                 that.timbre.init(that);
             };
 
@@ -3477,8 +3497,72 @@ function Logo () {
         case 'sixtyfourthNote':
             that._processNote(64, blk, turtle);
             break;
+        case 'pickup':
+            if (args.length !== 1 || typeof(args[0]) !== 'number') {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] < 0) {
+                that.pickup[turtle] = 0;
+            } else {
+                that.pickup[turtle] = args[0];
+            }
+
+	    that.notationPickup(turtle, that.pickup[turtle]);
+            break;
+        case 'onbeatdo':
+            // Set up a listner for this turtle/beat combo.
+            if (args.length === 2) {
+                if (!(args[1] in that.actions)) {
+                    that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                    that.stopTurtle = true;
+                } else {
+                    var __listener = function (event) {
+                        if (that.turtles.turtleList[turtle].running) {
+                            var queueBlock = new Queue(that.actions[args[1]], 1, blk);
+                            that.parentFlowQueue[turtle].push(blk);
+                            that.turtles.turtleList[turtle].queue.push(queueBlock);
+                        } else {
+                            // Since the turtle has stopped
+                            // running, we need to run the stack
+                            // from here.
+                            if (isflow) {
+                                that._runFromBlockNow(that, turtle, that.actions[args[1]], isflow, receivedArg);
+                            } else {
+                                that._runFromBlock(that, turtle, that.actions[args[1]], isflow, receivedArg);
+                            }
+                        }
+                    };
+
+                    // If there is already a listener, remove it
+                    // before adding the new one.
+		    var eventName = '__beat_' + args[0] + '_' + turtle + '__';
+                    that._setListener(turtle, eventName, __listener);
+                }
+            }
+            break;
         case 'meter':
-            // See Issue #337
+            if (args.length !== 2 || typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (args[0] <= 0) {
+                that.beatsPerMeasure[turtle] = 4;
+            } else {
+                that.beatsPerMeasure[turtle] = args[0];
+            }
+
+            if (args[1] <= 0) {
+                that.noteValuePerBeat[turtle] = 4;
+            } else {
+                that.noteValuePerBeat[turtle] = 1 / args[1];
+            }
+
+	    that.notationMeter(turtle, that.beatsPerMeasure[turtle], that.noteValuePerBeat[turtle]);
             break;
         case 'osctime':
         case 'newnote':
@@ -4998,9 +5082,6 @@ function Logo () {
             var noteBeatValue = noteValue;
         }
 
-        // How best to expose this in the UI? What units?
-        this.notesPlayed[turtle] += (1 / (noteValue * this.beatFactor[turtle]));
-
         var vibratoRate = 0;
         var vibratoValue = 0;
         var vibratoIntensity = 0;
@@ -5270,6 +5351,22 @@ function Logo () {
                     if (that.stopTurtle) {
                         return;
                     }
+
+                    if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+			var beatValue = 0;
+                        var measureValue = 0;
+                    } else {
+                        var beatValue = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
+                        var measureValue = Math.floor(((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) / that.beatsPerMeasure[turtle]) + 1;
+                    }
+
+                    that.currentBeat[turtle] = beatValue;
+                    that.currentMeasure[turtle] = measureValue;
+                    that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
+
+                    // FIXME: Only dispatch if there is a signal enabled
+		    var eventName = '__beat_' + beatValue + '_' + turtle + '__';
+                    that.stage.dispatchEvent(eventName);
 
                     var notes = [];
                     var drums = [];
@@ -6255,6 +6352,28 @@ function Logo () {
                     that.blocks.blockList[blk].value = 0;
                 }
                 break;
+            case 'beatvalue':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'beatvalue']);
+                } else {
+                    if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+			that.blocks.blockList[blk].value = 0;
+                    } else {
+                        that.blocks.blockList[blk].value = (((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
+                    }
+                }
+                break;
+            case 'measurevalue':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'measurevalue']);
+                } else {
+                    if (that.notesPlayed[turtle] < that.pickup[turtle]) {
+			that.blocks.blockList[blk].value = 0;
+                    } else {
+                        that.blocks.blockList[blk].value = Math.floor(((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) / that.beatsPerMeasure[turtle]) + 1;
+                    }
+                }
+                break;
             case 'turtlenote':
             case 'turtlenote2':
                 var value = null;
@@ -6919,6 +7038,22 @@ function Logo () {
         this.notationStaging[turtle].push([note, obj[0], obj[1], obj[2], obj[3], insideChord, this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0]);
     };
 
+    this.notationMeter = function (turtle, count, value) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('meter', count, value);
+    };
+
+    this.notationPickup = function (turtle, factor) {
+        if (this.notationStaging[turtle] == undefined) {
+            this.notationStaging[turtle] = [];
+        }
+
+        this.notationStaging[turtle].push('pickup', 1 / factor);
+    };
+    
     this.notationLineBreak = function (turtle) {
         if (this.notationStaging[turtle] == undefined) {
             this.notationStaging[turtle] = [];

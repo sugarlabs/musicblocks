@@ -180,6 +180,7 @@ function TimbreWidget () {
 
     this.init = function(logo) {
         this._logo = logo;
+        console.log("inside init");
         
         var w = window.innerWidth;
         this._cellScale = w / 1200;

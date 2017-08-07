@@ -292,6 +292,12 @@ function StatusMatrix() {
                         var value = '';
                     }
                     break;
+                case 'beatvalue':
+                    var value = this._logo.currentBeat[turtle];
+                    break;
+                case 'measurevalue':
+                    var value = this._logo.currentMeasure[turtle];
+                    break;
                 default:
                     var value = this._logo.blocks.blockList[this._logo.statusFields[i][0]].value;
                     break;
