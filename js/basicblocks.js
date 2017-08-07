@@ -550,6 +550,22 @@ function initBasicProtoBlocks(palettes, blocks) {
     onBeatDoBlock.dockTypes[1] = 'numberin';
     onBeatDoBlock.dockTypes[2] = 'textin';
 
+    var measureValueBlock = new ProtoBlock('measurevalue');
+    measureValueBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['measurevalue'] = measureValueBlock;
+    // .TRANS: count of current measure in meter
+    measureValueBlock.staticLabels.push(_('measure count'));
+    measureValueBlock.adjustWidthToLabel();
+    measureValueBlock.parameterBlock();
+
+    var beatValueBlock = new ProtoBlock('beatvalue');
+    beatValueBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['beatvalue'] = beatValueBlock;
+    // .TRANS: count of current beat in meter
+    beatValueBlock.staticLabels.push(_('beat count'));
+    beatValueBlock.adjustWidthToLabel();
+    beatValueBlock.parameterBlock();
+
     var pickupBlock = new ProtoBlock('pickup');
     pickupBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['pickup'] = pickupBlock;
@@ -557,12 +573,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     pickupBlock.staticLabels.push(_('pickup'));
     pickupBlock.oneArgBlock();
     pickupBlock.defaults.push(0);
-
-    var beatValueBlock = new ProtoBlock('beatvalue');
-    beatValueBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['beatvalue'] = beatValueBlock;
-    beatValueBlock.staticLabels.push(_('beat value'));
-    beatValueBlock.parameterBlock();
 
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['rhythm'];
