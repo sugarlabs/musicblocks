@@ -205,9 +205,45 @@ define(MYDEFINES, function (compatibility) {
             palettes.updatePalettes();
             var x = 100 * turtleBlocksScale;
             var y = 100 * turtleBlocksScale;
+
+            // First start blocks
             for (var blk in blocks.blockList) {
                 if (!blocks.blockList[blk].trash) {
                     var myBlock = blocks.blockList[blk];
+                    if (myBlock.name !== 'start') {
+                        continue;
+                    };
+
+                    if (myBlock.connections[0] == null) {
+                        var dx = x - myBlock.container.x;
+                        var dy = y - myBlock.container.y;
+                        blocks.moveBlockRelative(blk, dx, dy);
+                        blocks.findDragGroup(blk);
+                        if (blocks.dragGroup.length > 0) {
+                            for (var b = 0; b < blocks.dragGroup.length; b++) {
+                                var bblk = blocks.dragGroup[b];
+                                if (b !== 0) {
+                                    blocks.moveBlockRelative(bblk, dx, dy);
+                                }
+                            }
+                        }
+                        x += 200 * turtleBlocksScale;
+                        if (x > (canvas.width - 100) / (turtleBlocksScale)) {
+                            x = 100 * turtleBlocksScale;
+                            y += 100 * turtleBlocksScale;
+                        }
+                    }
+                }
+            }
+
+            // The everything else
+            for (var blk in blocks.blockList) {
+                if (!blocks.blockList[blk].trash) {
+                    var myBlock = blocks.blockList[blk];
+                    if (myBlock.name === 'start') {
+                        continue;
+                    };
+
                     if (myBlock.connections[0] == null) {
                         var dx = x - myBlock.container.x;
                         var dy = y - myBlock.container.y;
@@ -1245,7 +1281,7 @@ define(MYDEFINES, function (compatibility) {
                     } else if (palettes.activePalette != null) {
                         palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
                     } else if (scrollBlockContainer) {
-                        blocksContainer.y -= 21;
+                        blocksContainer.y -= 20;
                     }
                     break;
                 case KEYCODE_DOWN:
@@ -1259,7 +1295,7 @@ define(MYDEFINES, function (compatibility) {
                     } else if (palettes.activePalette != null) {
                         palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
                     } else if (scrollBlockContainer) {
-                        blocksContainer.y += 21;
+                        blocksContainer.y += 20;
                     }
                     break;
                 case KEYCODE_LEFT:
@@ -1268,7 +1304,7 @@ define(MYDEFINES, function (compatibility) {
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
                     } else if (scrollBlockContainer) {
-                        blocksContainer.x -= 21;
+                        blocksContainer.x -= 20;
                     }
                     break;
                 case KEYCODE_RIGHT:
@@ -1277,7 +1313,7 @@ define(MYDEFINES, function (compatibility) {
                         blocks.blockMoved(blocks.activeBlock);
                         blocks.adjustDocks(blocks.activeBlock, true);
                     } else if (scrollBlockContainer) {
-                        blocksContainer.x += 21;
+                        blocksContainer.x += 20;
                     }
                     break;
                 case HOME:
