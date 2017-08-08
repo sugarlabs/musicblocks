@@ -1732,6 +1732,15 @@ function Synth() {
     this.setVolume = function (vol) {
         var db = this.tone.gainToDb(vol / 100);
         Tone.Master.volume.rampTo(db, 0.01);
+        //console.log("played");
+    };
+
+    this.setStereo = function (inc){
+       var panner = new Tone.Panner(inc / 100);
+       //console.log(panner.pan);
+       var synth = new Tone.Synth();
+       synth.connect(panner);
+       panner.toMaster();
     };
 
 };
