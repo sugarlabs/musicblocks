@@ -54,7 +54,7 @@ function PitchSlider() {
         var note = obj[0] + obj[1];
         pitchnotes.push(note.replace(/♭/g, 'b').replace(/♯/g, '#'));
         var slider = docById('slider');
-        this._logo.synth.trigger(pitchnotes, 1, 'poly');
+        this._logo.synth.trigger(pitchnotes, 1, 'poly', null);
     };
 
     this._moveSlider = function (cell, upDown) {
