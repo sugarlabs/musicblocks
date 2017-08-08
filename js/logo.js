@@ -535,6 +535,7 @@ function Logo () {
             case 'random':
             case 'mod':
             case 'sqrt':
+            case 'abs':
             case 'int':
             case 'plus':
             case 'minus':
@@ -5765,6 +5766,15 @@ function Logo () {
                         a = -a;
                     }
                     that.blocks.blockList[blk].value = that._doSqrt(a);
+                }
+                break;
+            case 'abs':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, that.blocks.blockList[blk].name]);
+                } else {
+                    var cblk = that.blocks.blockList[blk].connections[1];
+                    var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                    that.blocks.blockList[blk].value = Math.abs(a);
                 }
                 break;
             case 'int':
