@@ -6789,7 +6789,7 @@ function Logo () {
             this.notationStaging[turtle] = [];
         }
 
-        this.notationStaging[turtle].push('break');
+        // this.notationStaging[turtle].push('break');
     };
 
     this.notationBeginArticulation = function (turtle) {
