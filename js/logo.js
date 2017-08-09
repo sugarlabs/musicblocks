@@ -84,6 +84,10 @@ function Logo () {
     this.turtleHeaps = {};
     this.invertList = {};
 
+    // We store each case arg and flow by switch block no. and turtle.
+    this.switchCases = {};
+    this.switchBlocks = {};
+
     // When we leave a clamp block, we need to dispatch a signal.
     this.endOfClampSignals = {};
 
@@ -100,23 +104,15 @@ function Logo () {
     // Music-related attributes
     this.notesPlayed = {};
 
-    // pitch-drum matrix
+    // Widget-related attributes
     this.showPitchDrumMatrix = false;
     this.inPitchDrumMatrix = false;
-
-    //rhythm-ruler
     this.inRhythmRuler = false;
     this.rhythmRulerMeasure = null;
-
     this.inPitchStaircase = false;
-
     this.inTempo = false;
-
     this.inPitchSlider = false;
-
     this._currentDrumBlock = null;
-
-    // pitch-rhythm matrix
     this.inMatrix = false;
     this.keySignature = {};
     this.tupletRhythms = [];
@@ -765,6 +761,8 @@ function Logo () {
             this.beatFactor[turtle] = 1;
             this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
+            this.switchCases[turtle] = {};
+	    this.switchBlocks[turtle] = [];
             this.duplicateFactor[turtle] = 1;
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
@@ -2608,6 +2606,64 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
+            break;
+        case 'switch':
+            that.switchBlocks[turtle].push(blk);
+	    that.switchCases[turtle][blk] = [];
+
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_switch_' + blk + '_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                var switchBlk = last(that.switchBlocks[turtle]);
+                // Run the cases here.
+                var argBlk = that.blocks.blockList[switchBlk].connections[1];
+                if (argBlk == null) {
+                    var switchCase = '__default__';
+                } else {
+                    var switchCase = that.parseArg(that, turtle, argBlk, that.receievedArg);
+                }
+
+                var caseFlow = null;
+                for (var i = 0; i < that.switchCases[turtle][switchBlk].length; i++) {
+                    if (that.switchCases[turtle][switchBlk][i][0] === switchCase) {
+			caseFlow = that.switchCases[turtle][switchBlk][i][1];
+                        break;
+                    } else if (that.switchCases[turtle][switchBlk][i][0] === '__default__') {
+			caseFlow = that.switchCases[turtle][switchBlk][i][1];
+                    }
+                }
+
+                if (caseFlow != null) {
+                    var queueBlock = new Queue(caseFlow, 1, switchBlk, null);
+                    that.parentFlowQueue[turtle].push(switchBlk);
+		    that.turtles.turtleList[turtle].queue.push(queueBlock);
+                }
+
+                // Clean up afterward.
+		that.switchCases[turtle][switchBlk] = [];
+		that.switchBlocks[turtle].pop();
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
+        case 'defaultcase':
+        case 'case':
+            var switchBlk = last(that.switchBlocks[turtle]);
+            if (switchBlk === null) {
+                that.errorMsg(_('The Case Block must be used inside of a Switch Block.'), blk);
+                that.stopTurtle = true;
+                break;
+            }
+
+            if (that.blocks.blockList[blk].name === 'defaultcase') {
+                that.switchCases[turtle][switchBlk].push(['__default__', args[0]]);
+            } else {
+                that.switchCases[turtle][switchBlk].push([args[0], args[1]]);
+	    }
             break;
         case 'invert2':
         case 'invert':
