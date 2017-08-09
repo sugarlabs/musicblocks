@@ -1,4 +1,4 @@
-// Copyright (c) 2014-16 Walter Bender
+// Copyright (c) 2014-17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -2378,6 +2378,29 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['hidden'] = hiddenBlock;
     hiddenBlock.hidden = true;
     hiddenBlock.hiddenBlockFlow();
+
+    var defaultBlock = new ProtoBlock('defaultcase');
+    defaultBlock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['defaultcase'] = defaultBlock;
+    defaultBlock.staticLabels.push(_('default'));
+    defaultBlock.adjustWidthToLabel();
+    defaultBlock.flowClampBlock();
+
+    var caseBlock = new ProtoBlock('case');
+    caseBlock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['case'] = caseBlock;
+    caseBlock.staticLabels.push(_('case'));
+    caseBlock.adjustWidthToLabel();
+    caseBlock.flowClampOneArgBlock();
+    caseBlock.dockTypes[1] = 'anyin';
+
+    var switchBlock = new ProtoBlock('switch');
+    switchBlock.palette = palettes.dict['flow'];
+    blocks.protoBlockDict['switch'] = switchBlock;
+    switchBlock.staticLabels.push(_('switch'));
+    switchBlock.adjustWidthToLabel();
+    switchBlock.flowClampOneArgBlock();
+    switchBlock.dockTypes[1] = 'anyin';
 
     var clampBlock = new ProtoBlock('clamp');
     clampBlock.palette = palettes.dict['flow'];
