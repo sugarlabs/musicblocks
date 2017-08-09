@@ -123,6 +123,7 @@ function Logo () {
     this._currentDrumBlock = null;
 
     this.inTimbre = false;
+    this.inSetTimbre = false;
 
     // pitch-rhythm matrix
     this.inMatrix = false;
@@ -717,6 +718,7 @@ function Logo () {
     };
 
     this.runLogoCommands = function (startHere, env) {
+        console.log('runLogo commands');
         // Save the state before running.
         this.saveLocally();
 
@@ -930,6 +932,7 @@ function Logo () {
         // (2) Execute the stack.
         // A bit complicated because we have lots of corner cases:
         if (startHere != null) {
+            console.log('start here');
             // console.log('startHere is ' + this.blocks.blockList[startHere].name);
 
             // If a block to start from was passed, find its
@@ -975,9 +978,11 @@ function Logo () {
             }
         }
         this.refreshCanvas();
+      //  console.log('canvas refreshed');
     };
 
     this._runFromBlock = function (that, turtle, blk, isflow, receivedArg) {
+        console.log('Run from block');
         if (blk == null) {
             return;
         }
@@ -1119,9 +1124,10 @@ function Logo () {
         }
     };
 
+
     this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
-
+        console.log('run from block now');
         this.receivedArg = receivedArg;
 
         // Sometimes we don't want to unwind the entire queue.
@@ -1192,6 +1198,7 @@ function Logo () {
             that.blocks.highlight(blk, false);
         }
 
+        console.log('len: ' + that.blocks.blockList[blk]);
         switch (that.blocks.blockList[blk].name) {
         case 'dispatch':
             // Dispatch an event.
@@ -2536,7 +2543,10 @@ function Logo () {
 
             if (args.length >= 1 && typeof(args[0] === 'textin')){
                 that.timbre.instrument_name = args[0];
-                console.log('timbre args : ' + args);
+                instruments_effects[that.timbre.instrument_name] = {};
+                instruments_effects[that.timbre.instrument_name]['vibratoActive'] = false;
+            //    console.log("vibratoActive " + instruments_effects[that.timbre.instrument_name]['vibratoActive']);
+            //    console.log('timbre args : ' + args);
             }else{
                 console.log('no args provided');
             }
@@ -3652,10 +3662,12 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'settimbre':
+        //debugger;
             console.log('inside set timbre');
             if (args.length >= 1 && typeof(args[0] === 'textin')){
                 that.set_instrument_name  = args[0];
                 console.log('settimbre args: ' + args);
+                that.inSetTimbre = true;
             }      
 
             if (that.set_instrument_name == null) {
@@ -5064,6 +5076,7 @@ function Logo () {
     };
 
     this._processNote = function (noteValue, blk, turtle) {
+
         if (this.bpm[turtle].length > 0) {
             var bpmFactor = TONEBPM / last(this.bpm[turtle]);
         } else {
@@ -5098,6 +5111,53 @@ function Logo () {
         var doTremolo = false;
         var doPhaser = false;
         var doChorus = false;
+
+        /* Applying effects inside the timbre block */
+
+        if ((this.inSetTimbre == true) && (turtle in this.instrument_names) && last(this.instrument_names[turtle])){
+            var inst_name = last(this.instrument_names[turtle]);
+           // console.log('inst_name: ' + inst_name);
+
+            var timbre_effects = instruments_effects[inst_name];
+
+            if (timbre_effects['vibratoActive'] == true) {
+                vibratoRate = timbre_effects['vibratoRate'];
+                vibratoIntensity = timbre_effects['vibratoIntensity'];
+                doVibrato = true;
+            }
+
+            /*
+            if(this.distortionAmount[turtle].length > 0) {
+                distortionAmount = last(this.distortionAmount[turtle]);
+                console.log(distortionAmount);
+                doDistortion = true;
+            }
+
+            if (this.tremoloDepth[turtle].length > 0) {
+                tremoloFrequency = last(this.tremoloFrequency[turtle]);
+                tremoloDepth = last(this.tremoloDepth[turtle]);
+                doTremolo = true;
+            }
+
+            if (this.rate[turtle].length > 0) {
+                rate = last(this.rate[turtle]);
+                octaves = last(this.octaves[turtle]);
+                baseFrequency = last(this.baseFrequency[turtle]);
+                doPhaser = true;
+            }
+
+            if (this.chorusRate[turtle].length > 0) {
+                chorusRate = last(this.chorusRate[turtle]);
+                delayTime = last(this.delayTime[turtle]);
+                chorusDepth = last(this.chorusDepth[turtle]);
+                doChorus = true;
+            }
+            */
+
+        }
+
+        /*------------------------*/
+
         if (this.vibratoRate[turtle].length > 0) {
             vibratoRate = last(this.vibratoRate[turtle]);
             vibratoIntensity = last(this.vibratoIntensity[turtle]);
@@ -5461,6 +5521,7 @@ function Logo () {
                         }
 
                         if (!that.justCounting[turtle]) {
+                            //debugger;
                             console.log("notes to play " + notes + ' ' + noteBeatValue);
                         } else {
                             console.log("notes to count " + notes + ' ' + noteBeatValue);

@@ -1333,6 +1333,10 @@ var instruments = {};
 
 var instruments_source = {};
 
+// Effects associated with instruments in the timbre widget
+
+var instruments_effects = {};
+
 
 function Synth() {
     // Isolate synth functions here

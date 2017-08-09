@@ -349,7 +349,7 @@ function TimbreWidget () {
             effectsButtonCell.id = "effectsButtonCell";
             that._effects();
         }
-
+        
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
         /*cell.onclick=function() {
             that._undo();
@@ -1051,6 +1051,10 @@ function TimbreWidget () {
                     that.phaserActive = false;
                     that.vibratoActive = true;
                     that.distortionActive = false;
+
+               //     console.log("instrument name: " + that.instrument_name);
+                    instruments_effects[that.instrument_name]['vibratoActive'] = true;
+               //     console.log('is vibratoactiv: ' + instruments_effects[that.instrument_name].vibratoActive);
                     
                     for (var i = 0; i < 2; i++) {
                         subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
@@ -1096,6 +1100,9 @@ function TimbreWidget () {
                         var elem = event.target;
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
+                   //     console.log('vibrato intensity: ' + parseFloat(elem.value));
+                        instruments_effects[that.instrument_name]['vibratoIntensity'] = parseFloat(elem.value)/100;
+
                         that._update(that.vibratoEffect.length - 1, elem.value, 0);
                     });    
 
@@ -1103,9 +1110,13 @@ function TimbreWidget () {
                         docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                         var elem = event.target;
                         docById("myRangeFx1").value = parseFloat(elem.value);
-
+                      //  console.log('vibrato Rate: ' + parseFloat(elem.value));
                         var obj = oneHundredToFraction(elem.value);
                         docById("myspanFx1").textContent = obj[0] + '/' + obj[1];
+                        var temp = parseFloat(obj[0])/parseFloat(obj[1]);
+                   //     console.log('vibrato Rate: ' + temp);
+                       // instruments_effects[]
+                        instruments_effects[that.instrument_name]['vibratoRate'] = Math.floor(Math.pow(temp, -1));
                         that._update(that.vibratoEffect.length - 1, obj[1], 1);
                         that._update(that.vibratoEffect.length - 1, obj[0], 2);
                     });    
