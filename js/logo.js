@@ -982,7 +982,7 @@ function Logo () {
     };
 
     this._runFromBlock = function (that, turtle, blk, isflow, receivedArg) {
-        console.log('Run from block');
+//        console.log('Run from block');
         if (blk == null) {
             return;
         }
@@ -1127,7 +1127,7 @@ function Logo () {
 
     this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
-        console.log('run from block now');
+//        console.log('run from block now');
         this.receivedArg = receivedArg;
 
         // Sometimes we don't want to unwind the entire queue.
@@ -1198,7 +1198,7 @@ function Logo () {
             that.blocks.highlight(blk, false);
         }
 
-        console.log('len: ' + that.blocks.blockList[blk]);
+//        console.log('len: ' + that.blocks.blockList[blk]);
         switch (that.blocks.blockList[blk].name) {
         case 'dispatch':
             // Dispatch an event.
@@ -2545,6 +2545,10 @@ function Logo () {
                 that.timbre.instrument_name = args[0];
                 instruments_effects[that.timbre.instrument_name] = {};
                 instruments_effects[that.timbre.instrument_name]['vibratoActive'] = false;
+                instruments_effects[that.timbre.instrument_name]['distortionActive'] = false;
+                instruments_effects[that.timbre.instrument_name]['tremoloActive'] = false;
+                instruments_effects[that.timbre.instrument_name]['phaserActive'] = false;
+                instruments_effects[that.timbre.instrument_name]['chorusActive'] = false;
             //    console.log("vibratoActive " + instruments_effects[that.timbre.instrument_name]['vibratoActive']);
             //    console.log('timbre args : ' + args);
             }else{
@@ -5116,7 +5120,7 @@ function Logo () {
 
         if ((this.inSetTimbre == true) && (turtle in this.instrument_names) && last(this.instrument_names[turtle])){
             var inst_name = last(this.instrument_names[turtle]);
-           // console.log('inst_name: ' + inst_name);
+            console.log('inst_name: ' + inst_name);
 
             var timbre_effects = instruments_effects[inst_name];
 
@@ -5126,34 +5130,34 @@ function Logo () {
                 doVibrato = true;
             }
 
-            /*
-            if(this.distortionAmount[turtle].length > 0) {
-                distortionAmount = last(this.distortionAmount[turtle]);
-                console.log(distortionAmount);
+            
+            if (timbre_effects['distortionActive'] == true) {
+                distortionAmount = timbre_effects['distortionAmount'];
                 doDistortion = true;
             }
 
-            if (this.tremoloDepth[turtle].length > 0) {
-                tremoloFrequency = last(this.tremoloFrequency[turtle]);
-                tremoloDepth = last(this.tremoloDepth[turtle]);
+            
+            if (timbre_effects['tremoloActive'] == true) {
+                tremoloFrequency = timbre_effects['tremoloFrequency'];
+                tremoloDepth = timbre_effects['tremoloDepth'];
                 doTremolo = true;
             }
 
-            if (this.rate[turtle].length > 0) {
-                rate = last(this.rate[turtle]);
-                octaves = last(this.octaves[turtle]);
-                baseFrequency = last(this.baseFrequency[turtle]);
+            
+            if (timbre_effects['phaserActive'] == true) {
+                rate = timbre_effects['rate'];
+                octaves = timbre_effects['octaves'];
+                baseFrequency = timbre_effects['baseFrequency'];
                 doPhaser = true;
             }
 
-            if (this.chorusRate[turtle].length > 0) {
-                chorusRate = last(this.chorusRate[turtle]);
-                delayTime = last(this.delayTime[turtle]);
-                chorusDepth = last(this.chorusDepth[turtle]);
+
+            if (timbre_effects['chorusActive'] == true) {
+                chorusRate = timbre_effects['chorusRate'];
+                delayTime = timbre_effects['delayTime'];
+                chorusDepth = timbre_effects['chorusDepth'];
                 doChorus = true;
             }
-            */
-
         }
 
         /*------------------------*/
@@ -5166,7 +5170,6 @@ function Logo () {
 
         if(this.distortionAmount[turtle].length > 0) {
             distortionAmount = last(this.distortionAmount[turtle]);
-            console.log(distortionAmount);
             doDistortion = true;
         }
 
@@ -5593,18 +5596,11 @@ function Logo () {
                                     } else {
                                         // Look for any notes in the chord that might be in the pitchDrumTable.
 
-                                     /*   if (turtle in that.instrument_names){
-                                            console.log('instrument_name : ' + last(that.instrument_names[turtle]));
-                                        }
-                                     */
-
                                         for (var d = 0; d < notes.length; d++) {
                                             if (notes[d] in that.pitchDrumTable[turtle]) {
                                                 that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null);
                                             }
                                             else if (turtle in that.instrument_names && last(that.instrument_names[turtle])) {
-                                               // console.log('trying to access synth: ' + last(that.instrument_names[turtle]));
-                                             //   console.log('instrument ' + last(that.instrument_names[turtle]) + " found");
                                                 that.synth.trigger(notes[d], beatValue, last(that.instrument_names[turtle]), params_effects);
                                             }
                                             else if (turtle in that.voices && last(that.voices[turtle])) {
