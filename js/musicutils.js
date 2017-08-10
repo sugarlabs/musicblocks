@@ -1333,6 +1333,10 @@ var instruments = {};
 
 var instruments_source = {};
 
+// Effects associated with instruments in the timbre widget
+
+var instruments_effects = {};
+
 
 function Synth() {
     // Isolate synth functions here
@@ -1597,11 +1601,6 @@ function Synth() {
     // Create the synth as per the user's input in the 'Timbre' clamp.
     this.createSynth = function (instrument_name, source_name, params) {
 
-        console.log('instrument: ' + instrument_name);
-       // console.log('params');
-        for (var key in params){
-            console.log(params[key]);
-        }
 
         if ((source_name in VOICE_SAMPLES) || (source_name in DRUM_SAMPLES)) {
             instruments[instrument_name] = this.createSampleSynth(instrument_name, source_name, null).toMaster();

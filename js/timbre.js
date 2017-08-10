@@ -180,7 +180,6 @@ function TimbreWidget () {
 
     this.init = function(logo) {
         this._logo = logo;
-        //console.log("inside init");
         
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -349,7 +348,7 @@ function TimbreWidget () {
             effectsButtonCell.id = "effectsButtonCell";
             that._effects();
         }
-
+        
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
         /*cell.onclick=function() {
             that._undo();
@@ -545,11 +544,9 @@ function TimbreWidget () {
                     }
                     if (that.AMSynthesizer.length != 1) {
                         blockValue = that.AMSynthesizer.length - 1;
-                        console.log(blockValue);
                     }
                     
                     document.getElementById("wrapperS0").addEventListener('change', function(event){
-                        console.log("bl"+blockValue);
                         docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
                         var elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
@@ -827,10 +824,8 @@ function TimbreWidget () {
                 var m = elem.id.slice(-1);
                 docById("myRange"+m).value = parseFloat(elem.value);
                 docById("myspan"+m).textContent = elem.value;
-                //console.log('inside envelope');
 
                 that.adsrVals['envelope'][that.adsrMap[m]] = parseFloat(elem.value) / 100;
-                //console.log('creating synth with name ' + that.instrument_name + " ");
                 that._update(blockValue, parseFloat(elem.value), m);
                 that._logo.synth.createSynth(that.instrument_name, synth_source, that.adsrVals);
             }); 
@@ -999,6 +994,8 @@ function TimbreWidget () {
                     that.vibratoActive = false;
                     that.distortionActive = false;
                     
+                    instruments_effects[that.instrument_name]['tremoloActive'] = true;
+
                     for(var i = 0; i < 2; i++) {
                         subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
                     }
@@ -1036,12 +1033,18 @@ function TimbreWidget () {
 
                     for(var i = 0; i < 2; i++){
                         document.getElementById("wrapperFx"+i).addEventListener('change', function(event){
-                            console.log("bl"+blockValue);
                             docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                             var elem = event.target;
                             var m = elem.id.slice(-1);
                             docById("myRangeFx"+m).value = parseFloat(elem.value);
                             docById("myspanFx"+m).textContent = elem.value;
+                            if (m==0){
+                                instruments_effects[that.instrument_name]['tremoloFrequency'] = parseFloat(elem.value);
+                            }
+                            if (m==1){
+                                instruments_effects[that.instrument_name]['tremoloDepth'] = parseFloat(elem.value)/100;
+                            }
+
                             that._update(blockValue, elem.value, Number(m));
                         });    
                     }
@@ -1051,7 +1054,8 @@ function TimbreWidget () {
                     that.phaserActive = false;
                     that.vibratoActive = true;
                     that.distortionActive = false;
-                    
+
+                    instruments_effects[that.instrument_name]['vibratoActive'] = true;
                     for (var i = 0; i < 2; i++) {
                         subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
                     }
@@ -1096,6 +1100,8 @@ function TimbreWidget () {
                         var elem = event.target;
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
+                        instruments_effects[that.instrument_name]['vibratoIntensity'] = parseFloat(elem.value)/100;
+
                         that._update(that.vibratoEffect.length - 1, elem.value, 0);
                     });    
 
@@ -1103,9 +1109,11 @@ function TimbreWidget () {
                         docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                         var elem = event.target;
                         docById("myRangeFx1").value = parseFloat(elem.value);
-
                         var obj = oneHundredToFraction(elem.value);
                         docById("myspanFx1").textContent = obj[0] + '/' + obj[1];
+                        var temp = parseFloat(obj[0])/parseFloat(obj[1]);
+
+                        instruments_effects[that.instrument_name]['vibratoRate'] = Math.floor(Math.pow(temp, -1));
                         that._update(that.vibratoEffect.length - 1, obj[1], 1);
                         that._update(that.vibratoEffect.length - 1, obj[0], 2);
                     });    
@@ -1115,6 +1123,8 @@ function TimbreWidget () {
                     that.phaserActive = false;
                     that.vibratoActive = false;
                     that.distortionActive = false;
+
+                     instruments_effects[that.instrument_name]['chorusActive'] = true;
                     
                     for(var i = 0; i < 3; i++) {
                         subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
@@ -1156,12 +1166,21 @@ function TimbreWidget () {
 
                     for(var i = 0; i < 3; i++){
                         document.getElementById("wrapperFx"+i).addEventListener('change', function(event){
-                            console.log("bl"+blockValue);
                             docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                             var elem = event.target;
                             var m = elem.id.slice(-1);
                             docById("myRangeFx"+m).value = parseFloat(elem.value);
                             docById("myspanFx"+m).textContent = elem.value;
+                            if (m==0){
+                                instruments_effects[that.instrument_name]['chorusRate'] = parseFloat(elem.value);
+                            }
+                            if (m==1){
+                                instruments_effects[that.instrument_name]['delayTime'] = parseFloat(elem.value);
+                            }
+                            if (m==2){
+                                instruments_effects[that.instrument_name]['chorusDepth'] = parseFloat(elem.value)/100;
+                            }
+                            
                             that._update(blockValue, elem.value, Number(m));
                         });    
                     }
@@ -1171,6 +1190,8 @@ function TimbreWidget () {
                     that.phaserActive = true;
                     that.vibratoActive = false;
                     that.distortionActive = false;
+
+                     instruments_effects[that.instrument_name]['phaserActive'] = true;
                     
                     for(var i = 0; i < 3; i++) {
                         subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
@@ -1212,12 +1233,22 @@ function TimbreWidget () {
 
                     for(var i = 0; i < 3; i++){
                         document.getElementById("wrapperFx"+i).addEventListener('change', function(event){
-                            console.log("bl"+blockValue);
                             docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                             var elem = event.target;
                             var m = elem.id.slice(-1);
                             docById("myRangeFx"+m).value = parseFloat(elem.value);
                             docById("myspanFx"+m).textContent = elem.value;
+
+                            if (m==0){
+                                instruments_effects[that.instrument_name]['rate'] = parseFloat(elem.value);
+                            }
+                            if (m==1){
+                                instruments_effects[that.instrument_name]['octaves'] = parseFloat(elem.value);
+                            }
+                            if (m==2){
+                                instruments_effects[that.instrument_name]['baseFrequency'] = parseFloat(elem.value);
+                            }
+
                             that._update(blockValue, elem.value, Number(m));
                         });    
                     }
@@ -1227,6 +1258,8 @@ function TimbreWidget () {
                     that.phaserActive = false;
                     that.vibratoActive = false;
                     that.distortionActive = true;
+
+                     instruments_effects[that.instrument_name]['distortionActive'] = true;
 
                     subHtmlElements += '<div id="wrapperFx0"><div id="sFx0" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx0"class="rangeslidervalue">2</span></div></div>';
 
@@ -1255,12 +1288,12 @@ function TimbreWidget () {
                         setTimeout(that.clampConnection(n, 2, topOfClamp), 500);
                     }
                     document.getElementById("wrapperFx0").addEventListener('change', function(event){
-                        console.log("bl"+blockValue);
                         docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                         var elem = event.target;
                         var m = elem.id.slice(-1);
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
+                        instruments_effects[that.instrument_name]['distortionAmount'] = parseFloat(elem.value)/100;
                         that._update(blockValue, elem.value, 0);
                     });    
                 }
