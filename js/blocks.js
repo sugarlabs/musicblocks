@@ -3959,6 +3959,9 @@ function Blocks () {
         var z = this.stage.getNumChildren() - 1;
         for (var b = 0; b < this.dragGroup.length; b++) {
             this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
+            if (this.blockList[this.dragGroup[b]].collapseContainer !== null) {
+		this.stage.setChildIndex(this.blockList[this.dragGroup[b]].collapseContainer, z);
+	    };
             z -= 1;
         }
 

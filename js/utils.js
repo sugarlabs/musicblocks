@@ -697,35 +697,48 @@ function displayMsg(blocks, text) {
 
 function toFixed2 (d) {
     // Return number as fixed 2 precision
-    var floor = Math.floor(d);
-    if (d !== floor) {
-        return d.toFixed(2).toString();
+    if (typeof(d) === 'number') {
+        var floor = Math.floor(d);
+        if (d !== floor) {
+            return d.toFixed(2).toString();
+        } else {
+            return d.toString();
+        }
     } else {
-        return d.toString();
+        return d;
     }
 };
 
 
 function mixedNumber (d) {
     // Return number as a mixed fraction string, e.g., "2 1/4"
-    var floor = Math.floor(d);
-    if (d > floor) {
-    var obj = rationalToFraction(d - floor);
-        if (floor === 0) {
-            return obj[0] + '/' + obj[1];
-        } else {
-            if (obj[0] === 1 && obj[1] === 1) {
-                return floor + 1;
+
+    if (typeof(d) === 'number') {
+        var floor = Math.floor(d);
+        if (d > floor) {
+            var obj = rationalToFraction(d - floor);
+            if (floor === 0) {
+                return obj[0] + '/' + obj[1];
+
             } else {
-                if (obj[1] > 99) {
-                    return d.toFixed(2);
+                if (obj[0] === 1 && obj[1] === 1) {
+                    return floor + 1;
                 } else {
-                    return floor + ' ' + obj[0] + '/' + obj[1];
+                    if (obj[1] > 99) {
+                        return d.toFixed(2);
+                    } else {
+                        return floor + ' ' + obj[0] + '/' + obj[1];
+                    }
                 }
             }
+        } else {
+            return d.toString();
         }
     } else {
-    return d.toString();
+
+        return d;
+
+
     }
 };
 

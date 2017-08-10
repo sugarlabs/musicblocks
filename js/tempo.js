@@ -116,7 +116,7 @@ function Tempo () {
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
                 // Play a tone.
-                this._logo.synth.trigger('C4', 0.125, 'poly');
+                this._logo.synth.trigger('C4', 0.125, 'poly', null);
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
