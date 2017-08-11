@@ -1615,7 +1615,7 @@ function Logo () {
             break;
         case 'clear':
             that.svgBackground = true;
-            that.turtles.turtleList[turtle].doClear(true, true);
+            that.turtles.turtleList[turtle].doClear(true, true, true);
             break;
         case 'setxy':
             if (args.length === 2) {

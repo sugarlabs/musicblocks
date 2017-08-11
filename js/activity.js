@@ -356,7 +356,7 @@ define(MYDEFINES, function (compatibility) {
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
                 logo.notationStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true);
+                turtles.turtleList[turtle].doClear(true, true, true);
             }
 
             blocksContainer.x = 0;
@@ -1421,7 +1421,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                turtles.turtleList[turtle].doClear(false, false);
+                turtles.turtleList[turtle].doClear(false, false, true);
             }
 
             var artcanvas = document.getElementById("overlayCanvas");
@@ -1791,7 +1791,7 @@ define(MYDEFINES, function (compatibility) {
             logo.notationNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.notationStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true);
+                turtles.turtleList[turtle].doClear(true, true, true);
             }
 
             logo.runLogoCommands();
@@ -1813,7 +1813,7 @@ define(MYDEFINES, function (compatibility) {
             logo.notationNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.notationStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true);
+                turtles.turtleList[turtle].doClear(true, true, true);
             }
 
             logo.runLogoCommands();
@@ -2054,12 +2054,22 @@ define(MYDEFINES, function (compatibility) {
             if (document.addEventListener) {
                 document.addEventListener('finishedLoading', function () {
                     setTimeout(function () {
-                        _allClear();}, 1000);
+                        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                            logo.turtleHeaps[turtle] = [];
+                            logo.notationStaging[turtle] = [];
+                            turtles.turtleList[turtle].doClear(true, true, false);
+                        }
+                    }, 1000);
                 });
             } else {
                 document.attachEvent('finishedLoading', function () {
                     setTimeout(function () {
-                        _allClear();}, 1000);
+                        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                            logo.turtleHeaps[turtle] = [];
+                            logo.notationStaging[turtle] = [];
+                            turtles.turtleList[turtle].doClear(true, true, false);
+                        }
+                    }, 1000);
                 });
             }
 
