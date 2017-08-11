@@ -48,6 +48,9 @@ function RhythmRuler () {
     this._rulerSelected = 0;
     this._rulerPlaying = -1;
 
+    this._mouseDownCell = null;
+    this._mouseUpCell = null;
+
     this._noteWidth = function (noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * 3);
     };
@@ -113,12 +116,14 @@ function RhythmRuler () {
             console.log(this._rulerSelected);
             return;
         }
+
         var divisionHistory = this.Rulers[this._rulerSelected][1];
         if (addToUndoList) {
-            this._undoList.push(this._rulerSelected);
+            this._undoList.push(['dissect', this._rulerSelected]);
         }
 
         divisionHistory.push([newCellIndex, inputNum]);
+
         ruler.deleteCell(newCellIndex);
 
         var noteValue = noteValues[newCellIndex];
@@ -137,23 +142,130 @@ function RhythmRuler () {
             } else {
                 newCell.innerHTML = '';
 
-                newCell.addEventListener('mouseover', function() {
+                newCell.addEventListener('mouseover', function (event) {
                     newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
                 });
 
-                newCell.addEventListener('mouseout', function() {
+                newCell.addEventListener('mouseout', function (event) {
                     newCell.innerHTML = '';
                 });
             }
 
+            newCell.addEventListener('mousedown', function (event) {
+                var cell = event.target;
+                that._mouseDownCell = cell;
+            });
+
+            newCell.addEventListener('mouseup', function (event) {
+                var cell = event.target;
+                that._mouseUpCell = cell;
+                if (that._mouseDownCell !== that._mouseUpCell) {
+                    that._tieRuler(event);
+                }
+
+                that._mouseDownCell = null;
+                that._mouseUpCell = null;
+            });
+
             newCell.style.width = newCellWidth + 'px';
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
-            newCell.addEventListener('click', function(event) {
+
+            newCell.addEventListener('click', function (event) {
                 that._dissectRuler(event);
             });
         }
         this._calculateZebraStripes(that._rulerSelected);
+    };
+
+    this._tieRuler = function (event) {
+        if (this._playing) {
+            console.log('You cannot tie while widget is playing.');
+            return;
+        }
+
+        // Does this work if there are more than 10 rulers?
+        var cell = event.target;
+        this._rulerSelected = cell.parentNode.id[5];
+        this.__tie(true);
+    };
+
+    this.__tie = function (addToUndoList) {
+        var ruler = docById('ruler' + this._rulerSelected);
+
+        try {
+            var noteValues = this.Rulers[this._rulerSelected][0];
+        } catch(e) {
+            console.log(e);
+            console.log(this._rulerSelected);
+            return;
+        }
+
+        var downCellIndex = this._mouseDownCell.cellIndex;
+        var upCellIndex = this._mouseUpCell.cellIndex;
+
+        if (downCellIndex === -1 || upCellIndex === -1) {
+            return;
+        }
+
+        if (downCellIndex > upCellIndex) {
+            var tmp = downCellIndex;
+            downCellIndex = upCellIndex;
+            upCellIndex = tmp;
+        }
+
+        try {
+            var noteValues = this.Rulers[this._rulerSelected][0];
+        } catch(e) {
+            console.log(e);
+            console.log(this._rulerSelected);
+            return;
+        }
+
+        var divisionHistory = this.Rulers[this._rulerSelected][1];
+        if (addToUndoList) {
+            this._undoList.push(['tie', this._rulerSelected]);
+        }
+
+        var history = [];
+        for (var i = downCellIndex; i < upCellIndex + 1; i++) {
+            history.push([i, noteValues[i]]);
+        }
+        divisionHistory.push(history);
+
+        var noteValue = noteValues[downCellIndex];
+        noteValue = 1 / noteValue;
+
+        // Delete all the cells between down and up except the down
+        // cell, which we will expand.
+        for (var i = upCellIndex; i > downCellIndex; i--) {
+            noteValue += 1 / noteValues[i];
+            ruler.deleteCell(i);
+            this.Rulers[this._rulerSelected][0].splice(i, 1);
+        }
+
+        var newCellWidth = this._noteWidth(1 / noteValue);
+        noteValues[downCellIndex] = 1 / noteValue;
+        this._mouseDownCell.style.width = newCellWidth + 'px';
+        this._mouseDownCell.style.minWidth = this._mouseDownCell.style.width;
+        this._mouseDownCell.style.maxWidth = this._mouseDownCell.style.width;
+
+        if (newCellWidth > 12) {
+            this._mouseDownCell.innerHTML = calcNoteValueToDisplay(1 / noteValue, 1);
+        } else {
+            var that = this;
+            this._mouseDownCell.innerHTML = '';
+
+            this._mouseDownCell.addEventListener('mouseover', function() {
+                that._mouseDownCell.innerHTML = calcNoteValueToDisplay(1 / noteValue, 1);
+            });
+
+            this._mouseDownCell.addEventListener('mouseout', function() {
+                that._mouseDownCell.innerHTML = '';
+            });
+        }
+
+        this._calculateZebraStripes(this._rulerSelected);
     };
 
     this._undo = function() {
@@ -164,38 +276,103 @@ function RhythmRuler () {
             return;
         }
 
-        var lastRuler = this._undoList.pop();
-
+        var obj = this._undoList.pop();
+        var lastRuler = obj[1];
         var divisionHistory = this.Rulers[lastRuler][1];
         if (divisionHistory.length === 0) {
             return;
         }
+
+
         var ruler = docById('ruler' + lastRuler);
         var noteValues = this.Rulers[lastRuler][0];
-        var inputNum = divisionHistory[divisionHistory.length - 1][1];
-        var newCellIndex = divisionHistory[divisionHistory.length - 1][0];
-        var cellWidth = ruler.cells[newCellIndex].style.width;
-        var newCellWidth = parseFloat(cellWidth)*inputNum;
-        var oldCellNoteValue = noteValues[newCellIndex];
-        var newNoteValue = oldCellNoteValue/inputNum;
 
-        var newCell = ruler.insertCell(newCellIndex);
-        newCell.style.width = this._noteWidth(newNoteValue) + 'px';
-        newCell.style.minWidth = newCell.style.width;
-        newCell.style.maxWidth = newCell.style.width;
-        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
+        if (obj[0] === 'dissect') {
+            var inputNum = divisionHistory[divisionHistory.length - 1][1];
+            var newCellIndex = divisionHistory[divisionHistory.length - 1][0];
+            var cellWidth = ruler.cells[newCellIndex].style.width;
+            var newCellWidth = parseFloat(cellWidth)*inputNum;
+            var oldCellNoteValue = noteValues[newCellIndex];
+            var newNoteValue = oldCellNoteValue/inputNum;
 
-        noteValues[newCellIndex] = oldCellNoteValue / inputNum;
-        noteValues.splice(newCellIndex + 1, inputNum - 1);
+            var newCell = ruler.insertCell(newCellIndex);
+            newCell.style.width = this._noteWidth(newNoteValue) + 'px';
+            newCell.style.minWidth = newCell.style.width;
+            newCell.style.maxWidth = newCell.style.width;
+            newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
 
-        var that = this;
-        newCell.addEventListener('click', function(event) {
-            that._dissectRuler(event);
-        });
+            noteValues[newCellIndex] = oldCellNoteValue / inputNum;
+            noteValues.splice(newCellIndex + 1, inputNum - 1);
 
-        for (var i = 0; i < inputNum; i++) {
-            ruler.deleteCell(newCellIndex + 1);
+            var that = this;
+
+            newCell.addEventListener('click', function(event) {
+                that._dissectRuler(event);
+            });
+
+            newCell.addEventListener('mousedown', function (event) {
+                var cell = event.target;
+                that._mouseDownCell = cell;
+            });
+
+            newCell.addEventListener('mouseup', function (event) {
+                var cell = event.target;
+                that._mouseUpCell = cell;
+                if (that._mouseDownCell !== that._mouseUpCell) {
+                    that._tieRuler(event);
+                }
+
+                that._mouseDownCell = null;
+                that._mouseUpCell = null;
+            });
+
+            for (var i = 0; i < inputNum; i++) {
+                ruler.deleteCell(newCellIndex + 1);
+            }
+        } else if (obj[0] === 'tie') {
+            var history = divisionHistory[divisionHistory.length - 1];
+            // The old cell is the same as the first entry in the
+            // history. Dissect the old cell into history.length
+            // parts and restore their size and note values.
+            var oldCell = ruler.cells[history[0][0]];
+            oldCell.style.width = this._noteWidth(history[0][1]) + 'px';
+            oldCell.style.minWidth = oldCell.style.width;
+            oldCell.style.maxWidth = oldCell.style.width;
+            noteValues[history[0][0]] = history[0][1];
+            oldCell.innerHTML = calcNoteValueToDisplay(history[0][1], 1);
+
+            var that = this;
+            for (var i = 1; i < history.length; i++) {
+                var newCell = ruler.insertCell(history[0][0] + i);
+                newCell.style.width = this._noteWidth(history[i][1]) + 'px';
+                newCell.style.minWidth = newCell.style.width;
+                newCell.style.maxWidth = newCell.style.width;
+                noteValues.splice(history[0][0] + i, 0, history[i][1]);
+                newCell.innerHTML = calcNoteValueToDisplay(history[i][1], 1);
+
+                newCell.addEventListener('click', function(event) {
+                    that._dissectRuler(event);
+                });
+
+                newCell.addEventListener('mousedown', function (event) {
+                    var cell = event.target;
+                    that._mouseDownCell = cell;
+                });
+
+                newCell.addEventListener('mouseup', function (event) {
+                    var cell = event.target;
+                    that._mouseUpCell = cell;
+                    if (that._mouseDownCell !== that._mouseUpCell) {
+                        that._tieRuler(event);
+                    }
+
+                    that._mouseDownCell = null;
+                    that._mouseUpCell = null;
+                });
+            }
+
+            this.Rulers[lastRuler][0] = noteValues;
         }
 
         divisionHistory.pop();
@@ -244,10 +421,10 @@ function RhythmRuler () {
                 this._playingAll = true;
                 var that = this;
                 setTimeout(function() {
-		    that.__resume();
+                    that.__resume();
                 }, 1000);
             }
-	} else if (!this._playingAll) {
+        } else if (!this._playingAll) {
             this.__resume();
         }
     };
@@ -839,11 +1016,22 @@ function RhythmRuler () {
 
                     this._rulerSelected = drum;
 
-                    var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
-                    if (cell != undefined) {
-                        this.__dissect(cell, this._dissectHistory[i][0][j][1], false);
+                    if (typeof(this._dissectHistory[i][0][j][0]) === 'number') {
+                        // dissect is [cell, num]
+                        var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
+                        if (cell != undefined) {
+                            this.__dissect(cell, this._dissectHistory[i][0][j][1], false);
+                        } else {
+                            console.log('Could not find cell to divide. Did the order of the rhythm blocks change?');
+                        }
                     } else {
-                        console.log('Could not find cell to divide. Did the order of the rhythm blocks change?');
+                        // tie is [[cell, value], [cell, value]...]
+                        var history = this._dissectHistory[i][0][j];
+                        this._mouseDownCell = rhythmRulerTableRow.cells[history[0][0]];
+                        this._mouseUpCell = rhythmRulerTableRow.cells[history[history.length - 1][0]];
+                        this.__tie(false);
+                        this._mouseDownCell = null;
+                        this._mouseUpCell = null;
                     }
                 }
             }
