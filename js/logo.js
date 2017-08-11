@@ -501,10 +501,58 @@ function Logo () {
     };
 
     this._clearParameterBlocks = function () {
-        for (var blk in this.blocks.blockList) {
-            if (this.blocks.blockList[blk].parameter) {
+        for (var blk = 0; blk < this.blocks.blockList.length; blk++) {
+            switch (this.blocks.blockList[blk].name) {
+            case 'and':
+            case 'or':
+            case 'not':
+            case 'less':
+            case 'greater':
+            case 'equal':
+            case 'random':
+            case 'mod':
+            case 'sqrt':
+            case 'abs':
+            case 'int':
+            case 'plus':
+            case 'minus':
+            case 'multiply':
+            case 'power':
+            case 'divide':
+            case 'namedbox':
+            case 'box':
+            case 'x':
+            case 'y':
+            case 'heading':
+            case 'color':
+            case 'hue':
+            case 'shade':
+            case 'grey':
+            case 'pensize':
+            case 'time':
+            case 'mousex':
+            case 'mousey':
+            case 'keyboard':
+            case 'loudness':
+            case 'consonantstepsizeup':
+            case 'consonantstepsizedown':
+            case 'transpositionfactor':
+            case 'staccatofactor':
+            case 'slurfactor':
+            case 'beatfactor':
+            case 'elapsednotes':
+            case 'duplicatefactor':
+            case 'skipfactor':
+            case 'notevolumefactor':
+            case 'turtlepitch':
+            case 'currentnote':
+            case 'currentoctave':
+            case 'bpmfactor':
+            case 'beatvalue':
+            case 'measurevalue':
                 this.blocks.blockList[blk].text.text = '';
                 this.blocks.blockList[blk].container.updateCache();
+                break;
             }
         }
         this.refreshCanvas();
@@ -3380,8 +3428,6 @@ function Logo () {
                         }
                     };
 
-                    // If there is already a listener, remove it
-                    // before adding the new one.
 		    var eventName = '__beat_' + args[0] + '_' + turtle + '__';
                     that._setListener(turtle, eventName, __listener);
                 }
