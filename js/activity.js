@@ -1875,7 +1875,7 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function runProject(env){
+        function runProject (env) {
             console.log("Running Project from Event");
             document.removeEventListener("finishedLoading", runProject);
             setTimeout(function () {
@@ -1885,7 +1885,7 @@ define(MYDEFINES, function (compatibility) {
             }, 5000);
         }
 
-        function loadProject(projectName, run, env) {
+        function loadProject (projectName, run, env) {
             //set default value of run
             run = typeof run !== 'undefined' ? run : false;
             // Show busy cursor.
@@ -1932,9 +1932,23 @@ define(MYDEFINES, function (compatibility) {
 
             if (run && firstRun) {
                 if (document.addEventListener) {
-                    document.addEventListener('finishedLoading', function (){runProject(env);}, false);
+                    document.addEventListener('finishedLoading', function () {
+                        setTimeout(function () {
+                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                                turtles.turtleList[turtle].doClear(true, true, false);
+                            }
+                            runProject(env);
+                        }, 1000);
+                    }, false);
                 } else {
-                    document.attachEvent('finishedLoading', function (){runProject(env);});
+                    document.attachEvent('finishedLoading', function () {
+                        setTimeout(function () {
+                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                                turtles.turtleList[turtle].doClear(true, true, false);
+                            }
+                            runProject(env);
+                        }, 1000);
+                    });
                 }
             }
 
