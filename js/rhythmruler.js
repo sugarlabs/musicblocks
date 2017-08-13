@@ -919,7 +919,7 @@ function RhythmRuler () {
         }, 500);
     };
 
-    this.init = function(logo) {
+    this.init = function (logo) {
         console.log('init RhythmRuler');
         this._logo = logo;
 
@@ -992,12 +992,20 @@ function RhythmRuler () {
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
         // FIXME: rough workaround for #508, investigate reasons why
         // the backspace press doesn't work by default
         var numberInput = docById('dissectNumber');
         numberInput.addEventListener('keydown', function(event) {
-           if (event.keyCode === BACKSPACE)
-               numberInput.value = numberInput.value.substring(0, numberInput.value.length-1);
+            if (event.keyCode === BACKSPACE) {
+               numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
+	    }
+
+            if (numberInput.value < 2) {
+                numberInput.value = 2;
+            } else if (numberInput.value > 128) {
+                numberInput.value = 128;
+	    }
         });
 
         var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'), '');
