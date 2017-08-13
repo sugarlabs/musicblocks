@@ -149,7 +149,7 @@ function RhythmRuler () {
 
             // Does this work if there are more than 10 rulers?
             this._rulerSelected = cell.parentNode.id[5];
-            this.__dissect(cell, inputNum, true);
+            this.__dissectByNumber(cell, inputNum, true);
         }
     };
 
@@ -182,7 +182,7 @@ function RhythmRuler () {
                 }
             }
 
-            this.__divide(this._tapCell, newNoteValues, true);
+            this.__divideFromList(this._tapCell, newNoteValues, true);
         }
 
         this._tapTimes = [];
@@ -192,13 +192,21 @@ function RhythmRuler () {
         this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
     };
 
-    this.__divide = function (cell, newNoteValues, addToUndoList) {
+    this.__divideFromList = function (cell, newNoteValues, addToUndoList) {
+        if (typeof(cell) !== 'object') {
+            return;
+        }
+
+        if (typeof(newNoteValues) !== 'object') {
+            return;
+        }
+
         var that = this;
 
         var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
 
-        if (typeof(this._rulerSelected) === 'string') {
+        if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
             var noteValues = this.Rulers[this._rulerSelected][0];
 
             var divisionHistory = this.Rulers[this._rulerSelected][1];
@@ -264,13 +272,21 @@ function RhythmRuler () {
         }
     };
 
-    this.__dissect = function (cell, inputNum, addToUndoList) {
+    this.__dissectByNumber = function (cell, inputNum, addToUndoList) {
+        if (typeof(cell) !== 'object') {
+            return;
+        }
+
+        if (typeof(inputNum) !== 'number') {
+            return;
+        }
+
         var that = this;
 
         var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
 
-        if (typeof(this._rulerSelected) === 'string') {
+        if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
             var noteValues = this.Rulers[this._rulerSelected][0];
 
             var divisionHistory = this.Rulers[this._rulerSelected][1];
@@ -340,6 +356,10 @@ function RhythmRuler () {
         if (this._playing) {
             console.log('You cannot tie while widget is playing.');
             return;
+        } else if (this._tapMode) {
+            // If we are tapping, then treat a tie as a tap.
+            this._dissectRuler(event);
+            return;
         }
 
         // Does this work if there are more than 10 rulers?
@@ -351,7 +371,15 @@ function RhythmRuler () {
     this.__tie = function (addToUndoList) {
         var ruler = docById('ruler' + this._rulerSelected);
 
-        if (typeof(this._rulerSelected) === 'string') {
+        if (this._mouseDownCell === null || this._mouseUpCell === null) {
+            return;
+        }
+
+        if (this._mouseDownCell === this._mouseUpCell) {
+            return;
+        }
+
+        if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
             var noteValues = this.Rulers[this._rulerSelected][0];
 
             var downCellIndex = this._mouseDownCell.cellIndex;
@@ -365,6 +393,9 @@ function RhythmRuler () {
                 var tmp = downCellIndex;
                 downCellIndex = upCellIndex;
                 upCellIndex = tmp;
+                var tmp = this._mouseDdownCell;
+                this._mouseDownCell = this._mouseUpCell;
+                this._mouseUpCell = tmp;
             }
 
             var noteValues = this.Rulers[this._rulerSelected][0];
@@ -479,8 +510,8 @@ function RhythmRuler () {
                 ruler.deleteCell(newCellIndex + 1);
             }
         } else if (obj[0] === 'tap') {
-            var oldNoteValues = divisionHistory[divisionHistory.length - 1][1];
-            var newCellIndex = divisionHistory[divisionHistory.length - 1][0];
+            var newCellIndex = last(divisionHistory)[0];
+            var oldNoteValues = last(divisionHistory)[1];
 
             // Calculate the new note value based on the sum of the
             // oldnoteValues.
@@ -528,7 +559,7 @@ function RhythmRuler () {
                 ruler.deleteCell(newCellIndex + 1);
             }
         } else if (obj[0] === 'tie') {
-            var history = divisionHistory[divisionHistory.length - 1];
+            var history = last(divisionHistory);
             // The old cell is the same as the first entry in the
             // history. Dissect the old cell into history.length
             // parts and restore their size and note values.
@@ -1229,7 +1260,7 @@ function RhythmRuler () {
                             // dissect is [cell, num]
                             var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
                             if (cell != undefined) {
-                                this.__dissect(cell, this._dissectHistory[i][0][j][1], false);
+                                this.__dissectByNumber(cell, this._dissectHistory[i][0][j][1], false);
                             } else {
                                 console.log('Could not find cell to divide. Did the order of the rhythm blocks change?');
                             }
@@ -1237,15 +1268,18 @@ function RhythmRuler () {
                             // divide is [cell, [values]]
                             var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
                             if (cell != undefined) {
-                                this.__divide(cell, this._dissectHistory[i][0][j][1], false);
+                                this.__divideFromList(cell, this._dissectHistory[i][0][j][1], false);
                             }
                         }
                     } else {
                         // tie is [[cell, value], [cell, value]...]
                         var history = this._dissectHistory[i][0][j];
                         this._mouseDownCell = rhythmRulerTableRow.cells[history[0][0]];
-                        this._mouseUpCell = rhythmRulerTableRow.cells[history[history.length - 1][0]];
-                        this.__tie(false);
+                        this._mouseUpCell = rhythmRulerTableRow.cells[last(history)[0]];
+                        if (this._mouseUpCell != undefined) {
+                            this.__tie(false);
+                        }
+
                         this._mouseDownCell = null;
                         this._mouseUpCell = null;
                     }
