@@ -1022,26 +1022,26 @@ function RhythmRuler () {
         };
 
         // We use this cell as a handle for dragging.
-        var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
+        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
 
-        cell.style.cursor = 'move';
+        dragCell.style.cursor = 'move';
 
-        this._dx = cell.getBoundingClientRect().left - rulerDiv.getBoundingClientRect().left;
-        this._dy = cell.getBoundingClientRect().top - rulerDiv.getBoundingClientRect().top;
+        this._dx = dragCell.getBoundingClientRect().left - rulerDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - rulerDiv.getBoundingClientRect().top;
         this._dragging = false;
         this._target = false;
-        this._dragCellHTML = cell.innerHTML;
+        this._dragCellHTML = dragCell.innerHTML;
 
-        cell.onmouseover = function(e) {
+        dragCell.onmouseover = function(e) {
             // In order to prevent the dragged item from triggering a
             // browser reload in Firefox, we empty the cell contents
             // before dragging.
-            cell.innerHTML = '';
+            dragCell.innerHTML = '';
         };
 
-        cell.onmouseout = function(e) {
+        dragCell.onmouseout = function(e) {
             if (!that._dragging) {
-                cell.innerHTML = that._dragCellHTML;
+                dragCell.innerHTML = that._dragCellHTML;
             }
         };
 
@@ -1056,7 +1056,7 @@ function RhythmRuler () {
                 rulerDiv.style.left = x + 'px';
                 var y = e.clientY - that._dy;
                 rulerDiv.style.top = y + 'px';
-                cell.innerHTML = that._dragCellHTML;
+                dragCell.innerHTML = that._dragCellHTML;
             }
         };
 
@@ -1071,7 +1071,7 @@ function RhythmRuler () {
                 rulerDiv.style.left = x + 'px';
                 var y = e.clientY - that._dy;
                 rulerDiv.style.top = y + 'px';
-                cell.innerHTML = that._dragCellHTML;
+                dragCell.innerHTML = that._dragCellHTML;
             }
         };
 
@@ -1081,7 +1081,7 @@ function RhythmRuler () {
         };
 
         rulerDiv.ondragstart = function(e) {
-            if (cell.contains(that._target)) {
+            if (dragCell.contains(that._target)) {
                 e.dataTransfer.setData('text/plain', '');
             } else {
                 e.preventDefault();
