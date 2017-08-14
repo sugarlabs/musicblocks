@@ -101,36 +101,26 @@ function RhythmRuler () {
                 this._rulerSelected = cell.parentNode.id[5];
                 var noteValues = this.Rulers[this._rulerSelected][0];
                 this._tapCell = event.target;
-                var d = new Date();
-                this._tapTimes = [d.getTime()];
 
-                // FIXME: time should be be based on BPM
+                // Play a count off before starting tapping.
                 var interval = this._bpmFactor / noteValues[this._tapCell.cellIndex];
-                this._tapEndTime = this._tapTimes[0] + interval;
+                
+                var drumBlockNo = this._logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
+                var drum = this._logo.blocks.blockList[drumBlockNo].value;
 
-                // Set a timeout to end tapping
                 var that = this;
+                // FIXME: Should be based on meter
+                for (var i = 0; i < 4; i++) {
+                    setTimeout(function () {
+                        that._logo.synth.trigger(0, that._logo.defaultBPMFactor / 16, drum, null);
+                    }, interval * i / 4);
+                }
+
                 setTimeout(function () {
-                    that.__endTapping();
+                    console.log('start tapping');
+                    that.__startTapping(noteValues, interval);
                 }, interval);
 
-                // Display a progress bar.
-                function __move(tick) {
-                    var elem = docById("progressBar");   
-                    var width = 1;
-                    var id = setInterval(frame, tick);
-                    function frame() {
-                        if (width >= 100) {
-                            clearInterval(id);
-                        } else {
-                            width++; 
-                            elem.style.width = width + '%'; 
-                        }
-                    };
-                };
-
-                this._tapCell.innerHTML = '<div id="progressBar"></div>';
-                __move(interval / 100);
             } else {
                 var d = new Date();
                 this._tapTimes.push(d.getTime());
@@ -151,6 +141,38 @@ function RhythmRuler () {
             this._rulerSelected = cell.parentNode.id[5];
             this.__dissectByNumber(cell, inputNum, true);
         }
+    };
+
+    this.__startTapping = function (noteValues, interval) {
+        var d = new Date();
+        this._tapTimes = [d.getTime()];
+        this._tapEndTime = this._tapTimes[0] + interval;
+
+        // Set a timeout to end tapping
+        var that = this;
+        setTimeout(function () {
+            that.__endTapping();
+        }, interval);
+
+        // Display a progress bar.
+        function __move(tick, stepSize) {
+            var elem = docById("progressBar");   
+            var width = 1;
+            var id = setInterval(frame, tick);
+
+            function frame() {
+                if (width >= 100) {
+                    clearInterval(id);
+                } else {
+                    width += stepSize;
+                    elem.style.width = width + '%'; 
+                }
+            };
+        };
+
+        this._tapCell.innerHTML = '<div id="progressBar"></div>';
+        // Progress once per 8th note.
+        __move(interval / 8, 100 / 8);
     };
 
     this.__endTapping = function () {
@@ -565,44 +587,48 @@ function RhythmRuler () {
             // The old cell is the same as the first entry in the
             // history. Dissect the old cell into history.length
             // parts and restore their size and note values.
-            var oldCell = ruler.cells[history[0][0]];
-            oldCell.style.width = this._noteWidth(history[0][1]) + 'px';
-            oldCell.style.minWidth = oldCell.style.width;
-            oldCell.style.maxWidth = oldCell.style.width;
-            noteValues[history[0][0]] = history[0][1];
-            oldCell.innerHTML = calcNoteValueToDisplay(history[0][1], 1);
+            if (history.length > 0) {
+                var oldCell = ruler.cells[history[0][0]];
+                oldCell.style.width = this._noteWidth(history[0][1]) + 'px';
+                oldCell.style.minWidth = oldCell.style.width;
+                oldCell.style.maxWidth = oldCell.style.width;
+                noteValues[history[0][0]] = history[0][1];
+                oldCell.innerHTML = calcNoteValueToDisplay(history[0][1], 1);
 
-            var that = this;
-            for (var i = 1; i < history.length; i++) {
-                var newCell = ruler.insertCell(history[0][0] + i);
-                newCell.style.width = this._noteWidth(history[i][1]) + 'px';
-                newCell.style.minWidth = newCell.style.width;
-                newCell.style.maxWidth = newCell.style.width;
-                noteValues.splice(history[0][0] + i, 0, history[i][1]);
-                newCell.innerHTML = calcNoteValueToDisplay(history[i][1], 1);
+                var that = this;
+                for (var i = 1; i < history.length; i++) {
+                    var newCell = ruler.insertCell(history[0][0] + i);
+                    newCell.style.width = this._noteWidth(history[i][1]) + 'px';
+                    newCell.style.minWidth = newCell.style.width;
+                    newCell.style.maxWidth = newCell.style.width;
+                    noteValues.splice(history[0][0] + i, 0, history[i][1]);
+                    newCell.innerHTML = calcNoteValueToDisplay(history[i][1], 1);
 
-                newCell.addEventListener('click', function(event) {
-                    that._dissectRuler(event);
-                });
+                    newCell.addEventListener('click', function(event) {
+                        that._dissectRuler(event);
+                    });
 
-                newCell.addEventListener('mousedown', function (event) {
-                    var cell = event.target;
-                    that._mouseDownCell = cell;
-                });
+                    newCell.addEventListener('mousedown', function (event) {
+                        var cell = event.target;
+                        that._mouseDownCell = cell;
+                    });
 
-                newCell.addEventListener('mouseup', function (event) {
-                    var cell = event.target;
-                    that._mouseUpCell = cell;
-                    if (that._mouseDownCell !== that._mouseUpCell) {
-                        that._tieRuler(event);
-                    }
+                    newCell.addEventListener('mouseup', function (event) {
+                        var cell = event.target;
+                        that._mouseUpCell = cell;
+                        if (that._mouseDownCell !== that._mouseUpCell) {
+                            that._tieRuler(event);
+                        }
 
-                    that._mouseDownCell = null;
-                    that._mouseUpCell = null;
-                });
+                        that._mouseDownCell = null;
+                        that._mouseUpCell = null;
+                    });
+                }
+
+                this.Rulers[lastRuler][0] = noteValues;
+            } else {
+                console.log('empty history encountered... skipping undo');
             }
-
-            this.Rulers[lastRuler][0] = noteValues;
         }
 
         divisionHistory.pop();
@@ -926,7 +952,6 @@ function RhythmRuler () {
         this._logo = logo;
 
         this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
-        console.log(this._bpmFactor);
 
         this._playing = false;
         this._playingOne = false;
@@ -1004,13 +1029,14 @@ function RhythmRuler () {
         numberInput.addEventListener('keydown', function(event) {
             if (event.keyCode === BACKSPACE) {
                numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
-	    }
+            }
 
+            // Put a limit on the size (2 <--> 128).
             if (numberInput.value < 2) {
                 numberInput.value = 2;
             } else if (numberInput.value > 128) {
                 numberInput.value = 128;
-	    }
+            }
         });
 
         var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'), '');
