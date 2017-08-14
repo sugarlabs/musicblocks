@@ -105,7 +105,7 @@ function RhythmRuler () {
                 this._tapTimes = [d.getTime()];
 
                 // FIXME: time should be be based on BPM
-                var interval = 3000 / noteValues[this._tapCell.cellIndex];
+                var interval = this._bpmFactor / noteValues[this._tapCell.cellIndex];
                 this._tapEndTime = this._tapTimes[0] + interval;
 
                 // Set a timeout to end tapping
@@ -166,11 +166,11 @@ function RhythmRuler () {
             // convert times into cells here.
             var newNoteValues = [];
             var sum = 0;
-            var interval = 3000 / noteValues[this._tapCell.cellIndex];
+            var interval = this._bpmFactor / noteValues[this._tapCell.cellIndex];
             for (var i = 1; i < this._tapTimes.length; i++) {
                 var dtime = this._tapTimes[i] - this._tapTimes[i - 1];
                 if (i < this._tapTimes.length - 1) {
-                    var obj = oneHundredToFraction(100 * dtime / 3000);
+                    var obj = oneHundredToFraction(100 * dtime / this._bpmFactor);
                     sum += obj[0] / obj[1];
                     newNoteValues.push(obj[1] / obj[0]);
                 } else {
@@ -922,6 +922,9 @@ function RhythmRuler () {
     this.init = function (logo) {
         console.log('init RhythmRuler');
         this._logo = logo;
+
+        this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
+        console.log(this._bpmFactor);
 
         this._playing = false;
         this._playingOne = false;
