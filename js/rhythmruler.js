@@ -429,13 +429,15 @@ function RhythmRuler () {
             this._mouseDownCell.style.maxWidth = this._mouseDownCell.style.width;
 
             if (newCellWidth > 12) {
-                this._mouseDownCell.innerHTML = calcNoteValueToDisplay(1 / noteValue, 1);
+                var obj = rationalToFraction(noteValue);
+                this._mouseDownCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
             } else {
                 var that = this;
                 this._mouseDownCell.innerHTML = '';
 
                 this._mouseDownCell.addEventListener('mouseover', function () {
-                    that._mouseDownCell.innerHTML = calcNoteValueToDisplay(1 / noteValue, 1);
+                    var obj = rationalToFraction(noteValue);
+                    that._mouseDownCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
                 });
 
                 this._mouseDownCell.addEventListener('mouseout', function () {
