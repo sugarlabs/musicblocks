@@ -808,16 +808,6 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // TONE (ARTICULATION) PALETTE
 
-    // Deprecated
-    var noteVolumeBlock = new ProtoBlock('setnotevolume');
-    noteVolumeBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
-    noteVolumeBlock.hidden = true;
-    noteVolumeBlock.staticLabels.push(_('set volume'));
-    noteVolumeBlock.adjustWidthToLabel();
-    noteVolumeBlock.oneArgBlock();
-    noteVolumeBlock.defaults.push(50);
-
     var staccatoFactor = new ProtoBlock('staccatofactor');
     staccatoFactor.palette = palettes.dict['tone'];
     blocks.protoBlockDict['staccatofactor'] = staccatoFactor;
@@ -1012,6 +1002,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     fffBlock.adjustWidthToLabel();
     fffBlock.zeroArgBlock();
 
+    var noteVolumeBlock = new ProtoBlock('setnotevolume');
+    noteVolumeBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['setnotevolume'] = noteVolumeBlock;
+    noteVolumeBlock.staticLabels.push(_('set volume'));
+    noteVolumeBlock.adjustWidthToLabel();
+    noteVolumeBlock.oneArgBlock();
+    noteVolumeBlock.defaults.push(50);
+
     var noteVolumeBlock2 = new ProtoBlock('setnotevolume2');
     noteVolumeBlock2.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setnotevolume2'] = noteVolumeBlock2;
@@ -1019,6 +1017,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteVolumeBlock2.adjustWidthToLabel();
     noteVolumeBlock2.flowClampOneArgBlock();
     noteVolumeBlock2.defaults.push(50);
+    noteVolumeBlock2.hidden = true;
 
     var crescendoBlock = new ProtoBlock('crescendo');
     crescendoBlock.palette = palettes.dict['tone'];
