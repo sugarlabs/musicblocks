@@ -4667,6 +4667,7 @@ function Logo () {
                 that._setListener(turtle, listenerName, __listener);
             }
             break;
+            // Deprecated
         case 'setnotevolume2':
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 that.polyVolume[turtle].push(args[0]);
@@ -4685,13 +4686,13 @@ function Logo () {
                 that._setListener(turtle, listenerName, __listener);
             }
             break;
-            // Deprecated
         case 'setnotevolume':
             if (args.length === 1) {
                 if (typeof(args[0]) === 'string') {
                     that.errorMsg(NANERRORMSG, blk);
                     that.stopTurtle = true;
                 } else {
+                    that.polyVolume[turtle].push(args[0]);
                     that._setSynthVolume(args[0], turtle);
                 }
             }
@@ -5548,12 +5549,6 @@ function Logo () {
                     }
 
                     that.notesPlayed[turtle] += (1 / (noteValue * that.beatFactor[turtle]));
-
-                    if (!firstNote) {
-                        // FIXME: Only dispatch if there is a signal enabled
-                        var eventName = '__beat_' + beatValue + '_' + turtle + '__';
-                        that.stage.dispatchEvent(eventName);
-                    }
 
                     var notes = [];
                     var drums = [];
