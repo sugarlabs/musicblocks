@@ -531,11 +531,14 @@ function Turtle (name, turtles, drum) {
     };
 
     // Turtle functions
-    this.doClear = function(resetPen, resetSkin) {
+    this.doClear = function(resetPen, resetSkin, resetPosition) {
         // Reset turtle.
-        this.x = 0;
-        this.y = 0;
-        this.orientation = 0.0;
+        if (resetPosition) {
+            this.x = 0;
+            this.y = 0;
+            this.orientation = 0.0;
+        }
+
         if (resetPen) {
             var i = this.turtles.turtleList.indexOf(this) % 10;
             this.color = i * 10;
@@ -1159,7 +1162,7 @@ function Turtles () {
         hitArea.y = 0;
         myTurtle.container.hitArea = hitArea;
 
-        function __processTurtleBitmap(turtles, name, bitmap, startBlock) {
+        function __processTurtleBitmap(that, name, bitmap, startBlock) {
             myTurtle.bitmap = bitmap;
             myTurtle.bitmap.regX = 27 | 0;
             myTurtle.bitmap.regY = 27 | 0;
@@ -1190,7 +1193,7 @@ function Turtles () {
                 startBlock.updateCache();
             }
 
-            turtles.refreshCanvas();
+            that.refreshCanvas();
         };
 
         if (this._drum) {
@@ -1207,48 +1210,48 @@ function Turtles () {
 
         myTurtle.color = i * 10;
         myTurtle.canvasColor = getMunsellColor(myTurtle.color, DEFAULTVALUE, DEFAULTCHROMA);
-        var turtles = this;
+        var that = this;
 
         myTurtle.container.on('mousedown', function (event) {
-            if (turtles._rotating) {
+            if (that._rotating) {
                 return;
             }
 
             var offset = {
-                x: myTurtle.container.x - (event.stageX / turtles.scale),
-                y: myTurtle.container.y - (event.stageY / turtles.scale)
+                x: myTurtle.container.x - (event.stageX / that.scale),
+                y: myTurtle.container.y - (event.stageY / that.scale)
             }
 
             myTurtle.container.on('pressmove', function (event) {
                 if (myTurtle.running) {
                     return;
                 }
-                myTurtle.container.x = (event.stageX / turtles.scale) + offset.x;
-                myTurtle.container.y = (event.stageY / turtles.scale) + offset.y;
-                myTurtle.x = turtles.screenX2turtleX(myTurtle.container.x);
-                myTurtle.y = turtles.screenY2turtleY(myTurtle.container.y);
-                turtles.refreshCanvas();
+                myTurtle.container.x = (event.stageX / that.scale) + offset.x;
+                myTurtle.container.y = (event.stageY / that.scale) + offset.y;
+                myTurtle.x = that.screenX2turtleX(myTurtle.container.x);
+                myTurtle.y = that.screenY2turtleY(myTurtle.container.y);
+                that.refreshCanvas();
             });
         });
 
         myTurtle.container.on('click', function (event) {
             // If turtles listen for clicks then they can be used as buttons.
             console.log('--> [click' + myTurtle.name + ']');
-            turtles.stage.dispatchEvent('click' + myTurtle.name);
+            that.stage.dispatchEvent('click' + myTurtle.name);
         });
 
         myTurtle.container.on('mouseover', function (event) {
             myTurtle.bitmap.scaleX = 1.2;
             myTurtle.bitmap.scaleY = 1.2;
             myTurtle.bitmap.scale = 1.2;
-            turtles.refreshCanvas();
+            that.refreshCanvas();
         });
 
         myTurtle.container.on('mouseout', function (event) {
             myTurtle.bitmap.scaleX = 1;
             myTurtle.bitmap.scaleY = 1;
             myTurtle.bitmap.scale = 1;
-            turtles.refreshCanvas();
+            that.refreshCanvas();
         });
 
         document.getElementById('loader').className = '';
@@ -1268,12 +1271,12 @@ function Turtles () {
         // Async creation of bitmap from SVG data
         // Works with Chrome, Safari, Firefox (untested on IE)
         var img = new Image();
-        var turtles = this;
+        var that = this;
 
         img.onload = function () {
             complete = true;
             var bitmap = new createjs.Bitmap(img);
-            callback(turtles, name, bitmap, extras);
+            callback(that, name, bitmap, extras);
         };
 
         img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));

@@ -303,7 +303,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (p === 2) {
                             // skip filter
                         } else if (p === 3) {
-			    svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
+                            svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
                         } else if (p === 5) {
                             // Add block value to SVG between tspans
                             svg += parts[p] + '>' + blocks.blockList[i].value + '<';
@@ -324,7 +324,7 @@ define(MYDEFINES, function (compatibility) {
                         } else if (p === 2) {
                             // skip filter
                         } else if (p === 3) {
-			    svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
+                            svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
                         } else if (p === parts.length - 2) {
                             svg += parts[p] + '>';
                         } else if (p === parts.length - 1) {
@@ -356,7 +356,7 @@ define(MYDEFINES, function (compatibility) {
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.turtleHeaps[turtle] = [];
                 logo.notationStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true);
+                turtles.turtleList[turtle].doClear(true, true, true);
             }
 
             blocksContainer.x = 0;
@@ -1002,7 +1002,6 @@ define(MYDEFINES, function (compatibility) {
 
             this.document.onkeydown = __keyPressed;
             _hideStopButton();
-
         };
 
         function _setupBlocksContainerEvents() {
@@ -1031,11 +1030,7 @@ define(MYDEFINES, function (compatibility) {
                     if (!moving) {
                         return;
                     }
-                    if (blocks.inLongPress) {
-                        blocks.saveStackButton.visible = false;
-                        blocks.dismissButton.visible = false;
-                        blocks.inLongPress = false;
-                    }
+
                     if (scrollBlockContainer) {
                         blocksContainer.x += event.stageX - lastCords.x;
                         blocksContainer.y += event.stageY - lastCords.y;
@@ -1050,7 +1045,7 @@ define(MYDEFINES, function (compatibility) {
                 stage.on('stagemouseup', function (event) {
                     stageMouseDown = false;
                     moving = false;
-                }, null, true); // once = true
+                });
             });
         };
 
@@ -1426,7 +1421,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                turtles.turtleList[turtle].doClear(false, false);
+                turtles.turtleList[turtle].doClear(false, false, true);
             }
 
             var artcanvas = document.getElementById("overlayCanvas");
@@ -1803,7 +1798,7 @@ define(MYDEFINES, function (compatibility) {
             logo.notationNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.notationStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true);
+                turtles.turtleList[turtle].doClear(true, true, true);
             }
 
             logo.runLogoCommands();
@@ -1825,7 +1820,7 @@ define(MYDEFINES, function (compatibility) {
             logo.notationNotes = {};
             for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 logo.notationStaging[turtle] = [];
-                turtles.turtleList[turtle].doClear(true, true);
+                turtles.turtleList[turtle].doClear(true, true, true);
             }
 
             logo.runLogoCommands();
@@ -1887,7 +1882,7 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
-        function runProject(env){
+        function runProject (env) {
             console.log("Running Project from Event");
             document.removeEventListener("finishedLoading", runProject);
             setTimeout(function () {
@@ -1897,7 +1892,7 @@ define(MYDEFINES, function (compatibility) {
             }, 5000);
         }
 
-        function loadProject(projectName, run, env) {
+        function loadProject (projectName, run, env) {
             //set default value of run
             run = typeof run !== 'undefined' ? run : false;
             // Show busy cursor.
@@ -1944,11 +1939,26 @@ define(MYDEFINES, function (compatibility) {
 
             if (run && firstRun) {
                 if (document.addEventListener) {
-                    document.addEventListener('finishedLoading', function (){runProject(env);}, false);
+                    document.addEventListener('finishedLoading', function () {
+                        setTimeout(function () {
+                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                                turtles.turtleList[turtle].doClear(true, true, false);
+                            }
+                            runProject(env);
+                        }, 1000);
+                    }, false);
                 } else {
-                    document.attachEvent('finishedLoading', function (){runProject(env);});
+                    document.attachEvent('finishedLoading', function () {
+                        setTimeout(function () {
+                            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                                turtles.turtleList[turtle].doClear(true, true, false);
+                            }
+                            runProject(env);
+                        }, 1000);
+                    });
                 }
             }
+
             firstRun = false;
         };
 
@@ -2055,9 +2065,35 @@ define(MYDEFINES, function (compatibility) {
             }
 
             sessionData = null;
+
             // Try restarting where we were when we hit save.
             var currentProject = storage.currentProject;
             sessionData = storage['SESSION' + currentProject];
+
+            // After we have finished loading the project, clear all
+            // to ensure a clean start.
+            if (document.addEventListener) {
+                document.addEventListener('finishedLoading', function () {
+                    setTimeout(function () {
+                        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                            logo.turtleHeaps[turtle] = [];
+                            logo.notationStaging[turtle] = [];
+                            turtles.turtleList[turtle].doClear(true, true, false);
+                        }
+                    }, 1000);
+                });
+            } else {
+                document.attachEvent('finishedLoading', function () {
+                    setTimeout(function () {
+                        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                            logo.turtleHeaps[turtle] = [];
+                            logo.notationStaging[turtle] = [];
+                            turtles.turtleList[turtle].doClear(true, true, false);
+                        }
+                    }, 1000);
+                });
+            }
+
             if (sessionData) {
                 try {
                     if (sessionData === 'undefined' || sessionData === '[]') {
@@ -2080,8 +2116,6 @@ define(MYDEFINES, function (compatibility) {
             }
 
             update = true;
-
-
         };
 
         function hideMsgs() {

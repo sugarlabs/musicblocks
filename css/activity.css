@@ -715,3 +715,9 @@ table {
 #sliderInCell {
     position: absolute;
 }
+
+#progressBar {
+  width: 1%;
+  height: 72px;
+  background-color: #4CAF50;
+}

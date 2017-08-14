@@ -48,6 +48,14 @@ function RhythmRuler () {
     this._rulerSelected = 0;
     this._rulerPlaying = -1;
 
+    this._tapMode = false;
+    this._tapTimes = [];
+    this._tapCell = null;
+    this._tapEndTime = null;
+
+    this._mouseDownCell = null;
+    this._mouseUpCell = null;
+
     this._noteWidth = function (noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * 3);
     };
@@ -81,82 +89,389 @@ function RhythmRuler () {
     };
 
     this._dissectRuler = function (event) {
+        var cell = event.target;
+
         if (this._playing) {
             console.log('You cannot dissect while widget is playing.');
             return;
-        }
+        } else if (this._tapMode) {
+            // Tap a rhythm by clicking in a cell.
 
-        var inputNum = docById('dissectNumber').value;
-        if (inputNum === '' || isNaN(inputNum)) {
-            inputNum = 2;
+            if (this._tapCell === null) {
+                this._rulerSelected = cell.parentNode.id[5];
+                var noteValues = this.Rulers[this._rulerSelected][0];
+                this._tapCell = event.target;
+
+                // Play a count off before starting tapping.
+                var interval = this._bpmFactor / noteValues[this._tapCell.cellIndex];
+                
+                var drumBlockNo = this._logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
+                var drum = this._logo.blocks.blockList[drumBlockNo].value;
+
+                var that = this;
+                // FIXME: Should be based on meter
+                for (var i = 0; i < 4; i++) {
+                    setTimeout(function () {
+                        that._logo.synth.trigger(0, that._logo.defaultBPMFactor / 16, drum, null);
+                    }, interval * i / 4);
+                }
+
+                setTimeout(function () {
+                    console.log('start tapping');
+                    that.__startTapping(noteValues, interval);
+                }, interval);
+
+            } else {
+                var d = new Date();
+                this._tapTimes.push(d.getTime());
+            }
         } else {
-            inputNum = Math.abs(Math.floor(inputNum));
+            this._rulerSelected = cell.parentNode.id[5];
+            var noteValues = this.Rulers[this._rulerSelected][0];
+            var inputNum = docById('dissectNumber').value;
+            if (inputNum === '' || isNaN(inputNum)) {
+                inputNum = 2;
+            } else {
+                inputNum = Math.abs(Math.floor(inputNum));
+            }
+
+            docById('dissectNumber').value = inputNum;
+
+            // Does this work if there are more than 10 rulers?
+            this._rulerSelected = cell.parentNode.id[5];
+            this.__dissectByNumber(cell, inputNum, true);
         }
-
-        docById('dissectNumber').value = inputNum;
-
-        var cell = event.target;
-        // Does this work if there are more than 10 rulers?
-        this._rulerSelected = cell.parentNode.id[5];
-        this.__dissect(cell, inputNum, true);
     };
 
-    this.__dissect = function (cell, inputNum, addToUndoList) {
+    this.__startTapping = function (noteValues, interval) {
+        var d = new Date();
+        this._tapTimes = [d.getTime()];
+        this._tapEndTime = this._tapTimes[0] + interval;
+
+        // Set a timeout to end tapping
+        var that = this;
+        setTimeout(function () {
+            that.__endTapping();
+        }, interval);
+
+        // Display a progress bar.
+        function __move(tick, stepSize) {
+            var elem = docById("progressBar");   
+            var width = 1;
+            var id = setInterval(frame, tick);
+
+            function frame() {
+                if (width >= 100) {
+                    clearInterval(id);
+                } else {
+                    width += stepSize;
+                    elem.style.width = width + '%'; 
+                }
+            };
+        };
+
+        this._tapCell.innerHTML = '<div id="progressBar"></div>';
+        // Progress once per 8th note.
+        __move(interval / 8, 100 / 8);
+    };
+
+    this.__endTapping = function () {
+        this._tapCell.innerHTML = '';
+        var d = new Date();
+        this._tapTimes.push(d.getTime());
+
+        this._tapMode = false;
+        if (typeof(this._rulerSelected) === 'string') {
+            var noteValues = this.Rulers[this._rulerSelected][0];
+            this._tapTimes[this._tapTimes.length - 1] = this._tapEndTime;
+
+            // convert times into cells here.
+            var newNoteValues = [];
+            var sum = 0;
+            var interval = this._bpmFactor / noteValues[this._tapCell.cellIndex];
+            for (var i = 1; i < this._tapTimes.length; i++) {
+                var dtime = this._tapTimes[i] - this._tapTimes[i - 1];
+                if (i < this._tapTimes.length - 1) {
+                    var obj = oneHundredToFraction(100 * dtime / this._bpmFactor);
+                    sum += obj[0] / obj[1];
+                    newNoteValues.push(obj[1] / obj[0]);
+                } else {
+                    // Since the fractional value is noisy,
+                    // ensure that the final beat make the
+                    // total add up to the proper note value.
+                    var obj = rationalToFraction(1 / noteValues[this._tapCell.cellIndex] - sum);
+                    newNoteValues.push(obj[1] / obj[0]);
+                }
+            }
+
+            this.__divideFromList(this._tapCell, newNoteValues, true);
+        }
+
+        this._tapTimes = [];
+        this._tapCell = null;
+        this._tapEndTime = null;
+        var iconSize = ICONSIZE;
+        this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+    };
+
+    this.__divideFromList = function (cell, newNoteValues, addToUndoList) {
+        if (typeof(cell) !== 'object') {
+            return;
+        }
+
+        if (typeof(newNoteValues) !== 'object') {
+            return;
+        }
+
         var that = this;
 
         var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
-        try {
+
+        if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
             var noteValues = this.Rulers[this._rulerSelected][0];
-        } catch(e) {
-            console.log(e);
-            console.log(this._rulerSelected);
-            return;
-        }
-        var divisionHistory = this.Rulers[this._rulerSelected][1];
-        if (addToUndoList) {
-            this._undoList.push(this._rulerSelected);
-        }
 
-        divisionHistory.push([newCellIndex, inputNum]);
-        ruler.deleteCell(newCellIndex);
+            var divisionHistory = this.Rulers[this._rulerSelected][1];
+            if (addToUndoList) {
+                this._undoList.push(['tap', this._rulerSelected]);
+            }
 
-        var noteValue = noteValues[newCellIndex];
-        var newNoteValue = inputNum * noteValue;
-        var tempwidth = this._noteWidth(newNoteValue);
-        var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
-        var difference = parseFloat(this._noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
-        var newCellWidth = parseFloat(this._noteWidth(newNoteValue)) + parseFloat(difference) / inputNum;
-        noteValues.splice(newCellIndex, 1);
+            divisionHistory.push([newCellIndex, newNoteValues]);
 
-        for (var i = 0; i < inputNum; i++) {
-            var newCell = ruler.insertCell(newCellIndex + i);
-            noteValues.splice(newCellIndex + i, 0, newNoteValue);
-            if (newCellWidth > 12) {
-                newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
-            } else {
-                newCell.innerHTML = '';
+            ruler.deleteCell(newCellIndex);
 
-                newCell.addEventListener('mouseover', function() {
-                    newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
+            var noteValue = noteValues[newCellIndex];
+            var tempwidth = this._noteWidth(newNoteValue);
+            noteValues.splice(newCellIndex, 1);
+
+            for (var i = 0; i < newNoteValues.length; i++) {
+                var newCell = ruler.insertCell(newCellIndex + i);
+                var newNoteValue = newNoteValues[i];
+                var newCellWidth = parseFloat(this._noteWidth(newNoteValue));
+                noteValues.splice(newCellIndex + i, 0, newNoteValue);
+                if (newCellWidth > 12) {
+                    var obj = rationalToFraction(1 / newNoteValue);
+                    newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
+                } else {
+                    newCell.innerHTML = '';
+
+                    newCell.addEventListener('mouseover', function (event) {
+                        var obj = rationalToFraction(1 / newNoteValue);
+                        newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
+                    });
+
+                    newCell.addEventListener('mouseout', function (event) {
+                        newCell.innerHTML = '';
+                    });
+                }
+
+                newCell.addEventListener('mousedown', function (event) {
+                    var cell = event.target;
+                    that._mouseDownCell = cell;
                 });
 
-                newCell.addEventListener('mouseout', function() {
-                    newCell.innerHTML = '';
+                newCell.addEventListener('mouseup', function (event) {
+                    var cell = event.target;
+                    that._mouseUpCell = cell;
+                    if (that._mouseDownCell !== that._mouseUpCell) {
+                        that._tieRuler(event);
+                    }
+
+                    that._mouseDownCell = null;
+                    that._mouseUpCell = null;
+                });
+
+                newCell.style.width = newCellWidth + 'px';
+                newCell.style.minWidth = newCell.style.width;
+                newCell.style.maxWidth = newCell.style.width;
+
+                newCell.addEventListener('click', function (event) {
+                    that._dissectRuler(event);
                 });
             }
 
-            newCell.style.width = newCellWidth + 'px';
-            newCell.style.minWidth = newCell.style.width;
-            newCell.style.maxWidth = newCell.style.width;
-            newCell.addEventListener('click', function(event) {
-                that._dissectRuler(event);
-            });
+            this._calculateZebraStripes(that._rulerSelected);
         }
-        this._calculateZebraStripes(that._rulerSelected);
     };
 
-    this._undo = function() {
+    this.__dissectByNumber = function (cell, inputNum, addToUndoList) {
+        if (typeof(cell) !== 'object') {
+            return;
+        }
+
+        if (typeof(inputNum) !== 'number') {
+            return;
+        }
+
+        var that = this;
+
+        var ruler = docById('ruler' + this._rulerSelected);
+        var newCellIndex = cell.cellIndex;
+
+        if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
+            var noteValues = this.Rulers[this._rulerSelected][0];
+
+            var divisionHistory = this.Rulers[this._rulerSelected][1];
+            if (addToUndoList) {
+                this._undoList.push(['dissect', this._rulerSelected]);
+            }
+
+            divisionHistory.push([newCellIndex, inputNum]);
+
+            ruler.deleteCell(newCellIndex);
+
+            var noteValue = noteValues[newCellIndex];
+            var newNoteValue = inputNum * noteValue;
+            var tempwidth = this._noteWidth(newNoteValue);
+            var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
+            var difference = parseFloat(this._noteWidth(noteValue)) - parseFloat(inputNum) * parseFloat(tempwidth);
+            var newCellWidth = parseFloat(this._noteWidth(newNoteValue)) + parseFloat(difference) / inputNum;
+            noteValues.splice(newCellIndex, 1);
+
+            for (var i = 0; i < inputNum; i++) {
+                var newCell = ruler.insertCell(newCellIndex + i);
+                noteValues.splice(newCellIndex + i, 0, newNoteValue);
+                if (newCellWidth > 12) {
+                    newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
+                } else {
+                    newCell.innerHTML = '';
+
+                    newCell.addEventListener('mouseover', function (event) {
+                        newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
+                    });
+
+                    newCell.addEventListener('mouseout', function (event) {
+                        newCell.innerHTML = '';
+                    });
+                }
+
+                newCell.addEventListener('mousedown', function (event) {
+                    var cell = event.target;
+                    that._mouseDownCell = cell;
+                });
+
+                newCell.addEventListener('mouseup', function (event) {
+                    var cell = event.target;
+                    that._mouseUpCell = cell;
+                    if (that._mouseDownCell !== that._mouseUpCell) {
+                        that._tieRuler(event);
+                    }
+
+                    that._mouseDownCell = null;
+                    that._mouseUpCell = null;
+                });
+
+                newCell.style.width = newCellWidth + 'px';
+                newCell.style.minWidth = newCell.style.width;
+                newCell.style.maxWidth = newCell.style.width;
+
+                newCell.addEventListener('click', function (event) {
+                    that._dissectRuler(event);
+                });
+            }
+
+            this._calculateZebraStripes(that._rulerSelected);
+        }
+    };
+
+    this._tieRuler = function (event) {
+        if (this._playing) {
+            console.log('You cannot tie while widget is playing.');
+            return;
+        } else if (this._tapMode) {
+            // If we are tapping, then treat a tie as a tap.
+            this._dissectRuler(event);
+            return;
+        }
+
+        // Does this work if there are more than 10 rulers?
+        var cell = event.target;
+        this._rulerSelected = cell.parentNode.id[5];
+        this.__tie(true);
+    };
+
+    this.__tie = function (addToUndoList) {
+        var ruler = docById('ruler' + this._rulerSelected);
+
+        if (this._mouseDownCell === null || this._mouseUpCell === null) {
+            return;
+        }
+
+        if (this._mouseDownCell === this._mouseUpCell) {
+            return;
+        }
+
+        if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
+            var noteValues = this.Rulers[this._rulerSelected][0];
+
+            var downCellIndex = this._mouseDownCell.cellIndex;
+            var upCellIndex = this._mouseUpCell.cellIndex;
+
+            if (downCellIndex === -1 || upCellIndex === -1) {
+                return;
+            }
+
+            if (downCellIndex > upCellIndex) {
+                var tmp = downCellIndex;
+                downCellIndex = upCellIndex;
+                upCellIndex = tmp;
+                var tmp = this._mouseDdownCell;
+                this._mouseDownCell = this._mouseUpCell;
+                this._mouseUpCell = tmp;
+            }
+
+            var noteValues = this.Rulers[this._rulerSelected][0];
+
+            var divisionHistory = this.Rulers[this._rulerSelected][1];
+            if (addToUndoList) {
+                this._undoList.push(['tie', this._rulerSelected]);
+            }
+
+            var history = [];
+            for (var i = downCellIndex; i < upCellIndex + 1; i++) {
+                history.push([i, noteValues[i]]);
+            }
+            divisionHistory.push(history);
+
+            var noteValue = noteValues[downCellIndex];
+            noteValue = 1 / noteValue;
+
+            // Delete all the cells between down and up except the down
+            // cell, which we will expand.
+            for (var i = upCellIndex; i > downCellIndex; i--) {
+                noteValue += 1 / noteValues[i];
+                ruler.deleteCell(i);
+                this.Rulers[this._rulerSelected][0].splice(i, 1);
+            }
+
+            var newCellWidth = this._noteWidth(1 / noteValue);
+            noteValues[downCellIndex] = 1 / noteValue;
+            this._mouseDownCell.style.width = newCellWidth + 'px';
+            this._mouseDownCell.style.minWidth = this._mouseDownCell.style.width;
+            this._mouseDownCell.style.maxWidth = this._mouseDownCell.style.width;
+
+            if (newCellWidth > 12) {
+                var obj = rationalToFraction(noteValue);
+                this._mouseDownCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
+            } else {
+                var that = this;
+                this._mouseDownCell.innerHTML = '';
+
+                this._mouseDownCell.addEventListener('mouseover', function () {
+                    var obj = rationalToFraction(noteValue);
+                    that._mouseDownCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
+                });
+
+                this._mouseDownCell.addEventListener('mouseout', function () {
+                    that._mouseDownCell.innerHTML = '';
+                });
+            }
+
+            this._calculateZebraStripes(this._rulerSelected);
+        }
+    };
+
+    this._undo = function () {
         this._logo.synth.stop();
         this._startingTime = null;
 
@@ -164,45 +479,169 @@ function RhythmRuler () {
             return;
         }
 
-        var lastRuler = this._undoList.pop();
-
+        var obj = this._undoList.pop();
+        var lastRuler = obj[1];
         var divisionHistory = this.Rulers[lastRuler][1];
         if (divisionHistory.length === 0) {
             return;
         }
+
+
         var ruler = docById('ruler' + lastRuler);
         var noteValues = this.Rulers[lastRuler][0];
-        var inputNum = divisionHistory[divisionHistory.length - 1][1];
-        var newCellIndex = divisionHistory[divisionHistory.length - 1][0];
-        var cellWidth = ruler.cells[newCellIndex].style.width;
-        var newCellWidth = parseFloat(cellWidth)*inputNum;
-        var oldCellNoteValue = noteValues[newCellIndex];
-        var newNoteValue = oldCellNoteValue/inputNum;
 
-        var newCell = ruler.insertCell(newCellIndex);
-        newCell.style.width = this._noteWidth(newNoteValue) + 'px';
-        newCell.style.minWidth = newCell.style.width;
-        newCell.style.maxWidth = newCell.style.width;
-        newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-        newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
+        if (obj[0] === 'dissect') {
+            var inputNum = divisionHistory[divisionHistory.length - 1][1];
+            var newCellIndex = divisionHistory[divisionHistory.length - 1][0];
+            var cellWidth = ruler.cells[newCellIndex].style.width;
+            var newCellWidth = parseFloat(cellWidth)*inputNum;
+            var oldCellNoteValue = noteValues[newCellIndex];
+            var newNoteValue = oldCellNoteValue/inputNum;
 
-        noteValues[newCellIndex] = oldCellNoteValue / inputNum;
-        noteValues.splice(newCellIndex + 1, inputNum - 1);
+            var newCell = ruler.insertCell(newCellIndex);
+            newCell.style.width = this._noteWidth(newNoteValue) + 'px';
+            newCell.style.minWidth = newCell.style.width;
+            newCell.style.maxWidth = newCell.style.width;
+            newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
 
-        var that = this;
-        newCell.addEventListener('click', function(event) {
-            that._dissectRuler(event);
-        });
+            noteValues[newCellIndex] = oldCellNoteValue / inputNum;
+            noteValues.splice(newCellIndex + 1, inputNum - 1);
 
-        for (var i = 0; i < inputNum; i++) {
-            ruler.deleteCell(newCellIndex + 1);
+            var that = this;
+
+            newCell.addEventListener('click', function(event) {
+                that._dissectRuler(event);
+            });
+
+            newCell.addEventListener('mousedown', function (event) {
+                var cell = event.target;
+                that._mouseDownCell = cell;
+            });
+
+            newCell.addEventListener('mouseup', function (event) {
+                var cell = event.target;
+                that._mouseUpCell = cell;
+                if (that._mouseDownCell !== that._mouseUpCell) {
+                    that._tieRuler(event);
+                }
+
+                that._mouseDownCell = null;
+                that._mouseUpCell = null;
+            });
+
+            for (var i = 0; i < inputNum; i++) {
+                ruler.deleteCell(newCellIndex + 1);
+            }
+        } else if (obj[0] === 'tap') {
+            var newCellIndex = last(divisionHistory)[0];
+            var oldNoteValues = last(divisionHistory)[1];
+
+            // Calculate the new note value based on the sum of the
+            // oldnoteValues.
+            var oldCellNoteValue = noteValues[newCellIndex];
+            var sum = 0;
+            for (var i = 0; i < oldNoteValues.length; i++) {
+                sum += 1 / oldNoteValues[i];
+            }
+
+            var newNoteValue = 1 / sum;
+
+            var newCell = ruler.insertCell(newCellIndex);
+            newCell.style.width = this._noteWidth(newNoteValue) + 'px';
+            newCell.style.minWidth = newCell.style.width;
+            newCell.style.maxWidth = newCell.style.width;
+            newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
+
+            noteValues[newCellIndex] = newNoteValue;
+            noteValues.splice(newCellIndex + 1, oldNoteValues.length - 1);
+
+            var that = this;
+
+            newCell.addEventListener('click', function(event) {
+                that._dissectRuler(event);
+            });
+
+            newCell.addEventListener('mousedown', function (event) {
+                var cell = event.target;
+                that._mouseDownCell = cell;
+            });
+
+            newCell.addEventListener('mouseup', function (event) {
+                var cell = event.target;
+                that._mouseUpCell = cell;
+                if (that._mouseDownCell !== that._mouseUpCell) {
+                    that._tieRuler(event);
+                }
+
+                that._mouseDownCell = null;
+                that._mouseUpCell = null;
+            });
+
+            for (var i = 0; i < oldNoteValues.length; i++) {
+                ruler.deleteCell(newCellIndex + 1);
+            }
+        } else if (obj[0] === 'tie') {
+            var history = last(divisionHistory);
+            // The old cell is the same as the first entry in the
+            // history. Dissect the old cell into history.length
+            // parts and restore their size and note values.
+            if (history.length > 0) {
+                var oldCell = ruler.cells[history[0][0]];
+                oldCell.style.width = this._noteWidth(history[0][1]) + 'px';
+                oldCell.style.minWidth = oldCell.style.width;
+                oldCell.style.maxWidth = oldCell.style.width;
+                noteValues[history[0][0]] = history[0][1];
+                oldCell.innerHTML = calcNoteValueToDisplay(history[0][1], 1);
+
+                var that = this;
+                for (var i = 1; i < history.length; i++) {
+                    var newCell = ruler.insertCell(history[0][0] + i);
+                    newCell.style.width = this._noteWidth(history[i][1]) + 'px';
+                    newCell.style.minWidth = newCell.style.width;
+                    newCell.style.maxWidth = newCell.style.width;
+                    noteValues.splice(history[0][0] + i, 0, history[i][1]);
+                    newCell.innerHTML = calcNoteValueToDisplay(history[i][1], 1);
+
+                    newCell.addEventListener('click', function(event) {
+                        that._dissectRuler(event);
+                    });
+
+                    newCell.addEventListener('mousedown', function (event) {
+                        var cell = event.target;
+                        that._mouseDownCell = cell;
+                    });
+
+                    newCell.addEventListener('mouseup', function (event) {
+                        var cell = event.target;
+                        that._mouseUpCell = cell;
+                        if (that._mouseDownCell !== that._mouseUpCell) {
+                            that._tieRuler(event);
+                        }
+
+                        that._mouseDownCell = null;
+                        that._mouseUpCell = null;
+                    });
+                }
+
+                this.Rulers[lastRuler][0] = noteValues;
+            } else {
+                console.log('empty history encountered... skipping undo');
+            }
         }
 
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
     };
 
-    this._clear = function() {
+    this._tap = function () {
+        this._tapMode = true;
+        var iconSize = ICONSIZE;
+        this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-active-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+    };
+
+    this._clear = function () {
         for (r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while(this.Rulers[r][1].length > 0) {
@@ -222,7 +661,7 @@ function RhythmRuler () {
         this._logo.synth.trigger(0, this._logo.defaultBPMFactor / noteValue, drum, null);
     };
 
-    this.__pause = function() {
+    this.__pause = function () {
         var iconSize = ICONSIZE;
         this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('play all') + '" alt="' + _('play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         this._playing = false;
@@ -235,7 +674,7 @@ function RhythmRuler () {
         }
     };
 
-    this.playAll = function() {
+    this.playAll = function () {
         // External call from run button.
         if (this._playing) {
             if (this._playingAll) {
@@ -243,16 +682,16 @@ function RhythmRuler () {
                 // Wait for pause to complete before restarting.
                 this._playingAll = true;
                 var that = this;
-                setTimeout(function() {
-		    that.__resume();
+                setTimeout(function () {
+                    that.__resume();
                 }, 1000);
             }
-	} else if (!this._playingAll) {
+        } else if (!this._playingAll) {
             this.__resume();
         }
     };
 
-    this.__resume = function() {
+    this.__resume = function () {
         var iconSize = ICONSIZE;
         this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('pause') + '" alt="' + _('pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         this._logo.setTurtleDelay(0);
@@ -269,7 +708,7 @@ function RhythmRuler () {
         this._playAll();
     };
 
-    this._playAll = function() {
+    this._playAll = function () {
         this._logo.synth.stop();
         if (this._startingTime == null) {
             var d = new Date();
@@ -286,7 +725,7 @@ function RhythmRuler () {
         }
     };
 
-    this._playOne = function() {
+    this._playOne = function () {
         this._logo.synth.stop();
         if (this._startingTime == null) {
             var d = new Date();
@@ -312,7 +751,7 @@ function RhythmRuler () {
 
         var that = this;
 
-        setTimeout(function() {
+        setTimeout(function () {
             var ruler = docById('ruler' + rulerNo);
             if (ruler == null) {
                 console.log('Cannot find ruler ' + rulerNo + '. Widget closed?');
@@ -391,7 +830,7 @@ function RhythmRuler () {
 
         this._logo.refreshCanvas();
 
-        setTimeout(function() {
+        setTimeout(function () {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
             // Get the first word of drum's name (ignore the word 'drum' itself)
@@ -441,7 +880,7 @@ function RhythmRuler () {
 
         this._logo.refreshCanvas();
 
-        setTimeout(function() {
+        setTimeout(function () {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
 
@@ -508,9 +947,11 @@ function RhythmRuler () {
         }, 500);
     };
 
-    this.init = function(logo) {
+    this.init = function (logo) {
         console.log('init RhythmRuler');
         this._logo = logo;
+
+        this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
 
         this._playing = false;
         this._playingOne = false;
@@ -554,7 +995,7 @@ function RhythmRuler () {
 
         this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('play all'), '');
 
-        this._playAllCell.onclick=function() {
+        this._playAllCell.onclick = function () {
             if (that._playing) {
                 that.__pause();
             }
@@ -564,12 +1005,12 @@ function RhythmRuler () {
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('save rhythms'), '');
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._save(0);
         };
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('save drum machine'), '');
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._saveDrumMachine(0);
         };
 
@@ -581,27 +1022,41 @@ function RhythmRuler () {
         cell.style.maxWidth = cell.style.width;
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
+
         // FIXME: rough workaround for #508, investigate reasons why
         // the backspace press doesn't work by default
         var numberInput = docById('dissectNumber');
         numberInput.addEventListener('keydown', function(event) {
-           if (event.keyCode === BACKSPACE)
-               numberInput.value = numberInput.value.substring(0, numberInput.value.length-1);
+            if (event.keyCode === BACKSPACE) {
+               numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
+            }
+
+            // Put a limit on the size (2 <--> 128).
+            if (numberInput.value < 2) {
+                numberInput.value = 2;
+            } else if (numberInput.value > 128) {
+                numberInput.value = 128;
+            }
         });
 
         var cell = this._addButton(row, 'restore-button.svg', iconSize, _('undo'), '');
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._undo();
         };
 
+        this._tapButton = this._addButton(row, 'tap-button.svg', iconSize, _('tap a rhythm'), '');
+        this._tapButton.onclick = function () {
+            that._tap();
+        };
+
         var cell = this._addButton(row, 'erase-button.svg', iconSize, _('clear'), '');
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._clear();
         };
 
         var cell = this._addButton(row, 'close-button.svg', iconSize, _('close'), '');
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             // Save the new dissect history.
             var dissectHistory = [];
             var drums = [];
@@ -637,26 +1092,26 @@ function RhythmRuler () {
         };
 
         // We use this cell as a handle for dragging.
-        var cell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
+        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('drag'), '');
 
-        cell.style.cursor = 'move';
+        dragCell.style.cursor = 'move';
 
-        this._dx = cell.getBoundingClientRect().left - rulerDiv.getBoundingClientRect().left;
-        this._dy = cell.getBoundingClientRect().top - rulerDiv.getBoundingClientRect().top;
+        this._dx = dragCell.getBoundingClientRect().left - rulerDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - rulerDiv.getBoundingClientRect().top;
         this._dragging = false;
         this._target = false;
-        this._dragCellHTML = cell.innerHTML;
+        this._dragCellHTML = dragCell.innerHTML;
 
-        cell.onmouseover = function(e) {
+        dragCell.onmouseover = function(e) {
             // In order to prevent the dragged item from triggering a
             // browser reload in Firefox, we empty the cell contents
             // before dragging.
-            cell.innerHTML = '';
+            dragCell.innerHTML = '';
         };
 
-        cell.onmouseout = function(e) {
+        dragCell.onmouseout = function(e) {
             if (!that._dragging) {
-                cell.innerHTML = that._dragCellHTML;
+                dragCell.innerHTML = that._dragCellHTML;
             }
         };
 
@@ -671,7 +1126,7 @@ function RhythmRuler () {
                 rulerDiv.style.left = x + 'px';
                 var y = e.clientY - that._dy;
                 rulerDiv.style.top = y + 'px';
-                cell.innerHTML = that._dragCellHTML;
+                dragCell.innerHTML = that._dragCellHTML;
             }
         };
 
@@ -686,7 +1141,7 @@ function RhythmRuler () {
                 rulerDiv.style.left = x + 'px';
                 var y = e.clientY - that._dy;
                 rulerDiv.style.top = y + 'px';
-                cell.innerHTML = that._dragCellHTML;
+                dragCell.innerHTML = that._dragCellHTML;
             }
         };
 
@@ -696,7 +1151,7 @@ function RhythmRuler () {
         };
 
         rulerDiv.ondragstart = function(e) {
-            if (cell.contains(that._target)) {
+            if (dragCell.contains(that._target)) {
                 e.dataTransfer.setData('text/plain', '');
             } else {
                 e.preventDefault();
@@ -738,7 +1193,7 @@ function RhythmRuler () {
             drumcell.setAttribute('id', i);
             drumcell.className = 'headcol';  // Position fixed when scrolling horizontally
 
-            drumcell.onclick=function() {
+            drumcell.onclick = function () {
                 var id = Number(this.getAttribute('id'));
                 if (that._playing) {
                     if (that._rulerPlaying === id) {
@@ -839,11 +1294,33 @@ function RhythmRuler () {
 
                     this._rulerSelected = drum;
 
-                    var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
-                    if (cell != undefined) {
-                        this.__dissect(cell, this._dissectHistory[i][0][j][1], false);
+                    if (typeof(this._dissectHistory[i][0][j][0]) === 'number') {
+                        if (typeof(this._dissectHistory[i][0][j][1]) === 'number') {
+                            // dissect is [cell, num]
+                            var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
+                            if (cell != undefined) {
+                                this.__dissectByNumber(cell, this._dissectHistory[i][0][j][1], false);
+                            } else {
+                                console.log('Could not find cell to divide. Did the order of the rhythm blocks change?');
+                            }
+                        } else {
+                            // divide is [cell, [values]]
+                            var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
+                            if (cell != undefined) {
+                                this.__divideFromList(cell, this._dissectHistory[i][0][j][1], false);
+                            }
+                        }
                     } else {
-                        console.log('Could not find cell to divide. Did the order of the rhythm blocks change?');
+                        // tie is [[cell, value], [cell, value]...]
+                        var history = this._dissectHistory[i][0][j];
+                        this._mouseDownCell = rhythmRulerTableRow.cells[history[0][0]];
+                        this._mouseUpCell = rhythmRulerTableRow.cells[last(history)[0]];
+                        if (this._mouseUpCell != undefined) {
+                            this.__tie(false);
+                        }
+
+                        this._mouseDownCell = null;
+                        this._mouseUpCell = null;
                     }
                 }
             }
@@ -861,11 +1338,11 @@ function RhythmRuler () {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        cell.onmouseover=function() {
+        cell.onmouseover = function () {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
         }
 
-        cell.onmouseout=function() {
+        cell.onmouseout = function () {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         }
 

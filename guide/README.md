@@ -733,11 +733,16 @@ will playback the rhythm using a drum for each beat. The *Play-all*
 button on the upper-left of the widget will play back all rhythms
 simultaneously.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg "usage of cells in rhythm ruler")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm4.svg "divide cells in rhythm ruler")
 
 The rhythm can be further subdivided by clicking in individual
 cells. In the example above, two quarter-notes have been created by
 clicking on one of the half-notes.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm8.svg "tie cells in rhythm ruler")
+
+By dragging across multiple cells, they become tied. In the example
+above, two third-notes have been tied into one two-thirds-note.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/rhythm5.svg "save stack button")
 

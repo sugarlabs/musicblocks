@@ -942,8 +942,8 @@ function oneHundredToFraction (d) {
     case 72:
     case 73:
     case 74:
-    return [23, 32];
-        break;
+		return [23, 32];
+		break;
     case 75:
     case 76:
     case 77:
@@ -986,6 +986,7 @@ function oneHundredToFraction (d) {
         break;
     default:
         return [d, 100];
-    break;
+		break;
     }
 };
+
