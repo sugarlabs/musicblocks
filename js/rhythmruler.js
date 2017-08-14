@@ -552,7 +552,9 @@ function RhythmRuler () {
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
             newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
-            newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
+
+            var obj = rationalToFraction(newNoteValue);
+            newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
 
             noteValues[newCellIndex] = newNoteValue;
             noteValues.splice(newCellIndex + 1, oldNoteValues.length - 1);
