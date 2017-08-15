@@ -214,6 +214,46 @@ function RhythmRuler () {
         this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
     };
 
+    this.__addCellEventHandlers = function (cell, cellWidth, noteValue) {
+        var that = this;
+
+        if (cellWidth > 12) {
+            var obj = rationalToFraction(1 / noteValue);
+            cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
+        } else {
+            cell.innerHTML = '';
+
+            cell.addEventListener('mouseover', function (event) {
+                var obj = rationalToFraction(1 / noteValue);
+                cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
+            });
+
+            cell.addEventListener('mouseout', function (event) {
+                cell.innerHTML = '';
+            });
+        }
+
+        cell.addEventListener('mousedown', function (event) {
+            var cell = event.target;
+            that._mouseDownCell = cell;
+        });
+
+        cell.addEventListener('mouseup', function (event) {
+            var cell = event.target;
+            that._mouseUpCell = cell;
+            if (that._mouseDownCell !== that._mouseUpCell) {
+                that._tieRuler(event);
+            }
+
+            that._mouseDownCell = null;
+            that._mouseUpCell = null;
+        });
+
+        cell.addEventListener('click', function (event) {
+            that._dissectRuler(event);
+        });
+    };
+
     this.__divideFromList = function (cell, newNoteValues, addToUndoList) {
         if (typeof(cell) !== 'object') {
             return;
@@ -222,8 +262,6 @@ function RhythmRuler () {
         if (typeof(newNoteValues) !== 'object') {
             return;
         }
-
-        var that = this;
 
         var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
@@ -249,48 +287,15 @@ function RhythmRuler () {
                 var newNoteValue = newNoteValues[i];
                 var newCellWidth = parseFloat(this._noteWidth(newNoteValue));
                 noteValues.splice(newCellIndex + i, 0, newNoteValue);
-                if (newCellWidth > 12) {
-                    var obj = rationalToFraction(1 / newNoteValue);
-                    newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
-                } else {
-                    newCell.innerHTML = '';
-
-                    newCell.addEventListener('mouseover', function (event) {
-                        var obj = rationalToFraction(1 / newNoteValue);
-                        newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
-                    });
-
-                    newCell.addEventListener('mouseout', function (event) {
-                        newCell.innerHTML = '';
-                    });
-                }
-
-                newCell.addEventListener('mousedown', function (event) {
-                    var cell = event.target;
-                    that._mouseDownCell = cell;
-                });
-
-                newCell.addEventListener('mouseup', function (event) {
-                    var cell = event.target;
-                    that._mouseUpCell = cell;
-                    if (that._mouseDownCell !== that._mouseUpCell) {
-                        that._tieRuler(event);
-                    }
-
-                    that._mouseDownCell = null;
-                    that._mouseUpCell = null;
-                });
 
                 newCell.style.width = newCellWidth + 'px';
                 newCell.style.minWidth = newCell.style.width;
                 newCell.style.maxWidth = newCell.style.width;
 
-                newCell.addEventListener('click', function (event) {
-                    that._dissectRuler(event);
-                });
+                this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
             }
 
-            this._calculateZebraStripes(that._rulerSelected);
+            this._calculateZebraStripes(this._rulerSelected);
         }
     };
 
@@ -302,8 +307,6 @@ function RhythmRuler () {
         if (typeof(inputNum) !== 'number') {
             return;
         }
-
-        var that = this;
 
         var ruler = docById('ruler' + this._rulerSelected);
         var newCellIndex = cell.cellIndex;
@@ -331,46 +334,14 @@ function RhythmRuler () {
             for (var i = 0; i < inputNum; i++) {
                 var newCell = ruler.insertCell(newCellIndex + i);
                 noteValues.splice(newCellIndex + i, 0, newNoteValue);
-                if (newCellWidth > 12) {
-                    newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
-                } else {
-                    newCell.innerHTML = '';
 
-                    newCell.addEventListener('mouseover', function (event) {
-                        newCell.innerHTML = calcNoteValueToDisplay(newNoteValue, 1);
-                    });
-
-                    newCell.addEventListener('mouseout', function (event) {
-                        newCell.innerHTML = '';
-                    });
-                }
-
-                newCell.addEventListener('mousedown', function (event) {
-                    var cell = event.target;
-                    that._mouseDownCell = cell;
-                });
-
-                newCell.addEventListener('mouseup', function (event) {
-                    var cell = event.target;
-                    that._mouseUpCell = cell;
-                    if (that._mouseDownCell !== that._mouseUpCell) {
-                        that._tieRuler(event);
-                    }
-
-                    that._mouseDownCell = null;
-                    that._mouseUpCell = null;
-                });
-
+                this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
                 newCell.style.width = newCellWidth + 'px';
                 newCell.style.minWidth = newCell.style.width;
                 newCell.style.maxWidth = newCell.style.width;
-
-                newCell.addEventListener('click', function (event) {
-                    that._dissectRuler(event);
-                });
             }
 
-            this._calculateZebraStripes(that._rulerSelected);
+            this._calculateZebraStripes(this._rulerSelected);
         }
     };
 
@@ -450,22 +421,7 @@ function RhythmRuler () {
             this._mouseDownCell.style.minWidth = this._mouseDownCell.style.width;
             this._mouseDownCell.style.maxWidth = this._mouseDownCell.style.width;
 
-            if (newCellWidth > 12) {
-                var obj = rationalToFraction(noteValue);
-                this._mouseDownCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
-            } else {
-                var that = this;
-                this._mouseDownCell.innerHTML = '';
-
-                this._mouseDownCell.addEventListener('mouseover', function () {
-                    var obj = rationalToFraction(noteValue);
-                    that._mouseDownCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
-                });
-
-                this._mouseDownCell.addEventListener('mouseout', function () {
-                    that._mouseDownCell.innerHTML = '';
-                });
-            }
+             this.__addCellEventHandlers(this._mouseDownCell, newCellWidth, noteValues[downCellIndex]);
 
             this._calculateZebraStripes(this._rulerSelected);
         }
@@ -494,7 +450,7 @@ function RhythmRuler () {
             var inputNum = divisionHistory[divisionHistory.length - 1][1];
             var newCellIndex = divisionHistory[divisionHistory.length - 1][0];
             var cellWidth = ruler.cells[newCellIndex].style.width;
-            var newCellWidth = parseFloat(cellWidth)*inputNum;
+            var newCellWidth = parseFloat(cellWidth) * inputNum;
             var oldCellNoteValue = noteValues[newCellIndex];
             var newNoteValue = oldCellNoteValue/inputNum;
 
@@ -508,27 +464,7 @@ function RhythmRuler () {
             noteValues[newCellIndex] = oldCellNoteValue / inputNum;
             noteValues.splice(newCellIndex + 1, inputNum - 1);
 
-            var that = this;
-
-            newCell.addEventListener('click', function(event) {
-                that._dissectRuler(event);
-            });
-
-            newCell.addEventListener('mousedown', function (event) {
-                var cell = event.target;
-                that._mouseDownCell = cell;
-            });
-
-            newCell.addEventListener('mouseup', function (event) {
-                var cell = event.target;
-                that._mouseUpCell = cell;
-                if (that._mouseDownCell !== that._mouseUpCell) {
-                    that._tieRuler(event);
-                }
-
-                that._mouseDownCell = null;
-                that._mouseUpCell = null;
-            });
+             this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
 
             for (var i = 0; i < inputNum; i++) {
                 ruler.deleteCell(newCellIndex + 1);
@@ -546,9 +482,10 @@ function RhythmRuler () {
             }
 
             var newNoteValue = 1 / sum;
+            var newCellWidth = this._noteWidth(newNoteValue);
 
             var newCell = ruler.insertCell(newCellIndex);
-            newCell.style.width = this._noteWidth(newNoteValue) + 'px';
+            newCell.style.width =  newCellWidth + 'px';
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
             newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
@@ -559,27 +496,7 @@ function RhythmRuler () {
             noteValues[newCellIndex] = newNoteValue;
             noteValues.splice(newCellIndex + 1, oldNoteValues.length - 1);
 
-            var that = this;
-
-            newCell.addEventListener('click', function(event) {
-                that._dissectRuler(event);
-            });
-
-            newCell.addEventListener('mousedown', function (event) {
-                var cell = event.target;
-                that._mouseDownCell = cell;
-            });
-
-            newCell.addEventListener('mouseup', function (event) {
-                var cell = event.target;
-                that._mouseUpCell = cell;
-                if (that._mouseDownCell !== that._mouseUpCell) {
-                    that._tieRuler(event);
-                }
-
-                that._mouseDownCell = null;
-                that._mouseUpCell = null;
-            });
+             this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
 
             for (var i = 0; i < oldNoteValues.length; i++) {
                 ruler.deleteCell(newCellIndex + 1);
@@ -597,34 +514,16 @@ function RhythmRuler () {
                 noteValues[history[0][0]] = history[0][1];
                 oldCell.innerHTML = calcNoteValueToDisplay(history[0][1], 1);
 
-                var that = this;
                 for (var i = 1; i < history.length; i++) {
                     var newCell = ruler.insertCell(history[0][0] + i);
-                    newCell.style.width = this._noteWidth(history[i][1]) + 'px';
+                    var newCellWidth = this._noteWidth(history[i][1]);
+                    newCell.style.width = newCellWidth + 'px';
                     newCell.style.minWidth = newCell.style.width;
                     newCell.style.maxWidth = newCell.style.width;
                     noteValues.splice(history[0][0] + i, 0, history[i][1]);
                     newCell.innerHTML = calcNoteValueToDisplay(history[i][1], 1);
 
-                    newCell.addEventListener('click', function(event) {
-                        that._dissectRuler(event);
-                    });
-
-                    newCell.addEventListener('mousedown', function (event) {
-                        var cell = event.target;
-                        that._mouseDownCell = cell;
-                    });
-
-                    newCell.addEventListener('mouseup', function (event) {
-                        var cell = event.target;
-                        that._mouseUpCell = cell;
-                        if (that._mouseDownCell !== that._mouseUpCell) {
-                            that._tieRuler(event);
-                        }
-
-                        that._mouseDownCell = null;
-                        that._mouseUpCell = null;
-                    });
+                    this.__addCellEventHandlers(newCell, newCellWidth, history[i][1]);
                 }
 
                 this.Rulers[lastRuler][0] = noteValues;
