@@ -794,7 +794,7 @@ function TimbreWidget () {
         var env = docById('timbreTable');
         var htmlElements = "";
         for (var i = 0; i < 4; i++) {
-            htmlElements += '<div id="wrapperEnv'+i+'"><div class="circle">'+("ADSR").charAt(i)+'</div><div id="insideDivEnv"><input type="range" id="myRange'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspan'+i+'"class="rangeslidervalue">2</span></div></div>';
+            htmlElements += '<div id="wrapperEnv'+i+'"><div class="circle" title='+that.adsrMap[i]+'>'+("ADSR").charAt(i)+'</div><div id="insideDivEnv"><input type="range" id="myRange'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspan'+i+'"class="rangeslidervalue">2</span></div></div>';
         };
 
         env.innerHTML = htmlElements;
