@@ -1,3 +1,5 @@
+msgid ""
+msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
@@ -549,7 +551,7 @@ msgstr "Synth no puede tocar acordes."
 
 #: js/logo.js:6279
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
-msgstr "El nombre de la nota debe ser A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ o A♭.""
+msgstr "El nombre de la nota debe ser A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ o A♭."
 
 #: js/logo.js:6305
 #: js/basicblocks.js:2215

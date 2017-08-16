@@ -1,15 +1,17 @@
-﻿"Project-Id-Version: turtleart-activity\n"
-"Report-Msgid-Bugs-To: \n"
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
 "POT-Creation-Date: 2013-12-05 00:30-0500\n"
 "PO-Revision-Date: 2016-11-17 21:51+0200\n"
 "Last-Translator: Gudrum Mathaes <gmathaes@paraguayeduca.org>\n"
 "Language-Team: Deutsche OLPC-Lokalisierung\n"
-"Language: de\n"
-"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.0.5\n"
+"Language: de\n"
+"X-Generator: Poedit 1.7.4\n"
 
 #: js/activity.js:443
 #: js/activity.js:443
@@ -3370,4 +3372,3 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Hirajoshi"
 #~msgstr ""
-

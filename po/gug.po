@@ -1,21 +1,16 @@
-# Copyright (C) 2017 Martin Oesterreich 
-# This file is distributed under the AGPL
-# Walter Bender <walter@sugarlabs.org>, 2017.
-#
 msgid ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+msgstr ""
+"Project-Id-Version: \n"
 "POT-Creation-Date: 2012-12-28 11:07-0500\n"
 "PO-Revision-Date: 2016-11-26 00:47+0000\n"
-"Last-Translator: Martin Oesterreich  <martin.otte80@gmail.com>\n"
+"Last-Translator: Martin Oesterreich <martin.otte80@gmail.com>\n"
 "Language-Team: Paraguan Guarani <cjl@sugarlabs.org>\n"
-"Language: gug\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: gug\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Pootle 2.5.1.1\n"
-"X-POOTLE-MTIME: 1480121257.000000\n"
+"X-Generator: Poedit 1.7.4\n"
 
 #: js/block.js:632
 #: js/pitchdrummatrix.js:178

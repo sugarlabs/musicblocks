@@ -1,4 +1,5 @@
 msgid ""
+msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
@@ -12,33 +13,6 @@ msgid ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.1\n"
 "X-POOTLE-MTIME: 1423841876.000000\n"
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
 
 #: js/activity.js:443
 #: js/activity.js:443
@@ -1971,7 +1945,7 @@ msgstr "crayon levé"
 
 #: js/basicblocks.js:1727
 msgid "pen down"
-msgstr ""crayon abaissé"
+msgstr "crayon abaissé"
 
 #: js/basicblocks.js:1734
 msgid "set pen size"

@@ -1,3 +1,5 @@
+msgid ""
+msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-17 00:31-0400\n"
@@ -11,33 +13,6 @@
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3);\n"
 "X-Generator: Pootle 2.0.5\n"
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
 
 #: js/activity.js:443
 #: js/activity.js:443
