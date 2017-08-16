@@ -473,7 +473,6 @@ function TimbreWidget () {
     };
 
     this._synth = function () {
-        console.log("heysynth");
         var that = this;
         var blockValue = 0;
 
@@ -522,18 +521,12 @@ function TimbreWidget () {
                     that.amsynthActive = true;
                     that.fmsynthActive = false;
                     that.duosynthActive = false;
-                    
-                    subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
-                    subDiv.innerHTML = subHtmlElements;
-                    docById('sS0').textContent = "Harmonicity";
-                    docById('myRangeS0').value = 1;
-                    docById('myspanS0').textContent = "1";
-                    
+
                     if (that.AMSynthesizer.length === 0) {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                         var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
-                        const AMSYNTHOBJ = [[0,["amsynth",{}],463,556,[null,1,null]],[1,["number",{"value":1}],566.5146484375,556,[0]]];
+                        const AMSYNTHOBJ = [[0,["amsynth",{}],0,0,[null,1,null]],[1,["number",{"value":1}],0,0,[0]]];
                         that._logo.blocks.loadNewBlocks(AMSYNTHOBJ);
 
                         var n = that._logo.blocks.blockList.length - 2;
@@ -542,6 +535,14 @@ function TimbreWidget () {
                    
                         setTimeout(that.blockConnection(2, bottomOfClamp), 500);
                     }
+                    
+                    subHtmlElements += '<div id="wrapperS0"><div id="sS0"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="1"><span id="myspanS0"class="rangeslidervalue">1</span></div></div>';
+                    subDiv.innerHTML = subHtmlElements;
+                    docById('sS0').textContent = "Harmonicity";
+                    docById('myRangeS0').value = that.AMSynthParams[0];
+                    docById('myspanS0').textContent = that.AMSynthParams[0];
+                    
+                    
                     if (that.AMSynthesizer.length != 1) {
                         blockValue = that.AMSynthesizer.length - 1;
                     }
@@ -559,26 +560,26 @@ function TimbreWidget () {
                     that.fmsynthActive = true;
                     that.amsynthActive = false;
                     that.duosynthActive = false;
-    
-                    subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
-                    subDiv.innerHTML = subHtmlElements;
-                    docById('sS0').textContent = "Modulation Index";
-                    docById('myRangeS0').value = 10;
-                    docById('myspanS0').textContent = "10";
 
                     if (that.FMSynthesizer.length === 0) {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                         var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
-                        const FMSYNTHOBJ = [[0,["fmsynth",{}],463,556,[null,1,null]],[1,["number",{"value":10}],566.5146484375,556,[0]]];
+                        const FMSYNTHOBJ = [[0,["fmsynth",{}],0,0,[null,1,null]],[1,["number",{"value":10}],0,0,[0]]];
                         that._logo.blocks.loadNewBlocks(FMSYNTHOBJ);
 
                         var n = that._logo.blocks.blockList.length - 2;
                         that.FMSynthesizer.push(n);
-                        that.FMSynthParams.push(1);
+                        that.FMSynthParams.push(10);
                    
                         setTimeout(that.blockConnection(2, bottomOfClamp), 500);
                     }
+
+                    subHtmlElements += '<div id="wrapperS0"><div id="sS0"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
+                    subDiv.innerHTML = subHtmlElements;
+                    docById('sS0').textContent = "Modulation Index";
+                    docById('myRangeS0').value = that.FMSynthParams[0];
+                    docById('myspanS0').textContent = that.FMSynthParams[0];
 
                     if (that.FMSynthesizer.length != 1) {
                         blockValue = that.FMSynthesizer.length - 1;
@@ -596,24 +597,12 @@ function TimbreWidget () {
                     that.duosynthActive = true;
                     that.amsynthActive = false;
                     that.fmsynthActive = false;
-                    
-                    for(var i = 0; i < 2; i++) {
-                        subHtmlElements += '<div id="wrapperS'+i+'"><div id="sS'+i+'" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS'+i+'"class="rangeslidervalue">2</span></div></div>';
-                    }
-                    
-                    subDiv.innerHTML = subHtmlElements;
-                    docById('sS0').textContent = "Vibrato Rate";
-                    docById('myRangeS0').value = 10;
-                    docById('myspanS0').textContent = "10";
-                    docById('sS1').textContent = "Vibrato Amount";
-                    docById('myRangeS1').value = 6;
-                    docById('myspanS1').textContent = "6";
 
                     if (that.duoSynthesizer.length === 0) {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                         var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
-                        const DUOSYNTHOBJ = [[0,["duosynth",{}],368,254,[null,1,2,null]],[1,["number",{"value":10}],481.54150390625,254,[0]],[2,["number",{"value":6}],481.54150390625,285.5,[0]]];
+                        const DUOSYNTHOBJ = [[0,["duosynth",{}],0,0,[null,1,2,null]],[1,["number",{"value":10}],0,0,[0]],[2,["number",{"value":6}],0,0,[0]]];
                         that._logo.blocks.loadNewBlocks(DUOSYNTHOBJ);
 
                         var n = that._logo.blocks.blockList.length - 3;
@@ -623,9 +612,21 @@ function TimbreWidget () {
                    
                         setTimeout(that.blockConnection(3, bottomOfClamp), 500);
                     }
+                    
+                    for(var i = 0; i < 2; i++) {
+                        subHtmlElements += '<div id="wrapperS'+i+'"><div id="sS'+i+'"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS'+i+'"class="rangeslidervalue">2</span></div></div>';
+                    }
+                    
+                    subDiv.innerHTML = subHtmlElements;
+                    docById('sS0').textContent = "Vibrato Rate";
+                    docById('myRangeS0').value = that.duoSynthParams[0];
+                    docById('myspanS0').textContent = that.duoSynthParams[0];
+                    docById('sS1').textContent = "Vibrato Amount";
+                    docById('myRangeS1').value = that.duoSynthParams[1];
+                    docById('myspanS1').textContent = that.duoSynthParams[1];
+
                     if (that.duoSynthesizer.length != 1) {
                         blockValue = that.duoSynthesizer.length - 1;
-                        console.log(blockValue);
                     }
                     
                     for (var i = 0; i < 2; i++) {
@@ -695,8 +696,8 @@ function TimbreWidget () {
         timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
 
         var env = docById('timbreTable');
-        var htmlElements = '<div id="wrapperOsc0"><div id="sOsc0" class="rectangle"><span>Type</span></div><div id="selOsc"></div></div>';
-            htmlElements += '<div id="wrapperOsc1"><div id="sOsc1" class="rectangle"><span></span></div><div id="insideDivOsc"><input type="range" id="myRangeO0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanO0"class="rangeslidervalue">2</span></div></div>';
+        var htmlElements = '<div id="wrapperOsc0"><div id="sOsc0"><span>Type</span></div><div id="selOsc"></div></div>';
+            htmlElements += '<div id="wrapperOsc1"><div id="sOsc1"><span></span></div><div id="insideDivOsc"><input type="range" id="myRangeO0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanO0"class="rangeslidervalue">2</span></div></div>';
     
         env.innerHTML = htmlElements;
         var envAppend = document.createElement("div");
@@ -864,9 +865,9 @@ function TimbreWidget () {
         timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
 
         var env = docById('timbreTable');
-        var htmlElements = '<div id="wrapper0"><div id="s" class="rectangle"><span>Type</span></div><div id="sel"></div></div>';
-            htmlElements += '<div id="wrapper1"><div id="s1" class="rectangle"><span></span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff" value="-12"/>-12<input type="radio" name="rolloff" value="-24"/>-24<input type="radio" name="rolloff" value="-48"/>-48<input type="radio" name="rolloff" value="-96"/>-96</p></div></div>';
-            htmlElements += '<div id="wrapper2"><div id="s2" class="rectangle"><span></span></div><div id="insideDivFilter"><input type="range" id="myRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="myspanF2"class="rangeslidervalue">2</span></div></div>';
+        var htmlElements = '<div id="wrapper0"><div id="s"><span>Type</span></div><div id="sel"></div></div>';
+            htmlElements += '<div id="wrapper1"><div id="s1"><span></span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff" value="-12"/>-12<input type="radio" name="rolloff" value="-24"/>-24<input type="radio" name="rolloff" value="-48"/>-48<input type="radio" name="rolloff" value="-96"/>-96</p></div></div>';
+            htmlElements += '<div id="wrapper2"><div id="s2"><span></span></div><div id="insideDivFilter"><input type="range" id="myRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="myspanF2"class="rangeslidervalue">2</span></div></div>';
         env.innerHTML = htmlElements;
         var envAppend = document.createElement("div");
         envAppend.id = "envAppend";
@@ -997,7 +998,7 @@ function TimbreWidget () {
                     instruments_effects[that.instrument_name]['tremoloActive'] = true;
 
                     for(var i = 0; i < 2; i++) {
-                        subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
                     }
                     subDiv.innerHTML = subHtmlElements;
                     docById('sFx0').textContent = "Rate";
@@ -1057,7 +1058,7 @@ function TimbreWidget () {
 
                     instruments_effects[that.instrument_name]['vibratoActive'] = true;
                     for (var i = 0; i < 2; i++) {
-                        subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
                     }
 
                     // Set slider values
@@ -1127,7 +1128,7 @@ function TimbreWidget () {
                      instruments_effects[that.instrument_name]['chorusActive'] = true;
                     
                     for(var i = 0; i < 3; i++) {
-                        subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
                     }
                     subDiv.innerHTML = subHtmlElements;
                     docById('sFx0').textContent = "Rate";
@@ -1194,7 +1195,7 @@ function TimbreWidget () {
                      instruments_effects[that.instrument_name]['phaserActive'] = true;
                     
                     for(var i = 0; i < 3; i++) {
-                        subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperFx'+i+'"><div id="sFx'+i+'"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx'+i+'"class="rangeslidervalue">2</span></div></div>';
                     }
                     subDiv.innerHTML = subHtmlElements;
                     docById('sFx0').textContent = "Rate";
@@ -1261,7 +1262,7 @@ function TimbreWidget () {
 
                      instruments_effects[that.instrument_name]['distortionActive'] = true;
 
-                    subHtmlElements += '<div id="wrapperFx0"><div id="sFx0" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx0"class="rangeslidervalue">2</span></div></div>';
+                    subHtmlElements += '<div id="wrapperFx0"><div id="sFx0"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx0"class="rangeslidervalue">2</span></div></div>';
 
                     subDiv.innerHTML = subHtmlElements;
                     docById('sFx0').textContent = "Distortion Amount";
