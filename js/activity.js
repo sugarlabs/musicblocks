@@ -829,13 +829,15 @@ define(MYDEFINES, function (compatibility) {
                 reader.onload = (function (theFile) {
                     // Show busy cursor.
                     document.body.style.cursor = 'wait';
+
                     setTimeout(function () {
                         var rawData = reader.result;
                         var cleanData = rawData.replace('\n', ' ');
                         try {
                             var obj = JSON.parse(cleanData);
                         } catch (e) {
-                            alert("Failed to load JSON data");
+                            alert(_('Failed to load file data.'));
+                            document.body.style.cursor = 'default';
                             return;
                         }
 
@@ -848,57 +850,64 @@ define(MYDEFINES, function (compatibility) {
                         refreshCanvas();
 
                         blocks.loadNewBlocks(obj);
-                        // Restore default cursor.
+
                         document.body.style.cursor = 'default';
                     }, 200);
                 });
 
                 reader.readAsText(fileChooser.files[0]);
             }, false);
-			
-			function handleFileSelect(evt) {
+        
+            function handleFileSelect (event) {
+                event.stopPropagation();
+                event.preventDefault();
 
-                evt.stopPropagation();
-                evt.preventDefault();
-
-                var files = evt.dataTransfer.files;
-
+                var files = event.dataTransfer.files;
                 var reader = new FileReader();
 
                 reader.onload = (function(theFile) {
-                document.body.style.cursor = 'wait';
-                setTimeout(function() {
-                var rawData = reader.result;
-                   if (rawData == null || rawData == "") {
-                       alert('Cannot load project from the file. Please check the file type');
-                   }
-                var cleanData = rawData.replace('\n', ' ');
-                var obj = JSON.parse(cleanData);
-                for (var name in blocks.palettes.dict) {
-                    blocks.palettes.dict[name].hideMenu(true);
-            }
+                    document.body.style.cursor = 'wait';
 
-            refreshCanvas();
-            blocks.loadNewBlocks(obj);
-        
-		}, 200);
-        document.body.style.cursor = 'default';
-        });
+                    setTimeout(function() {
+                        var rawData = reader.result;
+                        if (rawData == null || rawData == '') {
+                            alert(_('Cannot load project. Please check the file type.'));
+                        }
 
-        reader.readAsText(files[0]);
-        window.scroll(0, 0)
+                        var cleanData = rawData.replace('\n', ' ');
+                        try {
+                            var obj = JSON.parse(cleanData);
+                        } catch (e) {
+                            alert(_('Failed to load file data.'));
+                            document.body.style.cursor = 'default';
+                            return;
+                        }
+                        for (var name in blocks.palettes.dict) {
+                            blocks.palettes.dict[name].hideMenu(true);
+                        }
 
-        }
+                        sendAllToTrash(false, false);
+                        refreshCanvas();
 
-        function handleDragOver(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            evt.dataTransfer.dropEffect = 'copy';
-        };
+                        blocks.loadNewBlocks(obj);
 
-        var dropZone = document.getElementById('canvasHolder');
-        dropZone.addEventListener('dragover', handleDragOver, false);
-        dropZone.addEventListener('drop', handleFileSelect, false);
+                        document.body.style.cursor = 'default';
+                    }, 200);
+                });
+
+                reader.readAsText(files[0]);
+                window.scroll(0, 0)
+            };
+
+            function handleDragOver (event) {
+                event.stopPropagation();
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'copy';
+            };
+
+            var dropZone = document.getElementById('canvasHolder');
+            dropZone.addEventListener('dragover', handleDragOver, false);
+            dropZone.addEventListener('drop', handleFileSelect, false);
 
             allFilesChooser.addEventListener('click', function (event) {
                 this.value = null;
