@@ -855,6 +855,51 @@ define(MYDEFINES, function (compatibility) {
 
                 reader.readAsText(fileChooser.files[0]);
             }, false);
+			
+			function handleFileSelect(evt) {
+    
+			evt.stopPropagation();
+			evt.preventDefault();
+
+			var files = evt.dataTransfer.files;
+			
+			var reader = new FileReader();
+
+                reader.onload = (function (theFile) {
+                    document.body.style.cursor = 'wait';
+                    setTimeout(function () {
+                        var rawData = reader.result;
+						if (rawData == null || rawData == "")
+						{
+							alert("Can't load project from the file. Please check the file type");
+						}
+                        var cleanData = rawData.replace('\n', ' ');
+                        var obj = JSON.parse(cleanData);
+                        for (var name in blocks.palettes.dict) {
+                            blocks.palettes.dict[name].hideMenu(true);
+                        }
+
+                        refreshCanvas();
+
+                        blocks.loadNewBlocks(obj);
+                    }, 200);
+					document.body.style.cursor = 'default';
+                });
+
+                reader.readAsText(files[0]);
+				window.scroll(0, 0)	
+   
+			}
+
+			function handleDragOver(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
+			evt.dataTransfer.dropEffect = 'copy'; 
+			}
+
+			var dropZone = document.getElementById('canvasHolder');
+			dropZone.addEventListener('dragover', handleDragOver, false);
+			dropZone.addEventListener('drop', handleFileSelect, false);
 
             allFilesChooser.addEventListener('click', function (event) {
                 this.value = null;
