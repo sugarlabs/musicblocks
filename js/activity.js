@@ -857,49 +857,48 @@ define(MYDEFINES, function (compatibility) {
             }, false);
 			
 			function handleFileSelect(evt) {
-    
-			evt.stopPropagation();
-			evt.preventDefault();
 
-			var files = evt.dataTransfer.files;
-			
-			var reader = new FileReader();
+                evt.stopPropagation();
+                evt.preventDefault();
 
-                reader.onload = (function (theFile) {
-                    document.body.style.cursor = 'wait';
-                    setTimeout(function () {
-                        var rawData = reader.result;
-						if (rawData == null || rawData == "")
-						{
-							alert("Can't load project from the file. Please check the file type");
-						}
-                        var cleanData = rawData.replace('\n', ' ');
-                        var obj = JSON.parse(cleanData);
-                        for (var name in blocks.palettes.dict) {
-                            blocks.palettes.dict[name].hideMenu(true);
-                        }
+                var files = evt.dataTransfer.files;
 
-                        refreshCanvas();
+                var reader = new FileReader();
 
-                        blocks.loadNewBlocks(obj);
-                    }, 200);
-					document.body.style.cursor = 'default';
-                });
+                reader.onload = (function(theFile) {
+                document.body.style.cursor = 'wait';
+                setTimeout(function() {
+                var rawData = reader.result;
+                   if (rawData == null || rawData == "") {
+                       alert("Can't load project from the file. Please check the file type");
+                   }
+                var cleanData = rawData.replace('\n', ' ');
+                var obj = JSON.parse(cleanData);
+                for (var name in blocks.palettes.dict) {
+                    blocks.palettes.dict[name].hideMenu(true);
+            }
 
-                reader.readAsText(files[0]);
-				window.scroll(0, 0)	
-   
-			}
+            refreshCanvas();
+            blocks.loadNewBlocks(obj);
+        
+		}, 200);
+        document.body.style.cursor = 'default';
+        });
 
-			function handleDragOver(evt) {
-			evt.stopPropagation();
-			evt.preventDefault();
-			evt.dataTransfer.dropEffect = 'copy'; 
-			}
+        reader.readAsText(files[0]);
+        window.scroll(0, 0)
 
-			var dropZone = document.getElementById('canvasHolder');
-			dropZone.addEventListener('dragover', handleDragOver, false);
-			dropZone.addEventListener('drop', handleFileSelect, false);
+        }
+
+        function handleDragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy';
+        }
+
+        var dropZone = document.getElementById('canvasHolder');
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileSelect, false);
 
             allFilesChooser.addEventListener('click', function (event) {
                 this.value = null;
