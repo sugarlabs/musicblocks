@@ -17,6 +17,8 @@
 // rulerButtonsDiv is for the widget buttons
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
+var thatRhythmRuler = null;
+
 function RhythmRuler () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 675;
@@ -230,72 +232,102 @@ function RhythmRuler () {
     };
 
     this.__addCellEventHandlers = function (cell, cellWidth, noteValue) {
-        var that = this;
-
-        if (cellWidth > 12) {
-            // Check for REST
+        if (cellWidth > 12 && noteValue > 0) {
             var obj = rationalToFraction(Math.abs(1 / noteValue));
             cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
         } else {
             cell.innerHTML = '';
 
-            cell.addEventListener('mouseover', function (event) {
-                // Check for REST
-                var obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
-                cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
-            });
+            cell.removeEventListener('mouseover', this.__mouseOverHandler);
+            cell.addEventListener('mouseover', this.__mouseOverHandler);
 
-            cell.addEventListener('mouseout', function (event) {
-                cell.innerHTML = '';
-            });
+            cell.removeEventListener('mouseout', this.__mouseOutHandler);
+            cell.addEventListener('mouseout', this.__mouseOutHandler);
         }
 
-        cell.addEventListener('mousedown', function (event) {
-            var cell = event.target;
-            that._mouseDownCell = cell;
+        cell.removeEventListener('mousedown', this.__mouseDownHandler);
+        cell.addEventListener('mousedown', this.__mouseDownHandler);
 
+        cell.removeEventListener('mouseup', this.__mouseUpHandler);
+        cell.addEventListener('mouseup', this.__mouseUpHandler);
+
+        cell.removeEventListener('click', this.__clickHandler);
+        cell.addEventListener('click', this.__clickHandler);
+    };
+
+    this.__mouseOverHandler =  function (event) {
+        var cell = event.target;
+        if (cell == null) {
+            return;
+        }
+
+        var that = thatRhythmRuler;
+        that._rulerSelected = cell.parentNode.id[5];
+        var noteValues = that.Rulers[that._rulerSelected][0];
+        var noteValue = noteValues[cell.cellIndex];
+        if (noteValue < 0) {
+            var obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
+            cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]) + ' ' + _('silence');
+        } else {
+            var obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
+            cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
+        }
+    };
+
+    this.__mouseOutHandler = function (event) {
+        var that = thatRhythmRuler;
+        var cell = event.target;
+        cell.innerHTML = '';
+    };
+
+    this.__mouseDownHandler = function (event) {
+        var that = thatRhythmRuler;
+        var cell = event.target;
+        that._mouseDownCell = cell;
+
+        var d = new Date();
+        that._longPressStartTime = d.getTime();
+        that._inLongPress = false;
+
+        that._longPressBeep = setTimeout(function () {
+            that._logo.synth.trigger('C4', 1 / 32, 'chime', null);
+        }, 1500);
+    };
+
+    this.__mouseUpHandler = function (event) {
+        var that = thatRhythmRuler;
+        clearTimeout(that._longPressBeep);
+        var cell = event.target;
+        that._mouseUpCell = cell;
+        if (that._mouseDownCell !== that._mouseUpCell) {
+            that._tieRuler(event);
+        } else if (that._longPressStartTime != null && !that._tapMode) {
             var d = new Date();
-            that._longPressStartTime = d.getTime();
-            that._inLongPress = false;
+            var elapseTime = d.getTime() - that._longPressStartTime;
+            if (elapseTime > 1500) {
+                that._inLongPress = true;
+                that.__toggleRestState(this);
+            }
+        }
 
-            that._longPressBeep = setTimeout(function () {
-                that._logo.synth.trigger('C4', 1 / 32, 'chime', null);
-            }, 1500);
+        that._mouseDownCell = null;
+        that._mouseUpCell = null;
+        that._longPressStartTime = null;
+    };
 
-        });
-
-        cell.addEventListener('mouseup', function (event) {
-            clearTimeout(that._longPressBeep);
+    this.__clickHandler = function (event) {
+        if (event == undefined) return;
+        var that = thatRhythmRuler;
+        if (!that.__getLongPressStatus()) {
             var cell = event.target;
-            that._mouseUpCell = cell;
-            if (that._mouseDownCell !== that._mouseUpCell) {
-                that._tieRuler(event);
-            } else if (that._longPressStartTime != null && !that._tapMode) {
-                var d = new Date();
-                var elapseTime = d.getTime() - that._longPressStartTime;
-                if (elapseTime > 1500) {
-                    that._inLongPress = true;
-                    that.__toggleRestState(this);
-                }
+            if (cell != null) {
+                that._dissectRuler(event);
+            } else {
+                console.log('null cell found on click');
             }
+        }
 
-            that._mouseDownCell = null;
-            that._mouseUpCell = null;
-            that._longPressStartTime = null;
-        });
-
-        cell.addEventListener('click', function (event) {
-            if (!that.__getLongPressStatus()) {
-                var cell = event.target;
-                if (cell != null) {
-                    that._dissectRuler(event);
-                } else {
-                    console.log('null cell found on click');
-                }
-            }
-
-            that._inLongPress = false;
-        });
+        that._inLongPress = false;
     };
 
     this.__getLongPressStatus = function () {
@@ -308,12 +340,19 @@ function RhythmRuler () {
             var noteValues = this.Rulers[this._rulerSelected][0];
             var noteValue = noteValues[cell.cellIndex];
 
-            // FIXME: add hover
             if (noteValue < 0) {
                 var obj = rationalToFraction(Math.abs(1 / noteValue));
                 cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
+                cell.removeEventListener('mouseover', this.__mouseOverHandler);
+                cell.removeEventListener('mouseout', this.__mouseOutHandler);
             } else {
                 cell.innerHTML = '';
+
+                cell.removeEventListener('mouseover', this.__mouseOverHandler);
+                cell.addEventListener('mouseover', this.__mouseOverHandler);
+
+                cell.removeEventListener('mouseout', this.__mouseOutHandler);
+                cell.addEventListener('mouseout', this.__mouseOutHandler);
             }
 
             noteValues[cell.cellIndex] = -noteValue;
@@ -893,6 +932,8 @@ n
 
     this.init = function (logo) {
         console.log('init RhythmRuler');
+        thatRhythmRuler = this;
+
         this._logo = logo;
 
         this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
@@ -1208,9 +1249,7 @@ n
                     }
                 }
 
-                rulerSubCell.addEventListener('click', function(event) {
-                    that._dissectRuler(event);
-                });
+                this.__addCellEventHandlers(rulerSubCell, this._noteWidth(noteValue), noteValue);
             }
 
             // Match the play button height to the ruler height.
