@@ -99,6 +99,12 @@ function RhythmRuler () {
             return;
         }
 
+	if (this._tapMode && this._tapTimes.length > 0) {
+            var d = new Date();
+            this._tapTimes.push(d.getTime());
+            return;
+        }
+
         var cellParent = cell.parentNode;
         if (cellParent == null) {
             return;
@@ -117,6 +123,7 @@ function RhythmRuler () {
             if (this._tapCell === null) {
                 var noteValues = this.Rulers[this._rulerSelected][0];
                 this._tapCell = event.target;
+                this._tapTimes = [];
 
                 // Play a count off before starting tapping.
                 var interval = this._bpmFactor / Math.abs(noteValues[this._tapCell.cellIndex]);
@@ -133,13 +140,8 @@ function RhythmRuler () {
                 }
 
                 setTimeout(function () {
-                    console.log('start tapping');
                     that.__startTapping(noteValues, interval);
                 }, interval);
-
-            } else {
-                var d = new Date();
-                this._tapTimes.push(d.getTime());
             }
         } else {
             var noteValues = this.Rulers[this._rulerSelected][0];
@@ -191,14 +193,18 @@ function RhythmRuler () {
     };
 
     this.__endTapping = function () {
+        this._rulerSelected = this._tapCell.parentNode.id[5];
         this._tapCell.innerHTML = '';
         var d = new Date();
         this._tapTimes.push(d.getTime());
 
         this._tapMode = false;
-        if (typeof(this._rulerSelected) === 'string') {
+        if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
             var noteValues = this.Rulers[this._rulerSelected][0];
-            this._tapTimes[this._tapTimes.length - 1] = this._tapEndTime;
+
+            if (last(this._tapTimes) > this._tapEndTime) {
+                this._tapTimes[this._tapTimes.length - 1] = this._tapEndTime;
+            }
 
             // convert times into cells here.
             var newNoteValues = [];
@@ -291,6 +297,12 @@ function RhythmRuler () {
 
         that._longPressBeep = setTimeout(function () {
             that._logo.synth.trigger('C4', 1 / 32, 'chime', null);
+
+            var cell = that._mouseDownCell;
+            that._rulerSelected = cell.parentNode.id[5];
+            var noteValues = that.Rulers[that._rulerSelected][0];
+            var noteValue = noteValues[cell.cellIndex];
+            cell.style.backgroundColor = MATRIXBUTTONCOLOR;
         }, 1500);
     };
 
@@ -356,6 +368,8 @@ function RhythmRuler () {
             }
 
             noteValues[cell.cellIndex] = -noteValue;
+
+            this._calculateZebraStripes(this._rulerSelected);
         }
     };
 
@@ -386,7 +400,7 @@ function RhythmRuler () {
             var noteValue = noteValues[newCellIndex];
             var tempwidth = this._noteWidth(newNoteValue);
             noteValues.splice(newCellIndex, 1);
-n
+
             for (var i = 0; i < newNoteValues.length; i++) {
                 var newCell = ruler.insertCell(newCellIndex + i);
                 var newNoteValue = newNoteValues[i];
@@ -1227,6 +1241,9 @@ n
                 var noteValue = this.Rulers[i][0][j];
                 var rulerSubCell = rulerRow.insertCell(-1);
                 rulerSubCell.innerHTML = calcNoteValueToDisplay(noteValue, 1);
+                rulerSubCell.style.height = '70px';
+                rulerSubCell.minHeight = rulerSubCell.style.height;
+                rulerSubCell.maxHeight = rulerSubCell.style.height;
                 rulerSubCell.style.width = this._noteWidth(noteValue) + 'px';
                 rulerSubCell.minWidth = rulerSubCell.style.width;
                 rulerSubCell.maxWidth = rulerSubCell.style.width;
