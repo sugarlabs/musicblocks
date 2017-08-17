@@ -123,6 +123,17 @@ function RhythmRuler () {
             if (this._tapCell === null) {
                 var noteValues = this.Rulers[this._rulerSelected][0];
                 this._tapCell = event.target;
+                if (noteValues[this._tapCell.cellIndex] < 0) {
+                    // Don't allow tapping in rests.
+                    this._tapCell = null;
+                    this._tapMode = false;
+		    this._tapTimes = [];
+		    this._tapEndTime = null;
+		    var iconSize = ICONSIZE;
+		    this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                    return;
+                }
+
                 this._tapTimes = [];
 
                 // Play a count off before starting tapping.
