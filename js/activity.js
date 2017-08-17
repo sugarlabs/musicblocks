@@ -870,7 +870,7 @@ define(MYDEFINES, function (compatibility) {
                 setTimeout(function() {
                 var rawData = reader.result;
                    if (rawData == null || rawData == "") {
-                       alert("Can't load project from the file. Please check the file type");
+                       alert('Cannot load project from the file. Please check the file type');
                    }
                 var cleanData = rawData.replace('\n', ' ');
                 var obj = JSON.parse(cleanData);
@@ -894,7 +894,7 @@ define(MYDEFINES, function (compatibility) {
             evt.stopPropagation();
             evt.preventDefault();
             evt.dataTransfer.dropEffect = 'copy';
-        }
+        };
 
         var dropZone = document.getElementById('canvasHolder');
         dropZone.addEventListener('dragover', handleDragOver, false);
