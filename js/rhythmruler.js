@@ -329,7 +329,7 @@ function RhythmRuler () {
             var elapseTime = d.getTime() - that._longPressStartTime;
             if (elapseTime > 1500) {
                 that._inLongPress = true;
-                that.__toggleRestState(this);
+                that.__toggleRestState(this, true);
             }
         }
 
@@ -357,7 +357,7 @@ function RhythmRuler () {
         return this._inLongPress;
     };
 
-    this.__toggleRestState = function (cell) {
+    this.__toggleRestState = function (cell, addToUndoList) {
         if (cell != null) {
             this._rulerSelected = cell.parentNode.id[5];
             var noteValues = this.Rulers[this._rulerSelected][0];
@@ -381,6 +381,13 @@ function RhythmRuler () {
             noteValues[cell.cellIndex] = -noteValue;
 
             this._calculateZebraStripes(this._rulerSelected);
+
+	    var divisionHistory = this.Rulers[this._rulerSelected][1];
+            if (addToUndoList) {
+                this._undoList.push(['rest', this._rulerSelected]);
+            }
+
+	    divisionHistory.push(cell.cellIndex);
         }
     };
 
@@ -666,7 +673,12 @@ function RhythmRuler () {
             } else {
                 console.log('empty history encountered... skipping undo');
             }
-        }
+	} else if (obj[0] === 'rest') {
+            var newCellIndex = last(divisionHistory);
+            var cell = ruler.cells[newCellIndex];
+            this.__toggleRestState(cell, false);
+	    divisionHistory.pop();
+	}
 
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
@@ -1305,7 +1317,10 @@ function RhythmRuler () {
 
                     this._rulerSelected = drum;
 
-                    if (typeof(this._dissectHistory[i][0][j][0]) === 'number') {
+                    if (typeof(this._dissectHistory[i][0][j]) === 'number') {
+                        var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j]];
+			this.__toggleRestState(cell, false);
+		    } else if (typeof(this._dissectHistory[i][0][j][0]) === 'number') {
                         if (typeof(this._dissectHistory[i][0][j][1]) === 'number') {
                             // dissect is [cell, num]
                             var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
