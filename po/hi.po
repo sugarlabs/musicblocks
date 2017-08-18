@@ -1,8 +1,5 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
+msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-05 00:30-0500\n"
@@ -16,32 +13,6 @@ msgid ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.5\n"
 
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-#: js/activity.js:443
-#: js/activity.js:443
 #: js/activity.js:445
 #: js/activity.js:453
 #: js/activity.js:472

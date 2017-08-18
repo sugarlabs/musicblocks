@@ -1,7 +1,5 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-07 00:30-0500\n"
@@ -1507,7 +1505,7 @@ msgstr "Siqi wakichata imaña limt'añaxa maya sapachjata siqiru uñtayi"
 #: js/turtledefs.js:133
 #.TRANS: Aparece después de una larga pulsación en una pila.
 msgid "It appears after a long press on a stack."
-msgstr "Uka wakichata /"jaya limt'aña" siqina uñasi"
+msgstr "Uka wakichata \"jaya limt'aña\" siqina uñasi"
 
 #: js/turtledefs.js:134
 #.TRANS: Mostrar u ocultar cuadrícula en coordenadas cartesianas.

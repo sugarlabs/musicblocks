@@ -1,8 +1,5 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
+msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
@@ -13,27 +10,6 @@ msgid ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ar\n"
 "X-Generator: Poedit 1.8.6\n"
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
 
 #: js/activity.js:443
 #: js/activity.js:443

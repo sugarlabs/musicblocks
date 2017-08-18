@@ -2,5 +2,13 @@
 name = Mouse Music
 activity_version = 1
 bundle_id = org.sugarlabs.MusicBlocks
-exec = null
+exec = sugar-activity-web
 icon = activity-icon
+license = AGPL
+website = http://walterbender.github.io/musicblocks/guide/
+categories = programming art music
+summary = A Logo-inspired mouse that plays music
+repository = https://github.com/walterbender/musicblocks
+
+
+

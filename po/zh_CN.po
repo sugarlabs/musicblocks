@@ -1,4 +1,5 @@
 msgid ""
+msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-05 00:30-0500\n"
@@ -11,33 +12,6 @@ msgid ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: ini-to-pot script\n"
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
 
 #: js/activity.js:443
 #: js/activity.js:443
@@ -2385,7 +2359,7 @@ msgstr ""
 
 #: js/basicblocks.js:2756
 msgid "keyboard"
-msgstr ""查询键盘"
+msgstr "查询键盘"
 
 #: js/utilitybox.js:109
 msgid "Disable scrolling"

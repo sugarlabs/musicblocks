@@ -1,4 +1,5 @@
 msgid ""
+msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
@@ -11,32 +12,6 @@ msgid ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: ini-to-pot script\n"
 
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-
-msgid ""
-
-#: js/activity.js:443
-#: js/activity.js:443
 #: js/activity.js:445
 #: js/activity.js:453
 #: js/activity.js:472
