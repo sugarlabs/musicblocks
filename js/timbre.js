@@ -15,9 +15,8 @@ function TimbreWidget () {
             "release": 0.01
         },
     };
-
     this.adsrMap = ['attack', 'decay', 'sustain', 'release'];
-    this.fil = [];              //Need to optimise further
+    this.fil = [];              
     this.filterParams = [];
     this.osc = [];
     this.oscParams = [];
@@ -37,27 +36,16 @@ function TimbreWidget () {
     this.FMSynthParams = [];
     this.duoSynthesizer = [];
     this.duoSynthParams = [];
-    this.synthActive = false;
-    this.amsynthActive = false;
-    this.fmsynthActive = false;
-    this.duosynthActive = false;        //Need to optimise further
-    this.envelopeActive = false;
-    this.oscillatorActive = false;
-    this.filterActive = false;
-    this.effectsActive = false;
-    this.tremoloActive = false;
-    this.vibratoActive = false;
-    this.chorusActive = false;
-    this.phaserActive = false;
-    this.distortionActive = false;
+    this.activeParams = ['synth', 'amsynth', 'fmsynth', 'duosynth', 'envelope', 'oscillator', 'filter', 'effects', 'chorus', 'vibrato', 'phaser', 'distortion', 'tremolo'];
+    this.isActive = {};
+    for(var i=0; i < this.activeParams.length; i++) {
+        this.isActive[this.activeParams[i]] = false;
+    }
     this.blockNo = null;
     this.instrument_name = 'custom';
    
-   
-
-
     var that = this;
-    console.log('timbre initialised');
+    //console.log('timbre initialised');
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -83,39 +71,39 @@ function TimbreWidget () {
 
     this._update = function(i, value, k){
         var updateParams = [];
-        if (this.envelopeActive === true && this.env[i] != null) {
+        if (that.isActive['envelope'] === true && this.env[i] != null) {
             for (j = 0; j < 4; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.env[i]].connections[j+1];
             }
         }
-        if (this.filterActive === true && this.fil[i] != null) {
+        if (that.isActive['filter'] === true && this.fil[i] != null) {
             for (j = 0; j < 3; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.fil[i]].connections[j+1];
             }
         }
-        if (this.oscillatorActive === true && this.osc[i] != null) {
+        if (that.isActive['oscillator'] === true && this.osc[i] != null) {
             for (j = 0; j < 2; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.osc[i]].connections[j+1];
             }
         }
-        if (this.amsynthActive === true && this.AMSynthesizer[i] != null) {
+        if (that.isActive['amsynth'] === true && this.AMSynthesizer[i] != null) {
             updateParams[0] = this._logo.blocks.blockList[this.AMSynthesizer[i]].connections[1];
         }
-        if (this.fmsynthActive === true && this.FMSynthesizer[i] != null) {
+        if (that.isActive['fmsynth'] === true && this.FMSynthesizer[i] != null) {
             updateParams[0] = this._logo.blocks.blockList[this.FMSynthesizer[i]].connections[1];
         }
-        if (this.duosynthActive === true && this.duoSynthesizer[i] != null) {
+        if (that.isActive['duosynth'] === true && this.duoSynthesizer[i] != null) {
             for (j = 0; j < 2; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.duoSynthesizer[i]].connections[j+1];
             }
         }
-        if (this.tremoloActive === true && this.tremoloEffect[i] != null) {
+        if (that.isActive['tremolo'] === true && this.tremoloEffect[i] != null) {
             for (j = 0; j < 2; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.tremoloEffect[i]].connections[j+1];
             }
         }
 
-        if (this.vibratoActive === true && this.vibratoEffect[i] != null) {
+        if (that.isActive['vibrato'] === true && this.vibratoEffect[i] != null) {
             updateParams[0] = this._logo.blocks.blockList[this.vibratoEffect[i]].connections[1];
             // The rate arg of the vibrato block must be in the form: a / b
             var divBlock = this._logo.blocks.blockList[this.vibratoEffect[i]].connections[2];
@@ -148,21 +136,20 @@ function TimbreWidget () {
                 };
 
                 setTimeout(__blockRefresher(), 250);
-
             }
         }
 
-        if (this.chorusActive === true && this.chorusEffect[i] != null) {
+        if (that.isActive['chorus'] === true && this.chorusEffect[i] != null) {
             for (j = 0; j < 3; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.chorusEffect[i]].connections[j+1];
             }
         }
-        if (this.phaserActive === true && this.phaserEffect[i] != null) {
+        if (that.isActive['phaser'] === true && this.phaserEffect[i] != null) {
             for (j = 0; j < 3; j++) {
                 updateParams[j] = this._logo.blocks.blockList[this.phaserEffect[i]].connections[j+1];
             }
         }
-        if (this.distortionActive === true && this.distortionEffect[i] != null) {
+        if (that.isActive['distortion'] === true && this.distortionEffect[i] != null) {
             updateParams[0] = this._logo.blocks.blockList[this.distortionEffect[i]].connections[1];
         }
         
@@ -177,7 +164,6 @@ function TimbreWidget () {
             this._logo.blocks.blockList[updateParams[k]].updateCache();
             this._logo.refreshCanvas();
             saveLocally();
-
         }
     };
 
@@ -211,65 +197,49 @@ function TimbreWidget () {
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
         var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
         synthButtonCell.onclick = function() {
-            console.log('synth button cell');
-            that.synthActive = true;
-            that.oscillatorActive = false;
-            that.filterActive = false;
-            that.envelopeActive = false;
-            that.effectsActive = false;
-            that.tremoloActive = false;
-            that.chorusActive = false;
-            that.phaserActive = false;
-            that.vibratoActive = false;
-            that.distortionActive = false;
-
+            //console.log('synth button cell');
+            for(var i=0; i < that.activeParams.length; i++) {
+                that.isActive[that.activeParams[i]] = false;
+            }
+            that.isActive['synth'] = true;
             synthButtonCell.id = "synthButtonCell";
-            if(that.osc.length === 0){
+
+            if(that.osc.length === 0) {
               that._synth();  
             }
-            
         }
 
         var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
         oscillatorButtonCell.onclick=function() {
-            that.oscillatorActive = true;
-            that.filterActive = false;
-            that.envelopeActive = false;
-            that.effectsActive = false;
-            that.synthActive = false;
-            this.amsynthActive = false;
-            this.fmsynthActive = false;
-            this.duosynthActive = false;
-            that.tremoloActive = false;
-            that.chorusActive = false;
-            that.phaserActive = false;
-            that.vibratoActive = false;
-            that.distortionActive = false;
-        
+            for(var i=0; i < that.activeParams.length; i++) {
+                that.isActive[that.activeParams[i]] = false;
+            }
+            that.isActive['oscillator'] = true;
             oscillatorButtonCell.id = "oscillatorButtonCell";
+
             // Look to see if there is a filter block in the clamp. If
             // there isn't one, add one. If there is more than one, we
             // should ignore all but the last one.
             if (that.osc.length <= 1 && (that.AMSynthesizer.length === 0 && that.FMSynthesizer.length === 0 && that.duoSynthesizer.length === 0)) {
                 // Find the last block in the clamp, where we will add
                 // a filter block.
-                if(that.osc.length === 0){
-                var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
-                var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+                if(that.osc.length === 0) {
+                    var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                    var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
-                const OSCILLATOROBJ = [[0,["oscillator",{}],0,0,[null,2,1,null]],[1,["number",{"value":6}],0,0,[0]],[2,["oscillatortype",{"value":"sine"}],0,0,[0]]];
-                that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
+                    const OSCILLATOROBJ = [[0,["oscillator",{}],0,0,[null,2,1,null]],[1,["number",{"value":6}],0,0,[0]],[2,["oscillatortype",{"value":"sine"}],0,0,[0]]];
+                    that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
 
-                var n = that._logo.blocks.blockList.length - 3;
-                that.osc.push(n);
-                that.oscParams.push('sine');
-                that.oscParams.push(6);
+                    var n = that._logo.blocks.blockList.length - 3;
+                    that.osc.push(n);
+                    that.oscParams.push('sine');
+                    that.oscParams.push(6);
                 
-                setTimeout(that.blockConnection(3, bottomOfClamp), 500);
-            }
+                    setTimeout(that.blockConnection(3, bottomOfClamp), 500);
+                }
                 that._oscillator();            
             }
-            
+
             if(that.osc.length != 0 && (that.AMSynthesizer.length !=0  || that.FMSynthesizer.length != 0 || that.duoSynthesizer.length != 0)){
                 that._oscillator();
             }
@@ -277,21 +247,12 @@ function TimbreWidget () {
 
         var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
         envelopeButtonCell.onclick = function() {
-            that.envelopeActive = true;
-            that.filterActive = false;
-            that.oscillatorActive = false;
-            that.effectsActive = false;
-            that.synthActive = false;
-            this.amsynthActive = false;
-            this.fmsynthActive = false;
-            this.duosynthActive = false;
-            that.tremoloActive = false;
-            that.chorusActive = false;
-            that.phaserActive = false;
-            that.vibratoActive = false;
-            that.distortionActive = false;
-
+            for(var i=0; i < that.activeParams.length; i++) {
+                that.isActive[that.activeParams[i]] = false;
+            }
+            that.isActive['envelope'] = true;
             envelopeButtonCell.id = "envelopeButtonCell";
+
             if (that.env.length === 0) {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
@@ -313,19 +274,10 @@ function TimbreWidget () {
 
         var filterButtonCell = this._addButton(row, 'filter.svg', ICONSIZE, _('filter'));
         filterButtonCell.onclick = function() {
-            that.filterActive = true;
-            that.envelopeActive = false;
-            that.oscillatorActive = false;
-            that.effectsActive = false;
-            that.synthActive = false;
-            this.amsynthActive = false;
-            this.fmsynthActive = false;
-            this.duosynthActive = false;
-            that.tremoloActive = false;
-            that.chorusActive = false;
-            that.phaserActive = false;
-            that.vibratoActive = false;
-            that.distortionActive = false;
+            for(var i=0; i < that.activeParams.length; i++) {
+                that.isActive[that.activeParams[i]] = false;
+            }
+            that.isActive['filter'] = true;
             filterButtonCell.id = "filterButtonCell";
 
             if (that.fil.length === 0) {
@@ -348,14 +300,10 @@ function TimbreWidget () {
 
         var effectsButtonCell = this._addButton(row, 'effects.svg', ICONSIZE, _('effects'));
         effectsButtonCell.onclick=function() {
-            that.effectsActive = true;
-            that.filterActive = false;
-            that.envelopeActive = false;
-            that.oscillatorActive = false;
-            that.synthActive = false;
-            this.amsynthActive = false;
-            this.fmsynthActive = false;
-            this.duosynthActive = false;
+            for(var i=0; i < that.activeParams.length; i++) {
+                that.isActive[that.activeParams[i]] = false;
+            }
+            that.isActive['effects'] = true;
             effectsButtonCell.id = "effectsButtonCell";
             that._effects();
         }
@@ -529,147 +477,139 @@ function TimbreWidget () {
             synthsName[i].onclick = function () {
                 synthChosen = this.value;
                 var subHtmlElements = '<div id="chosen">'+synthChosen+'</div>';
-                    that.filterActive = false;
-                    that.envelopeActive = false;
-                    that.oscillatorActive = false;
-                    that.tremoloActive = false;
-                    that.chorusActive = false;
-                    that.phaserActive = false;
-                    that.vibratoActive = false;
-                    that.distortionActive = false;
-                    that.synthActive = true;
-                   // that.amsynthActive = false;
-                    //that.fmsynthActive = false;
-                    //that.duosynthActive = false;
-                    
-                    
-                if(synthChosen === "AMSynth") {
-                    that.amsynthActive = true;
-                    that.fmsynthActive = false;
-                    that.duosynthActive = false;
-                    
-                    subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
-                    subDiv.innerHTML = subHtmlElements;
-                    docById('sS0').textContent = "Harmonicity";
-                    docById('myRangeS0').value = 1;
-                    docById('myspanS0').textContent = "1";
-                    
-                    if (that.AMSynthesizer.length === 0) {
-                        var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
-                        var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+                    for(var i=0; i < that.activeParams.length; i++) {
+                        that.isActive[that.activeParams[i]] = false;
+                    }
+                    that.isActive['synth'] = true;
+
+                    if(synthChosen === "AMSynth") {
+                        that.isActive['amsynth'] = true;
+                        that.isActive['fmsynth'] = false;
+                        that.isActive['duosynth'] = false;
+
+                        if (that.AMSynthesizer.length === 0) {
+                            var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                            var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
-                        const AMSYNTHOBJ = [[0,["amsynth",{}],463,556,[null,1,null]],[1,["number",{"value":1}],566.5146484375,556,[0]]];
-                        that._logo.blocks.loadNewBlocks(AMSYNTHOBJ);
+                            const AMSYNTHOBJ = [[0,["amsynth",{}],463,556,[null,1,null]],[1,["number",{"value":1}],566.5146484375,556,[0]]];
+                            that._logo.blocks.loadNewBlocks(AMSYNTHOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 2;
-                        that.AMSynthesizer.push(n);
-                        that.AMSynthParams.push(1);
+                            var n = that._logo.blocks.blockList.length - 2;
+                            that.AMSynthesizer.push(n);
+                            that.AMSynthParams.push(1);
                    
-                        setTimeout(that.blockConnection(2, bottomOfClamp), 500);
-                    }
-                    if (that.AMSynthesizer.length != 1) {
-                        blockValue = that.AMSynthesizer.length - 1;
-                    }
+                            setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+                        }
                     
-                    document.getElementById("wrapperS0").addEventListener('change', function(event){
-                        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
-                        var elem = event.target;
-                        docById("myRangeS0").value = parseFloat(elem.value);
-                        docById("myspanS0").textContent = elem.value;
-                        that._update(blockValue, elem.value, 0);
-                    });
+                        subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
+                        subDiv.innerHTML = subHtmlElements;
+                        docById('sS0').textContent = "Harmonicity";
+                        docById('myRangeS0').value = that.AMSynthParams[0];
+                        docById('myspanS0').textContent = that.AMSynthParams[0];
                     
-
-                } else if (synthChosen === "FMSynth") {
-                    that.fmsynthActive = true;
-                    that.amsynthActive = false;
-                    that.duosynthActive = false;
-    
-                    subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
-                    subDiv.innerHTML = subHtmlElements;
-                    docById('sS0').textContent = "Modulation Index";
-                    docById('myRangeS0').value = 10;
-                    docById('myspanS0').textContent = "10";
-
-                    if (that.FMSynthesizer.length === 0) {
-                        var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
-                        var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
-                
-                        const FMSYNTHOBJ = [[0,["fmsynth",{}],463,556,[null,1,null]],[1,["number",{"value":10}],566.5146484375,556,[0]]];
-                        that._logo.blocks.loadNewBlocks(FMSYNTHOBJ);
-
-                        var n = that._logo.blocks.blockList.length - 2;
-                        that.FMSynthesizer.push(n);
-                        that.FMSynthParams.push(1);
-                   
-                        setTimeout(that.blockConnection(2, bottomOfClamp), 500);
-                    }
-
-                    if (that.FMSynthesizer.length != 1) {
-                        blockValue = that.FMSynthesizer.length - 1;
-                    }
+                 
+                        if (that.AMSynthesizer.length != 1) {
+                            blockValue = that.AMSynthesizer.length - 1;
+                        }
                     
-                    document.getElementById("wrapperS0").addEventListener('change', function(event){
-                        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
-                        var elem = event.target;
-                        docById("myRangeS0").value = parseFloat(elem.value);
-                        docById("myspanS0").textContent = elem.value;
-                        that._update(blockValue, elem.value, 0);
-                    });
-
-                } else if (synthChosen === "DuoSynth") {
-                    that.duosynthActive = true;
-                    that.amsynthActive = false;
-                    that.fmsynthActive = false;
-                    
-                    for(var i = 0; i < 2; i++) {
-                        subHtmlElements += '<div id="wrapperS'+i+'"><div id="sS'+i+'" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS'+i+'"class="rangeslidervalue">2</span></div></div>';
-                    }
-                    
-                    subDiv.innerHTML = subHtmlElements;
-                    docById('sS0').textContent = "Vibrato Rate";
-                    docById('myRangeS0').value = 10;
-                    docById('myspanS0').textContent = "10";
-                    docById('sS1').textContent = "Vibrato Amount";
-                    docById('myRangeS1').value = 6;
-                    docById('myspanS1').textContent = "6";
-
-                    if (that.duoSynthesizer.length === 0) {
-                        var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
-                        var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
-                
-                        const DUOSYNTHOBJ = [[0,["duosynth",{}],368,254,[null,1,2,null]],[1,["number",{"value":10}],481.54150390625,254,[0]],[2,["number",{"value":6}],481.54150390625,285.5,[0]]];
-                        that._logo.blocks.loadNewBlocks(DUOSYNTHOBJ);
-
-                        var n = that._logo.blocks.blockList.length - 3;
-                        that.duoSynthesizer.push(n);
-                        that.duoSynthParams.push(10);
-                        that.duoSynthParams.push(6);
-                   
-                        setTimeout(that.blockConnection(3, bottomOfClamp), 500);
-                    }
-                    if (that.duoSynthesizer.length != 1) {
-                        blockValue = that.duoSynthesizer.length - 1;
-                        console.log(blockValue);
-                    }
-                    
-                    for (var i = 0; i < 2; i++) {
-                        document.getElementById("wrapperS"+i).addEventListener('change', function(event){
+                        document.getElementById("wrapperS0").addEventListener('change', function(event){
                             docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
                             var elem = event.target;
-                            var m = elem.id.slice(-1);
-                            docById("myRangeS"+m).value = parseFloat(elem.value);
-                            docById("myspanS"+m).textContent = elem.value;
-                            that._update(blockValue, elem.value, Number(m));
+                            docById("myRangeS0").value = parseFloat(elem.value);
+                            docById("myspanS0").textContent = elem.value;
+                            that._update(blockValue, elem.value, 0);
                         });
-                    }
-                }  
+                    
+                    } else if (synthChosen === "FMSynth") {
+                        that.isActive['amsynth'] = false;
+                        that.isActive['fmsynth'] = true;
+                        that.isActive['duosynth'] = false;
+
+                        if (that.FMSynthesizer.length === 0) {
+                            var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                            var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+                
+                            const FMSYNTHOBJ = [[0,["fmsynth",{}],463,556,[null,1,null]],[1,["number",{"value":10}],566.5146484375,556,[0]]];
+                            that._logo.blocks.loadNewBlocks(FMSYNTHOBJ);
+
+                            var n = that._logo.blocks.blockList.length - 2;
+                            that.FMSynthesizer.push(n);
+                            that.FMSynthParams.push(1);
+                   
+                            setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+                        }
+
+                        subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
+                        subDiv.innerHTML = subHtmlElements;
+                        docById('sS0').textContent = "Modulation Index";
+                        docById('myRangeS0').value = that.FMSynthParams[0];
+                        docById('myspanS0').textContent = that.FMSynthParams[0];
+
+                        if (that.FMSynthesizer.length != 1) {
+                            blockValue = that.FMSynthesizer.length - 1;
+                        }
+                    
+                        document.getElementById("wrapperS0").addEventListener('change', function(event){
+                            docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
+                            var elem = event.target;
+                            docById("myRangeS0").value = parseFloat(elem.value);
+                            docById("myspanS0").textContent = elem.value;
+                            that._update(blockValue, elem.value, 0);
+                        });
+                    } else if (synthChosen === "DuoSynth") {
+                        that.isActive['amsynth'] = false;
+                        that.isActive['fmsynth'] = false;
+                        that.isActive['duosynth'] = true;
+
+                        if (that.duoSynthesizer.length === 0) {
+                            var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                            var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+                
+                            const DUOSYNTHOBJ = [[0,["duosynth",{}],368,254,[null,1,2,null]],[1,["number",{"value":10}],481.54150390625,254,[0]],[2,["number",{"value":6}],481.54150390625,285.5,[0]]];
+                            that._logo.blocks.loadNewBlocks(DUOSYNTHOBJ);
+
+                            var n = that._logo.blocks.blockList.length - 3;
+                            that.duoSynthesizer.push(n);
+                            that.duoSynthParams.push(10);
+                            that.duoSynthParams.push(6);
+                   
+                            setTimeout(that.blockConnection(3, bottomOfClamp), 500);
+                        }
+                    
+                        for(var i = 0; i < 2; i++) {
+                            subHtmlElements += '<div id="wrapperS'+i+'"><div id="sS'+i+'" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS'+i+'"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS'+i+'"class="rangeslidervalue">2</span></div></div>';
+                        }
+                    
+                        subDiv.innerHTML = subHtmlElements;
+                        docById('sS0').textContent = "Vibrato Rate";
+                        docById('myRangeS0').value = that.duoSynthParams[0];
+                        docById('myspanS0').textContent = that.duoSynthParams[0];
+                        docById('sS1').textContent = "Vibrato Amount";
+                        docById('myRangeS1').value = that.duoSynthParams[1];
+                        docById('myspanS1').textContent = that.duoSynthParams[1];
+
+                        if (that.duoSynthesizer.length != 1) {
+                            blockValue = that.duoSynthesizer.length - 1;
+                        //console.log(blockValue);
+                        }
+                    
+                        for (var i = 0; i < 2; i++) {
+                            document.getElementById("wrapperS"+i).addEventListener('change', function(event){
+                                docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
+                                var elem = event.target;
+                                var m = elem.id.slice(-1);
+                                docById("myRangeS"+m).value = parseFloat(elem.value);
+                                docById("myspanS"+m).textContent = elem.value;
+                                that._update(blockValue, elem.value, Number(m));
+                            });
+                        }
+                    }  
+                }   
             }
-        }
         
         btnReset.onclick = function() {
             docById("synthButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR
-            if(that.amsynthActive === true) {
+            if(that.isActive['amsynth'] === true) {
                 if (that.AMSynthesizer.length != 1) {
                     blockValue = that.AMSynthesizer.length - 1;
                 }
@@ -677,7 +617,7 @@ function TimbreWidget () {
                 docById("myspanS0").textContent = that.AMSynthParams[0];
                 that._update(blockValue, that.AMSynthParams[0], 0);
             }  
-            if(that.fmsynthActive === true) {
+            if(that.isActive['fmsynth'] === true) {
                 if (that.FMSynthesizer.length != 1) {
                     blockValue = that.FMSynthesizer.length - 1;
                 }
@@ -685,7 +625,7 @@ function TimbreWidget () {
                 docById("myspanS0").textContent = that.FMSynthParams[0];
                 that._update(blockValue, that.FMSynthParams[0], 0);
             }  
-            if(that.duosynthActive === true) {
+            if(that.isActive['duosynth'] === true) {
                 if (that.duoSynthesizer.length != 1) {
                     blockValue = that.duoSynthesizer.length - 1;
                 }
@@ -748,9 +688,6 @@ function TimbreWidget () {
         document.getElementById("wrapperOsc0").addEventListener('change', function(event){
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
             var elem = event.target;
-            //that.oscillatorVals['oscillator'][that.oscillatorMap[0]] = elem.value;
-            //var synth_source = "triangle";
-            //that._logo.synth.createSynth(that.instrument_name, synth_source, that.oscillatorVals);
             that._update(blockValue, elem.value, 0);
         });
 
@@ -759,9 +696,6 @@ function TimbreWidget () {
             var elem = event.target;
             docById("myRangeO0").value = parseFloat(elem.value);
             docById("myspanO0").textContent = elem.value;
-            //that.oscillatorVals['oscillator'][that.oscillatorMap[1]] = parseFloat(elem.value);
-            //var synth_source = "triangle";
-            //that._logo.synth.createSynth(that.instrument_name, synth_source, that.oscillatorVals);
             that._update(blockValue, elem.value, 1);
         });
         
@@ -782,16 +716,11 @@ function TimbreWidget () {
         btnReset.onclick = function() {
             docById("oscillatorButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             docById('selOsc1').value = that.oscParams[0];
-            //that.oscillatorVals['oscillator'][that.oscillatorMap[0]] = elem.value;
             that._update(blockValue, that.oscParams[0], 0);
             
             docById("myRangeO0").value = parseFloat(that.oscParams[1]);
             docById("myspanO0").textContent = that.oscParams[1];
-            //that.oscillatorVals['oscillator'][that.oscillatorMap[1]] = parseFloat(elem.value);
             that._update(blockValue, that.oscParams[1], 1);
-
-            //var synth_source = "triangle";
-            //that._logo.synth.createSynth(that.instrument_name, synth_source, that.oscillatorVals);
         }
     };
 
@@ -1139,11 +1068,11 @@ function TimbreWidget () {
                 effectChosen = this.value;
                 var subHtmlElements = '<div id="chosen">'+effectChosen+'</div>';
                 if (effectChosen === "Tremolo" ) {
-                    that.tremoloActive = true;
-                    that.chorusActive = false;
-                    that.phaserActive = false;
-                    that.vibratoActive = false;
-                    that.distortionActive = false;
+                    that.isActive['tremolo'] = true;
+                    that.isActive['chorus'] = false;
+                    that.isActive['vibrato'] = false;
+                    that.isActive['distortion'] = false;
+                    that.isActive['phaser'] = false;
                     
                     instruments_effects[that.instrument_name]['tremoloActive'] = true;
 
@@ -1200,11 +1129,12 @@ function TimbreWidget () {
                         });    
                     }
                 } else if (effectChosen === "Vibrato") {
-                    that.tremoloActive = false;
-                    that.chorusActive = false;
-                    that.phaserActive = false;
-                    that.vibratoActive = true;
-                    that.distortionActive = false;
+                    that.isActive['tremolo'] = false;
+                    that.isActive['chorus'] = false;
+                    that.isActive['vibrato'] = true;
+                    that.isActive['distortion'] = false;
+                    that.isActive['phaser'] = false;
+                    
 
                     instruments_effects[that.instrument_name]['vibratoActive'] = true;
                     for (var i = 0; i < 2; i++) {
@@ -1269,11 +1199,12 @@ function TimbreWidget () {
                         that._update(that.vibratoEffect.length - 1, obj[0], 2);
                     });    
                 } else if(effectChosen === "Chorus" ) {
-                    that.tremoloActive = false;
-                    that.chorusActive = true;
-                    that.phaserActive = false;
-                    that.vibratoActive = false;
-                    that.distortionActive = false;
+                    that.isActive['tremolo'] = false;
+                    that.isActive['chorus'] = true;
+                    that.isActive['vibrato'] = false;
+                    that.isActive['distortion'] = false;
+                    that.isActive['phaser'] = false;
+                    
 
                      instruments_effects[that.instrument_name]['chorusActive'] = true;
                     
@@ -1336,11 +1267,12 @@ function TimbreWidget () {
                         });    
                     }
                 } else if(effectChosen === "Phaser") {
-                    that.tremoloActive = false;
-                    that.chorusActive = false;
-                    that.phaserActive = true;
-                    that.vibratoActive = false;
-                    that.distortionActive = false;
+                    that.isActive['tremolo'] = false;
+                    that.isActive['chorus'] = false;
+                    that.isActive['vibrato'] = false;
+                    that.isActive['distortion'] = false;
+                    that.isActive['phaser'] = true;
+                    
 
                      instruments_effects[that.instrument_name]['phaserActive'] = true;
                     
@@ -1404,11 +1336,12 @@ function TimbreWidget () {
                         });    
                     }
                 } else if(effectChosen === "Distortion") {
-                    that.tremoloActive = false;
-                    that.chorusActive = false;
-                    that.phaserActive = false;
-                    that.vibratoActive = false;
-                    that.distortionActive = true;
+                    that.isActive['tremolo'] = false;
+                    that.isActive['chorus'] = false;
+                    that.isActive['vibrato'] = false;
+                    that.isActive['distortion'] = true;
+                    that.isActive['phaser'] = false;
+                    
 
                      instruments_effects[that.instrument_name]['distortionActive'] = true;
 
@@ -1453,7 +1386,7 @@ function TimbreWidget () {
         
         btnReset.onclick = function() {
             docById("effectsButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
-            if(that.tremoloActive === true) {
+            if(that.isActive['tremolo'] === true) {
                 if (that.tremoloEffect.length != 1) {
                     blockValue = that.tremoloEffect.length - 1;
                 }
@@ -1463,7 +1396,7 @@ function TimbreWidget () {
                     that._update(blockValue, that.tremoloParams[i], i);  
                 }
             }  
-            if(that.vibratoActive === true) {
+            if(that.isActive['vibrato'] === true) {
                 if (that.vibratoEffect.length != 1) {
                     blockValue = that.vibratoEffect.length - 1;
                 }
@@ -1473,7 +1406,7 @@ function TimbreWidget () {
                     that._update(blockValue, that.vibratoParams[i], i);  
                 }
             }  
-            if(that.phaserActive === true) {
+            if(that.isActive['phaser'] === true) {
                 if (that.phaserEffect.length != 1) {
                     blockValue = that.phaserEffect.length - 1;
                 }
@@ -1483,7 +1416,7 @@ function TimbreWidget () {
                     that._update(blockValue, that.phaserParams[i], i);  
                 }
             } 
-            if(that.chorusActive === true) {
+            if(that.isActive['chorus'] === true) {
                 if (that.chorusEffect.length != 1) {
                     blockValue = that.chorusEffect.length - 1;
                 }
@@ -1493,7 +1426,7 @@ function TimbreWidget () {
                     that._update(blockValue, that.chorusParams[i], i);  
                 }
             } 
-            if(that.distortionActive === true) {
+            if(that.isActive['distortion'] === true) {
                 if (that.distortionEffect.length != 1) {
                     blockValue = that.dstortionEffect.length - 1;
                 }
