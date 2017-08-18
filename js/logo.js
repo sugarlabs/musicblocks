@@ -2351,6 +2351,10 @@ function Logo () {
         case 'amsynth':
             var harmonicity;
             that.timbre.AMSynthParams = [];
+            if(that.timbre.osc.length != 0){
+                that.errorMsg(_("Unable to use synth due to existing oscillator"));
+                //that.stopTurtle = true;
+            }
             if(args.length === 1 && typeof(args[0]) === 'number') {
                 if(args[0] < 0) {
                     that.errorMsg(_('The input cannot be negative'));
@@ -2366,6 +2370,10 @@ function Logo () {
         case 'fmsynth':
             var modulationIndex;
             that.timbre.FMSynthParams = [];
+            if(that.timbre.osc.length != 0){
+                that.errorMsg(_("Unable to use synth due to existing oscillator"));
+                //that.stopTurtle = true;
+            }
             if(args.length === 1 && typeof(args[0]) === 'number') {
                 if(args[0] < 0) {
                     that.errorMsg(_('The input cannot be negative'));
@@ -2380,6 +2388,9 @@ function Logo () {
         case 'duosynth':
             var synthVibratoRate;
             var synthVibratoAmount;
+            if(that.timbre.osc.length != 0){
+                that.errorMsg(_("Unable to use synth due to existing oscillator"));
+            }
             that.timbre.duoSynthParams = [];
             if(args.length === 2 && typeof(args[0]) === 'number') {
                 synthVibratoRate = args[0];
@@ -2811,6 +2822,16 @@ function Logo () {
             var oscillatortype = 'triangle';
             var partials ;
             that.timbre.oscParams = [];
+
+            if(that.timbre.AMSynthesizer.length != 0){
+                that.errorMsg(_("Unable to use oscillator due to existing synth"));
+            }
+            if(that.timbre.FMSynthesizer.length != 0){
+                that.errorMsg(_("Unable to use oscillator due to existing synth"));
+            }
+            if(that.timbre.duoSynthesizer.length != 0){
+                that.errorMsg(_("Unable to use oscillator due to existing synth"));
+            }
 
             if(that.timbre.osc.length != 0) {
                 that.errorMsg(_("You are adding a second oscillator block"));
@@ -3773,7 +3794,7 @@ function Logo () {
             break;
         case 'settimbre':
         //debugger;
-            console.log('inside set timbre');
+            //console.log('inside set timbre');
             if (args.length >= 1 && typeof(args[0] === 'textin')){
                 that.set_instrument_name  = args[0];
                 console.log('settimbre args: ' + args);

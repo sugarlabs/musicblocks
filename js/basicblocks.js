@@ -482,22 +482,25 @@ function initBasicProtoBlocks(palettes, blocks) {
     oscillatorBlock.staticLabels.push(_('oscillator'), _('oscillatorType'), _('partials'));
     oscillatorBlock.extraWidth = 10;
     oscillatorBlock.adjustWidthToLabel();
-    oscillatorBlock.defaults.push(_('Triangle'));
+    oscillatorBlock.defaults.push(_('triangle'));
     oscillatorBlock.defaults.push(6);
+    oscillatorBlock.hidden = true;
     oscillatorBlock.twoArgBlock();
-    oscillatorBlock.dockTypes[1] = 'textin';
+    oscillatorBlock.dockTypes[1] = 'oscillatortype';
     oscillatorBlock.dockTypes[2] = 'numberin';
 
 
     var filtertypeBlock = new ProtoBlock('filtertype');
     filtertypeBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['filtertype'] = filtertypeBlock;
+    filtertypeBlock.hidden = true;
     filtertypeBlock.valueBlock();
     filtertypeBlock.dockTypes[0] = 'textout';
 
     var oscillatortypeBlock = new ProtoBlock('oscillatortype');
     oscillatortypeBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['oscillatortype'] = oscillatortypeBlock;
+    oscillatortypeBlock.hidden = true;
     oscillatortypeBlock.valueBlock();
     oscillatortypeBlock.dockTypes[0] = 'textout';
 
@@ -511,6 +514,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     envelopeBlock.defaults.push(50);
     envelopeBlock.defaults.push(60);
     envelopeBlock.defaults.push(1);
+    envelopeBlock.hidden = true;
     envelopeBlock.fourArgBlock();
     envelopeBlock.dockTypes[1] = 'numberin';
     envelopeBlock.dockTypes[2] = 'numberin';
@@ -527,6 +531,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     filterBlock.defaults.push(-12);
     filterBlock.defaults.push(392);
     filterBlock.threeArgBlock();
+    filterBlock.hidden = true;
     filterBlock.dockTypes[1] = 'anyin';
     filterBlock.dockTypes[2] = 'numberin';
     filterBlock.dockTypes[3] = 'numberin';

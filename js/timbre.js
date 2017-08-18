@@ -52,6 +52,9 @@ function TimbreWidget () {
     this.distortionActive = false;
     this.blockNo = null;
     this.instrument_name = 'custom';
+   
+   
+
 
     var that = this;
     console.log('timbre initialised');
@@ -221,7 +224,10 @@ function TimbreWidget () {
             that.distortionActive = false;
 
             synthButtonCell.id = "synthButtonCell";
-            that._synth();
+            if(that.osc.length === 0){
+              that._synth();  
+            }
+            
         }
 
         var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
@@ -239,19 +245,19 @@ function TimbreWidget () {
             that.phaserActive = false;
             that.vibratoActive = false;
             that.distortionActive = false;
-
+        
             oscillatorButtonCell.id = "oscillatorButtonCell";
             // Look to see if there is a filter block in the clamp. If
             // there isn't one, add one. If there is more than one, we
             // should ignore all but the last one.
-            if (that.osc.length === 0) {
+            if (that.osc.length <= 1 && (that.AMSynthesizer.length === 0 && that.FMSynthesizer.length === 0 && that.duoSynthesizer.length === 0)) {
                 // Find the last block in the clamp, where we will add
                 // a filter block.
-               
+                if(that.osc.length === 0){
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
-                const OSCILLATOROBJ = [[0,["oscillator",{}],0,0,[null,2,1,null]],[1,["number",{"value":6}],466.68701171875,544.5,[0]],[2,["oscillatortype",{"value":"sine"}],466.68701171875,513,[0]]];
+                const OSCILLATOROBJ = [[0,["oscillator",{}],0,0,[null,2,1,null]],[1,["number",{"value":6}],0,0,[0]],[2,["oscillatortype",{"value":"sine"}],0,0,[0]]];
                 that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
 
                 var n = that._logo.blocks.blockList.length - 3;
@@ -261,7 +267,12 @@ function TimbreWidget () {
                 
                 setTimeout(that.blockConnection(3, bottomOfClamp), 500);
             }
-            that._oscillator();
+                that._oscillator();            
+            }
+            
+            if(that.osc.length != 0 && (that.AMSynthesizer.length !=0  || that.FMSynthesizer.length != 0 || that.duoSynthesizer.length != 0)){
+                that._oscillator();
+            }
         }
 
         var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
@@ -518,6 +529,20 @@ function TimbreWidget () {
             synthsName[i].onclick = function () {
                 synthChosen = this.value;
                 var subHtmlElements = '<div id="chosen">'+synthChosen+'</div>';
+                    that.filterActive = false;
+                    that.envelopeActive = false;
+                    that.oscillatorActive = false;
+                    that.tremoloActive = false;
+                    that.chorusActive = false;
+                    that.phaserActive = false;
+                    that.vibratoActive = false;
+                    that.distortionActive = false;
+                    that.synthActive = true;
+                   // that.amsynthActive = false;
+                    //that.fmsynthActive = false;
+                    //that.duosynthActive = false;
+                    
+                    
                 if(synthChosen === "AMSynth") {
                     that.amsynthActive = true;
                     that.fmsynthActive = false;
