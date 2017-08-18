@@ -2360,12 +2360,12 @@ function Logo () {
 
             if(that.inTimbre) {
                     that.timbre.AMSynthesizer.push(blk);
-                    var AMSynthharmonicity = that.blocks.blockList[blk].connections[1];
-                    that.timbre.AMSynthParams.push(that.blocks.blockList[AMSynthharmonicity].text.text);
+                    that.timbre.AMSynthParams.push(harmonicity);
             }  
             break;
         case 'fmsynth':
             var modulationIndex;
+            that.timbre.FMSynthParams = [];
             if(args.length === 1 && typeof(args[0]) === 'number') {
                 if(args[0] < 0) {
                     that.errorMsg(_('The input cannot be negative'));
@@ -2373,24 +2373,22 @@ function Logo () {
                 modulationIndex = args[0];
             }  
             if(that.inTimbre) {
-                    that.timbre.FMSynthesizer.push(blk);
-                    var mi = that.blocks.blockList[blk].connections[1];
-                    that.timbre.FMSynthParams.push(that.blocks.blockList[mi].text.text);
+                that.timbre.FMSynthesizer.push(blk);
+                that.timbre.FMSynthParams.push(modulationIndex);
             }    
             break;
         case 'duosynth':
             var synthVibratoRate;
             var synthVibratoAmount;
+            that.timbre.duoSynthParams = [];
             if(args.length === 2 && typeof(args[0]) === 'number') {
                 synthVibratoRate = args[0];
                 synthVibratoAmount = args[1];
             }   
             if(that.inTimbre) {
                     that.timbre.duoSynthesizer.push(blk);
-                    var duoSynthRate = that.blocks.blockList[blk].connections[1];
-                    var duoSynthAmount = that.blocks.blockList[blk].connections[2];
-                    that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthRate].text.text);
-                    that.timbre.duoSynthParams.push(that.blocks.blockList[duoSynthAmount].text.text);
+                    that.timbre.duoSynthParams.push(synthVibratoRate);
+                    that.timbre.duoSynthParams.push(synthVibratoAmount);
             }
             break;
         case 'saveabc':
@@ -2745,7 +2743,6 @@ function Logo () {
             break;
         case 'envelope':
             var synth_source = "triangle";
-            //that.timbre.ENVs = [];
             if(that.timbre.env.length != 0) {
                 that.errorMsg(_("You are adding a second envelope block"));
                 that.timbre.ENVs = [];
@@ -2788,12 +2785,7 @@ function Logo () {
             var filtertype = 'highpass';
             var freq ;
             var rollOff ;
-            that.timbre.filterParams = [];
-
-            if(that.timbre.fil.length != 0) {
-                that.errorMsg(_("You are adding a second filter block"));
-            }
-
+           
             if (args.length === 3 && typeof(args[1] === 'number')) {
                 for (var typo in TYPES) {
                     if (TYPES[typo][0] === args[0]) {
@@ -2802,7 +2794,6 @@ function Logo () {
                         filtertype = args[0];
                     }
                 }
-
                 if ([-12, -24, -48, -96].indexOf(args[1]) === -1) {
                     that.errorMsg(_("Value should be either -12,-24,-48 or -96 db"));
                 }
@@ -2810,14 +2801,11 @@ function Logo () {
                 freq = args[2];
             } 
             if(that.inTimbre) {
-                    that.timbre.fil.push(blk);
-                    var filterType = that.blocks.blockList[blk].connections[1];
-                    var filterRolloff = that.blocks.blockList[blk].connections[2];
-                    var filterFrequency = that.blocks.blockList[blk].connections[3];
-                    that.timbre.filterParams.push(that.blocks.blockList[filterType].text.text);
-                    that.timbre.filterParams.push(that.blocks.blockList[filterRolloff].text.text);
-                    that.timbre.filterParams.push(that.blocks.blockList[filterFrequency].text.text);
-                }  
+                that.timbre.fil.push(blk);
+                that.timbre.filterParams.push(filtertype);
+                that.timbre.filterParams.push(rollOff);
+                that.timbre.filterParams.push(freq);
+            }  
             break;
         case 'oscillator':
             var oscillatortype = 'triangle';
@@ -2840,10 +2828,8 @@ function Logo () {
             } 
             if(that.inTimbre) {
                 that.timbre.osc.push(blk);
-                var oscillatorType = that.blocks.blockList[blk].connections[1];
-                var oscillatorPartials = that.blocks.blockList[blk].connections[2];
-                that.timbre.oscParams.push(that.blocks.blockList[oscillatorType].text.text);
-                that.timbre.oscParams.push(that.blocks.blockList[oscillatorPartials].text.text);
+                that.timbre.oscParams.push(oscillatortype);
+                that.timbre.oscParams.push(partials);
             }  
             break;    
         case 'invert1':
