@@ -2269,6 +2269,9 @@ define(MYDEFINES, function (compatibility) {
             default:
                 var errorMsgContainer = errorMsgText.parent;
                 errorMsgContainer.visible = true;
+				setTimeout(function () {
+					 errorMsgContainer.visible = false;
+				}, 15000);
                 errorMsgText.text = msg;
                 stage.setChildIndex(errorMsgContainer, stage.getNumChildren() - 1);
                 errorMsgContainer.updateCache();
