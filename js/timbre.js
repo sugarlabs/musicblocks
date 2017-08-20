@@ -1,6 +1,6 @@
 // Copyright (c) 2017 Walter Bender
 // Copyright (c) 2017 Tayba Wasim
-//Copyright (c) 2017 Prachi Agrawal
+// Copyright (c) 2017 Prachi Agrawal
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -21,10 +21,14 @@ function TimbreWidget () {
     var timbreTableDiv = docById('timbreTableDiv');
     this.env = [];
     this.ENVs = [];
-    this.adsrVals = {        
-        "envelope": {
-            "attack": 0.01,
-            "decay": 0.5,
+    this.synthVals = {
+        "oscillator": {
+            "type" : "sine"
+        }
+        ,        
+         "envelope": {
+             "attack": 0.01,
+             "decay": 0.5,
             "sustain": 0.6,
             "release": 0.01
         },
@@ -238,6 +242,7 @@ function TimbreWidget () {
                 // Find the last block in the clamp, where we will add
                 // a filter block.
                 if(that.osc.length === 0) {
+                    console.log('oscillator not found');
                     var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                     var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
@@ -701,12 +706,16 @@ function TimbreWidget () {
 
         document.getElementById("wrapperOsc0").addEventListener('change', function(event){
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
+            console.log('in oscillator type');
             var elem = event.target;
+            that.synthVals['oscillator']['type'] = elem.value;
             that._update(blockValue, elem.value, 0);
+            that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['type'], that.synthVals);
         });
 
         document.getElementById("wrapperOsc1").addEventListener('change', function(event){
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
+            console.log('in oscillator Partials');
             var elem = event.target;
             docById("myRangeO0").value = parseFloat(elem.value);
             docById("myspanO0").textContent = elem.value;
@@ -735,13 +744,14 @@ function TimbreWidget () {
             docById("myRangeO0").value = parseFloat(that.oscParams[1]);
             docById("myspanO0").textContent = that.oscParams[1];
             that._update(blockValue, that.oscParams[1], 1);
+            that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['type'], that.oscillatorVals);
         }
     };
 
     this._envelope = function() {
         var that = this;
         var blockValue = 0;
-        var synth_source = "triangle";
+    //    var synth_source = "triangle";
 
         if(this.env.length != 1) {
             blockValue = this.env.length - 1;
@@ -781,7 +791,7 @@ function TimbreWidget () {
         for (var i = 0; i < 4; i++) {
             docById("myRange"+i).value = parseFloat(that.ENVs[i]);
             docById("myspan"+i).textContent = that.ENVs[i];
-            that.adsrVals['envelope'][that.adsrMap[i]] = parseFloat(that.ENVs[i]) / 100;
+            that.synthVals['envelope'][that.adsrMap[i]] = parseFloat(that.ENVs[i]) / 100;
             that._update(blockValue, that.ENVs[i], i);
         }
 
@@ -791,23 +801,24 @@ function TimbreWidget () {
                 var elem = event.target;
                 var m = elem.id.slice(-1);
                 docById("myRange"+m).value = parseFloat(elem.value);
+                console.log(elem.value);
                 docById("myspan"+m).textContent = elem.value;
 
-                that.adsrVals['envelope'][that.adsrMap[m]] = parseFloat(elem.value) / 100;
+                that.synthVals['envelope'][that.adsrMap[m]] = parseFloat(elem.value) / 100;
                 that._update(blockValue, parseFloat(elem.value), m);
-                that._logo.synth.createSynth(that.instrument_name, synth_source, that.adsrVals);
+                that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['type'], that.synthVals);
             }); 
         }
        
         btnReset.onclick = function() {
             docById("envelopeButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
             for(var i = 0; i < 4; i++) {
-                that.adsrVals['envelope'][that.adsrMap[i]] = parseFloat(that.ENVs[i]) / 100;
+                that.synthVals['envelope'][that.adsrMap[i]] = parseFloat(that.ENVs[i]) / 100;
                 docById("myRange"+i).value = parseFloat(that.ENVs[i]);
                 docById("myspan"+i).textContent = that.ENVs[i];
                 that._update(blockValue, parseFloat(that.ENVs[i]), i);
             }
-            that._logo.synth.createSynth(that.instrument_name, synth_source, that.adsrVals);
+            that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['type'], that.synthVals);
         }
     };
 

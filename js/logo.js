@@ -2785,10 +2785,10 @@ function Logo () {
                 that.timbre.ENVs.push(Math.round(last(that.sustain[turtle]) * 100));
                 that.timbre.ENVs.push(Math.round(last(that.release[turtle]) * 100));
 
-                that.timbre.adsrVals[0] = last(that.attack[turtle]);
-                that.timbre.adsrVals[1] = last(that.decay[turtle]);
-                that.timbre.adsrVals[2] = last(that.sustain[turtle]);
-                that.timbre.adsrVals[3] = last(that.release[turtle]);
+                that.timbre.synthVals['envelope']['attack'] = last(that.attack[turtle]);
+                that.timbre.synthVals['envelope']['decay'] = last(that.decay[turtle]);
+                that.timbre.synthVals['envelope']['sustain'] = last(that.sustain[turtle]);
+                that.timbre.synthVals['envelope']['release'] = last(that.release[turtle]);
                 this.synth.createSynth(that.timbre.instrument_name, synth_source, that.timbre.adsrVals);
             }
             break; 
@@ -5244,51 +5244,49 @@ function Logo () {
         var doPhaser = false;
         var doChorus = false;
 
-        /* Applying effects inside the timbre block */
+        // Applying effects inside the timbre block 
 
         if ((this.inSetTimbre == true) && (turtle in this.instrument_names) && last(this.instrument_names[turtle])){
             var inst_name = last(this.instrument_names[turtle]);
             console.log('inst_name: ' + inst_name);
 
-            var timbre_effects = instruments_effects[inst_name];
+            if (inst_name in instruments_effects){
+                var timbre_effects = instruments_effects[inst_name];
 
-            if (timbre_effects['vibratoActive'] == true) {
-                vibratoRate = timbre_effects['vibratoRate'];
-                vibratoIntensity = timbre_effects['vibratoIntensity'];
-                doVibrato = true;
-            }
+                if (timbre_effects['vibratoActive'] == true) {
+                    vibratoRate = timbre_effects['vibratoRate'];
+                    vibratoIntensity = timbre_effects['vibratoIntensity'];
+                    doVibrato = true;
+                }
+                
+                if (timbre_effects['distortionActive'] == true) {
+                    distortionAmount = timbre_effects['distortionAmount'];
+                    doDistortion = true;
+                }
+                
+                if (timbre_effects['tremoloActive'] == true) {
+                    tremoloFrequency = timbre_effects['tremoloFrequency'];
+                    tremoloDepth = timbre_effects['tremoloDepth'];
+                    doTremolo = true;
+                }
+                
+                if (timbre_effects['phaserActive'] == true) {
+                    rate = timbre_effects['rate'];
+                    octaves = timbre_effects['octaves'];
+                    baseFrequency = timbre_effects['baseFrequency'];
+                    doPhaser = true;
+                }
 
-            
-            if (timbre_effects['distortionActive'] == true) {
-                distortionAmount = timbre_effects['distortionAmount'];
-                doDistortion = true;
-            }
-
-            
-            if (timbre_effects['tremoloActive'] == true) {
-                tremoloFrequency = timbre_effects['tremoloFrequency'];
-                tremoloDepth = timbre_effects['tremoloDepth'];
-                doTremolo = true;
-            }
-
-            
-            if (timbre_effects['phaserActive'] == true) {
-                rate = timbre_effects['rate'];
-                octaves = timbre_effects['octaves'];
-                baseFrequency = timbre_effects['baseFrequency'];
-                doPhaser = true;
-            }
-
-
-            if (timbre_effects['chorusActive'] == true) {
-                chorusRate = timbre_effects['chorusRate'];
-                delayTime = timbre_effects['delayTime'];
-                chorusDepth = timbre_effects['chorusDepth'];
-                doChorus = true;
+                if (timbre_effects['chorusActive'] == true) {
+                    chorusRate = timbre_effects['chorusRate'];
+                    delayTime = timbre_effects['delayTime'];
+                    chorusDepth = timbre_effects['chorusDepth'];
+                    doChorus = true;
+                }
             }
         }
 
-        /*------------------------*/
+        // ------------------------ 
 
         if (this.vibratoRate[turtle].length > 0) {
             vibratoRate = last(this.vibratoRate[turtle]);
