@@ -11,7 +11,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-
 function TimbreWidget () {
     const BUTTONDIVWIDTH = 476;   // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 685;
@@ -436,7 +435,7 @@ function TimbreWidget () {
         that._logo.blocks.adjustDocks(that.blockNo, true);
     };
 
-    this.blockConnection = function (len, bottomOfClamp) {
+    /*this.blockConnection = function (len, bottomOfClamp) {
         var n = that._logo.blocks.blockList.length - len;
         if (bottomOfClamp == null) {
             that._logo.blocks.blockList[that.blockNo].connections[2] = n;
@@ -448,8 +447,103 @@ function TimbreWidget () {
         }
         that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
         that._logo.blocks.adjustDocks(that.blockNo, true);
+    };*/
+     this._blockReplace = function (oldblk, newblk) {
+        // Find the connections from the old block
+        console.log(oldblk);
+        var c0 = this._logo.blocks.blockList[oldblk].connections[0];
+        var c1 = last(this._logo.blocks.blockList[oldblk].connections);
+
+        // Connect the new block
+        this._logo.blocks.blockList[newblk].connections[0] = c0;
+        this._logo.blocks.blockList[newblk].connections[this._logo.blocks.blockList[newblk].connections.length - 1] = c1;
+
+        if (c0 != null) {
+            for (var i = 0; i < this._logo.blocks.blockList[c0].connections.length; i++) {
+                if (this._logo.blocks.blockList[c0].connections[i] === oldblk) {
+                    this._logo.blocks.blockList[c0].connections[i] = newblk;
+                    break;
+                }
+            }
+        }
+
+        if (c1 != null) {
+            for (var i = 0; i < this._logo.blocks.blockList[c1].connections.length; i++) {
+                if (this._logo.blocks.blockList[c1].connections[i] === oldblk) {
+                    this._logo.blocks.blockList[c1].connections[i] = newblk;
+                    break;
+                }
+            }
+        }
+
+        // Refresh the dock positions
+        this._logo.blocks.adjustDocks(newblk, true);
+
+        // Send the old block to the trash
+        this._logo.blocks.blockList[oldblk].connections[0] = null;
+        this._logo.blocks.blockList[oldblk].connections[this._logo.blocks.blockList[oldblk].connections.length - 1] = null;
+        this._blocks.sendStackToTrash(this._logo.blocks.blockList[oldblk]);
+
+        this._logo.refreshCanvas();
     };
 
+    this.blockConnection = function (len, bottomOfClamp) {
+        var n = this._logo.blocks.blockList.length - len;
+        if (bottomOfClamp == null) {
+            this._logo.blocks.blockList[this.blockNo].connections[2] = n;
+            this._logo.blocks.blockList[n].connections[0] = this.blockNo;
+        } else {
+            var c = this._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+            // Check for nested clamps.
+            // A hidden block is attached to the bottom of each clamp.
+            while (this._logo.blocks.blockList[bottomOfClamp].name === 'hidden') {
+                var cblk = this._logo.blocks.blockList[bottomOfClamp].connections[0];
+                c = this._logo.blocks.blockList[cblk].connections.length - 2;
+                if (this._logo.blocks.blockList[cblk].connections[c] == null) {
+                    bottomOfClamp = cblk;
+                } else {
+                    // Find bottom of stack
+                    bottomOfClamp = this._logo.blocks.findBottomBlock(this._logo.blocks.blockList[cblk].connections[c]);
+                    c = this._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+                }
+            }
+
+            this._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
+            this._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
+        }
+        this._logo.blocks._clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+    };
+
+
+      /* this.blockConnection = function (len, bottomOfClamp) {
+        var n = that._logo.blocks.blockList.length - len;
+        if (bottomOfClamp == null) {
+            that._logo.blocks.blockList[that.blockNo].connections[2] = n;
+            that._logo.blocks.blockList[n].connections[0] = that.blockNo;
+        } else {
+            var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+            // Check for nested clamps.
+            // A hidden block is attached to the bottom of each clamp.
+            while (that._logo.blocks.blockList[bottomOfClamp].name === 'hidden') {
+                var cblk = that._logo.blocks.blockList[bottomOfClamp].connections[0];
+                c = that._logo.blocks.blockList[cblk].connections.length - 2;
+                if (that._logo.blocks.blockList[cblk].connections[c] == null) {
+                    bottomOfClamp = cblk;
+                } else {
+                    // Find bottom of stack
+            bottomOfClamp = that._logo.blocks.findBottomBlock(that._logo.blocks.blockList[cblk].connections[c]);
+                    c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+                }
+        }
+
+            that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
+            that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
+        }
+        that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
+        that._logo.blocks.adjustDocks(that.blockNo, true);
+    };
+*/
     this._synth = function () {
         console.log("heysynth");
         var that = this;
@@ -518,7 +612,8 @@ function TimbreWidget () {
                             that.AMSynthParams.push(1);
                    
                             setTimeout(that.blockConnection(2, bottomOfClamp), 500);
-                        }
+                        } 
+                        
                     
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
                         subDiv.innerHTML = subHtmlElements;
@@ -545,6 +640,7 @@ function TimbreWidget () {
                         that.isActive['duosynth'] = false;
 
                         if (that.FMSynthesizer.length === 0) {
+                          
                             var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                             var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
@@ -556,8 +652,12 @@ function TimbreWidget () {
                             that.FMSynthParams.push(1);
                    
                             setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+                        
+                            //if(that.AMSynthesizer.length != 0){
+                              // that._blockReplace(that.AMSynthesizer.pop(), that.FMSynthesizer.pop());
+                            //}
                         }
-
+                    
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
                         subDiv.innerHTML = subHtmlElements;
                         docById('sS0').textContent = "Modulation Index";
