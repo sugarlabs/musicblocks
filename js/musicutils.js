@@ -1580,7 +1580,7 @@ function Synth() {
         synthOptions = validateAndSetParams(synthOptions, params);
 
         if (source_name.toLowerCase() === 'amsynth') {
-            var temp_synth = new AMSynth(synthOptions);
+            var temp_synth = new Tone.AMSynth(synthOptions);
         }
         else if (source_name.toLowerCase() === 'fmsynth') {
             var temp_synth = new Tone.FMSynth(synthOptions);

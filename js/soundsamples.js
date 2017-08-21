@@ -104,8 +104,8 @@ const BUILTIN_SYNTHS = {
 };
 
 const CUSTOM_SYNTHS = {
-    'AMsynth': 1,
-    'FMsynth': 1,
-    'Duosynth': 1,
-    'Monosynth': 1
+    'amsynth': 1,
+    'fmsynth': 1,
+    'duosynth': 1,
+  //  'monosynth': 1
 };

@@ -33,6 +33,16 @@ function TimbreWidget () {
         },
     };
     this.adsrMap = ['attack', 'decay', 'sustain', 'release'];
+    this.amSynthParamvals = {
+        "harmonicity" : 3
+    };
+    this.fmSynthParamvals = {
+        'modulationIndex': 10
+    };
+    this.duoSynthParamVals = {
+        'vibratoAmount': 0.5,
+        'vibratoRate': 5
+    };
     this.fil = [];              
     this.filterParams = [];
     this.osc = [];
@@ -223,11 +233,14 @@ function TimbreWidget () {
 
             if(that.osc.length === 0) {
               that._synth();  
+            }else{
+                that._logo.errorMsg(_("Unable to use synth due to existing oscillator"));
             }
         }
 
         var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
         oscillatorButtonCell.onclick=function() {
+            console.log('oscillator button clicked');
             for(var i=0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -237,11 +250,11 @@ function TimbreWidget () {
             // Look to see if there is a filter block in the clamp. If
             // there isn't one, add one. If there is more than one, we
             // should ignore all but the last one.
-            if (that.osc.length <= 1 && (that.AMSynthesizer.length === 0 && that.FMSynthesizer.length === 0 && that.duoSynthesizer.length === 0)) {
+            if (that.osc.length <= 1) {
+            //if (that.osc.length <= 1 && (that.AMSynthesizer.length === 0 && that.FMSynthesizer.length === 0 && that.duoSynthesizer.length === 0)) {
                 // Find the last block in the clamp, where we will add
                 // a filter block.
                 if(that.osc.length === 0) {
-                    console.log('oscillator not found');
                     var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                     var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
                 
@@ -261,6 +274,7 @@ function TimbreWidget () {
             if(that.osc.length != 0 && (that.AMSynthesizer.length !=0  || that.FMSynthesizer.length != 0 || that.duoSynthesizer.length != 0)){
                 that._oscillator();
             }
+            
         }
 
         var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
@@ -613,28 +627,34 @@ function TimbreWidget () {
                    
                             setTimeout(that.blockConnection(2, bottomOfClamp), 500);
                         } 
-                        
                     
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
                         subDiv.innerHTML = subHtmlElements;
                         docById('sS0').textContent = "Harmonicity";
                         docById('myRangeS0').value = that.AMSynthParams[0];
                         docById('myspanS0').textContent = that.AMSynthParams[0];
-                    
+                        that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
+                        that._logo.synth.createSynth(that.instrument_name, 'amsynth', that.amSynthParamvals);
+                   //     console.log('inside AMSynth');
                  
                         if (that.AMSynthesizer.length != 1) {
                             blockValue = that.AMSynthesizer.length - 1;
                         }
                     
                         document.getElementById("wrapperS0").addEventListener('change', function(event){
+                            console.log('AMSynth event change');
                             docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
                             var elem = event.target;
                             docById("myRangeS0").value = parseFloat(elem.value);
+                            that.amSynthParamvals['harmonicity'] = parseFloat(elem.value);
                             docById("myspanS0").textContent = elem.value;
                             that._update(blockValue, elem.value, 0);
+                            that._logo.synth.createSynth(that.instrument_name, 'amsynth', that.amSynthParamvals);
+
                         });
                     
-                    } else if (synthChosen === "FMSynth") {
+                    }
+                    else if (synthChosen === "FMSynth") {
                         that.isActive['amsynth'] = false;
                         that.isActive['fmsynth'] = true;
                         that.isActive['duosynth'] = false;
@@ -663,6 +683,8 @@ function TimbreWidget () {
                         docById('sS0').textContent = "Modulation Index";
                         docById('myRangeS0').value = that.FMSynthParams[0];
                         docById('myspanS0').textContent = that.FMSynthParams[0];
+                        that.fmSynthParamvals['modulationIndex'] = parseFloat(that.FMSynthParams[0]);
+                        that._logo.synth.createSynth(that.instrument_name, 'fmsynth', that.fmSynthParamvals);
 
                         if (that.FMSynthesizer.length != 1) {
                             blockValue = that.FMSynthesizer.length - 1;
@@ -673,9 +695,12 @@ function TimbreWidget () {
                             var elem = event.target;
                             docById("myRangeS0").value = parseFloat(elem.value);
                             docById("myspanS0").textContent = elem.value;
+                            that.fmSynthParamvals['modulationIndex'] = parseFloat(elem.value);
                             that._update(blockValue, elem.value, 0);
+                            that._logo.synth.createSynth(that.instrument_name, 'fmsynth', that.fmSynthParamvals);
                         });
-                    } else if (synthChosen === "DuoSynth") {
+                    }
+                    else if (synthChosen === "DuoSynth") {
                         that.isActive['amsynth'] = false;
                         that.isActive['fmsynth'] = false;
                         that.isActive['duosynth'] = true;
@@ -703,13 +728,15 @@ function TimbreWidget () {
                         docById('sS0').textContent = "Vibrato Rate";
                         docById('myRangeS0').value = that.duoSynthParams[0];
                         docById('myspanS0').textContent = that.duoSynthParams[0];
+                        that.duoSynthParamVals['vibratoRate'] = parseFloat(that.duoSynthParams[0]); 
                         docById('sS1').textContent = "Vibrato Amount";
                         docById('myRangeS1').value = that.duoSynthParams[1];
                         docById('myspanS1').textContent = that.duoSynthParams[1];
+                        that.duoSynthParamVals['vibratoAmount'] = parseFloat(that.duoSynthParams[1]);
+                        that._logo.synth.createSynth(that.instrument_name, 'duosynth', that.duoSynthParamVals);
 
                         if (that.duoSynthesizer.length != 1) {
                             blockValue = that.duoSynthesizer.length - 1;
-                        //console.log(blockValue);
                         }
                     
                         for (var i = 0; i < 2; i++) {
@@ -718,8 +745,15 @@ function TimbreWidget () {
                                 var elem = event.target;
                                 var m = elem.id.slice(-1);
                                 docById("myRangeS"+m).value = parseFloat(elem.value);
+                                if(m==0){
+                                    that.duoSynthParamVals['vibratoRate'] = parseFloat(elem.value); 
+                                }
+                                else if(m==1){
+                                    that.duoSynthParamVals['vibratoAmount'] = parseFloat(elem.value); 
+                                }
                                 docById("myspanS"+m).textContent = elem.value;
                                 that._update(blockValue, elem.value, Number(m));
+                                that._logo.synth.createSynth(that.instrument_name, 'duosynth', that.duoSynthParamVals);
                             });
                         }
                     }  
@@ -734,7 +768,9 @@ function TimbreWidget () {
                 }
                 docById("myRangeS0").value = parseFloat(that.AMSynthParams[0]);
                 docById("myspanS0").textContent = that.AMSynthParams[0];
+                that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]); 
                 that._update(blockValue, that.AMSynthParams[0], 0);
+                that._logo.synth.createSynth(that.instrument_name, 'amsynth', that.amSynthParamvals);
             }  
             if(that.isActive['fmsynth'] === true) {
                 if (that.FMSynthesizer.length != 1) {
@@ -742,7 +778,9 @@ function TimbreWidget () {
                 }
                 docById("myRangeS0").value = parseFloat(that.FMSynthParams[0]);
                 docById("myspanS0").textContent = that.FMSynthParams[0];
+                that.fmSynthParamvals['modulationIndex'] = parseFloat(hat.FMSynthParams[0]);
                 that._update(blockValue, that.FMSynthParams[0], 0);
+                that._logo.synth.createSynth(that.instrument_name, 'fmsynth', that.fmSynthParamvals);
             }  
             if(that.isActive['duosynth'] === true) {
                 if (that.duoSynthesizer.length != 1) {
@@ -750,10 +788,13 @@ function TimbreWidget () {
                 }
                 docById("myRangeS0").value = parseFloat(that.duoSynthParams[0]);
                 docById("myspanS0").textContent = that.duoSynthParams[0];
+                that.duoSynthParamVals['vibratoRate'] = parseFloat(that.duoSynthParams[0]);
                 that._update(blockValue, that.duoSynthParams[0], 0);
                 docById("myRangeS1").value = parseFloat(that.duoSynthParams[1]);
                 docById("myspanS1").textContent = that.duoSynthParams[1];
+                that.duoSynthParamVals['vibratoAmount'] = parseFloat(that.duoSynthParams[1]);
                 that._update(blockValue, that.duoSynthParams[1], 1);
+                that._logo.synth.createSynth(that.instrument_name, 'duosynth', that.duoSynthParamVals);
             }             
         }
     };

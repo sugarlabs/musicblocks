@@ -2789,7 +2789,7 @@ function Logo () {
                 that.timbre.synthVals['envelope']['decay'] = last(that.decay[turtle]);
                 that.timbre.synthVals['envelope']['sustain'] = last(that.sustain[turtle]);
                 that.timbre.synthVals['envelope']['release'] = last(that.release[turtle]);
-                this.synth.createSynth(that.timbre.instrument_name, synth_source, that.timbre.adsrVals);
+             //   this.synth.createSynth(that.timbre.instrument_name, synth_source, that.timbre.adsrVals);
             }
             break; 
         case 'filter':
@@ -2823,7 +2823,7 @@ function Logo () {
             var partials ;
             that.timbre.oscParams = [];
 
-            if(that.timbre.AMSynthesizer.length != 0){
+           /* if(that.timbre.AMSynthesizer.length != 0){
                 that.errorMsg(_("Unable to use oscillator due to existing synth"));
             }
             if(that.timbre.FMSynthesizer.length != 0){
@@ -2831,7 +2831,7 @@ function Logo () {
             }
             if(that.timbre.duoSynthesizer.length != 0){
                 that.errorMsg(_("Unable to use oscillator due to existing synth"));
-            }
+            }*/
 
             if(that.timbre.osc.length != 0) {
                 that.errorMsg(_("You are adding a second oscillator block"));
