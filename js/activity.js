@@ -154,6 +154,7 @@ define(MYDEFINES, function (compatibility) {
         // default values
         const DEFAULTDELAY = 500; // milleseconds
         const TURTLESTEP = -1; // Run in step-by-step mode
+		const MSGTIMEOUT = 15000;
 
         const BLOCKSCALES = [1, 1.5, 2, 3, 4];
         var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
@@ -633,6 +634,7 @@ define(MYDEFINES, function (compatibility) {
 
         // ErrorMsg block
         var errorMsgText = null;
+	    var errorMsgTimeoutID = null;
         var errorMsgArrow = null;
         var errorArtwork = {};
         const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
@@ -858,56 +860,55 @@ define(MYDEFINES, function (compatibility) {
                 reader.readAsText(fileChooser.files[0]);
             }, false);
         
-            function handleFileSelect (event) {
-                event.stopPropagation();
-                event.preventDefault();
+            function handleFileSelect(evt) {
 
-                var files = event.dataTransfer.files;
+                evt.stopPropagation();
+                evt.preventDefault();
+
+                var files = evt.dataTransfer.files;
+
                 var reader = new FileReader();
 
                 reader.onload = (function(theFile) {
-                    document.body.style.cursor = 'wait';
+                document.body.style.cursor = 'wait';
+                setTimeout(function() {
+                var rawData = reader.result;
+                var cleanData = rawData.replace('\n', ' ');
+                try
+				{
+                    var obj = JSON.parse(cleanData);
+				}
+				catch (err)
+				{
+					errorMsg('Cannot load project from the file. Please check file type');
+				}
+                
+				for (var name in blocks.palettes.dict) {
+                    blocks.palettes.dict[name].hideMenu(true);
+				}
 
-                    setTimeout(function() {
-                        var rawData = reader.result;
-                        if (rawData == null || rawData == '') {
-                            alert(_('Cannot load project. Please check the file type.'));
-                        }
+            refreshCanvas();
+            blocks.loadNewBlocks(obj);
+        
+		}, 200);
+        document.body.style.cursor = 'default';
+        });
 
-                        var cleanData = rawData.replace('\n', ' ');
-                        try {
-                            var obj = JSON.parse(cleanData);
-                        } catch (e) {
-                            alert(_('Failed to load file data.'));
-                            document.body.style.cursor = 'default';
-                            return;
-                        }
-                        for (var name in blocks.palettes.dict) {
-                            blocks.palettes.dict[name].hideMenu(true);
-                        }
+        reader.readAsText(files[0]);
+        window.scroll(0, 0)
 
-                        sendAllToTrash(false, false);
-                        refreshCanvas();
+        }
 
-                        blocks.loadNewBlocks(obj);
-
-                        document.body.style.cursor = 'default';
-                    }, 200);
-                });
-
-                reader.readAsText(files[0]);
-                window.scroll(0, 0)
-            };
-
-            function handleDragOver (event) {
-                event.stopPropagation();
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'copy';
+            function handleDragOver(evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+                evt.dataTransfer.dropEffect = 'copy';
             };
 
             var dropZone = document.getElementById('canvasHolder');
             dropZone.addEventListener('dragover', handleDragOver, false);
             dropZone.addEventListener('drop', handleFileSelect, false);
+
 
             allFilesChooser.addEventListener('click', function (event) {
                 this.value = null;
@@ -2189,7 +2190,24 @@ define(MYDEFINES, function (compatibility) {
             stage.setChildIndex(msgContainer, stage.getNumChildren() - 1);
         };
 
-        function errorMsg(msg, blk, text) {
+        function errorMsg(msg, timeout, text, blk) {
+			
+			if (errorMsgTimeoutID != null) {
+                clearTimeout(errorMsgTimeoutID);
+            }
+			
+            if (timeout != undefined) {
+                var myTimeout = timeout;
+            } else {
+                var myTimeout = MSGTIMEOUT;
+            }
+
+            if (myTimeout > 0) {
+                errorMsgTimeoutID = setTimeout(function () {
+                console.log('hiding messages');
+                hideMsgs();
+		    }, myTimeout);
+		
              _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
@@ -2275,7 +2293,12 @@ define(MYDEFINES, function (compatibility) {
                 errorMsgContainer.updateCache();
                 break;
             }
+			
+		
+            }
 
+           
+			
             update = true;
         };
 
