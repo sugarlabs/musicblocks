@@ -18,6 +18,7 @@
 const _THIS_IS_MUSIC_BLOCKS_ = true;
 const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
+const _ERRORMSGTIMEOUT_ = 15000;
 
 function facebookInit() {
     window.fbAsyncInit = function () {
@@ -634,6 +635,7 @@ define(MYDEFINES, function (compatibility) {
         // ErrorMsg block
         var errorMsgText = null;
         var errorMsgArrow = null;
+        var errorMsgTimeoutID = null;
         var errorArtwork = {};
         const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
 
@@ -2189,7 +2191,11 @@ define(MYDEFINES, function (compatibility) {
             stage.setChildIndex(msgContainer, stage.getNumChildren() - 1);
         };
 
-        function errorMsg(msg, blk, text) {
+        function errorMsg(msg, blk, text, timeout) {
+            if (errorMsgTimeoutID != null) {
+                clearTimeout(errorMsgTimeoutID);
+            }
+
              _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
@@ -2275,6 +2281,20 @@ define(MYDEFINES, function (compatibility) {
                 errorMsgContainer.updateCache();
                 break;
             }
+
+            if (timeout != undefined) {
+                var myTimeout = timeout;
+            } else {
+                var myTimeout = _ERRORMSGTIMEOUT_;
+            }
+
+            if (myTimeout > 0) {
+		errorMsgTimeoutID = setTimeout(function () {
+                    hideMsgs();
+		}, myTimeout);
+            }
+
+
 
             update = true;
         };
