@@ -449,20 +449,7 @@ function TimbreWidget () {
         that._logo.blocks.adjustDocks(that.blockNo, true);
     };
 
-    /*this.blockConnection = function (len, bottomOfClamp) {
-        var n = that._logo.blocks.blockList.length - len;
-        if (bottomOfClamp == null) {
-            that._logo.blocks.blockList[that.blockNo].connections[2] = n;
-            that._logo.blocks.blockList[n].connections[0] = that.blockNo;
-        } else {
-            var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
-            that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
-            that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
-        }
-        that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
-        that._logo.blocks.adjustDocks(that.blockNo, true);
-    };*/
-     this._blockReplace = function (oldblk, newblk) {
+    this._blockReplace = function (oldblk, newblk) {
         // Find the connections from the old block
         console.log(oldblk);
         var c0 = this._logo.blocks.blockList[oldblk].connections[0];
@@ -491,12 +478,12 @@ function TimbreWidget () {
         }
 
         // Refresh the dock positions
-        this._logo.blocks.adjustDocks(newblk, true);
+        this._logo.blocks.adjustDocks(c0, true);
 
         // Send the old block to the trash
         this._logo.blocks.blockList[oldblk].connections[0] = null;
         this._logo.blocks.blockList[oldblk].connections[this._logo.blocks.blockList[oldblk].connections.length - 1] = null;
-        this._blocks.sendStackToTrash(this._logo.blocks.blockList[oldblk]);
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[oldblk]);
 
         this._logo.refreshCanvas();
     };
@@ -625,7 +612,18 @@ function TimbreWidget () {
                             that.AMSynthesizer.push(n);
                             that.AMSynthParams.push(1);
                    
-                            setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+                            //setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+                            setTimeout(function() {
+                            if(that.FMSynthesizer.length != 0){
+                                that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer));
+                                that.FMSynthesizer.pop();
+                            } else if(that.duoSynthesizer.length != 0){
+                                that._blockReplace(last(that.duoSynthesizer), last(that.AMSynthesizer));
+                                that.duoSynthesizer.pop();
+                            } else {
+                                that.blockConnection(2, bottomOfClamp);
+                            
+                            }},500);
                         } 
                     
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
@@ -671,11 +669,19 @@ function TimbreWidget () {
                             that.FMSynthesizer.push(n);
                             that.FMSynthParams.push(1);
                    
-                            setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+                          //  setTimeout(that.blockConnection(2, bottomOfClamp), 500);
                         
-                            //if(that.AMSynthesizer.length != 0){
-                              // that._blockReplace(that.AMSynthesizer.pop(), that.FMSynthesizer.pop());
-                            //}
+                            setTimeout(function() {
+                            if(that.AMSynthesizer.length != 0){
+                                that._blockReplace(last(that.AMSynthesizer), last(that.FMSynthesizer));
+                                that.AMSynthesizer.pop();
+                            } else if(that.duoSynthesizer.length != 0){
+                                that._blockReplace(last(that.duoSynthesizer), last(that.FMSynthesizer));
+                                that.duoSynthesizer.pop();
+                            } else {
+                                that.blockConnection(2, bottomOfClamp);
+                            
+                            }},500);                   
                         }
                     
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
@@ -717,7 +723,19 @@ function TimbreWidget () {
                             that.duoSynthParams.push(10);
                             that.duoSynthParams.push(6);
                    
-                            setTimeout(that.blockConnection(3, bottomOfClamp), 500);
+                            //setTimeout(that.blockConnection(3, bottomOfClamp), 500);
+                        setTimeout(function() {
+                            if(that.AMSynthesizer.length != 0){
+                                that._blockReplace(last(that.AMSynthesizer), last(that.duoSynthesizer));
+                                that.AMSynthesizer.pop();
+                            } else if(that.FMSynthesizer.length != 0){
+                                that._blockReplace(last(that.FMSynthesizer), last(that.duoSynthesizer));
+                                that.FMSynthesizer.pop();
+                            } else {
+                                that.blockConnection(2, bottomOfClamp);
+                            
+                            }},500);
+
                         }
                     
                         for(var i = 0; i < 2; i++) {
