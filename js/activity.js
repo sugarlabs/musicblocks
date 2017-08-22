@@ -154,6 +154,7 @@ define(MYDEFINES, function (compatibility) {
         // default values
         const DEFAULTDELAY = 500; // milleseconds
         const TURTLESTEP = -1; // Run in step-by-step mode
+		const MSGTIMEOUT = 15000;
 
         const BLOCKSCALES = [1, 1.5, 2, 3, 4];
         var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
@@ -633,6 +634,7 @@ define(MYDEFINES, function (compatibility) {
 
         // ErrorMsg block
         var errorMsgText = null;
+	    var errorMsgTimeoutID = null;
         var errorMsgArrow = null;
         var errorArtwork = {};
         const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
@@ -2188,7 +2190,24 @@ define(MYDEFINES, function (compatibility) {
             stage.setChildIndex(msgContainer, stage.getNumChildren() - 1);
         };
 
-        function errorMsg(msg, blk, text) {
+        function errorMsg(msg, timeout, text, blk) {
+			
+			if (errorMsgTimeoutID != null) {
+                clearTimeout(errorMsgTimeoutID);
+            }
+			
+            if (timeout != undefined) {
+                var myTimeout = timeout;
+            } else {
+                var myTimeout = MSGTIMEOUT;
+            }
+
+            if (myTimeout > 0) {
+                errorMsgTimeoutID = setTimeout(function () {
+                console.log('hiding messages');
+                hideMsgs();
+		    }, myTimeout);
+		
              _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
@@ -2269,15 +2288,17 @@ define(MYDEFINES, function (compatibility) {
             default:
                 var errorMsgContainer = errorMsgText.parent;
                 errorMsgContainer.visible = true;
-				setTimeout(function () {
-					 errorMsgContainer.visible = false;
-				}, 15000);
                 errorMsgText.text = msg;
                 stage.setChildIndex(errorMsgContainer, stage.getNumChildren() - 1);
                 errorMsgContainer.updateCache();
                 break;
             }
+			
+		
+            }
 
+           
+			
             update = true;
         };
 
