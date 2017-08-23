@@ -870,7 +870,11 @@ define(MYDEFINES, function (compatibility) {
 
                     setTimeout(function() {
                         var rawData = reader.result;
-                        var cleanData = rawData.replace('\n', ' ');
+                        
+						if (rawData == null || rawData == '') {		
+                            errorMsg('Cannot load project. Please check the file type.');		
+                        
+						var cleanData = rawData.replace('\n', ' ');
                        
                         try {
                             var obj = JSON.parse(cleanData);
