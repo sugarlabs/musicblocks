@@ -68,7 +68,7 @@ function Block(protoblock, blocks, overrideName) {
 
     // Some blocks have some post process after they are first loaded.
     this.postProcess = null;
-    this.postProcessArg = null;
+    this.postProcessArg = this;
 
     // Lock on label change
     this._label_lock = false;
@@ -76,30 +76,30 @@ function Block(protoblock, blocks, overrideName) {
     // Internal function for creating cache.
     // Includes workaround for a race condition.
     this._createCache = function () {
-        var myBlock = this;
-        myBlock.bounds = myBlock.container.getBounds();
+        var that = this;
+        this.bounds = this.container.getBounds();
 
-        if (myBlock.bounds == null) {
+        if (this.bounds == null) {
             setTimeout(function () {
-                myBlock._createCache();
+                that._createCache();
             }, 200);
         } else {
-            myBlock.container.cache(myBlock.bounds.x, myBlock.bounds.y, myBlock.bounds.width, myBlock.bounds.height);
+            this.container.cache(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
         }
     };
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
     this.updateCache = function () {
-        var myBlock = this;
+        var that = this;
 
-        if (myBlock.bounds == null) {
+        if (this.bounds == null) {
             setTimeout(function () {
-                myBlock.updateCache();
+                that.updateCache();
             }, 300);
         } else {
-            myBlock.container.updateCache();
-            myBlock.blocks.refreshCanvas();
+            this.container.updateCache();
+            this.blocks.refreshCanvas();
         }
     };
 
@@ -187,35 +187,35 @@ function Block(protoblock, blocks, overrideName) {
     this.resize = function (scale) {
         // If the block scale changes, we need to regenerate the
         // artwork and recalculate the hitarea.
-        var myBlock = this;
+        var that = this;
 
-        this.postProcess = function (args) {
-            if (myBlock.imageBitmap !== null) {
-                myBlock._positionMedia(myBlock.imageBitmap, myBlock.imageBitmap.image.width, myBlock.imageBitmap.image.height, scale);
-                z = myBlock.container.getNumChildren() - 1;
-                myBlock.container.setChildIndex(myBlock.imageBitmap, z);
+        this.postProcess = function (that) {
+            if (that.imageBitmap !== null) {
+                that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
+                z = that.container.getNumChildren() - 1;
+                that.container.setChildIndex(that.imageBitmap, z);
             }
 
-            if (myBlock.name === 'start' || myBlock.name === 'drum') {
+            if (that.name === 'start' || that.name === 'drum') {
                 // Rescale the decoration on the start blocks.
-                for (var turtle = 0; turtle < myBlock.blocks.turtles.turtleList.length; turtle++) {
-                    if (myBlock.blocks.turtles.turtleList[turtle].startBlock === myBlock) {
-                        myBlock.blocks.turtles.turtleList[turtle].resizeDecoration(scale, myBlock.bitmap.image.width);
-                        myBlock._ensureDecorationOnTop();
+                for (var turtle = 0; turtle < that.blocks.turtles.turtleList.length; turtle++) {
+                    if (that.blocks.turtles.turtleList[turtle].startBlock === that) {
+                        that.blocks.turtles.turtleList[turtle].resizeDecoration(scale, that.bitmap.image.width);
+                        that._ensureDecorationOnTop();
                         break;
                     }
                 }
             }
-            myBlock.updateCache();
-            myBlock._calculateBlockHitArea();
+            that.updateCache();
+            that._calculateBlockHitArea();
 
             // If it is in the trash, make sure it remains hidden.
-            if (myBlock.trash) {
-                myBlock.hide();
+            if (that.trash) {
+                that.hide();
             }
         };
 
-        this.postProcessArg = null;
+        this.postProcessArg = this;
 
         this.protoblock.scale = scale;
         this._newArtwork(0);
@@ -227,17 +227,19 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.collapseContainer !== null) {
             this.collapseContainer.uncache();
-            var postProcess = function (myBlock) {
-                myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = scale / 2;
-                myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = scale / 2;
+            var _postProcess = function (that) {
+                that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = scale / 2;
+                that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = scale / 2;
 
-                var bounds = myBlock.collapseContainer.getBounds();
-                myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                myBlock._positionCollapseContainer(myBlock.protoblock.scale);
-                myBlock._calculateCollapseHitArea();
+                that._positionCollapseContainer(that.protoblock.scale);
+                var bounds = that.collapseContainer.getBounds();
+                that.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+
+                // that._positionCollapseContainer(that.protoblock.scale);
+                that._calculateCollapseHitArea();
             };
 
-            this._generateCollapseArtwork(postProcess);
+            this._generateCollapseArtwork(_postProcess);
             var fontSize = 10 * scale;
             this.collapseText.font = fontSize + 'px Sans';
             this._positionCollapseLabel(scale);
@@ -346,15 +348,15 @@ function Block(protoblock, blocks, overrideName) {
 
     this._addImage = function () {
         var image = new Image();
-        var myBlock = this;
+        var that = this;
 
         image.onload = function () {
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
-            myBlock.container.addChild(bitmap);
-            myBlock._positionMedia(bitmap, image.width, image.height, myBlock.protoblock.scale);
-            myBlock.imageBitmap = bitmap;
-            myBlock.updateCache();
+            that.container.addChild(bitmap);
+            that._positionMedia(bitmap, image.width, image.height, that.protoblock.scale);
+            that.imageBitmap = bitmap;
+            that.updateCache();
         };
         image.src = this.image;
     };
@@ -385,90 +387,90 @@ function Block(protoblock, blocks, overrideName) {
 
     this.generateArtwork = function (firstTime) {
         // Get the block labels from the protoblock.
-        var myBlock = this;
+        var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         var block_label = '';
 
         // Create the highlight bitmap for the block.
-        function __processHighlightBitmap(name, bitmap, myBlock) {
-            if (myBlock.highlightBitmap != null) {
-                myBlock.container.removeChild(myBlock.highlightBitmap);
+        function __processHighlightBitmap(name, bitmap, that) {
+            if (that.highlightBitmap != null) {
+                that.container.removeChild(that.highlightBitmap);
             }
 
-            myBlock.highlightBitmap = bitmap;
-            myBlock.container.addChild(myBlock.highlightBitmap);
-            myBlock.highlightBitmap.x = 0;
-            myBlock.highlightBitmap.y = 0;
-            myBlock.highlightBitmap.name = 'bmp_highlight_' + thisBlock;
-            myBlock.highlightBitmap.cursor = 'pointer';
+            that.highlightBitmap = bitmap;
+            that.container.addChild(that.highlightBitmap);
+            that.highlightBitmap.x = 0;
+            that.highlightBitmap.y = 0;
+            that.highlightBitmap.name = 'bmp_highlight_' + thisBlock;
+            that.highlightBitmap.cursor = 'pointer';
             // Hide highlight bitmap to start.
-            myBlock.highlightBitmap.visible = false;
+            that.highlightBitmap.visible = false;
 
             // At me point, it should be safe to calculate the
             // bounds of the container and cache its contents.
             if (!firstTime) {
-                myBlock.container.uncache();
+                that.container.uncache();
             }
 
-            myBlock._createCache();
-            myBlock.blocks.refreshCanvas();
+            that._createCache();
+            that.blocks.refreshCanvas();
 
             if (firstTime) {
-                myBlock._loadEventHandlers();
-                if (myBlock.image !== null) {
-                    myBlock._addImage();
+                that._loadEventHandlers();
+                if (that.image !== null) {
+                    that._addImage();
                 }
-                myBlock._finishImageLoad();
+                that._finishImageLoad();
             } else {
-                if (myBlock.name === 'start' || myBlock.name === 'drum') {
-                    myBlock._ensureDecorationOnTop();
+                if (that.name === 'start' || that.name === 'drum') {
+                    that._ensureDecorationOnTop();
                 }
 
                 // Adjust the docks.
-                myBlock.blocks.adjustDocks(thisBlock, true);
+                that.blocks.adjustDocks(thisBlock, true);
 
                 // Adjust the text position.
-                myBlock._positionText(myBlock.protoblock.scale);
+                that._positionText(that.protoblock.scale);
 
-                if (COLLAPSABLES.indexOf(myBlock.name) !== -1) {
-                    myBlock.bitmap.visible = !myBlock.collapsed;
-                    myBlock.highlightBitmap.visible = false;
-                    myBlock.updateCache();
+                if (COLLAPSABLES.indexOf(that.name) !== -1) {
+                    that.bitmap.visible = !that.collapsed;
+                    that.highlightBitmap.visible = false;
+                    that.updateCache();
                 }
 
-                if (myBlock.postProcess != null) {
-                    myBlock.postProcess(myBlock.postProcessArg);
-                    myBlock.postProcess = null;
+                if (that.postProcess != null) {
+                    that.postProcess(that.postProcessArg);
+                    that.postProcess = null;
                 }
             }
         };
 
         // Create the bitmap for the block.
-        function __processBitmap(name, bitmap, myBlock) {
-            if (myBlock.bitmap != null) {
-                myBlock.container.removeChild(myBlock.bitmap);
+        function __processBitmap(name, bitmap, that) {
+            if (that.bitmap != null) {
+                that.container.removeChild(that.bitmap);
             }
 
-            myBlock.bitmap = bitmap;
-            myBlock.container.addChild(myBlock.bitmap);
-            myBlock.bitmap.x = 0;
-            myBlock.bitmap.y = 0;
-            myBlock.bitmap.name = 'bmp_' + thisBlock;
-            myBlock.bitmap.cursor = 'pointer';
-            myBlock.blocks.refreshCanvas();
+            that.bitmap = bitmap;
+            that.container.addChild(that.bitmap);
+            that.bitmap.x = 0;
+            that.bitmap.y = 0;
+            that.bitmap.name = 'bmp_' + thisBlock;
+            that.bitmap.cursor = 'pointer';
+            that.blocks.refreshCanvas();
 
-            if (myBlock.protoblock.disabled) {
-                var artwork = myBlock.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', block_label);
+            if (that.protoblock.disabled) {
+                var artwork = that.artwork.replace(/fill_color/g, DISABLEDFILLCOLOR).replace(/stroke_color/g, DISABLEDSTROKECOLOR).replace('block_label', block_label);
             } else {
-                var artwork = myBlock.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', block_label);
+                var artwork = that.artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', block_label);
             }
 
-            for (var i = 1; i < myBlock.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace('arg_label_' + i, myBlock.protoblock.staticLabels[i]);
+            for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
+                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
             }
 
-            myBlock.blocks.blockArt[myBlock.blocks.blockList.indexOf(myBlock)] = artwork;
-            _makeBitmap(artwork, myBlock.name, __processHighlightBitmap, myBlock);
+            that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
+            _makeBitmap(artwork, that.name, __processHighlightBitmap, that);
         };
 
         if (this.overrideName) {
@@ -597,13 +599,13 @@ function Block(protoblock, blocks, overrideName) {
             proto.basicBlockCollapsed();
             var obj = proto.generator();
             this.collapseArtwork = obj[0];
-            var postProcess = function (myBlock) {
-                myBlock._loadCollapsibleEventHandlers();
-                myBlock.loadComplete = true;
+            var postProcess = function (that) {
+                that._loadCollapsibleEventHandlers();
+                that.loadComplete = true;
 
-                if (myBlock.postProcess !== null) {
-                    myBlock.postProcess(myBlock.postProcessArg);
-                    myBlock.postProcess = null;
+                if (that.postProcess !== null) {
+                    that.postProcess(that.postProcessArg);
+                    that.postProcess = null;
                 }
             };
 
@@ -612,109 +614,111 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._generateCollapseArtwork = function (postProcess) {
-        var myBlock = this;
+        var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-        function __processHighlightCollapseBitmap(name, bitmap, myBlock) {
-            myBlock.highlightCollapseBlockBitmap = bitmap;
-            myBlock.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
-            myBlock.container.addChild(myBlock.highlightCollapseBlockBitmap);
-            myBlock.highlightCollapseBlockBitmap.visible = false;
+        function __processHighlightCollapseBitmap(name, bitmap, that) {
+            that.highlightCollapseBlockBitmap = bitmap;
+            that.highlightCollapseBlockBitmap.name = 'highlight_collapse_' + thisBlock;
+            that.container.addChild(that.highlightCollapseBlockBitmap);
+            that.highlightCollapseBlockBitmap.visible = false;
 
-            if (myBlock.collapseText === null) {
-                var fontSize = 10 * myBlock.protoblock.scale;
-                switch (myBlock.name) {
+            if (that.collapseText === null) {
+                var fontSize = 10 * that.protoblock.scale;
+                switch (that.name) {
                 case 'action':
-                    myBlock.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('action'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'start':
-                    myBlock.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('start'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'matrix':
-                    myBlock.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('matrix'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'status':
-                    myBlock.collapseText = new createjs.Text(_('status'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('status'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'pitchdrummatrix':
-                    myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'rhythmruler':
-                    myBlock.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'pitchstaircase':
-                    myBlock.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'tempo':
-                    myBlock.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('tempo'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'modewidget':
-                    myBlock.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('mode'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'pitchslider':
-                    myBlock.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('slider'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'drum':
-                    myBlock.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('drum'), fontSize + 'px Sans', '#000000');
                     break;
                 }
-                myBlock.collapseText.textAlign = 'left';
-                myBlock.collapseText.textBaseline = 'alphabetic';
-                myBlock.container.addChild(myBlock.collapseText);
+
+                that.collapseText.textAlign = 'left';
+                that.collapseText.textBaseline = 'alphabetic';
+                that.container.addChild(that.collapseText);
             }
-            myBlock._positionCollapseLabel(myBlock.protoblock.scale);
-            myBlock.collapseText.visible = myBlock.collapsed;
 
-            myBlock._ensureDecorationOnTop();
+            that._positionCollapseLabel(that.protoblock.scale);
+            that.collapseText.visible = that.collapsed;
 
-            myBlock.updateCache();
+            that._ensureDecorationOnTop();
 
-            myBlock.collapseContainer = new createjs.Container();
-            myBlock.collapseContainer.snapToPixelEnabled = true;
+            that.updateCache();
+
+            that.collapseContainer = new createjs.Container();
+            that.collapseContainer.snapToPixelEnabled = true;
 
             var image = new Image();
             image.onload = function () {
-                myBlock.collapseBitmap = new createjs.Bitmap(image);
-                myBlock.collapseBitmap.scaleX = myBlock.collapseBitmap.scaleY = myBlock.collapseBitmap.scale = myBlock.protoblock.scale / 2;
-                myBlock.collapseContainer.addChild(myBlock.collapseBitmap);
-                myBlock.collapseBitmap.visible = !myBlock.collapsed;
-                finishCollapseButton(myBlock);
+                that.collapseBitmap = new createjs.Bitmap(image);
+                that.collapseBitmap.scaleX = that.collapseBitmap.scaleY = that.collapseBitmap.scale = that.protoblock.scale / 2;
+                that.collapseContainer.addChild(that.collapseBitmap);
+                that.collapseBitmap.visible = !that.collapsed;
+                finishCollapseButton(that);
             };
 
             image.src = 'images/collapse.svg';
 
-            finishCollapseButton = function (myBlock) {
+            finishCollapseButton = function (that) {
                 var image = new Image();
                 image.onload = function () {
-                    myBlock.expandBitmap = new createjs.Bitmap(image);
-                    myBlock.expandBitmap.scaleX = myBlock.expandBitmap.scaleY = myBlock.expandBitmap.scale = myBlock.protoblock.scale / 2;
-                    myBlock.collapseContainer.addChild(myBlock.expandBitmap);
-                    myBlock.expandBitmap.visible = myBlock.collapsed;
+                    that.expandBitmap = new createjs.Bitmap(image);
+                    that.expandBitmap.scaleX = that.expandBitmap.scaleY = that.expandBitmap.scale = that.protoblock.scale / 2;
+                    that.collapseContainer.addChild(that.expandBitmap);
+                    that.expandBitmap.visible = that.collapsed;
 
-                    var bounds = myBlock.collapseContainer.getBounds();
-                    myBlock.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                    myBlock.blocks.stage.addChild(myBlock.collapseContainer);
+                    var bounds = that.collapseContainer.getBounds();
+                    that.collapseContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                    that.blocks.stage.addChild(that.collapseContainer);
                     if (postProcess !== null) {
-                        postProcess(myBlock);
+                        postProcess(that);
                     }
 
-                    myBlock.blocks.refreshCanvas();
-                    myBlock.blocks.cleanupAfterLoad(myBlock.name);
+                    that.blocks.refreshCanvas();
+                    that.blocks.cleanupAfterLoad(that.name);
                 };
 
                 image.src = 'images/expand.svg';
             }
         };
 
-        function __processCollapseBitmap(name, bitmap, myBlock) {
-            myBlock.collapseBlockBitmap = bitmap;
-            myBlock.collapseBlockBitmap.name = 'collapse_' + thisBlock;
-            myBlock.container.addChild(myBlock.collapseBlockBitmap);
-            myBlock.collapseBlockBitmap.visible = myBlock.collapsed;
-            myBlock.blocks.refreshCanvas();
+        function __processCollapseBitmap(name, bitmap, that) {
+            that.collapseBlockBitmap = bitmap;
+            that.collapseBlockBitmap.name = 'collapse_' + thisBlock;
+            that.container.addChild(that.collapseBlockBitmap);
+            that.collapseBlockBitmap.visible = that.collapsed;
+            that.blocks.refreshCanvas();
 
-            var artwork = myBlock.collapseArtwork;
-            _makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[myBlock.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[myBlock.protoblock.palette.name]).replace('block_label', ''), '', __processHighlightCollapseBitmap, myBlock);
+            var artwork = that.collapseArtwork;
+            _makeBitmap(artwork.replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]).replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]).replace('block_label', ''), '', __processHighlightCollapseBitmap, that);
         };
 
         var artwork = this.collapseArtwork;
@@ -805,7 +809,7 @@ function Block(protoblock, blocks, overrideName) {
     this.loadThumbnail = function (imagePath) {
         // Load an image thumbnail onto block.
         var thisBlock = this.blocks.blockList.indexOf(this);
-        var myBlock = this;
+        var that = this;
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             return;
         }
@@ -813,7 +817,7 @@ function Block(protoblock, blocks, overrideName) {
 
         image.onload = function () {
             // Before adding new artwork, remove any old artwork.
-            myBlock.removeChildBitmap('media');
+            that.removeChildBitmap('media');
 
             var bitmap = new createjs.Bitmap(image);
             bitmap.name = 'media';
@@ -837,13 +841,13 @@ function Block(protoblock, blocks, overrideName) {
 
             var bounds = myContainer.getBounds();
             myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            myBlock.value = myContainer.getCacheDataURL();
-            myBlock.imageBitmap = bitmap;
+            that.value = myContainer.getCacheDataURL();
+            that.imageBitmap = bitmap;
 
             // Next, scale the bitmap for the thumbnail.
-            myBlock._positionMedia(bitmap, bitmap.image.width, bitmap.image.height, myBlock.protoblock.scale);
-            myBlock.container.addChild(bitmap);
-            myBlock.updateCache();
+            that._positionMedia(bitmap, bitmap.image.width, bitmap.image.height, that.protoblock.scale);
+            that.container.addChild(bitmap);
+            that.updateCache();
         };
 
         if (imagePath === null) {
@@ -855,7 +859,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._doOpenMedia = function (thisBlock) {
         var fileChooser = docById('myOpenAll');
-        var myBlock = this;
+        var that = this;
 
         readerAction = function (event) {
             window.scroll(0, 0);
@@ -863,16 +867,16 @@ function Block(protoblock, blocks, overrideName) {
             var reader = new FileReader();
             reader.onloadend = (function () {
                 if (reader.result) {
-                    if (myBlock.name === 'media') {
-                        myBlock.value = reader.result;
-                        myBlock.loadThumbnail(null);
+                    if (that.name === 'media') {
+                        that.value = reader.result;
+                        that.loadThumbnail(null);
                         return;
                     }
-                    myBlock.value = [fileChooser.files[0].name, reader.result];
-                    myBlock.blocks.updateBlockText(thisBlock);
+                    that.value = [fileChooser.files[0].name, reader.result];
+                    that.blocks.updateBlockText(thisBlock);
                 }
             });
-            if (myBlock.name === 'media') {
+            if (that.name === 'media') {
                 reader.readAsDataURL(fileChooser.files[0]);
             }
             else {
@@ -889,63 +893,63 @@ function Block(protoblock, blocks, overrideName) {
 
     this.collapseToggle = function () {
         // Find the blocks to collapse/expand
-        var myBlock = this;
+        var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         this.blocks.findDragGroup(thisBlock);
 
         function __toggle() {
-            var collapse = myBlock.collapsed;
-            if (myBlock.collapseBitmap === null) {
+            var collapse = that.collapsed;
+            if (that.collapseBitmap === null) {
                 console.log('collapse bitmap not ready');
                 return;
             }
-            myBlock.collapsed = !collapse;
+            that.collapsed = !collapse;
 
             // These are the buttons to collapse/expand the stack.
-            myBlock.collapseBitmap.visible = collapse;
-            myBlock.expandBitmap.visible = !collapse;
+            that.collapseBitmap.visible = collapse;
+            that.expandBitmap.visible = !collapse;
 
             // These are the collpase-state bitmaps.
-            myBlock.collapseBlockBitmap.visible = !collapse;
-            myBlock.highlightCollapseBlockBitmap.visible = false;
-            myBlock.collapseText.visible = !collapse;
+            that.collapseBlockBitmap.visible = !collapse;
+            that.highlightCollapseBlockBitmap.visible = false;
+            that.collapseText.visible = !collapse;
 
             if (collapse) {
-                myBlock.bitmap.visible = true;
+                that.bitmap.visible = true;
             } else {
-                myBlock.bitmap.visible = false;
-                myBlock.updateCache();
+                that.bitmap.visible = false;
+                that.updateCache();
             }
-            myBlock.highlightBitmap.visible = false;
+            that.highlightBitmap.visible = false;
 
-            if (myBlock.name === 'action') {
+            if (that.name === 'action') {
                 // Label the collapsed block with the action label
-                if (myBlock.connections[1] !== null) {
-                    var text = myBlock.blocks.blockList[myBlock.connections[1]].value;
+                if (that.connections[1] !== null) {
+                    var text = that.blocks.blockList[that.connections[1]].value;
                     if (text.length > 8) {
                         text = text.substr(0, 7) + '...';
                     }
-                    myBlock.collapseText.text = text;
+                    that.collapseText.text = text;
                 } else {
-                    myBlock.collapseText.text = '';
+                    that.collapseText.text = '';
                 }
             }
 
             // Make sure the text is on top.
-            var z = myBlock.container.getNumChildren() - 1;
-            myBlock.container.setChildIndex(myBlock.collapseText, z);
+            var z = that.container.getNumChildren() - 1;
+            that.container.setChildIndex(that.collapseText, z);
 
             // Set collapsed state of blocks in drag group.
-            if (myBlock.blocks.dragGroup.length > 0) {
-                for (var b = 1; b < myBlock.blocks.dragGroup.length; b++) {
-                    var blk = myBlock.blocks.dragGroup[b];
-                    myBlock.blocks.blockList[blk].collapsed = !collapse;
-                    myBlock.blocks.blockList[blk].container.visible = collapse;
+            if (that.blocks.dragGroup.length > 0) {
+                for (var b = 1; b < that.blocks.dragGroup.length; b++) {
+                    var blk = that.blocks.dragGroup[b];
+                    that.blocks.blockList[blk].collapsed = !collapse;
+                    that.blocks.blockList[blk].container.visible = collapse;
                 }
             }
 
-            myBlock.collapseContainer.updateCache();
-            myBlock.updateCache();
+            that.collapseContainer.updateCache();
+            that.updateCache();
         }
 
         __toggle();
@@ -995,9 +999,9 @@ function Block(protoblock, blocks, overrideName) {
         var w2 = bounds.width;
         var h2 = bounds.height;
 
-        hitArea.graphics.beginFill('#FFF').drawEllipse(-w2 / 2, -h2 / 2, w2, h2);
-        hitArea.x = w2 / 2;
-        hitArea.y = h2 / 2;
+        hitArea.graphics.beginFill('#FFF').drawRect(0, 0, w2, h2);
+        hitArea.x = 0;
+        hitArea.y = 0;
         this.collapseContainer.hitArea = hitArea;
     };
 
@@ -1017,146 +1021,169 @@ function Block(protoblock, blocks, overrideName) {
 
     // These are the event handlers for collapsible blocks.
     this._loadCollapsibleEventHandlers = function () {
-        var myBlock = this;
+        var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
+
         this._calculateCollapseHitArea();
 
         this.collapseContainer.on('mouseover', function (event) {
-            myBlock.blocks.highlight(thisBlock, true);
-            myBlock.blocks.activeBlock = thisBlock;
-            myBlock.blocks.refreshCanvas();
+            console.log('mouseover');
+            that.blocks.highlight(thisBlock, true);
+            that.blocks.activeBlock = thisBlock;
+            that.blocks.refreshCanvas();
         });
 
+        var haveClick = false;
         var moved = false;
         var locked = false;
-        var mousedown = false;
-        var offset = {x:0, y:0};
+        var sawMouseDownEvent = false;
 
-        function handleClick () {
+        this.collapseContainer.on('click', function (event) {
+            console.log('click');
+            that.blocks.activeBlock = thisBlock;
+            haveClick = true;
+
             if (locked) {
                 return;
             }
 
             locked = true;
-
             setTimeout(function () {
                 locked = false;
             }, 500);
 
             hideDOMLabel();
-            if (!moved) {
-                myBlock.collapseToggle();
-            }
-        }
 
-        this.collapseContainer.on('click', function (event) {
-            handleClick();
+            if (!moved) {
+                that.collapseToggle();
+		// haveClick = false;
+            }
         });
 
         this.collapseContainer.on('mousedown', function (event) {
-            hideDOMLabel();
-            // Always show the trash when there is a block selected.
+            console.log('mousedown');
+            sawMouseDownEvent = true;
+            // Always show the trash when there is a block selected,
             trashcan.show();
+
+            console.log(1);
+            // Raise entire stack to the top.
+            that.blocks.raiseStackToTop(thisBlock);
+            console.log(2);
+            // And the collapse button
+            that.blocks.stage.setChildIndex(that.collapseContainer, blocks.stage.getNumChildren() - 1);
+            console.log(3);
             moved = false;
-            mousedown = true;
-            var d = new Date();
-            blocks.mouseDownTime = d.getTime();
-            offset = {
-                x: myBlock.collapseContainer.x - Math.round(event.stageX / blocks.blockScale),
-                y: myBlock.collapseContainer.y - Math.round(event.stageY / blocks.blockScale)
+            var original = {
+                x: event.stageX,
+                y: event.stageY
             };
-        });
 
-        this.collapseContainer.on('pressup', function (event) {
-            if (!mousedown) {
-                return;
-            }
-
-            mousedown = false;
-            if (moved) {
-                myBlock._collapseOut(blocks, thisBlock, moved, event);
-                moved = false;
-            } else {
-                var d = new Date();
-                if ((d.getTime() - blocks.mouseDownTime) > 1000) {
-                    var d = new Date();
-                    blocks.mouseDownTime = d.getTime();
-                    handleClick();
+            var offset = {
+                x: Math.round(that.collapseContainer.x - original.x),
+                y: Math.round(that.collapseContainer.y - original.y)
+            };
+            console.log(4);
+            that.collapseContainer.on('mouseout', function (event) {
+                console.log('mouseout');
+                if (haveClick) {
+                    return;
                 }
-            }
-        });
 
-        this.collapseContainer.on('mouseout', function (event) {
-            if (!mousedown) {
-                return;
-            }
-            mousedown = false;
-            if (moved) {
-                myBlock._collapseOut(blocks, thisBlock, moved, event);
+                that._collapseOut(event, moved, haveClick);
                 moved = false;
-            } else {
-                // Maybe restrict to Android?
-                var d = new Date();
-                if ((d.getTime() - blocks.mouseDownTime) < 200) {
-                    var d = new Date();
-                    blocks.mouseDownTime = d.getTime();
-                    handleClick();
+		sawMouseDownEvent = false;
+            });
+
+            that.collapseContainer.on('pressup', function (event) {
+                console.log('pressup' + sawMouseDownEvent + ' ' + haveClick);
+                if (sawMouseDownEvent && haveClick) {
+                    return;
                 }
-            }
-        });
 
-        this.collapseContainer.on('pressmove', function (event) {
-            if (!mousedown) {
-                return;
-            }
-            moved = true;
-            var oldX = myBlock.collapseContainer.x;
-            var oldY = myBlock.collapseContainer.y;
-            myBlock.collapseContainer.x = Math.round(event.stageX / blocks.blockScale) + offset.x;
-            myBlock.collapseContainer.y = Math.round(event.stageY / blocks.blockScale) + offset.y;
-            var dx = myBlock.collapseContainer.x - oldX;
-            var dy = myBlock.collapseContainer.y - oldY;
-            myBlock.container.x += dx;
-            myBlock.container.y += dy;
+                if (!sawMouseDownEvent && !moved) {
+                    // Sometimes we don't see a mousedown event, so
+                    // treat this like a click.
+                    that.collapseToggle();
+                } else {
+                    that._collapseOut(event, moved, haveClick, true);
+                }
+                moved = false;
+		sawMouseDownEvent = false;
+            });
 
-            // If we are over the trash, warn the user.
-            if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
-                trashcan.startHighlightAnimation();
-            } else {
-                trashcan.stopHighlightAnimation();
-            }
+            that.collapseContainer.on('pressmove', function (event) {
+                console.log('pressmove');
+                // FIXME: More voodoo
+                event.nativeEvent.preventDefault();
+                moved = true;
 
-            myBlock.blocks.findDragGroup(thisBlock)
-            if (myBlock.blocks.dragGroup.length > 0) {
-                for (var b = 0; b < myBlock.blocks.dragGroup.length; b++) {
-                    var blk = myBlock.blocks.dragGroup[b];
-                    if (b !== 0) {
-                        myBlock.blocks.moveBlockRelative(blk, dx, dy);
+                var oldX = that.collapseContainer.x;
+                var oldY = that.collapseContainer.y;
+
+                var dx = Math.round(event.stageX + offset.x - oldX);
+                var dy = Math.round(event.stageY + offset.y - oldY);
+
+
+                var finalPos = oldY + dy;
+
+                if (that.blocks.stage.y === 0 && finalPos < (45 * that.blocks.blockScale)) {
+                    dy += (45 * that.blocks.blockScale) - finalPos;
+                }
+
+                if (that.blocks.longPressTimeout != null) {
+                    clearTimeout(that.blocks.longPressTimeout);
+                    that.blocks.longPressTimeout = null;
+                }
+
+                that.blocks.moveBlockRelative(thisBlock, dx, dy);
+
+                // If we are over the trash, warn the user.
+                if (trashcan.overTrashcan(event.stageX, event.stageY)) {
+                    trashcan.startHighlightAnimation();
+                } else {
+                    trashcan.stopHighlightAnimation();
+                }
+
+                that._positionCollapseContainer(that.protoblock.scale);
+
+                // ...and move any connected blocks.
+                that.blocks.findDragGroup(thisBlock)
+                if (that.blocks.dragGroup.length > 0) {
+                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
+                        var blk = that.blocks.dragGroup[b];
+                        if (b !== 0) {
+                            that.blocks.moveBlockRelative(blk, dx, dy);
+                        }
                     }
                 }
-            }
 
-            myBlock.blocks.refreshCanvas();
+                that.blocks.refreshCanvas();
+		sawMouseDownEvent = false;
+            });
+            console.log(5);
         });
     };
 
-    this._collapseOut = function (blocks, thisBlock, moved, event) {
-        // Always hide the trash when there is no block selected.
+    this._collapseOut = function (event, moved, haveClick) {
+        var thisBlock = this.blocks.blockList.indexOf(this);
 
+        // Always hide the trash when there is no block selected.
+        console.log('collapseOut');
         trashcan.hide();
-        blocks.unhighlight(thisBlock);
+        this.blocks.unhighlight(thisBlock);
         if (moved) {
             // Check if block is in the trash.
-            if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+            if (trashcan.overTrashcan(event.stageX, event.stageY)) {
                 if (trashcan.isVisible)
-                    blocks.sendStackToTrash(this);
+                    this.blocks.sendStackToTrash(this);
             } else {
                 // Otherwise, process move.
-                blocks.blockMoved(thisBlock);
+                this.blocks.blockMoved(thisBlock);
             }
         }
 
-        if (blocks.activeBlock !== myBlock) {
+        if (blocks.activeBlock !== this) {
             return;
         }
 
@@ -1178,7 +1205,7 @@ function Block(protoblock, blocks, overrideName) {
         // section of block. Otherwise we would not be able to grab
         // blocks placed inside of clamps.
         if (this.isClampBlock() || this.isArgClamp()) {
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT);
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * blocks.blockScale);
         } else if (this.isNoHitBlock()) {
             // No hit area
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, 0, 0);
@@ -1187,12 +1214,13 @@ function Block(protoblock, blocks, overrideName) {
             // in the stack.
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height * 0.75);
         }
+
         this.container.hitArea = hitArea;
     };
 
     // These are the event handlers for block containers.
     this._loadEventHandlers = function () {
-        var myBlock = this;
+        var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
         var blocks = this.blocks;
 
@@ -1229,13 +1257,13 @@ function Block(protoblock, blocks, overrideName) {
                     var topBlock = blocks.findTopBlock(thisBlock);
                     blocks.selectedStack = topBlock;
                     blocks.selectingStack = false;
-                } else if (myBlock.name === 'media') {
-                    myBlock._doOpenMedia(thisBlock);
-                } else if (myBlock.name === 'loadFile') {
-                    myBlock._doOpenMedia(thisBlock);
-                } else if (SPECIALINPUTS.indexOf(myBlock.name) !== -1) {
-                    if (!myBlock.trash) {
-                        myBlock._changeLabel();
+                } else if (that.name === 'media') {
+                    that._doOpenMedia(thisBlock);
+                } else if (that.name === 'loadFile') {
+                    that._doOpenMedia(thisBlock);
+                } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
+                    if (!that.trash) {
+                        that._changeLabel();
                     }
                 } else {
                     if (!blocks.inLongPress) {
@@ -1250,11 +1278,11 @@ function Block(protoblock, blocks, overrideName) {
         this.container.on('mousedown', function (event) {
             // Track time for detecting long pause...
             // but only for top block in stack.
-            if (myBlock.connections[0] == null) {
+            if (that.connections[0] == null) {
                 var d = new Date();
                 blocks.mouseDownTime = d.getTime();
                 blocks.longPressTimeout = setTimeout(function () {
-                    blocks.triggerLongPress(myBlock);
+                    blocks.triggerLongPress(that);
                 }, LONGPRESSTIME);
             }
 
@@ -1265,91 +1293,98 @@ function Block(protoblock, blocks, overrideName) {
             blocks.raiseStackToTop(thisBlock);
 
             // And possibly the collapse button.
-            if (myBlock.collapseContainer != null) {
-                blocks.stage.setChildIndex(myBlock.collapseContainer, blocks.stage.getNumChildren() - 1);
+            if (that.collapseContainer != null) {
+                blocks.stage.setChildIndex(that.collapseContainer, blocks.stage.getNumChildren() - 1);
             }
 
             moved = false;
-            var offset = {
-                x: myBlock.container.x - Math.round(event.stageX / blocks.blockScale),
-                y: myBlock.container.y - Math.round(event.stageY / blocks.blockScale)
+            var original = {
+                x: event.stageX,
+                y: event.stageY
             };
 
-            myBlock.container.on('mouseout', function (event) {
+            var offset = {
+                x: Math.round(that.container.x - original.x),
+                y: Math.round(that.container.y - original.y)
+            };
+
+            that.container.on('mouseout', function (event) {
                 if (haveClick) {
                     return;
                 }
 
                 if (!blocks.inLongPress) {
-                    myBlock._mouseoutCallback(event, moved, haveClick, true);
+                    that._mouseoutCallback(event, moved, haveClick, true);
                 }
 
                 moved = false;
             });
 
-            myBlock.container.on('pressup', function (event) {
+            that.container.on('pressup', function (event) {
                 if (haveClick) {
                     return;
                 }
 
                 if (!blocks.inLongPress) {
-                    myBlock._mouseoutCallback(event, moved, haveClick, true);
+                    that._mouseoutCallback(event, moved, haveClick, true);
                 }
 
                 moved = false;
             });
 
-            var original = {x: event.stageX / blocks.blockScale, y: event.stageY / blocks.blockScale};
-
-            myBlock.container.on('pressmove', function (event) {
+            that.container.on('pressmove', function (event) {
                 // FIXME: More voodoo
                 event.nativeEvent.preventDefault();
-
-                if (blocks.longPressTimeout != null) {
-                    clearTimeout(blocks.longPressTimeout);
-                    blocks.longPressTimeout = null;
-                }
-
-                if (!moved && myBlock.label != null) {
-                    myBlock.label.style.display = 'none';
-                }
 
                 if (window.hasMouse) {
                     moved = true;
                 } else {
                     // Make it eaiser to select text on mobile.
                     setTimeout(function () {
-                        moved = Math.abs((event.stageX / blocks.blockScale) - original.x) + Math.abs((event.stageY / blocks.blockScale) - original.y) > 20 && !window.hasMouse;
+                        moved = Math.abs(event.stageX - original.x) + Math.abs(event.stageY - original.y) > 20 && !window.hasMouse;
                         getInput = !moved;
                     }, 200);
                 }
 
-                var oldX = myBlock.container.x;
-                var oldY = myBlock.container.y;
+                var oldX = that.container.x;
+                var oldY = that.container.y;
 
-                var dx = Math.round(Math.round(event.stageX / blocks.blockScale) + offset.x - oldX);
-                var dy = Math.round(Math.round(event.stageY / blocks.blockScale) + offset.y - oldY);
+                var dx = Math.round(event.stageX + offset.x - oldX);
+                var dy = Math.round(event.stageY + offset.y - oldY);
+
                 var finalPos = oldY + dy;
 
                 if (blocks.stage.y === 0 && finalPos < (45 * blocks.blockScale)) {
                     dy += (45 * blocks.blockScale) - finalPos;
                 }
 
+                // Add some wiggle room for longPress.
+                // if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+
+                if (blocks.longPressTimeout != null) {
+                    clearTimeout(blocks.longPressTimeout);
+                    blocks.longPressTimeout = null;
+                }
+
+                if (!moved && that.label != null) {
+                    that.label.style.display = 'none';
+                }
+
                 blocks.moveBlockRelative(thisBlock, dx, dy);
 
                 // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+                if (trashcan.overTrashcan(event.stageX, event.stageY)) {
                     trashcan.startHighlightAnimation();
                 } else {
                     trashcan.stopHighlightAnimation();
                 }
 
-                if (myBlock.isValueBlock() && myBlock.name !== 'media') {
+                if (that.isValueBlock() && that.name !== 'media') {
                     // Ensure text is on top
-                    var z = myBlock.container.getNumChildren() - 1;
-                    myBlock.container.setChildIndex(myBlock.text, z);
-                } else if (myBlock.collapseContainer != null) {
-                    myBlock._positionCollapseContainer(myBlock.protoblock.scale);
+                    var z = that.container.getNumChildren() - 1;
+                    that.container.setChildIndex(that.text, z);
+                } else if (that.collapseContainer != null) {
+                    that._positionCollapseContainer(that.protoblock.scale);
                 }
 
                 // ...and move any connected blocks.
@@ -1364,12 +1399,17 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 blocks.refreshCanvas();
+
+                // } else {
+                    // Didn't really move enough to be considered a move.
+                    // moved = false;
+                // }
             });
         });
 
         this.container.on('mouseout', function (event) {
             if (!blocks.inLongPress) {
-                myBlock._mouseoutCallback(event, moved, haveClick, true);
+                that._mouseoutCallback(event, moved, haveClick, true);
             }
 
             moved = false;
@@ -1377,7 +1417,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.container.on('pressup', function (event) {
             if (!blocks.inLongPress) {
-                myBlock._mouseoutCallback(event, moved, haveClick, false);
+                that._mouseoutCallback(event, moved, haveClick, false);
             }
 
             moved = false;
@@ -1397,7 +1437,7 @@ function Block(protoblock, blocks, overrideName) {
 
         if (moved) {
             // Check if block is in the trash.
-            if (trashcan.overTrashcan(event.stageX / blocks.blockScale, event.stageY / blocks.blockScale)) {
+            if (trashcan.overTrashcan(event.stageX, event.stageY)) {
                 if (trashcan.isVisible) {
                     blocks.sendStackToTrash(this);
                 }
@@ -1435,7 +1475,7 @@ function Block(protoblock, blocks, overrideName) {
         if (hideDOM) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
-            if (this.bounds != null && (event.stageX / blocks.blockScale < this.container.x || event.stageX / blocks.blockScale > this.container.x + this.bounds.width || event.stageY / blocks.blockScale < this.container.y || event.stageY / blocks.blockScale > this.container.y + this.bounds.height)) {
+            if (this.bounds != null && (event.stageX < this.container.x || event.stageX > this.container.x + this.bounds.width || event.stageY < this.container.y || event.stageY > this.container.y + this.bounds.height)) {
                 this._labelChanged();
                 hideDOMLabel();
                 this.blocks.unhighlight(null);
@@ -1481,7 +1521,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._changeLabel = function () {
-        var myBlock = this;
+        var that = this;
         var blocks = this.blocks;
         var x = this.container.x;
         var y = this.container.y;
@@ -1719,14 +1759,14 @@ function Block(protoblock, blocks, overrideName) {
                 return;
             }
 
-            myBlock._labelChanged();
+            that._labelChanged();
 
             event.preventDefault();
 
             labelElem.classList.remove('hasKeyboard');
 
             window.scroll(0, 0);
-            myBlock.label.removeEventListener('keypress', __keypress);
+            that.label.removeEventListener('keypress', __keypress);
 
             if (movedStage) {
                 blocks.stage.y = fromY;
@@ -1747,12 +1787,12 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            myBlock._labelChanged();
+            that._labelChanged();
         });
 
         if (this.labelattr != null) {
             this.labelattr.addEventListener('change', function () {
-                myBlock._labelChanged();
+                that._labelChanged();
             });
         }
 
@@ -1776,8 +1816,8 @@ function Block(protoblock, blocks, overrideName) {
 
         // Firefox fix
         setTimeout(function () {
-            myBlock.label.style.display = '';
-            myBlock.label.focus();
+            that.label.style.display = '';
+            that.label.focus();
             focused = true;
         }, 100);
     };
@@ -1785,7 +1825,6 @@ function Block(protoblock, blocks, overrideName) {
     this._labelChanged = function () {
         // Update the block values as they change in the DOM label.
         if (this == null || this.label == null) {
-            // console.log('cannot find block associated with label change');
             this._label_lock = false;
             return;
         }

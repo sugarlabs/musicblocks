@@ -18,6 +18,7 @@
 const _THIS_IS_MUSIC_BLOCKS_ = true;
 const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
+const _ERRORMSGTIMEOUT_ = 15000;
 
 function facebookInit() {
     window.fbAsyncInit = function () {
@@ -437,7 +438,7 @@ define(MYDEFINES, function (compatibility) {
                 logo.runLogoCommands(null, env);
             } else {
                 if (currentDelay !== 0) {
-                    // keep playing at full speep
+                    // keep playing at full speed
                     console.log('running from step');
                     logo.step();
                 } else {
@@ -634,6 +635,7 @@ define(MYDEFINES, function (compatibility) {
         // ErrorMsg block
         var errorMsgText = null;
         var errorMsgArrow = null;
+        var errorMsgTimeoutID = null;
         var errorArtwork = {};
         const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
 
@@ -2189,7 +2191,11 @@ define(MYDEFINES, function (compatibility) {
             stage.setChildIndex(msgContainer, stage.getNumChildren() - 1);
         };
 
-        function errorMsg(msg, blk, text) {
+        function errorMsg(msg, blk, text, timeout) {
+            if (errorMsgTimeoutID != null) {
+                clearTimeout(errorMsgTimeoutID);
+            }
+
              _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
@@ -2275,6 +2281,20 @@ define(MYDEFINES, function (compatibility) {
                 errorMsgContainer.updateCache();
                 break;
             }
+
+            if (timeout != undefined) {
+                var myTimeout = timeout;
+            } else {
+                var myTimeout = _ERRORMSGTIMEOUT_;
+            }
+
+            if (myTimeout > 0) {
+		errorMsgTimeoutID = setTimeout(function () {
+                    hideMsgs();
+		}, myTimeout);
+            }
+
+
 
             update = true;
         };
@@ -2913,6 +2933,7 @@ handleComplete);
 
         function _loadButtonDragHandler(container, ox, oy, action, longAction, extraLongAction, longImg, extraLongImg) {
             // Prevent multiple button presses (i.e., debounce).
+            var lockTimer = null;
             var locked = false;
 
             if (longAction === null) {
@@ -2924,11 +2945,33 @@ handleComplete);
             }
 
             // Long and extra-long press variables declaration
-            var pressTimer, pressTimerExtra, isLong = false, isExtraLong = false;
+            var pressTimer = null;
+            var isLong = false;
+            var pressTimerExtra = null;
+            var isExtraLong = false;
+
             var formerContainer = container;
 
             container.on('mousedown', function (event) {
-                var moved = true;
+                if (locked) {
+                    return;
+                } else {
+                    locked = true;
+
+                    lockTimer = setTimeout(function () {
+                        locked = false;
+                        clearTimeout(pressTimer);
+                        clearTimeout(pressTimerExtra);
+                        if (longImg !== null || extraLongImg !== null) {
+                            container.visible = false;
+                            container = formerContainer;
+                            container.visible = true;
+                        }
+                    }, 1500);
+                }
+
+                var mousedown = true;
+
                 var offset = {
                     x: container.x - Math.round(event.stageX / turtleBlocksScale),
                     y: container.y - Math.round(event.stageY / turtleBlocksScale)
@@ -2953,6 +2996,8 @@ handleComplete);
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
 
                 container.on('pressup', function (event) {
+                    clearTimeout(lockTimer);
+
                     hideButtonHighlight(circles, stage);
                     container.x = ox;
                     container.y = oy;
@@ -2963,13 +3008,9 @@ handleComplete);
                         container.visible = true;
                     }
 
-                    if (action != null && moved && !locked) {
-                        locked = true;
+                    locked = false;
 
-                        setTimeout(function () {
-                            locked = false;
-                        }, 500);
-
+                    if (action != null && mousedown && !locked) {
                         clearTimeout(pressTimer);
                         clearTimeout(pressTimerExtra);
 
@@ -2981,13 +3022,14 @@ handleComplete);
                             extraLongAction();
                         }
                     }
-                    moved = false;
+
+                    mousedown = false;
                 });
 
                 isLong = false;
                 isExtraLong = false;
             });
-
         };
+
     };
 });
