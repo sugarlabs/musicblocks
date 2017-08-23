@@ -872,7 +872,7 @@ define(MYDEFINES, function (compatibility) {
                         var rawData = reader.result;
                         var cleanData = rawData.replace('\n', ' ');
                        
-						try {
+                        try {
                             var obj = JSON.parse(cleanData);
                         } catch (e) {
                             errorMsg('Cannot load project from the file. Please check file type.');
