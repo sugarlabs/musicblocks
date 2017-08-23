@@ -22,7 +22,7 @@ function TimbreWidget () {
     this.ENVs = [];
     this.synthVals = {
         "oscillator": {
-            "type" : "sine"
+            "type" : "sine6"
         }
         ,        
          "envelope": {
@@ -865,20 +865,22 @@ function TimbreWidget () {
 
         document.getElementById("wrapperOsc0").addEventListener('change', function(event){
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
-            console.log('in oscillator type');
             var elem = event.target;
-            that.synthVals['oscillator']['type'] = elem.value;
+            that.oscParams[0] = elem.value;
+            that.synthVals['oscillator']['type'] = (elem.value + that.oscParams[1].toString());
             that._update(blockValue, elem.value, 0);
-            that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['type'], that.synthVals);
+            that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
         });
 
         document.getElementById("wrapperOsc1").addEventListener('change', function(event){
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
-            console.log('in oscillator Partials');
             var elem = event.target;
+            that.oscParams[1] = parseFloat(elem.value);
+            that.synthVals['oscillator']['type'] = (that.oscParams[0] + parseFloat(elem.value));
             docById("myRangeO0").value = parseFloat(elem.value);
             docById("myspanO0").textContent = elem.value;
             that._update(blockValue, elem.value, 1);
+            that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
         });
         
         var sliderPartials = docById('myRangeO0');
@@ -895,15 +897,20 @@ function TimbreWidget () {
         docById("myspanO0").textContent = that.oscParams[1];
         that._update(blockValue, that.oscParams[1], 1);
 
+        that.synthVals['oscillator']['type'] = (that.oscParams[0] + that.oscParams[1].toString());;
+        that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
+
         btnReset.onclick = function() {
             docById("oscillatorButtonCell").style.backgroundColor = MATRIXBUTTONCOLOR;
-            docById('selOsc1').value = that.oscParams[0];
-            that._update(blockValue, that.oscParams[0], 0);
+            docById('selOsc1').value = 'sine';
+            that._update(blockValue, 'sine', 0);
             
-            docById("myRangeO0").value = parseFloat(that.oscParams[1]);
-            docById("myspanO0").textContent = that.oscParams[1];
-            that._update(blockValue, that.oscParams[1], 1);
-            that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['type'], that.oscillatorVals);
+            docById("myRangeO0").value = parseFloat(6);
+            docById("myspanO0").textContent = '6';
+            that._update(blockValue, '6', 1);
+
+            that.synthVals['oscillator']['type'] = 'sine6';
+            that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
         }
     };
 
