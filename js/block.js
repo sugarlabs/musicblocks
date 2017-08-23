@@ -1060,7 +1060,6 @@ function Block(protoblock, blocks, overrideName) {
             }
         });
 
-        console.log('LOADING DOWN EH');
         this.collapseContainer.on('mousedown', function (event) {
             console.log('mousedown');
             sawMouseDownEvent = true;
