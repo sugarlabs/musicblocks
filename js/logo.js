@@ -2752,7 +2752,7 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'envelope':
-            var synth_source = "triangle";
+            var synth_source = "sine";
             if(that.timbre.env.length != 0) {
                 that.errorMsg(_("You are adding a second envelope block"));
                 that.timbre.ENVs = [];
@@ -2818,7 +2818,7 @@ function Logo () {
             }  
             break;
         case 'oscillator':
-            var oscillatortype = 'triangle';
+            var oscillatortype = 'sine';
             var partials ;
             that.timbre.oscParams = [];
 
