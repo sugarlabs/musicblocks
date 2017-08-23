@@ -871,28 +871,30 @@ define(MYDEFINES, function (compatibility) {
                     setTimeout(function() {
                         var rawData = reader.result;
                         
-						if (rawData == null || rawData == '') {		
-                            errorMsg('Cannot load project. Please check the file type.');		
-                        
-						var cleanData = rawData.replace('\n', ' ');
-                       
+                        if (rawData == null || rawData == '') {		
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        } else {
+                        var cleanData = rawData.replace('\n', ' ');
+                 
                         try {
                             var obj = JSON.parse(cleanData);
+                            for (var name in blocks.palettes.dict) {
+                                blocks.palettes.dict[name].hideMenu(true);
+                            }
+    
+                            sendAllToTrash(false, false);
+                            refreshCanvas();
+    
+                            blocks.loadNewBlocks(obj);
                         } catch (e) {
-                            errorMsg('Cannot load project from the file. Please check file type.');
-                            document.body.style.cursor = 'default';
-                            return;
+                            errorMsg(_('Cannot load project from the file. Please check file type.'));
                         }
-                        for (var name in blocks.palettes.dict) {
-                            blocks.palettes.dict[name].hideMenu(true);
-                        }
-
-                        sendAllToTrash(false, false);
-                        refreshCanvas();
-
-                        blocks.loadNewBlocks(obj);
-
+                    
                         document.body.style.cursor = 'default';
+
+						}
+						document.body.style.cursor = 'default';
+
                     }, 200);
                 });
 
