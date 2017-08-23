@@ -587,11 +587,11 @@ function PitchDrumMatrix() {
 
         if (playNote) {
             var waitTime = this._logo.defaultBPMFactor * 1000 * 0.25;
-            this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), 0.125, 'poly');
+            this._logo.synth.trigger(note.replace(/♭/g, 'b').replace(/♯/g, '#'), 0.125, 'poly', null, null);
 
             var that = this;
             setTimeout(function() {
-                that._logo.synth.trigger('C2', 0.125, drumName);
+                that._logo.synth.trigger('C2', 0.125, drumName, null, null);
             }, waitTime);
         }
     };
