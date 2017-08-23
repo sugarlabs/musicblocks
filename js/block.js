@@ -1249,7 +1249,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else {
                     if (!blocks.inLongPress) {
                         var topBlock = blocks.findTopBlock(thisBlock);
-                        console.log('running from ' + blocks.blockList[topBlock].name);
+//                        console.log('running from ' + blocks.blockList[topBlock].name);
                         blocks.logo.runLogoCommands(topBlock);
                     }
                 }

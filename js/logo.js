@@ -765,7 +765,6 @@ function Logo () {
     };
 
     this.runLogoCommands = function (startHere, env) {
-        console.log('runLogo commands');
         // Save the state before running.
         this.saveLocally();
 
@@ -981,7 +980,7 @@ function Logo () {
         // (2) Execute the stack.
         // A bit complicated because we have lots of corner cases:
         if (startHere != null) {
-            console.log('start here');
+//            console.log('start here');
             // console.log('startHere is ' + this.blocks.blockList[startHere].name);
 
             // If a block to start from was passed, find its
@@ -3984,10 +3983,10 @@ function Logo () {
             };
             that._setListener(turtle, listenerName, __listener);
             if(that.inTimbre) {
-                    that.timbre.vibratoEffect.push(blk);
-                    that.timbre.vibratoParams.push(last(that.vibratoIntensity[turtle]) * 100);
-                    that.timbre.vibratoParams.push(last(that.vibratoRate[turtle]));
-                }
+                that.timbre.vibratoEffect.push(blk);
+                that.timbre.vibratoParams.push(last(that.vibratoIntensity[turtle]) * 100);
+                that.timbre.vibratoParams.push(last(that.vibratoRate[turtle]));
+            }
             break;
         case 'dis':
             var distortion = (args[0] / 100);
@@ -5244,7 +5243,7 @@ function Logo () {
         var doPhaser = false;
         var doChorus = false;
 
-        // Applying effects inside the timbre block 
+        // Applying effects and filters inside the timbre block 
 
         if ((this.inSetTimbre == true) && (turtle in this.instrument_names) && last(this.instrument_names[turtle])){
             var inst_name = last(this.instrument_names[turtle]);
@@ -5284,6 +5283,7 @@ function Logo () {
                     doChorus = true;
                 }
             }
+
         }
 
         // ------------------------ 
@@ -5710,29 +5710,41 @@ function Logo () {
                                         }
 
                                     //    that.synth.triggerWithEffects(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
-                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), params_effects);
+                                        that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), params_effects, null);
                                     } else if (that.drumStyle[turtle].length > 0) {
                                         //that.synth.triggerWithEffects(notes, beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
-                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null);
+                                        that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null, null);
                                     } else if (that.turtles.turtleList[turtle].drum) {
                                        // that.synth.triggerWithEffects(notes, beatValue, 'drum', [], [], [], [], []);
-                                        that.synth.trigger(notes, beatValue, 'drum', null);
+                                        that.synth.trigger(notes, beatValue, 'drum', null, null);
 
                                     } else {
                                         // Look for any notes in the chord that might be in the pitchDrumTable.
 
                                         for (var d = 0; d < notes.length; d++) {
                                             if (notes[d] in that.pitchDrumTable[turtle]) {
-                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null);
+                                                that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null);
                                             }
                                             else if (turtle in that.instrument_names && last(that.instrument_names[turtle])) {
-                                                that.synth.trigger(notes[d], beatValue, last(that.instrument_names[turtle]), params_effects);
+
+                                                var params_filters = null;
+                                                if (last(that.instrument_names[turtle]) in instruments_filters){
+                                                    params_filters = instruments_filters[last(that.instrument_names[turtle])];
+
+                                                    console.log('filter params');
+                                                    console.log('type: ' + typeof(params_filters));
+
+                                                    // for(var ky in params_filters){
+                                                    //     console.log('ky: ' + ky + ' val: ' + params_filters[ky]);
+                                                    // }
+                                                }
+                                                that.synth.trigger(notes[d], beatValue, last(that.instrument_names[turtle]), params_effects, params_filters);
                                             }
                                             else if (turtle in that.voices && last(that.voices[turtle])) {
-                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), params_effects);
+                                                that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), params_effects, null);
                                             }
                                              else {
-                                                that.synth.trigger(notes[d], beatValue, 'default', params_effects);
+                                                that.synth.trigger(notes[d], beatValue, 'default', params_effects, null);
                                             }
                                         }
                                     }
@@ -5760,10 +5772,10 @@ function Logo () {
                                     if (that.drumStyle[turtle].length > 0) {
 
                                        // that.synth.triggerWithEffects(['C2'], beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
-                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), null);
+                                        that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), null, null);
                                     } else {
                                        // that.synth.triggerWithEffects(['C2'], beatValue, drums[i], [], [], [], [], []);
-                                        that.synth.trigger(['C2'], beatValue, drums[i], null);
+                                        that.synth.trigger(['C2'], beatValue, drums[i], null, null);
                                     }
                                 }
                             }
