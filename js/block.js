@@ -1027,7 +1027,6 @@ function Block(protoblock, blocks, overrideName) {
         this._calculateCollapseHitArea();
 
         this.collapseContainer.on('mouseover', function (event) {
-            console.log('mouseover');
             that.blocks.highlight(thisBlock, true);
             that.blocks.activeBlock = thisBlock;
             that.blocks.refreshCanvas();
@@ -1039,7 +1038,6 @@ function Block(protoblock, blocks, overrideName) {
         var sawMouseDownEvent = false;
 
         this.collapseContainer.on('click', function (event) {
-            console.log('click');
             that.blocks.activeBlock = thisBlock;
             haveClick = true;
 
@@ -1061,31 +1059,26 @@ function Block(protoblock, blocks, overrideName) {
         });
 
         this.collapseContainer.on('mousedown', function (event) {
-            console.log('mousedown');
             sawMouseDownEvent = true;
             // Always show the trash when there is a block selected,
             trashcan.show();
 
-            console.log(1);
             // Raise entire stack to the top.
             that.blocks.raiseStackToTop(thisBlock);
-            console.log(2);
             // And the collapse button
-            that.blocks.stage.setChildIndex(that.collapseContainer, blocks.stage.getNumChildren() - 1);
-            console.log(3);
+            that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.getNumChildren() - 1);
             moved = false;
             var original = {
-                x: event.stageX,
-                y: event.stageY
+                x: event.stageX / that.blocks.getStageScale(),
+                y: event.stageY / that.blocks.getStageScale()
             };
 
             var offset = {
                 x: Math.round(that.collapseContainer.x - original.x),
                 y: Math.round(that.collapseContainer.y - original.y)
             };
-            console.log(4);
+
             that.collapseContainer.on('mouseout', function (event) {
-                console.log('mouseout');
                 if (haveClick) {
                     return;
                 }
@@ -1096,7 +1089,6 @@ function Block(protoblock, blocks, overrideName) {
             });
 
             that.collapseContainer.on('pressup', function (event) {
-                console.log('pressup' + sawMouseDownEvent + ' ' + haveClick);
                 if (sawMouseDownEvent && haveClick) {
                     return;
                 }
@@ -1113,7 +1105,6 @@ function Block(protoblock, blocks, overrideName) {
             });
 
             that.collapseContainer.on('pressmove', function (event) {
-                console.log('pressmove');
                 // FIXME: More voodoo
                 event.nativeEvent.preventDefault();
                 moved = true;
@@ -1121,8 +1112,8 @@ function Block(protoblock, blocks, overrideName) {
                 var oldX = that.collapseContainer.x;
                 var oldY = that.collapseContainer.y;
 
-                var dx = Math.round(event.stageX + offset.x - oldX);
-                var dy = Math.round(event.stageY + offset.y - oldY);
+                var dx = Math.round(event.stageX / that.blocks.getStageScale() + offset.x - oldX);
+                var dy = Math.round(event.stageY / that.blocks.getStageScale() + offset.y - oldY);
 
 
                 var finalPos = oldY + dy;
@@ -1139,7 +1130,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.moveBlockRelative(thisBlock, dx, dy);
 
                 // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX, event.stageY)) {
+                if (trashcan.overTrashcan(event.stageX / that.blocks.getStageScale(), event.stageY / that.blocks.getStageScale())) {
                     trashcan.startHighlightAnimation();
                 } else {
                     trashcan.stopHighlightAnimation();
@@ -1161,7 +1152,6 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.refreshCanvas();
 		sawMouseDownEvent = false;
             });
-            console.log(5);
         });
     };
 
@@ -1169,12 +1159,11 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
 
         // Always hide the trash when there is no block selected.
-        console.log('collapseOut');
         trashcan.hide();
         this.blocks.unhighlight(thisBlock);
         if (moved) {
             // Check if block is in the trash.
-            if (trashcan.overTrashcan(event.stageX, event.stageY)) {
+            if (trashcan.overTrashcan(event.stageX / this.blocks.getStageScale(), event.stageY / this.blocks.getStageScale())) {
                 if (trashcan.isVisible)
                     this.blocks.sendStackToTrash(this);
             } else {
@@ -1183,13 +1172,13 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        if (blocks.activeBlock !== this) {
+        if (this.blocks.activeBlock !== this) {
             return;
         }
 
-        blocks.unhighlight(null);
-        blocks.activeBlock = null;
-        blocks.refreshCanvas();
+        this.blocks.unhighlight(null);
+        this.blocks.activeBlock = null;
+        this.blocks.refreshCanvas();
     };
 
     this._calculateBlockHitArea = function () {
@@ -1205,7 +1194,7 @@ function Block(protoblock, blocks, overrideName) {
         // section of block. Otherwise we would not be able to grab
         // blocks placed inside of clamps.
         if (this.isClampBlock() || this.isArgClamp()) {
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * blocks.blockScale);
+            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, STANDARDBLOCKHEIGHT * this.blocks.blockScale);
         } else if (this.isNoHitBlock()) {
             // No hit area
             hitArea.graphics.beginFill('#FFF').drawRect(0, 0, 0, 0);
@@ -1222,14 +1211,13 @@ function Block(protoblock, blocks, overrideName) {
     this._loadEventHandlers = function () {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
-        var blocks = this.blocks;
 
         this._calculateBlockHitArea();
 
         this.container.on('mouseover', function (event) {
-            blocks.highlight(thisBlock, true);
-            blocks.activeBlock = thisBlock;
-            blocks.refreshCanvas();
+            that.blocks.highlight(thisBlock, true);
+            that.blocks.activeBlock = thisBlock;
+            that.blocks.refreshCanvas();
         });
 
         var haveClick = false;
@@ -1238,7 +1226,7 @@ function Block(protoblock, blocks, overrideName) {
         var getInput = window.hasMouse;
 
         this.container.on('click', function (event) {
-            blocks.activeBlock = thisBlock;
+            that.blocks.activeBlock = thisBlock;
             haveClick = true;
 
             if (locked) {
@@ -1253,10 +1241,10 @@ function Block(protoblock, blocks, overrideName) {
             hideDOMLabel();
 
             if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
-                if (blocks.selectingStack) {
-                    var topBlock = blocks.findTopBlock(thisBlock);
-                    blocks.selectedStack = topBlock;
-                    blocks.selectingStack = false;
+                if (that.blocks.selectingStack) {
+                    var topBlock = that.blocks.findTopBlock(thisBlock);
+                    that.blocks.selectedStack = topBlock;
+                    that.blocks.selectingStack = false;
                 } else if (that.name === 'media') {
                     that._doOpenMedia(thisBlock);
                 } else if (that.name === 'loadFile') {
@@ -1266,10 +1254,10 @@ function Block(protoblock, blocks, overrideName) {
                         that._changeLabel();
                     }
                 } else {
-                    if (!blocks.inLongPress) {
-                        var topBlock = blocks.findTopBlock(thisBlock);
-                        console.log('running from ' + blocks.blockList[topBlock].name);
-                        blocks.logo.runLogoCommands(topBlock);
+                    if (!that.blocks.inLongPress) {
+                        var topBlock = that.blocks.findTopBlock(thisBlock);
+                        console.log('running from ' + that.blocks.blockList[topBlock].name);
+                        that.blocks.logo.runLogoCommands(topBlock);
                     }
                 }
             }
@@ -1280,9 +1268,9 @@ function Block(protoblock, blocks, overrideName) {
             // but only for top block in stack.
             if (that.connections[0] == null) {
                 var d = new Date();
-                blocks.mouseDownTime = d.getTime();
-                blocks.longPressTimeout = setTimeout(function () {
-                    blocks.triggerLongPress(that);
+                that.blocks.mouseDownTime = d.getTime();
+                that.blocks.longPressTimeout = setTimeout(function () {
+                    that.blocks.triggerLongPress(that);
                 }, LONGPRESSTIME);
             }
 
@@ -1290,17 +1278,17 @@ function Block(protoblock, blocks, overrideName) {
             trashcan.show();
 
             // Raise entire stack to the top.
-            blocks.raiseStackToTop(thisBlock);
+            that.blocks.raiseStackToTop(thisBlock);
 
             // And possibly the collapse button.
             if (that.collapseContainer != null) {
-                blocks.stage.setChildIndex(that.collapseContainer, blocks.stage.getNumChildren() - 1);
+                that.blocks.stage.setChildIndex(that.collapseContainer, that.blocks.stage.getNumChildren() - 1);
             }
 
             moved = false;
             var original = {
-                x: event.stageX,
-                y: event.stageY
+                x: event.stageX / that.blocks.getStageScale(),
+                y: event.stageY / that.blocks.getStageScale()
             };
 
             var offset = {
@@ -1313,7 +1301,7 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
-                if (!blocks.inLongPress) {
+                if (!that.blocks.inLongPress) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
 
@@ -1325,7 +1313,7 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
-                if (!blocks.inLongPress) {
+                if (!that.blocks.inLongPress) {
                     that._mouseoutCallback(event, moved, haveClick, true);
                 }
 
@@ -1341,7 +1329,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else {
                     // Make it eaiser to select text on mobile.
                     setTimeout(function () {
-                        moved = Math.abs(event.stageX - original.x) + Math.abs(event.stageY - original.y) > 20 && !window.hasMouse;
+                        moved = Math.abs(event.stageX / that.blocks.getStageScale() - original.x) + Math.abs(event.stageY / that.blocks.getStageScale() - original.y) > 20 && !window.hasMouse;
                         getInput = !moved;
                     }, 200);
                 }
@@ -1349,31 +1337,31 @@ function Block(protoblock, blocks, overrideName) {
                 var oldX = that.container.x;
                 var oldY = that.container.y;
 
-                var dx = Math.round(event.stageX + offset.x - oldX);
-                var dy = Math.round(event.stageY + offset.y - oldY);
+                var dx = Math.round(event.stageX / that.blocks.getStageScale() + offset.x - oldX);
+                var dy = Math.round(event.stageY / that.blocks.getStageScale() + offset.y - oldY);
 
                 var finalPos = oldY + dy;
 
-                if (blocks.stage.y === 0 && finalPos < (45 * blocks.blockScale)) {
-                    dy += (45 * blocks.blockScale) - finalPos;
+                if (that.blocks.stage.y === 0 && finalPos < (45 * that.blocks.blockScale)) {
+                    dy += (45 * that.blocks.blockScale) - finalPos;
                 }
 
                 // Add some wiggle room for longPress.
                 // if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
 
-                if (blocks.longPressTimeout != null) {
-                    clearTimeout(blocks.longPressTimeout);
-                    blocks.longPressTimeout = null;
+                if (that.blocks.longPressTimeout != null) {
+                    clearTimeout(that.blocks.longPressTimeout);
+                    that.blocks.longPressTimeout = null;
                 }
 
                 if (!moved && that.label != null) {
                     that.label.style.display = 'none';
                 }
 
-                blocks.moveBlockRelative(thisBlock, dx, dy);
+                that.blocks.moveBlockRelative(thisBlock, dx, dy);
 
                 // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX, event.stageY)) {
+                if (trashcan.overTrashcan(event.stageX / that.blocks.getStageScale(), event.stageY / that.blocks.getStageScale())) {
                     trashcan.startHighlightAnimation();
                 } else {
                     trashcan.stopHighlightAnimation();
@@ -1388,17 +1376,17 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 // ...and move any connected blocks.
-                blocks.findDragGroup(thisBlock)
-                if (blocks.dragGroup.length > 0) {
-                    for (var b = 0; b < blocks.dragGroup.length; b++) {
-                        var blk = blocks.dragGroup[b];
+                that.blocks.findDragGroup(thisBlock)
+                if (that.blocks.dragGroup.length > 0) {
+                    for (var b = 0; b < that.blocks.dragGroup.length; b++) {
+                        var blk = that.blocks.dragGroup[b];
                         if (b !== 0) {
-                            blocks.moveBlockRelative(blk, dx, dy);
+                            that.blocks.moveBlockRelative(blk, dx, dy);
                         }
                     }
                 }
 
-                blocks.refreshCanvas();
+                that.blocks.refreshCanvas();
 
                 // } else {
                     // Didn't really move enough to be considered a move.
@@ -1408,7 +1396,7 @@ function Block(protoblock, blocks, overrideName) {
         });
 
         this.container.on('mouseout', function (event) {
-            if (!blocks.inLongPress) {
+            if (!that.blocks.inLongPress) {
                 that._mouseoutCallback(event, moved, haveClick, true);
             }
 
@@ -1416,7 +1404,7 @@ function Block(protoblock, blocks, overrideName) {
         });
 
         this.container.on('pressup', function (event) {
-            if (!blocks.inLongPress) {
+            if (!that.blocks.inLongPress) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             }
 
@@ -1437,15 +1425,15 @@ function Block(protoblock, blocks, overrideName) {
 
         if (moved) {
             // Check if block is in the trash.
-            if (trashcan.overTrashcan(event.stageX, event.stageY)) {
+            if (trashcan.overTrashcan(event.stageX / this.blocks.getStageScale(), event.stageY / this.blocks.getStageScale())) {
                 if (trashcan.isVisible) {
-                    blocks.sendStackToTrash(this);
+                    this.blocks.sendStackToTrash(this);
                 }
             } else {
                 // Otherwise, process move.
                 // Also, keep track of the time of the last move.
                 var d = new Date();
-                blocks.mouseDownTime = d.getTime();
+                this.blocks.mouseDownTime = d.getTime();
                 this.blocks.blockMoved(thisBlock);
 
                 // Just in case the blocks are not properly docked after
@@ -1457,11 +1445,11 @@ function Block(protoblock, blocks, overrideName) {
             if (!haveClick) {
                 // Simulate click on Android.
                 var d = new Date();
-                if ((d.getTime() - blocks.mouseDownTime) < 500) {
+                if ((d.getTime() - this.blocks.mouseDownTime) < 500) {
                     if (!this.trash)
                     {
                         var d = new Date();
-                        blocks.mouseDownTime = d.getTime();
+                        this.blocks.mouseDownTime = d.getTime();
                         if (this.name === 'media' || this.name === 'loadFile') {
                             this._doOpenMedia(thisBlock);
                         } else {
@@ -1475,7 +1463,7 @@ function Block(protoblock, blocks, overrideName) {
         if (hideDOM) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
-            if (this.bounds != null && (event.stageX < this.container.x || event.stageX > this.container.x + this.bounds.width || event.stageY < this.container.y || event.stageY > this.container.y + this.bounds.height)) {
+            if (this.bounds != null && (event.stageX / this.blocks.getStageScale() < this.container.x || event.stageX / this.blocks.getStageScale() > this.container.x + this.bounds.width || event.stageY < this.container.y || event.stageY > this.container.y + this.bounds.height)) {
                 this._labelChanged();
                 hideDOMLabel();
                 this.blocks.unhighlight(null);
@@ -1522,18 +1510,17 @@ function Block(protoblock, blocks, overrideName) {
 
     this._changeLabel = function () {
         var that = this;
-        var blocks = this.blocks;
         var x = this.container.x;
         var y = this.container.y;
 
-        var canvasLeft = blocks.canvas.offsetLeft + 28 * blocks.blockScale;
-        var canvasTop = blocks.canvas.offsetTop + 6 * blocks.blockScale;
+        var canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        var canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         var movedStage = false;
-        if (!window.hasMouse && blocks.stage.y + y > 75) {
+        if (!window.hasMouse && this.blocks.stage.y + y > 75) {
             movedStage = true;
-            var fromY = blocks.stage.y;
-            blocks.stage.y = -y + 75;
+            var fromY = this.blocks.stage.y;
+            this.blocks.stage.y = -y + 75;
         }
 
         // A place in the DOM to put modifiable labels (textareas).
@@ -1769,8 +1756,8 @@ function Block(protoblock, blocks, overrideName) {
             that.label.removeEventListener('keypress', __keypress);
 
             if (movedStage) {
-                blocks.stage.y = fromY;
-                blocks.updateStage();
+                that.blocks.stage.y = fromY;
+                that.blocks.updateStage();
             }
         };
 
@@ -1796,21 +1783,21 @@ function Block(protoblock, blocks, overrideName) {
             });
         }
 
-        this.label.style.left = Math.round((x + blocks.stage.x) * blocks.blockScale + canvasLeft) + 'px';
-        this.label.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
+        this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.blockScale + canvasLeft) + 'px';
+        this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.blockScale + canvasTop) + 'px';
 
         // There may be a second select used for # and b.
         if (this.labelattr != null) {
-            this.label.style.width = Math.round(60 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.left = Math.round((x + blocks.stage.x + 60) * blocks.blockScale + canvasLeft) + 'px';
-            this.labelattr.style.top = Math.round((y + blocks.stage.y) * blocks.blockScale + canvasTop) + 'px';
-            this.labelattr.style.width = Math.round(60 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
-            this.labelattr.style.fontSize = Math.round(20 * blocks.blockScale * this.protoblock.scale / 2) + 'px';
+            this.label.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            this.labelattr.style.left = Math.round((x + this.blocks.stage.x + 60) * this.blocks.blockScale + canvasLeft) + 'px';
+            this.labelattr.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.blockScale + canvasTop) + 'px';
+            this.labelattr.style.width = Math.round(60 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            this.labelattr.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         } else {
-            this.label.style.width = Math.round(100 * blocks.blockScale) * this.protoblock.scale / 2 + 'px';
+            this.label.style.width = Math.round(100 * this.blocks.blockScale) * this.protoblock.scale / 2 + 'px';
         }
 
-        this.label.style.fontSize = Math.round(20 * blocks.blockScale * this.protoblock.scale / 2) + 'px';
+        this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
         this.label.style.display = '';
         this.label.focus();
 
@@ -1956,7 +1943,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 this.blocks.newNameddoBlock(newValue, this.blocks.actionHasReturn(c), this.blocks.actionHasArgs(c));
-                var blockPalette = blocks.palettes.dict['action'];
+                var blockPalette = this.blocks.palettes.dict['action'];
                 for (var blk = 0; blk < blockPalette.protoList.length; blk++) {
                     var block = blockPalette.protoList[blk];
                     if (oldValue === _('action')) {
