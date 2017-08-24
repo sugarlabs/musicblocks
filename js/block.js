@@ -1117,9 +1117,8 @@ function Block(protoblock, blocks, overrideName) {
 
 
                 var finalPos = oldY + dy;
-
-                if (that.blocks.stage.y === 0 && finalPos < (45 * that.blocks.blockScale)) {
-                    dy += (45 * that.blocks.blockScale) - finalPos;
+                if (that.blocks.stage.y === 0 && finalPos < 45) {
+                    dy += 45 - finalPos;
                 }
 
                 if (that.blocks.longPressTimeout != null) {
@@ -1341,9 +1340,8 @@ function Block(protoblock, blocks, overrideName) {
                 var dy = Math.round(event.stageY / that.blocks.getStageScale() + offset.y - oldY);
 
                 var finalPos = oldY + dy;
-
-                if (that.blocks.stage.y === 0 && finalPos < (45 * that.blocks.blockScale)) {
-                    dy += (45 * that.blocks.blockScale) - finalPos;
+                if (that.blocks.stage.y === 0 && finalPos < 45) {
+                    dy += 45 - finalPos;
                 }
 
                 // Add some wiggle room for longPress.
