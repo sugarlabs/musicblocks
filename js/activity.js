@@ -279,12 +279,15 @@ define(MYDEFINES, function (compatibility) {
                 if (blocks.blockList[i].name === 'hidden') {
                     continue;
                 }
+
                 if (blocks.blockList[i].name === 'hiddennoflow') {
                     continue;
                 }
+
                 if (blocks.blockList[i].trash) {
                     continue;
                 }
+
                 var parts = blocks.blockArt[i].split('><');
                 svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
                 switch(blocks.blockList[i].name) {
@@ -834,24 +837,26 @@ define(MYDEFINES, function (compatibility) {
 
                     setTimeout(function () {
                         var rawData = reader.result;
-                        var cleanData = rawData.replace('\n', ' ');
-                        try {
-                            var obj = JSON.parse(cleanData);
-                        } catch (e) {
-                            alert(_('Failed to load file data.'));
-                            document.body.style.cursor = 'default';
-                            return;
+                        if (rawData == null || rawData === '') {
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        } else {
+                            var cleanData = rawData.replace('\n', ' ');
+
+                            try {
+                                var obj = JSON.parse(cleanData);
+                                // First, hide the palettes as they will need updating.
+                                for (var name in blocks.palettes.dict) {
+                                    blocks.palettes.dict[name].hideMenu(true);
+                                }
+
+                                sendAllToTrash(false, false);
+                                refreshCanvas();
+
+                                blocks.loadNewBlocks(obj);
+                            } catch (e) {
+                                errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                            }
                         }
-
-                        // First, hide the palettes as they will need updating.
-                        for (var name in blocks.palettes.dict) {
-                            blocks.palettes.dict[name].hideMenu(true);
-                        }
-
-                        sendAllToTrash(false, false);
-                        refreshCanvas();
-
-                        blocks.loadNewBlocks(obj);
 
                         document.body.style.cursor = 'default';
                     }, 200);
