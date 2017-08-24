@@ -860,11 +860,11 @@ define(MYDEFINES, function (compatibility) {
                 reader.readAsText(fileChooser.files[0]);
             }, false);
         
-            function handleFileSelect (event) {
-                event.stopPropagation();
-                event.preventDefault();
+            function handleFileSelect (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
 
-                var files = event.dataTransfer.files;
+                var files = evt.dataTransfer.files;
                 var reader = new FileReader();
 
                 reader.onload = (function(theFile) {
@@ -872,28 +872,30 @@ define(MYDEFINES, function (compatibility) {
 
                     setTimeout(function() {
                         var rawData = reader.result;
+                        
                         if (rawData == null || rawData == '') {
-                            alert(_('Cannot load project. Please check the file type.'));
-                        }
-
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        } else {
                         var cleanData = rawData.replace('\n', ' ');
+
                         try {
                             var obj = JSON.parse(cleanData);
+                            for (var name in blocks.palettes.dict) {
+                                blocks.palettes.dict[name].hideMenu(true);
+                            }
+   
+                            sendAllToTrash(false, false);
+                            refreshCanvas();
+    
+                            blocks.loadNewBlocks(obj);
                         } catch (e) {
-                            alert(_('Failed to load file data.'));
-                            document.body.style.cursor = 'default';
-                            return;
+                            errorMsg(_('Cannot load project from the file. Please check file type.'));
                         }
-                        for (var name in blocks.palettes.dict) {
-                            blocks.palettes.dict[name].hideMenu(true);
+                     
                         }
-
-                        sendAllToTrash(false, false);
-                        refreshCanvas();
-
-                        blocks.loadNewBlocks(obj);
-
+                        
                         document.body.style.cursor = 'default';
+    
                     }, 200);
                 });
 
@@ -901,10 +903,10 @@ define(MYDEFINES, function (compatibility) {
                 window.scroll(0, 0)
             };
 
-            function handleDragOver (event) {
-                event.stopPropagation();
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'copy';
+            function handleDragOver (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+                evt.dataTransfer.dropEffect = 'copy';
             };
 
             var dropZone = document.getElementById('canvasHolder');
