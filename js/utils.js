@@ -798,8 +798,23 @@ readable-fractions/681534#681534
 };
 
 
+function nearestBeat (d, b) {
+    // Find the closest beat for a given fraction.
+
+    var sum = 1 / (2 * b);
+    var count = 1;
+    var dd = d / 100;
+    while (dd > sum) {
+        sum += 1 / b;
+        count += 1;
+    }
+
+    return [count, b];
+};
+
+
 function oneHundredToFraction (d) {
-   // Generate some simple fractions based on a scale of 1-100
+    // Generate some simple fractions based on a scale of 1-100
 
     if (d < 1) {
         return [1, 64];

@@ -218,22 +218,54 @@ function RhythmRuler () {
             }
 
             // convert times into cells here.
+            var inputNum = docById('dissectNumber').value;
+            if (inputNum === '' || isNaN(inputNum)) {
+                inputNum = 2;
+            } else {
+                inputNum = Math.abs(Math.floor(inputNum));
+            }
+
+            // Minimum beat is tied to the input number
+            switch(inputNum) {
+            case 2:
+                var minimumBeat = 16;
+                break;
+            case 3:
+                var minimumBeat = 27;
+                break;
+            case 4:
+                var minimumBeat = 32;
+                break;
+            case 5:
+                var minimumBeat = 25;
+                break;
+            case 6:
+                var minimumBeat = 36;
+                break;
+            case 7:
+                var minimumBeat = 14;
+                break;
+            default:
+                var minimumBeat = 16;
+                break;
+            }
+
             var newNoteValues = [];
             var sum = 0;
             var interval = this._bpmFactor / Math.abs(noteValues[this._tapCell.cellIndex]);
             for (var i = 1; i < this._tapTimes.length; i++) {
                 var dtime = this._tapTimes[i] - this._tapTimes[i - 1];
                 if (i < this._tapTimes.length - 1) {
-                    var obj = oneHundredToFraction(100 * dtime / this._bpmFactor);
-                    sum += obj[0] / obj[1];
-                    // Check for REST here.
-                    newNoteValues.push(obj[1] / obj[0]);
+                    var obj = nearestBeat(100 * dtime / this._bpmFactor, minimumBeat);
+                    if ((sum + (obj[0] / obj[1])) < 1) {
+			sum += obj[0] / obj[1];
+                        newNoteValues.push(obj[1] / obj[0]);
+                    }
                 } else {
                     // Since the fractional value is noisy,
                     // ensure that the final beat make the
                     // total add up to the proper note value.
                     var obj = rationalToFraction(1 / noteValues[this._tapCell.cellIndex] - sum);
-                    // Check for REST here.
                     newNoteValues.push(obj[1] / obj[0]);
                 }
             }
