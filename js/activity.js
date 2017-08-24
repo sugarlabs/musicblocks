@@ -889,10 +889,10 @@ define(MYDEFINES, function (compatibility) {
                         } catch (e) {
                             errorMsg(_('Cannot load project from the file. Please check file type.'));
                         }
-                    
+                     
                         }
                         
-			document.body.style.cursor = 'default';
+                        document.body.style.cursor = 'default';
 			    
                     }, 200);
                 });
