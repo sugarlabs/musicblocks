@@ -56,7 +56,7 @@ if (lang.indexOf('-') !== -1) {
 }
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'activity/abc', 'prefixfree.min'];
+    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'activity/abc', 'prefixfree.min'];
 } else {
     MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
 }
@@ -867,32 +867,32 @@ define(MYDEFINES, function (compatibility) {
                 var files = event.dataTransfer.files;
                 var reader = new FileReader();
 
-                reader.onload = (function(theFile) {
+                reader.onload = (function (theFile) {
                     document.body.style.cursor = 'wait';
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         var rawData = reader.result;
-                        if (rawData == null || rawData == '') {
-                            alert(_('Cannot load project. Please check the file type.'));
+                        if (rawData == null || rawData === '') {
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        } else {
+                            var cleanData = rawData.replace('\n', ' ');
+
+                            try {
+                                var obj = JSON.parse(cleanData);
+                                for (var name in blocks.palettes.dict) {
+                                    blocks.palettes.dict[name].hideMenu(true);
+                                }
+   
+                                sendAllToTrash(false, false);
+                                refreshCanvas();
+    
+                                blocks.loadNewBlocks(obj);
+                            } catch (e) {
+                                errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                            }
+                     
                         }
-
-                        var cleanData = rawData.replace('\n', ' ');
-                        try {
-                            var obj = JSON.parse(cleanData);
-                        } catch (e) {
-                            alert(_('Failed to load file data.'));
-                            document.body.style.cursor = 'default';
-                            return;
-                        }
-                        for (var name in blocks.palettes.dict) {
-                            blocks.palettes.dict[name].hideMenu(true);
-                        }
-
-                        sendAllToTrash(false, false);
-                        refreshCanvas();
-
-                        blocks.loadNewBlocks(obj);
-
+                        
                         document.body.style.cursor = 'default';
                     }, 200);
                 });
@@ -2289,12 +2289,10 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (myTimeout > 0) {
-		errorMsgTimeoutID = setTimeout(function () {
+                errorMsgTimeoutID = setTimeout(function () {
                     hideMsgs();
-		}, myTimeout);
+                }, myTimeout);
             }
-
-
 
             update = true;
         };
