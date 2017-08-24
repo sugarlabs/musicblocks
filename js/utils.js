@@ -802,7 +802,7 @@ function nearestBeat (d, b) {
     // Find the closest beat for a given fraction.
 
     var sum = 1 / (2 * b);
-    var count = 1;
+    var count = 0;
     var dd = d / 100;
     while (dd > sum) {
         sum += 1 / b;
@@ -942,7 +942,7 @@ function oneHundredToFraction (d) {
     case 72:
     case 73:
     case 74:
-	return [23, 32];
+        return [23, 32];
         break;
     case 75:
     case 76:
@@ -986,6 +986,6 @@ function oneHundredToFraction (d) {
         break;
     default:
         return [d, 100];
-	break;
+        break;
     }
 };

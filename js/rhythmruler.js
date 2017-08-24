@@ -99,7 +99,7 @@ function RhythmRuler () {
             return;
         }
 
-	if (this._tapMode && this._tapTimes.length > 0) {
+        if (this._tapMode && this._tapTimes.length > 0) {
             var d = new Date();
             this._tapTimes.push(d.getTime());
             return;
@@ -127,10 +127,10 @@ function RhythmRuler () {
                     // Don't allow tapping in rests.
                     this._tapCell = null;
                     this._tapMode = false;
-		    this._tapTimes = [];
-		    this._tapEndTime = null;
-		    var iconSize = ICONSIZE;
-		    this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                    this._tapTimes = [];
+                    this._tapEndTime = null;
+                    var iconSize = ICONSIZE;
+                    this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                     return;
                 }
 
@@ -245,6 +245,9 @@ function RhythmRuler () {
             case 7:
                 var minimumBeat = 14;
                 break;
+            case 8:
+                var minimumBeat = 64;
+                break;
             default:
                 var minimumBeat = 16;
                 break;
@@ -257,8 +260,13 @@ function RhythmRuler () {
                 var dtime = this._tapTimes[i] - this._tapTimes[i - 1];
                 if (i < this._tapTimes.length - 1) {
                     var obj = nearestBeat(100 * dtime / this._bpmFactor, minimumBeat);
+                    if (obj[0] === 0) {
+                        obj[0] = 1;
+                        obj[1] = obj[1] / 2;
+                    }
+
                     if ((sum + (obj[0] / obj[1])) < 1) {
-			sum += obj[0] / obj[1];
+                        sum += obj[0] / obj[1];
                         newNoteValues.push(obj[1] / obj[0]);
                     }
                 } else {
@@ -414,12 +422,12 @@ function RhythmRuler () {
 
             this._calculateZebraStripes(this._rulerSelected);
 
-	    var divisionHistory = this.Rulers[this._rulerSelected][1];
+            var divisionHistory = this.Rulers[this._rulerSelected][1];
             if (addToUndoList) {
                 this._undoList.push(['rest', this._rulerSelected]);
             }
 
-	    divisionHistory.push(cell.cellIndex);
+            divisionHistory.push(cell.cellIndex);
         }
     };
 
@@ -705,12 +713,12 @@ function RhythmRuler () {
             } else {
                 console.log('empty history encountered... skipping undo');
             }
-	} else if (obj[0] === 'rest') {
+        } else if (obj[0] === 'rest') {
             var newCellIndex = last(divisionHistory);
             var cell = ruler.cells[newCellIndex];
             this.__toggleRestState(cell, false);
-	    divisionHistory.pop();
-	}
+            divisionHistory.pop();
+        }
 
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
@@ -1351,8 +1359,8 @@ function RhythmRuler () {
 
                     if (typeof(this._dissectHistory[i][0][j]) === 'number') {
                         var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j]];
-			this.__toggleRestState(cell, false);
-		    } else if (typeof(this._dissectHistory[i][0][j][0]) === 'number') {
+                        this.__toggleRestState(cell, false);
+                    } else if (typeof(this._dissectHistory[i][0][j][0]) === 'number') {
                         if (typeof(this._dissectHistory[i][0][j][1]) === 'number') {
                             // dissect is [cell, num]
                             var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
