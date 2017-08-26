@@ -615,6 +615,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     duplicateFactor.staticLabels.push(_('duplicate factor'));
     duplicateFactor.adjustWidthToLabel();
     duplicateFactor.parameterBlock();
+    duplicateFactor.hidden = true;
 
     var skipFactor = new ProtoBlock('skipfactor');
     skipFactor.palette = palettes.dict['rhythm'];
@@ -622,6 +623,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     skipFactor.staticLabels.push(_('skip factor'));
     skipFactor.adjustWidthToLabel();
     skipFactor.parameterBlock();
+    skipFactor.hidden = true;
 
     var elapsedNotes = new ProtoBlock('elapsednotes');
     elapsedNotes.palette = palettes.dict['rhythm'];
@@ -2699,6 +2701,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTurtleName.defaults.push('Mozart');
 
     // SENSORS PALETTE
+
+    var pitchnessBlock = new ProtoBlock('pitchness');
+    pitchnessBlock.palette = palettes.dict['sensors'];
+    blocks.protoBlockDict['pitchness'] = pitchnessBlock;
+    pitchnessBlock.staticLabels.push(_('pitch'));
+    pitchnessBlock.adjustWidthToLabel();
+    pitchnessBlock.parameterBlock();
+    pitchnessBlock.hidden = true;
 
     var loudnessBlock = new ProtoBlock('loudness');
     loudnessBlock.palette = palettes.dict['sensors'];
