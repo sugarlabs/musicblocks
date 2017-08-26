@@ -5365,7 +5365,7 @@ function Logo () {
                 // Process pitches
                 if (that.notePitches[turtle].length > 0) {
                     for (var i = 0; i < that.notePitches[turtle].length; i++) {
-                        if (that.notePitches[turtle][i] === 'rest') {
+                        if (that.notePitches[turtle][i] === 'rest' || forceSilence) {
                             note = 'R';
                         } else {
                             var noteObj = that.getNote(that.notePitches[turtle][i], that.noteOctaves[turtle][i], that.noteTranspositions[turtle][i], that.keySignature[turtle]);
