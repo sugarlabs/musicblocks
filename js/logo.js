@@ -5297,22 +5297,11 @@ function Logo () {
 
             var waitTime = 0;
 
-            if (this.skipFactor[turtle] > 1 && this.skipIndex[turtle] % this.skipFactor[turtle] > 0) {
-                this.skipIndex[turtle] += 1;
-                // Lessen delay time by one note since we are
-                // skipping a note.
-                if (duration > 0) {
-                    this.waitTimes[turtle] -= ((bpmFactor / duration) + (this.noteDelay / 1000)) * 1000;
-                    if (this.waitTimes[turtle] < 0) {
-                        this.waitTimes[turtle] = 0;
-                    }
-                }
-
-                this.pushedNote[turtle] = false;
-                return;
-            }
-
+            var forceSilence = false;
             if (this.skipFactor[turtle] > 1) {
+                if (this.skipIndex[turtle] % this.skipFactor[turtle] > 0) {
+                    forceSilence = true;
+                }
                 this.skipIndex[turtle] += 1;
             }
 
@@ -5453,9 +5442,9 @@ function Logo () {
                         }
 
                         if (!that.suppressOutput[turtle] && duration > 0) {
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
+                            if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
 
-                                /*parameters related to effects*/
+                                // Parameters related to effects
                                 var params_effects = {
                                     'doVibrato' : false,
                                     'doDistortion' : false,
@@ -5480,29 +5469,21 @@ function Logo () {
                                         that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
 
-                                    //    that.synth.triggerWithEffects(notes, beatValue, last(that.oscList[turtle]), [vibratoIntensity, vibratoValue], [distortionAmount], [tremoloFrequency, tremoloDepth], [rate, octaves, baseFrequency], [chorusRate, delayTime, chorusDepth]);
                                     that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), params_effects);
                                 } else if (that.drumStyle[turtle].length > 0) {
-                                    //that.synth.triggerWithEffects(notes, beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
                                     that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null);
                                 } else if (that.turtles.turtleList[turtle].drum) {
-                                    // that.synth.triggerWithEffects(notes, beatValue, 'drum', [], [], [], [], []);
                                     that.synth.trigger(notes, beatValue, 'drum', null);
 
                                 } else {
-                                    // Look for any notes in the chord that might be in the pitchDrumTable.
-
-                                    /*   if (turtle in that.instrument_names){
-                                         console.log('instrument_name : ' + last(that.instrument_names[turtle]));
-                                         }
-                                    */
-
+                                    // Look for any notes in the chord
+                                    // that might be in the
+                                    // pitchDrumTable.
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
                                             that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null);
                                         }
                                         else if (turtle in that.instrument_names && last(that.instrument_names[turtle])) {
-                                            // console.log('trying to access synth: ' + last(that.instrument_names[turtle]));
                                             that.synth.trigger(notes[d], beatValue, last(that.instrument_names[turtle]), params_effects);
                                         }
                                         else if (turtle in that.voices && last(that.voices[turtle])) {
@@ -5531,7 +5512,7 @@ function Logo () {
 
                     // console.log('drums to play ' + drums + ' ' + noteBeatValue);
                     if (!that.suppressOutput[turtle] && duration > 0) {
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                             for (var i = 0; i < drums.length; i++) {
 
                                 if (that.drumStyle[turtle].length > 0) {
