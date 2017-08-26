@@ -1678,7 +1678,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doArc(args[0] * that.duplicateFactor[turtle], args[1]);
+                    that.turtles.turtleList[turtle].doArc(args[0], args[1]);
                 }
             }
             break;
@@ -1772,7 +1772,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doForward(args[0] * that.duplicateFactor[turtle]);
+                    that.turtles.turtleList[turtle].doForward(args[0]);
                 }
             }
             break;
@@ -1793,7 +1793,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doForward(-args[0] * that.duplicateFactor[turtle]);
+                    that.turtles.turtleList[turtle].doForward(-args[0]);
                 }
             }
             break;
@@ -1814,7 +1814,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doRight(args[0] * that.duplicateFactor[turtle]);
+                    that.turtles.turtleList[turtle].doRight(args[0]);
                 }
             }
             break;
@@ -1835,7 +1835,7 @@ function Logo () {
                         that.embeddedGraphics[turtle].push(blk);
                     }
                 } else {
-                    that.turtles.turtleList[turtle].doRight(-args[0] * that.duplicateFactor[turtle]);
+                    that.turtles.turtleList[turtle].doRight(-args[0]);
                 }
             }
             break;
@@ -3125,6 +3125,7 @@ function Logo () {
                         that.pitchBlocks.push(blk);
                     }
                 }
+
                 if (!(that.invertList[turtle].length === 0)) {
                     var delta = 0;
                     var len = that.invertList[turtle].length;
@@ -3151,6 +3152,7 @@ function Logo () {
                 } else {
                     var duplicateFactor = 1;
                 }
+
                 for (var i = 0; i < duplicateFactor; i++) {
                     // Apply transpositions
                     var transposition = 2 * delta;
@@ -3204,6 +3206,7 @@ function Logo () {
                 } else {
                     var duplicateFactor = 1;
                 }
+
                 for (var i = 0; i < duplicateFactor; i++) {
                     // Apply transpositions
                     var transposition = 2 * delta;
