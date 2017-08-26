@@ -2619,7 +2619,7 @@ handleComplete);
                     ['open', doLoad, _('Load project from files')],
                     ['save', doSave, _('Save project')],
                     // ['lilypond', _doLilypond, _('Save sheet music')],
-                    ['paste-disabled', pasteStack, _('Paste')],
+                    ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.')],
                     ['Cartesian', _doCartesian, _('Cartesian')],
                     ['polar', _doPolar, _('Polar')],
                     ['utility', _doUtilityBox, _('Settings')],
