@@ -99,7 +99,7 @@ function RhythmRuler () {
             return;
         }
 
-	if (this._tapMode && this._tapTimes.length > 0) {
+        if (this._tapMode && this._tapTimes.length > 0) {
             var d = new Date();
             this._tapTimes.push(d.getTime());
             return;
@@ -127,10 +127,10 @@ function RhythmRuler () {
                     // Don't allow tapping in rests.
                     this._tapCell = null;
                     this._tapMode = false;
-		    this._tapTimes = [];
-		    this._tapEndTime = null;
-		    var iconSize = ICONSIZE;
-		    this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                    this._tapTimes = [];
+                    this._tapEndTime = null;
+                    var iconSize = ICONSIZE;
+                    this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
                     return;
                 }
 
@@ -218,22 +218,62 @@ function RhythmRuler () {
             }
 
             // convert times into cells here.
+            var inputNum = docById('dissectNumber').value;
+            if (inputNum === '' || isNaN(inputNum)) {
+                inputNum = 2;
+            } else {
+                inputNum = Math.abs(Math.floor(inputNum));
+            }
+
+            // Minimum beat is tied to the input number
+            switch(inputNum) {
+            case 2:
+                var minimumBeat = 16;
+                break;
+            case 3:
+                var minimumBeat = 27;
+                break;
+            case 4:
+                var minimumBeat = 32;
+                break;
+            case 5:
+                var minimumBeat = 25;
+                break;
+            case 6:
+                var minimumBeat = 36;
+                break;
+            case 7:
+                var minimumBeat = 14;
+                break;
+            case 8:
+                var minimumBeat = 64;
+                break;
+            default:
+                var minimumBeat = 16;
+                break;
+            }
+
             var newNoteValues = [];
             var sum = 0;
             var interval = this._bpmFactor / Math.abs(noteValues[this._tapCell.cellIndex]);
             for (var i = 1; i < this._tapTimes.length; i++) {
                 var dtime = this._tapTimes[i] - this._tapTimes[i - 1];
                 if (i < this._tapTimes.length - 1) {
-                    var obj = oneHundredToFraction(100 * dtime / this._bpmFactor);
-                    sum += obj[0] / obj[1];
-                    // Check for REST here.
-                    newNoteValues.push(obj[1] / obj[0]);
+                    var obj = nearestBeat(100 * dtime / this._bpmFactor, minimumBeat);
+                    if (obj[0] === 0) {
+                        obj[0] = 1;
+                        obj[1] = obj[1] / 2;
+                    }
+
+                    if ((sum + (obj[0] / obj[1])) < 1) {
+                        sum += obj[0] / obj[1];
+                        newNoteValues.push(obj[1] / obj[0]);
+                    }
                 } else {
                     // Since the fractional value is noisy,
                     // ensure that the final beat make the
                     // total add up to the proper note value.
                     var obj = rationalToFraction(1 / noteValues[this._tapCell.cellIndex] - sum);
-                    // Check for REST here.
                     newNoteValues.push(obj[1] / obj[0]);
                 }
             }
@@ -382,12 +422,12 @@ function RhythmRuler () {
 
             this._calculateZebraStripes(this._rulerSelected);
 
-	    var divisionHistory = this.Rulers[this._rulerSelected][1];
+            var divisionHistory = this.Rulers[this._rulerSelected][1];
             if (addToUndoList) {
                 this._undoList.push(['rest', this._rulerSelected]);
             }
 
-	    divisionHistory.push(cell.cellIndex);
+            divisionHistory.push(cell.cellIndex);
         }
     };
 
@@ -673,12 +713,12 @@ function RhythmRuler () {
             } else {
                 console.log('empty history encountered... skipping undo');
             }
-	} else if (obj[0] === 'rest') {
+        } else if (obj[0] === 'rest') {
             var newCellIndex = last(divisionHistory);
             var cell = ruler.cells[newCellIndex];
             this.__toggleRestState(cell, false);
-	    divisionHistory.pop();
-	}
+            divisionHistory.pop();
+        }
 
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
@@ -1319,8 +1359,8 @@ function RhythmRuler () {
 
                     if (typeof(this._dissectHistory[i][0][j]) === 'number') {
                         var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j]];
-			this.__toggleRestState(cell, false);
-		    } else if (typeof(this._dissectHistory[i][0][j][0]) === 'number') {
+                        this.__toggleRestState(cell, false);
+                    } else if (typeof(this._dissectHistory[i][0][j][0]) === 'number') {
                         if (typeof(this._dissectHistory[i][0][j][1]) === 'number') {
                             // dissect is [cell, num]
                             var cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];

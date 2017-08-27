@@ -18,6 +18,7 @@
 const _THIS_IS_MUSIC_BLOCKS_ = true;
 const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
+const _ERRORMSGTIMEOUT_ = 15000;
 
 function facebookInit() {
     window.fbAsyncInit = function () {
@@ -55,7 +56,7 @@ if (lang.indexOf('-') !== -1) {
 }
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/timbre', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
+    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'activity/abc', 'prefixfree.min'];
 } else {
     MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
 }
@@ -278,12 +279,15 @@ define(MYDEFINES, function (compatibility) {
                 if (blocks.blockList[i].name === 'hidden') {
                     continue;
                 }
+
                 if (blocks.blockList[i].name === 'hiddennoflow') {
                     continue;
                 }
+
                 if (blocks.blockList[i].trash) {
                     continue;
                 }
+
                 var parts = blocks.blockArt[i].split('><');
                 svg += '<g transform="translate(' + blocks.blockList[i].container.x + ', ' + blocks.blockList[i].container.y + ')">';
                 switch(blocks.blockList[i].name) {
@@ -437,7 +441,7 @@ define(MYDEFINES, function (compatibility) {
                 logo.runLogoCommands(null, env);
             } else {
                 if (currentDelay !== 0) {
-                    // keep playing at full speep
+                    // keep playing at full speed
                     console.log('running from step');
                     logo.step();
                 } else {
@@ -634,6 +638,7 @@ define(MYDEFINES, function (compatibility) {
         // ErrorMsg block
         var errorMsgText = null;
         var errorMsgArrow = null;
+        var errorMsgTimeoutID = null;
         var errorArtwork = {};
         const ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
 
@@ -832,24 +837,26 @@ define(MYDEFINES, function (compatibility) {
 
                     setTimeout(function () {
                         var rawData = reader.result;
-                        var cleanData = rawData.replace('\n', ' ');
-                        try {
-                            var obj = JSON.parse(cleanData);
-                        } catch (e) {
-                            alert(_('Failed to load file data.'));
-                            document.body.style.cursor = 'default';
-                            return;
+                        if (rawData == null || rawData === '') {
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        } else {
+                            var cleanData = rawData.replace('\n', ' ');
+
+                            try {
+                                var obj = JSON.parse(cleanData);
+                                // First, hide the palettes as they will need updating.
+                                for (var name in blocks.palettes.dict) {
+                                    blocks.palettes.dict[name].hideMenu(true);
+                                }
+
+                                sendAllToTrash(false, false);
+                                refreshCanvas();
+
+                                blocks.loadNewBlocks(obj);
+                            } catch (e) {
+                                errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                            }
                         }
-
-                        // First, hide the palettes as they will need updating.
-                        for (var name in blocks.palettes.dict) {
-                            blocks.palettes.dict[name].hideMenu(true);
-                        }
-
-                        sendAllToTrash(false, false);
-                        refreshCanvas();
-
-                        blocks.loadNewBlocks(obj);
 
                         document.body.style.cursor = 'default';
                     }, 200);
@@ -865,32 +872,32 @@ define(MYDEFINES, function (compatibility) {
                 var files = event.dataTransfer.files;
                 var reader = new FileReader();
 
-                reader.onload = (function(theFile) {
+                reader.onload = (function (theFile) {
                     document.body.style.cursor = 'wait';
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         var rawData = reader.result;
-                        if (rawData == null || rawData == '') {
-                            alert(_('Cannot load project. Please check the file type.'));
+                        if (rawData == null || rawData === '') {
+                            errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                        } else {
+                            var cleanData = rawData.replace('\n', ' ');
+
+                            try {
+                                var obj = JSON.parse(cleanData);
+                                for (var name in blocks.palettes.dict) {
+                                    blocks.palettes.dict[name].hideMenu(true);
+                                }
+   
+                                sendAllToTrash(false, false);
+                                refreshCanvas();
+    
+                                blocks.loadNewBlocks(obj);
+                            } catch (e) {
+                                errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                            }
+                     
                         }
-
-                        var cleanData = rawData.replace('\n', ' ');
-                        try {
-                            var obj = JSON.parse(cleanData);
-                        } catch (e) {
-                            alert(_('Failed to load file data.'));
-                            document.body.style.cursor = 'default';
-                            return;
-                        }
-                        for (var name in blocks.palettes.dict) {
-                            blocks.palettes.dict[name].hideMenu(true);
-                        }
-
-                        sendAllToTrash(false, false);
-                        refreshCanvas();
-
-                        blocks.loadNewBlocks(obj);
-
+                        
                         document.body.style.cursor = 'default';
                     }, 200);
                 });
@@ -2196,7 +2203,11 @@ define(MYDEFINES, function (compatibility) {
             stage.setChildIndex(msgContainer, stage.getNumChildren() - 1);
         };
 
-        function errorMsg(msg, blk, text) {
+        function errorMsg(msg, blk, text, timeout) {
+            if (errorMsgTimeoutID != null) {
+                clearTimeout(errorMsgTimeoutID);
+            }
+
              _hideStopButton(); //Hide the button, as the program is going to be terminated
             if (errorMsgText == null) {
                 // The container may not be ready yet... so do nothing
@@ -2281,6 +2292,18 @@ define(MYDEFINES, function (compatibility) {
                 stage.setChildIndex(errorMsgContainer, stage.getNumChildren() - 1);
                 errorMsgContainer.updateCache();
                 break;
+            }
+
+            if (timeout != undefined) {
+                var myTimeout = timeout;
+            } else {
+                var myTimeout = _ERRORMSGTIMEOUT_;
+            }
+
+            if (myTimeout > 0) {
+                errorMsgTimeoutID = setTimeout(function () {
+                    hideMsgs();
+                }, myTimeout);
             }
 
             update = true;
@@ -2603,7 +2626,7 @@ handleComplete);
                     ['open', doLoad, _('Load project from files')],
                     ['save', doSave, _('Save project')],
                     // ['lilypond', _doLilypond, _('Save sheet music')],
-                    ['paste-disabled', pasteStack, _('Paste')],
+                    ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.')],
                     ['Cartesian', _doCartesian, _('Cartesian')],
                     ['polar', _doPolar, _('Polar')],
                     ['utility', _doUtilityBox, _('Settings')],
@@ -2920,6 +2943,7 @@ handleComplete);
 
         function _loadButtonDragHandler(container, ox, oy, action, longAction, extraLongAction, longImg, extraLongImg) {
             // Prevent multiple button presses (i.e., debounce).
+            var lockTimer = null;
             var locked = false;
 
             if (longAction === null) {
@@ -2931,11 +2955,33 @@ handleComplete);
             }
 
             // Long and extra-long press variables declaration
-            var pressTimer, pressTimerExtra, isLong = false, isExtraLong = false;
+            var pressTimer = null;
+            var isLong = false;
+            var pressTimerExtra = null;
+            var isExtraLong = false;
+
             var formerContainer = container;
 
             container.on('mousedown', function (event) {
-                var moved = true;
+                if (locked) {
+                    return;
+                } else {
+                    locked = true;
+
+                    lockTimer = setTimeout(function () {
+                        locked = false;
+                        clearTimeout(pressTimer);
+                        clearTimeout(pressTimerExtra);
+                        if (longImg !== null || extraLongImg !== null) {
+                            container.visible = false;
+                            container = formerContainer;
+                            container.visible = true;
+                        }
+                    }, 1500);
+                }
+
+                var mousedown = true;
+
                 var offset = {
                     x: container.x - Math.round(event.stageX / turtleBlocksScale),
                     y: container.y - Math.round(event.stageY / turtleBlocksScale)
@@ -2960,6 +3006,8 @@ handleComplete);
                 var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
 
                 container.on('pressup', function (event) {
+                    clearTimeout(lockTimer);
+
                     hideButtonHighlight(circles, stage);
                     container.x = ox;
                     container.y = oy;
@@ -2970,13 +3018,9 @@ handleComplete);
                         container.visible = true;
                     }
 
-                    if (action != null && moved && !locked) {
-                        locked = true;
+                    locked = false;
 
-                        setTimeout(function () {
-                            locked = false;
-                        }, 500);
-
+                    if (action != null && mousedown && !locked) {
                         clearTimeout(pressTimer);
                         clearTimeout(pressTimerExtra);
 
@@ -2988,13 +3032,14 @@ handleComplete);
                             extraLongAction();
                         }
                     }
-                    moved = false;
+
+                    mousedown = false;
                 });
 
                 isLong = false;
                 isExtraLong = false;
             });
-
         };
+
     };
 });
