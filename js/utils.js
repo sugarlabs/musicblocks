@@ -123,6 +123,11 @@ function docById(id) {
 };
 
 
+function docByName(name) {
+    return document.getElementByName(name);
+};
+
+
 function last(myList) {
     var i = myList.length;
     if (i === 0) {

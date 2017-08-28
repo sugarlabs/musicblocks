@@ -25,7 +25,7 @@ function TimbreWidget () {
     this.synthVals = {
         'oscillator': {
             'type' : 'sine6',
-            'source' : 'sine'
+            'source' : DEFAULTOSCILLATORTYPE
         },
         'envelope': {
             'attack': 0.01,
@@ -336,12 +336,12 @@ function TimbreWidget () {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                const FILTEROBJ = [[0, ['filter', {}], 0, 0, [null, 3, 1, 2, null]], [1, ['number', {'value': -12}], 0, 0, [0]], [2, ['number', {'value': 392}], 0, 0, [0]], [3, ['filtertype', {'value': 'highpass'}], 0, 0, [0]]];
+                const FILTEROBJ = [[0, ['filter', {}], 0, 0, [null, 3, 1, 2, null]], [1, ['number', {'value': -12}], 0, 0, [0]], [2, ['number', {'value': 392}], 0, 0, [0]], [3, ['filtertype', {'value': DEFAULTFILTERTYPE}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(FILTEROBJ);
 
                 var n = that._logo.blocks.blockList.length - 4;
                 that.fil.push(n);
-                that.filterParams.push('highpass');
+                that.filterParams.push(DEFAULTFILTERTYPE);
                 that.filterParams.push(-12);
                 that.filterParams.push(392);
 
@@ -610,7 +610,7 @@ function TimbreWidget () {
         mainDiv.innerHTML= '<p><input type="radio" name="synthsName" value="AMSynth"/>AMSynth</br><input type="radio" name="synthsName" value="FMSynth"/>FMSynth</br><input type="radio" name="synthsName" value="DuoSynth"/>DuoSynth</br></p>';
 
         var subDiv = docById('synth1');
-        var synthsName = document.getElementsByName('synthsName');
+        var synthsName = docByName('synthsName');
         var synthChosen;
         for (var i = 0; i < synthsName.length; i++) {
             synthsName[i].onclick = function () {
@@ -652,9 +652,11 @@ function TimbreWidget () {
 
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
                         subDiv.innerHTML = subHtmlElements;
+
                         docById('sS0').textContent = 'Harmonicity';
                         docById('myRangeS0').value = that.AMSynthParams[0];
                         docById('myspanS0').textContent = that.AMSynthParams[0];
+
                         that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
                         that._logo.synth.createSynth(that.instrument_name, 'amsynth', that.amSynthParamvals);
 
@@ -663,7 +665,6 @@ function TimbreWidget () {
                         }
 
                         document.getElementById('wrapperS0').addEventListener('change', function (event) {
-                            console.log('AMSynth event change');
                             docById('synthButtonCell').style.backgroundColor = '#C8C8C8';
                             var elem = event.target;
                             docById('myRangeS0').value = parseFloat(elem.value);
@@ -707,9 +708,11 @@ function TimbreWidget () {
 
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
                         subDiv.innerHTML = subHtmlElements;
+
                         docById('sS0').textContent = 'Modulation Index';
                         docById('myRangeS0').value = that.FMSynthParams[0];
                         docById('myspanS0').textContent = that.FMSynthParams[0];
+
                         that.fmSynthParamvals['modulationIndex'] = parseFloat(that.FMSynthParams[0]);
                         that._logo.synth.createSynth(that.instrument_name, 'fmsynth', that.fmSynthParamvals);
 
@@ -762,6 +765,7 @@ function TimbreWidget () {
                         }
 
                         subDiv.innerHTML = subHtmlElements;
+
                         docById('sS0').textContent = 'Vibrato Rate';
                         docById('myRangeS0').value = that.duoSynthParams[0];
                         docById('myspanS0').textContent = that.duoSynthParams[0];
@@ -788,6 +792,7 @@ function TimbreWidget () {
                                 else if (m==1) {
                                     that.duoSynthParamVals['vibratoAmount'] = parseFloat(elem.value);
                                 }
+
                                 docById('myspanS' + m).textContent = elem.value;
                                 that._update(blockValue, elem.value, Number(m));
                                 that._logo.synth.createSynth(that.instrument_name, 'duosynth', that.duoSynthParamVals);
@@ -803,6 +808,7 @@ function TimbreWidget () {
                 if (that.AMSynthesizer.length !== 1) {
                     blockValue = that.AMSynthesizer.length - 1;
                 }
+
                 docById('myRangeS0').value = parseFloat(that.AMSynthParams[0]);
                 docById('myspanS0').textContent = that.AMSynthParams[0];
                 that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
@@ -814,6 +820,7 @@ function TimbreWidget () {
                 if (that.FMSynthesizer.length !== 1) {
                     blockValue = that.FMSynthesizer.length - 1;
                 }
+
                 docById('myRangeS0').value = parseFloat(that.FMSynthParams[0]);
                 docById('myspanS0').textContent = that.FMSynthParams[0];
                 that.fmSynthParamvals['modulationIndex'] = parseFloat(hat.FMSynthParams[0]);
@@ -825,6 +832,7 @@ function TimbreWidget () {
                 if (that.duoSynthesizer.length !== 1) {
                     blockValue = that.duoSynthesizer.length - 1;
                 }
+
                 docById('myRangeS0').value = parseFloat(that.duoSynthParams[0]);
                 docById('myspanS0').textContent = that.duoSynthParams[0];
                 that.duoSynthParamVals['vibratoRate'] = parseFloat(that.duoSynthParams[0]);
@@ -916,9 +924,9 @@ function TimbreWidget () {
         docById('sOsc1').textContent = 'Partials';
         docById('myRangeO0').value = 6;
         docById('myspanO0').textContent = '6';
-
         docById('selOsc1').value = that.oscParams[0];
         that._update(blockValue, that.oscParams[0], 0);
+
         docById('myRangeO0').value = parseFloat(that.oscParams[1]);
         docById('myspanO0').textContent = that.oscParams[1];
         that._update(blockValue, that.oscParams[1], 1);
@@ -930,15 +938,15 @@ function TimbreWidget () {
 
         btnReset.onclick = function () {
             docById('oscillatorButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
-            docById('selOsc1').value = 'sine';
-            that._update(blockValue, 'sine', 0);
+            docById('selOsc1').value = DEFAULTOSCILLATORTYPE;
+            that._update(blockValue, DEFAULTOSCILLATORTYPE, 0);
 
             docById('myRangeO0').value = parseFloat(6);
             docById('myspanO0').textContent = '6';
             that._update(blockValue, '6', 1);
 
             that.synthVals['oscillator']['type'] = 'sine6';
-            that.synthVals['oscillator']['source'] = 'sine';
+            that.synthVals['oscillator']['source'] = DEFAULTOSCILLATORTYPE;
 
             that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
         }
@@ -996,9 +1004,7 @@ function TimbreWidget () {
                 var elem = event.target;
                 var m = elem.id.slice(-1);
                 docById('myRange' + m).value = parseFloat(elem.value);
-                console.log(elem.value);
                 docById('myspan' + m).textContent = elem.value;
-
                 that.synthVals['envelope'][that.adsrMap[m]] = parseFloat(elem.value) / 100;
                 that._update(blockValue, parseFloat(elem.value), m);
                 that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['source'], that.synthVals);
@@ -1067,7 +1073,7 @@ function TimbreWidget () {
         myDiv.innerHTML = selectOpt;
 
         if (!(that.instrument_name in instruments_filters)) {
-            var temp_obj = {'filterType' : 'highpass', 'filterRolloff' : -12, 'filterFrequency': 392};
+            var temp_obj = {'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392};
             instruments_filters[that.instrument_name] = [];
             instruments_filters[that.instrument_name].push(temp_obj);
         }
@@ -1081,7 +1087,7 @@ function TimbreWidget () {
             that._update(blockValue, elem.value, 0);
         });
 
-        var rolloffValue = document.getElementsByName('rolloff');
+        var rolloffValue = docByName('rolloff');
         for (var i = 0; i < rolloffValue.length; i++) {
             rolloffValue[i].onclick = function () {
                 blockValue = 0;
@@ -1110,7 +1116,6 @@ function TimbreWidget () {
         docById('s2').textContent = 'Frequency';
         docById('myRangeF2').value = '392';
         docById('myspanF2').textContent = '392';
-
         docById('sel1').value = that.filterParams[0];
         that._update(blockValue, that.filterParams[0], 0);
 
@@ -1142,7 +1147,6 @@ function TimbreWidget () {
 
             docById('newsel').innerHTML = selectOpt1;
             docById('newsel').style.marginTop = '-35px';
-
             docById('newmyRangeF2').value = '392';
             docById('newmyspanF2').textContent = '392';
             docById('newmyRangeF2').max = '7050';
@@ -1156,7 +1160,7 @@ function TimbreWidget () {
                 that._update(blockValue, elem.value, 0);
             });
 
-            var rolloffValue = document.getElementsByName('rolloff1');
+            var rolloffValue = docByName('rolloff1');
             for (var i = 0; i < rolloffValue.length; i++) {
                 blockValue = that.fil.length - 1;
                 rolloffValue[i].onclick = function () {
@@ -1178,10 +1182,9 @@ function TimbreWidget () {
                 instruments_filters[that.instrument_name][1]['filterFrequency'] = parseFloat(elem.value);
             });
 
-            console.log('filter no. 2 params: ' + that.filterParams);
             docById('sel2').value = that.filterParams[3];
-
             that._update(that.fil.length-1, that.filterParams[3], 0);
+
             docById('news1').value = that.filterParams[3];
             that._update(that.fil.length-1, that.filterParams[4], 1);
 
@@ -1191,13 +1194,14 @@ function TimbreWidget () {
         }
 
         btnReset.onclick = function () {
-            that.filterParams[0] = 'highpass';
+            that.filterParams[0] = DEFAULTFILTERTYPE;
             that.filterParams[1] = '-12';
             that.filterParams[2] = '392';
             docById('filterButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
             docById('sel1').value = that.filterParams[0];
             that._update(0, that.filterParams[0], 0);
             that._update(0, that.filterParams[1], 1);
+
             docById('myRangeF2').value = parseFloat(that.filterParams[2]);
             docById('myspanF2').textContent = that.filterParams[2];
             that._update(0, that.filterParams[2], 2);
@@ -1207,10 +1211,11 @@ function TimbreWidget () {
             instruments_filters[that.instrument_name][0]['filterFrequency'] = parseFloat(that.filterParams[2]);
 
             if (that.fil.length === 2) {
-                that.filterParams[3] = 'highpass';
+                that.filterParams[3] = DEFAULTFILTERTYPE;
                 that.filterParams[4] = '-12';
                 that.filterParams[5] = '392';
                 docById('sel2').value = that.filterParams[3];
+
                 that._update(that.fil.length - 1, that.filterParams[3], 0);
                 that._update(that.fil.length-1, that.filterParams[4], 1);
                 docById('newmyRangeF2').value = parseFloat(that.filterParams[5]);
@@ -1224,18 +1229,16 @@ function TimbreWidget () {
         }
 
         addFilter.onclick = function () {
-
-              console.log('adding new filter');
               if (that.fil.length < 2) {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                const FILTEROBJ = [[0, ['filter', {}], 0, 0, [null, 3, 1, 2, null]], [1, ['number', {'value': -12}], 0, 0, [0]], [2, ['number', {'value': 392}], 0, 0, [0]], [3, ['filtertype', {'value': 'highpass'}], 0, 0, [0]]];
+                const FILTEROBJ = [[0, ['filter', {}], 0, 0, [null, 3, 1, 2, null]], [1, ['number', {'value': -12}], 0, 0, [0]], [2, ['number', {'value': 392}], 0, 0, [0]], [3, ['filtertype', {'value': DEFAULTFILTERTYPE}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(FILTEROBJ);
 
                 var n = that._logo.blocks.blockList.length - 4;
                 that.fil.push(n);
-                that.filterParams.push('highpass');
+                that.filterParams.push(DEFAULTFILTERTYPE);
                 that.filterParams.push(-12);
                 that.filterParams.push(392);
 
@@ -1259,13 +1262,11 @@ function TimbreWidget () {
 
                 docById('newsel').innerHTML = selectOpt1;
                 docById('newsel').style.marginTop = '-35px';
-
                 docById('newmyRangeF2').value = '392';
                 docById('newmyspanF2').textContent = '392';
-
                 docById('newmyRangeF2').max = '7050';
 
-                var temp_obj = {'filterType' : 'highpass', 'filterRolloff' : -12, 'filterFrequency': 392};
+                var temp_obj = {'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392};
                 instruments_filters[that.instrument_name].push(temp_obj);
 
                 document.getElementById('newwrapper0').addEventListener('change', function (event) {
@@ -1277,7 +1278,7 @@ function TimbreWidget () {
                     that._update(blockValue, elem.value, 0);
                 });
 
-                var rolloffValue = document.getElementsByName('rolloff1');
+                var rolloffValue = docByName('rolloff1');
                 for (var i = 0; i < rolloffValue.length; i++) {
                     blockValue = that.fil.length - 1;
                     rolloffValue[i].onclick = function () {
@@ -1344,7 +1345,7 @@ function TimbreWidget () {
         mainDiv.innerHTML= '<p><input type="radio" name="effectsName" value="Tremolo"/>Tremolo</br><input type="radio" name="effectsName" value="Vibrato"/>Vibrato</br><input type="radio" name="effectsName" value="Chorus"/>Chorus</br><input type="radio" name="effectsName" value="Phaser"/>Phaser</br><input type="radio" name="effectsName" value="Distortion"/>Distortion</br></p>';
 
         var subDiv = docById('effect1');
-        var effectsName = document.getElementsByName('effectsName');
+        var effectsName = docByName('effectsName');
         var effectChosen;
 
         for (var i = 0; i < effectsName.length; i++) {
