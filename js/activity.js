@@ -902,8 +902,12 @@ define(MYDEFINES, function (compatibility) {
                     }, 200);
                 });
 
-                reader.readAsText(files[0]);
-                window.scroll(0, 0)
+                // Work-around in case the handler is called by the
+                // widget drag & drop code.
+                if (files[0] != undefined) {
+                    reader.readAsText(files[0]);
+                    window.scroll(0, 0)
+                }
             };
 
             function handleDragOver (event) {
