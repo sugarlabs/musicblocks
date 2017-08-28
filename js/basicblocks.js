@@ -340,6 +340,65 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // MATRIX PALETTE
 
+    var oscillatorBlock = new ProtoBlock('oscillator');
+    oscillatorBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['oscillator'] = oscillatorBlock;
+    oscillatorBlock.staticLabels.push(_('oscillator'), _('oscillatorType'), _('partials'));
+    oscillatorBlock.extraWidth = 10;
+    oscillatorBlock.adjustWidthToLabel();
+    oscillatorBlock.defaults.push(_('triangle'));
+    oscillatorBlock.defaults.push(6);
+    oscillatorBlock.hidden = true;
+    oscillatorBlock.twoArgBlock();
+    oscillatorBlock.dockTypes[1] = 'oscillatortype';
+    oscillatorBlock.dockTypes[2] = 'numberin';
+
+    var filtertypeBlock = new ProtoBlock('filtertype');
+    filtertypeBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['filtertype'] = filtertypeBlock;
+    filtertypeBlock.hidden = true;
+    filtertypeBlock.valueBlock();
+    filtertypeBlock.dockTypes[0] = 'textout';
+
+    var oscillatortypeBlock = new ProtoBlock('oscillatortype');
+    oscillatortypeBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['oscillatortype'] = oscillatortypeBlock;
+    oscillatortypeBlock.hidden = true;
+    oscillatortypeBlock.valueBlock();
+    oscillatortypeBlock.dockTypes[0] = 'textout';
+
+    var envelopeBlock = new ProtoBlock('envelope');
+    envelopeBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['envelope'] = envelopeBlock;
+    envelopeBlock.staticLabels.push(_('envelope'), _('attack'), _('decay'), _('sustain'), _('release'));
+    envelopeBlock.extraWidth = 10;
+    envelopeBlock.adjustWidthToLabel();
+    envelopeBlock.defaults.push(1);
+    envelopeBlock.defaults.push(50);
+    envelopeBlock.defaults.push(60);
+    envelopeBlock.defaults.push(1);
+    envelopeBlock.hidden = true;
+    envelopeBlock.fourArgBlock();
+    envelopeBlock.dockTypes[1] = 'numberin';
+    envelopeBlock.dockTypes[2] = 'numberin';
+    envelopeBlock.dockTypes[3] = 'numberin';
+    envelopeBlock.dockTypes[4] = 'numberin';
+
+    var filterBlock = new ProtoBlock('filter');
+    filterBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['filter'] = filterBlock;
+    filterBlock.staticLabels.push(_('filter'), _('type'), _('rolloff'), _('frequency'));
+    filterBlock.extraWidth = 10;
+    filterBlock.adjustWidthToLabel();
+    filterBlock.defaults.push(_('highpass'));
+    filterBlock.defaults.push(-12);
+    filterBlock.defaults.push(392);
+    filterBlock.threeArgBlock();
+    filterBlock.hidden = true;
+    filterBlock.dockTypes[1] = 'anyin';
+    filterBlock.dockTypes[2] = 'numberin';
+    filterBlock.dockTypes[3] = 'numberin';
+    
     var sixtyfourthNoteBlock = new ProtoBlock('sixtyfourthNote');
     sixtyfourthNoteBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['sixtyfourthNote'] = sixtyfourthNoteBlock;
@@ -476,66 +535,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm2.dockTypes[1] = 'anyin';
     rhythm2.dockTypes[2] = 'anyin';
 
-    var oscillatorBlock = new ProtoBlock('oscillator');
-    oscillatorBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['oscillator'] = oscillatorBlock;
-    oscillatorBlock.staticLabels.push(_('oscillator'), _('oscillatorType'), _('partials'));
-    oscillatorBlock.extraWidth = 10;
-    oscillatorBlock.adjustWidthToLabel();
-    oscillatorBlock.defaults.push(_('triangle'));
-    oscillatorBlock.defaults.push(6);
-    oscillatorBlock.hidden = true;
-    oscillatorBlock.twoArgBlock();
-    oscillatorBlock.dockTypes[1] = 'oscillatortype';
-    oscillatorBlock.dockTypes[2] = 'numberin';
+    var timbreBlock = new ProtoBlock('timbre');
+    timbreBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['timbre'] = timbreBlock;
+    timbreBlock.staticLabels.push(_('timbre'));
+    timbreBlock.extraWidth = 20;
+    timbreBlock.adjustWidthToLabel();
+    timbreBlock.stackClampOneArgBlock();
+    timbreBlock.defaults.push(_('custom'));
 
-
-    var filtertypeBlock = new ProtoBlock('filtertype');
-    filtertypeBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['filtertype'] = filtertypeBlock;
-    filtertypeBlock.hidden = true;
-    filtertypeBlock.valueBlock();
-    filtertypeBlock.dockTypes[0] = 'textout';
-
-    var oscillatortypeBlock = new ProtoBlock('oscillatortype');
-    oscillatortypeBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['oscillatortype'] = oscillatortypeBlock;
-    oscillatortypeBlock.hidden = true;
-    oscillatortypeBlock.valueBlock();
-    oscillatortypeBlock.dockTypes[0] = 'textout';
-
-    var envelopeBlock = new ProtoBlock('envelope');
-    envelopeBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['envelope'] = envelopeBlock;
-    envelopeBlock.staticLabels.push(_('envelope'), _('attack'), _('decay'), _('sustain'), _('release'));
-    envelopeBlock.extraWidth = 10;
-    envelopeBlock.adjustWidthToLabel();
-    envelopeBlock.defaults.push(1);
-    envelopeBlock.defaults.push(50);
-    envelopeBlock.defaults.push(60);
-    envelopeBlock.defaults.push(1);
-    envelopeBlock.hidden = true;
-    envelopeBlock.fourArgBlock();
-    envelopeBlock.dockTypes[1] = 'numberin';
-    envelopeBlock.dockTypes[2] = 'numberin';
-    envelopeBlock.dockTypes[3] = 'numberin';
-    envelopeBlock.dockTypes[4] = 'numberin';
-
-    var filterBlock = new ProtoBlock('filter');
-    filterBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['filter'] = filterBlock;
-    filterBlock.staticLabels.push(_('filter'), _('type'), _('rolloff'), _('frequency'));
-    filterBlock.extraWidth = 10;
-    filterBlock.adjustWidthToLabel();
-    filterBlock.defaults.push(_('highpass'));
-    filterBlock.defaults.push(-12);
-    filterBlock.defaults.push(392);
-    filterBlock.threeArgBlock();
-    filterBlock.hidden = true;
-    filterBlock.dockTypes[1] = 'anyin';
-    filterBlock.dockTypes[2] = 'numberin';
-    filterBlock.dockTypes[3] = 'numberin';
-    
     var modewidgetBlock = new ProtoBlock('modewidget');
     modewidgetBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['modewidget'] = modewidgetBlock;
@@ -581,16 +589,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmrulerBlock.adjustWidthToLabel();
     rhythmrulerBlock.stackClampOneArgBlock();
     rhythmrulerBlock.defaults.push(1);
-
-
-    var timbreBlock = new ProtoBlock('timbre');
-    timbreBlock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['timbre'] = timbreBlock;
-    timbreBlock.staticLabels.push(_('timbre'));
-    timbreBlock.extraWidth = 20;
-    timbreBlock.adjustWidthToLabel();
-    timbreBlock.stackClampOneArgBlock();
-    timbreBlock.defaults.push(_('custom'));
 
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['widgets'];

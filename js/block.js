@@ -651,7 +651,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
                     break;
                 case 'timbre':
-                    myBlock.collapseText = new createjs.Text(_('timbre'), fontSize + 'px Sans', '#000000');
+                    that.collapseText = new createjs.Text(_('timbre'), fontSize + 'px Sans', '#000000');
                     break;    
                 case 'pitchstaircase':
                     that.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', '#000000');
