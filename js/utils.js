@@ -670,6 +670,16 @@ function hideDOMLabel() {
     if (modenameLabel !== null) {
         modenameLabel.style.display = 'none';
     }
+
+    var filtertypeLabel = docById('filtertypeLabel');
+    if (filtertypeLabel !== null) {
+        filtertypeLabel.style.display = 'none';
+    }
+
+    var oscillatortypeLabel = docById('oscillatortypeLabel');
+    if (oscillatortypeLabel !== null) {
+        oscillatortypeLabel.style.display = 'none';
+    }
 };
 
 
@@ -702,12 +712,14 @@ function toFixed2 (d) {
 
 function mixedNumber (d) {
     // Return number as a mixed fraction string, e.g., "2 1/4"
+
     if (typeof(d) === 'number') {
         var floor = Math.floor(d);
         if (d > floor) {
             var obj = rationalToFraction(d - floor);
             if (floor === 0) {
                 return obj[0] + '/' + obj[1];
+
             } else {
                 if (obj[0] === 1 && obj[1] === 1) {
                     return floor + 1;
@@ -723,7 +735,10 @@ function mixedNumber (d) {
             return d.toString();
         }
     } else {
+
         return d;
+
+
     }
 };
 
@@ -942,7 +957,7 @@ function oneHundredToFraction (d) {
     case 72:
     case 73:
     case 74:
-        return [23, 32];
+		return [23, 32];
         break;
     case 75:
     case 76:
@@ -986,6 +1001,9 @@ function oneHundredToFraction (d) {
         break;
     default:
         return [d, 100];
+
         break;
+
     }
 };
+

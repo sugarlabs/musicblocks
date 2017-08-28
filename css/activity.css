@@ -157,7 +157,7 @@ nav ul {
 }
 
 nav ul li {
-    dispalay: inline;
+    display: inline;
     padding-right: 12px;
     float: right;
 }
@@ -549,6 +549,45 @@ table {
 }
 
 #pscInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
+#timbreDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#timbreTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#timbreButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#timbreOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y:auto;
+    overflow-x:none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#timbreInnerDiv {
     overflow-x:auto;
     margin-left: 53px;
 }

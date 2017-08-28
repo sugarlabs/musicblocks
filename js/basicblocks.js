@@ -340,6 +340,65 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // MATRIX PALETTE
 
+    var oscillatorBlock = new ProtoBlock('oscillator');
+    oscillatorBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['oscillator'] = oscillatorBlock;
+    oscillatorBlock.staticLabels.push(_('oscillator'), _('oscillatorType'), _('partials'));
+    oscillatorBlock.extraWidth = 10;
+    oscillatorBlock.adjustWidthToLabel();
+    oscillatorBlock.defaults.push(_('triangle'));
+    oscillatorBlock.defaults.push(6);
+    oscillatorBlock.hidden = true;
+    oscillatorBlock.twoArgBlock();
+    oscillatorBlock.dockTypes[1] = 'oscillatortype';
+    oscillatorBlock.dockTypes[2] = 'numberin';
+
+    var filtertypeBlock = new ProtoBlock('filtertype');
+    filtertypeBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['filtertype'] = filtertypeBlock;
+    filtertypeBlock.hidden = true;
+    filtertypeBlock.valueBlock();
+    filtertypeBlock.dockTypes[0] = 'textout';
+
+    var oscillatortypeBlock = new ProtoBlock('oscillatortype');
+    oscillatortypeBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['oscillatortype'] = oscillatortypeBlock;
+    oscillatortypeBlock.hidden = true;
+    oscillatortypeBlock.valueBlock();
+    oscillatortypeBlock.dockTypes[0] = 'textout';
+
+    var envelopeBlock = new ProtoBlock('envelope');
+    envelopeBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['envelope'] = envelopeBlock;
+    envelopeBlock.staticLabels.push(_('envelope'), _('attack'), _('decay'), _('sustain'), _('release'));
+    envelopeBlock.extraWidth = 10;
+    envelopeBlock.adjustWidthToLabel();
+    envelopeBlock.defaults.push(1);
+    envelopeBlock.defaults.push(50);
+    envelopeBlock.defaults.push(60);
+    envelopeBlock.defaults.push(1);
+    envelopeBlock.hidden = true;
+    envelopeBlock.fourArgBlock();
+    envelopeBlock.dockTypes[1] = 'numberin';
+    envelopeBlock.dockTypes[2] = 'numberin';
+    envelopeBlock.dockTypes[3] = 'numberin';
+    envelopeBlock.dockTypes[4] = 'numberin';
+
+    var filterBlock = new ProtoBlock('filter');
+    filterBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['filter'] = filterBlock;
+    filterBlock.staticLabels.push(_('filter'), _('type'), _('rolloff'), _('frequency'));
+    filterBlock.extraWidth = 10;
+    filterBlock.adjustWidthToLabel();
+    filterBlock.defaults.push(_('highpass'));
+    filterBlock.defaults.push(-12);
+    filterBlock.defaults.push(392);
+    filterBlock.threeArgBlock();
+    filterBlock.hidden = true;
+    filterBlock.dockTypes[1] = 'anyin';
+    filterBlock.dockTypes[2] = 'numberin';
+    filterBlock.dockTypes[3] = 'numberin';
+    
     var sixtyfourthNoteBlock = new ProtoBlock('sixtyfourthNote');
     sixtyfourthNoteBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['sixtyfourthNote'] = sixtyfourthNoteBlock;
@@ -475,6 +534,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythm2.twoArgBlock();
     rhythm2.dockTypes[1] = 'anyin';
     rhythm2.dockTypes[2] = 'anyin';
+
+    var timbreBlock = new ProtoBlock('timbre');
+    timbreBlock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['timbre'] = timbreBlock;
+    timbreBlock.staticLabels.push(_('timbre'));
+    timbreBlock.extraWidth = 20;
+    timbreBlock.adjustWidthToLabel();
+    timbreBlock.stackClampOneArgBlock();
+    timbreBlock.defaults.push(_('custom'));
 
     var modewidgetBlock = new ProtoBlock('modewidget');
     modewidgetBlock.palette = palettes.dict['widgets'];
@@ -870,6 +938,38 @@ function initBasicProtoBlocks(palettes, blocks) {
     setMasterBPMBlock.oneArgBlock();
     setMasterBPMBlock.defaults.push(90);
 
+    var amSynthBlock = new ProtoBlock('amsynth');
+    amSynthBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['amsynth'] = amSynthBlock;
+    amSynthBlock.staticLabels.push(_('AMSynth'));
+    amSynthBlock.extraWidth = 10;
+    amSynthBlock.adjustWidthToLabel();
+    amSynthBlock.defaults.push(1);
+    amSynthBlock.oneArgBlock();
+    amSynthBlock.dockTypes[1] = 'numberin';
+
+    var fmSynthBlock = new ProtoBlock('fmsynth');
+    fmSynthBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['fmsynth'] = fmSynthBlock;
+    fmSynthBlock.staticLabels.push(_('FMSynth'));
+    fmSynthBlock.extraWidth = 10;
+    fmSynthBlock.adjustWidthToLabel();
+    fmSynthBlock.defaults.push(10);
+    fmSynthBlock.oneArgBlock();
+    fmSynthBlock.dockTypes[1] = 'numberin';
+
+    var duoSynthBlock = new ProtoBlock('duosynth');
+    duoSynthBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['duosynth'] = duoSynthBlock;
+    duoSynthBlock.staticLabels.push(_('Duo Synth'), _('vibratoRate'), _('vibratoAmount'));
+    duoSynthBlock.extraWidth = 10;
+    duoSynthBlock.adjustWidthToLabel();
+    duoSynthBlock.defaults.push(10);
+    duoSynthBlock.defaults.push(6);
+    duoSynthBlock.twoArgBlock();
+    duoSynthBlock.dockTypes[1] = 'numberin';
+    duoSynthBlock.dockTypes[2] = 'numberin';
+
     var voicenameBlock = new ProtoBlock('voicename');
     voicenameBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['voicename'] = voicenameBlock;
@@ -1048,6 +1148,24 @@ function initBasicProtoBlocks(palettes, blocks) {
     staccatoBlock.flowClampOneArgBlock();
     staccatoBlock.defaults.push(32);
     staccatoBlock.hidden = true;
+
+    var setTimbreBlock = new ProtoBlock('settimbre');
+    setTimbreBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['settimbre'] = setTimbreBlock;
+    setTimbreBlock.staticLabels.push(_('set timbre'));
+    setTimbreBlock.adjustWidthToLabel();
+    setTimbreBlock.flowClampOneArgBlock();
+    setTimbreBlock.dockTypes[1] = 'textin';
+    setTimbreBlock.defaults.push(_('custom'));
+    
+    /*var setTimbreBlock = new ProtoBlock('settimbre');
+    setTimbreBlock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['settimbre'] = setTimbreBlock;
+    setTimbreBlock.staticLabels.push(_('set timbre'));
+    setTimbreBlock.adjustWidthToLabel();
+    setTimbreBlock.flowClampOneArgBlock();
+    setTimbreBlock.defaults.push(_('custom'));
+    */
 
     var newslurBlock = new ProtoBlock('newslur');
     newslurBlock.palette = palettes.dict['tone'];

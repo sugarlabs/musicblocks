@@ -12,11 +12,12 @@
 // Macro expansions
 
 function blockIsMacro (blkname) {
-    const BUILTINMACROS= ['action', 'articulation', 'augmented', 'augmentedx', 'augmented1', 'augmented2', 'augmented4', 'augmented5', 'augmented7','augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished', 'diminishedx', 'diminished1', 'diminished4', 'diminished5', 'diminished8', 'dividebeatfactor', 'dog', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'flat', 'floortom', 'halfNote', 'hihat', 'hollowline', 'invert', 'invert1', 'kick', 'major', 'majorx', 'major2', 'major3', 'major6', 'major7', 'matrix', 'meter', 'mf', 'midi', 'minor', 'minorx', 'minor2', 'minor3', 'minor6', 'minor7', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'octave', 'oneOf', 'osctime', 'p', 'perfect', 'perfectx', 'perfect1', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pluck', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'ridebell', 'sawtooth', 'setbpm', 'setdrum', 'setkey2', 'setnotevolume2', 'settransposition', 'setturtlename', 'setvoice', 'sharp', 'sine', 'sixteenthNote', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'steppitch', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'thirtysecondNote', 'tie', 'tom', 'tone', 'triangle', 'triangle1', 'tuplet3', 'tuplet4','turtlenote2', 'turtlepitch', 'vibrato', 'wholeNote', 'xturtle', 'yturtle'];
+
+    const BUILTINMACROS= ['action', 'articulation', 'augmented', 'augmentedx', 'augmented1', 'augmented2', 'augmented4', 'augmented5', 'augmented7','augmented8', 'backward', 'bottle', 'bubbles', 'cat', 'chine', 'clang', 'clap', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'darbuka', 'diminished', 'diminishedx', 'diminished1', 'diminished4', 'diminished5', 'diminished8', 'dividebeatfactor', 'dog', 'drift', 'duck', 'duplicatenotes', 'eighthNote', 'f', 'ff', 'fff', 'fill', 'fingercymbals', 'flat', 'floortom', 'halfNote', 'hihat', 'hollowline', 'invert', 'invert1', 'kick', 'major', 'majorx', 'major2', 'major3', 'major6', 'major7', 'matrix', 'meter', 'mf', 'midi', 'minor', 'minorx', 'minor2', 'minor3', 'minor6', 'minor7', 'mp', 'multiplybeatfactor', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'note', 'note1', 'note2', 'note3', 'note4', 'octave', 'oneOf', 'osctime', 'p', 'perfect', 'perfectx', 'perfect1', 'perfect4', 'perfect5', 'perfect8', 'pickup', 'pitchdrummatrix', 'pitchslider', 'pitchstaircase', 'playdrum', 'pluck', 'pp', 'ppp', 'quarterNote', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmruler', 'ridebell', 'sawtooth', 'setbpm', 'setdrum', 'setkey2', 'setnotevolume2', 'settransposition', 'setturtlename', 'setvoice', 'sharp', 'sine', 'sixteenthNote', 'sixtyfourthNote', 'skipnotes', 'slap', 'slur', 'snare', 'splash', 'square', 'staccato', 'status', 'steppitch', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'tempo', 'thirtysecondNote', 'tie', 'timbre', 'tom', 'tone', 'triangle', 'triangle1', 'tuplet3', 'tuplet4','turtlenote2', 'turtlepitch', 'vibrato', 'wholeNote', 'xturtle', 'yturtle'];
 
     return BUILTINMACROS.indexOf(blkname) > -1;
-};
 
+};
 
 function getMacroExpansion (blkname, x, y) {
     // Some blocks are expanded on load.
@@ -127,8 +128,8 @@ function getMacroExpansion (blkname, x, y) {
     const SPLASHOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('splash')}], 0, 0, [0]]];
     const SQUAREOBJ = [[0, 'note', x, y, [null, 1, 2, 4]], [1, ['number', {'value': 8}], 0, 0, [0]], [2, 'square', 0, 0, [0, 3, null]], [3, ['number', {'value': 440}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
     const STACCATOOBJ = [[0, 'staccato', x, y, [null, 1, null, 2]], [1, ['number', {'value': 32}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const STATUSOBJ = [[0, 'status', x, y, [null, 1, 8]], [1, 'hidden', 0, 0, [0, 2]], [2, ['print', {}], 0, 0, [1, 3, 4]], [3, ['beatvalue', {}], 0, 0, [2]], [4, ['print', {}], 0, 0, [2, 5, 6]], [5, ['measurevalue', {}], 0, 0, [4]], [6, ['print', {}], 0, 0, [4, 7, null]], [7, ['elapsednotes', {}], 0, 0, [6]], [8, 'hiddennoflow', 0, 0, [0, null]]];
-    const STEPPITCHOBJ = [[0, 'note', x, y, [null, 1, 2, 4]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'steppitch', 0, 0, [0, 3, null]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
+	const STATUSOBJ = [[0, 'status', x, y, [null, 1, 8]], [1, 'hidden', 0, 0, [0, 2]], [2, ['print', {}], 0, 0, [1, 3, 4]], [3, ['beatvalue', {}], 0, 0, [2]], [4, ['print', {}], 0, 0, [2, 5, 6]], [5, ['measurevalue', {}], 0, 0, [4]], [6, ['print', {}], 0, 0, [4, 7, null]], [7, ['elapsednotes', {}], 0, 0, [6]], [8, 'hiddennoflow', 0, 0, [0, null]]];
+	const STEPPITCHOBJ = [[0, 'note', x, y, [null, 1, 2, 4]], [1, ['number', {'value': 4}], 0, 0, [0]], [2, 'steppitch', 0, 0, [0, 3, null]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, 'hidden', 0, 0, [0, null]]];
     const STUPLETOBJ = [[0,'stuplet', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 3}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 2}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const STUPLET3OBJ = [[0,'stuplet', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 3}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 2}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const STUPLET5OBJ = [[0,'stuplet', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 2}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
@@ -138,7 +139,8 @@ function getMacroExpansion (blkname, x, y) {
     const TEMPOOBJ = [[0, 'tempo', x, y, [null, 1, 3]], [1, 'setmasterbpm', 0, 0, [0, 2, null]], [2, ['number', {'value': 90}], 0, 0, [1]], [3, 'hiddennoflow', 0, 0, [0, null]]];
     const THIRTYSECONDOBJ = [[0, 'rhythm2', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 32}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const TIEOBJ = [[0, 'tie', x, y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
-    const TOMOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('tom tom')}], 0, 0, [0]]];
+    const TIMBREOBJ = [[0, ['timbre', {'collapsed': false}], x, y, [null, 1, null, 2]], [1, ['text', {'value': 'custom'}], 0, 0, [0]], [2, ['hiddennoflow', {}], 0, 0, [0, null]]];
+	const TOMOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('tom tom')}], 0, 0, [0]]];
     const TONEOBJ = [[0, 'drift', x, y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'hertz', 0, 0, [2, 7, null]], [7, ['number', {'value': 392}], 0, 0, [6]]];
     const TRANSPOBJ = [[0, 'settransposition', x, y, [null, 1, null, 2]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const TRIANGLE1OBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('triangle bell')}], 0, 0, [0]]];
@@ -147,8 +149,8 @@ function getMacroExpansion (blkname, x, y) {
     const TUPLET4OBJ = [[0,'tuplet4', x, y, [null, 1, 4, 17]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': 2}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'rhythm2', 0, 0, [4, 6, 7, 10]], [6, ['number', {'value': 6}], 0, 0, [5]], [7, 'divide', 0, 0, [5, 8, 9]], [8, ['number', {'value': 1}], 0, 0, [7]], [9, ['number', {'value': 16}], 0, 0, [7]], [10, 'vspace', 0, 0, [5, 11]], [11, 'rhythm2', 0, 0, [10, 12, 13, 16]], [12, ['number', {'value': 1}], 0, 0, [11]], [13, 'divide', 0, 0, [11, 14, 15]], [14, ['number', {'value': 1}], 0, 0, [13]], [15, ['number', {'value': 4}], 0, 0, [13]], [16, 'vspace', 0, 0, [11, null]], [17, 'hidden', 0, 0, [0, null]]];
     const TURTLENOTEOBJ = [[0, 'turtlenote2', x, y, [null, 1, null]], [1, 'turtlename', 0, 0, [0]]];
     const TURTLEPITCHOBJ = [[0, 'turtlepitch', x, y, [null, 1, null]], [1, 'turtlename', 0, 0, [0]]];
-    const VIBRATOOBJ = [[0, ['vibrato', {}], x, y, [null, 1, 3, 2, 6]], [1, ['number', {'value': 10}], 0, 0, [0]], [2, ['vspace', {}], 0, 0, [0, null]], [3, ['divide', {}], 0, 0, [0, 4, 5]], [4, ['number', {'value': 1}], 0, 0, [3]], [5, ['number', {'value': 16}], 0, 0, [3]], [6, ['hidden', {}], 0, 0, [0, null]]];
-    const VOLOBJ = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 50}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+	const VIBRATOOBJ = [[0, ["vibrato", {}], x, y, [null, 1, 3, 2, 6]], [1, ["number", {"value": 10}], 0, 0, [0]], [2, ["vspace", {}], 0, 0, [0, null]], [3, ["divide", {}], 0, 0, [0, 4, 5]], [4, ["number", {"value": 1}], 0, 0, [3]], [5, ["number", {"value": 16}], 0, 0, [3]], [6, ["hidden", {}], 0, 0, [0, null]]];
+	const VOLOBJ = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 50}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const VOLOBJ15 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 15}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const VOLOBJ25 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 25}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const VOLOBJ35 = [[0, 'setnotevolume2', x, y, [null, 1, null, 2]], [1, ['number', {'value': 35}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
@@ -289,11 +291,12 @@ function getMacroExpansion (blkname, x, y) {
         'stuplet5': STUPLET5OBJ,
         'stuplet7': STUPLET7OBJ,
         'swing': SWINGOBJ,
-        'switch': SWITCHOBJ,
+		'switch': SWITCHOBJ,
         'tempo': TEMPOOBJ,
         'thirtysecondNote': THIRTYSECONDOBJ,
         'tie': TIEOBJ,
-        'tom': TOMOBJ,
+        'timbre': TIMBREOBJ,
+		'tom': TOMOBJ,
         'tone': TONEOBJ,
         'triangle1': TRIANGLE1OBJ,
         'triangle': TRIANGLEOBJ,
@@ -307,7 +310,7 @@ function getMacroExpansion (blkname, x, y) {
         'yturtle': YTURTLEOBJ,
     };
 
-    if (['namedbox', 'nameddo', 'namedcalc', 'namedarg', 'nameddoArg'].indexOf(blkname) === -1 && blkname in BUILTINMACROS) {
+	if (['namedbox', 'nameddo', 'namedcalc', 'namedarg', 'nameddoArg'].indexOf(blkname) === -1 && blkname in BUILTINMACROS) {
         return BUILTINMACROS[blkname];
     } else {
         return null;

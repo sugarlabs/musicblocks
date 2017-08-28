@@ -42,6 +42,7 @@ const TACAT = {
     'pitchdrummatrix': 'ignore',
     'tempo': 'ignore',
     'modewidget': 'ignore',
+    'timbre': 'ignore',
 
     'bpmfactor': 'rhythmfactor',
     'beatfactor': 'rhythmfactor',
@@ -53,6 +54,8 @@ const TACAT = {
     'drumname': 'ignore',
     'voicename': 'ignore',
     'modename': 'ignore',
+    'filtertype':'ignore',
+    'oscillatortype':'ignore',
 
     'hertz': 'pitch',
     'pitch': 'pitch',

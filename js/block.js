@@ -12,9 +12,9 @@
 
 // Length of a long touch
 const LONGPRESSTIME = 1500;
-const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
+const COLLAPSABLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'filtertype', 'oscillatortype'];
 
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
@@ -545,6 +545,12 @@ function Block(protoblock, blocks, overrideName) {
                 case 'drumname':
                     this.value = getDrumName(DEFAULTDRUM);
                     break;
+                case 'filtertype':
+                    this.value = getFilterTypes(DEFAULTFILTERTYPE);
+                    break; 
+                case 'oscillatortype':
+                    this.value = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
+                    break;        
                 }
             }
 
@@ -644,6 +650,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'rhythmruler':
                     that.collapseText = new createjs.Text(_('ruler'), fontSize + 'px Sans', '#000000');
                     break;
+                case 'timbre':
+                    that.collapseText = new createjs.Text(_('timbre'), fontSize + 'px Sans', '#000000');
+                    break;    
                 case 'pitchstaircase':
                     that.collapseText = new createjs.Text(_('stair'), fontSize + 'px Sans', '#000000');
                     break;
@@ -1253,6 +1262,7 @@ function Block(protoblock, blocks, overrideName) {
                         that._changeLabel();
                     }
                 } else {
+
                     if (!that.blocks.inLongPress) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
@@ -1701,6 +1711,56 @@ function Block(protoblock, blocks, overrideName) {
             labelHTML += '</select>';
             labelElem.innerHTML = labelHTML;
             this.label = docById('drumnameLabel');
+        } else if (this.name === 'filtertype') {
+            var type = 'filtertype';
+            if (this.value != null) {
+                var selectedtype = getFilterTypes(this.value);
+            } else {
+                var selectedtype = getFilterTypes(DEFAULTFILTERTYPE);
+            }
+
+            var labelHTML = '<select name="filtertype" id="filtertypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            for (var i = 0; i < TYPES.length; i++) {
+                if (TYPES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + TYPES[i][1] + '">' + TYPES[i][1] + '</option>';
+                } else if (selectedtype === TYPES[i][0]) {
+                    labelHTML += '<option value="' + selectedtype + '" selected>' + selectedtype + '</option>';
+                } else if (selectedtype === TYPES[i][1]) {
+                    labelHTML += '<option value="' + selectedtype + '" selected>' + selectedtype + '</option>';
+                } else {
+                    labelHTML += '<option value="' + TYPES[i][0] + '">' + TYPES[i][0] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('filtertypeLabel');    
+        } else if (this.name === 'oscillatortype') {
+            var type = 'oscillatortype';
+            if (this.value != null) {
+                var selectedosctype = getOscillatorTypes(this.value);
+            } else {
+                var selectedosctype = getOscillatorTypes(DEFAULTOSCILLATORTYPE);
+            }
+
+            var labelHTML = '<select name="oscillatortype" id="oscillatortypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
+            for (var i = 0; i < OSCTYPES.length; i++) {
+                if (OSCTYPES[i][0].length === 0) {
+                    // work around some weird i18n bug
+                    labelHTML += '<option value="' + OSCTYPES[i][1] + '">' + OSCTYPES[i][1] + '</option>';
+                } else if (selectedosctype === OSCTYPES[i][0]) {
+                    labelHTML += '<option value="' + selectedosctype + '" selected>' + selectedosctype + '</option>';
+                } else if (selectedosctype === OSCTYPES[i][1]) {
+                    labelHTML += '<option value="' + selectedosctype + '" selected>' + selectedosctype + '</option>';
+                } else {
+                    labelHTML += '<option value="' + OSCTYPES[i][0] + '">' + OSCTYPES[i][0] + '</option>';
+                }
+            }
+
+            labelHTML += '</select>';
+            labelElem.innerHTML = labelHTML;
+            this.label = docById('oscillatortypeLabel');    
         } else if (this.name === 'voicename') {
             var type = 'voicename';
             if (this.value != null) {
