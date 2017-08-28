@@ -262,6 +262,7 @@ function TimbreWidget () {
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
+
             that.isActive['oscillator'] = true;
             oscillatorButtonCell.id = 'oscillatorButtonCell';
 
@@ -275,7 +276,7 @@ function TimbreWidget () {
                     var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                     var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                    const OSCILLATOROBJ = [[0,['oscillator',{}],0,0,[null,2,1,null]],[1,['number',{'value':6}],0,0,[0]],[2,['oscillatortype',{'value':'sine'}],0,0,[0]]];
+                    const OSCILLATOROBJ = [[0, ['oscillator', {}], 0, 0, [null, 2,1, null]], [1, ['number', {'value': 6}], 0, 0, [0]], [2, ['oscillatortype', {'value': 'sine'}], 0, 0, [0]]];
                     that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
 
                     var n = that._logo.blocks.blockList.length - 3;
@@ -308,7 +309,7 @@ function TimbreWidget () {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                const ENVOBJ = [[0,['envelope',{}],0,0,[null,1,2,3,4,null]],[1,['number',{'value':1}],0,0,[0]],[2,['number',{'value':50}],0,0,[0]],[3,['number',{'value':60}],0,0,[0]],[4,['number',{'value':1}],0,0,[0]]];
+                const ENVOBJ = [[0, ['envelope', {}], 0, 0, [null, 1, 2, 3, 4, null]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, ['number', {'value': 60}], 0, 0, [0]], [4, ['number', {'value': 1}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(ENVOBJ);
 
                 var n = that._logo.blocks.blockList.length - 5;
@@ -335,7 +336,7 @@ function TimbreWidget () {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                const FILTEROBJ = [[0,['filter',{}],0,0,[null,3,1,2,null]],[1,['number',{'value':-12}],0,0,[0]],[2,['number',{'value':392}],0,0,[0]],[3,['filtertype',{'value':'highpass'}],0,0,[0]]];
+                const FILTEROBJ = [[0, ['filter', {}], 0, 0, [null, 3, 1, 2, null]], [1, ['number', {'value': -12}], 0, 0, [0]], [2, ['number', {'value': 392}], 0, 0, [0]], [3, ['filtertype', {'value': 'highpass'}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(FILTEROBJ);
 
                 var n = that._logo.blocks.blockList.length - 4;
@@ -629,7 +630,7 @@ function TimbreWidget () {
                             var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                             var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                            const AMSYNTHOBJ = [[0,['amsynth',{}],0,0,[null,1,null]],[1,['number',{'value':1}],0,0,[0]]];
+                            const AMSYNTHOBJ = [[0, ['amsynth', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 1}], 0, 0, [0]]];
                             that._logo.blocks.loadNewBlocks(AMSYNTHOBJ);
 
                             var n = that._logo.blocks.blockList.length - 2;
@@ -684,7 +685,7 @@ function TimbreWidget () {
                             var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                             var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                            const FMSYNTHOBJ = [[0,['fmsynth',{}],0,0,[null,1,null]],[1,['number',{'value':10}],0,0,[0]]];
+                            const FMSYNTHOBJ = [[0, ['fmsynth', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 10}], 0, 0, [0]]];
                             that._logo.blocks.loadNewBlocks(FMSYNTHOBJ);
 
                             var n = that._logo.blocks.blockList.length - 2;
@@ -735,7 +736,7 @@ function TimbreWidget () {
                             var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                             var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                            const DUOSYNTHOBJ = [[0,['duosynth',{}],0,0,[null,1,2,null]],[1,['number',{'value':10}],0,0,[0]],[2,['number',{'value':6}],0,0,[0]]];
+                            const DUOSYNTHOBJ = [[0, ['duosynth', {}], 0, 0, [null, 1, 2, null]], [1, ['number', {'value': 10}], 0, 0, [0]], [2, ['number', {'value': 6}], 0, 0, [0]]];
                             that._logo.blocks.loadNewBlocks(DUOSYNTHOBJ);
 
                             var n = that._logo.blocks.blockList.length - 3;
@@ -1229,7 +1230,7 @@ function TimbreWidget () {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                const FILTEROBJ = [[0,['filter',{}],0,0,[null,3,1,2,null]],[1,['number',{'value':-12}],0,0,[0]],[2,['number',{'value':392}],0,0,[0]],[3,['filtertype',{'value':'highpass'}],0,0,[0]]];
+                const FILTEROBJ = [[0, ['filter', {}], 0, 0, [null, 3, 1, 2, null]], [1, ['number', {'value': -12}], 0, 0, [0]], [2, ['number', {'value': 392}], 0, 0, [0]], [3, ['filtertype', {'value': 'highpass'}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(FILTEROBJ);
 
                 var n = that._logo.blocks.blockList.length - 4;
@@ -1385,7 +1386,7 @@ function TimbreWidget () {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
                         var n = that._logo.blocks.blockList.length;
-                        const TREMOLOOBJ = [[0,['tremolo',{}],0,0,[null,1,2,null,3]],[1,['number',{'value':10}],0,0,[0]],[2,['number',{'value':50}],0,0,[0]],[3,'hidden',0,0,[0,null]]];
+                        const TREMOLOOBJ = [[0, ['tremolo', {}], 0, 0, [null, 1, 2, null, 3]], [1, ['number', {'value': 10}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
                         that._logo.blocks.loadNewBlocks(TREMOLOOBJ);
 
                         that.tremoloEffect.push(n);
@@ -1445,7 +1446,7 @@ function TimbreWidget () {
                         var topOfTimbreClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
                         var vibratoBlock = that._logo.blocks.blockList.length;
-                        const VIBRATOOBJ = [[0, ['vibrato', {}], 0, 0, [null, 1, 3, 2, 6]], [1, ['number', {'value': 10}], 0, 0, [0]], [2, ['vspace', {}], 0, 0, [0, null]], [3, ['divide', {}], 0, 0, [0, 4, 5]], [4, ['number', {'value': 1}], 0, 0, [3]], [5, ['number', {'value': 16}], 0, 0, [3]], [6, ['hidden', {}], 0, 0, [0, null]]];
+                        const VIBRATOOBJ = [[0, ['vibrato', {}], 0, 0, [null, 1, 3, 2, 6]], [1, ['number', {'value':  10}], 0, 0, [0]], [2, ['vspace', {}], 0, 0, [0, null]], [3, ['divide', {}], 0, 0, [0, 4, 5]], [4, ['number', {'value':  1}], 0, 0, [3]], [5, ['number', {'value':  16}], 0, 0, [3]], [6, ['hidden', {}], 0, 0, [0, null]]];
                         that._logo.blocks.loadNewBlocks(VIBRATOOBJ);
 
                         that.vibratoEffect.push(vibratoBlock);
@@ -1522,7 +1523,7 @@ function TimbreWidget () {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
                         var n = that._logo.blocks.blockList.length;
-                        const CHORUSOBJ = [[0,['chorus',{}],0,0,[null,1,2,3,null,4]],[1,['number',{'value':2}],0,0,[0]],[2,['number',{'value':4}],0,0,[0]],[3,['number',{'value':70}],0,0,[0]],[4,'hidden',0,0,[0,null]]];
+                        const CHORUSOBJ = [[0, ['chorus', {}], 0, 0, [null, 1, 2, 3, null, 4]], [1, ['number', {'value': 2}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]], [3, ['number', {'value': 70}], 0, 0, [0]], [4, 'hidden', 0, 0, [0, null]]];
                         that._logo.blocks.loadNewBlocks(CHORUSOBJ);
 
                         that.chorusEffect.push(n);
@@ -1595,7 +1596,7 @@ function TimbreWidget () {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
                         var n = that._logo.blocks.blockList.length;
-                        const PHASEROBJ = [[0,['phaser',{}],0,0,[null,1,2,3,null,4]],[1,['number',{'value':5}],0,0,[0]],[2,['number',{'value':3}],0,0,[0]],[3,['number',{'value':350}],0,0,[0]],[4,'hidden',0,0,[0,null]]];
+                        const PHASEROBJ = [[0, ['phaser', {}], 0, 0, [null, 1, 2, 3, null, 4]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, ['number', {'value': 3}], 0, 0, [0]], [3, ['number', {'value': 350}], 0, 0, [0]], [4, 'hidden', 0, 0, [0, null]]];
                         that._logo.blocks.loadNewBlocks(PHASEROBJ);
 
                         that.phaserEffect.push(n);
@@ -1659,7 +1660,7 @@ function TimbreWidget () {
                         var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
 
                         var n = that._logo.blocks.blockList.length;
-                        const DISTORTIONOBJ = [[0,['dis',{}],0,0,[null,1,null,2]],[1,['number',{'value':40}],0,0,[0]],[2,'hidden',0,0,[0,null]]];
+                        const DISTORTIONOBJ = [[0, ['dis', {}], 0, 0, [null, 1, null, 2]], [1, ['number', {'value': 40}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
                         that._logo.blocks.loadNewBlocks(DISTORTIONOBJ);
 
                         that.distortionEffect.push(n);
