@@ -350,7 +350,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     oscillatorBlock.defaults.push(6);
     oscillatorBlock.hidden = true;
     oscillatorBlock.twoArgBlock();
-    oscillatorBlock.dockTypes[1] = 'oscillatortype';
+    oscillatorBlock.dockTypes[1] = 'anyin';
     oscillatorBlock.dockTypes[2] = 'numberin';
 
     var filtertypeBlock = new ProtoBlock('filtertype');
