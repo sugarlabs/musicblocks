@@ -249,7 +249,8 @@ function TimbreWidget () {
             synthButtonCell.id = 'synthButtonCell';
 
             if (that.osc.length === 0) {
-              that._synth();j            }else{
+		that._synth();
+            } else {
                 that._logo.errorMsg(_('Unable to use synth due to existing oscillator'));
             }
         }
