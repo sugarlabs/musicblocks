@@ -650,7 +650,7 @@ function TimbreWidget () {
                             }},500);
                         }
 
-                        subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperS0"><div id="sS0"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
                         subDiv.innerHTML = subHtmlElements;
 
                         docById('sS0').textContent = 'Harmonicity';
@@ -706,7 +706,7 @@ function TimbreWidget () {
                             }, 500);
                         }
 
-                        subHtmlElements += '<div id="wrapperS0"><div id="sS0" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperS0"><div id="sS0"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
                         subDiv.innerHTML = subHtmlElements;
 
                         docById('sS0').textContent = 'Modulation Index';
@@ -761,7 +761,7 @@ function TimbreWidget () {
                         }
 
                         for (var i = 0; i < 2; i++) {
-                            subHtmlElements += '<div id="wrapperS' + i + '"><div id="sS' + i + '" class="rectangle"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS' + i + '"class="rangeslidervalue">2</span></div></div>';
+                            subHtmlElements += '<div id="wrapperS' + i + '"><div id="sS' + i + '"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS' + i + '"class="rangeslidervalue">2</span></div></div>';
                         }
 
                         subDiv.innerHTML = subHtmlElements;
@@ -867,8 +867,8 @@ function TimbreWidget () {
         timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
 
         var env = docById('timbreTable');
-        var htmlElements = '<div id="wrapperOsc0"><div id="sOsc0" class="rectangle"><span>Type</span></div><div id="selOsc"></div></div>';
-            htmlElements += '<div id="wrapperOsc1"><div id="sOsc1" class="rectangle"><span></span></div><div id="insideDivOsc"><input type="range" id="myRangeO0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanO0"class="rangeslidervalue">2</span></div></div>';
+        var htmlElements = '<div id="wrapperOsc0"><div id="sOsc0"><span>Type</span></div><div id="selOsc"></div></div>';
+            htmlElements += '<div id="wrapperOsc1"><div id="sOsc1"><span></span></div><div id="insideDivOsc"><input type="range" id="myRangeO0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanO0"class="rangeslidervalue">2</span></div></div>';
 
         env.innerHTML = htmlElements;
         var envAppend = document.createElement('div');
@@ -1127,8 +1127,6 @@ function TimbreWidget () {
 
         // Have to integrate multiple filters
         if (that.fil.length === 2) {
-
-            console.log('2 filters present');
             var extraDiv = document.createElement('div');
             var newHtmlElements = '<br><div id="newwrapper0"><div id="news"><span>Type</span></div><div id="newsel"></div></div>';
             newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff1" value="-12"/>-12<input type="radio" name="rolloff1" value="-24"/>-24<input type="radio" name="rolloff1" value="-48"/>-48<input type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
@@ -1362,7 +1360,7 @@ function TimbreWidget () {
                     instruments_effects[that.instrument_name]['tremoloActive'] = true;
 
                     for (var i = 0; i < 2; i++) {
-                        subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
                     }
 
                     subDiv.innerHTML = subHtmlElements;
@@ -1426,7 +1424,7 @@ function TimbreWidget () {
 
                     instruments_effects[that.instrument_name]['vibratoActive'] = true;
                     for (var i = 0; i < 2; i++) {
-                        subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
                     }
 
                     // Set slider values
@@ -1497,7 +1495,7 @@ function TimbreWidget () {
                     instruments_effects[that.instrument_name]['chorusActive'] = true;
 
                     for (var i = 0; i < 3; i++) {
-                        subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
                     }
 
                     subDiv.innerHTML = subHtmlElements;
@@ -1570,7 +1568,7 @@ function TimbreWidget () {
                     instruments_effects[that.instrument_name]['phaserActive'] = true;
 
                     for (var i = 0; i < 3; i++) {
-                        subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
+                        subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
                     }
 
                     subDiv.innerHTML = subHtmlElements;
@@ -1642,7 +1640,7 @@ function TimbreWidget () {
 
                     instruments_effects[that.instrument_name]['distortionActive'] = true;
 
-                    subHtmlElements += '<div id="wrapperFx0"><div id="sFx0" class="rectangle"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx0"class="rangeslidervalue">2</span></div></div>';
+                    subHtmlElements += '<div id="wrapperFx0"><div id="sFx0"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx0"class="rangeslidervalue">2</span></div></div>';
 
                     subDiv.innerHTML = subHtmlElements;
 
