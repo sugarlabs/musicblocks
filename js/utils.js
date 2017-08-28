@@ -124,7 +124,7 @@ function docById(id) {
 
 
 function docByName(name) {
-    return document.getElementByName(name);
+    return document.getElementsByName(name);
 };
 
 
