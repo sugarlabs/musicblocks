@@ -368,7 +368,7 @@ var DRUMNAMES = [
     [_('duck'), 'duck', 'images/duck.svg'],
 ];
 
-var TYPES = [
+var FILTERTYPES = [
     [_('highpass'), 'highpass'],
     [_('lowpass'), 'lowpass'],
     [_('bandpass'), 'bandpass'],
@@ -482,13 +482,13 @@ function getFilterTypes(name) {
         console.log('getFiterType passed blank name. Returning ' + DEFAULTFILTERTYPE);
         name = DEFAULTFILTERTYPE;
     } 
-    for (var type = 0; type < TYPES.length; type++) {
-        if (TYPES[type][0].toLowerCase() === name.toLowerCase() || TYPES[type][1].toLowerCase() === name.toLowerCase()) {
-            if (TYPES[type][0] != '') {
-                return TYPES[type][0];
+    for (var type = 0; type < FILTERTYPES.length; type++) {
+        if (FILTERTYPES[type][0].toLowerCase() === name.toLowerCase() || FILTERTYPES[type][1].toLowerCase() === name.toLowerCase()) {
+            if (FILTERTYPES[type][0] != '') {
+                return FILTERTYPES[type][0];
             } else {
                 console.log('I18n is misbehaving when parsing filter type: ' + name);
-                return TYPES[type][1];
+                return FILTERTYPES[type][1];
             }
         }
     }

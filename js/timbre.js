@@ -276,12 +276,12 @@ function TimbreWidget () {
                     var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                     var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                    const OSCILLATOROBJ = [[0, ['oscillator', {}], 0, 0, [null, 2,1, null]], [1, ['number', {'value': 6}], 0, 0, [0]], [2, ['oscillatortype', {'value': 'sine'}], 0, 0, [0]]];
+                    const OSCILLATOROBJ = [[0, ['oscillator', {}], 0, 0, [null, 2,1, null]], [1, ['number', {'value': 6}], 0, 0, [0]], [2, ['oscillatortype', {'value': DEFAULTOSCILLATORTYPE}], 0, 0, [0]]];
                     that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
 
                     var n = that._logo.blocks.blockList.length - 3;
                     that.osc.push(n);
-                    that.oscParams.push('sine');
+                    that.oscParams.push(DEFAULTOSCILLATORTYPE);
                     that.oscParams.push(6);
 
                     setTimeout(that.blockConnection(3, bottomOfClamp), 500);
@@ -1058,8 +1058,8 @@ function TimbreWidget () {
         var myDiv = docById('sel');
 
         var selectOpt = '<select id="sel1">';
-        for (var i = 0; i < TYPES.length; i++) {
-            selectOpt += '<option value="' + TYPES[i][0]+ '">' + TYPES[i][0]+ '</option>';
+        for (var i = 0; i < FILTERTYPES.length; i++) {
+            selectOpt += '<option value="' + FILTERTYPES[i][0]+ '">' + FILTERTYPES[i][0]+ '</option>';
         }
 
         selectOpt += '</select>';
@@ -1134,8 +1134,8 @@ function TimbreWidget () {
             env.insertBefore(extraDiv, envAppend);
 
             var selectOpt1 = '<select id="sel2">';
-            for (var i = 0; i < TYPES.length; i++) {
-                selectOpt1 += '<option value="' + TYPES[i][0]+ '">' + TYPES[i][0]+ '</option>';
+            for (var i = 0; i < FILTERTYPES.length; i++) {
+                selectOpt1 += '<option value="' + FILTERTYPES[i][0]+ '">' + FILTERTYPES[i][0]+ '</option>';
             }
 
             selectOpt1 += '</select>';
@@ -1251,8 +1251,8 @@ function TimbreWidget () {
                 env.insertBefore(extraDiv, envAppend);
 
                 var selectOpt1 = '<select id="sel2">';
-                for (var i = 0; i < TYPES.length; i++) {
-                    selectOpt1 += '<option value="' + TYPES[i][0]+ '">' + TYPES[i][0]+ '</option>';
+                for (var i = 0; i < FILTERTYPES.length; i++) {
+                    selectOpt1 += '<option value="' + FILTERTYPES[i][0]+ '">' + FILTERTYPES[i][0]+ '</option>';
                 }
 
                 selectOpt1 += '</select>';

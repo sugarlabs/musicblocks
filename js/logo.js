@@ -2816,15 +2816,15 @@ function Logo () {
             }
             break; 
         case 'filter':
-            var filtertype = 'highpass';
+            var filtertype = DEFAULTFILTERTYPE;
             var freq ;
             var rollOff ;
            
             if (args.length === 3 && typeof(args[1] === 'number')) {
-                for (var typo in TYPES) {
-                    if (TYPES[typo][0] === args[0]) {
-                        filtertype = TYPES[typo][1];
-                    } else if (TYPES[typo][1] === args[0]) {
+                for (var typo in FILTERTYPES) {
+                    if (FILTERTYPES[typo][0] === args[0]) {
+                        filtertype = FILTERTYPES[typo][1];
+                    } else if (FILTERTYPES[typo][1] === args[0]) {
                         filtertype = args[0];
                     }
                 }
@@ -2842,7 +2842,7 @@ function Logo () {
             }  
             break;
         case 'oscillator':
-            var oscillatorType = 'sine';
+            var oscillatorType = DEFAULTOSCILLATORTYPE;
             var partials ;
             that.timbre.oscParams = [];
 

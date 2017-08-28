@@ -1720,16 +1720,16 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             var labelHTML = '<select name="filtertype" id="filtertypeLabel" style="position: absolute;  background-color: #00b0a4; width: 60px;">'
-            for (var i = 0; i < TYPES.length; i++) {
-                if (TYPES[i][0].length === 0) {
+            for (var i = 0; i < FILTERTYPES.length; i++) {
+                if (FILTERTYPES[i][0].length === 0) {
                     // work around some weird i18n bug
-                    labelHTML += '<option value="' + TYPES[i][1] + '">' + TYPES[i][1] + '</option>';
-                } else if (selectedtype === TYPES[i][0]) {
+                    labelHTML += '<option value="' + FILTERTYPES[i][1] + '">' + FILTERTYPES[i][1] + '</option>';
+                } else if (selectedtype === FILTERTYPES[i][0]) {
                     labelHTML += '<option value="' + selectedtype + '" selected>' + selectedtype + '</option>';
-                } else if (selectedtype === TYPES[i][1]) {
+                } else if (selectedtype === FILTERTYPES[i][1]) {
                     labelHTML += '<option value="' + selectedtype + '" selected>' + selectedtype + '</option>';
                 } else {
-                    labelHTML += '<option value="' + TYPES[i][0] + '">' + TYPES[i][0] + '</option>';
+                    labelHTML += '<option value="' + FILTERTYPES[i][0] + '">' + FILTERTYPES[i][0] + '</option>';
                 }
             }
 
