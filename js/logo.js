@@ -2842,7 +2842,7 @@ function Logo () {
             }  
             break;
         case 'oscillator':
-            var oscillatortype = 'sine';
+            var oscillatorType = 'sine';
             var partials ;
             that.timbre.oscParams = [];
 
@@ -2861,18 +2861,20 @@ function Logo () {
             }
 
             if (args.length === 2 && typeof(args[1] === 'number')) {
-                for (var typo in OSCTYPES) {
-                    if (TYPES[typo][0] === args[0]) {
-                        oscillatortype = TYPES[typo][1];
-                    } else if (TYPES[typo][1] === args[0]) {
-                        oscillatortype = args[0];
+                for (var otype in OSCTYPES) {
+                    if (OSCTYPES[otype][0] === args[0]) {
+                        oscillatorType = OSCTYPES[otype][1];
+                    } else if (OSCTYPES[otype][1] === args[0]) {
+                        oscillatorType = args[0];
                     }
                 }
+
                 partials = args[1];
             } 
+
             if(that.inTimbre) {
                 that.timbre.osc.push(blk);
-                that.timbre.oscParams.push(oscillatortype);
+                that.timbre.oscParams.push(oscillatorType);
                 that.timbre.oscParams.push(partials);
             }  
             break;    
