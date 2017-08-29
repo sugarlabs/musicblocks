@@ -249,7 +249,7 @@ function TimbreWidget () {
             synthButtonCell.id = 'synthButtonCell';
 
             if (that.osc.length === 0) {
-		that._synth();
+                that._synth();
             } else {
                 that._logo.errorMsg(_('Unable to use synth due to existing oscillator'));
             }
@@ -258,7 +258,6 @@ function TimbreWidget () {
         var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
 
         oscillatorButtonCell.onclick = function () {
-            console.log('oscillator button clicked');
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -539,39 +538,8 @@ function TimbreWidget () {
         this._logo.blocks.adjustDocks(this.blockNo, true);
     };
 
-
-      /*
-     this.blockConnection = function (len, bottomOfClamp) {
-        var n = that._logo.blocks.blockList.length - len;
-        if (bottomOfClamp == null) {
-            that._logo.blocks.blockList[that.blockNo].connections[2] = n;
-            that._logo.blocks.blockList[n].connections[0] = that.blockNo;
-        } else {
-            var c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
-            // Check for nested clamps.
-            // A hidden block is attached to the bottom of each clamp.
-            while (that._logo.blocks.blockList[bottomOfClamp].name === 'hidden') {
-                var cblk = that._logo.blocks.blockList[bottomOfClamp].connections[0];
-                c = that._logo.blocks.blockList[cblk].connections.length - 2;
-                if (that._logo.blocks.blockList[cblk].connections[c] == null) {
-                    bottomOfClamp = cblk;
-                } else {
-                    // Find bottom of stack
-            bottomOfClamp = that._logo.blocks.findBottomBlock(that._logo.blocks.blockList[cblk].connections[c]);
-                    c = that._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
-                }
-        }
-
-            that._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
-            that._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
-        }
-        that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
-        that._logo.blocks.adjustDocks(that.blockNo, true);
-    };
-    */
-
     this._synth = function () {
-      //  console.log('heysynth');
+        //  console.log('heysynth');
         var that = this;
         var blockValue = 0;
 
@@ -1043,8 +1011,8 @@ function TimbreWidget () {
 
         var env = docById('timbreTable');
         var htmlElements = '<div id="wrapper0"><div id="s"><span>Type</span></div><div id="sel"></div></div>';
-            htmlElements += '<div id="wrapper1"><div id="s1"><span></span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff" value="-12"/>-12<input type="radio" name="rolloff" value="-24"/>-24<input type="radio" name="rolloff" value="-48"/>-48<input type="radio" name="rolloff" value="-96"/>-96</p></div></div>';
-            htmlElements += '<div id="wrapper2"><div id="s2"><span></span></div><div id="insideDivFilter"><input type="range" id="myRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="myspanF2"class="rangeslidervalue">2</span></div></div>';
+        htmlElements += '<div id="wrapper1"><div id="s1"><span></span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff" value="-12" checked="checked"/>-12<input type="radio" name="rolloff" value="-24"/>-24<input type="radio" name="rolloff" value="-48"/>-48<input type="radio" name="rolloff" value="-96"/>-96</p></div></div>';
+        htmlElements += '<div id="wrapper2"><div id="s2"><span></span></div><div id="insideDivFilter"><input type="range" id="myRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="myspanF2"class="rangeslidervalue">2</span></div></div>';
 
         env.innerHTML = htmlElements;
         var envAppend = document.createElement('div');
@@ -1129,7 +1097,7 @@ function TimbreWidget () {
         if (that.fil.length === 2) {
             var extraDiv = document.createElement('div');
             var newHtmlElements = '<br><div id="newwrapper0"><div id="news"><span>Type</span></div><div id="newsel"></div></div>';
-            newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff1" value="-12"/>-12<input type="radio" name="rolloff1" value="-24"/>-24<input type="radio" name="rolloff1" value="-48"/>-48<input type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
+            newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff1" value="-12" checked="checked"/>-12<input type="radio" name="rolloff1" value="-24"/>-24<input type="radio" name="rolloff1" value="-48"/>-48<input type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
             newHtmlElements += '<div id="newwrapper2"><div id="news2"><span>Frequency</span></div><div id="insideDivFilter"><input type="range" id="newmyRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="newmyspanF2"class="rangeslidervalue">2</span></div></div>';
 
             extraDiv.className = 'rectangle';
@@ -1244,7 +1212,7 @@ function TimbreWidget () {
 
                 var extraDiv = document.createElement('div');
                 var newHtmlElements = '<br><div id="newwrapper0"><div id="news"><span>Type</span></div><div id="newsel"></div></div>';
-                newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff1" value="-12"/>-12<input type="radio" name="rolloff1" value="-24"/>-24<input type="radio" name="rolloff1" value="-48"/>-48<input type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
+                newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff1" value="-12" checked="checked"/>-12<input type="radio" name="rolloff1" value="-24"/>-24<input type="radio" name="rolloff1" value="-48"/>-48<input type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
                 newHtmlElements += '<div id="newwrapper2"><div id="news2"><span>Frequency</span></div><div id="insideDivFilter"><input type="range" id="newmyRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="newmyspanF2"class="rangeslidervalue">2</span></div></div>';
 
                 extraDiv.className = 'rectangle';
@@ -1420,7 +1388,6 @@ function TimbreWidget () {
                     that.isActive['vibrato'] = true;
                     that.isActive['distortion'] = false;
                     that.isActive['phaser'] = false;
-
 
                     instruments_effects[that.instrument_name]['vibratoActive'] = true;
                     for (var i = 0; i < 2; i++) {
