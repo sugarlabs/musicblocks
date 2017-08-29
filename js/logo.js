@@ -74,7 +74,7 @@ function Logo () {
     this.sustain = {};
     this.release = {};
     this.source_name = {};
-    
+
     this.evalFlowDict = {};
     this.evalArgDict = {};
     this.evalParameterDict = {};
@@ -2376,7 +2376,6 @@ function Logo () {
                 saveLilypondOutput(that, args[0]);
             }
             break;
-
         case 'amsynth':
             var harmonicity;
             that.timbre.AMSynthParams = [];
@@ -2389,12 +2388,12 @@ function Logo () {
                     that.errorMsg(_('The input cannot be negative'));
                 }
                 harmonicity = args[0];
-            } 
+            }
 
             if (that.inTimbre) {
                     that.timbre.AMSynthesizer.push(blk);
                     that.timbre.AMSynthParams.push(harmonicity);
-            }  
+            }
             break;
         case 'fmsynth':
             var modulationIndex;
@@ -2408,11 +2407,11 @@ function Logo () {
                     that.errorMsg(_('The input cannot be negative'));
                 }
                 modulationIndex = args[0];
-            }  
+            }
             if (that.inTimbre) {
                 that.timbre.FMSynthesizer.push(blk);
                 that.timbre.FMSynthParams.push(modulationIndex);
-            }    
+            }
             break;
         case 'duosynth':
             var synthVibratoRate;
@@ -2420,15 +2419,17 @@ function Logo () {
             if (that.timbre.osc.length != 0) {
                 that.errorMsg(_("Unable to use synth due to existing oscillator"));
             }
+
             that.timbre.duoSynthParams = [];
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 synthVibratoRate = args[0];
                 synthVibratoAmount = args[1];
-            }   
+            }
+
             if (that.inTimbre) {
-                    that.timbre.duoSynthesizer.push(blk);
-                    that.timbre.duoSynthParams.push(synthVibratoRate);
-                    that.timbre.duoSynthParams.push(synthVibratoAmount);
+                that.timbre.duoSynthesizer.push(blk);
+                that.timbre.duoSynthParams.push(synthVibratoRate);
+                that.timbre.duoSynthParams.push(synthVibratoAmount);
             }
             break;
         case 'saveabc':
@@ -2622,7 +2623,7 @@ function Logo () {
         case 'timbre':
             if (that.timbre == null) {
                 that.timbre = new TimbreWidget();
-                that.inTimbre = true;  
+                that.inTimbre = true;
             }
 
             if (args.length >= 1 && typeof(args[0] === 'textin')) {
@@ -2641,7 +2642,7 @@ function Logo () {
 
             childFlow = args[1];
             childFlowCount = 1;
-            
+
             that.timbre.blockNo = blk;
             that.timbre.env = [];
             that.timbre.ENVs = [];
@@ -2668,7 +2669,7 @@ function Logo () {
 
             var listenerName = '_timbre_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
-            
+
             var __listener = function (event) {
                 console.log("inside listener");
                 that.timbre.init(that);
@@ -2788,17 +2789,17 @@ function Logo () {
             if (args.length === 4 && typeof(args[0] === 'number')) {
                 if (args[0] < 0 || args[0] > 100) {
                     that.errorMsg(_('Attack value should be between 0-100'));
-                } 
+                }
                 if (args[1] < 0 || args[1] > 100) {
                     that.errorMsg(_('Decay value should be between 0-100'));
-                } 
+                }
                 if (args[2] < 0 || args[2] > 100) {
                     that.errorMsg(_('Sustain value should be between 0-100'));
-                } 
+                }
                 if (args[3] < 0 || args[3] > 100) {
                     that.errorMsg(_('Release value should be between 0-100'));
-                } 
-                
+                }
+
                 that.attack[turtle].push(args[0] / 100);
                 that.decay[turtle].push(args[1] / 100);
                 that.sustain[turtle].push(args[2] / 100);
@@ -2817,32 +2818,43 @@ function Logo () {
                 that.timbre.synthVals['envelope']['release'] = last(that.release[turtle]);
              //   this.synth.createSynth(that.timbre.instrumentName, synth_source, that.timbre.adsrVals);
             }
-            break; 
+            break;
         case 'filter':
             var filtertype = DEFAULTFILTERTYPE;
             var freq ;
             var rollOff ;
-           
+
             if (args.length === 3 && typeof(args[1] === 'number')) {
-                for (var typo in FILTERTYPES) {
-                    if (FILTERTYPES[typo][0] === args[0]) {
-                        filtertype = FILTERTYPES[typo][1];
-                    } else if (FILTERTYPES[typo][1] === args[0]) {
+                for (var ftype in FILTERTYPES) {
+                    if (FILTERTYPES[ftype][0] === args[0]) {
+                        filtertype = FILTERTYPES[ftype][1];
+                    } else if (FILTERTYPES[ftype][1] === args[0]) {
                         filtertype = args[0];
                     }
                 }
+
                 if ([-12, -24, -48, -96].indexOf(args[1]) === -1) {
                     that.errorMsg(_("Value should be either -12,-24,-48 or -96 db"));
                 }
+
                 rollOff = args[1];
                 freq = args[2];
-            } 
-            if (that.inTimbre) {
-                that.timbre.fil.push(blk);
-                that.timbre.filterParams.push(filtertype);
-                that.timbre.filterParams.push(rollOff);
-                that.timbre.filterParams.push(freq);
-            }  
+
+                if (that.inTimbre) {
+                    var obj = {'filterType': filtertype, 'filterRolloff': rollOff, 'filterFrequency': freq};
+                    if (that.timbre.instrumentName in instrumentsFilters) {
+                        instrumentsFilters[that.timbre.instrumentName].push(obj);
+                    } else {
+                        instrumentsFilters[that.timbre.instrumentName] = [];
+                        instrumentsFilters[that.timbre.instrumentName].push(obj);
+                    }
+
+                    that.timbre.fil.push(blk);
+                    that.timbre.filterParams.push(filtertype);
+                    that.timbre.filterParams.push(rollOff);
+                    that.timbre.filterParams.push(freq);
+                }
+            }
             break;
         case 'oscillator':
             var oscillatorType = DEFAULTOSCILLATORTYPE;
@@ -2863,15 +2875,14 @@ function Logo () {
                 }
 
                 partials = args[1];
-            } 
+            }
 
             if (that.inTimbre) {
                 that.timbre.osc.push(blk);
                 that.timbre.oscParams.push(oscillatorType);
                 that.timbre.oscParams.push(partials);
-            }  
-
-            break;    
+            }
+            break;
         case 'invert1':
             if (typeof(args[2]) === 'number') {
                 if (args[2] % 2 === 0) {
@@ -4044,7 +4055,7 @@ function Logo () {
                 that.timbre.tremoloEffect.push(blk);
                 that.timbre.tremoloParams.push(last(that.tremoloFrequency[turtle]));
                 that.timbre.tremoloParams.push(last(that.tremoloDepth[turtle]) * 100);
-            } 
+            }
             break;
         case 'phaser':
             var rate = args[0];
@@ -4073,7 +4084,7 @@ function Logo () {
                 that.timbre.phaserParams.push(last(that.rate[turtle]));
                 that.timbre.phaserParams.push(last(that.octaves[turtle]));
                 that.timbre.phaserParams.push(last(that.baseFrequency[turtle]));
-            } 
+            }
             break;
         case 'chorus':
             var chorusRate = args[0];
@@ -4108,7 +4119,7 @@ function Logo () {
                 that.timbre.chorusParams.push(last(that.chorusRate[turtle]));
                 that.timbre.chorusParams.push(last(that.delayTime[turtle]));
                 that.timbre.chorusParams.push(last(that.chorusDepth[turtle]) * 100);
-            } 
+            }
             break;
         case 'interval':
             if (typeof(args[0]) !== 'number') {
@@ -5368,18 +5379,18 @@ function Logo () {
                     vibratoIntensity = timbreEffects['vibratoIntensity'];
                     doVibrato = true;
                 }
-                
+
                 if (timbreEffects['distortionActive']) {
                     distortionAmount = timbreEffects['distortionAmount'];
                     doDistortion = true;
                 }
-                
+
                 if (timbreEffects['tremoloActive']) {
                     tremoloFrequency = timbreEffects['tremoloFrequency'];
                     tremoloDepth = timbreEffects['tremoloDepth'];
                     doTremolo = true;
                 }
-                
+
                 if (timbreEffects['phaserActive']) {
                     rate = timbreEffects['rate'];
                     octaves = timbreEffects['octaves'];
