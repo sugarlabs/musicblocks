@@ -171,8 +171,8 @@ function TimbreWidget () {
                     that._logo.blocks.blockList[last(that.vibratoEffect)].connections[2] = n;
                     that._logo.blocks.blockList[n].connections[0] = last(that.vibratoEffect);
                     that._logo.blocks.blockList[divBlock].connections[0] = null;
-                    that._logo.blocks._clampBlocksToCheck.push([n, 0]);
-                    that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
+                    that._logo.blocks.clampBlocksToCheck.push([n, 0]);
+                    that._logo.blocks.clampBlocksToCheck.push([that.blockNo, 0]);
                     that._logo.blocks.adjustDocks(that.blockNo, true);
                 };
 
@@ -452,8 +452,8 @@ function TimbreWidget () {
         }
 
         // Adjust the clamp sizes and positions.
-        that._logo.blocks._clampBlocksToCheck.push([n, 0]);
-        that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
+        that._logo.blocks.clampBlocksToCheck.push([n, 0]);
+        that._logo.blocks.clampBlocksToCheck.push([that.blockNo, 0]);
         that._logo.blocks.adjustDocks(that.blockNo, true);
     };
 
@@ -469,8 +469,8 @@ function TimbreWidget () {
         }
 
         // Adjust the clamp sizes and positions.
-        that._logo.blocks._clampBlocksToCheck.push([n, 0]);
-        that._logo.blocks._clampBlocksToCheck.push([that.blockNo, 0]);
+        that._logo.blocks.clampBlocksToCheck.push([n, 0]);
+        that._logo.blocks.clampBlocksToCheck.push([that.blockNo, 0]);
         that._logo.blocks.adjustDocks(that.blockNo, true);
     };
 
@@ -495,13 +495,13 @@ function TimbreWidget () {
             var blockAbove = c0;
             while (blockAbove != this.blockNo) {
                 if (this._logo.blocks.blockList[blockAbove].isClampBlock()) {
-                    this._logo.blocks._clampBlocksToCheck.push([blockAbove, 0]);
+                    this._logo.blocks.clampBlocksToCheck.push([blockAbove, 0]);
                 }
 
                 blockAbove = this._logo.blocks.blockList[blockAbove].connections[0];
             }
 
-            this._logo.blocks._clampBlocksToCheck.push([this.blockNo, 0]);
+            this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         }
 
         if (c1 != null) {
@@ -539,7 +539,7 @@ function TimbreWidget () {
             while (this._logo.blocks.blockList[bottomOfClamp].name === 'hidden') {
                 var cblk = this._logo.blocks.blockList[bottomOfClamp].connections[0];
                 c = this._logo.blocks.blockList[cblk].connections.length - 2;
-                this._logo.blocks._clampBlocksToCheck.push([cblk, 0]);
+                this._logo.blocks.clampBlocksToCheck.push([cblk, 0]);
                 if (this._logo.blocks.blockList[cblk].connections[c] == null) {
                     bottomOfClamp = cblk;
                 } else {
@@ -553,7 +553,7 @@ function TimbreWidget () {
             this._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
         }
 
-        this._logo.blocks._clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         this._logo.blocks.adjustDocks(this.blockNo, true);
     };
 

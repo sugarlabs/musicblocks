@@ -88,7 +88,7 @@ function Blocks () {
     // Arg clamp blocks that need expanding after load.
     this._checkArgClampBlocks = [];
     // Clamp blocks that need expanding after load.
-    this._clampBlocksToCheck = [];
+    this.clampBlocksToCheck = [];
 
     // We need to keep track of certain classes of blocks that exhibit
     // different types of behavior.
@@ -319,11 +319,11 @@ function Blocks () {
     // common operation for start and action blocks, but also for
     // repeat, forever, if, etc.
     this._adjustExpandableClampBlock = function () {
-        if (this._clampBlocksToCheck.length === 0) {
+        if (this.clampBlocksToCheck.length === 0) {
             return;
         }
 
-        var obj = this._clampBlocksToCheck.pop();
+        var obj = this.clampBlocksToCheck.pop();
         var blk = obj[0];
         var clamp = obj[1];
 
@@ -368,7 +368,7 @@ function Blocks () {
 
             // Recurse through the list.
             setTimeout(function () {
-                if (blocks._clampBlocksToCheck.length > 0) {
+                if (blocks.clampBlocksToCheck.length > 0) {
                     blocks._adjustExpandableClampBlock();
                 }
             }, 250);
@@ -862,7 +862,7 @@ function Blocks () {
         // (8) And we need to recheck if it inside of a expandable block.
 
         // Find any containing expandable blocks.
-        this._clampBlocksToCheck = [];
+        this.clampBlocksToCheck = [];
         if (thisBlock == null) {
             console.log('blockMoved called with null block.');
             return;
@@ -885,7 +885,7 @@ function Blocks () {
                 break;
             }
 
-            this._clampBlocksToCheck.push([blk, 0]);
+            this.clampBlocksToCheck.push([blk, 0]);
             blk = this._insideExpandableBlock(blk);
         }
 
@@ -1303,10 +1303,10 @@ function Blocks () {
                 }
 
                 if (that.blockList[blk].name === 'ifthenelse') {
-                    that._clampBlocksToCheck.push([blk, 0]);
-                    that._clampBlocksToCheck.push([blk, 1]);
+                    that.clampBlocksToCheck.push([blk, 0]);
+                    that.clampBlocksToCheck.push([blk, 1]);
                 } else {
-                    that._clampBlocksToCheck.push([blk, 0]);
+                    that.clampBlocksToCheck.push([blk, 0]);
                 }
 
                 blk = that._insideExpandableBlock(blk);
@@ -1730,13 +1730,13 @@ function Blocks () {
     this._expandClamps = function () {
         // Expand expandable clamp blocks as needed.
         this._findClamps();
-        this._clampBlocksToCheck = [];
+        this.clampBlocksToCheck = [];
         for (var i = 0; i < this._expandablesList.length; i++) {
             if (this.blockList[this._expandablesList[i]].name === 'ifthenelse') {
-                this._clampBlocksToCheck.push([this._expandablesList[i], 0]);
-                this._clampBlocksToCheck.push([this._expandablesList[i], 1]);
+                this.clampBlocksToCheck.push([this._expandablesList[i], 0]);
+                this.clampBlocksToCheck.push([this._expandablesList[i], 1]);
             } else {
-                this._clampBlocksToCheck.push([this._expandablesList[i], 0]);
+                this.clampBlocksToCheck.push([this._expandablesList[i], 0]);
             }
         }
 
