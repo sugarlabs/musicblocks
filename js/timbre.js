@@ -495,6 +495,9 @@ function TimbreWidget () {
             }
         }
 
+        // FIXME: Check for any containing clamps, which may need
+        // adjustment.
+
         // Refresh the dock positions
         this._logo.blocks.adjustDocks(c0, true);
 
@@ -604,16 +607,16 @@ function TimbreWidget () {
                             that.AMSynthParams.push(1);
 
                             setTimeout(function () {
-                            if (that.FMSynthesizer.length !== 0) {
-                                that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer));
-                                that.FMSynthesizer.pop();
-                            } else if (that.duoSynthesizer.length !== 0) {
-                                that._blockReplace(last(that.duoSynthesizer), last(that.AMSynthesizer));
-                                that.duoSynthesizer.pop();
-                            } else {
-                                that.blockConnection(2, bottomOfClamp);
-
-                            }},500);
+				if (that.FMSynthesizer.length !== 0) {
+                                    that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer));
+                                    that.FMSynthesizer.pop();
+				} else if (that.duoSynthesizer.length !== 0) {
+                                    that._blockReplace(last(that.duoSynthesizer), last(that.AMSynthesizer));
+                                    that.duoSynthesizer.pop();
+				} else {
+                                    that.blockConnection(2, bottomOfClamp);
+				}
+			    }, 500);
                         }
 
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
@@ -721,7 +724,7 @@ function TimbreWidget () {
                                     that._blockReplace(last(that.FMSynthesizer), last(that.duoSynthesizer));
                                     that.FMSynthesizer.pop();
                                 } else {
-                                    that.blockConnection(2, bottomOfClamp);
+                                    that.blockConnection(3, bottomOfClamp);
                                 }
                             }, 500);
                         }
