@@ -183,7 +183,7 @@ function Logo () {
     this.inDuplicate = {};
     this.skipFactor = {};
     this.skipIndex = {};
-    this.instrument_names = {};
+    this.instrumentNames = {};
     this.crescendoDelta = {};
     this.crescendoVolume = {};
     this.crescendoInitialVolume = {};
@@ -206,9 +206,10 @@ function Logo () {
     this.drumStyle = {};
     this.voices = {};
     this.backward = {};
+
+    // Effects parameters
     this.vibratoIntensity = {};
     this.vibratoRate = {};
-    this.justCounting = {};
     this.distortionAmount = {};
     this.tremoloFrequency = {};
     this.tremoloDepth = {};
@@ -218,7 +219,9 @@ function Logo () {
     this.chorusRate = {};
     this.delayTime = {};
     this.chorusDepth = {};
+
     // When counting notes or generating lilypond output...
+    this.justCounting = {};
     this.suppressOutput = {};
 
     // scale factor for turtle graphics embedded in notes
@@ -684,7 +687,7 @@ function Logo () {
                     } else {
                         var values = that.analyser.analyse();
                         var sum = 0;
-                        for (var k = 0; k < that.limit; k++){
+                        for (var k = 0; k < that.limit; k++) {
                             sum += (values[k] * values[k]);
                         }
                         value = Math.round(Math.sqrt(sum / that.limit));
@@ -859,7 +862,7 @@ function Logo () {
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
 
-            this.instrument_names[turtle] = [];
+            this.instrumentNames[turtle] = [];
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
             this.crescendoVolume[turtle] = [];
@@ -1214,7 +1217,7 @@ function Logo () {
         var args = [];
         if (that.blocks.blockList[blk].protoblock.args > 0) {
             for (var i = 1; i < that.blocks.blockList[blk].protoblock.args + 1; i++) {
-                if (that.blocks.blockList[blk].protoblock.dockTypes[i] === 'in' && that.blocks.blockList[blk].connections[i] == null){
+                if (that.blocks.blockList[blk].protoblock.dockTypes[i] === 'in' && that.blocks.blockList[blk].connections[i] == null) {
                     console.log('skipping null inflow args');
                 } else {
                     args.push(that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i], blk, receivedArg));
@@ -1387,7 +1390,7 @@ function Logo () {
                 actionArgs.pop();
             }
             if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++){
+                for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
                     var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
                     actionArgs.push(t);
                 }
@@ -1436,7 +1439,7 @@ function Logo () {
                 actionArgs.pop();
             }
             if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++){
+                for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
                     var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
                     actionArgs.push(t);
                 }
@@ -1500,7 +1503,7 @@ function Logo () {
                 if (that.meSpeak) {
                     var text = args[0];
                     var new_text = "";
-                    for (var i = 0; i < text.length; i++){
+                    for (var i = 0; i < text.length; i++) {
                         if ((text[i] >= 'a' && text[i] <= 'z') || (text[i] >= 'A' && text[i] <= 'Z') || text[i] === ',' || text[i] === '.' || text[i] === ' ')
                             new_text += text[i];
                     }
@@ -1768,7 +1771,7 @@ function Logo () {
                 xmlHttp.open('POST',outurl, true);
                 // Call a function when the state changes.
                 xmlHttp.onreadystatechange = function () {
-                    if(xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                    if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                         alert(xmlHttp.responseText);
                     }
                 };
@@ -2189,11 +2192,11 @@ function Logo () {
             function ValidURL(str) {
                 var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
                                          '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-                                         '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+                                         '((\\d{1,3}\\.) {3}\\d{1,3}))'+ // OR ip (v4) address
                                          '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
                                          '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
                                          '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-                if(!pattern.test(str)) {
+                if (!pattern.test(str)) {
                     that.errorMsg('Please enter a valid URL.');
                     return false;
                 } else {
@@ -2312,7 +2315,7 @@ function Logo () {
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open('GET', url, false );
             xmlHttp.send();
-            if (xmlHttp.readyState === 4  && xmlHttp.status === 200){
+            if (xmlHttp.readyState === 4  && xmlHttp.status === 200) {
                 console.log(xmlHttp.responseText);
                 try {
                     var data = JSON.parse(xmlHttp.responseText);
@@ -2330,7 +2333,7 @@ function Logo () {
                 that.errorMsg('xmlHttp.readyState: ' + xmlHttp.readyState);
                 break;
             }
-            if (name in that.turtleHeaps){
+            if (name in that.turtleHeaps) {
                 var oldHeap = turtleHeaps[turtle];
             } else {
                 var oldHeap = [];
@@ -2377,18 +2380,18 @@ function Logo () {
         case 'amsynth':
             var harmonicity;
             that.timbre.AMSynthParams = [];
-            if(that.timbre.osc.length != 0){
+            if (that.timbre.osc.length != 0) {
                 that.errorMsg(_("Unable to use synth due to existing oscillator"));
                 //that.stopTurtle = true;
             }
-            if(args.length === 1 && typeof(args[0]) === 'number') {
-                if(args[0] < 0) {
+            if (args.length === 1 && typeof(args[0]) === 'number') {
+                if (args[0] < 0) {
                     that.errorMsg(_('The input cannot be negative'));
                 }
                 harmonicity = args[0];
             } 
 
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                     that.timbre.AMSynthesizer.push(blk);
                     that.timbre.AMSynthParams.push(harmonicity);
             }  
@@ -2396,17 +2399,17 @@ function Logo () {
         case 'fmsynth':
             var modulationIndex;
             that.timbre.FMSynthParams = [];
-            if(that.timbre.osc.length != 0){
+            if (that.timbre.osc.length != 0) {
                 that.errorMsg(_("Unable to use synth due to existing oscillator"));
                 //that.stopTurtle = true;
             }
-            if(args.length === 1 && typeof(args[0]) === 'number') {
-                if(args[0] < 0) {
+            if (args.length === 1 && typeof(args[0]) === 'number') {
+                if (args[0] < 0) {
                     that.errorMsg(_('The input cannot be negative'));
                 }
                 modulationIndex = args[0];
             }  
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.FMSynthesizer.push(blk);
                 that.timbre.FMSynthParams.push(modulationIndex);
             }    
@@ -2414,15 +2417,15 @@ function Logo () {
         case 'duosynth':
             var synthVibratoRate;
             var synthVibratoAmount;
-            if(that.timbre.osc.length != 0){
+            if (that.timbre.osc.length != 0) {
                 that.errorMsg(_("Unable to use synth due to existing oscillator"));
             }
             that.timbre.duoSynthParams = [];
-            if(args.length === 2 && typeof(args[0]) === 'number') {
+            if (args.length === 2 && typeof(args[0]) === 'number') {
                 synthVibratoRate = args[0];
                 synthVibratoAmount = args[1];
             }   
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                     that.timbre.duoSynthesizer.push(blk);
                     that.timbre.duoSynthParams.push(synthVibratoRate);
                     that.timbre.duoSynthParams.push(synthVibratoAmount);
@@ -2622,15 +2625,15 @@ function Logo () {
                 that.inTimbre = true;  
             }
 
-            if (args.length >= 1 && typeof(args[0] === 'textin')){
-                that.timbre.instrument_name = args[0];
-                instruments_effects[that.timbre.instrument_name] = {};
-                instruments_effects[that.timbre.instrument_name]['vibratoActive'] = false;
-                instruments_effects[that.timbre.instrument_name]['distortionActive'] = false;
-                instruments_effects[that.timbre.instrument_name]['tremoloActive'] = false;
-                instruments_effects[that.timbre.instrument_name]['phaserActive'] = false;
-                instruments_effects[that.timbre.instrument_name]['chorusActive'] = false;
-            //    console.log("vibratoActive " + instruments_effects[that.timbre.instrument_name]['vibratoActive']);
+            if (args.length >= 1 && typeof(args[0] === 'textin')) {
+                that.timbre.instrumentName = args[0];
+                instrumentsEffects[that.timbre.instrumentName] = {};
+                instrumentsEffects[that.timbre.instrumentName]['vibratoActive'] = false;
+                instrumentsEffects[that.timbre.instrumentName]['distortionActive'] = false;
+                instrumentsEffects[that.timbre.instrumentName]['tremoloActive'] = false;
+                instrumentsEffects[that.timbre.instrumentName]['phaserActive'] = false;
+                instrumentsEffects[that.timbre.instrumentName]['chorusActive'] = false;
+            //    console.log("vibratoActive " + instrumentsEffects[that.timbre.instrumentName]['vibratoActive']);
             //    console.log('timbre args : ' + args);
             }else{
                 console.log('no args provided');
@@ -2777,7 +2780,7 @@ function Logo () {
             break;
         case 'envelope':
             var synth_source = "sine";
-            if(that.timbre.env.length != 0) {
+            if (that.timbre.env.length != 0) {
                 that.errorMsg(_("You are adding a second envelope block"));
                 that.timbre.ENVs = [];
             }
@@ -2801,7 +2804,7 @@ function Logo () {
                 that.sustain[turtle].push(args[2] / 100);
                 that.release[turtle].push(args[3] / 100);
             }
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.env.push(blk);
                 that.timbre.ENVs.push(Math.round(last(that.attack[turtle]) * 100));
                 that.timbre.ENVs.push(Math.round(last(that.decay[turtle]) * 100));
@@ -2812,7 +2815,7 @@ function Logo () {
                 that.timbre.synthVals['envelope']['decay'] = last(that.decay[turtle]);
                 that.timbre.synthVals['envelope']['sustain'] = last(that.sustain[turtle]);
                 that.timbre.synthVals['envelope']['release'] = last(that.release[turtle]);
-             //   this.synth.createSynth(that.timbre.instrument_name, synth_source, that.timbre.adsrVals);
+             //   this.synth.createSynth(that.timbre.instrumentName, synth_source, that.timbre.adsrVals);
             }
             break; 
         case 'filter':
@@ -2834,7 +2837,7 @@ function Logo () {
                 rollOff = args[1];
                 freq = args[2];
             } 
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.fil.push(blk);
                 that.timbre.filterParams.push(filtertype);
                 that.timbre.filterParams.push(rollOff);
@@ -2846,18 +2849,8 @@ function Logo () {
             var partials ;
             that.timbre.oscParams = [];
 
-           /* if(that.timbre.AMSynthesizer.length != 0){
-                that.errorMsg(_("Unable to use oscillator due to existing synth"));
-            }
-            if(that.timbre.FMSynthesizer.length != 0){
-                that.errorMsg(_("Unable to use oscillator due to existing synth"));
-            }
-            if(that.timbre.duoSynthesizer.length != 0){
-                that.errorMsg(_("Unable to use oscillator due to existing synth"));
-            }*/
-
-            if(that.timbre.osc.length != 0) {
-                that.errorMsg(_("You are adding a second oscillator block"));
+            if (that.timbre.osc.length != 0) {
+                that.errorMsg(_("You are adding a second oscillator block."));
             }
 
             if (args.length === 2 && typeof(args[1] === 'number')) {
@@ -2872,15 +2865,16 @@ function Logo () {
                 partials = args[1];
             } 
 
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.osc.push(blk);
                 that.timbre.oscParams.push(oscillatorType);
                 that.timbre.oscParams.push(partials);
             }  
+
             break;    
         case 'invert1':
             if (typeof(args[2]) === 'number') {
-                if (args[2] % 2 === 0){
+                if (args[2] % 2 === 0) {
                     args[2] = 'even';
                 } else {
                     args[2] = 'odd';
@@ -2895,7 +2889,7 @@ function Logo () {
                 args2 = 'odd';
             }
 
-            if (args[2] === 'even' || args[2] === 'odd'){
+            if (args[2] === 'even' || args[2] === 'odd') {
                 var octave = calcOctave(that.currentOctaves[turtle], args[1]);
                 that.invertList[turtle].push([args[0], octave, args[2]]);
             } else {
@@ -3255,14 +3249,6 @@ function Logo () {
                     that.stopTurtle = true;
                     break;
                 }
-
-                /*
-                if (typeof(args[1]) !== 'number') {
-                    that.errorMsg(NANERRORMSG, blk);
-                    that.stopTurtle = true;
-                    break;
-                }
-                */
 
                 if (typeof(args[0]) === 'number' && that.blocks.blockList[blk].name == 'pitch') {
                     // We interpret numbers two different ways:
@@ -3821,23 +3807,13 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
         case 'settimbre':
-        //debugger;
-            //console.log('inside set timbre');
-            if (args.length >= 1 && typeof(args[0] === 'textin')){
-                that.set_instrument_name  = args[0];
-                console.log('settimbre args: ' + args);
-                that.inSetTimbre = true;
-            }      
-
-            if (that.set_instrument_name == null) {
+            if (args[0] == null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
-
                 childFlow = args[1];
                 childFlowCount = 1;
             } else {
-                
-            //    console.log('pushing into instrument list: ' + that.set_instrument_name);
-                that.instrument_names[turtle].push(that.set_instrument_name);
+                that.inSetTimbre = true;
+                that.instrumentNames[turtle].push(args[0]);
                 childFlow = args[1];
                 childFlowCount = 1;
 
@@ -3845,12 +3821,13 @@ function Logo () {
                 that._setDispatchBlock(blk, turtle, listenerName);
 
                 var __listener = function (event) {
-                    that.instrument_names[turtle].pop();
+                    that.instrumentNames[turtle].pop();
                 };
 
                 that._setListener(turtle, listenerName, __listener);
             }
-        break;
+
+            break;
         case 'crescendo':
             if (args.length > 1 && args[0] !== 0) {
                 that.crescendoDelta[turtle].push(args[0]);
@@ -4011,7 +3988,7 @@ function Logo () {
                that.vibratoRate[turtle].pop();
             };
             that._setListener(turtle, listenerName, __listener);
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.vibratoEffect.push(blk);
                 that.timbre.vibratoParams.push(last(that.vibratoIntensity[turtle]) * 100);
                 that.timbre.vibratoParams.push(last(that.vibratoRate[turtle]));
@@ -4034,7 +4011,7 @@ function Logo () {
                that.distortionAmount[turtle].pop();
             };
             that._setListener(turtle, listenerName, __listener);
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.distortionEffect.push(blk);
                 that.timbre.distortionParams.push(last(that.distortionAmount[turtle]) * 100);
             }
@@ -4063,7 +4040,7 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.tremoloEffect.push(blk);
                 that.timbre.tremoloParams.push(last(that.tremoloFrequency[turtle]));
                 that.timbre.tremoloParams.push(last(that.tremoloDepth[turtle]) * 100);
@@ -4091,7 +4068,7 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.phaserEffect.push(blk);
                 that.timbre.phaserParams.push(last(that.rate[turtle]));
                 that.timbre.phaserParams.push(last(that.octaves[turtle]));
@@ -4126,7 +4103,7 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
 
-            if(that.inTimbre) {
+            if (that.inTimbre) {
                 that.timbre.chorusEffect.push(blk);
                 that.timbre.chorusParams.push(last(that.chorusRate[turtle]));
                 that.timbre.chorusParams.push(last(that.delayTime[turtle]));
@@ -5238,7 +5215,7 @@ function Logo () {
                 }
             }
 
-            if (isflow){
+            if (isflow) {
                 that._runFromBlockNow(that, turtle, nextBlock, isflow, passArg, queueStart);
             }
             else{
@@ -5363,7 +5340,7 @@ function Logo () {
         var vibratoRate = 0;
         var vibratoValue = 0;
         var vibratoIntensity = 0;
-        var distortionAmount = 0; //dis
+        var distortionAmount = 0;
         var tremoloFrequency = 0;
         var tremoloDepth = 0;
         var rate = 0;
@@ -5378,58 +5355,54 @@ function Logo () {
         var doPhaser = false;
         var doChorus = false;
 
-        // Applying effects and filters inside the timbre block 
+        // Appl any effects and filters associated with a custom timbre.
+        if (this.inSetTimbre && (turtle in this.instrumentNames) && last(this.instrumentNames[turtle])) {
+            var name = last(this.instrumentNames[turtle]);
 
-        if ((this.inSetTimbre == true) && (turtle in this.instrument_names) && last(this.instrument_names[turtle])){
-            var inst_name = last(this.instrument_names[turtle]);
-            console.log('inst_name: ' + inst_name);
+            if (name in instrumentsEffects) {
+                var timbreEffects = instrumentsEffects[name];
 
-            if (inst_name in instruments_effects){
-                var timbre_effects = instruments_effects[inst_name];
-
-                if (timbre_effects['vibratoActive'] == true) {
-                    vibratoRate = timbre_effects['vibratoRate'];
-                    vibratoIntensity = timbre_effects['vibratoIntensity'];
+                if (timbreEffects['vibratoActive']) {
+                    vibratoRate = timbreEffects['vibratoRate'];
+                    vibratoIntensity = timbreEffects['vibratoIntensity'];
                     doVibrato = true;
                 }
                 
-                if (timbre_effects['distortionActive'] == true) {
-                    distortionAmount = timbre_effects['distortionAmount'];
+                if (timbreEffects['distortionActive']) {
+                    distortionAmount = timbreEffects['distortionAmount'];
                     doDistortion = true;
                 }
                 
-                if (timbre_effects['tremoloActive'] == true) {
-                    tremoloFrequency = timbre_effects['tremoloFrequency'];
-                    tremoloDepth = timbre_effects['tremoloDepth'];
+                if (timbreEffects['tremoloActive']) {
+                    tremoloFrequency = timbreEffects['tremoloFrequency'];
+                    tremoloDepth = timbreEffects['tremoloDepth'];
                     doTremolo = true;
                 }
                 
-                if (timbre_effects['phaserActive'] == true) {
-                    rate = timbre_effects['rate'];
-                    octaves = timbre_effects['octaves'];
-                    baseFrequency = timbre_effects['baseFrequency'];
+                if (timbreEffects['phaserActive']) {
+                    rate = timbreEffects['rate'];
+                    octaves = timbreEffects['octaves'];
+                    baseFrequency = timbreEffects['baseFrequency'];
                     doPhaser = true;
                 }
 
-                if (timbre_effects['chorusActive'] == true) {
-                    chorusRate = timbre_effects['chorusRate'];
-                    delayTime = timbre_effects['delayTime'];
-                    chorusDepth = timbre_effects['chorusDepth'];
+                if (timbreEffects['chorusActive']) {
+                    chorusRate = timbreEffects['chorusRate'];
+                    delayTime = timbreEffects['delayTime'];
+                    chorusDepth = timbreEffects['chorusDepth'];
                     doChorus = true;
                 }
             }
-
         }
 
-        // ------------------------ 
-
+        // Apply effects.
         if (this.vibratoRate[turtle].length > 0) {
             vibratoRate = last(this.vibratoRate[turtle]);
             vibratoIntensity = last(this.vibratoIntensity[turtle]);
             doVibrato = true;
         }
 
-        if(this.distortionAmount[turtle].length > 0) {
+        if (this.distortionAmount[turtle].length > 0) {
             distortionAmount = last(this.distortionAmount[turtle]);
             doDistortion = true;
         }
@@ -5547,6 +5520,7 @@ function Logo () {
                             this.noteCents[turtle].push(this.tieNote[turtle][i][2]);
                             this.noteHertz[turtle].push(this.tieNote[turtle][i][3]);
                         }
+
                         this.tieNote[turtle] = [];
 
                         if (!this.justCounting[turtle]) {
@@ -5781,28 +5755,26 @@ function Logo () {
                             }
                         }
 
-
                         if (!that.suppressOutput[turtle] && duration > 0) {
                             if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
-
                                 // Parameters related to effects
-                                var params_effects = {
-                                    'doVibrato' : false,
-                                    'doDistortion' : false,
-                                    'doTremolo' : false,
-                                    'doPhaser' : false,
-                                    'doChorus' : false,
-                                    'vibratoIntensity' : vibratoIntensity,
-                                    'vibratoFrequency' : vibratoValue,
-                                    'distortionAmount' : distortionAmount,
-                                    'tremoloFrequency' : tremoloFrequency,
-                                    'tremoloDepth' : tremoloDepth,
-                                    'rate' : rate,
-                                    'octaves' : octaves,
-                                    'baseFrequency' : baseFrequency,
-                                    'chorusRate' : chorusRate,
-                                    'delayTime' : delayTime,
-                                    'chorusDepth' : chorusDepth
+                                var paramsEffects = {
+                                    'doVibrato': false,
+                                    'doDistortion': false,
+                                    'doTremolo': false,
+                                    'doPhaser': false,
+                                    'doChorus': false,
+                                    'vibratoIntensity': vibratoIntensity,
+                                    'vibratoFrequency': vibratoValue,
+                                    'distortionAmount': distortionAmount,
+                                    'tremoloFrequency': tremoloFrequency,
+                                    'tremoloDepth': tremoloDepth,
+                                    'rate': rate,
+                                    'octaves': octaves,
+                                    'baseFrequency': baseFrequency,
+                                    'chorusRate': chorusRate,
+                                    'delayTime': delayTime,
+                                    'chorusDepth': chorusDepth
                                 };
 
                                 if (that.oscList[turtle].length > 0) {
@@ -5810,31 +5782,21 @@ function Logo () {
                                         that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
 
-
-                                    that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), params_effects);
+                                    that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), paramsEffects, null);
                                 } else if (that.drumStyle[turtle].length > 0) {
-                                    that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null);
+                                    that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null, null);
                                 } else if (that.turtles.turtleList[turtle].drum) {
-                                    that.synth.trigger(notes, beatValue, 'drum', null);
-
-
+                                    that.synth.trigger(notes, beatValue, 'drum', null, null);
                                 } else {
-                                    // Look for any notes in the chord
-                                    // that might be in the
-                                    // pitchDrumTable.
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
-                                            that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null);
-                                        }
-                                        else if (turtle in that.instrument_names && last(that.instrument_names[turtle])) {
-                                            that.synth.trigger(notes[d], beatValue, last(that.instrument_names[turtle]), params_effects);
-                                        }
-                                        else if (turtle in that.voices && last(that.voices[turtle])) {
-                                            that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), params_effects);
-                                        }
-                                        else {
-                                            that.synth.trigger(notes[d], beatValue, 'default', params_effects);
-
+                                            that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null);
+                                        } else if (turtle in that.instrumentNames && last(that.instrumentNames[turtle])) {
+                                            that.synth.trigger(notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, null);
+                                        } else if (turtle in that.voices && last(that.voices[turtle])) {
+                                            that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null);
+                                        } else {
+                                            that.synth.trigger(notes[d], beatValue, 'default', paramsEffects, null);
                                         }
                                     }
                                 }
@@ -5854,20 +5816,13 @@ function Logo () {
                         drums.push(that.noteDrums[turtle][i]);
                     }
 
-                    // console.log('drums to play ' + drums + ' ' + noteBeatValue);
                     if (!that.suppressOutput[turtle] && duration > 0) {
                         if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                             for (var i = 0; i < drums.length; i++) {
-
                                 if (that.drumStyle[turtle].length > 0) {
-
-
-                                    // that.synth.triggerWithEffects(['C2'], beatValue, last(that.drumStyle[turtle]), [], [], [], [], []);
-                                    that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), null);
+                                    that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), null, null);
                                 } else {
-                                    // that.synth.triggerWithEffects(['C2'], beatValue, drums[i], [], [], [], [], []);
-                                    that.synth.trigger(['C2'], beatValue, drums[i], null);
-
+                                    that.synth.trigger(['C2'], beatValue, drums[i], null, null);
                                 }
                             }
                         }
@@ -6243,7 +6198,7 @@ function Logo () {
                 } else {
                     var values = that.analyser.analyse();
                     var sum = 0;
-                    for(var k=0; k<that.limit; k++){
+                    for(var k=0; k<that.limit; k++) {
                             sum += (values[k] * values[k]);
                     }
                     var rms = Math.sqrt(sum/that.limit);
@@ -6273,7 +6228,7 @@ function Logo () {
                 var cblk = that.blocks.blockList[blk].connections[1];
                 var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
                 var action_args=receivedArg
-                if(action_args.length >= Number(name)){
+                if (action_args.length >= Number(name)) {
                     var value = action_args[Number(name)-1];
                     that.blocks.blockList[blk].value = value;
                 }else {
@@ -6310,7 +6265,7 @@ function Logo () {
                     }
                 }
                 break;
-            case 'namedarg' :
+            case 'namedarg':
                 var name = that.blocks.blockList[blk].privateData;
                 var action_args = receivedArg;
 
@@ -6655,7 +6610,7 @@ function Logo () {
                             var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
 
                             var obj = [pitch, octave];
-                        } else if(that.notePitches[i].length > 0) {
+                        } else if (that.notePitches[i].length > 0) {
                             var obj = that.getNote(that.notePitches[i][0], that.noteOctaves[i][0], that.noteTranspositions[i][0], that.keySignature[i]);
                         } else {
                             console.log('Could not find a note for turtle ' + turtle);
@@ -6704,7 +6659,7 @@ function Logo () {
                             value = 1 / that.noteValue[turtle];
                         } else if (that.lastNotePlayed[turtle] !== null) {
                             value = that.lastNotePlayed[turtle][1];
-                        } else if(that.notePitches[i].length > 0) {
+                        } else if (that.notePitches[i].length > 0) {
                             value = that.noteBeat[i];
                         } else {
                             console.log('Could not find a note for turtle ' + turtle);
@@ -6975,7 +6930,7 @@ function Logo () {
                 var actionArgs = [];
                 // that.getBlockAtStartOfArg(blk);
                 if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                    for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++){
+                    for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
                         var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
                         actionArgs.push(t);
                     }
@@ -6996,7 +6951,7 @@ function Logo () {
                 var actionArgs = [];
                 // that.getBlockAtStartOfArg(blk);
                 if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                    for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++){
+                    for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
                         var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
                         actionArgs.push(t);
                     }
@@ -7228,7 +7183,7 @@ function Logo () {
                 solfege = solfege.substr(0, solfege.indexOf('<'));
             }
 
-            if(['#', '♯', '♭', 'b'].indexOf(solfege.substr(-1)) !== -1) {
+            if (['#', '♯', '♭', 'b'].indexOf(solfege.substr(-1)) !== -1) {
                 sharpFlat = true;
             }
 
@@ -7257,7 +7212,7 @@ function Logo () {
                     offset += 1;
                 } else if (solfege.substr(-1) === '♭') {
                     offset -= 1;
-                } else if(solfege.substr(-1) === 'b') {
+                } else if (solfege.substr(-1) === 'b') {
                     offset -= 1;
                 }
             }

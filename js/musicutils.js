@@ -173,8 +173,7 @@ const MUSICALMODES = {
     'spanish': [1, 2, 1, 1, 1, 2, 2, 2],
     'ocatonic': [1, 2, 1, 2, 1, 2, 1, 2],
 
-    // 7 notes in an octave
-
+     // 7 notes in an octave
     'major': [2, 2, 1, 2, 2, 2, 1],
     'harmonic major': [2, 2, 1, 2, 1, 3, 1],
     'natural minor': [2, 1, 2, 2, 1, 2, 2],
@@ -203,12 +202,12 @@ const MUSICALMODES = {
     'romanian minor': [2, 1, 3, 1, 2, 1, 2],
     'spanish gypsy': [1, 3, 1, 2, 1, 2, 2],
 
-    // 6 notes in an octave
+     // 6 notes in an octave
     'blues': [3, 2, 1, 1, 3, 2],
     'major blues': [2, 1, 1, 3, 2, 2],
     'whole tone': [2, 2, 2, 2, 2, 2],
 
-    // 5 notes in an octave
+     // 5 notes in an octave
     'pentatonic': [3, 2, 2, 3, 2],
     'chinese': [4, 2, 1, 4, 1],
     'egyptian': [2, 3, 2, 3, 2],
@@ -216,7 +215,7 @@ const MUSICALMODES = {
     'japanese': [1, 4, 2, 3, 2],
     'fibonacci': [1, 1, 2, 3, 5],
 
-    // User definition overrides this constant
+     // User definition overrides this constant
     'custom': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 };
 
@@ -369,20 +368,32 @@ var DRUMNAMES = [
 ];
 
 var FILTERTYPES = [
+    //.TRANS: highpass filter
     [_('highpass'), 'highpass'],
+    //.TRANS: lowpass filter
     [_('lowpass'), 'lowpass'],
+    //.TRANS: bandpass filter
     [_('bandpass'), 'bandpass'],
+    //.TRANS: highshelf filter
     [_('highshelf'), 'highshelf'],
+    //.TRANS: lowshelf filter
     [_('lowshelf'), 'lowshelf'],
+    //.TRANS: notch filter
     [_('notch'), 'notch'],
+    //.TRANS: allpass filter
     [_('allpass'), 'allpass'],
+    //.TRANS: peaking filter
     [_('peaking'), 'peaking'],
 ];
 
 var OSCTYPES = [
+    //.TRANS: sine wave
     [_('sine'), 'sine'],
+    //.TRANS: square wave
     [_('square'), 'square'],
+    //.TRANS: triangle wave
     [_('triangle'), 'triangle'],
+    //.TRANS: sawtooth wave
     [_('sawtooth'), 'sawtooth'],
 ];
 const DEFAULTVOICE = 'sine';
@@ -1308,41 +1319,41 @@ function reducedFraction(a, b) {
 
 // Validate the passed on parameters in a function as per the default
 // parameters values
-function validateAndSetParams(default_params, params) {
-    if (default_params && (default_params !== null) && params && (params !== undefined)) {
-        for (var key in default_params) {
+function validateAndSetParams(defaultParams, params) {
+    if (defaultParams && (defaultParams !== null) && params && (params !== undefined)) {
+        for (var key in defaultParams) {
             if (key in params && params[key] !== undefined)
-                default_params[key] = params[key];
+                defaultParams[key] = params[key];
         }
     }
 
-    return default_params;
+    return defaultParams;
 };
 
-// This object contains mapping between instrument_name and
-// corresponding synth object.  The instrument_name is the one that
+// This object contains mapping between instrument name and
+// corresponding synth object.  The instrument name is the one that
 // the user sets in the "Timbre" clamp and uses in the "Set Timbre"
 // clamp
 
 var instruments = {};
 
-// This object contains mapping between instrument_name and its source
+// This object contains mapping between instrument name and its source
 // - (0->default, 1->drum, 2->voice, 3->builtin)
-// e.g. instruments_source['kick drum'] = [1, 'kick drum']
+// e.g. instrumentsSource['kick drum'] = [1, 'kick drum']
 
-var instruments_source = {};
+var instrumentsSource = {};
 
 // Effects associated with instruments in the timbre widget
 
-var instruments_effects = {};
+var instrumentsEffects = {};
 
 // Filters associated with instruments in the timbre widget
 
-var instruments_filters = {};
+var instrumentsFilters = {};
 
 
 function Synth() {
-    // Isolate synth functions here
+    // Isolate synth functions here.
 
     // Using Tone.js
     this.tone = new Tone();
@@ -1352,8 +1363,8 @@ function Synth() {
     };
 
     // Function that provides default parameters for various synths
-    this.getDefaultParamValues = function (source_name) {
-        if (source_name.toLowerCase() === 'amsynth') {
+    this.getDefaultParamValues = function (sourceName) {
+        if (sourceName.toLowerCase() === 'amsynth') {
             var synthOptions = {
                 'harmonicity': 3,
                 'detune': 0,
@@ -1372,9 +1383,8 @@ function Synth() {
                     'sustain': 1,
                     'release': 0.5
                 }
-            }
-        }
-        else if (source_name.toLowerCase() === 'fmsynth') {
+            };
+        } else if (sourceName.toLowerCase() === 'fmsynth') {
             var synthOptions = {
                 'harmonicity': 3,
                 'modulationIndex': 10,
@@ -1394,9 +1404,8 @@ function Synth() {
                     'sustain': 1,
                     'release': 0.5
                 }
-            }
-        }
-         else if (source_name.toLowerCase() === 'monosynth') {
+            };
+        } else if (sourceName.toLowerCase() === 'monosynth') {
             var synthOptions = {
                 'oscillator': {
                     'type': 'square'
@@ -1421,9 +1430,8 @@ function Synth() {
                     'octaves': 7,
                     'exponent': 2
                 }
-            }
-        }
-        else if (source_name.toLowerCase() === 'duosynth') {
+            };
+        } else if (sourceName.toLowerCase() === 'duosynth') {
             var synthOptions = {
                 'vibratoAmount': 0.5,
                 'vibratoRate': 5,
@@ -1466,12 +1474,11 @@ function Synth() {
                         'release': 0.5
                     }
                 }
-            }
-        }
-        else if ((source_name.toLowerCase() === 'sine') || (source_name.toLowerCase() === 'triangle') || (source_name.toLowerCase() === 'square') | (source_name.toLowerCase() === 'sawtooth')) {
+            };
+        } else if ((sourceName.toLowerCase() === 'sine') || (sourceName.toLowerCase() === 'triangle') || (sourceName.toLowerCase() === 'square') | (sourceName.toLowerCase() === 'sawtooth')) {
             var synthOptions = {
                 'oscillator': {
-                    'type': source_name.toLowerCase()
+                    'type': sourceName.toLowerCase()
                 },
                 'envelope': {
                     'attack': 0.03,
@@ -1480,21 +1487,17 @@ function Synth() {
                     'release': 0.03
                 },
             };
-
-        }
-        else if ((source_name.toLowerCase() === 'pluck')) {
+        } else if ((sourceName.toLowerCase() === 'pluck')) {
              var synthOptions = {
                 'attackNoise': 1,
                 'dampening': 4000,
                 'resonance': 0.9
             };
-        }
-        else if ((source_name.toLowerCase() === 'poly')) {
+        } else if ((sourceName.toLowerCase() === 'poly')) {
             var synthOptions = {
                 polyphony: 6
             };
-        }
-        else {
+        } else {
             var synthOptions = {};
         }
 
@@ -1504,10 +1507,10 @@ function Synth() {
     // Poly synth will be loaded as the default synth.
     this.createDefaultSynth = function () {
         var default_synth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
-        instruments['custom'] = default_synth;
         instruments['default'] = default_synth;
-        instruments_source['custom'] = [0, 'custom'];
-        instruments_source['default'] = [0, 'default'];
+        instrumentsSource['default'] = [0, 'default'];
+        instruments['custom'] = default_synth;
+        instrumentsSource['custom'] = [0, 'custom'];
 
         for (var blt in BUILTIN_SYNTHS) {
             this.createSynth(blt, blt, null);
@@ -1524,49 +1527,49 @@ function Synth() {
 
     // Function reponsible for creating the synth using the existing
     // samples: drums and voices
-    this.createSampleSynth = function (instrument_name, source_name, params) {
-        if (source_name in VOICE_SAMPLES) {
-            instruments_source[instrument_name] = [2, source_name];
-            var temp_synth = new Tone.Sampler(VOICE_SAMPLES[source_name]);
+    this.createSampleSynth = function (instrumentName, sourceName, params) {
+        if (sourceName in VOICE_SAMPLES) {
+            instrumentsSource[instrumentName] = [2, sourceName];
+            var tempSynth = new Tone.Sampler(VOICE_SAMPLES[sourceName]);
         }
-        else if (source_name in DRUM_SAMPLES) {
-            instruments_source[instrument_name] = [1, source_name];
-            var temp_synth = new Tone.Sampler(DRUM_SAMPLES[source_name]);
+        else if (sourceName in DRUM_SAMPLES) {
+            instrumentsSource[instrumentName] = [1, sourceName];
+            var tempSynth = new Tone.Sampler(DRUM_SAMPLES[sourceName]);
         }
         else {
             // default drum sample
-            instruments_source[instrument_name] = [1, 'drum'];
-            var temp_synth = new Tone.Sampler(DRUM_SAMPLES[DEFAULTDRUM]);
+            instrumentsSource[instrumentName] = [1, 'drum'];
+            var tempSynth = new Tone.Sampler(DRUM_SAMPLES[DEFAULTDRUM]);
         }
 
-        return temp_synth;
+        return tempSynth;
     };
 
     // Function using builtin synths from Tone.js
-    this.createBuiltinSynth = function (instrument_name, source_name, params) {
-        if (source_name in BUILTIN_SYNTHS) {
-            var synthOptions = this.getDefaultParamValues(source_name);
+    this.createBuiltinSynth = function (instrumentName, sourceName, params) {
+        if (sourceName in BUILTIN_SYNTHS) {
+            var synthOptions = this.getDefaultParamValues(sourceName);
             synthOptions = validateAndSetParams(synthOptions, params);
         }
 
-        switch (source_name) {
+        switch (sourceName) {
             case 'sine':
             case 'triangle':
             case 'square':
             case 'sawtooth':
-                instruments_source[instrument_name] = [3, source_name];
+                instrumentsSource[instrumentName] = [3, sourceName];
                 var builtin_synth = new Tone.Synth(synthOptions);
                 break;
             case 'pluck':
-                instruments_source[instrument_name] = [3, source_name];
+                instrumentsSource[instrumentName] = [3, sourceName];
                 var builtin_synth = new Tone.PluckSynth(synthOptions);
                 break;
             case 'poly':
-                instruments_source[instrument_name] = [0, 'poly'];
+                instrumentsSource[instrumentName] = [0, 'poly'];
                 var builtin_synth = new Tone.PolySynth(synthOptions.polyphony, Tone.AMSynth);
                 break;
             default:
-                instruments_source[instrument_name] = [0, 'poly'];
+                instrumentsSource[instrumentName] = [0, 'poly'];
                 var builtin_synth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
                 break;
         }
@@ -1577,269 +1580,234 @@ function Synth() {
 
     // Function reponsible for creating the custom synth using the
     // Tonejs methods like AMSynth, FMSynth, etc.
-    this.createCustomSynth = function (source_name, params) {
+    this.createCustomSynth = function (sourceName, params) {
         // Getting parameters for custom synth
-        var synthOptions = this.getDefaultParamValues(source_name);
+        var synthOptions = this.getDefaultParamValues(sourceName);
         synthOptions = validateAndSetParams(synthOptions, params);
 
-        if (source_name.toLowerCase() === 'amsynth') {
-            var temp_synth = new Tone.AMSynth(synthOptions);
+        if (sourceName.toLowerCase() === 'amsynth') {
+            var tempSynth = new Tone.AMSynth(synthOptions);
         }
-        else if (source_name.toLowerCase() === 'fmsynth') {
-            var temp_synth = new Tone.FMSynth(synthOptions);
+        else if (sourceName.toLowerCase() === 'fmsynth') {
+            var tempSynth = new Tone.FMSynth(synthOptions);
         }
-        else if (source_name.toLowerCase() === 'monosynth') {
-            var temp_synth = new Tone.MonoSynth(synthOptions);
+        else if (sourceName.toLowerCase() === 'monosynth') {
+            var tempSynth = new Tone.MonoSynth(synthOptions);
         }
-        else if (source_name.toLowerCase() === 'duosynth') {
-            var temp_synth = new Tone.DuoSynth(synthOptions);
+        else if (sourceName.toLowerCase() === 'duosynth') {
+            var tempSynth = new Tone.DuoSynth(synthOptions);
         }
         else {
-            var temp_synth = new Tone.PolySynth(6, Tone.AMSynth);
+            var tempSynth = new Tone.PolySynth(6, Tone.AMSynth);
         }
 
-        return temp_synth;
+        return tempSynth;
     };
 
     // Create the synth as per the user's input in the 'Timbre' clamp.
-    this.createSynth = function (instrument_name, source_name, params) {
-
-
-        if ((source_name in VOICE_SAMPLES) || (source_name in DRUM_SAMPLES)) {
-            instruments[instrument_name] = this.createSampleSynth(instrument_name, source_name, null).toMaster();
+    this.createSynth = function (instrumentName, sourceName, params) {
+        if ((sourceName in VOICE_SAMPLES) || (sourceName in DRUM_SAMPLES)) {
+            instruments[instrumentName] = this.createSampleSynth(instrumentName, sourceName, null).toMaster();
         }
-        else if (source_name in BUILTIN_SYNTHS) {
-            instruments[instrument_name] = this.createBuiltinSynth(instrument_name, source_name, params).toMaster();
+        else if (sourceName in BUILTIN_SYNTHS) {
+            instruments[instrumentName] = this.createBuiltinSynth(instrumentName, sourceName, params).toMaster();
         }
-        else if (source_name in CUSTOM_SYNTHS) {
-            instruments[instrument_name] = this.createCustomSynth(source_name, params).toMaster();
-            instruments_source[instrument_name] = [0, 'poly'];
+        else if (sourceName in CUSTOM_SYNTHS) {
+            instruments[instrumentName] = this.createCustomSynth(sourceName, params).toMaster();
+            instrumentsSource[instrumentName] = [0, 'poly'];
         }
         else {
-            if (source_name.length >= 4) {
-
-                if (source_name.slice(0, 4) == 'http') {
-                    instruments[source_name] = new Tone.Sampler(source_name).toMaster();
-                    instruments_source[instrument_name] = [1, 'drum'];
-                }
-                else if (source_name.slice(0, 4) == 'file') {
-                    instruments[source_name] = new Tone.Sampler(source_name).toMaster();
-                    instruments_source[instrument_name] = [1, 'drum'];
-                }
-                else if (source_name === 'drum') {
-                    instruments[source_name] = this.createSampleSynth(source_name, source_name, null).toMaster();
-                    instruments_source[instrument_name] = [1, 'drum'];
+            if (sourceName.length >= 4) {
+                if (sourceName.slice(0, 4) === 'http') {
+                    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
+                    instrumentsSource[instrumentName] = [1, 'drum'];
+                } else if (sourceName.slice(0, 4) === 'file') {
+                    instruments[sourceName] = new Tone.Sampler(sourceName).toMaster();
+                    instrumentsSource[instrumentName] = [1, 'drum'];
+                } else if (sourceName === 'drum') {
+                    instruments[sourceName] = this.createSampleSynth(sourceName, sourceName, null).toMaster();
+                    instrumentsSource[instrumentName] = [1, 'drum'];
                 }
             }
         }
     };
 
-    this.loadSynth = function (source_name) {
-        if (instruments[source_name] == null) {
-            this.createSynth(source_name, source_name, null);
+    this.loadSynth = function (sourceName) {
+        if (instruments[sourceName] == null) {
+            this.createSynth(sourceName, sourceName, null);
         }
 
-        if (source_name in instruments)
-            return instruments[source_name].toMaster();
+        if (sourceName in instruments) {
+            return instruments[sourceName].toMaster();
+        }
 
         return null;
     }
 
-    this.performNotes = function (synth, notes, beatValue, params_effects, params_filters) {
-
-     /*    if (instrument_name == 'foo') {
-            console.log('applying highpass filter and effect');
-            var highpassFilter = new Tone.Filter(200, "highpass");
-            synth.chain(highpassFilter, Tone.Master);
-
-            var phaser = new Tone.Phaser({
-                'frequency': 0.5,
-                'octaves': 3,
-                'baseFrequency': 350
-            }).toMaster();
-            synth.chain(phaser, Tone.Master);
-        }
-        if (instrument_name == 'bar') {
-            console.log('applying highpass filter');
-            var highpassFilter = new Tone.Filter(200, "highpass");
-            synth.chain(highpassFilter, Tone.Master);
-
-        } */
-
-        if (params_effects === null && params_filters === null) {
-
+    this.performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters) {
+        if (paramsEffects == null && paramsFilters == null) {
             synth.triggerAttackRelease(notes, beatValue);
-        }
-        else {
-
-            if (params_filters && params_filters!=null && params_filters!=undefined){
-
-                var no_filters = params_filters.length;  // no. of filters
-                var k=0;
+        } else {
+            if (paramsFilters && paramsFilters!=null && paramsFilters!=undefined) {
+                var numFilters = paramsFilters.length;  // no. of filters
+                var k = 0;
                 var temp_filters = [];
 
-
-                console.log('no of filters: ' + no_filters);
-                for (k=0; k<no_filters; k++) {
+                console.log('no of filters: ' + numFilters);
+                for (k = 0; k < numFilters; k++) {
                     // filter rolloff has to be added
-
-                    console.log('Filter type: ' + params_filters[k].filterType);
-                    console.log('roll off : ' + params_filters[k].filterRolloff);
-                    var filterVal = new Tone.Filter(params_filters[k].filterFrequency, params_filters[k].filterType, params_filters[k].filterRolloff);
+                    console.log('Filter type: ' + paramsFilters[k].filterType);
+                    console.log('roll off : ' + paramsFilters[k].filterRolloff);
+                    var filterVal = new Tone.Filter(paramsFilters[k].filterFrequency, paramsFilters[k].filterType, paramsFilters[k].filterRolloff);
                     temp_filters.push(filterVal);
                     synth.chain(temp_filters[k], Tone.Master);
                 }
                
             }
 
-            if (params_effects && params_effects !=null && params_effects!=undefined){
-                if (params_effects.doVibrato) {
-                    var vibrato = new Tone.Vibrato(1 / params_effects.vibratoFrequency, params_effects.vibratoIntensity);
+            if (paramsEffects && paramsEffects != null && paramsEffects != undefined) {
+                if (paramsEffects.doVibrato) {
+                    var vibrato = new Tone.Vibrato(1 / paramsEffects.vibratoFrequency, paramsEffects.vibratoIntensity);
                     synth.chain(vibrato, Tone.Master);
                 }
 
-                if (params_effects.doDistortion) {
-                    var distort = new Tone.Distortion(params_effects.distortionAmount).toMaster();
+                if (paramsEffects.doDistortion) {
+                    var distort = new Tone.Distortion(paramsEffects.distortionAmount).toMaster();
                     synth.connect(distort, Tone.Master);
                 }
 
-                if (params_effects.doTremolo) {
+                if (paramsEffects.doTremolo) {
                     var tremolo = new Tone.Tremolo({
-                        'frequency': params_effects.tremoloFrequency,
-                        'depth': params_effects.tremoloDepth
+                        'frequency': paramsEffects.tremoloFrequency,
+                        'depth': paramsEffects.tremoloDepth
                     }).toMaster().start();
                     synth.chain(tremolo);
                 }
 
-                if (params_effects.doPhaser) {
+                if (paramsEffects.doPhaser) {
                     var phaser = new Tone.Phaser({
-                        'frequency': params_effects.rate,
-                        'octaves': params_effects.octaves,
-                        'baseFrequency': params_effects.baseFrequency
+                        'frequency': paramsEffects.rate,
+                        'octaves': paramsEffects.octaves,
+                        'baseFrequency': paramsEffects.baseFrequency
                     }).toMaster();
                     synth.chain(phaser, Tone.Master);
                 }
 
-                if (params_effects.doChorus) {
+                if (paramsEffects.doChorus) {
                     var chorusEffect = new Tone.Chorus({
-                        'frequency': params_effects.chorusRate,
-                        'delayTime': params_effects.delayTime,
-                        'depth': params_effects.chorusDepth
+                        'frequency': paramsEffects.chorusRate,
+                        'delayTime': paramsEffects.delayTime,
+                        'depth': paramsEffects.chorusDepth
                     }).toMaster();
                     synth.chain(chorusEffect, Tone.Master);
                 }
             }
+
             synth.triggerAttackRelease(notes, beatValue);
 
             setTimeout(function () {
-                if (params_effects && params_effects!=null && params_effects!=undefined){
-                    if (params_effects.doVibrato) {
+                if (paramsEffects && paramsEffects != null && paramsEffects != undefined) {
+                    if (paramsEffects.doVibrato) {
                         vibrato.dispose();
                     }
 
-                    if (params_effects.doDistortion) {
+                    if (paramsEffects.doDistortion) {
                         distort.dispose();
                     }
 
-                    if (params_effects.doTremolo) {
+                    if (paramsEffects.doTremolo) {
                         tremolo.dispose();
                     }
 
-                    if (params_effects.doPhaser) {
+                    if (paramsEffects.doPhaser) {
                         phaser.dispose();
                     }
 
-                    if (params_effects.doChorus) {
+                    if (paramsEffects.doChorus) {
                         chorusEffect.dispose();
                     }
                 }
 
-                if (params_filters && params_filters!=null && params_filters!=undefined){ 
-
-                    for (k=0; k<no_filters; k++) {
+                if (paramsFilters && paramsFilters != null && paramsFilters != undefined) { 
+                    for (k = 0; k < numFilters; k++) {
                         temp_filters[k].dispose();
                     }
                 }
-
             }, beatValue * 1000);
         }
     };
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
-    this.trigger = function (notes, beatValue, instrument_name, params_effects, params_filters) {
+    this.trigger = function (notes, beatValue, instrumentName, paramsEffects, paramsFilters) {
+        if (paramsEffects && paramsEffects !== 'null' && paramsEffects !== ' undefined') {
+            if (paramsEffects['vibratoIntensity'] != 0) {
+                paramsEffects.doVibrato = true;
+            }
 
-        if (params_effects && params_effects !== 'null' && params_effects !== ' undefined') {
-            if (params_effects['vibratoIntensity'] != 0) {
-                params_effects.doVibrato = true;
+            if (paramsEffects['distortionAmount'] != 0) {
+                paramsEffects.doDistortion = true;
             }
-            if (params_effects['distortionAmount'] != 0) {
-                params_effects.doDistortion = true;
+
+            if (paramsEffects['tremoloFrequency'] != 0) {
+                paramsEffects.doTremolo = true;
             }
-            if (params_effects['tremoloFrequency'] != 0) {
-                params_effects.doTremolo = true;
+
+            if (paramsEffects['rate'] != 0) {
+                paramsEffects.doPhaser = true;
             }
-            if (params_effects['rate'] != 0) {
-                params_effects.doPhaser = true;
-            }
-            if (params_effects['chorusRate'] != 0) {
-                params_effects.doChorus = true;
+
+            if (paramsEffects['chorusRate'] != 0) {
+                paramsEffects.doChorus = true;
             }
         }
 
         // flag indicates the source of the synth 0-> default, 1->
         // drum, 2-> voice, 3-> builtin
         var flag = 0;
-        var temp_synth = instruments['default'];
-        if (instrument_name in instruments) {
-
-            temp_synth = instruments[instrument_name];
-            flag = instruments_source[instrument_name][0];
-            if (flag==1 || flag==2) {
-                var sample_name = instruments_source[instrument_name][1];
+        var tempSynth = instruments['default'];
+        if (instrumentName in instruments) {
+            tempSynth = instruments[instrumentName];
+            flag = instrumentsSource[instrumentName][0];
+            if (flag === 1 || flag === 2) {
+                var sampleName = instrumentsSource[instrumentName][1];
             }
         }
 
-        var temp_notes = notes;
+        var tempNotes = notes;
         // Get note values as per the source of the synth.
         if (flag == 0) {
-            temp_notes = notes;
-        }
-        else if (flag == 2) {
-            var centerNo = SAMPLECENTERNO[sample_name];
+            tempNotes = notes;
+        } else if (flag == 2) {
+            var centerNo = SAMPLECENTERNO[sampleName];
             var obj = noteToPitchOctave(notes);
-            var noteNo = pitchToNumber(obj[0], obj[1], 'C Major');
+            var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
 
-            temp_notes = noteNo - centerNo;
-        }
-        else if (flag == 3) {
+            tempNotes = noteNum - centerNo;
+        } else if (flag == 3) {
             if (typeof(notes) === 'object') {
-                temp_notes = notes[0];
-            }
-            else {
-                temp_notes = notes;
+                tempNotes = notes[0];
+            } else {
+                tempNotes = notes;
             }
         }
 
         if (flag != 1) {
-            //  temp_synth = new Tone.PolySynth(6, Tone.AMSynth);
-            this.performNotes(temp_synth.toMaster(), temp_notes, beatValue, params_effects, params_filters);
-        }
-        else {
+            //  tempSynth = new Tone.PolySynth(6, Tone.AMSynth);
+            this.performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+        } else {
             // drum samples
-            if (instrument_name.slice(0, 4) == 'http') {
-                temp_synth.triggerAttack(0, beatValue);
-            }
-            else if (instrument_name.slice(0, 4) == 'file') {
-                temp_synth.triggerAttack(0, beatValue);
-            }
-            else {
-                temp_synth.triggerAttack(0);
+            if (instrumentName.slice(0, 4) === 'http') {
+                tempSynth.triggerAttack(0, beatValue);
+            } else if (instrumentName.slice(0, 4) === 'file') {
+                tempSynth.triggerAttack(0, beatValue);
+            } else {
+                tempSynth.triggerAttack(0);
             }
         }
     };
 
-    this.stopSound = function (instrument_name) {
-        instruments[instrument_name].triggerRelease();
+    this.stopSound = function (instrumentName) {
+        instruments[instrumentName].triggerRelease();
     };
 
     this.start = function () {

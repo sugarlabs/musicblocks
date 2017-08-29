@@ -77,7 +77,7 @@ function TimbreWidget () {
     }
 
     this.blockNo = null;  // index no. of the timbre widget block
-    this.instrument_name = 'custom';
+    this.instrumentName = 'custom';
 
     var that = this;
 
@@ -108,19 +108,19 @@ function TimbreWidget () {
 
         if (that.isActive['envelope'] === true && this.env[i] != null) {
             for (j = 0; j < 4; j++) {
-                updateParams[j] = this._logo.blocks.blockList[this.env[i]].connections[j+1];
+                updateParams[j] = this._logo.blocks.blockList[this.env[i]].connections[j + 1];
             }
         }
 
         if (that.isActive['filter'] === true && this.fil[i] != null) {
             for (j = 0; j < 3; j++) {
-                updateParams[j] = this._logo.blocks.blockList[this.fil[i]].connections[j+1];
+                updateParams[j] = this._logo.blocks.blockList[this.fil[i]].connections[j + 1];
             }
         }
 
         if (that.isActive['oscillator'] === true && this.osc[i] != null) {
             for (j = 0; j < 2; j++) {
-                updateParams[j] = this._logo.blocks.blockList[this.osc[i]].connections[j+1];
+                updateParams[j] = this._logo.blocks.blockList[this.osc[i]].connections[j + 1];
             }
         }
 
@@ -134,13 +134,13 @@ function TimbreWidget () {
 
         if (that.isActive['duosynth'] === true && this.duoSynthesizer[i] != null) {
             for (j = 0; j < 2; j++) {
-                updateParams[j] = this._logo.blocks.blockList[this.duoSynthesizer[i]].connections[j+1];
+                updateParams[j] = this._logo.blocks.blockList[this.duoSynthesizer[i]].connections[j + 1];
             }
         }
 
         if (that.isActive['tremolo'] === true && this.tremoloEffect[i] != null) {
             for (j = 0; j < 2; j++) {
-                updateParams[j] = this._logo.blocks.blockList[this.tremoloEffect[i]].connections[j+1];
+                updateParams[j] = this._logo.blocks.blockList[this.tremoloEffect[i]].connections[j + 1];
             }
         }
 
@@ -182,13 +182,13 @@ function TimbreWidget () {
 
         if (that.isActive['chorus'] === true && this.chorusEffect[i] != null) {
             for (j = 0; j < 3; j++) {
-                updateParams[j] = this._logo.blocks.blockList[this.chorusEffect[i]].connections[j+1];
+                updateParams[j] = this._logo.blocks.blockList[this.chorusEffect[i]].connections[j + 1];
             }
         }
 
         if (that.isActive['phaser'] === true && this.phaserEffect[i] != null) {
             for (j = 0; j < 3; j++) {
-                updateParams[j] = this._logo.blocks.blockList[this.phaserEffect[i]].connections[j+1];
+                updateParams[j] = this._logo.blocks.blockList[this.phaserEffect[i]].connections[j + 1];
             }
         }
 
@@ -210,8 +210,78 @@ function TimbreWidget () {
         }
     };
 
+    this._play = function () {
+        var that = this;
+
+        __playLoop = function (i) {
+            var timbreEffects = instrumentsEffects[that.instrumentName];
+            var paramsEffects = {
+                'doVibrato': false,
+                'doDistortion': false,
+                'doTremolo': false,
+                'doPhaser': false,
+                'doChorus': false,
+                'vibratoIntensity': 0,
+                'vibratoFrequency': 0,
+                'distortionAmount': 0,
+                'tremoloFrequency': 0,
+                'tremoloDepth': 0,
+                'rate': 0,
+                'octaves': 0,
+                'baseFrequency': 0,
+                'chorusRate': 0,
+                'delayTime': 0,
+                'chorusDepth': 0
+            };
+
+            if (timbreEffects['vibratoActive']) {
+                paramsEffects.vibratoRate = timbreEffects['vibratoRate'];
+                paramsEffects.vibratoIntensity = timbreEffects['vibratoIntensity'];
+                paramsEffects.doVibrato = true;
+            }
+                
+            if (timbreEffects['distortionActive']) {
+                paramsEffects.distortionAmount = timbreEffects['distortionAmount'];
+                paramsEffects.doDistortion = true;
+            }
+                
+            if (timbreEffects['tremoloActive']) {
+                paramsEffects.tremoloFrequency = timbreEffects['tremoloFrequency'];
+                paramsEffects.tremoloDepth = timbreEffects['tremoloDepth'];
+                paramsEffects.doTremolo = true;
+            }
+                
+            if (timbreEffects['phaserActive']) {
+                paramsEffects.rate = timbreEffects['rate'];
+                paramsEffects.octaves = timbreEffects['octaves'];
+                paramsEffects.baseFrequency = timbreEffects['baseFrequency'];
+                paramsEffects.doPhaser = true;
+            }
+
+            if (timbreEffects['chorusActive']) {
+                paramsEffects.chorusRate = timbreEffects['chorusRate'];
+                paramsEffects.delayTime = timbreEffects['delayTime'];
+                paramsEffects.chorusDepth = timbreEffects['chorusDepth'];
+                paramsEffects.doChorus = true;
+            }
+
+            that._logo.synth.trigger(that.notesToPlay[i][0], that.notesToPlay[i][1], that.instrumentName, paramsEffects);
+
+            i += 1;
+            if (i < that.notesToPlay.length) {
+                setTimeout(function () {
+		    __playLoop(i);
+		}, that._logo.defaultBPMFactor * 1000 * that.notesToPlay[i][1]);
+            }
+        };
+
+        __playLoop(0);
+    };
+
     this.init = function (logo) {
         this._logo = logo;
+
+        this.notesToPlay = [['G4', 1 / 4], ['E4', 1 / 4], ['G4', 1 / 2]];
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -236,7 +306,12 @@ function TimbreWidget () {
 
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play all'));
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('play'));
+
+        cell.onclick = function () {
+            that._play();
+        };
+
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
         var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
 
@@ -645,7 +720,7 @@ function TimbreWidget () {
                         docById('myspanS0').textContent = that.AMSynthParams[0];
 
                         that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
-                        that._logo.synth.createSynth(that.instrument_name, 'amsynth', that.amSynthParamvals);
+                        that._logo.synth.createSynth(that.instrumentName, 'amsynth', that.amSynthParamvals);
 
                         if (that.AMSynthesizer.length !== 1) {
                             blockValue = that.AMSynthesizer.length - 1;
@@ -658,7 +733,7 @@ function TimbreWidget () {
                             that.amSynthParamvals['harmonicity'] = parseFloat(elem.value);
                             docById('myspanS0').textContent = elem.value;
                             that._update(blockValue, elem.value, 0);
-                            that._logo.synth.createSynth(that.instrument_name, 'amsynth', that.amSynthParamvals);
+                            that._logo.synth.createSynth(that.instrumentName, 'amsynth', that.amSynthParamvals);
 
                         });
 
@@ -701,7 +776,7 @@ function TimbreWidget () {
                         docById('myspanS0').textContent = that.FMSynthParams[0];
 
                         that.fmSynthParamvals['modulationIndex'] = parseFloat(that.FMSynthParams[0]);
-                        that._logo.synth.createSynth(that.instrument_name, 'fmsynth', that.fmSynthParamvals);
+                        that._logo.synth.createSynth(that.instrumentName, 'fmsynth', that.fmSynthParamvals);
 
                         if (that.FMSynthesizer.length !== 1) {
                             blockValue = that.FMSynthesizer.length - 1;
@@ -714,7 +789,7 @@ function TimbreWidget () {
                             docById('myspanS0').textContent = elem.value;
                             that.fmSynthParamvals['modulationIndex'] = parseFloat(elem.value);
                             that._update(blockValue, elem.value, 0);
-                            that._logo.synth.createSynth(that.instrument_name, 'fmsynth', that.fmSynthParamvals);
+                            that._logo.synth.createSynth(that.instrumentName, 'fmsynth', that.fmSynthParamvals);
                         });
                     }
                     else if (synthChosen === 'DuoSynth') {
@@ -761,7 +836,7 @@ function TimbreWidget () {
                         docById('myRangeS1').value = that.duoSynthParams[1];
                         docById('myspanS1').textContent = that.duoSynthParams[1];
                         that.duoSynthParamVals['vibratoAmount'] = parseFloat(that.duoSynthParams[1]);
-                        that._logo.synth.createSynth(that.instrument_name, 'duosynth', that.duoSynthParamVals);
+                        that._logo.synth.createSynth(that.instrumentName, 'duosynth', that.duoSynthParamVals);
 
                         if (that.duoSynthesizer.length !== 1) {
                             blockValue = that.duoSynthesizer.length - 1;
@@ -782,7 +857,7 @@ function TimbreWidget () {
 
                                 docById('myspanS' + m).textContent = elem.value;
                                 that._update(blockValue, elem.value, Number(m));
-                                that._logo.synth.createSynth(that.instrument_name, 'duosynth', that.duoSynthParamVals);
+                                that._logo.synth.createSynth(that.instrumentName, 'duosynth', that.duoSynthParamVals);
                             });
                         }
                     }
@@ -800,7 +875,7 @@ function TimbreWidget () {
                 docById('myspanS0').textContent = that.AMSynthParams[0];
                 that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
                 that._update(blockValue, that.AMSynthParams[0], 0);
-                that._logo.synth.createSynth(that.instrument_name, 'amsynth', that.amSynthParamvals);
+                that._logo.synth.createSynth(that.instrumentName, 'amsynth', that.amSynthParamvals);
             }
 
             if (that.isActive['fmsynth'] === true) {
@@ -812,7 +887,7 @@ function TimbreWidget () {
                 docById('myspanS0').textContent = that.FMSynthParams[0];
                 that.fmSynthParamvals['modulationIndex'] = parseFloat(hat.FMSynthParams[0]);
                 that._update(blockValue, that.FMSynthParams[0], 0);
-                that._logo.synth.createSynth(that.instrument_name, 'fmsynth', that.fmSynthParamvals);
+                that._logo.synth.createSynth(that.instrumentName, 'fmsynth', that.fmSynthParamvals);
             }
 
             if (that.isActive['duosynth'] === true) {
@@ -828,7 +903,7 @@ function TimbreWidget () {
                 docById('myspanS1').textContent = that.duoSynthParams[1];
                 that.duoSynthParamVals['vibratoAmount'] = parseFloat(that.duoSynthParams[1]);
                 that._update(blockValue, that.duoSynthParams[1], 1);
-                that._logo.synth.createSynth(that.instrument_name, 'duosynth', that.duoSynthParamVals);
+                that._logo.synth.createSynth(that.instrumentName, 'duosynth', that.duoSynthParamVals);
             }
         }
     };
@@ -890,7 +965,7 @@ function TimbreWidget () {
             that.synthVals['oscillator']['source'] = elem.value;
 
             that._update(blockValue, elem.value, 0);
-            that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
+            that._logo.synth.createSynth(that.instrumentName, that.oscParams[0], that.synthVals);
         });
 
         document.getElementById('wrapperOsc1').addEventListener('change', function (event) {
@@ -901,7 +976,7 @@ function TimbreWidget () {
             docById('myRangeO0').value = parseFloat(elem.value);
             docById('myspanO0').textContent = elem.value;
             that._update(blockValue, elem.value, 1);
-            that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
+            that._logo.synth.createSynth(that.instrumentName, that.oscParams[0], that.synthVals);
         });
 
         var sliderPartials = docById('myRangeO0');
@@ -921,7 +996,7 @@ function TimbreWidget () {
         that.synthVals['oscillator']['type'] = (that.oscParams[0] + that.oscParams[1].toString());
         that.synthVals['oscillator']['source'] = that.oscParams[0];
 
-        that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
+        that._logo.synth.createSynth(that.instrumentName, that.oscParams[0], that.synthVals);
 
         btnReset.onclick = function () {
             docById('oscillatorButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -935,7 +1010,7 @@ function TimbreWidget () {
             that.synthVals['oscillator']['type'] = 'sine6';
             that.synthVals['oscillator']['source'] = DEFAULTOSCILLATORTYPE;
 
-            that._logo.synth.createSynth(that.instrument_name, that.oscParams[0], that.synthVals);
+            that._logo.synth.createSynth(that.instrumentName, that.oscParams[0], that.synthVals);
         }
     };
 
@@ -994,11 +1069,11 @@ function TimbreWidget () {
                 docById('myspan' + m).textContent = elem.value;
                 that.synthVals['envelope'][that.adsrMap[m]] = parseFloat(elem.value) / 100;
                 that._update(blockValue, parseFloat(elem.value), m);
-                that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['source'], that.synthVals);
+                that._logo.synth.createSynth(that.instrumentName, that.synthVals['oscillator']['source'], that.synthVals);
             });
         }
 
-        that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['source'], that.synthVals);
+        that._logo.synth.createSynth(that.instrumentName, that.synthVals['oscillator']['source'], that.synthVals);
 
         btnReset.onclick = function () {
             docById('envelopeButtonCell').style.backgroundColor = MATRIXBUTTONCOLOR;
@@ -1008,7 +1083,7 @@ function TimbreWidget () {
                 docById('myspan' + i).textContent = that.ENVs[i];
                 that._update(blockValue, parseFloat(that.ENVs[i]), i);
             }
-            that._logo.synth.createSynth(that.instrument_name, that.synthVals['oscillator']['source'], that.synthVals);
+            that._logo.synth.createSynth(that.instrumentName, that.synthVals['oscillator']['source'], that.synthVals);
         }
     };
 
@@ -1059,10 +1134,10 @@ function TimbreWidget () {
 
         myDiv.innerHTML = selectOpt;
 
-        if (!(that.instrument_name in instruments_filters)) {
+        if (!(that.instrumentName in instrumentsFilters)) {
             var temp_obj = {'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392};
-            instruments_filters[that.instrument_name] = [];
-            instruments_filters[that.instrument_name].push(temp_obj);
+            instrumentsFilters[that.instrumentName] = [];
+            instrumentsFilters[that.instrumentName].push(temp_obj);
         }
 
         document.getElementById('wrapper0').addEventListener('change', function (event) {
@@ -1070,7 +1145,7 @@ function TimbreWidget () {
             var elem = event.target;
             blockValue = 0;
             that.filterParams[0] = elem.value;
-            instruments_filters[that.instrument_name][0]['filterType'] = elem.value;
+            instrumentsFilters[that.instrumentName][0]['filterType'] = elem.value;
             that._update(blockValue, elem.value, 0);
         });
 
@@ -1079,7 +1154,7 @@ function TimbreWidget () {
             rolloffValue[i].onclick = function () {
                 blockValue = 0;
                 that.filterParams[1] = this.value;
-                instruments_filters[that.instrument_name][0]['filterRolloff'] = parseFloat(this.value);
+                instrumentsFilters[that.instrumentName][0]['filterRolloff'] = parseFloat(this.value);
                 that._update(blockValue, this.value, 1);
             }
         }
@@ -1092,7 +1167,7 @@ function TimbreWidget () {
             docById('myRangeF2').value = parseFloat(elem.value);
             docById('myspanF2').textContent = elem.value;
             that.filterParams[2] = elem.value;
-            instruments_filters[that.instrument_name][0]['filterFrequency'] = parseFloat(elem.value);
+            instrumentsFilters[that.instrumentName][0]['filterFrequency'] = parseFloat(elem.value);
             that._update(blockValue, elem.value, 2);
         });
 
@@ -1165,7 +1240,7 @@ function TimbreWidget () {
                 blockValue = that.fil.length - 1;
                 var elem = event.target;
                 that.filterParams[3] = elem.value;
-                instruments_filters[that.instrument_name][1]['filterType'] = elem.value;
+                instrumentsFilters[that.instrumentName][1]['filterType'] = elem.value;
                 that._update(blockValue, elem.value, 0);
             });
 
@@ -1175,7 +1250,7 @@ function TimbreWidget () {
                 rolloffValue[i].onclick = function () {
                     that._update(blockValue, this.value, 1);
                     that.filterParams[4] = this.value;
-                    instruments_filters[that.instrument_name][1]['filterRolloff'] = parseFloat(this.value);
+                    instrumentsFilters[that.instrumentName][1]['filterRolloff'] = parseFloat(this.value);
                 }
             }
 
@@ -1188,7 +1263,7 @@ function TimbreWidget () {
                 docById('newmyspanF2').textContent = elem.value;
                 that._update(blockValue, elem.value, 2);
                 that.filterParams[5] = elem.value;
-                instruments_filters[that.instrument_name][1]['filterFrequency'] = parseFloat(elem.value);
+                instrumentsFilters[that.instrumentName][1]['filterFrequency'] = parseFloat(elem.value);
             });
 
             docById('sel2').value = that.filterParams[3];
@@ -1239,9 +1314,9 @@ function TimbreWidget () {
             docById('myspanF2').textContent = that.filterParams[2];
             that._update(0, that.filterParams[2], 2);
 
-            instruments_filters[that.instrument_name][0]['filterType'] = that.filterParams[0];
-            instruments_filters[that.instrument_name][0]['filterRolloff'] = parseFloat(that.filterParams[1]);
-            instruments_filters[that.instrument_name][0]['filterFrequency'] = parseFloat(that.filterParams[2]);
+            instrumentsFilters[that.instrumentName][0]['filterType'] = that.filterParams[0];
+            instrumentsFilters[that.instrumentName][0]['filterRolloff'] = parseFloat(that.filterParams[1]);
+            instrumentsFilters[that.instrumentName][0]['filterFrequency'] = parseFloat(that.filterParams[2]);
 
             if (that.fil.length === 2) {
                 that.filterParams[3] = DEFAULTFILTERTYPE;
@@ -1255,9 +1330,9 @@ function TimbreWidget () {
                 docById('newmyspanF2').textContent = that.filterParams[5];
                 that._update(that.fil.length-1, that.filterParams[5], 2);
 
-                instruments_filters[that.instrument_name][1]['filterType'] = that.filterParams[3];
-                instruments_filters[that.instrument_name][1]['filterRolloff'] = parseFloat(that.filterParams[4]);
-                instruments_filters[that.instrument_name][1]['filterFrequency'] = parseFloat(that.filterParams[5]);
+                instrumentsFilters[that.instrumentName][1]['filterType'] = that.filterParams[3];
+                instrumentsFilters[that.instrumentName][1]['filterRolloff'] = parseFloat(that.filterParams[4]);
+                instrumentsFilters[that.instrumentName][1]['filterFrequency'] = parseFloat(that.filterParams[5]);
             }
         }
 
@@ -1301,14 +1376,14 @@ function TimbreWidget () {
                 docById('newmyRangeF2').max = '7050';
 
                 var temp_obj = {'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392};
-                instruments_filters[that.instrument_name].push(temp_obj);
+                instrumentsFilters[that.instrumentName].push(temp_obj);
 
                 document.getElementById('newwrapper0').addEventListener('change', function (event) {
                     docById('filterButtonCell').style.backgroundColor = '#C8C8C8';
                     blockValue = that.fil.length - 1;
                     var elem = event.target;
                     that.filterParams[3] = elem.value;
-                    instruments_filters[that.instrument_name][1]['filterType'] = elem.value;
+                    instrumentsFilters[that.instrumentName][1]['filterType'] = elem.value;
                     that._update(blockValue, elem.value, 0);
                 });
 
@@ -1317,7 +1392,7 @@ function TimbreWidget () {
                     blockValue = that.fil.length - 1;
                     rolloffValue[i].onclick = function () {
                         that._update(blockValue, this.value, 1);
-                        instruments_filters[that.instrument_name][1]['filterRolloff'] = parseFloat(this.value);
+                        instrumentsFilters[that.instrumentName][1]['filterRolloff'] = parseFloat(this.value);
                         that.filterParams[4] = this.value;
                     }
                 }
@@ -1329,7 +1404,7 @@ function TimbreWidget () {
                     var m = elem.id.slice(-1);
                     docById('newmyRangeF2').value = parseFloat(elem.value);
                     docById('newmyspanF2').textContent = elem.value;
-                    instruments_filters[that.instrument_name][1]['filterFrequency'] = parseFloat(elem.value);
+                    instrumentsFilters[that.instrumentName][1]['filterFrequency'] = parseFloat(elem.value);
                     that.filterParams[5] = elem.value;
                     that._update(blockValue, elem.value, 2);
                 });
@@ -1393,7 +1468,7 @@ function TimbreWidget () {
                     that.isActive['distortion'] = false;
                     that.isActive['phaser'] = false;
 
-                    instruments_effects[that.instrument_name]['tremoloActive'] = true;
+                    instrumentsEffects[that.instrumentName]['tremoloActive'] = true;
 
                     for (var i = 0; i < 2; i++) {
                         subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
@@ -1440,11 +1515,11 @@ function TimbreWidget () {
                             docById('myspanFx' + m).textContent = elem.value;
 
                             if (m === 0) {
-                                instruments_effects[that.instrument_name]['tremoloFrequency'] = parseFloat(elem.value);
+                                instrumentsEffects[that.instrumentName]['tremoloFrequency'] = parseFloat(elem.value);
                             }
 
                             if (m === 1) {
-                                instruments_effects[that.instrument_name]['tremoloDepth'] = parseFloat(elem.value)/100;
+                                instrumentsEffects[that.instrumentName]['tremoloDepth'] = parseFloat(elem.value)/100;
                             }
 
                             that._update(blockValue, elem.value, Number(m));
@@ -1457,7 +1532,7 @@ function TimbreWidget () {
                     that.isActive['distortion'] = false;
                     that.isActive['phaser'] = false;
 
-                    instruments_effects[that.instrument_name]['vibratoActive'] = true;
+                    instrumentsEffects[that.instrumentName]['vibratoActive'] = true;
                     for (var i = 0; i < 2; i++) {
                         subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
                     }
@@ -1502,7 +1577,7 @@ function TimbreWidget () {
                         var elem = event.target;
                         docById('myRangeFx0').value = parseFloat(elem.value);
                         docById('myspanFx0').textContent = elem.value;
-                        instruments_effects[that.instrument_name]['vibratoIntensity'] = parseFloat(elem.value) / 100;
+                        instrumentsEffects[that.instrumentName]['vibratoIntensity'] = parseFloat(elem.value) / 100;
 
                         that._update(that.vibratoEffect.length - 1, elem.value, 0);
                     });
@@ -1515,7 +1590,7 @@ function TimbreWidget () {
                         docById('myspanFx1').textContent = obj[0] + '/' + obj[1];
                         var temp = parseFloat(obj[0])/parseFloat(obj[1]);
 
-                        instruments_effects[that.instrument_name]['vibratoRate'] = Math.floor(Math.pow(temp, -1));
+                        instrumentsEffects[that.instrumentName]['vibratoRate'] = Math.floor(Math.pow(temp, -1));
                         that._update(that.vibratoEffect.length - 1, obj[1], 1);
                         that._update(that.vibratoEffect.length - 1, obj[0], 2);
                     });
@@ -1527,7 +1602,7 @@ function TimbreWidget () {
                     that.isActive['distortion'] = false;
                     that.isActive['phaser'] = false;
 
-                    instruments_effects[that.instrument_name]['chorusActive'] = true;
+                    instrumentsEffects[that.instrumentName]['chorusActive'] = true;
 
                     for (var i = 0; i < 3; i++) {
                         subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
@@ -1578,15 +1653,15 @@ function TimbreWidget () {
                             docById('myspanFx' + m).textContent = elem.value;
 
                             if (m === 0) {
-                                instruments_effects[that.instrument_name]['chorusRate'] = parseFloat(elem.value);
+                                instrumentsEffects[that.instrumentName]['chorusRate'] = parseFloat(elem.value);
                             }
 
                             if (m === 1) {
-                                instruments_effects[that.instrument_name]['delayTime'] = parseFloat(elem.value);
+                                instrumentsEffects[that.instrumentName]['delayTime'] = parseFloat(elem.value);
                             }
 
                             if (m === 2) {
-                                instruments_effects[that.instrument_name]['chorusDepth'] = parseFloat(elem.value)/100;
+                                instrumentsEffects[that.instrumentName]['chorusDepth'] = parseFloat(elem.value)/100;
                             }
 
                             that._update(blockValue, elem.value, Number(m));
@@ -1600,7 +1675,7 @@ function TimbreWidget () {
                     that.isActive['distortion'] = false;
                     that.isActive['phaser'] = true;
 
-                    instruments_effects[that.instrument_name]['phaserActive'] = true;
+                    instrumentsEffects[that.instrumentName]['phaserActive'] = true;
 
                     for (var i = 0; i < 3; i++) {
                         subHtmlElements += '<div id="wrapperFx' + i + '"><div id="sFx' + i + '"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx' + i + '"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx' + i + '"class="rangeslidervalue">2</span></div></div>';
@@ -1651,15 +1726,15 @@ function TimbreWidget () {
                             docById('myspanFx' + m).textContent = elem.value;
 
                             if (m === 0) {
-                                instruments_effects[that.instrument_name]['rate'] = parseFloat(elem.value);
+                                instrumentsEffects[that.instrumentName]['rate'] = parseFloat(elem.value);
                             }
 
                             if (m === 1) {
-                                instruments_effects[that.instrument_name]['octaves'] = parseFloat(elem.value);
+                                instrumentsEffects[that.instrumentName]['octaves'] = parseFloat(elem.value);
                             }
 
                             if (m === 2) {
-                                instruments_effects[that.instrument_name]['baseFrequency'] = parseFloat(elem.value);
+                                instrumentsEffects[that.instrumentName]['baseFrequency'] = parseFloat(elem.value);
                             }
 
                             that._update(blockValue, elem.value, Number(m));
@@ -1673,7 +1748,7 @@ function TimbreWidget () {
                     that.isActive['distortion'] = true;
                     that.isActive['phaser'] = false;
 
-                    instruments_effects[that.instrument_name]['distortionActive'] = true;
+                    instrumentsEffects[that.instrumentName]['distortionActive'] = true;
 
                     subHtmlElements += '<div id="wrapperFx0"><div id="sFx0"><span></span></div><div id="insideDivEffects"><input type="range" id="myRangeFx0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanFx0"class="rangeslidervalue">2</span></div></div>';
 
@@ -1709,7 +1784,7 @@ function TimbreWidget () {
                         var m = elem.id.slice(-1);
                         docById('myRangeFx0').value = parseFloat(elem.value);
                         docById('myspanFx0').textContent = elem.value;
-                        instruments_effects[that.instrument_name]['distortionAmount'] = parseFloat(elem.value)/100;
+                        instrumentsEffects[that.instrumentName]['distortionAmount'] = parseFloat(elem.value)/100;
                         that._update(blockValue, elem.value, 0);
                     });
                 }
