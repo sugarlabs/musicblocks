@@ -435,7 +435,6 @@ function TimbreWidget () {
     };
 
     this.clampConnection = function (n, clamp, topOfClamp) {
-        console.log('clampConnection');
         // Connect the clamp to the Widget block.
         that._logo.blocks.blockList[that.blockNo].connections[2] = n;
         that._logo.blocks.blockList[n].connections[0] = that.blockNo;
@@ -470,9 +469,7 @@ function TimbreWidget () {
     };
 
     this._blockReplace = function (oldblk, newblk) {
-        console.log('blockReplace');
         // Find the connections from the old block
-        console.log(oldblk);
         var c0 = this._logo.blocks.blockList[oldblk].connections[0];
         var c1 = last(this._logo.blocks.blockList[oldblk].connections);
 
@@ -510,7 +507,6 @@ function TimbreWidget () {
     };
 
     this.blockConnection = function (len, bottomOfClamp) {
-        console.log('blockConnection');
         var n = this._logo.blocks.blockList.length - len;
         if (bottomOfClamp == null) {
             this._logo.blocks.blockList[this.blockNo].connections[2] = n;
@@ -522,6 +518,7 @@ function TimbreWidget () {
             while (this._logo.blocks.blockList[bottomOfClamp].name === 'hidden') {
                 var cblk = this._logo.blocks.blockList[bottomOfClamp].connections[0];
                 c = this._logo.blocks.blockList[cblk].connections.length - 2;
+		this._logo.blocks._clampBlocksToCheck.push([cblk, 0]);
                 if (this._logo.blocks.blockList[cblk].connections[c] == null) {
                     bottomOfClamp = cblk;
                 } else {
@@ -534,6 +531,7 @@ function TimbreWidget () {
             this._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
             this._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
         }
+
         this._logo.blocks._clampBlocksToCheck.push([this.blockNo, 0]);
         this._logo.blocks.adjustDocks(this.blockNo, true);
     };
@@ -604,7 +602,7 @@ function TimbreWidget () {
                             var n = that._logo.blocks.blockList.length - 2;
                             that.AMSynthesizer.push(n);
                             that.AMSynthParams.push(1);
- j                            //setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+
                             setTimeout(function () {
                             if (that.FMSynthesizer.length !== 0) {
                                 that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer));
