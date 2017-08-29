@@ -1,41 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="210mm"
-   height="297mm"
-   viewBox="0 0 744.09448819 1052.3622047"
-   id="svg4554"
    version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="filter.svg">
+   id="svg4554"
+   viewBox="0 0 51.562502 51.562502"
+   height="55"
+   width="55">
   <defs
      id="defs4556" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="-320.71429"
-     inkscape:cy="520"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     inkscape:window-width="1839"
-     inkscape:window-height="1056"
-     inkscape:window-x="81"
-     inkscape:window-y="24"
-     inkscape:window-maximized="1" />
   <metadata
      id="metadata4559">
     <rdf:RDF>
@@ -49,20 +25,18 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
+     transform="translate(0,-1000.7997)"
      id="layer1">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:1600.46801758px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="-153.51819"
-       y="1167.1278"
-       id="text5148"
-       sodipodi:linespacing="125%"
-       transform="scale(1.1030656,0.90656438)"><tspan
-         sodipodi:role="line"
-         id="tspan5150"
-         x="-153.51819"
-         y="1167.1278">F</tspan></text>
+    <path
+       id="path4266"
+       d="M 19.442427,1028.4903 2.8482241,1009.2645 H 48.434363 l -19.088728,19.2258 v 13.611 l -9.902459,7.4631 z"
+       style="fill:none;stroke:#000000;stroke-width:2.6533947;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <ellipse
+       ry="4.8088398"
+       rx="23.894768"
+       cy="1007.4835"
+       cx="25.781252"
+       id="path4268"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:3.75000024;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>
