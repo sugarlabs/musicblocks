@@ -76,7 +76,7 @@ function TimbreWidget () {
         this.isActive[this.activeParams[i]] = false;
     }
 
-    this.blockNo = null;
+    this.blockNo = null;  // index no. of the timbre widget block
     this.instrument_name = 'custom';
 
     var that = this;
@@ -292,10 +292,10 @@ function TimbreWidget () {
             if (that.osc.length !== 0 && (that.AMSynthesizer.length !=0  || that.FMSynthesizer.length !== 0 || that.duoSynthesizer.length !== 0)) {
                 that._oscillator();
             }
-
         }
 
         var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
+
         envelopeButtonCell.onclick = function () {
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
@@ -320,10 +320,12 @@ function TimbreWidget () {
 
                 setTimeout(that.blockConnection(5, bottomOfClamp), 500);
             }
+
             that._envelope();
         }
 
         var filterButtonCell = this._addButton(row, 'filter.svg', ICONSIZE, _('filter'));
+
         filterButtonCell.onclick = function () {
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
@@ -346,14 +348,17 @@ function TimbreWidget () {
 
                 setTimeout(that.blockConnection(4, bottomOfClamp), 500);
             }
+
             that._filter();
         }
 
         var effectsButtonCell = this._addButton(row, 'effects.svg', ICONSIZE, _('effects'));
+
         effectsButtonCell.onclick = function () {
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
+
             that.isActive['effects'] = true;
             effectsButtonCell.id = 'effectsButtonCell';
             that._effects();
@@ -365,6 +370,7 @@ function TimbreWidget () {
         }*/
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('close'));
+
         cell.onclick = function () {
             docById('timbreDiv').style.visibility = 'hidden';
             docById('timbreButtonsDiv').style.visibility = 'hidden';
@@ -381,7 +387,7 @@ function TimbreWidget () {
         this._dragCellHTML = dragCell.innerHTML;
 
         dragCell.onmouseover = function (e) {
-                   dragCell.innerHTML = '';
+            dragCell.innerHTML = '';
         };
 
         dragCell.onmouseout = function (e) {
@@ -484,6 +490,18 @@ function TimbreWidget () {
                     break;
                 }
             }
+
+            // Look for a containing clamp, which may need to be resized.
+            var blockAbove = c0;
+            while (blockAbove != this.blockNo) {
+                if (this._logo.blocks.blockList[blockAbove].isClampBlock()) {
+                    this._logo.blocks._clampBlocksToCheck.push([blockAbove, 0]);
+                }
+
+                blockAbove = this._logo.blocks.blockList[blockAbove].connections[0];
+            }
+
+            this._logo.blocks._clampBlocksToCheck.push([this.blockNo, 0]);
         }
 
         if (c1 != null) {
@@ -521,7 +539,7 @@ function TimbreWidget () {
             while (this._logo.blocks.blockList[bottomOfClamp].name === 'hidden') {
                 var cblk = this._logo.blocks.blockList[bottomOfClamp].connections[0];
                 c = this._logo.blocks.blockList[cblk].connections.length - 2;
-		this._logo.blocks._clampBlocksToCheck.push([cblk, 0]);
+                this._logo.blocks._clampBlocksToCheck.push([cblk, 0]);
                 if (this._logo.blocks.blockList[cblk].connections[c] == null) {
                     bottomOfClamp = cblk;
                 } else {
@@ -607,16 +625,16 @@ function TimbreWidget () {
                             that.AMSynthParams.push(1);
 
                             setTimeout(function () {
-				if (that.FMSynthesizer.length !== 0) {
+                                if (that.FMSynthesizer.length !== 0) {
                                     that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer));
                                     that.FMSynthesizer.pop();
-				} else if (that.duoSynthesizer.length !== 0) {
+                                } else if (that.duoSynthesizer.length !== 0) {
                                     that._blockReplace(last(that.duoSynthesizer), last(that.AMSynthesizer));
                                     that.duoSynthesizer.pop();
-				} else {
+                                } else {
                                     that.blockConnection(2, bottomOfClamp);
-				}
-			    }, 500);
+                                }
+                            }, 500);
                         }
 
                         subHtmlElements += '<div id="wrapperS0"><div id="sS0"><span></span></div><div id="insideDivSynth"><input type="range" id="myRangeS0"class ="sliders" style="margin-top:20px" value="2"><span id="myspanS0"class="rangeslidervalue">2</span></div></div>';
