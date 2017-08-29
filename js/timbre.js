@@ -1030,7 +1030,7 @@ function TimbreWidget () {
 
         var env = docById('timbreTable');
         var htmlElements = '<div id="wrapper0"><div id="s"><span>Type</span></div><div id="sel"></div></div>';
-        htmlElements += '<div id="wrapper1"><div id="s1"><span></span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff" value="-12" checked="checked"/>-12<input type="radio" name="rolloff" value="-24"/>-24<input type="radio" name="rolloff" value="-48"/>-48<input type="radio" name="rolloff" value="-96"/>-96</p></div></div>';
+        htmlElements += '<div id="wrapper1"><div id="s1"><span></span></div><div id="insideDivFilter"><p><input id="radio0" type="radio" name="rolloff" value="-12" checked="checked"/>-12<input  id="radio1" type="radio" name="rolloff" value="-24"/>-24<input id="radio2" type="radio" name="rolloff" value="-48"/>-48<input id="radio3" type="radio" name="rolloff" value="-96"/>-96</p></div></div>';
         htmlElements += '<div id="wrapper2"><div id="s2"><span></span></div><div id="insideDivFilter"><input type="range" id="myRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="myspanF2"class="rangeslidervalue">2</span></div></div>';
 
         env.innerHTML = htmlElements;
@@ -1104,8 +1104,32 @@ function TimbreWidget () {
         docById('myRangeF2').value = '392';
         docById('myspanF2').textContent = '392';
         docById('sel1').value = that.filterParams[0];
-        that._update(blockValue, that.filterParams[0], 0);
 
+        if (that.filterParams[1] === -12) {
+            docById('radio0').checked = true;
+        } else {
+            docById('radio0').checked = false;
+        }
+
+        if (that.filterParams[1] === -24) {
+            docById('radio1').checked = true;
+        } else {
+            docById('radio1').checked = false;
+        }
+
+        if (that.filterParams[1] === -48) {
+            docById('radio2').checked = true;
+        } else {
+            docById('radio2').checked = false;
+        }
+
+        if (that.filterParams[1] === -96) {
+            docById('radio3').checked = true;
+        } else {
+            docById('radio3').checked = false;
+        }
+
+        that._update(blockValue, that.filterParams[0], 0);
         that._update(blockValue, that.filterParams[1], 1);
 
         docById('myRangeF2').value = parseFloat(that.filterParams[2]);
@@ -1116,7 +1140,7 @@ function TimbreWidget () {
         if (that.fil.length === 2) {
             var extraDiv = document.createElement('div');
             var newHtmlElements = '<br><div id="newwrapper0"><div id="news"><span>Type</span></div><div id="newsel"></div></div>';
-            newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff1" value="-12" checked="checked"/>-12<input type="radio" name="rolloff1" value="-24"/>-24<input type="radio" name="rolloff1" value="-48"/>-48<input type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
+            newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input id="radio4" type="radio" name="rolloff1" value="-12" checked="checked"/>-12<input id="radio5" type="radio" name="rolloff1" value="-24"/>-24<input id="radio6" type="radio" name="rolloff1" value="-48"/>-48<input id="radio7" type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
             newHtmlElements += '<div id="newwrapper2"><div id="news2"><span>Frequency</span></div><div id="insideDivFilter"><input type="range" id="newmyRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="newmyspanF2"class="rangeslidervalue">2</span></div></div>';
 
             extraDiv.className = 'rectangle';
@@ -1176,6 +1200,30 @@ function TimbreWidget () {
             docById('newmyRangeF2').value = parseFloat(that.filterParams[5]);
             docById('newmyspanF2').textContent = that.filterParams[5];
             that._update(that.fil.length-1, that.filterParams[5], 2);
+
+            if (that.filterParams[4] === -12) {
+                docById('radio4').checked = true;
+            } else {
+                docById('radio4').checked = false;
+            }
+
+            if (that.filterParams[4] === -24) {
+                docById('radio5').checked = true;
+            } else {
+                docById('radio5').checked = false;
+            }
+
+            if (that.filterParams[4] === -48) {
+                docById('radio6').checked = true;
+            } else {
+                docById('radio6').checked = false;
+            }
+
+            if (that.filterParams[4] === -96) {
+                docById('radio7').checked = true;
+            } else {
+                docById('radio7').checked = false;
+            }
         }
 
         btnReset.onclick = function () {
@@ -1214,7 +1262,7 @@ function TimbreWidget () {
         }
 
         addFilter.onclick = function () {
-              if (that.fil.length < 2) {
+            if (that.fil.length < 2) {
                 var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
@@ -1231,7 +1279,8 @@ function TimbreWidget () {
 
                 var extraDiv = document.createElement('div');
                 var newHtmlElements = '<br><div id="newwrapper0"><div id="news"><span>Type</span></div><div id="newsel"></div></div>';
-                newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input type="radio" name="rolloff1" value="-12" checked="checked"/>-12<input type="radio" name="rolloff1" value="-24"/>-24<input type="radio" name="rolloff1" value="-48"/>-48<input type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
+                console.log('ROLLOFF');
+                newHtmlElements += '<div id="newwrapper1"><div id="news1"><span>RollOff</span></div><div id="insideDivFilter"><p><input id="radio4" type="radio" name="rolloff1" value="-12" checked="checked"/>-12<input id="radio5" type="radio" name="rolloff1" value="-24"/>-24<input id="radio6" type="radio" name="rolloff1" value="-48"/>-48<input id="radio7" type="radio" name="rolloff1" value="-96"/>-96</p></div></div>';
                 newHtmlElements += '<div id="newwrapper2"><div id="news2"><span>Frequency</span></div><div id="insideDivFilter"><input type="range" id="newmyRangeF2"class ="sliders" style="margin-top:20px" value="2"><span id="newmyspanF2"class="rangeslidervalue">2</span></div></div>';
 
                 extraDiv.className = 'rectangle';
