@@ -5354,6 +5354,7 @@ function Logo () {
         var doTremolo = false;
         var doPhaser = false;
         var doChorus = false;
+        var filters = null;
 
         // Appl any effects and filters associated with a custom timbre.
         if (this.inSetTimbre && (turtle in this.instrumentNames) && last(this.instrumentNames[turtle])) {
@@ -5392,6 +5393,10 @@ function Logo () {
                     chorusDepth = timbreEffects['chorusDepth'];
                     doChorus = true;
                 }
+            }
+
+            if (name in instrumentsFilters) {
+                filters = instrumentsFilters[name];
             }
         }
 
@@ -5792,7 +5797,7 @@ function Logo () {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
                                             that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null);
                                         } else if (turtle in that.instrumentNames && last(that.instrumentNames[turtle])) {
-                                            that.synth.trigger(notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, null);
+                                            that.synth.trigger(notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters);
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null);
                                         } else {

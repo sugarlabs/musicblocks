@@ -1648,16 +1648,13 @@ function Synth() {
         if (paramsEffects == null && paramsFilters == null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
-            if (paramsFilters && paramsFilters!=null && paramsFilters!=undefined) {
+            if (paramsFilters && paramsFilters != null && paramsFilters != undefined) {
                 var numFilters = paramsFilters.length;  // no. of filters
                 var k = 0;
                 var temp_filters = [];
 
-                console.log('no of filters: ' + numFilters);
                 for (k = 0; k < numFilters; k++) {
                     // filter rolloff has to be added
-                    console.log('Filter type: ' + paramsFilters[k].filterType);
-                    console.log('roll off : ' + paramsFilters[k].filterRolloff);
                     var filterVal = new Tone.Filter(paramsFilters[k].filterFrequency, paramsFilters[k].filterType, paramsFilters[k].filterRolloff);
                     temp_filters.push(filterVal);
                     synth.chain(temp_filters[k], Tone.Master);
