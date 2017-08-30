@@ -120,7 +120,7 @@ function Logo () {
     this.inPitchSlider = false;
     this._currentDrumBlock = null;
     this.inTimbre = false;
-    this.inSetTimbre = false;
+    this.inSetTimbre = {};
 
     // pitch-rhythm matrix
 
@@ -861,7 +861,7 @@ function Logo () {
             this.polyVolume[turtle] = [DEFAULTVOLUME];
             this.oscList[turtle] = [];
             this.bpm[turtle] = [];
-
+            this.inSetTimbre[turtle] = false;
             this.instrumentNames[turtle] = [];
             this.crescendoDelta[turtle] = [];
             this.crescendoInitialVolume[turtle] = [];
@@ -918,6 +918,7 @@ function Logo () {
 
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
+        this.inTimbre = false;
         this.inRhythmRuler = false;
         this.rhythmRulerMeasure = null;
         this._currentDrumBlock = null;
@@ -2391,8 +2392,8 @@ function Logo () {
             }
 
             if (that.inTimbre) {
-                    that.timbre.AMSynthesizer.push(blk);
-                    that.timbre.AMSynthParams.push(harmonicity);
+                that.timbre.AMSynthesizer.push(blk);
+                that.timbre.AMSynthParams.push(harmonicity);
             }
             break;
         case 'fmsynth':
@@ -2623,10 +2624,11 @@ function Logo () {
         case 'timbre':
             if (that.timbre == null) {
                 that.timbre = new TimbreWidget();
-                that.inTimbre = true;
             }
 
-            if (args.length >= 1 && typeof(args[0] === 'textin')) {
+            that.inTimbre = true;
+
+            if (typeof(args[0]) === 'string') {
                 that.timbre.instrumentName = args[0];
                 instrumentsEffects[that.timbre.instrumentName] = {};
                 instrumentsEffects[that.timbre.instrumentName]['vibratoActive'] = false;
@@ -2634,10 +2636,10 @@ function Logo () {
                 instrumentsEffects[that.timbre.instrumentName]['tremoloActive'] = false;
                 instrumentsEffects[that.timbre.instrumentName]['phaserActive'] = false;
                 instrumentsEffects[that.timbre.instrumentName]['chorusActive'] = false;
-            //    console.log("vibratoActive " + instrumentsEffects[that.timbre.instrumentName]['vibratoActive']);
-            //    console.log('timbre args : ' + args);
-            }else{
-                console.log('no args provided');
+            } else {
+                that.errorMsg(NOINPUTERRORMSG, blk);
+                that.stopTurtle = true;
+                break;
             }
 
             childFlow = args[1];
@@ -2672,7 +2674,6 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                console.log("inside listener");
                 that.timbre.init(that);
             };
 
@@ -2806,6 +2807,7 @@ function Logo () {
                 that.sustain[turtle].push(args[2] / 100);
                 that.release[turtle].push(args[3] / 100);
             }
+
             if (that.inTimbre) {
                 that.timbre.env.push(blk);
                 that.timbre.ENVs.push(Math.round(last(that.attack[turtle]) * 100));
@@ -2817,7 +2819,6 @@ function Logo () {
                 that.timbre.synthVals['envelope']['decay'] = last(that.decay[turtle]);
                 that.timbre.synthVals['envelope']['sustain'] = last(that.sustain[turtle]);
                 that.timbre.synthVals['envelope']['release'] = last(that.release[turtle]);
-             //   this.synth.createSynth(that.timbre.instrumentName, synth_source, that.timbre.adsrVals);
             }
             break;
         case 'filter':
@@ -3824,7 +3825,7 @@ function Logo () {
                 childFlow = args[1];
                 childFlowCount = 1;
             } else {
-                that.inSetTimbre = true;
+                that.inSetTimbre[turtle] = true;
                 that.instrumentNames[turtle].push(args[0]);
                 childFlow = args[1];
                 childFlowCount = 1;
@@ -3833,6 +3834,7 @@ function Logo () {
                 that._setDispatchBlock(blk, turtle, listenerName);
 
                 var __listener = function (event) {
+                    that.inSetTimbre[turtle] = false;
                     that.instrumentNames[turtle].pop();
                 };
 
@@ -4817,7 +4819,7 @@ function Logo () {
             break;
         case 'setnotevolume':
             if (args.length === 1) {
-                if (typeof(args[0]) === 'string') {
+                if (typeof(args[0]) !== 'number') {
                     that.errorMsg(NANERRORMSG, blk);
                     that.stopTurtle = true;
                 } else {
@@ -5369,7 +5371,7 @@ function Logo () {
         var filters = null;
 
         // Apply any effects and filters associated with a custom timbre.
-        if (this.inSetTimbre && (turtle in this.instrumentNames) && last(this.instrumentNames[turtle])) {
+        if (this.inSetTimbre[turtle] && (turtle in this.instrumentNames) && last(this.instrumentNames[turtle])) {
             var name = last(this.instrumentNames[turtle]);
 
             if (name in instrumentsEffects) {
@@ -5451,7 +5453,8 @@ function Logo () {
         }
 
         if (this.inTimbre) {
-            this.timbre.notesToPlay.push([this.notePitches[turtle][0], 1 / noteBeatValue]);
+            var noteObj = this.getNote(this.notePitches[turtle][0], this.noteOctaves[turtle][0], this.noteTranspositions[turtle][0], this.keySignature[turtle]);
+            this.timbre.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
         } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
                 this.pitchTimeMatrix.addColBlock(blk, 1);

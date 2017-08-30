@@ -1648,7 +1648,7 @@ function Synth() {
         if (paramsEffects == null && paramsFilters == null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
-            if (paramsFilters && paramsFilters != null && paramsFilters != undefined) {
+            if (paramsFilters != null && paramsFilters != undefined) {
                 var numFilters = paramsFilters.length;  // no. of filters
                 var k = 0;
                 var temp_filters = [];
@@ -1662,7 +1662,7 @@ function Synth() {
                
             }
 
-            if (paramsEffects && paramsEffects != null && paramsEffects != undefined) {
+            if (paramsEffects != null && paramsEffects != undefined) {
                 if (paramsEffects.doVibrato) {
                     var vibrato = new Tone.Vibrato(1 / paramsEffects.vibratoFrequency, paramsEffects.vibratoIntensity);
                     synth.chain(vibrato, Tone.Master);
@@ -1736,7 +1736,7 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (notes, beatValue, instrumentName, paramsEffects, paramsFilters) {
-        if (paramsEffects && paramsEffects !== 'null' && paramsEffects !== ' undefined') {
+        if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] != 0) {
                 paramsEffects.doVibrato = true;
             }
@@ -1758,10 +1758,9 @@ function Synth() {
             }
         }
 
-        // flag indicates the source of the synth 0-> default, 1->
-        // drum, 2-> voice, 3-> builtin
-        var flag = 0;
+        var tempNotes = notes;
         var tempSynth = instruments['default'];
+        var flag = 0;
         if (instrumentName in instruments) {
             tempSynth = instruments[instrumentName];
             flag = instrumentsSource[instrumentName][0];
@@ -1770,29 +1769,9 @@ function Synth() {
             }
         }
 
-        var tempNotes = notes;
         // Get note values as per the source of the synth.
-        if (flag == 0) {
-            tempNotes = notes;
-        } else if (flag == 2) {
-            var centerNo = SAMPLECENTERNO[sampleName];
-            var obj = noteToPitchOctave(notes);
-            var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
-
-            tempNotes = noteNum - centerNo;
-        } else if (flag == 3) {
-            if (typeof(notes) === 'object') {
-                tempNotes = notes[0];
-            } else {
-                tempNotes = notes;
-            }
-        }
-
-        if (flag != 1) {
-            //  tempSynth = new Tone.PolySynth(6, Tone.AMSynth);
-            this.performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
-        } else {
-            // drum samples
+        switch(flag) {
+        case 1:  // drum
             if (instrumentName.slice(0, 4) === 'http') {
                 tempSynth.triggerAttack(0, beatValue);
             } else if (instrumentName.slice(0, 4) === 'file') {
@@ -1800,6 +1779,25 @@ function Synth() {
             } else {
                 tempSynth.triggerAttack(0);
             }
+            break;
+        case 2:  // voice sample
+            var centerNo = SAMPLECENTERNO[sampleName];
+            var obj = noteToPitchOctave(notes);
+            var noteNum = pitchToNumber(obj[0], obj[1], 'C Major');
+            tempNotes = noteNum - centerNo;
+            this.performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+            break;
+        case 3:  // builtin synth
+            if (typeof(notes) === 'object') {
+                tempNotes = notes[0];
+            }
+
+            this.performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+            break;
+        case 0:  // default synth
+        default:
+            this.performNotes(tempSynth.toMaster(), tempNotes, beatValue, paramsEffects, paramsFilters);
+            break;
         }
     };
 
