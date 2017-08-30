@@ -294,6 +294,11 @@ function TimbreWidget () {
         __playLoop(0);
     };
 
+    this._save = function () {
+        var obj = [[0, 'settimbre', 100, 100, [null, 1, null, 2]], [1, ['text', {'value': this.instrumentName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0]]];
+        this._logo.blocks.loadNewBlocks(obj);
+    };
+
     this.init = function (logo) {
         this._logo = logo;
 
@@ -327,6 +332,10 @@ function TimbreWidget () {
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('save'));
+        cell.onclick = function () {
+            that._save();
+        };
+
         var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
 
         synthButtonCell.onclick = function () {
