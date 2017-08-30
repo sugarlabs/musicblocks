@@ -20,6 +20,7 @@ function TimbreWidget () {
 
     var timbreTableDiv = docById('timbreTableDiv');
 
+    this.notesToPlay = [];
     this.env = [];
     this.ENVs = [];
     this.synthVals = {
@@ -104,6 +105,8 @@ function TimbreWidget () {
     };
 
     this._update = function (i, value, k) {
+        // This function is used to update the parameters in the
+        // blocks contained in the timbre widget clamp.
         var updateParams = [];
 
         if (that.isActive['envelope'] === true && this.env[i] != null) {
@@ -241,7 +244,7 @@ function TimbreWidget () {
             paramsEffects.distortionAmount = timbreEffects['distortionAmount'];
             paramsEffects.doDistortion = true;
         }
-        
+
         if (timbreEffects['tremoloActive']) {
             paramsEffects.tremoloFrequency = timbreEffects['tremoloFrequency'];
             paramsEffects.tremoloDepth = timbreEffects['tremoloDepth'];
@@ -273,6 +276,10 @@ function TimbreWidget () {
     this._play = function () {
         var that = this;
 
+        if (this.notesToPlay.length === 0) {
+            this.notesToPlay = [['G4', 1 / 4], ['E4', 1 / 4], ['G4', 1 / 2]];
+        }
+
         __playLoop = function (i) {
             that._playNote(that.notesToPlay[i][0], that.notesToPlay[i][1]);
 
@@ -289,8 +296,6 @@ function TimbreWidget () {
 
     this.init = function (logo) {
         this._logo = logo;
-
-        this.notesToPlay = [['G4', 1 / 4], ['E4', 1 / 4], ['G4', 1 / 2]];
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -1093,7 +1098,7 @@ function TimbreWidget () {
                 docById('myspan' + i).textContent = that.ENVs[i];
                 that._update(blockValue, parseFloat(that.ENVs[i]), i);
             }
- 
+
             that._logo.synth.createSynth(that.instrumentName, that.synthVals['oscillator']['source'], that.synthVals);
             that._playNote('G4', 1 / 8);
         }
@@ -1147,9 +1152,9 @@ function TimbreWidget () {
         myDiv.innerHTML = selectOpt;
 
         if (!(that.instrumentName in instrumentsFilters)) {
-            var temp_obj = {'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392};
+            var obj = {'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392};
             instrumentsFilters[that.instrumentName] = [];
-            instrumentsFilters[that.instrumentName].push(temp_obj);
+            instrumentsFilters[that.instrumentName].push(obj);
         }
 
         document.getElementById('wrapper0').addEventListener('change', function (event) {
@@ -1391,8 +1396,8 @@ function TimbreWidget () {
                 docById('newmyspanF2').textContent = '392';
                 docById('newmyRangeF2').max = '7050';
 
-                var temp_obj = {'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392};
-                instrumentsFilters[that.instrumentName].push(temp_obj);
+                var obj = {'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392};
+                instrumentsFilters[that.instrumentName].push(obj);
 
                 document.getElementById('newwrapper0').addEventListener('change', function (event) {
                     docById('filterButtonCell').style.backgroundColor = '#C8C8C8';

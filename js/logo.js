@@ -2666,6 +2666,7 @@ function Logo () {
             that.timbre.FMSynthParams = [];
             that.timbre.duoSynthesizer = [];
             that.timbre.duoSynthParams = [];
+            that.timbre.notesToPlay = [];
 
             var listenerName = '_timbre_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
@@ -5367,7 +5368,7 @@ function Logo () {
         var doChorus = false;
         var filters = null;
 
-        // Appl any effects and filters associated with a custom timbre.
+        // Apply any effects and filters associated with a custom timbre.
         if (this.inSetTimbre && (turtle in this.instrumentNames) && last(this.instrumentNames[turtle])) {
             var name = last(this.instrumentNames[turtle]);
 
@@ -5449,16 +5450,20 @@ function Logo () {
             this._setSynthVolume(last(this.polyVolume[turtle]), turtle);
         }
 
-        if (this.inMatrix) {
+        if (this.inTimbre) {
+            this.timbre.notesToPlay.push([this.notePitches[turtle][0], 1 / noteBeatValue]);
+        } else if (this.inMatrix) {
             if (this.inNoteBlock[turtle] > 0) {
                 this.pitchTimeMatrix.addColBlock(blk, 1);
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
                     this.pitchTimeMatrix.addNode(this.pitchBlocks[i], blk, 0);
                 }
+
                 for (var i = 0; i < this.drumBlocks.length; i++) {
                     this.pitchTimeMatrix.addNode(this.drumBlocks[i], blk, 0);
                 }
             }
+
             noteBeatValue *= this.beatFactor[turtle];
             if (this.tuplet === true) {
                 if (this.addingNotesToTuplet) {
