@@ -587,7 +587,7 @@ function TimbreWidget () {
                 that._envelope(true);  // create a new synth instrument
             } else {
                 that._envelope(false);
-	    }
+            }
         }
 
 

@@ -1655,7 +1655,7 @@ function Synth() {
 
                 for (k = 0; k < numFilters; k++) {
                     // filter rolloff has to be added
-                    var filterVal = new Tone.Filter(paramsFilters[k].filterFrequency, paramsFilters[k].filterType, paramsFilters[k].filterRolloff);
+		    var filterVal = new Tone.Filter(paramsFilters[k].filterFrequency, paramsFilters[k].filterType, paramsFilters[k].filterRolloff);
                     temp_filters.push(filterVal);
                     synth.chain(temp_filters[k], Tone.Master);
                 }
