@@ -3993,7 +3993,8 @@ function Logo () {
             childFlowCount = 1;
 
             that.vibratoIntensity[turtle].push(intensity / 100);
-            that.vibratoRate[turtle].push(Math.floor(Math.pow(rate, -1)));
+            console.log(rate + ' ' + Math.pow(rate, -1));
+            that.vibratoRate[turtle].push(Math.floor(Math.pow(rate, -1))); // 1 / rate
 
             var listenerName = '_vibrato_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
@@ -4005,7 +4006,9 @@ function Logo () {
             if (that.inTimbre) {
                 that.timbre.vibratoEffect.push(blk);
                 that.timbre.vibratoParams.push(last(that.vibratoIntensity[turtle]) * 100);
+		instrumentsEffects[that.timbre.instrumentName]['vibratoIntensity'] = that.vibratoIntensity[turtle];
                 that.timbre.vibratoParams.push(last(that.vibratoRate[turtle]));
+		instrumentsEffects[that.timbre.instrumentName]['vibratoFrequency'] = rate;
             }
             break;
         case 'dis':
@@ -5801,6 +5804,7 @@ function Logo () {
                                     'chorusDepth': chorusDepth
                                 };
 
+				console.log(vibratoIntensity + ' ' + vibratoValue);
                                 if (that.oscList[turtle].length > 0) {
                                     if (notes.length > 1) {
                                         that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
