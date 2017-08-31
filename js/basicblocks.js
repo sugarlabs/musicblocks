@@ -343,7 +343,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var oscillatorBlock = new ProtoBlock('oscillator');
     oscillatorBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['oscillator'] = oscillatorBlock;
-    oscillatorBlock.staticLabels.push(_('oscillator'), _('oscillatorType'), _('partials'));
+    oscillatorBlock.staticLabels.push(_('oscillator'), _('type'), _('partials'));
     oscillatorBlock.extraWidth = 10;
     oscillatorBlock.adjustWidthToLabel();
     oscillatorBlock.defaults.push(_('triangle'));
@@ -941,7 +941,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var amSynthBlock = new ProtoBlock('amsynth');
     amSynthBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['amsynth'] = amSynthBlock;
-    amSynthBlock.staticLabels.push(_('AMSynth'));
+    amSynthBlock.staticLabels.push(_('AM synth'));
     amSynthBlock.extraWidth = 10;
     amSynthBlock.adjustWidthToLabel();
     amSynthBlock.defaults.push(1);
@@ -951,7 +951,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var fmSynthBlock = new ProtoBlock('fmsynth');
     fmSynthBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['fmsynth'] = fmSynthBlock;
-    fmSynthBlock.staticLabels.push(_('FMSynth'));
+    fmSynthBlock.staticLabels.push(_('FM synth'));
     fmSynthBlock.extraWidth = 10;
     fmSynthBlock.adjustWidthToLabel();
     fmSynthBlock.defaults.push(10);
@@ -961,7 +961,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var duoSynthBlock = new ProtoBlock('duosynth');
     duoSynthBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['duosynth'] = duoSynthBlock;
-    duoSynthBlock.staticLabels.push(_('Duo Synth'), _('vibratoRate'), _('vibratoAmount'));
+    duoSynthBlock.staticLabels.push(_('duo synth'), _('vibrato rate'), _('vibrato intensity'));
     duoSynthBlock.extraWidth = 10;
     duoSynthBlock.adjustWidthToLabel();
     duoSynthBlock.defaults.push(10);
