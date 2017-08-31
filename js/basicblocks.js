@@ -686,6 +686,13 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleNoteBlock2.adjustWidthToLabel();
     turtleNoteBlock2.dockTypes[1] = 'anyin';
 
+    var myNoteBlock = new ProtoBlock('mynotevalue');
+    myNoteBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['mynotevalue'] = myNoteBlock;
+    myNoteBlock.staticLabels.push(_('note value'));
+    myNoteBlock.parameterBlock();
+    myNoteBlock.adjustWidthToLabel();
+
     var duplicateFactor = new ProtoBlock('duplicatefactor');
     duplicateFactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;

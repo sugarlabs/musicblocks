@@ -585,6 +585,7 @@ function Logo () {
             case 'bpmfactor':
             case 'beatvalue':
             case 'measurevalue':
+            case 'mynotevalue':
                 this.blocks.blockList[blk].text.text = '';
                 this.blocks.blockList[blk].container.updateCache();
                 break;
@@ -765,6 +766,22 @@ function Logo () {
             case 'measurevalue':
                 value = this.currentMeasure[turtle];
                 break;
+            case 'mynotevalue':
+                value = null;
+                if (this.noteValue[turtle] !== null) {
+		    value = 1 / this.noteValue[turtle];
+                } else if (this.lastNotePlayed[turtle] !== null) {
+		    value = this.lastNotePlayed[turtle][1];
+                } else if (this.notePitches[turtle].length > 0) {
+		    value = this.noteBeat[turtle];
+                } else {
+		    value = -1;
+                }
+
+                if (value !== 0) {
+		    value = mixedNumber(1 / value);
+                }
+                break;
             default:
                 if (name in this.evalParameterDict) {
                     eval(this.evalParameterDict[name]);
@@ -778,6 +795,7 @@ function Logo () {
                 if (value.length > 6) {
                     value = value.substr(0, 5) + '...';
                 }
+
                 this.blocks.blockList[blk].text.text = value;
             } else if (name === 'divide') {
                 this.blocks.blockList[blk].text.text = mixedNumber(value);
@@ -6747,6 +6765,29 @@ function Logo () {
                         that.blocks.blockList[blk].value = 0;
                     } else {
                         that.blocks.blockList[blk].value = Math.floor(((that.notesPlayed[turtle] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) / that.beatsPerMeasure[turtle]) + 1;
+                    }
+                }
+                break;
+            case 'mynotevalue':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'mynotevalue']);
+                } else {
+                    var value = null;
+                    if (that.noteValue[turtle] !== null) {
+			value = 1 / that.noteValue[turtle];
+                    } else if (that.lastNotePlayed[turtle] !== null) {
+			value = that.lastNotePlayed[turtle][1];
+                    } else if (that.notePitches[turtle].length > 0) {
+			value = that.noteBeat[turtle];
+                    } else {
+			console.log('Could not find a note for turtle ' + turtle);
+			value = -1;
+                    }
+
+                    if (value !== 0) {
+			that.blocks.blockList[blk].value = 1 / value;
+                    } else {
+			that.blocks.blockList[blk].value = 0;
                     }
                 }
                 break;

@@ -281,6 +281,8 @@ function StatusMatrix() {
                 case 'heading':
                     var value = this._logo.blocks.blockList[this._logo.statusFields[i][0]].value.toFixed(2);
                     break;
+                case 'mynotevalue':
+                    var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value);
                 case 'elapsednotes':
                     var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value);
                     break;
