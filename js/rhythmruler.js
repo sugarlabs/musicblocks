@@ -894,17 +894,19 @@ function RhythmRuler () {
                     var idx = newStack.length;
                     var noteValue = noteValues[i];
 
-                    newStack.push([idx, 'rhythm', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 3]]);
+                    newStack.push([idx, 'rhythm2', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
                     newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
-                    newStack.push([idx + 2, ['number', {'value': Math.abs(noteValue)}], 0, 0, [idx]]);
+                    newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+                    newStack.push([idx + 3, ['number', {'value': 1}], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 4, ['number', {'value': Math.abs(noteValue)}], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
                     if (i == ruler.cells.length - 1) {
-                        newStack.push([idx + 3, 'hidden', 0, 0, [idx, null]]);
-                    }
-                    else {
-                        newStack.push([idx + 3, 'hidden', 0, 0, [idx, idx + 4]]);
+                        newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
+                    } else {
+                        newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, idx + 7]]);
                     }
 
-                    previousBlock = idx + 3;
+                    previousBlock = idx + 6;
                     sameNoteValue = 1;
                 }
             }
