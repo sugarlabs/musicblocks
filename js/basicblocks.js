@@ -607,6 +607,15 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // RHYTHM PALETTE
 
+    var offBeatDoBlock = new ProtoBlock('offbeatdo');
+    offBeatDoBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['offbeatdo'] = offBeatDoBlock;
+    // #TRANS: on musical 'offbeat' do some action
+    offBeatDoBlock.staticLabels.push(_('offbeat do'));
+    offBeatDoBlock.oneArgBlock();
+    offBeatDoBlock.defaults.push(_('action'));
+    offBeatDoBlock.dockTypes[1] = 'textin';
+
     var onBeatDoBlock = new ProtoBlock('onbeatdo');
     onBeatDoBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['onbeatdo'] = onBeatDoBlock;

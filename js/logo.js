@@ -3,7 +3,7 @@
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
+// License as published by the Free Software Foundatioff; either
 // version 3 of the License, or (at your option) any later version.
 //
 // You should have received a copy of the GNU Affero General Public
@@ -73,7 +73,6 @@ function Logo () {
     this.decay = {};
     this.sustain = {};
     this.release = {};
-    this.source_name = {};
 
     this.evalFlowDict = {};
     this.evalArgDict = {};
@@ -89,6 +88,7 @@ function Logo () {
     this.returns = [];
     this.turtleHeaps = {};
     this.invertList = {};
+    this.beatList = {};
 
     // We store each case arg and flow by switch block no. and turtle.
     this.switchCases = {};
@@ -847,6 +847,7 @@ function Logo () {
             this.beatFactor[turtle] = 1;
             this.dotCount[turtle] = 0;
             this.invertList[turtle] = [];
+            this.beatList[turtle] = [];
             this.switchCases[turtle] = {};
             this.switchBlocks[turtle] = [];
             this.connectionStore[turtle] = {};
@@ -3687,8 +3688,37 @@ function Logo () {
 
             that.notationPickup(turtle, that.pickup[turtle]);
             break;
+        case 'offbeatdo':
+            // Set up a listener for this turtle/offbeat combo.
+            if (!(args[0] in that.actions)) {
+                that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                that.stopTurtle = true;
+            } else {
+                var __listener = function (event) {
+                    if (that.turtles.turtleList[turtle].running) {
+                        var queueBlock = new Queue(that.actions[args[0]], 1, blk);
+                        that.parentFlowQueue[turtle].push(blk);
+                        that.turtles.turtleList[turtle].queue.push(queueBlock);
+                    } else {
+                        // Since the turtle has stopped
+                        // running, we need to run the stack
+                        // from here.
+                        if (isflow) {
+                            that._runFromBlockNow(that, turtle, that.actions[args[0]], isflow, receivedArg);
+                        } else {
+                            that._runFromBlock(that, turtle, that.actions[args[0]], isflow, receivedArg);
+                        }
+                    }
+                };
+
+                var eventName = '__offbeat_' + turtle + '__';
+                that._setListener(turtle, eventName, __listener);
+
+                that.beatList[turtle].push('offbeat');
+            }
+            break;
         case 'onbeatdo':
-            // Set up a listner for this turtle/beat combo.
+            // Set up a listener for this turtle/onbeat combo.
             if (args.length === 2) {
                 if (!(args[1] in that.actions)) {
                     that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
@@ -3713,6 +3743,8 @@ function Logo () {
 
                     var eventName = '__beat_' + args[0] + '_' + turtle + '__';
                     that._setListener(turtle, eventName, __listener);
+
+                    that.beatList[turtle].push(args[0]);
                 }
             }
             break;
@@ -3761,9 +3793,13 @@ function Logo () {
             that.currentBeat[turtle] = beatValue;
             that.currentMeasure[turtle] = measureValue;
 
-            // FIXME: Only dispatch if there is a signal enabled
-            var eventName = '__beat_' + beatValue + '_' + turtle + '__';
-            that.stage.dispatchEvent(eventName);
+            if (that.beatList[turtle].indexOf(beatValue) !== -1) {
+                var eventName = '__beat_' + beatValue + '_' + turtle + '__';
+                that.stage.dispatchEvent(eventName);
+            } else if (that.beatList[turtle].indexOf('offbeat') !== -1) {
+                var eventName = '__offbeat_' + turtle + '__';
+                that.stage.dispatchEvent(eventName);
+            }
 
             // A note can contain multiple pitch blocks to create
             // a chord. The chord is accumuated in these arrays,
