@@ -769,17 +769,17 @@ function Logo () {
             case 'mynotevalue':
                 value = null;
                 if (this.noteValue[turtle] !== null) {
-		    value = 1 / this.noteValue[turtle];
+                    value = 1 / this.noteValue[turtle];
                 } else if (this.lastNotePlayed[turtle] !== null) {
-		    value = this.lastNotePlayed[turtle][1];
+                    value = this.lastNotePlayed[turtle][1];
                 } else if (this.notePitches[turtle].length > 0) {
-		    value = this.noteBeat[turtle];
+                    value = this.noteBeat[turtle];
                 } else {
-		    value = -1;
+                    value = -1;
                 }
 
                 if (value !== 0) {
-		    value = mixedNumber(1 / value);
+                    value = mixedNumber(1 / value);
                 }
                 break;
             default:
@@ -6688,6 +6688,19 @@ function Logo () {
                     that.blocks.blockList[blk].value = last(that.polyVolume[turtle]);
                 }
                 break;
+            case 'elapsednotes2':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'elapsednotes2']);
+                } else {
+                    var cblk = that.blocks.blockList[blk].connections[1];
+                    var notevalue = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                    if (notevalue == null || notevalue === 0) {
+                        that.blocks.blockList[blk].value = 0;
+                    } else {
+                        that.blocks.blockList[blk].value = that.notesPlayed[turtle] / notevalue;
+                    }
+                }
+                break;
             case 'elapsednotes':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'elapsednotes']);
@@ -6774,20 +6787,20 @@ function Logo () {
                 } else {
                     var value = null;
                     if (that.noteValue[turtle] !== null) {
-			value = 1 / that.noteValue[turtle];
+                        value = 1 / that.noteValue[turtle];
                     } else if (that.lastNotePlayed[turtle] !== null) {
-			value = that.lastNotePlayed[turtle][1];
+                        value = that.lastNotePlayed[turtle][1];
                     } else if (that.notePitches[turtle].length > 0) {
-			value = that.noteBeat[turtle];
+                        value = that.noteBeat[turtle];
                     } else {
-			console.log('Could not find a note for turtle ' + turtle);
-			value = -1;
+                        console.log('Could not find a note for turtle ' + turtle);
+                        value = -1;
                     }
 
                     if (value !== 0) {
-			that.blocks.blockList[blk].value = 1 / value;
+                        that.blocks.blockList[blk].value = 1 / value;
                     } else {
-			that.blocks.blockList[blk].value = 0;
+                        that.blocks.blockList[blk].value = 0;
                     }
                 }
                 break;

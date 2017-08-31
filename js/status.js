@@ -283,6 +283,12 @@ function StatusMatrix() {
                     break;
                 case 'mynotevalue':
                     var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value);
+                case 'elapsednotes2':
+                    var blk = this._logo.statusFields[i][0];
+                    var cblk = this._logo.blocks.blockList[blk].connections[1];
+                    var notevalue = this._logo.parseArg(this._logo, turtle, cblk, blk, null);
+                    var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value) + ' × ' + mixedNumber(notevalue);
+                    break;
                 case 'elapsednotes':
                     var value = mixedNumber(this._logo.blocks.blockList[this._logo.statusFields[i][0]].value);
                     break;

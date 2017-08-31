@@ -689,6 +689,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var myNoteBlock = new ProtoBlock('mynotevalue');
     myNoteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['mynotevalue'] = myNoteBlock;
+    //.TRANS: the value (e.g., 1/4 note) of the note being played.
     myNoteBlock.staticLabels.push(_('note value'));
     myNoteBlock.parameterBlock();
     myNoteBlock.adjustWidthToLabel();
@@ -713,9 +714,17 @@ function initBasicProtoBlocks(palettes, blocks) {
     elapsedNotes.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['elapsednotes'] = elapsedNotes;
     //.TRANS: number of whole notes that have been played
-    elapsedNotes.staticLabels.push(_('notes played'));
+    elapsedNotes.staticLabels.push(_('whole notes played'));
     elapsedNotes.adjustWidthToLabel();
     elapsedNotes.parameterBlock();
+
+    var elapsedNotes2 = new ProtoBlock('elapsednotes2');
+    elapsedNotes2.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['elapsednotes2'] = elapsedNotes2;
+    //.TRANS: number of notes that have been played
+    elapsedNotes2.staticLabels.push(_('notes played'));
+    elapsedNotes2.adjustWidthToLabel();
+    elapsedNotes2.oneArgMathBlock();
 
     var beatfactor = new ProtoBlock('beatfactor');
     beatfactor.palette = palettes.dict['rhythm'];
