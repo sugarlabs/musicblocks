@@ -503,6 +503,7 @@ function TimbreWidget () {
         var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('synthesizer'));
 
         synthButtonCell.onclick = function () {
+            addFilterButtonCell.style.backgroundColor = '#808080';
             //console.log('synth button cell');
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
@@ -520,6 +521,7 @@ function TimbreWidget () {
         var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('oscillator'));
 
         oscillatorButtonCell.onclick = function () {
+            addFilterButtonCell.style.backgroundColor = '#808080';
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -561,6 +563,7 @@ function TimbreWidget () {
         var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('envelope'));
 
         envelopeButtonCell.onclick = function () {
+            addFilterButtonCell.style.backgroundColor = '#808080';
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -594,6 +597,7 @@ function TimbreWidget () {
         var effectsButtonCell = this._addButton(row, 'effects.svg', ICONSIZE, _('effects'));
 
         effectsButtonCell.onclick = function () {
+            addFilterButtonCell.style.backgroundColor = '#808080';
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -606,6 +610,7 @@ function TimbreWidget () {
         var filterButtonCell = this._addButton(row, 'filter.svg', ICONSIZE, _('filter'));
 
         filterButtonCell.onclick = function () {
+            addFilterButtonCell.style.backgroundColor = MATRIXBUTTONCOLOR;
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -632,13 +637,21 @@ function TimbreWidget () {
             that._filter();
         }
 
-        var cell = this._addButton(row, 'filter+.svg', ICONSIZE, _('add filter'));
+        var addFilterButtonCell = this._addButton(row, 'filter+.svg', ICONSIZE, _('add filter'));
+        addFilterButtonCell.style.backgroundColor = '#808080';
 
-        cell.onclick = function () {
+        addFilterButtonCell.onclick = function () {
             if (that.isActive['filter']) {
                 that._addFilter();
             }
         };
+
+        addFilterButtonCell.onmouseover = function () {
+        }
+
+        addFilterButtonCell.onmouseout = function () {
+        }
+
 
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('undo'));
         cell.onclick = function () {
