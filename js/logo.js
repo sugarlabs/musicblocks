@@ -2384,14 +2384,19 @@ function Logo () {
                 that.errorMsg(_("Unable to use synth due to existing oscillator"));
                 //that.stopTurtle = true;
             }
+
             if (args.length === 1 && typeof(args[0]) === 'number') {
                 if (args[0] < 0) {
-                    that.errorMsg(_('The input cannot be negative'));
+                    that.errorMsg(_('The input cannot be negative.'));
                 }
                 harmonicity = args[0];
             }
 
             if (that.inTimbre) {
+                console.log('CREATING AM SYNTH...');
+                that.timbre.amSynthParamvals['harmonicity'] = harmonicity;
+                that.synth.createSynth(that.timbre.instrumentName, 'amsynth', that.timbre.amSynthParamvals);
+
                 that.timbre.AMSynthesizer.push(blk);
                 that.timbre.AMSynthParams.push(harmonicity);
             }
@@ -2405,11 +2410,15 @@ function Logo () {
             }
             if (args.length === 1 && typeof(args[0]) === 'number') {
                 if (args[0] < 0) {
-                    that.errorMsg(_('The input cannot be negative'));
+                    that.errorMsg(_('The input cannot be negative.'));
                 }
                 modulationIndex = args[0];
             }
             if (that.inTimbre) {
+                console.log('CREATING FM SYNTH...');
+                that.timbre.fmSynthParamvals['modulationIndex'] = modulationIndex;
+                that.synth.createSynth(that.timbre.instrumentName, 'fmsynth', that.timbre.fmSynthParamvals);
+
                 that.timbre.FMSynthesizer.push(blk);
                 that.timbre.FMSynthParams.push(modulationIndex);
             }
@@ -2428,6 +2437,11 @@ function Logo () {
             }
 
             if (that.inTimbre) {
+                console.log('CREATING DUO SYNTH...');
+                that.timbre.duoSynthParamVals['vibratoRate'] = synthVibratoRate;
+                that.timbre.duoSynthParamVals['vibratoAmount'] = synthVibratoAmount;
+                that.synth.createSynth(that.timbre.instrumentName, 'duosynth', that.timbre.duoSynthParamVals);
+
                 that.timbre.duoSynthesizer.push(blk);
                 that.timbre.duoSynthParams.push(synthVibratoRate);
                 that.timbre.duoSynthParams.push(synthVibratoAmount);
@@ -2629,6 +2643,7 @@ function Logo () {
             that.inTimbre = true;
 
             if (typeof(args[0]) === 'string') {
+                // CLear out the instrument because we will recreate it in the widget.
                 that.timbre.instrumentName = args[0];
                 instrumentsEffects[that.timbre.instrumentName] = {};
                 instrumentsEffects[that.timbre.instrumentName]['vibratoActive'] = false;
@@ -2636,6 +2651,7 @@ function Logo () {
                 instrumentsEffects[that.timbre.instrumentName]['tremoloActive'] = false;
                 instrumentsEffects[that.timbre.instrumentName]['phaserActive'] = false;
                 instrumentsEffects[that.timbre.instrumentName]['chorusActive'] = false;
+                instrumentsFilters[that.timbre.instrumentName] = [];
             } else {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 that.stopTurtle = true;
@@ -2783,11 +2799,6 @@ function Logo () {
             break;
         case 'envelope':
             var synth_source = "sine";
-            if (that.timbre.env.length != 0) {
-                that.errorMsg(_("You are adding a second envelope block"));
-                that.timbre.ENVs = [];
-            }
-
             if (args.length === 4 && typeof(args[0] === 'number')) {
                 if (args[0] < 0 || args[0] > 100) {
                     that.errorMsg(_('Attack value should be between 0-100'));
@@ -2809,16 +2820,24 @@ function Logo () {
             }
 
             if (that.inTimbre) {
+                that.timbre.synthVals['envelope']['attack'] = last(that.attack[turtle]);
+                that.timbre.synthVals['envelope']['decay'] = last(that.decay[turtle]);
+                that.timbre.synthVals['envelope']['sustain'] = last(that.sustain[turtle]);
+                that.timbre.synthVals['envelope']['release'] = last(that.release[turtle]);
+
+                if (that.timbre.env.length != 0) {
+                    that.errorMsg(_("You are adding a second envelope block"));
+                } else {
+                    // Create the synth for the instrument.
+                    console.log('CREATING ENVELOPE SYNTH...');
+		    that.synth.createSynth(that.timbre.instrumentName, that.timbre.synthVals['oscillator']['source'], that.timbre.synthVals);
+		}
+
                 that.timbre.env.push(blk);
                 that.timbre.ENVs.push(Math.round(last(that.attack[turtle]) * 100));
                 that.timbre.ENVs.push(Math.round(last(that.decay[turtle]) * 100));
                 that.timbre.ENVs.push(Math.round(last(that.sustain[turtle]) * 100));
                 that.timbre.ENVs.push(Math.round(last(that.release[turtle]) * 100));
-
-                that.timbre.synthVals['envelope']['attack'] = last(that.attack[turtle]);
-                that.timbre.synthVals['envelope']['decay'] = last(that.decay[turtle]);
-                that.timbre.synthVals['envelope']['sustain'] = last(that.sustain[turtle]);
-                that.timbre.synthVals['envelope']['release'] = last(that.release[turtle]);
             }
             break;
         case 'filter':
@@ -2843,13 +2862,11 @@ function Logo () {
                 freq = args[2];
 
                 if (that.inTimbre) {
-                    var obj = {'filterType': filtertype, 'filterRolloff': rollOff, 'filterFrequency': freq};
-                    if (that.timbre.instrumentName in instrumentsFilters) {
-                        instrumentsFilters[that.timbre.instrumentName].push(obj);
-                    } else {
+                    if (!(that.timbre.instrumentName in instrumentsFilters)) {
                         instrumentsFilters[that.timbre.instrumentName] = [];
-                        instrumentsFilters[that.timbre.instrumentName].push(obj);
                     }
+                    // Add the filter to the instrument
+                    instrumentsFilters[that.timbre.instrumentName].push({'filterType': filtertype, 'filterRolloff': rollOff, 'filterFrequency': freq});
 
                     that.timbre.fil.push(blk);
                     that.timbre.filterParams.push(filtertype);
@@ -2861,11 +2878,6 @@ function Logo () {
         case 'oscillator':
             var oscillatorType = DEFAULTOSCILLATORTYPE;
             var partials ;
-            that.timbre.oscParams = [];
-
-            if (that.timbre.osc.length != 0) {
-                that.errorMsg(_("You are adding a second oscillator block."));
-            }
 
             if (args.length === 2 && typeof(args[1] === 'number')) {
                 for (var otype in OSCTYPES) {
@@ -2880,6 +2892,15 @@ function Logo () {
             }
 
             if (that.inTimbre) {
+                if (that.timbre.osc.length != 0) {
+                    that.errorMsg(_("You are adding a second oscillator block."));
+                } else {
+                    that.timbre.oscParams = [];
+
+                    console.log('CREATING OSCILLATOR SYNTH...');
+                    that.synth.createSynth(that.timbre.instrumentName, oscillatorType, that.timbre.synthVals);
+                }
+
                 that.timbre.osc.push(blk);
                 that.timbre.oscParams.push(oscillatorType);
                 that.timbre.oscParams.push(partials);

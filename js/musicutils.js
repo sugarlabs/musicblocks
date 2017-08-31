@@ -492,7 +492,7 @@ function getFilterTypes(name) {
     if (name === '') {
         console.log('getFiterType passed blank name. Returning ' + DEFAULTFILTERTYPE);
         name = DEFAULTFILTERTYPE;
-    } 
+    }
     for (var type = 0; type < FILTERTYPES.length; type++) {
         if (FILTERTYPES[type][0].toLowerCase() === name.toLowerCase() || FILTERTYPES[type][1].toLowerCase() === name.toLowerCase()) {
             if (FILTERTYPES[type][0] != '') {
@@ -511,7 +511,7 @@ function getOscillatorTypes(name) {
     if (name === '') {
         console.log('getOscillatorType passed blank name. Returning ' + DEFAULTOSCILLATORTYPE);
         name = DEFAULTOSCILLATORTYPE;
-    } 
+    }
     for (var type = 0; type < OSCTYPES.length; type++) {
         if (OSCTYPES[type][0].toLowerCase() === name.toLowerCase() || OSCTYPES[type][1].toLowerCase() === name.toLowerCase()) {
             if (OSCTYPES[type][0] != '') {
@@ -1570,7 +1570,7 @@ function Synth() {
                 break;
             default:
                 instrumentsSource[instrumentName] = [0, 'poly'];
-                var builtin_synth = new Tone.PolySynth(6, Tone.AMSynth).toMaster();
+                var builtin_synth = new Tone.PolySynth(6, Tone.AMSynth);
                 break;
         }
 
@@ -1659,7 +1659,6 @@ function Synth() {
                     temp_filters.push(filterVal);
                     synth.chain(temp_filters[k], Tone.Master);
                 }
-               
             }
 
             if (paramsEffects != null && paramsEffects != undefined) {
@@ -1725,7 +1724,7 @@ function Synth() {
                     }
                 }
 
-                if (paramsFilters && paramsFilters != null && paramsFilters != undefined) { 
+                if (paramsFilters && paramsFilters != null && paramsFilters != undefined) {
                     for (k = 0; k < numFilters; k++) {
                         temp_filters[k].dispose();
                     }
