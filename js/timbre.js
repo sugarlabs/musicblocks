@@ -529,29 +529,22 @@ function TimbreWidget () {
             that.isActive['oscillator'] = true;
             oscillatorButtonCell.id = 'oscillatorButtonCell';
 
-            // Look to see if there is a filter block in the clamp. If
-            // there isn't one, add one. If there is more than one, we
-            // should ignore all but the last one.
-            if (that.osc.length <= 1) {
-                // Find the last block in the clamp, where we will add
-                // a filter block.
-                if (that.osc.length === 0) {
-                    var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
-                    var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
+            if (that.osc.length === 0) {
+                var topOfClamp = that._logo.blocks.blockList[that.blockNo].connections[2];
+                var bottomOfClamp = that._logo.blocks.findBottomBlock(topOfClamp);
 
-                    const OSCILLATOROBJ = [[0, ['oscillator', {}], 0, 0, [null, 2,1, null]], [1, ['number', {'value': 6}], 0, 0, [0]], [2, ['oscillatortype', {'value': DEFAULTOSCILLATORTYPE}], 0, 0, [0]]];
-                    that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
+                const OSCILLATOROBJ = [[0, ['oscillator', {}], 0, 0, [null, 2,1, null]], [1, ['number', {'value': 6}], 0, 0, [0]], [2, ['oscillatortype', {'value': DEFAULTOSCILLATORTYPE}], 0, 0, [0]]];
+                that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
 
-                    var n = that._logo.blocks.blockList.length - 3;
-                    that.osc.push(n);
-                    that.oscParams.push(DEFAULTOSCILLATORTYPE);
-                    that.oscParams.push(6);
+                var n = that._logo.blocks.blockList.length - 3;
+                that.osc.push(n);
+                that.oscParams.push(DEFAULTOSCILLATORTYPE);
+                that.oscParams.push(6);
 
-                    setTimeout(that.blockConnection(3, bottomOfClamp), 500);
+                setTimeout(that.blockConnection(3, bottomOfClamp), 500);
 
-                    that._oscillator(true);
-                }
-
+                that._oscillator(true);
+            } else {
                 that._oscillator(false);
             }
 
