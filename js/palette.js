@@ -202,7 +202,9 @@ function Palettes () {
     };
 
     this.hidePaletteIconCircles = function () {
-        hidePaletteNameDisplay(palette_text, this.stage);
+        // palette_text might not be defined yet.
+        hidePaletteNameDisplay(this.palette_text, this.stage);
+
         hideButtonHighlight(this.circles, this.stage);
     };
 
@@ -500,21 +502,21 @@ function Palettes () {
             that.circles = showButtonHighlight(palettes.buttons[name].x + r, palettes.buttons[name].y + r, r, event, palettes.scale, palettes.stage);
 
             /*add tooltip for palette buttons*/
-            palette_text = new createjs.Text(_(name), '20px Arial', 'black');
-            palette_text.x = palettes.buttons[name].x + 2.2 * r;
-            palette_text.y = palettes.buttons[name].y + 5 * r / 8;
-            palettes.stage.addChild(palette_text);
+            that.palette_text = new createjs.Text(_(name), '20px Arial', 'black');
+            that.palette_text.x = palettes.buttons[name].x + 2.2 * r;
+            that.palette_text.y = palettes.buttons[name].y + 5 * r / 8;
+            palettes.stage.addChild(that.palette_text);
         });
 
         this.buttons[name].on('pressup', function (event) {
             palettes.mouseOver = false;
-            hidePaletteNameDisplay(palette_text, palettes.stage);
+            hidePaletteNameDisplay(that.palette_text, palettes.stage);
             hideButtonHighlight(that.circles, palettes.stage);
         });
 
         this.buttons[name].on('mouseout', function (event) {
             palettes.mouseOver = false;
-            hidePaletteNameDisplay(palette_text, palettes.stage);
+            hidePaletteNameDisplay(that.palette_text, palettes.stage);
             hideButtonHighlight(that.circles, palettes.stage);
         });
 
