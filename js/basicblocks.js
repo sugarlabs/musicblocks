@@ -589,6 +589,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     rhythmrulerBlock.adjustWidthToLabel();
     rhythmrulerBlock.stackClampOneArgBlock();
     rhythmrulerBlock.defaults.push(1);
+    rhythmrulerBlock.hidden = true;
+
+    var rhythmruler2Block = new ProtoBlock('rhythmruler2');
+    rhythmruler2Block.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['rhythmruler2'] = rhythmruler2Block;
+    rhythmruler2Block.staticLabels.push(_('rhythm ruler'));
+    rhythmruler2Block.adjustWidthToLabel();
+    rhythmruler2Block.stackClampZeroArgBlock();
 
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['widgets'];

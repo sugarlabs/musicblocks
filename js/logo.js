@@ -2542,15 +2542,20 @@ function Logo () {
                 that.keySignature[turtle] = args[0] + ' ' + modename;
             }
             break;
+        case 'rhythmruler2':
         case 'rhythmruler':
-            childFlow = args[1];
+            if (that.blocks.blockList[blk].name === 'rhythmruler') {
+                childFlow = args[1];
+            } else {
+                childFlow = args[0];
+            }
+
             childFlowCount = 1;
 
             if (that.rhythmRuler == null) {
                 that.rhythmRuler = new RhythmRuler();
             }
 
-            // To do: restore previous state
             that.rhythmRuler.Rulers = [];
             that.rhythmRuler.Drums = [];
             that.inRhythmRuler = true;
