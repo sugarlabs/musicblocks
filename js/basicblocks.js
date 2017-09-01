@@ -2840,7 +2840,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTurtleName.twoArgBlock();
     setTurtleName.dockTypes[1] = 'anyin';
     setTurtleName.dockTypes[2] = 'anyin';
-    setTurtleName.defaults.push('0');
+    setTurtleName.defaults.push('-1');
     setTurtleName.defaults.push('Mozart');
 
     // SENSORS PALETTE

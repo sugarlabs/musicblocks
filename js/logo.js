@@ -1942,7 +1942,10 @@ function Logo () {
             break;
         case 'setturtlename':
             var foundTargetTurtle = false;
-            if (args.length === 2) {
+            if (args[0] === -1) {
+                that.turtles.turtleList[turtle].rename(args[1]);
+                foundTargetTurtle = true;
+            } else {
                 for (var i = 0; i < that.turtles.turtleList.length; i++) {
                     if (that.turtles.turtleList[i].name === args[0]) {
                         that.turtles.turtleList[i].rename(args[1]);
@@ -1951,6 +1954,7 @@ function Logo () {
                     }
                 }
             }
+
             if (!foundTargetTurtle) {
                 that.errorMsg('Could not find turtle ' + args[0], blk);
             }
@@ -6812,16 +6816,17 @@ function Logo () {
                 for (var i = 0; i < that.turtles.turtleList.length; i++) {
                     var thisTurtle = that.turtles.turtleList[i];
                     if (targetTurtle === thisTurtle.name) {
-                        if (that.noteValue[turtle] !== null) {
-                            value = 1 / that.noteValue[turtle];
-                        } else if (that.lastNotePlayed[turtle] !== null) {
-                            value = that.lastNotePlayed[turtle][1];
+                        if (that.noteValue[i] !== null) {
+                            value = 1 / that.noteValue[i];
+                        } else if (that.lastNotePlayed[i] !== null) {
+                            value = that.lastNotePlayed[i][1];
                         } else if (that.notePitches[i].length > 0) {
                             value = that.noteBeat[i];
                         } else {
                             console.log('Could not find a note for turtle ' + turtle);
                             value = -1;
                         }
+
                         if (that.blocks.blockList[blk].name === 'turtlenote') {
                             that.blocks.blockList[blk].value = value;
                         } else if (value !== 0) {
@@ -6829,6 +6834,7 @@ function Logo () {
                         } else {
                             that.blocks.blockList[blk].value = 0;
                         }
+                        break;
                     }
                 }
                 if (value == null) {

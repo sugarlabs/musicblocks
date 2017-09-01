@@ -392,6 +392,10 @@ function Turtle (name, turtles, drum) {
         }
     };
 
+    this.getNumber = function () {
+        return this.turtles.turtleList.indexOf(this);
+    };
+
     this.rename = function(name) {
         this.name = name;
 
