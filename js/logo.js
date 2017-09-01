@@ -1946,6 +1946,12 @@ function Logo () {
             if (args[0] === -1) {
                 that.turtles.turtleList[turtle].rename(args[1]);
                 foundTargetTurtle = true;
+            } else if (typeof(args[0]) === 'number') {
+                var i = Math.floor(args[0]);
+		if (i >= 0 && i <  that.turtles.turtleList.length) {
+                    that.turtles.turtleList[i].rename(args[1]);
+                    foundTargetTurtle = true;
+                }
             } else {
                 for (var i = 0; i < that.turtles.turtleList.length; i++) {
                     if (that.turtles.turtleList[i].name === args[0]) {
@@ -1958,6 +1964,7 @@ function Logo () {
 
             if (!foundTargetTurtle) {
                 that.errorMsg('Could not find turtle ' + args[0], blk);
+                that.turtles.turtleList[turtle].rename(args[1]);
             }
             break;
         case 'startTurtle':
@@ -6600,6 +6607,7 @@ function Logo () {
                     that.blocks.blockList[blk].value = that.turtles.screenY2turtleY(that.turtles.turtleList[turtle].container.y);
                 }
                 break;
+            case 'turtleheading':
             case 'xturtle':
             case 'yturtle':
                 var cblk = that.blocks.blockList[blk].connections[1];
@@ -6609,15 +6617,25 @@ function Logo () {
                     if (targetTurtle === thisTurtle.name) {
                         if (that.blocks.blockList[blk].name === 'yturtle') {
                             that.blocks.blockList[blk].value = that.turtles.screenY2turtleY(thisTurtle.container.y);
-                        } else {
+                        } else if (that.blocks.blockList[blk].name === 'xturtle') {
                             that.blocks.blockList[blk].value = that.turtles.screenX2turtleX(thisTurtle.container.x);
+                        } else {
+                            that.blocks.blockList[blk].value = thisTurtle.orientation;
                         }
                         break;
                     }
                 }
+
                 if (i === that.turtles.turtleList.length) {
                     that.errorMsg('Could not find turtle ' + targetTurtle, blk);
-                    that.blocks.blockList[blk].value = 0;
+                    var thisTurtle = that.turtles.turtleList[turtle];
+                    if (that.blocks.blockList[blk].name === 'yturtle') {
+                        that.blocks.blockList[blk].value = that.turtles.screenY2turtleY(thisTurtle.container.y);
+                    } else if (that.blocks.blockList[blk].name === 'xturtle') {
+                        that.blocks.blockList[blk].value = that.turtles.screenX2turtleX(thisTurtle.container.x);
+                    } else {
+                        that.blocks.blockList[blk].value = thisTurtle.orientation;
+                    }
                 }
                 break;
             case 'bpmfactor':
@@ -6777,20 +6795,20 @@ function Logo () {
                 } else {
                     var value = null;
                     if (that.lastNotePlayed[turtle] !== null) {
-			var len = that.lastNotePlayed[turtle][0].length;
-			var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
-			var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
-			var obj = [pitch, octave];
+                        var len = that.lastNotePlayed[turtle][0].length;
+                        var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
+                        var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
+                        var obj = [pitch, octave];
                     } else if (that.notePitches[turtle].length > 0) {
-			var obj = that.getNote(that.notePitches[turtle][0], that.noteOctaves[turtle][0], that.noteTranspositions[turtle][0], that.keySignature[turtle]);
+                        var obj = that.getNote(that.notePitches[turtle][0], that.noteOctaves[turtle][0], that.noteTranspositions[turtle][0], that.keySignature[turtle]);
                     } else {
-			console.log('Could not find a note ');
-			var obj = ['G', 4];
+                        console.log('Could not find a note ');
+                        var obj = ['G', 4];
                     }
 
                     value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
                     that.blocks.blockList[blk].value = value;
-		}
+                }
                 break;
             case 'beatvalue':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
