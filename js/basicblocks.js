@@ -149,6 +149,14 @@ function initBasicProtoBlocks(palettes, blocks) {
     consonantStepUpBlock.adjustWidthToLabel();
     consonantStepUpBlock.parameterBlock();
 
+    var myPitchBlock = new ProtoBlock('mypitch');
+    myPitchBlock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['mypitch'] = myPitchBlock;
+    //.TRANS: convert current note to piano key (1-88)
+    myPitchBlock.staticLabels.push(_('pitch number'));
+    myPitchBlock.parameterBlock();
+    myPitchBlock.adjustWidthToLabel();
+
     var midiBlock = new ProtoBlock('midi');
     midiBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['midi'] = midiBlock;

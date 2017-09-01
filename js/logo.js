@@ -579,12 +579,12 @@ function Logo () {
             case 'duplicatefactor':
             case 'skipfactor':
             case 'notevolumefactor':
-            case 'turtlepitch':
             case 'currentnote':
             case 'currentoctave':
             case 'bpmfactor':
             case 'beatvalue':
             case 'measurevalue':
+            case 'mypitch':
             case 'mynotevalue':
                 this.blocks.blockList[blk].text.text = '';
                 this.blocks.blockList[blk].container.updateCache();
@@ -736,14 +736,15 @@ function Logo () {
                 // FIX ME: bias and scaling
                 value = last(this.polyVolume[turtle]);
                 break;
-            case 'turtlepitch':
+            case 'mypitch':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
                     value = pitchToNumber(this.lastNotePlayed[turtle][0].slice(0, len - 1), parseInt(this.lastNotePlayed[turtle][0].slice(len - 1)), this.keySignature[turtle]) - that.pitchNumberOffset;
                 } else {
-                    console.log('Could not find a note for turtle ' + turtle);
-                    value = pitchToNumber('A', 4, this.keySignature[turtle])  - that.pitchNumberOffset;
+                    value = pitchToNumber('G', 4, this.keySignature[turtle])  - that.pitchNumberOffset;
                 }
+
+                value = value.toString();
                 break;
                 // Deprecated
             case 'currentnote':
@@ -1187,9 +1188,9 @@ function Logo () {
                 this.skipFactor[turtle][len - 1] = value;
             }
             break;
-        case 'turtlepitch':
+        case 'mypitch':
             var obj = numberToPitch(value + this.pitchNumberOffset);
-            this.lastNotePlayed[turtle] = [obj[0]+obj[1], this.lastNotePlayed[turtle][1]];
+            this.lastNotePlayed[turtle] = [obj[0] + obj[1], this.lastNotePlayed[turtle][1]];
             break;
         // Deprecated
         case 'currentnote':
@@ -6757,7 +6758,7 @@ function Logo () {
                             var obj = that.getNote(that.notePitches[i][0], that.noteOctaves[i][0], that.noteTranspositions[i][0], that.keySignature[i]);
                         } else {
                             console.log('Could not find a note for turtle ' + turtle);
-                            var obj = ['C', 0];
+                            var obj = ['G', 4];
                         }
                         value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
                         that.blocks.blockList[blk].value = value;
@@ -6769,6 +6770,27 @@ function Logo () {
                     that.errorMsg('Could not find turtle ' + targetTurtle, blk);
                     that.blocks.blockList[blk].value = 0;
                 }
+                break;
+            case 'mypitch':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'mypitch']);
+                } else {
+                    var value = null;
+                    if (that.lastNotePlayed[turtle] !== null) {
+			var len = that.lastNotePlayed[turtle][0].length;
+			var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
+			var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
+			var obj = [pitch, octave];
+                    } else if (that.notePitches[turtle].length > 0) {
+			var obj = that.getNote(that.notePitches[turtle][0], that.noteOctaves[turtle][0], that.noteTranspositions[turtle][0], that.keySignature[turtle]);
+                    } else {
+			console.log('Could not find a note ');
+			var obj = ['G', 4];
+                    }
+
+                    value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
+                    that.blocks.blockList[blk].value = value;
+		}
                 break;
             case 'beatvalue':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
