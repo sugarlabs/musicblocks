@@ -6742,10 +6742,10 @@ function Logo () {
                 for (var i = 0; i < that.turtles.turtleList.length; i++) {
                     var thisTurtle = that.turtles.turtleList[i];
                     if (targetTurtle === thisTurtle.name) {
-                        if (that.lastNotePlayed[turtle] !== null) {
-                            var len = that.lastNotePlayed[turtle][0].length;
-                            var pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
-                            var octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
+                        if (that.lastNotePlayed[i] !== null) {
+                            var len = that.lastNotePlayed[i][0].length;
+                            var pitch = that.lastNotePlayed[i][0].slice(0, len - 1);
+                            var octave = parseInt(that.lastNotePlayed[i][0].slice(len - 1));
 
                             var obj = [pitch, octave];
                         } else if (that.notePitches[i].length > 0) {
@@ -6756,8 +6756,10 @@ function Logo () {
                         }
                         value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - that.pitchNumberOffset;
                         that.blocks.blockList[blk].value = value;
+                        break;
                     }
                 }
+
                 if (value == null) {
                     that.errorMsg('Could not find turtle ' + targetTurtle, blk);
                     that.blocks.blockList[blk].value = 0;
