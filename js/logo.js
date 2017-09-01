@@ -2921,7 +2921,7 @@ function Logo () {
 
             if (that.inTimbre) {
                 if (that.timbre.osc.length != 0) {
-                    that.errorMsg(_("You are adding a second oscillator block."));
+                    that.errorMsg(_("You are adding multiple oscillator blocks."));
                 } else {
                     that.timbre.oscParams = [];
 
