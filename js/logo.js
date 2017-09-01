@@ -3648,13 +3648,11 @@ function Logo () {
             } else if (that.inRhythmRuler) {
                 // We don't check for balance since we want to support
                 // polyphonic rhythms.
-                // remove temporary work-around to #272.
-                // if (that.rhythmRulerMeasure === null) {
-                //     that.rhythmRulerMeasure = args[0] * args[1];
-                // } else if (that.rhythmRulerMeasure != (args[0] * args[1])) {
-                //     that.errorMsg('Rhythm Ruler imbalance.', blk);
-                //     that.stopTurtle = true;
-                // }
+                if (that.rhythmRulerMeasure === null) {
+                    that.rhythmRulerMeasure = args[0] * args[1];
+                } else if (that.rhythmRulerMeasure != (args[0] * args[1])) {
+                    that.textMsg(_('polyphonic rhythm'));
+                }
 
                 // Since there maybe more than one instance of the
                 // same drum, e.g., if a repeat is used, we look from
