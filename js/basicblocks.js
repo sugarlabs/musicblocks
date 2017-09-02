@@ -2894,6 +2894,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     startTurtleBlock.dockTypes[1] = 'anyin';
     startTurtleBlock.defaults.push('0');
 
+    var turtlecolorBlock = new ProtoBlock('turtlecolor');
+    turtlecolorBlock.palette = palettes.dict['mice'];
+    blocks.protoBlockDict['turtlecolor'] = turtlecolorBlock;
+    //.TRANS: pen color for this mouse
+    turtlecolorBlock.staticLabels.push(_('mouse color'));
+    turtlecolorBlock.adjustWidthToLabel();
+    turtlecolorBlock.oneArgMathBlock();;
+    turtlecolorBlock.dockTypes[1] = 'anyin';
+    turtlecolorBlock.defaults.push('Mozart');
+
     var turtleheadingBlock = new ProtoBlock('turtleheading');
     turtleheadingBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['turtleheading'] = turtleheadingBlock;

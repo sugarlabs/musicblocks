@@ -1963,14 +1963,14 @@ function Logo () {
             }
 
             if (!foundTargetTurtle) {
-                that.errorMsg('Could not find turtle ' + args[0], blk);
+                that.errorMsg('Could not find mouse ' + args[0], blk);
                 that.turtles.turtleList[turtle].rename(args[1]);
             }
             break;
         case 'startTurtle':
             var targetTurtle = that._getTargetTurtle(args);
             if (targetTurtle == null) {
-                that.errorMsg('Cannot find turtle: ' + args[0], blk)
+                that.errorMsg('Cannot find mouse: ' + args[0], blk)
             } else {
                 if (that.turtles.turtleList[targetTurtle].running) {
                     that.errorMsg('Turtle is already running.', blk);
@@ -1999,7 +1999,7 @@ function Logo () {
         case 'stopTurtle':
             var targetTurtle = that._getTargetTurtle(args);
             if (targetTurtle == null) {
-                that.errorMsg('Cannot find turtle: ' + args[0], blk)
+                that.errorMsg('Cannot find mouse: ' + args[0], blk)
             } else {
                 that.turtles.turtleList[targetTurtle].queue = [];
                 that.parentFlowQueue[targetTurtle] = [];
@@ -6627,7 +6627,7 @@ function Logo () {
                 }
 
                 if (i === that.turtles.turtleList.length) {
-                    that.errorMsg('Could not find turtle ' + targetTurtle, blk);
+                    that.errorMsg('Could not find mouse ' + targetTurtle, blk);
                     var thisTurtle = that.turtles.turtleList[turtle];
                     if (that.blocks.blockList[blk].name === 'yturtle') {
                         that.blocks.blockList[blk].value = that.turtles.screenY2turtleY(thisTurtle.container.y);
@@ -6785,7 +6785,7 @@ function Logo () {
                 }
 
                 if (value == null) {
-                    that.errorMsg('Could not find turtle ' + targetTurtle, blk);
+                    that.errorMsg('Could not find mouse ' + targetTurtle, blk);
                     that.blocks.blockList[blk].value = 0;
                 }
                 break;
@@ -6885,7 +6885,7 @@ function Logo () {
                     }
                 }
                 if (value == null) {
-                    that.errorMsg('Could not find turtle ' + targetTurtle, blk);
+                    that.errorMsg('Could not find mouse ' + targetTurtle, blk);
                     that.blocks.blockList[blk].value = -1;
                 }
                 break;
@@ -6903,6 +6903,23 @@ function Logo () {
                     that.statusFields.push([blk, 'color']);
                 } else {
                     that.blocks.blockList[blk].value = that.turtles.turtleList[turtle].color;
+                }
+                break;
+            case 'turtlecolor':
+                var cblk = that.blocks.blockList[blk].connections[1];
+                var targetTurtle = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                for (var i = 0; i < that.turtles.turtleList.length; i++) {
+                    var thisTurtle = that.turtles.turtleList[i];
+                    if (targetTurtle === thisTurtle.name) {
+                        that.blocks.blockList[blk].value = thisTurtle.color;
+                        break;
+                    }
+                }
+
+                if (i === that.turtles.turtleList.length) {
+                    that.errorMsg('Could not find mouse ' + targetTurtle, blk);
+                    var thisTurtle = that.turtles.turtleList[turtle];
+                    that.blocks.blockList[blk].value = thisTurtle.color;
                 }
                 break;
             case 'shade':
