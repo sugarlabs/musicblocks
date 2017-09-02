@@ -3760,6 +3760,7 @@ function Logo () {
                     that.stopTurtle = true;
                 } else {
                     var __listener = function (event) {
+                        console.log('DO');
                         if (that.turtles.turtleList[turtle].running) {
                             var queueBlock = new Queue(that.actions[args[1]], 1, blk);
                             that.parentFlowQueue[turtle].push(blk);
@@ -3828,10 +3829,30 @@ function Logo () {
             that.currentBeat[turtle] = beatValue;
             that.currentMeasure[turtle] = measureValue;
 
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            // Queue any beat actions.
             if (that.beatList[turtle].indexOf(beatValue) !== -1) {
+                // Put the childFlow into the queue before the beat
+                // action so that the beat action is at the end of the
+                // FILO.
+                var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
+                that.parentFlowQueue[turtle].push(blk);
+                that.turtles.turtleList[turtle].queue.push(queueBlock);
+		childFlow = null;
+
                 var eventName = '__beat_' + beatValue + '_' + turtle + '__';
                 that.stage.dispatchEvent(eventName);
             } else if (that.beatList[turtle].indexOf('offbeat') !== -1) {
+                // Put the childFlow into the queue before the beat
+                // action so that the beat action is at the end of the
+                // FILO.
+                var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
+                that.parentFlowQueue[turtle].push(blk);
+                that.turtles.turtleList[turtle].queue.push(queueBlock);
+		childFlow = null;
+
                 var eventName = '__offbeat_' + turtle + '__';
                 that.stage.dispatchEvent(eventName);
             }
@@ -3871,9 +3892,6 @@ function Logo () {
 
             that.inNoteBlock[turtle] += 1;
             that.whichNoteBlock[turtle] = blk;
-
-            childFlow = args[1];
-            childFlowCount = 1;
 
             var listenerName = '_playnote_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
