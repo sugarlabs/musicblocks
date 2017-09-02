@@ -5954,6 +5954,20 @@ function Logo () {
                         drums.push(that.noteDrums[turtle][i]);
                     }
 
+                    // If it is > 0, we already counted this note
+                    // (e.g. pitch & drum combination).
+                    if (that.notePitches[turtle].length === 0) {
+			if (!that.justCounting[turtle]) {
+                            console.log('notes to play ' + notes + ' ' + noteBeatValue);
+			} else {
+                            console.log('notes to count ' + notes + ' ' + noteBeatValue);
+			}
+
+			if (!that.suppressOutput[turtle]) {
+                            that.turtles.turtleList[turtle].blink(duration,last(that.polyVolume[turtle]));
+			}
+                    }
+
                     if (!that.suppressOutput[turtle] && duration > 0) {
                         if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                             for (var i = 0; i < drums.length; i++) {
