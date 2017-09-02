@@ -386,6 +386,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var filterBlock = new ProtoBlock('filter');
     filterBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['filter'] = filterBlock;
+    //.TRANS: rolloff is the steepness of a change in frequency.
     filterBlock.staticLabels.push(_('filter'), _('type'), _('rolloff'), _('frequency'));
     filterBlock.extraWidth = 10;
     filterBlock.adjustWidthToLabel();

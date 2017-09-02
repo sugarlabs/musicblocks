@@ -2837,16 +2837,16 @@ function Logo () {
             var synth_source = "sine";
             if (args.length === 4 && typeof(args[0] === 'number')) {
                 if (args[0] < 0 || args[0] > 100) {
-                    that.errorMsg(_('Attack value should be between 0-100'));
+                    that.errorMsg(_('Attack value should be from 0 to 100.'));
                 }
                 if (args[1] < 0 || args[1] > 100) {
-                    that.errorMsg(_('Decay value should be between 0-100'));
+                    that.errorMsg(_('Decay value should be from 0 to 100.'));
                 }
                 if (args[2] < 0 || args[2] > 100) {
-                    that.errorMsg(_('Sustain value should be between 0-100'));
+                    that.errorMsg(_('Sustain value should be from 0 to 100.'));
                 }
                 if (args[3] < 0 || args[3] > 100) {
-                    that.errorMsg(_('Release value should be between 0-100'));
+                    that.errorMsg(_('Release value should be from 0-100.'));
                 }
 
                 that.attack[turtle].push(args[0] / 100);
@@ -2862,7 +2862,7 @@ function Logo () {
                 that.timbre.synthVals['envelope']['release'] = last(that.release[turtle]);
 
                 if (that.timbre.env.length != 0) {
-                    that.errorMsg(_("You are adding a second envelope block"));
+                    that.errorMsg(_("You are adding multiple envelope blocks."));
                 } else {
                     // Create the synth for the instrument.
                     console.log('CREATING ENVELOPE SYNTH...');
@@ -2891,7 +2891,8 @@ function Logo () {
                 }
 
                 if ([-12, -24, -48, -96].indexOf(args[1]) === -1) {
-                    that.errorMsg(_("Value should be either -12,-24,-48 or -96 db"));
+                    //.TRANS: rolloff is the steepness of a change in frequency.
+                    that.errorMsg(_('Rolloff value should be either -12, -24, -48, or -96 decibels/octave.'));
                 }
 
                 rollOff = args[1];
@@ -3874,7 +3875,8 @@ function Logo () {
 
             // Ensure that note duration is positive.
             if (args[0] < 0) {
-                that.errorMsg(_('Note value must be greater than 0'), blk);
+                //.TRANS: Note value is the note duration.
+                that.errorMsg(_('Note value must be greater than 0.'), blk);
                 var noteBeatValue = 0;
             } else {
                 if (that.blocks.blockList[blk].name === 'newnote') {
@@ -4127,7 +4129,7 @@ function Logo () {
         case 'dis':
             var distortion = (args[0] / 100);
             if (distortion < 0 || distortion > 1) {
-                that.errorMsg(_('Distortion not in range'), blk);
+                that.errorMsg(_('Distortion must be from 0 to 100.'), blk);
                 that.stopTurtle = true;
             }
             childFlow = args[1];
