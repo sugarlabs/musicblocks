@@ -2414,7 +2414,11 @@ function Blocks () {
                 continue;
             }
 
-            if (['do', 'calc', 'doArg', 'calcArg', 'action'].indexOf(blkParent.name) === -1) {
+            if (['do', 'calc', 'doArg', 'calcArg', 'action', 'offbeatdo', 'onbeatdo', 'listen'].indexOf(blkParent.name) === -1) {
+                continue;
+            }
+
+            if ((blkParent.name === 'onbeatdo' || blkParent.name === 'listen') && blkParent.connections.indexOf(blk) !== 2) {
                 continue;
             }
 

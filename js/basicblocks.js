@@ -618,9 +618,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     offBeatDoBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['offbeatdo'] = offBeatDoBlock;
     // #TRANS: on musical 'offbeat' do some action
-    offBeatDoBlock.staticLabels.push(_('offbeat do'));
+    offBeatDoBlock.staticLabels.push(_('on offbeat do'));
     offBeatDoBlock.oneArgBlock();
     offBeatDoBlock.defaults.push(_('action'));
+    offBeatDoBlock.adjustWidthToLabel();
     offBeatDoBlock.dockTypes[1] = 'textin';
 
     var onBeatDoBlock = new ProtoBlock('onbeatdo');
