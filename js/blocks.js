@@ -1173,7 +1173,7 @@ function Blocks () {
                     } else if (this.blockList[newBlock].name === 'storein') {
                         // We may need to add new storein and namedo
                         // blocks to the palette.
-                        if (myBlock.value !== 'box') {
+                        if (newConnection === 1 && myBlock.value !== 'box') {
                             this.newStoreinBlock(myBlock.value);
                             this.newNamedboxBlock(myBlock.value);
                             var that = this;
@@ -3960,8 +3960,9 @@ function Blocks () {
         for (var b = 0; b < this.dragGroup.length; b++) {
             this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
             if (this.blockList[this.dragGroup[b]].collapseContainer !== null) {
-		this.stage.setChildIndex(this.blockList[this.dragGroup[b]].collapseContainer, z);
-	    };
+                this.stage.setChildIndex(this.blockList[this.dragGroup[b]].collapseContainer, z);
+            };
+
             z -= 1;
         }
 
