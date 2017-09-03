@@ -2013,6 +2013,14 @@ function Logo () {
                 that._doBreak(targetTurtle);
             }
             break;
+        case 'turtlesync':
+            var targetTurtle = that._getTargetTurtle(args);
+            if (targetTurtle == null) {
+                that.errorMsg('Cannot find mouse: ' + args[0], blk)
+            } else {
+                that.turtleTime[turtle] = that.turtleTime[targetTurtle];
+            }
+            break;
         case 'setcolor':
             if (args.length === 1) {
                 if (typeof(args[0]) === 'string') {

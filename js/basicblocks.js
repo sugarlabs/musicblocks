@@ -2975,6 +2975,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleNoteBlock2.dockTypes[1] = 'anyin';
     turtleNoteBlock2.defaults.push(_('Mr. Mouse'));
 
+    var turtleSyncBlock = new ProtoBlock('turtlesync');
+    turtleSyncBlock.palette = palettes.dict['mice'];
+    blocks.protoBlockDict['turtlesync'] = turtleSyncBlock;
+    turtleSyncBlock.staticLabels.push(_('mouse sync'));
+    turtleSyncBlock.oneArgBlock();
+    turtleSyncBlock.adjustWidthToLabel();
+    turtleSyncBlock.dockTypes[1] = 'anyin';
+    turtleSyncBlock.defaults.push(_('Mr. Mouse'));
+
     var turtleNameBlock = new ProtoBlock('turtlename');
     turtleNameBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['turtlename'] = turtleNameBlock;
