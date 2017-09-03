@@ -2894,8 +2894,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     startTurtleBlock.adjustWidthToLabel();
     startTurtleBlock.oneArgBlock();
     startTurtleBlock.dockTypes[1] = 'anyin';
-    startTurtleBlock.defaults.push(_('Mr. Mouse'))
-;
+    startTurtleBlock.defaults.push(_('Mr. Mouse'));
 
     var turtlecolorBlock = new ProtoBlock('turtlecolor');
     turtlecolorBlock.palette = palettes.dict['mice'];
@@ -2905,41 +2904,47 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtlecolorBlock.adjustWidthToLabel();
     turtlecolorBlock.oneArgMathBlock();;
     turtlecolorBlock.dockTypes[1] = 'anyin';
-    turtlecolorBlock.defaults.push(_('Mr. Mouse'))
-;
+    turtlecolorBlock.defaults.push(_('Mr. Mouse'));
 
     var turtleheadingBlock = new ProtoBlock('turtleheading');
     turtleheadingBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['turtleheading'] = turtleheadingBlock;
     //.TRANS: heading (compass direction) for this mouse
     turtleheadingBlock.staticLabels.push(_('mouse heading'));
-    turtleheadingBlock.adjustWidthToLabel();
     turtleheadingBlock.oneArgMathBlock();;
+    turtleheadingBlock.adjustWidthToLabel();
     turtleheadingBlock.dockTypes[1] = 'anyin';
-    turtleheadingBlock.defaults.push(_('Mr. Mouse'))
-;
+    turtleheadingBlock.defaults.push(_('Mr. Mouse'));
 
     var turtleyBlock = new ProtoBlock('yturtle');
     turtleyBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['yturtle'] = turtleyBlock;
     //.TRANS: y position for this mouse
     turtleyBlock.staticLabels.push(_('mouse y'));
-    turtleyBlock.adjustWidthToLabel();
     turtleyBlock.oneArgMathBlock();
+    turtleyBlock.adjustWidthToLabel();
     turtleyBlock.dockTypes[1] = 'anyin';
-    turtleyBlock.defaults.push(_('Mr. Mouse'))
-;
+    turtleyBlock.defaults.push(_('Mr. Mouse'));
 
     var turtlexBlock = new ProtoBlock('xturtle');
     turtlexBlock.palette = palettes.dict['mice'];
     blocks.protoBlockDict['xturtle'] = turtlexBlock;
     //.TRANS: x position for this mouse
     turtlexBlock.staticLabels.push(_('mouse x'));
-    turtlexBlock.adjustWidthToLabel();
     turtlexBlock.oneArgMathBlock();
+    turtlexBlock.adjustWidthToLabel();
     turtlexBlock.dockTypes[1] = 'anyin';
-    turtlexBlock.defaults.push(_('Mr. Mouse'))
-;
+    turtlexBlock.defaults.push(_('Mr. Mouse'));
+
+    var turtleElapsedNotes = new ProtoBlock('turtleelapsednotes');
+    turtleElapsedNotes.palette = palettes.dict['mice'];
+    blocks.protoBlockDict['turtleelapsednotes'] = turtleElapsedNotes;
+    //.TRANS: notes played by this mouse
+    turtleElapsedNotes.staticLabels.push(_('mouse notes played'));
+    turtleElapsedNotes.oneArgMathBlock();
+    turtleElapsedNotes.adjustWidthToLabel();
+    turtleElapsedNotes.dockTypes[1] = 'anyin';
+    turtleElapsedNotes.defaults.push(_('Mr. Mouse'));
 
     var turtlePitchBlock = new ProtoBlock('turtlepitch');
     turtlePitchBlock.palette = palettes.dict['mice'];
@@ -2949,8 +2954,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtlePitchBlock.oneArgMathBlock();
     turtlePitchBlock.adjustWidthToLabel();
     turtlePitchBlock.dockTypes[1] = 'anyin';
-    turtlePitchBlock.defaults.push(_('Mr. Mouse'))
-;
+    turtlePitchBlock.defaults.push(_('Mr. Mouse'));
 
     var turtleNoteBlock = new ProtoBlock('turtlenote');
     turtleNoteBlock.palette = palettes.dict['mice'];
@@ -2960,8 +2964,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleNoteBlock.adjustWidthToLabel();
     turtleNoteBlock.dockTypes[1] = 'anyin';
     turtleNoteBlock.hidden = true;
-    turtleNoteBlock.defaults.push(_('Mr. Mouse'))
-;
+    turtleNoteBlock.defaults.push(_('Mr. Mouse'));
 
     var turtleNoteBlock2 = new ProtoBlock('turtlenote2');
     turtleNoteBlock2.palette = palettes.dict['mice'];
@@ -2970,8 +2973,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     turtleNoteBlock2.oneArgMathBlock();
     turtleNoteBlock2.adjustWidthToLabel();
     turtleNoteBlock2.dockTypes[1] = 'anyin';
-    turtleNoteBlock2.defaults.push(_('Mr. Mouse'))
-;
+    turtleNoteBlock2.defaults.push(_('Mr. Mouse'));
 
     var turtleNameBlock = new ProtoBlock('turtlename');
     turtleNameBlock.palette = palettes.dict['mice'];
