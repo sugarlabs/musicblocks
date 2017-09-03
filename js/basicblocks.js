@@ -2985,6 +2985,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTurtleName.dockTypes[2] = 'anyin';
     setTurtleName.defaults.push(-1);
     setTurtleName.defaults.push('Mozart');
+    setTurtleName.hidden = true;
+
+    var setTurtleName2 = new ProtoBlock('setturtlename2');
+    setTurtleName2.palette = palettes.dict['mice'];
+    blocks.protoBlockDict['setturtlename2'] = setTurtleName2;
+    setTurtleName2.staticLabels.push(_('mouse name'));
+    setTurtleName2.adjustWidthToLabel();
+    setTurtleName2.oneArgBlock();
+    setTurtleName2.dockTypes[1] = 'anyin';
+    setTurtleName2.defaults.push('Mozart');
 
     // Push protoblocks onto their palettes.
     for (var protoblock in blocks.protoBlockDict) {

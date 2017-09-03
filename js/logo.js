@@ -1967,6 +1967,11 @@ function Logo () {
                 that.turtles.turtleList[turtle].rename(args[1]);
             }
             break;
+        case 'setturtlename2':
+            if (args[0] != null) {
+                that.turtles.turtleList[turtle].rename(args[0]);
+            }
+            break;
         case 'startTurtle':
             var targetTurtle = that._getTargetTurtle(args);
             if (targetTurtle == null) {
