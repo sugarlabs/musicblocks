@@ -294,8 +294,9 @@ function TimbreWidget () {
 
     this._save = function () {
         // Just save a set timbre block with the current instrument name.
-        var obj = [[0, 'settimbre', 100, 100, [null, 1, null, 2]], [1, ['text', {'value': this.instrumentName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+        var obj = [[0, 'settimbre', 100 + this._delta, 100 + this._delta, [null, 1, null, 2]], [1, ['text', {'value': this.instrumentName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         this._logo.blocks.loadNewBlocks(obj);
+        this._delta += 42;
     };
 
     this._undo = function () {
@@ -465,6 +466,7 @@ function TimbreWidget () {
 
     this.init = function (logo) {
         this._logo = logo;
+        this._delta = 0;
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
