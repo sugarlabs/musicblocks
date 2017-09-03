@@ -44,7 +44,7 @@ processLilypondNotes = function (logo, turtle) {
             note = pitchObj[0] + pitchObj[1];
         }
 
-        return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',,').replace(/2/g, ',').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
+        return note.replace(/♯/g, 'is').replace(/♭/g, 'es').replace(/10/g, "''''''''").replace(/1/g, ',, ').replace(/2/g, ', ').replace(/3/g, '').replace(/4/g, "'").replace(/5/g, "''").replace(/6/g, "'''").replace(/7/g, "''''").replace(/8/g, "''''''").replace(/9/g, "'''''''").toLowerCase();
     };
 
     var noteCounter = 0;
@@ -336,7 +336,7 @@ saveLilypondOutput = function(logo, saveName) {
                 instrumentName = RODENTSEN[t % 12];
             }
 
-            instrumentName = instrumentName.replace(/ /g, '_');
+            instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
 
             logo.notationOutput += instrumentName + ' = {\n';
             logo.notationOutput += logo.notationNotes[t];
@@ -353,7 +353,7 @@ saveLilypondOutput = function(logo, saveName) {
                 shortInstrumentName = RODENTSSHORTEN[t % 12];
             }
 
-            logo.notationOutput += instrumentName.replace(/ /g, '_') + 'Voice = ';
+            logo.notationOutput += instrumentName.replace(/ /g, '_').replace('.', '') + 'Voice = ';
             if (logo.turtles.turtleList[t].drum) {
                 logo.notationOutput += '\\new DrumStaff \\with {\n';
                 // logo.notationOutput += '   \\drummode {\n      hihat4 hh bassdrum bd\n   }\n';
@@ -367,7 +367,7 @@ saveLilypondOutput = function(logo, saveName) {
             // Automatic note splitting
             logo.notationOutput += '\n   \\remove "Note_heads_engraver"\n   \\consists "Completion_heads_engraver"\n   \\remove "Rest_engraver"\n   \\consists "Completion_rest_engraver"\n'
 
-            logo.notationOutput += '} { \\clef "' + last(clef) + '" \\' + instrumentName.replace(/ /g, '_') + ' }\n\n';
+            logo.notationOutput += '} { \\clef "' + last(clef) + '" \\' + instrumentName.replace(/ /g, '_').replace('.', '') + ' }\n\n';
         }
         c += 1;
     }
@@ -388,7 +388,7 @@ saveLilypondOutput = function(logo, saveName) {
                     } else if (instrumentName === t.toString()) {
                         instrumentName = RODENTS[t % 12];
                     }
-                    instrumentName = instrumentName.replace(/ /g, '_');
+                    instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
                     logo.notationOutput += '      \\' + instrumentName + 'Voice\n';
                 }
             }
@@ -408,8 +408,8 @@ saveLilypondOutput = function(logo, saveName) {
                     } else if (instrumentName === t.toString()) {
                         instrumentName = RODENTS[t % 12];
                     }
-                    instrumentName = instrumentName.replace(/ /g, '_');
-                    logo.notationOutput += '         \\context TabVoice = "'+ instrumentName + '" \\' + instrumentName.replace(/ /g, '_') + '\n';
+                    instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
+                    logo.notationOutput += '         \\context TabVoice = "'+ instrumentName + '" \\' + instrumentName.replace(/ /g, '_').replace('.', '') + '\n';
                 }
             }
         }
