@@ -570,7 +570,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     pitchsliderBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['pitchslider'] = pitchsliderBlock;
     //.TRANS: widget to generate pitches using a slider
-    pitchsliderBlock.staticLabels.push(_('pitchslider'));
+    pitchsliderBlock.staticLabels.push(_('pitch slider'));
     pitchsliderBlock.adjustWidthToLabel();
     pitchsliderBlock.stackClampZeroArgBlock();
 
@@ -629,7 +629,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     onBeatDoBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['onbeatdo'] = onBeatDoBlock;
     // #TRANS: 'on' musical 'beat' 'do' some action
-    onBeatDoBlock.staticLabels.push(_('on'), _('beat'), _('do'));
+    onBeatDoBlock.staticLabels.push(_('on beat'), _('beat'), _('do'));
     onBeatDoBlock.twoArgBlock();
     onBeatDoBlock.defaults.push(1);
     onBeatDoBlock.defaults.push(_('action'));

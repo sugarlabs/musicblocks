@@ -4171,7 +4171,8 @@ function Logo () {
             var depth = (args[1] / 100);
 
             if (depth < 0 || depth > 1) {
-                that.errorMsg(_('Depth entered is out of range'), blk);
+                //.TRANS: Depth is the intesity of the tremolo effect.
+                that.errorMsg(_('Depth is out of range.'), blk);
                 that.stopTurtle = true;
             }
 
@@ -4238,7 +4239,8 @@ function Logo () {
             var chorusDepth = (args[2] / 100);
 
             if (chorusDepth < 0 || chorusDepth > 1) {
-                that.errorMsg(_('Depth entered is out of range'), blk);
+                //.TRANS: Depth is the intesity of the chorus effect.
+                that.errorMsg(_('Depth is out of range.'), blk);
                 that.stopTurtle = true;
             }
 
