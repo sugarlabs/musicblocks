@@ -71,7 +71,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var currentNoteBlock = new ProtoBlock('currentnote');
     currentNoteBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['currentnote'] = currentNoteBlock;
-    currentNoteBlock.staticLabels.push(_('current pitch name'));
+    currentNoteBlock.staticLabels.push('current pitch name');
     currentNoteBlock.hidden = true;
     currentNoteBlock.adjustWidthToLabel();
     currentNoteBlock.parameterBlock();
@@ -80,7 +80,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var currentOctaveBlock = new ProtoBlock('currentoctave');
     currentOctaveBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['currentoctave'] = currentOctaveBlock;
-    currentOctaveBlock.staticLabels.push(_('current pitch octave'));
+    currentOctaveBlock.staticLabels.push('current pitch octave');
     currentOctaveBlock.hidden = true;
     currentOctaveBlock.adjustWidthToLabel();
     currentOctaveBlock.parameterBlock();
@@ -90,6 +90,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     squareBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['square'] = squareBlock;
     squareBlock.hidden = true;
+    //.TRANS: square wave
     squareBlock.staticLabels.push(_('square'));
     squareBlock.adjustWidthToLabel();
     squareBlock.oneArgBlock();
@@ -100,6 +101,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     triangleBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['triangle'] = triangleBlock;
     triangleBlock.hidden = true;
+    //.TRANS: triangle wave
     triangleBlock.staticLabels.push(_('triangle'));
     triangleBlock.adjustWidthToLabel();
     triangleBlock.oneArgBlock();
@@ -110,6 +112,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sineBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['sine'] = sineBlock;
     sineBlock.hidden = true;
+    //.TRANS: sine wave
     sineBlock.staticLabels.push(_('sine'));
     sineBlock.adjustWidthToLabel();
     sineBlock.oneArgBlock();
@@ -120,6 +123,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     sawtoothBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['sawtooth'] = sawtoothBlock;
     sawtoothBlock.hidden = true;
+    //.TRANS: sawtooth wave
     sawtoothBlock.staticLabels.push(_('sawtooth'));
     sawtoothBlock.adjustWidthToLabel();
     sawtoothBlock.oneArgBlock();
@@ -129,6 +133,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var transposition = new ProtoBlock('transpositionfactor');
     transposition.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['transpositionfactor'] = transposition;
+    //.TRANS: musical transposition (adjustment of pitch up or down)
     transposition.staticLabels.push(_('transposition'));
     transposition.adjustWidthToLabel();
     transposition.parameterBlock();
@@ -160,6 +165,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var midiBlock = new ProtoBlock('midi');
     midiBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['midi'] = midiBlock;
+    //.TRANS: MIDI is a technical standard for electronic music
     midiBlock.staticLabels.push('MIDI');
     midiBlock.adjustWidthToLabel();
     midiBlock.zeroArgBlock();
@@ -167,6 +173,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var setPitchNumberOffsetBlock = new ProtoBlock('setpitchnumberoffset');
     setPitchNumberOffsetBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['setpitchnumberoffset'] = setPitchNumberOffsetBlock;
+    //.TRANS: set an offset associated with the numeric piano keyboard mapping
     setPitchNumberOffsetBlock.staticLabels.push(_('set pitch number offset'), _('name'), _('octave'));
     setPitchNumberOffsetBlock.adjustWidthToLabel();
     setPitchNumberOffsetBlock.twoArgBlock();
@@ -222,6 +229,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var invertBlock = new ProtoBlock('invert1');
     invertBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invert1'] = invertBlock;
+    //.TRANS: pitch inversion rotates a pitch around another pitch
     invertBlock.staticLabels.push(_('invert'), _('name'), _('octave'), _('even') + '/' + _('odd'));
     invertBlock.adjustWidthToLabel();
     invertBlock.flowClampThreeArgBlock();
@@ -236,6 +244,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var invertBlock2 = new ProtoBlock('invert2');
     invertBlock2.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invert2'] = invertBlock2;
+    //.TRANS: pitch inversion rotates a pitch around another pitch
     invertBlock2.staticLabels.push(_('invert (odd)'), _('note'), _('octave'));
     invertBlock2.adjustWidthToLabel();
     invertBlock2.flowClampTwoArgBlock();
@@ -249,6 +258,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var invertBlock = new ProtoBlock('invert');
     invertBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['invert'] = invertBlock;
+    //.TRANS: pitch inversion rotates a pitch around another pitch
     invertBlock.staticLabels.push(_('invert (even)'), _('note'), _('octave'));
     invertBlock.adjustWidthToLabel();
     invertBlock.flowClampTwoArgBlock();
@@ -262,6 +272,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var transpositionBlock = new ProtoBlock('settransposition');
     transpositionBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['settransposition'] = transpositionBlock;
+    //.TRANS: adjust the amount of shift (up or down) of a pitch
     transpositionBlock.staticLabels.push(_('adjust transposition'));
     transpositionBlock.adjustWidthToLabel();
     transpositionBlock.defaults.push('1');
@@ -270,6 +281,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var octaveBlock = new ProtoBlock('octave');
     octaveBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['octave'] = octaveBlock;
+    //.TRANS: adjusts the shift up or down by one octave (the number of half-steps in the interval between two notes, one having twice or half the frequency of the other.
     octaveBlock.staticLabels.push(_('octave'));
     octaveBlock.adjustWidthToLabel();
     octaveBlock.zeroArgBlock();
@@ -277,6 +289,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var flatBlock = new ProtoBlock('flat');
     flatBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['flat'] = flatBlock;
+    //.TRANS: flat is a half-step down in pitch
     flatBlock.staticLabels.push(_('flat'));
     flatBlock.adjustWidthToLabel();
     flatBlock.flowClampZeroArgBlock();
@@ -284,6 +297,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var sharpBlock = new ProtoBlock('sharp');
     sharpBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['sharp'] = sharpBlock;
+    //.TRANS: sharp is a half-step up in pitch
     sharpBlock.staticLabels.push(_('sharp'));
     sharpBlock.adjustWidthToLabel();
     sharpBlock.flowClampZeroArgBlock();
@@ -291,6 +305,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var hertzBlock = new ProtoBlock('hertz');
     hertzBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['hertz'] = hertzBlock;
+    //.TRANS: a measure of frequency: one cycle per second
     hertzBlock.staticLabels.push(_('hertz'));
     hertzBlock.adjustWidthToLabel();
     hertzBlock.oneArgBlock();
@@ -299,6 +314,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitchNumberBlock = new ProtoBlock('pitchnumber');
     pitchNumberBlock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['pitchnumber'] = pitchNumberBlock;
+    //.TRANS: a mapping of pitch to the 88 piano keys
     pitchNumberBlock.staticLabels.push(_('pitch number'));
     pitchNumberBlock.adjustWidthToLabel();
     pitchNumberBlock.oneArgBlock();
@@ -308,9 +324,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     var scaleDegree = new ProtoBlock('scaledegree');
     scaleDegree.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['scaledegree'] = scaleDegree;
+    //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
     scaleDegree.staticLabels.push(_('scale degree'), _('number'), _('octave'));
     scaleDegree.adjustWidthToLabel();
-    scaleDegree.defaults.push(5); // G in C Major
+    scaleDegree.defaults.push(5);  // G in C Major
     scaleDegree.defaults.push(4);
     scaleDegree.twoArgBlock();
     scaleDegree.dockTypes[1] = 'numberin';
@@ -329,6 +346,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitch = new ProtoBlock('pitch');
     pitch.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['pitch'] = pitch;
+    //.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
     pitch.staticLabels.push(_('pitch'), _('name'), _('octave'));
     pitch.adjustWidthToLabel();
     pitch.defaults.push('sol');
@@ -342,9 +360,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     var oscillatorBlock = new ProtoBlock('oscillator');
     oscillatorBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['oscillator'] = oscillatorBlock;
+    //.TRANS: there are different types (sine, triangle, square...) of oscillators. Partials refers to the number of sine waves combined into the sound.
     oscillatorBlock.staticLabels.push(_('oscillator'), _('type'), _('partials'));
     oscillatorBlock.extraWidth = 10;
     oscillatorBlock.adjustWidthToLabel();
+    //.TRANS: triangle wave
     oscillatorBlock.defaults.push(_('triangle'));
     oscillatorBlock.defaults.push(6);
     oscillatorBlock.hidden = true;
@@ -369,7 +389,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     var envelopeBlock = new ProtoBlock('envelope');
     envelopeBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['envelope'] = envelopeBlock;
-    envelopeBlock.staticLabels.push(_('envelope'), _('attack'), _('decay'), _('sustain'), _('release'));
+    //.TRANS: sound envelope (ADSR)
+    envelopeBlock.staticLabels.push(_('envelope'));
+    //.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
+    envelopeBlock.staticLabels.push(_('attack'));
+    //.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
+    envelopeBlock.staticLabels.push(_('decay'));
+    //.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
+    envelopeBlock.staticLabels.push(_('sustain'));
+    //.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
+    envelopeBlock.staticLabels.push(_('release'));
     envelopeBlock.extraWidth = 10;
     envelopeBlock.adjustWidthToLabel();
     envelopeBlock.defaults.push(1);
@@ -386,10 +415,16 @@ function initBasicProtoBlocks(palettes, blocks) {
     var filterBlock = new ProtoBlock('filter');
     filterBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['filter'] = filterBlock;
+    //.TRANS: a filter removes some unwanted components from a signal
+    filterBlock.staticLabels.push(_('filter'));
+    //.TRANS: type of filter, e.g., lowpass, highpass, etc.
+    filterBlock.staticLabels.push(_('type'));
     //.TRANS: rolloff is the steepness of a change in frequency.
-    filterBlock.staticLabels.push(_('filter'), _('type'), _('rolloff'), _('frequency'));
+    filterBlock.staticLabels.push(_('rolloff'));
+    filterBlock.staticLabels.push(_('frequency'));
     filterBlock.extraWidth = 10;
     filterBlock.adjustWidthToLabel();
+    //.TRANS: highpass filter
     filterBlock.defaults.push(_('highpass'));
     filterBlock.defaults.push(-12);
     filterBlock.defaults.push(392);
@@ -451,7 +486,10 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tuplet2Block = new ProtoBlock('tuplet2');
     tuplet2Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['tuplet2'] = tuplet2Block;
-    tuplet2Block.staticLabels.push(_('tuplet'), _('number of notes'), _('note value'));
+    //.TRANS: A tuplet is a note value divided into irregular time values.
+    tuplet2Block.staticLabels.push(_('tuplet'));
+    tuplet2Block.staticLabels.push(_('number of notes'));
+    tuplet2Block.staticLabels.push(_('note value'));
     tuplet2Block.extraWidth = 20;
     tuplet2Block.adjustWidthToLabel();
     tuplet2Block.flowClampTwoArgBlock();
@@ -482,6 +520,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var simpleTuplet7Block = new ProtoBlock('stuplet7');
     simpleTuplet7Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['stuplet7'] = simpleTuplet7Block;
+    //.TRANS: A tuplet divided into 7 time values.
     simpleTuplet7Block.staticLabels.push(_('septuplet'));
     simpleTuplet7Block.adjustWidthToLabel();
     simpleTuplet7Block.zeroArgBlock();
@@ -489,6 +528,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var simpleTuplet5Block = new ProtoBlock('stuplet5');
     simpleTuplet5Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['stuplet5'] = simpleTuplet5Block;
+    //.TRANS: A tuplet divided into 5 time values.
     simpleTuplet5Block.staticLabels.push(_('quintuplet'));
     simpleTuplet5Block.adjustWidthToLabel();
     simpleTuplet5Block.zeroArgBlock();
@@ -496,6 +536,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var simpleTuplet3Block = new ProtoBlock('stuplet3');
     simpleTuplet3Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['stuplet3'] = simpleTuplet3Block;
+    //.TRANS: A tuplet divided into 3 time values.
     simpleTuplet3Block.staticLabels.push(_('triplet'));
     simpleTuplet3Block.adjustWidthToLabel();
     simpleTuplet3Block.zeroArgBlock();
@@ -538,6 +579,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var timbreBlock = new ProtoBlock('timbre');
     timbreBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['timbre'] = timbreBlock;
+    //.TRANS: timbre is the character or quality of a musical sound
     timbreBlock.staticLabels.push(_('timbre'));
     timbreBlock.extraWidth = 20;
     timbreBlock.adjustWidthToLabel();
@@ -562,6 +604,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitchDrumMatrixBlock = new ProtoBlock('pitchdrummatrix');
     pitchDrumMatrixBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['pitchdrummatrix'] = pitchDrumMatrixBlock;
+    //.TRANS: makes a mapping between pitches and drum sounds
     pitchDrumMatrixBlock.staticLabels.push(_('pitch-drum mapper'));
     pitchDrumMatrixBlock.adjustWidthToLabel();
     pitchDrumMatrixBlock.stackClampZeroArgBlock();
@@ -577,6 +620,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pitchstaircaseBlock = new ProtoBlock('pitchstaircase');
     pitchstaircaseBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['pitchstaircase'] = pitchstaircaseBlock;
+    //.TRANS: generate a progressive sequence of pitches
     pitchstaircaseBlock.staticLabels.push(_('pitch staircase'));
     pitchstaircaseBlock.adjustWidthToLabel();
     pitchstaircaseBlock.stackClampZeroArgBlock();
@@ -601,6 +645,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var matrixBlock = new ProtoBlock('matrix');
     matrixBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['matrix'] = matrixBlock;
+    //.TRANS: assigns pitch to a sequence of beats to generate a melody
     matrixBlock.staticLabels.push(_('pitch-time matrix'));
     matrixBlock.adjustWidthToLabel();
     matrixBlock.stackClampZeroArgBlock();
@@ -674,6 +719,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var noteCounter = new ProtoBlock('notecounter');
     noteCounter.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['notecounter'] = noteCounter;
+    //.TRANS: count the number of notes
     noteCounter.staticLabels.push(_('note counter'));
     noteCounter.argFlowClampBlock();
     noteCounter.adjustWidthToLabel();
@@ -689,7 +735,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var duplicateFactor = new ProtoBlock('duplicatefactor');
     duplicateFactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatefactor'] = duplicateFactor;
-    duplicateFactor.staticLabels.push(_('duplicate factor'));
+    duplicateFactor.staticLabels.push('duplicate factor');
     duplicateFactor.adjustWidthToLabel();
     duplicateFactor.parameterBlock();
     duplicateFactor.hidden = true;
@@ -697,7 +743,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var skipFactor = new ProtoBlock('skipfactor');
     skipFactor.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['skipfactor'] = skipFactor;
-    skipFactor.staticLabels.push(_('skip factor'));
+    skipFactor.staticLabels.push('skip factor');
     skipFactor.adjustWidthToLabel();
     skipFactor.parameterBlock();
     skipFactor.hidden = true;
@@ -729,6 +775,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var bpmBlock = new ProtoBlock('bpmfactor');
     bpmBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['bpmfactor'] = bpmBlock;
+    //.TRANS: number of beats played per minute
     bpmBlock.staticLabels.push(_('beats per minute'));
     bpmBlock.adjustWidthToLabel();
     bpmBlock.parameterBlock();
@@ -736,6 +783,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var driftBlock = new ProtoBlock('drift');
     driftBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['drift'] = driftBlock;
+    //.TRANS: don't lock notes to master clock ('run free')
     driftBlock.staticLabels.push(_('free time'));
     driftBlock.adjustWidthToLabel();
     driftBlock.flowClampZeroArgBlock();
@@ -752,6 +800,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var swingBlock = new ProtoBlock('swing');
     swingBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['swing'] = swingBlock;
+    //.TRANS: swing is a rhythmic variation that emphasises the offbeat
     swingBlock.staticLabels.push(_('swing'));
     swingBlock.adjustWidthToLabel();
     swingBlock.flowClampOneArgBlock();
@@ -761,6 +810,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var newswingBlock = new ProtoBlock('newswing');
     newswingBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newswing'] = newswingBlock;
+    //.TRANS: swing is a rhythmic variation that emphasises the offbeat
     newswingBlock.staticLabels.push(_('swing'));
     newswingBlock.adjustWidthToLabel();
     newswingBlock.flowClampOneArgBlock();
@@ -770,7 +820,11 @@ function initBasicProtoBlocks(palettes, blocks) {
     var newswingBlock = new ProtoBlock('newswing2');
     newswingBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newswing2'] = newswingBlock;
-    newswingBlock.staticLabels.push(_('swing'), _('swing value'), _('note value'));
+    newswingBlock.staticLabels.push(_('swing'));
+    //.TRANS: the amount to shift to the offbeat note
+    newswingBlock.staticLabels.push(_('swing value'));
+    //.TRANS: the notes which will be shifted
+    newswingBlock.staticLabels.push(_('note value'));
     newswingBlock.extraWidth = 20;
     newswingBlock.adjustWidthToLabel();
     newswingBlock.flowClampTwoArgBlock();
@@ -788,6 +842,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var backwardBlock = new ProtoBlock('backward');
     backwardBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['backward'] = backwardBlock;
+    //.TRANS: play music backward
     backwardBlock.staticLabels.push(_('backward'));
     backwardBlock.adjustWidthToLabel();
     backwardBlock.flowClampZeroArgBlock();
@@ -795,6 +850,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var skipNotesBlock = new ProtoBlock('skipnotes');
     skipNotesBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['skipnotes'] = skipNotesBlock;
+    //.TRANS: substitute rests on notes being skipped
     skipNotesBlock.staticLabels.push(_('skip notes'));
     skipNotesBlock.adjustWidthToLabel();
     skipNotesBlock.flowClampOneArgBlock();
@@ -803,6 +859,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var duplicateNotesBlock = new ProtoBlock('duplicatenotes');
     duplicateNotesBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['duplicatenotes'] = duplicateNotesBlock;
+    //.TRANS: play each note more than once
     duplicateNotesBlock.staticLabels.push(_('duplicate notes'));
     duplicateNotesBlock.adjustWidthToLabel();
     duplicateNotesBlock.flowClampOneArgBlock();
@@ -837,6 +894,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var rhythmicdotBlock = new ProtoBlock('rhythmicdot');
     rhythmicdotBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['rhythmicdot'] = rhythmicdotBlock;
+    //.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
     rhythmicdotBlock.staticLabels.push(_('dot'));
     rhythmicdotBlock.adjustWidthToLabel();
     rhythmicdotBlock.flowClampZeroArgBlock();
@@ -851,6 +909,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note4Block = new ProtoBlock('note4');
     note4Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note4'] = note4Block;
+    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     note4Block.staticLabels.push(_('note value') + ' ' + _('drum'));
     note4Block.adjustWidthToLabel();
     note4Block.zeroArgBlock();
@@ -858,6 +917,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note3Block = new ProtoBlock('note3');
     note3Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note3'] = note3Block;
+    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     note3Block.staticLabels.push(_('note value') + ' ' + _('392 hertz'));
     note3Block.adjustWidthToLabel();
     note3Block.zeroArgBlock();
@@ -865,6 +925,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note2Block = new ProtoBlock('note2');
     note2Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note2'] = note2Block;
+    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     note2Block.staticLabels.push(_('note value') + ' ' + 'G4');
     note2Block.adjustWidthToLabel();
     note2Block.zeroArgBlock();
@@ -872,6 +933,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note1Block = new ProtoBlock('note1');
     note1Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note1'] = note1Block;
+    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     note1Block.staticLabels.push(_('note value') + ' ' + i18nSolfege('sol') + '4');
     note1Block.adjustWidthToLabel();
     note1Block.zeroArgBlock();
@@ -880,7 +942,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     noteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note'] = noteBlock;
     noteBlock.hidden = true;
-    noteBlock.staticLabels.push('deprecated ' + _('note value'));
+    noteBlock.staticLabels.push('deprecated note value');
     noteBlock.adjustWidthToLabel();
     noteBlock.flowClampOneArgBlock();
     noteBlock.defaults.push(4);
@@ -888,6 +950,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var newnoteBlock = new ProtoBlock('newnote');
     newnoteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newnote'] = newnoteBlock;
+    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     newnoteBlock.staticLabels.push(_('note value'));
     newnoteBlock.adjustWidthToLabel();
     newnoteBlock.flowClampOneArgBlock();
@@ -922,6 +985,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var keyBlock = new ProtoBlock('key');
     keyBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['key'] = keyBlock;
+    //.TRANS: the key is a group of pitches with which a music composition is created
     keyBlock.staticLabels.push(_('key'));
     keyBlock.adjustWidthToLabel();
     keyBlock.parameterBlock();
@@ -958,6 +1022,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var amSynthBlock = new ProtoBlock('amsynth');
     amSynthBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['amsynth'] = amSynthBlock;
+    //.TRANS: AM (amplitude modulation) synthesizer
     amSynthBlock.staticLabels.push(_('AM synth'));
     amSynthBlock.extraWidth = 10;
     amSynthBlock.adjustWidthToLabel();
@@ -968,6 +1033,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var fmSynthBlock = new ProtoBlock('fmsynth');
     fmSynthBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['fmsynth'] = fmSynthBlock;
+    //.TRANS: FM (frequency modulation) synthesizer
     fmSynthBlock.staticLabels.push(_('FM synth'));
     fmSynthBlock.extraWidth = 10;
     fmSynthBlock.adjustWidthToLabel();
@@ -977,7 +1043,9 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     var duoSynthBlock = new ProtoBlock('duosynth');
     duoSynthBlock.palette = palettes.dict['tone'];
+
     blocks.protoBlockDict['duosynth'] = duoSynthBlock;
+    //.TRANS: a duo synthesizer combines a synth with a sequencer
     duoSynthBlock.staticLabels.push(_('duo synth'), _('vibrato rate'), _('vibrato intensity'));
     duoSynthBlock.extraWidth = 10;
     duoSynthBlock.adjustWidthToLabel();
@@ -996,6 +1064,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var distortionBlock = new ProtoBlock('dis');
     distortionBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['dis'] = distortionBlock;
+    //.TRANS: distortion is an alteration in the sound
     distortionBlock.staticLabels.push(_('distortion'));
     distortionBlock.adjustWidthToLabel();
     distortionBlock.flowClampOneArgBlock();
@@ -1005,7 +1074,12 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tremoloBlock = new ProtoBlock('tremolo');
     tremoloBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['tremolo'] = tremoloBlock;
-    tremoloBlock.staticLabels.push(_('tremolo'), _('rate'), _('depth'));
+    //.TRANS: a wavering effect in a musical tone
+    tremoloBlock.staticLabels.push(_('tremolo'));
+    //.TRANS: rate at which tremolo wavers
+    tremoloBlock.staticLabels.push(_('rate'));
+    //.TRANS: amplitude of tremolo waver
+    tremoloBlock.staticLabels.push(_('depth'));
     tremoloBlock.adjustWidthToLabel();
     tremoloBlock.flowClampTwoArgBlock();
     tremoloBlock.dockTypes[1] = 'numberin';
@@ -1016,7 +1090,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     var phaserBlock = new ProtoBlock('phaser');
     phaserBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['phaser'] = phaserBlock;
-    phaserBlock.staticLabels.push(_('phaser'), _('rate'), _('octaves'), _('base frequency'));
+    //.TRANS: alter the phase of the sound
+    phaserBlock.staticLabels.push(_('phaser'));
+    phaserBlock.staticLabels.push(_('rate'), _('octaves'), _('base frequency'));
     phaserBlock.adjustWidthToLabel();
     phaserBlock.flowClampThreeArgBlock();
     phaserBlock.dockTypes[1] = 'numberin';
@@ -1051,6 +1127,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var voiceBlock = new ProtoBlock('setvoice');
     voiceBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setvoice'] = voiceBlock;
+    //.TRANS: select synthesizer
     voiceBlock.staticLabels.push(_('set synth'));
     voiceBlock.adjustWidthToLabel();
     voiceBlock.flowClampOneArgBlock();
@@ -1141,7 +1218,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var crescendoBlock = new ProtoBlock('crescendo');
     crescendoBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['crescendo'] = crescendoBlock;
-    crescendoBlock.staticLabels.push(_('crescendo')+" +/-");
+    crescendoBlock.staticLabels.push(_('crescendo') + ' +/-');
     crescendoBlock.adjustWidthToLabel();
     crescendoBlock.flowClampOneArgBlock();
     crescendoBlock.defaults.push(5);
@@ -1175,15 +1252,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     setTimbreBlock.dockTypes[1] = 'textin';
     setTimbreBlock.defaults.push(_('custom'));
     
-    /*var setTimbreBlock = new ProtoBlock('settimbre');
-    setTimbreBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['settimbre'] = setTimbreBlock;
-    setTimbreBlock.staticLabels.push(_('set timbre'));
-    setTimbreBlock.adjustWidthToLabel();
-    setTimbreBlock.flowClampOneArgBlock();
-    setTimbreBlock.defaults.push(_('custom'));
-    */
-
     var newslurBlock = new ProtoBlock('newslur');
     newslurBlock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['newslur'] = newslurBlock;
