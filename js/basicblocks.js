@@ -511,7 +511,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tuplet3Block = new ProtoBlock('tuplet3');
     tuplet3Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['tuplet3'] = tuplet3Block;
-    //.TRANS: A tuplet is a note value divided into irregular time values.
     tuplet3Block.staticLabels.push(_('tuplet'));
     tuplet3Block.staticLabels.push(_('number of notes'), _('note value'));
     tuplet3Block.extraWidth = 20;
@@ -524,7 +523,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     var tuplet4Block = new ProtoBlock('tuplet4');
     tuplet4Block.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['tuplet4'] = tuplet4Block;
-    //.TRANS: A tuplet is a note value divided into irregular time values.
     tuplet4Block.staticLabels.push(_('tuplet'));
     tuplet4Block.staticLabels.push(_('note value'));
     tuplet4Block.extraWidth = 20;
@@ -559,7 +557,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     var simpleTupletBlock = new ProtoBlock('stuplet');
     simpleTupletBlock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['stuplet'] = simpleTupletBlock;
-    //.TRANS: A tuplet is a note value divided into irregular time values.
     simpleTupletBlock.staticLabels.push(_('simple tuplet'));
     simpleTupletBlock.staticLabels.push(_('number of notes'), _('note value'));
     simpleTupletBlock.adjustWidthToLabel();
@@ -707,7 +704,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var measureValueBlock = new ProtoBlock('measurevalue');
     measureValueBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['measurevalue'] = measureValueBlock;
-    // .TRANS: count of current measure in meter
+    //.TRANS: count of current measure in meter
     measureValueBlock.staticLabels.push(_('measure count'));
     measureValueBlock.adjustWidthToLabel();
     measureValueBlock.parameterBlock();
@@ -715,7 +712,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var beatValueBlock = new ProtoBlock('beatvalue');
     beatValueBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['beatvalue'] = beatValueBlock;
-    // .TRANS: count of current beat in meter
+    //.TRANS: count of current beat in meter
     beatValueBlock.staticLabels.push(_('beat count'));
     beatValueBlock.adjustWidthToLabel();
     beatValueBlock.parameterBlock();
@@ -723,7 +720,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var pickupBlock = new ProtoBlock('pickup');
     pickupBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['pickup'] = pickupBlock;
-    // .TRANS: anacrusis
+    //.TRANS: anacrusis
     pickupBlock.staticLabels.push(_('pickup'));
     pickupBlock.oneArgBlock();
     pickupBlock.defaults.push(0);
@@ -731,8 +728,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     var meter = new ProtoBlock('meter');
     meter.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['meter'] = meter;
-    // .TRANS: musical meter (time signature)
-    meter.staticLabels.push(_('meter'), _('number of beats'), _('note value'));
+    //.TRANS: musical meter (time signature)
+    meter.staticLabels.push(_('meter'));
+    meter.staticLabels.push(_('number of beats'), _('note value'));
     meter.extraWidth = 15;
     meter.adjustWidthToLabel();
     meter.defaults.push(4);
