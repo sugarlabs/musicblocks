@@ -846,7 +846,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     newswingBlock.staticLabels.push(_('swing'));
     //.TRANS: the amount to shift to the offbeat note
     newswingBlock.staticLabels.push(_('swing value'));
-    //.TRANS: the notes which will be shifted
     newswingBlock.staticLabels.push(_('note value'));
     newswingBlock.extraWidth = 20;
     newswingBlock.adjustWidthToLabel();
@@ -932,7 +931,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note4Block = new ProtoBlock('note4');
     note4Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note4'] = note4Block;
-    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     note4Block.staticLabels.push(_('note value') + ' ' + _('drum'));
     note4Block.adjustWidthToLabel();
     note4Block.zeroArgBlock();
@@ -940,7 +938,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note3Block = new ProtoBlock('note3');
     note3Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note3'] = note3Block;
-    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     note3Block.staticLabels.push(_('note value') + ' ' + _('392 hertz'));
     note3Block.adjustWidthToLabel();
     note3Block.zeroArgBlock();
@@ -948,7 +945,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note2Block = new ProtoBlock('note2');
     note2Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note2'] = note2Block;
-    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     note2Block.staticLabels.push(_('note value') + ' ' + 'G4');
     note2Block.adjustWidthToLabel();
     note2Block.zeroArgBlock();
@@ -956,7 +952,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     var note1Block = new ProtoBlock('note1');
     note1Block.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['note1'] = note1Block;
-    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     note1Block.staticLabels.push(_('note value') + ' ' + i18nSolfege('sol') + '4');
     note1Block.adjustWidthToLabel();
     note1Block.zeroArgBlock();
@@ -973,7 +968,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     var newnoteBlock = new ProtoBlock('newnote');
     newnoteBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['newnote'] = newnoteBlock;
-    //.TRANS: the temporal value of a note, e.g., 1/4, 1/8...
     newnoteBlock.staticLabels.push(_('note value'));
     newnoteBlock.adjustWidthToLabel();
     newnoteBlock.flowClampOneArgBlock();
@@ -1354,7 +1348,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     blocks.protoBlockDict['diminishedx'] = diminishedxBlock;
     //.TRANS: the "diminished" interval in music
     diminishedxBlock.staticLabels.push(_('diminished'));
-    diminishedxBlock.staticLabels.push(_('interval'), _('octave') + '+/-');
+    //.TRANS: the number of half-steps between notes
+    diminishedxBlock.staticLabels.push(_('interval'));
+    diminishedxBlock.staticLabels.push(_('octave') + '+/-');
     diminishedxBlock.extraWidth = 20;
     diminishedxBlock.adjustWidthToLabel();
     diminishedxBlock.flowClampTwoArgBlock();
