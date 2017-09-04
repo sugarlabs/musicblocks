@@ -1500,13 +1500,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     dogBlock.adjustWidthToLabel();
     dogBlock.oneArgBlock();
 
-    var pluckBlock = new ProtoBlock('pluck');
-    pluckBlock.palette = palettes.dict['drum'];
-    blocks.protoBlockDict['pluck'] = pluckBlock;
-    pluckBlock.staticLabels.push(_('pluck'));
-    pluckBlock.adjustWidthToLabel();
-    pluckBlock.oneArgBlock();
-
     var bottleBlock = new ProtoBlock('bottle');
     bottleBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['bottle'] = bottleBlock;
