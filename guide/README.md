@@ -433,11 +433,15 @@ If we put our song into an action...
 
 It gets more interesting if we shift up and down octaves.
 
-![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg "ringing the various voices offset in time")
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices4.svg playing the various voices offset in time")
 
 And even more interesting if we bring the various voices offset in time.
 
 [RUN LIVE](http://walterbender.github.io/musicblocks/?file=MusicBlocks_frerejacques.tb)
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices5.svg "queuing the various voices using events")
+
+An alternative to use a preprogrammed delay is to use the *Broadcast* block to bring in multiple voices. In the example above, after each section of the song is played, a new event is broadcasted, bringing in a new voice. Note the use of the *Mouse Sync* block. This ensures that the multiple voices are synced to the same master clock.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick drum")
 
