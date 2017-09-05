@@ -134,7 +134,7 @@ def clear():
         'palette-stroke': 'PALETTESTROKECOLORS',
         'palette-highlight': 'PALETTEHIGHLIGHTCOLORS',
         'palette-stroke-highlight': 'HIGHLIGHTSTROKECOLORS'}
-    JS_TYPES = ('flow', 'arg', 'block', 'parameter', 'setter')
+    JS_TYPES = ('flow', 'arg', 'block', 'parameter', 'setter', 'onload', 'onstart', 'onstop')
     # 'blkName': 'imageData',
     IMAGES = {}
 
