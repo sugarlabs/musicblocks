@@ -118,6 +118,15 @@ Example:
 //* palette-fill:food *// #FFFFFF
 //* palette-stroke:food *// #A0A0A0
 //* palette-highlight:food *// #D5D5D5
+
+Plugins can specify code to be executed on load, on start, and on stop.
+Example:
+
+//* onload:foo *//
+your code here...
+
+NOTE: name of on load, on start, and on stop sections must match the
+name of one of the plugin blocks.
 '''
 
 
@@ -129,6 +138,9 @@ def clear():
         'block': 'BLOCKPLUGINS',
         'parameter': 'PARAMETERPLUGINS',
         'setter': 'SETTERPLUGINS',
+        'onload': 'ONLOAD',
+        'onstart': 'ONSTART',
+        'onstop': 'ONSTOP',
         'palette-icon': 'PALETTEPLUGINS',
         'palette-fill': 'PALETTEFILLCOLORS',
         'palette-stroke': 'PALETTESTROKECOLORS',
