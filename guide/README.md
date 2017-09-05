@@ -441,7 +441,11 @@ And even more interesting if we bring the various voices offset in time.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/voices5.svg "queuing the various voices using events")
 
-An alternative to use a preprogrammed delay is to use the *Broadcast* block to bring in multiple voices. In the example above, after each section of the song is played, a new event is broadcasted, bringing in a new voice. Note the use of the *Mouse Sync* block. This ensures that the multiple voices are synced to the same master clock.
+An alternative to use a preprogrammed delay is to use the *Broadcast*
+block to bring in multiple voices. In the example above, after each
+section of the song is played, a new event is broadcasted, bringing in
+a new voice. Note the use of the *Mouse Sync* block. This ensures that
+the multiple voices are synced to the same master clock.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/drum3.svg "usage of kick drum")
 
@@ -480,6 +484,12 @@ master clock. The "Free-time* block prioritizes the sequence of
 actions over the specified rhythm.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png "rhythm sequence")
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics5.svg "using beat to synchronize graphics")
+
+Another approach to graphics is to use modulate them based on the beat. In the exxample above, we call the same graphics action for each note, but the parameters associated with the action, such as pen width, are dependent upon which beat we are on. On Beat 1, the pen size is set to 50 and the volume to 75. On Beat 3, the pen size is set to 25 and the volume to 50. On off beats, the pen size is set to 5 and the volumne to 5. The resultant graphic is shown below.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics6.svg "graphics modulated by beat")
 
 ### <a name="INTERACTIONS"></a>3.5 Interactions
 
