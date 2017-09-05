@@ -32,7 +32,8 @@ The Turtle Blocks guide is a good place to start learning about the basics. In t
       14. [Vibrato](#VIBRATO)
    3. [Voices](#VOICES)
    4. [Graphics](#GRAPHICS)
-   5. [Interactions](#INTERACTIONS)
+   5. [Beat](#BEAT)
+   6. [Interactions](#INTERACTIONS)
  4. [Widgets](#WIDGETS)
     1. [Monitoring status](#status)
     2. [Generating chunks of notes](#pitch-time)
@@ -485,13 +486,40 @@ actions over the specified rhythm.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics4.png "rhythm sequence")
 
+### <a name="BEAT"></a>3.5 Beat
+
+The beat of the music is determined by the *Meter* block (by default,
+it is set to 4:4).
+
+The *Pickup* block can be used to accommodate any notes that come in
+before the beat.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat1.svg "meter and pickup")
+
+Specifying beat is useful in that you can have the character of a note
+vary depending upon the beat. In the example below, the volume of
+notes on Beat 1 and Beat 3 are increased, while the volume of off
+beats is decreased.
+
+![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/beat2.svg "on-beat-do")
+
+The *On-Beat-Do* and *Off-Beat-Do* blocks let you specify actions to
+take on specific beats. (Note that the action is run before any blocks
+inside the note block associated with the beat are run.)
+
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics5.svg "using beat to synchronize graphics")
 
-Another approach to graphics is to use modulate them based on the beat. In the exxample above, we call the same graphics action for each note, but the parameters associated with the action, such as pen width, are dependent upon which beat we are on. On Beat 1, the pen size is set to 50 and the volume to 75. On Beat 3, the pen size is set to 25 and the volume to 50. On off beats, the pen size is set to 5 and the volumne to 5. The resultant graphic is shown below.
+Another approach to graphics is to use modulate them based on the
+beat. In the exxample above, we call the same graphics action for each
+note, but the parameters associated with the action, such as pen
+width, are dependent upon which beat we are on. On Beat 1, the pen
+size is set to 50 and the volume to 75. On Beat 3, the pen size is set
+to 25 and the volume to 50. On off beats, the pen size is set to 5 and
+the volumne to 5. The resultant graphic is shown below.
 
 ![alt tag](https://rawgithub.com/walterbender/musicblocks/master/guide/graphics6.svg "graphics modulated by beat")
 
-### <a name="INTERACTIONS"></a>3.5 Interactions
+### <a name="INTERACTIONS"></a>3.6 Interactions
 
 There are many ways to interactive with Music Blocks, including
 tracking the mouse position to impact some aspect of the music.
