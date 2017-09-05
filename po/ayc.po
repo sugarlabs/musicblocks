@@ -1,4 +1,3 @@
-msgid ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-07 00:30-0500\n"
@@ -30,6 +29,9 @@ msgid ""
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:532
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:40
+#: js/block.js:534
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:534
@@ -3959,13 +3961,21 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Jazz Minor"
 #~msgstr "Sullka Jazz wakichata"
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr "phisqïrinaka wakichäwi"
+#~msgid "fourths"
+#~msgstr "pusïrinaka wakichata"
 
 #~msgid "graphical notation matrix"
 #~msgstr "rixita qhananchaña wakichata"
+
+#~msgid "mashape"
+#~msgstr "mashape wakichata"
+
+#: js/basicblocks.js:519
+
+#~msgid "play backward"
+#~msgstr "warurt'äwi qhiparu jit'tayma"
 
 #: js/turtledefs.js:76
 
@@ -3995,6 +4005,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Chinese"
 #~msgstr "Chino ira wakichata"
 
+#: js/basicblocks.js:831
+
+#~msgid "denominator"
+#~msgstr "sutichriri"
+
 #: js/basicblocks.js:615
 
 #~msgid "duplicate factor"
@@ -4009,9 +4024,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "Hindu"
 #~msgstr "Hindú wakichata"
-
-#~msgid "maths"
-#~msgstr "jakhunaka tuqita"
 
 #: js/basicblocks.js:153
 
@@ -4046,20 +4058,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Enigmatic"
 #~msgstr "Enigmático wakichata"
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "pusïrinaka wakichata"
-
-#: js/basicblocks.js:519
-
-#~msgid "play backward"
-#~msgstr "warurt'äwi qhiparu jit'tayma"
-
-#: js/basicblocks.js:703
-
-#~msgid "set voice"
-#~msgstr "aru chimpuña"
+#~msgid "fifths"
+#~msgstr "phisqïrinaka wakichäwi"
 
 #: plugins/impact.rtp:32
 
@@ -4133,15 +4135,18 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "turtle note value"
 #~msgstr ""
 
+#: js/basicblocks.js:605
+
+#~msgid "tritone"
+#~msgstr "tritón wakichata"
+
 #: js/basicblocks.js:510
 
 #~msgid "play forward"
 #~msgstr "nayräxaru anataña"
 
-#: js/basicblocks.js:605
-
-#~msgid "tritone"
-#~msgstr "tritón wakichata"
+#~msgid "maths"
+#~msgstr "jakhunaka tuqita"
 
 #: js/musicutils.js:209
 
@@ -4174,9 +4179,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "1/32 note 𝅘𝅥𝅰"
 #~msgstr "1/32 chimpu 𝅘𝅥𝅰"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Aka limt’añaxa wakichatanaka wakisiri apanaqañanaka qhantayi jiwayi"
-
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -4199,9 +4201,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Impact data not available."
 #~msgstr "Wakisi wakichata chimpunakapa"
 
-#~msgid "mashape"
-#~msgstr "mashape wakichata"
-
 #: js/basicblocks.js:589
 
 #~msgid "thirds"
@@ -4214,6 +4213,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "actions"
 #~msgstr "saranaqäwinaka"
+
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "Akïri q'ucht'awi chimpu kimsaqallqu chimpu"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "wakichatanaka apanaqaña jithitatayaña chhaqtayaña"
@@ -4238,13 +4242,13 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Ethiopian"
 #~msgstr "Etíope wakichata"
 
+#~msgid "logic"
+#~msgstr "Sara"
+
 #: plugins/rodi.rtp:203
 
 #~msgid "see distance"
 #~msgstr "sara chani uñjaña"
-
-#~msgid "logic"
-#~msgstr "Sara"
 
 #~msgid "end hollow line"
 #~msgstr "p’iyani rixita tukuyaña"
@@ -4280,10 +4284,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "pitchslider"
 #~msgstr "tunu wakichata jithiyaña"
 
-#: js/logo.js:3606
+#: js/basicblocks.js:703
 
-#~msgid "Distortion not in range"
-#~msgstr ""
+#~msgid "set voice"
+#~msgstr "aru chimpuña"
 
 #: js/logo.js:1982
 
@@ -4324,6 +4328,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Arabic"
 #~msgstr "Arábica wakichata"
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Aka limt’añaxa wakichatanaka wakisiri apanaqañanaka qhantayi jiwayi"
+
 #: plugins/impact.rtp:32
 
 #~msgid "hours ago"
@@ -4333,11 +4340,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "Maqam"
 #~msgstr "Maqam wakichata"
-
-#: js/basicblocks.js:831
-
-#~msgid "denominator"
-#~msgstr "sutichriri"
 
 #: js/musicutils.js:219
 
@@ -4388,6 +4390,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Run fast / long press to run slow / extra-long press to run music slow"
 #~msgstr ""
 
+#: js/logo.js:3606
+
+#~msgid "Distortion not in range"
+#~msgstr ""
+
 #: js/musicutils.js:241
 
 #~msgid "Blues"
@@ -4397,11 +4404,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "field"
 #~msgstr "apanaqäwi"
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "Akïri q'ucht'awi chimpu kimsaqallqu chimpu"
 
 #: js/musicutils.js:201
 

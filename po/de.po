@@ -1,4 +1,3 @@
-msgid ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
@@ -25,6 +24,9 @@ msgid ""
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:532
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:40
+#: js/block.js:534
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:534
@@ -3316,10 +3318,13 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Jazz Minor"
 #~msgstr "melodisch Moll aufwärts"
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "Viertel"
+#~msgid "fifths"
+#~msgstr "Fünftel"
+
+#~msgid "mashape"
+#~msgstr ""
 
 #: js/basicblocks.js:519
 
@@ -3354,6 +3359,11 @@ msgstr "Wähle eine Datei aus"
 #~msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 #~msgstr "Diese Toolbar enthält Matrix, Noten, Töne, Schildkröten und mehr. Klicke um die Paletten der Blöcke anzuzeigen und ziehe die Blöcke von der Palette auf die Arbeitsfläche."
 
+#: js/basicblocks.js:831
+
+#~msgid "denominator"
+#~msgstr "Nenner"
+
 #: js/basicblocks.js:615
 
 #~msgid "duplicate factor"
@@ -3368,9 +3378,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Hindu"
 #~msgstr "Hinduistisch"
-
-#~msgid "maths"
-#~msgstr "Mathe"
 
 #: js/basicblocks.js:150
 
@@ -3405,22 +3412,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Enigmatic"
 #~msgstr "rätselhaft"
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr "Fünftel"
-
-#: js/palette.js:1771
-
-#: js/palette.js:1796
-
-#~msgid "mi"
-#~msgstr "E"
-
-#: js/basicblocks.js:686
-
-#~msgid "set voice"
-#~msgstr "Stimme"
+#~msgid "fourths"
+#~msgstr "Viertel"
 
 #: plugins/impact.rtp:32
 
@@ -3437,6 +3432,13 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Whole Tone"
 #~msgstr "Gnazer Ton"
+
+#: js/palette.js:1771
+
+#: js/palette.js:1796
+
+#~msgid "mi"
+#~msgstr "E"
 
 #~msgid "blocks"
 #~msgstr "Blöcke"
@@ -3470,11 +3472,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Romanian Minor"
 #~msgstr "Mi Sheberach"
-
-#: js/palette.js:1682
-
-#~msgid "la"
-#~msgstr "A"
 
 #: js/basicblocks.js:695
 
@@ -3511,15 +3508,18 @@ msgstr "Wähle eine Datei aus"
 #~msgid "re"
 #~msgstr "D"
 
+#: js/basicblocks.js:605
+
+#~msgid "tritone"
+#~msgstr ""
+
 #: js/basicblocks.js:510
 
 #~msgid "play forward"
 #~msgstr "Vorspulen"
 
-#: js/basicblocks.js:605
-
-#~msgid "tritone"
-#~msgstr ""
+#~msgid "maths"
+#~msgstr "Mathe"
 
 #: js/musicutils.js:209
 
@@ -3554,9 +3554,6 @@ msgstr "Wähle eine Datei aus"
 #~msgid "hspace"
 #~msgstr ""
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Hier kannst du die Haupt-Toolbar öffnen und schließen"
-
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -3579,9 +3576,6 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Impact data not available."
 #~msgstr ""
 
-#~msgid "mashape"
-#~msgstr ""
-
 #: js/basicblocks.js:589
 
 #~msgid "thirds"
@@ -3591,6 +3585,11 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "actions"
 #~msgstr "Aktionen"
+
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "Oktave der aktuellen Tonlage"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "Toolbar aus-/einklappen"
@@ -3615,13 +3614,13 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Ethiopian"
 #~msgstr "Äthopisch"
 
+#~msgid "logic"
+#~msgstr "Logik"
+
 #: plugins/rodi.rtp:203
 
 #~msgid "see distance"
 #~msgstr "Strecke anzeigen"
-
-#~msgid "logic"
-#~msgstr "Logik"
 
 #: js/turtledefs.js:97
 
@@ -3662,10 +3661,10 @@ msgstr "Wähle eine Datei aus"
 #~msgid "pitchslider"
 #~msgstr "Tonlagen-Schieber"
 
-#: js/logo.js:3606
+#: js/basicblocks.js:686
 
-#~msgid "Distortion not in range"
-#~msgstr ""
+#~msgid "set voice"
+#~msgstr "Stimme"
 
 #: js/logo.js:1982
 
@@ -3706,6 +3705,9 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Arabic"
 #~msgstr "Arabisch"
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Hier kannst du die Haupt-Toolbar öffnen und schließen"
+
 #: plugins/impact.rtp:32
 
 #~msgid "hours ago"
@@ -3715,11 +3717,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "Maqam"
 #~msgstr "Maqam"
-
-#: js/basicblocks.js:831
-
-#~msgid "denominator"
-#~msgstr "Nenner"
 
 #: js/musicutils.js:219
 
@@ -3796,6 +3793,16 @@ msgstr "Wähle eine Datei aus"
 #~msgid "Run fast / long press to run slow / extra-long press to run music slow"
 #~msgstr ""
 
+#: js/palette.js:1682
+
+#~msgid "la"
+#~msgstr "A"
+
+#: js/logo.js:3606
+
+#~msgid "Distortion not in range"
+#~msgstr ""
+
 #: js/musicutils.js:241
 
 #~msgid "Blues"
@@ -3805,11 +3812,6 @@ msgstr "Wähle eine Datei aus"
 
 #~msgid "field"
 #~msgstr "Feld"
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "Oktave der aktuellen Tonlage"
 
 #: js/musicutils.js:201
 

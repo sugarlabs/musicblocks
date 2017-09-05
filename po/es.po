@@ -36,6 +36,9 @@
 #: js/block.js:534
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
+#: js/block.js:534
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:40
 msgid "rest"
 msgstr "descanso"
 
@@ -3312,10 +3315,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "turtle note"
 #~msgstr "nota de tortugas"
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
-#~msgstr "quintos"
+#~msgid "fourths"
+#~msgstr "cuartas"
 
 #~msgid "mashape"
 #~msgstr "mashape"
@@ -3363,10 +3366,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Impact UID not found."
 #~msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr "cuartas"
+#~msgid "fifths"
+#~msgstr "quintos"
 
 #: plugins/impact.rtp:32
 
@@ -3448,6 +3451,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "1/32 note 𝅘𝅥𝅰"
 #~msgstr "1/32 nota"
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Este botón abre y cierra la barra de herramientas principal."
+
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -3469,11 +3475,6 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "actions"
 #~msgstr ""
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "octava actual"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "Expandir o colapsar barra"
@@ -3531,8 +3532,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "set beats per minute"
 #~msgstr "fijar pulsaciones por minuto"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Este botón abre y cierra la barra de herramientas principal."
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "octava actual"
 
 #: plugins/impact.rtp:32
 

@@ -13,7 +13,7 @@
 const DEFAULTVOLUME = 50;
 const TONEBPM = 240;  // Seems to be the default.
 const TARGETBPM = 90;  // What we'd like to use for beats per minute
-const DEFAULTDELAY = 500; // milleseconds
+const DEFAULTDELAY = 500;  // milleseconds
 const TURTLESTEP = -1;  // Run in step-by-step mode
 const NOTEDIV = 8;  // Number of steps to divide turtle graphics
 const OSCVOLUMEADJUSTMENT = 1.5  // The oscillator runs hot. We need

@@ -2,7 +2,6 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-msgid ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-07 00:30-0500\n"
@@ -30,6 +29,9 @@ msgid ""
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:532
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:40
+#: js/block.js:534
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:534
@@ -3321,9 +3323,12 @@ msgstr ""
 #~msgid "Jazz Minor"
 #~msgstr ""
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
+#~msgid "fourths"
+#~msgstr ""
+
+#~msgid "mashape"
 #~msgstr ""
 
 #: js/palette.js:1771
@@ -3356,6 +3361,11 @@ msgstr ""
 #~msgid "Chinese"
 #~msgstr ""
 
+#: js/basicblocks.js:831
+
+#~msgid "denominator"
+#~msgstr ""
+
 #: js/basicblocks.js:615
 
 #~msgid "duplicate factor"
@@ -3369,9 +3379,6 @@ msgstr ""
 #: js/musicutils.js:233
 
 #~msgid "Hindu"
-#~msgstr ""
-
-#~msgid "maths"
 #~msgstr ""
 
 #: js/basicblocks.js:153
@@ -3407,19 +3414,9 @@ msgstr ""
 #~msgid "Enigmatic"
 #~msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr ""
-
-#: js/basicblocks.js:519
-
-#~msgid "play backward"
-#~msgstr ""
-
-#: js/basicblocks.js:703
-
-#~msgid "set voice"
+#~msgid "fifths"
 #~msgstr ""
 
 #: plugins/impact.rtp:32
@@ -3471,11 +3468,6 @@ msgstr ""
 #~msgid "Romanian Minor"
 #~msgstr ""
 
-#: js/palette.js:1682
-
-#~msgid "la"
-#~msgstr ""
-
 #: js/basicblocks.js:712
 
 #~msgid "articulation"
@@ -3511,14 +3503,17 @@ msgstr ""
 #~msgid "re"
 #~msgstr ""
 
+#: js/basicblocks.js:605
+
+#~msgid "tritone"
+#~msgstr ""
+
 #: js/basicblocks.js:510
 
 #~msgid "play forward"
 #~msgstr ""
 
-#: js/basicblocks.js:605
-
-#~msgid "tritone"
+#~msgid "maths"
 #~msgstr ""
 
 #: js/musicutils.js:209
@@ -3554,9 +3549,6 @@ msgstr ""
 #~msgid "hspace"
 #~msgstr ""
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr ""
-
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -3579,9 +3571,6 @@ msgstr ""
 #~msgid "Impact data not available."
 #~msgstr ""
 
-#~msgid "mashape"
-#~msgstr ""
-
 #: js/basicblocks.js:589
 
 #~msgid "thirds"
@@ -3590,6 +3579,11 @@ msgstr ""
 #: js/turtledefs.js:21
 
 #~msgid "actions"
+#~msgstr ""
+
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
 #~msgstr ""
 
 #~msgid "Expand/collapse toolbar"
@@ -3615,12 +3609,12 @@ msgstr ""
 #~msgid "Ethiopian"
 #~msgstr ""
 
+#~msgid "logic"
+#~msgstr ""
+
 #: plugins/rodi.rtp:203
 
 #~msgid "see distance"
-#~msgstr ""
-
-#~msgid "logic"
 #~msgstr ""
 
 #: js/turtledefs.js:97
@@ -3662,9 +3656,9 @@ msgstr ""
 #~msgid "pitchslider"
 #~msgstr ""
 
-#: js/logo.js:3606
+#: js/basicblocks.js:703
 
-#~msgid "Distortion not in range"
+#~msgid "set voice"
 #~msgstr ""
 
 #: js/logo.js:1982
@@ -3711,6 +3705,9 @@ msgstr ""
 #~msgid "Arabic"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr ""
+
 #: plugins/impact.rtp:32
 
 #~msgid "hours ago"
@@ -3719,11 +3716,6 @@ msgstr ""
 #: js/musicutils.js:239
 
 #~msgid "Maqam"
-#~msgstr ""
-
-#: js/basicblocks.js:831
-
-#~msgid "denominator"
 #~msgstr ""
 
 #: js/musicutils.js:219
@@ -3792,6 +3784,16 @@ msgstr ""
 #~msgid "Run fast / long press to run slow / extra-long press to run music slow"
 #~msgstr ""
 
+#: js/palette.js:1682
+
+#~msgid "la"
+#~msgstr ""
+
+#: js/logo.js:3606
+
+#~msgid "Distortion not in range"
+#~msgstr ""
+
 #: js/musicutils.js:241
 
 #~msgid "Blues"
@@ -3800,11 +3802,6 @@ msgstr ""
 #: plugins/impact.rtp:32
 
 #~msgid "field"
-#~msgstr ""
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
 #~msgstr ""
 
 #: js/musicutils.js:201
@@ -3820,5 +3817,10 @@ msgstr ""
 #: js/musicutils.js:250
 
 #~msgid "Hirajoshi"
+#~msgstr ""
+
+#: js/basicblocks.js:519
+
+#~msgid "play backward"
 #~msgstr ""
 

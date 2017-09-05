@@ -1,4 +1,3 @@
-msgid ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
@@ -28,6 +27,9 @@ msgid ""
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:532
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:40
+#: js/block.js:534
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:534
@@ -3316,10 +3318,13 @@ msgstr ""
 #~msgid "Jazz Minor"
 #~msgstr ""
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
+#~msgid "fourths"
 #~msgstr ""
+
+#~msgid "mashape"
+#~msgstr "ọdịdị"
 
 #: js/palette.js:1771
 
@@ -3356,6 +3361,11 @@ msgstr ""
 #~msgid "Chinese"
 #~msgstr ""
 
+#: js/basicblocks.js:831
+
+#~msgid "denominator"
+#~msgstr "denominator"
+
 #: js/basicblocks.js:615
 
 #~msgid "duplicate factor"
@@ -3370,9 +3380,6 @@ msgstr ""
 
 #~msgid "Hindu"
 #~msgstr ""
-
-#~msgid "maths"
-#~msgstr "maths"
 
 #: js/basicblocks.js:153
 
@@ -3407,19 +3414,9 @@ msgstr ""
 #~msgid "Enigmatic"
 #~msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr ""
-
-#: js/basicblocks.js:519
-
-#~msgid "play backward"
-#~msgstr "egwu backward"
-
-#: js/basicblocks.js:703
-
-#~msgid "set voice"
+#~msgid "fifths"
 #~msgstr ""
 
 #: js/turtledefs.js:76
@@ -3476,11 +3473,6 @@ msgstr ""
 #~msgid "Romanian Minor"
 #~msgstr ""
 
-#: js/palette.js:1682
-
-#~msgid "la"
-#~msgstr ""
-
 #: js/basicblocks.js:712
 
 #~msgid "articulation"
@@ -3514,15 +3506,18 @@ msgstr ""
 #~msgid "re"
 #~msgstr ""
 
+#: js/basicblocks.js:605
+
+#~msgid "tritone"
+#~msgstr ""
+
 #: js/basicblocks.js:510
 
 #~msgid "play forward"
 #~msgstr ""
 
-#: js/basicblocks.js:605
-
-#~msgid "tritone"
-#~msgstr ""
+#~msgid "maths"
+#~msgstr "maths"
 
 #: js/musicutils.js:209
 
@@ -3555,9 +3550,6 @@ msgstr ""
 #~msgid "1/32 note 𝅘𝅥𝅰"
 #~msgstr "1/32 note 𝅘𝅥𝅰"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "Nke a button emepekwa na-emechi isi toolbar."
-
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -3580,9 +3572,6 @@ msgstr ""
 #~msgid "Impact data not available."
 #~msgstr ""
 
-#~msgid "mashape"
-#~msgstr "ọdịdị"
-
 #: js/basicblocks.js:589
 
 #~msgid "thirds"
@@ -3592,6 +3581,11 @@ msgstr ""
 
 #~msgid "actions"
 #~msgstr ""
+
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "pitch octave ugbu a"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "Ịmụbawanye / ida toolbar"
@@ -3616,13 +3610,13 @@ msgstr ""
 #~msgid "Ethiopian"
 #~msgstr ""
 
+#~msgid "logic"
+#~msgstr "mgbagha"
+
 #: plugins/rodi.rtp:203
 
 #~msgid "see distance"
 #~msgstr ""
-
-#~msgid "logic"
-#~msgstr "mgbagha"
 
 #~msgid "end hollow line"
 #~msgstr "akwụsị oghere ogbara"
@@ -3658,9 +3652,9 @@ msgstr ""
 #~msgid "pitchslider"
 #~msgstr ""
 
-#: js/logo.js:3606
+#: js/basicblocks.js:703
 
-#~msgid "Distortion not in range"
+#~msgid "set voice"
 #~msgstr ""
 
 #: js/logo.js:1982
@@ -3707,6 +3701,9 @@ msgstr ""
 #~msgid "Arabic"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "Nke a button emepekwa na-emechi isi toolbar."
+
 #: plugins/impact.rtp:32
 
 #~msgid "hours ago"
@@ -3716,11 +3713,6 @@ msgstr ""
 
 #~msgid "Maqam"
 #~msgstr ""
-
-#: js/basicblocks.js:831
-
-#~msgid "denominator"
-#~msgstr "denominator"
 
 #: js/musicutils.js:219
 
@@ -3788,6 +3780,16 @@ msgstr ""
 #~msgid "Run fast / long press to run slow / extra-long press to run music slow"
 #~msgstr ""
 
+#: js/palette.js:1682
+
+#~msgid "la"
+#~msgstr ""
+
+#: js/logo.js:3606
+
+#~msgid "Distortion not in range"
+#~msgstr ""
+
 #: js/musicutils.js:241
 
 #~msgid "Blues"
@@ -3797,11 +3799,6 @@ msgstr ""
 
 #~msgid "field"
 #~msgstr "fiilidi"
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "pitch octave ugbu a"
 
 #: js/musicutils.js:201
 
@@ -3817,4 +3814,9 @@ msgstr ""
 
 #~msgid "Hirajoshi"
 #~msgstr ""
+
+#: js/basicblocks.js:519
+
+#~msgid "play backward"
+#~msgstr "egwu backward"
 

@@ -1,4 +1,3 @@
-msgid ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-17 00:31-0400\n"
@@ -26,6 +25,9 @@ msgid ""
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:532
+#: js/pitchdrummatrix.js:235
+#: js/musicutils.js:40
+#: js/block.js:534
 #: js/pitchdrummatrix.js:235
 #: js/musicutils.js:40
 #: js/block.js:534
@@ -3322,9 +3324,12 @@ msgstr ""
 #~msgid "Jazz Minor"
 #~msgstr ""
 
-#: js/basicblocks.js:612
+#: js/basicblocks.js:596
 
-#~msgid "fifths"
+#~msgid "fourths"
+#~msgstr ""
+
+#~msgid "mashape"
 #~msgstr ""
 
 #: js/palette.js:1771
@@ -3362,6 +3367,11 @@ msgstr ""
 #~msgid "Chinese"
 #~msgstr ""
 
+#: js/basicblocks.js:831
+
+#~msgid "denominator"
+#~msgstr "ส่วน"
+
 #: js/basicblocks.js:615
 
 #~msgid "duplicate factor"
@@ -3376,9 +3386,6 @@ msgstr ""
 
 #~msgid "Hindu"
 #~msgstr ""
-
-#~msgid "maths"
-#~msgstr "คณิตศาสตร์"
 
 #: js/basicblocks.js:153
 
@@ -3413,19 +3420,9 @@ msgstr ""
 #~msgid "Enigmatic"
 #~msgstr ""
 
-#: js/basicblocks.js:596
+#: js/basicblocks.js:612
 
-#~msgid "fourths"
-#~msgstr ""
-
-#: js/basicblocks.js:519
-
-#~msgid "play backward"
-#~msgstr "เล่นย้อนหลัง"
-
-#: js/basicblocks.js:703
-
-#~msgid "set voice"
+#~msgid "fifths"
 #~msgstr ""
 
 #: plugins/impact.rtp:32
@@ -3477,11 +3474,6 @@ msgstr ""
 #~msgid "Romanian Minor"
 #~msgstr ""
 
-#: js/palette.js:1682
-
-#~msgid "la"
-#~msgstr ""
-
 #: js/basicblocks.js:712
 
 #~msgid "articulation"
@@ -3512,15 +3504,18 @@ msgstr ""
 #~msgid "re"
 #~msgstr ""
 
+#: js/basicblocks.js:605
+
+#~msgid "tritone"
+#~msgstr ""
+
 #: js/basicblocks.js:510
 
 #~msgid "play forward"
 #~msgstr ""
 
-#: js/basicblocks.js:605
-
-#~msgid "tritone"
-#~msgstr ""
+#~msgid "maths"
+#~msgstr "คณิตศาสตร์"
 
 #: js/musicutils.js:209
 
@@ -3550,9 +3545,6 @@ msgstr ""
 #~msgid "hspace"
 #~msgstr "ช่องว่างแนวนอน"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "ปุ่มนี้เปิดและปิดแถบเครื่องมือหลัก"
-
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
@@ -3575,9 +3567,6 @@ msgstr ""
 #~msgid "Impact data not available."
 #~msgstr ""
 
-#~msgid "mashape"
-#~msgstr ""
-
 #: js/basicblocks.js:589
 
 #~msgid "thirds"
@@ -3587,6 +3576,11 @@ msgstr ""
 
 #~msgid "actions"
 #~msgstr ""
+
+#: js/basicblocks.js:83
+
+#~msgid "current pitch octave"
+#~msgstr "เสียงโน้ตคู่แปด"
 
 #~msgid "Expand/collapse toolbar"
 #~msgstr "เพิ่ม/พัง กล่องเครื่องมือ"
@@ -3611,13 +3605,13 @@ msgstr ""
 #~msgid "Ethiopian"
 #~msgstr ""
 
+#~msgid "logic"
+#~msgstr "ตรรกะ"
+
 #: plugins/rodi.rtp:203
 
 #~msgid "see distance"
 #~msgstr ""
-
-#~msgid "logic"
-#~msgstr "ตรรกะ"
 
 #~msgid "end hollow line"
 #~msgstr "จบเส้นช่องโพรง"
@@ -3650,9 +3644,9 @@ msgstr ""
 #~msgid "pitchslider"
 #~msgstr ""
 
-#: js/logo.js:3606
+#: js/basicblocks.js:703
 
-#~msgid "Distortion not in range"
+#~msgid "set voice"
 #~msgstr ""
 
 #: js/logo.js:1982
@@ -3699,6 +3693,9 @@ msgstr ""
 #~msgid "Arabic"
 #~msgstr ""
 
+#~msgid "This button opens and closes the primary toolbar."
+#~msgstr "ปุ่มนี้เปิดและปิดแถบเครื่องมือหลัก"
+
 #: plugins/impact.rtp:32
 
 #~msgid "hours ago"
@@ -3708,11 +3705,6 @@ msgstr ""
 
 #~msgid "Maqam"
 #~msgstr ""
-
-#: js/basicblocks.js:831
-
-#~msgid "denominator"
-#~msgstr "ส่วน"
 
 #: js/musicutils.js:219
 
@@ -3780,6 +3772,16 @@ msgstr ""
 #~msgid "Run fast / long press to run slow / extra-long press to run music slow"
 #~msgstr ""
 
+#: js/palette.js:1682
+
+#~msgid "la"
+#~msgstr ""
+
+#: js/logo.js:3606
+
+#~msgid "Distortion not in range"
+#~msgstr ""
+
 #: js/musicutils.js:241
 
 #~msgid "Blues"
@@ -3789,11 +3791,6 @@ msgstr ""
 
 #~msgid "field"
 #~msgstr "เขตข้อมูล"
-
-#: js/basicblocks.js:83
-
-#~msgid "current pitch octave"
-#~msgstr "เสียงโน้ตคู่แปด"
 
 #: js/musicutils.js:201
 
@@ -3809,4 +3806,9 @@ msgstr ""
 
 #~msgid "Hirajoshi"
 #~msgstr ""
+
+#: js/basicblocks.js:519
+
+#~msgid "play backward"
+#~msgstr "เล่นย้อนหลัง"
 
