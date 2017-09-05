@@ -700,6 +700,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     onBeatDoBlock.defaults.push(_('action'));
     onBeatDoBlock.dockTypes[1] = 'numberin';
     onBeatDoBlock.dockTypes[2] = 'textin';
+    onBeatDoBlock.adjustWidthToLabel();
 
     var measureValueBlock = new ProtoBlock('measurevalue');
     measureValueBlock.palette = palettes.dict['rhythm'];
