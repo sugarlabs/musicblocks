@@ -988,7 +988,7 @@ function Logo () {
         this.blocks.findStacks();
         this.actions = {};
         for (var blk = 0; blk < this.blocks.stackList.length; blk++) {
-            if (this.blocks.blockList[this.blocks.stackList[blk]].name === 'start' || this.blocks.blockList[this.blocks.stackList[blk]].name === 'drum') {
+            if (['start', 'drum', 'status'].indexOf(this.blocks.blockList[this.blocks.stackList[blk]].name) !== -1) {
                 // Don't start on a start block in the trash.
                 if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
                     // Don't start on a start block with no connections.
@@ -1031,20 +1031,15 @@ function Logo () {
         // (2) Execute the stack.
         // A bit complicated because we have lots of corner cases:
         if (startHere != null) {
-//            console.log('start here');
-            // console.log('startHere is ' + this.blocks.blockList[startHere].name);
-
             // If a block to start from was passed, find its
             // associated turtle, i.e., which turtle should we use?
             var turtle = 0;
             while(this.blocks.turtles.turtleList[turtle].trash && turtle < this.turtles.turtleList.length) {
                 turtle += 1;
             }
-            if (this.blocks.blockList[startHere].name === 'start' || this.blocks.blockList[startHere].name === 'drum') {
+
+            if (['start', 'drum'].indexOf(this.blocks.blockList[startHere].name) !== -1) {
                 var turtle = this.blocks.blockList[startHere].value;
-                // console.log('starting on start with turtle ' + turtle);
-            // } else {
-                // console.log('starting on ' + this.blocks.blockList[startHere].name + ' with turtle ' + turtle);
             }
 
             this.turtles.turtleList[turtle].queue = [];
@@ -1057,6 +1052,11 @@ function Logo () {
             // If there are start blocks, run them all.
             for (var b = 0; b < startBlocks.length; b++) {
                 var turtle = this.blocks.blockList[startBlocks[b]].value;
+                // If we are starting on a status block, there is no turtle.
+                if (turtle == null) {
+                    turtle = 0;
+                }
+
                 this.turtles.turtleList[turtle].queue = [];
                 this.parentFlowQueue[turtle] = [];
                 this.unhightlightQueue[turtle] = [];
@@ -1067,7 +1067,6 @@ function Logo () {
                 }
             }
         } else {
-            // console.log('nothing to run');
             if (this.suppressOutput[turtle]) {
                 this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.suppressOutput[turtle] = false;
@@ -5792,8 +5791,7 @@ function Logo () {
                 this.skipIndex[turtle] += 1;
             }
 
-            if (!this.suppressOutput[turtle]) {
-            } else {
+            if (this.suppressOutput[turtle]) {
                 waitTime = 0;
             }
 
