@@ -1266,7 +1266,14 @@ function Block(protoblock, blocks, overrideName) {
                     if (!that.blocks.inLongPress) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.log('running from ' + that.blocks.blockList[topBlock].name);
-                        that.blocks.logo.runLogoCommands(topBlock);
+                        if (that.blocks.turtles.running()) {
+                            that.blocks.logo.doStopTurtle();
+                            setTimeout(function () {
+                                that.blocks.logo.runLogoCommands(topBlock);
+                            }, 250);
+                        } else {
+                            that.blocks.logo.runLogoCommands(topBlock);
+                        }
                     }
                 }
             }

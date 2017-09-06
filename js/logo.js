@@ -83,6 +83,10 @@ function Logo () {
     this.eventList = {};
     this.receivedArg = null;
 
+    this.parentFlowQueue = {};
+    this.unhighlightQueue = {};
+    this.parameterQueue = {};
+
     this.boxes = {};
     this.actions = {};
     this.returns = [];
@@ -988,7 +992,7 @@ function Logo () {
         this.blocks.findStacks();
         this.actions = {};
         for (var blk = 0; blk < this.blocks.stackList.length; blk++) {
-            if (['start', 'drum', 'statusFoo'].indexOf(this.blocks.blockList[this.blocks.stackList[blk]].name) !== -1) {
+            if (['start', 'drum', 'status'].indexOf(this.blocks.blockList[this.blocks.stackList[blk]].name) !== -1) {
                 // Don't start on a start block in the trash.
                 if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
                     // Don't start on a start block with no connections.
@@ -1012,9 +1016,19 @@ function Logo () {
         this.svgOutput = '';
         this.svgBackground = true;
 
-        this.parentFlowQueue = {};
-        this.unhightlightQueue = {};
-        this.parameterQueue = {};
+        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            if (turtle in this.parentFlowQueue) {
+                this.parentFlowQueue[turtle] = [];
+            }
+
+            if (turtle in this.unhighlightQueue) {
+                this.unhighlightQueue[turtle] = [];
+            }
+
+            if (turtle in this.parameterQueue) {
+                this.parameterQueue[turtle] = [];
+            }
+        }
 
         if (this.turtleDelay === 0) {
             // Don't update parameters when running full speed.
@@ -1039,33 +1053,48 @@ function Logo () {
             }
 
             if (['start', 'drum'].indexOf(this.blocks.blockList[startHere].name) !== -1) {
-                var turtle = this.blocks.blockList[startHere].value;
+                turtle = this.blocks.blockList[startHere].value;
             }
 
             this.turtles.turtleList[turtle].queue = [];
             this.parentFlowQueue[turtle] = [];
-            this.unhightlightQueue[turtle] = [];
+            this.unhighlightQueue[turtle] = [];
             this.parameterQueue[turtle] = [];
             this.turtles.turtleList[turtle].running = true;
             this._runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
-            // If there are start blocks, run them all.
+            var delayStart = 0;
+            // Look for a status block
             for (var b = 0; b < startBlocks.length; b++) {
-                var turtle = this.blocks.blockList[startBlocks[b]].value;
-                // If we are starting on a status block, there is no turtle.
-                if (turtle == null) {
-                    turtle = 0;
-                }
-
-                this.turtles.turtleList[turtle].queue = [];
-                this.parentFlowQueue[turtle] = [];
-                this.unhightlightQueue[turtle] = [];
-                this.parameterQueue[turtle] = [];
-                if (!this.turtles.turtleList[turtle].trash) {
+                if (this.blocks.blockList[startBlocks[b]].name === 'status'  && !this.blocks.blockList[startBlocks[b]].trash) {
+                    var turtle = 0;
+                    this.turtles.turtleList[turtle].queue = [];
+                    this.parentFlowQueue[turtle] = [];
+                    this.unhighlightQueue[turtle] = [];
+                    this.parameterQueue[turtle] = [];
                     this.turtles.turtleList[turtle].running = true;
+                    delayStart = 1000;
                     this._runFromBlock(this, turtle, startBlocks[b], 0, env);
                 }
             }
+
+            var that = this;
+            setTimeout(function () {
+                // If there are start blocks, run them all.
+                for (var b = 0; b < startBlocks.length; b++) {
+                    if (that.blocks.blockList[startBlocks[b]].name !== 'status') {
+                        var turtle = that.blocks.blockList[startBlocks[b]].value;
+                        that.turtles.turtleList[turtle].queue = [];
+                        that.parentFlowQueue[turtle] = [];
+                        that.unhighlightQueue[turtle] = [];
+                        that.parameterQueue[turtle] = [];
+                        if (!that.turtles.turtleList[turtle].trash) {
+                            that.turtles.turtleList[turtle].running = true;
+                            that._runFromBlock(that, turtle, startBlocks[b], 0, env);
+                        }
+                    }
+                }
+            }, delayStart);
         } else {
             if (this.suppressOutput[turtle]) {
                 this.errorMsg(NOACTIONERRORMSG, null, _('start'));
@@ -1075,12 +1104,11 @@ function Logo () {
                 document.body.style.cursor = 'default';
             }
         }
+
         this.refreshCanvas();
-      //  console.log('canvas refreshed');
     };
 
     this._runFromBlock = function (that, turtle, blk, isflow, receivedArg) {
-//        console.log('Run from block');
         if (blk == null) {
             return;
         }
@@ -1501,7 +1529,7 @@ function Logo () {
             // parent.
             var parentBlk = that.blocks.blockList[blk].connections[0];
             if (parentBlk != null) {
-                that.unhightlightQueue[turtle].push(parentBlk);
+                that.unhighlightQueue[turtle].push(parentBlk);
             }
             break;
         case 'wait':
@@ -1947,7 +1975,7 @@ function Logo () {
                 foundTargetTurtle = true;
             } else if (typeof(args[0]) === 'number') {
                 var i = Math.floor(args[0]);
-		if (i >= 0 && i <  that.turtles.turtleList.length) {
+                if (i >= 0 && i <  that.turtles.turtleList.length) {
                     that.turtles.turtleList[i].rename(args[1]);
                     foundTargetTurtle = true;
                 }
@@ -1983,7 +2011,7 @@ function Logo () {
                 that.turtles.turtleList[targetTurtle].queue = [];
                 that.turtles.turtleList[targetTurtle].running = true;
                 that.parentFlowQueue[targetTurtle] = [];
-                that.unhightlightQueue[targetTurtle] = [];
+                that.unhighlightQueue[targetTurtle] = [];
                 that.parameterQueue[targetTurtle] = [];
                 // Find the start block associated with this turtle.
                 var foundStartBlock = false;
@@ -2007,7 +2035,7 @@ function Logo () {
             } else {
                 that.turtles.turtleList[targetTurtle].queue = [];
                 that.parentFlowQueue[targetTurtle] = [];
-                that.unhightlightQueue[targetTurtle] = [];
+                that.unhighlightQueue[targetTurtle] = [];
                 that.parameterQueue[targetTurtle] = [];
                 that._doBreak(targetTurtle);
             }
@@ -3853,7 +3881,7 @@ function Logo () {
                 var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
                 that.parentFlowQueue[turtle].push(blk);
                 that.turtles.turtleList[turtle].queue.push(queueBlock);
-		childFlow = null;
+                childFlow = null;
 
                 var eventName = '__beat_' + beatValue + '_' + turtle + '__';
                 that.stage.dispatchEvent(eventName);
@@ -3864,7 +3892,7 @@ function Logo () {
                 var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
                 that.parentFlowQueue[turtle].push(blk);
                 that.turtles.turtleList[turtle].queue.push(queueBlock);
-		childFlow = null;
+                childFlow = null;
 
                 var eventName = '__offbeat_' + turtle + '__';
                 that.stage.dispatchEvent(eventName);
@@ -5312,11 +5340,16 @@ function Logo () {
             } else {
                 var queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
             }
+
             // We need to keep track of the parent block to the child
             // flow so we can unlightlight the parent block after the
             // child flow completes.
-            that.parentFlowQueue[turtle].push(blk);
-            that.turtles.turtleList[turtle].queue.push(queueBlock);
+            if (that.parentFlowQueue[turtle] != undefined) {
+                that.parentFlowQueue[turtle].push(blk);
+                that.turtles.turtleList[turtle].queue.push(queueBlock);
+            } else {
+                console.log('cannot find queue for turtle ' + turtle);
+            }
         }
 
         var nextBlock = null;
@@ -5355,16 +5388,18 @@ function Logo () {
             if ((that.backward[turtle].length > 0 && that.blocks.blockList[blk].connections[0] == null) || (that.backward[turtle].length === 0 && last(that.blocks.blockList[blk].connections) == null)) {
                 // If we are at the end of the child flow, queue the
                 // unhighlighting of the parent block to the flow.
-                if (that.parentFlowQueue[turtle].length > 0 && that.turtles.turtleList[turtle].queue.length > 0 && last(that.turtles.turtleList[turtle].queue).parentBlk !== last(that.parentFlowQueue[turtle])) {
-                    that.unhightlightQueue[turtle].push(last(that.parentFlowQueue[turtle]));
-                    // that.unhightlightQueue[turtle].push(that.parentFlowQueue[turtle].pop());
-                } else if (that.unhightlightQueue[turtle].length > 0) {
+                if (that.unhighlightQueue[turtle] === undefined) {
+                    console.log('cannot find highlight queue for turtle ' + turtle);
+                } else if (that.parentFlowQueue[turtle].length > 0 && that.turtles.turtleList[turtle].queue.length > 0 && last(that.turtles.turtleList[turtle].queue).parentBlk !== last(that.parentFlowQueue[turtle])) {
+                    that.unhighlightQueue[turtle].push(last(that.parentFlowQueue[turtle]));
+                    // that.unhighlightQueue[turtle].push(that.parentFlowQueue[turtle].pop());
+                } else if (that.unhighlightQueue[turtle].length > 0) {
                     // The child flow is finally complete, so unhighlight.
                     setTimeout(function () {
                         if (that.blocks.visible) {
-                            that.blocks.unhighlight(that.unhightlightQueue[turtle].pop());
+                            that.blocks.unhighlight(that.unhighlightQueue[turtle].pop());
                         } else {
-                            that.unhightlightQueue[turtle].pop();
+                            that.unhighlightQueue[turtle].pop();
                         }
                     }, that.turtleDelay);
                 }
@@ -5990,15 +6025,15 @@ function Logo () {
                     // If it is > 0, we already counted this note
                     // (e.g. pitch & drum combination).
                     if (that.notePitches[turtle].length === 0) {
-			if (!that.justCounting[turtle]) {
+                        if (!that.justCounting[turtle]) {
                             console.log('notes to play ' + notes + ' ' + noteBeatValue);
-			} else {
+                        } else {
                             console.log('notes to count ' + notes + ' ' + noteBeatValue);
-			}
+                        }
 
-			if (!that.suppressOutput[turtle]) {
+                        if (!that.suppressOutput[turtle]) {
                             that.turtles.turtleList[turtle].blink(duration,last(that.polyVolume[turtle]));
-			}
+                        }
                     }
 
                     if (!that.suppressOutput[turtle] && duration > 0) {
