@@ -760,7 +760,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     duplicateFactor.staticLabels.push('duplicate factor');
     duplicateFactor.adjustWidthToLabel();
     duplicateFactor.parameterBlock();
-    duplicateFactor.hidden = true;
+    // duplicateFactor.hidden = true;
 
     var skipFactor = new ProtoBlock('skipfactor');
     skipFactor.palette = palettes.dict['rhythm'];
