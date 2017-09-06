@@ -194,7 +194,9 @@ define(MYDEFINES, function (compatibility) {
         initVoiceI18N();
 
         window.onblur = function () {
-            logo.doStopTurtle();
+            if (!logo.runningLilypond) {
+                logo.doStopTurtle();
+            }
         };
 
         function _findBlocks() {
