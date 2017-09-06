@@ -1073,13 +1073,19 @@ function Logo () {
                     this.unhighlightQueue[turtle] = [];
                     this.parameterQueue[turtle] = [];
                     this.turtles.turtleList[turtle].running = true;
-                    delayStart = 1000;
+                    delayStart = 250;
                     this._runFromBlock(this, turtle, startBlocks[b], 0, env);
                 }
             }
 
             var that = this;
             setTimeout(function () {
+		if (delayStart !== 0) {
+                    // Launching status block would have hidden the
+                    // Stop Button so show it again.
+                    that.onRunTurtle();
+		}
+
                 // If there are start blocks, run them all.
                 for (var b = 0; b < startBlocks.length; b++) {
                     if (that.blocks.blockList[startBlocks[b]].name !== 'status') {
