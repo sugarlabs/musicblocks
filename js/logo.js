@@ -988,7 +988,7 @@ function Logo () {
         this.blocks.findStacks();
         this.actions = {};
         for (var blk = 0; blk < this.blocks.stackList.length; blk++) {
-            if (['start', 'drum', 'status'].indexOf(this.blocks.blockList[this.blocks.stackList[blk]].name) !== -1) {
+            if (['start', 'drum', 'statusFoo'].indexOf(this.blocks.blockList[this.blocks.stackList[blk]].name) !== -1) {
                 // Don't start on a start block in the trash.
                 if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
                     // Don't start on a start block with no connections.
