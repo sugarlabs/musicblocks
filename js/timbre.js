@@ -1289,12 +1289,12 @@ function TimbreWidget () {
             var radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
             docById('sel' + f).addEventListener('change', function (event) {
-		docById('filterButtonCell').style.backgroundColor = '#C8C8C0';
-		var elem = event.target;
-		var m = elem.id.slice(-1);
-		instrumentsFilters[that.instrumentName][m]['filterType'] = elem.value;
-		that._update(m, elem.value, 0);
-		that._playNote('G4', 1 / 8);
+                docById('filterButtonCell').style.backgroundColor = '#C8C8C0';
+                var elem = event.target;
+                var m = elem.id.slice(-1);
+                instrumentsFilters[that.instrumentName][m]['filterType'] = elem.value;
+                that._update(m, elem.value, 0);
+                that._playNote('G4', 1 / 8);
             });
 
             for (var i = 0; i < radioIDs.length; i++) {
@@ -1306,20 +1306,20 @@ function TimbreWidget () {
                     instrumentsFilters[that.instrumentName][Math.floor(m / 4)]['filterRolloff'] = parseFloat(this.value);
                     that._update(Math.floor(m / 4), this.value, 1);
                     that._playNote('G4', 1 / 8);
-		};
+                };
             }
 
             docById('myRangeF' + f).addEventListener('change', function (event) {
-		docById('filterButtonCell').style.backgroundColor = '#C8C0C8';
-		var elem = event.target;
-		var m = elem.id.slice(-1);
-		docById('myRangeF' + m).value = parseFloat(elem.value);
-		docById('myspanF' + m).textContent = elem.value;
-		instrumentsFilters[that.instrumentName][m]['filterFrequency'] = parseFloat(elem.value);
-		that._update(m, elem.value, 2);
-		that._playNote('G4', 1 / 8);
+                docById('filterButtonCell').style.backgroundColor = '#C8C0C8';
+                var elem = event.target;
+                var m = elem.id.slice(-1);
+                docById('myRangeF' + m).value = parseFloat(elem.value);
+                docById('myspanF' + m).textContent = elem.value;
+                instrumentsFilters[that.instrumentName][m]['filterFrequency'] = parseFloat(elem.value);
+                that._update(m, elem.value, 2);
+                that._playNote('G4', 1 / 8);
             });
-	}
+        }
     };
 
     this._updateFilters = function () {
