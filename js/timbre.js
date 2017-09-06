@@ -105,6 +105,11 @@ function TimbreWidget () {
     this._update = function (i, value, k) {
         // This function is used to update the parameters in the
         // blocks contained in the timbre widget clamp.
+        // i is the index into the parameter array. (For example, there
+        // can be multiple filter blocks associated with a timbre.)
+        // k is the parameter to update (There can be multiple
+        // parameters per block.)
+
         var updateParams = [];
 
         if (this.isActive['envelope'] === true && this.env[i] != null) {
@@ -1222,46 +1227,16 @@ function TimbreWidget () {
         var env = docById('timbreTable');
         env.innerHTML = '';
 
-        console.log(this.filterParams);
-
         for (var f = 0; f < this.fil.length; f++) {
             this._createFilter(f, env);
         }
 
-        // For some reason, the updates don't always happen in _createFilter.
-        for (var f = 0; f < this.fil.length; f++) {
-            docById('sel' + f).value = this.filterParams[f * 3];
-
-            var radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
-
-            if (this.filterParams[f * 3 + 1] === -12) {
-                docById('radio' + radioIDs[0]).checked = true;
-            } else {
-                docById('radio' + radioIDs[0]).checked = false;
-            }
-
-            if (this.filterParams[f * 3 + 1] === -24) {
-                docById('radio' + radioIDs[1]).checked = true;
-            } else {
-                docById('radio' + radioIDs[1]).checked = false;
-            }
-
-            if (this.filterParams[f * 3 + 1] === -48) {
-                docById('radio' + radioIDs[2]).checked = true;
-            } else {
-                docById('radio' + radioIDs[2]).checked = false;
-            }
-
-            if (this.filterParams[f * 3 + 1] === -96) {
-                docById('radio' + radioIDs[3]).checked = true;
-            } else {
-                docById('radio' + radioIDs[3]).checked = false;
-            }
-        }
+        this._addFilterListeners();
+        this._updateFilters();
     };
 
     this._createFilter = function (f, env) {
-        var that = this;
+        console.log('adding filter ' + f);
 
         var blockValue = f;
         var wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];
@@ -1297,46 +1272,6 @@ function TimbreWidget () {
         selectOpt += '</select>';
         myDiv.innerHTML = selectOpt;
 
-        docById('sel' + f).value = this.filterParams[f * 3];
-
-        docById('sel' + f).addEventListener('change', function (event) {
-            docById('filterButtonCell').style.backgroundColor = '#C8C8C0';
-            var elem = event.target;
-            var m = elem.id.slice(-1);
-            // that.filterParams[m * 3] = elem.value;
-            instrumentsFilters[that.instrumentName][m]['filterType'] = elem.value;
-            that._update(m, elem.value, 0);
-            that._playNote('G4', 1 / 8);
-        });
-
-        if (this.filterParams[f * 3 + 1] === -12) {
-            docById('radio' + radioIDs[0]).checked = true;
-        } else {
-            docById('radio' + radioIDs[0]).checked = false;
-        }
-
-        if (this.filterParams[f * 3 + 1] === -24) {
-            docById('radio' + radioIDs[1]).checked = true;
-        } else {
-            docById('radio' + radioIDs[1]).checked = false;
-        }
-
-        if (this.filterParams[f * 3 + 1] === -48) {
-            docById('radio' + radioIDs[2]).checked = true;
-        } else {
-            docById('radio' + radioIDs[2]).checked = false;
-        }
-
-        if (this.filterParams[f * 3 + 1] === -96) {
-            docById('radio' + radioIDs[3]).checked = true;
-        } else {
-            docById('radio' + radioIDs[3]).checked = false;
-        }
-
-        this._update(blockValue, this.filterParams[f * 3], 0);
-        this._update(blockValue, this.filterParams[f * 3 + 1], 1);
-        this._update(blockValue, this.filterParams[f * 3 + 2], 2);
-
         // Make sure there is an instruments filter for the filter.
         if (!(this.instrumentName in instrumentsFilters)) {
             instrumentsFilters[this.instrumentName] = [];
@@ -1345,43 +1280,89 @@ function TimbreWidget () {
         if (instrumentsFilters[this.instrumentName].length - 1 < f) {
             instrumentsFilters[this.instrumentName].push({'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392});
         }
+    };
 
-        var rolloffValue = docByName('rolloff' + f);
-        for (var i = 0; i < rolloffValue.length; i++) {
+    this._addFilterListeners = function () {
+         // Add the various listeners needed for the filter panel
+        var that = this;
+        for (var f = 0; f < this.fil.length; f++) {
+            var radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
-            rolloffValue[i].onclick = function (event) {
-                var elem = event.target;
-                console.log(elem.id);
-                var m = Math.floor(elem.id.slice(-1) / 4);
-                // that.filterParams[m * 3 + 1] = this.value;
-                instrumentsFilters[that.instrumentName][m]['filterRolloff'] = parseFloat(this.value);
-                that._update(m, this.value, 1);
-                that._playNote('G4', 1 / 8);
-            };
+            docById('sel' + f).addEventListener('change', function (event) {
+		docById('filterButtonCell').style.backgroundColor = '#C8C8C0';
+		var elem = event.target;
+		var m = elem.id.slice(-1);
+		instrumentsFilters[that.instrumentName][m]['filterType'] = elem.value;
+		that._update(m, elem.value, 0);
+		that._playNote('G4', 1 / 8);
+            });
 
+            for (var i = 0; i < radioIDs.length; i++) {
+                var radioButton = docById('radio' + radioIDs[i]);
+
+                radioButton.onclick = function (event) {
+                    var elem = event.target;
+                    var m = Number(elem.id.replace('radio',''));
+                    instrumentsFilters[that.instrumentName][Math.floor(m / 4)]['filterRolloff'] = parseFloat(this.value);
+                    that._update(Math.floor(m / 4), this.value, 1);
+                    that._playNote('G4', 1 / 8);
+		};
+            }
+
+            docById('myRangeF' + f).addEventListener('change', function (event) {
+		docById('filterButtonCell').style.backgroundColor = '#C8C0C8';
+		var elem = event.target;
+		var m = elem.id.slice(-1);
+		docById('myRangeF' + m).value = parseFloat(elem.value);
+		docById('myspanF' + m).textContent = elem.value;
+		instrumentsFilters[that.instrumentName][m]['filterFrequency'] = parseFloat(elem.value);
+		that._update(m, elem.value, 2);
+		that._playNote('G4', 1 / 8);
+            });
+	}
+    };
+
+    this._updateFilters = function () {
+        // Update the various inputs on the filters panel.
+        for (var f = 0; f < this.fil.length; f++) {
+            var radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
+
+            docById('sel' + f).value = instrumentsFilters[this.instrumentName][f]['filterType'];
+
+            var rolloff = instrumentsFilters[this.instrumentName][f]['filterRolloff'];
+            if (rolloff === -12) {
+                docById('radio' + radioIDs[0]).checked = true;
+            } else {
+                docById('radio' + radioIDs[0]).checked = false;
+            }
+
+            if (rolloff === -24) {
+                docById('radio' + radioIDs[1]).checked = true;
+            } else {
+                docById('radio' + radioIDs[1]).checked = false;
+            }
+
+            if (rolloff === -48) {
+                docById('radio' + radioIDs[2]).checked = true;
+            } else {
+                docById('radio' + radioIDs[2]).checked = false;
+            }
+
+            if (rolloff === -96) {
+                docById('radio' + radioIDs[3]).checked = true;
+            } else {
+                docById('radio' + radioIDs[3]).checked = false;
+            }
         }
-
-        document.getElementById('wrapper' + wrapperIDs[2]).addEventListener('change', function (event) {
-            docById('filterButtonCell').style.backgroundColor = '#C8C0C8';
-            var elem = event.target;
-            var m = elem.id.slice(-1);
-            docById('myRangeF' + m).value = parseFloat(elem.value);
-            docById('myspanF' + m).textContent = elem.value;
-            // that.filterParams[m * 3 + 2] = elem.value;
-            instrumentsFilters[that.instrumentName][m]['filterFrequency'] = parseFloat(elem.value);
-            that._update(m, elem.value, 2);
-            that._playNote('G4', 1 / 8);
-        });
     };
 
     this._addFilter = function () {
-        var that = this;
         var env = docById('timbreTable');
         var topOfClamp = this._logo.blocks.blockList[this.blockNo].connections[2];
         var bottomOfClamp = this._logo.blocks.findBottomBlock(topOfClamp);
 
         const FILTEROBJ = [[0, ['filter', {}], 0, 0, [null, 3, 1, 2, null]], [1, ['number', {'value': -12}], 0, 0, [0]], [2, ['number', {'value': 392}], 0, 0, [0]], [3, ['filtertype', {'value': DEFAULTFILTERTYPE}], 0, 0, [0]]];
-        that._logo.blocks.loadNewBlocks(FILTEROBJ);
+        this._logo.blocks.loadNewBlocks(FILTEROBJ);
 
         var n = this._logo.blocks.blockList.length - 4;
         this.fil.push(n);
@@ -1389,10 +1370,14 @@ function TimbreWidget () {
         this.filterParams.push(-12);
         this.filterParams.push(392);
 
+        var that = this;
         setTimeout(that.blockConnection(4, bottomOfClamp), 500);
 
         this._createFilter(this.fil.length - 1, env);
         this._playNote('G4', 1 / 8);
+
+        this._addFilterListeners();
+        this._updateFilters();
     };
 
     this._effects = function () {
