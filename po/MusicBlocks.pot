@@ -924,7 +924,7 @@ msgstr ""
 
 #: js/musicutils.js:308
 #.TRANS: musical instrument
-msgid "basse"
+msgid "bass"
 msgstr ""
 
 #: js/musicutils.js:310
@@ -1056,7 +1056,7 @@ msgstr ""
 #: js/basicblocks.js:1635
 #: js/macros.js:38
 #.TRANS: a musically tuned set of bells
-msgid "chine"
+msgid "chime"
 msgstr ""
 
 #: js/musicutils.js:347

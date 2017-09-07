@@ -158,7 +158,6 @@ function Palettes () {
 
     this.menuScrollEvent = function (direction, scrollSpeed) {
         var keys = Object.keys(this.buttons);
-
         var diff = direction * scrollSpeed;
         if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
             this.upIndicator.visible = false;

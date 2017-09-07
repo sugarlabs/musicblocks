@@ -1110,7 +1110,7 @@ msgstr "violonchelo wakichata"
 #: js/musicutils.js:308
 #.TRANS: musical instrument
 #.TRANS: 
-msgid "basse"
+msgid "bass"
 msgstr "aynacha ira"
 
 #: js/musicutils.js:310
@@ -1259,7 +1259,7 @@ msgstr "suxu suxu"
 #: js/macros.js:38
 #.TRANS: a musically tuned set of bells
 #.TRANS: 
-msgid "chine"
+msgid "chime"
 msgstr "thaya suyu"
 
 #: js/musicutils.js:347

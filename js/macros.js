@@ -35,7 +35,7 @@ function getMacroExpansion (blkname, x, y) {
     const BPMOBJ = [[0, 'setbpm', x, y, [null, 1, null, 2]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
     const BUBBLESOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('bubbles')}], 0, 0, [0]]];
     const CATOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('cat')}], 0, 0, [0]]];
-    const CHINEOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('chine')}], 0, 0, [0]]];
+    const CHINEOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('chime')}], 0, 0, [0]]];
     const CLANGOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('clang')}], 0, 0, [0]]];
     const CLAPOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('clap')}], 0, 0, [0]]];
     const COWBELLOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('cow bell')}], 0, 0, [0]]];

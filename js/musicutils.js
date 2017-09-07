@@ -305,7 +305,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('cello'), 'cello', 'images/voices.svg'],
     //.TRANS: musical instrument
-    // [_('basse'), 'basse', 'images/voices.svg'],
+    // [_('bass'), 'basse', 'images/voices.svg'],
     //.TRANS: polytone synthesizer
     [_('poly'), 'poly', 'images/synth.svg'],
     //.TRANS: sine wave
@@ -342,7 +342,7 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg'],
     //.TRANS: a musically tuned set of bells
-    [_('chine'), 'chine', 'images/chine.svg'],
+    [_('chime'), 'chine', 'images/chine.svg'],
     //.TRANS: sound effect
     [_('clang'), 'clang', 'images/clang.svg'],
     //.TRANS: sound effect

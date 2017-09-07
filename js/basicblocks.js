@@ -1633,7 +1633,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var chineBlock = new ProtoBlock('chine');
     chineBlock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['chine'] = chineBlock;
-    chineBlock.staticLabels.push(_('chine'));
+    chineBlock.staticLabels.push(_('chime'));
     chineBlock.adjustWidthToLabel();
     chineBlock.oneArgBlock();
 
