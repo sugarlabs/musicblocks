@@ -894,11 +894,13 @@ function RhythmRuler () {
                     var idx = newStack.length;
                     var noteValue = noteValues[i];
 
+                    var obj = rationalToFraction(1 / Math.abs(noteValue));
+
                     newStack.push([idx, 'rhythm2', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
                     newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
                     newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
-                    newStack.push([idx + 3, ['number', {'value': 1}], 0, 0, [idx + 2]]);
-                    newStack.push([idx + 4, ['number', {'value': Math.abs(noteValue)}], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
                     newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
                     if (i == ruler.cells.length - 1) {
                         newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
@@ -945,6 +947,8 @@ function RhythmRuler () {
                     var idx = newStack.length;
                     var noteValue = noteValues[i];
 
+                    var obj = rationalToFraction(1 / Math.abs(noteValue));
+
                     var drumBlockNo = that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1];
                     var drum = that._logo.blocks.blockList[drumBlockNo].value;
 
@@ -952,14 +956,14 @@ function RhythmRuler () {
                         // Add a note block.
                         newStack.push([idx, 'newnote', 0, 0, [previousBlock, idx + 1, idx + 4, idx + 7]]);
                         newStack.push([idx + 1, 'divide', 0, 0, [idx, idx + 2, idx + 3]]);
-                        newStack.push([idx + 2, ['number', {'value': 1}], 0, 0, [idx + 1]]);
+                        newStack.push([idx + 2, ['number', {'value': obj[0]}], 0, 0, [idx + 1]]);
                         if (noteValue < 0) {
-                            newStack.push([idx + 3, ['number', {'value': -noteValue}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
                             newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
                             newStack.push([idx + 5, 'rest2', 0, 0, [idx + 4, idx + 6]]);
                             newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
                         } else {
-                            newStack.push([idx + 3, ['number', {'value': noteValue}], 0, 0, [idx + 1]]);
+                            newStack.push([idx + 3, ['number', {'value': obj[1]}], 0, 0, [idx + 1]]);
                             newStack.push([idx + 4, 'vspace', 0, 0, [idx, idx + 5]]);
                             newStack.push([idx + 5, 'playdrum', 0, 0, [idx + 4, idx + 6, null]]);
                             newStack.push([idx + 6, ['drumname', {'value': drum}], 0, 0, [idx + 5]]);
