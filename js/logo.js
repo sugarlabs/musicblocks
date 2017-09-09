@@ -113,6 +113,7 @@ function Logo () {
 
     // Music-related attributes
     this.notesPlayed = {};
+    this.playbackQueue = {};
 
     // Widget-related attributes
     this.showPitchDrumMatrix = false;
@@ -176,6 +177,7 @@ function Logo () {
 
     // parameters used by the note block
     this.bpm = {};
+    this.previousTurtleTime = [];
     this.turtleTime = [];
     this.noteDelay = 0;
     this.playedNote = {};
@@ -844,6 +846,7 @@ function Logo () {
         // Each turtle needs to keep its own wait time and music
         // states.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+	    this.previousTurtleTime[turtle] = 0;
             this.turtleTime[turtle] = 0;
             this.waitTimes[turtle] = 0;
             this.endOfClampSignals[turtle] = {};
@@ -880,6 +883,7 @@ function Logo () {
             this.skipFactor[turtle] = 1;
             this.skipIndex[turtle] = 0;
             this.notesPlayed[turtle] = 0;
+            this.playbackQueue[turtle] = [];
             this.keySignature[turtle] = 'C ' + _('major');
             this.pushedNote[turtle] = false;
             this.polyVolume[turtle] = [DEFAULTVOLUME];
@@ -1080,11 +1084,11 @@ function Logo () {
 
             var that = this;
             setTimeout(function () {
-		if (delayStart !== 0) {
+                if (delayStart !== 0) {
                     // Launching status block would have hidden the
                     // Stop Button so show it again.
                     that.onRunTurtle();
-		}
+                }
 
                 // If there are start blocks, run them all.
                 for (var b = 0; b < startBlocks.length; b++) {
@@ -5818,6 +5822,7 @@ function Logo () {
             // the next block is executed.
             var duration = noteBeatValue * this.beatFactor[turtle];  // beat value
             if (duration > 0 && !this.suppressOutput[turtle]) {
+                this.previousTurtleTime[turtle] = this.turtleTime[turtle];
                 this.turtleTime[turtle] += ((bpmFactor / duration) + (this.noteDelay / 1000));
                 this._doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) - turtleLag, 0));
             }
@@ -5836,7 +5841,8 @@ function Logo () {
                 waitTime = 0;
             }
 
-            __playnote = function (that) {
+            var that = this;
+            __playnote = function () {
                 // Stop playing notes if the stop button is pressed.
                 if (that.stopTurtle) {
                     return;
@@ -5995,20 +6001,27 @@ function Logo () {
                                     }
 
                                     that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), paramsEffects, null);
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes, beatValue, last(that.oscList[turtle]), paramsEffects, null]);
                                 } else if (that.drumStyle[turtle].length > 0) {
                                     that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null, null);
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes, beatValue, that.drumStyle[turtle], null, null]); 
                                 } else if (that.turtles.turtleList[turtle].drum) {
                                     that.synth.trigger(notes, beatValue, 'drum', null, null);
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes, beatValue, 'drum', null, null]); 
                                 } else {
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
                                             that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null]);
                                         } else if (turtle in that.instrumentNames && last(that.instrumentNames[turtle])) {
                                             that.synth.trigger(notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters]);
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null]);
                                         } else {
                                             that.synth.trigger(notes[d], beatValue, 'default', paramsEffects, null);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes[d], beatValue, 'default', paramsEffects, null]);
                                         }
                                     }
                                 }
@@ -6047,8 +6060,10 @@ function Logo () {
                             for (var i = 0; i < drums.length; i++) {
                                 if (that.drumStyle[turtle].length > 0) {
                                     that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), null, null);
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], ['C2'], beatValue, last(that.drumStyle[turtle]), null, null]);
                                 } else {
                                     that.synth.trigger(['C2'], beatValue, drums[i], null, null);
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], ['C2'], beatValue, drums[i], null, null]);
                                 }
                             }
                         }
@@ -6064,11 +6079,10 @@ function Logo () {
             };
 
             if (waitTime === 0 || this.suppressOutput[turtle]) {
-                __playnote(this);
+                __playnote();
             } else {
-                var that = this;
                 setTimeout(function () {
-                    __playnote(that);
+                    __playnote();
                 }, waitTime + this.noteDelay);
             }
 
@@ -6086,6 +6100,43 @@ function Logo () {
         }
 
         this.pushedNote[turtle] = false;
+    };
+
+    this.playback = function () {
+        // TODO: Add graphics
+        var d = new Date();
+	this.firstNoteTime = d.getTime();
+
+        var that = this;
+
+        __playbackLoop = function (turtle, idx) {
+	    that.synth.trigger(that.playbackQueue[turtle][idx][1], that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5]);
+            var d = new Date();
+            var elapsedTime = (d.getTime() - that.firstNoteTime);
+            idx += 1;
+            if (that.playbackQueue[turtle].length > idx) {
+                var timeout = that.playbackQueue[turtle][idx][0] * 1000 - elapsedTime;
+                if (timeout < 0) {
+                    timeout = 0;
+                }
+
+                setTimeout(function () {
+                    __playbackLoop(turtle, idx);
+                }, timeout);
+            }
+        };
+
+        __playback = function (turtle) {
+            setTimeout(function () {
+                __playbackLoop(turtle, 0);
+            }, that.playbackQueue[turtle][0][0] * 1000);
+        };
+
+        for (var turtle in this.playbackQueue) {
+            if (this.playbackQueue[turtle].length > 0) {
+                __playback(turtle);
+            }
+        }
     };
 
     this._dispatchTurtleSignals = function (turtle, beatValue, blk, noteBeatValue) {
