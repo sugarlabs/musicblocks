@@ -1328,7 +1328,6 @@ define(MYDEFINES, function (compatibility) {
                     logo.doStopTurtle();
                     break;
                 case 80: // 'P'
-                    console.log(logo.playbackQueue);
                     logo.playback();
                     break;
                 }

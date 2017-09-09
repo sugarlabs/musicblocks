@@ -3811,7 +3811,6 @@ function Logo () {
                     that.stopTurtle = true;
                 } else {
                     var __listener = function (event) {
-                        console.log('DO');
                         if (that.turtles.turtleList[turtle].running) {
                             var queueBlock = new Queue(that.actions[args[1]], 1, blk);
                             that.parentFlowQueue[turtle].push(blk);
@@ -6001,27 +6000,27 @@ function Logo () {
                                     }
 
                                     that.synth.trigger(notes, beatValue, last(that.oscList[turtle]), paramsEffects, null);
-                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes, beatValue, last(that.oscList[turtle]), paramsEffects, null]);
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle]), paramsEffects, null]);
                                 } else if (that.drumStyle[turtle].length > 0) {
                                     that.synth.trigger(notes, beatValue, last(that.drumStyle[turtle]), null, null);
-                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes, beatValue, that.drumStyle[turtle], null, null]); 
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, that.drumStyle[turtle], null, null]); 
                                 } else if (that.turtles.turtleList[turtle].drum) {
                                     that.synth.trigger(notes, beatValue, 'drum', null, null);
-                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes, beatValue, 'drum', null, null]); 
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, 'drum', null, null]); 
                                 } else {
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
                                             that.synth.trigger(notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null);
-                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null]);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null]);
                                         } else if (turtle in that.instrumentNames && last(that.instrumentNames[turtle])) {
                                             that.synth.trigger(notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters);
-                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters]);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters]);
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             that.synth.trigger(notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null);
-                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null]);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null]);
                                         } else {
                                             that.synth.trigger(notes[d], beatValue, 'default', paramsEffects, null);
-                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], notes[d], beatValue, 'default', paramsEffects, null]);
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, 'default', paramsEffects, null]);
                                         }
                                     }
                                 }
@@ -6060,10 +6059,10 @@ function Logo () {
                             for (var i = 0; i < drums.length; i++) {
                                 if (that.drumStyle[turtle].length > 0) {
                                     that.synth.trigger(['C2'], beatValue, last(that.drumStyle[turtle]), null, null);
-                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], ['C2'], beatValue, last(that.drumStyle[turtle]), null, null]);
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', ['C2'], beatValue, last(that.drumStyle[turtle]), null, null]);
                                 } else {
                                     that.synth.trigger(['C2'], beatValue, drums[i], null, null);
-                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], ['C2'], beatValue, drums[i], null, null]);
+                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', ['C2'], beatValue, drums[i], null, null]);
                                 }
                             }
                         }
@@ -6111,7 +6110,41 @@ function Logo () {
 
         __playbackLoop = function (turtle, idx) {
             if (!that.stopTurtle) {
-                that.synth.trigger(that.playbackQueue[turtle][idx][1], that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5]);
+                switch(that.playbackQueue[turtle][idx][1]) {
+                case 'notes':
+                    that.synth.trigger(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
+                    break;
+                case 'arc':
+                    that.turtles.turtleList[turtle].doArc(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
+                case 'forward':
+                    that.turtles.turtleList[turtle].doForward(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'right':
+                    that.turtles.turtleList[turtle].doRight(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'setcolor':
+                    that.turtles.turtleList[turtle].doSetColor(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'sethue':
+                    that.turtles.turtleList[turtle].doSetHue(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'setshade':
+                    that.turtles.turtleList[turtle].doSetValue(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'settranslucency':
+                    that.turtles.turtleList[turtle].doSetPenAlpha(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'setgrey':
+                    that.turtles.turtleList[turtle].doSetChroma(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'setpensize':
+                    that.turtles.turtleList[turtle].doSetPensize(that.playbackQueue[turtle][idx][2]);
+                    break;
+                default:
+                    console.log(that.playbackQueue[turtle][idx][1]);
+                    break;
+                }
+
                 var d = new Date();
                 var elapsedTime = (d.getTime() - that.firstNoteTime);
                 idx += 1;
@@ -6136,6 +6169,14 @@ function Logo () {
 
         this.onRunTurtle();
         this.stopTurtle = false;
+        for (var turtle in this.playbackQueue) {
+            this.playbackQueue[turtle] = this.playbackQueue[turtle].sort(
+                function(a, b) {
+                    return a[0] - b[0]
+                }
+            )
+        }
+
         for (var turtle in this.playbackQueue) {
             if (this.playbackQueue[turtle].length > 0) {
                 __playback(turtle);
@@ -6249,11 +6290,15 @@ function Logo () {
             case 'setpensize':
                 var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 __pen(turtle, name, arg, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, name, arg]);
                 break;
             case 'right':
                 var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
-                    __right(turtle, arg / (NOTEDIV / that.dispatchFactor[turtle]), waitTime + t * stepTime * this.dispatchFactor[turtle]);
+                    var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
+                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    __right(turtle, deltaArg, deltaTime);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'right', deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
@@ -6261,7 +6306,10 @@ function Logo () {
             case 'left':
                 var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
-                    __right(turtle, -arg / (NOTEDIV / that.dispatchFactor[turtle]), waitTime + t * stepTime * this.dispatchFactor[turtle]);
+                    var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
+                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    __right(turtle, -deltaArg, deltaTime);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'right', -deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
@@ -6269,7 +6317,10 @@ function Logo () {
             case 'forward':
                 var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
-                    __forward(turtle, arg / (NOTEDIV / that.dispatchFactor[turtle]), waitTime + t * stepTime * this.dispatchFactor[turtle]);
+                    var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
+                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    __forward(turtle, deltaArg, deltaTime);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'forward', deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
@@ -6277,7 +6328,10 @@ function Logo () {
             case 'back':
                 var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
-                    __forward(turtle, -arg / (NOTEDIV / that.dispatchFactor[turtle]), waitTime + t * stepTime * this.dispatchFactor[turtle]);
+                    var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
+                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    __forward(turtle, -deltaArg, deltaTime);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'forward', -deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
@@ -6286,7 +6340,10 @@ function Logo () {
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
-                    __arc(turtle, arg1 / (NOTEDIV / that.dispatchFactor[turtle]), arg2, waitTime + t * stepTime * this.dispatchFactor[turtle]);
+                    var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
+                    var deltaArg = arg1 / (NOTEDIV / that.dispatchFactor[turtle]);
+                    __arc(turtle, deltaArg, arg2, deltaTime);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'arc', deltaArg, arg2]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
