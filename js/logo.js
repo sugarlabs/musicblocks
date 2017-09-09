@@ -6110,19 +6110,21 @@ function Logo () {
         var that = this;
 
         __playbackLoop = function (turtle, idx) {
-	    that.synth.trigger(that.playbackQueue[turtle][idx][1], that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5]);
-            var d = new Date();
-            var elapsedTime = (d.getTime() - that.firstNoteTime);
-            idx += 1;
-            if (that.playbackQueue[turtle].length > idx) {
-                var timeout = that.playbackQueue[turtle][idx][0] * 1000 - elapsedTime;
-                if (timeout < 0) {
-                    timeout = 0;
-                }
+            if (!that.stopTurtle) {
+                that.synth.trigger(that.playbackQueue[turtle][idx][1], that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5]);
+                var d = new Date();
+                var elapsedTime = (d.getTime() - that.firstNoteTime);
+                idx += 1;
+                if (that.playbackQueue[turtle].length > idx) {
+                    var timeout = that.playbackQueue[turtle][idx][0] * 1000 - elapsedTime;
+                    if (timeout < 0) {
+                        timeout = 0;
+                    }
 
-                setTimeout(function () {
-                    __playbackLoop(turtle, idx);
-                }, timeout);
+                    setTimeout(function () {
+                        __playbackLoop(turtle, idx);
+                    }, timeout);
+                }
             }
         };
 
@@ -6132,6 +6134,8 @@ function Logo () {
             }, that.playbackQueue[turtle][0][0] * 1000);
         };
 
+        this.onRunTurtle();
+        this.stopTurtle = false;
         for (var turtle in this.playbackQueue) {
             if (this.playbackQueue[turtle].length > 0) {
                 __playback(turtle);
