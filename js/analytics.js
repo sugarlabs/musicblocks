@@ -31,10 +31,16 @@ const TACAT = {
     'setmasterbpm': 'rhythm',
     'newswing2': 'rhythm',
     'drift': 'rhythm',
+    'offbeatdo': 'beat',
+    'onbeatdo': 'beat',
+    'pickup': 'rhythm',
+    'meter': 'rhythm',
 
     'matrix': 'ignore',
     'tuplet2': 'ignore',
+    'simpletuplet': 'ignore',
     'rhythm': 'ignore',
+    'rhythm2': 'ignore',
     'rhythmruler': 'ignore',
     'pitchstaircase': 'ignore',
     'pitchslider': 'ignore',
@@ -48,12 +54,19 @@ const TACAT = {
     'beatfactor': 'rhythmfactor',
     'skipfactor': 'rhythmfactor',
     'duplicationfactor': 'rhythmfactor',
+    'measurevalue': 'rhythmfactor',
+    'beatvalue': 'rhythmfactor',
+    'notecounter': 'rhythmfactor',
+    'mynotevalue': 'rhythmfactor',
+    'elapsednotes': 'rhythmfactor',
+    'elapsednotes2': 'rhythmfactor',
 
     'notename': 'ignore',
     'solfege': 'ignore',
     'drumname': 'ignore',
     'voicename': 'ignore',
     'modename': 'ignore',
+    'eastindiansolfege': 'ignore',
     'filtertype':'ignore',
     'oscillatortype':'ignore',
 
@@ -66,14 +79,20 @@ const TACAT = {
     'transpositionfactor': 'transposefactor',
     'consonantstepsizedown': 'transposefactor',
     'consonantstepsizeup': 'transposefactor',
+    'mypitch': 'transposefactor',
     'turtlepitch': 'transposefactor',
     'number2pitch': 'transposefactor',
     'number2octave': 'transposefactor',
+    'setpitchnumberoffset': 'transposefactor',
+    'pitchnumber': 'transposefactor',
+    'scaledegree': 'transposefactor',
+    'steppitch': 'transposefactor',
 
     'settransposition': 'transpose',
     'invert': 'transpose',
-//  'invert2': 'transpose',
-    
+    'invert1': 'transpose',
+    'invert2': 'transpose',
+
     'diminished': 'pitchchord',
     'augmented': 'pitchchord',
     'perfect': 'pitchchord',
@@ -86,16 +105,30 @@ const TACAT = {
     'notevolumefactor': 'tonefactor',
     'key': 'tonefactor',
 
+    'playdrum': 'tone',
+    'settimbre': 'tone',
     'setkey': 'tone',
     'setkey2': 'tone',
     'setvoice': 'tone',
     'setdrum': 'tone',
     'articulation': 'tone',
     'setnotevolume2': 'tone',
+    'setnotevolume': 'tone',
     'newstaccato': 'tone',
     'newslur': 'tone',
     'swing': 'tone',
     'crescendo': 'tone',
+    'envelope': 'tone',
+    'oscillatortype': 'tone',
+    'filter': 'tone',
+    'amsynth': 'tone',
+    'fmsynth': 'tone',
+    'duosynth': 'tone',
+    'dis': 'tone',
+    'tremolo': 'tone',
+    'chorus': 'tone',
+    'phaser': 'tone',
+    'vibrato': 'tone',
 
     'clear': 'forward',
     'forward': 'forward',
@@ -138,13 +171,13 @@ const TACAT = {
     'minus': 'number',
     'multiply': 'number',
     'divide': 'number',
-    'oneOf': 'number',
     'shade': 'pen',
     'mod': 'number',
     'int': 'number',
     'sqrt': 'number',
     'identity': 'number',
     'power': 'number',
+    'abs': 'number',
 
     'and': 'boolean',
     'or': 'boolean',
@@ -154,6 +187,7 @@ const TACAT = {
     'equal': 'boolean',
 
     'random': 'random',
+    'oneOf': 'random',
 
     'repeat': 'repeat',
     'forever': 'repeat',
@@ -162,6 +196,11 @@ const TACAT = {
     'ifthenelse': 'ifthen',
     'while': 'ifthen',
     'until': 'ifthen',
+    'switch': 'ifthen',
+    'case': 'ifthen',
+    'default': 'ifthen',
+    'break': 'ifthen',
+    'waitfor': 'ifthen',
 
     'action': 'action',
     'do': 'action',
@@ -188,8 +227,8 @@ const TACAT = {
     'mousex': 'sensor',
     'mousey': 'sensor',
 
-    'drum': 'action',
-    'start': 'action',
+    'drum': 'ignore',
+    'start': 'ignore',
 
     'mousebutton': 'sensor',
     'keyboard': 'sensor',
@@ -209,8 +248,6 @@ const TACAT = {
     'audio': 'media',
     'show': 'media',
     'setscale': 'media',
-    'savepix': 'media',
-    'savesvg': 'media',
     'mediawait': 'media',
     'mediapause': 'media',
     'mediastop': 'media',
@@ -219,21 +256,27 @@ const TACAT = {
     'sinewave': 'media',
     'description': 'media',
 
-    'push': 'extras',
-    'pop': 'extras',
-    'printheap': 'extras',
-    'clearheap': 'extras',
-    'isheapempty': 'extras',
-    'chr': 'extras',
-    'print': 'extras',
+    'savepix': 'ignore',
+    'savesvg': 'ignore',
+    'saveabc': 'ignore',
+    'savelilypond': 'ignore',
+    'nobackground': 'ignore',
+
+    'push': 'box',
+    'pop': 'box',
+    'printheap': 'box',
+    'clearheap': 'box',
+    'isheapempty': 'box',
+    'chr': 'number',
+    'print': 'ignore',
 
     'int': 'number',
 
     'myfunction': 'python',
     'userdefined': 'python',
-    'box': 'box',
-    'showHeap': 'extras',
-    'emptyHeap': 'extras',
+    'box': 'ignore',
+    'showHeap': 'box',
+    'emptyHeap': 'box',
     'loadblock': 'python',
     'loadpalette': 'python',
 
@@ -242,11 +285,27 @@ const TACAT = {
     'text': 'ignore',
     'number': 'ignore',
     'hspace': 'ignore',
-    'vspace': 'ignore'
+    'vspace': 'ignore',
+
+    'setturtlename2': 'mice',
+    'setturtlename': 'mice',
+    'turtlename': 'ignore',
+    'turtlesync': 'mice',
+    'turtlenote2': 'mice',
+    'turtlenote': 'mice',
+    'turtlepitch': 'mice',
+    'turtleelapsednotes': 'mice',
+    'xturtle': 'mice',
+    'yturtle': 'mice',
+    'turtleheading': 'mice',
+    'turtlecolor': 'mice',
+    'startturtle': 'mice',
+    'stopturtle': 'mice',
 };
 
 // Assign each bin to a palette.
 const TAPAL = {
+    'beat': 'notesp',
     'note': 'notesp',
     'rhythm': 'notesp',
     'rhythmfactor': 'notesp',
@@ -270,9 +329,9 @@ const TAPAL = {
     'box': 'boxp',
     'sensor': 'sensorp',
     'media': 'mediap',
-    'extras': 'extrasp',
+    'mice': 'micep',
     'number': 'numberp',
-    'python': 'extrasp',
+    'python': 'numberp',
     'ignore': 'numberp'
 };
 
@@ -280,6 +339,7 @@ const TAPAL = {
 const TASCORE = {
     'note': 1,
     'notefactor': 1,
+    'beat': 10,
     'rhythm': 5,
     'rhythmfactor': 5,
     'pitchchord': 3,
@@ -299,25 +359,25 @@ const TASCORE = {
     'boolean': 2.5,
     'random': 2.5,
     'repeat': 2.5,
-    'ifthen': 7.5,
-    'flowp': 10,
-    'box': 7.5,
-    'action': 7.5,
+    'ifthen': 5,
+    'flowp': 2.5,
+    'box': 2.5,
+    'action': 2.5,
     'boxp': 0,
     'media': 5,
     'mediap': 0,
     'python': 5,
-    'extras': 5,
-    'extrasp': 0,
+    'mice': 7.5,
+    'micep': 2.5,
     'ignore': 0,
     'sensor': 5,
     'sensorp': 0
 };
 
 // The list of palettes.
-const PALS = ['notesp', 'pitchp', 'tonep', 'turtlep', 'penp', 'numberp', 'flowp', 'boxp', 'sensorp', 'mediap', 'extrasp'];
+const PALS = ['notesp', 'pitchp', 'tonep', 'turtlep', 'penp', 'numberp', 'flowp', 'boxp', 'sensorp', 'mediap', 'micep'];
 
-const PALLABELS = [_('rhythm'), _('pitch'), _('tone'), _('mouse'), _('pen'), _('number'), _('flow'), _('action'), _('sensors'), _('media'), _('extras')];
+const PALLABELS = [_('rhythm'), _('pitch'), _('tone'), _('mouse'), _('pen'), _('number'), _('flow'), _('action'), _('sensors'), _('media'), _('mice')];
 
 
 function analyzeProject(blocks) {
@@ -328,6 +388,7 @@ function analyzeProject(blocks) {
         if (blocks.blockList[blk].trash) {
             continue;
         }
+
         // Check to see if the block is solo or has no child flow..
         switch(blocks.blockList[blk].name) {
         case 'rhythmicdot':
@@ -355,6 +416,11 @@ function analyzeProject(blocks) {
         case 'swing':
         case 'crescendo':
         case 'setnotevolume2':
+        case 'vibrato':
+        case 'tremolo':
+        case 'dis':
+        case 'chorus':
+        case 'phaser':
         case 'action':
             if (blocks.blockList[blk].connections[2] == null) {
 		continue;
