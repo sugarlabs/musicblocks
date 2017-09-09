@@ -852,6 +852,15 @@ function initBasicProtoBlocks(palettes, blocks) {
     newswingBlock.defaults.push(1 / 24);
     newswingBlock.defaults.push(1 / 8);
 
+    var setMasterBPMBlock = new ProtoBlock('setmasterbpm');
+    setMasterBPMBlock.palette = palettes.dict['rhythm'];
+    blocks.protoBlockDict['setmasterbpm'] = setMasterBPMBlock;
+    //.TRANS: master beats per minute controls BPM for all mice
+    setMasterBPMBlock.staticLabels.push(_('master beats per minute'));
+    setMasterBPMBlock.adjustWidthToLabel();
+    setMasterBPMBlock.oneArgBlock();
+    setMasterBPMBlock.defaults.push(90);
+
     var setbpmBlock = new ProtoBlock('setbpm');
     setbpmBlock.palette = palettes.dict['rhythm'];
     blocks.protoBlockDict['setbpm'] = setbpmBlock;
@@ -1031,15 +1040,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     setkey2Block.twoArgBlock();
     setkey2Block.dockTypes[1] = 'anyin';
     setkey2Block.dockTypes[2] = 'anyin';
-
-    var setMasterBPMBlock = new ProtoBlock('setmasterbpm');
-    setMasterBPMBlock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setmasterbpm'] = setMasterBPMBlock;
-    //.TRANS: master beats per minute controls BPM for all mice
-    setMasterBPMBlock.staticLabels.push(_('master beats per minute'));
-    setMasterBPMBlock.adjustWidthToLabel();
-    setMasterBPMBlock.oneArgBlock();
-    setMasterBPMBlock.defaults.push(90);
 
     var amSynthBlock = new ProtoBlock('amsynth');
     amSynthBlock.palette = palettes.dict['tone'];
