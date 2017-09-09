@@ -3897,7 +3897,6 @@ function Blocks () {
     this._cleanupStacks = function () {
         if (this._checkArgClampBlocks.length > 0) {
             // We make multiple passes because we need to account for nesting.
-            // FIXME: needs to be interwoven with TwoArgBlocks check.
             for (var i = 0; i < this._checkArgClampBlocks.length; i++) {
                 for (var b = 0; b < this._checkArgClampBlocks.length; b++) {
                     this._adjustArgClampBlock([this._checkArgClampBlocks[b]]);

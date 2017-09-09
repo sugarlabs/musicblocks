@@ -223,7 +223,6 @@ function ModeWidget() {
     this._addNotes = function() {
         // This is a brute-force way of adding notes in a circular
         // pattern within an HTML table.
-        // Fix me: Some of this could be done with CSS.
 
         var table = docById('modeTable');
 
