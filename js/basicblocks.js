@@ -2545,6 +2545,24 @@ function initBasicProtoBlocks(palettes, blocks) {
 
     // MEDIA PALETTE
 
+    var audioStopBlock = new ProtoBlock('stopplayback');
+    audioStopBlock.palette = palettes.dict['media'];
+    blocks.protoBlockDict['stopplayback'] = audioStopBlock;
+    //.TRANS: stops playback of an audio recording
+    audioStopBlock.staticLabels.push(_('stop play'));
+    audioStopBlock.adjustWidthToLabel();
+    audioStopBlock.zeroArgBlock();
+
+    var audioBlock = new ProtoBlock('playback');
+    audioBlock.palette = palettes.dict['media'];
+    blocks.protoBlockDict['playback'] = audioBlock;
+    audioBlock.defaults.push(null);
+    //.TRANS: play an audio recording
+    audioBlock.staticLabels.push(_('play back'));
+    audioBlock.adjustWidthToLabel();
+    audioBlock.oneArgBlock();
+    audioBlock.dockTypes[1] = 'mediain';
+
     var speakBlock = new ProtoBlock('speak');
     speakBlock.palette = palettes.dict['media'];
     blocks.protoBlockDict['speak'] = speakBlock;
@@ -2810,23 +2828,6 @@ function initBasicProtoBlocks(palettes, blocks) {
     nopThreeArgBlock.dockTypes[1] = 'anyin';
     nopThreeArgBlock.dockTypes[2] = 'anyin';
     nopThreeArgBlock.dockTypes[3] = 'anyin';
-
-    var audioBlock = new ProtoBlock('playback');
-    audioBlock.palette = palettes.dict['extras'];
-    blocks.protoBlockDict['playback'] = audioBlock;
-    audioBlock.defaults.push(null);
-    //.TRANS: play an audio recording
-    audioBlock.staticLabels.push(_('play back'));
-    audioBlock.adjustWidthToLabel();
-    audioBlock.oneArgBlock();
-    audioBlock.dockTypes[1] = 'mediain';
-
-    var audioStopBlock = new ProtoBlock('stopplayback');
-    audioStopBlock.palette = palettes.dict['extras'];
-    blocks.protoBlockDict['stopplayback'] = audioStopBlock;
-    audioStopBlock.staticLabels.push(_('stop play'));
-    audioStopBlock.adjustWidthToLabel();
-    audioStopBlock.zeroArgBlock();
 
     var abcBlock = new ProtoBlock('saveabc');
     abcBlock.palette = palettes.dict['extras'];
