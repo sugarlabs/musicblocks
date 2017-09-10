@@ -5920,10 +5920,6 @@ function Logo () {
                     vibratoValue = beatValue * (duration / vibratoRate);
                 }
 
-                that._dispatchTurtleSignals(turtle, beatValue, blk, noteBeatValue);
-                // After the note plays, clear the embedded graphics queue.
-                that.embeddedGraphics[turtle] = [];
-
                 // Process pitches
                 if (that.notePitches[turtle].length > 0) {
                     for (var i = 0; i < that.notePitches[turtle].length; i++) {
@@ -6100,6 +6096,10 @@ function Logo () {
                     }
                 }
 
+                that._dispatchTurtleSignals(turtle, beatValue, blk, noteBeatValue);
+                // After the note plays, clear the embedded graphics queue.
+                that.embeddedGraphics[turtle] = [];
+
                 // Ensure note value block unhighlights after note plays.
                 setTimeout(function () {
                     if (that.blocks.visible) {
@@ -6210,16 +6210,6 @@ function Logo () {
 
         this.onRunTurtle();
         this.stopTurtle = false;
-        /*
-        for (var turtle in this.playbackQueue) {
-            this.playbackQueue[turtle] = this.playbackQueue[turtle].sort(
-                function(a, b) {
-                    return a[0] - b[0]
-                }
-            )
-        }
-        */
-        console.log(this.playbackQueue);
 
         for (var turtle in this.playbackQueue) {
             if (this.playbackQueue[turtle].length > 0) {
