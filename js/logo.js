@@ -1738,8 +1738,13 @@ function Logo () {
                     }
                     that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
                     that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
+                } else if (that.inNoteBlock[turtle] > 0) {
+                    if (!that.suppressOutput[turtle]) {
+                        that.embeddedGraphics[turtle].push(blk);
+                    }
                 } else {
                     that.turtles.turtleList[turtle].doSetXY(args[0], args[1]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setxy', args[0], args[1]]);
                 }
             }
             break;
@@ -1761,6 +1766,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doArc(args[0], args[1]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'arc', args[0], args[1]]);
                 }
             }
             break;
@@ -1855,6 +1861,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doForward(args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'forward', args[0]);
                 }
             }
             break;
@@ -1876,6 +1883,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doForward(-args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'forward', -args[0]);
                 }
             }
             break;
@@ -1897,6 +1905,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doRight(args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'right', args[0]);
                 }
             }
             break;
@@ -1918,6 +1927,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doRight(-args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'right', -args[0]);
                 }
             }
             break;
@@ -1935,6 +1945,7 @@ function Logo () {
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else {
                     that.turtles.turtleList[turtle].doSetHeading(args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'heading', args[0]);
                 }
             }
             break;
@@ -2076,6 +2087,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doSetColor(args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'color', args[0]);
                 }
             }
             break;
@@ -2107,6 +2119,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doSetHue(args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'sethue', args[0]);
                 }
             }
             break;
@@ -2128,6 +2141,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doSetValue(args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'shade', args[0]);
                 }
             }
             break;
@@ -2151,6 +2165,7 @@ function Logo () {
                     args[0] %= 101;
                     var alpha = 1.0 - (args[0] / 100);
                     that.turtles.turtleList[turtle].doSetPenAlpha(alpha);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'settranslucency', args[0]);
                 }
             }
             break;
@@ -2172,6 +2187,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doSetChroma(args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setgrey', args[0]);
                 }
             }
             break;
@@ -2193,6 +2209,7 @@ function Logo () {
                     }
                 } else {
                     that.turtles.turtleList[turtle].doSetPensize(args[0]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setpensize', args[0]);
                 }
             }
             break;
@@ -2263,10 +2280,24 @@ function Logo () {
             that.setBackgroundColor(turtle);
             break;
         case 'penup':
-            that.turtles.turtleList[turtle].doPenUp();
+            if (that.inNoteBlock[turtle] > 0) {
+                if (!that.suppressOutput[turtle]) {
+                    that.embeddedGraphics[turtle].push(blk);
+                }
+            } else {
+                that.turtles.turtleList[turtle].doPenUp();
+		that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'penup']);
+            }
             break;
         case 'pendown':
-            that.turtles.turtleList[turtle].doPenDown();
+            if (that.inNoteBlock[turtle] > 0) {
+                if (!that.suppressOutput[turtle]) {
+                    that.embeddedGraphics[turtle].push(blk);
+                }
+            } else {
+                that.turtles.turtleList[turtle].doPenDown();
+		that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'pendown']);
+            }
             break;
         case 'openProject':
             url = args[0];
@@ -6116,6 +6147,10 @@ function Logo () {
                     break;
                 case 'arc':
                     that.turtles.turtleList[turtle].doArc(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
+                    break;
+                case 'setxy':
+                    that.turtles.turtleList[turtle].doSetXY(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
+                    break;
                 case 'forward':
                     that.turtles.turtleList[turtle].doForward(that.playbackQueue[turtle][idx][2]);
                     break;
@@ -6139,6 +6174,12 @@ function Logo () {
                     break;
                 case 'setpensize':
                     that.turtles.turtleList[turtle].doSetPensize(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'penup':
+                    that.turtles.turtleList[turtle].doPenUp();
+                    break;
+                case 'pendown':
+                    that.turtles.turtleList[turtle].doPenDown();
                     break;
                 default:
                     console.log(that.playbackQueue[turtle][idx][1]);
@@ -6177,6 +6218,8 @@ function Logo () {
             )
         }
 
+        // console.log(this.playbackQueue);
+
         for (var turtle in this.playbackQueue) {
             if (this.playbackQueue[turtle].length > 0) {
                 __playback(turtle);
@@ -6196,6 +6239,12 @@ function Logo () {
         function __pen(turtle, name, arg, timeout) {
             setTimeout(function () {
                 switch(name) {
+                case 'penup':
+                    that.turtles.turtleList[turtle].doPenUp();
+                    break;
+                case 'pendown':
+                    that.turtles.turtleList[turtle].doPenDown();
+                    break;
                 case 'setcolor':
                     that.turtles.turtleList[turtle].doSetColor(arg);
                     break;
@@ -6227,6 +6276,12 @@ function Logo () {
         function __forward(turtle, arg, timeout) {
             setTimeout(function () {
                 that.turtles.turtleList[turtle].doForward(arg);
+            }, timeout);
+        };
+
+        function __setxy(turtle, arg1, arg2, timeout) {
+            setTimeout(function () {
+                that.turtles.turtleList[turtle].doSetXY(arg1, arg2);
             }, timeout);
         };
 
@@ -6292,6 +6347,11 @@ function Logo () {
                 __pen(turtle, name, arg, waitTime);
                 that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, name, arg]);
                 break;
+            case 'penup':
+            case 'pendown':
+                __pen(turtle, name, null, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, name]);
+                break;
             case 'right':
                 var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
@@ -6335,6 +6395,12 @@ function Logo () {
                 }
 
                 waitTime += NOTEDIV * stepTime;
+                break;
+            case 'setxy':
+                var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
+                var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
+                __setxy(turtle, arg1, arg2, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'setxy', arg1, arg2]);
                 break;
             case 'arc':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
