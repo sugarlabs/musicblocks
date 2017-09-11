@@ -6179,29 +6179,29 @@ function Logo () {
         // TODO: Add graphics
         var d = new Date();
         this.firstNoteTime = d.getTime();
-        var inFill = false;
-        var inHollowLine = false;
+        var inFillClamp = false;
+        var inHollowLineClamp = false;
         var that = this;
 
         __playbackLoop = function (turtle, idx) {
             if (!that.stopTurtle) {
                 switch(that.playbackQueue[turtle][idx][1]) {
                 case 'fill':
-                    if (inFill) {
+                    if (inFillClamp) {
                         that.turtles.turtleList[turtle].doEndFill();
-                        inFill = false;
+                        inFillClamp = false;
                     } else {
                         that.turtles.turtleList[turtle].doStartFill();
-                        inFill = true;
+                        inFillClamp = true;
                     }
                     break;
                 case 'hollowline':
-                    if (inHollowLine) {
+                    if (inHollowLineClamp) {
                         that.turtles.turtleList[turtle].doEndHollowLine();
-                        inHollowLine = false;
+                        inHollowLineClamp = false;
                     } else {
                         that.turtles.turtleList[turtle].doStartHollowLine();
-                        inHollowLine = true;
+                        inHollowLineClamp = true;
                     }
                     break;
                 case 'notes':
@@ -6299,8 +6299,8 @@ function Logo () {
         }
 
         var that = this;
-        var inFill = false;
-        var inHollowLine = false;
+        var inFillClamp = false;
+        var inHollowLineClamp = false;
 
         function __pen(turtle, name, arg, timeout) {
             setTimeout(function () {
@@ -6379,24 +6379,24 @@ function Logo () {
 
         function __fill(turtle, timeout) {
             setTimeout(function () {
-                if (inFill) {
+                if (inFillClamp) {
                     that.turtles.turtleList[turtle].doEndFill();
-                    inFill = false;
+                    inFillClamp = false;
                 } else {
                     that.turtles.turtleList[turtle].doStartFill();
-                    inFill = true;
+                    inFillClamp = true;
                 }
             }, timeout);
         };
 
         function __hollowline(turtle, timeout) {
             setTimeout(function () {
-                if (inHollowLine) {
+                if (inHollowLineClamp) {
                     that.turtles.turtleList[turtle].doEndHollowLine();
-                    inHollowLine = false;
+                    inHollowLineClamp = false;
                 } else {
                     that.turtles.turtleList[turtle].doStartHollowLine();
-                    inHollowLine = true;
+                    inHollowLineClamp = true;
                 }
             }, timeout);
         };
