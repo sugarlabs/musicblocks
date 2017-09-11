@@ -2266,7 +2266,14 @@ function Logo () {
             that.turtles.turtleList[turtle].doEndFill();
             break;
         case 'hollowline':
-            that.turtles.turtleList[turtle].doStartHollowLine();
+            if (that.inNoteBlock[turtle] > 0) {
+                if (!that.suppressOutput[turtle]) {
+                    that.embeddedGraphics[turtle].push(blk);
+                }
+            } else {
+                that.turtles.turtleList[turtle].doStartHollowLine();
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'hollowline']);
+            }
 
             childFlow = args[0];
             childFlowCount = 1;
@@ -2275,7 +2282,14 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                that.turtles.turtleList[turtle].doEndHollowLine();
+                if (that.inNoteBlock[turtle] > 0) {
+                    if (!that.suppressOutput[turtle]) {
+                        that.embeddedGraphics[turtle].push(blk);
+                    }
+                } else {
+                    that.turtles.turtleList[turtle].doEndHollowLine();
+                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'hollowline']);
+                }
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -6166,6 +6180,7 @@ function Logo () {
         var d = new Date();
         this.firstNoteTime = d.getTime();
         var inFill = false;
+        var inHollowLine = false;
         var that = this;
 
         __playbackLoop = function (turtle, idx) {
@@ -6178,6 +6193,15 @@ function Logo () {
                     } else {
                         that.turtles.turtleList[turtle].doStartFill();
                         inFill = true;
+                    }
+                    break;
+                case 'hollowline':
+                    if (inHollowLine) {
+                        that.turtles.turtleList[turtle].doEndHollowLine();
+                        inHollowLine = false;
+                    } else {
+                        that.turtles.turtleList[turtle].doStartHollowLine();
+                        inHollowLine = true;
                     }
                     break;
                 case 'notes':
@@ -6276,6 +6300,7 @@ function Logo () {
 
         var that = this;
         var inFill = false;
+        var inHollowLine = false;
 
         function __pen(turtle, name, arg, timeout) {
             setTimeout(function () {
@@ -6364,6 +6389,18 @@ function Logo () {
             }, timeout);
         };
 
+        function __hollowline(turtle, timeout) {
+            setTimeout(function () {
+                if (inHollowLine) {
+                    that.turtles.turtleList[turtle].doEndHollowLine();
+                    inHollowLine = false;
+                } else {
+                    that.turtles.turtleList[turtle].doStartHollowLine();
+                    inHollowLine = true;
+                }
+            }, timeout);
+        };
+
         var extendedGraphicsCounter = 0;
         for (var i = 0; i < this.embeddedGraphics[turtle].length; i++) {
             var b = this.embeddedGraphics[turtle][i];
@@ -6428,6 +6465,10 @@ function Logo () {
             case 'fill':
                 __fill(turtle, waitTime);
                 that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'fill']);
+                break;
+            case 'hollowline':
+                __hollowline(turtle, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'hollowline']);
                 break;
             case 'controlpoint1':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
