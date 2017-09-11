@@ -431,6 +431,7 @@ function Logo () {
         var notesFinish = {};
         var thisNote = {};
         var that = this;
+
         __stepNote();
 
         function __stepNote() {
@@ -1099,6 +1100,7 @@ function Logo () {
             }
 
             var that = this;
+
             setTimeout(function () {
                 if (delayStart !== 0) {
                     // Launching status block would have hidden the
@@ -1138,6 +1140,8 @@ function Logo () {
         if (blk == null) {
             return;
         }
+
+        var logo = that;  // For plugin backward compatibility
 
         this.receivedArg = receivedArg;
 
@@ -1285,6 +1289,8 @@ function Logo () {
 
     this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
+
+        var logo = that;  // For plugin backward compatibility
         this.receivedArg = receivedArg;
 
         // Sometimes we don't want to unwind the entire queue.
@@ -7100,6 +7106,8 @@ function Logo () {
     };
 
     this.parseArg = function (that, turtle, blk, parentBlk, receivedArg) {
+        var logo = that;  // For plugin backward compatibility
+
         // Retrieve the value of a block.
         if (blk == null) {
             console.log('NO INPUT');
