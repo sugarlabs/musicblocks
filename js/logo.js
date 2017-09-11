@@ -6176,7 +6176,13 @@ function Logo () {
     };
 
     this.playback = function () {
-        // TODO: Add graphics
+        // TODO: Add volume support
+
+        if (this.turtles.running()) {
+            this.errorMsg(_('You must hit the stop button before playback.'), null);
+            return;
+        }
+
         var d = new Date();
         this.firstNoteTime = d.getTime();
         var inFillClamp = false;
