@@ -855,6 +855,9 @@ define(MYDEFINES, function (compatibility) {
                                 refreshCanvas();
 
                                 logo.playbackQueue = {};
+                                docById('playbackTableDiv').style.visibility = 'hidden';
+                                docById('playbackButtonsDiv').style.visibility = 'hidden';
+                                docById('playbackDiv').style.visibility = 'hidden';
                                 blocks.loadNewBlocks(obj);
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
@@ -895,6 +898,9 @@ define(MYDEFINES, function (compatibility) {
                                 refreshCanvas();
     
                                 logo.playbackQueue = {};
+                                docById('playbackTableDiv').style.visibility = 'hidden';
+                                docById('playbackButtonsDiv').style.visibility = 'hidden';
+                                docById('playbackDiv').style.visibility = 'hidden';
                                 blocks.loadNewBlocks(obj);
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
@@ -1646,6 +1652,9 @@ define(MYDEFINES, function (compatibility) {
 
             if (addStartBlock) {
                 logo.playbackQueue = {};
+                docById('playbackTableDiv').style.visibility = 'hidden';
+                docById('playbackButtonsDiv').style.visibility = 'hidden';
+                docById('playbackDiv').style.visibility = 'hidden';
                 blocks.loadNewBlocks(DATAOBJS);
             } else if (!doNotSave) {
                 // Overwrite session data too.
@@ -1998,6 +2007,9 @@ define(MYDEFINES, function (compatibility) {
 
                     var obj = JSON.parse(cleanData);
                     logo.playbackQueue = {};
+                    docById('playbackTableDiv').style.visibility = 'hidden';
+                    docById('playbackButtonsDiv').style.visibility = 'hidden';
+                    docById('playbackDiv').style.visibility = 'hidden';
                     blocks.loadNewBlocks(obj);
                     saveLocally();
                 } catch (e) {
@@ -2054,6 +2066,9 @@ define(MYDEFINES, function (compatibility) {
             try {
                 var obj = JSON.parse(data);
                 logo.playbackQueue = {};
+                docById('playbackTableDiv').style.visibility = 'hidden';
+                docById('playbackButtonsDiv').style.visibility = 'hidden';
+                docById('playbackDiv').style.visibility = 'hidden';
                 blocks.loadNewBlocks(obj);
             } catch (e) {
                 console.log('loadRawProject: could not parse project data');
@@ -2129,6 +2144,9 @@ define(MYDEFINES, function (compatibility) {
             justLoadStart = function () {
                 console.log('loading start and a matrix');
                 logo.playbackQueue = {};
+                docById('playbackTableDiv').style.visibility = 'hidden';
+                docById('playbackButtonsDiv').style.visibility = 'hidden';
+                docById('playbackDiv').style.visibility = 'hidden';
                 blocks.loadNewBlocks(DATAOBJS);
             };
 
@@ -2182,6 +2200,9 @@ define(MYDEFINES, function (compatibility) {
                         }
 
                         logo.playbackQueue = {};
+                        docById('playbackTableDiv').style.visibility = 'hidden';
+                        docById('playbackButtonsDiv').style.visibility = 'hidden';
+                        docById('playbackDiv').style.visibility = 'hidden';
                         blocks.loadNewBlocks(JSON.parse(sessionData));
                     }
                 } catch (e) {

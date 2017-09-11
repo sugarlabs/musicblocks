@@ -5582,12 +5582,12 @@ function Logo () {
 
             // Set up playback widget
             if (that.playbackWidget == null) {
-		that.playbackWidget = new PlaybackWidget();
-		that.playbackWidget.init(that);
+                that.playbackWidget = new PlaybackWidget();
+                that.playbackWidget.init(that);
             }
 
-	    docById('playbackTableDiv').style.visibility = 'visible';
-	    docById('playbackButtonsDiv').style.visibility = 'visible';
+            docById('playbackTableDiv').style.visibility = 'visible';
+            docById('playbackButtonsDiv').style.visibility = 'visible';
             docById('playbackDiv').style.visibility = 'visible';
         }
 
