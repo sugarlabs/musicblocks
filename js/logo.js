@@ -113,6 +113,11 @@ function Logo () {
 
     // Music-related attributes
     this.notesPlayed = {};
+
+    // When you run Music Blocks, you are "compiling" your code. The
+    // compiled code is stored in the playbackQueue, which can be used
+    // to playback the performance without the overhead of
+    // interpreting the code.
     this.playbackQueue = {};
 
     // Widget-related attributes
@@ -6278,7 +6283,10 @@ function Logo () {
                         __playbackLoop(turtle, idx);
                     }, timeout);
                 } else {
-                    that.turtles.turtleList[turtle].running = false;
+                    if (turtle < that.turtles.turtleList.length) {
+                        that.turtles.turtleList[turtle].running = false;
+                    }
+
                     if (!that.turtles.running()) {
                         that.onStopTurtle();
                     }
@@ -6297,7 +6305,9 @@ function Logo () {
 
         for (var turtle in this.playbackQueue) {
             if (this.playbackQueue[turtle].length > 0) {
-                this.turtles.turtleList[turtle].running = true;
+                if (turtle < this.turtles.turtleList.length) {
+                    this.turtles.turtleList[turtle].running = true;
+                }
                 __playback(turtle);
             }
         }

@@ -2890,10 +2890,19 @@ function Blocks () {
     };
 
     this.loadNewBlocks = function (blockObjs) {
+        var playbackQueueStartsHere = null;
+
         // Check for blocks connected to themselves,
         // and for action blocks not connected to text blocks.
         for (var b = 0; b < blockObjs.length; b++) {
             var blkData = blockObjs[b];
+
+            // Check for playbackQueue
+            if (typeof(blkData[1]) === 'number') {
+                playbackQueueStartsHere = b;
+                break;
+            }
+
             for (var c in blkData[4]) {
                 if (blkData[4][c] === blkData[0]) {
                     console.log('Circular connection in block data: ' + blkData);
@@ -2903,6 +2912,25 @@ function Blocks () {
                 }
             }
         }
+
+        // Load any playback code into the queue...
+        if (playbackQueueStartsHere != null) {
+            for (var b = playbackQueueStartsHere; b < blockObjs.length; b++) {
+                var turtle = blockObjs[b][1];
+                if (turtle in this.logo.playbackQueue) {
+                    this.logo.playbackQueue[turtle].push(blockObjs[b][2]);
+                } else {
+                    this.logo.playbackQueue[turtle] = [blockObjs[b][2]];
+                }
+            }
+
+            // and remove the entries from the end of blockObjs.
+            var n = blockObjs.length;
+            for (var b = playbackQueueStartsHere; b < n; b++) {
+                blockObjs.pop();
+            }
+        }
+
 
         // We'll need a list of existing storein and action names.
         var currentActionNames = [];

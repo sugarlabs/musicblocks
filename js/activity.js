@@ -854,6 +854,7 @@ define(MYDEFINES, function (compatibility) {
                                 sendAllToTrash(false, false);
                                 refreshCanvas();
 
+                                logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
@@ -893,6 +894,7 @@ define(MYDEFINES, function (compatibility) {
                                 sendAllToTrash(false, false);
                                 refreshCanvas();
     
+                                logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
@@ -1643,6 +1645,7 @@ define(MYDEFINES, function (compatibility) {
             }
 
             if (addStartBlock) {
+                logo.playbackQueue = {};
                 blocks.loadNewBlocks(DATAOBJS);
             } else if (!doNotSave) {
                 // Overwrite session data too.
@@ -1994,6 +1997,7 @@ define(MYDEFINES, function (compatibility) {
                     }
 
                     var obj = JSON.parse(cleanData);
+                    logo.playbackQueue = {};
                     blocks.loadNewBlocks(obj);
                     saveLocally();
                 } catch (e) {
@@ -2049,6 +2053,7 @@ define(MYDEFINES, function (compatibility) {
 
             try {
                 var obj = JSON.parse(data);
+                logo.playbackQueue = {};
                 blocks.loadNewBlocks(obj);
             } catch (e) {
                 console.log('loadRawProject: could not parse project data');
@@ -2123,6 +2128,7 @@ define(MYDEFINES, function (compatibility) {
             console.log('LOAD START')
             justLoadStart = function () {
                 console.log('loading start and a matrix');
+                logo.playbackQueue = {};
                 blocks.loadNewBlocks(DATAOBJS);
             };
 
@@ -2175,6 +2181,7 @@ define(MYDEFINES, function (compatibility) {
                             blocks.palettes.dict[name].hideMenu(true);
                         }
 
+                        logo.playbackQueue = {};
                         blocks.loadNewBlocks(JSON.parse(sessionData));
                     }
                 } catch (e) {
@@ -2460,6 +2467,20 @@ define(MYDEFINES, function (compatibility) {
                 data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
             }
 
+            // Next, save the playback queue.
+            var i = data.length;
+            if (i > 0) {
+                for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                    if (turtle in logo.playbackQueue) {
+                        for (var j = 0; j < logo.playbackQueue[turtle].length; j++) {
+                            data.push([i, turtle, logo.playbackQueue[turtle][j]]);
+                            i += 1;
+                        }
+                    }
+                }
+            }
+
+            console.log(JSON.stringify(data));
             return JSON.stringify(data);
         };
 
