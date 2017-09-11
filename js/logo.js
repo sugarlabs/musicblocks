@@ -6271,6 +6271,11 @@ function Logo () {
                     setTimeout(function () {
                         __playbackLoop(turtle, idx);
                     }, timeout);
+                } else {
+                    that.turtles.turtleList[turtle].running = false;
+                    if (!that.turtles.running()) {
+                        that.onStopTurtle();
+                    }
                 }
             }
         };
@@ -6286,6 +6291,7 @@ function Logo () {
 
         for (var turtle in this.playbackQueue) {
             if (this.playbackQueue[turtle].length > 0) {
+                this.turtles.turtleList[turtle].running = true;
                 __playback(turtle);
             }
         }
