@@ -618,6 +618,8 @@ function Logo () {
 
     this._updateParameterBlock = function (that, turtle, blk) {
         // Update the label on parameter blocks.
+        var logo = that;  // For plugin backward compatibility
+
         if (this.blocks.blockList[blk].protoblock.parameter) {
             var name = this.blocks.blockList[blk].name;
             var value = 0;
