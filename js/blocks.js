@@ -3864,6 +3864,13 @@ function Blocks () {
                         firstTurtle += 1;
                     }
                 }
+
+                // Finally, launch the widget
+		if (that.logo.playbackWidget == null) {
+		    that.logo.playbackWidget = new PlaybackWidget();
+		    that.logo.playbackWidget.init(that.logo);
+		}
+
             }, 500);
         }
     };

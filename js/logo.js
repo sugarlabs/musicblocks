@@ -68,6 +68,7 @@ function Logo () {
     this.pitchSlider = null;
     this.modeWidget = null;
     this.statusMatrix = null;
+    this.playbackWidget = null;
 
     this.attack = {};
     this.decay = {};
@@ -5579,6 +5580,15 @@ function Logo () {
                 eval(that.evalOnStopList[arg]);
             }
 
+            // Set up playback widget
+            if (that.playbackWidget == null) {
+		that.playbackWidget = new PlaybackWidget();
+		that.playbackWidget.init(that);
+            }
+
+	    docById('playbackTableDiv').style.visibility = 'visible';
+	    docById('playbackButtonsDiv').style.visibility = 'visible';
+            docById('playbackDiv').style.visibility = 'visible';
         }
 
         clearTimeout(this.saveTimeout);
