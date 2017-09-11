@@ -2229,7 +2229,14 @@ function Logo () {
             }
             break;
         case 'fill':
-            that.turtles.turtleList[turtle].doStartFill();
+            if (that.inNoteBlock[turtle] > 0) {
+                if (!that.suppressOutput[turtle]) {
+                    that.embeddedGraphics[turtle].push(blk);
+                }
+            } else {
+                that.turtles.turtleList[turtle].doStartFill();
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'fill']);
+            }
 
             childFlow = args[0];
             childFlowCount = 1;
@@ -2238,7 +2245,14 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                that.turtles.turtleList[turtle].doEndFill();
+                if (that.inNoteBlock[turtle] > 0) {
+                    if (!that.suppressOutput[turtle]) {
+                        that.embeddedGraphics[turtle].push(blk);
+                    }
+                } else {
+                    that.turtles.turtleList[turtle].doEndFill();
+                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'fill']);
+                }
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -6151,12 +6165,21 @@ function Logo () {
         // TODO: Add graphics
         var d = new Date();
         this.firstNoteTime = d.getTime();
-
+        var inFill = false;
         var that = this;
 
         __playbackLoop = function (turtle, idx) {
             if (!that.stopTurtle) {
                 switch(that.playbackQueue[turtle][idx][1]) {
+                case 'fill':
+                    if (inFill) {
+                        that.turtles.turtleList[turtle].doEndFill();
+                        inFill = false;
+                    } else {
+                        that.turtles.turtleList[turtle].doStartFill();
+                        inFill = true;
+                    }
+                    break;
                 case 'notes':
                     that.synth.trigger(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
                     break;
@@ -6252,6 +6275,7 @@ function Logo () {
         }
 
         var that = this;
+        var inFill = false;
 
         function __pen(turtle, name, arg, timeout) {
             setTimeout(function () {
@@ -6328,6 +6352,18 @@ function Logo () {
             }, timeout);
         };
 
+        function __fill(turtle, timeout) {
+            setTimeout(function () {
+                if (inFill) {
+                    that.turtles.turtleList[turtle].doEndFill();
+                    inFill = false;
+                } else {
+                    that.turtles.turtleList[turtle].doStartFill();
+                    inFill = true;
+                }
+            }, timeout);
+        };
+
         var extendedGraphicsCounter = 0;
         for (var i = 0; i < this.embeddedGraphics[turtle].length; i++) {
             var b = this.embeddedGraphics[turtle][i];
@@ -6388,6 +6424,10 @@ function Logo () {
             case 'pendown':
                 __pen(turtle, name, null, waitTime);
                 that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, name]);
+                break;
+            case 'fill':
+                __fill(turtle, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'fill']);
                 break;
             case 'controlpoint1':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
