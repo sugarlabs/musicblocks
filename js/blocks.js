@@ -3835,6 +3835,37 @@ function Blocks () {
                 }
             }
         }
+
+        if (playbackQueueStartsHere != null) {
+            var that = this;
+            setTimeout(function () {
+                // Now that we know how many turtles we have, we can make
+                // sure that the playback queue does not reference turtles
+                // that are not known to us.
+
+                // Find the first turtle not in the trash.
+                for (var firstTurtle = 0; firstTurtle < that.turtles.turtleList.length; firstTurtie++) {
+                    if (!that.turtles.turtleList[firstTurtle].trash) {
+                        break;
+                    }
+                }
+
+                if (firstTurtle === that.turtles.turtleList.length) {
+                    console.log('Cannot find a turtle');
+                    firstTurtle = 0;
+                }
+
+                // Is the first turtle in the playbackQueue?
+                if (!(firstTurtle in that.logo.playbackQueue)) {
+                    for (turtle in that.logo.playbackQueue) {
+                        console.log('playbackQueue: remapping from ' + turtle + ' to ' + firstTurtle);
+                        that.logo.playbackQueue[firstTurtle] = that.logo.playbackQueue[turtle];
+                        delete that.logo.playbackQueue[turtle];
+                        firstTurtle += 1;
+                    }
+                }
+            }, 500);
+        }
     };
 
     this.cleanupAfterLoad = function (name) {
