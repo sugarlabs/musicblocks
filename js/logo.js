@@ -5583,8 +5583,9 @@ function Logo () {
             // Set up playback widget
             if (that.playbackWidget == null) {
                 that.playbackWidget = new PlaybackWidget();
-                that.playbackWidget.init(that);
             }
+
+            that.playbackWidget.init(that);
 
             docById('playbackTableDiv').style.visibility = 'visible';
             docById('playbackButtonsDiv').style.visibility = 'visible';
@@ -6190,11 +6191,14 @@ function Logo () {
         this.pushedNote[turtle] = false;
     };
 
-    this.playback = function () {
+    this.playback = function (whichMouse) {
         // TODO: Add volume support
+        docById('playbackTableDiv').style.visibility = 'visible';
+        docById('playbackButtonsDiv').style.visibility = 'visible';
+        docById('playbackDiv').style.visibility = 'visible';
 
         if (this.turtles.running()) {
-            this.errorMsg(_('You must hit the stop button before playback.'), null);
+            errorMsg('running');
             return;
         }
 
@@ -6313,13 +6317,19 @@ function Logo () {
         this.onRunTurtle();
         this.stopTurtle = false;
 
-        for (var turtle in this.playbackQueue) {
-            if (this.playbackQueue[turtle].length > 0) {
-                if (turtle < this.turtles.turtleList.length) {
-                    this.turtles.turtleList[turtle].running = true;
+        if (whichMouse < 0) {
+            for (var turtle in this.playbackQueue) {
+                if (this.playbackQueue[turtle].length > 0) {
+                    if (turtle < this.turtles.turtleList.length) {
+                        this.turtles.turtleList[turtle].running = true;
+                    }
+
+                    __playback(turtle);
                 }
-                __playback(turtle);
-            }
+	    }
+        } else if (whichMouse < this.turtles.turtleList.length) {
+            this.turtles.turtleList[whichMouse].running = true;
+            __playback(whichMouse);
         }
     };
 

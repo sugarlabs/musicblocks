@@ -3868,14 +3868,15 @@ function Blocks () {
                 // Finally, launch the widget
                 if (that.logo.playbackWidget == null) {
                     that.logo.playbackWidget = new PlaybackWidget();
-                    that.logo.playbackWidget.init(that.logo);
                 }
+
+                that.logo.playbackWidget.init(that.logo);
 
                 docById('playbackTableDiv').style.visibility = 'visible';
                 docById('playbackButtonsDiv').style.visibility = 'visible';
                 docById('playbackDiv').style.visibility = 'visible';
 
-            }, 500);
+            }, 1500);
         }
     };
 

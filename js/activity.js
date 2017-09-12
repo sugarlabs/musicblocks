@@ -1336,7 +1336,7 @@ define(MYDEFINES, function (compatibility) {
                     logo.doStopTurtle();
                     break;
                 case 80: // 'P'
-                    logo.playback();
+                    logo.playback(-1);  // play all
                     break;
                 }
             } else if (event.ctrlKey) {
