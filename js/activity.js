@@ -438,6 +438,10 @@ define(MYDEFINES, function (compatibility) {
                 }
             }
 
+            docById('playbackTableDiv').style.visibility = 'hidden';
+            docById('playbackButtonsDiv').style.visibility = 'hidden';
+            docById('playbackDiv').style.visibility = 'hidden';
+
             if (!turtles.running()) {
                 console.log('running');
                 logo.runLogoCommands(null, env);
@@ -2501,7 +2505,6 @@ define(MYDEFINES, function (compatibility) {
                 }
             }
 
-            console.log(JSON.stringify(data));
             return JSON.stringify(data);
         };
 
