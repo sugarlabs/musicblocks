@@ -636,6 +636,14 @@ define(MYDEFINES, function (compatibility) {
             logo.playback(-1);
         };
 
+        function doRestartPlayback() {
+	    logo.doStopTurtle();
+
+            setTimeout(function () {
+                logo.playback(-1);
+            }, 500);
+        };
+
         function doCompile() {
             // Show busy cursor.
             document.body.style.cursor = 'wait';
@@ -825,7 +833,7 @@ define(MYDEFINES, function (compatibility) {
                 .setCompile(doCompile)
                 .setPause(null)
                 .setResume(null)
-                .setRewind(null);
+                .setRewind(doRestartPlayback);
 
             thumbnails = new SamplesViewer();
             thumbnails

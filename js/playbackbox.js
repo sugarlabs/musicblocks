@@ -93,7 +93,7 @@ function PlaybackBox () {
             this.rewindButton.visible = false;
             this._positionHoverText(this.rewindButton);
             this.rewindButton.on('click', function (event) {
-                // that._doRewind();
+                that._doRewind();
             });
 
             this.norewindButton = makeButton('media-playlist-repeat-insensitive', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
@@ -118,9 +118,8 @@ function PlaybackBox () {
             if (this._getQueueStatus()) {
                 this.noplayButton.visible = false;
                 this.playButton.visible = true;
-                // TODO: switch polarity once rewind is implemented
-                this.norewindButton.visible = true;
-                this.rewindButton.visible = false;
+                this.norewindButton.visible = false;
+                this.rewindButton.visible = true;
             } else {
                 this.noplayButton.visible = true;
                 this.playButton.visible = false;
