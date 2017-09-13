@@ -5581,16 +5581,7 @@ function Logo () {
             }
 
             if (!that.turtles.running() && queueStart === 0) {
-                // Set up playback widget
-                if (that.playbackWidget == null) {
-                    that.playbackWidget = new PlaybackWidget();
-                }
-
-                that.playbackWidget.init(that);
-
-                docById('playbackTableDiv').style.visibility = 'visible';
-                docById('playbackButtonsDiv').style.visibility = 'visible';
-                docById('playbackDiv').style.visibility = 'visible';
+                // TODO: Enable playback button here
             }
         }
 
@@ -6195,12 +6186,8 @@ function Logo () {
 
     this.playback = function (whichMouse) {
         // TODO: Add volume support
-        docById('playbackTableDiv').style.visibility = 'visible';
-        docById('playbackButtonsDiv').style.visibility = 'visible';
-        docById('playbackDiv').style.visibility = 'visible';
-
         if (this.turtles.running()) {
-            errorMsg('running');
+            this.errorMsg(_('already running'));
             return;
         }
 

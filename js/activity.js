@@ -56,7 +56,7 @@ if (lang.indexOf('-') !== -1) {
 }
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
-    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/timbre', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'activity/abc', 'activity/playback', 'prefixfree.min'];
+    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/timbre', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'prefixfree.min'];
 } else {
     MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
 }
@@ -111,6 +111,7 @@ define(MYDEFINES, function (compatibility) {
         var logo;
         var clearBox;
         var utilityBox;
+        var playbackBox;
         var thumbnails;
         var buttonsVisible = true;
         var headerContainer = null;
@@ -177,6 +178,7 @@ define(MYDEFINES, function (compatibility) {
         var onscreenButtons = [];
         var onscreenMenu = [];
         var utilityButton = null;
+        var playbackButton = null;
         var saveButton = null;
 
         var helpContainer = null;
@@ -438,10 +440,6 @@ define(MYDEFINES, function (compatibility) {
                 }
             }
 
-            docById('playbackTableDiv').style.visibility = 'hidden';
-            docById('playbackButtonsDiv').style.visibility = 'hidden';
-            docById('playbackDiv').style.visibility = 'hidden';
-
             if (!turtles.running()) {
                 console.log('running');
                 logo.runLogoCommands(null, env);
@@ -528,23 +526,18 @@ define(MYDEFINES, function (compatibility) {
         };
 
         var cartesianVisible = false;
-
-        function _doCartesian() {
-            if (cartesianVisible) {
-                _hideCartesian();
-                cartesianVisible = false;
-            } else {
-                _showCartesian();
-                cartesianVisible = true;
-            }
-        };
-
         var polarVisible = false;
 
-        function _doPolar() {
-            if (polarVisible) {
+        function _doCartesianPolar() {
+            if (cartesianVisible && polarVisible) {
+                _hideCartesian();
+                cartesianVisible = false;
+            } else if (!cartesianVisible && polarVisible) {
                 _hidePolar();
                 polarVisible = false;
+            } else if (!cartesianVisible && !polarVisible) {
+                _showCartesian();
+                cartesianVisible = true;
             } else {
                 _showPolar();
                 polarVisible = true;
@@ -627,6 +620,10 @@ define(MYDEFINES, function (compatibility) {
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
+        };
+
+        function doPlayback() {
+            logo.playback(-1);
         };
 
         // Do we need to update the stage?
@@ -794,6 +791,16 @@ define(MYDEFINES, function (compatibility) {
                 .setStats(doAnalytics)
                 .setScroller(toggleScroller);
 
+            playbackBox = new PlaybackBox();
+            playbackBox
+                .setStage(stage)
+                .setRefreshCanvas(refreshCanvas)
+                .setPlay(doPlayback)
+                .setCompile(null)
+                .setPause(null)
+                .setResume(null)
+                .setRewind(null);
+
             thumbnails = new SamplesViewer();
             thumbnails
                 .setStage(stage)
@@ -859,9 +866,6 @@ define(MYDEFINES, function (compatibility) {
                                 refreshCanvas();
 
                                 logo.playbackQueue = {};
-                                docById('playbackTableDiv').style.visibility = 'hidden';
-                                docById('playbackButtonsDiv').style.visibility = 'hidden';
-                                docById('playbackDiv').style.visibility = 'hidden';
                                 blocks.loadNewBlocks(obj);
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
@@ -902,9 +906,6 @@ define(MYDEFINES, function (compatibility) {
                                 refreshCanvas();
     
                                 logo.playbackQueue = {};
-                                docById('playbackTableDiv').style.visibility = 'hidden';
-                                docById('playbackButtonsDiv').style.visibility = 'hidden';
-                                docById('playbackDiv').style.visibility = 'hidden';
                                 blocks.loadNewBlocks(obj);
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
@@ -1619,6 +1620,10 @@ define(MYDEFINES, function (compatibility) {
             utilityBox.init(turtleBlocksScale, utilityButton.x - 27, utilityButton.y, _makeButton);
         };
 
+        function _doPlaybackBox() {
+            playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
+        };
+
         function sendAllToTrash(addStartBlock, doNotSave) {
             // First, hide the palettes as they will need updating.
             for (var name in blocks.palettes.dict) {
@@ -1656,9 +1661,6 @@ define(MYDEFINES, function (compatibility) {
 
             if (addStartBlock) {
                 logo.playbackQueue = {};
-                docById('playbackTableDiv').style.visibility = 'hidden';
-                docById('playbackButtonsDiv').style.visibility = 'hidden';
-                docById('playbackDiv').style.visibility = 'hidden';
                 blocks.loadNewBlocks(DATAOBJS);
             } else if (!doNotSave) {
                 // Overwrite session data too.
@@ -2011,9 +2013,6 @@ define(MYDEFINES, function (compatibility) {
 
                     var obj = JSON.parse(cleanData);
                     logo.playbackQueue = {};
-                    docById('playbackTableDiv').style.visibility = 'hidden';
-                    docById('playbackButtonsDiv').style.visibility = 'hidden';
-                    docById('playbackDiv').style.visibility = 'hidden';
                     blocks.loadNewBlocks(obj);
                     saveLocally();
                 } catch (e) {
@@ -2070,9 +2069,6 @@ define(MYDEFINES, function (compatibility) {
             try {
                 var obj = JSON.parse(data);
                 logo.playbackQueue = {};
-                docById('playbackTableDiv').style.visibility = 'hidden';
-                docById('playbackButtonsDiv').style.visibility = 'hidden';
-                docById('playbackDiv').style.visibility = 'hidden';
                 blocks.loadNewBlocks(obj);
             } catch (e) {
                 console.log('loadRawProject: could not parse project data');
@@ -2148,9 +2144,6 @@ define(MYDEFINES, function (compatibility) {
             justLoadStart = function () {
                 console.log('loading start and a matrix');
                 logo.playbackQueue = {};
-                docById('playbackTableDiv').style.visibility = 'hidden';
-                docById('playbackButtonsDiv').style.visibility = 'hidden';
-                docById('playbackDiv').style.visibility = 'hidden';
                 blocks.loadNewBlocks(DATAOBJS);
             };
 
@@ -2204,9 +2197,6 @@ define(MYDEFINES, function (compatibility) {
                         }
 
                         logo.playbackQueue = {};
-                        docById('playbackTableDiv').style.visibility = 'hidden';
-                        docById('playbackButtonsDiv').style.visibility = 'hidden';
-                        docById('playbackDiv').style.visibility = 'hidden';
                         blocks.loadNewBlocks(JSON.parse(sessionData));
                     }
                 } catch (e) {
@@ -2570,6 +2560,8 @@ handleComplete);
         };
 
         function _setupAndroidToolbar(showPalettesPopover) {
+            // NOTE: see getMainToolbarButtonNames in turtledefs.js
+
             if (headerContainer !== undefined) {
                 stage.removeChild(headerContainer);
                 for (var i in onscreenButtons) {
@@ -2673,6 +2665,7 @@ handleComplete);
                 }
             }
 
+            // NOTE: see getAuxToolbarButtonNames in turtledefs.js
             // Misc. other buttons
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var menuNames = [
@@ -2681,8 +2674,8 @@ handleComplete);
                     ['save', doSave, _('Save project')],
                     // ['lilypond', _doLilypond, _('Save sheet music')],
                     ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.')],
-                    ['Cartesian', _doCartesian, _('Cartesian')],
-                    ['polar', _doPolar, _('Polar')],
+                    ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar')],
+                    ['compile', _doPlaybackBox, _('playback')],
                     ['utility', _doUtilityBox, _('Settings')],
                     ['empty-trash', _deleteBlocksBox, _('Delete all')],
                     ['restore-trash', _restoreTrash, _('Undo')]
@@ -2693,8 +2686,7 @@ handleComplete);
                     ['open', doLoad, _('Load project from files')],
                     ['save', doSave, _('Save project')],
                     ['paste-disabled', pasteStack, _('Paste')],
-                    ['Cartesian', _doCartesian, _('Cartesian')],
-                    ['polar', _doPolar, _('Polar')],
+                    ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar')],
                     ['utility', _doUtilityBox, _('Settings')],
                     ['empty-trash', _deleteBlocksBox, _('Delete all')],
                     ['restore-trash', _restoreTrash, _('Undo')]
@@ -2730,7 +2722,9 @@ handleComplete);
                     utilityButton = container;
                 } else if (menuNames[i][0] === 'save') {
                     saveButton = container;
-                }
+                } else if (menuNames[i][0] === 'compile') {
+                    playbackButton = container;
+		}
 
                 container.visible = false;
             }

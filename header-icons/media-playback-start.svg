@@ -1,0 +1,15 @@
+<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd' [
+	<!ENTITY stroke_color "#010101">
+	<!ENTITY fill_color "#FFFFFF">
+]><svg enable-background="new 0 0 55 55" height="55px" version="1.1" viewBox="0 0 55 55" width="55px" x="0px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="0px"><g display="block" id="media-playback-start">
+	<g display="inline">
+		<g>
+			<g>
+				<g>
+					<path d="M27.496,5.051C15.036,5.07,4.952,15.155,4.93,27.618C4.952,40.08,15.036,50.164,27.496,50.185       c12.465-0.021,22.549-10.104,22.568-22.566C50.045,15.155,39.961,5.07,27.496,5.051z M21.551,37.977v-20.31l17.961,10.155       L21.551,37.977z" fill="&fill_color;"/>
+				</g>
+			</g>
+			<path d="M27.498,0C12.311,0,0,12.313,0,27.5C0,42.688,12.311,55,27.498,55C42.686,55,55,42.688,55,27.5     C55,12.313,42.686,0,27.498,0z M27.496,52.646c-13.826,0-25.033-11.209-25.035-25.033C2.463,13.787,13.67,2.577,27.496,2.574     c13.826,0.003,25.035,11.213,25.039,25.038C52.531,41.437,41.322,52.646,27.496,52.646z" fill="&fill_color;"/>
+		</g>
+	</g>
+</g></svg>

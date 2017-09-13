@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Walter Bender
+// Copyright (c) 2016,17 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -27,7 +27,7 @@ function getMainToolbarButtonNames(name) {
 
 
 function getAuxToolbarButtonNames(name) {
-    return (['planet', 'open', 'save', 'lilypond', 'paste-disabled', 'Cartesian', 'polar', 'utility', 'empty-trash', 'restore-trash'].indexOf(name) > -1);
+    return (['planet', 'open', 'save', 'lilypond', 'paste-disabled', 'Cartesian', 'compile', 'utility', 'empty-trash', 'restore-trash'].indexOf(name) > -1);
 }
 
 
@@ -131,8 +131,8 @@ function createHelpContent() {
         [_('Copy'), _('To copy a stack to the clipboard, do a long press on the stack.') + ' ' + _('The Paste Button will highlight.'), 'header-icons/paste-button.svg'],
         [_('Paste'), _('The paste button is enabled when there are blocks copied onto the clipboard.'), 'header-icons/paste-disabled-button.svg'],
         [_('Save stack'), _('The save-stack button saves a stack onto a custom palette.') + ' ' + _('It appears after a long press on a stack.'), 'header-icons/save-blocks-button.svg'],
-        [_('Cartesian'), _('Show or hide a Cartesian-coordinate grid.'), 'header-icons/Cartesian-button.svg'],
-        [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
+        [_('Cartesian') + '/' + _('Polar'), _('Show or hide a coordinate grid.'), 'header-icons/Cartesian-polar-button.svg'],
+        // [_('Polar'), _('Show or hide a polar-coordinate grid.'), 'header-icons/polar-button.svg'],
         [_('Settings'), _('Open a panel for configuring Music Blocks.'), 'header-icons/utility-button.svg'],
         [_('Decrease block size'), _('Decrease the size of the blocks.'), 'header-icons/smaller-button.svg'],
         [_('Increase block size'), _('Increase the size of the blocks.'), 'header-icons/bigger-button.svg'],
