@@ -111,7 +111,7 @@ define(MYDEFINES, function (compatibility) {
         var logo;
         var clearBox;
         var utilityBox;
-        var playbackBox;
+        var playbackBox = null;
         var thumbnails;
         var buttonsVisible = true;
         var headerContainer = null;
@@ -622,6 +622,16 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
+        function getPlaybackQueueStatus () {
+            return Object.keys(logo.playbackQueue).length > 0;
+        };
+        
+        function setPlaybackStatus () {
+            if (playbackBox != null) {
+                playbackBox.setPlaybackStatus();
+            }
+        };
+
         function doPlayback() {
             logo.playback(-1);
         };
@@ -728,6 +738,7 @@ define(MYDEFINES, function (compatibility) {
                 .setUpdateStage(stage.update)
                 .setGetStageScale(getStageScale)
                 .setTurtles(turtles)
+                .setSetPlaybackStatus(setPlaybackStatus)
                 .setErrorMsg(errorMsg);
             blocks.makeCopyPasteButtons(_makeButton, updatePasteButton);
 
@@ -763,6 +774,7 @@ define(MYDEFINES, function (compatibility) {
                 .setGetCurrentKeyCode(getCurrentKeyCode)
                 .setClearCurrentKeyCode(clearCurrentKeyCode)
                 .setMeSpeak(meSpeak)
+                .setSetPlaybackStatus(setPlaybackStatus)
                 .setSaveLocally(saveLocally);
 
             blocks.setLogo(logo);
@@ -808,6 +820,7 @@ define(MYDEFINES, function (compatibility) {
             playbackBox
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
+                .setQueueStatus(getPlaybackQueueStatus)
                 .setPlay(doPlayback)
                 .setCompile(doCompile)
                 .setPause(null)
@@ -880,6 +893,7 @@ define(MYDEFINES, function (compatibility) {
 
                                 logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
+                                setPlaybackStatus();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
                             }
@@ -920,6 +934,7 @@ define(MYDEFINES, function (compatibility) {
     
                                 logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
+                                setPlaybackStatus();
                             } catch (e) {
                                 errorMsg(_('Cannot load project from the file. Please check the file type.'));
                             }
@@ -1675,6 +1690,7 @@ define(MYDEFINES, function (compatibility) {
             if (addStartBlock) {
                 logo.playbackQueue = {};
                 blocks.loadNewBlocks(DATAOBJS);
+                setPlaybackStatus();
             } else if (!doNotSave) {
                 // Overwrite session data too.
                 saveLocally();
@@ -2027,6 +2043,7 @@ define(MYDEFINES, function (compatibility) {
                     var obj = JSON.parse(cleanData);
                     logo.playbackQueue = {};
                     blocks.loadNewBlocks(obj);
+                    setPlaybackStatus();
                     saveLocally();
                 } catch (e) {
                     console.log(e);
@@ -2083,6 +2100,7 @@ define(MYDEFINES, function (compatibility) {
                 var obj = JSON.parse(data);
                 logo.playbackQueue = {};
                 blocks.loadNewBlocks(obj);
+                setPlaybackStatus();
             } catch (e) {
                 console.log('loadRawProject: could not parse project data');
                 errorMsg(e);
@@ -2158,6 +2176,7 @@ define(MYDEFINES, function (compatibility) {
                 console.log('loading start and a matrix');
                 logo.playbackQueue = {};
                 blocks.loadNewBlocks(DATAOBJS);
+                setPlaybackStatus();
             };
 
             if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -2211,6 +2230,7 @@ define(MYDEFINES, function (compatibility) {
 
                         logo.playbackQueue = {};
                         blocks.loadNewBlocks(JSON.parse(sessionData));
+                        setPlaybackStatus();
                     }
                 } catch (e) {
                     console.log(e);
@@ -2737,7 +2757,7 @@ handleComplete);
                     saveButton = container;
                 } else if (menuNames[i][0] === 'compile') {
                     playbackButton = container;
-		}
+                }
 
                 container.visible = false;
             }

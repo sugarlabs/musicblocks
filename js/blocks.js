@@ -118,6 +118,11 @@ function Blocks () {
     // as to avoid palette refresh race conditions.
     this.deleteActionTimeout = 0;
 
+    this.setSetPlaybackStatus = function (setPlaybackStatus) {
+        this.setPlaybackStatus = setPlaybackStatus;
+        return this;
+    };
+
     this.setCanvas = function (canvas) {
         this.canvas = canvas;
         return this;
@@ -3865,7 +3870,7 @@ function Blocks () {
                     }
                 }
 
-                // TODO: Enable playback button here
+                that.setPlaybackStatus();
             }, 1500);
         }
     };

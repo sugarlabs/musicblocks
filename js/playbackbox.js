@@ -20,6 +20,7 @@ function PlaybackBox () {
     this._doPlay = null;
     this._doPause = null;
     this._doRewind = null;
+    this._getQueueStatus = null;
     this._container = null;
     this._scale = 1;
 
@@ -30,6 +31,11 @@ function PlaybackBox () {
 
     this.setRefreshCanvas = function (refreshCanvas) {
         this._refreshCanvas = refreshCanvas;
+        return this;
+    };
+
+    this.setQueueStatus = function (getQueueStatus) {
+        this._getQueueStatus = getQueueStatus;
         return this;
     };
 
@@ -104,17 +110,23 @@ function PlaybackBox () {
             this._show();
         }
 
-        if (this._logo.playbackQueue === {}) {
-            this.noplayButton.visible = true;
-            this.playButton.visible = false;
-            this.norewindButton.visible = true;
-            this.rewindButton.visible = false;
-        } else {
-            this.noplayButton.visible = false;
-            this.playButton.visible = true;
-            // TODO: switch polarity once rewind is implemented
-            this.norewindButton.visible = true;
-            this.rewindButton.visible = false;
+        this.setPlaybackStatus();
+    };
+
+    this.setPlaybackStatus = function () {
+        if (this._container != null) {
+            if (this._getQueueStatus()) {
+                this.noplayButton.visible = false;
+                this.playButton.visible = true;
+                // TODO: switch polarity once rewind is implemented
+                this.norewindButton.visible = true;
+                this.rewindButton.visible = false;
+            } else {
+                this.noplayButton.visible = true;
+                this.playButton.visible = false;
+                this.norewindButton.visible = true;
+                this.rewindButton.visible = false;
+            }
         }
     };
 
