@@ -5566,13 +5566,13 @@ function Logo () {
             // ensured that the turtle is really finished running
             // yet. Hence the timeout.
             __checkCompletionState = function () {
-                if (!that.turtles.running() && queueStart === 0 && that.suppressOutput[turtle] && !that.justCounting[turtle]) {
+                if (!that.turtles.running() && queueStart === 0 && !that.justCounting[turtle]) {
                     if (that.runningLilypond) {
                         console.log('saving lilypond output:');
                         console.log(that.notationStaging);
                         saveLilypondOutput(that, _('My Project') + '.ly');
                         that.runningLilypond = false;
-                    } else {
+                    } else if (that.suppressOutput[turtle]) {
                         console.log('finishing compiling');
                         that.setPlaybackStatus();
                         that.compiling = false;
@@ -5582,8 +5582,12 @@ function Logo () {
                     setTimeout(function () {
                         that.suppressOutput[turtle] = false;
                         that.checkingCompletionState = false;
-                        // Reset cursor.
+
+                        // Reset the cursor...
                         document.body.style.cursor = 'default';
+
+                        // And save the session.
+                        that.saveLocally();
                     }, 1000);
                 } else if (that.suppressOutput[turtle]) {
                     setTimeout(function () {
@@ -5592,7 +5596,7 @@ function Logo () {
                 }
             };
 
-            if (!that.turtles.running() && queueStart === 0 && that.suppressOutput[turtle] && !that.justCounting[turtle]) {
+            if (!that.turtles.running() && queueStart === 0 && !that.justCounting[turtle]) {
                 if (!that.checkingCompletionState) {
                     that.checkingCompletionState = true;
                     setTimeout(function () {
@@ -5630,15 +5634,6 @@ function Logo () {
                 // TODO: Enable playback button here
             }
         }
-
-        clearTimeout(this.saveTimeout);
-
-        var that = this;
-        this.saveTimeout = setTimeout(function () {
-            // Save at the end to save an image
-            // console.log('in saveTimeout');
-           that.saveLocally();
-        }, DEFAULTDELAY * 1.5);
     };
 
     this._setSynthVolume = function (vol, turtle) {
@@ -6231,7 +6226,7 @@ function Logo () {
                 }, beatValue * 1000);
             };
 
-            if (this.suppressOutput[turtle]) {
+            if (this.noteDelay === 0 || this.suppressOutput[turtle]) {
                 __playnote();
             } else {
                 setTimeout(function () {
