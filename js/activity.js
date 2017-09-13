@@ -626,6 +626,19 @@ define(MYDEFINES, function (compatibility) {
             logo.playback(-1);
         };
 
+        function doCompile() {
+            // Show busy cursor.
+            document.body.style.cursor = 'wait';
+
+            console.log('Compiling music for playback');
+            // Suppress music and turtle output when generating
+            // compiled output.
+            logo.playbackQueue = {};
+            logo.compiling = true;
+            logo.runLogoCommands();
+        };
+
+
         // Do we need to update the stage?
         var update = true;
 
@@ -796,7 +809,7 @@ define(MYDEFINES, function (compatibility) {
                 .setStage(stage)
                 .setRefreshCanvas(refreshCanvas)
                 .setPlay(doPlayback)
-                .setCompile(null)
+                .setCompile(doCompile)
                 .setPause(null)
                 .setResume(null)
                 .setRewind(null);

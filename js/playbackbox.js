@@ -70,7 +70,6 @@ function PlaybackBox () {
             this._positionHoverText(this.playButton);
             this.playButton.on('click', function (event) {
                 that._doPlay();
-                // that._hide();
             });
 
             this.noplayButton = makeButton('media-playback-start-insensitive', _('playback music'), this._container.x + 55, this._container.y + 85, 55, 0, this._stage);
@@ -82,7 +81,6 @@ function PlaybackBox () {
             this._positionHoverText(this.pauseButton);
             this.pauseButton.on('click', function (event) {
                 // that._doPause();
-                // that._hide();
             });
 
             this.rewindButton = makeButton('media-playlist-repeat', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
@@ -90,7 +88,6 @@ function PlaybackBox () {
             this._positionHoverText(this.rewindButton);
             this.rewindButton.on('click', function (event) {
                 // that._doRewind();
-                // that._hide();
             });
 
             this.norewindButton = makeButton('media-playlist-repeat-insensitive', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
@@ -101,8 +98,7 @@ function PlaybackBox () {
             this._compileButton.visible = true;
             this._positionHoverText(this._compileButton);
             this._compileButton.on('click', function (event) {
-                // that._doCompile();
-                // that._hide();
+                that._doCompile();
             });
         } else {
             this._show();
