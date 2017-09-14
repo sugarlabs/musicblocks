@@ -1261,7 +1261,11 @@ function Logo () {
         case 'notevolumefactor':
             var len = this.transposition[turtle].length;
             this.polyVolume[turtle][len - 1] = value;
-            this._setSynthVolume(value, turtle);
+            if (!this.suppressOutput[turtle]) {
+                this._setSynthVolume(value, turtle);
+            }
+
+            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setvolume', value]);
             break;
         default:
             if (this.blocks.blockList[blk].name in this.evalSetterDict) {
@@ -1573,8 +1577,11 @@ function Logo () {
                 if (that.meSpeak) {
                     if (that.inNoteBlock[turtle] > 0) {
                         that.embeddedGraphics[turtle].push(blk);
-                    } else if (!that.suppressOutput[turtle]) {
-                        that._processSpeak(args[0]);
+                    } else {
+                        if (!that.suppressOutput[turtle]) {
+                            that._processSpeak(args[0]);
+                        }
+
                         that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'speak', args[0]]);
                     }
                 }
@@ -2019,8 +2026,11 @@ function Logo () {
             if (args.length === 2) {
                 if (that.inNoteBlock[turtle] > 0) {
                     that.embeddedGraphics[turtle].push(blk);
-                } else if (!that.suppressOutput[turtle]) {
-                    that._processShow(turtle, args[0], args[1]);
+                } else {
+                    if (!that.suppressOutput[turtle]) {
+                        that._processShow(turtle, args[0], args[1]);
+                    }
+
                     that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'show', args[0], args[1]]);
                 }
             }
@@ -4118,6 +4128,7 @@ function Logo () {
                     if (!that.justCounting[turtle]) {
                         that.notationEndCrescendo(turtle, last(that.crescendoDelta[turtle]));
                     }
+
                     that.crescendoDelta[turtle].pop();
                     that.crescendoVolume[turtle].pop();
                     that.polyVolume[turtle].pop();
@@ -5058,8 +5069,13 @@ function Logo () {
                     console.log('articulated volume exceeds 100%. clipping');
                     newVolume = 100;
                 }
+
                 that.polyVolume[turtle].push(newVolume);
-                that._setSynthVolume(newVolume, turtle);
+                if (!this.suppressOutput[turtle]) {
+                    that._setSynthVolume(newVolume, turtle);
+                }
+
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setvolume', newVolume]);
 
                 if (!that.justCounting[turtle]) {
                     that.notationBeginArticulation(turtle);
@@ -5085,7 +5101,11 @@ function Logo () {
         case 'setnotevolume2':
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 that.polyVolume[turtle].push(args[0]);
-                that._setSynthVolume(args[0], turtle);
+                if (!this.suppressOutput[turtle]) {
+                    that._setSynthVolume(args[0], turtle);
+                }
+
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setvolume', args[0]]);
 
                 childFlow = args[1];
                 childFlowCount = 1;
@@ -5107,7 +5127,11 @@ function Logo () {
                     that.stopTurtle = true;
                 } else {
                     that.polyVolume[turtle].push(args[0]);
-                    that._setSynthVolume(args[0], turtle);
+                    if (!this.suppressOutput[turtle]) {
+                        that._setSynthVolume(args[0], turtle);
+                    }
+
+                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setvolume', args[0]]);
                 }
             }
             break;
@@ -5614,6 +5638,7 @@ function Logo () {
 
             if (!that.turtles.running() && queueStart === 0) {
                 // TODO: Enable playback button here
+                console.log('fin');
             }
         }
     };
@@ -6290,6 +6315,9 @@ function Logo () {
                     break;
                 case 'speak':
                     that._processSpeak(that.playbackQueue[turtle][idx][2]);
+                    break;
+                case 'setvolume':
+                    that._setSynthVolume(that.playbackQueue[turtle][idx][2], turtle);
                     break;
                 case 'arc':
                     that.turtles.turtleList[turtle].doArc(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
