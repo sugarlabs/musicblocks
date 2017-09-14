@@ -74,6 +74,7 @@ function PlaybackBox () {
             this.playButton = makeButton('media-playback-start', _('playback music'), this._container.x + 55, this._container.y + 85, 55, 0, this._stage);
             this.playButton.visible = true;
             this._positionHoverText(this.playButton);
+
             this.playButton.on('click', function (event) {
                 that._doPlay();
             });
@@ -85,6 +86,7 @@ function PlaybackBox () {
             this.pauseButton = makeButton('media-playback-pause', _('pause playback'), this._container.x + 55, this._container.y + 85, 55, 0, this._stage);
             this.pauseButton.visible = false;
             this._positionHoverText(this.pauseButton);
+
             this.pauseButton.on('click', function (event) {
                 // that._doPause();
             });
@@ -92,6 +94,7 @@ function PlaybackBox () {
             this.rewindButton = makeButton('media-playlist-repeat', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
             this.rewindButton.visible = false;
             this._positionHoverText(this.rewindButton);
+
             this.rewindButton.on('click', function (event) {
                 that._doRewind();
             });
@@ -103,6 +106,13 @@ function PlaybackBox () {
             this._compileButton = makeButton('compile-button', _('prepare music for playback'), this._container.x + 185, this._container.y + 85, 55, 0, this._stage);
             this._compileButton.visible = true;
             this._positionHoverText(this._compileButton);
+            for (var c = 0; c < this._compileButton.children.length; c++) {
+                if (this._compileButton.children[c].text != undefined) {
+                    this._compileButton.children[c].x = -180;
+                    break;
+                }
+            }
+
             this._compileButton.on('click', function (event) {
                 that._doCompile();
             });
