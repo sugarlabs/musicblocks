@@ -3260,6 +3260,7 @@ function Logo () {
             } else {
                 that.noteBeatValues[turtle].push(1);
             }
+
             that.pushedNote[turtle] = true;
             break;
         case 'steppitch':
@@ -5649,7 +5650,6 @@ function Logo () {
     };
 
     this._processNote = function (noteValue, blk, turtle) {
-
         if (this.bpm[turtle].length > 0) {
             var bpmFactor = TONEBPM / last(this.bpm[turtle]);
         } else {
@@ -5814,6 +5814,7 @@ function Logo () {
                 // When we are "drifting", we don't bother with lag.
                 var turtleLag = 0;
             }
+
             // If we are in a tie, depending upon parity, we either
             // add the duration from the previous note to the current
             // note, or we cache the duration and set the wait to
@@ -5907,7 +5908,6 @@ function Logo () {
             // initial notevalue. When that notevalue is encountered
             // again, the swing terminates, e.g., 8->4->4->4->8
             // 8->4->4->4->8
-            // FIXME: Will not work when using dup and skip.
             // FIXME: Could behave weirdly with tie.
             if (this.swing[turtle].length > 0) {
                 // Deprecated
@@ -6001,8 +6001,10 @@ function Logo () {
                     } else {
                         var beatValue = bpmFactor / (noteBeatValue * that.noteBeatValues[turtle][0]);
                     }
-                } else {
+                } else if (that.noteBeatValues[turtle].length > 0) {
                     var beatValue = bpmFactor / (noteBeatValue * that.noteBeatValues[turtle][0]);
+                } else {
+                    var beatValue = bpmFactor / noteBeatValue;
                 }
 
                 if (doVibrato) {
