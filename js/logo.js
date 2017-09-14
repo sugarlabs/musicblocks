@@ -2016,32 +2016,12 @@ function Logo () {
             break;
         case 'show':
             if (args.length === 2) {
-                if (typeof(args[1]) === 'string') {
-                    var len = args[1].length;
-                    if (len === 14 && args[1].substr(0, 14) === CAMERAVALUE) {
-                        doUseCamera(args, that.turtles, turtle, false, that.cameraID, that.setCameraID, that.errorMsg);
-                    } else if (len === 13 && args[1].substr(0, 13) === VIDEOVALUE) {
-                        doUseCamera(args, that.turtles, turtle, true, that.cameraID, that.setCameraID, that.errorMsg);
-                    } else if (len > 10 && args[1].substr(0, 10) === 'data:image') {
-                        that.turtles.turtleList[turtle].doShowImage(args[0], args[1]);
-                    } else if (len > 8 && args[1].substr(0, 8) === 'https://') {
-                        that.turtles.turtleList[turtle].doShowURL(args[0], args[1]);
-                    } else if (len > 7 && args[1].substr(0, 7) === 'http://') {
-                        that.turtles.turtleList[turtle].doShowURL(args[0], args[1]);
-                    } else if (len > 7 && args[1].substr(0, 7) === 'file://') {
-                        that.turtles.turtleList[turtle].doShowURL(args[0], args[1]);
-                    } else {
-                        that.turtles.turtleList[turtle].doShowText(args[0], args[1]);
-                    }
-                } else if (typeof(args[1]) === 'object' && that.blocks.blockList[that.blocks.blockList[blk].connections[2]].name === 'loadFile') {
-                    if (args[1]) {
-                        that.turtles.turtleList[turtle].doShowText(args[0], args[1][1]);
-                    } else {
-                        that.errorMsg(_('You must select a file.'));
-                    }
-                } else {
-                    that.turtles.turtleList[turtle].doShowText(args[0], args[1]);
-                }
+                if (that.inNoteBlock[turtle] > 0) {
+                    that.embeddedGraphics[turtle].push(blk);
+                } else if (!that.suppressOutput[turtle]) {
+		    that._processShow(turtle, args[0], args[1]);
+		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'show', args[0], args[1]]);
+		}
             }
             break;
         case 'turtleshell':
@@ -6304,6 +6284,9 @@ function Logo () {
                 case 'bezier':
                     that.turtles.turtleList[turtle].doBezier(that.cp1x[turtle], that.cp1y[turtle], that.cp2x[turtle], that.cp2y[turtle], that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
+                case 'show':
+                    that._processShow(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
+                    break;
                 case 'arc':
                     that.turtles.turtleList[turtle].doArc(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
@@ -6488,6 +6471,16 @@ function Logo () {
                 } else {
                     that.turtles.turtleList[turtle].doSetXY(arg1, arg2);
                 }
+            }, timeout);
+        };
+
+        function __show(turtle, arg1, arg2, timeout) {
+            if (that.suppressOutput[turtle]) {
+		return;
+            }
+
+            setTimeout(function () {
+                that._processShow(turtle, arg1, arg2);
             }, timeout);
         };
 
@@ -6739,6 +6732,12 @@ function Logo () {
                 __setxy(turtle, arg1, arg2, waitTime);
                 that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'setxy', arg1, arg2]);
                 break;
+            case 'show':
+                var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
+                var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
+                __show(turtle, arg1, arg2, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'show', arg1, arg2]);
+                break;
             case 'arc':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
@@ -6792,6 +6791,35 @@ function Logo () {
                     this.endOfClampSignals[turtle][nextBlock] = [listenerName];
                 }
             }
+        }
+    };
+
+    this._processShow = function (turtle, arg0, arg1) {
+        if (typeof(arg1) === 'string') {
+            var len = arg1.length;
+            if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
+                doUseCamera(args, this.turtles, turtle, false, this.cameraID, this.setCameraID, this.errorMsg);
+            } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
+                doUseCamera(args, this.turtles, turtle, true, this.cameraID, this.setCameraID, this.errorMsg);
+            } else if (len > 10 && arg1.substr(0, 10) === 'data:image') {
+                this.turtles.turtleList[turtle].doShowImage(arg0, arg1);
+            } else if (len > 8 && arg1.substr(0, 8) === 'https://') {
+                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+            } else if (len > 7 && arg1.substr(0, 7) === 'http://') {
+                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+            } else if (len > 7 && arg1.substr(0, 7) === 'file://') {
+                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+            } else {
+                this.turtles.turtleList[turtle].doShowText(arg0, arg1);
+            }
+        } else if (typeof(arg1) === 'object' && this.blocks.blockList[this.blocks.blockList[blk].connections[2]].name === 'loadFile') {
+            if (arg1) {
+                this.turtles.turtleList[turtle].doShowText(arg0, arg1[1]);
+            } else {
+                this.errorMsg(_('You must select a file.'));
+            }
+        } else {
+            this.turtles.turtleList[turtle].doShowText(arg0, arg1);
         }
     };
 
