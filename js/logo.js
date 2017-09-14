@@ -2008,6 +2008,8 @@ function Logo () {
                     }
                     that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
+                } else if (that.inNoteBlock[turtle] > 0) {
+                    that.embeddedGraphics[turtle].push(blk);
                 } else {
                     that.turtles.turtleList[turtle].doSetHeading(args[0]);
                     that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setheading', args[0]]);
@@ -6299,6 +6301,9 @@ function Logo () {
                 case 'right':
                     that.turtles.turtleList[turtle].doRight(that.playbackQueue[turtle][idx][2]);
                     break;
+                case 'setheading':
+                    that.turtles.turtleList[turtle].doSetHeading(that.playbackQueue[turtle][idx][2]);
+                    break;
                 case 'setcolor':
                     that.turtles.turtleList[turtle].doSetColor(that.playbackQueue[turtle][idx][2]);
                     break;
@@ -6437,6 +6442,16 @@ function Logo () {
                 } else {
                     that.turtles.turtleList[turtle].doRight(arg);
                 }
+            }, timeout);
+        };
+
+        function __setheading(turtle, arg, timeout) {
+            if (that.suppressOutput[turtle]) {
+                timeout = 0;
+            }
+
+            setTimeout(function () {
+                that.turtles.turtleList[turtle].doSetHeading(arg);
             }, timeout);
         };
 
@@ -6681,6 +6696,11 @@ function Logo () {
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 __bezier(turtle, arg1, arg2, waitTime);
                 that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'bezier', arg1, arg2]);
+                break;
+            case 'setheading':
+                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                __setheading(turtle, arg, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'setheading', arg]);
                 break;
             case 'right':
                 var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
