@@ -1571,13 +1571,12 @@ function Logo () {
         case 'speak':
             if (args.length === 1) {
                 if (that.meSpeak) {
-                    var text = args[0];
-                    var new_text = "";
-                    for (var i = 0; i < text.length; i++) {
-                        if ((text[i] >= 'a' && text[i] <= 'z') || (text[i] >= 'A' && text[i] <= 'Z') || text[i] === ',' || text[i] === '.' || text[i] === ' ')
-                            new_text += text[i];
+                    if (that.inNoteBlock[turtle] > 0) {
+                        that.embeddedGraphics[turtle].push(blk);
+                    } else if (!that.suppressOutput[turtle]) {
+                        that._processSpeak(args[0]);
+                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'speak', args[0]]);
                     }
-                    that.meSpeak.speak(new_text);
                 }
             }
             break;
@@ -2021,9 +2020,9 @@ function Logo () {
                 if (that.inNoteBlock[turtle] > 0) {
                     that.embeddedGraphics[turtle].push(blk);
                 } else if (!that.suppressOutput[turtle]) {
-		    that._processShow(turtle, args[0], args[1]);
-		    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'show', args[0], args[1]]);
-		}
+                    that._processShow(turtle, args[0], args[1]);
+                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'show', args[0], args[1]]);
+                }
             }
             break;
         case 'turtleshell':
@@ -6289,6 +6288,9 @@ function Logo () {
                 case 'show':
                     that._processShow(turtle, that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
+                case 'speak':
+                    that._processSpeak(that.playbackQueue[turtle][idx][2]);
+                    break;
                 case 'arc':
                     that.turtles.turtleList[turtle].doArc(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3]);
                     break;
@@ -6491,11 +6493,21 @@ function Logo () {
 
         function __show(turtle, arg1, arg2, timeout) {
             if (that.suppressOutput[turtle]) {
-		return;
+                return;
             }
 
             setTimeout(function () {
                 that._processShow(turtle, arg1, arg2);
+            }, timeout);
+        };
+
+        function __speak(turtle, arg, timeout) {
+            if (that.suppressOutput[turtle]) {
+                return;
+            }
+
+            setTimeout(function () {
+                that._processSpeak(arg);
             }, timeout);
         };
 
@@ -6758,6 +6770,11 @@ function Logo () {
                 __show(turtle, arg1, arg2, waitTime);
                 that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'show', arg1, arg2]);
                 break;
+            case 'speak':
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
+                __speak(turtle, arg, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'speak', arg]);
+                break;
             case 'arc':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
@@ -6812,6 +6829,16 @@ function Logo () {
                 }
             }
         }
+    };
+
+    this._processSpeak = function (text) {
+        var new_text = '';
+        for (var i = 0; i < text.length; i++) {
+            if ((text[i] >= 'a' && text[i] <= 'z') || (text[i] >= 'A' && text[i] <= 'Z') || text[i] === ',' || text[i] === '.' || text[i] === ' ')
+                new_text += text[i];
+        }
+
+        this.meSpeak.speak(new_text);
     };
 
     this._processShow = function (turtle, arg0, arg1) {
