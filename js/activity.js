@@ -20,34 +20,36 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
 const _ERRORMSGTIMEOUT_ = 15000;
 
-function facebookInit() {
-    window.fbAsyncInit = function () {
-        FB.init({
-            appId: '1496189893985945',
-            xfbml: true,
-            version: 'v2.1'
-        });
 
-        // ADD ADDITIONAL FACEBOOK CODE HERE
+if (_THIS_IS_TURTLE_BLOCKS_) {
+    function facebookInit() {
+	window.fbAsyncInit = function () {
+            FB.init({
+		appId: '1496189893985945',
+		xfbml: true,
+		version: 'v2.1'
+            });
+
+            // ADD ADDITIONAL FACEBOOK CODE HERE
+	};
     };
-};
 
 
-try {
-    (function (d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-            return;
-        }
+    try {
+	(function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+		return;
+            }
 
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-} catch (e) {
-};
-
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+    } catch (e) {
+    };
+}
 
 var lang = document.webL10n.getLanguage();
 if (lang.indexOf('-') !== -1) {
@@ -2030,6 +2032,7 @@ define(MYDEFINES, function (compatibility) {
 
                 try {
                     try {
+                        console.log('testing httpGet');
                         httpGet(null);
                         console.log('running from server or the user can access to examples.');
                         server = true;
@@ -2039,6 +2042,7 @@ define(MYDEFINES, function (compatibility) {
                     }
 
                     if (server) {
+                        console.log('testing server');
                         var rawData = httpGet(projectName);
                         var cleanData = rawData.replace('\n', '');
                     }
