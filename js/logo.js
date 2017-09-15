@@ -1569,7 +1569,17 @@ function Logo () {
             if (!that.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
-                        that.textMsg(args[0].toString());
+                        if (that.inNoteBlock[turtle] > 0) {
+                            that.embeddedGraphics[turtle].push(blk);
+                        } else {
+                            if (!that.suppressOutput[turtle]) {
+                                that.textMsg(args[0].toString());
+                            }
+
+                            if (!that.justCounting[turtle]) {
+                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'print', args[0]]);
+                            }
+                        }
                     }
                 }
             }
@@ -6390,6 +6400,9 @@ function Logo () {
                 case 'speak':
                     that._processSpeak(that.playbackQueue[turtle][idx][2]);
                     break;
+                case 'print':
+                    that.textMsg(that.playbackQueue[turtle][idx][2].toString());
+                    break;
                 case 'setvolume':
                     that._setSynthVolume(that.playbackQueue[turtle][idx][2], turtle);
                     break;
@@ -6610,6 +6623,16 @@ function Logo () {
 
             setTimeout(function () {
                 that._processSpeak(arg);
+            }, timeout);
+        };
+
+        function __print(arg, timeout) {
+            if (that.suppressOutput[turtle]) {
+                timeout = 0;
+            }
+
+            setTimeout(function () {
+                that.textMsg(arg.toString());
             }, timeout);
         };
 
@@ -6876,6 +6899,11 @@ function Logo () {
                 var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 __speak(turtle, arg, waitTime);
                 that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'speak', arg]);
+                break;
+            case 'print':
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
+                __print(arg, waitTime);
+                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'print', arg]);
                 break;
             case 'arc':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
