@@ -837,6 +837,7 @@ function Logo () {
         }
 
         this.stopTurtle = false;
+
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under blocks.
 
@@ -1349,7 +1350,9 @@ function Logo () {
         var actionArgs = [];
 
         if (that.blocks.visible) {
-            that.blocks.highlight(blk, false);
+            if (!that.suppressOutput[turtle] && !that.justCounting[turtle]) {
+                that.blocks.highlight(blk, false);
+            }
         }
 
 //        console.log('len: ' + that.blocks.blockList[blk]);
@@ -1557,7 +1560,9 @@ function Logo () {
             // parent.
             var parentBlk = that.blocks.blockList[blk].connections[0];
             if (parentBlk != null) {
-                that.unhighlightQueue[turtle].push(parentBlk);
+                if (!that.suppressOutput[turtle] && !that.justCounting[turtle]) {
+                    that.unhighlightQueue[turtle].push(parentBlk);
+                }
             }
             break;
         case 'wait':
@@ -5574,31 +5579,36 @@ function Logo () {
                 if (that.turtleDelay === TURTLESTEP) {
                     that.unhighlightStepQueue[turtle] = blk;
                 } else {
-                    setTimeout(function () {
-                        if (that.blocks.visible) {
-                            that.blocks.unhighlight(blk);
-                        }
-                    }, that.turtleDelay + that.waitTimes[turtle]);
+                    if (!that.suppressOutput[turtle] && !that.justCounting[turtle]) {
+                        setTimeout(function () {
+                            if (that.blocks.visible) {
+                                that.blocks.unhighlight(blk);
+                            }
+                        }, that.turtleDelay + that.waitTimes[turtle]);
+                    }
                 }
             }
 
             if ((that.backward[turtle].length > 0 && that.blocks.blockList[blk].connections[0] == null) || (that.backward[turtle].length === 0 && last(that.blocks.blockList[blk].connections) == null)) {
-                // If we are at the end of the child flow, queue the
-                // unhighlighting of the parent block to the flow.
-                if (that.unhighlightQueue[turtle] === undefined) {
-                    console.log('cannot find highlight queue for turtle ' + turtle);
-                } else if (that.parentFlowQueue[turtle].length > 0 && that.turtles.turtleList[turtle].queue.length > 0 && last(that.turtles.turtleList[turtle].queue).parentBlk !== last(that.parentFlowQueue[turtle])) {
-                    that.unhighlightQueue[turtle].push(last(that.parentFlowQueue[turtle]));
-                    // that.unhighlightQueue[turtle].push(that.parentFlowQueue[turtle].pop());
-                } else if (that.unhighlightQueue[turtle].length > 0) {
-                    // The child flow is finally complete, so unhighlight.
-                    setTimeout(function () {
-                        if (that.blocks.visible) {
-                            that.blocks.unhighlight(that.unhighlightQueue[turtle].pop());
-                        } else {
-                            that.unhighlightQueue[turtle].pop();
-                        }
-                    }, that.turtleDelay);
+                console.log(!that.suppressOutput[turtle] && !that.justCounting[turtle]);
+                if (!that.suppressOutput[turtle] && !that.justCounting[turtle]) {
+                    // If we are at the end of the child flow, queue the
+                    // unhighlighting of the parent block to the flow.
+                    if (that.unhighlightQueue[turtle] === undefined) {
+                        console.log('cannot find highlight queue for turtle ' + turtle);
+                    } else if (that.parentFlowQueue[turtle].length > 0 && that.turtles.turtleList[turtle].queue.length > 0 && last(that.turtles.turtleList[turtle].queue).parentBlk !== last(that.parentFlowQueue[turtle])) {
+                        that.unhighlightQueue[turtle].push(last(that.parentFlowQueue[turtle]));
+                        // that.unhighlightQueue[turtle].push(that.parentFlowQueue[turtle].pop());
+                    } else if (that.unhighlightQueue[turtle].length > 0) {
+                        // The child flow is finally complete, so unhighlight.
+                        setTimeout(function () {
+                            if (that.blocks.visible) {
+                                that.blocks.unhighlight(that.unhighlightQueue[turtle].pop());
+                            } else {
+                                that.unhighlightQueue[turtle].pop();
+                            }
+                        }, that.turtleDelay);
+                    }
                 }
             }
 
@@ -5677,26 +5687,28 @@ function Logo () {
                 }
             }
 
-            // Nothing else to do... so cleaning up.
-            if (that.turtles.turtleList[turtle].queue.length === 0 || blk !== last(that.turtles.turtleList[turtle].queue).parentBlk) {
-                setTimeout(function () {
-                    if (that.blocks.visible) {
-                        that.blocks.unhighlight(blk);
-                    }
-                }, that.turtleDelay);
-            }
-
-            // Unhighlight any parent blocks still highlighted.
-            for (var b in that.parentFlowQueue[turtle]) {
-                if (that.blocks.visible) {
-                    that.blocks.unhighlight(that.parentFlowQueue[turtle][b]);
+            if (!that.suppressOutput[turtle] && !that.justCounting[turtle]) {
+                // Nothing else to do... so cleaning up.
+                if (that.turtles.turtleList[turtle].queue.length === 0 || blk !== last(that.turtles.turtleList[turtle].queue).parentBlk) {
+                    setTimeout(function () {
+                        if (that.blocks.visible) {
+                            that.blocks.unhighlight(blk);
+                        }
+                    }, that.turtleDelay);
                 }
-            }
 
-            // Make sure the turtles are on top.
-            var i = that.stage.getNumChildren() - 1;
-            that.stage.setChildIndex(that.turtles.turtleList[turtle].container, i);
-            that.refreshCanvas();
+                // Unhighlight any parent blocks still highlighted.
+                for (var b in that.parentFlowQueue[turtle]) {
+                    if (that.blocks.visible) {
+                        that.blocks.unhighlight(that.parentFlowQueue[turtle][b]);
+                    }
+                }
+
+                // Make sure the turtles are on top.
+                var i = that.stage.getNumChildren() - 1;
+                that.stage.setChildIndex(that.turtles.turtleList[turtle].container, i);
+                that.refreshCanvas();
+            }
 
             for (var arg in that.evalOnStopList) {
                 eval(that.evalOnStopList[arg]);
@@ -6628,7 +6640,7 @@ function Logo () {
 
         function __print(arg, timeout) {
             if (that.suppressOutput[turtle]) {
-                timeout = 0;
+                return;
             }
 
             setTimeout(function () {
