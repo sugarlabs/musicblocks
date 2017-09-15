@@ -23,7 +23,7 @@ function RhythmRuler () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     const OUTERWINDOWWIDTH = 675;
     const INNERWINDOWWIDTH = 600;
-    const RULERHEIGHT = 82;  // A little extra than we need for FF.
+    const RULERHEIGHT = 70;
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
     const BACKSPACE = 8;
@@ -312,7 +312,7 @@ function RhythmRuler () {
         cell.addEventListener('click', this.__clickHandler);
     };
 
-    this.__mouseOverHandler =  function (event) {
+    this.__mouseOverHandler = function (event) {
         var cell = event.target;
         if (cell == null) {
             return;
@@ -468,6 +468,9 @@ function RhythmRuler () {
                 newCell.style.width = newCellWidth + 'px';
                 newCell.style.minWidth = newCell.style.width;
                 newCell.style.maxWidth = newCell.style.width;
+                newCell.style.height = RULERHEIGHT + 'px';
+                newCell.style.minHeight = newCell.style.height;
+                newCell.style.maxHeight = newCell.style.height;
 
                 this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
             }
@@ -512,10 +515,14 @@ function RhythmRuler () {
                 var newCell = ruler.insertCell(newCellIndex + i);
                 noteValues.splice(newCellIndex + i, 0, newNoteValue);
 
-                this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
                 newCell.style.width = newCellWidth + 'px';
                 newCell.style.minWidth = newCell.style.width;
                 newCell.style.maxWidth = newCell.style.width;
+                newCell.style.height = RULERHEIGHT + 'px';
+                newCell.style.minHeight = newCell.style.height;
+                newCell.style.maxHeight = newCell.style.height;
+
+                this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
             }
 
             this._calculateZebraStripes(this._rulerSelected);
@@ -603,8 +610,11 @@ function RhythmRuler () {
             this._mouseDownCell.style.width = newCellWidth + 'px';
             this._mouseDownCell.style.minWidth = this._mouseDownCell.style.width;
             this._mouseDownCell.style.maxWidth = this._mouseDownCell.style.width;
+            this._mouseDownCell.style.height = RULERHEIGHT + 'px';
+            this._mouseDownCell.style.minHeight = this._mouseDownCell.style.height;
+            this._mouseDownCell.style.maxHeight = this._mouseDownCell.style.height;
 
-             this.__addCellEventHandlers(this._mouseDownCell, newCellWidth, noteValues[downCellIndex]);
+            this.__addCellEventHandlers(this._mouseDownCell, newCellWidth, noteValues[downCellIndex]);
 
             this._calculateZebraStripes(this._rulerSelected);
         }
@@ -641,6 +651,10 @@ function RhythmRuler () {
             newCell.style.width = this._noteWidth(newNoteValue) + 'px';
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
+            newCell.style.height = RULERHEIGHT + 'px';
+            newCell.style.minHeight = newCell.style.height;
+            newCell.style.maxHeight = newCell.style.height;
+
             newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
             newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
 
@@ -671,6 +685,10 @@ function RhythmRuler () {
             newCell.style.width =  newCellWidth + 'px';
             newCell.style.minWidth = newCell.style.width;
             newCell.style.maxWidth = newCell.style.width;
+            newCell.style.height = RULERHEIGHT + 'px';
+            newCell.style.minHeight = newCell.style.height;
+            newCell.style.maxHeight = newCell.style.height;
+
             newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
 
             var obj = rationalToFraction(newNoteValue);
@@ -679,7 +697,7 @@ function RhythmRuler () {
             noteValues[newCellIndex] = newNoteValue;
             noteValues.splice(newCellIndex + 1, oldNoteValues.length - 1);
 
-             this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
+            this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
 
             for (var i = 0; i < oldNoteValues.length; i++) {
                 ruler.deleteCell(newCellIndex + 1);
@@ -695,14 +713,23 @@ function RhythmRuler () {
                 oldCell.style.width = oldCellWidth + 'px';
                 oldCell.style.minWidth = oldCell.style.width;
                 oldCell.style.maxWidth = oldCell.style.width;
+                oldCell.style.height = RULERHEIGHT + 'px';
+                oldCell.style.minHeight = oldCell.style.height;
+                oldCell.style.maxHeight = oldCell.style.height;
+
                 noteValues[history[0][0]] = history[0][1];
                 this.__addCellEventHandlers(oldCell, oldCellWidth, history[0][1]);
+
                 for (var i = 1; i < history.length; i++) {
                     var newCell = ruler.insertCell(history[0][0] + i);
                     var newCellWidth = this._noteWidth(history[i][1]);
                     newCell.style.width = newCellWidth + 'px';
                     newCell.style.minWidth = newCell.style.width;
                     newCell.style.maxWidth = newCell.style.width;
+                    newCell.style.height = RULERHEIGHT + 'px';
+                    newCell.style.minHeight = newCell.style.height;
+                    newCell.style.maxHeight = newCell.style.height;
+
                     noteValues.splice(history[0][0] + i, 0, history[i][1]);
                     newCell.innerHTML = calcNoteValueToDisplay(history[i][1], 1);
 
