@@ -6262,9 +6262,6 @@ function Logo () {
                                     }
                                 }
 
-                                if (!that.suppressOutput[turtle]) {
-                                    that.synth.start();
-                                }
                             }
                         }
 
@@ -6315,6 +6312,12 @@ function Logo () {
                                 }
                             }
                         }
+                    }
+                }
+
+                if (!that.suppressOutput[turtle]) {
+                    if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
+                        that.synth.start();
                     }
                 }
 
