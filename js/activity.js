@@ -644,15 +644,19 @@ define(MYDEFINES, function (compatibility) {
             logo.playback(-1);
             playbackBox.playButton.visible = false;
             playbackBox.pauseButton.visible = true;
+            playbackBox.norewindButton.visible = false;
+            playbackBox.rewindButton.visible = true;
         };
 
         function doRestartPlayback() {
             logo.doStopTurtle();
 
             setTimeout(function () {
-                logo.playback(-1);
-                playbackBox.playButton.visible = false;
-                playbackBox.pauseButton.visible = true;
+                // logo.playback(-1);
+                playbackBox.playButton.visible = true;
+                playbackBox.pauseButton.visible = false;
+                playbackBox.norewindButton.visible = true;
+                playbackBox.rewindButton.visible = false;
             }, 500);
         };
 

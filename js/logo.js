@@ -6368,16 +6368,15 @@ function Logo () {
                 return;
             } else {
                 this.stopTurtle = true;
+                return;
             }
-        } else if (this.playbackTime > 0) {
-            var d = new Date();
-            this.firstNoteTime = d.getTime();
-        } else {
-            var d = new Date();
-            this.firstNoteTime = d.getTime();
+        } else if (this.playbackTime === 0) {
             var inFillClamp = false;
             var inHollowLineClamp = false;
         }
+
+        var d = new Date();
+        this.firstNoteTime = d.getTime() - 1000 * this.playbackTime;
 
         var that = this;
 
@@ -6476,7 +6475,7 @@ function Logo () {
                 }
 
                 var d = new Date();
-                var elapsedTime = (d.getTime() - that.firstNoteTime);
+                var elapsedTime = d.getTime() - that.firstNoteTime;
                 idx += 1;
                 if (that.playbackQueue[turtle].length > idx) {
                     var timeout = that.playbackQueue[turtle][idx][0] * 1000 - elapsedTime;
@@ -6494,8 +6493,11 @@ function Logo () {
 
                     if (!that.turtles.running()) {
                         that.onStopTurtle();
+                        that.playbackTime = 0;
                     }
                 }
+            } else {
+                that.turtles.turtleList[turtle].running = false;
             }
         };
 
@@ -6512,10 +6514,10 @@ function Logo () {
                 }
             }
 
+            console.log('resume index: ' + idx);
+
             if (idx < that.playbackQueue[turtle].length) {
-                setTimeout(function () {
-                    __playbackLoop(turtle, idx);
-                }, that.playbackQueue[turtle][0][0] * 1000);
+                __playbackLoop(turtle, idx);
             }
         };
 
@@ -6529,9 +6531,11 @@ function Logo () {
                         this.turtles.turtleList[turtle].running = true;
                     }
 
-                    if (that.playbackTime > 0) {
+                    if (this.playbackTime > 0) {
+                        console.log('resuming play at ' + this.playbackTime);
                         __resumePlayback(turtle);
                     } else {
+                        console.log('play');
                         __playback(turtle);
                     }
                 }

@@ -135,8 +135,13 @@ function PlaybackBox () {
                 this.noplayButton.visible = false;
                 this.playButton.visible = true;
                 this.pauseButton.visible = false;
-                this.norewindButton.visible = false;
-                this.rewindButton.visible = true;
+                if (this._logo.playbackTime === 0) {
+                    this.norewindButton.visible = true;
+                    this.rewindButton.visible = false;
+                } else {
+                    this.norewindButton.visible = false;
+                    this.rewindButton.visible = true;
+                }
             } else {
                 this.noplayButton.visible = true;
                 this.playButton.visible = false;
