@@ -945,7 +945,7 @@ function Logo () {
             this.chorusDepth[turtle] = [];
             this.dispatchFactor[turtle] = 1;
             this.justCounting[turtle] = false;
-            this.suppressOutput[turtle] = this.runningLilypond | this.compiling;
+            this.suppressOutput[turtle] = this.runningLilypond || this.compiling;
             this.pickup[turtle] = 0;
             // Default is 4/4 time.
             this.beatsPerMeasure[turtle] = 4;
@@ -1285,7 +1285,6 @@ function Logo () {
 
     this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
-//        console.log('run from block now');
         this.receivedArg = receivedArg;
 
         // Sometimes we don't want to unwind the entire queue.
@@ -1358,7 +1357,6 @@ function Logo () {
             }
         }
 
-//        console.log('len: ' + that.blocks.blockList[blk]);
         switch (that.blocks.blockList[blk].name) {
         case 'dispatch':
             // Dispatch an event.
@@ -2649,7 +2647,6 @@ function Logo () {
             }
 
             if (that.inTimbre) {
-                console.log('CREATING AM SYNTH...');
                 that.timbre.amSynthParamvals['harmonicity'] = harmonicity;
                 that.synth.createSynth(that.timbre.instrumentName, 'amsynth', that.timbre.amSynthParamvals);
 
@@ -2671,7 +2668,6 @@ function Logo () {
                 modulationIndex = args[0];
             }
             if (that.inTimbre) {
-                console.log('CREATING FM SYNTH...');
                 that.timbre.fmSynthParamvals['modulationIndex'] = modulationIndex;
                 that.synth.createSynth(that.timbre.instrumentName, 'fmsynth', that.timbre.fmSynthParamvals);
 
@@ -2693,7 +2689,6 @@ function Logo () {
             }
 
             if (that.inTimbre) {
-                console.log('CREATING DUO SYNTH...');
                 that.timbre.duoSynthParamVals['vibratoRate'] = synthVibratoRate;
                 that.timbre.duoSynthParamVals['vibratoAmount'] = synthVibratoAmount;
                 that.synth.createSynth(that.timbre.instrumentName, 'duosynth', that.timbre.duoSynthParamVals);
@@ -3090,7 +3085,6 @@ function Logo () {
                     that.errorMsg(_("You are adding multiple envelope blocks."));
                 } else {
                     // Create the synth for the instrument.
-                    console.log('CREATING ENVELOPE SYNTH...');
                     that.synth.createSynth(that.timbre.instrumentName, that.timbre.synthVals['oscillator']['source'], that.timbre.synthVals);
                 }
 
@@ -3158,8 +3152,6 @@ function Logo () {
                     that.errorMsg(_("You are adding multiple oscillator blocks."));
                 } else {
                     that.timbre.oscParams = [];
-
-                    console.log('CREATING OSCILLATOR SYNTH...');
                     that.synth.createSynth(that.timbre.instrumentName, oscillatorType, that.timbre.synthVals);
                 }
 
@@ -6139,8 +6131,6 @@ function Logo () {
                             if (!that.justCounting[turtle]) {
                                 that.updateNotation(note, that.tieCarryOver[turtle], turtle, insideChord);
                             }
-                        } else {
-                            // console.log('duration == ' + duration + ' and tieCarryOver === 0 and drift is ' + drift);
                         }
                     }
 
@@ -6556,13 +6546,11 @@ function Logo () {
         var that = this;
         var inFillClamp = false;
         var inHollowLineClamp = false;
+        var suppressOutput = this.suppressOutput[turtle];
 
         function __pen(turtle, name, arg, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
-            }
 
-            setTimeout(function () {
+            function _penSwitch(name) {
                 switch(name) {
                 case 'penup':
                     that.turtles.turtleList[turtle].doPenUp();
@@ -6589,72 +6577,68 @@ function Logo () {
                     that.turtles.turtleList[turtle].doSetPensize(arg);
                     break;
                 }
-            }, timeout);
+            };
+
+            if (suppressOutput) {
+                _penSwitch(name);
+            } else {
+                setTimeout(function () {
+                    _penSwitch(name);
+                }, timeout);
+            }
         };
 
         function __right(turtle, arg, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
+            if (suppressOutput) {
+                var savedPenState = that.turtles.turtleList[turtle].penState;
+                that.turtles.turtleList[turtle].penState = false;
+                that.turtles.turtleList[turtle].doRight(arg);
+                that.turtles.turtleList[turtle].penState = savedPenState;
+            } else {
+                setTimeout(function () {
+                    that.turtles.turtleList[turtle].doRight(arg);
+                }, timeout);
             }
-
-            setTimeout(function () {
-                if (that.suppressOutput[turtle]) {
-                    var savedPenState = that.turtles.turtleList[turtle].penState;
-                    that.turtles.turtleList[turtle].penState = false;
-                    that.turtles.turtleList[turtle].doRight(arg);
-                    that.turtles.turtleList[turtle].penState = savedPenState;
-                } else {
-                    that.turtles.turtleList[turtle].doRight(arg);
-                }
-            }, timeout);
         };
 
         function __setheading(turtle, arg, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
-            }
-
-            setTimeout(function () {
+            if (suppressOutput) {
                 that.turtles.turtleList[turtle].doSetHeading(arg);
-            }, timeout);
+            } else {
+                setTimeout(function () {
+                    that.turtles.turtleList[turtle].doSetHeading(arg);
+                }, timeout);
+            }
         };
 
         function __forward(turtle, arg, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
+            if (suppressOutput) {
+                var savedPenState = that.turtles.turtleList[turtle].penState;
+                that.turtles.turtleList[turtle].penState = false;
+                that.turtles.turtleList[turtle].doForward(arg);
+                that.turtles.turtleList[turtle].penState = savedPenState;
+            } else {
+                setTimeout(function () {
+                    that.turtles.turtleList[turtle].doForward(arg);
+                }, timeout);
             }
-
-            setTimeout(function () {
-                if (that.suppressOutput[turtle]) {
-                    var savedPenState = that.turtles.turtleList[turtle].penState;
-                    that.turtles.turtleList[turtle].penState = false;
-                    that.turtles.turtleList[turtle].doForward(arg);
-                    that.turtles.turtleList[turtle].penState = savedPenState;
-                } else {
-                    that.turtles.turtleList[turtle].doForward(arg);
-                }
-            }, timeout);
         };
 
         function __setxy(turtle, arg1, arg2, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
+            if (suppressOutput) {
+                var savedPenState = that.turtles.turtleList[turtle].penState;
+                that.turtles.turtleList[turtle].penState = false;
+                that.turtles.turtleList[turtle].doSetXY(arg1, arg2);
+                that.turtles.turtleList[turtle].penState = savedPenState;
+            } else {
+                setTimeout(function () {
+                    that.turtles.turtleList[turtle].doSetXY(arg1, arg2);
+                }, timeout);
             }
-
-            setTimeout(function () {
-                if (that.suppressOutput[turtle]) {
-                    var savedPenState = that.turtles.turtleList[turtle].penState;
-                    that.turtles.turtleList[turtle].penState = false;
-                    that.turtles.turtleList[turtle].doSetXY(arg1, arg2);
-                    that.turtles.turtleList[turtle].penState = savedPenState;
-                } else {
-                    that.turtles.turtleList[turtle].doSetXY(arg1, arg2);
-                }
-            }, timeout);
         };
 
         function __show(turtle, arg1, arg2, timeout) {
-            if (that.suppressOutput[turtle]) {
+            if (suppressOutput) {
                 return;
             }
 
@@ -6664,7 +6648,7 @@ function Logo () {
         };
 
         function __speak(turtle, arg, timeout) {
-            if (that.suppressOutput[turtle]) {
+            if (suppressOutput) {
                 return;
             }
 
@@ -6674,7 +6658,7 @@ function Logo () {
         };
 
         function __print(arg, timeout) {
-            if (that.suppressOutput[turtle]) {
+            if (suppressOutput) {
                 return;
             }
 
@@ -6684,80 +6668,70 @@ function Logo () {
         };
 
         function __arc(turtle, arg1, arg2, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
+            if (suppressOutput) {
+                var savedPenState = that.turtles.turtleList[turtle].penState;
+                that.turtles.turtleList[turtle].penState = false;
+                that.turtles.turtleList[turtle].doArc(arg1, arg2);
+                that.turtles.turtleList[turtle].penState = savedPenState;
+            } else {
+                setTimeout(function () {
+                    that.turtles.turtleList[turtle].doArc(arg1, arg2);
+                }, timeout);
             }
-
-            setTimeout(function () {
-                if (that.suppressOutput[turtle]) {
-                    var savedPenState = that.turtles.turtleList[turtle].penState;
-                    that.turtles.turtleList[turtle].penState = false;
-                    that.turtles.turtleList[turtle].doArc(arg1, arg2);
-                    that.turtles.turtleList[turtle].penState = savedPenState;
-                } else {
-                    that.turtles.turtleList[turtle].doArc(arg1, arg2);
-                }
-            }, timeout);
         };
 
         function __cp1(turtle, arg1, arg2, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
-            }
-
-            setTimeout(function () {
+            if (suppressOutput) {
                 that.cp1x[turtle] = arg1;
                 that.cp1y[turtle] = arg2;
-            }, timeout);
+            } else {
+                setTimeout(function () {
+                    that.cp1x[turtle] = arg1;
+                    that.cp1y[turtle] = arg2;
+                }, timeout);
+            }
         };
 
         function __cp2(turtle, arg1, arg2, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
-            }
-
-            setTimeout(function () {
+            if (suppressOutput) {
                 that.cp2x[turtle] = arg1;
                 that.cp2y[turtle] = arg2;
-            }, timeout);
+            } else {
+                setTimeout(function () {
+                    that.cp2x[turtle] = arg1;
+                    that.cp2y[turtle] = arg2;
+                }, timeout);
+            }
         };
 
         function __bezier(turtle, arg1, arg2, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
+            if (suppressOutput) {
+                var savedPenState = that.turtles.turtleList[turtle].penState;
+                that.turtles.turtleList[turtle].penState = false;
+                that.turtles.turtleList[turtle].doBezier(that.cp1x[turtle], that.cp1y[turtle], that.cp2x[turtle], that.cp2y[turtle], arg1, arg2);
+                that.turtles.turtleList[turtle].penState = savedPenState;
+            } else {
+                setTimeout(function () {
+                    that.turtles.turtleList[turtle].doBezier(that.cp1x[turtle], that.cp1y[turtle], that.cp2x[turtle], that.cp2y[turtle], arg1, arg2);
+                }, timeout);
             }
-
-            setTimeout(function () {
-                if (that.suppressOutput[turtle]) {
-                    var savedPenState = that.turtles.turtleList[turtle].penState;
-                    that.turtles.turtleList[turtle].penState = false;
-                    that.turtles.turtleList[turtle].doBezier(that.cp1x[turtle], that.cp1y[turtle], that.cp2x[turtle], that.cp2y[turtle], arg1, arg2);
-                    that.turtles.turtleList[turtle].penState = savedPenState;
-                } else {
-                    that.turtles.turtleList[turtle].doBezier(that.cp1x[turtle], that.cp1y[turtle], that.cp2x[turtle], that.cp2y[turtle], arg1, arg2);
-                }
-            }, timeout);
         };
 
         function __fill(turtle, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
-            }
-
-            setTimeout(function () {
-                if (that.suppressOutput[turtle]) {
-                    var savedPenState = that.turtles.turtleList[turtle].penState;
-                    that.turtles.turtleList[turtle].penState = false;
-                    if (inFillClamp) {
-                        that.turtles.turtleList[turtle].doEndFill();
-                        inFillClamp = false;
-                    } else {
-                        that.turtles.turtleList[turtle].doStartFill();
-                        inFillClamp = true;
-                    }
-
-                    that.turtles.turtleList[turtle].penState = savedPenState;
+            if (suppressOutput) {
+                var savedPenState = that.turtles.turtleList[turtle].penState;
+                that.turtles.turtleList[turtle].penState = false;
+                if (inFillClamp) {
+                    that.turtles.turtleList[turtle].doEndFill();
+                    inFillClamp = false;
                 } else {
+                    that.turtles.turtleList[turtle].doStartFill();
+                    inFillClamp = true;
+                }
+
+                that.turtles.turtleList[turtle].penState = savedPenState;
+            } else {
+                setTimeout(function () {
                     if (inFillClamp) {
                         that.turtles.turtleList[turtle].doEndFill();
                         inFillClamp = false;
@@ -6765,16 +6739,12 @@ function Logo () {
                         that.turtles.turtleList[turtle].doStartFill();
                         inFillClamp = true;
                     }
-                }
-            }, timeout);
+                }, timeout);
+            }
         };
 
         function __hollowline(turtle, timeout) {
-            if (that.suppressOutput[turtle]) {
-                timeout = 0;
-            }
-
-            setTimeout(function () {
+            if (suppressOutput) {
                 if (inHollowLineClamp) {
                     that.turtles.turtleList[turtle].doEndHollowLine();
                     inHollowLineClamp = false;
@@ -6782,7 +6752,17 @@ function Logo () {
                     that.turtles.turtleList[turtle].doStartHollowLine();
                     inHollowLineClamp = true;
                 }
-            }, timeout);
+            } else {
+                setTimeout(function () {
+                    if (inHollowLineClamp) {
+                        that.turtles.turtleList[turtle].doEndHollowLine();
+                        inHollowLineClamp = false;
+                    } else {
+                        that.turtles.turtleList[turtle].doStartHollowLine();
+                        inHollowLineClamp = true;
+                    }
+                }, timeout);
+            }
         };
 
         var extendedGraphicsCounter = 0;
@@ -6844,7 +6824,7 @@ function Logo () {
                 break;
             case 'penup':
             case 'pendown':
-                if (!that.suppressOutput[turtle]) {
+                if (!suppressOutput) {
                     __pen(turtle, name, null, waitTime);
                 }
 
@@ -7999,14 +7979,47 @@ i]) - that.pitchNumberOffset;
                 } else {
                     var saveCountingStatus = that.justCounting[turtle];
                     var saveSuppressStatus = that.suppressOutput[turtle];
+
+                    // We need to save the state of the boxes and heap
+                    // although there is a potential of a boxes
+                    // collision with other turtles.
+                    var saveBoxes = JSON.stringify(that.boxes);
+                    var saveTurtleHeaps = JSON.stringify(that.turtleHeaps[turtle]);
+                    // And the turtle state
+                    var saveX = that.turtles.turtleList[turtle].x;
+                    var saveY = that.turtles.turtleList[turtle].y;
+                    var saveColor = that.turtles.turtleList[turtle].color;
+                    var saveValue = that.turtles.turtleList[turtle].value;
+                    var saveChroma = that.turtles.turtleList[turtle].chroma;
+                    var saveStroke = that.turtles.turtleList[turtle].stroke;
+                    var saveCanvasAlpha = that.turtles.turtleList[turtle].canvasAlpha;
+                    var saveOrientation = that.turtles.turtleList[turtle].orientation;
+                    var savePenState = that.turtles.turtleList[turtle].penState;
+
                     that.suppressOutput[turtle] = true;
                     that.justCounting[turtle] = true;
+
                     var actionArgs = [];
                     var saveNoteCount = that.notesPlayed[turtle];
                     that.turtles.turtleList[turtle].running = true;
                     that._runFromBlockNow(that, turtle, cblk, true, actionArgs, that.turtles.turtleList[turtle].queue.length);
                     that.blocks.blockList[blk].value = that.notesPlayed[turtle] - saveNoteCount;
                     that.notesPlayed[turtle] = saveNoteCount;
+
+                    // Restore previous state
+                    that.boxes = JSON.parse(saveBoxes);
+                    that.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+
+                    that.turtles.turtleList[turtle].doPenUp();
+                    that.turtles.turtleList[turtle].doSetXY(saveX, saveY);
+                    that.turtles.turtleList[turtle].color = saveColor;
+                    that.turtles.turtleList[turtle].value = saveValue;
+                    that.turtles.turtleList[turtle].chroma = saveChroma;
+                    that.turtles.turtleList[turtle].stroke = saveStroke;
+                    that.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
+                    that.turtles.turtleList[turtle].orientation = saveOrientation;
+                    that.turtles.turtleList[turtle].penState = savePenState;
+
                     that.justCounting[turtle] = saveCountingStatus;
                     that.suppressOutput[turtle] = saveSuppressStatus;
                 }
