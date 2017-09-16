@@ -54,11 +54,6 @@ function PlaybackBox () {
         return this;
     };
 
-    this.setResume = function (resume) {
-        this._doResume = resume;
-        return this;
-    };
-
     this.setRewind = function (rewind) {
         this._doRewind = rewind;
         return this;
