@@ -66,6 +66,7 @@ function PlaybackBox () {
             this._createBox(scale, x, y);
             var that = this;
 
+            //.TRANS: playback in the case refers to playing back music that has been preprocessed.
             this.playButton = makeButton('media-playback-start', _('playback music'), this._container.x + 55, this._container.y + 85, 55, 0, this._stage);
             this.playButton.visible = true;
             this._positionHoverText(this.playButton);
@@ -78,6 +79,7 @@ function PlaybackBox () {
             this.noplayButton.visible = true;
             this._positionHoverText(this.playButton);
 
+            //.TRANS: playback in the case refers to playing back music that has been preprocessed.
             this.pauseButton = makeButton('media-playback-pause', _('pause playback'), this._container.x + 55, this._container.y + 85, 55, 0, this._stage);
             this.pauseButton.visible = false;
             this._positionHoverText(this.pauseButton);
@@ -86,6 +88,7 @@ function PlaybackBox () {
                 that._doPause();
             });
 
+            //.TRANS: playback in the case refers to playing back music that has been preprocessed.
             this.rewindButton = makeButton('media-playlist-repeat', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
             this.rewindButton.visible = false;
             this._positionHoverText(this.rewindButton);
@@ -94,10 +97,12 @@ function PlaybackBox () {
                 that._doRewind();
             });
 
+            //.TRANS: playback in the case refers to playing back music that has been preprocessed.
             this.norewindButton = makeButton('media-playlist-repeat-insensitive', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
             this.norewindButton.visible = true;
             this._positionHoverText(this.norewindButton);
 
+            //.TRANS: playback in the case refers to playing back music that has been preprocessed.
             this._compileButton = makeButton('compile-button', _('prepare music for playback'), this._container.x + 185, this._container.y + 85, 55, 0, this._stage);
             this._compileButton.visible = true;
             this._positionHoverText(this._compileButton);
