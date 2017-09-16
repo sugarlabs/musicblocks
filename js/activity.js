@@ -23,30 +23,30 @@ const _ERRORMSGTIMEOUT_ = 15000;
 
 if (_THIS_IS_TURTLE_BLOCKS_) {
     function facebookInit() {
-	window.fbAsyncInit = function () {
+        window.fbAsyncInit = function () {
             FB.init({
-		appId: '1496189893985945',
-		xfbml: true,
-		version: 'v2.1'
+                appId: '1496189893985945',
+                xfbml: true,
+                version: 'v2.1'
             });
 
             // ADD ADDITIONAL FACEBOOK CODE HERE
-	};
+        };
     };
 
 
     try {
-	(function (d, s, id) {
+        (function (d, s, id) {
             var js, fjs = d.getElementsByTagName(s)[0];
             if (d.getElementById(id)) {
-		return;
+                return;
             }
 
             js = d.createElement(s);
             js.id = id;
             js.src = "https://connect.facebook.net/en_US/sdk.js";
             fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));
+        }(document, 'script', 'facebook-jssdk'));
     } catch (e) {
     };
 }
@@ -634,15 +634,25 @@ define(MYDEFINES, function (compatibility) {
             }
         };
 
+        function doPausePlayback () {
+            logo.playback(-1);
+            playbackBox.playButton.visible = true;
+            playbackBox.pauseButton.visible = false;
+        };
+
         function doPlayback() {
             logo.playback(-1);
+            playbackBox.playButton.visible = false;
+            playbackBox.pauseButton.visible = true;
         };
 
         function doRestartPlayback() {
-	    logo.doStopTurtle();
+            logo.doStopTurtle();
 
             setTimeout(function () {
                 logo.playback(-1);
+                playbackBox.playButton.visible = false;
+                playbackBox.pauseButton.visible = true;
             }, 500);
         };
 
@@ -833,8 +843,7 @@ define(MYDEFINES, function (compatibility) {
                 .setQueueStatus(getPlaybackQueueStatus)
                 .setPlay(doPlayback)
                 .setCompile(doCompile)
-                .setPause(null)
-                .setResume(null)
+                .setPause(doPausePlayback)
                 .setRewind(doRestartPlayback);
 
             thumbnails = new SamplesViewer();
@@ -1747,6 +1756,7 @@ define(MYDEFINES, function (compatibility) {
             // TODO: plugin support
             if (stopTurtleContainer.visible) {
                 _hideStopButton();
+                setPlaybackStatus();
             }
         };
 

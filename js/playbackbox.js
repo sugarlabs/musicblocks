@@ -88,7 +88,7 @@ function PlaybackBox () {
             this._positionHoverText(this.pauseButton);
 
             this.pauseButton.on('click', function (event) {
-                // that._doPause();
+                that._doPause();
             });
 
             this.rewindButton = makeButton('media-playlist-repeat', _('restart playback'), this._container.x + 120, this._container.y + 85, 55, 0, this._stage);
@@ -125,14 +125,22 @@ function PlaybackBox () {
 
     this.setPlaybackStatus = function () {
         if (this._container != null) {
-            if (this._getQueueStatus()) {
+            if (!this._container.visible) {
+                this.noplayButton.visible = false;
+                this.playButton.visible = false;
+                this.pauseButton.visible = false;
+                this.norewindButton.visible = false;
+                this.rewindButton.visible = false;
+            } else if (this._getQueueStatus()) {
                 this.noplayButton.visible = false;
                 this.playButton.visible = true;
+                this.pauseButton.visible = false;
                 this.norewindButton.visible = false;
                 this.rewindButton.visible = true;
             } else {
                 this.noplayButton.visible = true;
                 this.playButton.visible = false;
+                this.pauseButton.visible = false;
                 this.norewindButton.visible = true;
                 this.rewindButton.visible = false;
             }
@@ -187,7 +195,6 @@ function PlaybackBox () {
 
     this._createBox = function (scale, x, y) {
         this._scale = scale;
-        console.log(scale);
 
         function __processBackground(that, name, bitmap, extras) {
             that._container.addChild(bitmap);

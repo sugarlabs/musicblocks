@@ -120,6 +120,7 @@ function Logo () {
     // to playback the performance without the overhead of
     // interpreting the code.
     this.playbackQueue = {};
+    this.playbackTime = 0;
 
     // Widget-related attributes
     this.showPitchDrumMatrix = false;
@@ -513,10 +514,12 @@ function Logo () {
         // few odds and ends.
         this.stopTurtle = true;
         this.turtles.markAsStopped();
+        this.playbackTime = 0;
 
         for (var sound in this.sounds) {
             this.sounds[sound].stop();
         }
+
         this.sounds = [];
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -5590,7 +5593,6 @@ function Logo () {
             }
 
             if ((that.backward[turtle].length > 0 && that.blocks.blockList[blk].connections[0] == null) || (that.backward[turtle].length === 0 && last(that.blocks.blockList[blk].connections) == null)) {
-                console.log(!that.suppressOutput[turtle] && !that.justCounting[turtle]);
                 if (!that.suppressOutput[turtle] && !that.justCounting[turtle]) {
                     // If we are at the end of the child flow, queue the
                     // unhighlighting of the parent block to the flow.
@@ -6361,19 +6363,27 @@ function Logo () {
     };
 
     this.playback = function (whichMouse) {
-        // TODO: Add volume support
         if (this.turtles.running()) {
-            this.errorMsg(_('already running'));
-            return;
+            if (this.playbackTime === 0) {
+                return;
+            } else {
+                this.stopTurtle = true;
+            }
+        } else if (this.playbackTime > 0) {
+            var d = new Date();
+            this.firstNoteTime = d.getTime();
+        } else {
+            var d = new Date();
+            this.firstNoteTime = d.getTime();
+            var inFillClamp = false;
+            var inHollowLineClamp = false;
         }
 
-        var d = new Date();
-        this.firstNoteTime = d.getTime();
-        var inFillClamp = false;
-        var inHollowLineClamp = false;
         var that = this;
 
         __playbackLoop = function (turtle, idx) {
+            that.playbackTime = that.playbackQueue[turtle][idx][0];
+
             if (!that.stopTurtle) {
                 switch(that.playbackQueue[turtle][idx][1]) {
                 case 'fill':
@@ -6495,6 +6505,20 @@ function Logo () {
             }, that.playbackQueue[turtle][0][0] * 1000);
         };
 
+        __resumePlayback = function (turtle) {
+            for (var idx = 0; idx < that.playbackQueue[turtle].length; idx++) {
+                if (that.playbackQueue[turtle][idx][0] >= that.playbackTime) {
+                    break;
+                }
+            }
+
+            if (idx < that.playbackQueue[turtle].length) {
+                setTimeout(function () {
+                    __playbackLoop(turtle, idx);
+                }, that.playbackQueue[turtle][0][0] * 1000);
+            }
+        };
+
         this.onRunTurtle();
         this.stopTurtle = false;
 
@@ -6505,7 +6529,11 @@ function Logo () {
                         this.turtles.turtleList[turtle].running = true;
                     }
 
-                    __playback(turtle);
+                    if (that.playbackTime > 0) {
+                        __resumePlayback(turtle);
+                    } else {
+                        __playback(turtle);
+                    }
                 }
             }
         } else if (whichMouse < this.turtles.turtleList.length) {

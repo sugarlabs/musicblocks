@@ -898,7 +898,7 @@ function calcNoteValueToDisplay(a, b) {
     var noteValueToDisplay = null;
 
     if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
-        noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * this.cellScale + '>';
+        noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) + '>';
     } else {
         noteValueToDisplay = reducedFraction(b, a);
     }
