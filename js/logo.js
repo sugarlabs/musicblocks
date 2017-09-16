@@ -1291,7 +1291,6 @@ function Logo () {
 
     this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
         // Run a stack of blocks, beginning with blk.
-
         var logo = that;  // For plugin backward compatibility
         this.receivedArg = receivedArg;
 
