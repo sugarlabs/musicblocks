@@ -2788,9 +2788,9 @@ function Blocks () {
             this.palettes.dict[name].hideMenu(true);
         }
 
-        // var blockObjs = this._copyBlocksToObj();
-        // this.loadNewBlocks(blockObjs);
-        // console.log(this.selectedBlocksObj);
+        // Reposition the paste location relative to the stage position.
+        this.selectedBlocksObj[0][2] = 75 - this.stage.x;
+        this.selectedBlocksObj[0][3] = 75 - this.stage.y;
         this.loadNewBlocks(this.selectedBlocksObj);
     };
 
