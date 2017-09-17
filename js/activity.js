@@ -1148,8 +1148,10 @@ define(MYDEFINES, function (compatibility) {
                     stage.on('stagemouseup', function (event) {
                         stageMouseDown = false;
                     });
+
                     return;
                 }
+
                 moving = true;
                 lastCords = {
                     x: event.stageX,
@@ -1168,6 +1170,7 @@ define(MYDEFINES, function (compatibility) {
                             x: event.stageX,
                             y: event.stageY
                         };
+
                         refreshCanvas();
                     }
                 });
@@ -2604,6 +2607,7 @@ handleComplete);
                         bitmap.scaleX = cellSize / originalSize;
                         bitmap.scaleY = cellSize / originalSize;
                     }
+
                     bitmap.regX = halfSize / bitmap.scaleX;
                     bitmap.regY = halfSize / bitmap.scaleY;
                     pasteContainer.addChild(bitmap);

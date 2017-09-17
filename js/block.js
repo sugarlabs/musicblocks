@@ -1285,6 +1285,7 @@ function Block(protoblock, blocks, overrideName) {
             if (that.connections[0] == null) {
                 var d = new Date();
                 that.blocks.mouseDownTime = d.getTime();
+
                 that.blocks.longPressTimeout = setTimeout(function () {
                     that.blocks.triggerLongPress(that);
                 }, LONGPRESSTIME);

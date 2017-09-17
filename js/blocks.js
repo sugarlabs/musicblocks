@@ -2748,9 +2748,8 @@ function Blocks () {
     };
 
     this.triggerLongPress = function (myBlock) {
-        this.timeOut == null;
+        this.longPressTimeout = null;
         this.inLongPress = true;
-        var z = this.stage.getNumChildren() - 1;
 
         // Auto-select stack for copying -- no need to actually click on
         // the copy button.
@@ -2760,9 +2759,12 @@ function Blocks () {
         // Copy the selectedStack.
         this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj()));
 
+        // Update the paster button to indicate a block is selected.
         this.updatePasteButton();
 
+        // We display some extra buttons when we long-press an action block.
         if (myBlock.name === 'action') {
+            var z = this.stage.getNumChildren() - 1;
             this.dismissButton.visible = true;
             this.dismissButton.x = myBlock.container.x - 27;
             this.dismissButton.y = myBlock.container.y - 27;
