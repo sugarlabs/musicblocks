@@ -187,6 +187,7 @@ var urlsToCache = [
     'lib/voices/en/en.json',
     'lib/prefixfree.min.js',
     'lib/Chart.js',
+    'lib/dsp.js',
 
     'css/activity.css',
 
