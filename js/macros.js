@@ -139,7 +139,7 @@ function getMacroExpansion (blkname, x, y) {
     const TEMPOOBJ = [[0, 'tempo', x, y, [null, 1, 3]], [1, 'setmasterbpm', 0, 0, [0, 2, null]], [2, ['number', {'value': 90}], 0, 0, [1]], [3, 'hiddennoflow', 0, 0, [0, null]]];
     const THIRTYSECONDOBJ = [[0, 'rhythm2', x, y, [null, 1, 2, 5]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'divide', 0, 0, [0, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 32}], 0, 0, [2]], [5, 'vspace', 0, 0, [0, null]]];
     const TIEOBJ = [[0, 'tie', x, y, [null, null, 1]], [1, 'hidden', 0, 0, [0, null]]];
-    const TIMBREOBJ = [[0, ['timbre', {'collapsed': false}], x, y, [null, 1, null, 2]], [1, ['text', {'value': 'custom'}], 0, 0, [0]], [2, ['hiddennoflow', {}], 0, 0, [0, null]]];
+    const TIMBREOBJ = [[0, ['timbre', {'collapsed': false}], x, y, [null, 1, null, 2]], [1, ['text', {'value': _('custom')}], 0, 0, [0]], [2, ['hiddennoflow', {}], 0, 0, [0, null]]];
 	const TOMOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': _('tom tom')}], 0, 0, [0]]];
     const TONEOBJ = [[0, 'drift', x, y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'hertz', 0, 0, [2, 7, null]], [7, ['number', {'value': 392}], 0, 0, [6]]];
     const TRANSPOBJ = [[0, 'settransposition', x, y, [null, 1, null, 2]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
