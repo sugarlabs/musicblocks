@@ -1035,29 +1035,52 @@ function Turtle (name, turtles, drum) {
         }
     };
 
-    this.blink = function(duration,volume) {
+    this.blink = function(duration, volume) {
         var turtle = this;
-        var sizeinuse;
-        if (this.blinkFinished == false){
-            sizeinuse = this.beforeBlinkSize;
-        } else {
-            sizeinuse = turtle.bitmap.scaleX;
-            this.beforeBlinkSize = sizeinuse;
+        var sizeInUse;
+        this._blinkTimeout = null;
+
+        if (this.beforeBlinkSize == null) {
+            this.beforeBlinkSize = turtle.bitmap.scaleX;
         }
+
+        if (this.blinkFinished){
+            sizeInUse = turtle.bitmap.scaleX;
+        } else {
+            sizeInUse = this.beforeBlinkSize;
+        }
+
+        if (this._blinkTimeout != null || !this.blinkFinished) {
+            clearTimeout(this._blinkTimeout);
+            this._blinkTimeout = null;
+
+            turtle.bitmap.alpha = 1.0;
+            turtle.bitmap.scaleX = sizeInUse;
+            turtle.bitmap.scaleY = turtle.bitmap.scaleX;
+            turtle.bitmap.scale = turtle.bitmap.scaleX;
+            turtle.bitmap.rotation = turtle.orientation;
+            turtle.skinChanged = isSkinChanged;
+            var bounds = turtle.container.getBounds();
+            turtle.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            turtle.blinkFinished = true;
+        }
+
         this.blinkFinished = false;
         turtle.container.uncache();
         var scalefactor = 60 / 55;
         var volumescalefactor = 4 * (volume + 200) / 1000;
-        //Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.1
+        // Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.1
         turtle.bitmap.alpha = 0.5;
-        turtle.bitmap.scaleX = sizeinuse * scalefactor * volumescalefactor;
+        turtle.bitmap.scaleX = sizeInUse * scalefactor * volumescalefactor;
         turtle.bitmap.scaleY = turtle.bitmap.scaleX;
         turtle.bitmap.scale = turtle.bitmap.scaleX;
         var isSkinChanged = turtle.skinChanged;
         turtle.skinChanged = true;
-        createjs.Tween.get(turtle.bitmap).to({alpha: 1, scaleX: sizeinuse, scaleY: sizeinuse, scale: sizeinuse}, 500 / duration);
-        setTimeout(function() {
-            turtle.bitmap.scaleX = sizeinuse;
+        createjs.Tween.get(turtle.bitmap).to({alpha: 1, scaleX: sizeInUse, scaleY: sizeInUse, scale: sizeInUse}, 500 / duration);
+
+        this._blinkTimeout = setTimeout(function () {
+            turtle.bitmap.alpha = 1.0;
+            turtle.bitmap.scaleX = sizeInUse;
             turtle.bitmap.scaleY = turtle.bitmap.scaleX;
             turtle.bitmap.scale = turtle.bitmap.scaleX;
             turtle.bitmap.rotation = turtle.orientation;
