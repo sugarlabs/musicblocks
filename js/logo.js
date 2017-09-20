@@ -135,7 +135,6 @@ function Logo () {
     this.inSetTimbre = {};
 
     // pitch-rhythm matrix
-
     this.inMatrix = false;
     this.keySignature = {};
     this.tupletRhythms = [];
@@ -254,6 +253,17 @@ function Logo () {
     this.runningLilypond = false;
     this.checkingCompletionState = false;
     this.compiling = false;
+
+    // A place to save turtle state in order to store it after a compile
+    this._saveX = {};
+    this._saveY = {};
+    this._saveColor = {};
+    this._saveValue = {};
+    this._saveChroma = {};
+    this._saveStroke = {};
+    this._saveCanvasAlpha = {};
+    this._saveOrientation = {};
+    this._savePenState = {};
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         // Load the default synthesizer
@@ -947,14 +957,25 @@ function Logo () {
             this.delayTime[turtle] = [];
             this.chorusDepth[turtle] = [];
             this.dispatchFactor[turtle] = 1;
-            this.justCounting[turtle] = false;
-            this.suppressOutput[turtle] = this.runningLilypond || this.compiling;
             this.pickup[turtle] = 0;
             // Default is 4/4 time.
             this.beatsPerMeasure[turtle] = 4;
             this.noteValuePerBeat[turtle] = 4;
             this.currentBeat[turtle] = 0;
             this.currentMeasure[turtle] = 0;
+            this.justCounting[turtle] = false;
+            this.suppressOutput[turtle] = this.runningLilypond || this.compiling;
+            if (this.compiling) {
+		this._saveX[turtle] = this.turtles.turtleList[turtle].x;
+		this._saveY[turtle] = this.turtles.turtleList[turtle].y;
+		this._saveColor[turtle] = this.turtles.turtleList[turtle].color;
+		this._saveValue[turtle] = this.turtles.turtleList[turtle].value;
+		this._saveChroma[turtle] = this.turtles.turtleList[turtle].chroma;
+		this._saveStroke[turtle] = this.turtles.turtleList[turtle].stroke;
+		this._saveCanvasAlpha[turtle] = this.turtles.turtleList[turtle].canvasAlpha;
+		this._saveOrientation[turtle] = this.turtles.turtleList[turtle].orientation;
+		this._savePenState[turtle] = this.turtles.turtleList[turtle].penState;
+	    }
         }
 
         this.pitchNumberOffset = 39;  // C4
@@ -2191,7 +2212,7 @@ function Logo () {
                 } else {
                     that.turtles.turtleList[turtle].doSetColor(args[0]);
                     if (!that.justCounting[turtle]) {
-                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'color', args[0]]);
+                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setcolor', args[0]]);
                     }
                 }
             }
@@ -2245,7 +2266,7 @@ function Logo () {
                 } else {
                     that.turtles.turtleList[turtle].doSetValue(args[0]);
                     if (!that.justCounting[turtle]) {
-                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'shade', args[0]]);
+                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'setshade', args[0]]);
                     }
                 }
             }
@@ -5659,6 +5680,17 @@ function Logo () {
                         console.log('finishing compiling');
                         that.setPlaybackStatus();
                         that.compiling = false;
+                        for (t in that.turtles.turtleList) {
+			    that.turtles.turtleList[t].doPenUp();
+			    that.turtles.turtleList[t].doSetXY(that._saveX[t], that._saveY[t]);
+			    that.turtles.turtleList[t].color = that._saveColor[t];
+			    that.turtles.turtleList[t].value = that._saveValue[t];
+			    that.turtles.turtleList[t].chroma = that._saveChroma[t];
+			    that.turtles.turtleList[t].stroke = that._saveStroke[t];
+			    that.turtles.turtleList[t].canvasAlpha = that._saveCanvasAlpha[t];
+			    that.turtles.turtleList[t].doSetHeading(that._saveOrientation[t]);
+			    that.turtles.turtleList[t].penState = that._savePenState[t];
+			}
                     }
 
                     // Give the last note time to play.
@@ -6195,6 +6227,10 @@ function Logo () {
                                     'chorusDepth': chorusDepth
                                 };
 
+                                __hasParamEffect = function () {
+                                    return paramsEffects.doVibrato || paramsEffects.doDistortion || paramsEffects.doTremolo || paramsEffects.doPhaser || paramsEffects.doChous;
+                                }
+
                                 if (that.oscList[turtle].length > 0) {
                                     if (notes.length > 1) {
                                         that.errorMsg(last(that.oscList[turtle]) + ': ' +  _('synth cannot play chords.'), blk);
@@ -6205,7 +6241,11 @@ function Logo () {
                                     }
 
                                     if (!that.justCounting[turtle]) {
-                                        that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle]), paramsEffects, null]);
+					if (__hasParamEffect()) {
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle]), paramsEffects, null]);
+					} else {
+                                            that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes, beatValue, last(that.oscList[turtle]), null, null]);
+					}
                                     }
                                 } else if (that.drumStyle[turtle].length > 0) {
                                     if (!that.suppressOutput[turtle]) {
@@ -6239,7 +6279,11 @@ function Logo () {
                                             }
 
                                             if (!that.justCounting[turtle]) {
-                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters]);
+						if (__hasParamEffect()) {
+                                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters]);
+						} else {
+                                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.instrumentNames[turtle]), null, filters]);
+						}
                                             }
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             if (!that.suppressOutput[turtle]) {
@@ -6247,7 +6291,11 @@ function Logo () {
                                             }
 
                                             if (!that.justCounting[turtle]) {
-                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null]);
+						if (__hasParamEffect()) {
+                                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null]);
+						} else {
+                                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, last(that.voices[turtle]), null, null]);
+						}
                                             }
                                         } else {
                                             if (!that.suppressOutput[turtle]) {
@@ -6255,7 +6303,11 @@ function Logo () {
                                             }
 
                                             if (!that.justCounting[turtle]) {
-                                                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, 'default', paramsEffects, null]);
+						if (__hasParamEffect()) {
+                                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, 'default', paramsEffects, null]);
+						} else {
+                                                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle], 'notes', notes[d], beatValue, 'default', null, null]);
+						}
                                             }
                                         }
                                     }
@@ -6401,8 +6453,10 @@ function Logo () {
                     }
                     break;
                 case 'notes':
-                    that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
-                    that.synth.trigger(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        that.turtles.turtleList[turtle].blink(that.playbackQueue[turtle][idx][3], 50);
+                        that.synth.trigger(that.playbackQueue[turtle][idx][2], that.playbackQueue[turtle][idx][3], that.playbackQueue[turtle][idx][4], that.playbackQueue[turtle][idx][5], that.playbackQueue[turtle][idx][6]);
+		    }
                     break;
                 case 'controlpoint1':
                     that.cp1x[turtle] = that.playbackQueue[turtle][idx][2];
@@ -8026,7 +8080,7 @@ i]) - that.pitchNumberOffset;
                     that.turtles.turtleList[turtle].chroma = saveChroma;
                     that.turtles.turtleList[turtle].stroke = saveStroke;
                     that.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
-                    that.turtles.turtleList[turtle].orientation = saveOrientation;
+                    that.turtles.turtleList[turtle].doSetHeading(saveOrientation);
                     that.turtles.turtleList[turtle].penState = savePenState;
 
                     that.justCounting[turtle] = saveCountingStatus;
