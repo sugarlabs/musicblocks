@@ -562,7 +562,7 @@ msgstr "impar"
 
 #: js/logo.js:3254
 msgid "The Case Block must be used inside of a Switch Block."
-msgstr "El bloque de Case debe utilizarse dentro de un bloque de Switch."
+msgstr "El bloque de Caso debe utilizarse dentro de un bloque de Switch."
 
 #: js/logo.js:3327
 msgid "The Step Pitch Block must be used inside of a Note Block."
@@ -2516,11 +2516,11 @@ msgstr "objeto"
 
 #: js/basicblocks.js:2678
 msgid "default"
-msgstr ""
+msgstr "el caso por defecto"
 
 #: js/basicblocks.js:2685
 msgid "case"
-msgstr ""
+msgstr "caso"
 
 #: js/basicblocks.js:2693
 msgid "switch"

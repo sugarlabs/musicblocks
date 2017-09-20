@@ -2675,6 +2675,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var defaultBlock = new ProtoBlock('defaultcase');
     defaultBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['defaultcase'] = defaultBlock;
+    //.TRANS: the default case used in a switch statement in programming
     defaultBlock.staticLabels.push(_('default'));
     defaultBlock.adjustWidthToLabel();
     defaultBlock.flowClampBlock();
@@ -2682,6 +2683,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var caseBlock = new ProtoBlock('case');
     caseBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['case'] = caseBlock;
+    //.TRANS: the case statement used in a switch statement in programming
     caseBlock.staticLabels.push(_('case'));
     caseBlock.adjustWidthToLabel();
     caseBlock.flowClampOneArgBlock();
@@ -2690,6 +2692,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     var switchBlock = new ProtoBlock('switch');
     switchBlock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['switch'] = switchBlock;
+    //.TRANS: the switch statement used in programming
     switchBlock.staticLabels.push(_('switch'));
     switchBlock.adjustWidthToLabel();
     switchBlock.flowClampOneArgBlock();
