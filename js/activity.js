@@ -1525,10 +1525,11 @@ define(MYDEFINES, function (compatibility) {
 
             /*
             console.log('Resize: scale ' + turtleBlocksScale +
-            ', windowW ' + w + ', windowH ' + h +
+            ', stageW ' + w + ', stageH ' + h +
             ', canvasW ' + canvas.width + ', canvasH ' + canvas.height +
             ', screenW ' + screen.width + ', screenH ' + screen.height);
             */
+
             turtles.setScale(turtleBlocksScale);
             blocks.setScale(turtleBlocksScale);
             boundary.setScale(w, h, turtleBlocksScale);
@@ -1561,8 +1562,14 @@ define(MYDEFINES, function (compatibility) {
             }
 
             var artcanvas = document.getElementById("overlayCanvas");
-            artcanvas.width = w;
-            artcanvas.height = h;
+            // Workaround for #795
+            if (mobileSize) {
+                artcanvas.width = w * 2;
+                artcanvas.height = h * 2;
+            } else {
+                artcanvas.width = w;
+                artcanvas.height = h;
+            }
         };
 
         window.onresize = function () {
