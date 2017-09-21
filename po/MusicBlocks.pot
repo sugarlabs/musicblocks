@@ -19,7 +19,7 @@ msgstr ""
 #: js/block.js:2006
 #: js/block.js:2015
 #: js/block.js:2027
-#: js/activity.js:1659
+#: js/activity.js:1684
 #: js/analytics.js:380
 #: js/palette.js:633
 #: js/palette.js:642
@@ -48,15 +48,15 @@ msgstr ""
 #: js/blocks.js:2301
 #: js/blocks.js:2470
 #: js/blocks.js:2601
-#: js/blocks.js:3105
-#: js/blocks.js:3916
-#: js/blocks.js:4060
+#: js/blocks.js:3104
+#: js/blocks.js:3915
+#: js/blocks.js:4059
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr ""
 
 #: js/block.js:639
-#: js/logo.js:1129
+#: js/logo.js:1151
 #: js/turtle.js:564
 #: js/turtle.js:565
 #: js/basicblocks.js:2415
@@ -117,7 +117,7 @@ msgid "slider"
 msgstr ""
 
 #: js/block.js:1560
-#: js/logo.js:8359
+#: js/logo.js:8414
 #: js/musicutils.js:1148
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
@@ -166,142 +166,148 @@ msgstr ""
 msgid "Worldwide"
 msgstr ""
 
+#: js/activity.js:537
+#.TRANS: hide Polar coordinate overlay grid
+msgid "hide grid"
+msgstr ""
+
+#: js/activity.js:544
+#: js/activity.js:550
+#: js/activity.js:2764
+#: js/activity.js:2776
+#: js/turtledefs.js:98
+#.TRANS: show Cartesian coordinate overlay grid
+msgid "Cartesian"
+msgstr ""
+
+#: js/activity.js:550
 #: js/activity.js:557
+#: js/activity.js:2764
+#: js/activity.js:2776
+#: js/turtledefs.js:98
+#: js/turtledefs.js:99
+#.TRANS: show Polar coordinate overlay grid
+msgid "Polar"
+msgstr ""
+
+#: js/activity.js:574
 msgid "Close"
 msgstr ""
 
-#: js/activity.js:903
-#: js/activity.js:921
-#: js/activity.js:945
+#: js/activity.js:920
+#: js/activity.js:938
 #: js/activity.js:962
+#: js/activity.js:979
 msgid "Cannot load project from the file. Please check the file type."
 msgstr ""
 
-#: js/activity.js:2648
+#: js/activity.js:2673
 msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 msgstr ""
 
-#: js/activity.js:2649
-#: js/activity.js:2662
+#: js/activity.js:2674
+#: js/activity.js:2687
 #: js/turtledefs.js:81
 msgid "Run step by step"
 msgstr ""
 
-#: js/activity.js:2650
+#: js/activity.js:2675
 #: js/turtledefs.js:82
 msgid "Run note by note"
 msgstr ""
 
-#: js/activity.js:2651
-#: js/activity.js:2663
+#: js/activity.js:2676
+#: js/activity.js:2688
 #: js/turtledefs.js:83
 msgid "Stop"
 msgstr ""
 
-#: js/activity.js:2652
-#: js/activity.js:2664
+#: js/activity.js:2677
+#: js/activity.js:2689
 #: js/turtledefs.js:84
 msgid "Clean"
 msgstr ""
 
-#: js/activity.js:2653
+#: js/activity.js:2678
 #: js/turtledefs.js:85
 msgid "Show/hide palettes"
 msgstr ""
 
-#: js/activity.js:2654
-#: js/activity.js:2665
+#: js/activity.js:2679
+#: js/activity.js:2690
 #: js/turtledefs.js:86
 msgid "Show/hide blocks"
 msgstr ""
 
-#: js/activity.js:2655
-#: js/activity.js:2666
+#: js/activity.js:2680
+#: js/activity.js:2691
 #: js/turtledefs.js:87
 msgid "Expand/collapse collapsable blocks"
 msgstr ""
 
-#: js/activity.js:2656
-#: js/activity.js:2667
-#: js/activity.js:2706
+#: js/activity.js:2681
+#: js/activity.js:2692
+#: js/activity.js:2731
 #: js/turtledefs.js:88
 msgid "Home"
 msgstr ""
 
-#: js/activity.js:2657
-#: js/activity.js:2668
+#: js/activity.js:2682
+#: js/activity.js:2693
 #: js/turtledefs.js:89
 msgid "Help"
 msgstr ""
 
-#: js/activity.js:2661
+#: js/activity.js:2686
 msgid "Run fast / long press to run slowly"
 msgstr ""
 
-#: js/activity.js:2735
-#: js/activity.js:2748
+#: js/activity.js:2760
+#: js/activity.js:2772
 #: js/turtledefs.js:91
 msgid "Load samples from server"
 msgstr ""
 
-#: js/activity.js:2736
-#: js/activity.js:2749
+#: js/activity.js:2761
+#: js/activity.js:2773
 #: js/turtledefs.js:92
 msgid "Load project from files"
 msgstr ""
 
-#: js/activity.js:2737
-#: js/activity.js:2750
+#: js/activity.js:2762
+#: js/activity.js:2774
 #: js/turtledefs.js:93
 msgid "Save project"
 msgstr ""
 
-#: js/activity.js:2738
-#: js/turtledefs.js:94
-#: js/savebox.js:122
-msgid "Save sheet music"
-msgstr ""
-
-#: js/activity.js:2739
+#: js/activity.js:2763
 msgid "Long press on block(s) to copy. Click here to paste."
 msgstr ""
 
-#: js/activity.js:2740
-#: js/activity.js:2752
-#: js/turtledefs.js:98
-msgid "Cartesian"
-msgstr ""
-
-#: js/activity.js:2740
-#: js/activity.js:2752
-#: js/turtledefs.js:98
-#: js/turtledefs.js:99
-msgid "Polar"
-msgstr ""
-
-#: js/activity.js:2741
+#: js/activity.js:2765
+#: js/activity.js:2777
 msgid "playback"
 msgstr ""
 
-#: js/activity.js:2742
-#: js/activity.js:2753
+#: js/activity.js:2766
+#: js/activity.js:2778
 #: js/turtledefs.js:100
 msgid "Settings"
 msgstr ""
 
-#: js/activity.js:2743
-#: js/activity.js:2754
+#: js/activity.js:2767
+#: js/activity.js:2779
 #: js/turtledefs.js:106
 msgid "Delete all"
 msgstr ""
 
-#: js/activity.js:2744
-#: js/activity.js:2755
+#: js/activity.js:2768
+#: js/activity.js:2780
 #: js/turtledefs.js:107
 msgid "Undo"
 msgstr ""
 
-#: js/activity.js:2751
+#: js/activity.js:2775
 #: js/turtledefs.js:96
 msgid "Paste"
 msgstr ""
@@ -401,15 +407,15 @@ msgstr ""
 msgid "note"
 msgstr ""
 
-#: js/logo.js:633
+#: js/logo.js:644
 msgid "true"
 msgstr ""
 
-#: js/logo.js:635
+#: js/logo.js:646
 msgid "false"
 msgstr ""
 
-#: js/logo.js:905
+#: js/logo.js:916
 #: js/musicutils.js:244
 #: js/basicblocks.js:1528
 #: js/basicblocks.js:1535
@@ -423,101 +429,101 @@ msgstr ""
 msgid "major"
 msgstr ""
 
-#: js/logo.js:1286
+#: js/logo.js:1308
 msgid "Block does not support incrementing."
 msgstr ""
 
-#: js/logo.js:2556
-#: js/logo.js:7029
+#: js/logo.js:2578
+#: js/logo.js:7084
 msgid "You must select a file."
 msgstr ""
 
-#: js/logo.js:2565
+#: js/logo.js:2587
 #: plugins/heap.rtp:96
 msgid "The file you selected does not contain a valid heap."
 msgstr ""
 
-#: js/logo.js:2569
+#: js/logo.js:2591
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
 msgstr ""
 
-#: js/logo.js:2585
+#: js/logo.js:2607
 msgid "Error parsing JSON data:"
 msgstr ""
 
-#: js/logo.js:2590
+#: js/logo.js:2612
 msgid "404: Page not found"
 msgstr ""
 
-#: js/logo.js:2614
+#: js/logo.js:2636
 msgid "turtleHeaps does not contain a valid heap for"
 msgstr ""
 
-#: js/logo.js:2624
+#: js/logo.js:2646
 msgid "Index must be > 0."
 msgstr ""
 
-#: js/logo.js:2644
-#: js/logo.js:2667
-#: js/logo.js:2688
+#: js/logo.js:2666
+#: js/logo.js:2689
+#: js/logo.js:2710
 #: js/timbre.js:524
 msgid "Unable to use synth due to existing oscillator"
 msgstr ""
 
-#: js/logo.js:2650
 #: js/logo.js:2672
+#: js/logo.js:2694
 msgid "The input cannot be negative."
 msgstr ""
 
-#: js/logo.js:2715
-#: js/logo.js:2735
+#: js/logo.js:2737
+#: js/logo.js:2757
 msgid "Beats per minute must be > 30."
 msgstr ""
 
-#: js/logo.js:2718
-#: js/logo.js:2738
+#: js/logo.js:2740
+#: js/logo.js:2760
 msgid "Maximum beats per minute is 1000."
 msgstr ""
 
-#: js/logo.js:2890
+#: js/logo.js:2912
 msgid "You must have at least one pitch block and one drum block in the matrix."
 msgstr ""
 
-#: js/logo.js:3030
+#: js/logo.js:3052
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
 msgstr ""
 
-#: js/logo.js:3066
+#: js/logo.js:3088
 msgid "Attack value should be from 0 to 100."
 msgstr ""
 
-#: js/logo.js:3069
+#: js/logo.js:3091
 msgid "Decay value should be from 0 to 100."
 msgstr ""
 
-#: js/logo.js:3072
+#: js/logo.js:3094
 msgid "Sustain value should be from 0 to 100."
 msgstr ""
 
-#: js/logo.js:3075
+#: js/logo.js:3097
 msgid "Release value should be from 0-100."
 msgstr ""
 
-#: js/logo.js:3091
+#: js/logo.js:3113
 msgid "You are adding multiple envelope blocks."
 msgstr ""
 
-#: js/logo.js:3120
+#: js/logo.js:3142
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
 msgstr ""
 
-#: js/logo.js:3158
+#: js/logo.js:3180
 msgid "You are adding multiple oscillator blocks."
 msgstr ""
 
-#: js/logo.js:3178
+#: js/logo.js:3200
 #: js/basicblocks.js:237
 #: js/basicblocks.js:243
 #: js/macros.js:70
@@ -525,106 +531,106 @@ msgstr ""
 msgid "even"
 msgstr ""
 
-#: js/logo.js:3182
+#: js/logo.js:3204
 #: js/basicblocks.js:237
 msgid "odd"
 msgstr ""
 
-#: js/logo.js:3253
+#: js/logo.js:3275
 msgid "The Case Block must be used inside of a Switch Block."
 msgstr ""
 
-#: js/logo.js:3326
+#: js/logo.js:3348
 msgid "The Step Pitch Block must be used inside of a Note Block."
 msgstr ""
 
-#: js/logo.js:3497
+#: js/logo.js:3519
 msgid "Drum Block: Did you mean to use a Note block?"
 msgstr ""
 
-#: js/logo.js:3859
+#: js/logo.js:3881
 msgid "Pitch Block: Did you mean to use a Note block?"
 msgstr ""
 
-#: js/logo.js:3887
+#: js/logo.js:3909
 msgid "polyphonic rhythm"
 msgstr ""
 
-#: js/logo.js:3910
+#: js/logo.js:3932
 msgid "Rhythm Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:4102
+#: js/logo.js:4124
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
 msgstr ""
 
-#: js/logo.js:4319
+#: js/logo.js:4341
 msgid "Vibrato intensity must be between 1 and 100."
 msgstr ""
 
-#: js/logo.js:4324
+#: js/logo.js:4346
 msgid "Vibrato rate must be greater than 0."
 msgstr ""
 
-#: js/logo.js:4356
+#: js/logo.js:4378
 msgid "Distortion must be from 0 to 100."
 msgstr ""
 
-#: js/logo.js:4386
-#: js/logo.js:4454
+#: js/logo.js:4408
+#: js/logo.js:4476
 #.TRANS: Depth is the intesity of the tremolo effect.
 #.TRANS: Depth is the intesity of the chorus effect.
 msgid "Depth is out of range."
 msgstr ""
 
-#: js/logo.js:4536
-#: js/logo.js:4557
+#: js/logo.js:4558
+#: js/logo.js:4579
 msgid "Input to Perfect Block must be 1, 4, 5, or 8"
 msgstr ""
 
-#: js/logo.js:4582
-#: js/logo.js:4603
+#: js/logo.js:4604
+#: js/logo.js:4625
 msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 msgstr ""
 
-#: js/logo.js:4628
-#: js/logo.js:4649
+#: js/logo.js:4650
+#: js/logo.js:4671
 msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
 msgstr ""
 
-#: js/logo.js:4674
 #: js/logo.js:4696
+#: js/logo.js:4718
 msgid "Input to Major Block must be 2, 3, 6, or 7"
 msgstr ""
 
-#: js/logo.js:4721
-#: js/logo.js:4742
+#: js/logo.js:4743
+#: js/logo.js:4764
 msgid "Input to Minor Block must be 2, 3, 6, or 7"
 msgstr ""
 
-#: js/logo.js:5365
+#: js/logo.js:5387
 msgid "Hertz Block: Did you mean to use a Note block?"
 msgstr ""
 
-#: js/logo.js:5458
-#: js/logo.js:5482
+#: js/logo.js:5480
+#: js/logo.js:5504
 msgid "Tuplet Block: Did you mean to use a Matrix block?"
 msgstr ""
 
-#: js/logo.js:5655
+#: js/logo.js:5677
 msgid "My Project"
 msgstr ""
 
-#: js/logo.js:6199
+#: js/logo.js:6236
 msgid "synth cannot play chords."
 msgstr ""
 
-#: js/logo.js:7925
+#: js/logo.js:7980
 msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
 msgstr ""
 
-#: js/logo.js:7951
+#: js/logo.js:8006
 #: js/basicblocks.js:2499
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
@@ -684,7 +690,7 @@ msgstr ""
 #: js/basicblocks.js:2269
 #: js/blocks.js:777
 #: js/blocks.js:2389
-#: js/blocks.js:3936
+#: js/blocks.js:3935
 #.TRANS: a container into which to put something
 msgid "box"
 msgstr ""
@@ -1390,6 +1396,11 @@ msgstr ""
 
 #: js/turtledefs.js:93
 msgid "Save your project to a file."
+msgstr ""
+
+#: js/turtledefs.js:94
+#: js/savebox.js:122
+msgid "Save sheet music"
 msgstr ""
 
 #: js/turtledefs.js:94
