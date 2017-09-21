@@ -23,13 +23,6 @@
   </metadata>
   <defs
      id="defs2386" />
-  <rect
-     width="42.056076"
-     height="42.056076"
-     x="6.471962"
-     y="6.471962"
-     id="rect2394"
-     style="fill:none;stroke:#c0c0c0;stroke-width:2.94392514;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
   <path
      d="m 50.021437,27.5 a 22.521437,21.843301 0 1 1 -45.0428736,0 22.521437,21.843301 0 1 1 45.0428736,0 z"
      id="path3157"
@@ -46,4 +39,11 @@
        id="path3170-5"
        d="M 54,27.5 H 0.9999998" />
   </g>
+  <rect
+     width="42.056076"
+     height="42.056076"
+     x="6.471962"
+     y="6.471962"
+     id="rect2394"
+     style="fill:none;stroke:#ffffff;stroke-width:2.94392514;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
 </svg>

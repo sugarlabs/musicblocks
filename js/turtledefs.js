@@ -27,7 +27,7 @@ function getMainToolbarButtonNames(name) {
 
 
 function getAuxToolbarButtonNames(name) {
-    return (['planet', 'open', 'save', 'lilypond', 'paste-disabled', 'Cartesian', 'compile', 'utility', 'empty-trash', 'restore-trash'].indexOf(name) > -1);
+    return (['planet', 'open', 'save', 'paste-disabled', 'Cartesian', 'compile', 'utility', 'empty-trash', 'restore-trash'].indexOf(name) > -1);
 }
 
 

@@ -2938,7 +2938,6 @@ function Blocks () {
             }
         }
 
-
         // We'll need a list of existing storein and action names.
         var currentActionNames = [];
         var currentStoreinNames = [];

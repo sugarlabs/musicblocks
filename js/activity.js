@@ -60,7 +60,7 @@ if (lang.indexOf('-') !== -1) {
 if (_THIS_IS_MUSIC_BLOCKS_) {
     MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'Tone.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'dsp', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/modewidget', 'activity/soundsamples', 'activity/pitchtimematrix', 'activity/pitchdrummatrix', 'activity/rhythmruler', 'activity/pitchstaircase', 'activity/tempo', 'activity/pitchslider', 'activity/timbre', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'activity/abc', 'activity/playbackbox', 'prefixfree.min'];
 } else {
-    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'prefixfree.min'];
+    MYDEFINES = ["activity/sugarizer-compatibility", 'activity/platformstyle', 'easeljs-0.8.2.min', 'tweenjs-0.6.2.min', 'preloadjs-0.6.2.min', 'howler', 'p5.min', 'p5.sound.min', 'p5.dom.min', 'mespeak', 'Chart', 'activity/utils', 'activity/artwork', 'activity/status', 'activity/munsell', 'activity/trash', 'activity/boundary', 'activity/turtle', 'activity/palette', 'activity/protoblocks', 'activity/blocks', 'activity/block', 'activity/turtledefs', 'activity/logo', 'activity/clearbox', 'activity/savebox', 'activity/utilitybox', 'activity/samplesviewer', 'activity/basicblocks', 'activity/blockfactory', 'activity/analytics', 'activity/macros', 'activity/musicutils', 'activity/lilypond', 'activity/playbackbox', 'prefixfree.min'];
 }
 
 define(MYDEFINES, function (compatibility) {
@@ -123,6 +123,9 @@ define(MYDEFINES, function (compatibility) {
         var currentKeyCode = 0;
         var pasteContainer = null;
         var pasteImage = null;
+        var gridContainer = null;
+        var gridButtonLabel = null;
+        var gridImages = [];
         var chartBitmap = null;
         var saveBox;
 
@@ -527,23 +530,37 @@ define(MYDEFINES, function (compatibility) {
             logo.doStopTurtle();
         };
 
-        var cartesianVisible = false;
-        var polarVisible = false;
-
         function _doCartesianPolar() {
-            if (cartesianVisible && polarVisible) {
+            if (cartesianBitmap.visible && polarBitmap.visible) {
                 _hideCartesian();
-                cartesianVisible = false;
-            } else if (!cartesianVisible && polarVisible) {
+                //.TRANS: hide Polar coordinate overlay grid
+                gridButtonLabel.text = _('hide grid');
+                gridImages[1].visible = false;
+                gridImages[2].visible = false;
+                gridImages[3].visible = true;
+            } else if (!cartesianBitmap.visible && polarBitmap.visible) {
                 _hidePolar();
-                polarVisible = false;
-            } else if (!cartesianVisible && !polarVisible) {
+                //.TRANS: show Cartesian coordinate overlay grid
+                gridButtonLabel.text = _('Cartesian');
+                gridImages[1].visible = false;
+                gridImages[2].visible = false;
+                gridImages[3].visible = false;
+            } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
                 _showCartesian();
-                cartesianVisible = true;
-            } else {
+                gridButtonLabel.text = _('Cartesian') + ' + ' + _('Polar');
+                gridImages[1].visible = true;
+                gridImages[2].visible = false;
+                gridImages[3].visible = false;
+            } else if (cartesianBitmap.visible && !polarBitmap.visible) {
                 _showPolar();
-                polarVisible = true;
+                //.TRANS: show Polar coordinate overlay grid
+                gridButtonLabel.text = _('Polar');
+                gridImages[1].visible = false;
+                gridImages[2].visible = true;
+                gridImages[3].visible = false;
             }
+
+            update = true;
         };
 
         function toggleScroller() {
@@ -1049,7 +1066,8 @@ define(MYDEFINES, function (compatibility) {
             var projectName = null;
             var runProjectOnLoad = false;
 
-            _setupAndroidToolbar();
+            // This happens in the resize code.
+            // _setupAndroidToolbar();
 
             // Scale the canvas relative to the screen size.
             _onResize();
@@ -2742,7 +2760,6 @@ handleComplete);
                     ['planet', _doOpenSamples, _('Load samples from server')],
                     ['open', doLoad, _('Load project from files')],
                     ['save', doSave, _('Save project')],
-                    // ['lilypond', _doLilypond, _('Save sheet music')],
                     ['paste-disabled', pasteStack, _('Long press on block(s) to copy. Click here to paste.')],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar')],
                     ['compile', _doPlaybackBox, _('playback')],
@@ -2757,6 +2774,7 @@ handleComplete);
                     ['save', doSave, _('Save project')],
                     ['paste-disabled', pasteStack, _('Paste')],
                     ['Cartesian', _doCartesianPolar, _('Cartesian') + '/' + _('Polar')],
+                    ['compile', _doPlaybackBox, _('playback')],
                     ['utility', _doUtilityBox, _('Settings')],
                     ['empty-trash', _deleteBlocksBox, _('Delete all')],
                     ['restore-trash', _restoreTrash, _('Undo')]
@@ -2786,6 +2804,17 @@ handleComplete);
                 x += dx;
                 y += dy;
                 var container = _makeButton(menuNames[i][0] + '-button', menuNames[i][2], x, y, btnSize, 0);
+                if (menuNames[i][0] === 'paste-disabled') {
+                    pasteContainer = container;
+                } else if (menuNames[i][0] === 'Cartesian') {
+                    gridContainer = container;
+
+                    var gridButtons = ['header-icons/Cartesian-polar-button.svg', 'header-icons/polar-button.svg', 'header-icons/no-grid-button.svg'];
+                    for (var j = 0; j < gridButtons.length; j++) {
+                        _makeExtraGridButtons(gridButtons[j], 250 + j * 250);
+                    }
+                }
+
                 _loadButtonDragHandler(container, x, y, menuNames[i][1], null, null, null, null);
                 onscreenMenu.push(container);
                 if (menuNames[i][0] === 'utility') {
@@ -2804,6 +2833,33 @@ handleComplete);
                     onscreenMenu[button].visible = true;
                 }
             }
+        };
+
+        function _makeExtraGridButtons(name, delay) {
+	    setTimeout(function () {
+                var img = new Image();
+
+                img.onload = function () {
+                    var originalSize = 55;
+                    var halfSize = Math.floor(cellSize / 2);
+
+                    var bitmap = new createjs.Bitmap(img);
+                    if (cellSize !== originalSize) {
+                        bitmap.scaleX = cellSize / originalSize;
+                        bitmap.scaleY = cellSize / originalSize;
+                    }
+
+                    bitmap.regX = halfSize / bitmap.scaleX;
+                    bitmap.regY = halfSize / bitmap.scaleY;
+                    gridContainer.addChild(bitmap);
+                    bitmap.visible = false;
+                    gridImages.push(bitmap);
+
+                    update = true;
+                };
+
+                img.src = name;
+	    }, delay);
         };
 
         function doPopdownPalette() {
@@ -2975,9 +3031,6 @@ handleComplete);
 
         function _makeButton(name, label, x, y, size, rotation, parent) {
             var container = new createjs.Container();
-            if (name === 'paste-disabled-button') {
-                pasteContainer = container;
-            }
 
             if (parent == undefined) {
                 stage.addChild(container);
@@ -3051,6 +3104,12 @@ handleComplete);
                 bitmap.cache(0, 0, size, size);
                 bitmap.updateCache();
                 update = true;
+
+                if (name === 'Cartesian-button') {
+                    gridButtonLabel = text;
+                    gridImages = [bitmap];
+                }
+
             };
 
             img.src = 'header-icons/' + name + '.svg';
